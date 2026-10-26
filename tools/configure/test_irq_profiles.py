@@ -6,9 +6,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import configure as gate
-import selection
-from providers import common, maintained
+from tools.configure import configure as gate
+from tools.configure import selection
+from tools.configure.providers import common, maintained
 
 
 class InterruptProfileTests(unittest.TestCase):

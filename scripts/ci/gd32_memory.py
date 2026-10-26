@@ -118,7 +118,7 @@ def source_inputs(root):
     inputs = [root / "CMakeLists.txt", Path(__file__).resolve(),
               root / "scripts/ci/memory_budget.py",
               root / "scripts/ci/arch_compile.py"]
-    for directory in ("arch", "core", "io", "os", "soc/gd32/gd32f470",
+    for directory in ("arch", "core", "io", "os", "drivers", "soc/gd32/gd32f470",
                       "boards/gd32f470_liangshan", "cmake", "tools/configure",
                       "tools/measurement", "tools/evidence",
                       "tests/contracts/gd32_memory"):

@@ -1,0 +1,163 @@
+"""Maintained gd32f470 capability and static assembly contract."""
+from tools.configure.stream_profiles import StreamGeometry
+from tools.configure.uart_formats import UartFormatPolicy
+from types import MappingProxyType
+
+from tools.configure.providers import common, descriptor
+from .hardware import FIXED_DMA as _FIXED_DMA
+
+PARTS = MappingProxyType({
+    "GD32F470ZGT6": common.PartPolicy("LQFP144", frozenset(('addsram', 'tcm'))),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+CLASSIC_CAN_MAILBOXES = 3
+
+UART_FORMATS = UartFormatPolicy(words=("USART0",), irq_probe=True, byte_frames=True)
+
+STREAM_GEOMETRY = StreamGeometry(2, 1, 65535)
+
+CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
+ENUM_ABI = 'short-enums'
+IRQ_PRIORITY_BITS = 4
+DWT_CYCCNT = True
+FREERTOS_PORT = 'GCC/ARM_CM4F'
+EXTERNAL_IRQ_COUNT = 91
+CPU_FEATURES = MappingProxyType({
+    'dwt_cyccnt': True, 'mpu_version': 7, 'icache_line_bytes': 0,
+    'dcache_line_bytes': 0, 'security': 'single', 'sau': False, 'mve': 'none',
+    'dsp': True, 'mpu_regions': 8,
+})
+PREFIX = 'gd32'
+MODEL = False
+FLASH_GEOMETRY = ("g_nx_gd32f470_flash_geometry",
+                  "0u")
+FLASH_PROGRAM_UNIT = 2
+FLASH_INPUT_ALIGNMENT = 1
+FACT_REFERENCES = descriptor.maintained("gd32f470").references
+SOURCE_IMPORT_LOCK = descriptor.maintained("gd32f470").import_lock
+ETH_CONTROLLER = 'ENET'
+CONTROLLER_INTERFACES = MappingProxyType({
+    'ENET': MappingProxyType({
+        'eth_frames': ('rmii-vlan-sg-ptp',)})})
+USB_CONTROLLER = 'USBFS'
+CAN_CONTROLLERS = ('CAN0', 'CAN1')
+CAN_CLOCK_HZ = 50000000
+# Capability assertion for the actual fixed system.c cold implementation.
+CLOCK_PROFILES = MappingProxyType({
+    'hxtal25-pll200': MappingProxyType({
+        'hse_hz': 25000000, 'core_hz': 200000000,
+        'apb1_hz': 50000000, 'apb2_hz': 100000000,
+    }),
+})
+DMA_VECTOR = 'Channel'
+DMA_TOPOLOGY = (frozenset((0, 1)), range(8), range(8))
+LIMITS = MappingProxyType({
+    'uart_baud': (1526, 1000000), 'spi_hz': (390625, 50000000),
+    'timer_hz': 100000000, 'pwm_period': 65535,
+})
+ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
+SPI_REQUIRES_ENDPOINT = True
+
+_MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('timer_capture', 'edge-capture'): 'timer_capture',
+    ('advanced_pwm', 'complementary-pwm'): 'advanced_pwm',
+    ('eth', 'raw-rmii'): 'eth',
+    ('eth_frames', 'rmii-vlan-sg-ptp'): 'eth_frames',
+    ('usb_device', 'device-fs'): 'usb_device',
+    ('can', 'classic-irq'): 'can',
+    ('gpio', 'input'): 'gpio',
+    ('gpio', 'output'): 'gpio',
+    ('uart', 'irq-byte-event'): 'uart',
+    ('uart', 'irq-words'): 'uart_word',
+    ('spi', 'short-poll'): 'spi',
+    ('i2c', 'poll-messages'): 'i2c',
+    ('i2c', 'irq-messages'): 'i2c_async',
+    ('i2c', 'dma-messages'): 'i2c_async',
+    ('flash', 'poll-word'): 'flash',
+    ('watchdog', 'independent'): 'watchdog',
+    ('exti', 'edge-event'): 'exti',
+    ('pwm', 'fixed-pwm'): 'pwm',
+    ('adc', 'low-rate-scan'): 'adc',
+    ('uart', 'dma-tx'): 'uart_dma',
+    ('uart', 'irq-blocks'): 'uart_stream',
+    ('uart', 'rx-dma-idle'): 'uart_receive',
+    ('uart', 'dma-duplex'): 'uart_duplex',
+    ('uart', 'rx-dma-continuous'): 'uart_receive',
+    ('uart', 'dma-duplex-continuous'): 'uart_duplex',
+    ('spi', 'dma-full-duplex'): 'spi_dma',
+    ('adc', 'single-shot'): 'adc',
+    ('adc', 'trigger-dma'): 'adc_stream',
+    ('adc', 'trigger-dma-continuous'): 'adc_continuous',
+})
+
+
+def validate_selection(selection, route):
+    """Validate limits of the implemented provider, not theoretical silicon."""
+    kind = route["kind"]
+    mode_implementation(kind, selection["mode"])
+    if kind == "uart":
+        common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
+    elif kind == "pwm":
+        tick = selection["tick_hz"]
+        clock = LIMITS["timer_hz"]
+        if clock % tick or not 1 <= clock // tick <= 65536:
+            common.fail("PWM tick_hz is not an exact maintained timer divider")
+    elif kind == "spi":
+        common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
+                       "SPI max_hz")
+    elif kind == "adc":
+        if tuple(selection["channels"]) not in ADC_CHANNEL_SEQUENCES:
+            common.fail("ADC channel sequence is not implemented by the provider")
+        traits = common.mode_traits(kind, selection["mode"])
+        if not traits.continuous:
+            expected = 1 if traits.dma else 7
+            if selection["sample_times"] != [expected] * len(selection["channels"]):
+                common.fail("GD32 trigger-dma sampling is fifteen cycles (encoding 1)"
+                            if expected == 1 else
+                            "GD32 polling sampling is 480 cycles (encoding 7)")
+        common.integer(selection.get("timeout_ms"), 1, 1000,
+                       "ADC calibration timeout_ms")
+
+
+def mode_implementation(kind, mode):
+    implementation = _MODE_IMPLEMENTATIONS.get((kind, mode))
+    if implementation is None:
+        common.fail(f"Unmaintained provider mode: gd32f470/{kind}/{mode}")
+    return implementation
+
+
+def validate_dma(route, mode, normalize):
+    common.validate_dma(route, mode,
+                        _FIXED_DMA.get((route["controller"], mode)),
+                        'gd32f470', normalize, 'TIMER2')
+
+
+def dma_irq(dma):
+    return common.dma_irq(dma, DMA_VECTOR, DMA_TOPOLOGY)
+
+
+def validate_dma_resource(resource):
+    return common.validate_dma_resource(resource, DMA_TOPOLOGY)
+
+
+def shares_irq(kind, key):
+    del kind, key
+    return False
+
+
+def builtin_cs(controller):
+    return any(pin["function"] == "cs" for pin in controller["pins"])
+
+# Explicit software capabilities do not authorize an unreviewed route.
+ADC_GROUP = None
+PWM_SHARED = None
+ENDPOINT_POLICY = common.EndpointPolicy(
+    spi_transaction=True, spi_dma=("SPI4", "dma-full-duplex"))
+TIMEBASE_ALARM = True
+validate_mode_context = common.validate_mode_context
+mode_fields = common.mode_fields
+validate_controller_set = common.validate_controller_set
+validate_endpoint_clock = common.validate_endpoint_clock
+configuration_header = common.configuration_header
+validate_user_io_context = common.validate_user_io_context

@@ -8,6 +8,7 @@ selected by existing software fixtures. It does not infer physical support.
 
 import argparse
 from collections import defaultdict
+from dataclasses import asdict
 import json
 from pathlib import Path
 import re
@@ -37,6 +38,9 @@ def selection(assembly, root=ROOT):
     data = configure.resolve(Path(assembly), Path(root).resolve())
     typed = ConfigurationIR.from_validated(data)
     contracts = selected_contracts.for_configuration(typed)
+    policies = selected_contracts.silicon_policies(typed)
+    silicon = {owner: (json_value(asdict(policy)) if policy is not None else None)
+               for owner, policy in policies.items()}
     by_face = {(item.id, item.public_class): item for item in contracts}
     by_id = {item.id: item for item in typed.controllers}
     selected_faces = set()
@@ -49,7 +53,8 @@ def selection(assembly, root=ROOT):
         selected_faces.add(face)
         contract = by_face[face]
         record.update(dma=item.get("dma", []), pins=item.get("pins", []),
-                      contract=json_value(vars(contract)))
+                      contract=json_value(vars(contract)),
+                      silicon_admission=silicon[item["id"]])
         controllers.append(record)
     endpoints = []
     for item in typed.devices:
@@ -70,6 +75,7 @@ def selection(assembly, root=ROOT):
                            "backend", "clock_profile", "cpu", "irq",
                            "optimization", "physical_pcb_revision")},
             "configuration_sha256": data["configuration_sha256"],
+            "silicon_admission": silicon[None],
             "controllers": controllers, "endpoints": endpoints,
             "companion_interfaces": [json_value(vars(item))
                                      for item in contracts if
@@ -144,7 +150,7 @@ def collect(root=ROOT):
                 exports[symbol] = source.relative_to(root).as_posix()
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
-    shared_sources = (set((root / "soc/common").glob("*.c"))
+    shared_sources = (set((root / "drivers").rglob("*.c"))
                       | set((root / "io/src").rglob("*.c"))
                       | set((root / "soc/native/drivers").glob("*.c")))
     for source in sorted(shared_sources):

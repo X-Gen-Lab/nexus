@@ -1,9 +1,8 @@
-"""Cold construction for reviewed F103/GD303 legacy transport instances."""
-from .common import Construction, fail, kernel_policy_constant
-try:
-    from ..memory import dma_regions
-except ImportError:
-    from memory import dma_regions
+"""Shared construction templates for reviewed legacy transport profiles."""
+from dataclasses import dataclass
+
+from tools.configure.providers.common import Construction, fail, kernel_policy_constant
+from tools.configure.memory import dma_regions
 
 
 def dma_selected(result):
@@ -17,28 +16,43 @@ def dma_state(result):
             if dma_selected(result) else [])
 
 
-def _dma_facts(family):
-    return (("NX_F103", "RCC->AHBENR", "RCC_AHBENR_DMA1EN",
-             "DMA1_Channel7", "DMA1_Channel6") if family == "stm32f103" else
-            ("NX_GD303", "RCU_AHBEN", "RCU_AHBEN_DMA0EN",
-             "DMA0_Channel3", "DMA0_Channel4"))
+@dataclass(frozen=True)
+class LegacyTransportProfile:
+    """Exact SoC C resource spellings consumed by shared emission templates."""
+
+    family: str
+    hook: str
+    dma_gate: str
+    dma_gate_bit: str
+    tx: str
+    rx: str
+    flags: str
+    clear: str
+    tx_vector: str
+    rx_vector: str
+    tx_shift: int
+    rx_shift: int
+    i2c_controller: str
+    i2c_line_inputs: str
+    i2c_line_mask: int
+    i2c_peripheral_mhz: int
 
 
-def dma_preflight(result, family):
+def dma_preflight(result, profile):
     item = dma_selected(result)
     if item is None:
         return []
-    hook, gate, bit, tx, rx = _dma_facts(family)
-    vectors = [tx] + ([rx] if item.mode == "dma-duplex" else [])
+    hook = profile.hook
+    vectors = [profile.tx_vector] + ([profile.rx_vector] if item.mode == "dma-duplex" else [])
     conditions = " || ".join(f"!{hook}_IRQ_AVAILABLE({vector}_IRQn)"
                               for vector in vectors)
     return [f"    if ({conditions}) {{ result.primary = NX_ERROR_BUSY; return result; }}"]
 
 
-def dma_start(result, family, cleanup):
+def dma_start(result, profile, cleanup):
     if dma_selected(result) is None:
         return []
-    hook, gate, bit, _, _ = _dma_facts(family)
+    hook, gate, bit = profile.hook, profile.dma_gate, profile.dma_gate_bit
     return [f"    s_nx_transport_dma_gate_added = ~{hook}_READ(&{gate}) & {bit};",
         f"    {hook}_WRITE(&{gate}, {hook}_READ(&{gate}) | {bit});",
         "    nx_arch_dsb();",
@@ -49,20 +63,19 @@ def dma_start(result, family, cleanup):
         "        return result;", "    }"]
 
 
-def dma_stop(result, family):
+def dma_stop(result, profile):
     if dma_selected(result) is None:
         return []
-    hook, gate, _, _, _ = _dma_facts(family)
+    hook, gate = profile.hook, profile.dma_gate
     return [f"    {hook}_WRITE(&{gate}, {hook}_READ(&{gate}) & ~s_nx_transport_dma_gate_added);",
         "    nx_arch_dsb();",
         f"    if (({hook}_READ(&{gate}) & s_nx_transport_dma_gate_added) != 0u) {{ return NX_ERROR_IO; }}",
         "    s_nx_transport_dma_gate_added = 0u;"]
 
 
-def constructor(item, result, devices, family):
+def constructor(item, result, devices, profile):
     """Emit direct static faces; no lookup, allocation or runtime factory work."""
-    f1 = family == "stm32f103"
-    prefix = "nx_" + family
+    prefix = "nx_" + profile.family
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     irq = result["irq"]
@@ -80,39 +93,32 @@ def constructor(item, result, devices, family):
         lines += regions
         if not duplex:
             lines += [f"static uint8_t s_nx_rx_{name}[{item.options.rx_capacity}];"]
-        tx = "DMA1_Channel7" if f1 else "&DMA_CH3CTL(DMA0)"
-        rx = "DMA1_Channel6" if f1 else "&DMA_CH4CTL(DMA0)"
-        flags = "&DMA1->ISR" if f1 else "&DMA_INTF(DMA0)"
-        clear = "&DMA1->IFCR" if f1 else "&DMA_INTC(DMA0)"
-        rx_guard = (f" || {owner}.receive.stream != NULL || {owner}.receive.filling"
-                    if duplex else "")
-        lines += [f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {state}.wake != NULL || {state}.wake_publishers != 0u{rx_guard}) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.registers = (nx_uart_v1_registers_t*)(uintptr_t){item.controller};",
-            f"    {state}.tx = (nx_uart_v1_channel_t*)(uintptr_t){tx};",
-            f"    {state}.flags = {flags}; {state}.clear = {clear};",
-            f"    {state}.tx_shift = {24 if f1 else 12}u; {state}.rx_shift = {20 if f1 else 16}u;",
-            f"    {state}.regions = s_nx_dma_regions_{name}; {state}.region_count = {count}u;"]
+        config = "s_nx_config_" + name
+        lines += [f"static const nx_uart_v1_dma_config_t {config} = {{",
+            f"    .registers = (nx_uart_v1_registers_t*)(uintptr_t){item.controller},",
+            f"    .tx = (nx_uart_v1_channel_t*)(uintptr_t){profile.tx},",
+            f"    .flags = {profile.flags}, .clear = {profile.clear},",
+            f"    .tx_shift = {profile.tx_shift}u, .rx_shift = {profile.rx_shift}u,",
+            f"    .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
+            f"    .stop_irqs = {prefix}_uart_dma_stop_irqs,",
+            f"    .validate_wake = {prefix}_uart_dma_validate_wake,"]
         if duplex:
-            lines += [f"    {state}.receive = &{owner}.receive;",
-                f"    {owner}.receive.channel = (nx_uart_v1_channel_t*)(uintptr_t){rx};"]
+            lines += [f"    .receive = &{owner}.receive,",
+                f"    .rx = (nx_uart_v1_channel_t*)(uintptr_t){profile.rx},"]
         else:
-            lines += [f"    {state}.rx_storage = s_nx_rx_{name};"]
-        lines += [f"    {state}.rx_capacity = {0 if duplex else item.options.rx_capacity}u;",
-            f"    {state}.profile = {'NX_UART_RX_BLOCKS' if duplex else 'NX_UART_RX_BYTES'};",
-            f"    {state}.baud = {item.options.baud}u;",
-            f"    {state}.irq_policy = {policy};",
-            f"    nx_result_t status = {prefix}_{'usart2' if f1 else 'usart0'}_pins_prepare();",
-            "    if (status != NX_SUCCESS) { return status; }",
-            f"    return {prefix}_{'uart_duplex' if duplex else 'uart_dma'}_initialize(&{owner});", "}"]
+            lines += [f"    .rx_storage = s_nx_rx_{name},"]
+        lines += [f"    .rx_capacity = {0 if duplex else item.options.rx_capacity}u,",
+            f"    .profile = {'NX_UART_RX_BLOCKS' if duplex else 'NX_UART_RX_BYTES'},",
+            f"    .baud = {item.options.baud}u,",
+            f"    .irq_policy = {policy.removeprefix('(nx_irq_policy_t)')}", "};"]
         vectors = [(item.controller, "nx_uart_v1_channel_dma_irq" if duplex else
                     "nx_uart_v1_channel_dma_tx_irq", "")]
-        vectors += [("DMA1_Channel7" if f1 else "DMA0_Channel3",
+        vectors += [(profile.tx_vector,
                      "nx_uart_v1_channel_dma_channel_irq" if duplex else
                      "nx_uart_v1_channel_dma_tx_channel_irq",
                      ", false" if duplex else "")]
         if duplex:
-            vectors += [("DMA1_Channel6" if f1 else "DMA0_Channel4",
+            vectors += [(profile.rx_vector,
                          "nx_uart_v1_channel_dma_channel_irq", ", true")]
         for vector, method, argument in vectors:
             lines += [f"void {vector}_IRQHandler(void);",
@@ -120,14 +126,15 @@ def constructor(item, result, devices, family):
                 f"void {vector}_IRQHandler(void) {{ {method}(&{state}{argument}); }}"]
         return Construction(state_type=prefix + ("_uart_duplex_state_t" if duplex
                                                 else "_uart_dma_state_t"),
-            definitions=lines, initialize=f"prepare_{name}()",
+            definitions=lines,
+            initialize=f"{prefix}_{'uart_duplex' if duplex else 'uart_dma'}_prepare(&{owner}, &{config})",
             stop=[f"nx_uart_port_stop(&s_nx_face_{name})"],
             retain_on_failed_init=True)
     if item.kind != "i2c":
         fail("Unsupported legacy transport constructor")
-    controller = "I2C1" if f1 else "I2C0"
+    controller = profile.i2c_controller
     registers = f"(volatile uint32_t*)(uintptr_t){controller}"
-    inputs = "&GPIOB->IDR" if f1 else "&GPIO_ISTAT(GPIOB)"
+    inputs = profile.i2c_line_inputs
     for child in devices:
         if child["controller"] != item.id:
             continue
@@ -138,8 +145,8 @@ def constructor(item, result, devices, family):
     lines += [f"static nx_result_t prepare_{name}(void) {{",
         f"    if ({state}.retained || {state}.core.initialized || {state}.core.active != NULL || {state}.core.wake != NULL || {state}.core.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
         f"    {state}.core.registers = {registers};",
-        f"    {state}.core.line_inputs = {inputs}; {state}.core.line_mask = 192u;",
-        f"    {state}.core.peripheral_mhz = 8u; {state}.core.dma = NULL;",
+        f"    {state}.core.line_inputs = {inputs}; {state}.core.line_mask = {profile.i2c_line_mask}u;",
+        f"    {state}.core.peripheral_mhz = {profile.i2c_peripheral_mhz}u; {state}.core.dma = NULL;",
         f"    {state}.irq_policy = {policy};",
         f"    return {prefix}_i2c_async_initialize(&{state});", "}"]
     for suffix in ("EV", "ER"):

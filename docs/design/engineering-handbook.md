@@ -28,6 +28,7 @@
 | `core/` | 小型共同类型、状态与基础合同，以及有边界的基础设施启动；不容纳产品主循环 |
 | `arch/` | CPU 本地中断状态、屏障、必要原子原语与可选计时基础 |
 | `soc/` | 精确 silicon/variant、clock、controller、IRQ/DMA 与私有 vendor SDK 集成 |
+| `drivers/` | 经复核的共享 IP 寄存器算法，由所选 SoC target 私有选编 |
 | `io/` | typed I/O 合同、明确的实现接入面与必要可移植适配 |
 | `os/` | 有边界的 OS/backend 集成；应用 task 和调度策略留给产品 |
 | `components/` | 可独立选择、测试和链接的共同组件 |

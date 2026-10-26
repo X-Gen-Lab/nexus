@@ -4,14 +4,12 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import (Construction, fail, integer, sequence,
-                                   kernel_policy_constant)
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import (Construction, fail, integer, sequence,
-                                  kernel_policy_constant)
+from dataclasses import dataclass
+
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers import maintained
+from tools.configure.providers.common import (Construction, fail, integer, sequence,
+                               kernel_policy_constant)
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote"}
@@ -20,6 +18,22 @@ FIELDS = {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
           "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"}
 OPERATIONS = {"normal": "NX_CAN_NORMAL", "loopback": "NX_CAN_LOOPBACK",
               "silent-loopback": "NX_CAN_SILENT_LOOPBACK"}
+
+
+@dataclass(frozen=True)
+class CanPolicy:
+    """Exact status-vector spelling and extra GPIO clock responsibility."""
+
+    error_suffix: str
+    gpio_clock: str | None = None
+
+
+def _integration(result, prefix):
+    provider = maintained(result.soc_family)
+    policy = getattr(provider, "CAN_INTEGRATION", None)
+    if policy is None or provider.PREFIX != prefix:
+        fail("CAN binding differs from its exact selected provider")
+    return policy
 
 
 def fields(value, names, context):
@@ -39,9 +53,12 @@ def validate_soc(soc, provider):
             or facts["primary"] != names[0] or
             type(facts["filter_banks"]) is not int or facts["filter_banks"] != 28):
         fail("CAN domain differs from maintained exact SoC topology")
+    policy = getattr(provider, "CAN_INTEGRATION", None)
+    if policy is None:
+        fail("CAN facts have no reviewed provider integration")
     for index, name in enumerate(names):
         item = soc["controllers"][name]
-        suffix = "SCE" if provider.PREFIX == "stm32" else "EWMC"
+        suffix = policy.error_suffix
         vectors = [name + "_" + kind for kind in ("TX", "RX0", "RX1", suffix)]
         numbers = list(range(19, 23) if index == 0 else range(63, 67))
         if (item["modes"] != ["classic-irq"] or item["irq"] != vectors or
@@ -121,6 +138,7 @@ def state_declarations(result, prefix):
     domain = result.get("can_domain")
     if domain is None:
         return []
+    policy = _integration(result, prefix)
     filters = domain["filters"]
     lines = []
     if filters:
@@ -135,18 +153,21 @@ def state_declarations(result, prefix):
     lines += ["static nx_can_filter_domain_t s_nx_can_domain = {",
               f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",
               f"    .filter_count = {len(filters)}u, .split = {domain['split']}u", "};"]
-    if prefix == "gd32":
+    if policy.gpio_clock is not None:
         lines.append("static uint32_t s_nx_can_gpio_clocks_added;")
     return lines
 
 
 def constructor(item, result, prefix):
     """Lease pins until successful drain, including a failed cold start."""
+    integration = _integration(result, prefix)
+    if item.provider != result.soc_family:
+        fail("CAN owner differs from its exact selected provider")
     name = item.id.replace("-", "_")
     options = item.options
     state = "s_nx_port_" + name
     pins = item["pins"]
-    clock = "RCC->AHB1ENR" if prefix == "stm32" else "RCU_AHB1EN"
+    clock = integration.gpio_clock
     mask = sum(1 << (ord(port) - ord('A')) for port in {p['pin'][1] for p in pins})
     lines = [f"static nx_can_event_t s_nx_can_events_{name}[{options.event_capacity}];",
              f"static uint16_t s_nx_can_pin_snapshots_{name}[{len(pins)}];",
@@ -157,7 +178,7 @@ def constructor(item, result, prefix):
     for index, pin in reversed(list(enumerate(pins))):
         wire = pin['pin']
         lines += [f"    if ((s_nx_can_pin_leases_{name} & {1 << index}u) != 0u) {{"]
-        lines += withdraw_pin(prefix, wire)
+        lines += withdraw_pin(result.soc_family, wire)
         lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_can_pin_snapshots_{name}[{index}]);",
                   f"        s_nx_can_pin_leases_{name} &= (uint8_t)~{1 << index}u;", "    }"]
     lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
@@ -176,7 +197,7 @@ def constructor(item, result, prefix):
               f"        .fifo_order = {str(options.fifo_order).lower()},",
               f"        .irq_policy = {{ {kernel}, {policy['external_count']}u, {policy['priority_bits']}u, {ceiling}u }},",
               "        .sources = { " + ', '.join('{ .priority = '+str(options.irq.priority)+'u }' for _ in range(4)) + " }", "    };"]
-    if prefix == 'gd32':
+    if clock is not None:
         lines.append(f"    s_nx_can_gpio_clocks_added |= ~{clock} & {mask}u;")
     for index, pin in enumerate(pins):
         wire = pin['pin']
@@ -206,9 +227,11 @@ def constructor(item, result, prefix):
 def stop_domain(result, prefix):
     if result.get('can_domain') is None:
         return []
+    clock = _integration(result, prefix).gpio_clock
     lines = ["    if (s_nx_can_domain.primary != 0u) {",
              "        nx_result_t stopped = nx_can_filter_domain_stop(&s_nx_can_domain);",
              "        if (stopped != NX_SUCCESS) { return stopped; }", "    }"]
-    if prefix == 'gd32':
-        lines += ["    RCU_AHB1EN &= ~s_nx_can_gpio_clocks_added;", "    nx_arch_dsb();"]
+    if clock is not None:
+        lines += [f"    {clock} &= ~s_nx_can_gpio_clocks_added;",
+                  "    nx_arch_dsb();"]
     return lines

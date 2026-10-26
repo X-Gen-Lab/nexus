@@ -1,10 +1,9 @@
 """Nominal endpoint classes share controllers without interface casts."""
 from dataclasses import replace
 
-try:
-    from . import selected_contracts
-except ImportError:
-    import selected_contracts
+from tools.configure import selected_contracts
+from tools.configure.providers import maintained
+from tools.configure.providers.common import fail
 
 DRIVERS = selected_contracts.ENDPOINT_DRIVERS
 
@@ -20,7 +19,15 @@ def face_type(device):
     return "nx_" + selected.removesuffix("_device") + "_endpoint_t"
 
 
-def face(device, state, legacy_operations, prefix=None):
+def _spi_provider(family, *, dma):
+    provider = maintained(family)
+    policy = provider.ENDPOINT_POLICY
+    if not (policy.spi_dma is not None if dma else policy.spi_transaction):
+        fail("SPI transaction provider lacks an explicit table")
+    return provider
+
+
+def face(device, state, legacy_operations, family=None):
     """Emit one immutable enhanced or legacy face around existing state."""
     name = device.id.replace("-", "_")
     typename = face_type(device)
@@ -35,9 +42,8 @@ def face(device, state, legacy_operations, prefix=None):
                 f"const {typename}* const nx_device_{name} = "
                 f"&s_nx_device_face_{name};"]
     if device.driver == "spi-transaction":
-        if prefix not in {"native", "stm32", "gd32"}:
-            raise ValueError("SPI transaction provider lacks an explicit table")
-        operations = f"nx_{prefix}_spi_transaction_ops"
+        provider = _spi_provider(family, dma=False)
+        operations = f"nx_{provider.PREFIX}_spi_transaction_ops"
     elif device.driver == "i2c-long-endpoint":
         operations = "nx_i2c_v2_long_endpoint_ops"
     return [f"static const {typename} s_nx_device_face_{name} = {{",
@@ -55,9 +61,13 @@ def dma_construction(item, construction, prefix):
     """
     if item.interface_kind != "spi_dma_transaction":
         return construction
+    provider = _spi_provider(item.provider, dma=True)
+    if prefix != provider.PREFIX:
+        fail("SPI sequence binding differs from its exact selected provider")
+    selected_contracts.describe(item)
     name = item.id.replace("-", "_")
     sequence = f"s_nx_sequence_{name}"
-    backend = f"nx_{prefix}_spi_dma_sequence_backend"
+    backend = f"nx_{provider.PREFIX}_spi_dma_sequence_backend"
     definitions = [line.replace(f"prepare_{name}(", f"prepare_engine_{name}(")
                    .replace(f"nx_spi_port_stop(nx_binding_{name})",
                             f"nx_spi_dma_transaction_stop(nx_binding_{name})")
@@ -142,7 +152,6 @@ def emit_owner_factory(result):
                 if item.interface_kind == "spi_dma_transaction"]
     if not selected:
         return [], []
-    prefixes = {"stm32f407": "stm32", "gd32f470": "gd32", "native": "native"}
     header = ['#include "nexus/io/spi_dma_owner_binding.h"',
               '/** \\brief Pure lookup of the selected physical/model owner. */',
               'const nx_spi_dma_owner_binding_t* nx_factory_spi_dma_owner_binding(',
@@ -150,7 +159,9 @@ def emit_owner_factory(result):
     source = []
     for item in selected:
         name = item.id.replace("-", "_")
-        prefix = prefixes[item.provider]
+        provider = _spi_provider(item.provider, dma=True)
+        selected_contracts.describe(item)
+        prefix = provider.PREFIX
         source += [f'static const nx_spi_dma_owner_binding_t s_nx_spi_owner_{name} = {{',
                    f'    .port = &s_nx_face_{name},',
                    f'    .contains = nx_{prefix}_spi_dma_owner_contains,',

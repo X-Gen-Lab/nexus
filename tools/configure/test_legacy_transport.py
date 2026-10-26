@@ -51,7 +51,20 @@ class LegacyTransportTests(unittest.TestCase):
                     method = "uart_duplex" if mode == "dma-duplex" else "uart_dma"
                     operations = ("nx_uart_v1_channel_dma_ops" if mode == "dma-duplex"
                                   else "nx_uart_v1_channel_dma_tx_ops")
-                    self.assertIn(f"nx_{family}_{method}_initialize", source)
+                    self.assertIn(f"nx_{family}_{method}_prepare", source)
+                    self.assertIn(
+                        "static const nx_uart_v1_dma_config_t s_nx_config_serial = {",
+                        source)
+                    state_kind = "duplex" if mode == "dma-duplex" else "dma"
+                    self.assertIn(
+                        f"static nx_{family}_uart_{state_kind}_state_t s_nx_port_serial;",
+                        source)
+                    self.assertIn(
+                        f"nx_{family}_{method}_prepare(&s_nx_port_serial, &s_nx_config_serial)",
+                        source)
+                    self.assertIn(
+                        f".stop_irqs = nx_{family}_uart_dma_stop_irqs", source)
+                    self.assertNotIn("static nx_result_t prepare_serial(void)", source)
                     self.assertIn("&" + operations, source)
                     self.assertIn("DMA", source)
                     self.assertNotIn("HAL_Init", source)

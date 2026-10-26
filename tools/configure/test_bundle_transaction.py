@@ -9,8 +9,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import configure as gate
-import runtime
+from tools.configure import configure as gate
+from tools.configure import runtime
 
 
 class BundleTransactionTests(unittest.TestCase):
@@ -68,6 +68,31 @@ class BundleTransactionTests(unittest.TestCase):
             gate.configure(self.assembly, package, self.root)
         self.assertEqual((package / "board.json").read_bytes(), expected)
 
+    def test_driver_package_is_protected_before_owned_bundle_withdrawal(self):
+        package = self.root / "drivers/i2c/i2c_v1_async"
+        package.mkdir(parents=True)
+        (package / ".nexus-config-bundle").write_text("owned")
+        source = package / "i2c_v1_async.c"
+        source.write_text("/* Reviewed hardware algorithm. */\n")
+        expected = source.read_bytes()
+        with self.assertRaisesRegex(gate.ConfigurationError, "input package"):
+            gate.configure(self.assembly, package, self.root)
+        self.assertEqual(source.read_bytes(), expected)
+
+    def test_alternate_fact_root_cannot_replace_executed_soc_adapter(self):
+        code_root = self.root / "generator"
+        package = code_root / "soc/native/configure"
+        package.mkdir(parents=True)
+        (package / ".nexus-config-bundle").write_text("owned")
+        source = package / "bindings.py"
+        source.write_text("# Reviewed static configuration adapter.\n")
+        expected = source.read_bytes()
+        with patch.object(gate, "ROOT", code_root):
+            with self.assertRaisesRegex(gate.ConfigurationError,
+                                        "input package"):
+                gate.configure(self.assembly, package, self.root)
+        self.assertEqual(source.read_bytes(), expected)
+
     def test_nested_declared_board_fact_is_protected_before_withdrawal(self):
         package = self.root / "boards/native_reference"
         output = package / "generated"
@@ -100,8 +125,8 @@ class BundleTransactionTests(unittest.TestCase):
         self.assertIn("tools/configure/factory.py", paths)
         self.assertIn("tools/configure/bundle.py", paths)
         self.assertIn("tools/configure/emission.py", paths)
-        self.assertIn("tools/configure/providers/native/emission.py", paths)
-        self.assertNotIn("tools/configure/providers/gd32f470/emission.py", paths)
+        self.assertIn("soc/native/configure/emission.py", paths)
+        self.assertNotIn("soc/gd32/gd32f470/configure/emission.py", paths)
         self.assertEqual(set(paths), {item["path"] for item in identity["files"]})
         for record in identity["files"]:
             self.assertEqual(gate.file_digest(Path(paths[record["path"]])),
@@ -117,7 +142,7 @@ class BundleTransactionTests(unittest.TestCase):
         self.assertEqual(list(real.iterdir()), [])
 
     def test_same_output_concurrent_writer_is_rejected_without_damage(self):
-        import bundle
+        from tools.configure import bundle
         with bundle.transaction(self.output, ".nexus-config-bundle",
                                 inputs=(self.assembly,), fail=gate.fail) as pending:
             (pending / ".nexus-config-bundle").write_text("owned")
@@ -131,13 +156,13 @@ class BundleTransactionTests(unittest.TestCase):
 
     def test_interruption_has_no_old_public_bundle_and_next_run_recovers(self):
         self.configure()
-        script = ("import configure, os\n"
+        script = ("import os; from tools.configure import configure\n"
                   "configure.generate = lambda *args: os._exit(73)\n"
                   f"configure.configure(__import__('pathlib').Path({str(self.assembly)!r}), "
                   f"__import__('pathlib').Path({str(self.output)!r}), "
                   f"__import__('pathlib').Path({str(self.root)!r}))\n")
         process = subprocess.run([sys.executable, "-B", "-c", script],
-                                 env={**os.environ, "PYTHONPATH": str(gate.ROOT / "tools/configure")})
+                                 env={**os.environ, "PYTHONPATH": str(gate.ROOT)})
         self.assertEqual(process.returncode, 73)
         self.assertFalse(self.output.exists())
         self.configure()
@@ -176,11 +201,15 @@ class BundleTransactionTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        for module in ("factory", "emission"):
+        for module in ("tools/configure/factory.py",
+                       "tools/configure/emission.py",
+                       "soc/native/configure/emission.py",
+                       "soc/stm32/stm32h743/configure/clocks.py",
+                       "soc/stm32/stm32f407/configure/hardware.py"):
             with self.subTest(module=module):
                 def changing(*args, **kwargs):
                     result = original(*args, **kwargs)
-                    path = code_root / f"tools/configure/{module}.py"
+                    path = code_root / module
                     path.write_bytes(path.read_bytes() + b"\n# concurrent edit\n")
                     return result
                 self.configure()

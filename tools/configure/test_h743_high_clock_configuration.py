@@ -10,7 +10,8 @@ import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, clocks, configure as gate, ir
+from tools.configure import bindings, configure as gate, ir
+from soc.stm32.stm32h743.configure import clocks
 
 PROFILE = "hsi64-pll384-cache-off"
 EXPECTED = {
@@ -282,7 +283,7 @@ class H743SelectedKernelConfigurationTests(unittest.TestCase):
                           timing["assumptions"]["kernel_hz_max"],
                           timing["assumptions"]["pclk_hz_min"]),
                          (62000000, 65000000, 91140000))
-        self.assertIn(f"s_nx_port_bus1.timing = 0x{timing.timingr:08x}u;",
+        self.assertIn(f".timing = 0x{timing.timingr:08x}u,",
                       bindings.emit(result)[1])
 
     def test_i2c_assumptions_must_cover_the_whole_reviewed_clock_envelope(self):

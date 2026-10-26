@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 
-import configure as gate
+from tools.configure import configure as gate
 
 
 def facts(arch, **changes):
@@ -30,7 +30,7 @@ def irq(arch):
 
 class CpuProfileTests(unittest.TestCase):
     def setUp(self):
-        self.cpu = importlib.import_module("cpu")
+        self.cpu = importlib.import_module("tools.configure.cpu")
 
     def test_m33_dsp_fact_controls_emitted_instruction_capabilities(self):
         for enabled in (False, True):

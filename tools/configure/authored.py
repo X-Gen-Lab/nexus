@@ -153,12 +153,7 @@ def read(path, snapshots, root, fail, obj, integer, text):
 
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
-    try:
-        from . import kernel, threadx, uart_formats
-    except ImportError:
-        import kernel
-        import threadx
-        import uart_formats
+    from tools.configure import kernel, threadx, uart_formats
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}

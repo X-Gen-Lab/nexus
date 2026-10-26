@@ -35,7 +35,7 @@ provider directly through its shared read-only operations table.
 The [private clock contract](../../soc/stm32/stm32h743/private/stm32h743_clock.h) owns
 admission and clock responsibility. [System](../../soc/stm32/stm32h743/system.c) owns
 TIM2 and its vector. The generated
-[lifecycle glue](../../tools/configure/providers/stm32h743/emission.py) orders
+[lifecycle glue](../../soc/stm32/stm32h743/configure/emission.py) orders
 them and preserves startup and cleanup diagnostics. Their effect masks are
 different namespaces; the platform projects retained responsibility without
 treating the numeric masks as interchangeable.

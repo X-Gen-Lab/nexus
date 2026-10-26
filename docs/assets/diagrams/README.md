@@ -82,7 +82,7 @@ python tools/dev/dev.py docs check --full \
 
 结构图展示由生成器支持的按配置实例布局，不声称每块PCB均授权这些组合。同provider同模式实例共享readonly ops，各自context/state/storage独立。不同provider或模式可使用不同ops；调用方法接收本次context。controller和endpoint有独立factory命名空间，endpoint不冒充控制器。ID只在当前assembly有效，默认uint16_t typedef不提供语言级跨类防混用。
 
-依据：[typed factory生成](../../../tools/configure/factory.py)、[face/state装配](../../../tools/configure/bindings.py)、[SPI公开接口](../../../io/include/nexus/io/spi.h)、[Native provider](../../../tools/configure/providers/native/bindings.py)。
+依据：[typed factory生成](../../../tools/configure/factory.py)、[face/state装配](../../../tools/configure/bindings.py)、[SPI公开接口](../../../io/include/nexus/io/spi.h)、[Native provider](../../../soc/native/configure/bindings.py)。
 [可编辑DOT](factory-instances.dot)；实施关联：DOC-46。
 
 ## FIG-05 显式启动停机与失败撤回
@@ -302,7 +302,7 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 [公共 RTC](../../../io/include/nexus/io/rtc.h)、
 [公共 LPTIM](../../../io/include/nexus/io/lptim.h)、
 [Native 实现](../../../soc/native/drivers/rtc_lptim.c)、
-[Native 装配](../../../tools/configure/providers/native/bindings.py)。
+[Native 装配](../../../soc/native/configure/bindings.py)。
 [可编辑 DOT](rtc-lptim-lifecycle.dot)；实施关联：IO-36。软件开发证据与 main／SDK／
 候选／实板资格分别判断，不能从该图或渲染成功推断。
 
@@ -361,3 +361,17 @@ close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后�
 TCIF／NDTR0 只证明内存计数。停止 DMA 请求／引擎、观察 TXE 后另读新鲜 BSY、撤回地址／计数／标志和向量引用后，才能解除 owner 引用、归还原始整块借用并最终 release 发布 SETTLED。取消、超时或缺失证明都不撤销借用；首个错误保留，错误排空可能欠载且不保证有效音频。观察到复位／门控／时钟或时间历史丢失会永久隔离。所有共享用户及外部观察者先 join，最后才允许 Platform stop。
 
 依据：[精确机制页](../../design/f407-i2s2-slave-tx.md)、[公共合同](../../../components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实 provider](../../../soc/stm32/stm32f407/drivers/i2s2_slave_tx.c) 与[源码绑定证据](../../../tools/testing/evidence/f407-i2s2-20261020/README.md)。[可编辑 DOT](f407-i2s2-slave-tx.dot)。Native 模型、normal VE/ZG/default 链接和单个搬移 development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 SDK／formal／OCI 与物理退出仍分别开放。
+
+
+(fig-31-driver-source-ownership)=
+## FIG-31 共享 IP 与精确 SoC 源码归属
+
+**身份：current。范围：当前私有控制器源码的维护判定，不表示运行调用、初始化顺序或资格结果。**
+
+![FIG-31：先区分寄存器协议和芯片集成，再按逐芯片兼容性证据决定共享范围](driver-source-ownership.svg)
+
+箭头是标明条件的源码归属决策。精确芯片事实、时钟、复位、引脚、IRQ／DMA 与私有协作合同保留在其 SoC 范围；公共 I/O 合同及产品政策另按接入合同归属。寄存器布局、位含义、访问顺序和复位兼容性在每个选入芯片上均经复核，且各芯片勘误均已显式处理后，算法才放入 `drivers/<kind>/<ip>/`。名称相似、SDK 有宏或编译成功不能替代复核，未知兼容性继续保留精确 SoC 实现。
+
+共享算法仍由所选 SoC CMake target 私有编译，wrapper 保留真实路由、时钟、内存与准入责任。图不增加运行时转发、注册、任务或支持模式，也不证明实板行为。
+
+依据：[provider 接入指南](../../guides/provider-porting.md)、[共享 IP 合同](../../../drivers/README.md)、[SoC 合同](../../../soc/README.md)及[私有路径迁移](../../guides/migration.md#update-private-source-integrations)。[可编辑 DOT](driver-source-ownership.dot)；实施关联：R41。

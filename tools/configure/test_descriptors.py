@@ -4,21 +4,61 @@ import subprocess
 import sys
 import unittest
 
-try:
-    from .providers import descriptor, hardware
-except ImportError:
-    from providers import descriptor, hardware
+from tools.configure.providers import descriptor, hardware
 
 
 class DescriptorBoundaryTests(unittest.TestCase):
+    def test_hardware_lookup_loads_only_the_selected_registered_soc(self):
+        for family, selected, other, controller in (
+                ("stm32f407", "soc.stm32.stm32f407.configure",
+                 "soc.gd32.gd32f470.configure", "SPI1"),
+                ("gd32f470", "soc.gd32.gd32f470.configure",
+                 "soc.stm32.stm32f407.configure", "SPI4")):
+            with self.subTest(family=family):
+                code = "\n".join((
+                    "import sys",
+                    "from tools.configure import secondary_controllers",
+                    "from tools.configure.providers import hardware",
+                    "family, selected, other, controller = sys.argv[1:]",
+                    "assert selected not in sys.modules",
+                    "assert other not in sys.modules",
+                    "binding = hardware.maintained(family, controller)",
+                    "assert binding.controller == controller",
+                    "assert selected + '.hardware' in sys.modules",
+                    "assert other not in sys.modules",
+                    "module = sys.modules[selected + '.hardware']",
+                    "assert binding in module.CONTROLLER_BINDINGS",
+                    "assert hardware.bindings(family) is "
+                    "module.CONTROLLER_BINDINGS",
+                ))
+                run = subprocess.run([
+                    sys.executable, "-B", "-c", code,
+                    family, selected, other, controller], capture_output=True,
+                    text=True, check=False)
+                self.assertEqual(run.returncode, 0, run.stderr)
+
+    def test_soc_hardware_tables_are_selected_configuration_inputs(self):
+        from tools.configure import dependencies
+
+        for family, directory in (
+                ("stm32f407", "soc/stm32/stm32f407"),
+                ("gd32f470", "soc/gd32/gd32f470")):
+            with self.subTest(family=family):
+                names = dependencies.source_names("platform", family)
+                for name in ("hardware", "secondary"):
+                    helper = directory + f"/configure/{name}.py"
+                    self.assertIn(helper, names)
+                    self.assertNotIn(helper, dependencies.source_names(
+                        "platform", "native"))
+
     def test_coupled_g474_generator_inputs_are_part_of_source_identity(self):
         from tools.configure import dependencies
 
-        names = set(dependencies._names("platform", "stm32g474"))
+        names = set(dependencies.source_names("platform", "stm32g474"))
         self.assertIn("tools/configure/coupled_io.py", names)
-        self.assertIn("tools/configure/providers/stm32g474/coupled.py", names)
-        native = set(dependencies._names("platform", "native"))
-        self.assertNotIn("tools/configure/providers/stm32g474/coupled.py", native)
+        self.assertIn("soc/stm32/stm32g474/configure/coupled.py", names)
+        native = set(dependencies.source_names("platform", "native"))
+        self.assertNotIn("soc/stm32/stm32g474/configure/coupled.py", native)
 
     def test_h743_dma_configuration_binds_private_provider_payload(self):
         payload = descriptor.maintained("stm32h743").owned_payload
@@ -37,13 +77,13 @@ class DescriptorBoundaryTests(unittest.TestCase):
             "private/stm32h743_flash_ram_layout.h",
             "private/stm32h743_flash_mpu.h")}
         self.assertTrue(required <= payload, sorted(required - payload))
-        names = set(dependencies._names("platform", "stm32h743"))
+        names = set(dependencies.source_names("platform", "stm32h743"))
         # CMake owns firmware inputs; generator identity binds the descriptor,
         # not a competing collection of C/ASM compilation units.
         self.assertTrue(required.isdisjoint(names))
         self.assertIn("tools/configure/providers/descriptor.py", names)
         self.assertTrue(required.isdisjoint(
-            dependencies._names("platform", "native")))
+            dependencies.source_names("platform", "native")))
 
     def test_native_configuration_does_not_import_unselected_physical_families(self):
         run = subprocess.run([sys.executable, "-B", "-c",

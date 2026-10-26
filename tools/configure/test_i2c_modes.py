@@ -89,7 +89,7 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                                 and row["kind"] == "i2c"
                                 and row["mode"] == mode)
                 self.assertEqual(selected["exports"],
-                                 ["soc/common/i2c_v1_async.c"])
+                                 ["drivers/i2c/i2c_v1_async/i2c_v1_async.c"])
 
     def test_priority_integer_range_is_validated_before_emission(self):
         for priority in ("true", -1, 16):

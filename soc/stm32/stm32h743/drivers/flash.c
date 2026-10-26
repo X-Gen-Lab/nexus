@@ -13,7 +13,6 @@
 #include "stm32h743_clock.h"
 #endif
 #include <string.h>
-#define NX_H743_FLASH_BYTES  2097152U
 #define NX_H743_BANK_BYTES   1048576U
 #define NX_H743_SECTOR_BYTES 131072U
 #define NX_H743_WORD_BYTES   32U
@@ -28,22 +27,7 @@
 extern const nx_stm32h743_flash_image_t g_nx_stm32h743_flash_image;
 #define NX_H743_FLASH_IMAGE() (&g_nx_stm32h743_flash_image)
 #endif
-static const nx_flash_sector_t s_sectors[16] = {
-    {0U, NX_H743_SECTOR_BYTES},        {0x20000U, NX_H743_SECTOR_BYTES},
-    {0x40000U, NX_H743_SECTOR_BYTES},  {0x60000U, NX_H743_SECTOR_BYTES},
-    {0x80000U, NX_H743_SECTOR_BYTES},  {0xa0000U, NX_H743_SECTOR_BYTES},
-    {0xc0000U, NX_H743_SECTOR_BYTES},  {0xe0000U, NX_H743_SECTOR_BYTES},
-    {0x100000U, NX_H743_SECTOR_BYTES}, {0x120000U, NX_H743_SECTOR_BYTES},
-    {0x140000U, NX_H743_SECTOR_BYTES}, {0x160000U, NX_H743_SECTOR_BYTES},
-    {0x180000U, NX_H743_SECTOR_BYTES}, {0x1a0000U, NX_H743_SECTOR_BYTES},
-    {0x1c0000U, NX_H743_SECTOR_BYTES}, {0x1e0000U, NX_H743_SECTOR_BYTES}};
-const nx_flash_geometry_t g_nx_stm32h743_flash_geometry = {
-    .base_address = 0x08000000U,
-    .size = NX_H743_FLASH_BYTES,
-    .program_unit = NX_H743_WORD_BYTES,
-    .sectors = s_sectors,
-    .sector_count = 16U,
-    .program_flags = NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE};
+/* Geometry is emitted from the selected physical part facts. */
 static bool task(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
@@ -74,15 +58,17 @@ static bool valid(const nx_stm32h743_flash_state_t* p) {
            !system_overlap(p, sizeof(*p)) && p->registers != NULL &&
            (uintptr_t)p->registers <= UINTPTR_MAX - sizeof(*p->registers) &&
            p->memory != NULL &&
-           (uintptr_t)p->memory <= UINTPTR_MAX - NX_H743_FLASH_BYTES &&
+           (uintptr_t)p->memory <=
+               UINTPTR_MAX - g_nx_stm32h743_flash_geometry.size &&
            (uintptr_t)p->memory % _Alignof(uint32_t) == 0U &&
            p->poll_limit != 0U &&
            !overlap(p, sizeof(*p), p->registers, sizeof(*p->registers)) &&
-           !overlap(p, sizeof(*p), (const void*)p->memory, NX_H743_FLASH_BYTES);
+           !overlap(p, sizeof(*p), (const void*)p->memory,
+                    g_nx_stm32h743_flash_geometry.size);
 }
 static bool range(uint32_t offset, size_t length) {
-    return offset <= NX_H743_FLASH_BYTES &&
-           length <= NX_H743_FLASH_BYTES - offset;
+    return offset <= g_nx_stm32h743_flash_geometry.size &&
+           length <= g_nx_stm32h743_flash_geometry.size - offset;
 }
 static bool external(const nx_stm32h743_flash_state_t* p, const void* value,
                      size_t bytes) {
@@ -90,7 +76,7 @@ static bool external(const nx_stm32h743_flash_state_t* p, const void* value,
            !overlap(value, bytes, p, sizeof(*p)) &&
            !overlap(value, bytes, p->registers, sizeof(*p->registers)) &&
            !overlap(value, bytes, (const void*)p->memory,
-                    NX_H743_FLASH_BYTES) &&
+                    g_nx_stm32h743_flash_geometry.size) &&
            !system_overlap(value, bytes) &&
            nx_stm32h743_flash_ram_external(p, value, bytes);
 }

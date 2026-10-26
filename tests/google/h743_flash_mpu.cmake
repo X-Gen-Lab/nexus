@@ -6,6 +6,7 @@ nexus_google_test(nexus_h743_flash_mpu_test
         h743_model.cpp h743_flash_image_model.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
         ${h743_flash_ram_production_sources}
     LIBRARIES Nexus::IO Nexus::Arch

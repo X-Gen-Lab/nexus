@@ -5,7 +5,7 @@
  */
 #ifndef NX_U575_DEVICES_MODEL_H
 #define NX_U575_DEVICES_MODEL_H
-#include "../../soc/common/i2c_v2.h"
+#include "../../drivers/i2c/i2c_v2/i2c_v2.h"
 #include "u575_model.h"
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,7 @@ extern "C" {
 extern TIM_TypeDef* g_u575_pwm;
 void nx_u575_devices_reset(void);
 extern nx_i2c_v2_registers_t* g_u575_i2c;
+extern nx_i2c_v2_registers_t g_u575_i2c_registers;
 extern bool g_u575_i2c_berr;
 extern bool g_u575_hsi_hold_on;
 extern bool g_u575_hsi_hold_off;
@@ -60,7 +61,7 @@ void nx_u575_adc_poll(void* port);
 #undef TIM3
 #define TIM3 g_u575_pwm
 #undef I2C1
-#define I2C1 ((I2C_TypeDef*)g_u575_i2c)
+#define I2C1 ((I2C_TypeDef*)&g_u575_i2c_registers)
 #undef ADC4_COMMON
 #define ADC4_COMMON g_u575_adc_common
 void nx_u575_spi_write8(volatile uint32_t* reg, uint8_t value);

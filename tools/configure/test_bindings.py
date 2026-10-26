@@ -7,8 +7,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import bindings
-import configure as gate
+from tools.configure import bindings
+from tools.configure import configure as gate
 
 
 class BindingIdentityTests(unittest.TestCase):

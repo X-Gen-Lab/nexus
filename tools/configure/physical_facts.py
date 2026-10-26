@@ -2,10 +2,7 @@
 from collections.abc import Mapping
 import re
 
-try:
-    from .providers.common import fail
-except ImportError:
-    from providers.common import fail
+from tools.configure.providers.common import fail
 
 GPIO_PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 

@@ -478,9 +478,9 @@ class CurrentWorkPackageTests(unittest.TestCase):
                 self.assertIn(values[0]["provider_implementation"], {"rtc", "lptim"})
         inputs = {row["path"] for row in report["authority_inputs"]}
         self.assertTrue({"soc/native/soc.json", "soc/native/routes.json",
-                         "tools/configure/providers/native/__init__.py",
-                         "tools/configure/providers/native/bindings.py",
-                         "tools/configure/providers/native/emission.py",
+                         "soc/native/configure/__init__.py",
+                         "soc/native/configure/bindings.py",
+                         "soc/native/configure/emission.py",
                          "soc/native/drivers/rtc_lptim.c", fixture} <= inputs)
         empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
         self.assertFalse(any(empty in row["resolver_fixtures"] for row in models))

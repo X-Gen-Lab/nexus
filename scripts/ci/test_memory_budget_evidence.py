@@ -36,6 +36,25 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
                 recorder.write_text(recorder.read_text() + '# Changed recorder.\n')
                 self.assertNotEqual(before, gate.source_inputs(root))
 
+    def test_family_checkers_capture_shared_driver_source_and_header_bytes(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            (root / 'scripts/ci').mkdir(parents=True)
+            (root / 'CMakeLists.txt').write_text('# Source fixture.\n')
+            for name in ('gd32_memory.py', 'memory_budget.py', 'arch_compile.py'):
+                (root / 'scripts/ci' / name).write_text('# Recorded helper.\n')
+            for module in ('gd32_memory', 'stm32_memory', 'os_threadx'):
+                gate = importlib.import_module(module)
+                for suffix in ('.c', '.h'):
+                    with self.subTest(module=module, suffix=suffix):
+                        source = root / (
+                            'drivers/uart/reviewed_ip/driver' + suffix)
+                        source.parent.mkdir(parents=True, exist_ok=True)
+                        source.write_text('/* Reviewed driver bytes. */\n')
+                        before = gate.source_inputs(root)
+                        source.write_text('/* Changed driver bytes. */\n')
+                        self.assertNotEqual(before, gate.source_inputs(root))
+
     def test_budget_json_tamper_requires_the_precise_authority_rejection(self):
         report = {'schema_version': 1, 'kind': 'elf_resource_budget',
                   'status': 'failed',

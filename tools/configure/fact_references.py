@@ -2,10 +2,7 @@
 import re
 from urllib.parse import urlparse
 
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 def text(value, context):

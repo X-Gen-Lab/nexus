@@ -1,11 +1,7 @@
 """Compile/link bundle emission and shared private provider declarations."""
 import json
-try:
-    from .providers.common import fail
-    from .memory import dma_regions
-except ImportError:
-    from providers.common import fail
-    from memory import dma_regions
+from tools.configure.providers.common import fail
+from tools.configure.memory import dma_regions
 
 
 def emit_bundle(result, output):
@@ -14,28 +10,16 @@ def emit_bundle(result, output):
     Provider declarations depend on leaf memory contracts; this orchestration
     layer alone combines the complete compiler, linker and binding projections.
     """
-    try:
-        from . import cpu as cpu_profiles
-        from . import kernel, memory as memory_regions, metadata, i2s2
-        from .ir import thaw
-        from .providers import descriptor, maintained
-    except ImportError:
-        import cpu as cpu_profiles
-        import kernel
-        import memory as memory_regions
-        import metadata
-        import i2s2
-        from ir import thaw
-        from providers import descriptor, maintained
+    from tools.configure import cpu as cpu_profiles
+    from tools.configure import kernel, memory as memory_regions, metadata, i2s2
+    from tools.configure.ir import thaw
+    from tools.configure.providers import descriptor, maintained
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
     write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
                                       else result, indent=2, sort_keys=True) + "\n")
     # Compatibility fixtures enter through one adapter; normal generation uses
     # the already validated immutable CPU/kernel/instance decisions directly.
-    try:
-        from .ir import ConfigurationIR
-    except ImportError:
-        from ir import ConfigurationIR
+    from tools.configure.ir import ConfigurationIR
     if not isinstance(result, ConfigurationIR):
         result = ConfigurationIR.from_validated(result)
     profile, policy = result.cpu_profile, result.kernel
@@ -100,14 +84,8 @@ def emit_bundle(result, output):
     header.extend(["#endif", ""])
     write("nexus_config.h", "\n".join(header))
     write("selection.cmake", "\n".join(cmake) + "\n")
-    try:
-        from .bindings import emit
-    except ImportError:
-        from bindings import emit
-    try:
-        from .factory import emit as emit_factory, emit_strong
-    except ImportError:
-        from factory import emit as emit_factory, emit_strong
+    from tools.configure.bindings import emit
+    from tools.configure.factory import emit as emit_factory, emit_strong
     factory_header, factory_source = emit_factory(result)
     write("nexus_factory.h", factory_header)
     write("nexus_factory_strong.h", emit_strong(result))

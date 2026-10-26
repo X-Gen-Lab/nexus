@@ -1,29 +1,15 @@
 """One optional fixed-run provider lifecycle lease; no clock-policy engine."""
-try:
-    from .providers.common import fail
-    from .ir import RuntimePowerIR
-except ImportError:
-    from providers.common import fail
-    from ir import RuntimePowerIR
+from tools.configure.providers.common import fail
 
 
 def resolve(value, result):
-    """Admit only the explicit single SPI4 finite-DMA software reference."""
-    if (not isinstance(value, dict) or set(value) != {'mode', 'controllers'} or
-            value['mode'] != 'fixed-run' or
-            value['controllers'] != ['bus4']):
-        fail('power requires fixed-run and exactly controllers=["bus4"]')
-    controllers = result['controllers']
-    if (result['soc_family'] != 'stm32h743' or result['backend'] != 'baremetal' or
-            result['clock_profile'] != 'hsi64-fixed-cache-off' or
-            len(controllers) != 1 or controllers[0]['id'] != 'bus4' or
-            controllers[0]['kind'] != 'spi' or controllers[0]['mode'] != 'dma' or
-            controllers[0]['controller'] != 'SPI4' or
-            len(result['devices']) != 1 or
-            result['devices'][0]['controller'] != 'bus4' or
-            result['devices'][0].get('mode', 0) != 0):
-        fail('power supports only baremetal H743 fixed64 cache-off SPI4 finite DMA')
-    return RuntimePowerIR('fixed-run', ('bus4',))
+    """Optional lifecycle policy belongs to the selected concrete SoC."""
+    from tools.configure.providers import maintained
+    resolve_selected = getattr(maintained(result["soc_family"]),
+                               "resolve_runtime_power", None)
+    if resolve_selected is None:
+        fail("power has no maintained lifecycle for the selected SoC")
+    return resolve_selected(value, result)
 
 
 def header():
@@ -83,30 +69,7 @@ def state():
 
 
 def runtime_functions(result, context_guard, initialize):
-    """Use the same emitted I/O helpers as cold startup and global cleanup."""
-    try:
-        from .providers.stm32h743 import emission
-    except ImportError:
-        from providers.stm32h743 import emission
-    source = [
-        'nx_result_t nx_platform_runtime_pause(void) {',
-        f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}',
-        '    if (!s_nx_platform_started) { return NX_ERROR_STATE; }',
-        '    return nx_platform_stop_io(NULL, false);', '}',
-        'nx_platform_start_result_t nx_platform_runtime_resume(void) {',
-        '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };',
-        f'    if ({context_guard}) {{ result.primary = NX_ERROR_CONTEXT; return result; }}',
-        '    if (!s_nx_platform_started || s_nx_runtime_lease.owner != NULL) { result.primary = NX_ERROR_STATE; return result; }',
-        '    result.primary = nx_runtime_reopen();',
-        '    if (result.primary != NX_SUCCESS) { return result; }',
-        '    result.primary = nx_runtime_acquire();',
-        '    if (result.primary != NX_SUCCESS) { return result; }']
-    source.extend(emission.start_resources(result, cleanup='nx_platform_stop_io(NULL, true)'))
-    for index, expression in enumerate(initialize):
-        source += [f'    s_nx_platform_initialized = {index + 1}u;',
-                   f'    result.primary = {expression};',
-                   '    if (result.primary != NX_SUCCESS) {',
-                   '        result.cleanup = nx_platform_stop_io(NULL, true);',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    return source + ['    return result;', '}']
+    """Use the selected SoC's existing cold start and cleanup helpers."""
+    from tools.configure.providers import maintained
+    return maintained(result.soc_family).runtime_power_functions(
+        result, context_guard, initialize)

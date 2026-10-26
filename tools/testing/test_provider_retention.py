@@ -247,6 +247,26 @@ class ComponentPublicContractsTests(unittest.TestCase):
         self.assertIn(file_identity(root / "components/soc/stm32/stm32u575_lpdma_copy/include/"
                                     "nexus/components/stm32u575_lpdma_copy.h"), inputs)
 
+    def test_shared_ip_driver_retains_real_source_and_output_protection(self):
+        from tools.evidence.common import file_identity
+        from tools.measurement.interfaces import shared_operation_symbols
+        from tools.measurement.retention import component_owner_input_paths
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source, _ = self.tree(directory)
+            driver = root / "drivers/probe/reviewed_ip/probe.c"
+            driver.parent.mkdir(parents=True)
+            driver.write_text(
+                "const nx_component_probe_ops_t nx_shared_probe_ops = {"
+                ".start = real_start, .stop = real_stop};\n")
+            _, _, providers, _ = source_contracts(root)
+            self.assertIn("nx_shared_probe_ops", providers)
+            self.assertEqual(providers["nx_shared_probe_ops"]["source"],
+                             file_identity(driver))
+            self.assertEqual(shared_operation_symbols(root),
+                             {"nx_shared_probe_ops"})
+            self.assertIn(driver, component_owner_input_paths(root))
+            self.assertIn(source, component_owner_input_paths(root))
+
     def test_duplicate_component_operations_and_face_types_are_rejected(self):
         for declaration, message in (
                 ("typedef struct { int (*ready)(void*); } nx_base_ops_t;\n", "layout"),
@@ -311,11 +331,11 @@ class ProviderRetentionTests(unittest.TestCase):
         self.assertEqual(set(providers["nx_classic_can_ops"]["fields"]),
                          set(layouts["nx_can_ops_t"]))
 
-    def test_shared_soc_operations_are_read_from_the_actual_common_source(self):
+    def test_shared_ip_operations_are_read_from_the_actual_driver_source(self):
         _, _, providers, _ = source_contracts()
         provider = providers["nx_i2c_v1_async_ops"]
         self.assertTrue(provider["source"]["path"].endswith(
-            "soc/common/i2c_v1_async.c"))
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.c"))
         self.assertEqual(provider["fields"]["recover"], "recover")
         self.assertIn("nx_i2c_v1_async_endpoint_ops", providers)
 

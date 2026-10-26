@@ -5,14 +5,9 @@ They create no tasks, queues, Tick hardware, buffers or product recovery policy.
 """
 from types import MappingProxyType
 
-try:
-    from .ir import CpuProfileIR, KernelProfileIR
-    from .providers.common import fail, integer
-    from . import lowpower
-except ImportError:
-    from ir import CpuProfileIR, KernelProfileIR
-    from providers.common import fail, integer
-    import lowpower
+from tools.configure.ir import CpuProfileIR, KernelProfileIR
+from tools.configure.providers.common import fail, integer
+from tools.configure import lowpower
 
 
 _STANDARD = {"tick_source": "systick", "tick_hz": 1000,
@@ -58,10 +53,7 @@ def default_syscall(has_basepri, priority_bits):
 def resolve(choices, cpu, clock_hz):
     """Select a typed backend policy against exact CPU Port and clock facts."""
     if cpu.backend == "threadx":
-        try:
-            from . import threadx
-        except ImportError:
-            import threadx
+        from tools.configure import threadx
         return threadx.resolve(choices, cpu, clock_hz)
     if cpu.backend != "freertos":
         if choices is not None:
@@ -203,10 +195,7 @@ def bind(cpu, kernel):
 def from_validated(record):
     """Recover the backend-specific typed decision without inventing features."""
     if record.get("backend") == "threadx":
-        try:
-            from . import threadx
-        except ImportError:
-            import threadx
+        from tools.configure import threadx
         return threadx.ThreadXKernelProfileIR.from_validated(record)
     return KernelProfileIR.from_validated(record)
 

@@ -18,17 +18,13 @@ import sys
 import tempfile
 from types import MappingProxyType
 
-try:
-    from . import kernel, metadata, factory, sdk
-    from .ir import CpuProfileIR, freeze, thaw
-    from .providers.common import fail, integer
-except ImportError:
-    import kernel
-    import metadata
-    import factory
-    import sdk
-    from ir import CpuProfileIR, freeze, thaw
-    from providers.common import fail, integer
+# Direct CLI execution binds only this checkout or relocated SDK.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.configure import kernel, metadata, factory, sdk
+from tools.configure.ir import CpuProfileIR, freeze, thaw
+from tools.configure.providers.common import fail, integer
 
 
 ROOT = Path(__file__).resolve().parents[2]

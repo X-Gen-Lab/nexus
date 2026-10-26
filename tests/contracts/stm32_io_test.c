@@ -11,6 +11,25 @@
 #include <stdio.h>
 #include <string.h>
 
+/** \brief Independent RM0090 density oracle for the production engine. */
+static const nx_flash_sector_t s_sectors[] = {
+    {0x00000U, 0x04000U}, {0x04000U, 0x04000U}, {0x08000U, 0x04000U},
+    {0x0C000U, 0x04000U}, {0x10000U, 0x10000U}, {0x20000U, 0x20000U},
+    {0x40000U, 0x20000U}, {0x60000U, 0x20000U}, {0x80000U, 0x20000U},
+    {0xA0000U, 0x20000U}, {0xC0000U, 0x20000U}, {0xE0000U, 0x20000U}};
+const nx_flash_geometry_t g_nx_stm32_flash_ve = {.base_address = 0x08000000U,
+                                                 .size = 524288U,
+                                                 .program_unit = 4U,
+                                                 .sectors = s_sectors,
+                                                 .sector_count = 8U,
+                                                 .program_flags = 0U};
+const nx_flash_geometry_t g_nx_stm32_flash_zg = {.base_address = 0x08000000U,
+                                                 .size = 1048576U,
+                                                 .program_unit = 4U,
+                                                 .sectors = s_sectors,
+                                                 .sector_count = 12U,
+                                                 .program_flags = 0U};
+
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 nx_stm32_io_nvic_model_t g_nx_stm32_io_nvic;

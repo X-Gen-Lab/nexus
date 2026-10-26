@@ -53,6 +53,14 @@ class I2CLongNormalFactory : public testing::Test {
         device = nx_factory_i2c_long_device(SELECTED_DEVICE);
         ASSERT_NE(bus, nullptr);
         ASSERT_NE(device, nullptr);
+        state = static_cast<nx_i2c_v2_state_t*>(bus->context);
+        ASSERT_NE(state, nullptr);
+        size_t premature = 99U;
+        EXPECT_EQ(state->config == nullptr ? NX_ERROR_INVALID : NX_ERROR_STATE,
+                  nx_i2c_long_endpoint_transaction(device, messages, 2U, 10000U,
+                                                   &premature));
+        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
         EXPECT_EQ(0U, g_long_i2c.addresses);
         EXPECT_TRUE(g_long_i2c.controls.empty());
         EXPECT_FALSE(g_long_i2c.running);
@@ -61,11 +69,12 @@ class I2CLongNormalFactory : public testing::Test {
         ASSERT_EQ(started.cleanup, NX_SUCCESS);
         state = static_cast<nx_i2c_v2_state_t*>(bus->context);
         ASSERT_NE(state, nullptr);
-        ASSERT_EQ(state->registers, g_long_i2c.registers);
+        ASSERT_EQ(state->config->registers, g_long_i2c.registers);
         ASSERT_TRUE(state->initialized);
         ASSERT_TRUE(state->retained);
-        EXPECT_EQ(state->timing, NX_I2C_LONG_EXPECTED_TIMING);
-        EXPECT_EQ(state->registers->timing, NX_I2C_LONG_EXPECTED_TIMING);
+        EXPECT_EQ(state->config->timing, NX_I2C_LONG_EXPECTED_TIMING);
+        EXPECT_EQ(state->config->registers->timing,
+                  NX_I2C_LONG_EXPECTED_TIMING);
 #if defined(NX_I2C_LONG_G474)
         EXPECT_EQ(RCC->CCIPR & RCC_CCIPR_I2C1SEL, RCC_CCIPR_I2C1SEL_1);
 #elif defined(NX_I2C_LONG_H743)
@@ -117,7 +126,8 @@ class I2CLongNormalFactory : public testing::Test {
         g_long_i2c.refuse_control_clear = false;
         ASSERT_EQ(nx_i2c_port_recover(bus), NX_SUCCESS);
         EXPECT_FALSE(state->fault);
-        EXPECT_EQ(state->registers->timing, NX_I2C_LONG_EXPECTED_TIMING);
+        EXPECT_EQ(state->config->registers->timing,
+                  NX_I2C_LONG_EXPECTED_TIMING);
         size_t done = 0U;
         ASSERT_EQ(Transfer(&done), NX_SUCCESS);
         EXPECT_EQ(done, tx.size() + rx.size());
@@ -126,6 +136,22 @@ class I2CLongNormalFactory : public testing::Test {
         CheckPayload();
     }
 };
+TEST_F(I2CLongNormalFactory, StopAndRestartKeepOneImmutableConfiguration) {
+    const auto* selected = state->config;
+    ASSERT_NE(selected, nullptr);
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(bus));
+    EXPECT_EQ(selected, state->config);
+    const auto started = nx_platform_start();
+    ASSERT_EQ(NX_SUCCESS, started.primary);
+    ASSERT_EQ(NX_SUCCESS, started.cleanup);
+    EXPECT_EQ(selected, state->config);
+    EXPECT_EQ(NX_I2C_LONG_EXPECTED_TIMING, state->config->timing);
+    size_t done = 0U;
+    EXPECT_EQ(NX_SUCCESS, Transfer(&done));
+    EXPECT_EQ(tx.size() + rx.size(), done);
+}
 TEST_F(I2CLongNormalFactory, LongWriteReadPreservesMessageBoundariesAndTiming) {
     testing::StrictMock<
         testing::MockFunction<void(nx_i2c_long_factory_event_t, bool)>>
@@ -145,7 +171,7 @@ TEST_F(I2CLongNormalFactory, LongWriteReadPreservesMessageBoundariesAndTiming) {
     EXPECT_EQ(g_long_i2c.stops, 1U);
     EXPECT_EQ(g_long_i2c.resets, 0U);
     EXPECT_EQ(g_long_i2c.illegal_controls, 0U);
-    const size_t rx_chunks = state->receive_reload_one ? rx.size() : 2U;
+    const size_t rx_chunks = state->config->receive_reload_one ? rx.size() : 2U;
     EXPECT_EQ(g_long_i2c.reloads, 2U + rx_chunks - 1U);
     ASSERT_EQ(g_long_i2c.controls.size(), 3U + rx_chunks);
     for (size_t i = 0U; i < g_long_i2c.controls.size(); ++i) {
@@ -160,12 +186,13 @@ TEST_F(I2CLongNormalFactory, LongWriteReadPreservesMessageBoundariesAndTiming) {
         ASSERT_EQ(endpoint->port, state);
         EXPECT_EQ(entry.value & (uint32_t)I2C_CR2_SADD,
                   static_cast<uint32_t>(endpoint->address) << 1U);
-        if (i >= 3U && state->receive_reload_one) {
+        if (i >= 3U && state->config->receive_reload_one) {
             EXPECT_EQ((entry.value >> 16U) & 255U, 1U);
         }
     }
-    EXPECT_EQ(state->registers->cr2, 0U);
-    EXPECT_EQ(state->registers->isr & (I2C_ISR_BUSY | I2C_ISR_STOPF), 0U);
+    EXPECT_EQ(state->config->registers->cr2, 0U);
+    EXPECT_EQ(state->config->registers->isr & (I2C_ISR_BUSY | I2C_ISR_STOPF),
+              0U);
     CheckPayload();
     g_long_i2c.event = nullptr;
     observer = nullptr;

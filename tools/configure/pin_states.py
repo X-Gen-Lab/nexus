@@ -3,10 +3,8 @@
 These plans describe two software states, never a power mode or physical safety.
 No electrical values are inferred from a route, PCB name or unselected state.
 """
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers import maintained
+from tools.configure.providers.common import fail, integer
 
 
 def _object(value, fields, label):
@@ -62,10 +60,11 @@ def validate_binding(binding, kind, mask):
 
 
 def select(binding, *, family, part, controller, backend, clock):
-    """The first named-state mode has one exact software admission tuple."""
-    if (family, part, controller, backend, clock) != (
-            "stm32g474", "STM32G474RET6", "GPIOA", "baremetal", "hse24-pll170"):
-        fail("Named states require exact G474RE/GPIOA/hse24-pll170/baremetal")
+    """Require the exact SoC review before projecting normalized Board intent."""
+    validate = getattr(maintained(family), "validate_pin_states_selection", None)
+    if validate is None:
+        fail("Named states require an explicitly reviewed SoC selection")
+    validate(part=part, controller=controller, backend=backend, clock=clock)
     if "pin_state_resolution" not in binding:
         fail("Named states require explicit Board pin states")
     return binding["pin_state_resolution"]

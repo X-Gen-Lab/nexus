@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure as gate
+from tools.configure import can, configure as gate
 
 
 class CanConfigurationTests(unittest.TestCase):
@@ -51,6 +51,17 @@ class CanConfigurationTests(unittest.TestCase):
                        'CAN2_TX', 'CAN2_RX0', 'CAN2_RX1', 'CAN2_SCE'):
             self.assertIn('irq:' + vector, claims)
         self.assertFalse(any(name.startswith('dma:') for name in claims))
+
+    def test_constructor_rejects_a_foreign_vendor_binding(self):
+        for fixture, foreign in (("stm32-first.toml", "gd32"),
+                                 ("gd32-first.toml", "stm32")):
+            with self.subTest(fixture=fixture):
+                result = gate.resolve_ir(gate.ROOT /
+                    "tests/contracts/can_assembly" / fixture)
+                item = next(item for item in result.controllers
+                            if item.kind == "can")
+                with self.assertRaisesRegex(ValueError, "provider"):
+                    can.constructor(item, result, foreign)
 
     def test_generated_factory_and_partial_start_cleanup_are_explicit(self):
         path = self.authored(second=True)

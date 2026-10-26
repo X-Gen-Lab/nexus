@@ -9,10 +9,7 @@ SETTLED before reclaiming descriptors or payloads.
 from dataclasses import asdict, dataclass
 import re
 
-try:
-    from .resource_graph import fail, identifier, json_value, number, record
-except ImportError:
-    from resource_graph import fail, identifier, json_value, number, record
+from tools.configure.resource_graph import fail, identifier, json_value, number, record
 
 
 LIMIT = 1 << 32

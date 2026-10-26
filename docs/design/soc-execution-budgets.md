@@ -52,7 +52,7 @@ The exact implementations and configured limits remain authoritative:
   `20000000 / baud + 100` microseconds. GD IRQ uses its reviewed reset-abort
   protocol; it is not assigned the ST wire-drain formula.
 - SPI: `soc/*/*/drivers/spi*.c`; the finite DMA drain allowance is 200 microseconds.
-- I2C: `soc/common/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
+- I2C: `drivers/i2c/i2c_v1_async/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
   is 1,000 microseconds. Polling STOP has separate finite work.
 - ADC/EXTI/timer: selected SoC driver and private state; scan, queue and channel
   limits come from resolved inputs or explicit caller storage.

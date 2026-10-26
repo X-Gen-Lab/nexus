@@ -5,6 +5,7 @@ os
 components
 arch
 soc
+drivers
 boards
 tests
 tools/measurement

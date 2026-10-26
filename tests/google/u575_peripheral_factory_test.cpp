@@ -14,7 +14,7 @@
 class U575PeripheralFactory : public testing::Test {
   protected:
     SPI_TypeDef spi{};
-    nx_i2c_v2_registers_t i2c{};
+    nx_i2c_v2_registers_t& i2c{g_u575_i2c_registers};
     ADC_TypeDef adc{};
     ADC_Common_TypeDef common{};
     void SetUp() override {
@@ -51,6 +51,14 @@ TEST_F(U575PeripheralFactory, ColdAssemblyAndStopPreserveExternalPowerOwner) {
         nx_flash_port_geometry(nx_factory_flash(NX_FLASH_ID_STORAGE));
     ASSERT_NE(nullptr, capability);
     ASSERT_NE(nullptr, geometry);
+    EXPECT_EQ(0x08000000U, geometry->base_address);
+    EXPECT_EQ(2097152U, geometry->size);
+    ASSERT_EQ(256U, geometry->sector_count);
+    ASSERT_NE(nullptr, geometry->sectors);
+    for (size_t index = 0U; index < 256U; ++index) {
+        EXPECT_EQ(index * 8192U, geometry->sectors[index].offset);
+        EXPECT_EQ(8192U, geometry->sectors[index].size);
+    }
     EXPECT_EQ(geometry->program_unit, capability->unit_bytes);
     EXPECT_EQ(1U, capability->buffer_alignment);
     EXPECT_EQ(16U, GPIOA->ODR & 16U);

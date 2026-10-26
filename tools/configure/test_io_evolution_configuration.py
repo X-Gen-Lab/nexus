@@ -5,7 +5,7 @@ import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory
+from tools.configure import bindings, configure, enhanced_endpoints, factory
 
 
 class EnhancedEndpointConfiguration(unittest.TestCase):
@@ -133,6 +133,21 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                 header, source = bindings.emit(result)
                 self.assertIn("nx_spi_transaction_endpoint_t", header)
                 self.assertIn(operations, source)
+
+    def test_transaction_face_requires_exact_family_not_a_vendor_prefix(self):
+        for family, prefix, fixture in (
+                ("stm32f407", "stm32", "f407-spi-transaction.toml"),
+                ("gd32f470", "gd32", "gd470-spi-transaction.toml")):
+            with self.subTest(family=family):
+                result = configure.resolve_ir(configure.ROOT /
+                    "tests/contracts/io_evolution_assembly" / fixture)
+                endpoint = result.devices[0]
+                with self.assertRaises(ValueError):
+                    enhanced_endpoints.face(endpoint, "state", "unused", prefix)
+                source = enhanced_endpoints.face(endpoint, "state", "unused",
+                                                 family)
+                self.assertIn(f"&nx_{prefix}_spi_transaction_ops, &state",
+                              "\n".join(source))
 
     def test_polling_transaction_driver_cannot_silently_use_dma(self):
         with self.assertRaisesRegex(ValueError, "transaction.*poll|poll.*transaction"):

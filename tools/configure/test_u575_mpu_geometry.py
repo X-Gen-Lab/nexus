@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure, kernel
-from tools.configure.providers import stm32u575
+from soc.stm32.stm32u575 import configure as stm32u575
 from scripts.ci import stm32u575 as image_gate
 from tools.evidence.common import EvidenceError
 

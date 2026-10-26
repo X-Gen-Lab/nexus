@@ -1,11 +1,13 @@
 # Shared reviewed engines execute real owned C against external MMIO models.
 nexus_google_test(nexus_legacy_devices_test
     SOURCES legacy_devices_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/common/legacy_flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/common/legacy_adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/common/legacy_pwm.c"
+        "${NEXUS_SOURCE_DIR}/drivers/flash/legacy_flash/legacy_flash.c"
+        "${NEXUS_SOURCE_DIR}/drivers/adc/legacy_adc/legacy_adc.c"
+        "${NEXUS_SOURCE_DIR}/drivers/timer/legacy_pwm/legacy_pwm.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/common")
+    INCLUDES "${NEXUS_SOURCE_DIR}/drivers/adc/legacy_adc"
+        "${NEXUS_SOURCE_DIR}/drivers/flash/legacy_flash"
+        "${NEXUS_SOURCE_DIR}/drivers/timer/legacy_pwm")
 target_compile_options(nexus_legacy_devices_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/legacy_devices_model.h")
 
@@ -56,9 +58,9 @@ function(nexus_legacy_device_factory family)
             "${NEXUS_SOC_SOURCE_${family}}/system.c"
             "${NEXUS_SOC_SOURCE_${family}}/drivers/gpio.c"
             "${NEXUS_SOC_SOURCE_${family}}/drivers/devices.c" ${exti}
-            "${NEXUS_SOURCE_DIR}/soc/common/legacy_adc.c"
-            "${NEXUS_SOURCE_DIR}/soc/common/legacy_pwm.c"
-            "${NEXUS_SOURCE_DIR}/soc/common/legacy_flash.c"
+            "${NEXUS_SOURCE_DIR}/drivers/adc/legacy_adc/legacy_adc.c"
+            "${NEXUS_SOURCE_DIR}/drivers/timer/legacy_pwm/legacy_pwm.c"
+            "${NEXUS_SOURCE_DIR}/drivers/flash/legacy_flash/legacy_flash.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${bundle}" "${NEXUS_SOC_SOURCE_${family}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/${family}_model")

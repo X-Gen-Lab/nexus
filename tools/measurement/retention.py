@@ -101,7 +101,7 @@ def provider_initializers(path, source, root):
                 if definition.start() > include.start():
                     raise EvidenceError("provider operations macro must bind before include")
                 owned = set()
-                for directory in (root / "soc", root / "io"):
+                for directory in (root / "soc", root / "drivers", root / "io"):
                     owned.update(directory.rglob(name))
                 local = path.parent / name
                 if local.is_file():
@@ -166,7 +166,7 @@ def source_contracts(root=ROOT):
                 raise EvidenceError("duplicate public face type")
             faces[name] = operations
     provider_sources = set((root / "soc").rglob("drivers/*.c"))
-    provider_sources.update((root / "soc/common").glob("*.c"))
+    provider_sources.update((root / "drivers").rglob("*.c"))
     provider_sources.update((root / "io/src").rglob("*.c"))
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
@@ -654,7 +654,7 @@ def component_owner_input_paths(root):
     paths.update((root / "components").rglob("include/nexus/components/*.h"))
     paths.update((root / "components").rglob("src/*.c"))
     paths.update((root / "soc").rglob("drivers/*.c"))
-    paths.update((root / "soc/common").glob("*.c"))
+    paths.update((root / "drivers").rglob("*.c"))
     paths.update((root / "io/src").rglob("*.c"))
     paths.update((root / "io/private").glob("*.h"))
     paths.add(root / "soc/stm32/stm32u575/stop2.c")

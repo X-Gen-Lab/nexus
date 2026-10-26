@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
+    "__init__", "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
@@ -32,20 +32,18 @@ SDK = (
 )
 
 
-def _names(mode, family, *, sdk=False):
+def source_names(mode, family, *, sdk=False):
+    """Return declared generator inputs for freshness and SDK admission."""
     if mode not in {"platform", "runtime"}:
         raise ValueError("Unknown configuration-code dependency scope")
     names = ["tools/configure/" + name + ".py" for name in COMMON]
-    names.append("tools/maintenance/source_catalogue.py")
+    names.extend(("tools/__init__.py", "tools/maintenance/source_catalogue.py"))
     if sdk:
         names.extend(SDK)
     if mode == "runtime":
         names.append("tools/configure/runtime.py")
     else:
-        try:
-            from .providers import descriptor
-        except ImportError:
-            from providers import descriptor
+        from tools.configure.providers import descriptor
         names.extend("tools/configure/" + name + ".py" for name in PLATFORM)
         providers = (descriptor.families() if family is None else
                      (descriptor.maintained(family),))
@@ -66,7 +64,7 @@ def _identity(mode, records):
 
 def snapshot(*, mode, family=None, sdk=False):
     """Bind code before resolution; unknown family binds all maintained code."""
-    paths = {name: str(ROOT / name) for name in _names(mode, family, sdk=sdk)}
+    paths = {name: str(ROOT / name) for name in source_names(mode, family, sdk=sdk)}
     records = [{"path": name,
                 "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
                for name, path in paths.items()]
@@ -75,7 +73,7 @@ def snapshot(*, mode, family=None, sdk=False):
 
 def selected(paths, identity, *, family):
     """Retain the pre-resolution bytes of the selected family, never rehash."""
-    names = _names("platform", family,
+    names = source_names("platform", family,
                    sdk="cmake/package/package_source_sdk.py" in paths)
     records = {record["path"]: record for record in identity["files"]}
     if not set(names).issubset(records):

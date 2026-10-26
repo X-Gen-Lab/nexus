@@ -6,10 +6,10 @@ import re
 import tempfile
 import unittest
 
-import configure
-import cpu
-import runtime
-from test_cpu_profiles import facts, irq
+from tools.configure import configure
+from tools.configure import cpu
+from tools.configure import runtime
+from tools.configure.test_cpu_profiles import facts, irq
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,7 +25,7 @@ class KernelProfileTests(unittest.TestCase):
         if bits is not None:
             interrupts["priority_bits"] = bits
         profile = cpu.resolve(features, interrupts, "freertos")
-        return importlib.import_module("kernel").resolve(choices, profile, hz)
+        return importlib.import_module("tools.configure.kernel").resolve(choices, profile, hz)
 
     def test_standard_preserves_reviewed_existing_policy(self):
         result = self.resolve()
@@ -181,7 +181,7 @@ class KernelProfileTests(unittest.TestCase):
     def test_mpu_policy_requires_explicit_physical_region_count(self):
         features = facts("cortex-m3", mpu_version=7, mpu_regions=8)
         profile = cpu.resolve(features, irq("cortex-m3"), "freertos")
-        result = importlib.import_module("kernel").resolve(
+        result = importlib.import_module("tools.configure.kernel").resolve(
             {"memory_protection": True}, profile, 72000000)
         self.assertTrue(result.memory_protection)
         self.assertEqual(result.kernel_port, "GCC/ARM_CM3_MPU")
@@ -189,7 +189,7 @@ class KernelProfileTests(unittest.TestCase):
         features.pop("mpu_regions")
         profile = cpu.resolve(features, irq("cortex-m3"), "freertos")
         with self.assertRaisesRegex(ValueError, "explicit MPU"):
-            importlib.import_module("kernel").resolve(
+            importlib.import_module("tools.configure.kernel").resolve(
                 {"memory_protection": True}, profile, 72000000)
 
     def test_mpu_port_selection_tracks_exact_cpu_and_fpu(self):
@@ -203,7 +203,7 @@ class KernelProfileTests(unittest.TestCase):
                 if fpu != "none":
                     features["float_abi"] = "hard"
                 profile = cpu.resolve(features, irq(arch), "freertos")
-                module = importlib.import_module("kernel")
+                module = importlib.import_module("tools.configure.kernel")
                 result = module.resolve({"memory_protection": True}, profile, 48000000)
                 self.assertEqual(module.bind(profile, result).irq.kernel_port, port)
         for words in (63, 65, 65537, True):
@@ -215,7 +215,7 @@ class KernelProfileTests(unittest.TestCase):
             features = facts(arch, mpu_version=cpu.PROFILES[arch].mpu, mpu_regions=8)
             profile = cpu.resolve(features, irq(arch), "freertos")
             with self.subTest(arch=arch), self.assertRaisesRegex(ValueError, "MPU kernel"):
-                importlib.import_module("kernel").resolve(
+                importlib.import_module("tools.configure.kernel").resolve(
                     {"memory_protection": True}, profile, 48000000)
         for regions in (True, 7, 16):
             with self.subTest(regions=regions), self.assertRaisesRegex(ValueError, "MPU region"):
@@ -226,7 +226,7 @@ class KernelProfileTests(unittest.TestCase):
         for arch in ("cortex-m23", "cortex-m33", "cortex-m55", "cortex-m85"):
             features = facts(arch, security="nonsecure")
             profile = cpu.resolve(features, irq(arch), "freertos")
-            result = importlib.import_module("kernel").resolve(
+            result = importlib.import_module("tools.configure.kernel").resolve(
                 {"security_model": "split"}, profile, 48000000)
             self.assertEqual(result.security_model, "split")
             self.assertEqual(result.kernel_port,
@@ -242,14 +242,14 @@ class KernelProfileTests(unittest.TestCase):
                                     mpu_version=8, mpu_regions=8),
                               irq("cortex-m33"), "freertos")
         with self.assertRaisesRegex(ValueError, "combination"):
-            importlib.import_module("kernel").resolve(
+            importlib.import_module("tools.configure.kernel").resolve(
                 {"security_model": "split", "memory_protection": True},
                 profile, 48000000)
 
     def test_split_idle_secure_budget_is_explicit_aligned_and_bounded(self):
         profile = cpu.resolve(facts("cortex-m33", security="nonsecure"),
                               irq("cortex-m33"), "freertos")
-        module = importlib.import_module("kernel")
+        module = importlib.import_module("tools.configure.kernel")
         default = module.resolve({"security_model": "split"}, profile, 48000000)
         self.assertEqual(default.secure_idle_stack_bytes, 128)
         self.assertEqual(default.definitions["NEXUS_OS_SECURE_IDLE_STACK_BYTES"], 128)
@@ -272,7 +272,7 @@ class KernelProfileTests(unittest.TestCase):
                 self.resolve({"secure_idle_stack_bytes": value})
 
     def test_bind_updates_irq_policy_without_changing_cpu_abi(self):
-        module = importlib.import_module("kernel")
+        module = importlib.import_module("tools.configure.kernel")
         profile = cpu.resolve(facts("cortex-m3"), irq("cortex-m3"), "freertos")
         policy = module.resolve({"syscall_priority": 7}, profile, 72000000)
         bound = module.bind(profile, policy)

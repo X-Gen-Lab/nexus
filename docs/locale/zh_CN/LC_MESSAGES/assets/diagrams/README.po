@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: f671ec17b339cd38854405b8cd505d5ddc1e57258b6598f2f9cf449edfe8c5d4\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e9bf8514d8b46f9f905ccbea68dfe2473c7292eb9eae4af32f04399ea55e0273\n"
 
 msgid "Nexus 平台图册"
 msgstr "Nexus 平台图册"
@@ -116,9 +116,6 @@ msgstr "FIG-04：按需选入的两同类实例示意；同模式ops共享，con
 
 msgid "结构图展示由生成器支持的按配置实例布局，不声称每块PCB均授权这些组合。同provider同模式实例共享readonly ops，各自context/state/storage独立。不同provider或模式可使用不同ops；调用方法接收本次context。controller和endpoint有独立factory命名空间，endpoint不冒充控制器。ID只在当前assembly有效，默认uint16_t typedef不提供语言级跨类防混用。"
 msgstr "结构图展示由生成器支持的按配置实例布局，不声称每块PCB均授权这些组合。同provider同模式实例共享readonly ops，各自context/state/storage独立。不同provider或模式可使用不同ops；调用方法接收本次context。controller和endpoint有独立factory命名空间，endpoint不冒充控制器。ID只在当前assembly有效，默认uint16_t typedef不提供语言级跨类防混用。"
-
-msgid "依据：[typed factory生成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[face/state装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[SPI公开接口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/spi.h)、[Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/native/bindings.py)。 {download}`可编辑DOT <factory-instances.dot>`；实施关联：DOC-46。"
-msgstr "依据：[typed factory生成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[face/state装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[SPI公开接口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/spi.h)、[Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/native/bindings.py)。 {download}`可编辑DOT <factory-instances.dot>`；实施关联：DOC-46。"
 
 msgid "FIG-05 显式启动停机与失败撤回"
 msgstr "FIG-05 显式启动停机与失败撤回"
@@ -509,31 +506,6 @@ msgstr "Native RTC/LPTIM 的构建期装配、运行调用、最终访问和私�
 msgid "构建边、运行调用和请求源推进均有独立标签。factory 只返回已有接口面；生成的 Platform 首次准备构造一次，后续对已构造 owner 调用私有 start。stop 先关闭准入， 撤源失败仍保留请求和 owner；私有 start 优先拒绝保留责任。真实撤源并完成外部 join 后，重新开放先推进代次再开放准入，保留日历、速率、时钟与外部故障。模型推进不 发布请求结果。虚线硬件适配需要独立 SoC／时钟／备份域／IRQ／STOP／VBAT 合同， 不表示已有物理驱动或 HIL 通过。"
 msgstr "构建边、运行调用和请求源推进均有独立标签。factory 只返回已有接口面；生成的 Platform 首次准备构造一次，后续对已构造 owner 调用私有 start。stop 先关闭准入，撤源失败仍保留请求和 owner；私有 start 优先拒绝保留责任。真实撤源并完成外部 join 后，重新开放先推进代次再开放准入，保留日历、速率、时钟与外部故障。模型推进不发布请求结果。虚线硬件适配需要独立 SoC／时钟／备份域／IRQ／STOP／VBAT 合同，不表示已有物理驱动或 HIL 通过。"
 
-#: docs/assets/diagrams/README.md:301
-msgid ""
-"依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、 [公共 "
-"RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/rtc.h)、 [公共 LPTIM](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/lptim.h)、 "
-"[Native 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/native/drivers/rtc_lptim.c)、 [Native "
-"装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/configure/providers/native/bindings.py)。 {download}`可编辑 DOT "
-"<rtc-lptim-lifecycle.dot>`；实施关联：IO-36。软件开发证据与 main／SDK／ "
-"候选／实板资格分别判断，不能从该图或渲染成功推断。"
-msgstr ""
-"依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、[公共 "
-"RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/rtc.h)、[公共 LPTIM](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/lptim.h)、[Native 实现](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/native/drivers/rtc_lptim.c)、[Native 装配](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/configure/providers/native/bindings.py)。{download}`可编辑 DOT "
-"<rtc-lptim-lifecycle.dot>`；实施关联：IO-36。软件开发证据与 "
-"main／SDK／候选／实板资格分别判断，不能从该图或渲染成功推断。"
-
 msgid "FIG-22 G474 命名 GPIO 状态与保留租约"
 msgstr "FIG-22 G474 命名 GPIO 状态与保留租约"
 
@@ -709,3 +681,30 @@ msgstr ""
 "DOT <f407-i2s2-slave-tx.dot>`。Native 模型、normal VE/ZG/default 链接和单个搬移 "
 "development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 "
 "SDK／formal／OCI 与物理退出仍分别开放。"
+
+msgid "依据：[typed factory生成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[face/state装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[SPI公开接口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/spi.h)、[Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/configure/bindings.py)。 {download}`可编辑DOT <factory-instances.dot>`；实施关联：DOC-46。"
+msgstr "依据：[typed factory生成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[face/state装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[SPI公开接口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/spi.h)、[Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/configure/bindings.py)。 {download}`可编辑DOT <factory-instances.dot>`；实施关联：DOC-46。"
+
+msgid "依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、 [公共 RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/rtc.h)、 [公共 LPTIM](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/lptim.h)、 [Native 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/drivers/rtc_lptim.c)、 [Native 装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/configure/bindings.py)。 {download}`可编辑 DOT <rtc-lptim-lifecycle.dot>`；实施关联：IO-36。软件开发证据与 main／SDK／ 候选／实板资格分别判断，不能从该图或渲染成功推断。"
+msgstr "依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、[公共 RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/rtc.h)、[公共 LPTIM](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/lptim.h)、[Native 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/drivers/rtc_lptim.c)、[Native 装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/configure/bindings.py)。{download}`可编辑 DOT <rtc-lptim-lifecycle.dot>`；实施关联：IO-36。软件开发证据与 main／SDK／候选／实板资格分别判断，不能从该图或渲染成功推断。"
+
+msgid "FIG-31 共享 IP 与精确 SoC 源码归属"
+msgstr "FIG-31 共享 IP 与精确 SoC 源码归属"
+
+msgid "**身份：current。范围：当前私有控制器源码的维护判定，不表示运行调用、初始化顺序或资格结果。**"
+msgstr "**身份：current。范围：当前私有控制器源码的维护判定，不表示运行调用、初始化顺序或资格结果。**"
+
+msgid "![FIG-31：先区分寄存器协议和芯片集成，再按逐芯片兼容性证据决定共享范围](driver-source-ownership.svg)"
+msgstr "![FIG-31：先区分寄存器协议和芯片集成，再按逐芯片兼容性证据决定共享范围](driver-source-ownership.svg)"
+
+msgid "FIG-31：先区分寄存器协议和芯片集成，再按逐芯片兼容性证据决定共享范围"
+msgstr "FIG-31：先区分寄存器协议和芯片集成，再按逐芯片兼容性证据决定共享范围"
+
+msgid "箭头是标明条件的源码归属决策。精确芯片事实、时钟、复位、引脚、IRQ／DMA 与私有协作合同保留在其 SoC 范围；公共 I/O 合同及产品政策另按接入合同归属。寄存器布局、位含义、访问顺序和复位兼容性在每个选入芯片上均经复核，且各芯片勘误均已显式处理后，算法才放入 `drivers/<kind>/<ip>/`。名称相似、SDK 有宏或编译成功不能替代复核，未知兼容性继续保留精确 SoC 实现。"
+msgstr "箭头是标明条件的源码归属决策。精确芯片事实、时钟、复位、引脚、IRQ／DMA 与私有协作合同保留在其 SoC 范围；公共 I/O 合同及产品政策另按接入合同归属。寄存器布局、位含义、访问顺序和复位兼容性在每个选入芯片上均经复核，且各芯片勘误均已显式处理后，算法才放入 `drivers/<kind>/<ip>/`。名称相似、SDK 有宏或编译成功不能替代复核，未知兼容性继续保留精确 SoC 实现。"
+
+msgid "共享算法仍由所选 SoC CMake target 私有编译，wrapper 保留真实路由、时钟、内存与准入责任。图不增加运行时转发、注册、任务或支持模式，也不证明实板行为。"
+msgstr "共享算法仍由所选 SoC CMake target 私有编译，wrapper 保留真实路由、时钟、内存与准入责任。图不增加运行时转发、注册、任务或支持模式，也不证明实板行为。"
+
+msgid "依据：[provider 接入指南](../../guides/provider-porting.md)、[共享 IP 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)、[SoC 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/README.md)及[私有路径迁移](../../guides/migration.md#update-private-source-integrations)。{download}`可编辑 DOT <driver-source-ownership.dot>`；实施关联：R41。"
+msgstr "依据：[provider 接入指南](../../guides/provider-porting.md)、[共享 IP 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)、[SoC 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/README.md)及[私有路径迁移](../../guides/migration.md#update-private-source-integrations)。{download}`可编辑 DOT <driver-source-ownership.dot>`；实施关联：R41。"

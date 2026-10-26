@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a3c76bbcad37d922420743dd54dc8fdb9bd5d828b9e8b7989922f42fbe87ab46\n"
+"X-Nexus-Source-SHA256: b1fce9a4e31432cd1323234763e83f60e26e3700dc541d5bf88044c93b596330\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -248,10 +248,6 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/gd303-devices.toml`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/legacy_adc.c`"
-msgstr "`soc/common/legacy_adc.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "EXTI0"
 msgstr "EXTI0"
 
@@ -298,10 +294,6 @@ msgstr "poll-word"
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "`flash-internal`"
 msgstr "`flash-internal`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/legacy_flash.c`"
-msgstr "`soc/common/legacy_flash.c`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "FWDGT"
@@ -396,10 +388,6 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/i2c_v1_async.c`"
-msgstr "`soc/common/i2c_v1_async.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "SPI0"
 msgstr "SPI0"
 
@@ -436,10 +424,6 @@ msgid "`pwm-pa6`"
 msgstr "`pwm-pa6`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/legacy_pwm.c`"
-msgstr "`soc/common/legacy_pwm.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "USART0"
 msgstr "USART0"
 
@@ -464,10 +448,6 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-"
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
 "dma-duplex.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/uart_v1_channel_dma.c`"
-msgstr "`soc/common/uart_v1_channel_dma.c`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "dma-tx"
@@ -2114,10 +2094,6 @@ msgid "`i2c1-pb8-pb9`"
 msgstr "`i2c1-pb8-pb9`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/common/i2c_v2.c`"
-msgstr "`soc/common/i2c_v2.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
 "`tests/contracts/g474_assembly/spi.toml`, "
@@ -3012,3 +2988,21 @@ msgstr "`soc/native/drivers/uart_word.c`"
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"
+
+msgid "`drivers/adc/legacy_adc/legacy_adc.c`"
+msgstr "`drivers/adc/legacy_adc/legacy_adc.c`"
+
+msgid "`drivers/flash/legacy_flash/legacy_flash.c`"
+msgstr "`drivers/flash/legacy_flash/legacy_flash.c`"
+
+msgid "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
+msgstr "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
+
+msgid "`drivers/timer/legacy_pwm/legacy_pwm.c`"
+msgstr "`drivers/timer/legacy_pwm/legacy_pwm.c`"
+
+msgid "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
+msgstr "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
+
+msgid "`drivers/i2c/i2c_v2/i2c_v2.c`"
+msgstr "`drivers/i2c/i2c_v2/i2c_v2.c`"

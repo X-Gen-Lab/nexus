@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 9ef3517a89692e1b964709a2d134620926b9a71a6b5cbd45a9aa02426b7c784c\n"
+"X-Nexus-Source-SHA256: 194da1156f50c74ece168a0998e57343bf15650c3dbee8c7aaeda0f8cba7d327\n"
 
 msgid "How the platform is assembled and executed"
 msgstr "平台如何装配与执行"
@@ -275,17 +275,6 @@ msgstr ""
 "源码树按厂家组织 MCU 系列，按指令集架构组织 CPU "
 "实现。这些目录表达构建期所有权，不增加运行时分派或查找层。公共头文件路径、目标名称和人工配置中的系列标识保持稳定。"
 
-#: docs/explanation/platform-architecture.md:40
-msgid ""
-"The [source-adjacent contracts](source-map.md) own the directory map and "
-"layer README content. Native models implement the same public I/O contracts "
-"under the Native SoC package. Shared register-protocol algorithms remain in "
-"`soc/common/` only when the participating wrappers independently establish "
-"their silicon semantics."
-msgstr ""
-"[源码旁的合同](source-map.md)维护目录映射与各层 README 内容。Native 模型在 Native SoC 包内实现相同的公共 "
-"I/O 合同。只有参与的包装层分别核实硅片语义后，共享寄存器协议算法才放入 `soc/common/`。"
-
 #: docs/explanation/platform-architecture.md:46
 msgid ""
 "Common components and selected STM32 extensions have distinct source "
@@ -358,3 +347,9 @@ msgid ""
 msgstr ""
 "共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
 "仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"
+
+msgid "The [source-adjacent contracts](source-map.md) own the directory map and layer README content. Native models implement the same public I/O contracts under the Native SoC package. Shared register-protocol algorithms live under `drivers/<kind>/<ip>/` only when the participating wrappers independently establish their silicon semantics. Selected SoC targets compile these private sources directly; the directory adds no runtime layer to FIG-01. Cross-vendor SoC collaboration remains in `soc/common/`, while STM32 identity access remains under `soc/stm32/common/`."
+msgstr "[源码相邻合同](source-map.md) 维护目录映射和各层 README 正文。Native 模型在 Native SoC 包下实现相同的公共 I/O 合同。共享寄存器协议算法只有在参与的 wrapper 分别确认其硅片语义后，才位于 `drivers/<kind>/<ip>/`。所选 SoC target 直接编译这些私有源文件；目录不会给 FIG-01 增加运行时层。跨厂家 SoC 协作保留在 `soc/common/`，STM32 identity 访问保留在 `soc/stm32/common/`。"
+
+msgid "Each family's `configure/` package owns its capability policy, constructors and lifecycle emission; Native uses `soc/native/configure/`. The explicit provider map and shared leaf contracts remain in `tools/configure/providers/`. Common parsing, resource arbitration, typed IR and atomic publication stay in `tools/configure/`. Configuration tests stay under `tools/configure/tests/providers/<family>/`. These are build-time Python boundaries, independent of the C execution path."
+msgstr "每个家族的 `configure/` 包拥有能力策略、构造器与生命周期生成；Native 使用 `soc/native/configure/`。显式 provider map 与共享叶子合同保留在 `tools/configure/providers/`。通用解析、资源仲裁、typed IR 和原子发布仍在 `tools/configure/`。配置测试仍在 `tools/configure/tests/providers/<family>/`。这些是构建期 Python 边界，独立于 C 执行路径。"

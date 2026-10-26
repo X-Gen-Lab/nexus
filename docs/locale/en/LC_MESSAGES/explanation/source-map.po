@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 106f592299a30bbdfc5c4c0e2c51bba3ab9dbee0391cbd176c926879ccf43643\n"
+"X-Nexus-Source-SHA256: d46a85ccb625ff29f226b86d8c048d10f8d9c33f1e54c630a393969f846a84e8\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
@@ -1023,34 +1023,6 @@ msgstr ""
 "directory names do not create another configuration authority or a runtime "
 "registry."
 
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:20
-msgid ""
-"Each MCU family owns `soc.json`, `routes.json`, its private controller "
-"state, selected driver sources and explicit CMake targets. Startup, clocks, "
-"timebase, memory and power code remain with that family. Common register "
-"algorithms are shared only after every wrapper checks the real vendor "
-"layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do"
-" not establish equivalence."
-msgstr ""
-"Each MCU family owns `soc.json`, `routes.json`, its private controller "
-"state, selected driver sources and explicit CMake targets. Startup, clocks, "
-"timebase, memory and power code remain with that family. Common register "
-"algorithms are shared only after every wrapper checks the real vendor "
-"layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do"
-" not establish equivalence."
-
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:26
-msgid ""
-"`native/drivers/` implements the public I/O contracts as independent host "
-"models; it does not establish MCU timing or electrical behavior. `common/` "
-"remains cross-vendor because its reviewed algorithms serve both STM32 and "
-"GD32."
-msgstr ""
-"`native/drivers/` implements the public I/O contracts as independent host "
-"models; it does not establish MCU timing or electrical behavior. `common/` "
-"remains cross-vendor because its reviewed algorithms serve both STM32 and "
-"GD32."
-
 #: ../../../../tmp/nexus-quality-20261019/soc/README.md:30
 msgid ""
 "The [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
@@ -1166,3 +1138,69 @@ msgstr ""
 "supply or physical timing. Uninspected PCB revisions and jumpers remain "
 "unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
 "remains `not_executed`."
+
+msgid "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
+msgstr "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
+
+msgid "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
+msgstr "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
+
+msgid "Reusable IP implementations"
+msgstr "Reusable IP implementations"
+
+msgid "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
+msgstr "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
+
+msgid "Source directory"
+msgstr "Source directory"
+
+msgid "Maintained algorithm"
+msgstr "Maintained algorithm"
+
+msgid "`uart/uart_v1_channel_dma/`"
+msgstr "`uart/uart_v1_channel_dma/`"
+
+msgid "Legacy USART with fixed-channel DMA"
+msgstr "Legacy USART with fixed-channel DMA"
+
+msgid "`i2c/i2c_v1_async/`"
+msgstr "`i2c/i2c_v1_async/`"
+
+msgid "Reviewed V1 IRQ/DMA message sequencing"
+msgstr "Reviewed V1 IRQ/DMA message sequencing"
+
+msgid "`i2c/i2c_v2/`"
+msgstr "`i2c/i2c_v2/`"
+
+msgid "Reviewed V2 polling message sequencing"
+msgstr "Reviewed V2 polling message sequencing"
+
+msgid "`adc/legacy_adc/`"
+msgstr "`adc/legacy_adc/`"
+
+msgid "Legacy single-shot ADC"
+msgstr "Legacy single-shot ADC"
+
+msgid "`timer/legacy_pwm/`"
+msgstr "`timer/legacy_pwm/`"
+
+msgid "Legacy fixed PWM"
+msgstr "Legacy fixed PWM"
+
+msgid "`flash/legacy_flash/`"
+msgstr "`flash/legacy_flash/`"
+
+msgid "Legacy halfword Flash programming"
+msgstr "Legacy halfword Flash programming"
+
+msgid "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
+msgstr "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
+
+msgid "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
+msgstr "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
+
+msgid "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
+msgstr "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
+
+msgid "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
+msgstr "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."

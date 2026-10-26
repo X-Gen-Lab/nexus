@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b9b772b8503df2cd7e88d03fa892794c2613582789bf4d1c30bfe639173c2ef4\n"
+"X-Nexus-Source-SHA256: 51776ec62d9482ab03cca988e7d9f875a37aa437ac65bb1eb637dfb5db448289\n"
 
 msgid "当前系统架构"
 msgstr "当前系统架构"
@@ -215,25 +215,6 @@ msgstr ""
 "SoC/Board 事实采用 JSON，使用者编写 schema-2 TOML。严格 resolver 产生不可变 typed "
 "IR；各生成器消费同一结果。`resolved.json` 是该结果的序列化，不能作为手工 配置回填。迁移期 schema-1 JSON "
 "夹具有显式入口，不与 TOML 混合叠加。"
-
-msgid ""
-"IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC "
-"channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， "
-"不能声称所有字段均有名义强类型。`tools/configure/providers/<family>/` 明确 拥有 "
-"ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 "
-"constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共 "
-"binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK "
-"必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现， "
-"不复制驱动；文档矩阵不能反向决定配置。"
-msgstr ""
-"IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC "
-"channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， "
-"不能声称所有字段均有名义强类型。`tools/configure/providers/<family>/` 明确 拥有 "
-"ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 "
-"constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共 "
-"binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK "
-"必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现， "
-"不复制驱动；文档矩阵不能反向决定配置。"
 
 msgid ""
 "不可变 family descriptor 统一配置入口、依赖身份和 SDK 必需 payload；controller descriptor "
@@ -691,7 +672,24 @@ msgstr ""
 "specific APIs. Products switching RTOS explicitly adapt their lifecycle; no "
 "universal maximum pool is introduced."
 
-
 # CMSIS6 actual-POT delta; independent review pending.
 msgid "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"
 msgstr "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"
+
+msgid "`drivers/<kind>/<ip>/`"
+msgstr "`drivers/<kind>/<ip>/`"
+
+msgid "经逐芯片复核的共享 UART、I2C、ADC、timer 与 Flash 寄存器协议算法"
+msgstr "经逐芯片复核的共享 UART、I2C、ADC、timer 与 Flash 寄存器协议算法"
+
+msgid "所选 SoC target 私有编译；不拥有芯片路由、时钟、Board 或运行时注册"
+msgstr "所选 SoC target 私有编译；不拥有芯片路由、时钟、Board 或运行时注册"
+
+msgid "IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， 不能声称所有字段均有名义强类型。`soc/<vendor>/<family>/configure/`（Native 为 `soc/native/configure/`）明确 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现， 不复制驱动；文档矩阵不能反向决定配置。"
+msgstr "IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， 不能声称所有字段均有名义强类型。`soc/<vendor>/<family>/configure/`（Native 为 `soc/native/configure/`）明确 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现， 不复制驱动；文档矩阵不能反向决定配置。"
+
+msgid "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
+msgstr "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
+
+msgid "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"
+msgstr "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"

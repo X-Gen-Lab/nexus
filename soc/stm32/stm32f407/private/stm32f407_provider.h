@@ -190,8 +190,6 @@ extern GPIO_TypeDef g_nx_stm32_gpioa_model;
 #endif
 
 extern nx_stm32_system_t g_nx_stm32_system;
-extern const nx_flash_geometry_t g_nx_stm32_flash_ve;
-extern const nx_flash_geometry_t g_nx_stm32_flash_zg;
 
 /** \brief Configure a reviewed pin in a cold control path. */
 nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* gpio, uint8_t pin,

@@ -10,10 +10,7 @@ name. Calculated frequency excludes target clock stretching and arbitration.
 from dataclasses import asdict, dataclass
 from fractions import Fraction
 
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 FIELDS = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min", "bus_hz",

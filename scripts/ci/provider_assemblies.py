@@ -305,7 +305,7 @@ def source_inputs(root, fixtures):
     paths = {root / "CMakeLists.txt", Path(__file__).resolve(),
              Path(arch_compile.__file__).resolve()}
     directories = {root / name for name in (
-        "arch", "core", "io", "os", "soc", "boards", "components", "cmake",
+        "arch", "core", "io", "os", "soc", "drivers", "boards", "components", "cmake",
         "tools/configure", "tools/measurement", "tools/evidence", "dependencies")}
     projects = set()
     for fixture in fixtures:

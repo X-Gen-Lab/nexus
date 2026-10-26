@@ -1,11 +1,7 @@
 """Cross-domain selection checks above the leaf provider contracts."""
 
-try:
-    from .providers.common import (
-        UINT32_MAX, cpu_abi, fail, integer, mode_traits, sequence)
-except ImportError:
-    from providers.common import (
-        UINT32_MAX, cpu_abi, fail, integer, mode_traits, sequence)
+from tools.configure.providers.common import (
+    UINT32_MAX, cpu_abi, fail, integer, mode_traits, sequence)
 
 
 def validate_clock_profiles(soc, provider):
@@ -16,23 +12,16 @@ def validate_clock_profiles(soc, provider):
     actual = soc["clock_profiles"]
     if set(actual) != set(supported):
         fail("Clock profile identity differs from the fixed cold implementation")
-    try:
-        from . import clocks
-    except ImportError:
-        import clocks
     for name, expected in supported.items():
-        clocks.plan(name, actual[name])
-        if clocks.normalize(actual[name]) != clocks.normalize(expected):
+        provider.clock_plan(name, actual[name])
+        if provider.normalize_clock(actual[name]) != provider.normalize_clock(expected):
             fail(f"Clock profile differs from the fixed cold implementation: {name}")
 
 
 
 def resolve_interrupts(cpu, irq, backend, provider):
     """Bind logical IRQ range and syscall policy to a maintained kernel port."""
-    try:
-        from . import cpu as profiles
-    except ImportError:
-        import cpu as profiles
+    from tools.configure import cpu as profiles
     if cpu_abi(cpu) != provider.CPU_ABI:
         fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
     # Direct provider-contract tests may supply ABI assertions alone. Their
@@ -91,37 +80,22 @@ def validate_selection(selection, route, provider, ram_size):
     if kind == "lptim":
         integer(selection.get("tick_hz"), 1, UINT32_MAX, "LPTIM tick_hz")
     if kind in {"timer_capture", "advanced_pwm"}:
-        try:
-            from . import timer_advanced
-        except ImportError:
-            import timer_advanced
+        from tools.configure import timer_advanced
         timer_advanced.validate_selection(selection, route, provider)
     elif kind in {"eth", "eth_frames"}:
-        try:
-            from . import ethernet
-        except ImportError:
-            import ethernet
+        from tools.configure import ethernet
         ethernet.validate_selection(selection, route, provider, ram_size)
     elif kind == "usb_device":
-        try:
-            from . import usb_device
-        except ImportError:
-            import usb_device
+        from tools.configure import usb_device
         usb_device.validate_selection(selection, route, provider, ram_size)
     elif kind == "can":
-        try:
-            from . import can
-        except ImportError:
-            import can
+        from tools.configure import can
         can.validate_selection(selection, provider, ram_size)
     elif kind == "uart":
         if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
             fail("UART requires baud, RX profile and IRQ priority")
         integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
-        try:
-            from . import uart_formats
-        except ImportError:
-            import uart_formats
+        from tools.configure import uart_formats
         uart_formats.validate(selection, route, provider)
         if selection["mode"] == "irq-words":
             if selection["rx_profile"] != "words":

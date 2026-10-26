@@ -23,7 +23,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev import process
 
-OWNED = {"core", "io", "os", "components", "arch", "boards", "soc", "tools"}
+OWNED = {"core", "io", "os", "components", "arch", "boards", "soc", "drivers",
+         "tools"}
 
 # Register models compile the production translation units separately with
 # their actual model defines. The compilation database is the scope authority.
@@ -597,7 +598,7 @@ def analyze_context(kind, root, tool, index, context, directory, cancel_event,
             argv = [tool, entry["file"], "-p", str(directory),
                     "--checks=" + TIDY_CHECKS, "--warnings-as-errors=*",
                     "--header-filter=" + str(root) +
-                    "/(core|io|os|components|arch|boards|soc|tools)/.*"]
+                    "/(" + "|".join(sorted(OWNED)) + ")/.*"]
         else:
             projected = cppcheck_compilation_entry(entry)
             database.write_text(json.dumps([projected]))

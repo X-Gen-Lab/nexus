@@ -7,6 +7,7 @@
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
 | `arch/arm/cortex_m/`、`arch/native/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 Cache／MPU／SAU 与 Secure CMSE 权限观察 | 公共头仍位于 `arch/include/nexus/arch/`；无 SDK／OS／SoC 政策，原语编译与整平台资格分别记录 |
 | `soc/<vendor>/<family>/` | `stm32`／`gd32` 下 F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
+| `drivers/<kind>/<ip>/` | 经逐芯片复核的共享 UART、I2C、ADC、timer 与 Flash 寄存器协议算法 | 所选 SoC target 私有编译；不拥有芯片路由、时钟、Board 或运行时注册 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | 公共 include、`src/api` 检查分派、`src/mechanisms` 共用规则、`src/controllers` 控制器引擎；private 硬件边界 | 公共头不含厂商类型；Native provider 位于 `soc/native/drivers`，建立行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
@@ -105,13 +106,25 @@ typed IR；各生成器消费同一结果。`resolved.json` 是该结果的序�
 
 IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record，
 ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping，
-不能声称所有字段均有名义强类型。`tools/configure/providers/<family>/` 明确
+不能声称所有字段均有名义强类型。`soc/<vendor>/<family>/configure/`（Native 为
+`soc/native/configure/`）明确
 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及
 constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、
 资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。
 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family
 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现，
 不复制驱动；文档矩阵不能反向决定配置。
+
+显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在
+`tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格
+分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。
+
+`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划
+的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象；
+不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller
+路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核
+的 clock domain envelope。字段职责和新增料号检查见
+[provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。
 
 不可变 family descriptor 统一配置入口、依赖身份和 SDK 必需 payload；controller
 descriptor 复用精确寄存器基址、IRQ、DMA 和引脚绑定事实，生产 C 的 SDK 静态

@@ -162,6 +162,20 @@ class RuntimeAuditTests(unittest.TestCase):
             objects = gate.compiled_objects(root, build, variant)
             self.assertEqual(len(objects), len(sources))
             self.assertEqual(objects[-1]['source']['path'], str(sources[-1]))
+            for name in ('drivers/i2c/i2c_v2/i2c_v2.c',
+                         'soc/stm32/stm32g474/drivers/i2c.c',
+                         'boards/probe/startup.c'):
+                with self.subTest(non_runtime_source=name):
+                    unexpected = root / name
+                    unexpected.parent.mkdir(parents=True, exist_ok=True)
+                    unexpected.write_text('int non_runtime_source;\n')
+                    extra = dict(entries[0], file=str(unexpected))
+                    extra['arguments'] = [
+                        *entries[0]['arguments'][:-1], str(unexpected)]
+                    (build / 'compile_commands.json').write_text(
+                        json.dumps([*entries, extra]))
+                    with self.assertRaisesRegex(ValueError, 'CPU-only'):
+                        gate.compiled_objects(root, build, variant)
             incomplete = [item for item in entries
                           if not item['file'].endswith('nx_arch_sleep.c')]
             (build / 'compile_commands.json').write_text(json.dumps(incomplete))

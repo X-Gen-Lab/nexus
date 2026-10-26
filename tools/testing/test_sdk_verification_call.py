@@ -70,6 +70,18 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                 with self.subTest(path=path, command=command):
                     self.assertFalse(self.private_input(["-I", path], command=command))
 
+    def test_shared_ip_includes_remain_private_after_relocation(self):
+        for root in (self.sdk, ROOT):
+            directory = root / "drivers/i2c/i2c_v1_async"
+            for option, path in (("-I", directory),
+                                 ("-isystem", directory),
+                                 ("-include", directory / "i2c_v1_async.h")):
+                for command in (False, True):
+                    with self.subTest(root=root, option=option,
+                                      command=command):
+                        self.assertTrue(self.private_input(
+                            [option, path], command=command))
+
     def test_real_implementation_inputs_and_aliases_are_private(self):
         paths = [self.sdk, self.sdk / "components", self.sdk / "soc", self.private,
                  self.sdk / "vendors/st/stm32f4_hal/Inc",

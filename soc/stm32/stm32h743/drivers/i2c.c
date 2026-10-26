@@ -86,3 +86,12 @@ nx_result_t nx_stm32h743_i2c_pins_prepare(void) {
                ? NX_SUCCESS
                : NX_ERROR_IO;
 }
+
+nx_result_t nx_stm32h743_i2c_prepare(nx_i2c_v2_state_t* port,
+                                     const nx_i2c_v2_config_t* config) {
+    nx_result_t result = nx_i2c_v2_bind(port, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32h743_i2c_pins_prepare();
+    return result == NX_SUCCESS ? nx_i2c_v2_initialize(port) : result;
+}

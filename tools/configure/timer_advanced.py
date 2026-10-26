@@ -3,42 +3,57 @@
 Idle levels are explicit assembly policy, not a claim about an output stage or
 physical break circuit. Capture ring storage remains supplied by the caller.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import Construction, fail, integer
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import Construction, fail, integer
+from dataclasses import dataclass
+
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers import maintained
+from tools.configure.providers.common import Construction, fail, integer
+
+
+@dataclass(frozen=True)
+class TimerRegisters:
+    """Exact cold-state register boundary for a shared timer constructor."""
+
+    apb: str
+    gate: str
+    cr1: str
+    ccer: str
+    dier: str
+    bdtr: str | None = None
+    shared_interrupt: str | None = None
+    break_input: str | None = None
+    break_mask: int = 0
+
+
+@dataclass(frozen=True)
+class TimerBinding:
+    """One maintained timer personality and its physical ownership facts."""
+
+    kind: str
+    controller: str
+    vector: str
+    irq: int
+    clock_hz: int
+    pins: tuple
+    resources: tuple
+    registers: TimerRegisters | None = None
+
+
+@dataclass(frozen=True)
+class TimerPolicy:
+    """Explicit family timer bindings and an optional retained GPIO gate."""
+
+    bindings: tuple
+    gpio_clock: str | None
+
+    def binding(self, kind):
+        return next((item for item in self.bindings if item.kind == kind), None)
 
 
 KINDS = {"timer_capture", "advanced_pwm"}
 CAPTURE_FIELDS = {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"}
 ADVANCED_FIELDS = {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
                    "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"}
-PINS = {
-    "timer_capture": (("PB6", "capture", 2),),
-    "advanced_pwm": (("PA8", "output", 1), ("PB13", "complement", 1),
-                     ("PB12", "break", 1))}
-FACTS = {
-    "stm32g474": {"timer_capture": ("TIM5", "TIM5", 50, 170000000)},
-    "stm32": {"timer_capture": ("TIM4", "TIM4", 30, 84000000),
-              "advanced_pwm": ("TIM1", "TIM1_BRK_TIM9", 24, 168000000)},
-    "gd32": {"timer_capture": ("TIMER3", "TIMER3", 30, 100000000),
-             "advanced_pwm": ("TIMER0", "TIMER0_BRK_TIMER8", 24, 200000000)}}
-
-
-def pins(prefix, kind):
-    """Keep each reviewed package route separate from its public personality."""
-    return ((("PA0", "capture", 2),) if prefix == "stm32g474" and
-            kind == "timer_capture" else PINS[kind])
-
-
-def resources(prefix, kind):
-    controller = FACTS[prefix][kind][0]
-    result = ["clock:" + controller]
-    if kind == "advanced_pwm":
-        result += ["controller:" + ("TIM9" if prefix == "stm32" else "TIMER8")]
-    return result
 
 
 def validate_soc(soc, provider):
@@ -46,13 +61,14 @@ def validate_soc(soc, provider):
         kind = item["kind"]
         if kind not in KINDS:
             continue
-        facts = FACTS.get(provider.PREFIX, {}).get(kind)
+        policy = getattr(provider, "TIMER_ADVANCED", None)
+        facts = policy.binding(kind) if policy is not None else None
         mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
-        if (facts is None or name != facts[0] or item["modes"] != [mode] or
-                item["irq"] != [facts[1]] or item.get("irq_numbers") != [facts[2]] or
-                type(item.get("clock_hz")) is not int or item["clock_hz"] != facts[3] or
-                item["pins"] != [pin for pin, _, _ in pins(provider.PREFIX, kind)] or
-                item.get("resources") != resources(provider.PREFIX, kind)):
+        if (facts is None or name != facts.controller or item["modes"] != [mode] or
+                item["irq"] != [facts.vector] or item.get("irq_numbers") != [facts.irq] or
+                type(item.get("clock_hz")) is not int or item["clock_hz"] != facts.clock_hz or
+                item["pins"] != [pin for pin, _, _ in facts.pins] or
+                item.get("resources") != list(facts.resources)):
             fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
 
 
@@ -61,12 +77,13 @@ def validate_selection(selection, route, provider):
     fields = CAPTURE_FIELDS if kind == "timer_capture" else ADVANCED_FIELDS
     if not (fields - {"calls_os"}).issubset(selection):
         fail("Timer requires explicit clock, mode, safe policy, exclusive owner and IRQ")
-    facts = FACTS.get(provider.PREFIX, {}).get(kind)
+    policy = getattr(provider, "TIMER_ADVANCED", None)
+    facts = policy.binding(kind) if policy is not None else None
     actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
-    if facts is None or route["controller"] != facts[0] or actual != pins(provider.PREFIX, kind):
+    if facts is None or route["controller"] != facts.controller or actual != facts.pins:
         fail("Timer selection differs from the reviewed exclusive pad route")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")
-    if facts[3] % tick or not 1 <= facts[3] // tick <= 65536:
+    if facts.clock_hz % tick or not 1 <= facts.clock_hz // tick <= 65536:
         fail("Timer tick_hz must exactly divide the selected clock within 16 bits")
     if type(selection["exclusive"]) is not bool or not selection["exclusive"]:
         fail("Timer requires an explicit exclusive controller owner")
@@ -93,17 +110,17 @@ def constructor(item, result, prefix):
     state = "s_nx_port_" + name
     kind = item.kind
     capture = kind == "timer_capture"
-    stm = prefix == "stm32"
-    controller, vector, irq, hz = FACTS[prefix][kind]
+    policy = maintained(result.soc_family).TIMER_ADVANCED
+    facts = policy.binding(kind)
+    if facts is None or facts.registers is None:
+        fail("No maintained shared timer constructor for " + result.soc_family)
+    vector, irq, hz = facts.vector, facts.irq, facts.clock_hz
     bank, bit = irq // 32, 1 << (irq % 32)
-    apb = ("RCC->APB1ENR" if capture else "RCC->APB2ENR") if stm else (
-        "RCU_APB1EN" if capture else "RCU_APB2EN")
-    gate = ("RCC_APB1ENR_TIM4EN" if capture else "RCC_APB2ENR_TIM1EN") if stm else (
-        "RCU_APB1EN_TIMER3EN" if capture else "RCU_APB2EN_TIMER0EN")
-    cr1 = f"{controller}->CR1" if stm else f"TIMER_CTL0({controller})"
-    ccer = f"{controller}->CCER" if stm else f"TIMER_CHCTL2({controller})"
-    dier = f"{controller}->DIER" if stm else f"TIMER_DMAINTEN({controller})"
-    bdtr = "TIM1->BDTR" if stm else "TIMER_CCHP(TIMER0)"
+    registers = facts.registers
+    apb, gate = registers.apb, registers.gate
+    cr1, ccer, dier, bdtr = (registers.cr1, registers.ccer, registers.dier,
+                           registers.bdtr)
+    gpio = maintained(result.soc_family).GPIO_PHASE
     options = item.options
     lines = [f"static uint32_t s_nx_timer_clock_added_{name};",
              f"static uint16_t s_nx_timer_pin_saved_{name}[{len(item['pins'])}];",
@@ -116,7 +133,7 @@ def constructor(item, result, prefix):
     if capture:
         lines += [f"    .edge = NX_TIMER_EDGE_{options.edge.upper()}, .filter = {options.filter}u"]
     else:
-        lines += [f"    .break_input = {'&GPIOB->IDR' if stm else '&GPIO_ISTAT(GPIOB)'}, .break_mask = 4096u,",
+        lines += [f"    .break_input = {registers.break_input}, .break_mask = {registers.break_mask}u,",
                   f"    .period_ticks = {options.period_ticks}u, .deadtime_ticks = {options.deadtime_ticks}u,",
                   f"    .break_active_high = {str(options.break_active_high).lower()},",
                   f"    .idle_high = {str(options.idle_high).lower()}, .idle_complement_high = {str(options.idle_complement_high).lower()}"]
@@ -145,9 +162,9 @@ def constructor(item, result, prefix):
             high = (options.idle_high if pin["function"] == "output"
                     else options.idle_complement_high)
             value = (1 << number) if high else (1 << (number + 16))
-            bop = f"GPIO{wire[1]}->BSRR" if stm else f"GPIO_BOP(GPIO{wire[1]})"
-            odr = f"GPIO{wire[1]}->ODR" if stm else f"GPIO_OCTL(GPIO{wire[1]})"
-            mode = f"GPIO{wire[1]}->MODER" if stm else f"GPIO_CTL(GPIO{wire[1]})"
+            bop = gpio.output_set(wire[1])
+            odr = gpio.output_read(wire[1])
+            mode = gpio.mode(wire[1])
             mode_mask = 3 << (number * 2)
             output_mode = 1 << (number * 2)
             # Keep the owned AF/electrical fields until GPIO drive is observed.
@@ -165,7 +182,7 @@ def constructor(item, result, prefix):
         number = int(wire[2:])
         lease = 1 << index
         lines += [f"    if ((s_nx_timer_pin_leases_{name} & {lease}u) != 0u) {{"]
-        lines += withdraw_pin(prefix, wire)
+        lines += withdraw_pin(result.soc_family, wire)
         lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {number}u, s_nx_timer_pin_saved_{name}[{index}]);",
                   f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {number}u) != s_nx_timer_pin_saved_{name}[{index}]) {{ return NX_ERROR_IO; }}",
                   f"        s_nx_timer_pin_leases_{name} &= (uint8_t)~{lease}u;", "    }"]
@@ -184,7 +201,7 @@ def constructor(item, result, prefix):
               f"    if (({cr1} & 1u) != 0u || {ccer} != 0u || {dier} != 0u" +
               (f" || ({bdtr} & 33536u) != 0u" if not capture else "") + ") { return NX_ERROR_BUSY; }"]
     if not capture:
-        shared = "TIM9->DIER" if stm else "TIMER_DMAINTEN(TIMER8)"
+        shared = registers.shared_interrupt
         lines += [f"    if ({shared} != 0u) {{ return NX_ERROR_BUSY; }}"]
     lines += [f"    s_nx_timer_priority_saved_{name} = NVIC->IPR[{irq}];",
               f"    s_nx_timer_irq_leased_{name} = true;"]
@@ -221,84 +238,30 @@ def _gpio_mask(result):
         for pin in item["pins"]})
 
 
+def _gpio_clock(result):
+    policy = getattr(maintained(result.soc_family), "TIMER_ADVANCED", None)
+    return policy.gpio_clock if policy is not None else None
+
+
 def state_declarations(result, prefix):
-    if prefix != "gd32" or not _gpio_mask(result):
+    if _gpio_clock(result) is None or not _gpio_mask(result):
         return []
     return ["static uint32_t s_nx_timer_gpio_clocks_added;"]
 
 
 def start_resources(result, prefix):
     mask = _gpio_mask(result)
-    return ([f"    s_nx_timer_gpio_clocks_added = ~RCU_AHB1EN & {mask}u;"]
-            if prefix == "gd32" and mask else [])
+    clock = _gpio_clock(result)
+    return ([f"    s_nx_timer_gpio_clocks_added = ~{clock} & {mask}u;"]
+            if clock is not None and mask else [])
 
 
 def stop_system(result, prefix):
-    if prefix != "gd32" or not _gpio_mask(result):
+    clock = _gpio_clock(result)
+    if clock is None or not _gpio_mask(result):
         return []
     return ["    if (s_nx_platform_started && s_nx_timer_gpio_clocks_added != 0u) {",
-            "        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN, RCU_AHB1EN & ~s_nx_timer_gpio_clocks_added);",
+            f"        NX_PLATFORM_REGISTER_WRITE({clock}, {clock} & ~s_nx_timer_gpio_clocks_added);",
             "        nx_arch_dsb();",
-            "        if ((RCU_AHB1EN & s_nx_timer_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }",
+            f"        if (({clock} & s_nx_timer_gpio_clocks_added) != 0u) {{ return NX_ERROR_IO; }}",
             "        s_nx_timer_gpio_clocks_added = 0u;", "    }"]
-
-
-def g474_constructor(item):
-    """One selected timer personality, with caller-owned capture storage."""
-    capture = item.kind == "timer_capture"
-    name = item.id.replace("-", "_")
-    state, config = "s_nx_port_" + name, "s_nx_timer_config_" + name
-    vector, priority = "s_nx_vector_" + name, "s_nx_priority_" + name
-    options = item.options
-    lines = []
-    if capture:
-        lines += [f"static bool {vector};", f"static uint8_t {priority};",
-                  f"static const nx_timer_capture_config_t {config} = {{",
-                  f"    170000000u, {options.tick_hz}u, NX_TIMER_EDGE_{options.edge.upper()}, {options.filter}u, true }};"]
-    else:
-        mode = {"x2-ti1": "NX_ENCODER_MODE_X2_TI1",
-                "x2-ti2": "NX_ENCODER_MODE_X2_TI2",
-                "x4-ti12": "NX_ENCODER_MODE_X4_TI12"}[options.counting]
-        lines += [f"static const nx_stm32g474_encoder_config_t {config} = {{",
-                  f"    {mode}, {options.filter_a}u, {options.filter_b}u,",
-                  f"    {str(options.invert_a).lower()}, {str(options.invert_b).lower()}, true }};"]
-    lines += [f"static nx_result_t prepare_{name}(void) {{",
-              f"    if ({state}.config != NULL || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
-              "    nx_result_t status;"]
-    for pin in item["pins"]:
-        lines += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {int(pin['pin'][2:])}u, 2u);",
-                  "    if (status != NX_SUCCESS) { return status; }"]
-    kind = item.kind
-    lines += [f"    status = nx_stm32g474_{kind}_initialize(&{state}, &{config});",
-              "    if (status != NX_SUCCESS) { return status; }"]
-    if capture:
-        lines += [f"    {priority} = (uint8_t)NX_G474_IRQ_PRIORITY(TIM5_IRQn);",
-                  f"    {vector} = true;",
-                  f"    return NX_G474_IRQ_CONTROL(TIM5_IRQn, true, {options.irq.priority}u);"]
-    else:
-        lines += ["    return NX_SUCCESS;"]
-    lines += ["}", f"static nx_result_t stop_{name}(void) {{",
-              "    nx_result_t status;",
-              f"    if ({state}.config != NULL) {{",
-              f"        status = nx_{kind}_stop(&s_nx_face_{name});",
-              "        if (status != NX_SUCCESS) { return status; }", "    }"]
-    if capture:
-        lines += [f"    if ({vector}) {{",
-                  "        status = NX_G474_IRQ_CONTROL(TIM5_IRQn, false, 0u);",
-                  "        if (status != NX_SUCCESS) { return status; }",
-                  "        if (!NX_G474_IRQ_AVAILABLE(TIM5_IRQn)) { return NX_ERROR_BUSY; }",
-                  f"        NX_G474_IRQ_PRIORITY_WRITE(TIM5_IRQn, {priority});",
-                  "        nx_arch_dsb(); nx_arch_isb();",
-                  f"        if (NX_G474_IRQ_PRIORITY(TIM5_IRQn) != {priority}) {{ return NX_ERROR_IO; }}",
-                  f"        {vector} = false;", "    }",
-                  f"    return nx_stm32g474_timer_capture_release(&{state});", "}",
-                  "void TIM5_IRQHandler(void);",
-                  r"/** \brief One selected raw32-bit TIM5 capture observation. */",
-                  f"void TIM5_IRQHandler(void) {{ nx_stm32g474_timer_capture_irq(&{state}); }}"]
-    else:
-        lines += [f"    return nx_stm32g474_encoder_close(&{state});", "}"]
-    return Construction(
-        state_type=("nx_timer_capture_controller_t" if capture else
-                    "nx_stm32g474_encoder_state_t"),
-        definitions=lines, initialize=f"prepare_{name}()",
-        stop=[f"stop_{name}()"], retain_on_failed_init=True)

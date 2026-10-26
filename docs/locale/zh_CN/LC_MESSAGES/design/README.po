@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 83af2c9cbbb1440d01d51ef1a0453d153af91555b9f39353a7a7f6238486c1f1\n"
+"X-Nexus-Source-SHA256: 3836bff6a57c2a617f7df73eae1fc30d590b94004e2a06aa90530bc3e6c98221\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:1
 msgid "当前设计与实施台账"
@@ -637,3 +637,9 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:121
 msgid "[Source compatibility and SDK versions](source-compatibility.md)"
 msgstr "[源码兼容性与 SDK 版本](source-compatibility.md)"
+
+msgid "{download}`SoC/IP 目录整理 48 项台账 <soc-ip-layout-execution.csv>`"
+msgstr "{download}`SoC/IP 目录整理 48 项台账 <soc-ip-layout-execution.csv>`"
+
+msgid "八组路径、配置、构建与验证任务；实现、软件执行和实板状态分别记录"
+msgstr "八组路径、配置、构建与验证任务；实现、软件执行和实板状态分别记录"

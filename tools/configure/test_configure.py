@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import unittest
 
-import configure as gate
+from tools.configure import configure as gate
 
 
 class ResolverTests(unittest.TestCase):
@@ -270,7 +270,7 @@ class ResolverTests(unittest.TestCase):
             self.assertFalse(any(ord(char) < 32 and char not in "\n\t"
                                  for char in text), path.name)
         # Inspect the MCU-specific runtime hooks as well as the Native bundle.
-        import bindings
+        from tools.configure import bindings
         result = self.resolve()
         result["soc_family"] = "stm32f407"
         result["part"] = "STM32F407VET6"

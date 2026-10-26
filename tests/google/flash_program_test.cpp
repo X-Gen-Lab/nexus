@@ -28,6 +28,15 @@ static bool using_write_ports;
 static bool irq_active;
 static bool privileged = true;
 #if defined(NX_FLASH_PROGRAM_STM32)
+/** \brief Independent RM0090 density oracle for the production engine. */
+static const nx_flash_sector_t s_sectors[] = {
+    {0x00000U, 0x04000U}, {0x04000U, 0x04000U}, {0x08000U, 0x04000U},
+    {0x0C000U, 0x04000U}, {0x10000U, 0x10000U}, {0x20000U, 0x20000U},
+    {0x40000U, 0x20000U}, {0x60000U, 0x20000U}, {0x80000U, 0x20000U},
+    {0xA0000U, 0x20000U}, {0xC0000U, 0x20000U}, {0xE0000U, 0x20000U}};
+const nx_flash_geometry_t g_nx_stm32_flash_ve = {0x08000000U, 524288U, 4U,
+                                                 s_sectors,   8U,      0U};
+
 static nx_stm32_flash_state_t* model;
 static void complete(bool erase) {
     model->registers->SR &= ~static_cast<uint32_t>(FLASH_SR_BSY);

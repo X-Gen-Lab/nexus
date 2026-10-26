@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 from tools.configure import configure
 
 
@@ -88,6 +89,35 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         self.assertEqual(report['controllers'][0]['id'], 'first')
         self.assertIn('bindings.c', report['generated_files'])
         self.assertFalse((self.root / 'generated').exists())
+
+    def test_missing_selected_provider_entry_has_an_exact_cli_diagnostic(self):
+        missing = ModuleNotFoundError(
+            "No module named 'soc.native.configure'",
+            name='soc.native.configure')
+        with mock.patch('tools.configure.providers.import_module',
+                        side_effect=missing):
+            status, out, err = self.command(
+                'provider-check', '--assembly', str(self.assembly),
+                '--diagnostics-json')
+        self.assertEqual(status, 1)
+        self.assertEqual(out, '')
+        diagnostic = json.loads(err)
+        self.assertEqual(diagnostic['code'], 'provider_module_missing')
+        self.assertEqual(diagnostic['family'], 'native')
+        self.assertEqual(diagnostic['module'], 'soc.native.configure')
+        self.assertEqual(diagnostic['source'],
+                         'soc/native/configure/__init__.py')
+
+    def test_provider_internal_import_error_is_not_an_unmaintained_family(self):
+        for error in (ModuleNotFoundError(
+                "No module named 'internal_dependency'",
+                name='internal_dependency'), ImportError('invalid symbol')):
+            with self.subTest(error=error), mock.patch(
+                    'tools.configure.providers.import_module',
+                    side_effect=error):
+                with self.assertRaises(type(error)):
+                    self.command('check', '--assembly', str(self.assembly),
+                                 '--diagnostics-json')
 
 
 if __name__ == "__main__":

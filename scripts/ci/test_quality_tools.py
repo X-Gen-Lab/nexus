@@ -314,6 +314,57 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual([entry['file'] for entry in commands(self.root, self.build)],
                          [str(self.source), str(runtime)])
 
+    def test_shared_driver_in_actual_cmake_database_is_owned(self):
+        self.assertIsNotNone(shutil.which("cmake"),
+                             "CMake is required for the real database contract")
+        source = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.c"
+        source.parent.mkdir(parents=True)
+        source.write_text("int shared_driver;\n")
+        external = self.root / "vendors/fixture/driver.c"
+        external.parent.mkdir(parents=True)
+        external.write_text("int external_driver;\n")
+        (self.root / "CMakeLists.txt").write_text(
+            "cmake_minimum_required(VERSION 3.21)\n"
+            "project(shared_driver_analysis_scope C)\n"
+            "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n"
+            "add_library(owned OBJECT components/sample.c "
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.c)\n"
+            "add_library(external OBJECT vendors/fixture/driver.c)\n")
+        configured = subprocess.run(
+            ["cmake", "-S", str(self.root), "-B", str(self.build)],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(configured.returncode, 0,
+                         configured.stdout + configured.stderr)
+        raw = json.loads((self.build / "compile_commands.json").read_text())
+        actual = next(entry for entry in raw if entry["file"] == str(source))
+        selected = commands(self.root, self.build)
+        self.assertEqual({entry["file"] for entry in selected},
+                         {str(self.source), str(source)})
+        driver = next(entry for entry in selected
+                      if entry["file"] == str(source))
+        self.assertEqual(driver["nexus_analysis_scope"], "production")
+        self.assertEqual(driver["nexus_production_source"],
+                         "drivers/i2c/i2c_v1_async/i2c_v1_async.c")
+        self.assertEqual(quality_tools.compilation_entry(driver), actual)
+
+    def test_tidy_header_filter_includes_shared_driver_headers(self):
+        header = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.h"
+        header.parent.mkdir(parents=True)
+        header.write_text("extern int shared_driver;\n")
+        self.assertEqual(run("tidy", self.root, self.build,
+                             self.tool(0), self.report), 0)
+        argv = json.loads(next(line.removeprefix("Invocation: ")
+                               for line in self.report.read_text().splitlines()
+                               if line.startswith("Invocation: ")))
+        expression = next(argument.removeprefix("--header-filter=")
+                          for argument in argv
+                          if argument.startswith("--header-filter="))
+        self.assertRegex(str(header), expression)
+        self.assertNotRegex(str(self.root / "vendors/fixture/driver.h"),
+                            expression)
+        self.assertNotRegex(str(self.root / "drivers-extra/driver.h"),
+                            expression)
+
     def test_owned_posix_event_support_is_analyzed(self):
         support = self.root / "tests/contracts/os_freertos_runtime/posix_event.c"
         support.parent.mkdir(parents=True)

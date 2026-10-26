@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate
-from tools.configure.providers import stm32g474
+from soc.stm32.stm32g474 import configure as stm32g474
 from tools.configure.providers.common import ConfigurationError
 
 

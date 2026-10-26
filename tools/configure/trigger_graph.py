@@ -7,10 +7,7 @@ hardware, creates workers or converts event edges into software callbacks.
 
 from dataclasses import asdict, dataclass
 
-try:
-    from .resource_graph import fail, identifier, json_value, record
-except ImportError:
-    from resource_graph import fail, identifier, json_value, record
+from tools.configure.resource_graph import fail, identifier, json_value, record
 
 
 @dataclass(frozen=True)

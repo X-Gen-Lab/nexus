@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b78c9558bff324ba60f934dafc1f3a1fd5e9b5f26effb821d90cd5150204f572\n"
+"X-Nexus-Source-SHA256: 2fe2c5c99c3b9d10dcb26fcda33d417f0cd413daa55592829b6c828ff1d54f0e\n"
 
 msgid "Migrate legacy configuration and interface access"
 msgstr "迁移旧配置与接口访问"
@@ -138,3 +138,75 @@ msgid ""
 msgstr ""
 "构建独立搬移的 [SDK 消费者](../tutorials/source-sdk.md)，再用锁定编译器链接精确 MCU "
 "配置。保留迁移源码/配置的证据。旧 HAL/OSAL 文档保持历史身份；redirect 不使旧 API 合同等同于新合同。"
+
+msgid "Update private source integrations"
+msgstr "更新私有源码接入"
+
+msgid "The SoC/IP source reorganization keeps public C include paths, CMake target names, authored family identifiers and TOML selections. Ordinary public consumers rebuild against the chosen source revision. Maintainers of private providers, source auditors or custom SDK packaging must update the internal paths below; obsolete production family packages are not compatibility entry points."
+msgstr "SoC/IP 源码重组保持公共 C include 路径、CMake target 名称、装配中的家族标识与 TOML 选择。普通公共接口消费者按所选源码版本重新构建。私有 provider、源码审计器或自定义 SDK 打包的维护者须更新下列内部路径；旧生产家族包不是兼容入口。"
+
+msgid "Previous private source"
+msgstr "原私有源码"
+
+msgid "Current owner"
+msgstr "当前归属"
+
+msgid "`tools/configure/providers/native/` production modules"
+msgstr "`tools/configure/providers/native/` 生产模块"
+
+msgid "`soc/native/configure/`"
+msgstr "`soc/native/configure/`"
+
+msgid "`tools/configure/providers/<stm32-family>/` production modules"
+msgstr "`tools/configure/providers/<stm32-family>/` 生产模块"
+
+msgid "`soc/stm32/<family>/configure/`"
+msgstr "`soc/stm32/<family>/configure/`"
+
+msgid "`tools/configure/providers/<gd32-family>/` production modules"
+msgstr "`tools/configure/providers/<gd32-family>/` 生产模块"
+
+msgid "`soc/gd32/<family>/configure/`"
+msgstr "`soc/gd32/<family>/configure/`"
+
+msgid "Family configuration tests inside provider packages"
+msgstr "provider 包内的家族配置测试"
+
+msgid "`tools/configure/tests/providers/<family>/` in the existing tool-test domain"
+msgstr "既有工具测试执行域中的 `tools/configure/tests/providers/<family>/`"
+
+msgid "`soc/common/uart_v1_channel_dma.*`"
+msgstr "`soc/common/uart_v1_channel_dma.*`"
+
+msgid "`drivers/uart/uart_v1_channel_dma/`"
+msgstr "`drivers/uart/uart_v1_channel_dma/`"
+
+msgid "`soc/common/i2c_v1_async.*` and `soc/common/i2c_v2.*`"
+msgstr "`soc/common/i2c_v1_async.*` 与 `soc/common/i2c_v2.*`"
+
+msgid "`drivers/i2c/i2c_v1_async/` and `drivers/i2c/i2c_v2/`"
+msgstr "`drivers/i2c/i2c_v1_async/` 与 `drivers/i2c/i2c_v2/`"
+
+msgid "`soc/common/legacy_adc.c`, `legacy_pwm.c`, `legacy_flash.c`"
+msgstr "`soc/common/legacy_adc.c`, `legacy_pwm.c`, `legacy_flash.c`"
+
+msgid "`drivers/adc/legacy_adc/`, `drivers/timer/legacy_pwm/`, `drivers/flash/legacy_flash/`"
+msgstr "`drivers/adc/legacy_adc/`, `drivers/timer/legacy_pwm/`, `drivers/flash/legacy_flash/`"
+
+msgid "`soc/common/legacy_devices.h`"
+msgstr "`soc/common/legacy_devices.h`"
+
+msgid "Split into the three corresponding private driver headers; include only the required contract"
+msgstr "拆成三个对应的私有 driver 头文件；只 include 所需合同"
+
+msgid "`soc/common/stm32_identity.h`"
+msgstr "`soc/common/stm32_identity.h`"
+
+msgid "`soc/stm32/common/stm32_identity.h`"
+msgstr "`soc/stm32/common/stm32_identity.h`"
+
+msgid "The explicit provider map, descriptor and shared leaf contracts remain in `tools/configure/providers/`; common parsing, typed IR and atomic bundle handling remain in `tools/configure/`. `soc/common/uart_control.h` remains a cross-vendor SoC collaboration contract. Do not infer either module or source paths from a family-name prefix: use the maintained descriptor and explicit CMake target."
+msgstr "显式 provider map、descriptor 与共享叶子合同保留在 `tools/configure/providers/`；通用解析、typed IR 与原子 bundle 处理保留在 `tools/configure/`。`soc/common/uart_control.h` 仍是跨厂家 SoC 协作合同。不得根据家族名称前缀推断模块或源码路径：使用维护中的 descriptor 与显式 CMake target。"
+
+msgid "For a private extension, update imports and private includes, declared configuration inputs, source-observation coverage and the required SDK payload together. Resolve the same exact assembly and compare effective decisions before running its actual provider contracts and relocated consumer. A path migration does not establish new supported modes, hardware behavior or physical qualification. The [provider guide](provider-porting.md) owns new integration and lifecycle work; the {download}`48-task ledger <../design/soc-ip-layout-execution.csv>` records this refactor's implementation and execution separately."
+msgstr "私有扩展应一起更新 import、私有 include、声明的配置输入、源码观察覆盖和 SDK 必需 payload。解析同一精确装配并比较有效决策，再执行其真实 provider 合同与搬移 consumer。路径迁移不建立新支持模式、硬件行为或物理资格。[provider 指南](provider-porting.md)维护新接入与生命周期工作；{download}`48 项台账 <../design/soc-ip-layout-execution.csv>`分别记录本次重构的实现与执行。"

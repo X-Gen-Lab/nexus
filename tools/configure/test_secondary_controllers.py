@@ -1,4 +1,6 @@
 """Exact secondary controllers assemble without hidden pools or route repair."""
+import copy
+from dataclasses import replace
 import json
 from pathlib import Path
 import subprocess
@@ -7,6 +9,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate
+from tools.configure import secondary_controllers
 
 
 class SecondaryControllerConfigurationTests(unittest.TestCase):
@@ -37,6 +40,36 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertIn("dma:DMA0:stream6" if label == "gd32" else "dma:DMA1:stream6", claims)
                 self.assertIn("pin:PB10", claims)
                 self.assertIn("pin:PB11", claims)
+
+    def test_secondary_facts_keep_independent_sdk_assertions(self):
+        for directory, part, controller in (
+                ("soc/stm32/stm32f407", "STM32F407ZGT6", "USART2"),
+                ("soc/gd32/gd32f470", "GD32F470ZGT6", "USART1")):
+            facts = gate.load(gate.ROOT / directory / "soc.json")
+            gate.validate_soc(facts, part)
+            for field, changed in (("modes", ["irq-byte-event"]),
+                                   ("pins", ["PA0", "PA1"]),
+                                   ("irq", ["USART0_IRQn"]),
+                                   ("clock_hz", 42000001)):
+                with self.subTest(part=part, field=field):
+                    invalid = copy.deepcopy(facts)
+                    invalid["controllers"][controller][field] = changed
+                    with self.assertRaisesRegex(
+                            ValueError, "Secondary controller facts"):
+                        gate.validate_soc(invalid, part)
+
+    def test_typed_integration_cannot_drop_its_selected_dma_ownership(self):
+        for label, prefix in (("stm32-zg", "stm32"), ("gd32", "gd32")):
+            with self.subTest(label=label):
+                result = gate.resolve_ir(self.assembly(label))
+                item = next(controller for controller in result.controllers
+                            if controller.id == "secondary_uart")
+                self.assertTrue(item.integration.dma)
+                incomplete = replace(item, integration=replace(
+                    item.integration, dma=()))
+                with self.assertRaisesRegex(ValueError, "DMA"):
+                    secondary_controllers.constructor(incomplete, result,
+                                                      prefix)
 
     def test_maintained_constructor_model_uses_the_formal_typed_assembly(self):
         output = self.directory / "constructors.inc"

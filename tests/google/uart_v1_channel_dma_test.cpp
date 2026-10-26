@@ -18,6 +18,7 @@ static volatile uint32_t* s_clear;
 static volatile uint32_t* s_refused;
 static unsigned s_writes;
 static bool s_stop_refused;
+static const nx_uart_v1_dma_config_t* s_stopped_config;
 extern "C" uint32_t nx_uart_v1_model_read(const volatile uint32_t* reg) {
     uint32_t value = *reg;
     if (reg == &s_uart->data)
@@ -36,7 +37,8 @@ extern "C" void nx_uart_v1_model_write(volatile uint32_t* reg, uint32_t value) {
     else
         *reg = value;
 }
-static nx_result_t stop_irqs(void*) {
+static nx_result_t stop_irqs(void* context) {
+    s_stopped_config = static_cast<nx_uart_v1_dma_state_t*>(context)->config;
     return s_stop_refused ? NX_ERROR_IO : NX_SUCCESS;
 }
 static nx_result_t validate_wake(void*, const nx_irq_wake_t*, uint8_t ceiling) {
@@ -50,6 +52,7 @@ class UartV1ChannelDma : public testing::Test {
     uint8_t ring[8] = {}, payload[4] = {1U, 2U, 3U, 4U};
     uint8_t blocks[2][8] = {};
     nx_dma_memory_region_t regions[2] = {};
+    nx_uart_v1_dma_config_t config = {}, replacement_config = {};
     nx_uart_v1_dma_duplex_state_t owner = {};
     nx_uart_v1_dma_state_t& state = owner.uart;
     nx_uart_port_t port = {&nx_uart_v1_channel_dma_tx_ops, &state};
@@ -63,50 +66,52 @@ class UartV1ChannelDma : public testing::Test {
         s_refused = nullptr;
         s_writes = 0U;
         s_stop_refused = false;
+        s_stopped_config = nullptr;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         regions[0] = {reinterpret_cast<uintptr_t>(payload), sizeof(payload),
                       NX_DMA_MEMORY_READ};
         regions[1] = {reinterpret_cast<uintptr_t>(blocks), sizeof(blocks),
                       NX_DMA_MEMORY_WRITE};
-        state.registers = &uart;
-        state.tx = &tx;
-        state.flags = &flags;
-        state.clear = &clear;
-        state.regions = regions;
-        state.region_count = 2U;
-        state.tx_shift = 24U;
-        state.rx_shift = 20U;
-        state.rx_storage = ring;
-        state.rx_capacity = sizeof(ring);
-        state.baud = 115200U;
-        state.stop_irqs = stop_irqs;
-        state.validate_wake = validate_wake;
-        state.profile = NX_UART_RX_BYTES;
+        config.registers = &uart;
+        config.tx = &tx;
+        config.flags = &flags;
+        config.clear = &clear;
+        config.regions = regions;
+        config.region_count = 2U;
+        config.tx_shift = 24U;
+        config.rx_shift = 20U;
+        config.rx_storage = ring;
+        config.rx_capacity = sizeof(ring);
+        config.baud = 115200U;
+        config.stop_irqs = stop_irqs;
+        config.validate_wake = validate_wake;
+        config.profile = NX_UART_RX_BYTES;
         nx_request_initialize(&request.base);
         ASSERT_EQ(nx_uart_tx_prepare(&request, payload, sizeof(payload), 1000U),
                   NX_SUCCESS);
     }
     void Start(bool blocks_profile = false) {
         if (blocks_profile) {
-            state.profile = NX_UART_RX_BLOCKS;
-            state.receive = &owner.receive;
-            owner.receive.channel = &rx;
-            state.rx_capacity = 0U;
+            config.profile = NX_UART_RX_BLOCKS;
+            config.receive = &owner.receive;
+            config.rx = &rx;
+            config.rx_capacity = 0U;
             port.ops = &nx_uart_v1_channel_dma_ops;
         }
-        ASSERT_EQ(blocks_profile
-                      ? nx_uart_v1_channel_dma_initialize(&state, 8000000U)
-                      : nx_uart_v1_channel_dma_tx_initialize(&state, 8000000U),
+        ASSERT_EQ(blocks_profile ? nx_uart_v1_channel_dma_initialize(
+                                       &state, &config, 8000000U)
+                                 : nx_uart_v1_channel_dma_tx_initialize(
+                                       &state, &config, 8000000U),
                   NX_SUCCESS);
     }
     void UartIrq() {
-        if (state.profile == NX_UART_RX_BLOCKS)
+        if (config.profile == NX_UART_RX_BLOCKS)
             nx_uart_v1_channel_dma_irq(&state);
         else
             nx_uart_v1_channel_dma_tx_irq(&state);
     }
     void ChannelIrq(bool receive) {
-        if (state.profile == NX_UART_RX_BLOCKS)
+        if (config.profile == NX_UART_RX_BLOCKS)
             nx_uart_v1_channel_dma_channel_irq(&state, receive);
         else
             nx_uart_v1_channel_dma_tx_channel_irq(&state);
@@ -122,16 +127,164 @@ class UartV1ChannelDma : public testing::Test {
     }
 };
 TEST_F(UartV1ChannelDma, AdmitsOnlyReviewedClockWithoutEffects) {
-    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, 16000000U),
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 16000000U),
               NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(s_writes, 0U);
     Start();
     EXPECT_TRUE(state.retained);
     EXPECT_EQ(uart.baud, 69U);
 }
+TEST_F(UartV1ChannelDma, RejectsByteRingOverlappingTxChannelBeforeMmio) {
+    config.rx_storage = &tx;
+    config.rx_capacity = sizeof(tx);
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(s_writes, 0U);
+    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(state.initialized);
+}
+TEST_F(UartV1ChannelDma, RejectsByteRingOverlappingConfigBeforeBinding) {
+    config.rx_storage = &config;
+    config.rx_capacity = sizeof(config);
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(s_writes, 0U);
+    EXPECT_EQ(state.config, nullptr);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(UartV1ChannelDma, ConfigNeverBecomesRequestOrDmaPayload) {
+    regions[0] = {reinterpret_cast<uintptr_t>(&config), sizeof(config),
+                  NX_DMA_MEMORY_READ};
+    Start();
+    unsigned before = s_writes;
+    EXPECT_EQ(nx_uart_port_submit(
+                  &port, reinterpret_cast<nx_uart_tx_request_t*>(&config)),
+              NX_ERROR_INVALID);
+    ASSERT_EQ(nx_uart_tx_prepare(&request,
+                                 reinterpret_cast<const uint8_t*>(&config),
+                                 sizeof(config), 1000U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_uart_port_submit(&port, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(s_writes, before);
+}
+TEST_F(UartV1ChannelDma, ConfigNeverBecomesByteOutputCountOrWake) {
+    Start();
+    size_t count = 9U;
+    EXPECT_EQ(nx_uart_port_read_bytes(&port,
+                                      reinterpret_cast<uint8_t*>(&config),
+                                      sizeof(config), &count),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_uart_port_read_bytes(&port, payload, sizeof(payload),
+                                      reinterpret_cast<size_t*>(&config)),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_uart_port_attach_wake(
+                  &port, reinterpret_cast<const nx_irq_wake_t*>(&config), 0U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(count, 9U);
+    EXPECT_EQ(state.wake, nullptr);
+}
+TEST_F(UartV1ChannelDma, ConfigNeverBecomesStreamMetadataOrReceivePayload) {
+    regions[1] = {reinterpret_cast<uintptr_t>(&config), sizeof(config),
+                  NX_DMA_MEMORY_WRITE};
+    Start(true);
+    unsigned before = s_writes;
+    EXPECT_EQ(
+        nx_uart_port_rx_start(&port, reinterpret_cast<nx_stream_t*>(&config)),
+        NX_ERROR_INVALID);
+    stream.slots = reinterpret_cast<nx_stream_slot_t*>(&config);
+    stream.count = 1U;
+    EXPECT_EQ(nx_uart_port_rx_start(&port, &stream), NX_ERROR_INVALID);
+    slots[0].data = reinterpret_cast<uint8_t*>(&config);
+    slots[0].capacity = sizeof(config);
+    ASSERT_EQ(nx_stream_initialize(&stream, slots, 1U), NX_SUCCESS);
+    EXPECT_EQ(nx_uart_port_rx_start(&port, &stream), NX_ERROR_INVALID);
+    EXPECT_EQ(owner.receive.stream, nullptr);
+    EXPECT_FALSE(owner.receive.filling);
+    EXPECT_EQ(s_writes, before);
+}
+TEST_F(UartV1ChannelDma, WakeValidationRejectionRestoresColdBinding) {
+    config.irq_policy.syscall_ceiling = 1U;
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
+              NX_ERROR_PERMISSION);
+    EXPECT_EQ(state.config, nullptr);
+    EXPECT_FALSE(state.retained);
+    EXPECT_EQ(s_writes, 0U);
+}
+TEST_F(UartV1ChannelDma, OutstandingPublisherPreventsAnyColdBinding) {
+    state.wake_publishers = 1U;
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(state.config, nullptr);
+    EXPECT_EQ(state.wake_publishers, 1U);
+    EXPECT_EQ(s_writes, 0U);
+}
+TEST_F(UartV1ChannelDma, StoppedOwnerCanBindAnotherImmutableConfig) {
+    Start();
+    ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+    replacement_config = config;
+    replacement_config.baud = 57600U;
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &replacement_config,
+                                                   8000000U),
+              NX_SUCCESS);
+    EXPECT_EQ(state.config, &replacement_config);
+    EXPECT_EQ(uart.baud, 139U);
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+}
+TEST_F(UartV1ChannelDma, UnboundOwnerNeverAccessesHardwareOrBorrows) {
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_uart_port_submit(&port, &request), NX_ERROR_INVALID);
+    nx_uart_v1_channel_dma_tx_irq(&state);
+    nx_uart_v1_channel_dma_tx_channel_irq(&state);
+    EXPECT_EQ(state.config, nullptr);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(s_writes, 0U);
+}
+TEST_F(UartV1ChannelDma, FailedInitializationRetainsConfigUntilStopRetry) {
+    s_refused = &uart.baud;
+    s_stop_refused = true;
+    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
+              NX_ERROR_IO);
+    ASSERT_TRUE(state.retained);
+    ASSERT_FALSE(state.initialized);
+    EXPECT_EQ(state.config, &config);
+    nx_uart_v1_dma_config_t replacement = config;
+    replacement.baud = 57600U;
+    unsigned before = s_writes;
+    EXPECT_EQ(
+        nx_uart_v1_channel_dma_tx_initialize(&state, &replacement, 8000000U),
+        NX_ERROR_BUSY);
+    EXPECT_EQ(state.config, &config);
+    EXPECT_EQ(s_writes, before);
+    s_refused = nullptr;
+    s_stop_refused = false;
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(s_stopped_config, &config);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(UartV1ChannelDma, FailedStopRetainsConfigUntilSameIrqsWithdraw) {
+    Start();
+    s_stop_refused = true;
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_ERROR_IO);
+    ASSERT_TRUE(state.retained);
+    nx_uart_v1_dma_config_t replacement = config;
+    replacement.baud = 57600U;
+    unsigned before = s_writes;
+    EXPECT_EQ(
+        nx_uart_v1_channel_dma_tx_initialize(&state, &replacement, 8000000U),
+        NX_ERROR_BUSY);
+    EXPECT_EQ(state.config, &config);
+    EXPECT_EQ(s_writes, before);
+    s_stop_refused = false;
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(s_stopped_config, &config);
+    EXPECT_FALSE(state.retained);
+}
 TEST_F(UartV1ChannelDma, TxOnlySelectionKeepsIrqBytesAndRejectsBlocks) {
     port.ops = &nx_uart_v1_channel_dma_tx_ops;
-    ASSERT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, 8000000U),
+    ASSERT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, &config, 8000000U),
               NX_SUCCESS);
     uart.status = 1U << 5U;
     uart.data = 0x73U;
@@ -149,22 +302,27 @@ TEST_F(UartV1ChannelDma, RejectedTxReinitializeNeverCancelsExistingBorrow) {
     Start();
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     unsigned before = s_writes;
-    EXPECT_EQ(nx_uart_v1_channel_dma_tx_initialize(&state, 8000000U),
-              NX_ERROR_BUSY);
+    const nx_uart_v1_dma_config_t replacement = config;
+    EXPECT_EQ(
+        nx_uart_v1_channel_dma_tx_initialize(&state, &replacement, 8000000U),
+        NX_ERROR_BUSY);
     EXPECT_EQ(s_writes, before);
     EXPECT_FALSE(state.closing);
     EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(state.config, &config);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
 }
 TEST_F(UartV1ChannelDma, RejectedDuplexReinitializeKeepsExistingTxBorrow) {
     Start(true);
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     unsigned before = s_writes;
-    EXPECT_EQ(nx_uart_v1_channel_dma_initialize(&state, 8000000U),
+    const nx_uart_v1_dma_config_t replacement = config;
+    EXPECT_EQ(nx_uart_v1_channel_dma_initialize(&state, &replacement, 8000000U),
               NX_ERROR_BUSY);
     EXPECT_EQ(s_writes, before);
     EXPECT_FALSE(state.closing);
     EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(state.config, &config);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
 }
 TEST_F(UartV1ChannelDma, EmbeddedReceiveStateNeverBecomesDmaPayload) {
@@ -187,7 +345,7 @@ TEST_F(UartV1ChannelDma, DmaCompleteDoesNotSettleUntilWireTc) {
     EXPECT_EQ(tx.count, sizeof(payload));
     EXPECT_EQ(tx.control & 1U, 1U);
     tx.count = 0U;
-    flags = 2U << state.tx_shift;
+    flags = 2U << config.tx_shift;
     ChannelIrq(false);
     nx_uart_port_service(&port);
     EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
@@ -203,7 +361,7 @@ TEST_F(UartV1ChannelDma, RefusedWithdrawalRetainsAcceptedBorrow) {
     Start();
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     tx.count = 0U;
-    flags = 2U << state.tx_shift;
+    flags = 2U << config.tx_shift;
     s_refused = &tx.control;
     uart.status = 1U << 6U;
     ChannelIrq(false);
@@ -236,7 +394,7 @@ TEST_F(UartV1ChannelDma, FirstObservedCompletionAfterDeadlineIsTimeout) {
     Start();
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     tx.count = 0U;
-    flags = 2U << state.tx_shift;
+    flags = 2U << config.tx_shift;
     uart.status = 1U << 6U;
     ASSERT_EQ(nx_native_clock_configure(true, 1001U), NX_SUCCESS);
     ChannelIrq(false);
@@ -268,22 +426,24 @@ TEST_F(UartV1ChannelDma, SeparateInstancesNeverSettleEachOthersRequest) {
     nx_dma_memory_region_t other_region = {
         reinterpret_cast<uintptr_t>(other_payload), sizeof(other_payload),
         NX_DMA_MEMORY_READ};
+    nx_uart_v1_dma_config_t other_config = {};
     nx_uart_v1_dma_state_t other = {};
-    other.registers = &other_uart;
-    other.tx = &other_tx;
-    other.flags = &other_flags;
-    other.clear = &other_clear;
-    other.tx_shift = 12U;
-    other.rx_shift = 16U;
-    other.regions = &other_region;
-    other.region_count = 1U;
-    other.rx_storage = other_ring;
-    other.rx_capacity = sizeof(other_ring);
-    other.baud = 115200U;
-    other.stop_irqs = stop_irqs;
-    other.validate_wake = validate_wake;
-    ASSERT_EQ(nx_uart_v1_channel_dma_tx_initialize(&other, 8000000U),
-              NX_SUCCESS);
+    other_config.registers = &other_uart;
+    other_config.tx = &other_tx;
+    other_config.flags = &other_flags;
+    other_config.clear = &other_clear;
+    other_config.tx_shift = 12U;
+    other_config.rx_shift = 16U;
+    other_config.regions = &other_region;
+    other_config.region_count = 1U;
+    other_config.rx_storage = other_ring;
+    other_config.rx_capacity = sizeof(other_ring);
+    other_config.baud = 115200U;
+    other_config.stop_irqs = stop_irqs;
+    other_config.validate_wake = validate_wake;
+    ASSERT_EQ(
+        nx_uart_v1_channel_dma_tx_initialize(&other, &other_config, 8000000U),
+        NX_SUCCESS);
     const nx_uart_port_t other_face = {&nx_uart_v1_channel_dma_tx_ops, &other};
     nx_uart_tx_request_t other_request = {};
     nx_request_initialize(&other_request.base);
@@ -293,7 +453,7 @@ TEST_F(UartV1ChannelDma, SeparateInstancesNeverSettleEachOthersRequest) {
     ASSERT_EQ(nx_uart_port_submit(&other_face, &other_request), NX_SUCCESS);
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     tx.count = 0U;
-    flags = 2U << state.tx_shift;
+    flags = 2U << config.tx_shift;
     uart.status = 1U << 6U;
     ChannelIrq(false);
     nx_uart_port_service(&port);
@@ -308,7 +468,7 @@ TEST_F(UartV1ChannelDma, RxPublishFollowsDisableAndStableCount) {
     StartRx();
     ASSERT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     rx.count = 0U;
-    flags = 2U << state.rx_shift;
+    flags = 2U << config.rx_shift;
     ChannelIrq(true);
     EXPECT_NE(slots[0].state, NX_STREAM_SLOT_READY);
     nx_uart_port_service(&port);
@@ -319,7 +479,7 @@ TEST_F(UartV1ChannelDma, RxPublishFollowsDisableAndStableCount) {
 TEST_F(UartV1ChannelDma, RxWithdrawalFailureNeverReturnsProducerLoan) {
     StartRx();
     rx.count = 0U;
-    flags = 2U << state.rx_shift;
+    flags = 2U << config.rx_shift;
     s_refused = &rx.control;
     ChannelIrq(true);
     nx_uart_port_service(&port);
@@ -334,7 +494,7 @@ TEST_F(UartV1ChannelDma, BackpressureNeverOverwritesConsumerLoan) {
     StartRx();
     for (size_t i = 0; i < 2U; ++i) {
         rx.count = 0U;
-        flags = 2U << state.rx_shift;
+        flags = 2U << config.rx_shift;
         ChannelIrq(true);
         nx_uart_port_service(&port);
     }
@@ -361,7 +521,7 @@ TEST_F(UartV1ChannelDma, IdleBoundaryReturnsOnlyObservedPrefix) {
 TEST_F(UartV1ChannelDma, ByteDiscardedAfterNormalDmaBoundaryReportsLoss) {
     StartRx();
     rx.count = 0U;
-    flags = 2U << state.rx_shift;
+    flags = 2U << config.rx_shift;
     uart.status = 1U << 5U;
     uart.data = 0x55U;
     ChannelIrq(true);
@@ -373,7 +533,7 @@ TEST_F(UartV1ChannelDma, ByteDiscardedAfterNormalDmaBoundaryReportsLoss) {
 TEST_F(UartV1ChannelDma, StopDoesNotRevokeReadyOrConsumerLoans) {
     StartRx();
     rx.count = 0U;
-    flags = 2U << state.rx_shift;
+    flags = 2U << config.rx_shift;
     ChannelIrq(true);
     nx_uart_port_service(&port);
     nx_stream_block_t loan = {};
@@ -403,7 +563,7 @@ TEST_F(UartV1ChannelDma, CapturedWakePublisherMustJoinBeforeStorageReturns) {
     ASSERT_EQ(nx_uart_port_attach_wake(&port, &wake, 0U), NX_SUCCESS);
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     tx.count = 0U;
-    flags = 2U << state.tx_shift;
+    flags = 2U << config.tx_shift;
     uart.status = 1U << 6U;
     EXPECT_CALL(observer, Call()).WillOnce(testing::Invoke([&] {
         nx_uart_port_service(&port);

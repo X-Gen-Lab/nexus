@@ -83,6 +83,12 @@ information. Other validation failures retain `invalid_configuration` and the
 precise original message; no guessed line numbers or replacement values are
 reported.
 
+If the selected provider entry or one of its parent Python packages is missing,
+the diagnostic code is `provider_module_missing`, with `family`, `module`,
+`source` and `missing_module`. Only the selected family is loaded. A missing
+dependency inside an existing entry, or another import error, retains its actual
+exception; it is not reported as an unsupported provider.
+
 ```sh
 python tools/configure/configure.py provider-check \
   --assembly my-platform.toml --expect-family stm32f407 \
@@ -273,7 +279,13 @@ JSON is never consulted as a fallback for a failed TOML assembly.
 
 `providers/` explicitly admits Native, STM32F103/F407/G474/H743/U575 and
 GD32F303/F470. Each retains its documented exact part, route and mode scope.
-Each family's `contract.py` owns its mode map, CPU/enum ABI, numerical limits,
+Production family packages live in `soc/<vendor>/<family>/configure/`; Native
+uses `soc/native/configure/`. The explicit map, `FamilyDescriptor` and shared
+leaf contracts remain in `tools/configure/providers/`; provider tests remain
+in `tools/configure/tests/providers/<family>/`. Common parsing, resource
+arbitration, typed IR and atomic bundle publication remain in this tool directory.
+
+Each family's `configure/contract.py` owns its mode map, CPU/enum ABI, numerical limits,
 fixed DMA/trigger routes, IRQ sharing and built-in CS rules. `__init__.py`
 reexports the explicit contract and constructors; sibling implementations import
 `contract.py` directly rather than the partially initialized package. `bindings.py`

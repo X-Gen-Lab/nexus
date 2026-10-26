@@ -54,7 +54,7 @@ class I2CTimingConfiguration(unittest.TestCase):
                 _, generated = bindings.emit(result)
                 self.assertIn(f"0x{timing.timingr:08x}u", generated)
                 if fixture.startswith("u575"):
-                    self.assertIn("nx_stm32u575_i2c_initialize_timing", generated)
+                    self.assertIn("nx_stm32u575_i2c_prepare", generated)
 
     def test_declared_clock_must_contain_selected_source_nominal(self):
         for change in (dict(kernel_hz_min=30000000, kernel_hz_max=40000000),

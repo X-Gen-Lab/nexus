@@ -16,10 +16,11 @@ nexus_google_test(nexus_h743_high_kernel_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
 foreach(h743_high_target nexus_h743_high_system_test nexus_h743_high_kernel_test)
     target_include_directories(${h743_high_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
@@ -61,11 +62,11 @@ nexus_google_test(nexus_h743_high_factory_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_high_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
 target_include_directories(nexus_h743_high_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"

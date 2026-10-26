@@ -1,0 +1,63 @@
+"""Explicit family contract and static-construction exports."""
+from .contract import (
+    CLASSIC_CAN_MAILBOXES,
+    UART_FORMATS,
+    STREAM_GEOMETRY,
+    PARTS,
+    PUBLIC_FORMATS,
+    ADC_CHANNEL_SEQUENCES,
+    ADC_GROUP,
+    CAN_CLOCK_HZ,
+    CAN_CONTROLLERS,
+    CLOCK_PROFILES,
+    CONTROLLER_INTERFACES,
+    CPU_ABI,
+    CPU_FEATURES,
+    DMA_TOPOLOGY,
+    DMA_VECTOR,
+    DWT_CYCCNT,
+    ENDPOINT_POLICY,
+    ENUM_ABI,
+    ETH_CONTROLLER,
+    EXTERNAL_IRQ_COUNT,
+    FACT_REFERENCES,
+    FLASH_INPUT_ALIGNMENT,
+    FLASH_PROGRAM_UNIT,
+    FREERTOS_PORT,
+    IRQ_PRIORITY_BITS,
+    LIMITS,
+    MODEL,
+    PREFIX,
+    PWM_SHARED,
+    SPI_REQUIRES_ENDPOINT,
+    TIMEBASE_ALARM,
+    USB_CONTROLLER,
+    _FIXED_DMA,
+    _MODE_IMPLEMENTATIONS,
+    builtin_cs,
+    configuration_header,
+    dma_irq,
+    mode_fields,
+    mode_implementation,
+    shares_irq,
+    validate_controller_set,
+    validate_dma,
+    validate_dma_resource,
+    validate_endpoint_clock,
+    validate_mode_context,
+    validate_selection,
+    validate_user_io_context,
+)
+from .bindings import constructor
+from .emission import (includes, instance_declarations, implementation, operations,
+                       state_declarations, shared_irqs, stop_system,
+                       start_system, start_resources)
+from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
+from .preflight import PREFLIGHT_CALL, selected_preflight
+from . import gpio as GPIO_PHASE
+from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
+                       SECONDARY_FACTS)
+from .i2s2 import resolve_i2s2
+from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
+from . import secondary as SECONDARY_INTEGRATION
+from .integration import CAN_INTEGRATION

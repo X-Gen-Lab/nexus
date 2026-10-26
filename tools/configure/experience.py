@@ -12,16 +12,10 @@ import os
 from pathlib import Path
 import sys
 
-try:
-    from . import selected_contracts
-    from .providers import maintained
-    from .providers.common import mode_traits, route_dma
-    from .resource_graph import json_value, normalize_resource
-except ImportError:
-    import selected_contracts
-    from providers import maintained
-    from providers.common import mode_traits, route_dma
-    from resource_graph import json_value, normalize_resource
+from tools.configure import selected_contracts
+from tools.configure.providers import maintained
+from tools.configure.providers.common import mode_traits, route_dma
+from tools.configure.resource_graph import json_value, normalize_resource
 
 
 def project(result):
@@ -510,10 +504,7 @@ def run(gate, argv=None):
         else:
             result = resolve(args.assembly)
         if command == "provider-check":
-            try:
-                from . import onboarding
-            except ImportError:
-                import onboarding
+            from tools.configure import onboarding
             report = onboarding.check(
                 result, expected_family=args.expect_family,
                 expected_part=args.expect_part)

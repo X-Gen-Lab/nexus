@@ -231,6 +231,45 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
+    def shared_ip_driver(self, owner, *, alias=False):
+        source = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.c"
+        source.parent.mkdir(parents=True)
+        self.production.rename(source)
+        name = source.relative_to(self.root).as_posix()
+        if alias:
+            (self.root / "io").mkdir()
+            name = "io/../" + name
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        old_object = Path(entries[1]["arguments"][-1])
+        output = self.build / "CMakeFiles" / (owner + ".dir") / "ip.o"
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_bytes(old_object.read_bytes())
+        entries[1]["file"] = str(self.root / name)
+        entries[1]["arguments"][2] = str(self.root / name)
+        entries[1]["arguments"][-1] = str(output)
+        database.write_text(json.dumps(entries))
+        catalogue = json.loads(self.catalogue.read_text())
+        catalogue["properties"][0]["production_sources"] = [name]
+        self.catalogue.write_text(json.dumps(catalogue))
+
+    def test_shared_ip_driver_retains_target_local_execution_evidence(self):
+        self.shared_ip_driver(self.binary.name)
+        matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+        self.write_execution()
+        self.assertEqual(self.run_audit()["properties"][0]["status"],
+                         "executed-bounded")
+
+    def test_shared_ip_driver_cannot_borrow_another_target_object(self):
+        self.shared_ip_driver("another_target")
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_shared_ip_driver_alias_cannot_borrow_the_native_owner(self):
+        self.shared_ip_driver("nexus_io_native", alias=True)
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
     def test_duplicate_property_rejected(self):
         j = json.loads(self.catalogue.read_text()); j["properties"].append(copy.deepcopy(j["properties"][0])); self.catalogue.write_text(json.dumps(j))
         with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)

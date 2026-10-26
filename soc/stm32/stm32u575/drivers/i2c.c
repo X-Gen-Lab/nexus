@@ -46,13 +46,14 @@ static bool task(void) {
            !nx_arch_irq_is_masked();
 }
 static bool valid(const nx_i2c_v2_state_t* port) {
-    return port != NULL && port->registers != NULL && port->poll_limit != 0U &&
-           port->reset == &NX_U575_RCC->APB1RSTR1 &&
-           port->reset_mask == RCC_APB1RSTR1_I2C1RST;
+    return port != NULL && port->config != NULL &&
+           port->config->registers != NULL && port->config->poll_limit != 0U &&
+           port->config->reset == &NX_U575_RCC->APB1RSTR1 &&
+           port->config->reset_mask == RCC_APB1RSTR1_I2C1RST;
 }
 static nx_result_t source_wait(const nx_stm32u575_i2c_clock_t* clock,
                                bool ready) {
-    uint32_t remaining = clock->port->poll_limit;
+    uint32_t remaining = clock->port->config->poll_limit;
     do {
         if (((NX_U575_READ(&NX_U575_RCC->CR) & RCC_CR_HSIRDY) != 0U) == ready)
             return NX_SUCCESS;
@@ -157,27 +158,24 @@ nx_result_t nx_stm32u575_i2c_initialize_timing(nx_stm32u575_i2c_state_t* port,
         (NX_U575_READ(&NX_U575_RCC->CCIPR1) & RCC_CCIPR1_I2C1SEL) !=
             RCC_CCIPR1_I2C1SEL_1)
         return NX_ERROR_STATE;
-    /* The assembly checks the complete HSI16/electrical envelope. Keeping the
-     * selected word in the existing state also preserves it through recover;
-     * no separate timing owner or runtime clock calculation is introduced. */
-    port->timing = timing;
-    /* ES0499 Rev12 2.20.1 permits Standard250ns setup at>=4MHz kernel.
-     * Section2.20.2 requires clearing spurious master BERR without abort. */
-    port->ignore_master_berr = true;
-    port->receive_reload_one = false;
+    /* The assembly supplies immutable HSI16/electrical timing and ES0499
+     * Rev12 master-BERR policy; recover observes the same selected values. */
+    if (timing != port->config->timing || !port->config->ignore_master_berr ||
+        port->config->receive_reload_one)
+        return NX_ERROR_INVALID;
     nx_result_t result = nx_i2c_v2_initialize(port);
     if (result == NX_SUCCESS &&
-        LL_I2C_GetTimingPrescaler((I2C_TypeDef*)port->registers) !=
+        LL_I2C_GetTimingPrescaler((I2C_TypeDef*)port->config->registers) !=
             ((timing >> 28U) & 15U))
         return NX_ERROR_IO;
     return result;
 }
 nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port) {
-    /* RM0456 default: HSI16, PRESC=1, SCLL/H=47, SDADEL=4, SCLDEL=15,
-     * AF on/DNF0. DS13737 Table81's15.65..16.25MHz bounds give low/high
-     * above5.9us and SCLDEL above1.96us, with rise<=1000ns/fall<=300ns.
-     * Physical pull-ups, voltage and temperature still require validation. */
-    return nx_stm32u575_i2c_initialize_timing(port, 0x10f42f2fU);
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (!valid(port))
+        return NX_ERROR_INVALID;
+    return nx_stm32u575_i2c_initialize_timing(port, port->config->timing);
 }
 nx_result_t nx_stm32u575_i2c1_pins_prepare(void) {
     nx_result_t result = nx_stm32u575_gpio_clock_enable(1U);
@@ -194,4 +192,28 @@ nx_result_t nx_stm32u575_i2c1_pins_prepare(void) {
     result = nx_stm32u575_pin_alternate(GPIOB, 8U, 4U);
     return result == NX_SUCCESS ? nx_stm32u575_pin_alternate(GPIOB, 9U, 4U)
                                 : result;
+}
+
+nx_result_t nx_stm32u575_i2c_prepare(nx_i2c_v2_state_t* port,
+                                     nx_stm32u575_i2c_clock_t* clock,
+                                     const nx_i2c_v2_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (clock == NULL)
+        return NX_ERROR_INVALID;
+    if (clock->retained)
+        return NX_ERROR_BUSY;
+    nx_result_t result = nx_i2c_v2_bind(port, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32u575_i2c1_pins_prepare();
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32u575_i2c_clock_start(clock, port);
+    return result == NX_SUCCESS ? nx_stm32u575_i2c_initialize(port) : result;
+}
+nx_result_t nx_stm32u575_i2c_close(nx_i2c_v2_state_t* port,
+                                   nx_stm32u575_i2c_clock_t* clock) {
+    nx_result_t result = nx_i2c_v2_ops.stop(port);
+    return result == NX_SUCCESS ? nx_stm32u575_i2c_clock_stop(clock) : result;
 }

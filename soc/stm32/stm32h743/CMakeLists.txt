@@ -71,7 +71,7 @@ if(h7_spi_modes)
     endif()
 endif()
 if(h7_i2c_modes)
-    list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c")
+    list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c")
 endif()
 if(h7_flash_modes)
     set(h7_flash_ram_sources
@@ -105,7 +105,7 @@ if(h7_sources)
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32h743 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
-        "${NEXUS_SOURCE_DIR}/soc/common"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2"
         "${NEXUS_SOURCE_DIR}/io/private")
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include")

@@ -6,7 +6,9 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "legacy_devices.h"
+#include "legacy_adc.h"
+#include "legacy_flash.h"
+#include "legacy_pwm.h"
 #include "nexus/io/native/model.h"
 #include <array>
 #include <cstring>

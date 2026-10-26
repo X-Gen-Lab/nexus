@@ -10,12 +10,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-try:
-    from .providers import maintained
-    from .providers.common import fail, mode_traits
-except ImportError:
-    from providers import maintained
-    from providers.common import fail, mode_traits
+from tools.configure.providers import maintained
+from tools.configure.providers.common import fail, mode_traits
 
 
 ENDPOINT_DRIVERS = MappingProxyType({
@@ -33,10 +29,6 @@ FORMAT_FIELDS = MappingProxyType({
     "eth": ("vlan", "scatter_gather"),
     "eth_frames": ("vlan", "scatter_gather", "clock_domain"),
 })
-# Adding a provider/mode does not inherit a public-format implementation review.
-_FORMAT_PROVIDERS = frozenset((
-    "native", "stm32f103", "stm32f407", "stm32g474", "stm32h743",
-    "stm32u575", "gd32f303", "gd32f470"))
 
 
 @dataclass(frozen=True)
@@ -149,7 +141,8 @@ def _format(item, provider, shape):
     fields = {}
     abort = "request" if shape.irq and kind != "adc" else "not_applicable"
     continuity, source = "not_applicable", "unknown"
-    if kind in FORMAT_KINDS and item.provider not in _FORMAT_PROVIDERS:
+    if (kind in FORMAT_KINDS and
+            kind not in getattr(provider, "PUBLIC_FORMATS", ())):
         fail("I/O traits require an explicit provider format review")
     if kind == "uart":
         frame = options.frame
@@ -176,9 +169,10 @@ def _format(item, provider, shape):
             continuity = "double_buffer" if shape.continuous else "rearm_gap"
             source = "irq_observation"
     elif kind == "can":
-        if item.provider not in {"stm32f407", "gd32f470"}:
+        mailboxes = getattr(provider, "CLASSIC_CAN_MAILBOXES", None)
+        if type(mailboxes) is not int or mailboxes <= 0:
             fail("CAN traits require a reviewed physical mailbox topology")
-        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=3)
+        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=mailboxes)
         source = "irq_observation"
     elif kind in {"eth", "eth_frames"}:
         enhanced = kind == "eth_frames"
@@ -192,15 +186,13 @@ def _format(item, provider, shape):
     policy = "none"
     if dma:
         policy = "domain_cache_line" if line else "provider_domain"
-    if item.provider == "stm32h743" and (
-            (kind == "spi" and item.mode == "dma") or
-            (kind == "uart" and item.mode in
-             ("rx-dma-continuous", "dma-duplex-continuous"))):
-        line = options.dma_cache_line_bytes
-        policy = "domain_cache_line" if line else "provider_domain"
-    return dict(fields=fields, abort_scope=abort, continuity=continuity,
-                timestamp_source=source, dma_policy=policy,
-                cache_line_bytes=line)
+    result = dict(fields=fields, abort_scope=abort, continuity=continuity,
+                  timestamp_source=source, dma_policy=policy,
+                  cache_line_bytes=line)
+    selected_format = getattr(provider, "selected_format", None)
+    if selected_format is not None:
+        result.update(selected_format(item, shape))
+    return result
 
 
 def describe(item, endpoint=None, *, public_class=None):
@@ -233,19 +225,6 @@ def describe(item, endpoint=None, *, public_class=None):
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))
     if kind in {"uart", "spi"} and shape.dma:
         limits["max_transfer_units"] = "UINT16_MAX"
-    if item.provider == "stm32u575" and kind == "uart" and item.mode == "dma-chain-tx":
-        limits["max_transfer_units"] = 196605
-    if item.provider == "stm32h743" and kind == "uart" and item.mode == "rx-dma-continuous":
-        # This public request is IRQ TX; the separate RX block loan has the
-        # provider's 16-bit NDTR and optional complete-cache-line restrictions.
-        limits["max_transfer_units"] = "UINT32_MAX"
-    if (item.provider == "stm32h743" and kind == "uart" and
-            item.mode == "dma-duplex-continuous" and
-            item.options.dma_cache_line_bytes):
-        limits.update(buffer_alignment=32, max_transfer_units="65504")
-    if (item.provider == "stm32h743" and kind == "spi" and shape.dma and
-            item.options.dma_cache_line_bytes):
-        limits.update(buffer_alignment=32, max_transfer_units="65504")
     if kind == "spi" and not shape.dma and not provider.MODEL:
         limits["max_transfer_units"] = 256
     elif kind == "i2c" and not provider.MODEL:
@@ -285,6 +264,9 @@ def describe(item, endpoint=None, *, public_class=None):
             fail("Flash provider requires exact power-of-two units/alignment")
         limits.update(unit="program_units", unit_bytes=unit,
                       buffer_alignment=alignment)
+    selected_limits = getattr(provider, "selected_limits", None)
+    if selected_limits is not None:
+        limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
     if endpoint is not None and kind == "spi":
         formatted["fields"] = {
@@ -295,7 +277,9 @@ def describe(item, endpoint=None, *, public_class=None):
                       max_transfer_units=None, word_bits=(9,))
     elif selected in {"spi_transaction_device", "spi_dma_transaction",
                       "spi_dma_transaction_device"}:
-        if item.provider not in {"native", "stm32f407", "gd32f470"}:
+        policy = provider.ENDPOINT_POLICY
+        if not (policy.spi_transaction if selected == "spi_transaction_device"
+                else policy.spi_dma is not None):
             fail("SPI transaction traits require an explicitly reviewed "
                  "provider")
         dma = selected != "spi_transaction_device"
@@ -314,7 +298,7 @@ def describe(item, endpoint=None, *, public_class=None):
         formatted["fields"] = {
             **formatted["fields"], "word_bits": 0 if len(bits) > 1 else bits[0]}
     elif selected == "i2c_long_device":
-        if item.provider not in {"stm32g474", "stm32h743", "stm32u575"}:
+        if not provider.ENDPOINT_POLICY.i2c_long:
             fail("Long I2C traits require the reviewed v2 provider")
         limits.update(max_transfer_units="NX_I2C_LONG_MAX_MESSAGE_BYTES",
                       max_messages="NX_I2C_MAX_MESSAGES")
@@ -347,34 +331,40 @@ def for_configuration(result):
     return tuple(records)
 
 
-def silicon_policy(result, item=None):
-    """Project only the existing selected high-clock revision expectation.
-
-    Ordinary profiles have no completed rule through this projection. Returning
-    None never authorizes an unknown revision or executes a hardware check.
-    """
-    if (item is not None and item in result.controllers and
-            item.provider == "stm32h743" and item.kind == "spi" and
-            item.mode == "dma"):
-        if (result.backend != "baremetal" or
-                result["clock_profile"] not in {
-                    "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"}):
-            fail("Selected SPI DMA silicon expectation requires its exact profile")
-        cache = "on" if result["clock_profile"].endswith("-cache-on") else "off"
-        return SiliconPolicy(result["part"], result.soc_family,
-                             f"spi4-dma-hsi64-cache{cache}-dev450-v2003-trim64",
-                             (0x2003,), "selected_spi_dma_mode")
+def _silicon_policy(result, item=None):
+    """Read one existing selected admission, without widening its scope."""
     if item is not None:
-        if item not in result.controllers or item.kind != "adc_group":
+        if item not in result.controllers or item.provider != result.soc_family:
             fail("Selected silicon profile belongs to no ADC group owner")
-        return item.options.admission
-    plan = result.clock_plan
-    if plan is None:
-        return None
-    if result.soc_family != "stm32h743":
+        if item.kind == "adc_group":
+            return item.options.admission
+    provider = maintained(result.soc_family)
+    selected_policy = getattr(provider, "silicon_policy", None)
+    policy = (selected_policy(result, item)
+              if selected_policy is not None else None)
+    if item is None and result.clock_plan is not None and policy is None:
         fail("Selected silicon clock review has no maintained provider")
-    return SiliconPolicy(result["part"], result.soc_family, plan.profile,
-                         plan.reviewed_revision_ids, "selected_clock_profile")
+    return policy
+
+
+def silicon_policy(result, item=None):
+    """Project one selected rule; absent system review never grants admission."""
+    policy = _silicon_policy(result, item)
+    if item is not None and policy is None:
+        fail("Selected silicon profile belongs to no ADC group owner")
+    return policy
+
+
+def silicon_policies(result):
+    """Keep existing system and controller rules under their actual owners.
+
+    None entries mean no completed review in this projection, never approval
+    of an unknown revision. Endpoints do not acquire a controller's admission.
+    """
+    policies = {None: _silicon_policy(result)}
+    policies.update((item.id, _silicon_policy(result, item))
+                    for item in result.controllers)
+    return MappingProxyType(policies)
 
 
 def capability(item, model, endpoint=None, *, public_class=None):

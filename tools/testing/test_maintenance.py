@@ -49,6 +49,17 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
         self.assertEqual(spi["boards"], [])
 
+    def test_selected_shared_ip_exports_keep_the_actual_driver_path(self):
+        rows = capabilities.collect(ROOT)
+        selected = [row for row in rows if row["family"] == "stm32f407"
+                    and row["kind"] == "i2c" and row["exports"]
+                    and row["mode"] in {"irq-messages", "dma-messages"}]
+        self.assertTrue(selected)
+        for row in selected:
+            with self.subTest(mode=row["mode"]):
+                self.assertEqual(row["exports"],
+                                 ["drivers/i2c/i2c_v1_async/i2c_v1_async.c"])
+
     def test_native_selected_models_preserve_real_ops_and_no_physical_claim(self):
         rows = capabilities.collect(ROOT)
         selected = [row for row in rows if row["family"] == "native"]

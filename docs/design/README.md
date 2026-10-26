@@ -19,6 +19,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [当前与目标参考图](../assets/diagrams/README.md) | 本地 DOT/SVG 主图与两张补充图；主图以图清单为准，current/reference/target 身份、渲染与审查分别记录 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
+| [SoC/IP 目录整理 48 项台账](soc-ip-layout-execution.csv) | 八组路径、配置、构建与验证任务；实现、软件执行和实板状态分别记录 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
 | [选定模式 HIL 合同](selected-mode-hil.md) | H743 SPI Cache／连续 RX／UART DMA 双向、U575 UART 硬件链／RUN LPTIM 的精确采集协议；准备和原始记录校验不建立实板资格 |
 | [H743 V 修订高速时钟参考](h743-high-clock.md) | 已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界 |

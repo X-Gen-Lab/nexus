@@ -39,9 +39,20 @@ target names and authored family identifiers remain stable.
 
 The [source-adjacent contracts](source-map.md) own the directory map and layer
 README content. Native models implement the same public I/O contracts under the
-Native SoC package. Shared register-protocol algorithms remain in `soc/common/`
-only when the participating wrappers independently establish their silicon
-semantics.
+Native SoC package. Shared register-protocol algorithms live under
+`drivers/<kind>/<ip>/` only when the participating wrappers independently
+establish their silicon semantics. Selected SoC targets compile these private
+sources directly; the directory adds no runtime layer to FIG-01. Cross-vendor
+SoC collaboration remains in `soc/common/`, while STM32 identity access remains
+under `soc/stm32/common/`.
+
+Each family's `configure/` package owns its capability policy, constructors and
+lifecycle emission; Native uses `soc/native/configure/`. The explicit provider
+map and shared leaf contracts remain in `tools/configure/providers/`. Common
+parsing, resource arbitration, typed IR and atomic publication stay in
+`tools/configure/`. Configuration tests stay under
+`tools/configure/tests/providers/<family>/`. These are build-time Python
+boundaries, independent of the C execution path.
 
 Common components and selected STM32 extensions have distinct source ownership.
 Components are explicit targets; a chip-specific target still requires its

@@ -8,6 +8,7 @@
  */
 #ifndef NX_STM32G474_PROVIDER_H
 #define NX_STM32G474_PROVIDER_H
+#include "../../../../drivers/i2c/i2c_v2/i2c_v2.h"
 #include "nexus/io/exti.h"
 #include "nexus/io/gpio.h"
 #include "nexus/io/spi.h"
@@ -20,6 +21,13 @@ extern "C" {
 #endif
 /** \brief Configure reviewed PB8/PB9 AF4 open drain; Board owns pull-ups. */
 nx_result_t nx_stm32g474_i2c_pins_prepare(void);
+/** \brief Bind a cold I2C1 owner, prepare its pads, then acquire the engine.
+ * \param[in,out] port: Serialized runtime; retained owners reject rebinding.
+ * \param[in] config: Static immutable I2C1 resources and reviewed timing.
+ * \return Success/error; platform cleanup retains any partial pad effects.
+ */
+nx_result_t nx_stm32g474_i2c_prepare(nx_i2c_v2_state_t* port,
+                                     const nx_i2c_v2_config_t* config);
 typedef struct {
     GPIO_TypeDef* registers;
     uint32_t mask;

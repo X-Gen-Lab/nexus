@@ -96,7 +96,7 @@ def source_inputs(root):
               root / "scripts/ci/gd32_memory.py",
               root / "scripts/ci/memory_budget.py",
               root / "scripts/ci/arch_compile.py"]
-    for directory in ("arch", "core", "io", "os", "soc/stm32/stm32f407",
+    for directory in ("arch", "core", "io", "os", "drivers", "soc/stm32/stm32f407",
                       "boards/stm32f407_qiming_v31",
                       "boards/stm32f407ve_sky_qingchun", "cmake",
                       "tools/configure", "tools/measurement", "tools/evidence",

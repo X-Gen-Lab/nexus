@@ -2,9 +2,9 @@
 set(u5_factory_input "${NEXUS_SOURCE_DIR}/tests/contracts/u575_assembly/io.toml")
 set(u5_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/u575-factory")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32u575/__init__.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32u575/bindings.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32u575/emission.py")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/configure/__init__.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/configure/bindings.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/configure/emission.py")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
     --source-root "${NEXUS_SOURCE_DIR}" --assembly "${u5_factory_input}"

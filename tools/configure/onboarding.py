@@ -8,15 +8,9 @@ import hashlib
 from pathlib import Path
 import tempfile
 
-try:
-    from . import emission, selected_contracts
-    from .providers import descriptor, maintained
-    from .providers.common import fail
-except ImportError:
-    import emission
-    import selected_contracts
-    from providers import descriptor, maintained
-    from providers.common import fail
+from tools.configure import emission, selected_contracts
+from tools.configure.providers import descriptor, maintained
+from tools.configure.providers.common import fail
 
 
 def check(result, *, expected_family=None, expected_part=None):

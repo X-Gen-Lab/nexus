@@ -25,11 +25,20 @@ arch/
   include/nexus/arch/         public CPU contracts
   arm/cortex_m/              selected Arm Cortex-M implementation
   native/                    host CPU primitives
+drivers/
+  <kind>/<ip>/               reviewed reusable register-protocol algorithms
 soc/
-  common/                    reviewed shared register algorithms
+  common/                    cross-vendor SoC collaboration contracts
+  native/configure/          Native policy and static emission
   native/drivers/            independent host device models
+  stm32/common/              STM32 identity helpers
   stm32/<family>/            maintained STM32 provider packages
+    configure/               STM32 family policy, construction and emission
   gd32/<family>/             maintained GD32 provider packages
+    configure/               GD32 family policy, construction and emission
+tools/configure/
+  providers/                 explicit provider map and shared leaf contracts
+  tests/providers/<family>/  host configuration tests
 io/
   include/nexus/io/           public I/O contracts
   src/api/                   checked face dispatch
@@ -80,6 +89,13 @@ components/
 
 ```{include} ../../soc/README.md
 :relative-docs: ../../soc/
+:relative-images:
+```
+
+## Reusable IP implementations
+
+```{include} ../../drivers/README.md
+:relative-docs: ../../drivers/
 :relative-images:
 ```
 

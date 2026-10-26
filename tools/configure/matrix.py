@@ -3,30 +3,23 @@
 This reports software selections and reviewed routes, never physical execution
 or a source-target graph. Assemblies enter through one explicit catalogue.
 """
-try:
-    from .providers.descriptor import source_directory
-except ImportError:
-    from providers.descriptor import source_directory
 import argparse
 import json
 from pathlib import Path
+import sys
 import re
 import subprocess
 import tempfile
 
-try:
-    from . import authored, configure, factory, selected_contracts
-    from .contracts import COMPONENTS
-    from .providers import descriptor, maintained
-    from .providers.common import mode_traits
-except ImportError:
-    import authored
-    import configure
-    import factory
-    import selected_contracts
-    from contracts import COMPONENTS
-    from providers import descriptor, maintained
-    from providers.common import mode_traits
+# Direct CLI execution binds only this checkout or relocated SDK.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.configure.providers.descriptor import source_directory
+from tools.configure import authored, configure, factory, selected_contracts
+from tools.configure.contracts import COMPONENTS
+from tools.configure.providers import descriptor, maintained
+from tools.configure.providers.common import mode_traits
 
 
 CATALOGUE = "tools/configure/assemblies/catalogue.json"

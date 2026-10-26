@@ -12,18 +12,12 @@ import sys
 import tomllib
 from types import MappingProxyType
 
-try:
-    from . import cpu, kernel, metadata, factory, bundle, dependencies, sdk
-    from .ir import freeze
-except ImportError:
-    import cpu
-    import kernel
-    import metadata
-    import factory
-    import bundle
-    import dependencies
-    import sdk
-    from ir import freeze
+# Direct CLI execution binds only this checkout or relocated SDK.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.configure import cpu, kernel, metadata, factory, bundle, dependencies, sdk
+from tools.configure.ir import freeze
 
 
 ROOT = Path(__file__).resolve().parents[2]

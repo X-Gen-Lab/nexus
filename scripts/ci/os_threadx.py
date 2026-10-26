@@ -95,7 +95,7 @@ def check_symbols(text):
 
 def source_inputs(root):
     paths = set()
-    for layer in ('core', 'arch', 'io', 'os', 'soc', 'boards', 'tools/configure',
+    for layer in ('core', 'arch', 'io', 'os', 'soc', 'drivers', 'boards', 'tools/configure',
                   'tests/contracts/os_threadx_runtime'):
         paths.update(path for path in (root / layer).rglob('*')
                      if path.is_file() and '__pycache__' not in path.parts and

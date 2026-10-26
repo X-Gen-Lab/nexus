@@ -110,6 +110,50 @@ class DocumentationCommandTests(unittest.TestCase):
             result = cli.main(["check", "--staged"], root=self.root)
         self.assertNotEqual(result, 0)
 
+    def test_staged_check_rejects_configuration_code_outside_the_index(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        paths = (
+            "tools/configure/providers/common.py",
+            "tools/__init__.py", "soc/__init__.py",
+            "soc/native/__init__.py", "soc/native/configure/bindings.py",
+            "soc/stm32/__init__.py", "soc/stm32/stm32g474/__init__.py",
+            "soc/stm32/stm32g474/configure/coupled.py",
+            "soc/gd32/gd32f303/configure/contract.py")
+        for relative in paths:
+            source = self.root / relative
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text("reviewed = True\n")
+        subprocess.run(["git", "-C", str(self.root), "add", "docs", *paths],
+                       check=True)
+        self.assertEqual(self.run_staged_check()[0], 0)
+        for relative in paths:
+            with self.subTest(path=relative):
+                source = self.root / relative
+                source.write_text("reviewed = False\n")
+                result, errors = self.run_staged_check()
+                source.write_text("reviewed = True\n")
+                self.assertNotEqual(result, 0)
+                self.assertIn(relative, errors)
+
+    def test_staged_check_rejects_missing_and_untracked_soc_adapter(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        relative = "soc/native/configure/emission.py"
+        source = self.root / relative
+        source.parent.mkdir(parents=True)
+        source.write_text("reviewed = True\n")
+        subprocess.run(["git", "-C", str(self.root), "add", "docs", relative],
+                       check=True)
+        source.unlink()
+        result, errors = self.run_staged_check()
+        self.assertNotEqual(result, 0)
+        self.assertIn(relative, errors)
+        source.write_text("reviewed = True\n")
+        new_relative = "soc/native/configure/new_helper.py"
+        (self.root / new_relative).write_text("unreviewed = True\n")
+        result, errors = self.run_staged_check()
+        self.assertNotEqual(result, 0)
+        self.assertIn(new_relative, errors)
+
     def test_report_cannot_overwrite_a_document_input(self):
         page = self.root / "docs/index.md"
         original = page.read_bytes()

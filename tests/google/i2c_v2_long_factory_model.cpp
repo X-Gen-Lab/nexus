@@ -67,7 +67,7 @@ constexpr uint32_t txis = I2C_ISR_TXIS;
 constexpr uint32_t rxne = I2C_ISR_RXNE;
 constexpr uint32_t byte_mask = I2C_CR2_NBYTES;
 #if defined(NX_I2C_LONG_U575)
-nx_i2c_v2_registers_t u5_i2c{};
+
 SPI_TypeDef u5_spi{};
 ADC_TypeDef u5_adc{};
 ADC_Common_TypeDef u5_adc_common{};
@@ -146,11 +146,11 @@ extern "C" void nx_i2c_long_factory_reset(void) {
     g_long_i2c.reset_mask = RCC_APB1LRSTR_I2C1RST;
 #else
     nx_u575_devices_reset();
-    u5_i2c = {};
+    g_u575_i2c_registers = {};
     u5_spi = {};
     u5_adc = {};
     u5_adc_common = {};
-    g_u575_i2c = &u5_i2c;
+    g_u575_i2c = &g_u575_i2c_registers;
     g_u575_spi = &u5_spi;
     g_u575_adc = &u5_adc;
     g_u575_adc_common = &u5_adc_common;
@@ -266,7 +266,7 @@ extern "C" void nx_i2c_long_factory_poll(nx_i2c_v2_state_t* state) {
     auto& m = g_long_i2c;
     auto& r = *m.registers;
     tick();
-    if (state->registers != m.registers) {
+    if (state->config->registers != m.registers) {
         ++m.illegal_controls;
         return;
     }

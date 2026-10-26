@@ -57,6 +57,7 @@ target_compile_options(nexus_h743_peripheral_test PRIVATE
 nexus_google_test(nexus_h743_conversion_test SOURCES h743_conversion_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
@@ -136,11 +137,11 @@ nexus_google_test(nexus_h743_peripheral_factory_test SOURCES h743_peripheral_fac
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/watchdog.c"
-    "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+    "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_factory_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
 target_include_directories(nexus_h743_peripheral_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
@@ -155,10 +156,10 @@ target_compile_options(nexus_h743_peripheral_factory_test PRIVATE
 nexus_google_test(nexus_h743_i2c_v2_test SOURCES h743_i2c_v2_test.cpp
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
-    "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+    "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
 target_include_directories(nexus_h743_i2c_v2_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

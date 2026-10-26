@@ -897,7 +897,19 @@
     "address / vector proof missing": "address / vector proof missing",
     "bounded retry; history still known\\nresume already-proved cleanup stages": "bounded retry; history still known\nresume already-proved cleanup stages",
     "history lost at any borrowed phase": "history lost at any borrowed phase",
-    "history loss observed": "history loss observed"
+    "history loss observed": "history loss observed",
+    "FIG-31 Shared IP or exact SoC ownership": "FIG-31 Shared IP or exact SoC ownership",
+    "Private controller work": "Private controller work",
+    "Owns register-protocol sequencing?": "Owns register-protocol sequencing?",
+    "Keep exact SoC integration\\nfacts / clock / reset / pins / IRQ / DMA\\nor a narrowly scoped collaboration helper": "Keep exact SoC integration\nfacts / clock / reset / pins / IRQ / DMA\nor a narrowly scoped collaboration helper",
+    "drivers/<kind>/<ip>/\\nReviewed shared algorithm": "drivers/<kind>/<ip>/\nReviewed shared algorithm",
+    "Classify responsibility": "Classify responsibility",
+    "No": "No",
+    "Yes": "Yes",
+    "Yes: reviewed compatibility": "Yes: reviewed compatibility",
+    "No: retain exact scope": "No: retain exact scope",
+    "Layout / flags / order / reset compatibility reviewed;\\nevery chip erratum explicitly handled?": "Layout / flags / order / reset compatibility reviewed;\nevery chip erratum explicitly handled?",
+    "soc/<vendor>/<family>/drivers/\\nExact or not-yet-reviewed protocol": "soc/<vendor>/<family>/drivers/\nExact or not-yet-reviewed protocol"
   },
   "zh_CN": {
     "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用": "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用",
@@ -1796,6 +1808,18 @@
     "address / vector proof missing": "缺少地址／向量证明",
     "bounded retry; history still known\\nresume already-proved cleanup stages": "有界重试；历史仍已知\n从已证明的清理阶段继续",
     "history lost at any borrowed phase": "任一借用阶段丢失历史",
-    "history loss observed": "观察到历史丢失"
+    "history loss observed": "观察到历史丢失",
+    "FIG-31 Shared IP or exact SoC ownership": "FIG-31 共享 IP 与精确 SoC 源码归属",
+    "Private controller work": "私有控制器实现",
+    "Owns register-protocol sequencing?": "是否拥有寄存器协议时序？",
+    "Keep exact SoC integration\\nfacts / clock / reset / pins / IRQ / DMA\\nor a narrowly scoped collaboration helper": "保留精确 SoC 集成\n事实／时钟／复位／引脚／IRQ／DMA\n或窄范围协作辅助代码",
+    "drivers/<kind>/<ip>/\\nReviewed shared algorithm": "drivers/<kind>/<ip>/\n经复核的共享算法",
+    "Classify responsibility": "判定责任",
+    "No": "否",
+    "Yes": "是",
+    "Yes: reviewed compatibility": "是：兼容性已复核",
+    "No: retain exact scope": "否：保留精确范围",
+    "Layout / flags / order / reset compatibility reviewed;\\nevery chip erratum explicitly handled?": "布局／位／顺序／复位兼容性已复核；\n各芯片勘误均已显式处理？",
+    "soc/<vendor>/<family>/drivers/\\nExact or not-yet-reviewed protocol": "soc/<vendor>/<family>/drivers/\n精确或尚未复核的协议"
   }
 }

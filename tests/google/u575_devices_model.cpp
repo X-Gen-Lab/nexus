@@ -11,6 +11,7 @@
 #include <cstring>
 TIM_TypeDef* g_u575_pwm;
 nx_i2c_v2_registers_t* g_u575_i2c;
+nx_i2c_v2_registers_t g_u575_i2c_registers;
 bool g_u575_i2c_berr;
 bool g_u575_hsi_hold_on;
 bool g_u575_hsi_hold_off;
@@ -261,6 +262,7 @@ void nx_u575_devices_reset(void) {
     g_u575_model.rcc.ICSCR3 = RCC_ICSCR3_HSITRIM_4;
     g_u575_pwm = nullptr;
     g_u575_i2c = nullptr;
+    g_u575_i2c_registers = {};
     g_u575_spi = nullptr;
     g_u575_adc = nullptr;
     g_u575_adc_common = nullptr;

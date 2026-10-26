@@ -7,9 +7,9 @@ import subprocess
 import tempfile
 import unittest
 
-import bindings
-import configure as gate
-import selection as selection_rules
+from tools.configure import bindings
+from tools.configure import configure as gate
+from tools.configure import selection as selection_rules
 
 
 class ProviderContractTests(unittest.TestCase):
@@ -50,7 +50,7 @@ class ProviderContractTests(unittest.TestCase):
                          "dma:DMA3:stream31")
 
     def test_selected_provider_owns_dma_range_and_selector_checks(self):
-        from providers import maintained
+        from tools.configure.providers import maintained
         for family in ("stm32f407", "gd32f470"):
             provider = maintained(family)
             provider.validate_dma_resource("dma:DMA1:stream7:channel7")
@@ -63,7 +63,7 @@ class ProviderContractTests(unittest.TestCase):
             maintained("native").validate_dma_resource("dma:DMA1:stream0")
 
     def test_physical_dma_controller_names_follow_each_vendor(self):
-        from providers import maintained
+        from tools.configure.providers import maintained
         gd = maintained("gd32f470")
         self.assertEqual(gd.validate_dma_resource("dma:DMA0:stream6:channel1"),
                          (0, 6, 1))
@@ -77,7 +77,7 @@ class ProviderContractTests(unittest.TestCase):
             stm.validate_dma_resource("dma:DMA0:stream0:channel0")
 
     def test_adc_scan_and_single_shot_have_distinct_channel_contracts(self):
-        from providers import common, maintained
+        from tools.configure.providers import common, maintained
         for family in ("stm32f407", "gd32f470"):
             provider = maintained(family)
             for mode, channels in (("low-rate-scan", [0]),
@@ -94,7 +94,7 @@ class ProviderContractTests(unittest.TestCase):
                                                   131072)
 
     def test_adc_constructor_sequences_are_validated_before_generation(self):
-        from providers import common, maintained
+        from tools.configure.providers import common, maintained
         selection = {"id": "adc", "binding": "adc", "mode": "low-rate-scan",
                      "channels": [1, 0], "sample_times": [7, 7],
                      "reference_mv": 3300, "timeout_ms": 100}
@@ -106,7 +106,7 @@ class ProviderContractTests(unittest.TestCase):
                                               maintained(family), 131072)
 
     def test_mode_traits_are_explicit_immutable_and_directional(self):
-        from providers import common
+        from tools.configure.providers import common
         for kind, mode, tx, rx, continuous in (
                 ("uart", "dma-tx", True, False, False),
                 ("uart", "rx-dma-idle", False, True, False),
@@ -143,7 +143,7 @@ class ProviderContractTests(unittest.TestCase):
             bindings.emit(result)
 
     def test_family_contract_has_explicit_abi_and_irq_identity(self):
-        from providers import maintained
+        from tools.configure.providers import maintained
         for family, arch, vector in (("native", "native", None),
                                      ("stm32f407", "cortex-m4", "Stream"),
                                      ("gd32f470", "cortex-m4", "Channel")):
@@ -157,7 +157,7 @@ class ProviderContractTests(unittest.TestCase):
             maintained("future")
 
     def test_facts_cannot_advertise_an_unimplemented_mode(self):
-        from providers import maintained
+        from tools.configure.providers import maintained
         for family in ("native", "stm32f407", "gd32f470"):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError,
