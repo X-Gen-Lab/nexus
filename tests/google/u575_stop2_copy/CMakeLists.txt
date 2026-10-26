@@ -13,7 +13,7 @@ set(u575_copy_includes
 set(u575_copy_sdk
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
 add_library(nexus_u575_stop2_copy_bus OBJECT
     "${NEXUS_SOURCE_DIR}/tests/google/u575_lpdma_copy/model.cpp")
 nexus_apply_target_policy(nexus_u575_stop2_copy_bus)
@@ -21,6 +21,8 @@ target_link_libraries(nexus_u575_stop2_copy_bus PRIVATE Nexus::IO Nexus::Arch
     nexus_owned_warnings nexus_build_options)
 target_include_directories(nexus_u575_stop2_copy_bus PRIVATE ${u575_copy_includes})
 target_include_directories(nexus_u575_stop2_copy_bus SYSTEM PRIVATE ${u575_copy_sdk})
+nexus_use_cmsis_core(nexus_u575_stop2_copy_bus)
+nexus_use_cmsis_host_model(nexus_u575_stop2_copy_bus)
 target_compile_definitions(nexus_u575_stop2_copy_bus PRIVATE STM32U575xx
     NX_U575_LPDMA_COPY_MODEL
     nx_u575_lpdma_copy_read=nx_u575_lpdma_copy_bus_read
@@ -34,6 +36,7 @@ nexus_google_test(nexus_u575_stop2_copy_test
     LIBRARIES Nexus::ClockDomain Nexus::IO Nexus::Arch
     INCLUDES ${u575_copy_includes})
 target_include_directories(nexus_u575_stop2_copy_test SYSTEM PRIVATE ${u575_copy_sdk})
+nexus_use_cmsis_core(nexus_u575_stop2_copy_test)
 target_compile_definitions(nexus_u575_stop2_copy_test PRIVATE STM32U575xx
     NX_U575_LPDMA_COPY_MODEL NX_U575_STOP2_MODEL NEXUS_U575_STOP2_COPY)
 set_source_files_properties(

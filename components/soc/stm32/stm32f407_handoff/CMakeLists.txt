@@ -1,5 +1,6 @@
 # Exact optional SoC transition. Products explicitly link this public target.
 # Author: Nexus Team
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/platform/CMSISCore.cmake")
 if(NOT NEXUS_SOC_FAMILY STREQUAL "stm32f407" OR
         NOT NEXUS_BACKEND STREQUAL "baremetal")
     return()
@@ -19,8 +20,8 @@ target_include_directories(nexus_stm32f407_handoff PUBLIC
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
     "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
 target_include_directories(nexus_stm32f407_handoff SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+nexus_use_cmsis_core(nexus_stm32f407_handoff)
 target_link_libraries(nexus_stm32f407_handoff PUBLIC Nexus::ClockDomain
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 target_compile_definitions(nexus_stm32f407_handoff PRIVATE STM32F407xx

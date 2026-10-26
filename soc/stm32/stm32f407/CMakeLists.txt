@@ -1,6 +1,7 @@
 # Fixed providers reuse official LL privately while preserving Nexus ownership.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4")
-set(stm32_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(stm32_cmsis)
 foreach(required "${stm32_device}/Include/stm32f407xx.h"
                  "${stm32_cmsis}/core_cm4.h"
                  "${stm32_device}/Source/Templates/gcc/startup_stm32f407xx.s")
@@ -87,7 +88,8 @@ if(stm32_sources)
         "${CMAKE_CURRENT_SOURCE_DIR}/../../common"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/private")
     target_include_directories(nexus_soc_stm32f407 SYSTEM PRIVATE
-        "${stm32_device}/Include" "${stm32_cmsis}")
+        "${stm32_device}/Include")
+    nexus_use_cmsis_core(nexus_soc_stm32f407)
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
     nexus_stm32f4_official(nexus_soc_stm32f407)
@@ -124,8 +126,8 @@ function(nexus_add_stm32f407_sleep target)
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
         "${sleep_source}/components/clock_domain/private")
     target_include_directories(${target} SYSTEM PRIVATE
-        "${sleep_source}/vendors/st/cmsis_device_f4/Include"
-        "${sleep_source}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${sleep_source}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE STM32F407xx)
 endfunction()
 
@@ -138,8 +140,8 @@ if(NEXUS_OS_TIMEBASE_LOWPOWER)
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${NEXUS_SOURCE_DIR}/os/freertos/private")
     target_include_directories(nx_stm32f407_lowpower_binding SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(nx_stm32f407_lowpower_binding)
     target_compile_definitions(nx_stm32f407_lowpower_binding PRIVATE STM32F407xx)
     target_sources(nexus_soc_stm32f407 INTERFACE
         $<TARGET_OBJECTS:nx_stm32f407_lowpower_binding>)

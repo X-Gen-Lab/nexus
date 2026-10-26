@@ -1,5 +1,6 @@
 # Fixed optional SRAM4/LPTIM1 receiver, distinct public API and physical role.
 # Author: Nexus Team
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/platform/CMSISCore.cmake")
 if(NOT TARGET Nexus::U575RetainedTime OR
         NOT NEXUS_SOC_FAMILY STREQUAL "stm32u575" OR
         NOT NEXUS_EXACT_PART STREQUAL "STM32U575ZIT6Q" OR
@@ -18,8 +19,8 @@ target_include_directories(nexus_stm32u575_lpdma_lptim1 PUBLIC
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private")
 target_include_directories(nexus_stm32u575_lpdma_lptim1 SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc")
+nexus_use_cmsis_core(nexus_stm32u575_lpdma_lptim1)
 target_compile_definitions(nexus_stm32u575_lpdma_lptim1 PRIVATE
     STM32U575xx NEXUS_U575_STOP2_LPTIM1)
 target_link_libraries(nexus_stm32u575_lpdma_lptim1 PUBLIC

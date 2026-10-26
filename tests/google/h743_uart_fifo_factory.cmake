@@ -32,7 +32,8 @@ nexus_google_test(nexus_h743_uart_fifo_factory_test
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_h743_uart_fifo_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_uart_fifo_factory_test)
 target_compile_definitions(nexus_h743_uart_fifo_factory_test PRIVATE STM32H743xx
     _init=nx_h743_fifo_fixture_init _fini=nx_h743_fifo_fixture_fini)
 target_compile_options(nexus_h743_uart_fifo_factory_test PRIVATE

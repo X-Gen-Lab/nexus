@@ -21,7 +21,8 @@ foreach(kind unit combined)
         INCLUDES ${u575_stop2_includes})
     target_include_directories(${name} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${name})
     target_compile_definitions(${name} PRIVATE STM32U575xx NX_U575_STOP2_MODEL)
     if(kind STREQUAL "combined")
         target_compile_definitions(${name} PRIVATE NX_U575_STOP2_COMBINED)

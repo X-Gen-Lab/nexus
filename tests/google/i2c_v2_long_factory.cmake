@@ -78,7 +78,8 @@ foreach(long_family g474 h743 u575)
     nexus_stm32_official(${long_target} ${long_official})
     target_include_directories(${long_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_${long_official}/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${long_target})
     target_compile_definitions(${long_target} PRIVATE ${long_part} ${long_define}
         NX_I2C_LONG_EXPECTED_TIMING=${long_timing}U
         _init=nx_${long_family}_i2c_long_fixture_init

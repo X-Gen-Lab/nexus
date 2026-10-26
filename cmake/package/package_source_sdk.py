@@ -45,6 +45,13 @@ ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodule
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
+CMSIS_CORE_DIRECTORY = "vendors/arm/CMSIS_6"
+CMSIS_CORE_REQUIRED_HEADERS = (
+    "core_cm0.h", "core_cm0plus.h", "core_cm3.h", "core_cm4.h",
+    "core_cm7.h", "core_cm23.h", "core_cm33.h", "core_cm55.h",
+    "core_cm85.h", "cmsis_compiler.h", "cmsis_gcc.h", "cmsis_version.h",
+    "m-profile/armv7m_mpu.h", "m-profile/armv8m_mpu.h",
+    "m-profile/armv7m_cachel1.h", "m-profile/cmsis_gcc_m.h", "tz_context.h")
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
@@ -60,6 +67,7 @@ REQUIRED_FILES = (
     'components/usb_control/src/usb_descriptors.c',
     'components/usb_control/src/usb_acm.c',
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
+    "cmake/platform/CMSISCore.cmake",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
     "arch/include/nexus/arch/arch.h", "arch/arm/cortex_m/nx_arch_cortex_m.c",
     "arch/arm/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
@@ -150,7 +158,7 @@ REQUIRED_FILES = (
     "tools/measurement/workload.c",
     "ext/freertos/tasks.c", "ext/freertos/queue.c", "ext/freertos/list.c",
     "ext/freertos/LICENSE.md",
-    "vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_5/LICENSE.txt",
+    "vendors/arm/CMSIS_6/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_6/LICENSE",
     "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
     "vendors/st/cmsis_device_f4/LICENSE.md",
     "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
@@ -466,6 +474,8 @@ REQUIRED_FILES += tuple("components/mapped_storage/include/nexus/components/"
                         + name + ".h" for name in (
                             "mapped_storage", "mapped_storage_owner",
                             "native_mapped_storage"))
+REQUIRED_FILES += tuple(CMSIS_CORE_DIRECTORY + "/CMSIS/Core/Include/" + name
+                        for name in CMSIS_CORE_REQUIRED_HEADERS)
 REQUIRED_FILES += ("tools/maintenance/cmsis_device_lock.py",)
 for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)
@@ -580,7 +590,20 @@ def verify_preparation_snapshot(root, revision, index):
 def dependency_entries(root, dependency):
     """Redistribute only the locked source closure for reviewed imports."""
     entries = tree_entries(root / dependency)
-    if dependency == "ext/threadx":
+    if dependency == CMSIS_CORE_DIRECTORY:
+        prefix = "CMSIS/Core/Include/"
+        required = {prefix + name for name in CMSIS_CORE_REQUIRED_HEADERS}
+        required.add("LICENSE")
+        if not required.issubset(entries):
+            raise SDKError("CMSIS Core committed header/notice graph is incomplete")
+        # Compiler and architecture headers contain recursive includes. Keep the
+        # complete reviewed Include tree, never templates or RTOS components.
+        entries = {name: entry for name, entry in entries.items()
+                   if name == "LICENSE" or name.startswith(prefix)}
+        if any(mode not in ("100644", "100755") or kind != "blob"
+               for mode, kind, _ in entries.values()):
+            raise SDKError("CMSIS Core payload must contain regular tracked files")
+    elif dependency == "ext/threadx":
         raw, _ = snapshot(root / "dependencies/threadx.lock.json")
         lock = parse_json(raw)
         names = threadx_lock.contract(lock) | {lock["license"]["path"]}

@@ -17,7 +17,8 @@ foreach(usb_family stm32f407 gd32f470)
     if(usb_family STREQUAL "stm32f407")
         target_include_directories(${usb_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${usb_target})
         target_compile_definitions(${usb_target} PRIVATE STM32F407xx)
     else()
         set(usb_gd

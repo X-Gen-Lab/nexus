@@ -7,7 +7,8 @@ nexus_google_test(nexus_u575_memory_test
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_memory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_memory_test)
 target_compile_definitions(nexus_u575_memory_test PRIVATE STM32U575xx)
 target_compile_options(nexus_u575_memory_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/google/u575_memory_model.h")

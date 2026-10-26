@@ -58,7 +58,8 @@ foreach(eth_frames_family stm32 gd32)
             USE_RTOS=0 USE_HAL_ETH_REGISTER_CALLBACKS=0)
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${eth_frames_target})
         nexus_stm32f4_official(${eth_frames_target})
     else()
         set(eth_frames_gd
@@ -74,9 +75,11 @@ foreach(eth_frames_family stm32 gd32)
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
             "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${eth_frames_sdk} SYSTEM PRIVATE
-            "${eth_frames_gd}/CMSIS"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
             "${eth_frames_gd}/CMSIS/GD/GD32F4xx/Include"
             "${eth_frames_gd}/GD32F4xx_standard_peripheral/Include")
+        nexus_use_cmsis_core(${eth_frames_sdk})
+        nexus_use_cmsis_host_model(${eth_frames_sdk})
         target_compile_definitions(${eth_frames_sdk} PRIVATE
             GD32F470 HXTAL_VALUE=25000000)
         target_compile_options(${eth_frames_sdk} PRIVATE
@@ -90,9 +93,10 @@ foreach(eth_frames_family stm32 gd32)
         target_include_directories(${eth_frames_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
-            "${eth_frames_gd}/CMSIS"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
             "${eth_frames_gd}/CMSIS/GD/GD32F4xx/Include"
             "${eth_frames_gd}/GD32F4xx_standard_peripheral/Include")
+        nexus_use_cmsis_core(${eth_frames_target})
         target_compile_options(${eth_frames_target} PRIVATE
             "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
     endif()

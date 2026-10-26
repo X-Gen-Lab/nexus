@@ -11,7 +11,8 @@ nexus_google_test(nexus_h743_flash_ram_closure_test
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_flash_ram_closure_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_flash_ram_closure_test)
 target_compile_definitions(nexus_h743_flash_ram_closure_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_flash_ram_closure_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_mpu_model.h"
@@ -43,7 +44,8 @@ nexus_google_test(nexus_h743_flash_ram_generated_test
 target_include_directories(nexus_h743_flash_ram_generated_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_flash_ram_generated_test)
 target_compile_definitions(nexus_h743_flash_ram_generated_test PRIVATE
     STM32H743xx _init=nx_h743_ram_fixture_init _fini=nx_h743_ram_fixture_fini)
 target_compile_options(nexus_h743_flash_ram_generated_test PRIVATE
@@ -64,7 +66,8 @@ nexus_google_test(nexus_h743_flash_fixed_storage_test
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_flash_fixed_storage_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_flash_fixed_storage_test)
 target_compile_definitions(nexus_h743_flash_fixed_storage_test PRIVATE
     STM32H743xx NX_H743_FLASH_RAM_FIXED_STORAGE=1)
 target_compile_options(nexus_h743_flash_fixed_storage_test PRIVATE

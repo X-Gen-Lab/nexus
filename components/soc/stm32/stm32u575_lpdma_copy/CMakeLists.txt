@@ -1,5 +1,6 @@
 # Exact public receiver; unavailable outside its selected SRAM4 reference.
 # Author: Nexus Team
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/platform/CMSISCore.cmake")
 if(NOT TARGET Nexus::U575RetainedTime OR
         NOT NEXUS_SOC_FAMILY STREQUAL "stm32u575" OR
         NOT NEXUS_EXACT_PART STREQUAL "STM32U575ZIT6Q" OR
@@ -17,8 +18,8 @@ target_include_directories(nexus_stm32u575_lpdma_copy PUBLIC
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private")
 target_include_directories(nexus_stm32u575_lpdma_copy SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc")
+nexus_use_cmsis_core(nexus_stm32u575_lpdma_copy)
 target_compile_definitions(nexus_stm32u575_lpdma_copy PRIVATE STM32U575xx)
 target_link_libraries(nexus_stm32u575_lpdma_copy PUBLIC Nexus::U575RetainedTime
     PRIVATE Nexus::IO Nexus::Arch nexus_build_options nexus_owned_warnings)

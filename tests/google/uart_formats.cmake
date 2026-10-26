@@ -11,7 +11,8 @@ nexus_google_test(nexus_stm32_uart_formats_test STM32F4_LL
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_uart_formats_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_uart_formats_test)
 target_compile_definitions(nexus_stm32_uart_formats_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx NX_UART_FORMAT_STM32)
 target_compile_options(nexus_stm32_uart_formats_test PRIVATE

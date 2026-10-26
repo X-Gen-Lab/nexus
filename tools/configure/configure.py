@@ -89,7 +89,7 @@ def c_identity(value):
 
 
 def dependency_identity(root, relative, expected=None):
-    """Validate checkout commits, or the verified installed SDK identities."""
+    """Validate staged development pins, or verified installed SDK identities."""
     manifest = root / ".nexus-source-sdk.json"
     if manifest.is_file():
         return sdk_dependency_identity(sdk.verify(root), relative, expected)
@@ -112,9 +112,9 @@ def dependency_identity(root, relative, expected=None):
                                      env=environment)
             if command.returncode:
                 fail(f"Cannot verify SDK dependency: {relative}")
-            return command.stdout.strip()
+            return command.stdout
         # One porcelain snapshot supplies HEAD and dirty state. Every call still
-        # observes the checkout and parent Gitlink afresh; no result is cached.
+        # observes the checkout and staged Gitlink afresh; no result is cached.
         status = git(checkout, "status", "--porcelain=v2", "--branch",
                      "--no-ahead-behind", "--untracked-files=normal").splitlines()
         commits = [line.removeprefix("# branch.oid ") for line in status
@@ -123,8 +123,15 @@ def dependency_identity(root, relative, expected=None):
                 r"(?:[0-9a-f]{40}|[0-9a-f]{64})", commits[0]) is None):
             fail(f"Cannot verify SDK dependency: {relative}")
         commit = commits[0]
-        entry = git(root, "ls-tree", "HEAD", "--", relative).split()
-        if len(entry) != 4 or entry[:2] != ["160000", "commit"] or entry[2] != commit:
+        # A dependency upgrade must configure before its parent commit exists.
+        # Require the real index's explicit stage-0 pin, never an unstaged
+        # checkout or inherited hook index. SDK publication separately requires
+        # clean committed source and does not use this development selection.
+        entries = git(root, "--literal-pathspecs", "ls-files", "--stage", "-z",
+                      "--", relative).split("\0")
+        metadata, separator, path = entries[0].partition("\t")
+        if (len(entries) != 2 or entries[-1] != "" or not separator or
+                path != relative or metadata.split() != ["160000", commit, "0"]):
             fail(f"SDK dependency differs from the locked Gitlink: {relative}")
         if any(line and not line.startswith("# ") for line in status):
             fail(f"SDK dependency has unrecorded changes: {relative}")

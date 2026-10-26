@@ -77,7 +77,7 @@ jobs:
         with:
           submodules: false
       - name: Initialize pinned maintained dependencies
-        run: git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
+        run: git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_6 vendors/st/cmsis_device_f4
       - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest

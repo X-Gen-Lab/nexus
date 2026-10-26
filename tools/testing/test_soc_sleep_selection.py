@@ -8,6 +8,7 @@ from tools.configure.providers.descriptor import source_directory
 
 import json
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -51,6 +52,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" provider)
             (source / "CMakeLists.txt").write_text(f'''\
 cmake_minimum_required(VERSION 3.31)
 project(sleep_external_scope_contract LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(nexus_io INTERFACE)
 add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
@@ -114,8 +116,19 @@ endif()
                              process.stdout + process.stderr)
             properties = (source / "build" / "properties.txt").read_text(
                 encoding="utf-8")
-            return dict(line.split("=", 1)
-                        for line in properties.splitlines())
+            result = dict(line.split("=", 1)
+                          for line in properties.splitlines())
+            if selected:
+                database = json.loads(
+                    (source / "build/compile_commands.json").read_text())
+                units = [unit for unit in database
+                         if Path(unit["file"]) ==
+                         ROOT / source_directory(family) / "sleep.c"]
+                self.assertEqual(len(units), 1)
+                result["compile_arguments"] = (
+                    units[0].get("arguments") or
+                    shlex.split(units[0]["command"]))
+            return result
 
     def assert_selected_private_imports(self, family):
         properties = self.configure_properties(family, True)
@@ -132,13 +145,11 @@ endif()
         if family == "stm32f407":
             sdk_imports = {
                 (ROOT / "vendors/st/cmsis_device_f4/Include").as_posix(),
-                (ROOT / "vendors/arm/CMSIS_5/CMSIS/Core/Include").as_posix(),
             }
             definitions = {"STM32F407xx"}
         else:
             firmware = ROOT / "vendors/gigadevice/gd32f4xx/Firmware"
             sdk_imports = {
-                (firmware / "CMSIS").as_posix(),
                 (firmware / "CMSIS/GD/GD32F4xx/Include").as_posix(),
                 (firmware / "GD32F4xx_standard_peripheral/Include").as_posix(),
             }
@@ -151,8 +162,18 @@ endif()
                          definitions)
         self.assertEqual(set(properties["LINK_LIBRARIES"].split(";")), {
             "Nexus::ClockDomain", "Nexus::Arch", "nexus_build_options",
-            "nexus_owned_warnings",
+            "nexus_owned_warnings", "nexus_cmsis_core",
         })
+        arguments = properties["compile_arguments"]
+        self.assertIn("-DCMSIS_DISABLE_DEPRECATED=1", arguments)
+        includes = set()
+        for index, argument in enumerate(arguments):
+            if argument in {"-I", "-isystem"}:
+                includes.add(arguments[index + 1])
+            elif argument.startswith("-I"):
+                includes.add(argument[2:])
+        core = (ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include").as_posix()
+        self.assertEqual(includes, private_imports | sdk_imports | {core})
         self.assertEqual(properties["EXCLUDE_FROM_ALL"], "TRUE")
         self.assertEqual(properties["INTERPROCEDURAL_OPTIMIZATION"], "ON")
         self.assertEqual(properties["C_COMPILER_LAUNCHER"],

@@ -44,9 +44,9 @@ def required_submodules(scope: str, family: str | None = None,
         return MODULES if scope == "native" else RUNTIME_MODULES
     if scope != "arm" or family not in FAMILY_MODULE or backend not in ("baremetal", "freertos", "threadx"):
         raise EvidenceError("unsupported dependency scope/family/backend")
-    # The family descriptor owns its approved Git dependencies. The imported
-    # GD32 source still uses the explicitly shared CMSIS core module.
-    selected = ["vendors/arm/CMSIS_5", *FAMILY_MODULE[family]]
+    # Family descriptors own every approved compiler dependency, including the
+    # shared Core used by imported GD32 device definitions.
+    selected = list(FAMILY_MODULE[family])
     if backend != "baremetal":
         selected.append("ext/" + backend)
     return tuple(dict.fromkeys(selected))

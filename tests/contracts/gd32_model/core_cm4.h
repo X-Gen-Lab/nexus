@@ -26,7 +26,7 @@ typedef struct {
     uint32_t ISPR[8];
     uint32_t ICPR[8];
     uint32_t IABR[8];
-    uint8_t IP[240];
+    uint8_t IPR[240];
     uint32_t priority_group;
 } NVIC_Type;
 extern NVIC_Type g_gd32_model_nvic;
@@ -64,11 +64,11 @@ static inline void NVIC_ClearPendingIRQ(IRQn_Type irq) {
 }
 /** \brief Set a four-bit external preemption priority. */
 static inline void NVIC_SetPriority(IRQn_Type irq, uint32_t priority) {
-    NVIC->IP[(unsigned)irq] = (uint8_t)priority;
+    NVIC->IPR[(unsigned)irq] = (uint8_t)priority;
 }
 /** \brief Read a model preemption priority. */
 static inline uint32_t NVIC_GetPriority(IRQn_Type irq) {
-    return NVIC->IP[(unsigned)irq];
+    return NVIC->IPR[(unsigned)irq];
 }
 /** \brief Host-only reset CPU register storage. */
 typedef struct {

@@ -24,7 +24,8 @@ foreach(h743_high_target nexus_h743_high_system_test nexus_h743_high_kernel_test
     target_include_directories(${h743_high_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${h743_high_target})
     target_compile_definitions(${h743_high_target} PRIVATE STM32H743xx)
     target_compile_options(${h743_high_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_high_profile_model.h")
@@ -68,7 +69,8 @@ nexus_google_test(nexus_h743_high_factory_test
 target_include_directories(nexus_h743_high_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_high_factory_test)
 target_compile_definitions(nexus_h743_high_factory_test PRIVATE STM32H743xx
     _init=nx_h743_high_fixture_init _fini=nx_h743_high_fixture_fini)
 target_compile_options(nexus_h743_high_factory_test PRIVATE

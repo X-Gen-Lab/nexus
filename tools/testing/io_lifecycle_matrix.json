@@ -5995,7 +5995,7 @@
         "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
         "EXPECT_EQ(PEER_DIER,1U)",
         "EXPECT_EQ(advanced->config,nullptr)",
-        "EXPECT_EQ(NVIC->IP[24],0x30U)"
+        "EXPECT_EQ(NVIC->IPR[24],0x30U)"
       ],
       "calls": [
         "nx_platform_start("
@@ -6025,7 +6025,7 @@
         "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
         "EXPECT_NE(advanced->config,nullptr)",
         "EXPECT_NE(ADV_GATE&1U,0U)",
-        "EXPECT_EQ(NVIC->IP[24],0x50U)",
+        "EXPECT_EQ(NVIC->IPR[24],0x50U)",
         "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
         "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
       ],
@@ -6254,8 +6254,8 @@
         "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
         "EXPECT_EQ(capture->config,nullptr)",
         "EXPECT_EQ(advanced->config,nullptr)",
-        "EXPECT_EQ(NVIC->IP[30],0x20U)",
-        "EXPECT_EQ(NVIC->IP[24],0x30U)",
+        "EXPECT_EQ(NVIC->IPR[30],0x20U)",
+        "EXPECT_EQ(NVIC->IPR[24],0x30U)",
         "EXPECT_TRUE(capture->initialized)",
         "EXPECT_TRUE(advanced->initialized)",
         "EXPECT_EQ(advanced->duty_ticks,0U)"
@@ -6595,7 +6595,7 @@
         "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
         "EXPECT_EQ(PEER_DIER,1U)",
         "EXPECT_EQ(advanced->config,nullptr)",
-        "EXPECT_EQ(NVIC->IP[24],0x30U)"
+        "EXPECT_EQ(NVIC->IPR[24],0x30U)"
       ],
       "calls": [
         "nx_platform_start("
@@ -6625,7 +6625,7 @@
         "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
         "EXPECT_NE(advanced->config,nullptr)",
         "EXPECT_NE(ADV_GATE&1U,0U)",
-        "EXPECT_EQ(NVIC->IP[24],0x50U)",
+        "EXPECT_EQ(NVIC->IPR[24],0x50U)",
         "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
         "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
       ],
@@ -6854,8 +6854,8 @@
         "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
         "EXPECT_EQ(capture->config,nullptr)",
         "EXPECT_EQ(advanced->config,nullptr)",
-        "EXPECT_EQ(NVIC->IP[30],0x20U)",
-        "EXPECT_EQ(NVIC->IP[24],0x30U)",
+        "EXPECT_EQ(NVIC->IPR[30],0x20U)",
+        "EXPECT_EQ(NVIC->IPR[24],0x30U)",
         "EXPECT_TRUE(capture->initialized)",
         "EXPECT_TRUE(advanced->initialized)",
         "EXPECT_EQ(advanced->duty_ticks,0U)"

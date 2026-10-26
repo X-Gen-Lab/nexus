@@ -27,7 +27,8 @@ foreach(memory_variant default ccm invalid)
     target_include_directories(${memory_target} BEFORE PRIVATE "${memory_model}")
     target_include_directories(${memory_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${memory_target})
     target_compile_definitions(${memory_target} PRIVATE STM32F407xx
         NEXUS_STM32_MODEL)
     target_compile_options(${memory_target} PRIVATE -fno-pie

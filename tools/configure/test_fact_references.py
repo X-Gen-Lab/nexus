@@ -3,8 +3,10 @@ from tools.configure.providers.descriptor import source_directory
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -111,6 +113,27 @@ class ReferenceInputClosureTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
+        # The imported Device headers now consume the separately pinned Core.
+        # Keep a real clean child checkout and parent stage-0 Gitlink so these
+        # tests still exercise production input closure without replacing it.
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith("GIT_")}
+
+        def git(*arguments):
+            return subprocess.run(["git", *map(str, arguments)], check=True,
+                                  capture_output=True, text=True,
+                                  env=environment, timeout=30).stdout.strip()
+
+        core = "vendors/arm/CMSIS_6"
+        checkout = self.root / core
+        checkout.parent.mkdir(parents=True)
+        git("-C", self.root, "init", "--quiet")
+        git("clone", "--quiet", "--shared", "--sparse",
+            gate.ROOT / core, checkout)
+        git("-C", checkout, "sparse-checkout", "set", "CMSIS/Core/Include")
+        commit = git("-C", checkout, "rev-parse", "HEAD")
+        git("-C", self.root, "update-index", "--add", "--cacheinfo",
+            "160000," + commit + "," + core)
         for relative in ("dependencies/platform-compatibility.json",
                          "soc/gd32/gd32f470/soc.json", "soc/gd32/gd32f470/routes.json",
                          "soc/gd32/gd32f470/references.json",

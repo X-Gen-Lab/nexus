@@ -21,7 +21,8 @@ foreach(eth_family stm32 gd32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${eth_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${eth_target})
         target_compile_definitions(${eth_target} PRIVATE
             NX_ETH_TEST_STM32 STM32F407xx)
     else()

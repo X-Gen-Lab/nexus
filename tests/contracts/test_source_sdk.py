@@ -33,6 +33,75 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
 })
 
 
+class CMSISCoreSelectionTests(unittest.TestCase):
+    """Export Core include files without importing unrelated CMSIS components."""
+
+    dependency = "vendors/arm/CMSIS_6"
+    headers = ("core_cm0.h", "core_cm0plus.h", "core_cm3.h", "core_cm4.h",
+               "core_cm7.h", "core_cm23.h", "core_cm33.h", "core_cm55.h",
+               "core_cm85.h", "cmsis_compiler.h", "cmsis_gcc.h",
+               "cmsis_version.h", "m-profile/armv7m_mpu.h",
+               "m-profile/armv8m_mpu.h", "m-profile/armv7m_cachel1.h",
+               "m-profile/cmsis_gcc_m.h", "tz_context.h")
+
+    def setUp(self):
+        self.entries = {"CMSIS/Core/Include/" + name:
+                        ("100644", "blob", "1" * 40)
+                        for name in self.headers}
+        self.entries.update({
+            "LICENSE": ("100644", "blob", "2" * 40),
+            "CMSIS/Core/Include/m-profile/internal/detail.h":
+                ("100644", "blob", "3" * 40),
+            "CMSIS/Core/Template/ARMv7-M/ARMv7-M.sct":
+                ("100644", "blob", "4" * 40),
+            "CMSIS/RTOS2/Include/cmsis_os2.h":
+                ("100644", "blob", "5" * 40),
+            "CMSIS/Core_A/Include/core_ca.h":
+                ("100644", "blob", "6" * 40),
+            "README.md": ("100644", "blob", "7" * 40),
+        })
+
+    def selected(self):
+        with mock.patch.object(source_sdk, "tree_entries",
+                               return_value=self.entries):
+            return source_sdk.dependency_entries(ROOT, self.dependency)
+
+    def test_export_is_recursive_core_headers_and_license_only(self):
+        selected = self.selected()
+        expected = {name for name in self.entries
+                    if name.startswith("CMSIS/Core/Include/")} | {"LICENSE"}
+        self.assertEqual(set(selected), expected)
+        self.assertEqual(selected["CMSIS/Core/Include/core_cm4.h"],
+                         self.entries["CMSIS/Core/Include/core_cm4.h"])
+
+    def test_missing_maintained_cpu_or_compiler_header_rejects(self):
+        for name in self.headers:
+            with self.subTest(header=name):
+                entry = self.entries.pop("CMSIS/Core/Include/" + name)
+                with self.assertRaises(source_sdk.SDKError):
+                    self.selected()
+                self.entries["CMSIS/Core/Include/" + name] = entry
+
+    def test_missing_license_rejects_instead_of_exporting_partial_notice(self):
+        del self.entries["LICENSE"]
+        with self.assertRaises(source_sdk.SDKError):
+            self.selected()
+
+    def test_symlink_or_gitlink_inside_include_tree_is_not_redistributed(self):
+        for mode, kind in (("120000", "blob"), ("160000", "commit")):
+            with self.subTest(mode=mode):
+                self.entries["CMSIS/Core/Include/nested/foreign.h"] = (
+                    mode, kind, "8" * 40)
+                with self.assertRaises(source_sdk.SDKError):
+                    self.selected()
+
+    def test_missing_nested_transitive_header_is_not_hidden_by_top_level_list(self):
+        name = "CMSIS/Core/Include/m-profile/internal/detail.h"
+        selected = self.selected()
+        self.assertIn(name, selected)
+        self.assertEqual(selected[name], self.entries[name])
+
+
 class SourceSDKSelectionTests(unittest.TestCase):
     def test_component_construction_helpers_are_required_sdk_payload(self):
         required = {"cmake/platform/Components.cmake",
@@ -1554,13 +1623,20 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             target.write_bytes(original)
 
-    def test_rehashed_missing_arch_source_is_rejected(self):
+    def test_rehashed_missing_arch_or_core_source_is_rejected(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
-        for name in ("arch/include/nexus/arch/arch.h",
+        for name in ("cmake/platform/CMSISCore.cmake",
+                     "arch/include/nexus/arch/arch.h",
                      "arch/arm/cortex_m/nx_arch_cortex_m.c",
                      "arch/arm/cortex_m/private/compiler.h",
-                     "arch/native/nx_arch_native.c"):
+                     "arch/native/nx_arch_native.c",
+                     "vendors/arm/CMSIS_6/LICENSE",
+                     "vendors/arm/CMSIS_6/CMSIS/Core/Include/cmsis_gcc.h",
+                     "vendors/arm/CMSIS_6/CMSIS/Core/Include/"
+                     "m-profile/cmsis_gcc_m.h",
+                     "vendors/arm/CMSIS_6/CMSIS/Core/Include/"
+                     "m-profile/armv8m_mpu.h"):
             with self.subTest(name=name):
                 target = self.sdk / name
                 original_source = target.read_bytes()

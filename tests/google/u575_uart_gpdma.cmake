@@ -8,7 +8,8 @@ nexus_google_test(nexus_u575_uart_gpdma_test
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_uart_gpdma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_uart_gpdma_test)
 target_compile_definitions(nexus_u575_uart_gpdma_test PRIVATE STM32U575xx)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
 nexus_stm32_official(nexus_u575_uart_gpdma_test u5)

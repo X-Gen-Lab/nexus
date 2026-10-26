@@ -1,7 +1,8 @@
 # Exact medium-density F103RB; official CMSIS/LL remain private to owned C.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(f1_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1")
 set(f1_hal "${NEXUS_SOURCE_DIR}/vendors/st/stm32f1_hal")
-set(f1_core "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(f1_core)
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/maintenance/stm32f1_hal_lock.py"
     --source "${f1_hal}"
@@ -75,7 +76,8 @@ if(f1_sources)
     target_include_directories(nexus_soc_stm32f103 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private")
     target_include_directories(nexus_soc_stm32f103 SYSTEM PRIVATE
-        "${f1_device}/Include" "${f1_hal}/Inc" "${f1_core}")
+        "${f1_device}/Include" "${f1_hal}/Inc")
+    nexus_use_cmsis_core(nexus_soc_stm32f103)
     target_compile_definitions(nexus_soc_stm32f103 PRIVATE STM32F103xB)
 else()
     add_library(nexus_soc_stm32f103 INTERFACE)

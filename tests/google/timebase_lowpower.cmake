@@ -29,7 +29,8 @@ foreach(timebase_family stm32f407 gd32f470)
     if(timebase_family STREQUAL "stm32f407")
         target_include_directories(${timebase_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${timebase_target})
         target_compile_definitions(${timebase_target} PRIVATE STM32F407xx)
     else()
         set(timebase_vendor
@@ -74,7 +75,8 @@ foreach(timebase_family stm32f407 gd32f470)
     if(timebase_family STREQUAL "stm32f407")
         target_include_directories(${timebase_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${timebase_target})
         target_compile_definitions(${timebase_target} PRIVATE
             STM32F407xx NEXUS_STM32_MODEL)
     else()

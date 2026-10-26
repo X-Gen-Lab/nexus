@@ -8,7 +8,8 @@ nexus_google_test(nexus_u575_rtc_test
 target_include_directories(nexus_u575_rtc_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_rtc_test)
 target_compile_definitions(nexus_u575_rtc_test PRIVATE STM32U575xx)
 set_source_files_properties(
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/rtc.c" PROPERTIES

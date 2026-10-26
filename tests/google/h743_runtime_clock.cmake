@@ -32,7 +32,8 @@ nexus_google_test(nexus_h743_runtime_clock_test SOURCES
         "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
 target_include_directories(nexus_h743_runtime_clock_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_runtime_clock_test)
 target_compile_definitions(nexus_h743_runtime_clock_test PRIVATE STM32H743xx
     _init=nx_h743_runtime_init _fini=nx_h743_runtime_fini)
 target_compile_options(nexus_h743_runtime_clock_test PRIVATE

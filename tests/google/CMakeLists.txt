@@ -3,6 +3,7 @@ if(CMAKE_CROSSCOMPILING OR NOT NEXUS_SOC_FAMILY STREQUAL "native")
     message(FATAL_ERROR "GoogleTest/GoogleMock require the Native test profile")
 endif()
 include("${NEXUS_SOURCE_DIR}/cmake/testing/GoogleTest.cmake")
+include("${NEXUS_SOURCE_DIR}/tests/cmake/CMSISHostModel.cmake")
 nexus_host_google_test()
 
 # Preserve complete host DWARF without repeating uncompressed framework debug
@@ -25,6 +26,7 @@ function(nexus_google_test name)
     set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${name} PRIVATE nexus_build_options nexus_owned_warnings
         GTest::gmock_main ${ARG_LIBRARIES})
+    nexus_use_cmsis_host_model(${name})
     if(nexus_google_compressed_debug_enabled)
         target_link_options(${name} PRIVATE
             "-Wl,--compress-debug-sections=zlib-gabi")
@@ -174,7 +176,8 @@ nexus_google_test(nexus_stm32_uart_dma_test STM32F4_LL SOURCES stm32_uart_dma_te
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_uart_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_uart_dma_test)
 target_compile_definitions(nexus_stm32_uart_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
@@ -184,7 +187,8 @@ nexus_google_test(nexus_irq_wake_stm32_test STM32F4_LL SOURCES irq_wake_stm32_te
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_irq_wake_stm32_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_irq_wake_stm32_test)
 target_compile_definitions(nexus_irq_wake_stm32_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
@@ -237,7 +241,8 @@ nexus_google_test(nexus_stm32_spi_dma_test STM32F4_LL
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_spi_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_spi_dma_test)
 target_compile_definitions(nexus_stm32_spi_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_spi_dma_test PRIVATE
@@ -273,7 +278,8 @@ nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_uart_receive_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_uart_receive_test)
 target_compile_definitions(nexus_stm32_uart_receive_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_uart_receive_test PRIVATE
@@ -305,7 +311,8 @@ nexus_google_test(nexus_stm32_uart_stream_test STM32F4_LL
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_uart_stream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_uart_stream_test)
 target_compile_definitions(nexus_stm32_uart_stream_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
@@ -335,7 +342,8 @@ nexus_google_test(nexus_stm32_adc_stream_test STM32F4_LL
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
 target_include_directories(nexus_stm32_adc_stream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_adc_stream_test)
 target_compile_definitions(nexus_stm32_adc_stream_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_adc_stream_test PRIVATE
@@ -410,7 +418,8 @@ nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_register_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32_i2c_register_test)
 target_compile_definitions(nexus_stm32_i2c_register_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx NEXUS_I2C_STM32_TEST)
 target_compile_options(nexus_stm32_i2c_register_test PRIVATE
@@ -445,7 +454,8 @@ foreach(i2c_family generic stm32 gd32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${i2c_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${i2c_target})
         target_compile_definitions(${i2c_target} PRIVATE
             NX_I2C_TEST_STM32 NEXUS_STM32_MODEL STM32F407xx)
     elseif(i2c_family STREQUAL "gd32")

@@ -1,8 +1,9 @@
 # Exact HD RCT6 official startup and private register definitions.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(gd303_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x")
 set(gd303_device "${gd303_vendor}/Firmware/CMSIS/GD/GD32F30x")
 set(gd303_headers "${gd303_vendor}/Firmware/GD32F30x_standard_peripheral/Include")
-set(gd303_core "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(gd303_core)
 execute_process(COMMAND "${Python3_EXECUTABLE}"
     "${NEXUS_SOURCE_DIR}/scripts/ci/verify_vendor_source.py"
     --root "${gd303_vendor}"
@@ -65,7 +66,8 @@ if(gd303_sources)
     target_include_directories(nexus_soc_gd32f303 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private")
     target_include_directories(nexus_soc_gd32f303 SYSTEM PRIVATE
-        "${gd303_device}/Include" "${gd303_headers}" "${gd303_core}")
+        "${gd303_device}/Include" "${gd303_headers}")
+    nexus_use_cmsis_core(nexus_soc_gd32f303)
     target_compile_definitions(nexus_soc_gd32f303 PRIVATE GD32F30X_HD)
 else()
     add_library(nexus_soc_gd32f303 INTERFACE)

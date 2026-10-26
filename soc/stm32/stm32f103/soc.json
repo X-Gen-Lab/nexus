@@ -365,7 +365,7 @@
     "irq:TIM2_IRQn"
   ],
   "source_lock": {
-    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_core": "af1b110e46a1720349f6f125e386e126767699bd",
     "cmsis_device_f1": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
     "hal_driver_f1": "fee494a92b5ad331f92ad21f76c66a5cb83773ee"
   },

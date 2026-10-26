@@ -13,5 +13,6 @@ target_compile_definitions(nexus_u575_lpdma_copy_test PRIVATE STM32U575xx
     NX_U575_LPDMA_COPY_MODEL)
 target_include_directories(nexus_u575_lpdma_copy_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include"
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc")
+nexus_use_cmsis_core(nexus_u575_lpdma_copy_test)

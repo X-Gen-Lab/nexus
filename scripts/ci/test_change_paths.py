@@ -64,7 +64,7 @@ class ChangePathsTests(unittest.TestCase):
                 self.assertTrue(self.decisions([("modified", path)])["build-test"])
 
     def test_sdk_and_rtos_gitlink_updates_require_builds(self):
-        for path in ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
+        for path in ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                      "vendors/st/stm32f4xx_hal_driver", "ext/freertos", "ext/googletest"):
             with self.subTest(path=path):
                 self.assertTrue(self.decisions([("modified", path)])["build-test"])

@@ -41,15 +41,17 @@ foreach(eth_family stm32 gd32)
     if(eth_family STREQUAL "stm32")
         target_include_directories(${eth_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${eth_target})
         target_compile_definitions(${eth_target} PRIVATE STM32F407xx NX_ETH_FACTORY_STM32)
     else()
         set(eth_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_include_directories(${eth_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
         target_include_directories(${eth_target} SYSTEM PRIVATE
-            "${eth_gd}/CMSIS" "${eth_gd}/CMSIS/GD/GD32F4xx/Include"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}" "${eth_gd}/CMSIS/GD/GD32F4xx/Include"
             "${eth_gd}/GD32F4xx_standard_peripheral/Include")
+        nexus_use_cmsis_core(${eth_target})
         target_compile_definitions(${eth_target} PRIVATE GD32F470 HXTAL_VALUE=25000000 NX_ETH_FACTORY_GD32)
         target_compile_options(${eth_target} PRIVATE
             "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")

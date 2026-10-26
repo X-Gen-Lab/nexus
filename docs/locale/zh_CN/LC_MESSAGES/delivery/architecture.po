@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 46b73bd18b5c78a8c2e7c8baa8b017a9eb184e741e94519561b3ff0042e3fa4c\n"
+"X-Nexus-Source-SHA256: b9b772b8503df2cd7e88d03fa892794c2613582789bf4d1c30bfe639173c2ef4\n"
 
 msgid "当前系统架构"
 msgstr "当前系统架构"
@@ -690,3 +690,8 @@ msgstr ""
 "across backends, while Task/Queue/join/static control blocks retain backend-"
 "specific APIs. Products switching RTOS explicitly adapt their lifecycle; no "
 "universal maximum pool is introduced."
+
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"
+msgstr "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"

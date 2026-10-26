@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #ifdef __cplusplus
-#define ARM_CACHEL1_ARMV7_H
+#define ARM_ARMV7M_CACHEL1_H
 #endif
 #include "stm32h743xx.h"
 #ifdef __cplusplus

@@ -49,7 +49,8 @@ foreach(variant spi-dma spi-dma-cache-on spi-dma-uart-tx spi-dma-uart-rx)
         INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE STM32H743xx
         D2_UART_MODE=${uart_mode} H743_SPI_DMA_CACHE_ON=${cache_on}
         _init=nx_h743_d2_${suffix}_init _fini=nx_h743_d2_${suffix}_fini)

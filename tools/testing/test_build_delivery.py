@@ -329,7 +329,7 @@ class BuildDeliveryTests(unittest.TestCase):
         self.assertIn("vendors/st/cmsis_device_u5", selected)
         self.assertIn("ext/freertos", selected)
         selected = dependencies.required_submodules("arm", "stm32h743", "baremetal")
-        self.assertEqual(selected, ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_h7"))
+        self.assertEqual(selected, ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_h7"))
         with self.assertRaises(EvidenceError):
             dependencies.required_submodules("arm", "unknown", "baremetal")
 
@@ -366,7 +366,7 @@ class BuildDeliveryTests(unittest.TestCase):
                 "google/googletest.git", "unreviewed/googletest.git")).encode())
 
     def test_f407_scoped_prepare_includes_actual_official_ll_dependency(self):
-        expected = ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
+        expected = ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                     "vendors/st/stm32f4_hal")
         for backend in ("baremetal", "freertos", "threadx"):
             with self.subTest(backend=backend):

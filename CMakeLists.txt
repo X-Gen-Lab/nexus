@@ -48,6 +48,8 @@ endforeach()
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Configure.cmake")
 nexus_resolve_assembly()
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
+include("${NEXUS_SOURCE_DIR}/cmake/platform/CMSISCore.cmake")
+nexus_cmsis_core_include(NEXUS_CMSIS_CORE_INCLUDE_DIR)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Firmware.cmake")
 
 add_subdirectory(core)
@@ -86,6 +88,9 @@ endif()
 if(NEXUS_SYSTEM_VENDOR_INCLUDES)
     target_include_directories(nexus_platform SYSTEM PRIVATE
         ${NEXUS_SYSTEM_VENDOR_INCLUDES})
+endif()
+if(NOT NEXUS_SOC_FAMILY STREQUAL "native")
+    nexus_use_cmsis_core(nexus_platform)
 endif()
 if(NEXUS_SYSTEM_COMPILE_DEFINITIONS)
     target_compile_definitions(nexus_platform PRIVATE

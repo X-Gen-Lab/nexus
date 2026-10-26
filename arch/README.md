@@ -113,6 +113,11 @@ profiles; the normal ARM path inlines that boundary and never links the mocks.
 Native tests exercise real recursive exclusion, strict token nesting and context
 queries. Cache, MPU and security models mock only external CPU/MMIO operations
 and run the production C algorithms, including rejection before state changes.
-Pinned CMSIS `core_cm0plus/7/23/33/55/85.h`, `mpu_armv7/8.h` and
-`cachel1_armv7.h` establish the maintained register layouts. Actual IRQ latency,
+The pinned official CMSIS-Core v6.4.0 headers
+`core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`,
+`core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`,
+`m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed
+register-layout references. The shared private Core source does not
+change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU
+contracts, and does not establish new processor/profile or physical support. Actual IRQ latency,
 privilege transitions, DMA/cache coherency and CPU timing require HIL.

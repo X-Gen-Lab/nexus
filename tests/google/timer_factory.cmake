@@ -44,7 +44,8 @@ foreach(timer_family stm32 gd32)
     if(timer_family STREQUAL "stm32")
         target_include_directories(${timer_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${timer_target})
         target_compile_definitions(${timer_target} PRIVATE
             STM32F407xx NX_TIMER_FACTORY_STM32)
     else()

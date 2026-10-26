@@ -36,7 +36,8 @@ nexus_google_test(nexus_g474_pwm_shared_factory_test
 nexus_stm32_official(nexus_g474_pwm_shared_factory_test g4)
 target_include_directories(nexus_g474_pwm_shared_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_pwm_shared_factory_test)
 target_compile_definitions(nexus_g474_pwm_shared_factory_test PRIVATE
     STM32G474xx _init=nx_g474_shared_factory_init
     _fini=nx_g474_shared_factory_fini)
