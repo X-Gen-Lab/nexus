@@ -219,6 +219,36 @@ needs network access. Candidate plans must end with the owned candidate verifier
 These commands delegate to `dependencies.py` and `qualification.py`; they do not
 establish a second build graph. Cache commands delegate to `cache.py`.
 
+For the maintained software plan, select a finite budget for the delegated
+command and a fresh canonical absolute output path outside the platform input
+checkout, without symlink or parent-path aliases. Check the variable names in the
+environment passed to this invocation first: maintained provider and TrustZone
+qualification reject every `GIT_` override, including the display-only
+`GIT_PAGER`. If a launcher injects `GIT_PAGER`, omit only that variable from the
+launched process. Stop before launch if any other `GIT_` names remain and review
+the intended invocation environment. Scope this preparation to the command's
+process environment.
+
+From the prepared repository root, for example, using a new writable directory:
+
+```sh
+NEXUS_COMMAND_TIMEOUT=14400 NEXUS_BUILD_JOBS=2 \
+    python tools/dev/dev.py qualify --plan tools/dev/plans/software.json \
+    --output /workspace/nexus-software-qualification-run-01
+```
+
+The 14400-second budget is an invocation choice, not a new default or a completion
+guarantee for every host. `NEXUS_COMMAND_TIMEOUT` supplies the default for process
+calls without an explicit timeout; the outer `dev.py qualify` command uses that
+default, which is 1800 seconds when unset. Each plan stage retains its `timeout_s`,
+with a default of 1800 seconds when that field is absent. The maintained software
+plan uses effective stage budgets of 1800 or 7200 seconds. Its SDK stage writes
+`<output>/sdk`, and packaging rejects a prefix inside its input checkout or with
+path aliases. Choose a new canonical directory for each attempt and retain failed
+or interrupted receipts. Check the complete plan report and every actual stage
+exit; successful early stages and a larger retry budget do not establish a
+complete run.
+
 The manual `formal-software.yml` workflow runs the complete maintained software
 plan on a fresh `main` checkout. The requested commit must equal both the source
 and workflow SHA:

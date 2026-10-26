@@ -7,29 +7,72 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ea087bcf69871eb402409853f6770cdca807552b3c87ed7abbcfd892e7cf4a0f\n"
+"X-Nexus-Source-SHA256: 6c8c2a916b96cfe22750332e7dd3c4e71a9514d0d9b336fe98ebc306d65c7778\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:1
 msgid "当前证据与验收边界"
 msgstr "当前证据与验收边界"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:3
+#: ../../../../../docs/delivery/verification.md:3
 msgid ""
-"本次九核 CPU/Arch/Core/OS runtime 与平台迭代必须重新执行验证。旧版本候选、 历史测试数量和开发目录不能继承为新 HEAD "
-"的资格。实施台账的 implemented 表示源码和工具已落地；验收状态必须读取对应 HEAD 的执行报告。最终执行保存在外部 `nexus-"
-"delivery/<HEAD>/`；每份报告绑定源码、配置、依赖、工具、命令返回码和产物。"
+"本页说明平台执行报告的范围与验收边界。每次迭代都按实际源码重新建立证据， 旧版本候选、历史测试数量和开发目录不继承为新 HEAD 的资格。实施台账的 "
+"`implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。 "
+"原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。"
 msgstr ""
-"本次九核 CPU/Arch/Core/OS runtime 与平台迭代必须重新执行验证。旧版本候选、 历史测试数量和开发目录不能继承为新 HEAD "
-"的资格。实施台账的 implemented 表示源码和工具已落地；验收状态必须读取对应 HEAD 的执行报告。最终执行保存在外部 `nexus-"
-"delivery/<HEAD>/`；每份报告绑定源码、配置、依赖、工具、命令返回码和产物。"
+"本页说明平台执行报告的范围与验收边界。每次迭代都按实际源码重新建立证据， 旧版本候选、历史测试数量和开发目录不继承为新 HEAD 的资格。实施台账的 "
+"`implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。 "
+"原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。"
+
+#: ../../../../../docs/delivery/verification.md:8
+#, python-brace-format
+msgid ""
+"本次 SoC/IP 重构的软件执行绑定代码提交 P `92e669233957a2e450a528394e8f4dd0794c7049`，tree 为"
+" `6e38d4c43d59330a0a9a9b7cac21f591d9c2719f`。 平台 PR 36 已合并为 "
+"`c79fd9672a9fe56379744d834cfccd822bc40be1`，tree 与 P 相同； 外部 examples PR 15 "
+"已合并为 `bd3b90f135600b6405459347cb9e2cff5692d2e3`， 保留正式 P pin。{download}`48 "
+"项重构台账 <../design/soc-ip-layout-execution.csv>`记录逐项结果 和原始证据。本次维护计划 159 项由同一 "
+"P 的两段实际执行覆盖：A 保留的前 90 项完整结果，加上 B 对原计划后 69 项的完整执行。"
+msgstr ""
+"本次 SoC/IP 重构的软件执行绑定代码提交 P `92e669233957a2e450a528394e8f4dd0794c7049`，tree 为"
+" `6e38d4c43d59330a0a9a9b7cac21f591d9c2719f`。 平台 PR 36 已合并为 "
+"`c79fd9672a9fe56379744d834cfccd822bc40be1`，tree 与 P 相同； 外部 examples PR 15 "
+"已合并为 `bd3b90f135600b6405459347cb9e2cff5692d2e3`， 保留正式 P pin。{download}`48 "
+"项重构台账 <../design/soc-ip-layout-execution.csv>`记录逐项结果 和原始证据。本次维护计划 159 项由同一 "
+"P 的两段实际执行覆盖：A 保留的前 90 项完整结果，加上 B 对原计划后 69 项的完整执行。"
+
+#: ../../../../../docs/delivery/verification.md:17
+msgid ""
+"环境重启中断了 A 的静态分析。A 原报告仍为 `running`，没有 `source_after`； "
+"独立中断观察记录后来观察到的源码和启动身份，重启原因未确定。B 按原后缀计划 完整重跑静态分析，结果为 "
+"`executed_passed`。精确的阶段、顺序、命令退出码和 源码身份已核对；这不是一次完整计划运行通过，未补造 A 的结束状态。 搬移 SDK"
+" 独立消费、外部 examples 的十六个 ARM 配置和三十二个主矩阵 ELF、 十一组资源比较及两次 fresh、network-none "
+"离线构建均有独立结果。 既有六类 scope 的候选封存与 owned verifier 已通过，候选状态为 "
+"`software_qualified`；签名仍为 `unsigned`，产品提升未执行，物理 HIL 为 `not_executed`。"
+msgstr ""
+"环境重启中断了 A 的静态分析。A 原报告仍为 `running`，没有 `source_after`； "
+"独立中断观察记录后来观察到的源码和启动身份，重启原因未确定。B 按原后缀计划 完整重跑静态分析，结果为 "
+"`executed_passed`。精确的阶段、顺序、命令退出码和 源码身份已核对；这不是一次完整计划运行通过，未补造 A 的结束状态。 搬移 SDK"
+" 独立消费、外部 examples 的十六个 ARM 配置和三十二个主矩阵 ELF、 十一组资源比较及两次 fresh、network-none "
+"离线构建均有独立结果。 既有六类 scope 的候选封存与 owned verifier 已通过，候选状态为 "
+"`software_qualified`；签名仍为 `unsigned`，产品提升未执行，物理 HIL 为 `not_executed`。"
+
+#: ../../../../../docs/delivery/verification.md:27
+msgid ""
+"本文档更新只记录 P 的软件证据。文档自身身份由对应 `documentation-build.json` 的 `source` "
+"和实际执行收条确定；文档提交不继承或 替换 P 的软件资格。失败和中断尝试保留原状态与原始证据，不把 A/B 覆盖重标为 一次 "
+"`executed_passed`，也不把中断阶段的部分工作计为完成。"
+msgstr ""
+"本文档更新只记录 P 的软件证据。文档自身身份由对应 `documentation-build.json` 的 `source` "
+"和实际执行收条确定；文档提交不继承或 替换 P 的软件资格。失败和中断尝试保留原状态与原始证据，不把 A/B 覆盖重标为 一次 "
+"`executed_passed`，也不把中断阶段的部分工作计为完成。"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
 msgid "范围"
 msgstr "范围"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
-msgid "当前执行入口"
-msgstr "当前执行入口"
+#: ../../../../../docs/delivery/verification.md
+msgid "维护的执行入口"
+msgstr "维护的执行入口"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
 msgid "资格边界"
@@ -39,10 +82,9 @@ msgstr "资格边界"
 msgid "Native／Core／OS／组件"
 msgstr "Native／Core／OS／组件"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
-msgid "`tools/dev/dev.py test --preset native-debug`，另执行 release 和 ASan／UBSan"
-msgstr ""
-"`tools/dev/dev.py test --preset native-debug`，另执行 release 和 ASan／UBSan"
+#: ../../../../../docs/delivery/verification.md
+msgid "`tools/dev/dev.py test --preset native-debug`，另执行 release、ASan／UBSan 和 TSan"
+msgstr "`tools/dev/dev.py test --preset native-debug`，另执行 release、ASan／UBSan 和 TSan"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
 msgid "实际软件所有权、线程、故障行为；不构成 MCU 电气资格"
@@ -208,9 +250,13 @@ msgstr "外部示例"
 msgid "独立 `X-Gen-Lab/nexus-examples`"
 msgstr "独立 `X-Gen-Lab/nexus-examples`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
-msgid "精确 pin 后 Native 运行与十个 ARM 配置、二十个 ELF；产品实现留在外部"
-msgstr "精确 pin 后 Native 运行与十个 ARM 配置、二十个 ELF；产品实现留在外部"
+#: ../../../../../docs/delivery/verification.md
+msgid ""
+"本轮正式 pin P 后 Native 运行与十六个 ARM 配置、三十二个主矩阵 "
+"ELF（`platform_reference`／`uart_owner_runtime`）；专用示例另列于原报告，产品实现留在外部"
+msgstr ""
+"本轮正式 pin P 后 Native 运行与十六个 ARM 配置、三十二个主矩阵 "
+"ELF（`platform_reference`／`uart_owner_runtime`）；专用示例另列于原报告，产品实现留在外部"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:0
 msgid "源码 SDK"
@@ -252,19 +298,19 @@ msgstr "`tools/hil/prepare.py`、`admit.py`、三板 fixture 与 station templat
 msgid "工装已准备；未连接设备，所有物理结果 `not_executed`"
 msgstr "工装已准备；未连接设备，所有物理结果 `not_executed`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:27
+#: ../../../../../docs/delivery/verification.md:51
 msgid ""
-"本轮 SoC 的 canonical commit、实际完整门禁、离线候选与剩余验收范围见 [SoC 扩展执行记录](soc-extensions-"
-"verification.md)； [早期基线记录](soc-refinement-verification.md) 保留原版本证据。 版本化 "
-"datasheet／manual／errata 索引只建立来源；实际 silicon revision 和各 mode 的 workaround "
-"适用性单独验收。 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 profile，不将不同 backend、 route "
-"或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。"
+"此前 SoC 扩展迭代的 canonical commit、门禁与候选证据见 [SoC 扩展执行记录](soc-extensions-"
+"verification.md)； [早期基线记录](soc-refinement-verification.md) 保留原版本证据。 "
+"这些历史结果保持原源码范围，不构成本次重构的资格。 版本化 datasheet／manual／errata 索引只建立来源；实际 silicon "
+"revision 和各 mode 的 workaround 适用性单独验收。 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 "
+"profile，不将不同 backend、 route 或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。"
 msgstr ""
-"本轮 SoC 的 canonical commit、实际完整门禁、离线候选与剩余验收范围见 [SoC 扩展执行记录](soc-extensions-"
-"verification.md)； [早期基线记录](soc-refinement-verification.md) 保留原版本证据。 版本化 "
-"datasheet／manual／errata 索引只建立来源；实际 silicon revision 和各 mode 的 workaround "
-"适用性单独验收。 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 profile，不将不同 backend、 route "
-"或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。"
+"此前 SoC 扩展迭代的 canonical commit、门禁与候选证据见 [SoC 扩展执行记录](soc-extensions-"
+"verification.md)； [早期基线记录](soc-refinement-verification.md) 保留原版本证据。 "
+"这些历史结果保持原源码范围，不构成本次重构的资格。 版本化 datasheet／manual／errata 索引只建立来源；实际 silicon "
+"revision 和各 mode 的 workaround 适用性单独验收。 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 "
+"profile，不将不同 backend、 route 或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:35
 msgid ""
@@ -278,25 +324,25 @@ msgstr ""
 "hash，也不能跳过 reference-only admission。真实 station 与工具输入、 协议、仪器、连续非空 samples 和 "
 "reviewed limits 一起决定结果。物理 Flash 掉电还需外部产品提供擦除对齐且避开全部 firmware LOAD 的显式测试布局。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:41
+#: ../../../../../docs/delivery/verification.md:66
 msgid ""
-"开发执行目录 `build/controller-routes-factory/` 与 `build/minimal-factory-"
+"此前开发执行目录 `build/controller-routes-factory/` 与 `build/minimal-factory-"
 "resources/` 保留独立 attempt 和原始命令，不覆盖旧运行。资源 数字只描述对应 ELF；源码变化后重新执行。MSP "
 "显式预留，heap=0；未使用的内存域 不因芯片具有该区域就自动驻留。汇编和 ELF 字节不能替代实际 cycles／IRQ latency。"
 msgstr ""
-"开发执行目录 `build/controller-routes-factory/` 与 `build/minimal-factory-"
+"此前开发执行目录 `build/controller-routes-factory/` 与 `build/minimal-factory-"
 "resources/` 保留独立 attempt 和原始命令，不覆盖旧运行。资源 数字只描述对应 ELF；源码变化后重新执行。MSP "
 "显式预留，heap=0；未使用的内存域 不因芯片具有该区域就自动驻留。汇编和 ELF 字节不能替代实际 cycles／IRQ latency。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:46
+#: ../../../../../docs/delivery/verification.md:71
 msgid ""
-"本轮 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存 CPU "
+"此前 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存 CPU "
 "事实/schema、原子 publication/RMW、九核寄存器模型、可选 feature 编译与 真实 kernel context "
 "审计各自的原始报告。公开报告记录实际命令、退出码、工具 与 hash；通过数和 feature 范围由执行结果读取，不继承此前数字或一种组合。 "
 "Source/installed Runtime consumer 与完整平台 consumer 分开建立证据，前者 没有具体 "
 "startup、SoC、Board 或 factory，不能替代后者或 candidate 封存。"
 msgstr ""
-"本轮 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存 CPU "
+"此前 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存 CPU "
 "事实/schema、原子 publication/RMW、九核寄存器模型、可选 feature 编译与 真实 kernel context "
 "审计各自的原始报告。公开报告记录实际命令、退出码、工具 与 hash；通过数和 feature 范围由执行结果读取，不继承此前数字或一种组合。 "
 "Source/installed Runtime consumer 与完整平台 consumer 分开建立证据，前者 没有具体 "

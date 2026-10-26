@@ -104,6 +104,22 @@ Do not cache acceptance reports, restore incompatible objects or parallelize two
 mutations of the same build tree. Full gate discovery, actual exits, output
 identities and failure/cancellation retention remain mandatory.
 
+Before running a long qualification plan, select an explicit finite outer
+command budget and a fresh canonical absolute output path outside the platform
+input checkout, without symlink or parent-path aliases. `NEXUS_COMMAND_TIMEOUT`
+supplies the default where a process call has no explicit timeout; it does not
+replace the plan's stage deadlines. The maintained software plan packages an SDK
+under its output, so the existing SDK boundary rejects an output inside the
+platform checkout or with path aliases.
+
+Check the invocation environment first: maintained provider and TrustZone
+qualification reject every `GIT_` variable, including the display-only
+`GIT_PAGER`. Omit an injected `GIT_PAGER` only from this launched process, and
+stop if other `GIT_` names remain. Follow the
+[development command reference](../../tools/dev/README.md) for the maintained
+invocation. Preserve failed and interrupted attempts; a larger retry budget and
+successful early stages do not establish a completed plan or a sealed candidate.
+
 Before deleting a test, identify its behavioral obligation and independent
 remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate
 of the same contract. Keep tests that expose rejected ownership, retained borrows,

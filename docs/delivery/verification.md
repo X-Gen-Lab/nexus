@@ -1,13 +1,37 @@
 # 当前证据与验收边界
 
-本次九核 CPU/Arch/Core/OS runtime 与平台迭代必须重新执行验证。旧版本候选、
-历史测试数量和开发目录不能继承为新 HEAD 的资格。实施台账的 implemented
-表示源码和工具已落地；验收状态必须读取对应 HEAD 的执行报告。最终执行保存在外部
-`nexus-delivery/<HEAD>/`；每份报告绑定源码、配置、依赖、工具、命令返回码和产物。
+本页说明平台执行报告的范围与验收边界。每次迭代都按实际源码重新建立证据，
+旧版本候选、历史测试数量和开发目录不继承为新 HEAD 的资格。实施台账的
+`implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。
+原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。
 
-| 范围 | 当前执行入口 | 资格边界 |
+本次 SoC/IP 重构的软件执行绑定代码提交 P
+`92e669233957a2e450a528394e8f4dd0794c7049`，tree 为
+`6e38d4c43d59330a0a9a9b7cac21f591d9c2719f`。
+平台 PR 36 已合并为 `c79fd9672a9fe56379744d834cfccd822bc40be1`，tree 与 P 相同；
+外部 examples PR 15 已合并为 `bd3b90f135600b6405459347cb9e2cff5692d2e3`，
+保留正式 P pin。[48 项重构台账](../design/soc-ip-layout-execution.csv)记录逐项结果
+和原始证据。本次维护计划 159 项由同一 P 的两段实际执行覆盖：A 保留的前
+90 项完整结果，加上 B 对原计划后 69 项的完整执行。
+
+环境重启中断了 A 的静态分析。A 原报告仍为 `running`，没有 `source_after`；
+独立中断观察记录后来观察到的源码和启动身份，重启原因未确定。B 按原后缀计划
+完整重跑静态分析，结果为 `executed_passed`。精确的阶段、顺序、命令退出码和
+源码身份已核对；这不是一次完整计划运行通过，未补造 A 的结束状态。
+搬移 SDK 独立消费、外部 examples 的十六个 ARM 配置和三十二个主矩阵 ELF、
+十一组资源比较及两次 fresh、network-none 离线构建均有独立结果。
+既有六类 scope 的候选封存与 owned verifier 已通过，候选状态为
+`software_qualified`；签名仍为 `unsigned`，产品提升未执行，物理 HIL 为
+`not_executed`。
+
+本文档更新只记录 P 的软件证据。文档自身身份由对应
+`documentation-build.json` 的 `source` 和实际执行收条确定；文档提交不继承或
+替换 P 的软件资格。失败和中断尝试保留原状态与原始证据，不把 A/B 覆盖重标为
+一次 `executed_passed`，也不把中断阶段的部分工作计为完成。
+
+| 范围 | 维护的执行入口 | 资格边界 |
 |---|---|---|
-| Native／Core／OS／组件 | `tools/dev/dev.py test --preset native-debug`，另执行 release 和 ASan／UBSan | 实际软件所有权、线程、故障行为；不构成 MCU 电气资格 |
+| Native／Core／OS／组件 | `tools/dev/dev.py test --preset native-debug`，另执行 release、ASan／UBSan 和 TSan | 实际软件所有权、线程、故障行为；不构成 MCU 电气资格 |
 | GoogleTest／GoogleMock | `scripts/ci/tdd_gate.py --all`；`tests/google/` | 全量发现与实际非过滤执行、fresh XML、零跳过；不是历史编辑顺序的自动证明 |
 | Cortex-M CPU 机制 | `tests/google/arch_*`、`*atomic*`；`scripts/ci/arch_compile.py` | 九核宏／ABI／对象／指令／原子依赖；生产 cache/MPU/SAU 模型；不扩大 SoC/Board 或实板支持 |
 | CPU runtime / kernel | `scripts/ci/cortex_runtime.py`；`tests/contracts/cortex_runtime/` | 公共 `nexus_add_runtime` 生产源图、Core/Arch/I/O/所选 OS 与真实 kernel context 的编译/ELF 审计；不是 MCU 执行 |
@@ -19,14 +43,15 @@
 | 可选 RAM 放置 | `scripts/ci/stm32_memory.py`、`scripts/ci/gd32_memory.py` | F407 CCM、GD ADDSRAM／TCM 的链接和初始化域；不证明掉电／reset retention |
 | 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 维护的 controller 类型、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
 | 最小资源矩阵 | `tools/measurement/compare.py` | 三板 60 个 O2／Os／O3 ± LTO 镜像；18 empty GC 检查；实际 face／ops 存储成本 |
-| 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与十个 ARM 配置、二十个 ELF；产品实现留在外部 |
+| 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 本轮正式 pin P 后 Native 运行与十六个 ARM 配置、三十二个主矩阵 ELF（`platform_reference`／`uart_owner_runtime`）；专用示例另列于原报告，产品实现留在外部 |
 | 源码 SDK | `cmake/package/package_source_sdk.py`、`verify_consumers.py` | 干净版本、source closure/identity、移动路径 C／C++ Native 和 Runtime consumer、STM／GD 固件链接 |
 | 离线复现／候选 | `tools/evidence/reproduce.py`、`candidate.py`、`proof.py` | 两次独立 network-none 构建，相同源码／配置／工具／ELF 身份及必需 scope |
 | HIL | `tools/hil/prepare.py`、`admit.py`、三板 fixture 与 station template | 工装已准备；未连接设备，所有物理结果 `not_executed` |
 
-本轮 SoC 的 canonical commit、实际完整门禁、离线候选与剩余验收范围见
+此前 SoC 扩展迭代的 canonical commit、门禁与候选证据见
 [SoC 扩展执行记录](soc-extensions-verification.md)；
 [早期基线记录](soc-refinement-verification.md) 保留原版本证据。
+这些历史结果保持原源码范围，不构成本次重构的资格。
 版本化 datasheet／manual／errata
 索引只建立来源；实际 silicon revision 和各 mode 的 workaround 适用性单独验收。
 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 profile，不将不同 backend、
@@ -38,12 +63,12 @@ metadata hash，也不能跳过 reference-only admission。真实 station 与工
 协议、仪器、连续非空 samples 和 reviewed limits 一起决定结果。物理 Flash
 掉电还需外部产品提供擦除对齐且避开全部 firmware LOAD 的显式测试布局。
 
-开发执行目录 `build/controller-routes-factory/` 与
+此前开发执行目录 `build/controller-routes-factory/` 与
 `build/minimal-factory-resources/` 保留独立 attempt 和原始命令，不覆盖旧运行。资源
 数字只描述对应 ELF；源码变化后重新执行。MSP 显式预留，heap=0；未使用的内存域
 不因芯片具有该区域就自动驻留。汇编和 ELF 字节不能替代实际 cycles／IRQ latency。
 
-本轮 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存
+此前 CPU/runtime 开发执行目录为 `/workspace/nexus-all-cortex-evidence`，保存
 CPU 事实/schema、原子 publication/RMW、九核寄存器模型、可选 feature 编译与
 真实 kernel context 审计各自的原始报告。公开报告记录实际命令、退出码、工具
 与 hash；通过数和 feature 范围由执行结果读取，不继承此前数字或一种组合。
