@@ -1,4 +1,4 @@
-# Authored translation; independent review is recorded in metadata.
+# Authored translation; independent semantic review pending.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 720a0c94f05496b8e156b5c3132933925e74540863b0d0b91ff674bb2ab77a3b\n"
+"X-Nexus-Source-SHA256: c711089cbe43ec0a8e661af4a3faf17fd2281993f111982b2f7222dd9fca8f47\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
@@ -179,6 +179,39 @@ msgid ""
 msgstr ""
 "根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
 "数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
+
+#: ../../../../../docs/development/workflow.md:107
+msgid ""
+"Before running a long qualification plan, select an explicit finite outer "
+"command budget and a fresh canonical absolute output path outside the "
+"platform input checkout, without symlink or parent-path aliases. "
+"`NEXUS_COMMAND_TIMEOUT` supplies the default where a process call has no "
+"explicit timeout; it does not replace the plan's stage deadlines. The "
+"maintained software plan packages an SDK under its output, so the existing "
+"SDK boundary rejects an output inside the platform checkout or with path "
+"aliases."
+msgstr ""
+"运行较长的资格计划前，应显式选择有限的外层命令预算，并选择平台输入 checkout "
+"之外、无符号链接或父路径别名的新规范化绝对输出路径。`NEXUS_COMMAND_TIMEOUT` 为没有显式 timeout 的 process "
+"调用提供默认预算，不替代计划各阶段的期限。维护中的软件计划在输出目录下打包 SDK，因此既有 SDK 边界会拒绝位于平台 checkout "
+"内或带路径别名的输出。"
+
+#: ../../../../../docs/development/workflow.md:115
+msgid ""
+"Check the invocation environment first: maintained provider and TrustZone "
+"qualification reject every `GIT_` variable, including the display-only "
+"`GIT_PAGER`. Omit an injected `GIT_PAGER` only from this launched process, "
+"and stop if other `GIT_` names remain. Follow the [development command "
+"reference](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/dev/README.md) for the maintained invocation. Preserve failed "
+"and interrupted attempts; a larger retry budget and successful early stages"
+" do not establish a completed plan or a sealed candidate."
+msgstr ""
+"先检查本次调用的环境：维护中的 provider 和 TrustZone 验收拒绝所有 `GIT_` 变量，包括仅控制显示的 "
+"`GIT_PAGER`。若启动器注入了 `GIT_PAGER`，只在本次启动的进程环境中省略它；若仍有其他 `GIT_` "
+"变量名，则停止启动。维护中的调用方式见[开发命令参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/tools/dev/README.md)。应保留失败和中断的尝试；更长的重试预算和前面阶段通过，都不等于完整计划已经完成或候选已经封存。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:107
 msgid ""
