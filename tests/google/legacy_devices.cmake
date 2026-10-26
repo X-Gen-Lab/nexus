@@ -79,8 +79,7 @@ function(nexus_physical_flash_program_test family)
     if(family STREQUAL "stm32")
         set(soc stm32f407)
         set(definitions NEXUS_STM32_MODEL STM32F407xx NX_FLASH_PROGRAM_STM32)
-        set(includes "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        set(includes "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     else()
         set(soc gd32f470)
         set(definitions GD32F470 HXTAL_VALUE=25000000)
@@ -117,7 +116,7 @@ function(nexus_physical_flash_program_test family)
             "${NEXUS_SOC_SOURCE_${soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_include_directories(${target} SYSTEM PRIVATE ${includes})
-    nexus_use_cmsis_core(${target})
+    # Both pulse fixtures use the complete host Core model selected above.
     target_compile_definitions(${target} PRIVATE ${definitions}
         _init=nx_flash_fixture_init _fini=nx_flash_fixture_fini)
     target_compile_options(${target} PRIVATE

@@ -39,9 +39,8 @@ foreach(can_family stm32 gd32)
         target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
-            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}" "${can_gd}/CMSIS/GD/GD32F4xx/Include"
+            "${can_gd}/CMSIS/GD/GD32F4xx/Include"
             "${can_gd}/GD32F4xx_standard_peripheral/Include")
-        nexus_use_cmsis_core(${can_target})
         target_compile_definitions(${can_target} PRIVATE GD32F470 HXTAL_VALUE=25000000)
         target_include_directories(${can_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
