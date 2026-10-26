@@ -19,12 +19,13 @@ foreach(legacy_family stm32f103 gd32f303)
     target_compile_options(${legacy_target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/legacy_transport_model.h")
     target_include_directories(${legacy_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${legacy_target})
     if(legacy_family STREQUAL "stm32f103")
         target_include_directories(${legacy_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include")
         target_compile_definitions(${legacy_target} PRIVATE
-            NX_LEGACY_F103 STM32F103xB __ARM_ARCH_7M__=1)
+            NX_LEGACY_F103 STM32F103xB __ARM_ARCH_7M__=1 __ARM_FEATURE_LDREX=7)
     else()
         target_include_directories(${legacy_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"

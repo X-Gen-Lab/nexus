@@ -65,14 +65,15 @@ foreach(usb_family stm32 gd32)
         if(usb_family STREQUAL "stm32")
             target_include_directories(${usb_target} SYSTEM PRIVATE
                 "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-                "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+                "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+            nexus_use_cmsis_core(${usb_target})
             target_compile_definitions(${usb_target} PRIVATE STM32F407xx NX_USB_FACTORY_STM32)
         else()
             set(usb_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
             target_include_directories(${usb_target} PRIVATE
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
             target_include_directories(${usb_target} SYSTEM PRIVATE
-                "${usb_gd}/CMSIS" "${usb_gd}/CMSIS/GD/GD32F4xx/Include"
+                "${usb_gd}/CMSIS/GD/GD32F4xx/Include"
                 "${usb_gd}/GD32F4xx_standard_peripheral/Include"
                 "${usb_gd}/GD32F4xx_usb_library/driver/Include")
             target_compile_definitions(${usb_target} PRIVATE GD32F470 HXTAL_VALUE=25000000 NX_USB_GD_MODEL)

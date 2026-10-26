@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.31)
 project(nexus_u575_trustzone_reference LANGUAGES C ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 get_filename_component(nexus_source "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+include("${nexus_source}/cmake/platform/CMSISCore.cmake")
+nexus_cmsis_core_include(NEXUS_CMSIS_CORE_INCLUDE_DIR)
 include("${nexus_source}/cmake/platform/Runtime.cmake")
 if(NEXUS_TRUSTZONE_STAGE STREQUAL "secure")
     nexus_add_runtime(ASSEMBLY "${CMAKE_CURRENT_LIST_DIR}/secure.toml")
@@ -16,7 +18,8 @@ if(NEXUS_TRUSTZONE_STAGE STREQUAL "secure")
         "${nexus_source}/components/user_io_broker/private")
     target_include_directories(u575_secure SYSTEM PRIVATE
         "${nexus_source}/vendors/st/cmsis_device_u5/Include"
-        "${nexus_source}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(u575_secure)
     target_compile_definitions(u575_secure PRIVATE STM32U575xx)
     target_link_options(u575_secure PRIVATE
         "-T${CMAKE_CURRENT_LIST_DIR}/secure.ld"

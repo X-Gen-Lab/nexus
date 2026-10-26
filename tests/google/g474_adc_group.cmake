@@ -13,7 +13,8 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
 nexus_stm32_official(nexus_g474_adc_group_test g4)
 target_include_directories(nexus_g474_adc_group_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_adc_group_test)
 target_compile_definitions(nexus_g474_adc_group_test PRIVATE STM32G474xx)
 target_compile_options(nexus_g474_adc_group_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/g474_adc_group_model.h")

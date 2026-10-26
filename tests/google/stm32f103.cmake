@@ -16,8 +16,10 @@ foreach(f1_suite system provider watchdog exti spi)
     target_include_directories(${f1_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f1_hal/Inc"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
-    target_compile_definitions(${f1_target} PRIVATE STM32F103xB __ARM_ARCH_7M__=1)
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${f1_target})
+    target_compile_definitions(${f1_target} PRIVATE STM32F103xB
+        __ARM_ARCH_7M__=1 __ARM_FEATURE_LDREX=7)
     target_compile_options(${f1_target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/contracts/stm32f103_model/model.h")
 endforeach()

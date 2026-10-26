@@ -11,7 +11,8 @@ foreach(u5_suite system provider)
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_include_directories(${u5_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${u5_target})
     target_compile_definitions(${u5_target} PRIVATE STM32U575xx)
     target_compile_options(${u5_target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/u575_model.h")

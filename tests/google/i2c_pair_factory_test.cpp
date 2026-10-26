@@ -652,11 +652,11 @@ extern "C" void nx_i2c_pair_irq_clear(IRQn_Type irq) {
 }
 /** \brief Store the actual implemented logical priority. */
 extern "C" void nx_i2c_pair_irq_priority(IRQn_Type irq, uint32_t value) {
-    NVIC->IP[static_cast<unsigned>(irq)] = static_cast<uint8_t>(value << 4U);
+    NVIC->IPR[static_cast<unsigned>(irq)] = static_cast<uint8_t>(value << 4U);
 }
 /** \brief Report hardware priority facts without substituting policy. */
 extern "C" uint32_t nx_i2c_pair_irq_get_priority(IRQn_Type irq) {
-    return NVIC->IP[static_cast<unsigned>(irq)] >> 4U;
+    return NVIC->IPR[static_cast<unsigned>(irq)] >> 4U;
 }
 /** \brief W1C clears only bits in the selected controller flag group. */
 extern "C" void nx_i2c_pair_dma_ack(volatile uint32_t* clear, uint32_t value) {

@@ -326,8 +326,8 @@ class TimerFactory : public testing::Test {
 #else
         RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
 #endif
-        NVIC->IP[30] = 0x20U;
-        NVIC->IP[24] = 0x30U;
+        NVIC->IPR[30] = 0x20U;
+        NVIC->IPR[24] = 0x30U;
         cap = nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_ENCODER);
         power = nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_POWER);
         ASSERT_NE(cap, nullptr);
@@ -409,8 +409,8 @@ TEST_F(TimerFactory, ActualPolicyAndStaticIrqContextsAreBound) {
     EXPECT_EQ(capture->config->edge, NX_TIMER_EDGE_BOTH);
     EXPECT_EQ(capture->config->filter, 3U);
     EXPECT_EQ(advanced->config->deadtime_ticks, 128U);
-    EXPECT_EQ(NVIC->IP[30], 0x50U);
-    EXPECT_EQ(NVIC->IP[24], 0x50U);
+    EXPECT_EQ(NVIC->IPR[30], 0x50U);
+    EXPECT_EQ(NVIC->IPR[24], 0x50U);
     ASSERT_EQ(nx_timer_capture_start(cap, ring, 2U), NX_SUCCESS);
     edge(31U);
     nx_timer_capture_event_t event{};
@@ -455,7 +455,7 @@ TEST_F(TimerFactory, RefusedColdGateNeverBorrowsTimerOrPins) {
     EXPECT_EQ(result.primary, NX_ERROR_IO);
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
     EXPECT_EQ(capture->config, nullptr);
-    EXPECT_EQ(NVIC->IP[30], 0x20U);
+    EXPECT_EQ(NVIC->IPR[30], 0x20U);
 }
 TEST_F(TimerFactory,
        ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact) {
@@ -465,7 +465,7 @@ TEST_F(TimerFactory,
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
     EXPECT_EQ(PEER_DIER, 1U);
     EXPECT_EQ(advanced->config, nullptr);
-    EXPECT_EQ(NVIC->IP[24], 0x30U);
+    EXPECT_EQ(NVIC->IPR[24], 0x30U);
 }
 TEST_F(TimerFactory, ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition) {
     NVIC->ISER[0] = 1U << 30U;
@@ -473,7 +473,7 @@ TEST_F(TimerFactory, ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition) {
     EXPECT_EQ(result.primary, NX_ERROR_BUSY);
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
     EXPECT_NE(NVIC->ISER[0] & (1U << 30U), 0U);
-    EXPECT_EQ(NVIC->IP[30], 0x20U);
+    EXPECT_EQ(NVIC->IPR[30], 0x20U);
 }
 TEST_F(TimerFactory, RefusedIrqDisableRetainsPinsGatesAndProviderStorage) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
@@ -482,7 +482,7 @@ TEST_F(TimerFactory, RefusedIrqDisableRetainsPinsGatesAndProviderStorage) {
     EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
     EXPECT_NE(advanced->config, nullptr);
     EXPECT_NE(ADV_GATE & 1U, 0U);
-    EXPECT_EQ(NVIC->IP[24], 0x50U);
+    EXPECT_EQ(NVIC->IPR[24], 0x50U);
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
     s_refused = nullptr;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
@@ -530,13 +530,13 @@ TEST_F(TimerFactory, ActivePublisherPreventsStorageReuseEvenAfterDisable) {
 }
 TEST_F(TimerFactory, RefusedPriorityRestorePreservesLeaseUntilRetry) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
-    s_priority_refused = &NVIC->IP[24];
+    s_priority_refused = &NVIC->IPR[24];
     EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
     EXPECT_NE(advanced->config, nullptr);
     EXPECT_NE(ADV_GATE & 1U, 0U);
     s_priority_refused = nullptr;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
-    EXPECT_EQ(NVIC->IP[24], 0x30U);
+    EXPECT_EQ(NVIC->IPR[24], 0x30U);
 }
 TEST_F(TimerFactory, QueuedCaptureLoanBlocksPlatformClockAndPinRelease) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
@@ -717,8 +717,8 @@ TEST_F(TimerFactory, StopAndColdRestartReuseOnlyAProvedQuiescentSession) {
     ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
     EXPECT_EQ(capture->config, nullptr);
     EXPECT_EQ(advanced->config, nullptr);
-    EXPECT_EQ(NVIC->IP[30], 0x20U);
-    EXPECT_EQ(NVIC->IP[24], 0x30U);
+    EXPECT_EQ(NVIC->IPR[30], 0x20U);
+    EXPECT_EQ(NVIC->IPR[24], 0x30U);
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     EXPECT_TRUE(capture->initialized);
     EXPECT_TRUE(advanced->initialized);

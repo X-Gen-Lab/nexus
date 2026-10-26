@@ -8,7 +8,8 @@ nexus_google_test(nexus_h743_uart_continuous_test SOURCES
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_uart_continuous_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_uart_continuous_test)
 target_compile_definitions(nexus_h743_uart_continuous_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_uart_continuous_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_uart_continuous_model.h")
@@ -24,7 +25,8 @@ nexus_google_test(nexus_h743_uart_duplex_test SOURCES
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_uart_duplex_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_uart_duplex_test)
 target_compile_definitions(nexus_h743_uart_duplex_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_uart_duplex_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_uart_continuous_model.h")
@@ -72,7 +74,8 @@ foreach(cache off on)
     endif()
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE STM32H743xx
         H743_CONTINUOUS_DUPLEX=$<STREQUAL:${mode},duplex>
         H743_CONTINUOUS_CACHE_ON=$<STREQUAL:${cache},on>

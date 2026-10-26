@@ -43,7 +43,8 @@ foreach(g4_timer_kind capture encoder)
             "${NEXUS_SOURCE_DIR}/tests/contracts")
     target_include_directories(${g4_timer_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${g4_timer_target})
     target_compile_definitions(${g4_timer_target} PRIVATE STM32G474xx
         "_init=nx_g474_${g4_timer_kind}_init"
         "_fini=nx_g474_${g4_timer_kind}_fini")

@@ -28,7 +28,8 @@ nexus_google_test(nexus_g474_exti_test SOURCES g474_exti_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_exti_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_exti_test)
 target_compile_definitions(nexus_g474_exti_test PRIVATE STM32G474xx
     _init=nx_g474_exti_fixture_init _fini=nx_g474_exti_fixture_fini)
 target_compile_options(nexus_g474_exti_test PRIVATE

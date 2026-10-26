@@ -1,6 +1,7 @@
 # Reviewed G474 controller modes; official CMSIS inputs remain private.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(g4_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4")
-set(g4_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(g4_cmsis)
 set(g4_lock "${NEXUS_SOURCE_DIR}/dependencies/stm32g4.lock.json")
 set(g4_verifier "${NEXUS_SOURCE_DIR}/tools/maintenance/stm32g4_lock.py")
 execute_process(
@@ -104,7 +105,8 @@ if(g4_sources)
         nexus_stm32_official(nexus_soc_stm32g474 g4)
     endif()
     target_include_directories(nexus_soc_stm32g474 SYSTEM PRIVATE
-        "${g4_device}/Include" "${g4_cmsis}")
+        "${g4_device}/Include")
+    nexus_use_cmsis_core(nexus_soc_stm32g474)
     target_compile_definitions(nexus_soc_stm32g474 PRIVATE STM32G474xx)
     if(g4_can_fd_modes)
         target_compile_definitions(nexus_soc_stm32g474 PRIVATE

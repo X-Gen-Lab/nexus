@@ -1,7 +1,8 @@
 # Compile real provider sources against deterministic register/event models.
+include("${NEXUS_SOURCE_DIR}/tests/cmake/CMSISHostModel.cmake")
 set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-set(stm32_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(stm32_cmsis)
 add_executable(contract_stm32_system_model
     "${stm32_root}/system.c" "../stm32_system_test.c")
 add_executable(contract_stm32_io_model
@@ -34,6 +35,8 @@ foreach(target contract_stm32_system_model contract_stm32_io_model
         "${stm32_root}/private" "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${target} SYSTEM PRIVATE
         "${stm32_device}" "${stm32_cmsis}")
+    nexus_use_cmsis_core(${target})
+    nexus_use_cmsis_host_model(${target})
     target_compile_definitions(${target} PRIVATE NEXUS_STM32_MODEL STM32F407xx)
     target_link_libraries(${target} PRIVATE nexus_io nexus_build_options
         nexus_owned_warnings)

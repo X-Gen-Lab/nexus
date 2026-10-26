@@ -73,11 +73,11 @@ class DescriptorBoundaryTests(unittest.TestCase):
         f4 = descriptor.maintained("stm32f407")
         g4 = descriptor.maintained("stm32g474")
         self.assertEqual(f4.git_dependencies, (
-            ("cmsis_core", "vendors/arm/CMSIS_5"),
+            ("cmsis_core", "vendors/arm/CMSIS_6"),
             ("cmsis_device_f4", "vendors/st/cmsis_device_f4"),
             ("hal_driver_f4", "vendors/st/stm32f4_hal")))
         self.assertEqual(g4.git_dependencies, (
-            ("cmsis_core", "vendors/arm/CMSIS_5"),
+            ("cmsis_core", "vendors/arm/CMSIS_6"),
             ("cmsis_device_g4", "vendors/st/cmsis_device_g4"),
             ("hal_driver_g4", "vendors/st/stm32g4_hal")))
         self.assertEqual(descriptor.maintained("gd32f470").import_lock,
@@ -106,6 +106,28 @@ class DescriptorBoundaryTests(unittest.TestCase):
             with self.subTest(family=family, controller=controller):
                 with self.assertRaises(ValueError):
                     hardware.maintained(family, controller)
+
+
+class CMSISCoreDescriptorContracts(unittest.TestCase):
+    def test_catalogue_uses_neutral_identity_and_exact_upstream_notice(self):
+        from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+
+        core, = [item for item in SOURCE_DEPENDENCIES
+                 if item.identifier == "cmsis_core"]
+        self.assertEqual(core.path, "vendors/arm/CMSIS_6")
+        self.assertEqual(core.origin,
+                         "https://github.com/ARM-software/CMSIS_6.git")
+        self.assertEqual(core.notice, "LICENSE")
+        self.assertFalse(any(item.identifier == "cmsis5"
+                             for item in SOURCE_DEPENDENCIES))
+
+    def test_every_mcu_family_binds_the_same_neutral_core_identity(self):
+        for item in descriptor.families():
+            if item.family == "native":
+                continue
+            with self.subTest(family=item.family):
+                self.assertIn(("cmsis_core", "vendors/arm/CMSIS_6"),
+                              item.git_dependencies)
 
 
 if __name__ == "__main__":

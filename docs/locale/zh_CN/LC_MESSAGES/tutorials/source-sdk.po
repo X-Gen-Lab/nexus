@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f072413de7ce3cf3fb1f1152672d9a0e6e2fe17dad505c896180bb0461259520\n"
+"X-Nexus-Source-SHA256: 6aed4e5c6ffe695da5a3ce2a55dbc0e5b936a64b5f5bb888a6ae31f452588cae\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:9
 msgid "Build an independent Source SDK consumer"
@@ -356,3 +356,8 @@ msgid ""
 msgstr ""
 "修复打包限制时保留全部原始证据文件。不得为了获得成功而移动标签、删去证据或换用不同源码的 CI "
 "运行。仅触发工作流不能证明已发布：必须检查完成的工作流、发布清单与资产，再独立下载并验证 SDK。恢复不建立物理 HIL 或生产资格。"
+
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "The SDK retains the complete recursive CMSIS-Core `Include` tree and its Apache-2.0 `LICENSE` from the locked official v6.4.0 source. It does not include the entire CMSIS repository or automatically enable CMSIS-RTOS, CMSIS-Driver, DSP or NN. These private implementation headers are distinct from the public `Nexus::Core` mechanisms. Device/startup and HAL/LL remain separately locked; older bundled GigaDevice Core files retain their original bytes and notices without becoming the selected common Core. Verify the complete moved prefix, not a manually copied subset of headers. This dependency update does not expand supported chips or replace current-source compiler and consumer evidence."
+msgstr "SDK 保留锁定的官方 v6.4.0 来源中完整递归 CMSIS-Core `Include` 树及其 Apache-2.0 `LICENSE`。它不包含整个 CMSIS 仓库，也不自动启用 CMSIS-RTOS、CMSIS-Driver、DSP 或 NN。这些私有实现头与公共 `Nexus::Core` 中性机制不同。Device/startup 和 HAL/LL 仍分别锁定；GigaDevice 原包中的旧 Core 文件保留原始字节及通知，但不作为选中的共享 Core 来源。应验证移位后的完整 prefix，而不是手动复制的头文件子集。这项依赖更新不扩大芯片支持，也不替代当前源码的编译器与 consumer 执行证据。"

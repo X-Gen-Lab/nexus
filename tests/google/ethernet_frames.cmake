@@ -20,7 +20,8 @@ foreach(eth_frames_family common stm32 gd32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${eth_frames_target})
         nexus_stm32f4_official(${eth_frames_target})
     elseif(eth_frames_family STREQUAL "gd32")
         target_compile_definitions(${eth_frames_target} PRIVATE

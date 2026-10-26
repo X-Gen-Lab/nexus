@@ -33,7 +33,8 @@ nexus_google_test(nexus_g474_mainstream_test SOURCES g474_mainstream_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_mainstream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_mainstream_test)
 target_compile_definitions(nexus_g474_mainstream_test PRIVATE STM32G474xx
     _init=nx_g474_mainstream_init _fini=nx_g474_mainstream_fini)
 target_compile_options(nexus_g474_mainstream_test PRIVATE
@@ -49,7 +50,8 @@ nexus_google_test(nexus_g474_watchdog_test SOURCES g474_watchdog_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_watchdog_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_watchdog_test)
 target_compile_definitions(nexus_g474_watchdog_test PRIVATE STM32G474xx)
 target_compile_options(nexus_g474_watchdog_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.h")
@@ -64,7 +66,8 @@ nexus_google_test(nexus_g474_spi_test SOURCES g474_spi_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_spi_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_spi_test)
 target_compile_definitions(nexus_g474_spi_test PRIVATE STM32G474xx)
 target_compile_options(nexus_g474_spi_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.h")
@@ -105,7 +108,8 @@ nexus_google_test(nexus_g474_peripheral_factory_test SOURCES g474_peripheral_fac
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_peripheral_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_peripheral_factory_test)
 target_compile_definitions(nexus_g474_peripheral_factory_test PRIVATE STM32G474xx
     _init=nx_g474_peripheral_init _fini=nx_g474_peripheral_fini)
 target_compile_options(nexus_g474_peripheral_factory_test PRIVATE
@@ -121,7 +125,8 @@ nexus_google_test(nexus_g474_pwm_test SOURCES g474_pwm_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_pwm_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_pwm_test)
 target_compile_definitions(nexus_g474_pwm_test PRIVATE STM32G474xx)
 target_compile_options(nexus_g474_pwm_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.h")
@@ -161,7 +166,8 @@ nexus_google_test(nexus_g474_pwm_factory_test SOURCES g474_pwm_factory_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_pwm_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_g474_pwm_factory_test)
 target_compile_definitions(nexus_g474_pwm_factory_test PRIVATE STM32G474xx
     _init=nx_g474_pwm_factory_init _fini=nx_g474_pwm_factory_fini)
 target_compile_options(nexus_g474_pwm_factory_test PRIVATE

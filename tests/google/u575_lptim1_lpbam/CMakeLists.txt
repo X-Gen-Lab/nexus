@@ -13,7 +13,7 @@ set(u575_lptim1_includes
 set(u575_lptim1_sdk
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32u5_hal/Inc"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
 add_library(nexus_u575_lptim1_lpbam_bus OBJECT
     "${NEXUS_SOURCE_DIR}/tests/google/u575_lptim1_lpbam/model.cpp")
 nexus_apply_target_policy(nexus_u575_lptim1_lpbam_bus)
@@ -21,6 +21,8 @@ target_link_libraries(nexus_u575_lptim1_lpbam_bus PRIVATE Nexus::IO Nexus::Arch
     nexus_owned_warnings nexus_build_options)
 target_include_directories(nexus_u575_lptim1_lpbam_bus PRIVATE ${u575_lptim1_includes})
 target_include_directories(nexus_u575_lptim1_lpbam_bus SYSTEM PRIVATE ${u575_lptim1_sdk})
+nexus_use_cmsis_core(nexus_u575_lptim1_lpbam_bus)
+nexus_use_cmsis_host_model(nexus_u575_lptim1_lpbam_bus)
 target_compile_definitions(nexus_u575_lptim1_lpbam_bus PRIVATE STM32U575xx
     NX_U575_LPDMA_COPY_MODEL
     nx_u575_lpdma_copy_read=nx_u575_lpdma_copy_bus_read
@@ -35,6 +37,7 @@ nexus_google_test(nexus_u575_lptim1_lpbam_test
     LIBRARIES Nexus::ClockDomain Nexus::IO Nexus::Arch
     INCLUDES ${u575_lptim1_includes})
 target_include_directories(nexus_u575_lptim1_lpbam_test SYSTEM PRIVATE ${u575_lptim1_sdk})
+nexus_use_cmsis_core(nexus_u575_lptim1_lpbam_test)
 target_compile_definitions(nexus_u575_lptim1_lpbam_test PRIVATE STM32U575xx
     NX_U575_LPDMA_COPY_MODEL NX_U575_STOP2_MODEL NEXUS_U575_STOP2_LPTIM1)
 set_source_files_properties(

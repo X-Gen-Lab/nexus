@@ -7,7 +7,8 @@ nexus_google_test(nexus_u575_lptim_test
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_lptim_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_lptim_test)
 target_compile_definitions(nexus_u575_lptim_test PRIVATE STM32U575xx)
 target_compile_options(nexus_u575_lptim_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/google/u575_lptim_model.h")
@@ -41,7 +42,8 @@ nexus_google_test(nexus_u575_lptim_factory_test
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_lptim_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_lptim_factory_test)
 target_compile_definitions(nexus_u575_lptim_factory_test PRIVATE STM32U575xx
     _init=nx_u575_lptim_fixture_init _fini=nx_u575_lptim_fixture_fini)
 target_compile_options(nexus_u575_lptim_factory_test PRIVATE

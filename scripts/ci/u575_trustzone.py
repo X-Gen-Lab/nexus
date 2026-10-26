@@ -153,7 +153,7 @@ def source_inputs(root):
     paths.add(Path(__file__).resolve())
     for directory in (root / "tests/contracts/u575_trustzone",
                       root / "vendors/st/cmsis_device_u5/Include",
-                      root / "vendors/arm/CMSIS_5/CMSIS/Core/Include"):
+                      root / "vendors/arm/CMSIS_6/CMSIS/Core/Include"):
         paths.update(path for path in directory.rglob("*") if path.is_file()
                      and "__pycache__" not in path.parts)
     return [arch_compile.digest(path) for path in sorted(paths)]

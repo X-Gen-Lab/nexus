@@ -76,7 +76,7 @@ class SelectedIdentityTests(unittest.TestCase):
         self.commit_source()
         # These synthetic modules exercise selected recursive identity only;
         # they never qualify official vendor bytes or physical firmware.
-        self.initialize('vendors/arm/CMSIS_5', 'vendors/st/cmsis_device_f4',
+        self.initialize('vendors/arm/CMSIS_6', 'vendors/st/cmsis_device_f4',
                         'vendors/st/stm32f4_hal')
         self.artifacts = self.root / 'build/arm'
         self.artifacts.mkdir(parents=True)
@@ -133,7 +133,7 @@ class SelectedIdentityTests(unittest.TestCase):
         self.assertEqual(len(record['dependency_scope']['recursive_submodules']), 3)
         self.assertEqual({item['path'] for item in
                           record['dependency_scope']['recursive_submodules']},
-                         {'vendors/arm/CMSIS_5', 'vendors/st/cmsis_device_f4',
+                         {'vendors/arm/CMSIS_6', 'vendors/st/cmsis_device_f4',
                           'vendors/st/stm32f4_hal'})
         self.assertEqual(record['dependency_scope']['assembly'],
                          file_identity(self.assembly))

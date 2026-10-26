@@ -8,7 +8,8 @@ nexus_google_test(nexus_h743_dma_test SOURCES h743_dma_test.cpp
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_dma_test)
 target_compile_definitions(nexus_h743_dma_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_dma_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_dma_model.h")
@@ -44,7 +45,8 @@ nexus_google_test(nexus_h743_dma_factory_test SOURCES h743_dma_factory_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_dma_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_dma_factory_test)
 target_compile_definitions(nexus_h743_dma_factory_test PRIVATE STM32H743xx
     _init=nx_h743_dma_fixture_init _fini=nx_h743_dma_fixture_fini)
 target_compile_options(nexus_h743_dma_factory_test PRIVATE
@@ -59,7 +61,8 @@ nexus_google_test(nexus_h743_receive_test SOURCES h743_receive_test.cpp
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_receive_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_receive_test)
 target_compile_definitions(nexus_h743_receive_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_receive_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_dma_model.h")
@@ -95,7 +98,8 @@ nexus_google_test(nexus_h743_receive_factory_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_receive_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_h743_receive_factory_test)
 target_compile_definitions(nexus_h743_receive_factory_test PRIVATE STM32H743xx
     _init=nx_h743_receive_fixture_init _fini=nx_h743_receive_fixture_fini)
 target_compile_options(nexus_h743_receive_factory_test PRIVATE

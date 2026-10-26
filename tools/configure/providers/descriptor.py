@@ -88,7 +88,7 @@ _DESCRIPTORS = MappingProxyType({
         'cmake/package/verification/io_evolution/consumers/native-time-empty.c',
     )),
     "stm32f103": FamilyDescriptor("stm32f103", (
-        ("cmsis_core", "cmsis5"),
+        ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f1", "stm32f1_cmsis"),
         ("hal_driver_f1", "stm32f1_hal")), references="references.json",
         configuration_helpers=("tools/configure/providers/legacy_transport.py",),
@@ -112,7 +112,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32f103/private/stm32f103_provider.h",
             "boards/stm32f103_reference/board.json")),
     "stm32f407": FamilyDescriptor("stm32f407", (
-        ("cmsis_core", "cmsis5"),
+        ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f4", "stm32f4_cmsis"),
         ("hal_driver_f4", "stm32f4_hal")),
         references="references.json", owned_payload=(
@@ -126,11 +126,12 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32f407/drivers/ethernet_frames.c",
             "soc/stm32/stm32f407/private/stm32f407_eth_frames.h")),
     "gd32f470": FamilyDescriptor("gd32f470",
+        (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
         references="references.json", owned_payload=(
             "soc/gd32/gd32f470/drivers/ethernet_frames.c",
             "soc/gd32/gd32f470/private/gd32f470_eth_frames.h")),
-    "gd32f303": FamilyDescriptor("gd32f303", (("cmsis_core", "cmsis5"),),
+    "gd32f303": FamilyDescriptor("gd32f303", (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f30x/source.lock.json",
         configuration_helpers=("tools/configure/providers/legacy_transport.py",),
         references="references.json", owned_payload=(
@@ -173,7 +174,7 @@ _DESCRIPTORS = MappingProxyType({
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_fwdgt.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dbg.h")),
     "stm32g474": FamilyDescriptor("stm32g474", (
-        ("cmsis_core", "cmsis5"),
+        ("cmsis_core", "cmsis_core"),
         ("cmsis_device_g4", "stm32g4_cmsis"),
         ("hal_driver_g4", "stm32g4_hal")), references="references.json",
         configuration_helpers=tuple("tools/configure/providers/stm32g474/" + name
@@ -209,7 +210,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
             "boards/stm32g474re_hse24_reference/board.json")),
     "stm32h743": FamilyDescriptor("stm32h743", (
-        ("cmsis_core", "cmsis5"),
+        ("cmsis_core", "cmsis_core"),
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
             "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
             "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c",
@@ -279,7 +280,7 @@ _DESCRIPTORS = MappingProxyType({
             "boards/stm32h743zi_hsi_reference/board.json",
             "boards/stm32h743zi_rtscts_reference/board.json")),
     "stm32u575": FamilyDescriptor("stm32u575", (
-        ("cmsis_core", "cmsis5"),
+        ("cmsis_core", "cmsis_core"),
         ("cmsis_device_u5", "stm32u5_cmsis"),
         ("hal_driver_u5", "stm32u5_hal")), owned_payload=(
             "soc/stm32/stm32u575/CMakeLists.txt", "soc/stm32/stm32u575/system.c",

@@ -32,6 +32,17 @@ against the selected Git dependency and imported SDK bytes. The lock records the
 reviewed LL headers and license; it is not a declaration that all HAL modules are
 compiled, supported or validated.
 
+CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The
+Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family
+entries while keeping their Device/startup, HAL/LL and imported vendor bytes.
+The internal `nexus_cmsis_core` target supplies CPU headers; it does not change
+public Nexus types, Arch context/ownership contracts or the selected peripheral
+state machine. [Vendor versions](../../vendors/VERSIONS.md) distinguishes the
+release, Core version macros, literal pack metadata and license identities.
+Actual include closure, firmware links and installed-SDK consumption require
+current-source evidence; a common Core pin does not transfer F4 qualification to
+G4, H7, U5 or GD32.
+
 The selected production approach uses official LL operations inside existing F407
 provider state machines. It retains request admission, absolute deadlines, wire
 completion, cancellation, drain and quarantine. A full HAL Handle/callback

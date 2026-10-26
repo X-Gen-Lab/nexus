@@ -128,7 +128,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         device = module.dependency_entries(ROOT, profile.cmsis_directory)
         self.assertTrue({'Include/stm32u5xx.h', 'Include/stm32u575xx.h',
                          'Include/system_stm32u5xx.h'}.issubset(device))
-        core = module.dependency_entries(ROOT, 'vendors/arm/CMSIS_5')
+        core = module.dependency_entries(ROOT, 'vendors/arm/CMSIS_6')
         self.assertIn('CMSIS/Core/Include/core_cm33.h', core)
 
     def test_g4_exact_closed_graph_adds_transitive_hal_definitions_only(self):

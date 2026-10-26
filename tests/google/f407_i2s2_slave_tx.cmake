@@ -19,7 +19,8 @@ nexus_google_test(nexus_f407_i2s2_slave_tx_test
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_f407_i2s2_slave_tx_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_f407_i2s2_slave_tx_test)
 target_compile_definitions(nexus_f407_i2s2_slave_tx_test PRIVATE STM32F407xx
     NEXUS_STM32_MODEL=1 NX_F407_I2S_FLASH_BYTES=524288)
 target_compile_options(nexus_f407_i2s2_slave_tx_test PRIVATE

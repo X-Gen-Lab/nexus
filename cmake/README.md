@@ -20,6 +20,19 @@ ABI flags and selected static bindings once. It does not initialize application
 components or start a scheduler. Products own tasks, stack/TCB and queue storage,
 Flash regions and shutdown policy. Vendor includes stay private to providers.
 
+The internal `nexus_cmsis_core` target in `platform/CMSISCore.cmake` owns the
+single pinned CMSIS-Core include tree. Family implementation targets use
+`nexus_use_cmsis_core(target)`; callers do not add a second bundled Core include
+root or override `NEXUS_CMSIS_CORE_INCLUDE_DIR` as a product setting. This is
+separate from the public `Nexus::Core` target and does not export vendor types
+through ordinary Nexus interfaces. Device/startup and HAL/LL remain family-owned.
+
+Including the helper only derives its owned path; selecting an MCU
+implementation performs the header-presence check and sets
+`CMSIS_DISABLE_DEPRECATED=1`. Ordinary Native production configuration does not
+require an Arm Core checkout. Native MCU-model fixtures explicitly opt into
+the corresponding private dependency.
+
 The installed SDK contains source and exported `find_package(Nexus CONFIG)`
 helpers, not a precompiled universal MCU library. To prepare and verify it:
 
@@ -33,6 +46,15 @@ marked development fixture cannot be published. Relocate the complete prefix;
 file hashes, licensing, dependencies and the CMake exports are verified. Actual
 C/C++ Native execution and both MCU-family ARM relocation contracts live in
 `tests/contracts/test_source_sdk.py`.
+
+The source package retains the complete recursive CMSIS-Core `Include` tree
+and its Apache-2.0 `LICENSE` from official v6.4.0 at the locked commit. Compiler
+and architecture header closure is preserved; Core templates, RTOS components
+and the rest of the upstream repository are not implicitly packaged or enabled.
+The unchanged GigaDevice imports may still contain older bundled Core files;
+retaining their original source/notices is distinct from compiling against them.
+Actual include-closure, selected ARM and relocated-SDK checks establish the
+migration's software scope; the version inventory alone establishes none of it.
 
 Board packages are read-only `board.json` facts with provenance and reviewed
 wiring. SoC resources and route catalogs live in `soc/<family>`. Unreviewed

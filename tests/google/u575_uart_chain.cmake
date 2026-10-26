@@ -42,7 +42,8 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
 foreach(target nexus_u575_uart_chain_test nexus_u575_uart_chain_factory_test)
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE STM32U575xx)
     nexus_stm32_official(${target} u5)
 endforeach()

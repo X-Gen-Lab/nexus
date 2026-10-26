@@ -811,7 +811,7 @@
     "pin:PG10"
   ],
   "source_lock": {
-    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_core": "af1b110e46a1720349f6f125e386e126767699bd",
     "cmsis_device_g4": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
     "hal_driver_g4": "f5929f431f9effe45fbe18f5337e4753ced9ac92"
   },

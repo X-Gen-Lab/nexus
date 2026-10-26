@@ -31,14 +31,15 @@ foreach(can_family stm32 gd32)
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${can_target})
         target_compile_definitions(${can_target} PRIVATE STM32F407xx NX_CAN_TEST_STM32 NX_CAN_FACTORY_STM32)
     else()
         set(can_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
-            "${can_gd}/CMSIS" "${can_gd}/CMSIS/GD/GD32F4xx/Include"
+            "${can_gd}/CMSIS/GD/GD32F4xx/Include"
             "${can_gd}/GD32F4xx_standard_peripheral/Include")
         target_compile_definitions(${can_target} PRIVATE GD32F470 HXTAL_VALUE=25000000)
         target_include_directories(${can_target} PRIVATE

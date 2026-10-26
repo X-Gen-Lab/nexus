@@ -16,7 +16,8 @@ nexus_google_test(${gd303_target}
 target_include_directories(${gd303_target} SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(${gd303_target})
 target_compile_definitions(${gd303_target} PRIVATE GD32F30X_HD)
 target_compile_options(${gd303_target} PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.h")
@@ -58,7 +59,8 @@ nexus_google_test(nexus_gd32f303_factory_test SOURCES gd32f303_factory_test.cpp
 target_include_directories(nexus_gd32f303_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_gd32f303_factory_test)
 target_compile_definitions(nexus_gd32f303_factory_test PRIVATE GD32F30X_HD
     _init=nx_gd303_fixture_init _fini=nx_gd303_fixture_fini)
 target_compile_options(nexus_gd32f303_factory_test PRIVATE
@@ -100,7 +102,8 @@ nexus_google_test(nexus_gd32f303_spi_factory_test SOURCES gd32f303_spi_factory_t
 target_include_directories(nexus_gd32f303_spi_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_gd32f303_spi_factory_test)
 target_compile_definitions(nexus_gd32f303_spi_factory_test PRIVATE GD32F30X_HD
     _init=nx_gd303_fixture_init _fini=nx_gd303_fixture_fini)
 target_compile_options(nexus_gd32f303_spi_factory_test PRIVATE

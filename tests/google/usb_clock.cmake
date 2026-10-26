@@ -14,7 +14,8 @@ foreach(clock_family stm32f407 gd32f470)
     if(clock_family STREQUAL "stm32f407")
         target_include_directories(${clock_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${clock_target})
         target_compile_definitions(${clock_target} PRIVATE STM32F407xx)
     else()
         set(clock_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")

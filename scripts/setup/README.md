@@ -6,9 +6,16 @@ repository tools and both local Git hooks for each clone:
 ```sh
 python scripts/setup/install_dev_tools.py
 .venv/bin/python -m pip install -r requirements.txt
-git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
+git submodule update --init --recursive
 python tools/dev/dev.py doctor
 ```
+
+The committed graph includes the shared `vendors/arm/CMSIS_6` Core source and
+the selected ST/GigaDevice Device and driver dependencies. CMSIS-Core is pinned
+to official v6.4.0; exact release, header-version and pack-metadata identities
+are recorded in [vendor versions](../../vendors/VERSIONS.md). It is a private
+implementation dependency, distinct from public `Nexus::Core`. Initializing
+these sources does not establish support for every upstream component or chip.
 
 The installer preserves existing hooks using pre-commit's migration and rejects
 an explicit `core.hooksPath`. CI uses `--skip-hooks` and executes the same checks.

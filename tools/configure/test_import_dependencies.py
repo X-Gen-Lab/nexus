@@ -13,8 +13,8 @@ class ImportedDependencyContracts(unittest.TestCase):
     def test_imported_family_also_binds_its_pinned_cmsis_core(self):
         result = configure.resolve(ASSEMBLY, ROOT)
         records = {item["path"]: item for item in result["source_dependencies"]}
-        self.assertEqual(records["vendors/arm/CMSIS_5"]["commit"],
-                         "55b19837f5703e418ca37894d5745b1dc05e4c91")
+        self.assertEqual(records["vendors/arm/CMSIS_6"]["commit"],
+                         "af1b110e46a1720349f6f125e386e126767699bd")
         self.assertEqual(records["vendors/gigadevice/gd32f30x"]["kind"],
                          "vendor-source-import")
 

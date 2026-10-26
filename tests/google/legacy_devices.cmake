@@ -12,7 +12,8 @@ target_compile_options(nexus_legacy_devices_test PRIVATE
 function(nexus_legacy_device_factory family)
     if(family STREQUAL "stm32f103")
         set(short f103)
-        set(definitions STM32F103xB __ARM_ARCH_7M__=1 NX_LEGACY_FACTORY_F103)
+        set(definitions STM32F103xB __ARM_ARCH_7M__=1 __ARM_FEATURE_LDREX=7
+            NX_LEGACY_FACTORY_F103)
         set(vendor "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include"
             "${NEXUS_SOURCE_DIR}/vendors/st/stm32f1_hal/Inc")
     else()
@@ -62,7 +63,8 @@ function(nexus_legacy_device_factory family)
         INCLUDES "${bundle}" "${NEXUS_SOC_SOURCE_${family}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/${family}_model")
     target_include_directories(${target} SYSTEM PRIVATE ${vendor}
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE ${definitions}
         _init=nx_legacy_fixture_init _fini=nx_legacy_fixture_fini)
     target_compile_options(${target} PRIVATE
@@ -77,8 +79,7 @@ function(nexus_physical_flash_program_test family)
     if(family STREQUAL "stm32")
         set(soc stm32f407)
         set(definitions NEXUS_STM32_MODEL STM32F407xx NX_FLASH_PROGRAM_STM32)
-        set(includes "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        set(includes "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     else()
         set(soc gd32f470)
         set(definitions GD32F470 HXTAL_VALUE=25000000)
@@ -115,6 +116,7 @@ function(nexus_physical_flash_program_test family)
             "${NEXUS_SOC_SOURCE_${soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_include_directories(${target} SYSTEM PRIVATE ${includes})
+    # Both pulse fixtures use the complete host Core model selected above.
     target_compile_definitions(${target} PRIVATE ${definitions}
         _init=nx_flash_fixture_init _fini=nx_flash_fixture_fini)
     target_compile_options(${target} PRIVATE

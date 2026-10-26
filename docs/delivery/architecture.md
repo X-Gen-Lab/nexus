@@ -124,6 +124,15 @@ CMake 中 `Nexus::Platform` 导出配置、typed factory 和不可变接口；SD
 provider storage 只对实现与生成 binding TU 可见。公共消费路径没有厂商 SDK ABI。
 外部 firmware 通过 `nexus_add_firmware()` 显式装入 startup/system/linker 和资源校验。
 
+七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup
+及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和
+`nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制
+不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core
+字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和
+许可证身份见[供应商版本](../../vendors/VERSIONS.md)。这一依赖迁移不改变公共
+Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域；
+实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。
+
 ## 固定对象与执行
 
 CPU 原语、特权、中断屏蔽和 FreeRTOS 启动合同见

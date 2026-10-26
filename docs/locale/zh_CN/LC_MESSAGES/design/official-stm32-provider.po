@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c69c8ab13ba94aba9903e7827d6bc2c8aa81225d8baa9d04d72e7315bd424d5b\n"
+"X-Nexus-Source-SHA256: 234b72b653b59e592d440ee0f53de9d4911dd1cbe06e551e9d9e8f17b1563c62\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -415,3 +415,8 @@ msgid ""
 msgstr ""
 "Bootloader 交接、动态变频、deep STOP、更广的 H743 DMA 和通用 U575 跨域 I/O，继续保留[SoC "
 "完善台账](soc-refinement.md)中各自未实现或部分实现的退出条件。官方驱动不会自动提供这些功能需要的平台合同。"
+
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family entries while keeping their Device/startup, HAL/LL and imported vendor bytes. The internal `nexus_cmsis_core` target supplies CPU headers; it does not change public Nexus types, Arch context/ownership contracts or the selected peripheral state machine. [Vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) distinguishes the release, Core version macros, literal pack metadata and license identities. Actual include closure, firmware links and installed-SDK consumption require current-source evidence; a common Core pin does not transfer F4 qualification to G4, H7, U5 or GD32."
+msgstr "CMSIS Device 配对与共享的 Arm CMSIS-Core 来源分别维护。Core 迁移为七个维护中的 STM32/GD32 family 入口锁定官方 v6.4.0，同时保持各自的 Device/startup、HAL/LL 和供应商导入字节。内部 `nexus_cmsis_core` 目标提供 CPU 头，不改变公共 Nexus 类型、Arch 上下文／所有权合同或已选外设状态机。[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)分别记录发布版本、Core 版本宏、原始 pack 元数据和许可证身份。实际 include 闭包、固件链接和安装后 SDK 消费都需要当前源码的执行证据；使用同一 Core pin 不会把 F4 的资格转移给 G4、H7、U5 或 GD32。"

@@ -41,7 +41,7 @@ class G474ConfigurationTests(unittest.TestCase):
         with patch.object(gate, "dependency_identity", wraps=gate.dependency_identity) as dependency:
             result = gate.resolve_ir(self.assembly())
         paths = [call.args[1] for call in dependency.call_args_list]
-        self.assertEqual(paths, ["vendors/arm/CMSIS_5", "vendors/st/cmsis_device_g4",
+        self.assertEqual(paths, ["vendors/arm/CMSIS_6", "vendors/st/cmsis_device_g4",
                                  "vendors/st/stm32g4_hal"])
         self.assertNotIn("vendors/st/cmsis_device_f4", paths)
         self.assertEqual(result["source_dependencies"][1]["commit"],

@@ -222,7 +222,7 @@ def constructor(item, result, prefix):
         if item.kind == "spi":
             body += [f"    if (({controller}->SR & SPI_SR_BSY) != 0u) {{ return NX_ERROR_BUSY; }}"]
     for index, (_, irq, _) in enumerate(vectors):
-        body += [f"    s_nx_pair_priorities_{name}[{index}] = NVIC->IP[{irq}];"]
+        body += [f"    s_nx_pair_priorities_{name}[{index}] = NVIC->IPR[{irq}];"]
     body += [f"    s_nx_pair_vectors_{name} = true;"]
     for index, pin in enumerate(pins):
         wire, function = pin["pin"], pin["function"]
@@ -294,9 +294,9 @@ def constructor(item, result, prefix):
     body += [f"    if (({apb} & {gate}) == 0u) {{ return NX_ERROR_IO; }}"]
     for _, irq, _ in vectors:
         bank, mask = irq // 32, 1 << (irq % 32)
-        body += [f"    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[{irq}], {item.options.irq.priority << 4}u);",
+        body += [f"    NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[{irq}], {item.options.irq.priority << 4}u);",
                  "    nx_arch_dsb();",
-                 f"    if (NVIC->IP[{irq}] != {item.options.irq.priority << 4}u || (NVIC->ISER[{bank}] & {mask}u) == 0u) {{ return NX_ERROR_IO; }}"]
+                 f"    if (NVIC->IPR[{irq}] != {item.options.irq.priority << 4}u || (NVIC->ISER[{bank}] & {mask}u) == 0u) {{ return NX_ERROR_IO; }}"]
     body += ["    return NX_SUCCESS;", "}"]
     stop = [f"static nx_result_t stop_{name}(void) {{", "    nx_result_t status;",
             f"    if (s_nx_pair_constructed_{name}) {{",
@@ -309,9 +309,9 @@ def constructor(item, result, prefix):
         stop += [f"        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[{bank}], {mask}u);",
                  f"        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[{bank}], {mask}u);", "        nx_arch_dsb();",
                  f"        if (((NVIC->ISER[{bank}] | NVIC->ISPR[{bank}] | NVIC->IABR[{bank}]) & {mask}u) != 0u) {{ return NX_ERROR_BUSY; }}",
-                 f"        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[{irq}], s_nx_pair_priorities_{name}[{index}]);",
+                 f"        NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[{irq}], s_nx_pair_priorities_{name}[{index}]);",
                  "        nx_arch_dsb();",
-                 f"        if (NVIC->IP[{irq}] != s_nx_pair_priorities_{name}[{index}]) {{ return NX_ERROR_IO; }}"]
+                 f"        if (NVIC->IPR[{irq}] != s_nx_pair_priorities_{name}[{index}]) {{ return NX_ERROR_IO; }}"]
     stop += [f"        s_nx_pair_vectors_{name} = false;", "    }"]
     # All active-low CS outputs observe inactive drive before any pin release.
     for index, pin in enumerate(pins):

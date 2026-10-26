@@ -28,7 +28,8 @@ foreach(family IN ITEMS h743 u575)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/${family}_model.h")
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_${sdk}/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${target})
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
     nexus_stm32_official(${target} ${sdk})
 endforeach()

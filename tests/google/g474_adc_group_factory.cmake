@@ -44,7 +44,8 @@ foreach(profile regular-software regular-timer injected-software injected-timer)
     nexus_stm32_official("${group_target}" g4)
     target_include_directories("${group_target}" SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core("${group_target}")
     target_compile_definitions("${group_target}" PRIVATE STM32G474xx
         NX_G474_ADC_GROUP_EXTERNAL_CORE
         _init=nx_g474_adc_group_fixture_init _fini=nx_g474_adc_group_fixture_fini)

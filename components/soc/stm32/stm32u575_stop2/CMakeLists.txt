@@ -1,5 +1,6 @@
 # Exact optional SoC Stop2 owner. External products explicitly link this target.
 # Author: Nexus Team
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/platform/CMSISCore.cmake")
 if(NOT NEXUS_SOC_FAMILY STREQUAL "stm32u575" OR
         NOT NEXUS_BACKEND STREQUAL "baremetal" OR
         NOT NEXUS_ARCH_SECURITY_STATE EQUAL 0)
@@ -19,8 +20,8 @@ target_include_directories(nexus_stm32u575_stop2 PUBLIC
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
     "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
 target_include_directories(nexus_stm32u575_stop2 SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include")
+nexus_use_cmsis_core(nexus_stm32u575_stop2)
 target_link_libraries(nexus_stm32u575_stop2 PUBLIC Nexus::U575RetainedTime
     Nexus::ClockDomain PRIVATE Nexus::Arch nexus_build_options
     nexus_owned_warnings)
@@ -42,8 +43,8 @@ if(TARGET Nexus::U575LpdmaCopy)
         "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
         "${NEXUS_SOURCE_DIR}/components/soc/stm32/stm32u575_lpdma_copy/private")
     target_include_directories(nexus_stm32u575_stop2_copy SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include")
+    nexus_use_cmsis_core(nexus_stm32u575_stop2_copy)
     target_link_libraries(nexus_stm32u575_stop2_copy PUBLIC
         Nexus::U575LpdmaCopy Nexus::U575RetainedTime Nexus::ClockDomain
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
@@ -66,8 +67,8 @@ if(TARGET Nexus::U575LpdmaLptim1)
         "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
         "${NEXUS_SOURCE_DIR}/components/soc/stm32/stm32u575_lpdma_lptim1/private")
     target_include_directories(nexus_stm32u575_stop2_lptim1 SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include")
+    nexus_use_cmsis_core(nexus_stm32u575_stop2_lptim1)
     target_link_libraries(nexus_stm32u575_stop2_lptim1 PUBLIC
         Nexus::U575LpdmaLptim1 Nexus::U575RetainedTime Nexus::ClockDomain
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)

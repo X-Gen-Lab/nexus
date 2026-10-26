@@ -15,7 +15,8 @@ target_include_directories(nexus_freertos_mpu_gpio_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/ext/freertos/include"
     "${NEXUS_SOURCE_DIR}/ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_freertos_mpu_gpio_test)
 target_compile_definitions(nexus_freertos_mpu_gpio_test PRIVATE STM32U575xx
     NEXUS_OS_MPU_GPIO=1 NEXUS_ARCH_MPU_VERSION=8 NEXUS_CPU_HAS_BASEPRI=1
     NX_U575_MPU_USER_MODEL=1)

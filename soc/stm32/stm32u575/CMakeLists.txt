@@ -1,6 +1,7 @@
 # Reviewed U575 GPIO/USART slice; official CMSIS inputs remain private.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(u5_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5")
-set(u5_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+nexus_cmsis_core_include(u5_cmsis)
 set(u5_lock "${NEXUS_SOURCE_DIR}/dependencies/stm32u5.lock.json")
 set(u5_verifier "${NEXUS_SOURCE_DIR}/tools/maintenance/cmsis_device_lock.py")
 execute_process(
@@ -78,7 +79,8 @@ if(u5_sources)
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${NEXUS_SOURCE_DIR}/io/private")
     target_include_directories(nexus_soc_stm32u575 SYSTEM PRIVATE
-        "${u5_device}/Include" "${u5_cmsis}")
+        "${u5_device}/Include")
+    nexus_use_cmsis_core(nexus_soc_stm32u575)
     target_compile_definitions(nexus_soc_stm32u575 PRIVATE STM32U575xx)
     if(u5_rtc_modes OR u5_spi_modes OR u5_i2c_modes OR u5_adc_modes OR u5_pwm_modes OR
             "dma-tx" IN_LIST u5_uart_modes OR

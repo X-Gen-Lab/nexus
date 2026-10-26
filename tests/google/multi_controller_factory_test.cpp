@@ -329,11 +329,11 @@ extern "C" void nx_multi_factory_irq_pending_clear(int irq) {
 }
 extern "C" void nx_multi_factory_irq_priority(int irq, uint32_t priority) {
     if (irq >= 0 && irq < 240)
-        nx_multi_factory_priority_write(&NVIC->IP[(unsigned)irq],
+        nx_multi_factory_priority_write(&NVIC->IPR[(unsigned)irq],
                                         static_cast<uint8_t>(priority << 4U));
 }
 extern "C" uint32_t nx_multi_factory_irq_get_priority(int irq) {
-    return irq >= 0 && irq < 240 ? NVIC->IP[(unsigned)irq] >> 4U : 0U;
+    return irq >= 0 && irq < 240 ? NVIC->IPR[(unsigned)irq] >> 4U : 0U;
 }
 /** \brief Reset only the selected SPI peripheral, preserving its peer. */
 extern "C" void nx_multi_factory_spi_reset(volatile uint32_t* reg,
@@ -812,7 +812,7 @@ TEST_F(MultipleFactory, RefusedPendingJoinKeepsTheSelectedSession) {
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
 }
 TEST_F(MultipleFactory, ColdPriorityRefusalReversesTheConstructedProvider) {
-    s_priority_refused = &NVIC->IP[(unsigned)SECONDARY_UART_DMA_IRQ];
+    s_priority_refused = &NVIC->IPR[(unsigned)SECONDARY_UART_DMA_IRQ];
     nx_platform_start_result_t result = nx_platform_start();
     EXPECT_EQ(result.primary, NX_ERROR_IO);
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
@@ -861,7 +861,7 @@ TEST_F(MultipleFactory, StopProvesInactiveCsBeforeRestoringAnySelectedSpiPin) {
 }
 TEST_F(MultipleFactory, RefusedSelectedPriorityRestoreRetainsColdLease) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
-    s_priority_refused = &NVIC->IP[(unsigned)SECONDARY_SPI_RX_IRQ];
+    s_priority_refused = &NVIC->IPR[(unsigned)SECONDARY_SPI_RX_IRQ];
     EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
     s_priority_refused = nullptr;

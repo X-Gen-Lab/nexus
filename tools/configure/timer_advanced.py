@@ -128,9 +128,9 @@ def constructor(item, result, prefix):
               f"        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[{bank}], {bit}u);",
               f"        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[{bank}], {bit}u);", "        nx_arch_dsb();",
               f"        if (((NVIC->ISER[{bank}] | NVIC->ISPR[{bank}] | NVIC->IABR[{bank}]) & {bit}u) != 0u) {{ return NX_ERROR_BUSY; }}",
-              f"        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[{irq}], s_nx_timer_priority_saved_{name});",
+              f"        NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[{irq}], s_nx_timer_priority_saved_{name});",
               "        nx_arch_dsb();",
-              f"        if (NVIC->IP[{irq}] != s_nx_timer_priority_saved_{name}) {{ return NX_ERROR_IO; }}",
+              f"        if (NVIC->IPR[{irq}] != s_nx_timer_priority_saved_{name}) {{ return NX_ERROR_IO; }}",
               f"        s_nx_timer_irq_leased_{name} = false;", "    }",
               f"    status = nx_{prefix}_{kind}_release(&{state});",
               "    if (status != NX_SUCCESS) { return status; }"]
@@ -186,7 +186,7 @@ def constructor(item, result, prefix):
     if not capture:
         shared = "TIM9->DIER" if stm else "TIMER_DMAINTEN(TIMER8)"
         lines += [f"    if ({shared} != 0u) {{ return NX_ERROR_BUSY; }}"]
-    lines += [f"    s_nx_timer_priority_saved_{name} = NVIC->IP[{irq}];",
+    lines += [f"    s_nx_timer_priority_saved_{name} = NVIC->IPR[{irq}];",
               f"    s_nx_timer_irq_leased_{name} = true;"]
     for index, pin in enumerate(item["pins"]):
         wire = pin["pin"]
@@ -199,10 +199,10 @@ def constructor(item, result, prefix):
                   "    if (status != NX_SUCCESS) { return status; }"]
     lines += [f"    status = nx_{prefix}_{kind}_initialize(&{state}, &s_nx_timer_config_{name});",
               "    if (status != NX_SUCCESS) { return status; }",
-              f"    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[{irq}], {options.irq.priority << 4}u);",
+              f"    NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[{irq}], {options.irq.priority << 4}u);",
               f"    NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[{bank}], {bit}u);",
               f"    NX_PLATFORM_REGISTER_WRITE(NVIC->ISER[{bank}], {bit}u);", "    nx_arch_dsb();",
-              f"    if (NVIC->IP[{irq}] != {options.irq.priority << 4}u || (NVIC->ISER[{bank}] & {bit}u) == 0u || (NVIC->ISPR[{bank}] & {bit}u) != 0u) {{ return NX_ERROR_IO; }}",
+              f"    if (NVIC->IPR[{irq}] != {options.irq.priority << 4}u || (NVIC->ISER[{bank}] & {bit}u) == 0u || (NVIC->ISPR[{bank}] & {bit}u) != 0u) {{ return NX_ERROR_IO; }}",
               "    return NX_SUCCESS;", "}", f"void {vector}_IRQHandler(void);",
               "/** \\brief Bounded dispatch from the exclusively leased vector. */",
               f"void {vector}_IRQHandler(void) {{ nx_{prefix}_{kind}_irq(&{state}); }}"]

@@ -18,7 +18,8 @@ foreach(can_family stm32 gd32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        nexus_use_cmsis_core(${can_target})
         target_compile_definitions(${can_target} PRIVATE
             NX_CAN_SOC_STM32 NEXUS_STM32_MODEL STM32F407xx)
     else()

@@ -2,9 +2,9 @@
 	path = ext/freertos
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 
-[submodule "vendors/arm/CMSIS_5"]
-	path = vendors/arm/CMSIS_5
-	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "vendors/arm/CMSIS_6"]
+	path = vendors/arm/CMSIS_6
+	url = https://github.com/ARM-software/CMSIS_6.git
 
 [submodule "vendors/st/cmsis_device_f4"]
 	path = vendors/st/cmsis_device_f4

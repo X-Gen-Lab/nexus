@@ -54,9 +54,8 @@ static nx_result_t cpu_ready(void) {
         NX_F407_READ(MPU->CTRL) != 0U ||
         (NX_F407_READ(SCB->CCR) & ((1U << 16U) | (1U << 17U))) != 0U ||
         NX_F407_READ(SCB->SCR) != 0U ||
-        (NX_F407_READ(CoreDebug->DHCSR) & 0xfU) != 0U ||
-        NX_F407_READ(CoreDebug->DEMCR) != 0U ||
-        NX_F407_READ(FLASH->ACR) != 0U) {
+        (NX_F407_READ(DCB->DHCSR) & 0xfU) != 0U ||
+        NX_F407_READ(DCB->DEMCR) != 0U || NX_F407_READ(FLASH->ACR) != 0U) {
         return NX_ERROR_UNSUPPORTED;
     }
     const uint32_t pending = SCB_ICSR_VECTACTIVE_Msk |

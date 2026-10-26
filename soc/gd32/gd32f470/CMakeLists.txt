@@ -1,4 +1,5 @@
 # Exact GD32F470ZGT6 implementation; SDK headers stay private to this target.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/CMSISCore.cmake")
 set(gd_vendor "${PROJECT_SOURCE_DIR}/vendors/gigadevice/gd32f4xx")
 if(DEFINED NEXUS_SOURCE_DIR)
     set(gd_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx")
@@ -12,6 +13,7 @@ if(NOT gd_sdk_verified EQUAL 0)
     message(FATAL_ERROR "GD32 SDK lock failed: ${gd_sdk_output}${gd_sdk_error}")
 endif()
 set(gd_firmware "${gd_vendor}/Firmware")
+nexus_cmsis_core_include(gd_core)
 set(gd_device "${gd_firmware}/CMSIS/GD/GD32F4xx")
 set(gd_peripheral "${gd_firmware}/GD32F4xx_standard_peripheral")
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
@@ -102,8 +104,9 @@ foreach(unit IN LISTS gd_sdk_units)
 endforeach()
 target_include_directories(nexus_gd32_sdk PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/private")
-target_include_directories(nexus_gd32_sdk SYSTEM PRIVATE "${gd_firmware}/CMSIS"
+target_include_directories(nexus_gd32_sdk SYSTEM PRIVATE
     "${gd_device}/Include" "${gd_peripheral}/Include")
+nexus_use_cmsis_core(nexus_gd32_sdk)
 target_link_libraries(nexus_gd32_sdk PRIVATE nexus_build_options)
 target_compile_definitions(nexus_gd32_sdk PRIVATE GD32F470 HXTAL_VALUE=25000000)
 add_library(nexus_soc_gd32f470 STATIC ${gd_sources})
@@ -115,9 +118,10 @@ target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../../common"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/private")
 target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
-    "${gd_firmware}/CMSIS" "${gd_device}/Include"
+    "${gd_device}/Include"
     "${gd_peripheral}/Include"
     "${gd_firmware}/GD32F4xx_usb_library/driver/Include")
+nexus_use_cmsis_core(nexus_soc_gd32f470)
 target_compile_definitions(nexus_soc_gd32f470 PRIVATE GD32F470
     HXTAL_VALUE=25000000)
 set(NEXUS_STARTUP_SOURCE "${gd_device}/Source/GCC/startup_gd32f450_470.S"
@@ -131,7 +135,7 @@ set(NEXUS_SYSTEM_SOURCE ${gd_system_sources} PARENT_SCOPE)
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/private"
     PARENT_SCOPE)
-set(NEXUS_SYSTEM_VENDOR_INCLUDES "${gd_firmware}/CMSIS"
+set(NEXUS_SYSTEM_VENDOR_INCLUDES "${gd_core}"
     "${gd_device}/Include" "${gd_peripheral}/Include" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS GD32F470 HXTAL_VALUE=25000000 PARENT_SCOPE)
 
@@ -152,8 +156,9 @@ function(nexus_add_gd32f470_sleep target)
         "${sleep_source}/components/clock_domain/private")
     set(sleep_vendor "${sleep_source}/vendors/gigadevice/gd32f4xx/Firmware")
     target_include_directories(${target} SYSTEM PRIVATE
-        "${sleep_vendor}/CMSIS" "${sleep_vendor}/CMSIS/GD/GD32F4xx/Include"
+        "${sleep_vendor}/CMSIS/GD/GD32F4xx/Include"
         "${sleep_vendor}/GD32F4xx_standard_peripheral/Include")
+    nexus_use_cmsis_core(${target})
     target_compile_definitions(${target} PRIVATE GD32F470 HXTAL_VALUE=25000000)
 endfunction()
 
@@ -166,8 +171,9 @@ if(NEXUS_OS_TIMEBASE_LOWPOWER)
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${NEXUS_SOURCE_DIR}/os/freertos/private")
     target_include_directories(nx_gd32f470_lowpower_binding SYSTEM PRIVATE
-        "${gd_firmware}/CMSIS" "${gd_device}/Include"
+        "${gd_device}/Include"
         "${gd_peripheral}/Include")
+    nexus_use_cmsis_core(nx_gd32f470_lowpower_binding)
     target_compile_definitions(nx_gd32f470_lowpower_binding PRIVATE GD32F470
         HXTAL_VALUE=25000000)
     target_compile_definitions(nexus_soc_gd32f470 PRIVATE

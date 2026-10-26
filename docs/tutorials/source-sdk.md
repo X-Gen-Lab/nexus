@@ -125,6 +125,16 @@ files reject configuration. A package made with `--development-fixture` remains
 nonpublishable and requires `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON` in its consumer.
 Never use that opt-in to bypass release qualification.
 
+The SDK retains the complete recursive CMSIS-Core `Include` tree and its
+Apache-2.0 `LICENSE` from the locked official v6.4.0 source. It does not include
+the entire CMSIS repository or automatically enable CMSIS-RTOS, CMSIS-Driver,
+DSP or NN. These private implementation headers are distinct from the public
+`Nexus::Core` mechanisms. Device/startup and HAL/LL remain separately locked;
+older bundled GigaDevice Core files retain their original bytes and notices
+without becoming the selected common Core. Verify the complete moved prefix,
+not a manually copied subset of headers. This dependency update does not expand
+supported chips or replace current-source compiler and consumer evidence.
+
 The formal installed-prefix verifier requires the locked ARM compiler on `PATH`
 in addition to host tools. It builds Native C/C++ and the maintained MCU consumers:
 

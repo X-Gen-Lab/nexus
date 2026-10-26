@@ -210,9 +210,8 @@ static nx_result_t preflight(bool alarm_copy) {
         NX_STOP_READ(MPU->CTRL) != 0U ||
         (NX_STOP_READ(FPU->FPCCR) & FPU_FPCCR_LSPACT_Msk) != 0U ||
         NX_STOP_READ(SCB->SCR) != 0U ||
-        (NX_STOP_READ(CoreDebug->DHCSR) & 0xfU) != 0U ||
-        NX_STOP_READ(CoreDebug->DEMCR) != 0U ||
-        NX_STOP_READ(DBGMCU->CR) != 0U ||
+        (NX_STOP_READ(DCB->DHCSR) & 0xfU) != 0U ||
+        NX_STOP_READ(DCB->DEMCR) != 0U || NX_STOP_READ(DBGMCU->CR) != 0U ||
         (NX_STOP_READ(RCC->BDCR) & (RCC_BDCR_LSION | RCC_BDCR_LSIRDY)) != 0U)
         return NX_ERROR_UNSUPPORTED;
     if (g_nx_stm32u575_system.started ||

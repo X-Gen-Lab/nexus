@@ -45,7 +45,8 @@ nexus_google_test(${g4_fdcan_target}
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(${g4_fdcan_target} SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
-    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(${g4_fdcan_target})
 target_compile_definitions(${g4_fdcan_target} PRIVATE STM32G474xx
     USE_RTOS=0 USE_HAL_FDCAN_REGISTER_CALLBACKS=0
     NX_G474_FDCAN_FACTORY_NORMAL=${g4_fdcan_normal}
