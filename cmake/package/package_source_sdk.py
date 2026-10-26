@@ -30,6 +30,7 @@ try:
         stm32g4_lock, threadx_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
+    from tools.configure import dependencies as configuration_dependencies
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -58,7 +59,6 @@ REQUIRED_FILES = (
     'io/include/nexus/io/usb_profile.h',
     'io/include/nexus/io/usb_activation.h',
     'io/src/mechanisms/usb_profile.c',
-    'tools/configure/usb_profiles.py',
     'components/usb_control/CMakeLists.txt',
     'components/usb_control/include/nexus/components/usb_control.h',
     'components/usb_control/include/nexus/components/usb_descriptors.h',
@@ -93,17 +93,14 @@ REQUIRED_FILES = (
     "components/owner_observer/src/owner_observer.c",
     "soc/gd32/gd32f470/memory_init.c", "soc/gd32/gd32f470/private/memory_init.h",
     "core/src/request.c", "io/include/nexus/io/fwd.h",
-    "soc/native/CMakeLists.txt", "io/include/nexus/io/gpio.h",
+    "io/include/nexus/io/gpio.h",
     "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
     "boards/stm32f407_qiming_v31/board.json",
     "boards/stm32f407ve_sky_qingchun/board.json",
     "boards/gd32f470_liangshan/board.json",
-    "soc/stm32/stm32f407/soc.json", "soc/gd32/gd32f470/soc.json",
-    "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
+    "cmake/platform/Firmware.cmake",
     "cmake/platform/TargetPolicy.cmake", "cmake/platform/Components.cmake",
-    "tools/configure/bundle.py", "tools/configure/dependencies.py",
-    "tools/configure/contracts.py", "tools/configure/matrix.py",
-    "tools/configure/sdk.py", "tools/configure/experience.py",
+    "tools/configure/matrix.py",
     "tools/configure/assemblies/catalogue.json",
     "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
     "tools/dev/change_paths.py",
@@ -113,10 +110,7 @@ REQUIRED_FILES = (
     "tools/evidence/store.py",
     "tools/evidence/environment.py", "tools/evidence/recipe.py",
     "tools/maintenance/stm32_ll_lock.py", "cmake/platform/Workload.cmake",
-    "tools/configure/authored.py", "tools/configure/ir.py",
-    "tools/configure/cpu.py", "tools/configure/runtime.py",
-    "tools/configure/kernel.py", "tools/configure/metadata.py",
-    "tools/configure/memory.py", "tools/configure/can.py", "dependencies/platform-compatibility.json",
+    "dependencies/platform-compatibility.json",
     "os/freertos/tick.c", "os/freertos/include/nexus/os/tick.h",
     "os/CMakeLists.txt", "os/diagnostic.c",
     "os/include/nexus/os/diagnostic.h", "os/freertos/CMakeLists.txt",
@@ -140,11 +134,7 @@ REQUIRED_FILES = (
     "os/freertos/secure/private/hardware.h",
     "os/freertos/secure/context.c", "os/freertos/secure/init.c",
     "cmake/platform/Runtime.cmake", "os/freertos/prepare_m7_integer.py",
-    "tools/configure/providers/__init__.py",
-    "tools/configure/providers/common.py",
-    "tools/__init__.py", "tools/configure/__init__.py",
-    "soc/__init__.py", "soc/stm32/__init__.py", "soc/gd32/__init__.py",
-    "tools/configure/factory.py", "tools/configure/assemblies/native.toml",
+    "tools/configure/assemblies/native.toml",
     "tools/configure/assemblies/qiming-baremetal-uart-dma.toml",
     "tools/configure/assemblies/sky-baremetal.toml",
     "tools/configure/assemblies/liangshan-baremetal.toml",
@@ -157,7 +147,7 @@ REQUIRED_FILES = (
     "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
     "vendors/gigadevice/gd32f4xx/source.lock.json",
     "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",
-    "cmake/package/package_source_sdk.py")
+    )
 MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
@@ -190,9 +180,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "boards/g474-pin-states/board.json", "consumers/pin-states.c",
         "native-time-pair.toml", "native-time-empty.toml",
         "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
-REQUIRED_FILES += ("tools/configure/selected_contracts.py",
-                   "tools/configure/i2s2.py",
-                   "tools/configure/pin_states.py",
+REQUIRED_FILES += (
                    "tools/configure/assemblies/g474-pin-states.toml",
                    "tools/configure/assemblies/h743-high-peripherals.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)
@@ -204,7 +192,6 @@ REQUIRED_FILES += (
     "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
     "soc/native/drivers/ethernet_frames_access.h")
 REQUIRED_FILES += (
-    "soc/stm32/stm32g474/configure/adc_group.py",
     "soc/stm32/stm32g474/reviews/adc-group.json",
     "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c")
 # Required payload identity is separate from CMake's production source graph.
@@ -241,9 +228,8 @@ REQUIRED_FILES += tuple(f"ext/freertos/include/{name}" for name in (
     "mpu_syscall_numbers.h", "deprecated_definitions.h", "timers.h",
     "event_groups.h", "stream_buffer.h"))
 REQUIRED_FILES += (
-    "dependencies/threadx.lock.json", "tools/maintenance/threadx_lock.py",
-    "tools/maintenance/source_catalogue.py", "tools/configure/threadx.py",
-    "tools/configure/lowpower.py", "os/threadx/CMakeLists.txt",
+    "dependencies/threadx.lock.json",
+    "os/threadx/CMakeLists.txt",
     "os/threadx/Kernel.cmake", "os/threadx/threadx.c", "os/threadx/m4.c",
     "os/threadx/m4_vectors.S", "os/threadx/prepare_linux.py",
     "os/threadx/config/tx_user.h", "os/threadx/include/nexus/os/threadx.h")
@@ -254,7 +240,7 @@ threadx_lock.contract(_threadx_lock)
 REQUIRED_FILES += tuple("ext/threadx/" + name for name in _threadx_lock["files"])
 REQUIRED_FILES += ("ext/threadx/" + _threadx_lock["license"]["path"],)
 REQUIRED_FILES += ("dependencies/stm32g4.lock.json",
-                   "tools/maintenance/stm32g4_lock.py")
+                   )
 _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_bytes())
 stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
@@ -275,19 +261,15 @@ for _official in OFFICIAL_DRIVERS:
 REQUIRED_FILES += (
     "core/CMakeLists.txt", "core/src/time.c", "core/src/fault.c",
     "core/src/stack_observation.c", "io/CMakeLists.txt",
-    "tools/configure/bindings.py", "tools/configure/emission.py",
-    "tools/configure/usb_device.py", "tools/configure/ethernet.py",
-    "tools/configure/timer_advanced.py", "tools/configure/assembly.schema.json",
-    "tools/configure/secondary_controllers.py",
+    "tools/configure/assembly.schema.json",
     "cmake/platform/Configure.cmake", "cmake/platform/ControllerModes.cmake",
     "cmake/platform/Options.cmake", "cmake/platform/SDK.cmake",
-    "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
     "tools/maintenance/dependency_proposals.py",
     "os/freertos/timebase_lowpower.c",
     "os/freertos/private/timebase_lowpower.h", "os/freertos/stack_snapshot.c",
     "os/freertos/include/nexus/os/freertos_stack.h",
     "os/threadx/private/irq_model.h", "os/threadx/private/m4_model.h",
-    "drivers/i2c/i2c_v1_async/i2c_v1_async.c", "drivers/i2c/i2c_v1_async/i2c_v1_async.h")
+    )
 REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "fault", "memory", "request", "request_observer", "stack_observation",
     "silicon", "status", "time"))
@@ -327,7 +309,7 @@ REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".h" for name in (
 for _family in ("stm32f407", "gd32f470"):
     REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/" + name for name in (
         "CMakeLists.txt", "system.c", "sleep.c", "timebase_lowpower.c",
-        "usb_clock.c", "soc.json", "routes.json"))
+        "usb_clock.c"))
     REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/drivers/" + name + ".c"
                             for name in (
         "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
@@ -338,21 +320,8 @@ for _family in ("stm32f407", "gd32f470"):
                             + name + ".h" for name in (
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
         "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
-REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
-    "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
-    "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
-    "stream_profiles", "coupled_io", "runtime_power"))
+REQUIRED_FILES += ("soc/common/uart_control.h",)
 REQUIRED_FILES += (
-    "soc/stm32/stm32g474/drivers/pwm_group.c",
-    "soc/stm32/stm32g474/drivers/timer_capture.c",
-    "soc/stm32/stm32g474/drivers/encoder.c",
-    "soc/stm32/stm32g474/private/stm32g474_pwm_group.h",
-    "soc/stm32/stm32g474/private/stm32g474_timer.h",
-    "soc/common/uart_control.h")
-REQUIRED_FILES += (
-    "tools/configure/fact_references.py", "tools/configure/preflight.py",
-    "tools/configure/gpio_phase.py",
-    "soc/stm32/stm32f407/references.json", "soc/gd32/gd32f470/references.json",
     "soc/stm32/stm32f407/private/stm32f407_system.h",
     "soc/stm32/stm32f407/private/stm32f407_stream.h",
     "soc/gd32/gd32f470/timebase.c", "soc/gd32/gd32f470/private/system.h",
@@ -376,19 +345,8 @@ REQUIRED_FILES += (
     "components/user_io_broker/src/user_io_async.c",
     "cmake/package/verification/io_evolution/consumers/user-io-async.c")
 REQUIRED_FILES += (
-    "components/soc/stm32/stm32u575_retained_time/CMakeLists.txt",
-    "components/soc/stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h",
-    "components/soc/stm32/stm32u575_retained_time/private/retained_time.h",
-    "components/soc/stm32/stm32u575_retained_time/src/stm32u575_retained_time.c",
-    "soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h",
-    "cmake/package/verification/io_evolution/consumers/u575-retained-time.c")
-REQUIRED_FILES += (
-    "components/soc/stm32/stm32u575_stop2/CMakeLists.txt",
     "components/soc/stm32/stm32u575_stop2/README.md",
-    "components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
-    "soc/stm32/stm32u575/stop2.c",
-    "soc/stm32/stm32u575/private/stm32u575_stop2_hw.h",
-    "cmake/package/verification/io_evolution/consumers/u575-stop2.c")
+    )
 REQUIRED_FILES += (
     "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
     "components/soc/stm32/stm32h743_frame_dma2d/CMakeLists.txt",
@@ -407,14 +365,6 @@ for _component, _include, _private in (
         "CMakeLists.txt", "src/" + _component + ".c", "include/" + _include))
     if _private is not None:
         REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
-# G474 owned support retains its selected production units independently of
-# test fixtures. The device closure follows each exact reviewed source lock.
-REQUIRED_FILES += tuple("soc/stm32/stm32g474/" + name for name in (
-    "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
-    "drivers/exti.c", "drivers/spi.c", "drivers/watchdog.c", "drivers/pwm.c",
-    "private/stm32g474_system.h", "private/stm32g474_provider.h",
-    "soc.json", "routes.json"))
-REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
 # The standalone Secure mechanism includes its complete private hardware port.
 REQUIRED_FILES += tuple("soc/stm32/stm32u575/" + name for name in (
     "security.c", "private/stm32u575_security.h",
@@ -467,19 +417,16 @@ REQUIRED_FILES += tuple("components/mapped_storage/include/nexus/components/"
                             "native_mapped_storage"))
 REQUIRED_FILES += tuple(CMSIS_CORE_DIRECTORY + "/CMSIS/Core/Include/" + name
                         for name in CMSIS_CORE_REQUIRED_HEADERS)
-REQUIRED_FILES += ("tools/maintenance/cmsis_device_lock.py",)
 for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)
     REQUIRED_FILES += tuple(_review["directory"] + "/" + name
                             for name in sorted(_review["files"]))
-REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
+# Reuse the generator closure; SDK-only entry points remain explicit above.
+for _mode in ("platform", "runtime"):
+    REQUIRED_FILES += tuple(configuration_dependencies.source_names(
+        _mode, None, sdk=True))
 for _descriptor in provider_descriptors.families():
-    REQUIRED_FILES += (_descriptor.configuration_modules + _descriptor.fact_files
-                       + _descriptor.owned_payload)
-REQUIRED_FILES += ("tools/configure/providers/descriptor.py",
-                   "tools/configure/providers/hardware.py",
-                   "tools/configure/clocks.py", "tools/configure/physical_facts.py",
-                   "tools/configure/selection.py", "tools/configure/onboarding.py")
+    REQUIRED_FILES += _descriptor.fact_files + _descriptor.owned_payload
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")

@@ -5,19 +5,12 @@ only placement and per-domain budgets; it never changes bus-master reachability.
 """
 
 
-def select(regions, budgets, family, part, *, obj, integer, fail):
+def select(regions, budgets, maintained, *, obj, integer, fail):
     choices = obj(budgets.get("regions", {}), set(),
                   budgets.get("regions", {}).keys() if isinstance(
                       budgets.get("regions", {}), dict) else (),
                   "memory regions")
     available = {item["id"]: item for item in regions}
-    maintained = ({"addsram", "tcm"} if (
-        family == "gd32f470" and part == "GD32F470ZGT6") else
-        {"ccm"} if family == "stm32f407" and part in {
-            "STM32F407VET6", "STM32F407ZGT6"} else
-        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6" else
-        {"sram4"} if family == "stm32u575" and part == "STM32U575ZIT6Q"
-        else set())
     for name, choice in choices.items():
         if name not in maintained or name not in available:
             fail(f"Unsupported optional memory region: {name}")
@@ -31,6 +24,26 @@ def select(regions, budgets, family, part, *, obj, integer, fail):
     ordered = sorted(regions, key=lambda region: not region["linker"])
     return [{**region, "linker": region["linker"] or region["id"] in choices}
             for region in ordered]
+
+
+def flash_geometry(result, *, symbol, sector_symbol, program_unit,
+                   program_flags="0u", static=True):
+    """Emit one readonly physical geometry from the selected immutable facts."""
+    physical = getattr(result, "physical_part", None)
+    flash = physical.flash if physical is not None else result["flash"]
+    lines = [f"static const nx_flash_sector_t {sector_symbol}[] = {{"]
+    offset = 0
+    for block in flash["erase_blocks"]:
+        lines.append(f"    {{ {offset}u, {block}u }},")
+        offset += block
+    storage = "static " if static else ""
+    return lines + ["};", f"{storage}const nx_flash_geometry_t {symbol} = {{",
+                   f"    .base_address = 0x{flash['origin']:08x}u,",
+                   f"    .size = {flash['size']}u,",
+                   f"    .program_unit = {program_unit}u,",
+                   f"    .sectors = {sector_symbol},",
+                   f"    .sector_count = {len(flash['erase_blocks'])}u,",
+                   f"    .program_flags = {program_flags}", "};"]
 
 
 def budget_limits(result):
@@ -245,47 +258,12 @@ def linker(result):
                              f"0x{region['origin']:08x}, LENGTH = {region['size']}"
                              for region in selected)
     extra_sections = _extra_sections(extras)
-    # Only the selected H743 Flash provider consumes this immutable record.
-    # Linker LONG expressions preserve physical addresses without C pointer-to-
-    # integer initializers, static RAM, or product partition assumptions.
-    flash_image_record = ""
-    flash_ram_phdr = ""
-    flash_ram_section = ""
-    flash_workspace_bss = ""
-    if result["soc_family"] == "stm32h743" and any(
-            item["kind"] == "flash" for item in result["controllers"]):
-        flash_image_record = """    .nx_flash_image (READONLY) : ALIGN(4) {
-        g_nx_stm32h743_flash_image = .;
-        LONG(__nx_flash_live_start)
-        LONG(__nx_flash_live_end)
-        LONG(__nx_flash_image_load_start)
-        LONG(__nx_flash_image_load_end)
-    } > FLASH :flash
-    ASSERT(SIZEOF(.nx_flash_image) == 16, "Flash image record ABI differs")
-"""
-        # The cold Flash owner copies and verifies these exact bytes before
-        # entering. RX and RW LOAD permissions remain separate; no section
-        # name alone establishes the emitted instruction/literal closure.
-        flash_ram_phdr = "    flash_ram PT_LOAD FLAGS(5);\n"
-        flash_ram_section = """    .nx_flash_ram : ALIGN(4) {
-        __nx_flash_ram_start = .;
-        KEEP(*(.nx_flash_ram .nx_flash_ram.*))
-        . = ALIGN(4);
-        __nx_flash_ram_end = .;
-    } > RAM AT> FLASH :flash_ram
-    __nx_flash_ram_load_start = LOADADDR(.nx_flash_ram);
-    __nx_flash_ram_load_end = LOADADDR(.nx_flash_ram) + SIZEOF(.nx_flash_ram);
-"""
-        # The prefix is an internal ABI shared with the checked C/ASM layout.
-        # Collect it before .bss* so ordinary startup clears the entire owner.
-        flash_workspace_bss = """. = ALIGN(1024);
-        __nx_flash_ram_vector_start = .;
-        KEEP(*(.bss.nx_h743_flash_workspace))
-        __nx_flash_ram_workspace_end = .;
-        __nx_flash_ram_vector_end = __nx_flash_ram_vector_start + 664;
-        __nx_flash_ram_stack_start = __nx_flash_ram_vector_end;
-        __nx_flash_ram_stack_end = __nx_flash_ram_stack_start + 1024;
-        """
+    # Optional exact SoC sections remain independent from generic placement.
+    from tools.configure.providers import maintained
+    fragments = getattr(maintained(result["soc_family"]),
+                        "linker_fragments", None)
+    (flash_image_record, flash_ram_phdr, flash_ram_section,
+     flash_workspace_bss) = (fragments(result) if fragments else ("", "", "", ""))
     return f'''/* Exact resolved physical layout; no product reservation. */
 ENTRY(Reset_Handler)
 PHDRS {{

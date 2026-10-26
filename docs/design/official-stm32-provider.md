@@ -81,6 +81,95 @@ conflicts. CMake owns source selection and target dependencies. Preserve these
 separate authorities: generation must not create a second source build graph,
 and a syntactically valid configuration must not imply unimplemented hardware.
 
+## Selected immutable I2C V2 configuration
+
+The selected G474, H743 and U575 polling I2C V2 providers separate the private
+`nx_i2c_v2_config_t` from `nx_i2c_v2_state_t`. The generated readonly configuration
+holds register/reset addresses, the reset mask, timing, finite polling budget
+and the explicitly selected BERR and one-byte RX reload quirks. Zero-initialized
+runtime storage keeps a configuration pointer and `initialized`, `retained`,
+`active` and `fault` state. Public faces, shared ops and factory lookup stay the
+same. This split is not a measured Flash or RAM saving.
+
+The private `nx_i2c_v2_bind` runs under the serialized privileged task owner with
+interrupts unmasked.
+It validates the configuration and rejects overlap with runtime or hardware
+storage. An initialized, retained or active owner rejects rebinding without
+mutation; successful binding itself has no hardware effects. The immutable
+configuration must live as long as its runtime owner; successful stop releases
+hardware ownership but preserves the binding. Do not reset a live owner merely
+to replace its configuration.
+
+Concrete G474/H743 `i2c_prepare` entries bind first, then prepare pins and
+initialize the engine. U575's separate mutable clock owner rejects a retained
+clock before binding, and acquires the selected clock before engine initialization.
+Its `i2c_close` stops the engine first; it releases the clock only after that stop
+succeeds. Failed drain retains the relevant runtime and clock responsibility
+for explicit cleanup or retry.
+
+The family emitter now supplies static configuration and calls these concrete C
+entries. The existing `Construction` record and generated Platform still order
+resource phases, controller starts and reverse cleanup. Other peripheral modes
+retain their corresponding family emission paths; this selected refactor does
+not move every platform lifecycle into a new common abstraction.
+
+See the [private shared contract](../../drivers/i2c/i2c_v2/i2c_v2.h) and the
+[U575 integration](../../soc/stm32/stm32u575/drivers/i2c.c) for exact parameters
+and failure ordering. The [refactor ledger](soc-ip-layout-execution.csv) separates
+focused software evidence, final linked cost comparison and physical execution.
+
+## Selected immutable UART DMA configuration
+
+The selected F103 and GD303 UART DMA modes use `nx_uart_v1_dma_config_t` for
+register/channel addresses, DMA memory domains, IRQ withdrawal and wake-validation
+callbacks, byte-ring or duplex receive storage, capacity, baud, IRQ policy and
+channel shifts. The selected profile identifies the active storage union member.
+`nx_uart_v1_dma_state_t` retains the configuration pointer, deadlines, active
+request and wake references, ring cursors, publication state and lifecycle flags.
+Duplex embeds its own mutable receive extension; byte mode does not reserve one.
+Configuration and its referenced resources have the runtime owner's lifetime.
+Successful stop preserves the binding, and zero-initialized runtime binds only
+during cold admission.
+
+Each family's concrete `uart_dma_prepare` and `uart_duplex_prepare` requires a
+serialized privileged task with interrupts unmasked. After null/profile checks,
+it checks the existing cold owner before preparing exact pins and calling the
+initializer. Retained hardware, active requests, wake publishers and duplex RX
+loans prevent rebinding; the candidate receive extension is checked even before
+a configuration is bound. Failed withdrawal retains the same configuration and
+outstanding loans for ordinary stop or retry. The shared readonly ops, public
+faces and direct IRQ symbols remain unchanged; no hot-path dispatch layer is
+added.
+
+The family's frozen `LegacyTransportProfile` supplies exact wiring to the
+existing emitter without family-name fallback. For these UART modes the selected
+`Construction.initialize` calls concrete C preparation; generation supplies
+static configuration, faces and IRQ forwarding. AHB DMA gates and Platform phase
+ordering remain in the existing SoC emission and shared template. Legacy I2C V1
+and other peripheral cold paths retain their selected generated behavior.
+
+See the [UART private contract](../../drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)
+for the exact storage, callback and lifetime requirements. Host tests exercise
+the actual SoC wrapper, shared engine and GPIO model; generated factory validation
+and final ARM resource measurements remain separate evidence scopes.
+
+## Selected legacy cold integration
+
+F103 and GD303 keep concrete ADC, PWM and Flash `prepare` entries in their
+respective `drivers/devices.c`. These privileged task entries require interrupts
+unmasked and reject the relevant live, retained or faulted owner before replacing
+its resource binding. The exact C adapter owns register addresses, fixed pin and
+gate relationships, system-clock state and chip-specific cold checks. Family
+generation still validates the selected Board/mode and supplies its chosen values.
+The existing shared `nx_legacy_*_close` paths retain stop and drain responsibility.
+
+This moves the selected cold integration out of generated statement sequences;
+it does not turn the legacy drivers into the I2C V2 configuration type. ADC, PWM
+and Flash retain their separate private contracts. Other GPIO, IRQ UART, SPI,
+watchdog and EXTI paths can still contain concrete behavior emitted by their
+family adapter. Review each selected mode's real start/stop path rather than
+inferring a platform-wide lifecycle change from the directory layout.
+
 ## Conditions for full HAL transport
 
 Before accepting a Handle-based mode, establish a progressing time source for

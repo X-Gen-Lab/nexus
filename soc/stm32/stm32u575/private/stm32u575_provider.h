@@ -125,6 +125,22 @@ nx_result_t nx_stm32u575_i2c_initialize_timing(nx_stm32u575_i2c_state_t* port,
                                                uint32_t timing);
 /** \brief Prepare leased PB8/PB9 AF4, open drain; pull-ups remain external. */
 nx_result_t nx_stm32u575_i2c1_pins_prepare(void);
+/** \brief Bind cold resources, prepare pads, then acquire HSI16 and I2C1.
+ * \param[in,out] port: Runtime; live or retained owners reject rebinding.
+ * \param[in,out] clock: Independent cold HSI16/selector cleanup owner.
+ * \param[in] config: Immutable exact resources, timing and errata policy.
+ * \return Success/error; partial acquisition requires ordinary close.
+ */
+nx_result_t nx_stm32u575_i2c_prepare(nx_i2c_v2_state_t* port,
+                                     nx_stm32u575_i2c_clock_t* clock,
+                                     const nx_i2c_v2_config_t* config);
+/** \brief Prove peripheral withdrawal before releasing its HSI16 owner.
+ * \param[in,out] port: Serialized runtime with all transfers joined.
+ * \param[in,out] clock: Same retained independent clock owner.
+ * \return Success/error; failed steps preserve responsibility for retry.
+ */
+nx_result_t nx_stm32u575_i2c_close(nx_i2c_v2_state_t* port,
+                                   nx_stm32u575_i2c_clock_t* clock);
 /** \brief SPI1 V3 finite polling, byte FIFO and explicit TSIZE/CSTART. */
 typedef struct {
     SPI_TypeDef* registers;

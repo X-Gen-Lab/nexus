@@ -32,15 +32,15 @@ extern "C" void nx_fault_observe(nx_fault_domain_t, nx_result_t, const char*,
     faults->Observe();
 }
 extern "C" void nx_test_i2c_v2_write(volatile uint32_t* reg, uint32_t value) {
-    if (reg == current->reset) {
+    if (reg == current->config->reset) {
         if (reset_refused)
             return;
         *reg = value;
-        if ((value & current->reset_mask) != 0U)
-            *current->registers = {};
+        if ((value & current->config->reset_mask) != 0U)
+            *current->config->registers = {};
         return;
     }
-    auto* r = current->registers;
+    auto* r = current->config->registers;
     if (reg == &r->icr) {
         r->isr &= ~value;
         return;
@@ -69,7 +69,7 @@ extern "C" void nx_test_i2c_v2_write(volatile uint32_t* reg, uint32_t value) {
     }
 }
 extern "C" void nx_test_i2c_v2_poll(nx_i2c_v2_state_t* p) {
-    auto* r = p->registers;
+    auto* r = p->config->registers;
     if (stalled)
         return;
     if (injected != 0U) {
@@ -99,6 +99,8 @@ class G474I2cV2 : public testing::Test {
   protected:
     nx_i2c_v2_registers_t registers{};
     uint32_t reset{};
+    nx_i2c_v2_config_t config{};
+    nx_i2c_v2_config_t alternate{};
     nx_i2c_v2_state_t state{};
     nx_i2c_v2_endpoint_state_t endpoint{&state, 0x50};
     nx_i2c_port_t face{&nx_i2c_v2_ops, &state};
@@ -107,6 +109,7 @@ class G474I2cV2 : public testing::Test {
     void SetUp() override {
         nx_g474_model_reset();
         current = &state;
+        state.config = &config;
         faults = &fault_mock;
         stalled = false;
         reset_refused = false;
@@ -114,11 +117,11 @@ class G474I2cV2 : public testing::Test {
         remaining = 0;
         controls.clear();
         bytes.clear();
-        state.registers = &registers;
-        state.reset = &reset;
-        state.reset_mask = 1;
-        state.timing = 0x30420f13;
-        state.poll_limit = 8;
+        config.registers = &registers;
+        config.reset = &reset;
+        config.reset_mask = 1;
+        config.timing = 0x30420f13;
+        config.poll_limit = 8;
     }
     void Start() {
         ASSERT_EQ(NX_SUCCESS, nx_i2c_v2_initialize(&state));
@@ -129,6 +132,84 @@ TEST_F(G474I2cV2, ForeignLiveHardwareRejectsWithoutWrites) {
     EXPECT_EQ(NX_ERROR_BUSY, nx_i2c_v2_initialize(&state));
     EXPECT_EQ(0U, registers.timing);
     EXPECT_FALSE(state.retained);
+}
+TEST_F(G474I2cV2, ColdBindingCannotReplaceRetainedCleanupResources) {
+    const auto& first = config;
+    alternate = config;
+    alternate.timing = 0x20420f13U;
+    alternate.poll_limit = 4U;
+    const auto& second = alternate;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_v2_bind(&state, &first));
+    EXPECT_EQ(&first, state.config);
+    EXPECT_TRUE(controls.empty());
+    Start();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_i2c_v2_bind(&state, &second));
+    EXPECT_EQ(&first, state.config);
+    reset_refused = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_i2c_port_stop(&face));
+    EXPECT_TRUE(state.retained);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_i2c_v2_bind(&state, &second));
+    EXPECT_EQ(&first, state.config);
+    reset_refused = false;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_port_stop(&face));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_v2_bind(&state, &second));
+    EXPECT_EQ(&second, state.config);
+    EXPECT_EQ(0U, registers.cr1);
+    EXPECT_EQ(0U, registers.timing);
+}
+TEST_F(G474I2cV2, UnboundFacesRejectWithoutDereferencingConfiguration) {
+    state.config = nullptr;
+    uint8_t byte = 1U;
+    nx_i2c_message_t message{&byte, 1U, false};
+    size_t done = 99U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_v2_initialize(&state));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_port_stop(&face));
+    EXPECT_EQ(NX_ERROR_STATE, nx_i2c_port_recover(&face));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&device, &message, 1U, 100U, &done));
+    EXPECT_EQ(99U, done);
+    EXPECT_TRUE(controls.empty());
+    EXPECT_FALSE(state.retained);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_v2_bind(&state, nullptr));
+    EXPECT_EQ(nullptr, state.config);
+}
+TEST_F(G474I2cV2, ColdBindingRejectsConfigurationInsideHardwareStorage) {
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_v2_bind(
+                  &state, reinterpret_cast<const nx_i2c_v2_config_t*>(&state)));
+    EXPECT_EQ(&config, state.config);
+    auto replacement = config;
+    replacement.reset = &replacement.timing;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_v2_bind(&state, &replacement));
+    EXPECT_EQ(&config, state.config);
+    replacement = config;
+    replacement.registers =
+        reinterpret_cast<nx_i2c_v2_registers_t*>(&replacement);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_v2_bind(&state, &replacement));
+    EXPECT_EQ(&config, state.config);
+    EXPECT_TRUE(controls.empty());
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(G474I2cV2, ConfigurationCannotBeBorrowedAsDataOrProgressOutput) {
+    Start();
+    size_t done = 99U;
+    nx_i2c_message_t message{reinterpret_cast<uint8_t*>(&config), 1U, true};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&device, &message, 1U, 100U, &done));
+    EXPECT_EQ(99U, done);
+    message.read = false;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&device, &message, 1U, 100U, &done));
+    uint8_t byte = 1U;
+    message.data = &byte;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&device, &message, 1U, 100U,
+                                          reinterpret_cast<size_t*>(&config)));
+    EXPECT_TRUE(controls.empty());
+    EXPECT_TRUE(bytes.empty());
+    EXPECT_EQ(&registers, config.registers);
+    EXPECT_EQ(8U, config.poll_limit);
+    EXPECT_FALSE(state.active);
 }
 TEST_F(G474I2cV2, ExactPadsAreReleasedOpenDrainWithoutInternalPullups) {
     g_g474_model.gpio_b.ODR = 1U;
@@ -239,8 +320,8 @@ TEST_F(G474I2cV2, NackAndArbitrationDoNotBecomeSuccess) {
               nx_i2c_endpoint_transaction(&device, &message, 1, 100, &done));
 }
 TEST_F(G474I2cV2, AuditedMasterBerrQuirkClearsOnlyThatFlagAndContinues) {
+    config.ignore_master_berr = true;
     Start();
-    state.ignore_master_berr = true;
     uint8_t tx = 1;
     nx_i2c_message_t message{&tx, 1, false};
     size_t done = 0;

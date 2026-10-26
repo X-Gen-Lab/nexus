@@ -3,9 +3,26 @@
 This mechanism does not infer a Board connector, powered role, class protocol or
 physical qualification. Selected endpoints are separate static typed identities.
 """
+from dataclasses import dataclass
+
 from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers import maintained
 from tools.configure.providers.common import (Construction, fail, integer,
                                kernel_policy_constant)
+
+
+@dataclass(frozen=True)
+class UsbDevicePolicy:
+    """One SoC's reviewed FS controller, physical pads and cold clock leases."""
+
+    controller: str
+    irq: int
+    clock_hz: int
+    fifo_words: int
+    endpoint_numbers: int
+    pins: tuple
+    resources: tuple
+    gpio_clock: str | None
 
 
 FIELDS = {"event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
@@ -20,19 +37,20 @@ def validate_soc(soc, provider):
               if item["kind"] == "usb_device"}
     if not actual:
         return
-    expected = getattr(provider, "USB_CONTROLLER", None)
+    hardware = getattr(provider, "USB_DEVICE", None)
+    expected = hardware.controller if hardware is not None else None
     if actual != {expected}:
         fail("USB controller differs from the maintained internal FS PHY")
     item = soc["controllers"][expected]
     if (item["modes"] != ["device-fs"] or item["irq"] != [expected] or
-            item.get("irq_numbers") != [67] or item["pins"] != ["PA11", "PA12"] or
+            item.get("irq_numbers") != [hardware.irq] or
+            item["pins"] != [pin for pin, _, _ in hardware.pins] or
             any(type(item.get(key)) is not int or item[key] != value
-                for key, value in (("clock_hz", 48000000),
-                                   ("fifo_words", 320), ("endpoint_numbers", 4)))):
+                for key, value in (("clock_hz", hardware.clock_hz),
+                                   ("fifo_words", hardware.fifo_words),
+                                   ("endpoint_numbers", hardware.endpoint_numbers)))):
         fail("USB FS IRQ, endpoint, FIFO or clock facts differ from the SDK binding")
-    required = ["clock:USBFS48"]
-    if provider.PREFIX == "gd32":
-        required += ["clock:CK48", "clock:PLLSAIP"]
+    required = list(hardware.resources)
     if item.get("resources") != required:
         fail("USB FS clock ownership differs from the maintained cold lease")
 
@@ -49,9 +67,10 @@ def validate_selection(selection, route, provider, ram_size):
         fail("USB vbus_sensing requires an explicit boolean")
     if selection["vbus_sensing"]:
         fail("USB VBUS electrical route is not reviewed for this binding")
-    if route["controller"] != getattr(provider, "USB_CONTROLLER", None) or [
-            (pin["pin"], pin["function"], pin["af"]) for pin in route["pins"]] != [
-                ("PA11", "dm", 10), ("PA12", "dp", 10)]:
+    hardware = getattr(provider, "USB_DEVICE", None)
+    if (hardware is None or route["controller"] != hardware.controller or
+            tuple((pin["pin"], pin["function"], pin["af"])
+                  for pin in route["pins"]) != hardware.pins):
         fail("USB FS requires its reviewed internal PHY PA11/PA12 AF10 route")
 
 
@@ -138,7 +157,7 @@ def constructor(item, result, prefix):
     for index, pin in reversed(list(enumerate(pins))):
         wire = pin["pin"]
         lines += [f"    if ((s_nx_usb_pin_leases_{name} & {1 << index}u) != 0u) {{"]
-        lines += withdraw_pin(prefix, wire)
+        lines += withdraw_pin(result.soc_family, wire)
         lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_usb_pin_snapshots_{name}[{index}]);",
                   f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {wire[2:]}u) != s_nx_usb_pin_snapshots_{name}[{index}]) {{",
                   "            return NX_ERROR_IO;", "        }",
@@ -180,7 +199,7 @@ def constructor(item, result, prefix):
               f"        nx_deadline_after(nx_time_now_us(), {options.clock_timeout_us}u));",
               "    if (status != NX_SUCCESS) { return status; }",
               f"    return nx_{prefix}_usb_device_initialize(&{state}, &s_nx_usb_clock_{name});", "}"]
-    vector = "OTG_FS" if prefix == "stm32" else "USBFS"
+    vector = maintained(result.soc_family).USB_DEVICE.controller
     lines += [f"void {vector}_IRQHandler(void);",
               "/** \\brief Dispatch the selected internal-PHY FS PIO controller. */",
               f"void {vector}_IRQHandler(void) {{ nx_usb_controller_irq(&{state}); }}"]
@@ -199,25 +218,32 @@ def gpio_clock_mask(result):
     return sum(1 << (ord(port) - ord('A')) for port in ports)
 
 
+def _gpio_clock(result):
+    hardware = getattr(maintained(result.soc_family), "USB_DEVICE", None)
+    return hardware.gpio_clock if hardware is not None else None
+
+
 def state_declarations(result, prefix):
     return (["static uint32_t s_nx_usb_gpio_clocks_added;"] if
-            prefix == "gd32" and gpio_clock_mask(result) else [])
+            _gpio_clock(result) is not None and gpio_clock_mask(result) else [])
 
 
 def start_resources(result, prefix):
     mask = gpio_clock_mask(result)
+    clock = _gpio_clock(result)
     # Capture before any other selected controller enables a shared GPIO gate.
-    return ([f"    s_nx_usb_gpio_clocks_added = ~RCU_AHB1EN & {mask}u;"] if
-            prefix == "gd32" and mask else [])
+    return ([f"    s_nx_usb_gpio_clocks_added = ~{clock} & {mask}u;"] if
+            clock is not None and mask else [])
 
 
 def stop_system(result, prefix):
-    if prefix != "gd32" or not gpio_clock_mask(result):
+    clock = _gpio_clock(result)
+    if clock is None or not gpio_clock_mask(result):
         return []
     # Every selected port has drained before releasing this shared GPIO gate.
     return ["    if (s_nx_platform_started) {",
-            "        RCU_AHB1EN &= ~s_nx_usb_gpio_clocks_added;",
+            f"        {clock} &= ~s_nx_usb_gpio_clocks_added;",
             "        nx_arch_dsb();",
-            "        if ((RCU_AHB1EN & s_nx_usb_gpio_clocks_added) != 0u) {",
+            f"        if (({clock} & s_nx_usb_gpio_clocks_added) != 0u) {{",
             "            return NX_ERROR_IO;", "        }",
             "        s_nx_usb_gpio_clocks_added = 0u;", "    }"]

@@ -4,13 +4,16 @@ JSON hardware facts and authored inputs are validated once by the resolver. This
 module stores that decision; it does not select targets or repair configuration.
 """
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
-from tools.configure.resource_graph import ResourcePlanIR
+from tools.configure.resource_graph import ResourceClaimIR, ResourcePlanIR
 from tools.configure.trigger_graph import TriggerPlanIR
-from tools.configure.dma_topology import DmaTopologyIR
+from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
 from tools.configure.i2s2 import I2s2RoleIR
+if TYPE_CHECKING:
+    from tools.configure.providers.hardware import ControllerBinding
 
 
 def freeze(value):
@@ -669,6 +672,7 @@ class ControllerIR(Record):
     options: ControllerOptions
     values: Mapping
     interface_kind: str | None = None
+    integration: "ControllerIntegrationIR | None" = None
 
     @classmethod
     def create(cls, values, provider):
@@ -812,6 +816,37 @@ class ClockPlanIR:
 
 
 @dataclass(frozen=True)
+class PhysicalPartIR:
+    """Views of validated physical facts; no second geometry authority."""
+
+    part: str
+    package: str
+    flash: Mapping
+    memory: tuple[Mapping, ...]
+
+
+@dataclass(frozen=True)
+class ControllerIntegrationIR:
+    """One selected owner composed from the already validated immutable plans.
+
+    Clock Hz is a nominal APB input where the exact hardware binding names it.
+    Only clock_plan can establish reviewed domain bounds; None is not a guessed
+    clock or a grant of hardware support. Construction still owns static state.
+    """
+
+    controller: str
+    resources: tuple[ResourceClaimIR, ...]
+    dma: tuple[DmaLaneIR, ...]
+    irq: IrqOptions | None
+    irq_profile: InterruptProfileIR
+    clock_plan: ClockPlanIR | None
+    clock_inputs: Mapping
+    clock_hz: int | None
+    pins: tuple[Mapping, ...]
+    hardware: "ControllerBinding | None"
+
+
+@dataclass(frozen=True)
 class RuntimePowerIR:
     """Selected provider lifecycle enrollment, never nominal clock bounds."""
     mode: str
@@ -839,14 +874,41 @@ class ConfigurationIR(Record):
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
     runtime_power: RuntimePowerIR | None = None
     i2s2: I2s2RoleIR | None = None
+    physical_part: PhysicalPartIR | None = None
 
     @classmethod
     def from_validated(cls, result):
+        from tools.configure.providers import maintained
+        provider = maintained(result["soc_family"])
+        resources = ResourcePlanIR.from_validated(result["resource_plan"])
+        dma = DmaTopologyIR.from_validated(result["dma_topology"])
+        irq = InterruptProfileIR(**result["irq"])
+        clock = (ClockPlanIR.from_validated(result["clock_plan"])
+                 if result.get("clock_plan") is not None else None)
+        values = dict(freeze(result))
         controllers = tuple(ControllerIR.create(item, result["soc_family"])
                             for item in result["controllers"])
+        integrated = []
+        for item in controllers:
+            hardware = next((binding for binding in
+                getattr(provider, "CONTROLLER_BINDINGS", ())
+                if binding.controller == item.controller and
+                binding.kind == item.kind), None)
+            integration = ControllerIntegrationIR(
+                item.controller,
+                tuple(claim for claim in resources.claims
+                      if item.id in claim.owner.split(";") and
+                      claim.mode not in {"reserved", "kernel"}),
+                tuple(lane for lane in dma.lanes if lane.owner == item.id),
+                getattr(item.options, "irq", None), irq, clock,
+                values["clock"],
+                (values["clock"][f"apb{hardware.apb}_hz"]
+                 if hardware is not None else None),
+                item.values["pins"], hardware)
+            integrated.append(replace(item, integration=integration))
+        controllers = tuple(integrated)
         devices = tuple(EndpointIR.create(item, controllers)
                         for item in result["devices"])
-        values = dict(freeze(result))
         values["controllers"] = controllers
         values["devices"] = devices
         budgets = result["memory_budgets"]
@@ -859,7 +921,6 @@ class ConfigurationIR(Record):
                                           budgets.get("regions", {}).items())),
                                 (MpuMemoryReservationsIR(**budgets["mpu"])
                                  if "mpu" in budgets else None))
-        irq = InterruptProfileIR(**result["irq"])
         cpu = CpuProfileIR.from_validated(result["cpu_profile"])
         kernel_type = (ThreadXKernelProfileIR if result["backend"] == "threadx"
                        else KernelProfileIR)
@@ -872,11 +933,9 @@ class ConfigurationIR(Record):
                                 tuple(CanFilterIR(**item) for item in
                                       result["can_domain"]["filters"]))
                     if result.get("can_domain") is not None else None),
-                   ResourcePlanIR.from_validated(result["resource_plan"]),
+                   resources,
                    TriggerPlanIR.from_validated(result["trigger_plan"]),
-                   DmaTopologyIR.from_validated(result["dma_topology"]),
-                   (ClockPlanIR.from_validated(result["clock_plan"])
-                    if result.get("clock_plan") is not None else None),
+                   dma, clock,
                    MappingProxyType(values),
                    tuple(PwmSharedOwnerIR.from_validated(item)
                          for item in result.get("pwm_shared_owners", ())),
@@ -885,7 +944,9 @@ class ConfigurationIR(Record):
                     if "runtime_power" in result else None),
                    (I2s2RoleIR(result["i2s2"]["profile"], result["i2s2"]["part"],
                                tuple(result["i2s2"]["claims"]))
-                    if "i2s2" in result else None))
+                    if "i2s2" in result else None),
+                   PhysicalPartIR(result["part"], result["package"],
+                                  values["flash"], values["memory"]))
 
     def to_dict(self):
         return thaw(self)

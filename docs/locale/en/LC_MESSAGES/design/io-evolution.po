@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 7493f2e353ae0a2e023b3d5d4ba5fcfa5e267d1623ae9c37410eb82a837c359d\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d5cf0aa4fe9d4f59197175405e982169a55c023bcfcd54b90466713484edacaa\n"
 
 msgid "I/O evolution: static resources and explicit data contracts"
 msgstr "I/O evolution: static resources and explicit data contracts"
@@ -519,3 +519,6 @@ msgstr "The dedicated [single-tuple LPTIM1 LPBAM reference](u575-lptim1-lpbam.md
 
 msgid "Use [platform integration contracts](integration-contracts.md), [the lifecycle matrix](io-lifecycle-matrix.md), [software qualification](../reference/platforms/qualification.md) and {download}`the 42-item ledger <io-evolution-execution.csv>` when reviewing or delivering a change. Update that single ledger with actual evidence; do not replace pending work by a broad claim that the platform supports an entire MCU family."
 msgstr "Use [platform integration contracts](integration-contracts.md), [the lifecycle matrix](io-lifecycle-matrix.md), [software qualification](../reference/platforms/qualification.md) and {download}`the 42-item ledger <io-evolution-execution.csv>` when reviewing or delivering a change. Update that single ledger with actual evidence; do not replace pending work by a broad claim that the platform supports an entire MCU family."
+
+msgid "The read-only `capabilities.py --assembly` view projects this review separately for the system-clock owner and each selected controller as `silicon_admission`. It uses the existing policy and typed IR. An endpoint or companion does not inherit its owner's review; an owner with no applicable record reports `null`. H743's selected clock and SPI DMA records retain their own revision/profile scope, while G474 ADC retains its device, density, workaround and review-digest fields. These are reviewed admission rules, not observed identity, broader errata coverage or physical qualification."
+msgstr "The read-only `capabilities.py --assembly` view projects this review separately for the system-clock owner and each selected controller as `silicon_admission`. It uses the existing policy and typed IR. An endpoint or companion does not inherit its owner's review; an owner with no applicable record reports `null`. H743's selected clock and SPI DMA records retain their own revision/profile scope, while G474 ADC retains its device, density, workaround and review-digest fields. These are reviewed admission rules, not observed identity, broader errata coverage or physical qualification."

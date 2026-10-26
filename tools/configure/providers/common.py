@@ -27,6 +27,41 @@ def fail(message, **details):
 
 
 @dataclass(frozen=True)
+class PartPolicy:
+    """Reviewed package and optional placement, separate from physical sizes."""
+
+    package: str
+    optional_memory: frozenset[str] = frozenset()
+
+    def validate(self, variant):
+        if variant["package"] != self.package:
+            fail("Physical package differs from the reviewed exact part")
+        domains = {region["id"]: region for region in variant["memory"]}
+        if not self.optional_memory.issubset(domains) or any(
+                domains[name]["linker"] for name in self.optional_memory):
+            fail("Optional memory policy differs from physical part domains")
+
+
+def exact_part(parts, part):
+    """An unregistered density/package never inherits another part's policy."""
+    if part not in parts:
+        fail(f"Unmaintained exact part: {part}")
+    return parts[part]
+
+
+@dataclass(frozen=True)
+class I2cTimingClock:
+    """Selected local source bounds; electrical assumptions remain authored."""
+
+    nominal_hz: int
+    pclk_hz: int
+    minimum_hz: int | None = None
+    maximum_hz: int | None = None
+    pclk_minimum_hz: int | None = None
+    requires_explicit: bool = False
+
+
+@dataclass(frozen=True)
 class EndpointPolicy:
     """Family-owned endpoint capabilities; hardware routes remain separate."""
 
@@ -146,7 +181,13 @@ class Construction(Mapping):
 
 def owned_claims(result, owners):
     """Instance names never acquire Board/SoC reservations or kernel claims."""
-    return (claim for claim in result["claims"]
+    try:
+        plan = result.resource_plan
+    except (AttributeError, KeyError):
+        # Narrow direct-constructor fixtures expose only the legacy mapping.
+        plan = None
+    claims = plan.claims if plan is not None else result["claims"]
+    return (claim for claim in claims
             if claim.get("mode") not in {"reserved", "kernel"} and
             owners.intersection(claim["owner"].split(";")))
 

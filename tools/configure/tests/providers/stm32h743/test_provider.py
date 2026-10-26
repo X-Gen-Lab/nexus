@@ -2,15 +2,43 @@
 import copy
 import json
 from pathlib import Path
+import tempfile
 import unittest
 
 from soc.stm32.stm32h743 import configure as provider
+from tools.configure import configure
 from tools.configure.providers.common import ConfigurationError
 
 ROOT = Path(__file__).resolve().parents[5]
 
 
 class H743DmaConfiguration(unittest.TestCase):
+    def test_dma_modes_start_the_selected_instance_prepare_function(self):
+        fixtures = (
+            ("tests/contracts/h743_assembly/dma-cache.toml", "uart_dma"),
+            ("tests/contracts/h743_assembly/rx-cache.toml", "uart_receive"),
+            ("tools/configure/assemblies/h743-uart-continuous.toml",
+             "uart_continuous"),
+            ("tools/configure/assemblies/h743-uart-duplex-continuous.toml",
+             "uart_duplex"),
+        )
+        for relative, driver in fixtures:
+            with self.subTest(driver=driver), tempfile.TemporaryDirectory() as directory:
+                original = ROOT / relative
+                text = original.read_text()
+                board = text.split('board_package = "', 1)[1].split('"', 1)[0]
+                text = text.replace(board, str((original.parent / board).resolve()))
+                text = text.replace("[uart.console", "[uart.telemetry")
+                source = Path(directory) / "assembly.toml"
+                source.write_text(text)
+                output = Path(directory) / "generated"
+                configure.configure(source, output)
+                body = (output / "bindings.c").read_text()
+                self.assertIn("result.primary = prepare_telemetry();", body)
+                self.assertIn(
+                    f"return nx_stm32h743_{driver}_initialize(&s_nx_port_telemetry,",
+                    body)
+
     def test_receive_route_is_exact_and_distinct_from_transmit(self):
         self.assertEqual(provider.mode_implementation("uart", "rx-dma-idle"),
                          "uart_receive")

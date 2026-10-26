@@ -20,11 +20,11 @@ class LegacyDevicesTests(unittest.TestCase):
             with self.subTest(family=family):
                 result = configure.resolve(self.fixture(family), ROOT)
                 _, source = bindings.emit(result)
-                self.assertIn("nx_legacy_adc_initialize", source)
-                self.assertIn("nx_legacy_pwm_initialize", source)
-                self.assertIn("nx_legacy_flash_initialize", source)
-                self.assertIn(".startup_delay_us = " +
-                              ("4u" if family == "f103" else "2000u"), source)
+                prefix = "stm32f103" if family == "f103" else "gd32f303"
+                self.assertIn(f"nx_{prefix}_adc_prepare", source)
+                self.assertIn(f"nx_{prefix}_pwm_prepare", source)
+                self.assertIn(f"nx_{prefix}_flash_prepare", source)
+                self.assertNotIn(".startup_delay_us = ", source)
                 self.assertNotIn("malloc(", source)
                 physical = next(item for item in result["controllers"]
                                 if item["kind"] == "flash")

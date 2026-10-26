@@ -27,23 +27,27 @@ typedef struct {
     volatile uint32_t rxdr;
     volatile uint32_t txdr;
 } nx_i2c_v2_registers_t;
-/** \brief One exclusive executor, fixed kernel clock/timing and reset lease.
- * \note SoC owns clocks, pin wiring and electrical timing. No IRQ or DMA.
- */
+/** \brief Reviewed immutable resources, timing and exact errata policy. */
 typedef struct {
     nx_i2c_v2_registers_t* registers;
     volatile uint32_t* reset;
     uint32_t reset_mask;
     uint32_t timing;
     uint32_t poll_limit;
+    /** \brief Exact SoC errata permits master-only spurious BERR. */
+    bool ignore_master_berr;
+    /** \brief Exact SoC errata requires NBYTES1 throughout reloaded RX. */
+    bool receive_reload_one;
+} nx_i2c_v2_config_t;
+/** \brief One exclusive executor with immutable configuration and runtime.
+ * \note SoC owns clocks, pin wiring and electrical timing. No IRQ or DMA.
+ */
+typedef struct {
+    const nx_i2c_v2_config_t* config;
     bool initialized;
     bool retained;
     bool active;
     bool fault;
-    /** \brief Exact SoC errata permits ignoring master-only spurious BERR. */
-    bool ignore_master_berr;
-    /** \brief Exact SoC errata requires NBYTES1 throughout reloaded RX. */
-    bool receive_reload_one;
 } nx_i2c_v2_state_t;
 typedef struct {
     nx_i2c_v2_state_t* port;
@@ -52,6 +56,14 @@ typedef struct {
 extern const nx_i2c_ops_t nx_i2c_v2_ops;
 extern const nx_i2c_endpoint_ops_t nx_i2c_v2_endpoint_ops;
 extern const nx_i2c_long_ops_t nx_i2c_v2_long_endpoint_ops;
+/** \brief Bind fixed resources only while the serialized owner is cold.
+ * \param[in,out] port: Static runtime; live or retained owners reject changes.
+ * \param[in] config: Immutable static resources with the runtime's lifetime.
+ * \return Success without hardware effects, or an unchanged rejection.
+ * \note Stop releases hardware ownership, not the configuration binding.
+ */
+nx_result_t nx_i2c_v2_bind(nx_i2c_v2_state_t* port,
+                           const nx_i2c_v2_config_t* config);
 /** \brief Acquire cold disabled hardware after the SoC has acquired its gate.
  * \param[in,out] port: Exact static context with reviewed finite poll budget.
  * \return Success or rejection; retained requires ordinary stop cleanup.

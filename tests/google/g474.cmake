@@ -41,6 +41,7 @@ nexus_google_test(nexus_g474_acquisition_test SOURCES g474_acquisition_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc_stream.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/g474_flash_geometry.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
     LIBRARIES Nexus::IO Nexus::Arch

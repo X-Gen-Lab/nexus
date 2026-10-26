@@ -95,6 +95,7 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
+    initialize = f"prepare_{name}()"
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
@@ -251,26 +252,17 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     elif item.kind == "i2c":
         clock = f"s_nx_i2c_clock_{name}"
-        initialize = (f"nx_stm32u575_i2c_initialize_timing(&{state}, "
-                      f"0x{item.options.timing.timingr:08x}u)"
-                      if item.options.timing is not None else
-                      f"nx_stm32u575_i2c_initialize(&{state})")
+        config = f"s_nx_config_{name}"
+        timing = (f"0x{item.options.timing.timingr:08x}"
+                  if item.options.timing is not None else "0x10f42f2f")
         definitions += [f"static nx_stm32u575_i2c_clock_t {clock};",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = (nx_i2c_v2_registers_t*)I2C1;",
-                        f"    {state}.reset = &RCC->APB1RSTR1;",
-                        f"    {state}.reset_mask = RCC_APB1RSTR1_I2C1RST;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        "    nx_result_t status = nx_stm32u575_i2c1_pins_prepare();",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    status = nx_stm32u575_i2c_clock_start(&{clock}, &{state});",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return {initialize};", "}",
-                        f"static nx_result_t stop_{name}(void) {{",
-                        f"    nx_result_t status = nx_i2c_port_stop(&s_nx_face_{name});",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32u575_i2c_clock_stop(&{clock});", "}"]
+                        f"static const nx_i2c_v2_config_t {config} = {{",
+                        "    .registers = (nx_i2c_v2_registers_t*)I2C1,",
+                        "    .reset = &RCC->APB1RSTR1, .reset_mask = RCC_APB1RSTR1_I2C1RST,",
+                        f"    .timing = {timing}u, .poll_limit = 1000000u,",
+                        "    .ignore_master_berr = true, .receive_reload_one = false",
+                        "};"]
+        initialize = f"nx_stm32u575_i2c_prepare(&{state}, &{clock}, &{config})"
         children = [child for child in devices if child["controller"] == item.id]
         for child in children:
             child_name = child["id"].replace("-", "_")
@@ -281,7 +273,7 @@ def constructor(item, result, board_bindings, routes, devices):
             definitions += [f"static nx_stm32u575_i2c_endpoint_state_t {endpoint} = {{ &{state}, {address}u }};",
                             *enhanced_endpoints.face(child, endpoint,
                                                      "nx_i2c_v2_endpoint_ops")]
-        stop = f"stop_{name}()"
+        stop = f"nx_stm32u575_i2c_close(&{state}, &{clock})"
     elif item.kind == "adc":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
@@ -320,5 +312,5 @@ def constructor(item, result, board_bindings, routes, devices):
     return Construction(
         state_type=("nx_i2c_v2_state_t" if item.kind == "i2c" else
                     f"nx_stm32u575_{implementation}_state_t"),
-        definitions=definitions, initialize=f"prepare_{name}()",
+        definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)

@@ -1,4 +1,6 @@
 """Reviewed byte frames and an independent nine-bit IRQ personality."""
+from dataclasses import dataclass
+
 from tools.configure.providers.common import fail, integer
 
 
@@ -10,14 +12,26 @@ FIFO_THRESHOLDS = ("eighth", "quarter", "half", "three-quarters",
                    "seven-eighths")
 
 
+@dataclass(frozen=True)
+class UartFormatPolicy:
+    """SoC-owned format review, independent of the actual mode support gate."""
+
+    fifo: tuple[str, int] | None = None
+    words: tuple[str, ...] = ()
+    irq_probe: bool = False
+    byte_frames: bool = False
+
+
+_NO_FORMATS = UartFormatPolicy()
+
+
 def _fifo(selection, route, provider):
     profile = selection.get("fifo")
     if selection["mode"] not in FIFO_MODES:
         if "fifo" in selection:
             fail("FIFO profile belongs only to the selected FIFO byte mode")
         return
-    expected = {"stm32h743": ("USART3", 16),
-                "stm32u575": ("USART1", 8)}.get(provider.PREFIX)
+    expected = getattr(provider, "UART_FORMATS", _NO_FORMATS).fifo
     if expected is None or route["controller"] != expected[0]:
         fail("FIFO UART requires its exact reviewed controller/provider")
     fields = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
@@ -37,10 +51,11 @@ def _fifo(selection, route, provider):
 def validate(selection, route, provider):
     """Do not infer flow-control wiring or reinterpret word data as bytes."""
     _fifo(selection, route, provider)
+    policy = getattr(provider, "UART_FORMATS", _NO_FORMATS)
     if "irq_probe" in selection:
         if type(selection["irq_probe"]) is not bool:
             fail("UART IRQ probe must be boolean")
-        if selection["irq_probe"] and (provider.PREFIX not in {"stm32", "gd32"} or
+        if selection["irq_probe"] and (not policy.irq_probe or
                                       selection["mode"] != "irq-words"):
             fail("UART IRQ probe requires a reviewed physical word vector")
     frame = selection.get("frame")
@@ -71,18 +86,14 @@ def validate(selection, route, provider):
     if words:
         if frame != {**DEFAULT, "data_bits": 9}:
             fail("Word UART currently requires exact 9N1 without flow control")
-        if (provider.PREFIX not in {"native", "stm32", "gd32"} or
-                provider.PREFIX == "stm32" and
-                route["controller"] != "USART1" or
-                provider.PREFIX == "gd32" and
-                route["controller"] != "USART0"):
+        if route["controller"] not in policy.words:
             fail("Word UART provider/route is not reviewed")
         return
     if bits == 9:
         fail("Nine-bit words require the independent irq-words mode")
     if frame == DEFAULT:
         return
-    if (provider.PREFIX not in {"stm32", "gd32"} or
+    if (not policy.byte_frames or
             selection["mode"] != "irq-byte-event"):
         fail("UART frame provider requires a reviewed byte IRQ mode")
 

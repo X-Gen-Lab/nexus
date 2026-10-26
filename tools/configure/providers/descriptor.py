@@ -77,7 +77,8 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f1", "stm32f1_cmsis"),
         ("hal_driver_f1", "stm32f1_hal")), references="references.json",
-        configuration_helpers=("tools/configure/providers/legacy_transport.py",),
+        configuration_helpers=("tools/configure/providers/legacy_transport.py",
+                               "soc/stm32/stm32f103/configure/transport.py"),
         owned_payload=(
             "soc/stm32/stm32f103/CMakeLists.txt", "soc/stm32/stm32f103/system.c",
             "soc/stm32/stm32f103/drivers/gpio.c", "soc/stm32/stm32f103/drivers/uart.c",
@@ -104,7 +105,8 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f4", "stm32f4_cmsis"),
         ("hal_driver_f4", "stm32f4_hal")),
-        references="references.json", owned_payload=(
+        references="references.json", configuration_helpers=("soc/stm32/stm32f407/configure/secondary.py", "soc/stm32/stm32f407/configure/integration.py", "soc/stm32/stm32f407/configure/i2s2.py", "soc/stm32/stm32f407/configure/hardware.py", 'soc/stm32/stm32f407/configure/preflight.py', 'soc/stm32/stm32f407/configure/gpio.py'),
+        owned_payload=(
             "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
             "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h",
             "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c",
@@ -118,13 +120,15 @@ _DESCRIPTORS = MappingProxyType({
         "soc/gd32/gd32f470", "soc/gd32/gd32f470/configure",
         (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
-        references="references.json", owned_payload=(
+        references="references.json", configuration_helpers=("soc/gd32/gd32f470/configure/secondary.py", "soc/gd32/gd32f470/configure/integration.py", "soc/gd32/gd32f470/configure/hardware.py", 'soc/gd32/gd32f470/configure/preflight.py', 'soc/gd32/gd32f470/configure/gpio.py'),
+        owned_payload=(
             "soc/gd32/gd32f470/drivers/ethernet_frames.c",
             "soc/gd32/gd32f470/private/gd32f470_eth_frames.h")),
     "gd32f303": FamilyDescriptor("gd32f303", "gd32",
         "soc/gd32/gd32f303", "soc/gd32/gd32f303/configure", (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f30x/source.lock.json",
-        configuration_helpers=("tools/configure/providers/legacy_transport.py",),
+        configuration_helpers=("tools/configure/providers/legacy_transport.py",
+                               "soc/gd32/gd32f303/configure/transport.py"),
         references="references.json", owned_payload=(
             "soc/gd32/gd32f303/CMakeLists.txt", "soc/gd32/gd32f303/system.c",
             "soc/gd32/gd32f303/drivers/gpio.c", "soc/gd32/gd32f303/drivers/uart.c",
@@ -173,7 +177,8 @@ _DESCRIPTORS = MappingProxyType({
         ("hal_driver_g4", "stm32g4_hal")), references="references.json",
         configuration_helpers=tuple("soc/stm32/stm32g474/configure/" + name
                                     for name in ("coupled.py", "adc_group.py",
-                                                 "pwm_shared.py")),
+                                                 "pwm_shared.py", "preflight.py", "gpio.py",
+                                                 "integration.py", "timer.py")),
         owned_payload=(
             "soc/stm32/stm32g474/CMakeLists.txt", "soc/stm32/stm32g474/system.c",
             "soc/stm32/stm32g474/drivers/gpio.c", "soc/stm32/stm32g474/drivers/uart.c",
@@ -206,7 +211,13 @@ _DESCRIPTORS = MappingProxyType({
     "stm32h743": FamilyDescriptor("stm32h743", "stm32",
         "soc/stm32/stm32h743", "soc/stm32/stm32h743/configure", (
         ("cmsis_core", "cmsis_core"),
-        ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
+        ("cmsis_device_h7", "stm32h7_cmsis")),
+        configuration_helpers=("soc/stm32/stm32h743/configure/runtime_power.py", "soc/stm32/stm32h743/configure/memory.py",
+            'soc/stm32/stm32h743/configure/preflight.py',
+
+            "soc/stm32/stm32h743/configure/selected_support.py",
+            "soc/stm32/stm32h743/configure/clocks.py"),
+        owned_payload=(
             "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
             "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c",
             "tools/configure/assemblies/h743-spi-dma.toml",
@@ -278,7 +289,12 @@ _DESCRIPTORS = MappingProxyType({
         "soc/stm32/stm32u575", "soc/stm32/stm32u575/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_u5", "stm32u5_cmsis"),
-        ("hal_driver_u5", "stm32u5_hal")), owned_payload=(
+        ("hal_driver_u5", "stm32u5_hal")),
+        configuration_helpers=(
+            'soc/stm32/stm32u575/configure/preflight.py',
+
+            "soc/stm32/stm32u575/configure/selected_support.py",),
+        owned_payload=(
             "soc/stm32/stm32u575/CMakeLists.txt", "soc/stm32/stm32u575/system.c",
             "soc/stm32/stm32u575/memory_init.c",
             "soc/stm32/stm32u575/private/stm32u575_memory_init.h",

@@ -412,9 +412,13 @@ def compiled_objects(root: Path, build: Path, variant: dict) -> list[dict]:
     sources = set()
     generated_port = build / 'nexus-runtime/os/freertos/m7-integer-port/port.c'
     for item in result:
-        source = Path(item['source']['path'])
-        if source.is_relative_to(root):
-            sources.add(source.relative_to(root).as_posix())
+        source = Path(item['source']['path']).resolve()
+        if source.is_relative_to(root.resolve()):
+            relative = source.relative_to(root.resolve())
+            if relative.parts[0] in {'soc', 'drivers', 'boards'}:
+                raise ValueError('CPU-only Runtime graph contains platform source: '
+                                 + relative.as_posix())
+            sources.add(relative.as_posix())
         elif (variant['profile']['irq']['kernel_port'] ==
               'nexus/ARM_CM7_integer' and source == generated_port):
             item['generated_by'] = compiler_gate.digest(

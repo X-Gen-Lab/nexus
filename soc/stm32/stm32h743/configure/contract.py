@@ -1,7 +1,16 @@
 """Source-reviewed H743 GPIO/USART byte-mode capability contract."""
+from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
 
+
+PARTS = MappingProxyType({
+    "STM32H743ZIT6": common.PartPolicy("LQFP144", frozenset(('sram1',))),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+
+UART_FORMATS = UartFormatPolicy(fifo=("USART3", 16))
 
 CPU_ABI = MappingProxyType({
     "arch": "cortex-m7", "fpu": "fpv5-d16", "float_abi": "hard"})
@@ -15,6 +24,8 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 32, "dcache_line_bytes": 32, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32h743"
+FLASH_GEOMETRY = ("g_nx_stm32h743_flash_geometry",
+                  "NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE")
 FLASH_PROGRAM_UNIT = 32
 FLASH_INPUT_ALIGNMENT = 1
 ADC_PIN_CHANNELS = MappingProxyType({("ADC1", "PA3"): 15})

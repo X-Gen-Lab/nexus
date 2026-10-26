@@ -67,3 +67,38 @@ Build an independent relocated [SDK consumer](../tutorials/source-sdk.md), then
 link the exact MCU configuration with the locked compiler. Retain evidence for
 the migrated source and configuration. Old HAL/OSAL documentation remains historical;
 a redirect does not make an old API contract equivalent to a new one.
+
+## Update private source integrations
+
+The SoC/IP source reorganization keeps public C include paths, CMake target names,
+authored family identifiers and TOML selections. Ordinary public consumers rebuild
+against the chosen source revision. Maintainers of private providers, source
+auditors or custom SDK packaging must update the internal paths below; obsolete
+production family packages are not compatibility entry points.
+
+| Previous private source | Current owner |
+| --- | --- |
+| `tools/configure/providers/native/` production modules | `soc/native/configure/` |
+| `tools/configure/providers/<stm32-family>/` production modules | `soc/stm32/<family>/configure/` |
+| `tools/configure/providers/<gd32-family>/` production modules | `soc/gd32/<family>/configure/` |
+| Family configuration tests inside provider packages | `tools/configure/tests/providers/<family>/` in the existing tool-test domain |
+| `soc/common/uart_v1_channel_dma.*` | `drivers/uart/uart_v1_channel_dma/` |
+| `soc/common/i2c_v1_async.*` and `soc/common/i2c_v2.*` | `drivers/i2c/i2c_v1_async/` and `drivers/i2c/i2c_v2/` |
+| `soc/common/legacy_adc.c`, `legacy_pwm.c`, `legacy_flash.c` | `drivers/adc/legacy_adc/`, `drivers/timer/legacy_pwm/`, `drivers/flash/legacy_flash/` |
+| `soc/common/legacy_devices.h` | Split into the three corresponding private driver headers; include only the required contract |
+| `soc/common/stm32_identity.h` | `soc/stm32/common/stm32_identity.h` |
+
+The explicit provider map, descriptor and shared leaf contracts remain in
+`tools/configure/providers/`; common parsing, typed IR and atomic bundle handling
+remain in `tools/configure/`. `soc/common/uart_control.h` remains a cross-vendor
+SoC collaboration contract. Do not infer either module or source paths from a
+family-name prefix: use the maintained descriptor and explicit CMake target.
+
+For a private extension, update imports and private includes, declared configuration
+inputs, source-observation coverage and the required SDK payload together. Resolve
+the same exact assembly and compare effective decisions before running its actual
+provider contracts and relocated consumer. A path migration does not establish
+new supported modes, hardware behavior or physical qualification. The
+[provider guide](provider-porting.md) owns new integration and lifecycle work;
+the [48-task ledger](../design/soc-ip-layout-execution.csv) records this refactor's
+implementation and execution separately.

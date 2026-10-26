@@ -57,6 +57,7 @@ target_compile_options(nexus_h743_peripheral_test PRIVATE
 nexus_google_test(nexus_h743_conversion_test SOURCES h743_conversion_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")

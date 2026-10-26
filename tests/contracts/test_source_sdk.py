@@ -103,6 +103,21 @@ class CMSISCoreSelectionTests(unittest.TestCase):
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_required_configuration_payload_follows_the_generator_closure(self):
+        import importlib.util
+        from tools.configure import dependencies
+        specification = importlib.util.spec_from_file_location(
+            "sdk_configuration_closure", ROOT / "cmake/package/package_source_sdk.py")
+        updated = importlib.util.module_from_spec(specification)
+        with mock.patch.object(dependencies, "COMMON",
+                               (*dependencies.COMMON, "new_shared_contract")):
+            specification.loader.exec_module(updated)
+            self.assertIn("tools/configure/new_shared_contract.py",
+                          updated.REQUIRED_FILES)
+        for mode in ("platform", "runtime"):
+            self.assertLessEqual(set(dependencies.source_names(mode, None, sdk=True)),
+                                 set(source_sdk.REQUIRED_FILES))
+
     def test_component_construction_helpers_are_required_sdk_payload(self):
         required = {"cmake/platform/Components.cmake",
                     "components/soc/CMakeLists.txt",

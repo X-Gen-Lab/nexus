@@ -201,11 +201,15 @@ class BundleTransactionTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        for module in ("factory", "emission"):
+        for module in ("tools/configure/factory.py",
+                       "tools/configure/emission.py",
+                       "soc/native/configure/emission.py",
+                       "soc/stm32/stm32h743/configure/clocks.py",
+                       "soc/stm32/stm32f407/configure/hardware.py"):
             with self.subTest(module=module):
                 def changing(*args, **kwargs):
                     result = original(*args, **kwargs)
-                    path = code_root / f"tools/configure/{module}.py"
+                    path = code_root / module
                     path.write_bytes(path.read_bytes() + b"\n# concurrent edit\n")
                     return result
                 self.configure()

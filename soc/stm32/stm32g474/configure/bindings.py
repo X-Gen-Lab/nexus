@@ -1,8 +1,9 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 from tools.configure.ir import controller_ir
-from tools.configure import enhanced_endpoints, timer_advanced
+from tools.configure import enhanced_endpoints
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
 from tools.configure.memory import dma_regions
+from . import timer
 
 
 def constructor(item, result, board_bindings, routes, devices):
@@ -22,10 +23,11 @@ def constructor(item, result, board_bindings, routes, devices):
         from . import coupled
         return coupled.constructor(item, result, board_bindings)
     if item.kind in {"timer_capture", "encoder"}:
-        return timer_advanced.g474_constructor(item)
+        return timer.constructor(item)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
+    initialize = f"prepare_{name}()"
     if item.kind == "gpio" and item.mode == "named-states":
         options = item.options
         plan = "s_nx_pin_plan_" + name
@@ -242,17 +244,14 @@ def constructor(item, result, board_bindings, routes, devices):
     elif item.kind == "i2c":
         timing = (f"0x{item.options.timing.timingr:08x}"
                   if item.options.timing is not None else "0x30420f13")
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = (nx_i2c_v2_registers_t*)(void*)I2C1;",
-                        f"    {state}.reset = &RCC->APB1RSTR1;",
-                        f"    {state}.reset_mask = RCC_APB1RSTR1_I2C1RST;",
-                        f"    {state}.timing = {timing}u;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        f"    {state}.ignore_master_berr = true;",
-                        "    nx_result_t status = nx_stm32g474_i2c_pins_prepare();",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_i2c_v2_initialize(&{state});", "}"]
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_i2c_v2_config_t {config} = {{",
+                        "    .registers = (nx_i2c_v2_registers_t*)(void*)I2C1,",
+                        "    .reset = &RCC->APB1RSTR1, .reset_mask = RCC_APB1RSTR1_I2C1RST,",
+                        f"    .timing = {timing}u, .poll_limit = 1000000u,",
+                        "    .ignore_master_berr = true, .receive_reload_one = false",
+                        "};"]
+        initialize = f"nx_stm32g474_i2c_prepare(&{state}, &{config})"
         for child in devices:
             if child["controller"] != item.id:
                 continue
@@ -348,5 +347,5 @@ def constructor(item, result, board_bindings, routes, devices):
                   f"nx_stm32g474_{item.kind}_state_t")
     return Construction(
         state_type=state_type,
-        definitions=definitions, initialize=f"prepare_{name}()",
+        definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)

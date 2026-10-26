@@ -1,4 +1,5 @@
 """Exact legacy GPIO lease and fixed IRC8 lifecycle; no runtime registry."""
+from .transport import PROFILE
 from tools.configure.providers import legacy_transport
 
 
@@ -86,7 +87,7 @@ def state_declarations(result):
 
 
 def start_system(result):
-    source = legacy_transport.dma_preflight(result, "gd32f303")
+    source = legacy_transport.dma_preflight(result, PROFILE)
     if _pins(result):
         source += [f'    result.primary = nx_gd32f303_pins_preflight({_pins(result)}u);',
                    '    if (result.primary != NX_SUCCESS) { return result; }']
@@ -123,7 +124,7 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    source = legacy_transport.dma_start(result, "gd32f303", cleanup)
+    source = legacy_transport.dma_start(result, PROFILE, cleanup)
     if _pins(result):
         source += [f'    result.primary = nx_gd32f303_pins_acquire(&s_nx_platform_pins, {_pins(result)}u);',
             '    if (result.primary != NX_SUCCESS) {',
@@ -150,7 +151,7 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
 
 
 def stop_system(result, *, system_phase=None):
-    source = legacy_transport.dma_stop(result, "gd32f303")
+    source = legacy_transport.dma_stop(result, PROFILE)
     if _pins(result):
         source += ['    nx_result_t pins = nx_gd32f303_pins_release(&s_nx_platform_pins);',
                    '    if (pins != NX_SUCCESS) { return pins; }']

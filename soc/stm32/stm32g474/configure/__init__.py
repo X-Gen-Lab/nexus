@@ -1,5 +1,8 @@
 """Explicit family contract and static-construction exports."""
 from .contract import (
+    PARTS,
+    i2c_timing_clock,
+    PUBLIC_FORMATS,
     ADC_GROUP,
     ADC_PIN_CHANNELS,
     CAN_CONTROLLERS,
@@ -16,6 +19,7 @@ from .contract import (
     EXTERNAL_IRQ_COUNT,
     FACT_REFERENCES,
     FLASH_INPUT_ALIGNMENT,
+    FLASH_GEOMETRY,
     FLASH_PROGRAM_UNIT,
     FREERTOS_PORT,
     IRQ_PRIORITY_BITS,
@@ -45,3 +49,9 @@ from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)
+from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
+from .preflight import PREFLIGHT_CALL, selected_preflight
+from . import gpio as GPIO_PHASE
+from .integration import TIMER_ADVANCED
+from . import coupled as COUPLED_IO
+from .integration import validate_pin_states_selection

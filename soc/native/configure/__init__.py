@@ -1,5 +1,8 @@
 """Explicit family contract and static-construction exports."""
 from .contract import (
+    UART_FORMATS,
+    PARTS,
+    PUBLIC_FORMATS,
     ADC_GROUP,
     CPU_ABI,
     CPU_FEATURES,
@@ -37,3 +40,4 @@ from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)
+from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan

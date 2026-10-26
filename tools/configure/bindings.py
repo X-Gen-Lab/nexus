@@ -127,6 +127,14 @@ def emit(result):
         source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
                    for item in uart_formats.probed(result)]
     source.extend(provider.includes(result))
+    geometry = getattr(provider, "FLASH_GEOMETRY", None)
+    if geometry is not None and any(item.kind == "flash"
+                                    for item in selections):
+        from tools.configure.memory import flash_geometry
+        source.extend(flash_geometry(
+            result, symbol=geometry[0], sector_symbol=geometry[0] + "_sectors",
+            program_unit=provider.FLASH_PROGRAM_UNIT,
+            program_flags=geometry[1], static=False))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
     if runtime:
@@ -140,7 +148,7 @@ def emit(result):
                       for member in owner.members}
     physical_constructed = set()
     if shared_members:
-        from soc.stm32.stm32g474.configure import pwm_shared
+        pwm_shared = provider.PWM_SHARED
     for selection_index, item in enumerate(selections):
         name = symbol(item.id)
         exported_type = interface_type(controller_class(item), "port")

@@ -144,7 +144,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
         original = json.dumps(physical, sort_keys=True)
         selected = memory.select(list(reversed(physical)),
             {"regions": {"tcm": {"limit_bytes": 64}}},
-            "gd32f470", "GD32F470ZGT6", obj=gate.obj,
+            frozenset({"addsram", "tcm"}), obj=gate.obj,
             integer=gate.integer, fail=gate.fail)
         self.assertEqual(next(item["id"] for item in selected if item["linker"]),
                          "sram")

@@ -1,5 +1,9 @@
 """Explicit family contract and static-construction exports."""
 from .contract import (
+    UART_FORMATS,
+    PARTS,
+    i2c_timing_clock,
+    PUBLIC_FORMATS,
     ADC_GROUP,
     ADC_PIN_CHANNELS,
     CAN_CONTROLLERS,
@@ -15,6 +19,7 @@ from .contract import (
     ETH_CONTROLLER,
     EXTERNAL_IRQ_COUNT,
     FLASH_INPUT_ALIGNMENT,
+    FLASH_GEOMETRY,
     FLASH_PROGRAM_UNIT,
     FREERTOS_PORT,
     IRQ_PRIORITY_BITS,
@@ -45,6 +50,9 @@ from .contract import (
     validate_user_io_context,
 )
 from .bindings import constructor
+from .selected_support import selected_limits
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)
+from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
+from .preflight import PREFLIGHT_CALL, selected_preflight

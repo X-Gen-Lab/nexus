@@ -4,21 +4,25 @@ Rate and delay inputs remain engineering assumptions. Reviewed provider modes
 own target count, replacement count and units; the actual runtime pool is still
 checked before the original provider may borrow it. No pool is generated here.
 """
-from tools.configure.providers.common import fail, integer
+from dataclasses import dataclass
+
+from tools.configure.providers.common import fail, integer, mode_traits
 
 
 FIELDS = frozenset(("max_units_per_second", "units_per_block", "blocks",
                     "release_delay_us", "target_delay_us", "on_exhaustion",
                     "source"))
-_REVIEWED = frozenset(
-    (provider, kind, mode)
-    for provider in ("stm32", "gd32")
-    for kind, modes in (("uart", ("rx-dma-continuous",
-                                  "dma-duplex-continuous")),
-                        ("adc", ("trigger-dma-continuous",)))
-    for mode in modes)
 _U64 = (1 << 64) - 1
 _SIZE = (1 << 32) - 1
+
+
+@dataclass(frozen=True)
+class StreamGeometry:
+    """Reviewed hardware targets, cold replacement count and DMA counter."""
+
+    hardware_targets: int
+    spare_blocks: int
+    counter_max: int
 
 
 def resolve(selection, kind, provider):
@@ -26,8 +30,11 @@ def resolve(selection, kind, provider):
     value = selection.get("stream")
     if value is None:
         return None
-    if (provider.PREFIX, kind, selection["mode"]) not in _REVIEWED:
+    geometry = getattr(provider, "STREAM_GEOMETRY", None)
+    if (geometry is None or kind not in {"uart", "adc"} or
+            not mode_traits(kind, selection["mode"]).continuous):
         fail("Stream profile requires a reviewed continuous provider mode")
+    provider.mode_implementation(kind, selection["mode"])
     if not isinstance(value, dict) or set(value) != FIELDS:
         fail("Stream profile requires exact rate/block/delay/policy/source "
              "fields; hardware geometry is provider-owned")
@@ -56,13 +63,13 @@ def resolve(selection, kind, provider):
     else:
         channels = len(selection["channels"])
         unit_bytes, counter_units = channels * 2, units * channels
-    if counter_units > 65535:
+    if counter_units > geometry.counter_max:
         fail("Stream DMA counter exceeds complete byte/scan block limit")
     denominator, numerator = units * 1000000, rate * hold
     if denominator > _U64 or numerator > _U64:
         fail("Stream budget uint64 arithmetic overflow")
     retained = numerator // denominator + (numerator % denominator != 0)
-    required = 2 + 1 + retained
+    required = geometry.hardware_targets + geometry.spare_blocks + retained
     payload = required * units * unit_bytes
     configured_payload = blocks * units * unit_bytes
     if required > _SIZE or max(payload, configured_payload) > _SIZE:
@@ -72,7 +79,8 @@ def resolve(selection, kind, provider):
         fail("Stream target latency must be strictly below block fill time")
     if blocks < required:
         fail("Stream budget capacity is below targets + spare + held blocks")
-    return {**value, "hardware_targets": 2, "spare_blocks": 1,
+    return {**value, "hardware_targets": geometry.hardware_targets,
+            "spare_blocks": geometry.spare_blocks,
             "unit_bytes": unit_bytes, "counter_units_per_block": counter_units,
             "retained_blocks": retained, "required_blocks": required,
             "required_payload_bytes": payload,
@@ -98,7 +106,8 @@ def emit_instance(item):
     values = (f"UINT64_C({profile.max_units_per_second})",
               f"{profile.units_per_block}U", f"{profile.unit_bytes}U",
               f"UINT64_C({profile.release_delay_us})",
-              f"UINT64_C({profile.target_delay_us})", "2U", "1U",
+              f"UINT64_C({profile.target_delay_us})",
+              f"{profile.hardware_targets}U", f"{profile.spare_blocks}U",
               f"{profile.blocks}U")
     return [f"static const nx_{item.kind}_stream_profile_t",
             f"    s_nx_stream_profile_{name} = {{",

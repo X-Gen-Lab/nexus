@@ -100,6 +100,7 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
+    initialize = f"prepare_{name}()"
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
@@ -171,9 +172,9 @@ def constructor(item, result, board_bindings, routes, devices):
             lane = 1 if receive else 0
             member = "rx" if receive else "tx"
             resource_owner = rx_owner if receive else owner + ".transmit"
-            initialize = ("uart_duplex" if duplex else
-                          "uart_continuous" if continuous else
-                          "uart_receive" if receive else "uart_dma")
+            dma_implementation = ("uart_duplex" if duplex else
+                                  "uart_continuous" if continuous else
+                                  "uart_receive" if receive else "uart_dma")
             definitions += [f"    {resource_owner}.dma = DMA1;",
                             f"    {resource_owner}.{member} = DMA1_Stream{lane};",
                             f"    {resource_owner}.mux = DMAMUX1_Channel{lane};",
@@ -185,7 +186,7 @@ def constructor(item, result, board_bindings, routes, devices):
                                 f"    {owner}.transmit.mux = DMAMUX1_Channel0;",
                                 f"    {owner}.transmit.regions = s_nx_dma_regions_{name};",
                                 f"    {owner}.transmit.region_count = {region_count}u;"]
-            definitions += [f"    return nx_stm32h743_{initialize}_initialize(&{owner}, {clock}u, 1000000u);"]
+            definitions += [f"    return nx_stm32h743_{dma_implementation}_initialize(&{owner}, {clock}u, 1000000u);"]
         else:
             definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
         handler = ("uart_duplex_uart" if duplex else
@@ -307,18 +308,14 @@ def constructor(item, result, board_bindings, routes, devices):
         timing = "0x70f22727" if result["clock"]["apb1_hz"] == 64000000 else "0x30f22727"
         if item.options.timing is not None:
             timing = f"0x{item.options.timing.timingr:08x}"
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = (nx_i2c_v2_registers_t*)(void*)I2C1;",
-                        f"    {state}.reset = &RCC->APB1LRSTR;",
-                        f"    {state}.reset_mask = RCC_APB1LRSTR_I2C1RST;",
-                        f"    {state}.timing = {timing}u;",
-                        f"    {state}.ignore_master_berr = true;",
-                        f"    {state}.receive_reload_one = true;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        "    nx_result_t status = nx_stm32h743_i2c_pins_prepare();",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_i2c_v2_initialize(&{state});", "}"]
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_i2c_v2_config_t {config} = {{",
+                        "    .registers = (nx_i2c_v2_registers_t*)(void*)I2C1,",
+                        "    .reset = &RCC->APB1LRSTR, .reset_mask = RCC_APB1LRSTR_I2C1RST,",
+                        f"    .timing = {timing}u, .poll_limit = 1000000u,",
+                        "    .ignore_master_berr = true, .receive_reload_one = true",
+                        "};"]
+        initialize = f"nx_stm32h743_i2c_prepare(&{state}, &{config})"
         for child in devices:
             if child["controller"] != item.id:
                 continue
@@ -395,5 +392,5 @@ def constructor(item, result, board_bindings, routes, devices):
         raise ValueError("Unmaintained H743 constructor")
     return Construction(
         state_type=f"nx_stm32h743_{implementation}_state_t",
-        definitions=definitions, initialize=f"prepare_{name}()",
+        definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)

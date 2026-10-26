@@ -99,8 +99,8 @@ TEST_F(H743PeripheralFactory, AllConcreteProvidersAndEndpointPinsAreAssembled) {
     EXPECT_EQ(0x70f22727U, I2C1->TIMINGR);
     const auto* i2c = static_cast<const nx_i2c_v2_state_t*>(
         nx_factory_i2c(NX_I2C_ID_BUS1)->context);
-    EXPECT_TRUE(i2c->ignore_master_berr);
-    EXPECT_TRUE(i2c->receive_reload_one);
+    EXPECT_TRUE(i2c->config->ignore_master_berr);
+    EXPECT_TRUE(i2c->config->receive_reload_one);
     EXPECT_EQ(3U, (GPIOB->OTYPER >> 8U) & 3U);
     EXPECT_EQ(0x44U, GPIOB->AFR[1] & 255U);
     EXPECT_EQ(1U, (GPIOE->MODER >> 22U) & 3U);
@@ -127,6 +127,14 @@ TEST_F(H743PeripheralFactory,
     const auto* capability = nx_factory_flash_capability(NX_FLASH_ID_STORAGE);
     ASSERT_NE(nullptr, geometry);
     ASSERT_NE(nullptr, capability);
+    EXPECT_EQ(0x08000000U, geometry->base_address);
+    EXPECT_EQ(2097152U, geometry->size);
+    ASSERT_EQ(16U, geometry->sector_count);
+    ASSERT_NE(nullptr, geometry->sectors);
+    for (size_t index = 0U; index < 16U; ++index) {
+        EXPECT_EQ(index * 131072U, geometry->sectors[index].offset);
+        EXPECT_EQ(131072U, geometry->sectors[index].size);
+    }
     EXPECT_EQ(geometry->program_unit, capability->unit_bytes);
     EXPECT_EQ(1U, capability->buffer_alignment);
 }

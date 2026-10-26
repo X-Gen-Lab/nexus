@@ -30,10 +30,14 @@ static bool task(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+static bool valid_config(const nx_i2c_v2_config_t* config) {
+    return config != NULL && config->registers != NULL &&
+           config->reset != NULL && config->reset_mask != 0U &&
+           (config->reset_mask & (config->reset_mask - 1U)) == 0U &&
+           config->poll_limit != 0U;
+}
 static bool valid(const nx_i2c_v2_state_t* p) {
-    return p != NULL && p->registers != NULL && p->reset != NULL &&
-           p->reset_mask != 0U &&
-           (p->reset_mask & (p->reset_mask - 1U)) == 0U && p->poll_limit != 0U;
+    return p != NULL && valid_config(p->config);
 }
 static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
     return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
@@ -41,35 +45,62 @@ static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
 static bool span(const void* a, size_t n) {
     return a != NULL && n != 0U && (uintptr_t)a <= UINTPTR_MAX - n;
 }
+nx_result_t nx_i2c_v2_bind(nx_i2c_v2_state_t* p,
+                           const nx_i2c_v2_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    /* Reject overlap before reading configuration: binding the pointer must
+     * never overwrite the descriptor itself or mutable hardware storage. */
+    if (p == NULL || !span(config, sizeof(*config)) ||
+        overlap(config, sizeof(*config), p, sizeof(*p)))
+        return NX_ERROR_INVALID;
+    if (p->initialized || p->retained || p->active)
+        return NX_ERROR_BUSY;
+    if (!valid_config(config) ||
+        overlap(config, sizeof(*config), config->registers,
+                sizeof(*config->registers)) ||
+        overlap(config, sizeof(*config), (const void*)config->reset,
+                sizeof(*config->reset)))
+        return NX_ERROR_INVALID;
+    p->config = config;
+    return NX_SUCCESS;
+}
 static bool protected(const nx_i2c_v2_endpoint_state_t* e, const void* a,
                       size_t n) {
     return overlap(a, n, e, sizeof(*e)) ||
            overlap(a, n, e->port, sizeof(*e->port)) ||
-           overlap(a, n, e->port->registers, sizeof(*e->port->registers)) ||
-           overlap(a, n, (const void*)e->port->reset, sizeof(*e->port->reset));
+           overlap(a, n, e->port->config, sizeof(*e->port->config)) ||
+           overlap(a, n, e->port->config->registers,
+                   sizeof(*e->port->config->registers)) ||
+           overlap(a, n, (const void*)e->port->config->reset,
+                   sizeof(*e->port->config->reset));
 }
 /** \brief Both reset edges and disabled/idle readbacks precede loan release. */
 static nx_result_t reset(nx_i2c_v2_state_t* p) {
-    NX_I2C_V2_WRITE(p->reset, NX_I2C_V2_READ(p->reset) | p->reset_mask);
+    const nx_i2c_v2_config_t* config = p->config;
+    NX_I2C_V2_WRITE(config->reset,
+                    NX_I2C_V2_READ(config->reset) | config->reset_mask);
     nx_arch_dsb();
-    if ((NX_I2C_V2_READ(p->reset) & p->reset_mask) == 0U)
+    if ((NX_I2C_V2_READ(config->reset) & config->reset_mask) == 0U)
         return NX_ERROR_IO;
-    NX_I2C_V2_WRITE(p->reset, NX_I2C_V2_READ(p->reset) & ~p->reset_mask);
+    NX_I2C_V2_WRITE(config->reset,
+                    NX_I2C_V2_READ(config->reset) & ~config->reset_mask);
     nx_arch_dsb();
-    if ((NX_I2C_V2_READ(p->reset) & p->reset_mask) != 0U ||
-        NX_I2C_V2_READ(&p->registers->cr1) != 0U ||
-        (NX_I2C_V2_READ(&p->registers->isr) & BUSY) != 0U)
+    if ((NX_I2C_V2_READ(config->reset) & config->reset_mask) != 0U ||
+        NX_I2C_V2_READ(&config->registers->cr1) != 0U ||
+        (NX_I2C_V2_READ(&config->registers->isr) & BUSY) != 0U)
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }
 static nx_result_t configure(nx_i2c_v2_state_t* p) {
-    NX_I2C_V2_WRITE(&p->registers->cr2, 0U);
-    NX_I2C_V2_WRITE(&p->registers->timing, p->timing);
-    NX_I2C_V2_WRITE(&p->registers->icr, ERRORS | STOPF);
-    NX_I2C_V2_WRITE(&p->registers->cr1, PE);
+    const nx_i2c_v2_config_t* config = p->config;
+    NX_I2C_V2_WRITE(&config->registers->cr2, 0U);
+    NX_I2C_V2_WRITE(&config->registers->timing, config->timing);
+    NX_I2C_V2_WRITE(&config->registers->icr, ERRORS | STOPF);
+    NX_I2C_V2_WRITE(&config->registers->cr1, PE);
     nx_arch_dsb();
-    return NX_I2C_V2_READ(&p->registers->cr1) == PE &&
-                   NX_I2C_V2_READ(&p->registers->timing) == p->timing
+    return NX_I2C_V2_READ(&config->registers->cr1) == PE &&
+                   NX_I2C_V2_READ(&config->registers->timing) == config->timing
                ? NX_SUCCESS
                : NX_ERROR_IO;
 }
@@ -78,13 +109,15 @@ nx_result_t nx_i2c_v2_initialize(nx_i2c_v2_state_t* p) {
         return NX_ERROR_CONTEXT;
     if (!valid(p))
         return NX_ERROR_INVALID;
+    const nx_i2c_v2_config_t* config = p->config;
     if (p->initialized || p->retained || p->active ||
-        NX_I2C_V2_READ(&p->registers->cr1) != 0U ||
-        NX_I2C_V2_READ(&p->registers->cr2) != 0U ||
-        NX_I2C_V2_READ(&p->registers->oar1) != 0U ||
-        NX_I2C_V2_READ(&p->registers->oar2) != 0U ||
-        NX_I2C_V2_READ(&p->registers->timeout) != 0U ||
-        (NX_I2C_V2_READ(&p->registers->isr) & (BUSY | ERRORS | STOPF)) != 0U)
+        NX_I2C_V2_READ(&config->registers->cr1) != 0U ||
+        NX_I2C_V2_READ(&config->registers->cr2) != 0U ||
+        NX_I2C_V2_READ(&config->registers->oar1) != 0U ||
+        NX_I2C_V2_READ(&config->registers->oar2) != 0U ||
+        NX_I2C_V2_READ(&config->registers->timeout) != 0U ||
+        (NX_I2C_V2_READ(&config->registers->isr) & (BUSY | ERRORS | STOPF)) !=
+            0U)
         return NX_ERROR_BUSY;
     p->retained = true;
     p->fault = false;
@@ -94,16 +127,17 @@ nx_result_t nx_i2c_v2_initialize(nx_i2c_v2_state_t* p) {
 }
 static nx_result_t wait(nx_i2c_v2_state_t* p, uint32_t mask, uint32_t expected,
                         nx_time_us_t deadline) {
-    uint32_t remaining = p->poll_limit;
+    const nx_i2c_v2_config_t* config = p->config;
+    uint32_t remaining = config->poll_limit;
     do {
         NX_I2C_V2_POLL(p);
-        uint32_t flags = NX_I2C_V2_READ(&p->registers->isr);
+        uint32_t flags = NX_I2C_V2_READ(&config->registers->isr);
         if ((flags & ARLO) != 0U)
             return NX_ERROR_ARBITRATION;
         if ((flags & NACK) != 0U)
             return NX_ERROR_NACK;
-        if ((flags & BERR) != 0U && p->ignore_master_berr) {
-            NX_I2C_V2_WRITE(&p->registers->icr, BERR);
+        if ((flags & BERR) != 0U && config->ignore_master_berr) {
+            NX_I2C_V2_WRITE(&config->registers->icr, BERR);
             flags &= ~BERR;
         }
         if ((flags & (BERR | OVR)) != 0U)
@@ -153,9 +187,10 @@ static nx_result_t transaction_bounded(void* context,
     }
     *transferred = 0U;
     nx_i2c_v2_state_t* p = e->port;
+    const nx_i2c_v2_config_t* config = p->config;
     if (!p->initialized || p->fault)
         return NX_ERROR_STATE;
-    if (p->active || (NX_I2C_V2_READ(&p->registers->isr) & BUSY) != 0U)
+    if (p->active || (NX_I2C_V2_READ(&config->registers->isr) & BUSY) != 0U)
         return NX_ERROR_BUSY;
     if (deadline == NX_DEADLINE_NEVER)
         return NX_ERROR_UNSUPPORTED;
@@ -166,7 +201,7 @@ static nx_result_t transaction_bounded(void* context,
         size_t position = 0U;
         do {
             size_t chunk = messages[m].length - position;
-            if (p->receive_reload_one && messages[m].read &&
+            if (config->receive_reload_one && messages[m].read &&
                 messages[m].length > 255U)
                 chunk = 1U;
             else if (chunk > 255U)
@@ -176,7 +211,7 @@ static nx_result_t transaction_bounded(void* context,
                 ((uint32_t)e->address << 1U) | ((uint32_t)chunk << 16U) |
                 (messages[m].read ? RD : 0U) | (position == 0U ? START : 0U) |
                 (!last_chunk ? RELOAD : (m + 1U == count ? AUTOEND : 0U));
-            NX_I2C_V2_WRITE(&p->registers->cr2, control);
+            NX_I2C_V2_WRITE(&config->registers->cr2, control);
             for (size_t i = 0U; i < chunk && result == NX_SUCCESS; ++i) {
                 result = wait(p, messages[m].read ? RXNE : TXIS,
                               messages[m].read ? RXNE : TXIS, deadline);
@@ -184,9 +219,9 @@ static nx_result_t transaction_bounded(void* context,
                     break;
                 if (messages[m].read)
                     messages[m].data[position] =
-                        (uint8_t)NX_I2C_V2_READ(&p->registers->rxdr);
+                        (uint8_t)NX_I2C_V2_READ(&config->registers->rxdr);
                 else
-                    NX_I2C_V2_WRITE(&p->registers->txdr,
+                    NX_I2C_V2_WRITE(&config->registers->txdr,
                                     messages[m].data[position]);
                 ++position;
                 ++*transferred;
@@ -208,13 +243,13 @@ static nx_result_t transaction_bounded(void* context,
         if (reset(p) != NX_SUCCESS)
             retain_and_park(p);
     } else {
-        NX_I2C_V2_WRITE(&p->registers->icr, STOPF);
-        NX_I2C_V2_WRITE(&p->registers->cr2, 0U);
+        NX_I2C_V2_WRITE(&config->registers->icr, STOPF);
+        NX_I2C_V2_WRITE(&config->registers->cr2, 0U);
         nx_arch_dsb();
         /* The bus is already drained, so caller buffers may return. Reuse
          * still requires independent STOPCF and control-clear proof. */
-        if ((NX_I2C_V2_READ(&p->registers->isr) & (STOPF | BUSY)) != 0U ||
-            NX_I2C_V2_READ(&p->registers->cr2) != 0U) {
+        if ((NX_I2C_V2_READ(&config->registers->isr) & (STOPF | BUSY)) != 0U ||
+            NX_I2C_V2_READ(&config->registers->cr2) != 0U) {
             p->fault = true;
             result = NX_ERROR_IO;
         }
@@ -251,7 +286,7 @@ static nx_result_t recover(void* context) {
     if (result == NX_SUCCESS)
         result = configure(p);
     if (result == NX_SUCCESS &&
-        (NX_I2C_V2_READ(&p->registers->isr) & BUSY) != 0U)
+        (NX_I2C_V2_READ(&p->config->registers->isr) & BUSY) != 0U)
         result = NX_ERROR_BUSY;
     p->fault = result != NX_SUCCESS;
     p->initialized = result == NX_SUCCESS;

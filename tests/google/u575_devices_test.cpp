@@ -84,15 +84,19 @@ TEST_F(U575Pwm, RefusedStopRetainsPinAndTimerUntilRetry) {
 class U575I2c : public testing::Test {
   protected:
     nx_i2c_v2_registers_t registers{};
+    nx_i2c_v2_config_t config{};
     nx_stm32u575_i2c_state_t state{};
     nx_stm32u575_i2c_clock_t clock{};
     void SetUp() override {
         nx_u575_devices_reset();
         g_u575_i2c = &registers;
-        state.registers = &registers;
-        state.reset = &g_u575_model.rcc.APB1RSTR1;
-        state.reset_mask = RCC_APB1RSTR1_I2C1RST;
-        state.poll_limit = 4U;
+        state.config = &config;
+        config.timing = 0x10f42f2fU;
+        config.ignore_master_berr = true;
+        config.registers = &registers;
+        config.reset = &g_u575_model.rcc.APB1RSTR1;
+        config.reset_mask = RCC_APB1RSTR1_I2C1RST;
+        config.poll_limit = 4U;
         g_nx_stm32u575_system.started = true;
         g_nx_stm32u575_system.core_hz = 4000000U;
     }
@@ -118,8 +122,8 @@ TEST_F(U575I2c, IndependentHsi16ClockAndFiniteReloadPreserveSystemTime) {
     EXPECT_EQ(system_clock, g_u575_model.rcc.CFGR1);
     EXPECT_EQ(time_prescaler, g_u575_model.timer.PSC);
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_i2c_initialize(&state));
-    EXPECT_TRUE(state.ignore_master_berr);
-    EXPECT_FALSE(state.receive_reload_one);
+    EXPECT_TRUE(config.ignore_master_berr);
+    EXPECT_FALSE(config.receive_reload_one);
     EXPECT_EQ(0x10f42f2fU, registers.timing);
     EXPECT_EQ(1U, registers.cr1);
     nx_i2c_port_t face{&nx_i2c_v2_ops, &state};
@@ -146,9 +150,10 @@ TEST_F(U575I2c, ExplicitTimingReachesActualRegistersAndSurvivesRecovery) {
     g_u575_model.rcc.APB1ENR1 = RCC_APB1ENR1_I2C1EN;
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_i2c_clock_start(&clock, &state));
     constexpr uint32_t timing = 0x20f41f1fU;
+    config.timing = timing;
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_i2c_initialize_timing(&state, timing));
     EXPECT_EQ(timing, registers.timing);
-    EXPECT_EQ(timing, state.timing);
+    EXPECT_EQ(timing, config.timing);
     nx_i2c_port_t face{&nx_i2c_v2_ops, &state};
     ASSERT_EQ(NX_SUCCESS, nx_i2c_port_recover(&face));
     EXPECT_EQ(timing, registers.timing);
@@ -226,6 +231,24 @@ TEST_F(U575I2c, FailedPeripheralSetupDrainsBeforeClockRelease) {
     g_u575_model.ignore_write = nullptr;
     EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&face));
     EXPECT_EQ(NX_SUCCESS, nx_stm32u575_i2c_clock_stop(&clock));
+}
+TEST_F(U575I2c, FailedColdPrepareKeepsConfigurationUntilClockRelease) {
+    g_u575_model.rcc.APB1ENR1 = RCC_APB1ENR1_I2C1EN;
+    g_u575_hsi_hold_on = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_stm32u575_i2c_prepare(&state, &clock, &config));
+    EXPECT_TRUE(clock.retained);
+    EXPECT_FALSE(state.retained);
+    auto replacement = config;
+    replacement.timing = 0x20f41f1fU;
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32u575_i2c_prepare(&state, &clock, &replacement));
+    EXPECT_EQ(&config, state.config);
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_i2c_close(&state, &clock));
+    EXPECT_FALSE(clock.retained);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_i2c_close(&state, &clock));
 }
 class U575Spi : public testing::Test {
   protected:

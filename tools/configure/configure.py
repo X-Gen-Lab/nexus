@@ -256,6 +256,8 @@ def validate_soc(soc, part):
     if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
         fail(f"Unmaintained exact part: {part}")
     provider = maintained(soc["id"])
+    from tools.configure.providers.common import exact_part
+    policy = exact_part(provider.PARTS, part)
     reference = getattr(provider, "FACT_REFERENCES", None)
     if reference is not None and soc.get("references") != reference:
         fail("SoC references differ from the maintained source index")
@@ -263,6 +265,7 @@ def validate_soc(soc, part):
     # route facts. A controller pad is not evidence that a package bonds it out.
     for exact, package in soc["variants"].items():
         identity(exact, "variant")
+        exact_part(provider.PARTS, exact)
         if not isinstance(package, dict):
             fail("Physical variant must be an object")
         if provider.MODEL and "pins" not in package:
@@ -299,6 +302,7 @@ def validate_soc(soc, part):
         ranges.append((start, end, region["id"]))
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
+    policy.validate(variant)
     cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS,
               cpu_profiles.CPU_OPTIONAL_FIELDS,
               "CPU facts")
@@ -366,7 +370,7 @@ def validate_soc(soc, part):
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
         identity(name, "clock profile")
-        clocks.normalize(profile)
+        provider.normalize_clock(profile)
     validate_clock_profiles(soc, provider)
     return variant
 
@@ -676,8 +680,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
-    clock_plan = clocks.plan(assembly["clock_profile"], clock)
-    clock = clocks.normalize(clock)
+    clock_plan = provider.clock_plan(assembly["clock_profile"], clock)
+    clock = provider.normalize_clock(clock)
     clocks.match_board(clock, board["clocks"])
     i2s2_role = i2s2.resolve(assembly.get("i2s2"), family=family,
                             part=part, backend=backend,
@@ -740,7 +744,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
         fail("Flash budget exceeds exact physical density")
     selected_memory = memory_regions.select(
-        variant["memory"], budgets, family, part, obj=obj, integer=integer, fail=fail)
+        variant["memory"], budgets, provider.PARTS[part].optional_memory,
+        obj=obj, integer=integer, fail=fail)
     bindings = resolve_bindings(board, routes, part)
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):

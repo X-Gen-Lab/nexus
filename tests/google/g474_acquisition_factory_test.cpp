@@ -88,6 +88,16 @@ TEST_F(G474AcquisitionFactory, LookupIsPureAndFlashCapabilityMatchesGeometry) {
               nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_REGISTERS));
     ASSERT_NE(nullptr, physical);
     ASSERT_NE(nullptr, capability);
+    const auto* geometry = nx_flash_port_geometry(physical);
+    ASSERT_NE(nullptr, geometry);
+    EXPECT_EQ(0x08000000U, geometry->base_address);
+    EXPECT_EQ(524288U, geometry->size);
+    ASSERT_EQ(256U, geometry->sector_count);
+    ASSERT_NE(nullptr, geometry->sectors);
+    for (size_t index = 0U; index < 256U; ++index) {
+        EXPECT_EQ(index * 2048U, geometry->sectors[index].offset);
+        EXPECT_EQ(2048U, geometry->sectors[index].size);
+    }
     EXPECT_EQ(8U, nx_flash_port_geometry(physical)->program_unit);
     EXPECT_EQ(NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE,
               nx_flash_port_geometry(physical)->program_flags);

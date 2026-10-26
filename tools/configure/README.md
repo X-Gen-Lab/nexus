@@ -83,6 +83,12 @@ information. Other validation failures retain `invalid_configuration` and the
 precise original message; no guessed line numbers or replacement values are
 reported.
 
+If the selected provider entry or one of its parent Python packages is missing,
+the diagnostic code is `provider_module_missing`, with `family`, `module`,
+`source` and `missing_module`. Only the selected family is loaded. A missing
+dependency inside an existing entry, or another import error, retains its actual
+exception; it is not reported as an unsupported provider.
+
 ```sh
 python tools/configure/configure.py provider-check \
   --assembly my-platform.toml --expect-family stm32f407 \

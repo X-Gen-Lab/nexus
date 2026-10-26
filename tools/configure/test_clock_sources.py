@@ -6,6 +6,29 @@ from tools.configure import configure as gate
 
 
 class ClockSourceContractTests(unittest.TestCase):
+    def test_h743_rejects_non_object_profiles_as_configuration_errors(self):
+        from tools.configure.providers import maintained
+        provider = maintained("stm32h743")
+        for value in (None, 123, True, [], "invalid"):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(gate.ConfigurationError,
+                                            "Clock profile must be an object"):
+                    provider.normalize_clock(value)
+                facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
+                facts["clock_profiles"]["hsi64-fixed-cache-off"] = value
+                with self.assertRaisesRegex(gate.ConfigurationError,
+                                            "Clock profile must be an object"):
+                    gate.validate_soc(facts, "STM32H743ZIT6")
+
+    def test_domain_shape_alone_does_not_authorize_family_clock_policy(self):
+        from tools.configure import clocks
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
+        profile = facts["clock_profiles"]["hsi64-pll384-cache-off"]
+        with self.assertRaisesRegex(ValueError, "Clock"):
+            clocks.normalize(profile)
+        with self.assertRaisesRegex(ValueError, "Clock"):
+            clocks.plan("hsi64-pll384-cache-off", profile)
+
     def test_existing_hse_facts_accept_one_explicit_source_identity(self):
         for family, part in (("stm32f407", "STM32F407ZGT6"),
                              ("gd32f470", "GD32F470ZGT6"),

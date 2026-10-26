@@ -1,4 +1,5 @@
 """One selected immutable face, actual shared ops and bounded private storage."""
+from .transport import PROFILE
 from tools.configure.ir import controller_ir
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
 
@@ -12,10 +13,11 @@ def constructor(item, result, board_bindings, routes, devices):
     validate_selection(item, item)
     if item.kind == "i2c" or (item.kind == "uart" and item.mode != "irq-bytes"):
         from tools.configure.providers.legacy_transport import constructor as transport_constructor
-        return transport_constructor(item, result, devices, "gd32f303")
+        return transport_constructor(item, result, devices, PROFILE)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
+    initialize = f"prepare_{name}()"
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
             f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
@@ -121,54 +123,24 @@ def constructor(item, result, board_bindings, routes, devices):
             f"void EXTI{line}_IRQHandler(void) {{ nx_gd32f303_exti_irq(&{state}); }}"]
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     elif item.kind in {"adc", "pwm", "flash"}:
-        definitions += [f"static nx_result_t prepare_{name}(void) {{"]
         if item.kind == "flash":
             supply = board_bindings[item.binding].get("supply_mv")
             if type(supply) is not int or not 2700 <= supply <= 3600:
                 fail("GD303 Flash requires explicit Board supply_mv2700..3600")
-            definitions += [
-                f"    if ({state}.initialized || {state}.active || {state}.fault) {{ return NX_ERROR_BUSY; }}",
-                f"    {state}.registers = (nx_legacy_flash_registers_t*)(uintptr_t)FMC;",
-                f"    {state}.geometry = &g_nx_gd32f303_flash_geometry;",
-                f"    {state}.memory = (volatile uint8_t*)(uintptr_t)0x08000000u;",
-                f"    {state}.supply_mv = {supply}u;",
-                f"    return nx_legacy_flash_initialize(&{state});", "}"]
-            stop = f"nx_legacy_flash_close(&{state})"
+            initialize = f"nx_gd32f303_flash_prepare(&{state}, {supply}u)"
+        elif item.kind == "adc":
+            initialize = (f"nx_gd32f303_adc_prepare(&{state}, "
+                          f"{item.options.reference_mv}u)")
         else:
-            definitions += [
-                f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
-                f"    {state}.clock_started = &g_nx_gd32f303_system.started;",
-                f"    {state}.pin_mode = &GPIO_CTL0(GPIOA);",
-                f"    {state}.pin_lock = &GPIO_LOCK(GPIOA);",
-                f"    {state}.poll_limit = 1000000u;"]
-            if item.kind == "adc":
-                definitions += [
-                    f"    {state}.registers = (nx_legacy_adc_registers_t*)(uintptr_t)ADC0;",
-                    f"    {state}.gate = &RCU_APB2EN;",
-                    f"    {state}.gate_mask = RCU_APB2EN_ADC0EN;",
-                    f"    {state}.divider = &RCU_CFG0;",
-                    f"    {state}.divider_mask = RCU_CFG0_ADCPSC | RCU_CFG0_ADCPSC_2;",
-                    f"    {state}.reference_mv = {item.options.reference_mv}u;",
-                    f"    {state}.startup_delay_us = 2000u;",
-                    "    if ((NX_GD303_READ(&RCU_CFG1) & RCU_CFG1_ADCPSC_3) != 0u || NX_GD303_READ(&ADC_OVSAMPCTL(ADC0)) != 0u) { return NX_ERROR_BUSY; }"]
-            else:
-                initial = board_bindings[item.binding].get("initial")
-                if type(initial) is not int or initial not in {0, 64}:
-                    fail("GD303 PWM requires explicit PA6 inactive level")
-                definitions += [
-                    f"    {state}.registers = (nx_legacy_pwm_registers_t*)(uintptr_t)TIMER2;",
-                    f"    {state}.gate = &RCU_APB1EN;",
-                    f"    {state}.gate_mask = RCU_APB1EN_TIMER2EN;",
-                    f"    {state}.pin_latch = &GPIO_OCTL(GPIOA);",
-                    f"    {state}.pin_set = &GPIO_BOP(GPIOA);",
-                    f"    {state}.inactive = {initial}u;",
-                    f"    {state}.tick_hz = {item.options.tick_hz}u;",
-                    f"    {state}.period_ticks = {item.options.period_ticks}u;",
-                    f"    {state}.duty_ticks = {item.options.duty_ticks}u;"]
-            definitions += [f"    return nx_legacy_{item.kind}_initialize(&{state});", "}"]
-            stop = f"nx_legacy_{item.kind}_close(&{state})"
+            initial = board_bindings[item.binding].get("initial")
+            if type(initial) is not int or initial not in {0, 64}:
+                fail("GD303 PWM requires explicit PA6 inactive level")
+            initialize = (f"nx_gd32f303_pwm_prepare(&{state}, "
+                          f"{item.options.tick_hz}u, {item.options.period_ticks}u, "
+                          f"{item.options.duty_ticks}u, {initial}u)")
+        stop = f"nx_legacy_{item.kind}_close(&{state})"
     else:
         fail("Unmaintained GD303 constructor")
     return Construction(state_type=f"nx_gd32f303_{item.kind}_state_t",
-        definitions=definitions, initialize=f"prepare_{name}()",
+        definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=item.kind != "flash")

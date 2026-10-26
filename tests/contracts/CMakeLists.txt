@@ -53,6 +53,7 @@ foreach(unit gpio uart spi i2c flash watchdog exti timer adc)
     list(APPEND gd32_driver_sources "${gd32_driver_root}/${unit}.c")
 endforeach()
 nexus_behavior_test(contract_gd32_io SOURCES gd32_io_test.c
+    gd32f470_flash_geometry.c
     gd32_model/model.c ${gd32_driver_sources}
     LIBRARIES Nexus::IO
     INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model"

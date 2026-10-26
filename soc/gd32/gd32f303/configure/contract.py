@@ -3,6 +3,12 @@ from types import MappingProxyType
 from tools.configure.providers import common, descriptor
 
 
+PARTS = MappingProxyType({
+    "GD32F303RCT6": common.PartPolicy("LQFP64"),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+
 CPU_ABI = MappingProxyType({
     "arch": "cortex-m4", "fpu": "fpv4-sp-d16", "float_abi": "hard"})
 ENUM_ABI = "short-enums"
@@ -15,6 +21,7 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "gd32f303"
+FLASH_GEOMETRY = ("g_nx_gd32f303_flash_geometry", "0u")
 FLASH_PROGRAM_UNIT = 2
 FLASH_INPUT_ALIGNMENT = 1
 MODEL = False

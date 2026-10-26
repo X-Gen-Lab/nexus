@@ -205,6 +205,13 @@ void nx_stm32h743_exti_irq(nx_stm32h743_exti_state_t* port);
 typedef nx_i2c_v2_state_t nx_stm32h743_i2c_state_t;
 /** \brief Prepare selected PB8/PB9 AF4 open drain after Platform pin lease. */
 nx_result_t nx_stm32h743_i2c_pins_prepare(void);
+/** \brief Bind a cold I2C1 owner, prepare its pads, then acquire the engine.
+ * \param[in,out] port: Serialized runtime; retained owners reject rebinding.
+ * \param[in] config: Static immutable I2C1 resources and reviewed timing.
+ * \return Success/error; platform cleanup retains any partial pad effects.
+ */
+nx_result_t nx_stm32h743_i2c_prepare(nx_i2c_v2_state_t* port,
+                                     const nx_i2c_v2_config_t* config);
 extern const nx_gpio_ops_t nx_stm32h743_gpio_ops;
 /** \brief One ADC1 PA3/INP15 conversion, no injected/continuous/DMA mode. */
 typedef struct {

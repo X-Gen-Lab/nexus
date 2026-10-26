@@ -1,6 +1,15 @@
 """Maintained native capability and static assembly contract."""
+from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
+
+PARTS = MappingProxyType({
+    "NATIVE_MODEL": common.PartPolicy("host-model"),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+
+UART_FORMATS = UartFormatPolicy(words=("UART0",))
 
 CPU_ABI = MappingProxyType({'arch': 'native', 'fpu': 'none', 'float_abi': 'native'})
 ENUM_ABI = 'native-int'

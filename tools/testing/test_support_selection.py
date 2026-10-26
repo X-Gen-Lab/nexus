@@ -15,6 +15,64 @@ ASSEMBLIES = ROOT / "tools/configure/assemblies"
 
 
 class ExactSupportSelectionTests(unittest.TestCase):
+    def test_high_clock_reports_only_its_selected_revision_expectation(self):
+        result = capabilities.selection(ROOT / (
+            "cmake/package/verification/io_evolution/h743-high-empty.toml"),
+            ROOT)
+        self.assertIn("silicon_admission", result)
+        policy = result["silicon_admission"]
+        self.assertEqual(policy["part"], "STM32H743ZIT6")
+        self.assertEqual(policy["reviewed_revision_ids"], [0x2003])
+        self.assertEqual(policy["review_scope"], "selected_clock_profile")
+        self.assertEqual(policy["unknown_revision"], "reject")
+        self.assertIs(policy["physical_qualified"], False)
+        self.assertNotIn("observed_revision", policy)
+        self.assertEqual(result["controllers"], [])
+
+    def test_spi_revision_policy_belongs_to_its_controller_not_every_face(self):
+        result = capabilities.selection(
+            ASSEMBLIES / "h743-spi-dma-cache-on.toml", ROOT)
+        controller, = result["controllers"]
+        self.assertIn("silicon_admission", controller)
+        policy = controller["silicon_admission"]
+        self.assertEqual(policy["profile"],
+                         "spi4-dma-hsi64-cacheon-dev450-v2003-trim64")
+        self.assertEqual(policy["reviewed_revision_ids"], [0x2003])
+        self.assertEqual(policy["review_scope"], "selected_spi_dma_mode")
+        self.assertEqual(policy["unknown_revision"], "reject")
+        self.assertIs(policy["physical_qualified"], False)
+        self.assertIsNone(result["silicon_admission"])
+        endpoint, = result["endpoints"]
+        self.assertEqual(endpoint["controller"], controller["id"])
+        self.assertNotIn("silicon_admission", endpoint)
+
+    def test_adc_admission_preserves_reviewed_rules_and_workaround_scope(self):
+        result = capabilities.selection(ROOT / (
+            "cmake/package/verification/io_evolution/"
+            "g474-adc-group-regular-software.toml"), ROOT)
+        controller, = result["controllers"]
+        self.assertIn("silicon_admission", controller)
+        policy = controller["silicon_admission"]
+        self.assertEqual((policy["device_id"], policy["flash_bytes"]),
+                         (0x469, 524288))
+        self.assertEqual(policy["rules"], [{"revision_id": 0x2003,
+                                          "required_workarounds": 2}])
+        self.assertEqual(policy["applied_workarounds"], 6)
+        self.assertRegex(policy["review_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(policy["unknown_revision"], "reject")
+        self.assertIs(policy["physical_qualified"], False)
+        self.assertEqual(result, json.loads(json.dumps(result)))
+
+    def test_absent_revision_review_remains_explicitly_unknown(self):
+        for name in ("qiming-baremetal-uart.toml", "native-uart.toml"):
+            with self.subTest(assembly=name):
+                result = capabilities.selection(ASSEMBLIES / name, ROOT)
+                self.assertIn("silicon_admission", result)
+                self.assertIsNone(result["silicon_admission"])
+                self.assertTrue(all(item.get("silicon_admission", "missing")
+                                    is None for item in result["controllers"]))
+                self.assertIs(result["physical_qualified"], False)
+
     def test_selected_part_backend_clock_and_dma_remain_exact(self):
         result = capabilities.selection(
             ASSEMBLIES / "qiming-baremetal-uart-dma.toml", ROOT)

@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 7493f2e353ae0a2e023b3d5d4ba5fcfa5e267d1623ae9c37410eb82a837c359d\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d5cf0aa4fe9d4f59197175405e982169a55c023bcfcd54b90466713484edacaa\n"
 
 msgid "I/O evolution: static resources and explicit data contracts"
 msgstr "I/O 增量架构：静态资源与明确的数据合同"
@@ -509,3 +509,6 @@ msgstr "专用的 [LPTIM1 单组 LPBAM 参考](u575-lptim1-lpbam.md) 在同一 c
 
 msgid "Use [platform integration contracts](integration-contracts.md), [the lifecycle matrix](io-lifecycle-matrix.md), [software qualification](../reference/platforms/qualification.md) and {download}`the 42-item ledger <io-evolution-execution.csv>` when reviewing or delivering a change. Update that single ledger with actual evidence; do not replace pending work by a broad claim that the platform supports an entire MCU family."
 msgstr "评审和交付变更时，参照[平台接入合同](integration-contracts.md)、[生命周期矩阵](io-lifecycle-matrix.md)、[软件资格](../reference/platforms/qualification.md)和{download}`42 项台账 <io-evolution-execution.csv>`。用实际证据更新这一份台账，不要用“支持整个 MCU 系列”等宽泛结论替代待完成工作。"
+
+msgid "The read-only `capabilities.py --assembly` view projects this review separately for the system-clock owner and each selected controller as `silicon_admission`. It uses the existing policy and typed IR. An endpoint or companion does not inherit its owner's review; an owner with no applicable record reports `null`. H743's selected clock and SPI DMA records retain their own revision/profile scope, while G474 ADC retains its device, density, workaround and review-digest fields. These are reviewed admission rules, not observed identity, broader errata coverage or physical qualification."
+msgstr "只读 `capabilities.py --assembly` 视图通过 `silicon_admission`，分别投影系统时钟 owner 与各选定控制器的复核策略。它使用既有 policy 与 typed IR。endpoint 或 companion 不继承其 owner 的复核；没有适用记录的 owner 报告 `null`。H743 所选时钟与 SPI DMA 记录保持各自 revision／profile 范围，G474 ADC 则保留 device、density、workaround 与复核摘要字段。这些是经复核的准入规则，不是已观察的芯片身份、更广勘误覆盖或物理资格。"

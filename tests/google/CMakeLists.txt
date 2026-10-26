@@ -350,6 +350,7 @@ target_compile_options(nexus_stm32_adc_stream_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_stream_model.h")
 
 nexus_google_test(nexus_gd32_flash_fault_test SOURCES gd32_flash_fault_test.cpp
+    "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f470_flash_geometry.c"
     "${gd_multi_root}/drivers/flash.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO

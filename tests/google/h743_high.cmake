@@ -16,6 +16,7 @@ nexus_google_test(nexus_h743_high_kernel_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"

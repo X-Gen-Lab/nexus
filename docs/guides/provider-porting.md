@@ -28,6 +28,29 @@ Read the [architecture](../explanation/platform-architecture.md),
 [integration contract](../design/integration-contracts.md) and
 [provider assembly contract](../design/provider-assemblies.md).
 
+## Choose the source owner
+
+![Current decision for shared register algorithms and exact SoC integration](../assets/diagrams/driver-source-ownership.svg)
+
+FIG-31 classifies private controller work. Arrows are maintenance decisions, not
+runtime calls. Sharing requires evidence for every selecting chip's register
+layout, flags, ordering and reset compatibility, plus explicit handling of its
+errata. Similar names or a successful compile do not establish that evidence.
+Keep an unreviewed or incompatible protocol in its exact SoC implementation.
+
+| Change | Source owner and required check |
+| --- | --- |
+| Public I/O contract or portable I/O rule | `io/`; preserve the public ownership and failure contract |
+| Reusable register-protocol algorithm | `drivers/<kind>/<ip>/`; each SoC wrapper establishes the actual silicon contract |
+| Part, memory, clock, reset, pin, IRQ or DMA integration | Exact `soc/<vendor>/<family>/`; facts, configuration policy and private C retain distinct jobs |
+| Private SoC collaboration helper | Narrowest reviewed SoC scope; `soc/common/uart_control.h` is cross-vendor, while STM32 identity access is vendor-specific |
+| External device, protocol or product policy | Existing component ports or the external product, according to the [integration contract](../design/integration-contracts.md) |
+
+The SoC target selects shared sources through explicit CMake entries and private
+includes. The driver directory does not choose routes, clock profiles or an ABI,
+and its presence does not add a maintained mode. Never introduce a runtime
+forwarder merely to match a source directory.
+
 ## Implement in a reviewable sequence
 
 1. Prepare the [fixed source and recursive dependencies](source-checkout.md).
@@ -84,6 +107,64 @@ resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
 policy, `ir.py` adapts typed IR, and `matrix.py` orchestrates support catalogues.
 The descriptor explicitly lists `configuration_modules`, including `contract.py`,
 so edits trigger reconfiguration and remain in the Source SDK closure.
+
+## Keep facts and admission policy distinct
+
+The exact `soc.json` variant supplies physical Flash origin, size, erase blocks
+and RAM domains. Each family's `contract.PARTS` explicitly admits its full part
+numbers through the frozen `PartPolicy`: the package and optional memory-domain
+allowlist are software policy, not duplicate size tables. Unknown parts, a
+different package or optional domains inconsistent with the physical facts reject.
+
+Trace an added part or mode through these maintained inputs before adding its
+constructor:
+
+| Input or projection | Maintainer's check |
+| --- | --- |
+| `soc.json` variant and `routes.json` | Exact physical geometry, bonded pads, route provenance and finite mode allowlist |
+| Family `PARTS` and `PartPolicy` | Explicit full part, reviewed package and optional placement domains |
+| `normalize_clock` and `clock_plan` | The exact family implements the selected profile and any reviewed domain relationships |
+| `i2c_timing_clock` | `I2cTimingClock` carries selected kernel and peripheral clock bounds and whether explicit timing is required; electrical assumptions remain authored |
+| Selected limits, format and silicon policy | Metadata belongs to the exact selected owner; missing review remains explicit and does not admit a mode |
+| `PhysicalPartIR` | Views the same frozen part, package, Flash and memory facts; it adds no JSON or configuration-identity field |
+| `ControllerIntegrationIR` | Reuses canonical resource claims, DMA lanes, IRQ options/profile, clocks, pins and the exact SoC hardware binding |
+| Family `UART_FORMATS`, `STREAM_GEOMETRY` and `ENDPOINT_POLICY` | Explicit reviewed formats, stream geometry and endpoint capability; a vendor alias or name prefix does not select a policy |
+| Generated static C and private provider | Consume validated values and retain independent SDK/register assertions and runtime failure checks |
+
+F407 Flash generation illustrates the boundary: its selected sector array and
+readonly geometry come from validated `result.flash.erase_blocks`, origin and
+size. The C SDK assertion still checks the physical base, and independent
+register-model tests retain the reference geometry. Removing duplicate production
+tables does not make configuration a substitute for hardware validation.
+
+All seven maintained MCU families obtain generated readonly Flash geometry from
+the validated facts through `memory.flash_geometry`. Six retain their existing
+global geometry symbols; F407 emits selected static geometry. Native remains a
+host model. The exact source and independently maintained test oracle still need
+the applicable provider and linked-image checks.
+
+`ConfigurationIR.physical_part` views the existing frozen Flash and memory
+objects. `ControllerIR.integration` composes existing `ResourcePlanIR` claims,
+`DmaTopologyIR` lanes, IRQ options and profile, clock plan/inputs, selected pins
+and a family `ControllerBinding`. Its `clock_hz` is only the paired nominal APB
+input; a missing value is not guessed, and reviewed frequency bounds come from
+`clock_plan`. F407 SPI and the paired secondary-controller paths consume this
+view; other bindings can still use their existing typed or legacy-fixture
+adapter. Do not describe the view as a new route resolver or a completed rewrite
+of every constructor.
+
+Family policy hooks remain declared configuration inputs. H743's reviewed clock
+domain relationships and selected Flash linker fragments live in its `configure/`
+package; generic tools still own parsing, typed IR, resource arbitration and
+atomic publication. A hook must not create a second source graph or silently
+choose a different part, route or profile.
+
+The paired F407/GD470 controller bindings, DMA vector maps and concrete secondary
+controller hooks live with their SoC. Common code keeps resource leases, fixed
+IRQ wiring and drain ordering while consuming the selected typed integration.
+Coupled personalities and named pin states likewise require explicit provider
+policy. Cross-Board/backend qualification remains in its existing OS contract;
+moving family mechanisms does not broaden those admitted combinations.
 
 The read-only [work-package view](../../tools/maintenance/README.md) connects
 exact maintained modes to resolver fixtures, selected ops sources and reviewed

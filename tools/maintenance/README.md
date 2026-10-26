@@ -7,9 +7,20 @@ exact initialized production definition exists; it does not mean that hardware
 or the new HEAD has been qualified. Initialize the pinned SDK submodules before
 running the resolver-backed check.
 
+`capabilities.py --assembly <assembly.toml>` prints the selected source and
+support projection. Its top-level `silicon_admission` belongs to the system-clock
+owner; the same field under each controller belongs only to that controller.
+These fields project existing reviewed policy, not observed chip identity.
+Unreviewed owners report `null`; endpoints and companion controllers do not
+inherit another owner's policy. H743 high-clock and SPI DMA reviews and G474 ADC
+review/workaround records keep their exact profile, revision and scope fields.
+They neither admit an unknown revision nor establish physical qualification.
+
 ```sh
 python tools/maintenance/capabilities.py --check
 python tools/maintenance/capabilities.py --write
+python tools/maintenance/capabilities.py \
+  --assembly tools/configure/assemblies/h743-high-peripherals.toml
 python -B -m unittest tools.testing.test_maintenance -v
 ```
 

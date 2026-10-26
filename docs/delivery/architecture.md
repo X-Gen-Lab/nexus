@@ -119,6 +119,13 @@ constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema�
 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格
 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。
 
+`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划
+的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象；
+不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller
+路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核
+的 clock domain envelope。字段职责和新增料号检查见
+[provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。
+
 不可变 family descriptor 统一配置入口、依赖身份和 SDK 必需 payload；controller
 descriptor 复用精确寄存器基址、IRQ、DMA 和引脚绑定事实，生产 C 的 SDK 静态
 断言仍独立核对。`clock.source`／`input_hz` 表达 HSE、HSI 或 MSIS 等真实来源；

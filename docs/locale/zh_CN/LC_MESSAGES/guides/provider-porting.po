@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b549e776621d6b5afb4ee13536b50b1446ea2b45f56661f895b899332c033ffa\n"
+"X-Nexus-Source-SHA256: 38bf5ff725d9469f952bba6a94866ef6509ab77bb2c3dad9a2c107d7a20dee24\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:9
 msgid "Add a SoC, provider or reusable component"
@@ -209,3 +209,138 @@ msgstr "将家族加入 `tools/configure/` 中显式维护的 provider map。生
 
 msgid "Within each SoC's `configure/` package, `contract.py` owns mode capabilities, ABI/limits and family admission policy. Sibling modules import that contract directly; `__init__.py` explicitly exports it with constructors and emitters. The leaf `providers/common.py` owns validation helpers and immutable `Construction`; leaf contracts and common helpers do not import the top-level resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ policy, `ir.py` adapts typed IR, and `matrix.py` orchestrates support catalogues. The descriptor explicitly lists `configuration_modules`, including `contract.py`, so edits trigger reconfiguration and remain in the Source SDK closure."
 msgstr "每个 SoC 的 `configure/` 包中，`contract.py` 拥有模式能力、ABI／限制与家族准入策略。同级模块直接导入该合同；`__init__.py` 将其与构造器、生成器一起显式导出。叶子模块 `providers/common.py` 拥有校验辅助逻辑和不可变 `Construction`；叶子合同与公共辅助模块不导入顶层 resolver 或 emitter。`selection.py` 检查跨域选项、时钟和 IRQ 策略，`ir.py` 适配 typed IR，`matrix.py` 编排支持目录。descriptor 显式列出包含 `contract.py` 的 `configuration_modules`，使编辑能够触发重新配置，并纳入 Source SDK 闭包。"
+
+msgid "Choose the source owner"
+msgstr "确定源码归属"
+
+msgid "![Current decision for shared register algorithms and exact SoC integration](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![共享寄存器算法与精确 SoC 集成的当前判定](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "Current decision for shared register algorithms and exact SoC integration"
+msgstr "共享寄存器算法与精确 SoC 集成的当前判定"
+
+msgid "FIG-31 classifies private controller work. Arrows are maintenance decisions, not runtime calls. Sharing requires evidence for every selecting chip's register layout, flags, ordering and reset compatibility, plus explicit handling of its errata. Similar names or a successful compile do not establish that evidence. Keep an unreviewed or incompatible protocol in its exact SoC implementation."
+msgstr "FIG-31 对私有控制器工作作归属判定。箭头表示维护决策，不是运行时调用。共享需要每个选入芯片的寄存器布局、位含义、访问顺序及复位兼容性证据，并显式处理其勘误。名称相似或编译成功不能建立这些证据。尚未复核或不兼容的协议保留在精确 SoC 实现中。"
+
+msgid "Change"
+msgstr "变更"
+
+msgid "Source owner and required check"
+msgstr "源码归属与必需检查"
+
+msgid "Public I/O contract or portable I/O rule"
+msgstr "公共 I/O 合同或可移植 I/O 规则"
+
+msgid "`io/`; preserve the public ownership and failure contract"
+msgstr "`io/`；保持公共所有权与失败合同"
+
+msgid "Reusable register-protocol algorithm"
+msgstr "可复用寄存器协议算法"
+
+msgid "`drivers/<kind>/<ip>/`; each SoC wrapper establishes the actual silicon contract"
+msgstr "`drivers/<kind>/<ip>/`；每个 SoC wrapper 确认实际硅片合同"
+
+msgid "Part, memory, clock, reset, pin, IRQ or DMA integration"
+msgstr "料号、内存、时钟、复位、引脚、IRQ 或 DMA 集成"
+
+msgid "Exact `soc/<vendor>/<family>/`; facts, configuration policy and private C retain distinct jobs"
+msgstr "精确 `soc/<vendor>/<family>/`；事实、配置策略与私有 C 保持各自职责"
+
+msgid "Private SoC collaboration helper"
+msgstr "私有 SoC 协作辅助代码"
+
+msgid "Narrowest reviewed SoC scope; `soc/common/uart_control.h` is cross-vendor, while STM32 identity access is vendor-specific"
+msgstr "最窄的已复核 SoC 范围；`soc/common/uart_control.h` 跨厂家共享，STM32 identity 访问则属于厂家特定范围"
+
+msgid "External device, protocol or product policy"
+msgstr "外部器件、协议或产品策略"
+
+msgid "Existing component ports or the external product, according to the [integration contract](../design/integration-contracts.md)"
+msgstr "按[接入合同](../design/integration-contracts.md)放入既有组件端口或外部产品"
+
+msgid "The SoC target selects shared sources through explicit CMake entries and private includes. The driver directory does not choose routes, clock profiles or an ABI, and its presence does not add a maintained mode. Never introduce a runtime forwarder merely to match a source directory."
+msgstr "SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。"
+
+msgid "Keep facts and admission policy distinct"
+msgstr "区分事实与准入策略"
+
+msgid "The exact `soc.json` variant supplies physical Flash origin, size, erase blocks and RAM domains. Each family's `contract.PARTS` explicitly admits its full part numbers through the frozen `PartPolicy`: the package and optional memory-domain allowlist are software policy, not duplicate size tables. Unknown parts, a different package or optional domains inconsistent with the physical facts reject."
+msgstr "精确 `soc.json` variant 提供物理 Flash 起始地址、大小、擦除块和 RAM 域。每个家族的 `contract.PARTS` 通过冻结的 `PartPolicy` 显式准入完整料号：封装与可选内存域 allowlist 是软件策略，不是重复的容量表。未知料号、不同封装或与物理事实不一致的可选域均拒绝。"
+
+msgid "Trace an added part or mode through these maintained inputs before adding its constructor:"
+msgstr "添加构造器前，沿以下维护中的输入核对新增料号或模式："
+
+msgid "Input or projection"
+msgstr "输入或投影"
+
+msgid "Maintainer's check"
+msgstr "维护者检查"
+
+msgid "`soc.json` variant and `routes.json`"
+msgstr "`soc.json` variant 与 `routes.json`"
+
+msgid "Exact physical geometry, bonded pads, route provenance and finite mode allowlist"
+msgstr "精确物理几何、引出 pad、路由来源和有限模式 allowlist"
+
+msgid "Family `PARTS` and `PartPolicy`"
+msgstr "家族 `PARTS` 与 `PartPolicy`"
+
+msgid "Explicit full part, reviewed package and optional placement domains"
+msgstr "显式完整料号、已复核封装与可选放置域"
+
+msgid "`normalize_clock` and `clock_plan`"
+msgstr "`normalize_clock` 与 `clock_plan`"
+
+msgid "The exact family implements the selected profile and any reviewed domain relationships"
+msgstr "精确家族实现所选 profile 及经复核的时钟域关系"
+
+msgid "`i2c_timing_clock`"
+msgstr "`i2c_timing_clock`"
+
+msgid "`I2cTimingClock` carries selected kernel and peripheral clock bounds and whether explicit timing is required; electrical assumptions remain authored"
+msgstr "`I2cTimingClock` 携带所选内核与外设时钟边界，以及是否要求显式 timing；电气假设仍由装配编写者提供"
+
+msgid "Selected limits, format and silicon policy"
+msgstr "所选限制、格式和硅片策略"
+
+msgid "Metadata belongs to the exact selected owner; missing review remains explicit and does not admit a mode"
+msgstr "元数据属于精确选定 owner；缺失复核保持明确，不因此准入模式"
+
+msgid "Generated static C and private provider"
+msgstr "生成的静态 C 与私有 provider"
+
+msgid "Consume validated values and retain independent SDK/register assertions and runtime failure checks"
+msgstr "消费已校验数值，并保留独立 SDK／寄存器断言与运行时失败检查"
+
+msgid "F407 Flash generation illustrates the boundary: its selected sector array and readonly geometry come from validated `result.flash.erase_blocks`, origin and size. The C SDK assertion still checks the physical base, and independent register-model tests retain the reference geometry. Removing duplicate production tables does not make configuration a substitute for hardware validation."
+msgstr "F407 Flash 生成展示了该边界：所选 sector 数组与只读 geometry 来自已校验的 `result.flash.erase_blocks`、起始地址和大小。C SDK 断言仍核对物理基址，独立寄存器模型测试保留参考几何。删除重复生产表不会让配置取代硬件校验。"
+
+msgid "Family policy hooks remain declared configuration inputs. H743's reviewed clock domain relationships and selected Flash linker fragments live in its `configure/` package; generic tools still own parsing, typed IR, resource arbitration and atomic publication. A hook must not create a second source graph or silently choose a different part, route or profile."
+msgstr "家族策略 hook 仍是声明的配置输入。H743 经复核的时钟域关系与所选 Flash linker fragment 位于其 `configure/` 包；通用工具仍拥有解析、typed IR、资源仲裁与原子发布。hook 不得创建第二份源码图，也不得静默选择不同料号、路由或 profile。"
+
+msgid "`PhysicalPartIR`"
+msgstr "`PhysicalPartIR`"
+
+msgid "Views the same frozen part, package, Flash and memory facts; it adds no JSON or configuration-identity field"
+msgstr "查看同一组冻结的料号、封装、Flash 与内存事实；不增加 JSON 或配置身份字段"
+
+msgid "`ControllerIntegrationIR`"
+msgstr "`ControllerIntegrationIR`"
+
+msgid "Reuses canonical resource claims, DMA lanes, IRQ options/profile, clocks, pins and the exact SoC hardware binding"
+msgstr "复用规范资源 claim、DMA lane、IRQ 选项／profile、时钟、引脚及精确 SoC 硬件绑定"
+
+msgid "Family `UART_FORMATS`, `STREAM_GEOMETRY` and `ENDPOINT_POLICY`"
+msgstr "家族 `UART_FORMATS`、`STREAM_GEOMETRY` 与 `ENDPOINT_POLICY`"
+
+msgid "Explicit reviewed formats, stream geometry and endpoint capability; a vendor alias or name prefix does not select a policy"
+msgstr "显式经复核的格式、stream geometry 与 endpoint 能力；厂家别名或名称前缀不选择策略"
+
+msgid "All seven maintained MCU families obtain generated readonly Flash geometry from the validated facts through `memory.flash_geometry`. Six retain their existing global geometry symbols; F407 emits selected static geometry. Native remains a host model. The exact source and independently maintained test oracle still need the applicable provider and linked-image checks."
+msgstr "维护中的七个 MCU 家族都通过 `memory.flash_geometry`，从已校验事实生成只读 Flash geometry。六个家族保留既有全局 geometry symbol；F407 生成所选静态 geometry。Native 仍是主机模型。精确源码与独立维护的测试 oracle 仍须执行适用的 provider 和最终链接映像检查。"
+
+msgid "`ConfigurationIR.physical_part` views the existing frozen Flash and memory objects. `ControllerIR.integration` composes existing `ResourcePlanIR` claims, `DmaTopologyIR` lanes, IRQ options and profile, clock plan/inputs, selected pins and a family `ControllerBinding`. Its `clock_hz` is only the paired nominal APB input; a missing value is not guessed, and reviewed frequency bounds come from `clock_plan`. F407 SPI and the paired secondary-controller paths consume this view; other bindings can still use their existing typed or legacy-fixture adapter. Do not describe the view as a new route resolver or a completed rewrite of every constructor."
+msgstr "`ConfigurationIR.physical_part` 查看既有冻结 Flash 与 memory 对象。`ControllerIR.integration` 组合既有 `ResourcePlanIR` claim、`DmaTopologyIR` lane、IRQ 选项与 profile、clock plan／inputs、所选引脚和家族 `ControllerBinding`。其 `clock_hz` 仅为成对控制器的名义 APB 输入；缺值不作猜测，经复核的频率边界来自 `clock_plan`。F407 SPI 与成对 secondary-controller 路径消费该视图；其他 binding 仍可使用既有 typed 或旧 fixture 适配器。不得将该视图描述为新的路由 resolver，或所有构造器已完成重写。"
+
+msgid "The paired F407/GD470 controller bindings, DMA vector maps and concrete secondary controller hooks live with their SoC. Common code keeps resource leases, fixed IRQ wiring and drain ordering while consuming the selected typed integration. Coupled personalities and named pin states likewise require explicit provider policy. Cross-Board/backend qualification remains in its existing OS contract; moving family mechanisms does not broaden those admitted combinations."
+msgstr "成对 F407／GD470 控制器的 binding、DMA vector map 与具体 secondary controller hook 位于各自 SoC。公共代码消费所选 typed integration，并保留资源 lease、固定 IRQ wiring 和 drain 顺序。耦合 personality 与命名引脚状态同样要求显式 provider 策略。跨 Board／backend 资格仍属于既有 OS 合同；搬移家族机制不会扩大已准入组合。"

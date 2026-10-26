@@ -460,6 +460,8 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
                                              size_t count,
                                              nx_time_us_t deadline,
                                              size_t* transferred);
+/** \brief Readonly physical geometry emitted from the selected SoC facts. */
+extern const nx_flash_geometry_t g_nx_gd32f470_flash_geometry;
 extern const nx_flash_ops_t nx_gd32_flash_ops;
 const nx_flash_geometry_t* nx_gd32_flash_geometry(const void* context);
 nx_result_t nx_gd32_flash_read(const void* context, uint32_t offset, void* data,

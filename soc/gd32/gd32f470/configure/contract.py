@@ -1,7 +1,21 @@
 """Maintained gd32f470 capability and static assembly contract."""
+from tools.configure.stream_profiles import StreamGeometry
+from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 
-from tools.configure.providers import common, descriptor, hardware
+from tools.configure.providers import common, descriptor
+from .hardware import FIXED_DMA as _FIXED_DMA
+
+PARTS = MappingProxyType({
+    "GD32F470ZGT6": common.PartPolicy("LQFP144", frozenset(('addsram', 'tcm'))),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+CLASSIC_CAN_MAILBOXES = 3
+
+UART_FORMATS = UartFormatPolicy(words=("USART0",), irq_probe=True, byte_frames=True)
+
+STREAM_GEOMETRY = StreamGeometry(2, 1, 65535)
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
 ENUM_ABI = 'short-enums'
@@ -16,6 +30,8 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
+FLASH_GEOMETRY = ("g_nx_gd32f470_flash_geometry",
+                  "0u")
 FLASH_PROGRAM_UNIT = 2
 FLASH_INPUT_ALIGNMENT = 1
 FACT_REFERENCES = descriptor.maintained("gd32f470").references
@@ -42,7 +58,6 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
-_FIXED_DMA = hardware.fixed_dma("gd32f470")
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('timer_capture', 'edge-capture'): 'timer_capture',

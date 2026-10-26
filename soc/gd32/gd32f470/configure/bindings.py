@@ -67,7 +67,7 @@ def prepared(name, pins, initialize, after=(), before=()):
     lines += ["    return NX_SUCCESS;", "rollback:"]
     for wire in reversed(unique_pins):
         lines += [f"    if (captured_{wire}) {{"]
-        lines += rollback_pin("gd32", wire, f"saved_{wire}")
+        lines += rollback_pin("gd32f470", wire, f"saved_{wire}")
         lines += ["    }"]
     lines += [f"    RCU_AHB1EN = (RCU_AHB1EN & ~{mask}u) | saved_clocks | retained_gpio_clocks;",
               "    nx_arch_dsb();", "    return status;", "}"]
@@ -83,7 +83,7 @@ def released(name, pins, stop, cs_pins=()):
         lines.append(f"    GPIO_BOP(GPIO{wire[1]}) = {1 << int(wire[2:])}u;")
     for pin in pins:
         wire = pin["pin"]
-        lines += withdraw_pin("gd32", wire, indent=4)
+        lines += withdraw_pin("gd32f470", wire, indent=4)
         lines.append(f"    (void)nx_gd32_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 0u, 0u, 0u, false);")
     return lines + ["    return NX_SUCCESS;", "}"]
 
@@ -226,7 +226,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             if index:
                 declarations.append(f"static nx_gd32_{implementation}_endpoint_state_t {endpoint};")
             declarations += enhanced_endpoints.face(
-                child, endpoint, f"nx_gd32_{implementation}_endpoint_ops", "gd32")
+                child, endpoint, f"nx_gd32_{implementation}_endpoint_ops", "gd32f470")
             base = endpoint + (".endpoint" if dma else "")
             # Every endpoint retains its own reviewed CS. No first-child bus alias.
             after += [f"    {base}.cs_gpio = {cs_gpio};", f"    {base}.cs_mask = {cs_mask}u;"]

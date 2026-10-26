@@ -7,6 +7,7 @@ nexus_google_test(nexus_u575_devices_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/exti.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/u575_flash_geometry.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/i2c.c"
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"

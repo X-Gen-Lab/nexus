@@ -1,12 +1,23 @@
 """Source-reviewed U575 GPIO/USART byte-mode and inactive IWDG contract."""
+from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 import re
 from tools.configure.providers import common
 
 
+PARTS = MappingProxyType({
+    "STM32U575ZIT6Q": common.PartPolicy("LQFP144_SMPS", frozenset(('sram4',))),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+
+UART_FORMATS = UartFormatPolicy(fifo=("USART1", 8))
+
 CPU_ABI = MappingProxyType({
     "arch": "cortex-m33", "fpu": "fpv5-sp-d16", "float_abi": "hard"})
 ENUM_ABI = "short-enums"
+FLASH_GEOMETRY = ("g_nx_stm32u575_flash_geometry",
+                  "NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE")
 FLASH_PROGRAM_UNIT = 16
 FLASH_INPUT_ALIGNMENT = 1
 IRQ_PRIORITY_BITS = 4
@@ -259,3 +270,8 @@ def validate_user_io_context(assembly, part):
     if (part != "STM32U575ZIT6Q" or assembly["clock_profile"] != "msis4" or
             assembly["layout"] is not None or "power" in assembly):
         common.fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+
+
+def i2c_timing_clock(clock, clock_plan):
+    """The reviewed I2C1 mux owns the independent internal HSI16 source."""
+    return common.I2cTimingClock(16000000, clock["apb1_hz"])

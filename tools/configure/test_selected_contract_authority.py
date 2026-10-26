@@ -3,7 +3,7 @@
 These configure/emission tests do not replace actual provider and generated
 Platform GoogleTests, linked resource measurements or physical qualification.
 """
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 import importlib
 import json
 from pathlib import Path
@@ -256,6 +256,28 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             policy.reviewed_revision_ids = (0x1003, 0x2003)
 
+    def test_silicon_projection_keeps_the_selected_controller_owner(self):
+        result = configure.resolve_ir(configure.ROOT /
+            "tools/configure/assemblies/h743-spi-dma-uart-tx.toml")
+        compiler = self.compiler()
+        policies = compiler.silicon_policies(result)
+        spi = next(item for item in result.controllers if item.kind == "spi")
+        uart = next(item for item in result.controllers if item.kind == "uart")
+        self.assertIsNone(policies[None])
+        self.assertIsNone(policies[uart.id])
+        self.assertEqual(policies[spi.id].review_scope,
+                         "selected_spi_dma_mode")
+        with self.assertRaises(TypeError):
+            policies[uart.id] = policies[spi.id]
+        with self.assertRaisesRegex(ValueError, "owner"):
+            compiler.silicon_policy(result, replace(spi, id="not-selected"))
+        with self.assertRaisesRegex(ValueError, "owner"):
+            compiler.silicon_policy(result, uart)
+        foreign = replace(spi, provider="native")
+        with self.assertRaisesRegex(ValueError, "owner"):
+            compiler.silicon_policy(replace(result, controllers=(foreign,)),
+                                    foreign)
+
     def test_caller_authored_observation_or_workaround_claim_is_rejected(self):
         fixture = configure.ROOT / (
             "cmake/package/verification/io_evolution/h743-high-empty.toml")
@@ -283,6 +305,22 @@ class SelectedContractAuthorityTests(unittest.TestCase):
 
 
 class ExistingConsumerAuthorityTests(unittest.TestCase):
+    def test_selected_soc_policy_helpers_belong_to_the_actual_input_closure(self):
+        helpers = {
+            family: f"soc/stm32/{family}/configure/selected_support.py"
+            for family in ("stm32h743", "stm32u575")}
+        for family, expected in helpers.items():
+            with self.subTest(family=family):
+                paths, identity = dependencies.snapshot(mode="platform",
+                                                        family=family)
+                self.assertIn(expected, paths)
+                self.assertEqual(sum(row["path"] == expected for row in
+                                     identity["files"]), 1)
+                self.assertTrue(all(other == expected or other not in paths
+                                    for other in helpers.values()))
+        native, _ = dependencies.snapshot(mode="platform", family="native")
+        self.assertTrue(set(helpers.values()).isdisjoint(native))
+
     def test_selected_compiler_is_a_real_configuration_dependency(self):
         paths, identity = dependencies.snapshot(mode="platform",
                                                 family="stm32g474")

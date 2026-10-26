@@ -1,12 +1,12 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
 from tools.configure.ir import controller_ir
-from tools.configure.memory import dma_regions
+from tools.configure.memory import dma_regions, flash_geometry
 from tools.configure.gpio_phase import rollback_pin, withdraw_pin
 from tools.configure import enhanced_endpoints, uart_formats
-from tools.configure.providers.common import Construction, mode_traits
+from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
 from tools.configure import can, usb_device, ethernet, timer_advanced, secondary_controllers
-from .contract import ADC_CHANNEL_SEQUENCES, LIMITS
+from .contract import ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS, PARTS
 
 
 def _symbol(value):
@@ -39,7 +39,7 @@ def _release(pins):
     lines = []
     for pin in pins:
         wire = pin["pin"]
-        lines += withdraw_pin("stm32", wire, indent=4)
+        lines += withdraw_pin("stm32f407", wire, indent=4)
         lines += [f"    (void)nx_stm32_pin_configure(GPIO{wire[1]}, "
                   f"{wire[2:]}u, 0u, 0u, 0u, false);"]
     return lines
@@ -74,6 +74,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     clock_bits = {"APB1ENR": "0u", "APB2ENR": "0u"}
     if kind == "spi":
         dma = item["mode"] == "dma"
+        selected = item.integration
+        clock_hz = (selected.clock_hz if selected is not None else
+                    result["clock"]["apb2_hz"])
         bus = f"s_nx_port_{name}" + (".spi" if dma else "")
         if item["controller"] != "SPI1":
             raise ValueError("Only reviewed SPI1 is maintained")
@@ -86,7 +89,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  "    nx_arch_dsb();",
                  f"    {bus}.registers = SPI1;",
                  f"    {bus}.rcc = RCC;",
-                 f"    {bus}.clock_hz = 84000000u;",
+                 f"    {bus}.clock_hz = {clock_hz}u;",
                  "    saved_spi_cr1 = SPI1->CR1;",
                  "    saved_spi_cr2 = SPI1->CR2;",
                  "    captured_spi = true;",
@@ -115,7 +118,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                              *enhanced_endpoints.face(
                                  child, endpoint,
                                  f"nx_stm32_{implementation}_endpoint_ops",
-                                 "stm32")]
+                                 "stm32f407")]
             _check(body, f"nx_stm32_gpio_clock_enable({ord(cs_pin[1]) - ord('A')}u)")
             _capture(body, cs_pin)
             rollback_extra.append(f"    s_nx_cs_{child_name}.initialized = false;")
@@ -139,19 +142,32 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             if dma:
                 body.append(f"    {endpoint}.dma = &s_nx_port_{name};")
         if dma:
-            tx, rx = hardware.maintained("stm32f407", item.controller).dma(item.mode)
-            tx_vector = hardware.dma_vector("stm32f407", tx)
-            rx_vector = hardware.dma_vector("stm32f407", rx)
+            tx, rx = secondary_controllers.dma_paths(item)
+            if selected is None:
+                # Direct legacy constructor fixtures have no configuration IR.
+                # Production always consumes its selected canonical DMA lanes.
+                dma_bank = f"DMA{tx[0]}"
+                tx_vector = hardware.dma_vector("stm32f407", tx)
+                rx_vector = hardware.dma_vector("stm32f407", rx)
+                irq = item.options.irq
+            else:
+                if len(selected.dma) != 2 or selected.irq is None:
+                    raise ValueError("SPI DMA requires two selected lanes and IRQ policy")
+                tx_lane, rx_lane = selected.dma
+                dma_bank = tx_lane.engine
+                tx_vector = f"{tx_lane.engine}_Stream{tx_lane.lane}"
+                rx_vector = f"{rx_lane.engine}_Stream{rx_lane.lane}"
+                irq = selected.irq
             region_lines, region_count = dma_regions(name, result, include_flash=True)
             declarations += region_lines
-            body += [f"    s_nx_port_{name}.dma = DMA{tx[0]};",
+            body += [f"    s_nx_port_{name}.dma = {dma_bank};",
                      f"    s_nx_port_{name}.tx = {tx_vector};",
                      f"    s_nx_port_{name}.rx = {rx_vector};",
                      f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
                      f"    s_nx_port_{name}.region_count = {region_count}u;"]
             _check(body, f"nx_stm32_spi_dma_initialize(&s_nx_port_{name})")
-            body += [f"    NVIC_SetPriority({tx_vector}_IRQn, {item.options.irq.priority}u);",
-                     f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);"]
+            body += [f"    NVIC_SetPriority({tx_vector}_IRQn, {irq.priority}u);",
+                     f"    NVIC_SetPriority({rx_vector}_IRQn, {irq.priority}u);"]
             for vector, receive in ((tx_vector, "false"), (rx_vector, "true")):
                 declarations += [f"void {vector}_IRQHandler(void);",
                                  "/** \\brief Exact selected SPI DMA terminal observation. */",
@@ -271,9 +287,19 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     elif kind == "flash":
         if item["controller"] != "FLASH":
             raise ValueError("Only the full internal Flash provider is maintained")
-        geometry = "ve" if result["part"] == "STM32F407VET6" else "zg"
+        exact_part(PARTS, result["part"])
+        physical = getattr(result, "physical_part", None)
+        flash = physical.flash if physical is not None else result["flash"]
+        sectors = f"s_nx_flash_sectors_{name}"
+        geometry = f"s_nx_flash_geometry_{name}"
+        declarations += flash_geometry(
+            result, symbol=geometry, sector_symbol=sectors,
+            program_unit=FLASH_PROGRAM_UNIT)
+        declarations += [
+            f'_Static_assert(FLASH_BASE == 0x{flash["origin"]:08x}u,',
+            '               "Reviewed Flash base differs from the SDK");']
         body += [f"    s_nx_port_{name}.registers = FLASH;",
-                 f"    s_nx_port_{name}.geometry = &g_nx_stm32_flash_{geometry};",
+                 f"    s_nx_port_{name}.geometry = &{geometry};",
                  f"    s_nx_port_{name}.memory = (volatile uint8_t*)FLASH_BASE;",
                  f"    s_nx_port_{name}.supply_mv = 3300u;"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
@@ -473,7 +499,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         body += ["rollback:"] + rollback_extra
         for pin in reversed(pins):
             body += [f"    if (captured_{pin}) {{"]
-            body += rollback_pin("stm32", pin, f"saved_{pin}")
+            body += rollback_pin("stm32f407", pin, f"saved_{pin}")
             body += ["    }"]
         body += [f"    RCC->APB1ENR = (RCC->APB1ENR & ~(uint32_t)({clock_bits['APB1ENR']})) | saved_apb1;",
                  f"    RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)({clock_bits['APB2ENR']})) | saved_apb2;",
@@ -538,7 +564,7 @@ def _gpio_constructor(item):
                '        uint32_t retained_gpio_clocks = 0u;']
     for pin in item["pins"]:
         number = pin["pin"][2:]
-        definitions += rollback_pin("stm32", pin["pin"], f"saved_{number}")
+        definitions += rollback_pin("stm32f407", pin["pin"], f"saved_{number}")
     definitions += [f'        RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock | retained_gpio_clocks;',
                '        nx_arch_dsb();', '    }', '    return status;', '}']
     init = f'prepare_{name}()'
@@ -605,8 +631,8 @@ def _uart_constructor(item, result):
                f'    nx_result_t uart = pins == NX_SUCCESS ? {initialize} : pins;',
                '    if (uart != NX_SUCCESS) {',
                '        uint32_t retained_gpio_clocks = 0u;']
-    definitions += rollback_pin("stm32", "PA9", "saved_tx")
-    definitions += rollback_pin("stm32", "PA10", "saved_rx")
+    definitions += rollback_pin("stm32f407", "PA9", "saved_tx")
+    definitions += rollback_pin("stm32f407", "PA10", "saved_rx")
     definitions += [
                '        RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_USART1EN) | saved_uart_clock;',
                '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock | retained_gpio_clocks;',
@@ -616,8 +642,8 @@ def _uart_constructor(item, result):
                f'static nx_result_t stop_{name}(void) {{',
                f'    nx_result_t status = {stop_function}(&s_nx_face_{name});',
                '    if (status != NX_SUCCESS) { return status; }']
-    definitions += withdraw_pin("stm32", "PA9", indent=4)
-    definitions += withdraw_pin("stm32", "PA10", indent=4)
+    definitions += withdraw_pin("stm32f407", "PA9", indent=4)
+    definitions += withdraw_pin("stm32f407", "PA10", indent=4)
     definitions += [
                '    (void)nx_stm32_pin_configure(GPIOA, 9u, 0u, 0u, 0u, false);',
                '    (void)nx_stm32_pin_configure(GPIOA, 10u, 0u, 0u, 0u, false);',

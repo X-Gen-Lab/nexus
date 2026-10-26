@@ -136,6 +136,15 @@ device or density mismatch, or missing required workaround.
 The caller decides whether to start hardware after admission. Reading a revision
 does not establish electrical behavior, errata coverage for every mode or HIL.
 
+The read-only `capabilities.py --assembly` view projects this review separately
+for the system-clock owner and each selected controller as `silicon_admission`.
+It uses the existing policy and typed IR. An endpoint or companion does not
+inherit its owner's review; an owner with no applicable record reports `null`.
+H743's selected clock and SPI DMA records retain their own revision/profile
+scope, while G474 ADC retains its device, density, workaround and review-digest
+fields. These are reviewed admission rules, not observed identity, broader
+errata coverage or physical qualification.
+
 ## Use units that match the selected data path
 
 The enhanced contracts are separate typed interfaces. Their existence does not

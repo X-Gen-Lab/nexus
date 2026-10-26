@@ -33,10 +33,9 @@ class U575DeviceSelectionTests(unittest.TestCase):
         construction = stm32u575.constructor(controller, result, {}, {}, ())
         self.assertEqual(construction.state_type, "nx_i2c_v2_state_t")
         source = "\n".join(construction.definitions)
-        self.assertIn("nx_stm32u575_i2c_clock_start", source)
-        self.assertIn("nx_stm32u575_i2c_clock_stop", source)
-        self.assertLess(source.index("nx_i2c_port_stop"),
-                        source.index("nx_stm32u575_i2c_clock_stop"))
+        self.assertIn("static const nx_i2c_v2_config_t", source)
+        self.assertIn("nx_stm32u575_i2c_prepare", construction.initialize)
+        self.assertIn("nx_stm32u575_i2c_close", construction.stop[0])
 
     def test_exact_selected_modes_and_pin_routes(self):
         items = [

@@ -3,6 +3,12 @@ from types import MappingProxyType
 from tools.configure.providers import common, descriptor
 
 
+PARTS = MappingProxyType({
+    "STM32G474RET6": common.PartPolicy("LQFP64"),
+})
+PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
+                            "eth", "eth_frames"))
+
 CPU_ABI = MappingProxyType({
     "arch": "cortex-m4", "fpu": "fpv4-sp-d16", "float_abi": "hard"})
 ENUM_ABI = "short-enums"
@@ -29,6 +35,8 @@ SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = "Channel"
 DMA_TOPOLOGY = (frozenset((1,)), range(1, 2), range(5, 6))
 ADC_PIN_CHANNELS = MappingProxyType({("ADC1", "PA0"): 1})
+FLASH_GEOMETRY = ("g_nx_stm32g474_flash_geometry",
+                  "NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE")
 FLASH_PROGRAM_UNIT = 8
 FLASH_INPUT_ALIGNMENT = 1
 CLOCK_PROFILES = MappingProxyType({
@@ -75,8 +83,8 @@ def validate_selection(selection, route):
         from . import adc_group
         adc_group.validate_selection(selection, route)
     elif kind in {"pwm_adc", "can_fd"}:
-        from tools.configure import coupled_io
-        coupled_io.validate_selection(selection, route, PREFIX)
+        from . import coupled
+        coupled.validate_selection(selection, route)
     elif kind == "uart":
         reviewed = {
             "LPUART1": (("PA2", "tx", 12), ("PA3", "rx", 12)),
@@ -264,3 +272,8 @@ validate_controller_set = common.validate_controller_set
 validate_endpoint_clock = common.validate_endpoint_clock
 configuration_header = common.configuration_header
 validate_user_io_context = common.validate_user_io_context
+
+
+def i2c_timing_clock(clock, clock_plan):
+    """The reviewed I2C1 mux owns the independent internal HSI16 source."""
+    return common.I2cTimingClock(16000000, clock["apb1_hz"])

@@ -1,5 +1,10 @@
 """Explicit family contract and static-construction exports."""
 from .contract import (
+    CLASSIC_CAN_MAILBOXES,
+    UART_FORMATS,
+    STREAM_GEOMETRY,
+    PARTS,
+    PUBLIC_FORMATS,
     ADC_CHANNEL_SEQUENCES,
     ADC_GROUP,
     CAN_CLOCK_HZ,
@@ -17,6 +22,7 @@ from .contract import (
     EXTERNAL_IRQ_COUNT,
     FACT_REFERENCES,
     FLASH_INPUT_ALIGNMENT,
+    FLASH_GEOMETRY,
     FLASH_PROGRAM_UNIT,
     FREERTOS_PORT,
     IRQ_PRIORITY_BITS,
@@ -48,3 +54,11 @@ from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)
+from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
+from .preflight import PREFLIGHT_CALL, selected_preflight
+from . import gpio as GPIO_PHASE
+from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
+                       SECONDARY_FACTS)
+from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
+from . import secondary as SECONDARY_INTEGRATION
+from .integration import CAN_INTEGRATION

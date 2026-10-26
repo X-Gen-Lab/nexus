@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a1679457ca8f75b1f2f5aa06735f520fbc0036442242921a998b328a0cf029e8\n"
+"X-Nexus-Source-SHA256: 51776ec62d9482ab03cca988e7d9f875a37aa437ac65bb1eb637dfb5db448289\n"
 
 msgid "当前系统架构"
 msgstr "当前系统架构"
@@ -690,3 +690,6 @@ msgstr "IR 身份、预算和各类 controller options 使用冻结 record，IRQ
 
 msgid "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
 msgstr "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
+
+msgid "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"
+msgstr "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"

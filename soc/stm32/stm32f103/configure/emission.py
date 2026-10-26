@@ -1,4 +1,5 @@
 """Exact F1 CRL pin leases; clocks and lifecycle stay statically assembled."""
+from .transport import PROFILE
 from tools.configure.providers import legacy_transport
 
 
@@ -107,7 +108,7 @@ def state_declarations(result):
 
 
 def start_system(result):
-    source = legacy_transport.dma_preflight(result, "stm32f103")
+    source = legacy_transport.dma_preflight(result, PROFILE)
     source += ['    result.primary = nx_stm32f103_system_preflight(&g_nx_stm32f103_system);',
               '    if (result.primary != NX_SUCCESS) { return result; }']
     if _uart(result):
@@ -151,7 +152,7 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    transport = legacy_transport.dma_start(result, "stm32f103", cleanup)
+    transport = legacy_transport.dma_start(result, PROFILE, cleanup)
     if not _pins(result):
         return transport
     bits, fields = _masks(result)
@@ -198,7 +199,7 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
 
 
 def stop_system(result, *, system_phase=None):
-    source = legacy_transport.dma_stop(result, "stm32f103")
+    source = legacy_transport.dma_stop(result, PROFILE)
     if _pins(result):
         source += ['    if (s_nx_platform_started) {',
                    '        nx_result_t pins = restore_f103_pins();',

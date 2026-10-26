@@ -1,0 +1,28 @@
+// FIG-31 current: maintenance decisions, not runtime calls or qualification.
+// Source basis: 7b985c4c source layout and docs/guides/provider-porting.md.
+digraph DriverSourceOwnership {
+    graph [label="FIG-31 共享 IP 与精确 SoC 源码归属",
+           rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35,
+           ranksep=0.45, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    work [label="私有控制器实现", fillcolor="#f8fafc"];
+    protocol [label="是否拥有寄存器协议时序？", shape=diamond,
+              fillcolor="#fefce8"];
+    reviewed [label="布局／位／顺序／复位兼容性已复核；\n各芯片勘误均已显式处理？",
+              shape=diamond, fillcolor="#fefce8"];
+    integration [label="保留精确 SoC 集成\n事实／时钟／复位／引脚／IRQ／DMA\n或窄范围协作辅助代码"];
+    shared [label="drivers/<kind>/<ip>/\n经复核的共享算法"];
+    exact [label="soc/<vendor>/<family>/drivers/\n精确或尚未复核的协议"];
+
+    work -> protocol [label="判定责任"];
+    protocol -> integration [label="否"];
+    protocol -> reviewed [label="是"];
+    reviewed -> shared [label="是：兼容性已复核"];
+    reviewed -> exact [label="否：保留精确范围"];
+}

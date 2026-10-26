@@ -34,15 +34,15 @@ extern "C" void nx_fault_observe(nx_fault_domain_t, nx_result_t, const char*,
     faults->Observe();
 }
 extern "C" void nx_test_i2c_v2_write(volatile uint32_t* reg, uint32_t value) {
-    if (reg == current->reset) {
+    if (reg == current->config->reset) {
         if (reset_refused)
             return;
         *reg = value;
-        if ((value & current->reset_mask) != 0U)
-            *current->registers = {};
+        if ((value & current->config->reset_mask) != 0U)
+            *current->config->registers = {};
         return;
     }
-    auto* r = current->registers;
+    auto* r = current->config->registers;
     if (reg == &r->icr) {
         r->isr &= ~value;
         return;
@@ -74,7 +74,7 @@ extern "C" void nx_test_i2c_v2_write(volatile uint32_t* reg, uint32_t value) {
     }
 }
 extern "C" void nx_test_i2c_v2_poll(nx_i2c_v2_state_t* p) {
-    auto* r = p->registers;
+    auto* r = p->config->registers;
     if (stalled)
         return;
     if (bytes.size() >= inject_after) {
@@ -109,6 +109,7 @@ class H743I2cV2 : public testing::Test {
   protected:
     nx_i2c_v2_registers_t registers{};
     uint32_t reset{};
+    nx_i2c_v2_config_t config{};
     nx_i2c_v2_state_t state{};
     nx_i2c_v2_endpoint_state_t endpoint{&state, 0x50};
     nx_i2c_port_t face{&nx_i2c_v2_ops, &state};
@@ -121,6 +122,7 @@ class H743I2cV2 : public testing::Test {
         g_h743_model.rcc.APB1LENR = RCC_APB1LENR_I2C1EN;
         g_h743_model.rcc.AHB4ENR = RCC_AHB4ENR_GPIOBEN;
         current = &state;
+        state.config = &config;
         faults = &fault_mock;
         stalled = false;
         stall_after_write = false;
@@ -130,11 +132,11 @@ class H743I2cV2 : public testing::Test {
         remaining = 0;
         controls.clear();
         bytes.clear();
-        state.registers = &registers;
-        state.reset = &reset;
-        state.reset_mask = 1;
-        state.timing = 0x30420f13;
-        state.poll_limit = 8;
+        config.registers = &registers;
+        config.reset = &reset;
+        config.reset_mask = 1;
+        config.timing = 0x30420f13;
+        config.poll_limit = 8;
     }
     void Start() {
         ASSERT_EQ(NX_SUCCESS, nx_i2c_v2_initialize(&state));
@@ -237,7 +239,7 @@ TEST_F(H743I2cV2, OptionalLongMessagesReloadWithoutAdditionalAddressPhases) {
     }
 }
 TEST_F(H743I2cV2, LongReadReloadPreservesErratumOneByteRuleAndRepeatedStart) {
-    state.receive_reload_one = true;
+    config.receive_reload_one = true;
     Start();
     nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
     uint8_t address = 0x10U;
@@ -326,7 +328,7 @@ TEST_F(H743I2cV2, TwoHundredFiftySixByteReceptionKeepsOneReadDirection) {
     EXPECT_EQ(0x5aU, rx[255]);
 }
 TEST_F(H743I2cV2, AuditedH7ReceptionReloadsOneByteWithoutExtraStart) {
-    state.receive_reload_one = true;
+    config.receive_reload_one = true;
     Start();
     uint8_t rx[256] = {};
     nx_i2c_message_t message{rx, sizeof(rx), true};
@@ -373,8 +375,8 @@ TEST_F(H743I2cV2, NackAndArbitrationDoNotBecomeSuccess) {
               nx_i2c_endpoint_transaction(&device, &message, 1, 100, &done));
 }
 TEST_F(H743I2cV2, AuditedMasterBerrQuirkClearsOnlyThatFlagAndContinues) {
+    config.ignore_master_berr = true;
     Start();
-    state.ignore_master_berr = true;
     uint8_t tx = 1;
     nx_i2c_message_t message{&tx, 1, false};
     size_t done = 0;
