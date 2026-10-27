@@ -1,6 +1,6 @@
 """Maintained provider boundaries and immutable mode decisions."""
 from tools.configure.providers.descriptor import source_directory
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 import json
 from pathlib import Path
 import subprocess
@@ -136,9 +136,9 @@ class ProviderContractTests(unittest.TestCase):
             gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_unknown_emitter_cannot_fall_back_to_native(self):
-        result = gate.resolve(gate.ROOT /
+        result = gate.resolve_ir(gate.ROOT /
                               "tools/configure/assemblies/native-empty.toml")
-        result["soc_family"] = "unmaintained"
+        result = replace(result, soc_family="unmaintained")
         with self.assertRaisesRegex(ValueError, "Unmaintained SoC provider"):
             bindings.emit(result)
 
@@ -169,16 +169,16 @@ class ProviderContractTests(unittest.TestCase):
         ir = gate.resolve_ir(gate.ROOT /
                              "tools/configure/assemblies/native-uart.toml")
         uart, = ir.controllers
-        self.assertEqual(uart.options.baud, uart["baud"])
-        self.assertEqual(uart.options.rx_profile, uart["rx_profile"])
-        self.assertEqual(uart.options.rx_capacity, uart["rx_capacity"])
-        self.assertEqual(uart.options.irq.priority, uart["irq_priority"])
+        self.assertEqual(uart.options.baud, uart.to_dict()["baud"])
+        self.assertEqual(uart.options.rx_profile, uart.to_dict()["rx_profile"])
+        self.assertEqual(uart.options.rx_capacity, uart.to_dict()["rx_capacity"])
+        self.assertEqual(uart.options.irq.priority, uart.to_dict()["irq_priority"])
         with self.assertRaises(FrozenInstanceError):
             uart.options.baud = 9600
         with self.assertRaises(FrozenInstanceError):
             uart.options.irq.priority = 0
-        self.assertEqual(ir.to_dict(), gate.resolve(gate.ROOT /
-                         "tools/configure/assemblies/native-uart.toml"))
+        self.assertEqual(ir.to_dict(), gate.resolve_ir(gate.ROOT /
+                         "tools/configure/assemblies/native-uart.toml").to_dict())
 
     def test_adc_and_pwm_decisions_preserve_json_projection(self):
         for path, kind in (("stm32_assembly/ve-adc-scan.toml", "adc"),
@@ -189,18 +189,18 @@ class ProviderContractTests(unittest.TestCase):
                 item, = (item for item in ir.controllers if item.kind == kind)
                 if kind == "adc":
                     self.assertEqual(item.options.channels,
-                                     tuple(item["channels"]))
+                                     tuple(item.to_dict()["channels"]))
                     self.assertEqual(item.options.sample_times,
-                                     tuple(item["sample_times"]))
+                                     tuple(item.to_dict()["sample_times"]))
                 else:
-                    self.assertEqual(item.options.tick_hz, item["tick_hz"])
+                    self.assertEqual(item.options.tick_hz, item.to_dict()["tick_hz"])
                 with self.assertRaises(FrozenInstanceError):
                     if kind == "adc":
                         item.options.reference_mv = 0
                     else:
                         item.options.period_ticks = 1
-                self.assertEqual(ir.to_dict(), gate.resolve(
-                    gate.ROOT / "tests/contracts" / path))
+                self.assertEqual(ir.to_dict(), gate.resolve_ir(
+                    gate.ROOT / "tests/contracts" / path).to_dict())
 
     def test_rejected_family_invalidates_previous_bundle(self):
         with tempfile.TemporaryDirectory() as directory:

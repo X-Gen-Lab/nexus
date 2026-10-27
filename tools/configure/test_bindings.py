@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import bindings
 from tools.configure import configure as gate
 
@@ -16,24 +17,24 @@ class BindingIdentityTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.assembly = self.root / "assembly.json"
+        self.assembly = self.root / "assembly.toml"
         self.board = self.root / "board"
         self.board.mkdir()
 
     def fixture(self, filename):
         path = gate.ROOT / filename
-        data = gate.load_assembly(path)
+        data = gate.load_assembly(path).to_dict()
         source = path.parent / data["board_package"] / "board.json"
         shutil.copyfile(source, self.board / "board.json")
         data["board_package"] = str(self.board)
         return data
 
     def write(self, data):
-        self.assembly.write_text(json.dumps(data), encoding="utf-8")
+        self.assembly.write_text(render_toml(data), encoding="utf-8")
 
     def source(self, data):
         self.write(data)
-        result = gate.resolve(self.assembly)
+        result = gate.resolve_ir(self.assembly)
         return bindings.emit(result)[1]
 
     def assert_unique_storage(self, source):
@@ -53,7 +54,7 @@ class BindingIdentityTests(unittest.TestCase):
                                   "initial": 16})
         board_path.write_text(json.dumps(board), encoding="utf-8")
         data["controllers"].append({"id": identity,
-                                    "binding": "independent-output",
+                                    "binding": "independent-output", "authored_kind": "gpio",
                                     "mode": "output"})
 
     def test_platform_state_names_remain_legal_instance_ids(self):
@@ -79,7 +80,7 @@ class BindingIdentityTests(unittest.TestCase):
         self.assert_unique_storage(source)
         self.assertIn("static nx_stm32_gpio_state_t s_nx_port_sensor_cs;", source)
         self.assertIn("static nx_stm32_gpio_state_t s_nx_cs_sensor;", source)
-        self.assertIn(".cs = &s_nx_cs_sensor;", source)
+        self.assertIn("{ &s_nx_endpoint_spi0, &s_nx_cs_sensor,", source)
         self.assertIn("nx_binding_sensor_cs = &s_nx_face_sensor_cs;", source)
 
     def test_gpio_identity_does_not_alias_pwm_or_adc_storage(self):

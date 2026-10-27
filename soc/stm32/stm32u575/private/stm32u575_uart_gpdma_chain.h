@@ -38,6 +38,16 @@ typedef struct {
 
 extern const nx_uart_ops_t nx_stm32u575_uart_chain_ops;
 
+/** \brief Bind exact chain resources before any pin or UART effects.
+ * \param[in,out] port: Cold privileged task owner without retained loans.
+ * \param[in] config: Facts point at chain facts.base and two disjoint nodes.
+ * \return Invalid or busy without rebinding; partial hardware failure retains
+ *         the ordinary whole-stop responsibility and enclosing pin lease.
+ */
+nx_result_t
+nx_stm32u575_uart_chain_prepare(nx_stm32u575_uart_gpdma_state_t* port,
+                                const nx_stm32u575_uart_gpdma_config_t* config);
+
 /** \brief Cold TZEN0/MSIS4 USART1 finite hardware-chain owner.
  * \param[in,out] port: Same private prefix; facts points to chain facts.base.
  * \param[in] clock_hz: Existing 4 MHz PCLK profile.

@@ -118,6 +118,25 @@ nx_result_t nx_native_lptim_start(nx_native_lptim_state_t* state) {
     state->opened = true;
     return NX_SUCCESS;
 }
+/** \brief Keep owner lifecycle selection in the tested provider. */
+nx_result_t nx_native_rtc_prepare(nx_native_rtc_state_t* state,
+                                  const nx_clock_t* clock) {
+    if (!rtc_owner(state)) {
+        return NX_ERROR_INVALID;
+    }
+    return state->constructed ? nx_native_rtc_start(state)
+                              : nx_native_rtc_construct(state, clock);
+}
+/** \brief Never reset the fixed source binding or overwrite retained loans. */
+nx_result_t nx_native_lptim_prepare(nx_native_lptim_state_t* state,
+                                    const nx_clock_t* clock, uint32_t tick_hz) {
+    if (!lptim_owner(state)) {
+        return NX_ERROR_INVALID;
+    }
+    return state->constructed
+               ? nx_native_lptim_start(state)
+               : nx_native_lptim_construct(state, clock, tick_hz);
+}
 /** \brief Copy a coherent setting without an implicit clock or date policy. */
 static nx_result_t rtc_read(const void* context, nx_rtc_snapshot_t* snapshot) {
     const nx_native_rtc_state_t* state = context;

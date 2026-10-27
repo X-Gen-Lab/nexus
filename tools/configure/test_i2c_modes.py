@@ -42,7 +42,7 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                     self.assertEqual(item.options.irq.priority, 5)
                     with self.assertRaises(FrozenInstanceError):
                         item.options.irq.priority = 6
-                    claims = {claim["key"] for claim in ir["claims"]}
+                    claims = {claim.key for claim in ir.claims}
                     controller = "I2C1" if prefix == "stm32" else "I2C0"
                     self.assertIn(f"irq:{controller}_EV", claims)
                     self.assertIn(f"irq:{controller}_ER", claims)

@@ -46,8 +46,11 @@ python tools/configure/configure.py generate     --assembly tools/configure/asse
 
 Use a new output path you own. Check `resolved.json` and generated headers; never
 author the resolved output or reuse stale generated files after a failure.
-Legacy schema-1 JSON exists only for explicit migration fixtures. A failed TOML
-does not fall back to JSON, Kconfig, old headers or cache values.
+Legacy schema-1 JSON is no longer a platform input. Convert it to a complete
+schema-2 TOML assembly; generated `resolved.json` remains audit output only.
+A failed TOML does not fall back to JSON, Kconfig, old headers or cache values.
+Frozen historical evidence remains verifiable under its original format; this
+read-only retention does not reopen old configuration or generation paths.
 
 ## Move access and lifecycle together
 

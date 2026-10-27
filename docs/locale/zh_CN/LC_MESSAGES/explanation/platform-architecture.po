@@ -1,4 +1,4 @@
-# Authored translation; review state is explicit in catalog metadata.
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 194da1156f50c74ece168a0998e57343bf15650c3dbee8c7aaeda0f8cba7d327\n"
+"X-Nexus-Source-SHA256: 55aec84366db512be2ec6b95279f9a9b87e2eef4a60bafe9776b6821a82eefdd\n"
 
 msgid "How the platform is assembled and executed"
 msgstr "平台如何装配与执行"
@@ -92,18 +92,135 @@ msgstr "外部产品"
 msgid "Main, workers, roles, private PCB, budgets, partitions and recovery"
 msgstr "main、执行任务、角色、私有 PCB、预算、分区与恢复"
 
+#: docs/explanation/platform-architecture.md:33
+msgid "Current source organization"
+msgstr "当前源码组织"
+
+#: docs/explanation/platform-architecture.md:35
+msgid ""
+"The source tree groups MCU families by vendor and CPU implementations by "
+"instruction-set architecture. These directories describe ownership at build "
+"time; they add no runtime dispatch or lookup layer. Public include paths, "
+"target names and authored family identifiers remain stable."
+msgstr ""
+"源码树按厂家组织 MCU 系列，按指令集架构组织 CPU "
+"实现。这些目录表达构建期所有权，不增加运行时分派或查找层。公共头文件路径、目标名称和人工配置中的系列标识保持稳定。"
+
+msgid "The [source-adjacent contracts](source-map.md) own the directory map and layer README content. Native models implement the same public I/O contracts under the Native SoC package. Shared register-protocol algorithms live under `drivers/<kind>/<ip>/` only when the participating wrappers independently establish their silicon semantics. Selected SoC targets compile these private sources directly; the directory adds no runtime layer to FIG-01. Cross-vendor SoC collaboration remains in `soc/common/`, while STM32 identity access remains under `soc/stm32/common/`."
+msgstr "[源码相邻合同](source-map.md) 维护目录映射和各层 README 正文。Native 模型在 Native SoC 包下实现相同的公共 I/O 合同。共享寄存器协议算法只有在参与的 wrapper 分别确认其硅片语义后，才位于 `drivers/<kind>/<ip>/`。所选 SoC target 直接编译这些私有源文件；目录不会给 FIG-01 增加运行时层。跨厂家 SoC 协作保留在 `soc/common/`，STM32 identity 访问保留在 `soc/stm32/common/`。"
+
+msgid "Each family's `configure/` package owns its capability policy, constructors and lifecycle emission; Native uses `soc/native/configure/`. The explicit provider map and shared leaf contracts remain in `tools/configure/providers/`. Common parsing, resource arbitration, typed IR and atomic publication stay in `tools/configure/`. Configuration tests stay under `tools/configure/tests/providers/<family>/`. These are build-time Python boundaries, independent of the C execution path."
+msgstr "每个家族的 `configure/` 包拥有能力策略、构造器与生命周期生成；Native 使用 `soc/native/configure/`。显式 provider map 与共享叶子合同保留在 `tools/configure/providers/`。通用解析、资源仲裁、typed IR 和原子发布仍在 `tools/configure/`。配置测试仍在 `tools/configure/tests/providers/<family>/`。这些是构建期 Python 边界，独立于 C 执行路径。"
+
+
+#: docs/explanation/platform-architecture.md:46
+msgid ""
+"Common components and selected STM32 extensions have distinct source "
+"ownership. Components are explicit targets; a chip-specific target still "
+"requires its exact SoC, mode and backend, and its presence does not extend "
+"the public support matrix."
+msgstr ""
+"通用组件与选定的 STM32 扩展具有不同的源码所有权。组件都是显式目标；芯片专用目标仍要求精确 SoC、模式和后端，其存在不会扩大公共支持矩阵。"
+
+#: docs/explanation/platform-architecture.md:51
+msgid "Platform and CPU-only Runtime"
+msgstr "Platform 与仅 CPU 的 Runtime"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Consumption entry"
+msgstr "消费入口"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Provided assembly"
+msgstr "提供的装配"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "External responsibility"
+msgstr "外部责任"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Platform`"
+msgstr "`Nexus::Platform`"
+
+#: docs/explanation/platform-architecture.md:0
+msgid ""
+"Exact SoC/Board facts, selected providers, static factory and explicit "
+"lifecycle"
+msgstr "精确 SoC／Board 事实、所选 provider、静态 factory 与显式生命周期"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Product sources, workers, budgets, storage regions and recovery"
+msgstr "产品源码、执行任务、预算、存储区域与恢复"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Runtime`"
+msgstr "`Nexus::Runtime`"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Core, Arch, public I/O faces and the explicitly selected OS adapter"
+msgstr "Core、Arch、公共 I/O 接口面与显式选择的 OS adapter"
+
+#: docs/explanation/platform-architecture.md:0
+msgid ""
+"Startup, vectors, memory/clock facts, Board wiring and concrete device "
+"providers"
+msgstr "启动、向量、内存／时钟事实、Board 接线及具体设备 provider"
+
+#: docs/explanation/platform-architecture.md:58
+msgid ""
+"One build directory admits one resolved assembly. Use separate build "
+"directories for different boards or CPU/security images; a product build "
+"coordinator or CI matrix owns their orchestration. Runtime and Platform "
+"reuse the same production mechanisms but are separate consumption modes."
+msgstr ""
+"一个构建目录只接纳一份解析后的装配。不同板卡或 CPU／安全域镜像使用独立构建目录，由产品构建协调器或 CI 矩阵编排。Runtime 与 "
+"Platform 复用相同生产机制，但属于不同的消费模式。"
+
+#: docs/explanation/platform-architecture.md:63
+msgid ""
+"The common OS boundary is the wait/wake port. Task, queue, join and storage "
+"APIs remain backend-specific, including the real kernel control-block types."
+" Products switching kernels must adapt that lifecycle explicitly; no "
+"universal object pool or hidden scheduling task is supplied."
+msgstr ""
+"共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
+"仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"
+
 msgid "Build-time decisions and runtime work"
 msgstr "构建期决策与运行时工作"
 
 msgid ""
-"The resolver combines authored TOML with reviewed SoC/Board facts into "
-"immutable typed IR and an atomic bundle. It validates modes, resources, "
-"clocks, IRQs, ABI, DMA reachability and budgets. CMake owns the source "
-"dependency graph; the resolver does not discover software from device names "
-"or generate product workers."
+"TOML schema 2 is the only authored platform input. The parser freezes "
+"user intent as `AuthoredAssembly`; `resolve_ir()` combines it with "
+"reviewed SoC/Board facts and validates modes, resources, clocks, IRQs, "
+"ABI, DMA reachability and budgets. It returns `ConfigurationIR` "
+"directly. Named frozen records hold each decision once; they do not "
+"expose a Mapping facade or a duplicate `values` store. Hardware fact "
+"leaves and keyed indexes still use immutable mappings, and local "
+"resolver validation drafts may use dictionaries. These are explicit data"
+" boundaries, not a promise to assign a separate nominal type to every "
+"JSON field."
 msgstr ""
-"解析器将人工编写的 TOML 与已审查 SoC／Board 事实组合为不可变类型化 IR 及原子生成包。它验证模式、资源、时钟、IRQ、ABI、DMA "
-"可达性与预算。CMake 拥有源码依赖图；解析器不根据设备名称发现软件，也不生成产品执行任务。"
+"TOML schema 2 是平台唯一的人工编写输入。解析器将用户意图冻结为 `AuthoredAssembly`；`resolve_ir()`"
+" 结合经审查的 SoC/Board 事实，校验模式、资源、时钟、IRQ、ABI、DMA 可达性与预算，并直接返回 "
+"`ConfigurationIR`。具名冻结记录为每个决策只保存一份值，不暴露 Mapping 包装接口，也不保存重复的 "
+"`values`。硬件事实叶数据和按键索引仍使用不可变 mapping，resolver "
+"的局部校验草稿也可用字典。这些是明确的数据边界，不承诺为每个 JSON 字段创建独立名义类型。"
+
+msgid ""
+"Factory and emitters consume the same typed result. `to_dict()` derives "
+"the schema-1 `resolved.json` audit/artifact projection; it is never read"
+" back as an authored platform input. Private typed source epoch 2 is "
+"separate from that serialized format and from the public C factory "
+"epoch. Old JSON assemblies are rejected. Historical evidence keeps its "
+"original bytes and read-only verification. CMake owns the source "
+"dependency graph; resolution does not discover software from device "
+"names or generate product workers."
+msgstr ""
+"Factory 和 emitter 消费同一类型化结果。`to_dict()` 派生 schema-1 `resolved.json` "
+"审计／产物投影，绝不会将其读回为人工编写的平台输入。私有 typed source epoch 2 与该序列化格式、公共 C factory "
+"epoch 分别计代。旧 JSON 装配会被拒绝。历史证据保留原字节与只读校验。CMake "
+"拥有源码依赖图；解析不会从设备名称发现软件，也不会生成产品 worker。"
 
 msgid ""
 "![Actual compile-target dependency relationships](../assets/diagrams/build-"
@@ -140,17 +257,28 @@ msgstr ""
 "分发固定到提供者实例，不为每个字节重复执行工厂查找。"
 
 msgid ""
-"The constructor contract names private state, definitions, initialization, "
-"stop actions and failed-init responsibility explicitly. Common generation "
-"does not infer these from family names. Selected STM32F4 official LL "
-"operations remain inside private SoC state machines; factory and public I/O "
-"contracts are unchanged. Full HAL Handle/callback transport requires "
-"separate mode-specific evaluation. See [official driver "
+"The constructor contract names private state, definitions, "
+"initialization, stop actions and failed-init responsibility explicitly. "
+"Its initializer and stop list use immutable `DirectCall` values with "
+"explicit static references or constants; no free-form C expression or "
+"function-pointer/member-call expression can enter those fields. "
+"Definitions and some remaining cold helper bodies are still emitted as C"
+" source. The C compiler establishes actual symbol and parameter types. "
+"Model tests and linked-image checks remain necessary: this narrow "
+"representation is not a complete typed C AST. Common generation does not"
+" infer these decisions from family names. Selected STM32F4 official LL "
+"operations remain inside private SoC state machines; factory and public "
+"I/O contracts are unchanged. Full HAL Handle/callback transport requires"
+" separate mode-specific evaluation. See [official driver "
 "integration](../design/official-stm32-provider.md)."
 msgstr ""
-"构造器合同明确给出私有状态、定义、初始化、停止动作与初始化失败责任。公共生成器不从家族名称推断这些内容。所选 STM32F4 官方 LL "
-"操作继续位于私有 SoC 状态机内，factory 与公共 I/O 合同不变。完整 HAL Handle/callback transport "
-"需要逐模式独立评估。见[官方驱动接入](../design/official-stm32-provider.md)。"
+"构造合同明确命名私有状态、定义、初始化、停止动作和初始化失败责任。initializer 与 stop 列表使用不可变 "
+"`DirectCall`，参数为显式静态引用或常量；这些字段不接受任意 C "
+"表达式或函数指针／成员调用表达式。定义及部分尚存的冷态辅助函数体仍作为 C 源码生成。C "
+"编译器建立实际符号与参数类型。模型测试和链接镜像检查仍不可省略：这种窄表示不是完整的类型化 C AST。公共生成器不从系列名称推断这些决策。选定"
+" STM32F4 官方 LL 操作仍在私有 SoC 状态机内部，factory 与公共 I/O 合同不变。完整 HAL "
+"Handle/callback "
+"传输需要按具体模式单独评估。参见[官方驱动集成](../design/official-stm32-provider.md)。"
 
 msgid ""
 "The legacy F103/GD303 selections share private algorithms only after exact "
@@ -260,96 +388,3 @@ msgstr ""
 "阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
 "contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
 "HIL 分别建立各自执行范围。"
-
-#: docs/explanation/platform-architecture.md:33
-msgid "Current source organization"
-msgstr "当前源码组织"
-
-#: docs/explanation/platform-architecture.md:35
-msgid ""
-"The source tree groups MCU families by vendor and CPU implementations by "
-"instruction-set architecture. These directories describe ownership at build "
-"time; they add no runtime dispatch or lookup layer. Public include paths, "
-"target names and authored family identifiers remain stable."
-msgstr ""
-"源码树按厂家组织 MCU 系列，按指令集架构组织 CPU "
-"实现。这些目录表达构建期所有权，不增加运行时分派或查找层。公共头文件路径、目标名称和人工配置中的系列标识保持稳定。"
-
-#: docs/explanation/platform-architecture.md:46
-msgid ""
-"Common components and selected STM32 extensions have distinct source "
-"ownership. Components are explicit targets; a chip-specific target still "
-"requires its exact SoC, mode and backend, and its presence does not extend "
-"the public support matrix."
-msgstr ""
-"通用组件与选定的 STM32 扩展具有不同的源码所有权。组件都是显式目标；芯片专用目标仍要求精确 SoC、模式和后端，其存在不会扩大公共支持矩阵。"
-
-#: docs/explanation/platform-architecture.md:51
-msgid "Platform and CPU-only Runtime"
-msgstr "Platform 与仅 CPU 的 Runtime"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "Consumption entry"
-msgstr "消费入口"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "Provided assembly"
-msgstr "提供的装配"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "External responsibility"
-msgstr "外部责任"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "`Nexus::Platform`"
-msgstr "`Nexus::Platform`"
-
-#: docs/explanation/platform-architecture.md:0
-msgid ""
-"Exact SoC/Board facts, selected providers, static factory and explicit "
-"lifecycle"
-msgstr "精确 SoC／Board 事实、所选 provider、静态 factory 与显式生命周期"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "Product sources, workers, budgets, storage regions and recovery"
-msgstr "产品源码、执行任务、预算、存储区域与恢复"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "`Nexus::Runtime`"
-msgstr "`Nexus::Runtime`"
-
-#: docs/explanation/platform-architecture.md:0
-msgid "Core, Arch, public I/O faces and the explicitly selected OS adapter"
-msgstr "Core、Arch、公共 I/O 接口面与显式选择的 OS adapter"
-
-#: docs/explanation/platform-architecture.md:0
-msgid ""
-"Startup, vectors, memory/clock facts, Board wiring and concrete device "
-"providers"
-msgstr "启动、向量、内存／时钟事实、Board 接线及具体设备 provider"
-
-#: docs/explanation/platform-architecture.md:58
-msgid ""
-"One build directory admits one resolved assembly. Use separate build "
-"directories for different boards or CPU/security images; a product build "
-"coordinator or CI matrix owns their orchestration. Runtime and Platform "
-"reuse the same production mechanisms but are separate consumption modes."
-msgstr ""
-"一个构建目录只接纳一份解析后的装配。不同板卡或 CPU／安全域镜像使用独立构建目录，由产品构建协调器或 CI 矩阵编排。Runtime 与 "
-"Platform 复用相同生产机制，但属于不同的消费模式。"
-
-#: docs/explanation/platform-architecture.md:63
-msgid ""
-"The common OS boundary is the wait/wake port. Task, queue, join and storage "
-"APIs remain backend-specific, including the real kernel control-block types."
-" Products switching kernels must adapt that lifecycle explicitly; no "
-"universal object pool or hidden scheduling task is supplied."
-msgstr ""
-"共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
-"仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"
-
-msgid "The [source-adjacent contracts](source-map.md) own the directory map and layer README content. Native models implement the same public I/O contracts under the Native SoC package. Shared register-protocol algorithms live under `drivers/<kind>/<ip>/` only when the participating wrappers independently establish their silicon semantics. Selected SoC targets compile these private sources directly; the directory adds no runtime layer to FIG-01. Cross-vendor SoC collaboration remains in `soc/common/`, while STM32 identity access remains under `soc/stm32/common/`."
-msgstr "[源码相邻合同](source-map.md) 维护目录映射和各层 README 正文。Native 模型在 Native SoC 包下实现相同的公共 I/O 合同。共享寄存器协议算法只有在参与的 wrapper 分别确认其硅片语义后，才位于 `drivers/<kind>/<ip>/`。所选 SoC target 直接编译这些私有源文件；目录不会给 FIG-01 增加运行时层。跨厂家 SoC 协作保留在 `soc/common/`，STM32 identity 访问保留在 `soc/stm32/common/`。"
-
-msgid "Each family's `configure/` package owns its capability policy, constructors and lifecycle emission; Native uses `soc/native/configure/`. The explicit provider map and shared leaf contracts remain in `tools/configure/providers/`. Common parsing, resource arbitration, typed IR and atomic publication stay in `tools/configure/`. Configuration tests stay under `tools/configure/tests/providers/<family>/`. These are build-time Python boundaries, independent of the C execution path."
-msgstr "每个家族的 `configure/` 包拥有能力策略、构造器与生命周期生成；Native 使用 `soc/native/configure/`。显式 provider map 与共享叶子合同保留在 `tools/configure/providers/`。通用解析、资源仲裁、typed IR 和原子发布仍在 `tools/configure/`。配置测试仍在 `tools/configure/tests/providers/<family>/`。这些是构建期 Python 边界，独立于 C 执行路径。"

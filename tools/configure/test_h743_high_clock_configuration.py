@@ -82,7 +82,7 @@ class H743HighClockConfigurationTests(unittest.TestCase):
                 self.assertEqual((domain.source, domain.nominal_hz,
                                   domain.minimum_hz, domain.maximum_hz), expected)
         self.assertNotIn("adc1", plan.domains)
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_legacy_projections_have_one_reviewed_nominal_authority(self):
         facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
@@ -171,7 +171,7 @@ class H743HighClockConfigurationTests(unittest.TestCase):
                 with self.subTest(profile=name):
                     result = self.resolved(name)
                     self.assertIsNone(getattr(result, "clock_plan", None))
-                    self.assertEqual(dict(result["clock"]), {
+                    self.assertEqual(dict(result.clock), {
                         "source":"hsi", "input_hz":64000000,
                         "core_hz":mhz*1000000, "apb1_hz":mhz*1000000,
                         "apb2_hz":mhz*1000000})
@@ -279,9 +279,9 @@ class H743SelectedKernelConfigurationTests(unittest.TestCase):
         self.assertEqual(timing.provenance, "authored_declared_assumptions")
         self.assertFalse(timing.physical_qualified)
         self.assertEqual(timing.cr1_filter_bits, 0)
-        self.assertEqual((timing["assumptions"]["kernel_hz_min"],
-                          timing["assumptions"]["kernel_hz_max"],
-                          timing["assumptions"]["pclk_hz_min"]),
+        self.assertEqual((timing.assumptions["kernel_hz_min"],
+                          timing.assumptions["kernel_hz_max"],
+                          timing.assumptions["pclk_hz_min"]),
                          (62000000, 65000000, 91140000))
         self.assertIn(f".timing = 0x{timing.timingr:08x}u,",
                       bindings.emit(result)[1])

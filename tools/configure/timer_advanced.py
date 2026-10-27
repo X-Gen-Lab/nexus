@@ -3,6 +3,7 @@
 Idle levels are explicit assembly policy, not a claim about an output stage or
 physical break circuit. Capture ring storage remains supplied by the caller.
 """
+from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
 from tools.configure.gpio_phase import withdraw_pin
@@ -123,7 +124,7 @@ def constructor(item, result, prefix):
     gpio = maintained(result.soc_family).GPIO_PHASE
     options = item.options
     lines = [f"static uint32_t s_nx_timer_clock_added_{name};",
-             f"static uint16_t s_nx_timer_pin_saved_{name}[{len(item['pins'])}];",
+             f"static uint16_t s_nx_timer_pin_saved_{name}[{len(item.pins)}];",
              f"static uint8_t s_nx_timer_pin_leases_{name};",
              f"static uint8_t s_nx_timer_priority_saved_{name};",
              f"static bool s_nx_timer_irq_leased_{name};"]
@@ -154,7 +155,7 @@ def constructor(item, result, prefix):
     # Both outputs must have observed inactive drive before any pin lease
     # is released. A refused second store retains the entire output group.
     if not capture:
-        for index, pin in enumerate(item["pins"]):
+        for index, pin in enumerate(item.pins):
             if pin["function"] == "break":
                 continue
             wire = pin["pin"]
@@ -177,7 +178,7 @@ def constructor(item, result, prefix):
                       f"        if (({mode} & {mode_mask}u) != {output_mode}u) {{ return NX_ERROR_IO; }}",
                       f"        if (({odr} & {1 << number}u) != {1 << number if high else 0}u) {{ return NX_ERROR_IO; }}",
                       "    }"]
-    for index, pin in reversed(list(enumerate(item["pins"]))):
+    for index, pin in reversed(list(enumerate(item.pins))):
         wire = pin["pin"]
         number = int(wire[2:])
         lease = 1 << index
@@ -193,7 +194,7 @@ def constructor(item, result, prefix):
               f"static nx_result_t prepare_{name}(void) {{", "    nx_result_t status;",
               f"    if ({state}.config != NULL) {{ return NX_ERROR_BUSY; }}",
               f"    if (((NVIC->ISER[{bank}] | NVIC->ISPR[{bank}] | NVIC->IABR[{bank}]) & {bit}u) != 0u) {{ return NX_ERROR_BUSY; }}"]
-    if result.get("kernel_profile") is not None:
+    if result.kernel is not None:
         lines += ["    if (((SCB->AIRCR >> 8u) & 7u) > 3u) { return NX_ERROR_PERMISSION; }"]
     lines += [f"    s_nx_timer_clock_added_{name} = ~{apb} & {gate};",
               f"    NX_PLATFORM_REGISTER_WRITE({apb}, {apb} | {gate});", "    nx_arch_dsb();",
@@ -205,7 +206,7 @@ def constructor(item, result, prefix):
         lines += [f"    if ({shared} != 0u) {{ return NX_ERROR_BUSY; }}"]
     lines += [f"    s_nx_timer_priority_saved_{name} = NVIC->IPR[{irq}];",
               f"    s_nx_timer_irq_leased_{name} = true;"]
-    for index, pin in enumerate(item["pins"]):
+    for index, pin in enumerate(item.pins):
         wire = pin["pin"]
         number = int(wire[2:])
         lines += [f"    status = nx_{prefix}_gpio_clock_enable({ord(wire[1])-ord('A')}u);",
@@ -225,17 +226,17 @@ def constructor(item, result, prefix):
               f"void {vector}_IRQHandler(void) {{ nx_{prefix}_{kind}_irq(&{state}); }}"]
     return Construction(
         state_type=f"nx_{kind}_controller_t", definitions=lines,
-        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
         retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
                        f"s_nx_timer_pin_saved_{name}[{index}]"
-                       for index, pin in enumerate(item["pins"])})
+                       for index, pin in enumerate(item.pins)})
 
 
 def _gpio_mask(result):
     return sum(1 << (ord(port) - ord('A')) for port in {
         pin["pin"][1] for item in result.controllers if item.kind in KINDS
-        for pin in item["pins"]})
+        for pin in item.pins})
 
 
 def _gpio_clock(result):

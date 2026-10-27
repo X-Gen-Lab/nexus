@@ -78,10 +78,22 @@ object pool or hidden scheduling task is supplied.
 
 ## Build-time decisions and runtime work
 
-The resolver combines authored TOML with reviewed SoC/Board facts into immutable
-typed IR and an atomic bundle. It validates modes, resources, clocks, IRQs, ABI,
-DMA reachability and budgets. CMake owns the source dependency graph; the resolver
-does not discover software from device names or generate product workers.
+TOML schema 2 is the only authored platform input. The parser freezes user intent
+as `AuthoredAssembly`; `resolve_ir()` combines it with reviewed SoC/Board facts
+and validates modes, resources, clocks, IRQs, ABI, DMA reachability and budgets.
+It returns `ConfigurationIR` directly. Named frozen records hold each decision
+once; they do not expose a Mapping facade or a duplicate `values` store. Hardware
+fact leaves and keyed indexes still use immutable mappings, and local resolver
+validation drafts may use dictionaries. These are explicit data boundaries,
+not a promise to assign a separate nominal type to every JSON field.
+
+Factory and emitters consume the same typed result. `to_dict()` derives the
+schema-1 `resolved.json` audit/artifact projection; it is never read back as an
+authored platform input. Private typed source epoch 2 is separate from that
+serialized format and from the public C factory epoch. Old JSON assemblies are
+rejected. Historical evidence keeps its original bytes and read-only verification.
+CMake owns the source dependency graph; resolution does not discover software
+from device names or generate product workers.
 
 ![Actual compile-target dependency relationships](../assets/diagrams/build-targets.svg)
 
@@ -97,8 +109,15 @@ its shared ops table with its instance context. IRQ dispatch is fixed to provide
 instances and does not repeat factory lookup for every byte.
 
 The constructor contract names private state, definitions, initialization, stop
-actions and failed-init responsibility explicitly. Common generation does not
-infer these from family names. Selected STM32F4 official LL operations remain
+actions and failed-init responsibility explicitly. Its initializer and stop list
+use immutable `DirectCall` values with explicit static references or constants;
+no free-form C expression or function-pointer/member-call expression can enter
+those fields.
+Definitions and some remaining cold helper bodies are still emitted as C source.
+The C compiler establishes actual symbol and parameter types. Model tests and
+linked-image checks remain necessary: this narrow representation is not a complete
+typed C AST. Common generation does not infer
+these decisions from family names. Selected STM32F4 official LL operations remain
 inside private SoC state machines; factory and public I/O contracts are unchanged.
 Full HAL Handle/callback transport requires separate mode-specific evaluation.
 See [official driver integration](../design/official-stm32-provider.md).

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "gd32f470_provider.h"
+#include "gd32f470_spi_cold.h"
 #include "gd32f4xx.h"
 #include "nexus/io/spi_transaction.h"
 #include "private/system.h"
@@ -15,6 +16,182 @@ const nx_gd32_spi_controller_t nx_gd32_spi0_controller = {SPI0, 100000000U,
                                                           RCU_SPI0};
 const nx_gd32_spi_controller_t nx_gd32_spi4_controller = {SPI4, 100000000U,
                                                           RCU_SPI4};
+
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+
+static bool cold_context(void) {
+    return nx_arch_is_privileged() && !nx_gd32_in_isr() &&
+           !nx_gd32_irq_masked();
+}
+
+bool nx_gd32_spi_config_valid(const nx_gd32_spi_config_t* config) {
+    if (config == NULL || config->pins == NULL || config->endpoints == NULL ||
+        config->endpoint_count == 0U || config->endpoint_count > 13U ||
+        config->pin_count != 3U + config->endpoint_count ||
+        (config->controller != &nx_gd32_spi0_controller &&
+         config->controller != &nx_gd32_spi4_controller))
+        return false;
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_gd32_spi_pin_config_t* pin = &config->pins[i];
+        if (pin->snapshot == NULL || pin->port_index > 8U || pin->pin > 15U ||
+            pin->alternate > 15U ||
+            pin->registers != GPIOA + (uint32_t)pin->port_index * 0x400U)
+            return false;
+        for (size_t prior = 0U; prior < i; ++prior) {
+            const nx_gd32_spi_pin_config_t* other = &config->pins[prior];
+            if (pin->snapshot == other->snapshot ||
+                (pin->registers == other->registers && pin->pin == other->pin))
+                return false;
+        }
+    }
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        const nx_gd32_spi_endpoint_config_t* endpoint = &config->endpoints[i];
+        if (endpoint->endpoint == NULL || endpoint->mode > 3U ||
+            endpoint->frequency_hz < (config->controller->clock_hz >> 8U) ||
+            endpoint->frequency_hz > config->controller->clock_hz / 2U)
+            return false;
+        for (size_t prior = 0U; prior < i; ++prior) {
+            if (endpoint->endpoint == config->endpoints[prior].endpoint)
+                return false;
+        }
+    }
+    return true;
+}
+
+nx_result_t nx_gd32_spi_pins_prepare(const nx_gd32_spi_config_t* config,
+                                     nx_gd32_spi_cold_t* cold) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (cold == NULL || !nx_gd32_spi_config_valid(config))
+        return NX_ERROR_INVALID;
+    if (cold->pin_leases != 0U || cold->constructed || cold->clock_owned)
+        return NX_ERROR_BUSY;
+    const uint32_t clock = config->controller->clock;
+    if ((RCU_REG_VAL(clock) & BIT(RCU_BIT_POS(clock))) != 0U)
+        return NX_ERROR_BUSY;
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_gd32_spi_pin_config_t* pin = &config->pins[i];
+        nx_result_t status = nx_gd32_gpio_clock_enable(pin->port_index);
+        if (status != NX_SUCCESS)
+            return status;
+        *pin->snapshot = nx_gd32_pin_capture(pin->registers, pin->pin);
+        cold->pin_leases |= (uint16_t)(1U << i);
+        if (i >= 3U) {
+            const uint32_t bit = 1U << pin->pin;
+            NX_PLATFORM_REGISTER_WRITE(GPIO_BOP(pin->registers), bit);
+            nx_arch_dsb();
+            if ((GPIO_OCTL(pin->registers) & bit) == 0U)
+                return NX_ERROR_IO;
+        }
+        status =
+            nx_gd32_pin_configure(pin->registers, pin->pin, i >= 3U ? 1U : 2U,
+                                  pin->alternate, 0U, false);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_gd32_spi_pins_close(const nx_gd32_spi_config_t* config,
+                                   nx_gd32_spi_cold_t* cold) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (cold == NULL || !nx_gd32_spi_config_valid(config))
+        return NX_ERROR_INVALID;
+    /* Prove every acquired CS inactive before restoring any selected pad. */
+    for (size_t i = 3U; i < config->pin_count; ++i) {
+        if ((cold->pin_leases & (1U << i)) == 0U)
+            continue;
+        const nx_gd32_spi_pin_config_t* pin = &config->pins[i];
+        const uint32_t bit = 1U << pin->pin;
+        NX_PLATFORM_REGISTER_WRITE(GPIO_BOP(pin->registers), bit);
+        nx_arch_dsb();
+        if ((GPIO_OCTL(pin->registers) & bit) == 0U)
+            return NX_ERROR_IO;
+    }
+    for (size_t count = config->pin_count; count != 0U; --count) {
+        const uint16_t owned = (uint16_t)(1U << (count - 1U));
+        if ((cold->pin_leases & owned) == 0U)
+            continue;
+        const nx_gd32_spi_pin_config_t* pin = &config->pins[count - 1U];
+        const uint32_t mask = 3U << (pin->pin * 2U);
+        const uint32_t mode = GPIO_CTL(pin->registers) & mask;
+        if (mode != 0U && mode != mask) {
+            NX_PLATFORM_REGISTER_WRITE(GPIO_CTL(pin->registers),
+                                       GPIO_CTL(pin->registers) | mask);
+            nx_arch_dsb();
+            if ((GPIO_CTL(pin->registers) & mask) != mask)
+                return NX_ERROR_IO;
+        }
+        nx_gd32_pin_restore(pin->registers, pin->pin, *pin->snapshot);
+        nx_arch_dsb();
+        if (nx_gd32_pin_capture(pin->registers, pin->pin) != *pin->snapshot)
+            return NX_ERROR_IO;
+        cold->pin_leases &= (uint16_t)~owned;
+    }
+    if (cold->clock_owned) {
+        const uint32_t clock = config->controller->clock;
+        const uint32_t mask = BIT(RCU_BIT_POS(clock));
+        NX_PLATFORM_REGISTER_WRITE(RCU_REG_VAL(clock),
+                                   RCU_REG_VAL(clock) & ~mask);
+        nx_arch_dsb();
+        if ((RCU_REG_VAL(clock) & mask) != 0U)
+            return NX_ERROR_IO;
+        cold->clock_owned = false;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_gd32_spi_prepare(nx_gd32_spi_state_t* port,
+                                const nx_gd32_spi_config_t* config,
+                                nx_gd32_spi_cold_t* cold) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || cold == NULL)
+        return NX_ERROR_INVALID;
+    if (port->initialized || port->active)
+        return NX_ERROR_BUSY;
+    nx_result_t status = nx_gd32_spi_pins_prepare(config, cold);
+    if (status != NX_SUCCESS)
+        return status;
+    const nx_gd32_spi_endpoint_config_t* first = &config->endpoints[0];
+    const nx_gd32_spi_pin_config_t* cs = &config->pins[3];
+    status = nx_gd32_spi_initialize_at(
+        port, first->endpoint, config->controller, cs->registers, 1U << cs->pin,
+        first->frequency_hz, first->mode);
+    if (status != NX_SUCCESS)
+        return status;
+    cold->constructed = true;
+    cold->clock_owned = true;
+    for (size_t i = 1U; i < config->endpoint_count; ++i) {
+        const nx_gd32_spi_endpoint_config_t* endpoint = &config->endpoints[i];
+        cs = &config->pins[3U + i];
+        status = nx_gd32_spi_endpoint_initialize(
+            port, endpoint->endpoint, cs->registers, 1U << cs->pin,
+            endpoint->frequency_hz, endpoint->mode);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_gd32_spi_close(nx_gd32_spi_state_t* port,
+                              const nx_gd32_spi_config_t* config,
+                              nx_gd32_spi_cold_t* cold) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || cold == NULL || !nx_gd32_spi_config_valid(config))
+        return NX_ERROR_INVALID;
+    if (cold->constructed) {
+        nx_result_t status = nx_gd32_spi_stop(port);
+        if (status != NX_SUCCESS)
+            return status;
+        cold->constructed = false;
+    }
+    return nx_gd32_spi_pins_close(config, cold);
+}
 
 /** \brief           Poll a hardware fact without silently ignoring faults. */
 static nx_result_t wait_status(nx_gd32_spi_state_t* port, uint32_t mask,
@@ -105,7 +282,13 @@ nx_result_t nx_gd32_spi_initialize_at(
                        ((uint32_t)divisor << 3U) |
                        ((mode & 1U) != 0U ? SPI_CTL0_CKPH : 0U) |
                        ((mode & 2U) != 0U ? SPI_CTL0_CKPL : 0U);
-    rcu_periph_clock_enable((rcu_periph_enum)controller->clock);
+    const uint32_t clock = controller->clock;
+    const uint32_t gate = BIT(RCU_BIT_POS(clock));
+    NX_PLATFORM_REGISTER_WRITE(RCU_REG_VAL(clock), RCU_REG_VAL(clock) | gate);
+    nx_gd32_peripheral_barrier();
+    if ((RCU_REG_VAL(clock) & gate) == 0U) {
+        return NX_ERROR_IO;
+    }
     spi_i2s_deinit(controller->registers);
     SPI_CTL0(controller->registers) = control;
     SPI_CTL1(controller->registers) = 0U;
@@ -219,8 +402,14 @@ nx_result_t nx_gd32_spi_stop(nx_gd32_spi_state_t* port) {
     }
     spi_i2s_deinit(port->controller->registers);
     nx_gd32_peripheral_barrier();
+    const uint32_t clock = port->controller->clock;
+    const uint32_t gate = BIT(RCU_BIT_POS(clock));
+    NX_PLATFORM_REGISTER_WRITE(RCU_REG_VAL(clock), RCU_REG_VAL(clock) & ~gate);
+    nx_gd32_peripheral_barrier();
+    if ((RCU_REG_VAL(clock) & gate) != 0U) {
+        return NX_ERROR_IO;
+    }
     port->initialized = false;
-    rcu_periph_clock_disable((rcu_periph_enum)port->controller->clock);
     return NX_SUCCESS;
 }
 

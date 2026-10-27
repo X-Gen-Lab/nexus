@@ -57,6 +57,6 @@ Actual include-closure, selected ARM and relocated-SDK checks establish the
 migration's software scope; the version inventory alone establishes none of it.
 
 Board packages are read-only `board.json` facts with provenance and reviewed
-wiring. SoC resources and route catalogs live in `soc/<family>`. Unreviewed
+wiring. SoC resources and route catalogs live in `soc/<vendor>/<family>`. Unreviewed
 physical connections cannot be enabled by claiming chip-level capability.
 See [integration contracts](../docs/design/integration-contracts.md).

@@ -27,15 +27,15 @@ class G474ConfigurationTests(unittest.TestCase):
 
     def test_single_ram_alias_exact_irqs_and_initial_provider_scope(self):
         result = self.resolve(self.assembly())
-        self.assertEqual(result["part"], "STM32G474RET6")
-        self.assertEqual(result["irq"]["external_count"], 102)
-        self.assertEqual(result["clock"]["core_hz"], 170000000)
-        self.assertEqual([(item["origin"], item["size"]) for item in result["memory"]],
+        self.assertEqual(result.part, "STM32G474RET6")
+        self.assertEqual(result.irq.external_count, 102)
+        self.assertEqual(result.clock["core_hz"], 170000000)
+        self.assertEqual([(item["origin"], item["size"]) for item in result.memory],
                          [(0x20000000, 98304), (0x10000000, 32768)])
         self.assertEqual([(item.kind, item.mode) for item in result.controllers],
                          [("gpio", "output"), ("uart", "irq-bytes")])
-        self.assertFalse(result["physical_qualified"])
-        self.assertEqual(sum(result["flash"]["erase_blocks"]), 524288)
+        self.assertFalse(result.physical_qualified)
+        self.assertEqual(sum(result.flash["erase_blocks"]), 524288)
 
     def test_g4_source_dependency_uses_g4_checkout_identity(self):
         with patch.object(gate, "dependency_identity", wraps=gate.dependency_identity) as dependency:
@@ -44,9 +44,9 @@ class G474ConfigurationTests(unittest.TestCase):
         self.assertEqual(paths, ["vendors/arm/CMSIS_6", "vendors/st/cmsis_device_g4",
                                  "vendors/st/stm32g4_hal"])
         self.assertNotIn("vendors/st/cmsis_device_f4", paths)
-        self.assertEqual(result["source_dependencies"][1]["commit"],
+        self.assertEqual(result.source_dependencies[1]["commit"],
                          "626ee412334a5ed2e5b320af5a8d77d69f03a558")
-        self.assertEqual(result["source_dependencies"][2]["commit"],
+        self.assertEqual(result.source_dependencies[2]["commit"],
                          "f5929f431f9effe45fbe18f5337e4753ced9ac92")
 
     def test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call(self):
@@ -74,7 +74,7 @@ class G474ConfigurationTests(unittest.TestCase):
         result = self.resolve(self.assembly(lambda text: text.replace(
             'backend = "baremetal"', 'backend = "freertos"')))
         self.assertEqual(result.kernel.kernel_port, "GCC/ARM_CM4F")
-        self.assertEqual(result["irq"]["syscall_priority"], 5)
+        self.assertEqual(result.irq.syscall_priority, 5)
         with self.assertRaises(ValueError):
             self.resolve(self.assembly(lambda text: text.replace(
                 'clock = "hse24-pll170"', 'clock = "hse8-pll168"')))

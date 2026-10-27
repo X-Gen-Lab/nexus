@@ -107,7 +107,7 @@ class G474SharedPwmConfiguration(unittest.TestCase):
             owner.period_ticks = 2000
         with self.assertRaises(FrozenInstanceError):
             owner.members[1].channel = 1
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_declaration_order_does_not_select_a_different_physical_owner(self):
         forward = self.normal()
@@ -190,8 +190,9 @@ class G474SharedPwmConfiguration(unittest.TestCase):
         result = self.normal()
         item = result.controllers[0]
         provider = maintained("stm32g474")
-        selection = dict(item.values)
-        route = {key: item[key] for key in ("kind", "controller", "pins")}
+        selection = item.to_dict()
+        route = {key: getattr(item, key) for key in
+                 ("kind", "controller", "pins")}
         provider.validate_selection(selection, route)
         for family in ("stm32f103", "stm32f407", "stm32h743", "gd32f470"):
             with self.subTest(family=family), self.assertRaises(ValueError):

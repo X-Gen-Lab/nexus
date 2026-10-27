@@ -27,14 +27,14 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         for label in ("stm32-zg", "stm32-ve", "gd32"):
             with self.subTest(label=label):
                 result = gate.resolve_ir(self.assembly(label))
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
                 self.assertEqual(len(result.controllers), 2)
                 capture = next(item for item in result.controllers if item.kind == "timer_capture")
                 self.assertEqual(capture.options.edge, "both")
                 self.assertEqual(capture.options.filter, 3)
                 with self.assertRaises(FrozenInstanceError):
                     capture.options.tick_hz = 2
-                claims = {item["key"] for item in result["claims"]}
+                claims = {item.key for item in result.claims}
                 self.assertIn("pin:PB6", claims)
                 self.assertIn("pin:PB12", claims)
                 self.assertIn("pin:PB13", claims)

@@ -29,6 +29,8 @@ def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
+    if any(item.kind == "spi" for item in selections):
+        source.append('#include "stm32f407_spi_cold.h"')
     if any(item.mode == "irq-words" for item in selections):
         source.append('#include "stm32f407_uart_word.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in selections):
@@ -70,9 +72,9 @@ def instance_declarations(item, result):
     if kind in {"spi", "i2c"}:
         initializer = ""
         if kind == "i2c":
-            child = next((device for device in result.devices if device["controller"] == item.id), None)
+            child = next((device for device in result.devices if device.controller == item.id), None)
             if child is not None:
-                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }}"
+                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }}"
         source.append('static nx_stm32'
                       f"_{implementation(item)}_endpoint_state_t "
                       f"s_nx_endpoint_{name}{initializer};")
@@ -86,7 +88,7 @@ def has_dma(result):
 
 def _dma_clock_mask(result):
     controllers = {dma.split(":", 1)[0]
-                   for item in result.controllers for dma in item.get("dma", ())}
+                   for item in result.controllers for dma in item.dma}
     return " | ".join(f"RCC_AHB1ENR_{name}EN" for name in sorted(controllers))
 
 
@@ -95,7 +97,7 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    if any(item["kind"] == "exti" for item in selections):
+    if any(item.kind == "exti" for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
     source.extend(ethernet.state_declarations(result, "stm32"))
@@ -116,7 +118,7 @@ def stop_system(result, *, system_phase=None):
     source.extend(timer_advanced.stop_system(result, "stm32"))
     source.extend(secondary_controllers.stop_system(result, "stm32"))
     source += gpio_phase.release(result)
-    if any(item["kind"] == "exti" for item in selections):
+    if any(item.kind == "exti" for item in selections):
         source += ['    if (s_nx_platform_started) { RCC->APB2ENR &= ~s_nx_platform_syscfg_clock_added; }']
     if dma_clock:
         source += ['    if (s_nx_platform_started) {',
@@ -141,9 +143,9 @@ def start_system(result):
     source = preflight.emit(result)
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')
-    if any(item["kind"] == "exti" for item in selections):
+    if any(item.kind == "exti" for item in selections):
         source.append('    s_nx_platform_syscfg_clock_added = 0u;')
-    source += [f'    result.primary = nx_stm32_validate_identity({result["flash"]["size"]}u);',
+    source += [f'    result.primary = nx_stm32_validate_identity({result.flash["size"]}u);',
                '    if (result.primary != NX_SUCCESS) { return result; }']
     source += gpio_phase.acquire(result)
     source += ['    nx_stm32_start_result_t system = nx_stm32_system_start(&g_nx_stm32_system, 1000000u);',
@@ -168,6 +170,6 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
         source += [f'    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & ({mask});',
                    f'    RCC->AHB1ENR |= ({mask});',
                    '    (void)RCC->AHB1ENR;', '    nx_arch_dsb();']
-    if any(item["kind"] == "exti" for item in selections):
+    if any(item.kind == "exti" for item in selections):
         source.append('    s_nx_platform_syscfg_clock_added = ~RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN;')
     return source

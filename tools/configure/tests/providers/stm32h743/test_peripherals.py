@@ -76,7 +76,7 @@ class H743PeripheralCapabilityTests(unittest.TestCase):
             source = Path(directory) / "assembly.toml"
             source.write_text(original + '\n[memory.regions.sram1]\nlimit_bytes=256\n')
             ir = configure.resolve_ir(source)
-            domains = {item["id"]: item for item in ir["memory"]}
+            domains = {item["id"]: item for item in ir.memory}
             self.assertTrue(domains["sram1"]["linker"])
             self.assertFalse(domains["sram2"]["linker"])
             self.assertFalse(domains["dtcm"]["linker"])

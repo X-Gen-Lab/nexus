@@ -22,6 +22,7 @@ target_compile_options(nexus_stm32_spi_transaction_test PRIVATE
 nexus_google_test(nexus_gd32_spi_transaction_test
     SOURCES spi_transaction_provider_test.cpp
         "${gd_multi_root}/drivers/spi.c"
+        "${gd_multi_root}/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
@@ -56,6 +57,7 @@ target_compile_options(nexus_stm32_spi_dma_sequence_test PRIVATE
 nexus_google_test(nexus_gd32_spi_dma_sequence_test
     SOURCES spi_dma_sequence_provider_test.cpp
         "${gd_multi_root}/drivers/spi.c"
+        "${gd_multi_root}/drivers/gpio.c"
         "${gd_multi_root}/drivers/spi_dma.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 from pathlib import Path
 import shutil
 import sys
@@ -12,15 +13,14 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
-    file_identity, identifier, load_json, stream_digest, verify_file_identity)
+    file_identity, identifier, load_json, parse_json, regular_file, stream_digest,
+    verify_file_identity)
+from tools.evidence.common import SOFTWARE_QUALIFICATION_SCOPES as REQUIRED_SCOPES
 from tools.evidence.identity import resolved_identity, verify_source
 from tools.evidence.container import verify as verify_environment
 from tools.measurement.elf import Elf32, binary_from_elf
 from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
 from tools.evidence.proof import validate_scope_proof, verify_sdk_file
-
-REQUIRED_SCOPES = frozenset({"host_contracts", "arm_link", "resource_budget",
-                           "source_sdk", "reproducibility", "hil_tooling"})
 
 
 def collect_identities(value, *, identity_verifier=verify_file_identity,
@@ -219,11 +219,16 @@ def verify(candidate_path: Path) -> dict:
         "configuration_sha256", "input_manifest_sha256", "artifacts", "payloads",
         "qualified_scopes", "sdk_packages", "physical_status", "product_promotion", "signature_status",
         "limitations"})
+    identifier(candidate["candidate_id"], "candidate id")
     if (type(candidate["schema_version"]) is not int or candidate["schema_version"] != 1 or
             candidate["kind"] != "sealed_software_candidate"
             or candidate["status"] != "software_qualified" or
-            set(candidate["qualified_scopes"]) != REQUIRED_SCOPES or
-            candidate["physical_status"] != "not_executed"):
+            not isinstance(candidate["qualified_scopes"], list) or
+            any(not isinstance(scope, str) for scope in candidate["qualified_scopes"]) or
+            sorted(candidate["qualified_scopes"]) != sorted(REQUIRED_SCOPES) or
+            candidate["physical_status"] != "not_executed" or
+            candidate["product_promotion"] != "not_performed" or
+            candidate["signature_status"] != "unsigned"):
         raise EvidenceError("unsupported or incomplete software candidate")
     root = candidate_path.parent
     identities = {}
@@ -240,6 +245,8 @@ def verify(candidate_path: Path) -> dict:
             raise EvidenceError("duplicate candidate payload")
         identities[identity["sha256"]] = path
     manifest = load_json(identities[candidate["input_manifest_sha256"]])
+    if manifest["candidate_id"] != candidate["candidate_id"]:
+        raise EvidenceError("sealed candidate identity differs from its manifest")
     if manifest["source"] != candidate["source"] or manifest["source"]["dirty"]:
         raise EvidenceError("sealed candidate source mismatch or dirty source")
     def packed(identity):
@@ -278,6 +285,54 @@ def verify(candidate_path: Path) -> dict:
         raise EvidenceError("sealed software qualification missing")
     collect_evidence_closure(collect_identities(manifest, identity_verifier=packed), resolver=packed)
     return candidate
+
+
+def verified_projection(candidate_path: Path) -> dict:
+    """Project an existing verified seal; never execute or confer new scopes.
+
+    Navigation consumers share the complete candidate verifier. The manifest
+    and configuration are parsed from the same bytes whose identities are
+    checked, rather than trusting a second mutable JSON read after verification.
+    The result binds an observation, not a lock on future filesystem changes.
+    """
+    candidate_path = Path(candidate_path).absolute()
+    before = file_identity(candidate_path)
+    sealed = verify(candidate_path)
+    payloads = {item["sha256"]: item for item in sealed["payloads"]}
+
+    def packed_identity(sha):
+        item = payloads[sha]
+        return {**item, "path": str(candidate_path.parent / item["path"])}
+
+    def packed_json(sha):
+        identity = packed_identity(sha)
+        path = regular_file(identity["path"])
+        with path.open("rb") as stream:
+            contents = stream.read(4 * 1024 * 1024 + 1)
+        if (len(contents) > 4 * 1024 * 1024 or
+                len(contents) != identity["size"] or
+                hashlib.sha256(contents).hexdigest() != identity["sha256"]):
+            raise EvidenceError("candidate projection payload changed")
+        return parse_json(contents)
+
+    manifest = packed_json(sealed["input_manifest_sha256"])
+    resolved = packed_json(manifest["configuration"]["sha256"])
+    artifacts = {role: packed_identity(item["sha256"])
+                 for role, item in sealed["artifacts"].items()}
+    for identity in artifacts.values():
+        verify_file_identity(identity)
+    if file_identity(candidate_path) != before:
+        raise EvidenceError("candidate changed during projection verification")
+    return {"schema_version": 1,
+            "kind": "verified_software_candidate_reference",
+            "candidate": before, "candidate_id": sealed["candidate_id"],
+            "source": sealed["source"],
+            "configuration_sha256": sealed["configuration_sha256"],
+            "resolved": resolved, "artifacts": artifacts,
+            "qualified_scopes": sealed["qualified_scopes"],
+            "physical_status": sealed["physical_status"],
+            "product_promotion": sealed["product_promotion"],
+            "signature_status": sealed["signature_status"]}
 
 
 def main() -> int:

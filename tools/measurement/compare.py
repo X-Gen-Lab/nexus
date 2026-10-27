@@ -4,17 +4,19 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
-    load_json, regular_file)
+    regular_file)
 from tools.evidence.identity import git_source, resolved_identity
 from tools.evidence.reproduce import run_logged
 from tools.measurement.resources import (measure, resolved_float_abi,
@@ -27,21 +29,56 @@ OPTIMIZATIONS = ("O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto")
 
 
 def profile_input(source: Path, assembly_path: Path, workload: str,
-                  build_root: Path) -> dict:
+                  build_root: Path) -> str:
     """Use the same authoring front end; temporary profiles are derived inputs."""
+    from tools.configure.configure import load_assembly
     selected_path = assembly_path.with_name(
         assembly_path.stem + "-" + workload + assembly_path.suffix)
-    if selected_path.suffix == ".toml":
-        from tools.configure.configure import load_assembly
-        assembly = load_assembly(selected_path, source)
+    snapshots = {}
+    assembly = load_assembly(selected_path, source, snapshots)
+    board = (selected_path.parent / assembly.board_package).resolve()
+    replacements = {"board_package": os.path.relpath(board,
+                                                    build_root.resolve())}
+    if assembly.layout is not None:
+        layout = (selected_path.parent / assembly.layout).resolve()
+        replacements["layout"] = os.path.relpath(layout, build_root.resolve())
+    contents = snapshots[selected_path.resolve()].decode("utf-8")
+    return _root_values(contents, replacements, remove=("board",))
+
+
+def _root_values(contents: str, replacements: dict[str, str],
+                 *, remove: tuple[str, ...] = ()) -> str:
+    """Replace complete root assignments, preserving every nested table byte.
+
+    Parsing complete statements avoids mistaking a quoted key, comment or a
+    multiline string for a table boundary. This is a narrow source edit, not a
+    second TOML serializer or configuration resolver.
+    """
+    tomllib.loads(contents)
+    names = set(replacements).union(remove)
+    lines = contents.splitlines(keepends=True)
+    kept = []
+    pending = ""
+    for index, line in enumerate(lines):
+        if not pending and line.lstrip().startswith("["):
+            kept.extend(lines[index:])
+            break
+        pending += line
+        try:
+            statement = tomllib.loads(pending)
+        except tomllib.TOMLDecodeError:
+            continue
+        if not names.intersection(statement):
+            kept.append(pending)
+        pending = ""
     else:
-        assembly = load_json(selected_path)
-    board = (selected_path.parent / assembly["board_package"]).resolve()
-    if assembly.get("layout") is not None:
-        layout = (selected_path.parent / assembly["layout"]).resolve()
-        assembly["layout"] = os.path.relpath(layout, build_root.resolve())
-    assembly["board_package"] = os.path.relpath(board, build_root.resolve())
-    return assembly
+        if pending:
+            raise ValueError("Incomplete authored TOML root assignment")
+    prefix = "".join(key + " = " + json.dumps(value) + "\n"
+                     for key, value in replacements.items())
+    result = prefix + "".join(kept)
+    tomllib.loads(result)
+    return result
 
 
 def tool_identity(executable: str, version_args: list[str]) -> dict:
@@ -88,9 +125,10 @@ def compare(source: Path, assembly_path: Path, build_root: Path,
     for optimization in optimizations:
         for workload in workloads:
             profile = build_root / (optimization + "-" + workload)
-            selected = {**profile_inputs[workload], "optimization": optimization}
-            selected_path = build_root / (optimization + "-" + workload + ".json")
-            atomic_json(selected_path, selected)
+            selected = _root_values(profile_inputs[workload],
+                                    {"optimization": optimization})
+            selected_path = build_root / (optimization + "-" + workload + ".toml")
+            selected_path.write_text(selected, encoding="utf-8")
             commands = [[tools["cmake"]["file"]["path"], "-S", str(source),
                 "-B", str(profile), "-G", "Ninja",
                 "-DCMAKE_MAKE_PROGRAM=" + tools["ninja"]["file"]["path"],

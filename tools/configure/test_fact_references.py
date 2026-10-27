@@ -157,15 +157,15 @@ class ReferenceInputClosureTests(unittest.TestCase):
         result = gate.resolve_ir(self.assembly, self.root)
         self.assertEqual(result.to_dict()["fact_references"],
                          json.loads(self.references.read_text()))
-        inputs = {item["path"]: item["sha256"] for item in result["inputs"]}
+        inputs = {item["path"]: item["sha256"] for item in result.inputs}
         self.assertEqual(inputs["soc/gd32/gd32f470/references.json"],
                          hashlib.sha256(self.references.read_bytes()).hexdigest())
-        before = result["configuration_sha256"]
+        before = result.configuration_sha256
         data = json.loads(self.references.read_text())
         data["documents"]["datasheet"]["revision"] += "-fixture"
         self.references.write_text(json.dumps(data))
         self.assertNotEqual(before, gate.resolve_ir(
-            self.assembly, self.root)["configuration_sha256"])
+            self.assembly, self.root).configuration_sha256)
 
     def test_reference_change_during_generation_revokes_old_bundle(self):
         output = self.root / "generated"

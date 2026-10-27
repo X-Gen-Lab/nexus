@@ -135,9 +135,9 @@ class MaintainedMatrixTests(unittest.TestCase):
             ("adc", "ADC1", "single-shot"),
             ("flash", "FLASH", "poll-word")})
         result = configure.resolve_ir(configure.ROOT / reference)
-        self.assertEqual(result["clock_profile"], "hsi64-pll384-cache-off")
+        self.assertEqual(result.clock_profile, "hsi64-pll384-cache-off")
         self.assertEqual(result.clock_plan.reviewed_revision_ids, (0x2003,))
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_u575_sram4_copy_reference_is_exact_and_not_physical_qualification(self):
         reference = "tools/configure/assemblies/u575-lpdma-copy-stop2.toml"
@@ -178,8 +178,8 @@ class MaintainedMatrixTests(unittest.TestCase):
                           for item in row["selected"]],
                          [("gpio", "GPIOA", "named-states")])
         result = configure.resolve_ir(configure.ROOT / reference)
-        self.assertEqual(result["clock_profile"], "hse24-pll170")
-        self.assertFalse(result["physical_qualified"])
+        self.assertEqual(result.clock_profile, "hse24-pll170")
+        self.assertFalse(result.physical_qualified)
         classes = {name: items for name, _, items in factory.classes(result)}
         self.assertEqual([item.id for item in classes["pin_state"]], ["status"])
         self.assertEqual(classes["gpio"], [])
@@ -194,13 +194,13 @@ class MaintainedMatrixTests(unittest.TestCase):
                 self.assertEqual(reference["scope"], "public_reference")
                 self.assertEqual(reference["physical_status"], "not_executed")
                 ir = configure.resolve_ir(configure.ROOT / path)
-                self.assertEqual((ir.board, ir.soc_family, ir["part"], ir.backend,
-                                  ir["clock_profile"]),
+                self.assertEqual((ir.board, ir.soc_family, ir.part, ir.backend,
+                                  ir.clock_profile),
                                  ("stm32h743zi-hsi-reference", "stm32h743",
                                   "STM32H743ZIT6", "baremetal",
                                   "hsi64-fixed-cache-on" if path.endswith(
                                       "cache-on.toml") else "hsi64-fixed-cache-off"))
-                self.assertFalse(ir["physical_qualified"])
+                self.assertFalse(ir.physical_qualified)
                 controllers = {item.id: item for item in ir.controllers}
                 self.assertEqual(set(controllers), {"bus4"} |
                                  ({"console"} if mode else set()))
@@ -208,26 +208,26 @@ class MaintainedMatrixTests(unittest.TestCase):
                 self.assertEqual((spi.kind, spi.controller, spi.mode),
                                  ("spi", "SPI4", "dma"))
                 self.assertEqual([(pin["pin"], pin["function"], pin["af"])
-                                  for pin in spi["pins"]],
+                                  for pin in spi.pins],
                                  [("PE12", "sck", 5), ("PE13", "miso", 5),
                                   ("PE14", "mosi", 5)])
-                self.assertEqual(tuple(spi["dma"]),
+                self.assertEqual(tuple(spi.dma),
                                  ("DMA1:stream2:channel83",
                                   "DMA1:stream3:channel84"))
                 self.assertEqual((spi.options.max_hz, spi.options.irq.priority,
                                   spi.options.irq.calls_os), (1000000, 5, False))
                 endpoint, = ir.devices
-                self.assertEqual((endpoint["controller"], endpoint["driver"],
-                                  endpoint["cs_binding"], endpoint["mode"]),
+                self.assertEqual((endpoint.controller, endpoint.driver,
+                                  endpoint.options.cs_binding, endpoint.options.mode),
                                  ("bus4", "spi-endpoint", "spi4-cs", 0))
                 if mode:
                     uart = controllers["console"]
                     self.assertEqual((uart.kind, uart.controller, uart.mode),
                                      ("uart", "USART3", mode))
                     self.assertEqual([(pin["pin"], pin["function"], pin["af"])
-                                      for pin in uart["pins"]],
+                                      for pin in uart.pins],
                                      [("PD8", "tx", 7), ("PD9", "rx", 7)])
-                    self.assertEqual(tuple(uart["dma"]),
+                    self.assertEqual(tuple(uart.dma),
                                      ("DMA1:stream0:channel46",) if mode == "dma-tx"
                                      else ("DMA1:stream1:channel45",))
 

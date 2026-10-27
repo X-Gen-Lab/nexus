@@ -34,15 +34,15 @@ def silicon_policy(result, item=None):
         if item.kind != "spi" or item.mode != "dma":
             return None
         if (result.backend != "baremetal" or
-                result["clock_profile"] not in {
+                result.clock_profile not in {
                     "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"}):
             fail("Selected SPI DMA silicon expectation requires its exact profile")
-        cache = "on" if result["clock_profile"].endswith("-cache-on") else "off"
-        return SiliconPolicy(result["part"], result.soc_family,
+        cache = "on" if result.clock_profile.endswith("-cache-on") else "off"
+        return SiliconPolicy(result.part, result.soc_family,
                              f"spi4-dma-hsi64-cache{cache}-dev450-v2003-trim64",
                              (0x2003,), "selected_spi_dma_mode")
     plan = result.clock_plan
     if plan is None:
         return None
-    return SiliconPolicy(result["part"], result.soc_family, plan.profile,
+    return SiliconPolicy(result.part, result.soc_family, plan.profile,
                          plan.reviewed_revision_ids, "selected_clock_profile")

@@ -72,7 +72,15 @@ Each constructor returns the frozen `Construction` record from
 `state_type`, `definitions`, `initialize`, `stop`, `retain_on_failed_init`,
 `exports` and `pin_snapshots`. The common emitter consumes these decisions rather
 than reconstructing state types or failed-init responsibility from a family name.
-This is a Python generation contract; no descriptor or dispatch layer is emitted
+`initialize` is an immutable `DirectCall`; `stop` is a tuple of these calls.
+Arguments are explicit static `Symbol` or `Address` values, uint32 constants,
+booleans, NULL, or nested direct calls such as absolute-deadline construction.
+Free-form expressions, casts, assignments and function-pointer/member-call
+expressions reject.
+`definitions`, `exports` and `face_definitions` remain C source strings; they can
+still contain selected helper bodies. The real C compiler establishes symbol
+and parameter types. This is a narrow Python generation contract, not a complete
+C AST; these Python records introduce no additional runtime metadata or dispatch
 into the MCU image.
 
 The family owns numerical limits, supported modes, exact routes and construction
@@ -163,12 +171,28 @@ gate relationships, system-clock state and chip-specific cold checks. Family
 generation still validates the selected Board/mode and supplies its chosen values.
 The existing shared `nx_legacy_*_close` paths retain stop and drain responsibility.
 
-This moves the selected cold integration out of generated statement sequences;
-it does not turn the legacy drivers into the I2C V2 configuration type. ADC, PWM
-and Flash retain their separate private contracts. Other GPIO, IRQ UART, SPI,
-watchdog and EXTI paths can still contain concrete behavior emitted by their
-family adapter. Review each selected mode's real start/stop path rather than
-inferring a platform-wide lifecycle change from the directory layout.
+The ADC and PWM owners now reference their own readonly hardware descriptions,
+`nx_legacy_adc_config_t` and `nx_legacy_pwm_config_t`, supplied by each exact SoC.
+Register addresses, gates and fixed pad facts move out of mutable owner storage.
+ADC reference voltage and PWM tick/period/duty/inactive level remain selected
+owner state; they are not promoted into shared hardware facts. Configuration
+must outlive the owner and cannot overlap its state or API output storage.
+This does not turn these drivers into the I2C V2 type; Flash keeps its separate
+private contract. Actual linked costs depend on the exact selected image.
+
+Selected U575 USART1 `dma-tx` and `dma-chain-tx` use static cold configuration and
+concrete C preparation. Their C adapters own admission, binding and pin preparation
+before existing finite/chain initialization. Selected F407 SPI polling/DMA and paired-controller DMA, plus
+GD470 SPI0/SPI4 polling and finite full-duplex DMA, move prepare/close behavior
+into concrete C while preserving the same Platform snapshot slots and retained
+cleanup responsibility. GD470 also moves its conditional EXTI close into C.
+The hot transfer engines, public faces and direct IRQ ownership are unchanged.
+
+This is a bounded cold-path migration. Other GPIO, IRQ UART, ADC, PWM, EXTI and
+additional mode-specific paths may still emit C behavior in family helpers.
+Review each selected mode's real start/stop path; neither a typed call field nor
+a new directory establishes that all lifecycle behavior has moved out of the
+generator. Physical timing and final software qualification remain separate.
 
 ## Conditions for full HAL transport
 

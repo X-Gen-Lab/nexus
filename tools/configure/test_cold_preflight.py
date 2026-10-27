@@ -1,10 +1,10 @@
 """Cold assembly rejects observed foreign resources before clock effects."""
-import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, preflight
+from tools.configure.tests.assembly_fixture import render_toml
+from tools.configure import bindings, configure as gate, preflight, resource_graph
 from tools.configure.dma_topology import DmaTopologyIR
 
 
@@ -38,13 +38,13 @@ class ColdPreflightGenerationTests(unittest.TestCase):
                                   ("threadx", "threadx")):
             with self.subTest(backend=backend), tempfile.TemporaryDirectory() as directory:
                 data = gate.load_assembly(
-                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml")
+                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml").to_dict()
                 data["backend"] = backend
                 data["controllers"][1]["id"] = identity
                 if backend == "threadx":
                     data["os"] = {"tick_source": "systick"}
-                path = Path(directory) / "assembly.json"
-                path.write_text(json.dumps(data))
+                path = Path(directory) / "assembly.toml"
+                path.write_text(render_toml(data))
                 result = gate.resolve_ir(path)
                 source = "\n".join(preflight.selected(result))
                 self.assertIn("USART1_IRQn", source)
@@ -58,9 +58,13 @@ class ColdPreflightGenerationTests(unittest.TestCase):
                 ("stm32u575", "USART1", ("PA9", "PA10"), "U575",
                  "RCC_APB2ENR_USART1EN", "RCC_CCIPR1_USART1SEL")):
             item = AdmissionInput(id="console", kind="uart", controller=controller,
+                                  mode="irq-byte-event",
                                   pins=[{"pin": pin} for pin in pins])
             result = AdmissionInput(soc_family=family, controllers=(item,), devices=(),
                 dma_topology=DmaTopologyIR(()),
+                resource_plan=resource_graph.resolve([{
+                    "key": "irq:" + controller, "owner": "console",
+                    "mode": "irq-byte-event", "source": "projection-test"}]),
                 claims=[{"key": "irq:" + controller, "owner": "console"}])
             with self.subTest(family=family):
                 source = "\n".join(preflight.emit(result))

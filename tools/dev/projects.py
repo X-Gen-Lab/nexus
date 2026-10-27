@@ -163,9 +163,9 @@ def create(templates, revision, template, output, *, source_root=ROOT):
         result["validation"] = {
             "scope": "current resolver and declared inputs only",
             "source_root": str(source_root),
-            "configuration_sha256": resolved["configuration_sha256"],
+            "configuration_sha256": resolved.configuration_sha256,
             "inputs": [file_identity(input_paths[item["path"]])
-                       for item in resolved["inputs"]],
+                       for item in resolved.inputs],
             "resolver": file_identity(source_root /
                                       "tools/configure/configure.py"),
         }

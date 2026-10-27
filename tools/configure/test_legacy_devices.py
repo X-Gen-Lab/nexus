@@ -15,10 +15,17 @@ class LegacyDevicesTests(unittest.TestCase):
     def fixture(self, family):
         return ROOT / f"tests/contracts/mainstream_assembly/{family}-devices.toml"
 
+    def test_constructor_rejects_unresolved_mapping(self):
+        for family in ("stm32f103", "gd32f303"):
+            with self.subTest(family=family):
+                provider = maintained(family)
+                with self.assertRaisesRegex(ConfigurationError, "typed"):
+                    provider.constructor({}, None, {}, {}, ())
+
     def test_exact_devices_generate_private_static_states(self):
         for family in ("f103", "gd303"):
             with self.subTest(family=family):
-                result = configure.resolve(self.fixture(family), ROOT)
+                result = configure.resolve_ir(self.fixture(family), ROOT)
                 _, source = bindings.emit(result)
                 prefix = "stm32f103" if family == "f103" else "gd32f303"
                 self.assertIn(f"nx_{prefix}_adc_prepare", source)
@@ -26,12 +33,12 @@ class LegacyDevicesTests(unittest.TestCase):
                 self.assertIn(f"nx_{prefix}_flash_prepare", source)
                 self.assertNotIn(".startup_delay_us = ", source)
                 self.assertNotIn("malloc(", source)
-                physical = next(item for item in result["controllers"]
-                                if item["kind"] == "flash")
-                provider = maintained(result["soc_family"])
+                physical = next(item for item in result.controllers
+                                if item.kind == "flash")
+                provider = maintained(result.soc_family)
                 construction = provider.constructor(
-                    physical, result, result["board_bindings"],
-                    result["routes"], result["devices"])
+                    physical, result, result.board_bindings,
+                    result.routes, result.devices)
                 self.assertFalse(construction.retain_on_failed_init)
                 self.assertEqual(provider.FLASH_PROGRAM_UNIT, 2)
                 self.assertEqual(provider.FLASH_INPUT_ALIGNMENT, 1)
@@ -50,7 +57,7 @@ class LegacyDevicesTests(unittest.TestCase):
                         path = Path(directory) / "invalid.toml"
                         path.write_text(text.replace(old, new))
                         with self.assertRaises(ConfigurationError):
-                            configure.resolve(path, ROOT)
+                            configure.resolve_ir(path, ROOT)
 
     def test_non_exact_timer_divider_is_rejected(self):
         for family in ("f103", "gd303"):
@@ -60,7 +67,7 @@ class LegacyDevicesTests(unittest.TestCase):
                 path = Path(directory) / "invalid.toml"
                 path.write_text(text)
                 with self.assertRaises(ConfigurationError):
-                    configure.resolve(path, ROOT)
+                    configure.resolve_ir(path, ROOT)
 
     def test_source_sdk_requires_each_new_gd303_device_header(self):
         from tools.configure.providers import descriptor
@@ -72,7 +79,7 @@ class LegacyDevicesTests(unittest.TestCase):
 
     def test_physical_flash_factory_rejects_missing_exact_provider_contract(self):
         from tools.configure import factory
-        result = configure.resolve(self.fixture("f103"), ROOT)
+        result = configure.resolve_ir(self.fixture("f103"), ROOT)
         provider = maintained("stm32f103")
         for attribute in ("FLASH_PROGRAM_UNIT", "FLASH_INPUT_ALIGNMENT"):
             with self.subTest(attribute=attribute):

@@ -38,14 +38,16 @@ def includes(result):
                    '    nx_gd32_spi_dma_sequence_backend;']
     if gpio_phase.applies(result):
         source += ['#include "gd32f4xx_gpio.h"', '#include "gd32f4xx_rcu.h"']
-    if any(item["kind"] == "uart" and item["mode"] == "dma-tx" for item in selections):
+    if any(item.kind == "uart" and item.mode == "dma-tx" for item in selections):
         source.append('#include "gd32f470_dma.h"')
-    if any(item["kind"] == "spi" and item["mode"] == "dma-full-duplex" for item in selections):
+    if any(item.kind == "spi" for item in selections):
+        source.append('#include "gd32f470_spi_cold.h"')
+    if any(item.kind == "spi" and item.mode == "dma-full-duplex" for item in selections):
         source.append('#include "gd32f470_spi_dma.h"')
     if any(item.kind == "adc" and mode_traits(item.kind, item.mode).dma
            for item in selections):
         source.append('#include "gd32f470_adc_stream.h"')
-    if any(item["kind"] == "uart" and item["mode"] == "irq-blocks" for item in selections):
+    if any(item.kind == "uart" and item.mode == "irq-blocks" for item in selections):
         source.append('#include "gd32f470_uart_stream.h"')
     if any(item.kind == "uart" and mode_traits(item.kind, item.mode).rx_dma
            for item in selections):
@@ -79,9 +81,9 @@ def instance_declarations(item, result):
     if kind in {"spi", "i2c"}:
         initializer = ""
         if kind == "i2c":
-            child = next((device for device in result.devices if device["controller"] == item.id), None)
+            child = next((device for device in result.devices if device.controller == item.id), None)
             if child is not None:
-                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }}"
+                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }}"
         source.append('static nx_gd32'
                       f"_{implementation(item)}_endpoint_state_t "
                       f"s_nx_endpoint_{name}{initializer};")
@@ -95,7 +97,7 @@ def has_dma(result):
 
 def _dma_clock_mask(result):
     controllers = {dma.split(":", 1)[0]
-                   for item in result.controllers for dma in item.get("dma", ())}
+                   for item in result.controllers for dma in item.dma}
     return " | ".join(f"RCU_AHB1EN_{name}EN" for name in sorted(controllers))
 
 
@@ -114,7 +116,7 @@ def state_declarations(result):
 def shared_irqs(result):
     selected = sorted((item for item in result.controllers
                        if item.kind == "exti"),
-                      key=lambda item: int(item["pins"][0]["pin"][2:]))
+                      key=lambda item: int(item.pins[0]["pin"][2:]))
     if not selected:
         return []
     pointers = ", ".join("&s_nx_port_" + item.id.replace("-", "_")
@@ -125,7 +127,7 @@ def shared_irqs(result):
               f"{{ s_nx_exti_ports, {len(selected)}u }};"]
     vectors = {}
     for item in selected:
-        line = int(item["pins"][0]["pin"][2:])
+        line = int(item.pins[0]["pin"][2:])
         vector = (f"EXTI{line}" if line < 5 else
                   "EXTI5_9" if line < 10 else "EXTI10_15")
         vectors[vector] = vectors.get(vector, 0) | (1 << line)
@@ -164,7 +166,7 @@ def stop_system(result, *, system_phase=None):
 def start_system(result):
     dma_clock = has_dma(result)
     source = preflight.emit(result)
-    if result.get("can_domain") is not None:
+    if result.can_domain is not None:
         source.append("    s_nx_can_gpio_clocks_added = 0u;")
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')

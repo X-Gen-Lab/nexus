@@ -19,10 +19,10 @@ def check(result, *, expected_family=None, expected_part=None):
         fail("Provider check family differs from the resolved exact family",
              code="provider_identity_mismatch", expected=expected_family,
              actual=result.soc_family)
-    if expected_part is not None and result["part"] != expected_part:
+    if expected_part is not None and result.part != expected_part:
         fail("Provider check part differs from the resolved exact part",
              code="provider_identity_mismatch", expected=expected_part,
-             actual=result["part"])
+             actual=result.part)
     provider = maintained(result.soc_family)
     family = descriptor.maintained(result.soc_family)
     # Use the production emitter once. It exercises provider constructors,
@@ -45,12 +45,12 @@ def check(result, *, expected_family=None, expected_part=None):
     return {
         "schema_version": 1, "kind": "provider_configuration_check",
         "checks": ["resolved_typed_ir", "static_bundle_emitted"],
-        "family": result.soc_family, "part": result["part"],
-        "board": result["board"], "backend": result["backend"],
-        "configuration_sha256": result["configuration_sha256"],
+        "family": result.soc_family, "part": result.part,
+        "board": result.board, "backend": result.backend,
+        "configuration_sha256": result.configuration_sha256,
         "controllers": controllers,
         "configuration_modules": list(family.configuration_modules),
-        "fact_inputs": [dict(item) for item in result["inputs"]],
+        "fact_inputs": [dict(item) for item in result.inputs],
         "generated_files": generated,
         "physical_verification": ("not_applicable" if provider.MODEL else
                                   "not_established_by_configuration"),

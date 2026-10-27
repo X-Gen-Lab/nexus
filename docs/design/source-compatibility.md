@@ -17,7 +17,7 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 | `factory_abi_epoch` | `1` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
 | source SDK | `source_only` / `exact` | CMake package 只接受相同完整版本，拒绝 ranges |
 | authored assembly | `2` | 简化的 TOML 选择面；不改变 Board/SoC 事实 |
-| projection / typed IR | `1` / `1` | 严格 resolver 与实际 emitter 的源码格式 |
+| resolved JSON projection / typed IR | `1` / `2` | 单向 JSON 输出格式与私有 Python 类型化源码接口分别计代 |
 | Board / SoC / routes | `1` / `1` / `1` | 物理事实文件及生产 validator 必须一致 |
 | CPU runtime assembly / facts / resolved | `1` / `1` / `1` | CPU 软件配置，不能升格 SoC/Board 资格 |
 | installed source SDK manifest | `1` | 既有完整 file-map/源依赖/package-export 校验 |
@@ -26,6 +26,12 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 意味着生产 validator/emitter 明确维护了新的格式，并更新策略断言与负测。策略不能
 使尚未实现的 schema 获得支持。SDK manifest 增加一个被 file-map 覆盖的源码文件，
 不等于修改 manifest 格式。
+
+类型化源码接口第 2 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、
+factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。
+`resolved.json` 仍是第 1 版单向输出，用于审计和独立产物检查，不是可信配置入口。
+`source_epoch` 是 Python 类级合同，不写入 JSON，也不增加 MCU 状态或改变公共
+C factory 接口。维护工具直接观察实际 IR 类的两项声明，并核对唯一版本策略。
 
 当前 `0.2.0` 用于开发与软件候选准备，不表示已公开发行或已通过候选验收。
 本次 semantic version 变化保留 epoch `1`、exact 匹配和 authored schema `2`；

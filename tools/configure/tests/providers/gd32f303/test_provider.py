@@ -1,9 +1,12 @@
 """Exact GD303 geometry, silicon routes and static construction boundaries."""
+from dataclasses import replace
 import importlib
 import json
 from pathlib import Path
 import unittest
 
+from tools.configure import configure
+from tools.configure.calls import Address, DirectCall
 from tools.configure.ir import ControllerIR
 from tools.configure.providers.common import ConfigurationError
 
@@ -13,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[5]
 
 def uart(**changes):
     return {**{"id": "serial", "binding": "uart0", "kind": "uart",
-        "controller": "USART0", "mode": "irq-bytes", "baud": 115200,
+        "controller": "USART0", "route": "usart0-pa9-pa10",
+        "mask": 1536, "initial": 0, "mode": "irq-bytes", "baud": 115200,
         "rx_profile": "bytes", "rx_capacity": 64, "irq_priority": 5,
         "calls_os": False, "pins": [
             {"pin": "PA9", "function": "tx", "af": 0},
@@ -22,18 +26,16 @@ def uart(**changes):
 
 def gpio(**changes):
     return {**{"id": "output", "binding": "gpio0", "kind": "gpio",
-        "controller": "GPIOA", "mode": "output", "mask": 32, "initial": 0,
+        "controller": "GPIOA", "route": "gpio-pa5",
+        "mode": "output", "mask": 32, "initial": 0,
         "pins": [{"pin": "PA5", "function": "output", "af": 0}]}, **changes}
 
 
-class Result(dict):
-    def __init__(self, *items, backend="baremetal"):
-        super().__init__(irq={"external_count": 60, "priority_bits": 4,
-            "syscall_priority": 5 if backend == "freertos" else None},
-            devices=[], board_bindings={}, routes={}, kernel_profile=(
-                {"kernel_policy": "basepri"} if backend == "freertos" else None))
-        self.controllers = tuple(ControllerIR.create(item, "gd32f303")
-                                 for item in items)
+def Result(*items, backend="baremetal"):
+    baseline = configure.resolve_ir(ROOT / "tools/configure/assemblies" /
+        f"gd32-f303-{backend}-empty.toml")
+    return replace(baseline, controllers=tuple(
+        ControllerIR.create(item, "gd32f303") for item in items))
 
 
 class GD303ProviderTests(unittest.TestCase):
@@ -105,7 +107,7 @@ class GD303ProviderTests(unittest.TestCase):
         self.assertIn("nx_gd32f303_usart0_pins_prepare()", source)
         self.assertIn("8000000u", source)
         self.assertEqual(construction.stop,
-                         ("nx_uart_port_stop(&s_nx_face_serial)",))
+                         (DirectCall("nx_uart_port_stop", (Address("s_nx_face_serial"),)),))
         self.assertTrue(construction.retain_on_failed_init)
 
     def test_foreign_provider_and_mode_cannot_bypass_constructor(self):

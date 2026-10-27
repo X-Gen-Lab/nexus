@@ -255,7 +255,7 @@ Breathe XML 路径由本次输出根注入，不能继续固定读取 docs/api �
 
 ## 10. 版本和发布身份
 
-文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段，
+文档 manifest 复用既有 identity 和证据定位结构。下表映射当前 schema-2 字段，
 完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准：
 
 | 字段 | 来源与意义 |
@@ -263,16 +263,17 @@ Breathe XML 路径由本次输出根注入，不能继续固定读取 docs/api �
 | `version` | 严格 loader 读取唯一人工维护的兼容性 JSON；CMake 派生同值，不另写版本常量 |
 | `code_source.commit`、`code_source.tree` | 被文档描述的实际代码源码 |
 | `documentation_source.commit`、`documentation_source.tree` | 本次正文、配置和翻译源码 |
-| `qualified_code.commit`、`qualified_code.tree` | 当前引用资格的精确源码，保留原scope |
-| `qualified_code.index`、`qualified_code.index_sha256` | 既有结果索引路径和摘要，保留其配置与执行身份 |
+| `qualification_references[].source` | 显式选入的每份原候选源码；不继承为文档 HEAD 资格 |
+| `qualification_references[].candidate`、`configuration_sha256`、`artifacts`、`qualified_scopes` | 经原 verifier 核对的候选定位、摘要和精确范围；默认列表为空 |
 | `tool_versions` | 实际工具、安装回执及依赖锁身份，不由版本字符串推断执行 |
 | `languages` | 实际构建的locale数组；逐页翻译审查状态记录在构建结果中 |
 | `files` | 成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt |
 
 三种源码身份不能互相覆盖。文档更新可引用经过验证的旧代码记录，不把该记录
 重新标记为当前 HEAD 已执行。若描述的代码与资格不同，页面显示各自来源和边界。
-本方案描述的起点是 docs HEAD 7abde0e4、qualified code cc6a065c；历史 SoC
-记录保持独立。计划工具一旦实现变更，按新源码执行其门禁。
+原方案起点 docs HEAD 7abde0e4 与 qualified code cc6a065c 保持历史身份。
+当前 schema 2 显式引用多份原候选，schema 1 仅保留原包的只读验证／恢复。
+工具实现变化按新源码执行门禁，不改写已有证据字节。
 
 版本 URL 结构如下；具体已发布版本以实际发布记录为准：
 

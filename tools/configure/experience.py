@@ -542,9 +542,10 @@ def run(gate, argv=None):
                     print("  " + impact["category"] + " " + impact["path"] +
                           ": " + impact["obligation"])
         else:
-            print(f"Resolved {result['part']}/{result['board']}/"
-                  f"{result['backend']}: "
-                  f"{result['configuration_sha256']}")
+            data = project(result)
+            print(f"Resolved {data['part']}/{data['board']}/"
+                  f"{data['backend']}: "
+                  f"{data['configuration_sha256']}")
         return 0
     except (gate.ConfigurationError, OSError, ValueError,
             TypeError, KeyError) as error:

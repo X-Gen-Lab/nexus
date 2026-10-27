@@ -1,5 +1,38 @@
 """Small, strict TOML authoring surface; hardware facts remain JSON."""
 import tomllib
+from dataclasses import dataclass
+from collections.abc import Mapping
+
+from tools.configure.ir import Record, freeze
+
+
+@dataclass(frozen=True)
+class AuthoredAssembly(Record):
+    """Parsed user intent; unresolved choices are never hardware decisions."""
+    board_package: str
+    backend: str
+    clock_profile: str
+    controllers: tuple[Mapping, ...]
+    devices: tuple[Mapping, ...]
+    memory_budgets: Mapping
+    layout: str | None
+    source_fields: tuple[str, ...]
+    abi: str | None = None
+    optimization: str = "Os"
+    components: tuple[str, ...] = ()
+    os: Mapping | None = None
+    factory: Mapping | None = None
+    can_domain: Mapping | None = None
+    power: Mapping | None = None
+    i2s2: Mapping | None = None
+
+    @classmethod
+    def create(cls, values):
+        return cls(**{key: freeze(value) for key, value in values.items()},
+                   source_fields=tuple(values))
+
+    def projection(self):
+        return {name: getattr(self, name) for name in self.source_fields}
 
 INSTANCE_FIELDS = {
     "rtc": {"binding", "mode"},
@@ -126,7 +159,7 @@ def normalize(data, path, root, fail, obj, integer, text):
             "USB endpoint " + name)
         devices.append({**definition, "id": name, "driver": "usb-fs-endpoint",
                         "authored_kind": "usb_device"})
-    result = {"schema_version": 1, "board_package": package,
+    result = {"board_package": package,
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
@@ -136,7 +169,7 @@ def normalize(data, path, root, fail, obj, integer, text):
     if "i2s2" in data:
         result["i2s2"] = dict(obj(data["i2s2"], {"profile"}, (),
                                    "I2S2 chip hardware role"))
-    return result
+    return AuthoredAssembly.create(result)
 
 
 def read(path, snapshots, root, fail, obj, integer, text):

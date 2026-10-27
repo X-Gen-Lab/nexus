@@ -4,22 +4,22 @@ import unittest
 
 class PhysicalFactBoundaryTests(unittest.TestCase):
     def test_mixed_dma_reachability_requires_an_explicit_engine(self):
-        from tools.configure import emission
+        from tools.configure import memory as emission
         result = {"memory": [{"id": "dtcm", "origin": 0x20000000,
                               "size": 131072, "linker": True,
                               "dma_engines": {"DMA1": False, "MDMA": True}}]}
         with self.assertRaisesRegex(ValueError, "engine"):
-            emission.dma_regions("port", result)
-        lines, count = emission.dma_regions("port", result, engine="MDMA")
+            emission.dma_regions_from_facts("port", result["memory"])
+        lines, count = emission.dma_regions_from_facts("port", result["memory"], engine="MDMA")
         self.assertEqual(count, 1)
         self.assertIn("0x20000000", "\n".join(lines))
-        _, count = emission.dma_regions("port", result, engine="DMA1")
+        _, count = emission.dma_regions_from_facts("port", result["memory"], engine="DMA1")
         self.assertEqual(count, 0)
         with self.assertRaises(ValueError):
-            emission.dma_regions("port", result, engine="nearest-DMA")
+            emission.dma_regions_from_facts("port", result["memory"], engine="nearest-DMA")
 
     def test_engine_ram_facts_do_not_authorize_flash_read_access(self):
-        from tools.configure import emission
+        from tools.configure import memory as emission
         result = {"memory": [{"id": "sram4", "origin": 0x38000000,
                               "size": 65536,
                               "dma_engines": {"BDMA": True, "MDMA": True}}],
@@ -27,12 +27,12 @@ class PhysicalFactBoundaryTests(unittest.TestCase):
         for engine in ("BDMA", "MDMA"):
             with self.subTest(engine=engine):
                 with self.assertRaisesRegex(ValueError, "Flash.*reachability"):
-                    emission.dma_regions("port", result, include_flash=True,
+                    emission.dma_regions_from_facts("port", result["memory"], flash=result["flash"],
                                          engine=engine)
         # Existing shared-reachability families keep their reviewed Flash path.
         result["memory"][0] = {"origin": 0x20000000, "size": 131072,
                                "dma": True}
-        lines, count = emission.dma_regions("port", result, include_flash=True)
+        lines, count = emission.dma_regions_from_facts("port", result["memory"], flash=result["flash"])
         self.assertEqual(count, 2)
         self.assertIn("0x08000000", "\n".join(lines))
 

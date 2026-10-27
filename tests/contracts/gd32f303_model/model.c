@@ -141,11 +141,11 @@ void nx_gd303_model_device_poll(unsigned kind, void* port) {
     }
     if (kind == 1U) {
         nx_legacy_adc_state_t* p = port;
-        p->registers->control2 &= ~12U;
-        if ((p->registers->control2 & (1U << 22U)) != 0U) {
-            p->registers->control2 &= ~(1U << 22U);
-            p->registers->data = 1234U;
-            p->registers->status |= 2U;
+        p->config->registers->control2 &= ~12U;
+        if ((p->config->registers->control2 & (1U << 22U)) != 0U) {
+            p->config->registers->control2 &= ~(1U << 22U);
+            p->config->registers->data = 1234U;
+            p->config->registers->status |= 2U;
         }
     }
 }

@@ -38,7 +38,7 @@ class AdcMappingTests(unittest.TestCase):
         self.assertIn("RCC_CCIPR_ADC12SEL_1", source)
         self.assertIn("NX_G474_FLASH_REMAP()", source)
         self.assertIn("RCC_APB2ENR_SYSCFGEN", source)
-        self.assertIn("irq:FLASH", {claim["key"] for claim in result["claims"]})
+        self.assertIn("irq:FLASH", {claim.key for claim in result.resource_plan.claims})
         self.assertIn("NX_G474_IRQ_AVAILABLE((IRQn_Type)FLASH_IRQn)", source)
         self.assertIn("FLASH_ECCR_ECCIE", source)
         self.assertNotIn("DMA1_Channel1_IRQHandler", source)
@@ -56,7 +56,7 @@ class AdcMappingTests(unittest.TestCase):
         self.assertIn("98304u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE", source)
         self.assertNotIn("(uintptr_t)0x10000000u", source)
         self.assertIn("DMA1_Channel1_IRQHandler", source)
-        claims = {claim["key"] for claim in result["claims"]}
+        claims = {claim.key for claim in result.resource_plan.claims}
         self.assertIn("controller:TIM6", claims)
         self.assertIn("dma:DMA1:stream1", claims)
 

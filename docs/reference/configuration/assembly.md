@@ -11,7 +11,15 @@ source_language: en
 The authored configuration authority is one schema-2 TOML assembly. SoC and Board
 facts remain maintained JSON; `resolved.json` is output, not an authored alternative.
 CMake owns software dependencies. Failed TOML resolution never falls back to Kconfig,
-cache variables, schema-1 JSON or old generated headers.
+cache variables, schema-1 JSON or old generated headers. Legacy JSON assemblies
+are rejected as inputs, not retained as an alternate authoring interface.
+
+The parser creates immutable `AuthoredAssembly` intent. Production consumers use
+`resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and
+artifact-boundary consumers request `to_dict()`. Typed source epoch 2 and the
+schema-1 JSON output projection are separate contracts. The
+[source compatibility policy](../../design/source-compatibility.md) owns their
+version declarations; neither introduces firmware metadata or runtime dispatch.
 
 Before running the resolver, prepare the
 [fixed source and recursive dependencies](../../guides/source-checkout.md).

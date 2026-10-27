@@ -4,6 +4,7 @@ This module executes only at configuration time. Selected instances retain
 their existing provider layout and readonly operations tables. It emits no
 runtime registry, allocator, worker or dispatch layer.
 """
+from tools.configure.calls import DirectCall
 from tools.configure.gpio_phase import withdraw_pin
 from tools.configure.memory import dma_regions
 from tools.configure.providers.common import Construction, fail, mode_traits
@@ -57,13 +58,13 @@ def _gate(item, policy):
 def _pins(item, result):
     integration = getattr(item, "integration", None)
     pins = [dict(pin) for pin in (integration.pins if integration is not None
-                                  else item["pins"])]
+                                  else item.pins)]
     if item.kind == "spi":
         for device in result.devices:
-            if device["controller"] != item.id or "cs_binding" not in device:
+            if device.controller != item.id or device.options.cs_binding is None:
                 continue
-            binding = result["board_bindings"][device["cs_binding"]]
-            for pin in result["routes"][binding["route"]]["pins"]:
+            binding = result.board_bindings[device.options.cs_binding]
+            for pin in result.routes[binding["route"]]["pins"]:
                 pins.append({**dict(pin), "function": "cs"})
     return pins
 
@@ -127,16 +128,16 @@ def _clock_hz(item, result):
             fail("Paired controller has no reviewed nominal clock input")
         return integration.clock_hz
     bus = _binding(item).apb
-    return result["clock"][f"apb{bus}_hz"]
+    return result.clock[f"apb{bus}_hz"]
 
 
 def _endpoint_faces(item, result, prefix, policy):
     name = _symbol(item.id)
-    children = [device for device in result.devices if device["controller"] == item.id]
+    children = [device for device in result.devices if device.controller == item.id]
     declarations = []
     assignments = []
     for index, device in enumerate(children):
-        child = _symbol(device["id"])
+        child = _symbol(device.id)
         endpoint = "s_nx_endpoint_" + (name if index == 0 else child)
         implementation = "spi_dma" if item.kind == "spi" else "i2c_async"
         if index:
@@ -148,8 +149,8 @@ def _endpoint_faces(item, result, prefix, policy):
         declarations += enhanced_endpoints.face(device, endpoint,
                                                  operations, item.provider)
         if item.kind != "i2c":
-            pins = (result["routes"][result["board_bindings"][device["cs_binding"]]["route"]]["pins"]
-                    if "cs_binding" in device else [pin for pin in item["pins"] if pin["function"] == "cs"])
+            pins = (result.routes[result.board_bindings[device.options.cs_binding]["route"]]["pins"]
+                    if device.options.cs_binding is not None else [pin for pin in item.pins if pin["function"] == "cs"])
             if len(pins) != 1:
                 fail("Paired SPI requires one explicit reviewed CS per child")
             wire = pins[0]["pin"]
@@ -201,7 +202,7 @@ def constructor(item, result, prefix):
         for dma, stream, _ in dma_paths(item):
             control = policy.dma_control(dma, stream)
             body += [f"    if (({control} & 1u) != 0u) {{ return NX_ERROR_BUSY; }}"]
-    if result.get("kernel_profile") is not None:
+    if result.kernel is not None:
         body += ["    if (((SCB->AIRCR >> 8u) & 7u) > 3u) { return NX_ERROR_PERMISSION; }"]
     acquire_gate = policy.acquire_gate(item.kind)
     if not acquire_gate:
@@ -247,7 +248,7 @@ def constructor(item, result, prefix):
             definitions += [f"static const nx_i2c_v1_dma_t s_nx_pair_dma_{name} = {policy.I2C_DMA_PREFIX}_{controller}_DMA(s_nx_dma_regions_{name}, {region_count}u);"]
         body += [f"    {state}.registers = (volatile uint32_t*){controller};",
                  f"    {state}.line_inputs = {policy.I2C_LINE_INPUTS};",
-                 f"    {state}.line_mask = {sum(1 << int(pin['pin'][2:]) for pin in item['pins'])}u;",
+                 f"    {state}.line_mask = {sum(1 << int(pin['pin'][2:]) for pin in item.pins)}u;",
                  f"    {state}.peripheral_mhz = {_clock_hz(item, result) // 1000000}u;",
                  f"    {state}.dma = {'&s_nx_pair_dma_' + name if mode_traits(item.kind, item.mode).dma else 'NULL'};"]
         _check(body, f"nx_{prefix}_i2c_async_initialize(&{state}, {item.options.irq.priority}u)")
@@ -318,8 +319,8 @@ def constructor(item, result, prefix):
                       "i2c": "i2c_async"}[item.kind]
     return Construction(
         state_type=f"nx_{prefix}_{implementation}_state_t",
-        definitions=definitions, initialize=f"prepare_{name}()",
-        stop=[f"stop_{name}()"], retain_on_failed_init=True,
+        definitions=definitions, initialize=DirectCall(f"prepare_{name}"),
+        stop=[DirectCall(f"stop_{name}")], retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
                        f"s_nx_pair_pin_saved_{name}[{index}]"
                        for index, pin in enumerate(pins)})

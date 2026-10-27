@@ -27,13 +27,13 @@ class EthernetConfigurationTests(unittest.TestCase):
         for label in ("stm32-zg", "gd32"):
             with self.subTest(label=label):
                 result = gate.resolve_ir(self.assembly(label))
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
                 self.assertEqual(len(result.controllers), 1)
                 self.assertEqual(result.controllers[0].options.address,
                                  (2, 0, 0, 0, 0, 1))
                 with self.assertRaises(FrozenInstanceError):
                     result.controllers[0].options.rx_count = 3
-                claims = {item["key"] for item in result["claims"]}
+                claims = {item.key for item in result.claims}
                 self.assertIn("irq:ENET" if label == "gd32" else "irq:ETH", claims)
                 self.assertIn("pin:PG14", claims)
                 self.assertIn("clock:ETHMAC", claims)

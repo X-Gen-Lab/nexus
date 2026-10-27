@@ -30,14 +30,14 @@ class UsbConfigurationTests(unittest.TestCase):
         for family in ("stm32-zg", "stm32-ve", "gd32"):
             with self.subTest(family=family):
                 ir = gate.resolve_ir(self.assembly(family))
-                self.assertFalse(ir["physical_qualified"])
+                self.assertFalse(ir.physical_qualified)
                 self.assertEqual(len(ir.controllers), 1)
                 self.assertEqual(len(ir.devices), 4)
                 self.assertEqual(ir.controllers[0].options.rx_fifo_words, 96)
                 self.assertFalse(ir.controllers[0].options.vbus_sensing)
                 with self.assertRaises(FrozenInstanceError):
                     ir.controllers[0].options.rx_fifo_words = 100
-                claims = {item["key"] for item in ir["claims"]}
+                claims = {item.key for item in ir.claims}
                 self.assertIn("pin:PA11", claims)
                 self.assertIn("pin:PA12", claims)
                 self.assertIn("irq:USBFS" if family == "gd32" else "irq:OTG_FS", claims)
@@ -70,10 +70,10 @@ class UsbConfigurationTests(unittest.TestCase):
                                   options.fifo_words),
                                  (2, "in", "interrupt", 10, 160, 16))
                 self.assertEqual(len(ir.devices), 5)
-                self.assertFalse(ir["physical_qualified"])
+                self.assertFalse(ir.physical_qualified)
                 with self.assertRaises(FrozenInstanceError):
                     options.transfer = "bulk"
-                claims = {item["key"] for item in ir["claims"]}
+                claims = {item.key for item in ir.claims}
                 controller = "USBFS" if family == "gd32" else "OTG_FS"
                 self.assertIn("usb:" + controller + ":endpoint:2:in", claims)
                 self.assertFalse(any(item.startswith("dma:") for item in claims))

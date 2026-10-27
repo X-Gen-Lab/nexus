@@ -30,10 +30,17 @@ def resolve_interrupts(cpu, irq, backend, provider):
     facts = {**provider.CPU_FEATURES, **cpu}
     irq = {"external_count": provider.EXTERNAL_IRQ_COUNT, **irq}
     profile = profiles.resolve(facts, irq, backend, enum_abi=provider.ENUM_ABI)
-    result = profile.to_dict()["irq"]
-    if backend == "freertos" and result["kernel_port"] != provider.FREERTOS_PORT:
+    return validate_interrupt_profile(profile, provider)
+
+
+def validate_interrupt_profile(profile, provider):
+    """Bind the resolved CPU once to the exact provider's maintained port."""
+    if cpu_abi(profile.cpu) != provider.CPU_ABI:
+        fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
+    if (profile.backend == "freertos" and
+            profile.irq.kernel_port != provider.FREERTOS_PORT):
         fail(f"Unmaintained FreeRTOS port: {provider.FREERTOS_PORT}")
-    return result
+    return profile.irq
 
 
 

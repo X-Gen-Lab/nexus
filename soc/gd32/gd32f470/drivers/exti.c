@@ -208,6 +208,14 @@ nx_result_t nx_gd32_exti_read(void* context, nx_exti_event_t* events,
     return *count ? NX_SUCCESS : NX_ERROR_EMPTY;
 }
 
+/** \brief Cold cleanup skips rejected storage but retains live IRQ ownership.
+ */
+nx_result_t nx_gd32_exti_close(nx_gd32_exti_state_t* port) {
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    return port->initialized ? nx_gd32_exti_stop(port) : NX_SUCCESS;
+}
+
 /** \brief           Withdraw owned sources before releasing borrowed storage.
  * \note            Refused writes retain domain, queue and wake obligations;
  *                  a later serialized stop retries without disturbing peers.

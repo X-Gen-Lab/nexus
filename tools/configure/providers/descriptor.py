@@ -111,6 +111,7 @@ _DESCRIPTORS = MappingProxyType({
             "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h",
             "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c",
             "soc/stm32/stm32f407/private/stm32f407_i2s2_slave_tx.h",
+            "soc/stm32/stm32f407/private/stm32f407_spi_cold.h",
             "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
             "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
             "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c",
@@ -122,6 +123,7 @@ _DESCRIPTORS = MappingProxyType({
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
         references="references.json", configuration_helpers=("soc/gd32/gd32f470/configure/secondary.py", "soc/gd32/gd32f470/configure/integration.py", "soc/gd32/gd32f470/configure/hardware.py", 'soc/gd32/gd32f470/configure/preflight.py', 'soc/gd32/gd32f470/configure/gpio.py'),
         owned_payload=(
+            "soc/gd32/gd32f470/private/gd32f470_spi_cold.h",
             "soc/gd32/gd32f470/drivers/ethernet_frames.c",
             "soc/gd32/gd32f470/private/gd32f470_eth_frames.h")),
     "gd32f303": FamilyDescriptor("gd32f303", "gd32",

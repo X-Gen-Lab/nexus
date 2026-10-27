@@ -4,6 +4,7 @@
 CMake remains the authority for source targets. This tool never discovers source
 code, creates workers, selects application policy, or invents a hardware route.
 """
+from collections.abc import Mapping
 from contextlib import contextmanager
 from functools import lru_cache
 import hashlib
@@ -22,11 +23,13 @@ if __package__ in (None, ""):
 
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2
+from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure import resource_graph, trigger_graph, dma_topology
 from tools.configure.contracts import COMPONENTS
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
+                        validate_interrupt_profile,
                         validate_selection)
 from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                mode_traits, route_dma,
@@ -39,7 +42,7 @@ PIN = physical_facts.GPIO_PIN
 KINDS = {"rtc", "lptim", "gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "pwm", "adc", "can", "usb_device", "eth", "eth_frames",
          "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group"}
-C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
+C_KEYWORDS = C11_KEYWORDS | {"main"}
 
 
 @contextmanager
@@ -382,8 +385,6 @@ def load_assembly(path, root=ROOT, snapshots=None):
     if path.suffix == ".toml":
         from tools.configure import authored
         return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
-    if path.suffix == ".json":
-        return load(path, snapshots)
     fail("Assembly must use authored TOML (.toml)")
 
 
@@ -535,14 +536,16 @@ def bind_input_identities(inputs, root, snapshots, input_paths):
 
 def resolve_components(assembly):
     """Validate component intent; CMake chooses its source targets."""
-    components = sequence(assembly.get("components", []), "components")
+    components = sequence(list(assembly.components) if
+                          isinstance(assembly.components, tuple) else
+                          assembly.components, "components")
     for component in components:
         text(component, "component")
     unique(components, "components")
     for component in components:
         if component not in COMPONENTS:
             fail(f"Unknown maintained component: {component}")
-    if any(device["driver"] == "bmp280" for device in assembly["devices"]):
+    if any(device["driver"] == "bmp280" for device in assembly.devices):
         if "bmp280-spi" not in components:
             fail("BMP280 SPI device requires the maintained bmp280-spi component")
     return components
@@ -606,7 +609,7 @@ def board_directory(path):
     return path.resolve()
 
 
-def resolve(assembly_path, root=ROOT, *, input_paths=None):
+def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
     verified_sdk = sdk.verify(root)
@@ -623,18 +626,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     policy_path = contained_file(root, metadata.POLICY)
     platform_metadata = metadata.policy_contract(
         read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
-    assembly_input = load_assembly(assembly_path, root, snapshots)
-    assembly = obj(assembly_input,
-                   {"schema_version", "board_package", "backend", "clock_profile",
-                    "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power", "i2s2"}, "assembly")
-    integer(assembly["schema_version"], 1, 1, "assembly schema")
-    factory_options = obj(assembly.get("factory", {}), (),
+    assembly = load_assembly(assembly_path, root, snapshots)
+    from tools.configure.ir import thaw
+    controller_selections = thaw(assembly.controllers)
+    endpoint_selections = thaw(assembly.devices)
+    factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
                           {"capabilities"}, "factory policy")
     if ("capabilities" in factory_options and
             type(factory_options["capabilities"]) is not bool):
         fail("Factory capabilities must be boolean")
-    board_name = text(assembly["board_package"], "Board package")
+    board_name = text(assembly.board_package, "Board package")
     board_dir = board_directory(assembly_path.parent / board_name)
     board_path = board_dir / "board.json"
     board = obj(read(board_path),
@@ -665,7 +666,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     integer(routes_doc["schema_version"], 1, 1, "routes schema")
     routes = resolve_routes(routes_doc, soc, part, provider)
     validate_board_context(board)
-    backend = assembly["backend"]
+    backend = assembly.backend
     if backend not in {"baremetal", "freertos", "native", "threadx"}:
         fail(f"Unsupported OS backend: {backend}")
     host = soc["cpu"]["arch"] == "native"
@@ -674,33 +675,33 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail("Native is a host model; its backend cannot qualify MCU execution")
     if backend == "threadx":
         threadx.validate_platform(board["id"], family)
-    resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
     cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
                                        enum_abi=provider.ENUM_ABI)
-    clock = soc["clock_profiles"].get(assembly["clock_profile"])
+    validate_interrupt_profile(cpu_profile, provider)
+    clock = soc["clock_profiles"].get(assembly.clock_profile)
     if clock is None:
-        fail(f"Unknown clock profile: {assembly['clock_profile']}")
-    clock_plan = provider.clock_plan(assembly["clock_profile"], clock)
+        fail(f"Unknown clock profile: {assembly.clock_profile}")
+    clock_plan = provider.clock_plan(assembly.clock_profile, clock)
     clock = provider.normalize_clock(clock)
     clocks.match_board(clock, board["clocks"])
-    i2s2_role = i2s2.resolve(assembly.get("i2s2"), family=family,
+    i2s2_role = i2s2.resolve(thaw(assembly.i2s2), family=family,
                             part=part, backend=backend,
-                            clock_profile=assembly["clock_profile"])
-    if "os" in assembly and not isinstance(assembly["os"], dict):
+                            clock_profile=assembly.clock_profile)
+    if assembly.os is not None and not isinstance(assembly.os, Mapping):
         fail("OS policy: expected object")
-    kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
+    kernel_profile = kernel.resolve(thaw(assembly.os), cpu_profile,
                                     clock["core_hz"])
     if (backend == "freertos" and kernel_profile.lowpower_port == "timebase" and
             not provider.TIMEBASE_ALARM):
         fail("Timebase lowpower requires the maintained STM32F407/GD32F470 SoC alarm")
     cpu_profile = kernel.bind(cpu_profile, kernel_profile)
-    irq_profile = cpu_profile.to_dict()["irq"]
-    if "abi" in assembly and assembly["abi"] != cpu_abi(soc["cpu"]):
+    irq_profile = cpu_profile.irq
+    if assembly.abi is not None and assembly.abi != cpu_abi(soc["cpu"]):
         fail("Assembly ABI contradicts the selected SoC")
-    optimization = assembly.get("optimization", "Os")
+    optimization = assembly.optimization
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
-    budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
+    budgets = obj(thaw(assembly.memory_budgets), {"main_stack_bytes"},
                   {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
                   "memory budgets")
     for name, value in budgets.items():
@@ -756,17 +757,17 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel",
-                  "FreeRTOS " + irq_profile["kernel_port"])
+                  "FreeRTOS " + irq_profile.kernel_port)
     elif backend == "threadx" and not host:
         for irq in ("PendSV", *(["SysTick"] if
                                 kernel_profile.tick_source == "systick" else [])):
             claim("irq:" + irq, "threadx", "kernel",
-                  "ThreadX " + irq_profile["kernel_port"])
+                  "ThreadX " + irq_profile.kernel_port)
     selected = []
     adc_group_contract = None
     instance_ids = []
     irq_owners = {}
-    for selection in sequence(assembly["controllers"], "selected controllers"):
+    for selection in sequence(controller_selections, "selected controllers"):
         location = (selection.get("id", "<unknown>") if isinstance(selection, dict)
                     else "<invalid>")
         binding = selection.get("binding") if isinstance(selection, dict) else None
@@ -808,10 +809,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 resolved_pin_states = pin_states.select(
                     binding, family=family, part=part,
                     controller=route["controller"], backend=backend,
-                    clock=assembly["clock_profile"])
+                    clock=assembly.clock_profile)
             provider.validate_mode_context(
                 selection, route, backend=backend,
-                clock_profile=assembly["clock_profile"])
+                clock_profile=assembly.clock_profile)
             for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
                             "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
                 integer(selection[numeric], 1, context=numeric)
@@ -821,7 +822,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     fail("PWM duty exceeds period")
             if "irq_priority" in selection:
                 integer(selection["irq_priority"], 0,
-                        irq_profile["maximum_priority"], "IRQ priority")
+                        irq_profile.maximum_priority, "IRQ priority")
             if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
                 fail("Polling SPI has no IRQ options")
             if route["kind"] == "spi" and mode_traits("spi", mode).dma and "irq_priority" not in selection:
@@ -831,7 +832,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if selection.get("calls_os", False) and (
                     kernel_profile is None or host or
                     kernel_profile.kernel_policy == "none" or
-                    selection.get("irq_priority", 0) < irq_profile["syscall_priority"]):
+                    selection.get("irq_priority", 0) < irq_profile.syscall_priority):
                 fail("OS-calling ISR violates the selected kernel syscall ceiling")
             if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
                 fail("Controller speed exceeds maintained limit")
@@ -895,7 +896,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                                 if resolved_stream is not None else {}),
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
             selected[-1].update(provider.mode_fields(
-                selection, route, clock_profile=assembly["clock_profile"]))
+                selection, route, clock_profile=assembly.clock_profile))
             if route["kind"] == "can_fd":
                 selected[-1]["message_ram_words"] = hardware["message_ram_words"]
             if route["kind"] == "adc_group":
@@ -915,7 +916,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                         selection, adc_group_review, adc_group_digest,
                         part=part, clock=clock))
     provider.validate_controller_set(
-        selected, clock_profile=assembly["clock_profile"])
+        selected, clock_profile=assembly.clock_profile)
     ethernet.resolve_counter_domains(selected)
     pwm_shared_owners = []
     pwm_sharing = {}
@@ -924,18 +925,18 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if provider.PWM_SHARED is None:
             fail("Shared PWM has no maintained physical owner")
         pwm_shared_owners = provider.PWM_SHARED.resolve(
-            selected, bindings, soc, clock, assembly["clock_profile"])
+            selected, bindings, soc, clock, assembly.clock_profile)
         physical_claims, pwm_sharing = provider.PWM_SHARED.resources(
             pwm_shared_owners)
         claim_list.extend(physical_claims)
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
-    can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
+    can_domain = can.resolve_domain(thaw(assembly.can_domain), selected,
                                     soc, provider, claim, claims)
     device_ids = []
     addresses = set()
     chip_selects = set()
-    for device in sequence(assembly["devices"], "devices"):
+    for device in sequence(endpoint_selections, "devices"):
         location = (device.get("id", "<unknown>") if isinstance(device, dict)
                     else "<invalid>")
         context = f"endpoint {location}"
@@ -1021,9 +1022,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 addresses.add(key)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
-    usb_device.complete_plan(selected, assembly["devices"], claim)
+    usb_device.complete_plan(selected, endpoint_selections, claim)
     for controller in selected:
-        children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
+        children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
         if (provider.ENDPOINT_POLICY.model_async_echo and
                 controller["kind"] == "spi" and
                 controller["mode"] == "async-model" and not children):
@@ -1050,8 +1051,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
         inputs.append(contained_file(board_dir, name))
-    if assembly["layout"] is not None:
-        layout_path = (assembly_path.parent / text(assembly["layout"], "layout path")).resolve()
+    if assembly.layout is not None:
+        layout_path = (assembly_path.parent / text(assembly.layout, "layout path")).resolve()
         layout_doc = obj(read(layout_path), {"schema_version", "regions"}, (), "layout")
         integer(layout_doc["schema_version"], 1, 1, "layout schema")
         boundaries = {variant["flash"]["origin"]}
@@ -1113,56 +1114,67 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         inputs.append(manifest)
     records = bind_input_identities(inputs, root, snapshots, input_paths)
     components = resolve_components(assembly)
-    result = {"schema_version": 1, "platform_metadata": platform_metadata,
-              "board": board["id"], "soc_family": family,
-              "part": part, "package": variant["package"], "backend": backend,
-              "cpu": soc["cpu"], "irq": irq_profile,
-              "cpu_profile": cpu_profile.to_dict(),
-              "kernel_profile": (kernel_profile.to_dict()
-                                 if kernel_profile is not None else None),
-              "clock_profile": assembly["clock_profile"],
-              "clock": clock, "memory": selected_memory, "flash": variant["flash"],
-              "layout": layout, "controllers": selected, "devices": assembly["devices"],
-              "can_domain": can_domain,
-              "can_controllers": list(provider.CAN_CONTROLLERS) if can_domain else [],
-              "components": components, "claims": claim_list, "memory_budgets": budgets,
-              "board_bindings": bindings, "routes": routes,
-              "optimization": optimization, "inputs": records,
-              "source_dependencies": source_dependencies,
-              "physical_pcb_revision": board["physical_pcb_revision"],
-              "limitations": board["unknowns"] + ["Physical qualification not executed"],
-              "physical_qualified": False,
-              "enum_abi": provider.ENUM_ABI}
-    if i2s2_role is not None:
-        result["i2s2"] = {"profile": i2s2_role.profile, "part": i2s2_role.part,
-                          "claims": list(i2s2_role.claims)}
-    from tools.configure import runtime_power
-    runtime = (runtime_power.resolve(assembly["power"], result)
-               if "power" in assembly else None)
-    if runtime is not None:
-        result["runtime_power"] = {"mode": runtime.mode, "controllers": list(runtime.controllers)}
-    result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
-    if clock_plan is not None:
-        result["clock_plan"] = clock_plan
-    if pwm_shared_owners:
-        result["pwm_shared_owners"] = pwm_shared_owners
-        result["resource_plan"] = resource_graph.resolve(
-            claim_list, shared=pwm_sharing).to_dict()
-    else:
-        result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
-    result["trigger_plan"] = trigger_graph.resolve_fixed(selected, routes).to_dict()
+    resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
+    triggers = trigger_graph.resolve_fixed(selected, routes)
     for item in selected:
         if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
             item["adc_group_resolution"]["trigger_identity"] = next(
-                index + 1 for index, edge in enumerate(
-                    result["trigger_plan"]["edges"])
-                if edge["target"] == item["id"] + ":adc")
-    result["dma_topology"] = dma_topology.resolve_selected(selected, provider).to_dict()
-    if references is not None:
-        result["fact_references"] = references
-    result["configuration_sha256"] = hashlib.sha256(
-        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-    return result
+                index + 1 for index, edge in enumerate(triggers.edges)
+                if edge.target == item["id"] + ":adc")
+    dma_plan = dma_topology.resolve_selected(selected, provider)
+    from dataclasses import replace
+    from tools.configure.ir import (
+        CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
+        EndpointIR, FactoryOptions, MemoryBudgetIR, MemoryRegionBudgetIR,
+        MpuMemoryReservationsIR, PhysicalPartIR, PwmSharedOwnerIR,
+        RuntimePowerIR, freeze)
+    controllers = tuple(ControllerIR.create(item, family) for item in selected)
+    devices = tuple(EndpointIR.create(item, controllers)
+                    for item in endpoint_selections)
+    memory_budget = MemoryBudgetIR(
+        budgets["main_stack_bytes"], budgets.get("libc_heap_bytes", 0),
+        budgets.get("static_ram_bytes"), budgets.get("flash_load_bytes"),
+        tuple(MemoryRegionBudgetIR(name, item["limit_bytes"])
+              for name, item in sorted(budgets.get("regions", {}).items())),
+        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None)
+    resolved = ConfigurationIR(
+        board=board["id"], soc_family=family,
+        cpu_profile=cpu_profile, kernel=kernel_profile,
+        controllers=controllers, devices=devices, memory_budget=memory_budget,
+        factory=FactoryOptions(factory_options.get("capabilities", False)),
+        can_domain=(CanDomainIR(can_domain["split"], tuple(
+            CanFilterIR(**item) for item in can_domain["filters"]))
+            if can_domain is not None else None),
+        resource_plan=resources, trigger_plan=triggers, dma_topology=dma_plan,
+        clock_plan=(ClockPlanIR.from_validated(clock_plan)
+                    if clock_plan is not None else None),
+        physical_part=PhysicalPartIR(part, variant["package"],
+            freeze(variant["flash"]), freeze(selected_memory)),
+        clock=freeze(clock), clock_profile=assembly.clock_profile,
+        layout=freeze(layout), board_bindings=freeze(bindings),
+        routes=freeze(routes), platform_metadata=freeze(platform_metadata),
+        inputs=freeze(records), source_dependencies=freeze(source_dependencies),
+        components=tuple(components),
+        can_controllers=tuple(provider.CAN_CONTROLLERS) if can_domain else (),
+        optimization=optimization,
+        physical_pcb_revision=board["physical_pcb_revision"],
+        limitations=tuple(board["unknowns"]) + ("Physical qualification not executed",),
+        physical_qualified=False,
+        fact_references=freeze(references),
+        pwm_shared_owners=tuple(PwmSharedOwnerIR.from_validated(item)
+                               for item in pwm_shared_owners),
+        i2s2=i2s2_role)
+    resolved = resolved.with_integrations()
+    if assembly.power is not None:
+        from tools.configure import runtime_power
+        runtime = runtime_power.resolve(thaw(assembly.power), resolved)
+        resolved = replace(resolved, runtime_power=RuntimePowerIR(
+            runtime.mode, tuple(runtime.controllers)))
+    projection = resolved.to_dict()
+    del projection["configuration_sha256"]
+    digest = hashlib.sha256(json.dumps(
+        projection, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return replace(resolved, configuration_sha256=digest)
 
 
 def c_id(value):
@@ -1174,10 +1186,8 @@ normalize_resource = resource_graph.normalize_resource
 
 def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
     """Return the immutable typed resolution consumed by every emitter."""
-    from tools.configure.ir import ConfigurationIR
     try:
-        return ConfigurationIR.from_validated(
-            resolve(assembly_path, root, input_paths=input_paths))
+        return _resolve(assembly_path, root, input_paths=input_paths)
     except ConfigurationError as error:
         raise ConfigurationError(f"{assembly_path}: {error}",
                                  **error.details) from error
@@ -1199,8 +1209,7 @@ def protected_inputs(assembly, root):
     paths = [assembly, root.resolve(), ROOT, root / metadata.POLICY]
     try:
         content = assembly.read_text(encoding="utf-8")
-        raw = (tomllib.loads(content) if assembly.suffix == ".toml" else
-               json.loads(content))
+        raw = tomllib.loads(content) if assembly.suffix == ".toml" else {}
     except (OSError, ValueError):
         return paths
     if not isinstance(raw, dict):
@@ -1248,7 +1257,7 @@ def configure(assembly, output, root=ROOT):
         dependencies.emit(temporary, code_paths, code_identity)
         # Publish only if every snapshotted authored or package input still
         # matches the resolved identity, including compatibility metadata.
-        for record in result["inputs"]:
+        for record in result.inputs:
             if file_digest(Path(input_paths[record["path"]])) != record["sha256"]:
                 fail(f"Input changed during generation: {record['path']}")
         dependencies.verify(initial_code_paths, initial_code_identity)

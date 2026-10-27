@@ -20,6 +20,7 @@ SPECIFICATIONS = (
     ("platform-refinement-execution.csv", "platform-refinement", "I/O 完善台账"),
     ("io-evolution-execution.csv", "io-evolution", "I/O 增量实施台账"),
     ("soc-refinement-execution.csv", "soc-refinement", "SoC 原专项台账"),
+    ("soc-ip-layout-execution.csv", "soc-ip-layout", "SoC/IP 目录整理台账"),
     ("build-system-execution.csv", "build-system", "构建系统原专项台账"),
     ("documentation-system-execution.csv", "documentation-system", "文档系统台账"),
     ("developer-experience-execution.csv", "developer-experience", "开发体验75 项台账"),

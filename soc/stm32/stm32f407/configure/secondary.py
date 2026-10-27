@@ -26,14 +26,6 @@ def busy_condition(controller, kind):
     return f"({controller}->SR & SPI_SR_BSY) != 0u" if kind == "spi" else None
 
 
-def spi_endpoint(name, child, endpoint, wire, mask, mode, rate):
-    cs = "s_nx_cs_" + child
-    return ([f"static nx_stm32_gpio_state_t {cs};"], [
-        f"    {cs} = (nx_stm32_gpio_state_t) {{ .registers = GPIO{wire[1]}, .mask = {mask}u, .output = true, .initialized = true }};",
-        f"    {endpoint}.endpoint = (nx_stm32_spi_endpoint_state_t) {{ .port = &s_nx_port_{name}.spi, .cs = &{cs}, .cs_mask = {mask}u, .mode = {mode}u, .frequency_hz = {rate}u }};",
-        f"    {endpoint}.dma = &s_nx_port_{name};"])
-
-
 def setup_uart(item, name, state, paths, clock_hz):
     dma, stream, channel = paths[0]
     controller = item.controller
@@ -50,15 +42,3 @@ def setup_uart(item, name, state, paths, clock_hz):
         f"    {state}.transmit.stream = {stream}u;",
         f"    {state}.transmit.channel = {channel}u;"],
         f"nx_stm32_uart_dma_initialize(&{state}, {clock_hz}u)")
-
-
-def setup_spi(item, result, name, state, paths, clock_hz, children, endpoints):
-    tx, rx = paths
-    before = [
-        f"    {state}.spi.registers = {item.controller};",
-        f"    {state}.spi.rcc = RCC;",
-        f"    {state}.spi.clock_hz = {clock_hz}u;",
-        f"    {state}.dma = DMA{tx[0]};",
-        f"    {state}.tx = DMA{tx[0]}_Stream{tx[1]};",
-        f"    {state}.rx = DMA{rx[0]}_Stream{rx[1]};", *endpoints]
-    return before, f"nx_stm32_spi_dma_initialize(&{state})", []

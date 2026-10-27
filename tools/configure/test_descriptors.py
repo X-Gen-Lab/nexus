@@ -66,6 +66,14 @@ class DescriptorBoundaryTests(unittest.TestCase):
                      "soc/stm32/stm32h743/private/stm32h743_dma.h"):
             self.assertIn(name, payload)
 
+    def test_gd470_spi_cold_contract_is_owned_without_a_second_build_graph(self):
+        from tools.configure import dependencies
+
+        header = "soc/gd32/gd32f470/private/gd32f470_spi_cold.h"
+        self.assertIn(header, descriptor.maintained("gd32f470").owned_payload)
+        self.assertNotIn(header, descriptor.maintained("native").owned_payload)
+        self.assertNotIn(header, dependencies.source_names("platform", "gd32f470"))
+
     def test_h743_flash_configuration_binds_the_complete_private_ram_pod(self):
         from tools.configure import dependencies
 

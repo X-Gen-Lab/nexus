@@ -4,6 +4,7 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
+from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
 from tools.configure.gpio_phase import withdraw_pin
@@ -135,24 +136,24 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
 
 
 def state_declarations(result, prefix):
-    domain = result.get("can_domain")
+    domain = result.can_domain
     if domain is None:
         return []
     policy = _integration(result, prefix)
-    filters = domain["filters"]
+    filters = domain.filters
     lines = []
     if filters:
         lines += ["static const nx_can_filter_t s_nx_can_filters[] = {"]
         for item in filters:
-            values = [f"{item[name]}u" for name in ("id", "mask", "bank")]
-            values += [f"{item['controller_index']}u", f"{item['fifo']}u",
-                       "NX_CAN_" + item["format"].upper(),
-                       str(item["remote"]).lower(), str(item["match_remote"]).lower()]
+            values = [f"{getattr(item, name)}u" for name in ("id", "mask", "bank")]
+            values += [f"{item.controller_index}u", f"{item.fifo}u",
+                       "NX_CAN_" + item.format.upper(),
+                       str(item.remote).lower(), str(item.match_remote).lower()]
             lines.append("    { " + ", ".join(values) + " },")
         lines.append("};")
     lines += ["static nx_can_filter_domain_t s_nx_can_domain = {",
               f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",
-              f"    .filter_count = {len(filters)}u, .split = {domain['split']}u", "};"]
+              f"    .filter_count = {len(filters)}u, .split = {domain.split}u", "};"]
     if policy.gpio_clock is not None:
         lines.append("static uint32_t s_nx_can_gpio_clocks_added;")
     return lines
@@ -166,7 +167,7 @@ def constructor(item, result, prefix):
     name = item.id.replace("-", "_")
     options = item.options
     state = "s_nx_port_" + name
-    pins = item["pins"]
+    pins = item.pins
     clock = integration.gpio_clock
     mask = sum(1 << (ord(port) - ord('A')) for port in {p['pin'][1] for p in pins})
     lines = [f"static nx_can_event_t s_nx_can_events_{name}[{options.event_capacity}];",
@@ -183,10 +184,10 @@ def constructor(item, result, prefix):
                   f"        s_nx_can_pin_leases_{name} &= (uint8_t)~{1 << index}u;", "    }"]
     lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
               "    nx_result_t status;"]
-    policy = result['irq']
+    policy = result.irq
     kernel = kernel_policy_constant(result)
-    ceiling = policy['syscall_priority'] or 0
-    controller_index = result['can_controllers'].index(item['controller'])
+    ceiling = policy.syscall_priority or 0
+    controller_index = result.can_controllers.index(item.controller)
     t = options.timing
     lines += [f"    {state} = (nx_can_controller_t){{",
               "        .domain = &s_nx_can_domain,",
@@ -195,7 +196,7 @@ def constructor(item, result, prefix):
               f"        .drain_timeout_us = {options.drain_timeout_us}u, .poll_limit = {options.poll_limit}u,",
               f"        .mode = {OPERATIONS[options.operation]}, .index = {controller_index}u,",
               f"        .fifo_order = {str(options.fifo_order).lower()},",
-              f"        .irq_policy = {{ {kernel}, {policy['external_count']}u, {policy['priority_bits']}u, {ceiling}u }},",
+              f"        .irq_policy = {{ {kernel}, {policy.external_count}u, {policy.priority_bits}u, {ceiling}u }},",
               "        .sources = { " + ', '.join('{ .priority = '+str(options.irq.priority)+'u }' for _ in range(4)) + " }", "    };"]
     if clock is not None:
         lines.append(f"    s_nx_can_gpio_clocks_added |= ~{clock} & {mask}u;")
@@ -211,13 +212,13 @@ def constructor(item, result, prefix):
               f"        status = nx_{prefix}_can_domain_initialize(&s_nx_can_domain);",
               "        if (status != NX_SUCCESS) { return status; }", "    }",
               f"    return nx_{prefix}_can_initialize(&{state});", "}"]
-    for vector in item['can_irqs']:
+    for vector in item.can_irqs:
         lines += [f"void {vector}_IRQHandler(void);",
                   "/** \\brief Dispatch the exact selected classic CAN hardware source. */",
                   f"void {vector}_IRQHandler(void) {{ nx_can_controller_irq(&{state}); }}"]
     return Construction(
         state_type="nx_can_controller_t", definitions=lines,
-        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
         retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
                        f"s_nx_can_pin_snapshots_{name}[{index}]"
@@ -225,7 +226,7 @@ def constructor(item, result, prefix):
 
 
 def stop_domain(result, prefix):
-    if result.get('can_domain') is None:
+    if result.can_domain is None:
         return []
     clock = _integration(result, prefix).gpio_clock
     lines = ["    if (s_nx_can_domain.primary != 0u) {",

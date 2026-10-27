@@ -583,6 +583,129 @@ static nx_result_t stop(void* context) {
     return NX_SUCCESS;
 }
 
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+#ifndef NX_PLATFORM_PRIORITY_WRITE
+#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))
+#endif
+
+static bool cold_config(const nx_gd32_spi_dma_config_t* config) {
+    return config != NULL && nx_gd32_spi_config_valid(&config->spi) &&
+           config->regions != NULL && config->region_count != 0U &&
+           config->priority <= 15U;
+}
+
+nx_result_t nx_gd32_spi_dma_prepare(nx_gd32_spi_dma_state_t* state,
+                                    const nx_gd32_spi_dma_config_t* config,
+                                    nx_gd32_spi_dma_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_gd32_in_isr() || nx_gd32_irq_masked())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || cold == NULL || !cold_config(config))
+        return NX_ERROR_INVALID;
+    if (cold->vectors || cold->spi.constructed || cold->spi.pin_leases != 0U ||
+        cold->spi.clock_owned || state->initialized || state->spi.initialized ||
+        state->spi.active || state->active != NULL || state->wake != NULL)
+        return NX_ERROR_BUSY;
+    const nx_gd32_spi_controller_t* controller = config->spi.controller;
+    const unsigned vectors[2] = {(unsigned)dma_irq_at(controller, false),
+                                 (unsigned)dma_irq_at(controller, true)};
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const unsigned irq = vectors[i];
+        const uint32_t mask = 1UL << (irq % 32U);
+        if (((NVIC->ISER[irq / 32U] | NVIC->ISPR[irq / 32U] |
+              NVIC->IABR[irq / 32U]) &
+             mask) != 0U)
+            return NX_ERROR_BUSY;
+    }
+    if (((*engine_at(controller, true) | *engine_at(controller, false)) &
+         DMA_CHXCTL_CHEN) != 0U)
+        return NX_ERROR_BUSY;
+    if (config->kernel_bound && NVIC_GetPriorityGrouping() > 3U)
+        return NX_ERROR_PERMISSION;
+    const uint32_t clock = controller->clock;
+    if ((RCU_REG_VAL(clock) & BIT(RCU_BIT_POS(clock))) != 0U)
+        return NX_ERROR_BUSY;
+    for (unsigned i = 0U; i < 2U; ++i)
+        cold->priorities[i] = NVIC->IPR[vectors[i]];
+    cold->vectors = true;
+    nx_result_t status = nx_gd32_spi_pins_prepare(&config->spi, &cold->spi);
+    if (status != NX_SUCCESS)
+        return status;
+    state->regions = config->regions;
+    state->region_count = config->region_count;
+    const nx_gd32_spi_endpoint_config_t* first = &config->spi.endpoints[0];
+    const nx_gd32_spi_pin_config_t* cs = &config->spi.pins[3];
+    status = nx_gd32_spi_dma_initialize_at(
+        state, (nx_gd32_spi_dma_endpoint_state_t*)first->endpoint, controller,
+        cs->registers, 1U << cs->pin, first->frequency_hz, first->mode,
+        config->priority);
+    if (status != NX_SUCCESS)
+        return status;
+    cold->spi.constructed = true;
+    cold->spi.clock_owned = true;
+    for (size_t i = 1U; i < config->spi.endpoint_count; ++i) {
+        const nx_gd32_spi_endpoint_config_t* endpoint =
+            &config->spi.endpoints[i];
+        cs = &config->spi.pins[3U + i];
+        status = nx_gd32_spi_endpoint_initialize(
+            &state->spi, endpoint->endpoint, cs->registers, 1U << cs->pin,
+            endpoint->frequency_hz, endpoint->mode);
+        if (status != NX_SUCCESS)
+            return status;
+        ((nx_gd32_spi_dma_endpoint_state_t*)endpoint->endpoint)->dma = state;
+    }
+    if ((RCU_REG_VAL(clock) & BIT(RCU_BIT_POS(clock))) == 0U)
+        return NX_ERROR_IO;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const unsigned irq = vectors[i];
+        const uint8_t priority = (uint8_t)(config->priority << 4U);
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[irq], priority);
+        nx_arch_dsb();
+        if (NVIC->IPR[irq] != priority ||
+            (NVIC->ISER[irq / 32U] & (1UL << (irq % 32U))) == 0U)
+            return NX_ERROR_IO;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_gd32_spi_dma_close(nx_gd32_spi_dma_state_t* state,
+                                  const nx_gd32_spi_dma_config_t* config,
+                                  nx_gd32_spi_dma_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_gd32_in_isr() || nx_gd32_irq_masked())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || cold == NULL || !cold_config(config))
+        return NX_ERROR_INVALID;
+    if (cold->spi.constructed) {
+        nx_result_t status = stop(state);
+        if (status != NX_SUCCESS)
+            return status;
+        cold->spi.constructed = false;
+    }
+    if (cold->vectors) {
+        const nx_gd32_spi_controller_t* controller = config->spi.controller;
+        const unsigned vectors[2] = {(unsigned)dma_irq_at(controller, false),
+                                     (unsigned)dma_irq_at(controller, true)};
+        for (unsigned i = 0U; i < 2U; ++i) {
+            const unsigned irq = vectors[i];
+            const uint32_t mask = 1UL << (irq % 32U);
+            NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[irq / 32U], mask);
+            NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[irq / 32U], mask);
+            nx_arch_dsb();
+            if (((NVIC->ISER[irq / 32U] | NVIC->ISPR[irq / 32U] |
+                  NVIC->IABR[irq / 32U]) &
+                 mask) != 0U)
+                return NX_ERROR_BUSY;
+            NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[irq], cold->priorities[i]);
+            nx_arch_dsb();
+            if (NVIC->IPR[irq] != cold->priorities[i])
+                return NX_ERROR_IO;
+        }
+        cold->vectors = false;
+    }
+    return nx_gd32_spi_pins_close(&config->spi, &cold->spi);
+}
+
 /** \brief Explicit idle recovery clears a fault without replay or clock theft.
  */
 static nx_result_t recover(void* context) {

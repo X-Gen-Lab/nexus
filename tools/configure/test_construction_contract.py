@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
+from tools.configure.calls import DirectCall
 from tools.configure.providers import common, maintained
 
 
@@ -14,7 +15,7 @@ class ConstructionContractTests(unittest.TestCase):
 
     def construction(self, result, item):
         return maintained(result.soc_family).constructor(
-            item, result, result["board_bindings"], result["routes"],
+            item, result, result.board_bindings, result.routes,
             result.devices)
 
     def test_every_family_returns_explicit_immutable_construction(self):
@@ -36,8 +37,11 @@ class ConstructionContractTests(unittest.TestCase):
                                   bool)
                     self.assertIsInstance(construction.definitions, tuple)
                     self.assertIsInstance(construction.stop, tuple)
-                    self.assertEqual(construction["definitions"],
-                                     construction.definitions)
+                    self.assertIsInstance(construction.initialize, DirectCall)
+                    self.assertTrue(all(isinstance(call, DirectCall)
+                                        for call in construction.stop))
+                    with self.assertRaises(TypeError):
+                        construction["definitions"]
                     with self.assertRaises(FrozenInstanceError):
                         construction.state_type = "foreign_state_t"
 
@@ -72,7 +76,7 @@ class ConstructionContractTests(unittest.TestCase):
                         f"{result.controllers.index(item) + 1}u;",
                         source.index("nx_platform_start(void)"))
                     initialize = source.index(
-                        "result.primary = " + construction.initialize)
+                        "result.primary = " + construction.initialize.render())
                     self.assertLess(before, initialize)
 
     def test_storage_type_is_provider_owned_without_prefix_inference(self):
@@ -108,7 +112,7 @@ class ConstructionContractTests(unittest.TestCase):
                     source = bindings.emit(result)[1]
                 start = source[source.index("nx_platform_start(void)"):]
                 initialize = start.index(
-                    "result.primary = " + construction.initialize)
+                    "result.primary = " + construction.initialize.render())
                 self.assertEqual("s_nx_platform_initialized = 1u;" in
                                  start[:initialize], retained)
                 self.assertIn("result.cleanup = "

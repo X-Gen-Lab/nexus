@@ -49,7 +49,7 @@ class AdcContinuousConfigurationTests(unittest.TestCase):
                 self.assertEqual(adc.options.sample_times, (0, 7))
                 with self.assertRaises(FrozenInstanceError):
                     adc.options.sample_times = (1, 1)
-                claims = {item["key"] for item in ir["claims"]}
+                claims = {item.key for item in ir.claims}
                 self.assertIn("controller:" + timer, claims)
                 self.assertIn("dma:" + dma, claims)
                 output = self.root / family
@@ -127,9 +127,9 @@ class UartReceiveConfigurationTests(unittest.TestCase):
                     duplex = mode.startswith("dma-duplex")
                     expected = ((f"{dma}:stream7:channel4",) if duplex else ())
                     expected += (f"{dma}:stream2:channel4",)
-                    self.assertEqual(uart["dma"], expected)
+                    self.assertEqual(uart.dma, expected)
                     self.assertIsNone(uart.options.rx_capacity)
-                    claims = {item["key"] for item in ir["claims"]}
+                    claims = {item.key for item in ir.claims}
                     self.assertIn(f"dma:{dma}:stream2", claims)
                     self.assertEqual(f"dma:{dma}:stream7" in claims, duplex)
                     output = self.root / (family + "-" + mode)

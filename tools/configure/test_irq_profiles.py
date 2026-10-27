@@ -46,9 +46,9 @@ class InterruptProfileTests(unittest.TestCase):
                 irq = selection.resolve_interrupts(provider.CPU_ABI,
                                                  {"priority_bits": bits},
                                                  "freertos", provider)
-                self.assertEqual(irq["maximum_priority"], (1 << bits) - 1)
-                self.assertEqual(irq["syscall_priority"], 10 if bits == 8 else 5)
-                self.assertEqual(irq["kernel_port"], "GCC/ARM_CM4F")
+                self.assertEqual(irq.maximum_priority, (1 << bits) - 1)
+                self.assertEqual(irq.syscall_priority, 10 if bits == 8 else 5)
+                self.assertEqual(irq.kernel_port, "GCC/ARM_CM4F")
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "IRQ priority bits"):
             selection.resolve_interrupts(provider.CPU_ABI,
@@ -81,7 +81,7 @@ class InterruptProfileTests(unittest.TestCase):
                 self.assertEqual(ir.irq.maximum_priority, 15)
                 self.assertEqual(ir.irq.syscall_priority,
                                  5 if backend == "freertos" else None)
-                self.assertEqual(ir["cpu"]["dwt_cyccnt"], dwt)
+                self.assertEqual(ir.cpu["dwt_cyccnt"], dwt)
                 with self.assertRaises(FrozenInstanceError):
                     ir.irq.priority_bits = 2
                 output = Path(temp) / "bundle"
@@ -107,7 +107,7 @@ class InterruptProfileTests(unittest.TestCase):
                               'float_abi="native"\n'
                               '[memory]\nmain_stack_bytes=2048\n')
             ir = gate.resolve_ir(source)
-            self.assertFalse(ir["cpu"]["dwt_cyccnt"])
+            self.assertFalse(ir.cpu["dwt_cyccnt"])
 
     def test_selected_irq_checks_fact_range_and_os_policy_before_generation(self):
         original = gate.ROOT / "tools/configure/assemblies/qiming-freertos-uart.toml"

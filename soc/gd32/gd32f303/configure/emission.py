@@ -39,12 +39,12 @@ def shared_irqs(result):
 
 def _pins(result):
     numbers = {int(pin['pin'][2:]) for item in result.controllers
-               for pin in item['pins'] if pin['pin'].startswith('PA')}
-    for child in result.get("devices", ()):
-        if "cs_binding" in child:
-            binding = result["board_bindings"][child["cs_binding"]]
+               for pin in item.pins if pin['pin'].startswith('PA')}
+    for child in result.devices:
+        if child.kind == "spi" and child.options.cs_binding is not None:
+            binding = result.board_bindings[child.options.cs_binding]
             numbers.update(int(pin['pin'][2:])
-                for pin in result["routes"][binding["route"]]["pins"])
+                for pin in result.routes[binding["route"]]["pins"])
     return sum(1 << number for number in sorted(numbers))
 
 

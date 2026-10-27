@@ -14,27 +14,25 @@ def emit_bundle(result, output):
     from tools.configure import kernel, memory as memory_regions, metadata, i2s2
     from tools.configure.ir import thaw
     from tools.configure.providers import descriptor, maintained
-    write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
-    write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
-                                      else result, indent=2, sort_keys=True) + "\n")
-    # Compatibility fixtures enter through one adapter; normal generation uses
-    # the already validated immutable CPU/kernel/instance decisions directly.
     from tools.configure.ir import ConfigurationIR
     if not isinstance(result, ConfigurationIR):
-        result = ConfigurationIR.from_validated(result)
+        raise TypeError("Bundle emission requires ConfigurationIR")
+    write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
+    write("resolved.json", json.dumps(result.to_dict(), indent=2,
+                                      sort_keys=True) + "\n")
     profile, policy = result.cpu_profile, result.kernel
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
-              f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
-              f'#define NEXUS_EXACT_PART "{result["part"]}"',
-              f'#define NEXUS_CORE_HZ {result["clock"]["core_hz"]}u',
-              f'#define NEXUS_CLOCK_INPUT_HZ {result["clock"]["input_hz"]}u',
-              f'#define NEXUS_CLOCK_SOURCE_{result["clock"]["source"].upper()} 1',
+              f'#define NEXUS_CONFIG_SHA256 "{result.configuration_sha256}"',
+              f'#define NEXUS_EXACT_PART "{result.part}"',
+              f'#define NEXUS_CORE_HZ {result.clock["core_hz"]}u',
+              f'#define NEXUS_CLOCK_INPUT_HZ {result.clock["input_hz"]}u',
+              f'#define NEXUS_CLOCK_SOURCE_{result.clock["source"].upper()} 1',
               f'#define NEXUS_MAIN_STACK_BYTES {result.memory_budget.main_stack_bytes}u',
-              f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
+              f'#define NEXUS_BACKEND_{result.backend.upper()} 1',
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
-              *metadata.header_lines(thaw(result["platform_metadata"]))]
+              *metadata.header_lines(thaw(result.platform_metadata))]
     header.extend(i2s2.header_lines(result.i2s2))
     probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
                  for item in result.controllers)
@@ -43,23 +41,23 @@ def emit_bundle(result, output):
                    '#error "Probe choice must match the selected Platform usage"',
                    "#endif", "#ifndef NX_IO_CYCLE_PROBES",
                    "#define NX_IO_CYCLE_PROBES 1", "#endif"]
-    if result["clock"]["source"] == "hse":
-        header.insert(7, f'#define NEXUS_HSE_HZ {result["clock"]["input_hz"]}u')
+    if result.clock["source"] == "hse":
+        header.insert(7, f'#define NEXUS_HSE_HZ {result.clock["input_hz"]}u')
     header.extend(maintained(result.soc_family).configuration_header(result))
-    cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
+    cmake = [f'set(NEXUS_SOC_FAMILY "{result.soc_family}")',
              'set(NEXUS_SOC_SOURCE_DIRECTORY "' +
-             descriptor.maintained(result["soc_family"]).source_directory + '")',
-             f'set(NEXUS_EXACT_PART "{result["part"]}")',
+             descriptor.maintained(result.soc_family).source_directory + '")',
+             f'set(NEXUS_EXACT_PART "{result.part}")',
              'set(NEXUS_PROVIDER_CONFIG_MODULES "' + ';'.join(
-                 descriptor.maintained(result["soc_family"]).configuration_modules)
+                 descriptor.maintained(result.soc_family).configuration_modules)
              + '")',
              *cpu_profiles.selection_lines(profile),
              *kernel.selection_lines(policy),
              *memory_regions.selection_lines(result),
-             f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
-             f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
-             'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
-             'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+             f'set(NEXUS_CONFIG_SHA256 "{result.configuration_sha256}")',
+             f'set(NEXUS_OPTIMIZATION "{result.optimization}")',
+             'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item.kind for item in result.controllers})) + '")',
+             'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
     # Canonical source directories also serve multi-family host models. These
     # paths carry no translation-unit graph or additional support decisions.
     cmake += [f'set(NEXUS_SOC_SOURCE_{item.family} "${{NEXUS_SOURCE_DIR}}/' +
@@ -96,4 +94,4 @@ def emit_bundle(result, output):
     write("memory.ld", memory_regions.linker(result))
     write("resource-budget.json", json.dumps(memory_regions.resource_budget(result),
                                             indent=2, sort_keys=True) + "\n")
-    write(".nexus-config-bundle", result["configuration_sha256"] + "\n")
+    write(".nexus-config-bundle", result.configuration_sha256 + "\n")

@@ -1,14 +1,13 @@
-#
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
+"Project-Id-Version: Nexus documentation\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6b89c334b35f7f1475e81552cda98f43030879841233b557f4f7efbb804bf495\n"
+"X-Nexus-Source-SHA256: 37a3be649a7d680cba2fa10020334d14f1a09719b4f8c4bec5eb3c6472d650fa\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:1
 msgid "Nexus 文档系统架构与交付规划"
@@ -821,10 +820,10 @@ msgid "10. 版本和发布身份"
 msgstr "10. 版本和发布身份"
 
 msgid ""
-"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
+"文档 manifest 复用既有 identity 和证据定位结构。下表映射当前 schema-2 字段， "
 "完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
 msgstr ""
-"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
+"文档 manifest 复用既有 identity 和证据定位结构。下表映射当前 schema-2 字段， "
 "完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:0
@@ -854,17 +853,21 @@ msgstr "`documentation_source.commit`、`documentation_source.tree`"
 msgid "本次正文、配置和翻译源码"
 msgstr "本次正文、配置和翻译源码"
 
-msgid "`qualified_code.commit`、`qualified_code.tree`"
-msgstr "`qualified_code.commit`、`qualified_code.tree`"
+msgid "`qualification_references[].source`"
+msgstr "`qualification_references[].source`"
 
-msgid "当前引用资格的精确源码，保留原scope"
-msgstr "当前引用资格的精确源码，保留原scope"
+msgid "显式选入的每份原候选源码；不继承为文档 HEAD 资格"
+msgstr "显式选入的每份原候选源码；不继承为文档 HEAD 资格"
 
-msgid "`qualified_code.index`、`qualified_code.index_sha256`"
-msgstr "`qualified_code.index`、`qualified_code.index_sha256`"
+msgid ""
+"`qualification_references[].candidate`、`configuration_sha256`、`artifacts"
+"`、`qualified_scopes`"
+msgstr ""
+"`qualification_references[].candidate`、`configuration_sha256`、`artifacts"
+"`、`qualified_scopes`"
 
-msgid "既有结果索引路径和摘要，保留其配置与执行身份"
-msgstr "既有结果索引路径和摘要，保留其配置与执行身份"
+msgid "经原 verifier 核对的候选定位、摘要和精确范围；默认列表为空"
+msgstr "经原 verifier 核对的候选定位、摘要和精确范围；默认列表为空"
 
 msgid "`tool_versions`"
 msgstr "`tool_versions`"
@@ -886,15 +889,16 @@ msgid ""
 msgstr ""
 "成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:271
 msgid ""
 "三种源码身份不能互相覆盖。文档更新可引用经过验证的旧代码记录，不把该记录 重新标记为当前 HEAD "
-"已执行。若描述的代码与资格不同，页面显示各自来源和边界。 本方案描述的起点是 docs HEAD 7abde0e4、qualified code "
-"cc6a065c；历史 SoC 记录保持独立。计划工具一旦实现变更，按新源码执行其门禁。"
+"已执行。若描述的代码与资格不同，页面显示各自来源和边界。 原方案起点 docs HEAD 7abde0e4 与 qualified code "
+"cc6a065c 保持历史身份。 当前 schema 2 显式引用多份原候选，schema 1 仅保留原包的只读验证／恢复。 "
+"工具实现变化按新源码执行门禁，不改写已有证据字节。"
 msgstr ""
 "三种源码身份不能互相覆盖。文档更新可引用经过验证的旧代码记录，不把该记录 重新标记为当前 HEAD "
-"已执行。若描述的代码与资格不同，页面显示各自来源和边界。 本方案描述的起点是 docs HEAD 7abde0e4、qualified code "
-"cc6a065c；历史 SoC 记录保持独立。计划工具一旦实现变更，按新源码执行其门禁。"
+"已执行。若描述的代码与资格不同，页面显示各自来源和边界。 原方案起点 docs HEAD 7abde0e4 与 qualified code "
+"cc6a065c 保持历史身份。 当前 schema 2 显式引用多份原候选，schema 1 仅保留原包的只读验证／恢复。 "
+"工具实现变化按新源码执行门禁，不改写已有证据字节。"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:276
 msgid "版本 URL 结构如下；具体已发布版本以实际发布记录为准："

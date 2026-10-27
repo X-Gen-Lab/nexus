@@ -2,7 +2,7 @@
 
 
 def linker_fragments(result):
-    if not any(item["kind"] == "flash" for item in result["controllers"]):
+    if not any(item.kind == "flash" for item in result.controllers):
         return ("", "", "", "")
     flash_image_record = """    .nx_flash_image (READONLY) : ALIGN(4) {
     g_nx_stm32h743_flash_image = .;

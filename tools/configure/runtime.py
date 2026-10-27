@@ -91,9 +91,9 @@ def resolve(assembly):
             raise RuntimeError("Unsupported runtime optimization")
         profile = cpu.resolve(facts["cpu"], facts["irq"], choices["backend"])
         policy = kernel.resolve(choices.get("os"), profile, hz)
-        if policy is not None and policy.get("user_io", "none") != "none":
+        if policy is not None and getattr(policy, "user_io", "none") != "none":
             raise RuntimeError("GPIO user I/O requires exact platform memory reservations")
-        if policy is not None and policy.get("lowpower_port") == "timebase":
+        if policy is not None and getattr(policy, "lowpower_port", None) == "timebase":
             raise RuntimeError("CPU-only lowpower runtime requires reviewed SoC timer facts")
         profile = kernel.bind(profile, policy)
         digest = hashlib.sha256()

@@ -1,4 +1,4 @@
-# Authored translation; review state is explicit in catalog metadata.
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 51776ec62d9482ab03cca988e7d9f875a37aa437ac65bb1eb637dfb5db448289\n"
+"X-Nexus-Source-SHA256: 77731080a72496622d8699797ce669cda9eeb5e35df86a6ac509513835477f49\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:1
 msgid "当前系统架构"
@@ -79,6 +79,15 @@ msgstr ""
 msgid "私有 SDK 与私有 provider storage；各家族只开放已维护模式"
 msgstr ""
 "Private SDK/provider storage; each family exposes only maintained modes"
+
+msgid "`drivers/<kind>/<ip>/`"
+msgstr "`drivers/<kind>/<ip>/`"
+
+msgid "经逐芯片复核的共享 UART、I2C、ADC、timer 与 Flash 寄存器协议算法"
+msgstr "Shared UART, I2C, ADC, timer and Flash register-protocol algorithms reviewed for each participating chip"
+
+msgid "所选 SoC target 私有编译；不拥有芯片路由、时钟、Board 或运行时注册"
+msgstr "Compiled privately by the selected SoC target; no ownership of chip routes, clocks, Board or runtime registration"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`boards/<board>/board.json`"
@@ -362,17 +371,67 @@ msgstr ""
 "reconfiguration invalidates the old bundle instead of silently reusing a "
 "previous success."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:102
 msgid ""
-"SoC/Board 事实采用 JSON，使用者编写 schema-2 TOML。严格 resolver 产生不可变 typed "
-"IR；各生成器消费同一结果。`resolved.json` 是该结果的序列化，不能作为手工 配置回填。迁移期 schema-1 JSON "
-"夹具有显式入口，不与 TOML 混合叠加。"
+"SoC/Board 事实采用 JSON，平台装配只接受 schema-2 TOML。`AuthoredAssembly` "
+"保存冻结的用户意图；`resolve_ir()` 严格校验事实、模式和资源后直接产生不可变 `ConfigurationIR`。生产 "
+"resolver、factory 和 emitter 使用具名字段，不提供 Mapping 接口或保存第二份 `values` "
+"决策副本。`to_dict()` 派生 `resolved.json` 供审计与独立产物检查，不能回填为配置；旧 schema-1 JSON "
+"装配入口已删除。 历史证据仍保持原格式和只读校验，不建立当前代码资格。"
 msgstr ""
-"SoC/Board facts use JSON and consumers author schema-2 TOML. A strict "
-"resolver produces immutable typed IR consumed by every generator. "
-"`resolved.json` serializes that result and is not hand-authored "
-"configuration input. Migration schema-1 JSON fixtures have explicit entry "
-"points and are not overlaid with TOML."
+"SoC/Board facts use JSON; platform assemblies accept only schema-2 TOML."
+" `AuthoredAssembly` retains frozen user intent. After strict validation "
+"of facts, modes and resources, `resolve_ir()` directly produces "
+"immutable `ConfigurationIR`. Production resolver, factory and emitters "
+"use named fields, without a Mapping interface or a second `values` copy "
+"of decisions. `to_dict()` derives `resolved.json` for audits and "
+"independent artifact checks; it cannot be fed back as configuration. The"
+" legacy schema-1 JSON assembly entry has been removed. Historical "
+"evidence retains its original format and read-only verification; it "
+"grants no qualification to current code."
+
+msgid ""
+"IR 身份、预算和 controller／endpoint／CPU／kernel／resource options 使用冻结 "
+"record；IRQ 为嵌套 record，ADC channels/sample times 为 tuple。原 JSON 硬件 "
+"事实与按身份索引的只读 mapping 仍是明确的叶数据，resolver 内局部校验草稿也仍 可使用 dict；这不等于每个 JSON "
+"字段都有名义类型。`source_fields` 只记录投影 字段存在性，不保存决策值副本。Python typed source epoch "
+"为 2，JSON 投影仍为 schema 1；两者各自计代，不改变 MCU C factory 接口。"
+msgstr ""
+"IR identity, budgets and controller/endpoint/CPU/kernel/resource options"
+" use frozen records; IRQ is a nested record, and ADC channels/sample "
+"times are tuples. Original JSON hardware facts and identity-keyed "
+"readonly mappings remain explicit leaf data, and local resolver "
+"validation drafts may still use dictionaries. This does not give every "
+"JSON field a nominal type. `source_fields` records only projection-field"
+" presence, not duplicate decision values. Python typed source epoch is "
+"2, while JSON projection remains schema 1; they have separate "
+"generations and do not change MCU C factory interfaces."
+
+msgid ""
+"`soc/<vendor>/<family>/configure/`（Native 为 `soc/native/configure/`）明确 "
+"拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 "
+"constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共"
+" binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 "
+"CMake/SDK 必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board "
+"复用已有实现， 不复制驱动；文档矩阵不能反向决定配置。"
+msgstr ""
+"`soc/<vendor>/<family>/configure/` (`soc/native/configure/` for Native) "
+"explicitly owns ABI, mode-to-implementation decisions, DMA routes, "
+"triggers, shared IRQ and CS contracts, constructors/rollback/IRQ and "
+"system-clock emission. The common resolver retains schema, facts, "
+"resources, input identity and output; common bindings orchestrate Nexus "
+"faces and uniform lifecycle progress. A new SoC requires explicit "
+"registration of its real provider modules and maintained CMake/SDK "
+"required files. Unknown families and modes reject without inheriting "
+"Native or Cortex-M4 defaults. An ordinary Board reuses existing "
+"implementations rather than copying drivers; documentation matrices "
+"cannot make configuration decisions."
+
+msgid "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
+msgstr "The explicit provider map and shared leaf contracts remain in `tools/configure/providers/`; configuration tests remain in `tools/configure/tests/providers/<family>/`. Shared IP source selection, configuration package placement and physical qualification are reviewed separately. This layout refactor does not expand supported modes; physical status remains `not_executed`."
+
+msgid "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"
+msgstr "`ConfigurationIR.physical_part` and `ControllerIR.integration` are named views of existing frozen facts and resource plans. They reuse the original Flash/memory, resource claim, DMA lane, IRQ and clock objects; they add neither JSON/configuration-identity fields nor another route resolver. F407 SPI and paired secondary-controller paths consume the integration, while other constructors can retain their existing adapters. A nominal APB frequency does not replace the reviewed clock-domain envelope. See the [provider porting guide](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct) for field responsibilities and new-part checks."
+
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:116
 msgid ""
@@ -403,6 +462,10 @@ msgstr ""
 "implementation/generated binding TUs. Public consumption has no vendor-SDK "
 "ABI. External firmware explicitly adds startup/system/linker/resource checks"
 " through `nexus_add_firmware()`."
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"
+msgstr "The seven SoC family entries select the pinned official CMSIS-Core v6.4.0 CPU headers, while each family retains its locked vendor Device/startup and HAL/LL sources. The build target graph owns the internal `nexus_cmsis_core` and `nexus_use_cmsis_core(target)`, distinct from the public neutral `Nexus::Core` mechanisms. Ordinary public consumers do not inherit vendor Core headers or types. The old Core bytes and notices in the GD32F470 import remain; the selected source is shared, and directory presence alone does not establish a compiler dependency. See [vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) for version and license identities. This dependency migration does not change public Arch context, ownership or mask-restoration contracts, or automatically enable a new chip, profile or security domain. Actual include closure, ARM links, relocated-SDK consumption and physical qualification have separate acceptance scopes."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:127
 msgid "固定对象与执行"
@@ -925,25 +988,3 @@ msgstr ""
 "documentation does not replace tested-code identity. New candidates have "
 "independent exit conditions. No hardware is connected; physical results "
 "remain `not_executed`."
-
-# CMSIS6 actual-POT delta; independent review pending.
-msgid "七个 SoC family 的 CPU 头统一选用官方 CMSIS-Core v6.4.0 pin，Device、startup 及 HAL/LL 仍由各 family 的锁定供应商来源维护。内部 `nexus_cmsis_core` 和 `nexus_use_cmsis_core(target)` 归构建目标图拥有，与公共 `Nexus::Core` 中性机制 不同；普通公共消费路径不导出厂商 Core 头或类型。GD32F470 原导入中的旧 Core 字节与通知保留，实际选入的是共享来源，不能仅凭目录存在判断编译依赖。版本和 许可证身份见[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)。这一依赖迁移不改变公共 Arch 的上下文、所有权与屏蔽恢复合同，不自动启用新的芯片、profile 或安全域； 实际 include 闭包、ARM 链接、移位 SDK 消费与物理资格分别验收。"
-msgstr "The seven SoC family entries select the pinned official CMSIS-Core v6.4.0 CPU headers, while each family retains its locked vendor Device/startup and HAL/LL sources. The build target graph owns the internal `nexus_cmsis_core` and `nexus_use_cmsis_core(target)`, distinct from the public neutral `Nexus::Core` mechanisms. Ordinary public consumers do not inherit vendor Core headers or types. The old Core bytes and notices in the GD32F470 import remain; the selected source is shared, and directory presence alone does not establish a compiler dependency. See [vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) for version and license identities. This dependency migration does not change public Arch context, ownership or mask-restoration contracts, or automatically enable a new chip, profile or security domain. Actual include closure, ARM links, relocated-SDK consumption and physical qualification have separate acceptance scopes."
-
-msgid "`drivers/<kind>/<ip>/`"
-msgstr "`drivers/<kind>/<ip>/`"
-
-msgid "经逐芯片复核的共享 UART、I2C、ADC、timer 与 Flash 寄存器协议算法"
-msgstr "Shared UART, I2C, ADC, timer and Flash register-protocol algorithms reviewed for each participating chip"
-
-msgid "所选 SoC target 私有编译；不拥有芯片路由、时钟、Board 或运行时注册"
-msgstr "Compiled privately by the selected SoC target; no ownership of chip routes, clocks, Board or runtime registration"
-
-msgid "IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， 不能声称所有字段均有名义强类型。`soc/<vendor>/<family>/configure/`（Native 为 `soc/native/configure/`）明确 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及 constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、 资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现， 不复制驱动；文档矩阵不能反向决定配置。"
-msgstr "IR identity, budgets and controller options use frozen records; IRQ is a nested record, and ADC channels/sample times are tuples. The complete JSON fact projection still retains a readonly mapping, so not every field has a nominal strong type. `soc/<vendor>/<family>/configure/` (Native: `soc/native/configure/`) explicitly owns ABI, mode-to-implementation mapping, DMA routes, triggers, shared IRQ and CS contracts, constructors, rollback, IRQ and system-clock emission. The common resolver retains schema, facts, resources, input identity and outputs; common bindings assemble Nexus faces and shared lifecycle progress. A new SoC requires explicit real provider modules and maintained CMake/SDK required files. Unknown families and modes reject without Native or Cortex-M4 defaults. Ordinary Boards reuse existing implementations without copying drivers; documentation matrices cannot determine configuration."
-
-msgid "显式 provider map 与共享 leaf 合同仍在 `tools/configure/providers/`，配置测试仍在 `tools/configure/tests/providers/<family>/`。共享 IP 源码选编、配置包位置与物理资格 分别核对；本轮路径整理不扩大模式支持，实板状态仍为 `not_executed`。"
-msgstr "The explicit provider map and shared leaf contracts remain in `tools/configure/providers/`; configuration tests remain in `tools/configure/tests/providers/<family>/`. Shared IP source selection, configuration package placement and physical qualification are reviewed separately. This layout refactor does not expand supported modes; physical status remains `not_executed`."
-
-msgid "`ConfigurationIR.physical_part` 与 `ControllerIR.integration` 是现有冻结事实和资源计划 的具名视图，复用原 Flash／memory、resource claim、DMA lane、IRQ 和 clock 对象； 不增加 JSON／配置身份字段或另一套路由解析。F407 SPI 与成对 secondary-controller 路径已消费该 integration，其他构造仍可使用既有适配。名义 APB 频率不替代经复核 的 clock domain envelope。字段职责和新增料号检查见 [provider 接入指南](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct)。"
-msgstr "`ConfigurationIR.physical_part` and `ControllerIR.integration` are named views of existing frozen facts and resource plans. They reuse the original Flash/memory, resource claim, DMA lane, IRQ and clock objects; they add neither JSON/configuration-identity fields nor another route resolver. F407 SPI and paired secondary-controller paths consume the integration, while other constructors can retain their existing adapters. A nominal APB frequency does not replace the reviewed clock-domain envelope. See the [provider porting guide](../guides/provider-porting.md#keep-facts-and-admission-policy-distinct) for field responsibilities and new-part checks."

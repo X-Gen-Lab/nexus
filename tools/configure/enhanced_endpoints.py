@@ -2,6 +2,7 @@
 from dataclasses import replace
 
 from tools.configure import selected_contracts
+from tools.configure.calls import DirectCall
 from tools.configure.providers import maintained
 from tools.configure.providers.common import fail
 
@@ -68,20 +69,20 @@ def dma_construction(item, construction, prefix):
     name = item.id.replace("-", "_")
     sequence = f"s_nx_sequence_{name}"
     backend = f"nx_{provider.PREFIX}_spi_dma_sequence_backend"
-    definitions = [line.replace(f"prepare_{name}(", f"prepare_engine_{name}(")
-                   .replace(f"nx_spi_port_stop(nx_binding_{name})",
-                            f"nx_spi_dma_transaction_stop(nx_binding_{name})")
-                   .replace(f"nx_spi_port_stop(&s_nx_face_{name})",
-                            f"nx_spi_dma_transaction_stop(&s_nx_face_{name})")
-                   for line in construction.definitions]
-    definitions += [f"static nx_result_t prepare_{name}(void) {{",
+    definitions = list(construction.definitions)
+    definitions += [f"static nx_result_t prepare_sequence_{name}(void) {{",
                     f"    if ({sequence}.active != NULL || {sequence}.cs_held ||",
                     f"        {sequence}.pending_release) {{ return NX_ERROR_BUSY; }}",
-                    f"    nx_result_t status = prepare_engine_{name}();",
+                    f"    nx_result_t status = {construction.initialize.render()};",
                     "    if (status != NX_SUCCESS) { return status; }",
                     f"    return nx_spi_dma_sequence_initialize(&{sequence},",
                     f"        &{backend}, &s_nx_port_{name});", "}"]
     return replace(construction, definitions=tuple(definitions),
+                   initialize=DirectCall(f"prepare_sequence_{name}"),
+                   stop=tuple(DirectCall("nx_spi_dma_transaction_stop",
+                                         call.arguments)
+                              if call.function == "nx_spi_port_stop" else call
+                              for call in construction.stop),
                    face_context="&" + sequence,
                    face_definitions=(
                        f"static nx_spi_dma_sequence_state_t {sequence} = {{",

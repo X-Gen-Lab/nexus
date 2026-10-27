@@ -1,9 +1,9 @@
 """Malformed EXTI enums reject before any generated bundle is published."""
-import json
 from pathlib import Path
 import tempfile
 import unittest
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
 from soc.stm32.stm32g474 import configure as stm32g474
 from tools.configure.providers.common import ConfigurationError
@@ -15,13 +15,13 @@ class ExtiEdgeTypeTests(unittest.TestCase):
         for edge in ([], {}, ["rising"], {"edge": "both"}):
             with self.subTest(edge=edge), tempfile.TemporaryDirectory() as value:
                 directory = Path(value)
-                authored = gate.load_assembly(fixture)
+                authored = gate.load_assembly(fixture).to_dict()
                 authored["board_package"] = str(fixture.parent / "exti_board")
                 selection = next(item for item in authored["controllers"]
                                  if "edge" in item)
                 selection["edge"] = edge
-                assembly = directory / "assembly.json"
-                assembly.write_text(json.dumps(authored))
+                assembly = directory / "assembly.toml"
+                assembly.write_text(render_toml(authored))
                 output = directory / "generated"
                 with self.assertRaisesRegex(ConfigurationError, "EXTI edge"):
                     gate.configure(assembly, output)

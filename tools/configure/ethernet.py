@@ -3,6 +3,7 @@
 The MAC bus-master domain is distinct from stream-DMA controller routes. PHY
 presence, reset, clock, negotiation and network policy remain external facts.
 """
+from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
 from tools.configure.gpio_phase import withdraw_pin
@@ -100,7 +101,7 @@ def constructor(item, result, prefix):
     if memory is None or memory.get("dma") is not True:
         fail("Ethernet requires its reviewed bus-master memory domain")
     gates = hardware.frame_gates if enhanced else hardware.raw_gates
-    pins = item["pins"]
+    pins = item.pins
     ahb, apb = hardware.ahb, hardware.apb
     syscfg_gate = hardware.syscfg_gate
     mux, mux_mask = hardware.mux, hardware.mux_mask
@@ -153,7 +154,7 @@ def constructor(item, result, prefix):
                 if enhanced else [
                     f"        .epoch = {state}.epoch, .drain_timeout_us = {options.drain_timeout_us}u,"]),
               "        .address = { " + ", ".join(str(byte) + "u" for byte in options.address) + " },",
-              f"        .irq_policy = {{ {kernel_policy_constant(result)}, {result['irq']['external_count']}u, {result['irq']['priority_bits']}u, {result['irq']['syscall_priority'] or 0}u }},",
+              f"        .irq_policy = {{ {kernel_policy_constant(result)}, {result.irq.external_count}u, {result.irq.priority_bits}u, {result.irq.syscall_priority or 0}u }},",
               f"        .source = {{ {hardware.irq}, {options.irq.priority}u, 3u }}", "    };"]
     for index, pin in enumerate(pins):
         wire = pin["pin"]
@@ -175,7 +176,7 @@ def constructor(item, result, prefix):
               f"void {hardware.controller}_IRQHandler(void) {{ nx_{stem}_mac_irq(&{state}); }}"]
     return Construction(
         state_type=f"nx_{stem}_mac_t", definitions=lines,
-        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
         retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
                        f"s_nx_eth_pin_snapshots_{name}[{index}]"
@@ -225,7 +226,7 @@ def start_resources(result, prefix):
         mask = sum(1 << index for index in {ord(pin["pin"][1])-ord('A')
                    for item in result.controllers
                    if item.kind in {"eth", "eth_frames"}
-                   for pin in item["pins"]})
+                   for pin in item.pins})
         lines.append(f"    s_nx_eth_gpio_clocks_added = ~{hardware.gpio_clock} & {mask}u;")
     return lines
 

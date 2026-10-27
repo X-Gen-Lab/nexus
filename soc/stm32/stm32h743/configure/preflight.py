@@ -53,21 +53,21 @@ def selected_preflight(result, *, dma_conditions=None):
             source += _reject(f'(NX_{hook}_READ(&RCC->{gate_register}) & RCC_{gate_register}_{uart}EN) != 0u')
             source += _reject(f'(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u')
             source += _reject(f'!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)')
-            if item.get('mode') in {'dma-tx', 'rx-dma-idle', 'rx-dma-continuous', 'dma-duplex-continuous'}:
-                lanes = (0, 1) if item.get('mode') == 'dma-duplex-continuous' else (0,) if item.get('mode') == 'dma-tx' else (1,)
+            if item.mode in {'dma-tx', 'rx-dma-idle', 'rx-dma-continuous', 'dma-duplex-continuous'}:
+                lanes = (0, 1) if item.mode == 'dma-duplex-continuous' else (0,) if item.mode == 'dma-tx' else (1,)
                 for lane in lanes:
                     source += _reject(f'!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)')
                 source.append('    if ((NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u) {')
                 for lane in lanes:
                     source += _reject(f'NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u || NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u', indent=8)
                 source.append('    }')
-        for pin in item['pins']:
+        for pin in item.pins:
             name = pin['pin']
             pads.setdefault(name[1], set()).add(int(name[2:]))
     for item in result.devices:
-        binding = result['board_bindings'].get(item.get('cs_binding'))
+        binding = result.board_bindings.get(getattr(item.options, "cs_binding", None))
         if binding is not None:
-            for pin in result['routes'][binding['route']]['pins']:
+            for pin in result.routes[binding['route']]['pins']:
                 name = pin['pin']
                 pads.setdefault(name[1], set()).add(int(name[2:]))
     for port, numbers in sorted(pads.items()):

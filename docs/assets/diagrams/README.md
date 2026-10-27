@@ -69,7 +69,12 @@ python tools/dev/dev.py docs check --full \
 
 ![FIG-03：构建输入/产物链，生成失败使owned bundle失效](configuration-generation.svg)
 
-边表示构建时输入和产物传递，不表示运行时调用。严格解析不能修复非法字段、冲突或陈旧输入；失败只撤回拥有的输出，不清理未拥有目录，也不暴露半成品。ELF/资源报告不构成实板资格。
+边表示构建时输入和产物传递，不表示运行时调用。TOML 唯一入口先得到冻结
+`AuthoredAssembly` 意图，再与 SoC/Board 事实校验得到具名 `ConfigurationIR`。
+同一 IR 驱动 SoC 的静态定义／冷态调用与单向 JSON／配置／内存投影；全部经过
+同一 bundle 事务发布。`resolved.json` 不回流为装配输入。严格解析不能修复非法
+字段、冲突或陈旧输入；失败只撤回拥有的输出，不清理未拥有目录，也不暴露半成品。
+ELF／资源报告不构成实板资格。
 
 依据：[配置器](../../../tools/configure/configure.py)、[不可变IR](../../../tools/configure/ir.py)、[bundle事务](../../../tools/configure/bundle.py)、[构建合同](../../design/build-system.md)。
 [可编辑DOT](configuration-generation.dot)；实施关联：DOC-45。

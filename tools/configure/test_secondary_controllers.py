@@ -31,12 +31,12 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
         for label in ("stm32-zg", "stm32-ve", "gd32"):
             with self.subTest(label=label):
                 result = gate.resolve_ir(self.assembly(label))
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
                 self.assertEqual(len(result.controllers), 5)
                 expected = {"USART0", "USART1", "SPI4", "SPI0", "I2C1"} if label == "gd32" else {
                     "USART1", "USART2", "SPI1", "SPI2", "I2C2"}
                 self.assertEqual({item.controller for item in result.controllers}, expected)
-                claims = {item["key"] for item in result["claims"]}
+                claims = {item.key for item in result.claims}
                 self.assertIn("dma:DMA0:stream6" if label == "gd32" else "dma:DMA1:stream6", claims)
                 self.assertIn("pin:PB10", claims)
                 self.assertIn("pin:PB11", claims)
@@ -80,7 +80,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
             cwd=gate.ROOT, capture_output=True, text=True, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         source = output.read_text()
-        self.assertIn("prepare_spi0", source)
+        self.assertIn("nx_stm32_spi_config_t s_nx_spi_config_spi0", source)
         self.assertNotIn("s_nx_pair_clock_added", source)
 
     def test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses(self):
@@ -90,7 +90,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                     path = self.assembly(label, "-i2c-pair", lambda text: text.replace("dma-messages", mode))
                     result = gate.resolve_ir(path)
                     self.assertEqual(len(result.controllers), 2)
-                    self.assertEqual([item["address"] for item in result.devices], [80, 80])
+                    self.assertEqual([item.options.address for item in result.devices], [80, 80])
                     output = self.directory / (label + mode)
                     gate.configure(path, output)
                     source = (output / "bindings.c").read_text()
@@ -98,7 +98,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                     self.assertIn("s_nx_port_primary_i2c", source)
                     self.assertIn("s_nx_port_secondary_i2c", source)
                     self.assertIn("I2C1_EV_IRQHandler" if label == "gd32" else "I2C2_EV_IRQHandler", source)
-                    self.assertEqual(any(item["key"].startswith("dma:") for item in result["claims"]), mode == "dma-messages")
+                    self.assertEqual(any(item.key.startswith("dma:") for item in result.claims), mode == "dma-messages")
 
     def test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts(self):
         for label in ("stm32-zg", "gd32"):
@@ -146,7 +146,7 @@ address = 80
             rtos = gate.resolve_ir(self.assembly(label, "-freertos"))
             self.assertEqual([(item.controller, item.mode) for item in bare.controllers],
                              [(item.controller, item.mode) for item in rtos.controllers])
-            self.assertEqual(rtos["irq"]["kernel_port"], "GCC/ARM_CM4F")
+            self.assertEqual(rtos.irq.kernel_port, "GCC/ARM_CM4F")
             self.assertTrue(all(not item.options.irq.calls_os for item in rtos.controllers))
 
 

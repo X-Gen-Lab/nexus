@@ -1,31 +1,32 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
-from tools.configure.ir import controller_ir
+from tools.configure.calls import Address, DirectCall
+from tools.configure.ir import ControllerIR
 from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
 
 
 def spi_dma_constructor(item, result, board_bindings, routes, devices):
     """One exact static owner; Platform already holds its gates and pads."""
-    from tools.configure.memory import dma_regions
+    from tools.configure.memory import dma_regions_from_facts
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     children = [child for child in devices if child.controller == item.id]
     if len(children) != 1:
         fail("H743 SPI DMA requires one exact PE11 endpoint")
     child = children[0]
-    binding = board_bindings[child["cs_binding"]]
+    binding = board_bindings[child.options.cs_binding]
     pins = routes[binding["route"]]["pins"]
     if (len(pins) != 1 or pins[0]["pin"] != "PE11" or
             binding.get("initial") != 2048 or binding.get("mask") != 2048 or
-            child.get("mode", 0) != 0 or child.driver != "spi-endpoint"):
+            child.options.mode != 0 or child.driver != "spi-endpoint"):
         fail("H743 SPI DMA requires mode0 and PE11 initial-high CS")
-    rate = child.get("max_hz", item.options.max_hz)
+    rate = child.options.max_hz
     if (type(rate) is not int or not 253907 <= rate <= item.options.max_hz or
             item.options.max_hz * 256 < 65000000):
         fail("H743 SPI DMA rate is outside its hardware divider")
-    memory = [region for region in result["memory"]
+    memory = [region for region in result.memory
               if region["id"] == "axi-sram" and region["linker"]]
-    region_lines, count = dma_regions(name, {"memory": memory}, engine="DMA1")
+    region_lines, count = dma_regions_from_facts(name, memory, engine="DMA1")
     if count != 1:
         fail("H743 SPI DMA requires initialized AXI SRAM only")
     child_name = child.id.replace("-", "_")
@@ -84,23 +85,23 @@ def spi_dma_constructor(item, result, board_bindings, routes, devices):
                         r"/** \brief Selected bounded observer; task owns final withdrawal. */",
                         f"void {vector}_IRQHandler(void) {{ {call}; }}"]
     return Construction("nx_stm32h743_spi_dma_state_t", definitions,
-                        f"prepare_{name}()", [f"stop_{name}()"], True)
+                        DirectCall(f"prepare_{name}"), [DirectCall(f"stop_{name}")], True)
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct only the exact GPIOB/byte USART3 implementation."""
-    from .contract import mode_implementation, validate_selection
-    item = controller_ir(item, "stm32h743")
+    from .contract import mode_implementation
+    if not isinstance(item, ControllerIR):
+        fail("stm32h743 constructor requires a resolved controller")
     if item.provider != "stm32h743":
         fail("H743 constructor cannot reinterpret a foreign provider decision")
-    validate_selection(item, item)
     implementation = mode_implementation(item.kind, item.mode)
     if implementation == "spi_dma":
         return spi_dma_constructor(item, result, board_bindings, routes, devices)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
-    initialize = f"prepare_{name}()"
+    initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
@@ -109,7 +110,8 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.output = {'true' if item.mode == 'output' else 'false'};",
                         f"    return nx_stm32h743_gpio_initialize(&{state}, {item.options.initial}u);",
                         "}"]
-        stop = f"nx_stm32h743_gpio_stop(&{state}, {item.options.initial}u)"
+        stop = DirectCall("nx_stm32h743_gpio_stop",
+                          (Address(state), item.options.initial))
     elif item.kind == "uart":
         options = item.options
         duplex = item.mode == "dma-duplex-continuous"
@@ -128,19 +130,19 @@ def constructor(item, result, board_bindings, routes, devices):
             state += ".uart"
         if fifo:
             definitions += uart_formats.fifo_definitions(item)
-        plan = result.get("clock_plan")
-        clock = (plan["domains"]["usart3"]["nominal_hz"] if plan is not None
-                 else result["clock"]["apb1_hz"])
+        plan = result.clock_plan
+        clock = (plan.domains["usart3"].nominal_hz if plan is not None
+                 else result.clock["apb1_hz"])
         divisor = (clock + options.baud // 2) // options.baud
         if not 16 <= divisor <= 0xffff:
             fail("USART baud is not representable by the selected local kernel")
         if dma:
-            from tools.configure.memory import dma_regions
+            from tools.configure.memory import dma_regions_from_facts
             # Reachability does not authorize unselected, uninitialized RAM.
             allowed_memory = {"axi-sram"} if continuous else {"axi-sram", "sram1"}
-            memory = [region for region in result["memory"]
+            memory = [region for region in result.memory
                       if region["id"] in allowed_memory and region["linker"]]
-            region_lines, region_count = dma_regions(name, {"memory": memory},
+            region_lines, region_count = dma_regions_from_facts(name, memory,
                                                        engine="DMA1")
             if region_count != len(memory) or not 1 <= region_count <= 2:
                 fail("H743 DMA requires selected initialized AXI/SRAM1")
@@ -148,7 +150,7 @@ def constructor(item, result, board_bindings, routes, devices):
         capacity = options.rx_capacity
         if not receive and (type(capacity) is not int or not 1 <= capacity <= 4096):
             raise ValueError("H743 USART3 requires an explicit bounded byte ring")
-        irq = result["irq"]
+        irq = result.irq
         if not receive:
             definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];"]
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
@@ -159,7 +161,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.baud = {options.baud}u;",
                         f"    {state}.irq = USART3_IRQn;",
                         f"    {state}.profile = {'NX_UART_RX_BLOCKS' if receive else 'NX_UART_RX_BYTES'};",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
                         "    nx_result_t status = nx_stm32h743_usart3"
                         + ("_rtscts" if flow else "") + "_pins_prepare();",
                         "    if (status != NX_SUCCESS) { return status; }",
@@ -209,15 +211,15 @@ def constructor(item, result, board_bindings, routes, devices):
                 definitions += ["void DMA1_Stream0_IRQHandler(void);",
                                 r"/** \brief Independent selected TX DMA terminal observation. */",
                                 f"void DMA1_Stream0_IRQHandler(void) {{ nx_stm32h743_uart_duplex_dma_irq(&{owner}); }}"]
-        stop = f"nx_uart_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "spi":
-        children = [child for child in devices if child["controller"] == item.id]
+        children = [child for child in devices if child.controller == item.id]
         if not children:
             fail("H743 SPI requires a reviewed active-low CS endpoint")
-        plan = result.get("clock_plan")
-        source_max = (plan["domains"]["spi4"]["maximum_hz"] if plan is not None
+        plan = result.clock_plan
+        source_max = (plan.domains["spi4"].maximum_hz if plan is not None
                       else {32000000: 32500000, 64000000: 65000000}.get(
-                          result["clock"]["apb2_hz"]))
+                          result.clock["apb2_hz"]))
         if source_max is None:
             fail("H743 SPI requires an exact reviewed kernel profile")
         if item.options.max_hz * 256 < source_max:
@@ -225,7 +227,7 @@ def constructor(item, result, board_bindings, routes, devices):
         body = [f"static nx_result_t prepare_{name}(void) {{",
                 f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
                 f"    {state}.registers = {item.controller};",
-                f"    {state}.clock_hz = {result['clock']['apb2_hz']}u;",
+                f"    {state}.clock_hz = {result.clock['apb2_hz']}u;",
                 f"    {state}.poll_limit = 1000000u;"]
         register = "APB2RSTR"
         body += [f"    {state}.reset = &RCC->{register};",
@@ -236,10 +238,10 @@ def constructor(item, result, board_bindings, routes, devices):
                  f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
                  "    if (status != NX_SUCCESS) { return status; }"]
         for child in children:
-            child_name = child["id"].replace("-", "_")
+            child_name = child.id.replace("-", "_")
             cs = f"s_nx_cs_{child_name}"
             endpoint = f"s_nx_endpoint_{child_name}"
-            binding = board_bindings[child["cs_binding"]]
+            binding = board_bindings[child.options.cs_binding]
             pins = routes[binding["route"]]["pins"]
             if len(pins) != 1:
                 fail("H743 SPI endpoint CS requires one reviewed pad")
@@ -247,12 +249,12 @@ def constructor(item, result, board_bindings, routes, devices):
             mask = 1 << int(pin[2:])
             if binding.get("initial") != mask:
                 fail("H743 SPI active-low CS requires an initial high latch")
-            rate = child.get("max_hz", item.options.max_hz)
+            rate = child.options.max_hz
             if (type(rate) is not int or
                     not 250000 <= rate <= item.options.max_hz or
                     rate * 256 < source_max):
                 fail("H743 SPI endpoint rate is outside its hardware divider")
-            mode = child.get("mode", 0)
+            mode = child.options.mode
             if type(mode) is not int or not 0 <= mode <= 3:
                 fail("H743 SPI endpoint mode must be 0 through 3")
             definitions += [f"static nx_stm32h743_gpio_state_t {cs};",
@@ -271,17 +273,17 @@ def constructor(item, result, board_bindings, routes, devices):
                      f"    {endpoint}.mode = {mode}u;"]
             stops += [f"    status = nx_stm32h743_gpio_stop(&{cs}, {mask}u);",
                       "    if (status != NX_SUCCESS) { return status; }"]
-        for pin in item["pins"]:
+        for pin in item.pins:
             wire = pin["pin"]
             body += [f"    status = nx_stm32h743_pin_alternate(GPIO{wire[1]}, {int(wire[2:])}u, {pin['af']}u);",
                      "    if (status != NX_SUCCESS) { return status; }"]
         definitions += body + ["    return NX_SUCCESS;", "}"]
         definitions += stops + ["    return NX_SUCCESS;", "}"]
-        stop = f"stop_{name}()"
+        stop = DirectCall(f"stop_{name}")
     elif item.kind == "pwm":
-        pin = item["pins"][0]["pin"]
+        pin = item.pins[0]["pin"]
         idle = "s_nx_idle_" + name
-        binding = board_bindings.get(item["binding"], {})
+        binding = board_bindings.get(item.binding, {})
         mask = 1 << int(pin[2:])
         initial = binding.get("initial")
         if type(initial) is not int or initial not in {0, mask} or binding.get("mask") != mask:
@@ -303,9 +305,9 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.tick_hz = {item.options.tick_hz}u;",
                         f"    {state}.poll_limit = 1000000u;",
                         f"    return nx_stm32h743_pwm_initialize(&{state});", "}"]
-        stop = f"nx_stm32h743_pwm_close(&{state})"
+        stop = DirectCall("nx_stm32h743_pwm_close", (Address(state),))
     elif item.kind == "i2c":
-        timing = "0x70f22727" if result["clock"]["apb1_hz"] == 64000000 else "0x30f22727"
+        timing = "0x70f22727" if result.clock["apb1_hz"] == 64000000 else "0x30f22727"
         if item.options.timing is not None:
             timing = f"0x{item.options.timing.timingr:08x}"
         config = "s_nx_config_" + name
@@ -315,16 +317,17 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    .timing = {timing}u, .poll_limit = 1000000u,",
                         "    .ignore_master_berr = true, .receive_reload_one = true",
                         "};"]
-        initialize = f"nx_stm32h743_i2c_prepare(&{state}, &{config})"
+        initialize = DirectCall("nx_stm32h743_i2c_prepare",
+                                (Address(state), Address(config)))
         for child in devices:
-            if child["controller"] != item.id:
+            if child.controller != item.id:
                 continue
-            child_name = child["id"].replace("-", "_")
+            child_name = child.id.replace("-", "_")
             endpoint = "s_nx_endpoint_" + child_name
-            definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child['address']}u }};",
+            definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child.options.address}u }};",
                             *enhanced_endpoints.face(child, endpoint,
                                                      "nx_i2c_v2_endpoint_ops")]
-        stop = f"nx_i2c_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_i2c_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "adc":
         supply = board_bindings.get(item.binding, {}).get("supply_mv")
         if type(supply) is not int or not 2400 <= supply <= 3300 or not 2000 <= item.options.reference_mv <= supply:
@@ -339,12 +342,12 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.supply_mv = {supply}u;",
                         f"    {state}.poll_limit = 1000000u;",
                         f"    return nx_stm32h743_adc_initialize(&{state});", "}"]
-        stop = f"nx_stm32h743_adc_stop(&{state})"
+        stop = DirectCall("nx_stm32h743_adc_stop", (Address(state),))
     elif item.kind == "flash":
         supply = board_bindings.get(item.binding, {}).get("supply_mv")
         if type(supply) is not int or not 2700 <= supply <= 3600:
             fail("H743 Flash requires explicit Board supply_mv2700..3600")
-        if not result["clock_profile"].endswith("-cache-off"):
+        if not result.clock_profile.endswith("-cache-off"):
             fail("H743 Flash pulse mode requires the reviewed Cache-off profile")
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.active) {{ return NX_ERROR_BUSY; }}",
@@ -353,7 +356,8 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.supply_mv = {supply}u;",
                         f"    {state}.poll_limit = 500000000u;",
                         f"    return nx_stm32h743_flash_ram_initialize(&{state}, &g_nx_stm32h743_flash_ram_workspace);", "}"]
-        stop = "nx_stm32h743_flash_ram_stop(&g_nx_stm32h743_flash_ram_workspace)"
+        stop = DirectCall("nx_stm32h743_flash_ram_stop",
+                          (Address("g_nx_stm32h743_flash_ram_workspace"),))
     elif item.kind == "watchdog":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",
@@ -366,10 +370,10 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"static nx_result_t stop_{name}(void) {{",
                         f"    return nx_stm32h743_watchdog_stop(&{state});",
                         "}"]
-        stop = f"stop_{name}()"
+        stop = DirectCall(f"stop_{name}")
     elif item.kind == "exti":
         options = item.options
-        irq = result["irq"]
+        irq = result.irq
         line = int(item.controller[-1])
         definitions += [f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
                         f"static nx_result_t prepare_{name}(void) {{",
@@ -382,12 +386,12 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.line = {line}u;",
                         f"    {state}.priority = {options.irq.priority}u;",
                         f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
                         f"    return nx_stm32h743_exti_initialize(&{state});",
                         "}", f"void EXTI{line}_IRQHandler(void);",
                         r"/** \brief One selected line, one bounded coalesced edge fact. */",
                         f"void EXTI{line}_IRQHandler(void) {{ nx_stm32h743_exti_irq(&{state}); }}"]
-        stop = f"nx_exti_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_exti_port_stop", (Address(f"s_nx_face_{name}"),))
     else:
         raise ValueError("Unmaintained H743 constructor")
     return Construction(

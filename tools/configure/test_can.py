@@ -43,7 +43,7 @@ class CanConfigurationTests(unittest.TestCase):
         self.assertEqual(len(ir.can_domain.filters), 2)
         with self.assertRaises(FrozenInstanceError):
             ir.controllers[0].options.timing.prescaler = 7
-        claims = {item['key'] for item in ir['claims']}
+        claims = {item.key for item in ir.claims}
         self.assertIn('can:filter-domain', claims)
         self.assertIn('can:filter-bank:0', claims)
         self.assertIn('can:filter-bank:14', claims)

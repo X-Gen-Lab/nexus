@@ -1,11 +1,11 @@
 """Optional factory metadata and nominal IDs exercise actual generated C."""
 from dataclasses import FrozenInstanceError
-import json
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
 from tools.configure import factory
 
@@ -92,12 +92,12 @@ class OptionalFactoryTests(unittest.TestCase):
                         "gd32_assembly/blocks.toml"):
             with self.subTest(fixture=fixture):
                 path = gate.ROOT / "tests/contracts" / fixture
-                normalized = gate.load_assembly(path)
+                normalized = gate.load_assembly(path).to_dict()
                 normalized["board_package"] = str(
                     path.parent / normalized["board_package"])
                 normalized["factory"] = {"capabilities": True}
-                assembly = self.root / "mcu.json"
-                assembly.write_text(json.dumps(normalized))
+                assembly = self.root / "mcu.toml"
+                assembly.write_text(render_toml(normalized))
                 result = gate.resolve_ir(assembly)
                 header, getters = factory.emit(result)
                 (self.root / "nexus_factory.h").write_text(header)
@@ -106,7 +106,7 @@ class OptionalFactoryTests(unittest.TestCase):
                 for class_name, shape, instances in factory.classes(result):
                     kind = class_name.removesuffix("_device")
                     for instance in instances:
-                        name = factory.symbol(instance["id"])
+                        name = factory.symbol(instance.id)
                         alias = ("nx_device_" if shape == "endpoint" else
                                  "nx_binding_") + name
                         aliases.append(f"const nx_{kind}_{shape}_t* const "

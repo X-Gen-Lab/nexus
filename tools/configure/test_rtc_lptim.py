@@ -38,27 +38,30 @@ class NativeTimeAssemblyTests(unittest.TestCase):
         self.assertEqual(type(records["calendar_a"].options).__name__, "NoOptions")
         with self.assertRaises(FrozenInstanceError):
             records["counter_a"].options.tick_hz = 7
-        claims = [entry for entry in result["claims"]
-                  if entry["owner"] in records]
-        self.assertEqual({entry["key"] for entry in claims},
+        claims = [entry for entry in result.claims
+                  if entry.owner in records]
+        self.assertEqual({entry.key for entry in claims},
                          {"controller:RTC0", "controller:RTC1",
                           "controller:LPTIM0", "controller:LPTIM1"})
         for item in result.controllers:
-            self.assertEqual(tuple(item["pins"]), ())
-            self.assertNotIn("irq_priority", item)
-            self.assertNotIn("dma", item)
+            self.assertEqual(item.pins, ())
+            self.assertIsNone(getattr(item.options, "irq", None))
+            self.assertEqual(item.dma, ())
 
-    def test_existing_lifecycle_emits_construct_or_explicit_reopen(self):
+    def test_lifecycle_delegates_prepare_and_stop_to_each_selected_time_provider(self):
         result = self.resolve()
         _, source = bindings.emit(result)
         self.assertEqual(source.count("static const nx_clock_t s_nx_native_time_clock"), 1)
         self.assertIn("nx_time_now_us()", source)
         for kind, name in [("rtc", "calendar_a"), ("rtc", "calendar_b"),
                            ("lptim", "counter_a"), ("lptim", "counter_b")]:
-            self.assertIn("s_nx_port_" + name + ".constructed", source)
-            self.assertIn("nx_native_" + kind + "_start(&s_nx_port_" + name, source)
-            self.assertIn("nx_native_" + kind + "_construct(&s_nx_port_" + name, source)
+            self.assertIn("nx_native_" + kind + "_prepare(&s_nx_port_" + name +
+                          ", &s_nx_native_time_clock", source)
             self.assertIn("nx_" + kind + "_port_stop(&s_nx_face_" + name, source)
+        self.assertIn("&s_nx_port_counter_a, &s_nx_native_time_clock, 32768u)",
+                      source)
+        self.assertIn("&s_nx_port_counter_b, &s_nx_native_time_clock, 1000u)",
+                      source)
         self.assertNotIn("memset(", source)
         self.assertNotIn("NativeSystem", source)
         self.assertNotIn("registry", source)

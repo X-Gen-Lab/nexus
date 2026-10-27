@@ -262,20 +262,26 @@ Descriptions add no independent acceptance rules. The resolver additionally
 checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
-`ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR`,
-`CpuProfileIR`, `InterruptProfileIR` and `ConfigurationIR`. Controller options use
-frozen GPIO, UART, SPI, I2C,
-EXTI, PWM and ADC records. SPI and I2C endpoints also hold frozen mode/speed/CS
-and address/model decisions; USB endpoints retain their bounded packet plan.
-IRQ priority and kernel-call intent are a nested record;
-ADC channel and sample sequences are tuples. Constructor emitters consume these
-named decisions directly; reviewed hardware facts retain an immutable Mapping
-projection. This does not make C factory ID aliases nominal strong types.
-`resolved.json` is their JSON projection, with the same configuration identity.
+`authored.py` parses the sole platform input, TOML schema 2, into frozen
+`AuthoredAssembly`: unresolved user intent, not admitted hardware. The production
+entry `resolve_ir()` validates exact facts, selections and conflicts before
+returning `ConfigurationIR`. Its frozen named controller, endpoint, CPU/kernel,
+memory and resource records are the sole stored decisions. They do not implement
+the dictionary interface or retain a second `values` mapping. Nested IRQ options
+are records; ADC channel/sample sequences are tuples. Reviewed JSON hardware facts
+and keyed indexes remain explicitly immutable leaf mappings; temporary resolver
+drafts remain local validation data. This is not a claim that every JSON key has
+its own nominal Python class or that C factory ID aliases are nominal strong types.
+
+Private typed source epoch 2 and serialized projection schema 1 are distinct.
+`to_dict()` derives `resolved.json` for audit, diagnostics and independent artifact
+checks; serialization does not become another configuration input. `source_fields`
+records projection-field presence, not a duplicate set of decision values.
 There is no mutable configuration cache or generated software dependency graph.
-The schema-1 JSON reader remains for explicit legacy contract fixtures and
-migration measurements. Maintained assemblies and source-SDK examples use TOML;
-JSON is never consulted as a fallback for a failed TOML assembly.
+Legacy JSON platform assemblies are rejected, including former production
+fixture entry points. Maintained test fixtures author TOML through test-only
+helpers. Historical reports keep their original bytes and read-only verification;
+they cannot reenable a legacy platform input.
 
 `providers/` explicitly admits Native, STM32F103/F407/G474/H743/U575 and
 GD32F303/F470. Each retains its documented exact part, route and mode scope.
@@ -294,7 +300,15 @@ shared-clock lifecycle emission. Each constructor returns the frozen
 `Construction` contract with explicit `state_type`, `definitions`, `initialize`,
 `stop`, `retain_on_failed_init`, `exports` and `pin_snapshots`. The common emitter
 consumes those named fields instead of inferring private C types or cleanup
-responsibility from family names. The record exists only during generation;
+responsibility from family names. `initialize` is a `DirectCall`; `stop` is a tuple
+of direct calls. Their arguments admit only explicit `Symbol`/`Address` references,
+uint32 constants, booleans, NULL and nested direct calls. They reject free-form
+expressions, casts, assignments and function-pointer/member-call expressions.
+The actual C compiler still validates symbol declarations and parameter types.
+This is a narrow call
+representation, not a complete C AST: `definitions`, `exports` and
+`face_definitions` still contain C source, including remaining family cold
+behavior. The record exists only during generation;
 no runtime registration or additional dispatch is emitted. The public resolver owns schema, reviewed facts,
 input snapshots and resource conflicts. The public binding emitter owns Nexus
 faces and common lifecycle progress. There is no package discovery or runtime
@@ -312,7 +326,7 @@ This refactor adds no firmware registration, allocation or dispatch layer.
 
 Dependency direction stays explicit: `providers/common.py` contains leaf input
 checks and frozen contracts; cross-domain option/clock/IRQ validation lives in
-`selection.py`. `ir.py` owns the legacy-controller-to-typed-IR adapter. DMA region
+`selection.py`. `ir.py` owns frozen decisions and their one-way audit projection. DMA region
 rendering lives with memory policy in `memory.py`; provider bindings do not
 import the top-level emitter. Preflight receives the selected H743 DMA admission
 callback from its emitter instead of importing that emitter back. Derived

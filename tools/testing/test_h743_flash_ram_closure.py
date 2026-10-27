@@ -56,11 +56,11 @@ class H743FlashRamClosureTests(unittest.TestCase):
         self.addCleanup(self.storage.cleanup)
         self.directory = Path(self.storage.name)
         self.images = 0
-        self.selected = gate.resolve(
+        self.selected = gate.resolve_ir(
             ROOT / "tools/configure/assemblies/h743-high-peripherals.toml",
-            root=ROOT)
-        self.unselected = gate.resolve(
-            ASSEMBLIES / "h743-high-empty.toml", root=ROOT)
+            root=ROOT).to_dict()
+        self.unselected = gate.resolve_ir(
+            ASSEMBLIES / "h743-high-empty.toml", root=ROOT).to_dict()
 
     def command(self, argv, directory):
         result = subprocess.run(argv, cwd=directory, capture_output=True,

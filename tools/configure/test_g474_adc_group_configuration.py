@@ -5,13 +5,13 @@ private provider GoogleTests. A source-record digest is not HIL qualification.
 """
 from dataclasses import FrozenInstanceError
 import hashlib
-import json
 from pathlib import Path
 import re
 import tempfile
 import tomllib
 import unittest
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import bindings, configure, factory, selected_contracts
 
 
@@ -53,16 +53,16 @@ class G474ADCGroupConfiguration(unittest.TestCase):
                     records = selected_contracts.for_configuration(result)
                     self.assertEqual({row.public_class for row in records},
                                      {"adc_group"})
-                    self.assertFalse(result["physical_qualified"])
+                    self.assertFalse(result.physical_qualified)
 
-    def test_legacy_json_adc_group_binds_the_validated_route_review(self):
+    def test_authored_adc_group_binds_the_validated_route_review(self):
         fixture = self.fixture()
         assembly = {
             "schema_version": 1,
             "board_package": str(fixture.parent / "boards/g474-adc-group"),
             "backend": "baremetal", "clock_profile": "hse24-pll170",
             "controllers": [{
-                "id": "samples", "binding": "samples",
+                "id": "samples", "binding": "samples", "authored_kind": "adc_group",
                 "mode": "regular-sequence-dma", "channels": [2, 1],
                 "sample_times": [0, 0], "reference_mv": 3300,
                 "exclusive": True, "silicon_profile": "g474-adc-group-x",
@@ -70,14 +70,14 @@ class G474ADCGroupConfiguration(unittest.TestCase):
             "devices": [], "memory_budgets": {"main_stack_bytes": 2048},
             "layout": None}
         with tempfile.TemporaryDirectory() as temporary:
-            path = Path(temporary) / "assembly.json"
-            path.write_text(json.dumps(assembly))
+            path = Path(temporary) / "assembly.toml"
+            path.write_text(render_toml(assembly))
             result = configure.resolve_ir(path, configure.ROOT)
         item, = result.controllers
         self.assertEqual((item.kind, item.controller, item.options.channels),
                          ("adc_group", "ADC1", (2, 1)))
         policy = selected_contracts.silicon_policy(result, item)
-        review, = (entry for entry in result["inputs"]
+        review, = (entry for entry in result.inputs
                    if entry["sha256"] == policy.review_sha256)
         review_bytes = (configure.ROOT / review["path"]).read_bytes()
         self.assertEqual(hashlib.sha256(review_bytes).hexdigest(),
@@ -133,7 +133,7 @@ class G474ADCGroupConfiguration(unittest.TestCase):
         for group in ("regular", "injected"):
             with self.subTest(group=group):
                 result = self.resolve(group + "-software")
-                keys = {claim["key"] for claim in result["claims"]}
+                keys = {claim.key for claim in result.claims}
                 self.assertTrue({"controller:ADC1", "controller:ADC2",
                                  "controller:ADC345", "irq:ADC1_2"} <= keys)
                 has_dma = group == "regular"
@@ -151,7 +151,7 @@ class G474ADCGroupConfiguration(unittest.TestCase):
         for group in ("regular", "injected"):
             with self.subTest(group=group):
                 result = self.resolve(group + "-timer")
-                keys = {claim["key"] for claim in result["claims"]}
+                keys = {claim.key for claim in result.claims}
                 self.assertIn("controller:TIM6", keys)
                 self.assertNotIn("irq:TIM6_DAC", keys)
                 self.assertTrue(result.trigger_plan.edges)
@@ -232,7 +232,7 @@ class G474ADCGroupConfiguration(unittest.TestCase):
         result = self.resolve()
         item, = result.controllers
         policy = selected_contracts.silicon_policy(result, item)
-        review = [entry for entry in result["inputs"]
+        review = [entry for entry in result.inputs
                   if entry["sha256"] == policy.review_sha256]
         self.assertEqual(len(review), 1)
         self.assertTrue(re.fullmatch(

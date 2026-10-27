@@ -41,8 +41,8 @@ class Gd32ExtiGenerationTests(unittest.TestCase):
         initialize = start.index("result.primary = nx_gd32_exti_initialize(")
         self.assertLess(start.index("s_nx_platform_initialized = 1u;"),
                         initialize)
-        self.assertIn("s_nx_port_edge3.initialized ? "
-                      "nx_exti_port_stop(&s_nx_face_edge3) : NX_SUCCESS", source)
+        self.assertIn("nx_gd32_exti_close(&s_nx_port_edge3)", source)
+        self.assertNotIn("s_nx_port_edge3.initialized ?", source)
         self.assertIn("result.cleanup = "
                       "nx_platform_stop_impl(diagnostic, true);", start)
         self.assertIn("if (status_0 != NX_SUCCESS) { return status_0; }", source)

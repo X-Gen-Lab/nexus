@@ -75,6 +75,32 @@ static bool chain_layout(const nx_stm32u575_uart_gpdma_state_t* s) {
                           sizeof(*facts));
 }
 
+static bool chain_cold_layout(const nx_stm32u575_uart_gpdma_state_t* s,
+                              const nx_stm32u575_uart_gpdma_config_t* config) {
+    const nx_stm32u575_uart_chain_facts_t* facts =
+        (const nx_stm32u575_uart_chain_facts_t*)config->facts;
+    if (facts->nodes == NULL || (uintptr_t)facts->nodes % 32U != 0U ||
+        (uintptr_t)facts->nodes > UINTPTR_MAX - CHAIN_BYTES)
+        return false;
+    const uintptr_t begin = NX_U575_CHAIN_NODE_BUS(facts->nodes);
+    if (begin < CHAIN_SRAM_BEGIN || begin >= CHAIN_SRAM_END ||
+        begin % 32U != 0U || CHAIN_BYTES > CHAIN_SRAM_END - begin ||
+        (begin >> 16U) != ((begin + CHAIN_BYTES - 1U) >> 16U))
+        return false;
+    const void* spans[2] = {facts->nodes, (const void*)begin};
+    for (unsigned i = 0U; i < 2U; ++i) {
+        if (chain_overlap(spans[i], CHAIN_BYTES, s, sizeof(*s)) ||
+            chain_overlap(spans[i], CHAIN_BYTES, config, sizeof(*config)) ||
+            chain_overlap(spans[i], CHAIN_BYTES, facts, sizeof(*facts)) ||
+            chain_overlap(spans[i], CHAIN_BYTES, config->rx_storage,
+                          config->rx_capacity) ||
+            chain_overlap(spans[i], CHAIN_BYTES, &g_nx_stm32u575_system,
+                          sizeof(g_nx_stm32u575_system)))
+            return false;
+    }
+    return true;
+}
+
 static uint32_t chain_address(const nx_stm32u575_uart_chain_node_t* node) {
     return (uint32_t)NX_U575_CHAIN_NODE_BUS(node) & DMA_CLLR_LA;
 }
@@ -144,11 +170,14 @@ static bool chain_withdraw(nx_stm32u575_uart_gpdma_state_t* s) {
 #define NX_U575_GPDMA_COUNT(request)                                           \
     ((uint32_t)((request)->length > UINT16_MAX ? UINT16_MAX                    \
                                                : (request)->length))
-#define NX_U575_GPDMA_TCEM                 DMA_CTR2_TCEM
-#define NX_U575_GPDMA_WITHDRAW(s)          chain_withdraw(s)
-#define nx_stm32u575_uart_gpdma_initialize nx_stm32u575_uart_chain_initialize
-#define nx_stm32u575_uart_gpdma_irq        nx_stm32u575_uart_chain_irq
-#define nx_stm32u575_uart_gpdma_uart_irq   nx_stm32u575_uart_chain_uart_irq
+#define NX_U575_GPDMA_TCEM                  DMA_CTR2_TCEM
+#define NX_U575_GPDMA_WITHDRAW(s)           chain_withdraw(s)
+#define NX_U575_GPDMA_FACTS_BYTES           sizeof(nx_stm32u575_uart_chain_facts_t)
+#define NX_U575_GPDMA_COLD_VALID(s, config) chain_cold_layout((s), (config))
+#define nx_stm32u575_uart_gpdma_prepare     nx_stm32u575_uart_chain_prepare
+#define nx_stm32u575_uart_gpdma_initialize  nx_stm32u575_uart_chain_initialize
+#define nx_stm32u575_uart_gpdma_irq         nx_stm32u575_uart_chain_irq
+#define nx_stm32u575_uart_gpdma_uart_irq    nx_stm32u575_uart_chain_uart_irq
 #include "stm32u575_uart_gpdma_impl.h"
 
 const nx_uart_ops_t nx_stm32u575_uart_chain_ops = {

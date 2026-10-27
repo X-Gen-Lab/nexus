@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
 from tools.configure import runtime
 
@@ -24,14 +25,14 @@ class BundleTransactionTests(unittest.TestCase):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, target)
-        self.assembly = self.root / "assembly.json"
+        self.assembly = self.root / "assembly.toml"
         self.authored = {
             "schema_version": 1,
             "board_package": "boards/native_reference",
             "backend": "native", "clock_profile": "model",
             "controllers": [], "devices": [],
             "memory_budgets": {"main_stack_bytes": 2048}, "layout": None}
-        self.assembly.write_text(json.dumps(self.authored))
+        self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
         self.output = self.root / "generated"
 
     def configure(self):
@@ -50,7 +51,7 @@ class BundleTransactionTests(unittest.TestCase):
     def test_owned_marker_never_authorizes_deleting_authored_input(self):
         self.output.mkdir()
         (self.output / ".nexus-config-bundle").write_text("owned")
-        authored = self.output / "assembly.json"
+        authored = self.output / "assembly.toml"
         authored.write_bytes(self.assembly.read_bytes())
         expected = authored.read_bytes()
         with self.assertRaisesRegex(gate.ConfigurationError, "input"):
@@ -62,7 +63,7 @@ class BundleTransactionTests(unittest.TestCase):
         shutil.copytree(self.root / "boards/native_reference", package)
         (package / ".nexus-config-bundle").write_text("owned")
         self.authored["board_package"] = "external-board"
-        self.assembly.write_text(json.dumps(self.authored))
+        self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
         expected = (package / "board.json").read_bytes()
         with self.assertRaisesRegex(gate.ConfigurationError, "input"):
             gate.configure(self.assembly, package, self.root)
@@ -172,7 +173,7 @@ class BundleTransactionTests(unittest.TestCase):
         self.configure()
         before = self.timestamps()
         self.authored["memory_budgets"]["main_stack_bytes"] = 4096
-        self.assembly.write_text(json.dumps(self.authored))
+        self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
         self.configure()
         after = self.timestamps()
         self.assertNotEqual(before["memory.ld"][0], after["memory.ld"][0])
@@ -225,7 +226,7 @@ class BundleTransactionTests(unittest.TestCase):
         self.authored["devices"] = [{"id": "sensor", "controller": "bus",
                                       "driver": "spi-endpoint", "mode": 3,
                                       "max_hz": 1000000, "model_bytes": 32}]
-        self.assembly.write_text(json.dumps(self.authored))
+        self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
         result = gate.resolve_ir(self.assembly, self.root)
         options = result.devices[0].options
         self.assertEqual(options.mode, 3)

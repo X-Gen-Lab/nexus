@@ -246,4 +246,4 @@ def validate_endpoint_clock(speed, *, clock_plan):
 
 
 def configuration_header(result):
-    return [f'#define NEXUS_SOC_CACHE_MASK {cache_mask(result["clock_profile"])}u']
+    return [f'#define NEXUS_SOC_CACHE_MASK {cache_mask(result.clock_profile)}u']

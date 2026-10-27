@@ -158,6 +158,73 @@ TEST_F(U575UartGpdma, ColdGateAndBothIrqsAreProvedBeforeReady) {
     g_u575_uart_gpdma.before_write = nullptr;
 }
 
+TEST_F(U575UartGpdma, ColdPrepareBindsAndStartsTheSelectedStaticOwner) {
+    const nx_stm32u575_uart_gpdma_config_t config{
+        &facts,
+        ring,
+        sizeof(ring),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 126U, 4U, 0U},
+        4000000U,
+        8U};
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    EXPECT_EQ(&facts, state.facts);
+    EXPECT_EQ(ring, state.uart.rx_storage);
+    EXPECT_TRUE(state.uart.initialized);
+    EXPECT_TRUE(g_u575_model.irq_enabled[USART1_IRQn]);
+    EXPECT_TRUE(g_u575_model.irq_enabled[GPDMA1_Channel0_IRQn]);
+}
+
+TEST_F(U575UartGpdma, ColdPrepareRefusesLiveAndRetainedRebindingUnchanged) {
+    const nx_stm32u575_uart_gpdma_config_t config{
+        &facts,
+        ring,
+        sizeof(ring),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 126U, 4U, 0U},
+        4000000U,
+        8U};
+    state.uart.retained = true;
+    const auto before = state;
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    state.uart.retained = false;
+    state.uart.wake_publishers = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    EXPECT_EQ(1U, state.uart.wake_publishers);
+    EXPECT_EQ(writes, g_u575_model.writes);
+    state.uart.wake_publishers = 0U;
+}
+
+TEST_F(U575UartGpdma, ColdPrepareRejectsForeignRouteAndStorageAliases) {
+    nx_stm32u575_uart_gpdma_config_t config{&facts,
+                                            ring,
+                                            sizeof(ring),
+                                            115200U,
+                                            {NX_IRQ_KERNEL_NONE, 126U, 4U, 0U},
+                                            4000000U,
+                                            8U};
+    const auto before = state;
+    const auto writes = g_u575_model.writes;
+    facts.request = 26U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    facts.request = 25U;
+    config.rx_storage = reinterpret_cast<uint8_t*>(&state);
+    config.rx_capacity = sizeof(state);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    config.rx_storage = reinterpret_cast<uint8_t*>(&config);
+    config.rx_capacity = sizeof(config);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_uart_gpdma_prepare(&state, &config));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(writes, g_u575_model.writes);
+}
+
 TEST_F(U575UartGpdma, ByteProgrammingAndFreshFlagsPrecedeEveryEnable) {
     ASSERT_NO_FATAL_FAILURE(Open());
     GPDMA1_Channel0_NS->CSR |= DMA_CSR_TCF | DMA_CSR_SUSPF;

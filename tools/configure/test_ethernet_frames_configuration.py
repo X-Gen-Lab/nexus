@@ -41,7 +41,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
             with self.subTest(family=family):
                 result = self.resolve(family)
                 item, = result.controllers
-                self.assertEqual(result['part'], part)
+                self.assertEqual(result.part, part)
                 self.assertEqual((item.kind, item.controller, item.mode),
                                  ('eth_frames', controller,
                                   'rmii-vlan-sg-ptp'))
@@ -53,7 +53,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertLessEqual(options.clock_domain, 0xffffffff)
                 with self.assertRaises(FrozenInstanceError):
                     options.clock_domain = 5
-                self.assertFalse(result['physical_qualified'])
+                self.assertFalse(result.physical_qualified)
 
     def test_factory_uses_distinct_frame_face_and_paired_mdio_without_io(self):
         for family in ('f407zg', 'gd470'):

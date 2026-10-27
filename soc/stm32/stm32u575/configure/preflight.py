@@ -43,7 +43,7 @@ def selected_preflight(result, *, dma_conditions=None):
             source += _reject(f'(NX_{hook}_READ(&RCC->{gate_register}) & RCC_{gate_register}_{uart}EN) != 0u')
             source += _reject(f'(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u')
             source += _reject(f'!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)')
-            if item.get('mode') in {'dma-tx', 'dma-chain-tx'}:
+            if item.mode in {'dma-tx', 'dma-chain-tx'}:
                 source += _reject('!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)')
         elif item.kind in {'spi', 'pwm', 'i2c', 'adc'}:
             register = 'APB2ENR' if item.controller == 'SPI1' else 'AHB3ENR' if item.controller == 'ADC4' else 'APB1ENR1'
@@ -61,16 +61,15 @@ def selected_preflight(result, *, dma_conditions=None):
             line = int(item.controller[-1])
             source += _reject(f'!NX_U575_IRQ_AVAILABLE((IRQn_Type)EXTI{line}_IRQn)')
             source += _reject(f'((NX_U575_READ(&EXTI->IMR1) | NX_U575_READ(&EXTI->EMR1) | NX_U575_READ(&EXTI->RTSR1) | NX_U575_READ(&EXTI->FTSR1) | NX_U575_READ(&EXTI->RPR1) | NX_U575_READ(&EXTI->FPR1)) & {1 << line}u) != 0u')
-        for pin in item['pins']:
+        for pin in item.pins:
             name = pin['pin']
             pads.setdefault(name[1], set()).add(int(name[2:]))
-    if 'claims' in result:
-        owners = {item.id for item in result.controllers}
-        owners.update((item['id'] for item in result['devices']))
-        for claim in owned_claims(result, owners):
-            if claim['key'].startswith('pin:'):
-                pin = claim['key'][4:]
-                pads.setdefault(pin[1], set()).add(int(pin[2:]))
+    owners = {item.id for item in result.controllers}
+    owners.update((item.id for item in result.devices))
+    for claim in owned_claims(result, owners):
+        if claim.key.startswith('pin:'):
+            pin = claim.key[4:]
+            pads.setdefault(pin[1], set()).add(int(pin[2:]))
     for port, numbers in sorted(pads.items()):
         mask = sum((1 << number for number in numbers))
         if port == 'G' and mask & ~3:

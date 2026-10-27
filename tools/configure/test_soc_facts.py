@@ -151,13 +151,13 @@ class ImportedDependencyContractTests(unittest.TestCase):
     def test_import_has_a_typed_dependency_and_same_locked_input_digest(self):
         result = self.resolve()
         digest = hashlib.sha256(self.lock_path.read_bytes()).hexdigest()
-        entry = next((item for item in result["source_dependencies"]
+        entry = next((item for item in result.source_dependencies
                       if item["path"] == "vendors/gigadevice/gd32f4xx"), None)
         self.assertIsNotNone(entry, "Imported SDK must retain source identity")
         self.assertEqual(entry["kind"], "vendor-source-import")
         self.assertEqual(entry["lock_sha256"], digest)
         self.assertEqual(entry["version"], "3.3.3")
-        inputs = {item["path"]: item["sha256"] for item in result["inputs"]}
+        inputs = {item["path"]: item["sha256"] for item in result.inputs}
         self.assertEqual(inputs["vendors/gigadevice/gd32f4xx/source.lock.json"],
                          digest)
 
@@ -190,9 +190,9 @@ class ImportedDependencyContractTests(unittest.TestCase):
         lock["version"] = "3.3.3-reviewed-fixture"
         self.lock_path.write_text(json.dumps(lock))
         after = self.resolve()
-        self.assertNotEqual(before["configuration_sha256"],
-                            after["configuration_sha256"])
-        imports = [item for item in after["source_dependencies"]
+        self.assertNotEqual(before.configuration_sha256,
+                            after.configuration_sha256)
+        imports = [item for item in after.source_dependencies
                    if item.get("kind") == "vendor-source-import"]
         self.assertEqual(len(imports), 1, "Changed lock must retain its import")
         self.assertEqual(imports[0]["version"], "3.3.3-reviewed-fixture")

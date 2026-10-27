@@ -3,6 +3,7 @@
 FreeRTOS profiles and the strict ThreadX static-port policy remain independent.
 They create no tasks, queues, Tick hardware, buffers or product recovery policy.
 """
+from dataclasses import replace
 from types import MappingProxyType
 
 from tools.configure.ir import CpuProfileIR, KernelProfileIR
@@ -86,7 +87,7 @@ def resolve(choices, cpu, clock_hz):
         fail("Unsupported OS security model")
     if security == "split" and (cpu.arch not in {
             "cortex-m23", "cortex-m33", "cortex-m55", "cortex-m85"} or
-            cpu["cpu"]["security"] != "nonsecure"):
+            cpu.cpu["security"] != "nonsecure"):
         fail("Split kernel security requires explicit v8-M Nonsecure CPU facts")
     if security == "split":
         port = f"GCC/ARM_CM{cpu.arch[8:]}/non_secure"
@@ -106,7 +107,7 @@ def resolve(choices, cpu, clock_hz):
         fail("Unsupported user I/O policy")
     if user_io == "gpio-write" and (
             not protected or security != "single" or
-            cpu.arch != "cortex-m33" or cpu["cpu"]["security"] != "single" or
+            cpu.arch != "cortex-m33" or cpu.cpu["security"] != "single" or
             cpu.definitions["NEXUS_CPU_MPU_REGIONS"] != 8 or
             options["tickless"] or options["tick_source"] != "systick"):
         fail("GPIO user I/O requires the exact single-world MPU-v2 M33 profile")
@@ -183,21 +184,11 @@ def bind(cpu, kernel):
     """Attach selected logical syscall policy without mutating physical facts."""
     if kernel is None:
         return cpu
-    record = cpu.to_dict()
-    record["irq"]["syscall_priority"] = kernel.syscall_priority
-    record["irq"]["kernel_port"] = kernel.kernel_port
-    record["irq"]["mask_kind"] = kernel.kernel_policy
-    record["definitions"]["NEXUS_IRQ_KERNEL_POLICY"] = kernel.definitions[
-        "NEXUS_IRQ_KERNEL_POLICY"]
-    return CpuProfileIR.from_validated(record)
-
-
-def from_validated(record):
-    """Recover the backend-specific typed decision without inventing features."""
-    if record.get("backend") == "threadx":
-        from tools.configure import threadx
-        return threadx.ThreadXKernelProfileIR.from_validated(record)
-    return KernelProfileIR.from_validated(record)
+    irq = replace(cpu.irq, syscall_priority=kernel.syscall_priority,
+                  kernel_port=kernel.kernel_port, mask_kind=kernel.kernel_policy)
+    definitions = MappingProxyType({**cpu.definitions,
+        "NEXUS_IRQ_KERNEL_POLICY": kernel.definitions["NEXUS_IRQ_KERNEL_POLICY"]})
+    return replace(cpu, irq=irq, definitions=definitions)
 
 
 def header_lines(kernel):

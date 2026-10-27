@@ -27,6 +27,20 @@ typedef struct {
     uint8_t priority;
 } nx_stm32u575_uart_gpdma_facts_t;
 
+/** \brief Immutable cold assembly; no descriptor is retained at runtime.
+ * \note Facts and RX storage outlive the owner. The descriptor itself is read
+ *       only during prepare; it must not alias mutable state or RX storage.
+ */
+typedef struct {
+    const nx_stm32u575_uart_gpdma_facts_t* facts;
+    uint8_t* rx_storage;
+    size_t rx_capacity;
+    uint32_t baud;
+    nx_irq_policy_t irq_policy;
+    uint32_t clock_hz;
+    uint32_t poll_limit;
+} nx_stm32u575_uart_gpdma_config_t;
+
 /** \brief Selected-only extension, one UART hardware owner and wake sink.
  * \note The ordinary IRQ-byte state/ops are unchanged. The prefix owns IRQ RX
  *       metadata but ordinary byte TX IRQ/service must not process DMA TX.
@@ -47,6 +61,18 @@ typedef struct {
 } nx_stm32u575_uart_gpdma_state_t;
 
 extern const nx_uart_ops_t nx_stm32u575_uart_gpdma_ops;
+
+/** \brief Bind a cold owner and prepare its exact USART1 pins and hardware.
+ * \param[in,out] port: Serialized privileged task owner without retained loans.
+ * \param[in] config: Explicit resources, byte ring and finite ACK budget.
+ * \return Software rejection leaves binding unchanged. Hardware failure may
+ *         retain effects and requires the ordinary checked stop path.
+ * \note Platform owns the enclosing pin lease. Keep it until checked whole
+ *       stop; prepare does not revoke a request or an outstanding publisher.
+ */
+nx_result_t
+nx_stm32u575_uart_gpdma_prepare(nx_stm32u575_uart_gpdma_state_t* port,
+                                const nx_stm32u575_uart_gpdma_config_t* config);
 
 /** \brief Cold exclusive TZEN0 USART1 owner with persistent DMAT request gate.
  * \param[in,out] port: Static state, exact facts and disjoint byte RX ring.

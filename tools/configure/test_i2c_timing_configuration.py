@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.configure import bindings, configure
 
@@ -62,6 +63,17 @@ class I2CTimingConfiguration(unittest.TestCase):
             with self.subTest(change=change), self.assertRaisesRegex(
                     ValueError, "clock|nominal|source"):
                 self.resolve(**change)
+
+    def test_solver_result_reaches_selection_without_json_reconstruction(self):
+        from tools.configure.i2c_timing import I2cTimingIR
+
+        with patch.object(I2cTimingIR, "to_dict",
+                          side_effect=AssertionError("output-only projection")):
+            result = self.resolve()
+        item = next(item for item in result.controllers if item.kind == "i2c")
+        self.assertGreater(item.options.timing.timingr, 0)
+        self.assertEqual(item.options.timing.source,
+                         "software test declared envelope; not measured")
 
     def test_unimplemented_filter_choices_cannot_be_calculation_only(self):
         for changes in (dict(digital_filter_cycles=1),

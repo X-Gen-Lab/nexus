@@ -44,23 +44,23 @@ def selected_preflight(result, *, dma_conditions=None):
             if item.kind == 'eth_frames':
                 clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_ETHMACPTPEN'))
         elif item.kind == 'exti':
-            line = int(item['pins'][0]['pin'][2:])
+            line = int(item.pins[0]['pin'][2:])
             registers = 'EXTI->IMR | EXTI->EMR | EXTI->PR'
             source += _reject(f'(({registers}) & {1 << line}u) != 0u')
     for item in claims:
-        timer = item['key'].removeprefix('controller:')
+        timer = item.key.removeprefix('controller:')
         if re.fullmatch('TIM[1349]|TIMER[0238]', timer):
             clocks.add(_clock(timer))
-    if result.get('can_domain') is not None:
+    if result.can_domain is not None:
         clocks.add(_clock('CAN1'))
     for register, mask in sorted(clocks):
         source += _reject(f'({register} & ({mask})) != 0u')
-    for key in sorted({item['key'] for item in claims if item['key'].startswith('irq:')}):
+    for key in sorted({item.key for item in claims if item.key.startswith('irq:')}):
         vector = key.removeprefix('irq:') + '_IRQn'
         bank = f'(uint32_t){vector} / 32u'
         mask = f'(1u << ((uint32_t){vector} % 32u))'
         source += _reject(f'((NVIC->ISER[{bank}] | NVIC->ISPR[{bank}] | NVIC->IABR[{bank}]) & {mask}) != 0u')
-    for key in sorted({item['key'] for item in claims if item['key'].startswith('dma:')}):
+    for key in sorted({item.key for item in claims if item.key.startswith('dma:')}):
         match = re.fullmatch('dma:(DMA[0-9]+):stream([0-7])', key)
         if match is None:
             fail('No maintained selected DMA lane admission: ' + key)

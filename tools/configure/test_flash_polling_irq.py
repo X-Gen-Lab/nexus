@@ -51,13 +51,13 @@ class FlashPollingIrqTests(unittest.TestCase):
                     [("physical", controller, "poll-word")],
                     [(item.id, item.controller, item.mode)
                      for item in result.controllers])
-                claims = [item for item in result["claims"]
-                          if item["key"] == "irq:" + controller]
+                claims = [item for item in result.claims
+                          if item.key == "irq:" + controller]
                 self.assertEqual(1, len(claims))
-                self.assertEqual("physical", claims[0]["owner"])
-                self.assertEqual("poll-word", claims[0]["mode"])
-                self.assertNotIn("irq:4", {item["key"]
-                                           for item in result["claims"]})
+                self.assertEqual("physical", claims[0].owner)
+                self.assertEqual("poll-word", claims[0].mode)
+                self.assertNotIn("irq:4", {item.key
+                                           for item in result.claims})
                 self.assertEqual("irq:" + controller,
                                  gate.normalize_resource("irq:" + vector))
 
@@ -99,7 +99,7 @@ class FlashPollingIrqTests(unittest.TestCase):
                     self.assembly(label, selected=False), ROOT)
                 self.assertFalse(result.controllers)
                 self.assertNotIn("irq:" + controller,
-                                 {item["key"] for item in result["claims"]})
+                                 {item.key for item in result.claims})
 
     def test_unselected_flash_allows_a_board_reserved_completion_irq(self):
         for label, _, controller, _ in CASES:
@@ -109,10 +109,10 @@ class FlashPollingIrqTests(unittest.TestCase):
                         label, selected=False,
                         reserved="irq:" + controller + suffix), ROOT)
                     self.assertFalse(result.controllers)
-                    claims = [item for item in result["claims"]
-                              if item["key"] == "irq:" + controller]
+                    claims = [item for item in result.claims
+                              if item.key == "irq:" + controller]
                     self.assertEqual(1, len(claims))
-                    self.assertEqual("board-reserved", claims[0]["owner"])
+                    self.assertEqual("board-reserved", claims[0].owner)
 
     def test_polling_lease_does_not_generate_an_isr_or_irq_capability(self):
         self.assertFalse(mode_traits("flash", "poll-word").irq)

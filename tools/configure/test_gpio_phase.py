@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import bindings, configure as gate, gpio_phase
 from tools.configure.providers import maintained
 
@@ -83,7 +84,7 @@ class ColdPinStorageTests(unittest.TestCase):
                     "tests/contracts/multi_controller_assembly/" + label
                     + ".toml")
                 controller_pins = {pin["pin"] for item in result.controllers
-                                   for pin in item["pins"]}
+                                   for pin in item.pins}
                 self.assertNotIn(hidden, controller_pins)
                 self.assertIn(hidden, gpio_phase.selected_pins(result))
 
@@ -119,7 +120,7 @@ class ColdPinStorageTests(unittest.TestCase):
             with self.subTest(identity=identity), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 data = gate.load_assembly(
-                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml")
+                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml").to_dict()
                 board_path = Path(data["board_package"]) / "board.json"
                 board = json.loads(board_path.read_text())
                 if custom_reservation:
@@ -129,8 +130,8 @@ class ColdPinStorageTests(unittest.TestCase):
                 (root / "board.json").write_text(json.dumps(board))
                 data["board_package"] = str(root)
                 data["controllers"][0]["id"] = identity
-                assembly = root / "assembly.json"
-                assembly.write_text(json.dumps(data))
+                assembly = root / "assembly.toml"
+                assembly.write_text(render_toml(data))
                 result = gate.resolve_ir(assembly)
                 self.assertNotIn("PA13", gpio_phase.selected_pins(result))
                 self.assertNotIn("PA14", gpio_phase.selected_pins(result))

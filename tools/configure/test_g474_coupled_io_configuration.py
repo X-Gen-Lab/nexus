@@ -47,7 +47,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
         self.assertEqual(item.options.sample_times, (0,))
         with self.assertRaises(FrozenInstanceError):
             item.options.trigger_ticks = 51
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_pwm_adc_factory_does_not_expose_independently_startable_subfaces(self):
         result = self.resolve("pwm-adc")
@@ -67,7 +67,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
 
     def test_pwm_adc_owns_every_subresource_and_real_trigger_edge(self):
         result = self.resolve("pwm-adc")
-        owners = {claim["key"]: claim["owner"] for claim in result["claims"]}
+        owners = {claim.key: claim.owner for claim in result.claims}
         expected = {"controller:TIM1", "controller:ADC1", "controller:ADC2",
                     "controller:ADC345", "controller:COMP1", "controller:TIM15",
                     "dma:DMA1:stream1", "controller:DMAMUX1_Channel0",
@@ -134,7 +134,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
                          (256, 2047, "standard", 0))
         with self.assertRaises(FrozenInstanceError):
             filter_.mask = 0
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_can_fd_factory_is_distinct_from_classic_can(self):
         result = self.resolve("can-fd")
@@ -152,7 +152,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
 
     def test_can_fd_owns_physical_ram_and_both_vectors_with_one_publisher(self):
         result = self.resolve("can-fd")
-        claims = {claim["key"] for claim in result["claims"]}
+        claims = {claim.key for claim in result.claims}
         self.assertTrue({"controller:FDCAN1", "message-ram:FDCAN1",
                          "clock:FDCAN", "irq:FDCAN1_IT0",
                          "irq:FDCAN1_IT1"}.issubset(claims))
@@ -202,15 +202,15 @@ class G474CoupledIOConfiguration(unittest.TestCase):
                          ("can_fd", "FDCAN1", "iso-fd-normal"))
         self.assertEqual(item.options, loopback.controllers[0].options)
         def physical_claims(result):
-            return [(claim["key"], claim["owner"], claim["source"])
-                    for claim in result["claims"]]
+            return [(claim.key, claim.owner, claim.source)
+                    for claim in result.claims]
         self.assertEqual(physical_claims(normal), physical_claims(loopback))
         for result, mode in ((normal, "iso-fd-normal"),
                              (loopback, "iso-fd-loopback")):
-            self.assertTrue(all(claim["mode"] == mode
-                                for claim in result["claims"]
-                                if claim["owner"] == "fieldbus"))
-        self.assertFalse(normal["physical_qualified"])
+            self.assertTrue(all(claim.mode == mode
+                                for claim in result.claims
+                                if claim.owner == "fieldbus"))
+        self.assertFalse(normal.physical_qualified)
         self.assertEqual(item.options.message_ram_words, 212)
         with self.assertRaises(FrozenInstanceError):
             item.mode = "iso-fd-loopback"
@@ -259,7 +259,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
                                   (output / "nexus_factory.h").read_text())
         for name in ("pwm-group", "timer-capture", "encoder"):
             result = configure.resolve_ir(self.root / (name + ".toml"))
-            self.assertFalse(result["physical_qualified"])
+            self.assertFalse(result.physical_qualified)
 
 
 if __name__ == "__main__":

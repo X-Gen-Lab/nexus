@@ -158,6 +158,42 @@ TEST_F(U575UartChain, PackedNodesAndPersistentDmatPrecedeFirstEnable) {
     g_u575_uart_gpdma.before_write = nullptr;
 }
 
+TEST_F(U575UartChain, ColdPrepareBindsTheExactChainWithoutChangingNodes) {
+    const nx_stm32u575_uart_gpdma_config_t config{
+        &facts.base,
+        ring,
+        sizeof(ring),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 126U, 4U, 0U},
+        4000000U,
+        8U};
+    state = {};
+    nodes[0].block = 17U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_uart_chain_prepare(&state, &config));
+    EXPECT_EQ(&facts.base, state.facts);
+    EXPECT_EQ(17U, nodes[0].block);
+    EXPECT_TRUE(state.uart.initialized);
+}
+
+TEST_F(U575UartChain, ColdPrepareRejectsMisalignedNodesBeforeBindingOrPins) {
+    const nx_stm32u575_uart_gpdma_config_t config{
+        &facts.base,
+        ring,
+        sizeof(ring),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 126U, 4U, 0U},
+        4000000U,
+        8U};
+    const auto before = state;
+    const auto writes = g_u575_model.writes;
+    facts.nodes =
+        reinterpret_cast<nx_stm32u575_uart_chain_node_t*>(kSram + 0x1004U);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_uart_chain_prepare(&state, &config));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(writes, g_u575_model.writes);
+}
+
 TEST_F(U575UartChain, HardwareFetchesNextBlockWithoutServiceOrIntermediateTcf) {
     ASSERT_NO_FATAL_FAILURE(Open());
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&face, &request));

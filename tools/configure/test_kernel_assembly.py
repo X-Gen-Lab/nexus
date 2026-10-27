@@ -47,23 +47,23 @@ class KernelAssemblyTests(unittest.TestCase):
             with self.subTest(board=board):
                 result = self.resolve(self.assembly(board=board))
                 self.assertEqual(result.kernel.backend, "threadx")
-                self.assertNotIn("idle_stack_words", result.kernel)
-                claims = {item["key"] for item in result["claims"]}
+                self.assertFalse(hasattr(result.kernel, "idle_stack_words"))
+                claims = {item.key for item in result.claims}
                 self.assertIn("irq:PendSV", claims)
                 self.assertIn("irq:SysTick", claims)
                 self.assertNotIn("irq:SVC", claims)
                 self.assertIn("ext/threadx", {item["path"] for item in
-                                               result["source_dependencies"]})
+                                               result.source_dependencies})
 
     def test_threadx_native_is_host_architecture_with_no_fake_exceptions(self):
         result = self.resolve(self.assembly(board="native_reference", uart=False))
         self.assertEqual(result.cpu_profile.arch, "native")
         self.assertEqual(result.kernel.tick_source, "host")
-        self.assertFalse(any(item["key"].startswith("irq:") for item in result["claims"]))
+        self.assertFalse(any(item.key.startswith("irq:") for item in result.claims))
 
     def test_external_threadx_tick_does_not_claim_systick(self):
         result = self.resolve(self.assembly(options='tick_source="external"\n'))
-        claims = {item["key"] for item in result["claims"]}
+        claims = {item.key for item in result.claims}
         self.assertIn("irq:PendSV", claims)
         self.assertNotIn("irq:SysTick", claims)
 

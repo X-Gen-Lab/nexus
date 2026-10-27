@@ -1,4 +1,5 @@
 """Cold-only generated glue for two independently selected G474 owners."""
+from tools.configure.calls import DirectCall
 from collections.abc import Mapping
 
 from tools.configure.providers.common import (
@@ -92,7 +93,7 @@ def _pwm_adc(item, result, binding):
         "    return NX_SUCCESS;", "}",
     ]
     return Construction("nx_stm32g474_pwm_adc_state_t", tuple(lines),
-                        f"prepare_{name}()", (f"stop_{name}()",), True)
+                        DirectCall(f"prepare_{name}"), (DirectCall(f"stop_{name}"),), True)
 
 
 def _can_fd(item, result, binding):
@@ -114,7 +115,7 @@ def _can_fd(item, result, binding):
         for value in options.filters:
             lines.append(f"    {{ {value.id}u, {value.mask}u, NX_CAN_{value.format.upper()}, {value.fifo}u }},")
         lines.append("};")
-    irq = result["irq"]
+    irq = result.irq
     lines += [
         f"static nx_result_t prepare_{name}(void) {{",
         f"    if ({state}.retained || {domain}.retained || {domain}.acquired_mask != 0u) {{ return NX_ERROR_BUSY; }}",
@@ -125,7 +126,7 @@ def _can_fd(item, result, binding):
         f"    {state}.filter_count = {len(options.filters)}u;",
         f"    {state}.events = s_nx_events_{name};",
         f"    {state}.capacity = {options.event_capacity}u;",
-        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
         f"    {state}.drain_timeout_us = {options.drain_timeout_us}u;",
         f"    {state}.poll_limit = {options.poll_limit}u;",
         f"    nx_result_t status = nx_stm32g474_fdcan_domain_initialize(&{domain});",
@@ -149,7 +150,7 @@ def _can_fd(item, result, binding):
         f"    return nx_stm32g474_fdcan_domain_stop(&{domain});", "}",
     ]
     return Construction("nx_stm32g474_fdcan_state_t", tuple(lines),
-                        f"prepare_{name}()", (f"stop_{name}()",), True)
+                        DirectCall(f"prepare_{name}"), (DirectCall(f"stop_{name}"),), True)
 
 
 MODES = {"pwm_adc": ("finite-regular-dma",),

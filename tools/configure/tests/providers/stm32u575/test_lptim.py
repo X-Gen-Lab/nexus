@@ -47,7 +47,7 @@ class U575LptimTests(unittest.TestCase):
                          (item.kind, item.controller, item.mode))
         self.assertEqual(1000000, item.options.tick_hz)
         self.assertEqual(5, item.options.irq.priority)
-        self.assertEqual((), tuple(item['pins']))
+        self.assertEqual((), item.pins)
         _, source = bindings.emit(result)
         self.assertIn('nx_stm32u575_lptim_initialize(', source)
         self.assertIn('nx_stm32u575_lptim_irq(', source)

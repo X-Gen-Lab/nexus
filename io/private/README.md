@@ -11,8 +11,7 @@ and clock facts, IRQ/DMA bindings and checked silicon semantics. Textual provide
 templates bind direct operations macros to concrete readonly tables; they do not
 create a runtime mode registry or a forwarding layer.
 
-Use `soc/common/` for a shared, silicon-specific register algorithm such as I2C
-V1. `io/src/api/` owns public checked dispatch, `io/src/mechanisms/` owns reusable
+Use `drivers/` for a reviewed shared register algorithm such as I2C V1. `io/src/api/` owns public checked dispatch, `io/src/mechanisms/` owns reusable
 I/O rules, and `io/src/controllers/` owns shared controller engines. Use this
 directory for private structures, external hardware boundaries or direct provider
 templates. Native models live in `soc/native/drivers/`; MCU wrappers live under

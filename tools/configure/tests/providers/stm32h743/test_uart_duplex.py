@@ -31,14 +31,14 @@ class H743DuplexConfiguration(unittest.TestCase):
                 result = configure.resolve_ir(source)
                 item = result.controllers[0]
                 self.assertEqual(("DMA1:stream0:channel46",
-                                  "DMA1:stream1:channel45"), tuple(item["dma"]))
+                                  "DMA1:stream1:channel45"), item.dma)
                 record = selected_contracts.describe(item)
                 self.assertEqual("double_buffer", record.continuity)
                 self.assertEqual((32, "65504") if cached else
                                  (1, "UINT16_MAX"),
                                  (record.buffer_alignment,
                                   record.max_transfer_units))
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
 
     def test_generation_has_one_uart_owner_and_both_explicit_vectors(self):
         with tempfile.TemporaryDirectory() as directory:

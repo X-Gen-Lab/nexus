@@ -225,9 +225,12 @@ class ConsumerAbiTests(unittest.TestCase):
         subprocess.run(["git", "-C", str(source), "add", "."], check=True)
         subprocess.run(["git", "-C", str(source), "-c", "user.name=Fixture",
             "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"], check=True)
-        assembly = self.root / "fixture.json"
-        atomic_json(assembly, {"board_package": "board.json"})
-        atomic_json(self.root / "fixture-empty.json", {"board_package": "board.json"})
+        assembly = self.root / "fixture.toml"
+        contents = ('schema = 2\nboard_package = "board"\n'
+                    'backend = "baremetal"\nclock = "fixed"\n'
+                    '[memory]\nmain_stack_bytes = 2048\n')
+        assembly.write_text(contents)
+        (self.root / "fixture-empty.toml").write_text(contents)
         def build_boundary(argv, log):
             if "-B" in argv:
                 build_layout(Path(argv[argv.index("-B") + 1]), declared,

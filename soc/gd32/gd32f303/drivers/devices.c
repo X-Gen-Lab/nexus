@@ -31,6 +31,17 @@ static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+static const nx_legacy_adc_config_t s_adc_config = {
+    .registers = (nx_legacy_adc_registers_t*)(uintptr_t)ADC0,
+    .gate = &RCU_APB2EN,
+    .divider = &RCU_CFG0,
+    .pin_mode = &GPIO_CTL0(GPIOA),
+    .pin_lock = &GPIO_LOCK(GPIOA),
+    .clock_started = &g_nx_gd32f303_system.started,
+    .gate_mask = RCU_APB2EN_ADC0EN,
+    .divider_mask = RCU_CFG0_ADCPSC | RCU_CFG0_ADCPSC_2,
+    .poll_limit = 1000000U,
+    .startup_delay_us = 2000U};
 nx_result_t nx_gd32f303_adc_prepare(nx_gd32f303_adc_state_t* port,
                                     uint32_t reference_mv) {
     if (!task_context())
@@ -39,17 +50,10 @@ nx_result_t nx_gd32f303_adc_prepare(nx_gd32f303_adc_state_t* port,
         return NX_ERROR_INVALID;
     if (port->retained || port->initialized || port->active)
         return NX_ERROR_BUSY;
-    port->clock_started = &g_nx_gd32f303_system.started;
-    port->pin_mode = &GPIO_CTL0(GPIOA);
-    port->pin_lock = &GPIO_LOCK(GPIOA);
-    port->poll_limit = 1000000U;
-    port->registers = (nx_legacy_adc_registers_t*)(uintptr_t)ADC0;
-    port->gate = &RCU_APB2EN;
-    port->gate_mask = RCU_APB2EN_ADC0EN;
-    port->divider = &RCU_CFG0;
-    port->divider_mask = RCU_CFG0_ADCPSC | RCU_CFG0_ADCPSC_2;
+    if (reference_mv < 2700U || reference_mv > 3600U)
+        return NX_ERROR_INVALID;
+    port->config = &s_adc_config;
     port->reference_mv = reference_mv;
-    port->startup_delay_us = 2000U;
     /* The extra GD303 divider and oversampling controls are outside the
      * shared reviewed register prefix and must remain cold. */
     if ((NX_GD303_READ(&RCU_CFG1) & RCU_CFG1_ADCPSC_3) != 0U ||
@@ -57,6 +61,16 @@ nx_result_t nx_gd32f303_adc_prepare(nx_gd32f303_adc_state_t* port,
         return NX_ERROR_BUSY;
     return nx_legacy_adc_initialize(port);
 }
+static const nx_legacy_pwm_config_t s_pwm_config = {
+    .registers = (nx_legacy_pwm_registers_t*)(uintptr_t)TIMER2,
+    .gate = &RCU_APB1EN,
+    .pin_mode = &GPIO_CTL0(GPIOA),
+    .pin_lock = &GPIO_LOCK(GPIOA),
+    .pin_latch = &GPIO_OCTL(GPIOA),
+    .pin_set = &GPIO_BOP(GPIOA),
+    .clock_started = &g_nx_gd32f303_system.started,
+    .gate_mask = RCU_APB1EN_TIMER2EN,
+    .poll_limit = 1000000U};
 nx_result_t nx_gd32f303_pwm_prepare(nx_gd32f303_pwm_state_t* port,
                                     uint32_t tick_hz, uint32_t period_ticks,
                                     uint32_t duty_ticks, uint32_t inactive) {
@@ -66,15 +80,7 @@ nx_result_t nx_gd32f303_pwm_prepare(nx_gd32f303_pwm_state_t* port,
         return NX_ERROR_INVALID;
     if (port->retained || port->initialized || port->running)
         return NX_ERROR_BUSY;
-    port->clock_started = &g_nx_gd32f303_system.started;
-    port->pin_mode = &GPIO_CTL0(GPIOA);
-    port->pin_lock = &GPIO_LOCK(GPIOA);
-    port->poll_limit = 1000000U;
-    port->registers = (nx_legacy_pwm_registers_t*)(uintptr_t)TIMER2;
-    port->gate = &RCU_APB1EN;
-    port->gate_mask = RCU_APB1EN_TIMER2EN;
-    port->pin_latch = &GPIO_OCTL(GPIOA);
-    port->pin_set = &GPIO_BOP(GPIOA);
+    port->config = &s_pwm_config;
     port->inactive = inactive;
     port->tick_hz = tick_hz;
     port->period_ticks = period_ticks;

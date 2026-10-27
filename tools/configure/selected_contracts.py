@@ -310,7 +310,7 @@ def describe(item, endpoint=None, *, public_class=None):
                          timestamp_source="unknown",
                          dma_policy="none", cache_line_bytes=0)
     engines = tuple(sorted({path.split(":", 1)[0]
-                            for path in item.values.get("dma", ())}))
+                            for path in item.dma}))
     return SelectedContract(
         id=endpoint.id if endpoint is not None else item.id,
         provider=item.provider, controller=item.controller, kind=kind,

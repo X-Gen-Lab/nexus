@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
     "__init__", "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
-    "providers/descriptor",
+    "providers/descriptor", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",

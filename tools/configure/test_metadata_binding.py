@@ -45,7 +45,7 @@ class MetadataBindingTests(unittest.TestCase):
         self.assembly.write_text(self.assembly.read_text().replace(
             '[memory]', 'components=["owner-observer"]\n[memory]'))
         result = gate.resolve_ir(self.assembly, self.root)
-        self.assertEqual(result["components"], ("owner-observer",))
+        self.assertEqual(result.components, ("owner-observer",))
 
     def test_assembly_header_and_input_closure_bind_policy(self):
         output = self.root / "platform"
@@ -60,7 +60,7 @@ class MetadataBindingTests(unittest.TestCase):
         self.assertEqual(factory.FACTORY_ABI_EPOCH, 1)
 
     def test_assembly_policy_change_invalidates_configuration_identity(self):
-        before = gate.resolve_ir(self.assembly, self.root)["configuration_sha256"]
+        before = gate.resolve_ir(self.assembly, self.root).configuration_sha256
         self.change_policy(semantic_version=self.other_version)
         result = gate.configure(self.assembly, self.root / "changed", self.root)
         self.assertNotEqual(before, result["configuration_sha256"])

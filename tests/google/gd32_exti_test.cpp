@@ -139,6 +139,30 @@ class Gd32Exti : public testing::Test {
         }
     }
 };
+TEST_F(Gd32Exti, ColdCloseDoesNotAccessUnownedHardware) {
+    EXTI_INTEN = 1U << 3U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_gd32_exti_close(nullptr));
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_exti_close(&first));
+    EXPECT_EQ(1U << 3U, EXTI_INTEN);
+    EXPECT_EQ(0U, s_exti_clear_calls);
+    EXPECT_EQ(0U, s_nvic_disable_calls);
+    EXPECT_EQ(0U, s_nvic_pending_calls);
+}
+TEST_F(Gd32Exti, ColdCloseRetainsAnActiveVectorUntilExplicitRetry) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_gd32_exti_initialize(&first, &domain, 3, 4, NX_EXTI_BOTH,
+                                      first_events, 2, 5));
+    const unsigned irq = static_cast<unsigned>(EXTI3_IRQn);
+    const uint32_t mask = 1U << (irq % 32U);
+    NVIC->IABR[irq / 32U] = mask;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_exti_close(&first));
+    EXPECT_TRUE(first.initialized);
+    EXPECT_EQ(first_events, first.events);
+    NVIC->IABR[irq / 32U] = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_exti_close(&first));
+    EXPECT_FALSE(first.initialized);
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_exti_close(&first));
+}
 TEST_F(Gd32Exti, ForeignEnabledLineRejectsBeforePinOrMuxChanges) {
     EXTI_INTEN = 1U << 3U;
     GPIO_CTL(GPIOE) = 0x12345678U;

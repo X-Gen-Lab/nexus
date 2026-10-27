@@ -35,10 +35,10 @@ class F407I2s2RoleTests(unittest.TestCase):
     def test_authored_role_does_not_select_a_software_library_or_endpoint(self):
         selected = {"profile": "slave-tx-stereo16-pb12-pb13-pb15"}
         normalized = self.normalize(selected)
-        self.assertEqual(normalized["i2s2"], selected)
-        self.assertEqual(normalized["controllers"], [])
-        self.assertEqual(normalized["devices"], [])
-        self.assertNotIn("components", normalized)
+        self.assertEqual(normalized.i2s2, selected)
+        self.assertEqual(normalized.controllers, ())
+        self.assertEqual(normalized.devices, ())
+        self.assertEqual(normalized.components, ())
 
     def test_authored_role_rejects_unreviewed_hardware_properties(self):
         with self.assertRaises(ValueError):

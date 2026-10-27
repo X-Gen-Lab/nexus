@@ -28,14 +28,14 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         root = "cmake/package/verification/io_evolution/"
         choices = (
             ("native-time-pair", {"rtc", "lptim"},
-             "nx_native_lptim_construct("),
+             "nx_native_lptim_prepare("),
             ("native-time-empty", set(), "nx_platform_start_impl("),
             ("h743-high-empty", set(),
              "nx_stm32h743_pll384_system_start("),
             ("h743-high-uart", {"gpio", "uart"},
              "nx_stm32h743_pll384_system_start("),
             ("u575-uart-gpdma", {"uart"},
-             "nx_stm32u575_uart_gpdma_initialize("),
+             "nx_stm32u575_uart_gpdma_prepare("),
             ("g474-can-fd-loopback", {"can_fd"},
              ".mode = NX_STM32G474_FDCAN_INTERNAL_LOOPBACK"),
             ("g474-can-fd-normal", {"can_fd"},
@@ -62,7 +62,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                 self.assertEqual({row.public_class for row in records},
                                  expected)
                 self.assertIn(mechanism, bindings.emit(result)[1])
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
 
     def test_canonical_h743_high_flash_keeps_exact_public_interfaces(self):
         result, records = self.selected(
@@ -72,7 +72,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                           "i2c_device", "adc", "flash"})
         self.assertIn("nx_stm32h743_pll384_system_start(",
                       bindings.emit(result)[1])
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_catalogue_has_eight_exact_parts_without_family_inference(self):
         rows = matrix.support_catalogue(configure.ROOT)
@@ -333,7 +333,9 @@ class ExistingConsumerAuthorityTests(unittest.TestCase):
         # A known public shape alone cannot authorize this actual provider.
         item = ControllerIR.create({
             "id": "capture", "binding": "capture", "kind": "timer_capture",
+            "pins": (), "route": "capability-rejection-fixture",
             "controller": "TIM5", "mode": "edge-capture",
+            "mask": 0, "initial": 0,
             "tick_hz": 1000000, "edge": "rising", "filter": 0,
             "exclusive": True, "irq_priority": 5}, "stm32f103")
         with self.assertRaisesRegex(ValueError, "Unmaintained provider mode"):
@@ -342,6 +344,7 @@ class ExistingConsumerAuthorityTests(unittest.TestCase):
     def test_factory_model_flag_cannot_disagree_with_its_actual_provider(self):
         item = ControllerIR.create({
             "id": "pin", "binding": "pin", "kind": "gpio",
+            "pins": (), "route": "capability-rejection-fixture",
             "controller": "GPIO0", "mode": "input", "mask": 1,
             "initial": 0}, "native")
         with self.assertRaisesRegex(ValueError, "model.*provider"):
@@ -350,6 +353,7 @@ class ExistingConsumerAuthorityTests(unittest.TestCase):
     def test_capability_class_cannot_invent_a_face_for_another_kind(self):
         item = ControllerIR.create({
             "id": "pin", "binding": "pin", "kind": "gpio",
+            "pins": (), "route": "capability-rejection-fixture",
             "controller": "GPIO0", "mode": "input", "mask": 1,
             "initial": 0}, "native")
         with self.assertRaisesRegex(ValueError, "class.*selected"):

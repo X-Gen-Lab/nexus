@@ -37,8 +37,9 @@ def public_header(kind):
 
 
 def _typed(result):
-    return (result if isinstance(result, ConfigurationIR) else
-            ConfigurationIR.from_validated(result))
+    if not isinstance(result, ConfigurationIR):
+        raise TypeError("Factory emission requires ConfigurationIR")
+    return result
 
 
 def classes(result):

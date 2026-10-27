@@ -12,7 +12,7 @@ class SelectedIoPlanTests(unittest.TestCase):
         result = configure.resolve_ir(
             configure.ROOT / "tools/configure/assemblies/native-gpio.toml")
         self.assertEqual(len(result.resource_plan.claims),
-                         len(result["claims"]))
+                         len(result.claims))
         self.assertEqual(result.resource_plan.to_dict(),
                          result.to_dict()["resource_plan"])
         with self.assertRaises(FrozenInstanceError):
@@ -28,7 +28,7 @@ class SelectedIoPlanTests(unittest.TestCase):
                          result.to_dict()["trigger_plan"])
         self.assertEqual(result.dma_topology.to_dict(),
                          result.to_dict()["dma_topology"])
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_empty_selection_has_explicit_empty_plans(self):
         result = configure.resolve_ir(

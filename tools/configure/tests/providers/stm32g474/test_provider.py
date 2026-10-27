@@ -1,5 +1,6 @@
 """Fixed G474 capability, route and cold emitter boundary contracts."""
 import importlib
+from dataclasses import replace
 import json
 from pathlib import Path
 import unittest
@@ -31,16 +32,20 @@ def gpio(**changes):
             **changes}
 
 
-class Result(dict):
-    def __init__(self, *items, backend="baremetal"):
-        super().__init__(irq={"external_count": 102, "priority_bits": 4,
-                              "syscall_priority": 5 if backend == "freertos"
-                              else None}, devices=[], board_bindings={},
-                         routes={}, kernel_profile=(
-                             {"kernel_policy": "basepri"}
-                             if backend == "freertos" else None))
-        self.controllers = tuple(ControllerIR.create(item, "stm32g474")
-                                 for item in items)
+def fixture_controller(values, provider="stm32g474"):
+    """Provide explicit resolved route facts for isolated constructor tests."""
+    return ControllerIR.create({"route": "fixture-route", "mask": 0,
+                                "initial": 0, **values}, provider)
+
+
+def Result(*items, backend="baremetal"):
+    """Use actual resolved profile facts with isolated constructor selections."""
+    profile = ("mainstream-freertos.toml" if backend == "freertos"
+               else "empty.toml")
+    result = configure.resolve_ir(ROOT / "tests/contracts/g474_assembly" /
+                                  profile)
+    return replace(result, controllers=tuple(
+        fixture_controller(item) for item in items))
 
 
 class G474ProviderTests(unittest.TestCase):
@@ -152,15 +157,15 @@ class G474ProviderTests(unittest.TestCase):
         self.assertEqual(board["bindings"][0]["initial"], 0)
 
     def test_uart_ctor_is_guarded_before_overwriting_retained_state(self):
-        item = ControllerIR.create(uart(), "stm32g474")
+        item = fixture_controller(uart())
         construction = self.provider.constructor(item, Result(uart()), {}, {}, ())
-        source = "\n".join(construction["definitions"])
+        source = "\n".join(construction.definitions)
         self.assertLess(source.index(".retained"), source.index(".registers ="))
         self.assertIn("NX_UART_RX_BYTES", source)
         self.assertIn("static uint8_t s_nx_rx_console[64];", source)
         self.assertIn("nx_stm32g474_lpuart1_pins_prepare()", source)
         self.assertIn("170000000u, 1000000u", source)
-        self.assertEqual(construction["stop"],
+        self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_uart_port_stop(&s_nx_face_console)",))
         self.assertIn("LPUART1_IRQHandler", source)
         self.assertNotIn("DMA", source)
@@ -173,7 +178,7 @@ class G474ProviderTests(unittest.TestCase):
                     self.provider.constructor(uart(**changes), Result(), {}, {}, ())
 
     def test_foreign_typed_provider_decision_cannot_be_reinterpreted(self):
-        item = ControllerIR.create(uart(), "stm32f407")
+        item = fixture_controller(uart(), "stm32f407")
         with self.assertRaisesRegex(ConfigurationError, "provider"):
             self.provider.constructor(item, Result(), {}, {}, ())
 
@@ -182,7 +187,7 @@ class G474ProviderTests(unittest.TestCase):
                                           ("freertos", "BASEPRI", 5)):
             result = Result(uart(), backend=backend)
             source = "\n".join(self.provider.constructor(
-                result.controllers[0], result, {}, {}, ())["definitions"])
+                result.controllers[0], result, {}, {}, ()).definitions)
             self.assertIn(f"NX_IRQ_KERNEL_{policy}, 102u, 4u, {ceiling}u", source)
             self.assertNotIn("xTaskCreate", source)
 
@@ -222,7 +227,7 @@ class G474ProviderTests(unittest.TestCase):
 
     def test_gpios_and_uart_use_real_readonly_tables_without_forwarders(self):
         for values in (gpio(), uart()):
-            item = ControllerIR.create(values, "stm32g474")
+            item = fixture_controller(values)
             self.assertEqual(self.provider.operations(item),
                              f"nx_stm32g474_{item.kind}_ops")
             self.assertEqual(self.provider.instance_declarations(item, Result()), [])

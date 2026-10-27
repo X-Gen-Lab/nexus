@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
+from tools.configure.calls import Address, DirectCall
 from tools.configure.memory import dma_regions
 
 
@@ -78,10 +79,10 @@ def constructor(item, result, devices, profile):
     prefix = "nx_" + profile.family
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
-    irq = result["irq"]
+    irq = result.irq
     policy = (f"(nx_irq_policy_t){{ {kernel_policy_constant(result)}, "
-              f"{irq['external_count']}u, {irq['priority_bits']}u, "
-              f"{irq['syscall_priority'] or 0}u }}")
+              f"{irq.external_count}u, {irq.priority_bits}u, "
+              f"{irq.syscall_priority or 0}u }}")
     lines = []
     if item.kind == "uart":
         duplex = item.mode == "dma-duplex"
@@ -127,8 +128,10 @@ def constructor(item, result, devices, profile):
         return Construction(state_type=prefix + ("_uart_duplex_state_t" if duplex
                                                 else "_uart_dma_state_t"),
             definitions=lines,
-            initialize=f"{prefix}_{'uart_duplex' if duplex else 'uart_dma'}_prepare(&{owner}, &{config})",
-            stop=[f"nx_uart_port_stop(&s_nx_face_{name})"],
+            initialize=DirectCall(
+                f"{prefix}_{'uart_duplex' if duplex else 'uart_dma'}_prepare",
+                (Address(owner), Address(config))),
+            stop=[DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))],
             retain_on_failed_init=True)
     if item.kind != "i2c":
         fail("Unsupported legacy transport constructor")
@@ -136,10 +139,10 @@ def constructor(item, result, devices, profile):
     registers = f"(volatile uint32_t*)(uintptr_t){controller}"
     inputs = profile.i2c_line_inputs
     for child in devices:
-        if child["controller"] != item.id:
+        if child.controller != item.id:
             continue
         child_name = child.id.replace("-", "_")
-        lines += [f"static {prefix}_i2c_async_endpoint_state_t s_nx_endpoint_{child_name} = {{ .port = &{state}.core, .address = {child['address']}u }};",
+        lines += [f"static {prefix}_i2c_async_endpoint_state_t s_nx_endpoint_{child_name} = {{ .port = &{state}.core, .address = {child.options.address}u }};",
             f"static const nx_i2c_endpoint_t s_nx_device_face_{child_name} = {{ &nx_i2c_v1_async_endpoint_ops, &s_nx_endpoint_{child_name} }};",
             f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
     lines += [f"static nx_result_t prepare_{name}(void) {{",
@@ -155,5 +158,6 @@ def constructor(item, result, devices, profile):
             r"/** \brief Exact selected I2C V1 bounded protocol window. */",
             f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&{state}.core); }}"]
     return Construction(state_type=prefix + "_i2c_async_state_t",
-        definitions=lines, initialize=f"prepare_{name}()",
-        stop=[f"{prefix}_i2c_async_stop(&{state})"], retain_on_failed_init=True)
+        definitions=lines, initialize=DirectCall(f"prepare_{name}"),
+        stop=[DirectCall(f"{prefix}_i2c_async_stop", (Address(state),))],
+        retain_on_failed_init=True)

@@ -23,7 +23,7 @@ START = "<!-- nexus-capabilities:start -->"
 END = "<!-- nexus-capabilities:end -->"
 
 
-def selection(assembly, root=ROOT):
+def selection(assembly, root=ROOT, *, candidate_path=None):
     """Describe one validated selection; execution has a separate authority.
 
     Family declarations cannot establish a selected Board/backend/clock tuple.
@@ -31,12 +31,15 @@ def selection(assembly, root=ROOT):
     contracts. No test receipt, linked image or physical observation is inferred
     from an accepted configuration or a model implementation.
     """
-    from tools.configure.ir import ConfigurationIR
     from tools.configure import selected_contracts
     from tools.configure.resource_graph import json_value
+    from tools.evidence import identity
 
-    data = configure.resolve(Path(assembly), Path(root).resolve())
-    typed = ConfigurationIR.from_validated(data)
+    root = Path(root).resolve()
+    source = (identity.observe_git_source(root)
+              if candidate_path is not None else None)
+    typed = configure.resolve_ir(Path(assembly), root)
+    data = typed.to_dict()
     contracts = selected_contracts.for_configuration(typed)
     policies = selected_contracts.silicon_policies(typed)
     silicon = {owner: (json_value(asdict(policy)) if policy is not None else None)
@@ -69,7 +72,7 @@ def selection(assembly, root=ROOT):
     validation["configuration"] = "validated"
     if typed.soc_family == "native":
         validation["physical_hil"] = "not_applicable"
-    return {"schema_version": 1, "kind": "selected_support",
+    result = {"schema_version": 1, "kind": "selected_support",
             "selection": {key: data[key] for key in
                           ("board", "soc_family", "part", "package",
                            "backend", "clock_profile", "cpu", "irq",
@@ -89,6 +92,44 @@ def selection(assembly, root=ROOT):
                             "hardware qualification.",
                             *[item for item in data.get("limitations", [])
                               if item != "Physical qualification not executed"]]}
+    if candidate_path is not None:
+        _associate_candidate(result, data, source, Path(candidate_path))
+        if identity.observe_git_source(root) != source:
+            from tools.evidence.common import EvidenceError
+            raise EvidenceError("source changed during support query")
+    return result
+
+
+def _associate_candidate(result, resolved, source, candidate_path):
+    """Only an exact verified source/configuration can support this selection."""
+    from tools.evidence import candidate
+
+    reference = candidate.verified_projection(candidate_path)
+    source_keys = ("commit", "tree", "dirty", "submodules")
+    clean_dependencies = all(line.startswith(" ")
+                             for line in source["submodules"])
+    source_match = (source["dirty"] is False and clean_dependencies and
+                    all(source[key] == reference["source"][key]
+                        for key in source_keys))
+    configuration_match = (
+        reference["configuration_sha256"] == resolved["configuration_sha256"]
+        and reference["resolved"] == resolved)
+    relation = ("configuration_mismatch" if not configuration_match else
+                "exact_source_and_configuration" if source_match else
+                "historical_source")
+    result["current_source"] = source
+    result["evidence"] = {
+        "relation": relation, "source_match": source_match,
+        "configuration_match": configuration_match,
+        "reference": {key: value for key, value in reference.items()
+                      if key != "resolved"}}
+    if source_match and configuration_match:
+        for name in ("host_models", "arm_image", "installed_sdk",
+                     "software_candidate"):
+            result["validation"][name] = "passed"
+    result["limitations"].append(
+        "Evidence association verifies an existing candidate; it executes no "
+        "new checks and does not assess physical HIL or qualify other selections.")
 
 
 def c_code(source):
@@ -182,12 +223,13 @@ def collect(root=ROOT):
     fixture_paths = sorted(set(assembly_paths) | set(contract_paths)
                            | set(sdk_paths))
     for fixture in fixture_paths:
-        result = configure.resolve(fixture, root)
+        typed = configure.resolve_ir(fixture, root)
+        result = typed.to_dict()
         if result["soc_family"] == "native":
             provider = configure.maintained(result["soc_family"])
             if provider.MODEL is not True or result["physical_qualified"] is not False:
                 raise ValueError("Native source provenance requires an unqualified MODEL")
-        source = c_code(bindings.emit(result)[1])
+        source = c_code(bindings.emit(typed)[1])
         for item in result["controllers"]:
             name = bindings.symbol(item["id"])
             face_name = re.escape("s_nx_face_" + name)
@@ -274,11 +316,17 @@ def main(arguments=None):
     action.add_argument("--assembly", type=Path,
                         help="print exact selected support JSON, not execution "
                              "qualification")
+    parser.add_argument("--candidate", type=Path,
+                        help="verify and associate an existing sealed "
+                             "candidate.json with --assembly")
     parser.add_argument("--root", type=Path, default=ROOT)
     args = parser.parse_args(arguments)
+    if args.candidate is not None and args.assembly is None:
+        parser.error("--candidate requires --assembly")
     try:
         if args.assembly is not None:
-            print(json.dumps(selection(args.assembly, args.root), indent=2,
+            print(json.dumps(selection(args.assembly, args.root,
+                                       candidate_path=args.candidate), indent=2,
                              sort_keys=True))
             return 0
         examples = documentation.check(args.root)
@@ -300,7 +348,7 @@ def main(arguments=None):
         print(f"Resolved {sum(row['kind'] != 'fragment' for row in examples)} "
               "TOML examples; "
               f"{sum(row['kind'] == 'fragment' for row in examples)} explicit fragments")
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, KeyError, TypeError) as error:
         print(f"Capability consistency rejected: {error}", file=sys.stderr)
         return 1
     return 0

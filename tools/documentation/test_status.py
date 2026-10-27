@@ -112,6 +112,30 @@ class StatusTests(unittest.TestCase):
         self.assertIn("a\\|b", view)
         self.assertIn("&lt;tag&gt;", view)
 
+    def test_soc_ip_ledger_is_registered_without_changing_original_status(self):
+        specification = next((item for item in status.SPECIFICATIONS
+                              if item[0] == "soc-ip-layout-execution.csv"), None)
+        self.assertIsNotNone(specification,
+                             "completed SoC/IP ledger must enter default views")
+        source = self.root / "docs/design" / specification[0]
+        source.write_text(
+            "task_id,software_status,physical_status,evidence_paths\n"
+            "R44,segmented_execution_passed,not_executed,original/A;original/B\n"
+            "R48,software_qualified,not_executed,original/candidate.json\n")
+        original = source.read_bytes()
+        report = status.generate(self.root, specifications=(specification,))
+        self.assertEqual(report["status"], "passed")
+        output = self.root / "docs/status/ledgers/soc-ip-layout.md"
+        self.assertIn("segmented_execution_passed", output.read_text())
+        self.assertIn("original/A;original/B", output.read_text())
+        self.assertIn("not_executed", output.read_text())
+        self.assertEqual(source.read_bytes(), original)
+        output.write_text(output.read_text().replace("not_executed", "passed"))
+        checked = status.generate(self.root, check=True,
+                                  specifications=(specification,))
+        self.assertEqual(checked["status"], "failed")
+        self.assertEqual(source.read_bytes(), original)
+
     def test_current_io_ledger_is_generated_and_checked_without_promotion(self):
         fields = ("task_id", "priority", "phase", "task", "dependencies",
                   "implementation_status", "validation_status",
