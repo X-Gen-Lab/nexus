@@ -5,6 +5,109 @@
 `implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。
 原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。
 
+## 类型化平台统一：精确源码与执行边界
+
+本轮代码提交 P2 为 `fc01d863c3374643c276195ae19a24e6f8b8c8ee`，tree 为
+`e6f3d6310fd46265be49d47ef3fd7a4d944a8386`；对应
+[平台 PR 38](https://github.com/X-Gen-Lab/nexus/pull/38)。外部示例 E 为
+`acb5179ec09e0c2fae1911d32655296df39acedc`，tree 为
+`4e4e504c28766f0790dc4cd4dc45e8f9bcc49beb`；对应
+[示例 PR 16](https://github.com/X-Gen-Lab/nexus-examples/pull/16)。
+PR 状态与软件执行是不同事实；本节不宣称上述 PR 已合并。
+
+候选 `typed-unification-fc01d863c337-acb5179ec09e` 已封存并经 owned verifier
+实际校验通过，状态为 `software_qualified`，覆盖 `host_contracts`、`arm_link`、
+`resource_budget`、`source_sdk`、`reproducibility` 和 `hil_tooling` 六个原 scope。
+配置 SHA-256 为 `0117c83ff7876bf3867338f31caec160c18815a629cb1c44bfe1a4ead410590b`；
+候选 JSON 为 2,366,210 bytes，SHA-256 为
+`f1c2af3ac73cb219b41b6d68f1c1b07db108357d0de8a92107ab7b1e8ec1ede6`。
+同一 ELF／BIN／map 的字节身份由原交付索引逐项记录。`hil_tooling` 只证明工装范围；
+物理 HIL 仍为 `not_executed`，签名为 `unsigned`，产品提升为 `not_performed`。
+
+R02 已完成两次独立 fresh、`--network none` 构建，共四条实际配置／构建命令，
+均返回 0；两个独立输出的 ELF／BIN 逐字节一致，原结果为 `bit_exact_elf_bin`。
+所选配置是外部示例 `reproduction/assemblies/qiming-baremetal.toml`：启明 F407ZG、
+裸机、`hse8-pll168`、`Os`、GPIO 输出和 UART1 IRQ events（容量 32），显式选择
+`uart-owner` 组件。该结果不扩展为其他板卡、模式或实板时序的复现结论。
+
+持久导航入口是
+`/workspace/nexus-examples/build/platform-candidate-fc01d863c337-acb5179ec09e-01/delivery-index.json`，
+4,716 bytes，SHA-256 为
+`5e99131826172355a95506b0293c8fe98f75cb07f3b6298f5f3805d6008caf43`。
+其中 `candidate_portable` 指向 6,441 个文件的完整归档：434,092,822 bytes，
+SHA-256 为 `a443e9c3b39528d5d5fbbdd19ee1c065496cd86b8df78cb5380aab4505bf3aa9`；
+`finalization_package` 指向保留原收尾报告和失败尝试的独立归档。
+前述 `/tmp/...` 是原执行定位，环境恢复后不保证仍存在；按索引及 member 映射
+恢复原字节，不修改原 locator。该主机路径不是公开下载 URL。
+
+Q02 已按完整维护计划独立执行全部 159 阶段，状态为 `executed_passed`。
+前后源码观察完全一致，均为 clean P2；原报告
+`/tmp/nexus-unification/formal-fc01d863c337-02/report.json` 为 201,097 bytes，
+SHA-256 为 `8c67786b80b5fb64cb0f6f216c1dbf4c05ddb84f61ab2ef4542fb0f55e0910a2`。
+维护工具已核对全部阶段、原执行顺序、命令返回码、计划和源码身份。
+这是一次完整 Q02 执行，没有拼接 Q01 前缀；报告中的 `software_qualified=false`
+保持原值，软件计划通过不等同于候选已封存。
+
+示例 E 的完整本地执行已通过：17 个 preset（1 个 Native、16 个 ARM）、98 条实际命令、39 个 ELF 预算检查
+及 12 项 HIL 准备。HIL 输出为 `prepared_unbound`，不代表已连接实板或物理通过。
+原执行 `/tmp/nexus-examples-typed-fc01d863c337-all-001/execution.json`
+为 15,662 bytes，SHA-256 为
+`c89682f4b2b30383dca2c3e845aad6170c6f4271b310886d72deb358b136348b`。
+E 实际消费 `/tmp/nexus-unification/formal-fc01d863c337-01/sdk`；原命令保持该
+真实路径，不改写为 Q02 SDK。Q01 计划失败与其中已经生成的 SDK 是不同范围，
+示例结果不反向将 Q01 计划变成通过。
+
+R01 准备阶段通过维护的 `verify_source_sdk` 分别完整校验了 Q01、Q02 的 SDK，
+确认 2,931 个源码文件、相同 source manifest 字节和两份 CMake export 文件一致；
+记录为 `verified_identical_installed_sdk_bytes`。两个 manifest 均为 370,911 bytes，
+SHA-256 为 `77c5fa4e0eb0c584b195ce92a59e8ac6129dc5d493c3e1184df89a9a5618248d`。
+原结果位于
+`/tmp/nexus-unification/candidate-fc01d863c337-acb5179ec09e-01/readiness.json`，
+8,263 bytes，SHA-256 为
+`378fff8b25917b86bf88d4a9e5a2613947e0f4219c6f6c94bc6cf390babfaee0`。
+该记录保留 E 的真实 Q01 SDK 输入；Q02 是本轮唯一完整软件计划权威。
+SDK 字节等价本身不等同于双构建或候选通过。
+
+恢复后对 clean P2 checkout 重新执行维护的 `capabilities.py --candidate` 查询，
+实际返回 0，`source_match=true`，但结果为 `configuration_mismatch`。
+按路径比较输入集合，SDK 侧额外包含摘要为
+`77c5fa4e0eb0c584b195ce92a59e8ac6129dc5d493c3e1184df89a9a5618248d`
+的 `.nexus-source-sdk.json`；输入记录顺序也不同，其余配置语义字段相同。
+因此仅 `configuration=validated`，模型、ARM 镜像、SDK、候选及物理查询结果仍为
+`not_assessed`，不因源码相同而放宽完整配置身份校验。新观察保存在
+`/workspace/nexus/.git/local-recovery/typed-platform-unification/capability-recovery/comparison.json`，
+SHA-256 为 `565993a80527d4e3c2e5af7ca7a00dd4448665023b5cee18560d0ba1050f0d87`。
+已封存产物的正向验证入口是恢复候选后运行 `candidate.py verify --candidate`；
+它与源码 checkout 的能力关联查询分别说明自己的范围。
+
+Q01 的前 90 阶段通过，第 91 阶段因锁定 `clang-tidy` 未进入执行 PATH 而失败，
+该阶段未完成 C 静态分析。补齐环境并通过版本、真实 C11 probe 和 doctor 后，
+Q02 重新完整执行；没有拼接 Q01 前缀。Q01 的失败事实仍保留；原临时报告与命令记录在环境重置后已丢失，
+不能重新核验，也未改写为成功。
+
+候选首次准备 R01 的 `prepare-spec` 已成功；随后辅助脚本因工具链的 65-byte
+installer marker 摘要口径不一致，在 Docker 启动前停止。独立 inventory 确认
+其余字节与锁定归档一致，工具链未修改；R01 原记录保留在收尾归档中。
+该准备失败不冒充 R02 已实际完成的断网双构建。
+
+代码执行身份 P2 与文档提交身份分别记录。文档更新、构建和发布不会生成新的
+平台软件资格。正式 schema 2 文档包仅在候选实际校验通过后显式设置
+`qualification_references`；其文档源码以本次包的 `documentation_source`
+和构建 receipt 为准，被引用候选继续保留原 P2 身份。
+
+`local_ci.py` 已对完整 Q02 进行只读验证，实际返回 0；结果为
+`/tmp/nexus-unification/root/local-ci-full-verified.json`，2,385 bytes，SHA-256
+为 `2bb9bbcfb51c61d26f49435b4dc6cb3650cdae340db55d7e8c4aea7386e991ca`。
+尝试向精确 P2 发布 `nexus/local-software-plan` 时，GitHub 返回 HTTP 403，
+指出连接缺少 `statuses:write`。原 receipt
+`/tmp/nexus-unification/local-status-fc01d863.json` 的 publication 为
+`unconfirmed`；3,872 bytes，SHA-256 为
+`4fa133eb62e7767048450743710f9ec292d349dbcaf3faaf062e258508992f2a`。
+本次独立服务端回读该 SHA 的 statuses 为空，不能宣称状态已发布或远端绿灯。
+本地验证不冒充 Actions jobs、发布流水线或已启用的分支保护。
+
+## 历史 SoC/IP 目录整理执行
+
 本次 SoC/IP 重构的软件执行绑定代码提交 P
 `92e669233957a2e450a528394e8f4dd0794c7049`，tree 为
 `6e38d4c43d59330a0a9a9b7cac21f591d9c2719f`。

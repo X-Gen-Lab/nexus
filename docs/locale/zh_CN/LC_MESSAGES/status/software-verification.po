@@ -1,4 +1,4 @@
-# Independently reviewed translations; exact canonical source identity below.
+# Authored translation; independent semantic review completed.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a1b25e155c63dd34ef73caa0cc272c9ace92fb7d59c8a3c304240cce142b64d7\n"
+"X-Nexus-Source-SHA256: 484a725528e64db1d0ed3c200238033f4f5ffe96bba408fc559a4afaaa1303d4\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:9
 msgid "软件验证、源码身份与证据"
@@ -118,6 +118,23 @@ msgstr "精确代码源码"
 #: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "原权威及执行说明"
 msgstr "原权威及执行说明"
+
+msgid "类型化 IR、冷态接入与交付统一"
+msgstr "类型化 IR、冷态接入与交付统一"
+
+msgid ""
+"P2 `fc01d863c3374643c276195ae19a24e6f8b8c8ee`；E "
+"`acb5179ec09e0c2fae1911d32655296df39acedc`"
+msgstr ""
+"P2 `fc01d863c3374643c276195ae19a24e6f8b8c8ee`；E "
+"`acb5179ec09e0c2fae1911d32655296df39acedc`"
+
+msgid ""
+"[精确执行说明](../delivery/verification.md)；Q02 完整 159 阶段通过，E "
+"完整本地执行通过；精确配置候选及六个 scope 已通过；Q01 失败单独保留，远端状态发布未确认，物理 HIL 未执行"
+msgstr ""
+"[精确执行说明](../delivery/verification.md)；Q02 完整 159 阶段通过，E "
+"完整本地执行通过；精确配置候选及六个 scope 已通过；Q01 失败单独保留，远端状态发布未确认，物理 HIL 未执行"
 
 msgid "SoC/IP 目录整理与原候选"
 msgstr "SoC/IP 目录整理与原候选"
