@@ -1,4 +1,5 @@
 """Authored configuration and typed factory behavioral contracts."""
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure.providers.descriptor import source_directory
 from contextlib import redirect_stdout
 from dataclasses import FrozenInstanceError
@@ -59,7 +60,7 @@ flash_load_limit_bytes = 65536
         self.assertEqual(ir.board, "native-reference")
         self.assertEqual(ir.memory_budget.main_stack_bytes, 2048)
         self.assertEqual(ir.controllers, ())
-        self.assertFalse(ir["physical_qualified"])
+        self.assertFalse(ir.physical_qualified)
         with self.assertRaises(FrozenInstanceError):
             ir.board = "other"
 
@@ -79,8 +80,8 @@ calls_os = false
         uart, = ir.controllers
         self.assertEqual((uart.id, uart.kind, uart.controller),
                          ("link0", "uart", "UART0"))
-        self.assertEqual(uart["mode"], "irq-byte-event")
-        self.assertEqual(uart["rx_capacity"], 64)
+        self.assertEqual(uart.mode, "irq-byte-event")
+        self.assertEqual(uart.options.rx_capacity, 64)
         self.assertEqual(uart.provider, "native")
 
     def test_authored_kind_must_match_board_binding(self):
@@ -179,7 +180,7 @@ model_bytes=64
 controller="bus"
 model_bytes=128
 """)
-        self.assertEqual([device["model_bytes"] for device in ir.devices],
+        self.assertEqual([device.options.model_bytes for device in ir.devices],
                          [64, 128])
         output = self.root / "bundle"
         gate.configure(self.assembly, output, self.root)
@@ -234,8 +235,8 @@ model_bytes=128
                                                            'mode = "dma-tx"'))
         ir = gate.resolve_ir(self.assembly, gate.ROOT)
         uart = next(item for item in ir.controllers if item.kind == "uart")
-        self.assertEqual(uart["dma"], ("DMA2:stream7:channel4",))
-        self.assertIn("dma:DMA2:stream7", {item["key"] for item in ir["claims"]})
+        self.assertEqual(uart.dma, ("DMA2:stream7:channel4",))
+        self.assertIn("dma:DMA2:stream7", {item.key for item in ir.claims})
         output = self.root / "bundle"
         gate.configure(self.assembly, output, gate.ROOT)
         generated = (output / "bindings.c").read_text()
@@ -276,8 +277,8 @@ model_bytes=128
         self.assertIn("void USART0_IRQHandler(void)", generated)
         self.assertIn("void USART1_IRQHandler(void)", generated)
         self.assertIn("nx_gd32_uart_irq(&s_nx_port_link_b)", generated)
-        self.assertIn(".cs_gpio = GPIOB", generated)
-        self.assertIn(".cs_mask = 1u", generated)
+        self.assertIn("{ GPIOB, &s_nx_spi_pin_state_bus_spi_b[3u], "
+                      "1u, 0u, 0u }", generated)
         self.assertIn("nx_gd32_pin_restore", generated)
 
     def test_stm32_spi_dma_uses_exact_streams_and_endpoint_provider(self):
@@ -291,11 +292,12 @@ model_bytes=128
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
         for text in ("nx_stm32_spi_dma_state_t", "nx_stm32_spi_dma_endpoint_state_t",
-                     "nx_stm32_spi_dma_initialize", "&nx_stm32_spi_dma_endpoint_ops",
+                     "nx_stm32_spi_dma_prepare", "&nx_stm32_spi_dma_endpoint_ops",
+                     "nx_stm32_spi_dma_close",
                      "void DMA2_Stream3_IRQHandler(void)", "void DMA2_Stream0_IRQHandler(void)",
                      "nx_spi_port_stop(nx_binding_spi0)"):
             self.assertIn(text, generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertTrue({"dma:DMA2:stream3", "dma:DMA2:stream0"} <= claims)
 
     def test_gd32_uart_dma_uses_vendor_channel_vector_and_shared_clock(self):
@@ -311,7 +313,7 @@ model_bytes=128
                      "nx_gd32_uart_dma_uart_irq(&s_nx_port_link_a)",
                      "RCU_AHB1EN_DMA1EN"):
             self.assertIn(text, generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertIn("irq:DMA1_Channel7", claims)
         self.assertNotIn("irq:DMA1_Stream7", claims)
 
@@ -327,11 +329,11 @@ model_bytes=128
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
         for text in ("nx_gd32_spi_dma_state_t", "nx_gd32_spi_dma_endpoint_state_t",
-                     "&nx_gd32_spi_dma_endpoint_ops", "nx_gd32_spi_dma_initialize",
+                     "&nx_gd32_spi_dma_endpoint_ops", "nx_gd32_spi_dma_prepare",
                      "void DMA1_Channel3_IRQHandler(void)", "void DMA1_Channel4_IRQHandler(void)",
-                     "stop_bus_spi_a()", "nx_spi_port_stop(&s_nx_face_bus_spi_a)"):
+                     "nx_gd32_spi_dma_close", "nx_spi_port_stop(nx_binding_bus_spi_a)"):
             self.assertIn(text, generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertTrue({"dma:DMA1:stream3", "dma:DMA1:stream4", "dma:DMA1:stream7"} <= claims)
 
     def test_uart_blocks_have_caller_storage_and_mode_specific_ops(self):
@@ -348,7 +350,7 @@ model_bytes=128
                      "nx_stm32_uart_stream_irq(&s_nx_port_uart1)"):
             self.assertIn(text, generated)
         self.assertNotIn("s_nx_rx_uart1[", generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertNotIn("dma:DMA2:stream7", claims)
         with self.assertRaisesRegex(gate.ConfigurationError, "capacity"):
             self.assembly.write_text(self.assembly.read_text().replace('format = "blocks"', 'format = "blocks"\ncapacity = 8'))
@@ -375,7 +377,7 @@ model_bytes=128
                      "nx_stm32_adc_stream_initialize", "DMA2_Stream4_IRQHandler",
                      "nx_adc_port_stream_stop(&s_nx_face_adc0)"):
             self.assertIn(text, generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertTrue({"controller:TIM3", "dma:DMA2:stream4"} <= claims)
         self.assembly.write_text(self.assembly.read_text() +
             '\n[pwm.pwm0]\nbinding="pwm0"\nmode="fixed-pwm"\nperiod_ticks=1000\nduty_ticks=100\ntick_hz=1000000\n')
@@ -397,7 +399,7 @@ model_bytes=128
                      "nx_gd32_adc_stream_initialize", "void DMA1_Channel0_IRQHandler(void)",
                      "nx_gd32_adc_stream_stop(&s_nx_port_adc0)"):
             self.assertIn(text, generated)
-        claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
+        claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertTrue({"controller:TIMER2", "dma:DMA1:stream0"} <= claims)
         self.assembly.write_text(contents.replace('sample_times=[1]', 'sample_times=[7]'))
         with self.assertRaisesRegex(gate.ConfigurationError, "fifteen cycles"):
@@ -434,13 +436,13 @@ model_bytes=128
                 with self.subTest(provider=(family, controller)):
                     package = self.copy_soc_package(family)
                     source = gate.ROOT / "tests/contracts" / fixture
-                    normalized = gate.load_assembly(source)
+                    normalized = gate.load_assembly(source).to_dict()
                     normalized["board_package"] = str(source.parent / normalized["board_package"])
-                    assembly = self.root / "canonical.json"
-                    assembly.write_text(json.dumps(normalized))
+                    assembly = self.root / "canonical.toml"
+                    assembly.write_text(render_toml(normalized))
                     ir = gate.resolve_ir(assembly, self.root)
-                    selected_route = next(item["route"] for item in ir.controllers
-                                          if item["controller"] == controller)
+                    selected_route = next(item.route for item in ir.controllers
+                                          if item.controller == controller)
                     routes = json.loads((package / "routes.json").read_text())
                     route = next(route for route in routes["routes"] if route["id"] == selected_route)
                     route["dma"] = [f"{dma.split(':')[0]}:stream{6-index}:{dma.rsplit(':', 1)[1]}"
@@ -459,7 +461,7 @@ model_bytes=128
                 with self.subTest(family=family, kind=kind):
                     filename = ((stem + "-") if stem else "") + kind + ".toml"
                     source = gate.ROOT / "tests/contracts" / family / filename
-                    normalized = gate.load_assembly(source)
+                    normalized = gate.load_assembly(source).to_dict()
                     original_board = source.parent / normalized["board_package"]
                     board = json.loads((original_board / "board.json").read_text())
                     board["reserved_resources"].append("timer:" + timer)
@@ -467,8 +469,8 @@ model_bytes=128
                     board_package.mkdir(exist_ok=True)
                     (board_package / "board.json").write_text(json.dumps(board))
                     normalized["board_package"] = str(board_package)
-                    assembly = self.root / "timer.json"
-                    assembly.write_text(json.dumps(normalized))
+                    assembly = self.root / "timer.toml"
+                    assembly.write_text(render_toml(normalized))
                     with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
                         gate.resolve_ir(assembly)
 
@@ -481,14 +483,14 @@ model_bytes=128
                 with self.subTest(family=family):
                     package = self.copy_soc_package(family)
                     source = gate.ROOT / "tests/contracts" / fixture
-                    normalized = gate.load_assembly(source)
+                    normalized = gate.load_assembly(source).to_dict()
                     normalized["board_package"] = str(source.parent / normalized["board_package"])
-                    assembly = self.root / "trigger.json"
-                    assembly.write_text(json.dumps(normalized))
+                    assembly = self.root / "trigger.toml"
+                    assembly.write_text(render_toml(normalized))
                     ir = gate.resolve_ir(assembly, self.root)
-                    selected = next(item for item in ir.controllers if item["kind"] == "adc")
+                    selected = next(item for item in ir.controllers if item.kind == "adc")
                     routes = json.loads((package / "routes.json").read_text())
-                    route = next(route for route in routes["routes"] if route["id"] == selected["route"])
+                    route = next(route for route in routes["routes"] if route["id"] == selected.route)
                     route["mode_resources"] = {}
                     (package / "routes.json").write_text(json.dumps(routes))
                     with self.assertRaisesRegex(gate.ConfigurationError, "Trigger resource differs from fixed provider"):
@@ -496,16 +498,16 @@ model_bytes=128
 
     def test_gd32_timebase_is_reserved_by_soc_for_every_board(self):
         source = gate.ROOT / "tools/configure/assemblies/liangshan-baremetal-empty.toml"
-        normalized = gate.load_assembly(source)
+        normalized = gate.load_assembly(source).to_dict()
         board = json.loads((Path(normalized["board_package"]) / "board.json").read_text())
         board["reserved_resources"] = []
         package = self.root / "timebase_board"
         package.mkdir()
         (package / "board.json").write_text(json.dumps(board))
         normalized["board_package"] = str(package)
-        assembly = self.root / "timebase.json"
-        assembly.write_text(json.dumps(normalized))
-        claims = {claim["key"]: claim["owner"] for claim in gate.resolve_ir(assembly)["claims"]}
+        assembly = self.root / "timebase.toml"
+        assembly.write_text(render_toml(normalized))
+        claims = {claim.key: claim.owner for claim in gate.resolve_ir(assembly).claims}
         self.assertEqual(claims.get("controller:TIMER1"), "soc-timebase")
         self.assertEqual(claims.get("irq:TIMER1"), "soc-timebase")
         board["reserved_resources"] = ["TIMER1", "timer:TIMER1", "irq:TIMER1_IRQn"]
@@ -514,11 +516,11 @@ model_bytes=128
 
     def test_spi_child_frequency_below_provider_divider_is_rejected(self):
         source = gate.ROOT / "tests/contracts/gd32_assembly/spi.toml"
-        normalized = gate.load_assembly(source)
+        normalized = gate.load_assembly(source).to_dict()
         normalized["board_package"] = str(source.parent / normalized["board_package"])
         normalized["devices"][0]["max_hz"] = 1000
-        assembly = self.root / "canonical.json"
-        assembly.write_text(json.dumps(normalized))
+        assembly = self.root / "canonical.toml"
+        assembly.write_text(render_toml(normalized))
         with self.assertRaisesRegex(gate.ConfigurationError, "SPI endpoint speed"):
             gate.resolve_ir(assembly)
 
@@ -538,4 +540,4 @@ model_bytes=128
         emitted = json.loads((output / "resolved.json").read_text())
         self.assertEqual(emitted, ir.to_dict())
         self.assertEqual(emitted["configuration_sha256"],
-                         ir["configuration_sha256"])
+                         ir.configuration_sha256)

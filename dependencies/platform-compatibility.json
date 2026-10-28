@@ -11,7 +11,7 @@
   "schemas": {
     "assembly_authoring": 2,
     "assembly_projection": 1,
-    "typed_ir": 1,
+    "typed_ir": 2,
     "board": 1,
     "soc": 1,
     "routes": 1,

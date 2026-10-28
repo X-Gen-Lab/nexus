@@ -32,7 +32,7 @@ class G474ControlConfiguration(unittest.TestCase):
         self.assertIn("const nx_pwm_group_t* nx_factory_pwm_group(", header)
         self.assertIn("NX_PWM_GROUP_ID_WAVE", header)
         self.assertIn("return nx_binding_wave;", getters)
-        claims = {claim["key"] for claim in result["claims"]}
+        claims = {claim.key for claim in result.claims}
         self.assertTrue({"controller:TIM1", "controller:TIM15",
                          "controller:COMP1", "pin:PA1", "pin:PA4",
                          "pin:PA8", "pin:PA9", "pin:PA10"} <= claims)

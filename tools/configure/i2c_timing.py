@@ -9,6 +9,7 @@ name. Calculated frequency excludes target clock stretching and arbitration.
 
 from dataclasses import asdict, dataclass
 from fractions import Fraction
+from typing import ClassVar
 
 from tools.configure.providers.common import fail, integer
 
@@ -25,6 +26,10 @@ SPECS = {
 
 @dataclass(frozen=True)
 class I2cTimingIR:
+    time_unit: ClassVar[str] = "ns"
+    rate_scope: ClassVar[str] = "unstretched-master"
+    reference: ClassVar[str] = "AN4235 DocID024161 Rev2 sections2.2.3/2.2.4"
+
     timingr: int
     cr1_filter_bits: int
     bus_hz_min: int
@@ -36,9 +41,8 @@ class I2cTimingIR:
     sdadel_ns_max: int
 
     def to_dict(self):
-        return {**asdict(self), "time_unit": "ns",
-                "rate_scope": "unstretched-master",
-                "reference": "AN4235 DocID024161 Rev2 sections2.2.3/2.2.4"}
+        return {**asdict(self), "time_unit": self.time_unit,
+                "rate_scope": self.rate_scope, "reference": self.reference}
 
 
 def _ceil(value):

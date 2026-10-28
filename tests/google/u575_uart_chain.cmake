@@ -21,6 +21,7 @@ nexus_google_test(nexus_u575_uart_chain_test SOURCES
     u575_uart_chain_test.cpp u575_uart_chain_model.cpp
     u575_uart_gpdma_model.cpp u575_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_dma_chain.c"
     LIBRARIES Nexus::IO Nexus::Arch

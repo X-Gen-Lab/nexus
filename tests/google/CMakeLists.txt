@@ -321,6 +321,7 @@ target_sources(nexus_stm32_uart_stream_test PRIVATE
 
 nexus_google_test(nexus_gd32_spi_dma_test SOURCES gd32_spi_dma_test.cpp
     "${gd_multi_root}/drivers/spi.c" "${gd_multi_root}/drivers/spi_dma.c"
+    "${gd_multi_root}/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"

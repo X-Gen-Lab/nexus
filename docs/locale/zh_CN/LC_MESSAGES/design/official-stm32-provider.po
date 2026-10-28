@@ -1,4 +1,4 @@
-#
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e620ed5c7a5d445115a60b3037c1b29f7c065c7bacc7146f013283553971d253\n"
+"X-Nexus-Source-SHA256: 97e789c2e703cfbaef9df4d47cc1c744bf286e9a47740f91a745a681bb5e3127\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -60,6 +60,10 @@ msgstr ""
 " v1.28.3。机器权威是[官方驱动锁](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json)，校验时对照所选 Git 依赖与导入 "
 "SDK 字节。锁文件记录已审查的 LL 头和许可证，不表示全部 HAL 模块均已编译、支持或验证。"
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family entries while keeping their Device/startup, HAL/LL and imported vendor bytes. The internal `nexus_cmsis_core` target supplies CPU headers; it does not change public Nexus types, Arch context/ownership contracts or the selected peripheral state machine. [Vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) distinguishes the release, Core version macros, literal pack metadata and license identities. Actual include closure, firmware links and installed-SDK consumption require current-source evidence; a common Core pin does not transfer F4 qualification to G4, H7, U5 or GD32."
+msgstr "CMSIS Device 配对与共享的 Arm CMSIS-Core 来源分别维护。Core 迁移为七个维护中的 STM32/GD32 family 入口锁定官方 v6.4.0，同时保持各自的 Device/startup、HAL/LL 和供应商导入字节。内部 `nexus_cmsis_core` 目标提供 CPU 头，不改变公共 Nexus 类型、Arch 上下文／所有权合同或已选外设状态机。[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)分别记录发布版本、Core 版本宏、原始 pack 元数据和许可证身份。实际 include 闭包、固件链接和安装后 SDK 消费都需要当前源码的执行证据；使用同一 Core pin 不会把 F4 的资格转移给 G4、H7、U5 或 GD32。"
 
 msgid ""
 "The selected production approach uses official LL operations inside existing"
@@ -127,21 +131,33 @@ msgid "Build-time provider contract"
 msgstr "构建期 provider 合同"
 
 msgid ""
-"Each constructor returns the frozen `Construction` record from [provider "
-"common contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tools/configure/providers/common.py). It names "
-"`state_type`, `definitions`, `initialize`, `stop`, `retain_on_failed_init`, "
-"`exports` and `pin_snapshots`. The common emitter consumes these decisions "
-"rather than reconstructing state types or failed-init responsibility from a "
-"family name. This is a Python generation contract; no descriptor or dispatch"
-" layer is emitted into the MCU image."
+"Each constructor returns the frozen `Construction` record from [provider"
+" common contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMEN"
+"TATION-SOURCE/tools/configure/providers/common.py). It names "
+"`state_type`, `definitions`, `initialize`, `stop`, "
+"`retain_on_failed_init`, `exports` and `pin_snapshots`. The common "
+"emitter consumes these decisions rather than reconstructing state types "
+"or failed-init responsibility from a family name. `initialize` is an "
+"immutable `DirectCall`; `stop` is a tuple of these calls. Arguments are "
+"explicit static `Symbol` or `Address` values, uint32 constants, "
+"booleans, NULL, or nested direct calls such as absolute-deadline "
+"construction. Free-form expressions, casts, assignments and "
+"function-pointer/member-call expressions reject. `definitions`, "
+"`exports` and `face_definitions` remain C source strings; they can still"
+" contain selected helper bodies. The real C compiler establishes symbol "
+"and parameter types. This is a narrow Python generation contract, not a "
+"complete C AST; these Python records introduce no additional runtime "
+"metadata or dispatch into the MCU image."
 msgstr ""
-"每个构造器返回[provider 公共合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tools/configure/providers/common.py)中的冻结 `Construction`"
-" 记录，明确给出 "
-"`state_type`、`definitions`、`initialize`、`stop`、`retain_on_failed_init`、`exports`"
-" 和 `pin_snapshots`。公共生成器消费这些决策，不再从家族名称重建状态类型或初始化失败责任。这是 Python 生成合同，不会向 MCU "
-"镜像增加描述符或分派层。"
+"每个构造器返回[provider 公共合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOC"
+"UMENTATION-SOURCE/tools/configure/providers/common.py)中的冻结 "
+"`Construction` 记录，明确 `state_type`、`definitions`、`initialize`、`stop`、`ret"
+"ain_on_failed_init`、`exports` 和 `pin_snapshots`。公共 emitter "
+"消费这些决策，不从系列名称重建状态类型或初始化失败责任。`initialize` 是不可变 `DirectCall`；`stop` 是这些调用的"
+" tuple。参数只能是显式静态 `Symbol` 或 `Address`、uint32 常量、布尔值、NULL，或构造绝对期限等嵌套直接调用。"
+"任意表达式、强制转换、赋值以及函数指针／成员调用表达式均拒绝。`definitions`、`exports` 和 "
+"`face_definitions` 仍是 C 源码字符串，可包含选定辅助函数体。真实 C 编译器建立符号与参数类型。这是窄 Python "
+"生成合同，不是完整 C AST；这些 Python 记录不会向 MCU 镜像添加额外的运行时元数据或分发。"
 
 msgid ""
 "The family owns numerical limits, supported modes, exact routes and "
@@ -153,6 +169,92 @@ msgid ""
 msgstr ""
 "家族负责数值限制、支持模式、精确路线与构造语义；resolver 负责严格字段、不可变输入和资源冲突；CMake "
 "负责源码选择和目标依赖。必须保留这些独立权威：生成器不得创建第二份源码构建图，配置语法正确也不能表示尚未实现的硬件已经可用。"
+
+msgid "Selected immutable I2C V2 configuration"
+msgstr "选定 I2C V2 的不可变配置"
+
+msgid "The selected G474, H743 and U575 polling I2C V2 providers separate the private `nx_i2c_v2_config_t` from `nx_i2c_v2_state_t`. The generated readonly configuration holds register/reset addresses, the reset mask, timing, finite polling budget and the explicitly selected BERR and one-byte RX reload quirks. Zero-initialized runtime storage keeps a configuration pointer and `initialized`, `retained`, `active` and `fault` state. Public faces, shared ops and factory lookup stay the same. This split is not a measured Flash or RAM saving."
+msgstr "选定 G474、H743 与 U575 轮询 I2C V2 provider 将私有 `nx_i2c_v2_config_t` 与 `nx_i2c_v2_state_t` 分开。生成的只读配置保存寄存器／复位地址、复位掩码、timing、有限轮询预算，以及显式选择的 BERR 和单字节 RX reload 勘误选项。零初始化的运行时存储保留配置指针和 `initialized`、`retained`、`active`、`fault` 状态。公共 face、共享 ops 和 factory 查找保持不变。该拆分不等于已经测得 Flash 或 RAM 节省。"
+
+msgid "The private `nx_i2c_v2_bind` runs under the serialized privileged task owner with interrupts unmasked. It validates the configuration and rejects overlap with runtime or hardware storage. An initialized, retained or active owner rejects rebinding without mutation; successful binding itself has no hardware effects. The immutable configuration must live as long as its runtime owner; successful stop releases hardware ownership but preserves the binding. Do not reset a live owner merely to replace its configuration."
+msgstr "私有 `nx_i2c_v2_bind` 在串行化的特权 Task owner 下执行，且要求中断未屏蔽。它校验配置，并拒绝与运行时或硬件存储重叠。已 initialized、retained 或 active 的 owner 在不修改状态的前提下拒绝重新绑定；成功绑定本身没有硬件效果。不可变配置必须与运行时 owner 同寿命；成功 stop 释放硬件所有权，但保留绑定。不得只为替换配置而重置仍在使用的 owner。"
+
+msgid "Concrete G474/H743 `i2c_prepare` entries bind first, then prepare pins and initialize the engine. U575's separate mutable clock owner rejects a retained clock before binding, and acquires the selected clock before engine initialization. Its `i2c_close` stops the engine first; it releases the clock only after that stop succeeds. Failed drain retains the relevant runtime and clock responsibility for explicit cleanup or retry."
+msgstr "具体 G474／H743 `i2c_prepare` 入口先绑定，再准备引脚并初始化引擎。U575 独立的可变 clock owner 在绑定前拒绝 retained clock，并在引擎初始化前取得所选时钟。其 `i2c_close` 先停止引擎；只有该 stop 成功后才释放时钟。排空失败保留相关运行时与时钟责任，供显式清理或重试。"
+
+msgid "The family emitter now supplies static configuration and calls these concrete C entries. The existing `Construction` record and generated Platform still order resource phases, controller starts and reverse cleanup. Other peripheral modes retain their corresponding family emission paths; this selected refactor does not move every platform lifecycle into a new common abstraction."
+msgstr "家族 emitter 现在提供静态配置并调用这些具体 C 入口。既有 `Construction` record 与生成的 Platform 仍编排资源阶段、控制器启动和逆序清理。其他外设模式保留各自的家族生成路径；本次选定重构不会把所有平台生命周期移入新的公共抽象。"
+
+msgid "See the [private shared contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h) and the [U575 integration](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c) for exact parameters and failure ordering. The {download}`refactor ledger <soc-ip-layout-execution.csv>` separates focused software evidence, final linked cost comparison and physical execution."
+msgstr "精确参数与失败顺序见[私有共享合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h)及 [U575 集成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c)。{download}`重构台账 <soc-ip-layout-execution.csv>`分别记录聚焦软件证据、最终链接成本比较和物理执行。"
+
+msgid "Selected immutable UART DMA configuration"
+msgstr "选定 UART DMA 的不可变配置"
+
+msgid "The selected F103 and GD303 UART DMA modes use `nx_uart_v1_dma_config_t` for register/channel addresses, DMA memory domains, IRQ withdrawal and wake-validation callbacks, byte-ring or duplex receive storage, capacity, baud, IRQ policy and channel shifts. The selected profile identifies the active storage union member. `nx_uart_v1_dma_state_t` retains the configuration pointer, deadlines, active request and wake references, ring cursors, publication state and lifecycle flags. Duplex embeds its own mutable receive extension; byte mode does not reserve one. Configuration and its referenced resources have the runtime owner's lifetime. Successful stop preserves the binding, and zero-initialized runtime binds only during cold admission."
+msgstr "选定 F103 与 GD303 UART DMA 模式使用 `nx_uart_v1_dma_config_t` 保存寄存器／channel 地址、DMA 内存域、IRQ 撤下与 wake 校验 callback、字节 ring 或 duplex receive 存储、容量、波特率、IRQ 策略和 channel shift。所选 profile 标识存储 union 的有效成员。`nx_uart_v1_dma_state_t` 保留配置指针、deadline、active request 与 wake 引用、ring 游标、发布状态和生命周期标志。Duplex 内嵌自身可变 receive 扩展；字节模式不预留该扩展。配置及其引用资源与运行时 owner 同寿命。成功 stop 保留绑定，零初始化运行时仅在冷态准入期间绑定。"
+
+msgid "Each family's concrete `uart_dma_prepare` and `uart_duplex_prepare` requires a serialized privileged task with interrupts unmasked. After null/profile checks, it checks the existing cold owner before preparing exact pins and calling the initializer. Retained hardware, active requests, wake publishers and duplex RX loans prevent rebinding; the candidate receive extension is checked even before a configuration is bound. Failed withdrawal retains the same configuration and outstanding loans for ordinary stop or retry. The shared readonly ops, public faces and direct IRQ symbols remain unchanged; no hot-path dispatch layer is added."
+msgstr "每个家族的具体 `uart_dma_prepare` 与 `uart_duplex_prepare` 要求串行化特权 Task，且中断未屏蔽。在 null／profile 检查后，先检查既有冷态 owner，再准备精确引脚并调用 initializer。Retained hardware、active request、wake publisher 与 duplex RX loan 阻止重新绑定；即使尚未绑定配置，也会检查候选 receive 扩展。撤下失败保留同一配置及未归还 loan，供普通 stop 或重试。共享只读 ops、公共 face 与直接 IRQ symbol 保持不变；不增加热路径 dispatch 层。"
+
+msgid "The family's frozen `LegacyTransportProfile` supplies exact wiring to the existing emitter without family-name fallback. For these UART modes the selected `Construction.initialize` calls concrete C preparation; generation supplies static configuration, faces and IRQ forwarding. AHB DMA gates and Platform phase ordering remain in the existing SoC emission and shared template. Legacy I2C V1 and other peripheral cold paths retain their selected generated behavior."
+msgstr "家族冻结的 `LegacyTransportProfile` 向既有 emitter 提供精确 wiring，不使用家族名称 fallback。对于这些 UART 模式，所选 `Construction.initialize` 调用具体 C prepare；生成提供静态配置、face 与 IRQ forwarding。AHB DMA gate 与 Platform phase 顺序保留在既有 SoC emission 和共享 template 中。Legacy I2C V1 与其他外设冷态路径保留各自选定的生成行为。"
+
+msgid "See the [UART private contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h) for the exact storage, callback and lifetime requirements. Host tests exercise the actual SoC wrapper, shared engine and GPIO model; generated factory validation and final ARM resource measurements remain separate evidence scopes."
+msgstr "精确存储、callback 与寿命要求见 [UART 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)。主机测试执行实际 SoC wrapper、共享 engine 与 GPIO model；生成 factory 校验和最终 ARM 资源测量仍是独立证据范围。"
+
+
+msgid "Selected legacy cold integration"
+msgstr "选定 legacy 冷态集成"
+
+msgid "F103 and GD303 keep concrete ADC, PWM and Flash `prepare` entries in their respective `drivers/devices.c`. These privileged task entries require interrupts unmasked and reject the relevant live, retained or faulted owner before replacing its resource binding. The exact C adapter owns register addresses, fixed pin and gate relationships, system-clock state and chip-specific cold checks. Family generation still validates the selected Board/mode and supplies its chosen values. The existing shared `nx_legacy_*_close` paths retain stop and drain responsibility."
+msgstr "F103 与 GD303 在各自 `drivers/devices.c` 保留具体 ADC、PWM 和 Flash `prepare` 入口。这些特权 Task 入口要求中断未屏蔽，并在替换资源绑定前拒绝相关 live、retained 或 faulted owner。精确 C adapter 拥有寄存器地址、固定引脚与 gate 关系、system-clock 状态和芯片特定冷态检查。家族生成仍校验所选 Board／模式并提供选定数值。既有共享 `nx_legacy_*_close` 路径保留 stop 与 drain 责任。"
+
+msgid ""
+"The ADC and PWM owners now reference their own readonly hardware "
+"descriptions, `nx_legacy_adc_config_t` and `nx_legacy_pwm_config_t`, "
+"supplied by each exact SoC. Register addresses, gates and fixed pad "
+"facts move out of mutable owner storage. ADC reference voltage and PWM "
+"tick/period/duty/inactive level remain selected owner state; they are "
+"not promoted into shared hardware facts. Configuration must outlive the "
+"owner and cannot overlap its state or API output storage. This does not "
+"turn these drivers into the I2C V2 type; Flash keeps its separate "
+"private contract. Actual linked costs depend on the exact selected "
+"image."
+msgstr ""
+"ADC 和 PWM owner 现在引用各精确 SoC 提供的只读硬件描述 `nx_legacy_adc_config_t` 与 "
+"`nx_legacy_pwm_config_t`。寄存器地址、gate 和固定 pad 事实移出可变 owner 存储。ADC 参考电压及 "
+"PWM tick／period／duty／inactive level 仍为选定 owner 状态，不提升为共享硬件事实。配置生命周期必须覆盖 "
+"owner，且不能与其 state 或 API 输出存储重叠。这不会把驱动变成 I2C V2 类型；Flash "
+"保留独立私有合同。实际链接成本取决于精确选定镜像。"
+
+msgid ""
+"Selected U575 USART1 `dma-tx` and `dma-chain-tx` use static cold "
+"configuration and concrete C preparation. Their C adapters own "
+"admission, binding and pin preparation before existing finite/chain "
+"initialization. Selected F407 SPI polling/DMA and paired-controller DMA,"
+" plus GD470 SPI0/SPI4 polling and finite full-duplex DMA, move "
+"prepare/close behavior into concrete C while preserving the same "
+"Platform snapshot slots and retained cleanup responsibility. GD470 also "
+"moves its conditional EXTI close into C. The hot transfer engines, "
+"public faces and direct IRQ ownership are unchanged."
+msgstr ""
+"选定 U575 USART1 `dma-tx` 与 `dma-chain-tx` 使用静态冷态配置和具体 C prepare。C 适配器在既有 "
+"finite/chain 初始化前负责准入、绑定与引脚准备。选定 F407 SPI 轮询／DMA、成对控制器 DMA，以及 GD470 "
+"SPI0/SPI4 轮询和有限全双工 DMA，将 prepare/close 行为移入具体 C，同时保留原 Platform snapshot "
+"槽及失败后保留的清理责任。GD470 的条件 EXTI close 也迁入 C。热路径传输引擎、公共 face 和直接 IRQ 所有权不变。"
+
+msgid ""
+"This is a bounded cold-path migration. Other GPIO, IRQ UART, ADC, PWM, "
+"EXTI and additional mode-specific paths may still emit C behavior in "
+"family helpers. Review each selected mode's real start/stop path; "
+"neither a typed call field nor a new directory establishes that all "
+"lifecycle behavior has moved out of the generator. Physical timing and "
+"final software qualification remain separate."
+msgstr ""
+"这是有界冷态迁移。其他 GPIO、IRQ UART、ADC、PWM、EXTI 以及附加模式专用路径仍可能在系列辅助函数中生成 C "
+"行为。必须审查每个选定模式的真实 start/stop "
+"路径；类型化调用字段或新目录都不能证明全部生命周期行为已移出生成器。物理时序与最终软件资格分别建立。"
 
 msgid "Conditions for full HAL transport"
 msgstr "完整 HAL transport 的接入条件"
@@ -415,49 +517,3 @@ msgid ""
 msgstr ""
 "Bootloader 交接、动态变频、deep STOP、更广的 H743 DMA 和通用 U575 跨域 I/O，继续保留[SoC "
 "完善台账](soc-refinement.md)中各自未实现或部分实现的退出条件。官方驱动不会自动提供这些功能需要的平台合同。"
-
-# CMSIS6 actual-POT delta; independent review pending.
-msgid "CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family entries while keeping their Device/startup, HAL/LL and imported vendor bytes. The internal `nexus_cmsis_core` target supplies CPU headers; it does not change public Nexus types, Arch context/ownership contracts or the selected peripheral state machine. [Vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) distinguishes the release, Core version macros, literal pack metadata and license identities. Actual include closure, firmware links and installed-SDK consumption require current-source evidence; a common Core pin does not transfer F4 qualification to G4, H7, U5 or GD32."
-msgstr "CMSIS Device 配对与共享的 Arm CMSIS-Core 来源分别维护。Core 迁移为七个维护中的 STM32/GD32 family 入口锁定官方 v6.4.0，同时保持各自的 Device/startup、HAL/LL 和供应商导入字节。内部 `nexus_cmsis_core` 目标提供 CPU 头，不改变公共 Nexus 类型、Arch 上下文／所有权合同或已选外设状态机。[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)分别记录发布版本、Core 版本宏、原始 pack 元数据和许可证身份。实际 include 闭包、固件链接和安装后 SDK 消费都需要当前源码的执行证据；使用同一 Core pin 不会把 F4 的资格转移给 G4、H7、U5 或 GD32。"
-
-msgid "Selected immutable I2C V2 configuration"
-msgstr "选定 I2C V2 的不可变配置"
-
-msgid "The selected G474, H743 and U575 polling I2C V2 providers separate the private `nx_i2c_v2_config_t` from `nx_i2c_v2_state_t`. The generated readonly configuration holds register/reset addresses, the reset mask, timing, finite polling budget and the explicitly selected BERR and one-byte RX reload quirks. Zero-initialized runtime storage keeps a configuration pointer and `initialized`, `retained`, `active` and `fault` state. Public faces, shared ops and factory lookup stay the same. This split is not a measured Flash or RAM saving."
-msgstr "选定 G474、H743 与 U575 轮询 I2C V2 provider 将私有 `nx_i2c_v2_config_t` 与 `nx_i2c_v2_state_t` 分开。生成的只读配置保存寄存器／复位地址、复位掩码、timing、有限轮询预算，以及显式选择的 BERR 和单字节 RX reload 勘误选项。零初始化的运行时存储保留配置指针和 `initialized`、`retained`、`active`、`fault` 状态。公共 face、共享 ops 和 factory 查找保持不变。该拆分不等于已经测得 Flash 或 RAM 节省。"
-
-msgid "Concrete G474/H743 `i2c_prepare` entries bind first, then prepare pins and initialize the engine. U575's separate mutable clock owner rejects a retained clock before binding, and acquires the selected clock before engine initialization. Its `i2c_close` stops the engine first; it releases the clock only after that stop succeeds. Failed drain retains the relevant runtime and clock responsibility for explicit cleanup or retry."
-msgstr "具体 G474／H743 `i2c_prepare` 入口先绑定，再准备引脚并初始化引擎。U575 独立的可变 clock owner 在绑定前拒绝 retained clock，并在引擎初始化前取得所选时钟。其 `i2c_close` 先停止引擎；只有该 stop 成功后才释放时钟。排空失败保留相关运行时与时钟责任，供显式清理或重试。"
-
-msgid "The family emitter now supplies static configuration and calls these concrete C entries. The existing `Construction` record and generated Platform still order resource phases, controller starts and reverse cleanup. Other peripheral modes retain their corresponding family emission paths; this selected refactor does not move every platform lifecycle into a new common abstraction."
-msgstr "家族 emitter 现在提供静态配置并调用这些具体 C 入口。既有 `Construction` record 与生成的 Platform 仍编排资源阶段、控制器启动和逆序清理。其他外设模式保留各自的家族生成路径；本次选定重构不会把所有平台生命周期移入新的公共抽象。"
-
-msgid "See the [private shared contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h) and the [U575 integration](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c) for exact parameters and failure ordering. The {download}`refactor ledger <soc-ip-layout-execution.csv>` separates focused software evidence, final linked cost comparison and physical execution."
-msgstr "精确参数与失败顺序见[私有共享合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h)及 [U575 集成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c)。{download}`重构台账 <soc-ip-layout-execution.csv>`分别记录聚焦软件证据、最终链接成本比较和物理执行。"
-
-msgid "Selected legacy cold integration"
-msgstr "选定 legacy 冷态集成"
-
-msgid "F103 and GD303 keep concrete ADC, PWM and Flash `prepare` entries in their respective `drivers/devices.c`. These privileged task entries require interrupts unmasked and reject the relevant live, retained or faulted owner before replacing its resource binding. The exact C adapter owns register addresses, fixed pin and gate relationships, system-clock state and chip-specific cold checks. Family generation still validates the selected Board/mode and supplies its chosen values. The existing shared `nx_legacy_*_close` paths retain stop and drain responsibility."
-msgstr "F103 与 GD303 在各自 `drivers/devices.c` 保留具体 ADC、PWM 和 Flash `prepare` 入口。这些特权 Task 入口要求中断未屏蔽，并在替换资源绑定前拒绝相关 live、retained 或 faulted owner。精确 C adapter 拥有寄存器地址、固定引脚与 gate 关系、system-clock 状态和芯片特定冷态检查。家族生成仍校验所选 Board／模式并提供选定数值。既有共享 `nx_legacy_*_close` 路径保留 stop 与 drain 责任。"
-
-msgid "This moves the selected cold integration out of generated statement sequences; it does not turn the legacy drivers into the I2C V2 configuration type. ADC, PWM and Flash retain their separate private contracts. Other GPIO, IRQ UART, SPI, watchdog and EXTI paths can still contain concrete behavior emitted by their family adapter. Review each selected mode's real start/stop path rather than inferring a platform-wide lifecycle change from the directory layout."
-msgstr "这将选定冷态集成移出生成语句序列；不会把 legacy driver 转成 I2C V2 配置类型。ADC、PWM 和 Flash 保留各自的私有合同。其他 GPIO、IRQ UART、SPI、watchdog 与 EXTI 路径仍可包含家族 adapter 生成的具体行为。应复核每个所选模式的实际 start／stop 路径，不得由目录布局推断整个平台的生命周期变更。"
-
-msgid "The private `nx_i2c_v2_bind` runs under the serialized privileged task owner with interrupts unmasked. It validates the configuration and rejects overlap with runtime or hardware storage. An initialized, retained or active owner rejects rebinding without mutation; successful binding itself has no hardware effects. The immutable configuration must live as long as its runtime owner; successful stop releases hardware ownership but preserves the binding. Do not reset a live owner merely to replace its configuration."
-msgstr "私有 `nx_i2c_v2_bind` 在串行化的特权 Task owner 下执行，且要求中断未屏蔽。它校验配置，并拒绝与运行时或硬件存储重叠。已 initialized、retained 或 active 的 owner 在不修改状态的前提下拒绝重新绑定；成功绑定本身没有硬件效果。不可变配置必须与运行时 owner 同寿命；成功 stop 释放硬件所有权，但保留绑定。不得只为替换配置而重置仍在使用的 owner。"
-
-msgid "Selected immutable UART DMA configuration"
-msgstr "选定 UART DMA 的不可变配置"
-
-msgid "The selected F103 and GD303 UART DMA modes use `nx_uart_v1_dma_config_t` for register/channel addresses, DMA memory domains, IRQ withdrawal and wake-validation callbacks, byte-ring or duplex receive storage, capacity, baud, IRQ policy and channel shifts. The selected profile identifies the active storage union member. `nx_uart_v1_dma_state_t` retains the configuration pointer, deadlines, active request and wake references, ring cursors, publication state and lifecycle flags. Duplex embeds its own mutable receive extension; byte mode does not reserve one. Configuration and its referenced resources have the runtime owner's lifetime. Successful stop preserves the binding, and zero-initialized runtime binds only during cold admission."
-msgstr "选定 F103 与 GD303 UART DMA 模式使用 `nx_uart_v1_dma_config_t` 保存寄存器／channel 地址、DMA 内存域、IRQ 撤下与 wake 校验 callback、字节 ring 或 duplex receive 存储、容量、波特率、IRQ 策略和 channel shift。所选 profile 标识存储 union 的有效成员。`nx_uart_v1_dma_state_t` 保留配置指针、deadline、active request 与 wake 引用、ring 游标、发布状态和生命周期标志。Duplex 内嵌自身可变 receive 扩展；字节模式不预留该扩展。配置及其引用资源与运行时 owner 同寿命。成功 stop 保留绑定，零初始化运行时仅在冷态准入期间绑定。"
-
-msgid "Each family's concrete `uart_dma_prepare` and `uart_duplex_prepare` requires a serialized privileged task with interrupts unmasked. After null/profile checks, it checks the existing cold owner before preparing exact pins and calling the initializer. Retained hardware, active requests, wake publishers and duplex RX loans prevent rebinding; the candidate receive extension is checked even before a configuration is bound. Failed withdrawal retains the same configuration and outstanding loans for ordinary stop or retry. The shared readonly ops, public faces and direct IRQ symbols remain unchanged; no hot-path dispatch layer is added."
-msgstr "每个家族的具体 `uart_dma_prepare` 与 `uart_duplex_prepare` 要求串行化特权 Task，且中断未屏蔽。在 null／profile 检查后，先检查既有冷态 owner，再准备精确引脚并调用 initializer。Retained hardware、active request、wake publisher 与 duplex RX loan 阻止重新绑定；即使尚未绑定配置，也会检查候选 receive 扩展。撤下失败保留同一配置及未归还 loan，供普通 stop 或重试。共享只读 ops、公共 face 与直接 IRQ symbol 保持不变；不增加热路径 dispatch 层。"
-
-msgid "The family's frozen `LegacyTransportProfile` supplies exact wiring to the existing emitter without family-name fallback. For these UART modes the selected `Construction.initialize` calls concrete C preparation; generation supplies static configuration, faces and IRQ forwarding. AHB DMA gates and Platform phase ordering remain in the existing SoC emission and shared template. Legacy I2C V1 and other peripheral cold paths retain their selected generated behavior."
-msgstr "家族冻结的 `LegacyTransportProfile` 向既有 emitter 提供精确 wiring，不使用家族名称 fallback。对于这些 UART 模式，所选 `Construction.initialize` 调用具体 C prepare；生成提供静态配置、face 与 IRQ forwarding。AHB DMA gate 与 Platform phase 顺序保留在既有 SoC emission 和共享 template 中。Legacy I2C V1 与其他外设冷态路径保留各自选定的生成行为。"
-
-msgid "See the [UART private contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h) for the exact storage, callback and lifetime requirements. Host tests exercise the actual SoC wrapper, shared engine and GPIO model; generated factory validation and final ARM resource measurements remain separate evidence scopes."
-msgstr "精确存储、callback 与寿命要求见 [UART 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)。主机测试执行实际 SoC wrapper、共享 engine 与 GPIO model；生成 factory 校验和最终 ARM 资源测量仍是独立证据范围。"

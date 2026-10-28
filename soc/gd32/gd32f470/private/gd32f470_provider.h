@@ -481,6 +481,12 @@ nx_result_t nx_gd32_watchdog_state(const void* context,
 extern const nx_exti_ops_t nx_gd32_exti_ops;
 nx_result_t nx_gd32_exti_read(void* context, nx_exti_event_t* events,
                               size_t capacity, size_t* count);
+/** \brief Close an accepted cold EXTI instance or a side-effect-free rejection.
+ * \param[in,out] port: Serialized static owner retained after failed admission.
+ * \return Success if cold; active IRQ or failed withdrawal keeps its lease.
+ * \note Same task context and ownership rules as stop for initialized storage.
+ */
+nx_result_t nx_gd32_exti_close(nx_gd32_exti_state_t* port);
 nx_result_t nx_gd32_exti_stop(void* context);
 extern const nx_pwm_ops_t nx_gd32_pwm_ops;
 nx_result_t nx_gd32_pwm_set(void* context, uint32_t period_ticks,

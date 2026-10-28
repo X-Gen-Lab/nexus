@@ -7,11 +7,37 @@ import re
 import tempfile
 import tomllib
 
-from tools.configure import authored, configure, runtime
+from tools.configure import configure, runtime
 
 FENCE = re.compile(r"^```(?P<language>toml|json)[ \t]*\n"
                    r"(?P<body>.*?)^```[ \t]*$", re.MULTILINE | re.DOTALL)
 FRAGMENT = re.compile(r"<!-- nexus-toml-fragment:\s*(.*?)\s*-->$")
+
+
+def _toml_value(value):
+    """Preserve parsed example values while relocating only external paths."""
+    if isinstance(value, dict):
+        return "{" + ", ".join(json.dumps(key) + " = " + _toml_value(item)
+                              for key, item in value.items()) + "}"
+    if isinstance(value, list):
+        return "[" + ", ".join(_toml_value(item) for item in value) + "]"
+    if type(value) in (str, bool, int, float):
+        return json.dumps(value, ensure_ascii=False, allow_nan=False)
+    raise ValueError("Unsupported value in authored TOML example")
+
+
+def _assembly(block, document, temporary):
+    """Relocate document-owned paths without a legacy JSON configuration input."""
+    relocated = dict(block)
+    for key in ("board_package", "layout"):
+        value = relocated.get(key)
+        if isinstance(value, str) and not Path(value).is_absolute():
+            relocated[key] = str(document.parent / value)
+    path = temporary / "assembly.toml"
+    path.write_text("\n".join(json.dumps(key) + " = " + _toml_value(value)
+                              for key, value in relocated.items()) + "\n",
+                    encoding="utf-8")
+    return path
 
 
 def _runtime(block, following, document, temporary):
@@ -36,7 +62,7 @@ def _runtime(block, following, document, temporary):
 
 def check_document(document, root=configure.ROOT, *, contents=None):
     """Run production resolution; a fragment marker requires a stated reason."""
-    document = Path(document)
+    document = Path(document).absolute()
     contents = document.read_text(encoding="utf-8") if contents is None else contents
     openings = len(re.findall(r"^```toml[ \t]*$", contents, re.MULTILINE))
     matches = [match for match in FENCE.finditer(contents)
@@ -61,22 +87,9 @@ def check_document(document, root=configure.ROOT, *, contents=None):
             with tempfile.TemporaryDirectory(prefix="nexus-doc-config-") as name:
                 temporary = Path(name)
                 if "schema" in block:
-                    # Preserve authored validation before using the explicit
-                    # legacy projection to relocate external package paths.
-                    normalized = authored.normalize(
-                        block, document, root, configure.fail, configure.obj,
-                        configure.integer, configure.text)
-                    package = Path(normalized["board_package"])
-                    if not package.is_absolute():
-                        normalized["board_package"] = str(document.parent / package)
-                    if normalized.get("layout") is not None:
-                        layout = Path(normalized["layout"])
-                        if not layout.is_absolute():
-                            normalized["layout"] = str(document.parent / layout)
-                    assembly = temporary / "assembly.json"
-                    assembly.write_text(json.dumps(normalized), encoding="utf-8")
-                    result = configure.resolve(assembly, root)
-                    digest, kind = result["configuration_sha256"], "assembly"
+                    assembly = _assembly(block, document, temporary)
+                    result = configure.resolve_ir(assembly, root)
+                    digest, kind = result.configuration_sha256, "assembly"
                 elif "cpu_facts" in block:
                     _runtime(block, contents[match.end():], document, temporary)
                     assembly = temporary / "runtime.toml"

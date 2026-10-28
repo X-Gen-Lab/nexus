@@ -149,16 +149,16 @@ def resolve_catalogue(root=configure.ROOT):
         references.append({
             "assembly": path.relative_to(root).as_posix(),
             "board": result.board, "family": result.soc_family,
-            "part": result["part"], "backend": result.backend,
-            "optimization": result["optimization"],
-            "configuration_sha256": result["configuration_sha256"],
+            "part": result.part, "backend": result.backend,
+            "optimization": result.optimization,
+            "configuration_sha256": result.configuration_sha256,
             "selected": [{"id": item.id, "kind": item.kind,
                           "controller": item.controller, "mode": item.mode}
                          for item in result.controllers],
             "scope": "native_model" if result.soc_family == "native" else "public_reference",
             "physical_status": "not_executed",
-            "pcb_revision": result["physical_pcb_revision"],
-            "limitations": list(result["limitations"]),
+            "pcb_revision": result.physical_pcb_revision,
+            "limitations": list(result.limitations),
         })
     return {"schema_version": 1, "identity_kind": "derived-software-support",
             "contracts": contract, "references": references,

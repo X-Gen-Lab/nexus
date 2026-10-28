@@ -16,7 +16,7 @@ class U575RtcTests(unittest.TestCase):
         item, = result.controllers
         self.assertEqual(('rtc', 'RTC0', 'retained-calendar-alarm'),
                          (item.kind, item.controller, item.mode))
-        self.assertEqual((), tuple(item['pins']))
+        self.assertEqual((), item.pins)
         _, source = bindings.emit(result)
         self.assertIn('nx_stm32u575_rtc_initialize(', source)
         self.assertIn('nx_rtc_port_stop(', source)

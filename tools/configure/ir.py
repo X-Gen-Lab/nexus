@@ -4,9 +4,9 @@ JSON hardware facts and authored inputs are validated once by the resolver. This
 module stores that decision; it does not select targets or repair configuration.
 """
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, is_dataclass, replace
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import ClassVar, TYPE_CHECKING
 
 from tools.configure.resource_graph import ResourceClaimIR, ResourcePlanIR
 from tools.configure.trigger_graph import TriggerPlanIR
@@ -25,6 +25,11 @@ def freeze(value):
 
 
 def thaw(value):
+    if isinstance(value, Record):
+        return {key: thaw(item) for key, item in value.projection().items()}
+    if is_dataclass(value):
+        return {item.name: thaw(getattr(value, item.name))
+                for item in fields(value)}
     if isinstance(value, Mapping):
         return {key: thaw(item) for key, item in value.items()}
     if isinstance(value, tuple):
@@ -32,16 +37,13 @@ def thaw(value):
     return value
 
 
-class Record(Mapping):
-    """Read-only projection used by existing narrow constructor emitters."""
-    def __getitem__(self, key):
-        return self.values[key]
+class Record:
+    """Derived read-only projection; named fields are the sole stored values."""
+    def projection(self):
+        return {item.name: getattr(self, item.name) for item in fields(self)}
 
-    def __iter__(self):
-        return iter(self.values)
-
-    def __len__(self):
-        return len(self.values)
+    def to_dict(self):
+        return thaw(self)
 
 
 @dataclass(frozen=True)
@@ -63,9 +65,6 @@ class InterruptProfileIR:
 
 @dataclass(frozen=True)
 class CpuProfileIR(Record):
-    arch: str
-    fpu: str
-    float_abi: str
     enum_abi: str
     backend: str
     arch_macro: str
@@ -74,16 +73,32 @@ class CpuProfileIR(Record):
     irq: InterruptProfileIR
     compile_options: tuple[str, ...]
     definitions: Mapping
-    values: Mapping
+    cpu: Mapping
+
+    @property
+    def arch(self) -> str:
+        return self.cpu["arch"]
+
+    @property
+    def fpu(self) -> str:
+        return self.cpu["fpu"]
+
+    @property
+    def float_abi(self) -> str:
+        return self.cpu["float_abi"]
+
+    def projection(self):
+        return {**super().projection(), "arch": self.arch, "fpu": self.fpu,
+                "float_abi": self.float_abi}
 
     @classmethod
     def from_validated(cls, record):
         return cls(*(record[name] for name in (
-            "arch", "fpu", "float_abi", "enum_abi", "backend", "arch_macro",
+            "enum_abi", "backend", "arch_macro",
             "has_basepri", "atomic_backend")),
                    InterruptProfileIR(**record["irq"]),
                    tuple(record["compile_options"]),
-                   freeze(record["definitions"]), freeze(record))
+                   freeze(record["definitions"]), freeze(record["cpu"]))
 
     def to_dict(self):
         return thaw(self)
@@ -117,7 +132,6 @@ class KernelProfileIR(Record):
     min_stack_words: int
     stack_alignment_bytes: int
     definitions: Mapping
-    values: Mapping
 
     @classmethod
     def from_validated(cls, record):
@@ -130,7 +144,7 @@ class KernelProfileIR(Record):
             "max_task_name_len", "mutexes", "counting_semaphores",
             "task_notifications", "notification_slots", "trace", "runtime_stats",
             "tickless", "lowpower_port", "min_stack_words", "stack_alignment_bytes")),
-                   freeze(record["definitions"]), freeze(record))
+                   freeze(record["definitions"]))
 
     def to_dict(self):
         return thaw(self)
@@ -153,7 +167,6 @@ class ThreadXKernelProfileIR(Record):
     min_stack_bytes: int
     stack_alignment_bytes: int
     definitions: Mapping
-    values: Mapping
 
     @classmethod
     def from_validated(cls, record):
@@ -162,7 +175,7 @@ class ThreadXKernelProfileIR(Record):
             "max_priorities", "syscall_priority", "interrupt_mask",
             "kernel_policy", "kernel_port", "timer_process_in_isr",
             "min_stack_bytes", "stack_alignment_bytes")),
-                   freeze(record["definitions"]), freeze(record))
+                   freeze(record["definitions"]))
 
     def to_dict(self):
         return thaw(self)
@@ -219,13 +232,10 @@ class StreamProfileIR(Record):
     physical_qualified: bool
     source: str
     on_exhaustion: str
-    values: Mapping
 
     @classmethod
     def from_validated(cls, values):
-        fields = cls.__dataclass_fields__.keys() - {"values"}
-        return cls(**{name: values[name] for name in fields},
-                   values=freeze(values))
+        return cls(**{item.name: values[item.name] for item in fields(cls)})
 
 
 @dataclass(frozen=True)
@@ -262,14 +272,17 @@ class I2cTimingSelectionIR(Record):
     provenance: str
     physical_qualified: bool
     source: str
-    values: Mapping
-
-    @classmethod
-    def from_validated(cls, values):
-        return cls(*(values[name] for name in (
-            "timingr", "cr1_filter_bits", "provenance", "physical_qualified",
-            "source")), freeze(values))
-
+    bus_hz_min: int
+    bus_hz_max: int
+    low_ns_min: int
+    high_ns_min: int
+    scldel_ns_min: int
+    sdadel_ns_min: int
+    sdadel_ns_max: int
+    time_unit: str
+    rate_scope: str
+    reference: str
+    assumptions: Mapping
 
 @dataclass(frozen=True)
 class I2cOptions:
@@ -639,9 +652,7 @@ def mode_options(values):
                           values.get("dma_cache_line_bytes", 0))
     if kind == "i2c":
         return I2cOptions(values.get("max_hz", 100000), irq,
-                         I2cTimingSelectionIR.from_validated(
-                             values["timing_resolution"])
-                         if "timing_resolution" in values else None)
+                         values.get("timing_resolution"))
     if kind == "exti":
         return ExtiOptions(values["edge"], values["event_capacity"], irq)
     if kind == "pwm":
@@ -661,6 +672,19 @@ def mode_options(values):
     raise ValueError(f"Unmaintained controller decision: {kind}")
 
 
+def option_projection(options):
+    """Export selected options without retaining a parallel input dictionary."""
+    result = {item.name: getattr(options, item.name) for item in fields(options)}
+    irq = result.pop("irq", None)
+    if irq is not None:
+        result.update(irq_priority=irq.priority, calls_os=irq.calls_os,
+                      irq_probe=irq.probe)
+    stream = result.pop("stream_profile", None)
+    if stream is not None:
+        result["stream_resolution"] = stream
+    return result
+
+
 @dataclass(frozen=True)
 class ControllerIR(Record):
     id: str
@@ -670,16 +694,69 @@ class ControllerIR(Record):
     mode: str
     provider: str
     options: ControllerOptions
-    values: Mapping
+    pins: tuple[Mapping, ...]
+    route: str
+    dma: tuple[str, ...]
+    can_irqs: tuple[str, ...]
+    source_fields: tuple[str, ...]
+    route_mask: int | None = None
+    route_initial: int | None = None
+    stream_fields: tuple[str, ...] = ()
     interface_kind: str | None = None
     integration: "ControllerIntegrationIR | None" = None
 
+    @property
+    def mask(self):
+        return (self.route_mask if self.route_mask is not None
+                else self.options.mask)
+
+    @property
+    def initial(self):
+        return (self.route_initial if self.route_initial is not None
+                else self.options.initial)
+
+    def projection(self):
+        result = {name: getattr(self, name) for name in (
+            "id", "kind", "controller", "binding", "mode", "pins", "route",
+            "dma", "can_irqs", "interface_kind", "mask", "initial")}
+        result.update(option_projection(self.options))
+        if isinstance(self.options, PinStateOptions):
+            result["pin_state_resolution"] = {
+                "default": self.options.default, "sleep": self.options.sleep}
+        if isinstance(self.options, I2cOptions) and self.options.timing is not None:
+            timing = self.options.timing
+            result["timing_resolution"] = timing
+            result["timing"] = {key: timing.assumptions[key] for key in (
+                "kernel_hz_min", "kernel_hz_max", "pclk_hz_min", "bus_hz_min",
+                "rise_ns_max", "fall_ns_max")}
+            result["timing"]["source"] = timing.source
+        stream = getattr(self.options, "stream_profile", None)
+        if stream is not None:
+            result["stream"] = {name: getattr(stream, name)
+                                for name in self.stream_fields}
+        if isinstance(self.options, AdcGroupOptions):
+            result["adc_group_resolution"] = {name: getattr(self.options, name)
+                for name in ("rank_repeat", "sample_stride", "scan_stride",
+                    "max_frames", "adc_clock_hz", "hclk_hz", "trigger_identity",
+                    "admission")}
+        return {name: result[name] for name in self.source_fields}
+
     @classmethod
     def create(cls, values, provider):
-        return cls(*(values[key] for key in
+        options = mode_options(values)
+        result = cls(*(values[key] for key in
                      ("id", "kind", "controller", "binding", "mode")),
-                   provider, mode_options(values), freeze(values),
-                   values.get("interface_kind", values["kind"]))
+                     provider, options, freeze(values["pins"]), values["route"],
+                     tuple(values.get("dma", ())),
+                     tuple(values.get("can_irqs", ())), tuple(values),
+                     route_mask=(None if hasattr(options, "mask") else values["mask"]),
+                     route_initial=(None if hasattr(options, "initial") else values["initial"]),
+                     stream_fields=tuple(values.get("stream", ())),
+                     interface_kind=values.get("interface_kind", values["kind"]))
+        # The projection is deliberately exhaustive: a new resolved field must
+        # acquire a typed owner instead of silently disappearing into metadata.
+        result.projection()
+        return result
 
 
 @dataclass(frozen=True)
@@ -727,7 +804,14 @@ class EndpointIR(Record):
     options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
               SpiDMATransactionEndpointOptions |
               I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions)
-    values: Mapping
+    source_fields: tuple[str, ...]
+
+    def projection(self):
+        result = {"id": self.id, "controller": self.controller,
+                  "driver": self.driver, **option_projection(self.options)}
+        if isinstance(self.options, UsbEndpointOptions):
+            result["endpoint_index"] = self.options.index
+        return {name: result[name] for name in self.source_fields}
 
     @classmethod
     def create(cls, values, controllers):
@@ -754,7 +838,7 @@ class EndpointIR(Record):
         else:
             raise ValueError(f"Unmaintained endpoint decision: {kind}")
         return cls(values["id"], values["controller"], values["driver"],
-                   kind, options, freeze(values))
+                   kind, options, tuple(values))
 
 
 @dataclass(frozen=True)
@@ -780,6 +864,20 @@ class MemoryBudgetIR:
     flash_load_limit_bytes: int | None
     regions: tuple[MemoryRegionBudgetIR, ...] = ()
     mpu: MpuMemoryReservationsIR | None = None
+
+    def projection(self):
+        result = {"main_stack_bytes": self.main_stack_bytes,
+                  "libc_heap_bytes": self.libc_heap_bytes}
+        for key, value in (("static_ram_bytes", self.static_ram_limit_bytes),
+                           ("flash_load_bytes", self.flash_load_limit_bytes)):
+            if value is not None:
+                result[key] = value
+        if self.regions:
+            result["regions"] = {item.id: {"limit_bytes": item.limit_bytes}
+                                 for item in self.regions}
+        if self.mpu is not None:
+            result["mpu"] = thaw(self.mpu)
+        return result
 
 
 @dataclass(frozen=True)
@@ -855,10 +953,9 @@ class RuntimePowerIR:
 
 @dataclass(frozen=True)
 class ConfigurationIR(Record):
+    source_epoch: ClassVar[int] = 2
     board: str
     soc_family: str
-    backend: str
-    irq: InterruptProfileIR
     cpu_profile: CpuProfileIR
     kernel: KernelProfileIR | ThreadXKernelProfileIR | None
     controllers: tuple[ControllerIR, ...]
@@ -870,89 +967,111 @@ class ConfigurationIR(Record):
     trigger_plan: TriggerPlanIR
     dma_topology: DmaTopologyIR
     clock_plan: ClockPlanIR | None
-    values: Mapping
+    physical_part: PhysicalPartIR
+    clock: Mapping
+    clock_profile: str
+    layout: Mapping
+    board_bindings: Mapping
+    routes: Mapping
+    platform_metadata: Mapping
+    inputs: tuple[Mapping, ...]
+    source_dependencies: tuple[Mapping, ...]
+    components: tuple[str, ...]
+    can_controllers: tuple[str, ...]
+    optimization: str
+    physical_pcb_revision: str | None
+    limitations: tuple[str, ...]
+    physical_qualified: bool
+    fact_references: Mapping | None = None
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
     runtime_power: RuntimePowerIR | None = None
     i2s2: I2s2RoleIR | None = None
-    physical_part: PhysicalPartIR | None = None
+    configuration_sha256: str = ""
+    schema_version: int = 1
 
-    @classmethod
-    def from_validated(cls, result):
+    @property
+    def backend(self):
+        return self.cpu_profile.backend
+
+    @property
+    def enum_abi(self):
+        return self.cpu_profile.enum_abi
+
+    @property
+    def irq(self):
+        return self.cpu_profile.irq
+
+    @property
+    def cpu(self):
+        return self.cpu_profile.cpu
+
+    @property
+    def part(self):
+        return self.physical_part.part
+
+    @property
+    def package(self):
+        return self.physical_part.package
+
+    @property
+    def flash(self):
+        return self.physical_part.flash
+
+    @property
+    def memory(self):
+        return self.physical_part.memory
+
+    @property
+    def claims(self):
+        return self.resource_plan.claims
+
+    def projection(self):
+        result = {item.name: getattr(self, item.name) for item in fields(self)
+                  if item.name not in {
+                      "kernel", "memory_budget", "physical_part", "fact_references",
+                      "pwm_shared_owners", "runtime_power", "i2s2", "clock_plan"}}
+        result.update(backend=self.backend, enum_abi=self.enum_abi,
+                      irq=thaw(self.irq), cpu=self.cpu, part=self.part,
+                      package=self.package, flash=self.flash, memory=self.memory,
+                      kernel_profile=self.kernel,
+                      memory_budgets=self.memory_budget.projection(),
+                      claims=tuple({name: getattr(claim, name) for name in
+                          ("key", "owner", "mode", "source")} for claim in self.claims))
+        for name in ("fact_references", "runtime_power", "i2s2", "clock_plan"):
+            if getattr(self, name) is not None:
+                result[name] = getattr(self, name)
+        if self.pwm_shared_owners:
+            result["pwm_shared_owners"] = self.pwm_shared_owners
+        return result
+
+    def with_integrations(self):
+        """Reference canonical selected plans without copying or re-resolving."""
         from tools.configure.providers import maintained
-        provider = maintained(result["soc_family"])
-        resources = ResourcePlanIR.from_validated(result["resource_plan"])
-        dma = DmaTopologyIR.from_validated(result["dma_topology"])
-        irq = InterruptProfileIR(**result["irq"])
-        clock = (ClockPlanIR.from_validated(result["clock_plan"])
-                 if result.get("clock_plan") is not None else None)
-        values = dict(freeze(result))
-        controllers = tuple(ControllerIR.create(item, result["soc_family"])
-                            for item in result["controllers"])
+        provider = maintained(self.soc_family)
         integrated = []
-        for item in controllers:
+        for item in self.controllers:
             hardware = next((binding for binding in
                 getattr(provider, "CONTROLLER_BINDINGS", ())
                 if binding.controller == item.controller and
                 binding.kind == item.kind), None)
             integration = ControllerIntegrationIR(
                 item.controller,
-                tuple(claim for claim in resources.claims
+                tuple(claim for claim in self.resource_plan.claims
                       if item.id in claim.owner.split(";") and
                       claim.mode not in {"reserved", "kernel"}),
-                tuple(lane for lane in dma.lanes if lane.owner == item.id),
-                getattr(item.options, "irq", None), irq, clock,
-                values["clock"],
-                (values["clock"][f"apb{hardware.apb}_hz"]
-                 if hardware is not None else None),
-                item.values["pins"], hardware)
+                tuple(lane for lane in self.dma_topology.lanes if lane.owner == item.id),
+                getattr(item.options, "irq", None), self.irq, self.clock_plan,
+                self.clock,
+                (self.clock[f"apb{hardware.apb}_hz"]
+                 if hardware is not None else None), item.pins, hardware)
             integrated.append(replace(item, integration=integration))
-        controllers = tuple(integrated)
-        devices = tuple(EndpointIR.create(item, controllers)
-                        for item in result["devices"])
-        values["controllers"] = controllers
-        values["devices"] = devices
-        budgets = result["memory_budgets"]
-        memory = MemoryBudgetIR(budgets["main_stack_bytes"],
-                                budgets.get("libc_heap_bytes", 0),
-                                budgets.get("static_ram_bytes"),
-                                budgets.get("flash_load_bytes"),
-                                tuple(MemoryRegionBudgetIR(name, choice["limit_bytes"])
-                                      for name, choice in sorted(
-                                          budgets.get("regions", {}).items())),
-                                (MpuMemoryReservationsIR(**budgets["mpu"])
-                                 if "mpu" in budgets else None))
-        cpu = CpuProfileIR.from_validated(result["cpu_profile"])
-        kernel_type = (ThreadXKernelProfileIR if result["backend"] == "threadx"
-                       else KernelProfileIR)
-        kernel = (kernel_type.from_validated(result["kernel_profile"])
-                  if result.get("kernel_profile") is not None else None)
-        return cls(result["board"], result["soc_family"], result["backend"], irq, cpu, kernel,
-                   controllers, devices, memory,
-                   FactoryOptions(result.get("factory", {}).get("capabilities", False)),
-                   (CanDomainIR(result["can_domain"]["split"],
-                                tuple(CanFilterIR(**item) for item in
-                                      result["can_domain"]["filters"]))
-                    if result.get("can_domain") is not None else None),
-                   resources,
-                   TriggerPlanIR.from_validated(result["trigger_plan"]),
-                   dma, clock,
-                   MappingProxyType(values),
-                   tuple(PwmSharedOwnerIR.from_validated(item)
-                         for item in result.get("pwm_shared_owners", ())),
-                   (RuntimePowerIR(result["runtime_power"]["mode"],
-                                   tuple(result["runtime_power"]["controllers"]))
-                    if "runtime_power" in result else None),
-                   (I2s2RoleIR(result["i2s2"]["profile"], result["i2s2"]["part"],
-                               tuple(result["i2s2"]["claims"]))
-                    if "i2s2" in result else None),
-                   PhysicalPartIR(result["part"], result["package"],
-                                  values["flash"], values["memory"]))
-
-    def to_dict(self):
-        return thaw(self)
+        return replace(self, controllers=tuple(integrated))
 
 
 def controller_ir(item, family):
-    """Adapt validated legacy constructor fixtures without re-resolving facts."""
-    return (item if isinstance(item, ControllerIR) else
-            ControllerIR.create(item, family))
+    """Require one resolved owner; constructors never reinterpret raw inputs."""
+    if not isinstance(item, ControllerIR):
+        raise TypeError("Provider construction requires ControllerIR")
+    if item.provider != family:
+        raise ValueError("Controller provider differs from the selected family")
+    return item

@@ -1,5 +1,6 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
-from tools.configure.ir import controller_ir
+from tools.configure.calls import Address, DirectCall
+from tools.configure.ir import ControllerIR
 from tools.configure import enhanced_endpoints
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
 from tools.configure.memory import dma_regions
@@ -8,8 +9,8 @@ from . import timer
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct exact static controller state, endpoints and bounded storage."""
-    from .contract import validate_selection
-    item = controller_ir(item, "stm32g474")
+    if not isinstance(item, ControllerIR):
+        fail("stm32g474 constructor requires a resolved controller")
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")
     if item.kind == "pwm" and item.mode == "shared-fixed-pwm":
@@ -17,8 +18,6 @@ def constructor(item, result, board_bindings, routes, devices):
     if item.kind == "adc_group":
         from . import adc_group
         return adc_group.constructor(item, result, board_bindings[item.binding])
-    validate_selection(item, routes[item["route"]] if item.kind in {
-        "pwm_adc", "can_fd"} else item)
     if item.kind in {"pwm_adc", "can_fd"}:
         from . import coupled
         return coupled.constructor(item, result, board_bindings)
@@ -27,7 +26,7 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
-    initialize = f"prepare_{name}()"
+    initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio" and item.mode == "named-states":
         options = item.options
         plan = "s_nx_pin_plan_" + name
@@ -46,8 +45,8 @@ def constructor(item, result, board_bindings, routes, devices):
                         "}"]
         return Construction(
             state_type="nx_stm32g474_pin_state_t", definitions=definitions,
-            initialize=f"prepare_{name}()",
-            stop=[f"nx_stm32g474_pin_state_stop(&{state})"],
+            initialize=DirectCall(f"prepare_{name}"),
+            stop=[DirectCall("nx_stm32g474_pin_state_stop", (Address(state),))],
             retain_on_failed_init=True)
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
@@ -57,14 +56,15 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.output = {'true' if item.mode == 'output' else 'false'};",
                         f"    return nx_stm32g474_gpio_initialize(&{state}, {item.options.initial}u);",
                         "}"]
-        stop = f"nx_stm32g474_gpio_stop(&{state}, {item.options.initial}u)"
+        stop = DirectCall("nx_stm32g474_gpio_stop",
+                          (Address(state), item.options.initial))
     elif item.kind == "uart":
         options = item.options
         capacity = options.rx_capacity
         if type(capacity) is not int or not 1 <= capacity <= 4096:
             raise ValueError("G474 LPUART requires an explicit bounded byte ring")
-        irq = result["irq"]
-        tx, rx = item["pins"]
+        irq = result.irq
+        tx, rx = item.pins
         definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];",
                         f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
@@ -74,7 +74,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.baud = {options.baud}u;",
                         f"    {state}.irq = {item.controller}_IRQn;",
                         f"    {state}.profile = NX_UART_RX_BYTES;",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
                         ("    nx_result_t status = nx_stm32g474_lpuart1_pins_prepare();"
                          if item.controller == "LPUART1" else
                          f"    nx_result_t status = nx_stm32g474_uart_pins_prepare(GPIO{tx['pin'][1]}, {int(tx['pin'][2:])}u, GPIO{rx['pin'][1]}, {int(rx['pin'][2:])}u, {tx['af']}u);"),
@@ -83,9 +83,9 @@ def constructor(item, result, board_bindings, routes, devices):
                         "}", f"void {item.controller}_IRQHandler(void);",
                         r"/** \brief One selected controller, at most one TX/RX byte. */",
                         f"void {item.controller}_IRQHandler(void) {{ nx_stm32g474_uart_irq(&{state}); }}"]
-        stop = f"nx_uart_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "spi":
-        children = [child for child in devices if child["controller"] == item.id]
+        children = [child for child in devices if child.controller == item.id]
         if not children:
             fail("G474 SPI requires a reviewed active-low CS endpoint")
         body = [f"static nx_result_t prepare_{name}(void) {{",
@@ -102,10 +102,10 @@ def constructor(item, result, board_bindings, routes, devices):
                  f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
                  "    if (status != NX_SUCCESS) { return status; }"]
         for child in children:
-            child_name = child["id"].replace("-", "_")
+            child_name = child.id.replace("-", "_")
             cs = f"s_nx_cs_{child_name}"
             endpoint = f"s_nx_endpoint_{child_name}"
-            binding = board_bindings[child["cs_binding"]]
+            binding = board_bindings[child.options.cs_binding]
             pins = routes[binding["route"]]["pins"]
             if len(pins) != 1:
                 fail("G474 SPI endpoint CS requires one reviewed pad")
@@ -113,10 +113,10 @@ def constructor(item, result, board_bindings, routes, devices):
             mask = 1 << int(pin[2:])
             if binding.get("initial") != mask:
                 fail("G474 SPI active-low CS requires an initial high latch")
-            rate = child.get("max_hz", item.options.max_hz)
+            rate = child.options.max_hz
             if type(rate) is not int or not 664063 <= rate <= item.options.max_hz:
                 fail("G474 SPI endpoint rate is outside its hardware divider")
-            mode = child.get("mode", 0)
+            mode = child.options.mode
             if type(mode) is not int or not 0 <= mode <= 3:
                 fail("G474 SPI endpoint mode must be 0 through 3")
             definitions += [f"static nx_stm32g474_gpio_state_t {cs};",
@@ -135,13 +135,13 @@ def constructor(item, result, board_bindings, routes, devices):
                      f"    {endpoint}.mode = {mode}u;"]
             stops += [f"    status = nx_stm32g474_gpio_stop(&{cs}, {mask}u);",
                       "    if (status != NX_SUCCESS) { return status; }"]
-        for pin in item["pins"]:
+        for pin in item.pins:
             wire = pin["pin"]
             body += [f"    status = nx_stm32g474_pin_alternate(GPIO{wire[1]}, {int(wire[2:])}u, {pin['af']}u);",
                      "    if (status != NX_SUCCESS) { return status; }"]
         definitions += body + ["    return NX_SUCCESS;", "}"]
         definitions += stops + ["    return NX_SUCCESS;", "}"]
-        stop = f"stop_{name}()"
+        stop = DirectCall(f"stop_{name}")
     elif item.kind == "pwm_group":
         if board_bindings[item.binding].get("mask") != 1810 or board_bindings[item.binding].get("initial") != 0:
             fail("G474 coherent PWM requires explicit three-pin inactive-low Board facts")
@@ -214,11 +214,11 @@ def constructor(item, result, board_bindings, routes, devices):
             f"        if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {comp}.saved) {{ return NX_ERROR_IO; }}",
             f"        {comp}.retained = false;", "    }",
             "    return NX_SUCCESS;", "}"]
-        stop = f"stop_{name}()"
+        stop = DirectCall(f"stop_{name}")
     elif item.kind == "pwm":
-        pin = item["pins"][0]["pin"]
+        pin = item.pins[0]["pin"]
         idle = "s_nx_idle_" + name
-        binding = board_bindings.get(item["binding"], {})
+        binding = board_bindings.get(item.binding, {})
         mask = 1 << int(pin[2:])
         initial = binding.get("initial")
         if type(initial) is not int or initial not in {0, mask} or binding.get("mask") != mask:
@@ -240,7 +240,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.tick_hz = {item.options.tick_hz}u;",
                         f"    {state}.poll_limit = 1000000u;",
                         f"    return nx_stm32g474_pwm_initialize(&{state});", "}"]
-        stop = f"nx_stm32g474_pwm_close(&{state})"
+        stop = DirectCall("nx_stm32g474_pwm_close", (Address(state),))
     elif item.kind == "i2c":
         timing = (f"0x{item.options.timing.timingr:08x}"
                   if item.options.timing is not None else "0x30420f13")
@@ -251,16 +251,17 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    .timing = {timing}u, .poll_limit = 1000000u,",
                         "    .ignore_master_berr = true, .receive_reload_one = false",
                         "};"]
-        initialize = f"nx_stm32g474_i2c_prepare(&{state}, &{config})"
+        initialize = DirectCall("nx_stm32g474_i2c_prepare",
+                                (Address(state), Address(config)))
         for child in devices:
-            if child["controller"] != item.id:
+            if child.controller != item.id:
                 continue
-            child_name = child["id"].replace("-", "_")
+            child_name = child.id.replace("-", "_")
             endpoint = "s_nx_endpoint_" + child_name
-            definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child['address']}u }};",
+            definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child.options.address}u }};",
                             *enhanced_endpoints.face(child, endpoint,
                                                      "nx_i2c_v2_endpoint_ops")]
-        stop = f"nx_i2c_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_i2c_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "flash":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.active || {state}.restore_pending || (FLASH->SR & FLASH_SR_BSY) != 0u) {{ return NX_ERROR_BUSY; }}",
@@ -268,7 +269,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.memory = (volatile uint8_t*)FLASH_BASE;",
                         f"    {state}.supply_mv = 3300u;",
                         "    return NX_SUCCESS;", "}"]
-        stop = f"nx_stm32g474_flash_close(&{state})"
+        stop = DirectCall("nx_stm32g474_flash_close", (Address(state),))
     elif item.kind == "adc":
         stream = item.mode == "trigger-dma"
         target = state + (".adc" if stream else "")
@@ -289,22 +290,22 @@ def constructor(item, result, board_bindings, routes, devices):
                         "    nx_arch_dsb();",
                         "    if ((NX_G474_READ(&GPIOA->MODER) & 3u) != 3u || (NX_G474_READ(&GPIOA->PUPDR) & 3u) != 0u) { return NX_ERROR_IO; }"]
         if stream:
-            irq = result["irq"]
+            irq = result.irq
             definitions += [f"    {state}.timer = TIM6;",
                             f"    {state}.dma = DMA1;",
                             f"    {state}.channel = DMA1_Channel1;",
                             f"    {state}.mux = DMAMUX1_Channel0;",
                             f"    {state}.regions = s_nx_dma_regions_{name};",
                             f"    {state}.region_count = {count}u;",
-                            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
                             f"    return nx_stm32g474_adc_stream_initialize(&{state});", "}",
                             "void DMA1_Channel1_IRQHandler(void);",
                             r"/** \brief One selected finite ADC block terminal observation. */",
                             f"void DMA1_Channel1_IRQHandler(void) {{ nx_stm32g474_adc_stream_irq(&{state}); }}"]
-            stop = f"nx_stm32g474_adc_stream_close(&{state})"
+            stop = DirectCall("nx_stm32g474_adc_stream_close", (Address(state),))
         else:
             definitions += [f"    return nx_stm32g474_adc_initialize(&{state});", "}"]
-            stop = f"nx_stm32g474_adc_close(&{state})"
+            stop = DirectCall("nx_stm32g474_adc_close", (Address(state),))
     elif item.kind == "watchdog":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",
@@ -317,10 +318,10 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"static nx_result_t stop_{name}(void) {{",
                         f"    return nx_stm32g474_watchdog_stop(&{state});",
                         "}"]
-        stop = f"stop_{name}()"
+        stop = DirectCall(f"stop_{name}")
     elif item.kind == "exti":
         options = item.options
-        irq = result["irq"]
+        irq = result.irq
         line = int(item.controller[-1])
         definitions += [f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
                         f"static nx_result_t prepare_{name}(void) {{",
@@ -333,12 +334,12 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.line = {line}u;",
                         f"    {state}.priority = {options.irq.priority}u;",
                         f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
                         f"    return nx_stm32g474_exti_initialize(&{state});",
                         "}", f"void EXTI{line}_IRQHandler(void);",
                         r"/** \brief One selected line, one bounded coalesced edge fact. */",
                         f"void EXTI{line}_IRQHandler(void) {{ nx_stm32g474_exti_irq(&{state}); }}"]
-        stop = f"nx_exti_port_stop(&s_nx_face_{name})"
+        stop = DirectCall("nx_exti_port_stop", (Address(f"s_nx_face_{name}"),))
     else:
         raise ValueError("Unmaintained G474 constructor")
     state_type = ("nx_i2c_v2_state_t" if item.kind == "i2c" else

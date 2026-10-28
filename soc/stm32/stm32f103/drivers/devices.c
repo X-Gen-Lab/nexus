@@ -54,6 +54,17 @@ static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+static const nx_legacy_adc_config_t s_adc_config = {
+    .registers = (nx_legacy_adc_registers_t*)ADC1,
+    .gate = &RCC->APB2ENR,
+    .divider = &RCC->CFGR,
+    .pin_mode = &GPIOA->CRL,
+    .pin_lock = &GPIOA->LCKR,
+    .clock_started = &g_nx_stm32f103_system.started,
+    .gate_mask = RCC_APB2ENR_ADC1EN,
+    .divider_mask = RCC_CFGR_ADCPRE,
+    .poll_limit = 1000000U,
+    .startup_delay_us = 4U};
 nx_result_t nx_stm32f103_adc_prepare(nx_stm32f103_adc_state_t* port,
                                      uint32_t reference_mv) {
     if (!task_context())
@@ -62,19 +73,22 @@ nx_result_t nx_stm32f103_adc_prepare(nx_stm32f103_adc_state_t* port,
         return NX_ERROR_INVALID;
     if (port->retained || port->initialized || port->active)
         return NX_ERROR_BUSY;
-    port->clock_started = &g_nx_stm32f103_system.started;
-    port->pin_mode = &GPIOA->CRL;
-    port->pin_lock = &GPIOA->LCKR;
-    port->poll_limit = 1000000U;
-    port->registers = (nx_legacy_adc_registers_t*)ADC1;
-    port->gate = &RCC->APB2ENR;
-    port->gate_mask = RCC_APB2ENR_ADC1EN;
-    port->divider = &RCC->CFGR;
-    port->divider_mask = RCC_CFGR_ADCPRE;
+    if (reference_mv < 2700U || reference_mv > 3600U)
+        return NX_ERROR_INVALID;
+    port->config = &s_adc_config;
     port->reference_mv = reference_mv;
-    port->startup_delay_us = 4U;
     return nx_legacy_adc_initialize(port);
 }
+static const nx_legacy_pwm_config_t s_pwm_config = {
+    .registers = (nx_legacy_pwm_registers_t*)TIM3,
+    .gate = &RCC->APB1ENR,
+    .pin_mode = &GPIOA->CRL,
+    .pin_lock = &GPIOA->LCKR,
+    .pin_latch = &GPIOA->ODR,
+    .pin_set = &GPIOA->BSRR,
+    .clock_started = &g_nx_stm32f103_system.started,
+    .gate_mask = RCC_APB1ENR_TIM3EN,
+    .poll_limit = 1000000U};
 nx_result_t nx_stm32f103_pwm_prepare(nx_stm32f103_pwm_state_t* port,
                                      uint32_t tick_hz, uint32_t period_ticks,
                                      uint32_t duty_ticks, uint32_t inactive) {
@@ -84,15 +98,7 @@ nx_result_t nx_stm32f103_pwm_prepare(nx_stm32f103_pwm_state_t* port,
         return NX_ERROR_INVALID;
     if (port->retained || port->initialized || port->running)
         return NX_ERROR_BUSY;
-    port->clock_started = &g_nx_stm32f103_system.started;
-    port->pin_mode = &GPIOA->CRL;
-    port->pin_lock = &GPIOA->LCKR;
-    port->poll_limit = 1000000U;
-    port->registers = (nx_legacy_pwm_registers_t*)TIM3;
-    port->gate = &RCC->APB1ENR;
-    port->gate_mask = RCC_APB1ENR_TIM3EN;
-    port->pin_latch = &GPIOA->ODR;
-    port->pin_set = &GPIOA->BSRR;
+    port->config = &s_pwm_config;
     port->inactive = inactive;
     port->tick_hz = tick_hz;
     port->period_ticks = period_ticks;

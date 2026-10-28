@@ -101,8 +101,8 @@ class FamilyLoadingTests(unittest.TestCase):
             ROOT / "tools/configure/assemblies/native-gpio.toml")
         provider = maintained("native")
         construction = provider.constructor(
-            result.controllers[0], result, result["board_bindings"],
-            result["routes"], result.devices)
+            result.controllers[0], result, result.board_bindings,
+            result.routes, result.devices)
         self.assertIs(type(construction), common.Construction)
         with self.assertRaises(common.ConfigurationError):
             maintained("../native")

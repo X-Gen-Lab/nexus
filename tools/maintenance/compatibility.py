@@ -70,6 +70,22 @@ def dict_schema(tree, field, required_keys):
     return one(values, field + " dictionary")
 
 
+def class_epoch(tree, class_name, field):
+    """Read the actual typed contract, not an obsolete intermediate mapping."""
+    values = []
+    for node in tree.body:
+        if not isinstance(node, ast.ClassDef) or node.name != class_name:
+            continue
+        for declaration in node.body:
+            if (isinstance(declaration, ast.AnnAssign) and
+                    isinstance(declaration.target, ast.Name) and
+                    declaration.target.id == field and
+                    isinstance(declaration.value, ast.Constant) and
+                    type(declaration.value.value) is int):
+                values.append(declaration.value.value)
+    return one(values, class_name + "." + field + " schema epoch")
+
+
 def guard_schema(tree, variable):
     values = []
     for node in ast.walk(tree):
@@ -129,6 +145,7 @@ def observe(root=ROOT):
     version = load_policy(root)["semantic_version"]
     authored = ast.parse(source("tools/configure/authored.py"))
     configured = ast.parse(source("tools/configure/configure.py"))
+    typed = ast.parse(source("tools/configure/ir.py"))
     runtime = ast.parse(source("tools/configure/runtime.py"))
     package = ast.parse(source("cmake/package/package_source_sdk.py"))
     factory = ast.parse(source("tools/configure/factory.py"))
@@ -137,8 +154,10 @@ def observe(root=ROOT):
     if editor["properties"]["schema"]["const"] != author_epoch:
         raise ValueError("Editor schema differs from actual authoring validator")
     schemas = {"assembly_authoring": author_epoch,
-               "assembly_projection": dict_schema(authored, "schema_version", {"board_package"}),
-               "typed_ir": dict_schema(configured, "schema_version", {"board", "soc_family"}),
+               "assembly_projection": class_epoch(
+                   typed, "ConfigurationIR", "schema_version"),
+               "typed_ir": class_epoch(
+                   typed, "ConfigurationIR", "source_epoch"),
                "board": integer_call(configured, "Board schema"),
                "soc": integer_call(configured, "SoC schema"),
                "routes": integer_call(configured, "routes schema"),

@@ -8,11 +8,250 @@
  */
 #include "nexus/io/spi_transaction.h"
 #include "stm32f407_provider.h"
+#include "stm32f407_spi_cold.h"
 #include "stm32f4xx_ll_spi.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
+
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+
+static bool cold_context(void) {
+    return nx_arch_is_privileged() && !nx_arch_in_isr() &&
+           !nx_arch_irq_is_masked();
+}
+
+static volatile uint32_t* cold_gate(const nx_stm32_spi_config_t* config) {
+    return config->registers == SPI1 ? &RCC->APB2ENR : &RCC->APB1ENR;
+}
+
+static uint32_t cold_gate_mask(const nx_stm32_spi_config_t* config) {
+    return config->registers == SPI1 ? RCC_APB2ENR_SPI1EN : RCC_APB1ENR_SPI2EN;
+}
+
+/** \brief Withdraw electrical drive before altering a saved latch or mux. */
+static bool cold_withdraw(const nx_stm32_spi_pin_config_t* pin) {
+    uint32_t mask = 3U << (pin->pin * 2U);
+    uint32_t mode = pin->registers->MODER & mask;
+    if (mode != 0U && mode != mask) {
+        NX_PLATFORM_REGISTER_WRITE(pin->registers->MODER,
+                                   pin->registers->MODER | mask);
+        nx_arch_dsb();
+        if ((pin->registers->MODER & mask) != mask)
+            return false;
+    }
+    return true;
+}
+
+bool nx_stm32_spi_config_valid(const nx_stm32_spi_config_t* config) {
+    if (config == NULL || config->pins == NULL || config->endpoints == NULL ||
+        config->endpoint_count == 0U ||
+        config->endpoint_count > SIZE_MAX - 3U ||
+        config->pin_count != 3U + config->endpoint_count ||
+        (config->registers != SPI1 && config->registers != SPI2) ||
+        config->clock_hz != (config->registers == SPI1 ? 84000000U : 42000000U))
+        return false;
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_stm32_spi_pin_config_t* pin = &config->pins[i];
+        if (pin->snapshot == NULL || pin->port_index > 8U || pin->pin > 15U ||
+            pin->alternate > 15U ||
+            (uintptr_t)pin->registers !=
+                GPIOA_BASE + (uintptr_t)pin->port_index * 0x400U)
+            return false;
+        for (size_t prior = 0U; prior < i; ++prior) {
+            const nx_stm32_spi_pin_config_t* other = &config->pins[prior];
+            if (pin->snapshot == other->snapshot ||
+                (pin->registers == other->registers && pin->pin == other->pin))
+                return false;
+        }
+    }
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        const nx_stm32_spi_endpoint_config_t* endpoint = &config->endpoints[i];
+        if (endpoint->endpoint == NULL || endpoint->chip_select == NULL ||
+            endpoint->mode > 3U || endpoint->frequency_hz == 0U ||
+            endpoint->frequency_hz > config->clock_hz / 2U)
+            return false;
+    }
+    return true;
+}
+
+nx_result_t nx_stm32_spi_cold_rollback(nx_stm32_spi_state_t* port,
+                                       const nx_stm32_spi_config_t* config,
+                                       nx_stm32_spi_cold_receipt_t* receipt) {
+    if (!receipt->rollback_pending)
+        return NX_SUCCESS;
+    if (receipt->registers_captured) {
+        NX_PLATFORM_REGISTER_WRITE(config->registers->CR2, receipt->cr2);
+        NX_PLATFORM_REGISTER_WRITE(config->registers->CR1, receipt->cr1);
+        nx_arch_dsb();
+        if (config->registers->CR1 != receipt->cr1 ||
+            config->registers->CR2 != receipt->cr2)
+            return NX_ERROR_IO;
+        receipt->registers_captured = false;
+    }
+    volatile uint32_t* gate = cold_gate(config);
+    uint32_t mask = cold_gate_mask(config);
+    NX_PLATFORM_REGISTER_WRITE(*gate,
+                               (*gate & ~mask) | receipt->peripheral_clock);
+    nx_arch_dsb();
+    if ((*gate & mask) != receipt->peripheral_clock)
+        return NX_ERROR_IO;
+    while (receipt->captured != 0U) {
+        size_t index = receipt->captured - 1U;
+        const nx_stm32_spi_pin_config_t* pin = &config->pins[index];
+        if (!cold_withdraw(pin))
+            return NX_ERROR_IO;
+        nx_stm32_pin_restore(pin->registers, pin->pin, *pin->snapshot);
+        nx_arch_dsb();
+        if (nx_stm32_pin_capture(pin->registers, pin->pin) != *pin->snapshot)
+            return NX_ERROR_IO;
+        if (index >= 3U)
+            config->endpoints[index - 3U].chip_select->initialized = false;
+        --receipt->captured;
+    }
+    NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,
+                               (RCC->AHB1ENR & ~receipt->gpio_mask) |
+                                   receipt->gpio_clocks);
+    nx_arch_dsb();
+    if ((RCC->AHB1ENR & receipt->gpio_mask) != receipt->gpio_clocks)
+        return NX_ERROR_IO;
+    *receipt = (nx_stm32_spi_cold_receipt_t){0};
+    port->registers = NULL;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
+                                      const nx_stm32_spi_config_t* config,
+                                      nx_stm32_spi_cold_receipt_t* receipt) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || receipt == NULL)
+        return NX_ERROR_INVALID;
+    if (port->registers != NULL || port->active || receipt->rollback_pending)
+        return NX_ERROR_BUSY;
+    if (!nx_stm32_spi_config_valid(config))
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        if (config->endpoints[i].chip_select->initialized)
+            return NX_ERROR_BUSY;
+    }
+    *receipt = (nx_stm32_spi_cold_receipt_t){0};
+    for (size_t i = 0U; i < config->pin_count; ++i)
+        receipt->gpio_mask |= 1U << config->pins[i].port_index;
+    receipt->gpio_clocks = RCC->AHB1ENR & receipt->gpio_mask;
+    volatile uint32_t* gate = cold_gate(config);
+    receipt->peripheral_clock = *gate & cold_gate_mask(config);
+    receipt->rollback_pending = true;
+    port->registers = config->registers;
+    port->rcc = RCC;
+    port->clock_hz = config->clock_hz;
+    NX_PLATFORM_REGISTER_WRITE(*gate, *gate | cold_gate_mask(config));
+    nx_arch_dsb();
+    nx_result_t status = NX_ERROR_IO;
+    if ((*gate & cold_gate_mask(config)) == 0U)
+        goto failed;
+    receipt->cr1 = config->registers->CR1;
+    receipt->cr2 = config->registers->CR2;
+    status = NX_ERROR_BUSY;
+    if ((receipt->cr1 & SPI_CR1_SPE) != 0U)
+        goto failed;
+    receipt->registers_captured = true;
+    NX_PLATFORM_REGISTER_WRITE(config->registers->CR1, 0U);
+    NX_PLATFORM_REGISTER_WRITE(config->registers->CR2, 0U);
+    nx_arch_dsb();
+    status = NX_ERROR_IO;
+    if (config->registers->CR1 != 0U || config->registers->CR2 != 0U)
+        goto failed;
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_stm32_spi_pin_config_t* pin = &config->pins[i];
+        status = nx_stm32_gpio_clock_enable(pin->port_index);
+        if (status != NX_SUCCESS)
+            goto failed;
+        *pin->snapshot = nx_stm32_pin_capture(pin->registers, pin->pin);
+        receipt->captured = i + 1U;
+        if (i < 3U) {
+            status = nx_stm32_pin_configure(pin->registers, pin->pin, 2U,
+                                            pin->alternate, 0U, false);
+        } else {
+            const nx_stm32_spi_endpoint_config_t* endpoint =
+                &config->endpoints[i - 3U];
+            nx_stm32_gpio_state_t* cs = endpoint->chip_select;
+            cs->registers = pin->registers;
+            cs->mask = 1U << pin->pin;
+            cs->output = true;
+            status = nx_stm32_gpio_initialize(cs, cs->mask);
+            if (status == NX_SUCCESS) {
+                endpoint->endpoint->port = port;
+                endpoint->endpoint->cs = cs;
+                endpoint->endpoint->cs_mask = cs->mask;
+                endpoint->endpoint->mode = endpoint->mode;
+                endpoint->endpoint->frequency_hz = endpoint->frequency_hz;
+            }
+        }
+        if (status != NX_SUCCESS)
+            goto failed;
+    }
+    receipt->rollback_pending = false;
+    return NX_SUCCESS;
+failed:
+    (void)nx_stm32_spi_cold_rollback(port, config, receipt);
+    return status;
+}
+
+nx_result_t nx_stm32_spi_prepare(nx_stm32_spi_state_t* port,
+                                 const nx_stm32_spi_config_t* config,
+                                 nx_stm32_spi_cold_receipt_t* receipt) {
+    return nx_stm32_spi_cold_acquire(port, config, receipt);
+}
+
+nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
+                               const nx_stm32_spi_config_t* config,
+                               nx_stm32_spi_cold_receipt_t* receipt) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || receipt == NULL)
+        return NX_ERROR_INVALID;
+    if (port->registers == NULL)
+        return NX_SUCCESS;
+    if (!nx_stm32_spi_config_valid(config) ||
+        port->registers != config->registers)
+        return NX_ERROR_INVALID;
+    if (port->active)
+        return NX_ERROR_BUSY;
+    if (receipt->rollback_pending)
+        return nx_stm32_spi_cold_rollback(port, config, receipt);
+    NX_PLATFORM_REGISTER_WRITE(port->registers->CR1, 0U);
+    NX_PLATFORM_REGISTER_WRITE(port->registers->CR2, 0U);
+    nx_arch_dsb();
+    if (port->registers->CR1 != 0U || port->registers->CR2 != 0U)
+        return NX_ERROR_IO;
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        nx_stm32_gpio_state_t* cs = config->endpoints[i].chip_select;
+        nx_result_t result = nx_stm32_gpio_stop(cs, cs->mask);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    for (size_t i = 0U; i < 3U; ++i) {
+        const nx_stm32_spi_pin_config_t* pin = &config->pins[i];
+        if (!cold_withdraw(pin))
+            return NX_ERROR_IO;
+        (void)nx_stm32_pin_configure(pin->registers, pin->pin, 0U, 0U, 0U,
+                                     false);
+    }
+    volatile uint32_t* gate = cold_gate(config);
+    uint32_t mask = cold_gate_mask(config);
+    NX_PLATFORM_REGISTER_WRITE(*gate,
+                               (*gate & ~mask) | receipt->peripheral_clock);
+    nx_arch_dsb();
+    if ((*gate & mask) != receipt->peripheral_clock)
+        return NX_ERROR_IO;
+    *receipt = (nx_stm32_spi_cold_receipt_t){0};
+    port->registers = NULL;
+    return NX_SUCCESS;
+}
 #ifndef NX_STM32_SPI_RESET
 #define NX_STM32_SPI_RESET(reset, mask, active)                                \
     do {                                                                       \

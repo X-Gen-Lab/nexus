@@ -5,6 +5,7 @@ checks remain mandatory; a policy record does not implement a workaround.
 """
 import re
 
+from tools.configure.calls import Address, DirectCall
 from tools.configure.providers.common import Construction, fail, integer, sequence
 from tools.configure.memory import dma_regions
 
@@ -227,5 +228,5 @@ def constructor(item, result, binding):
                   "void DMA1_Channel1_IRQHandler(void) { "
                   f"nx_stm32g474_adc_group_dma_irq(&{state}); }}"]
     return Construction("nx_stm32g474_adc_group_state_t", tuple(lines),
-                        f"prepare_{name}()",
-                        (f"nx_stm32g474_adc_group_close(&{state})",), True)
+                        DirectCall(f"prepare_{name}"),
+                        (DirectCall("nx_stm32g474_adc_group_close", (Address(state),)),), True)

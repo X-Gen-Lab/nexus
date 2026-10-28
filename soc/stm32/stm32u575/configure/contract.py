@@ -267,8 +267,8 @@ def validate_mode_context(selection, route, *, backend, clock_profile):
 
 
 def validate_user_io_context(assembly, part):
-    if (part != "STM32U575ZIT6Q" or assembly["clock_profile"] != "msis4" or
-            assembly["layout"] is not None or "power" in assembly):
+    if (part != "STM32U575ZIT6Q" or assembly.clock_profile != "msis4" or
+            assembly.layout is not None or assembly.power is not None):
         common.fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
 
 

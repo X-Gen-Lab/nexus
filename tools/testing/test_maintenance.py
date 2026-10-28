@@ -105,15 +105,15 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         self.assertTrue(fixtures)
         rows = capabilities.collect(ROOT)
         for fixture in fixtures:
-            resolved = capabilities.configure.resolve(fixture, ROOT)
+            resolved = capabilities.configure.resolve_ir(fixture, ROOT)
             relative = fixture.relative_to(ROOT).as_posix()
-            for item in resolved["controllers"]:
-                with self.subTest(fixture=fixture.name, device=item["id"]):
+            for item in resolved.controllers:
+                with self.subTest(fixture=fixture.name, device=item.id):
                     selected = [row for row in rows if
                                 (row["family"], row["controller"], row["kind"],
                                  row["mode"]) ==
-                                (resolved["soc_family"], item["controller"],
-                                 item["kind"], item["mode"])]
+                                (resolved.soc_family, item.controller,
+                                 item.kind, item.mode)]
                     self.assertEqual(len(selected), 1)
                     self.assertIn(relative, selected[0]["fixtures"])
                     self.assertTrue(selected[0]["exports"])

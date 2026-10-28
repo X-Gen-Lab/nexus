@@ -27,6 +27,12 @@
 #ifndef NX_SPI_DMA_SEQUENCE_ENGINE_READ
 #define NX_SPI_DMA_SEQUENCE_ENGINE_READ(control) (*(control))
 #endif
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+#ifndef NX_PLATFORM_PRIORITY_WRITE
+#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))
+#endif
 
 /** \brief Selected register identity determines the immutable reviewed route.
  */
@@ -527,6 +533,250 @@ static nx_result_t stop(void* context) {
     state->initialized = false;
     state->spi.registers->CR2 = 0U;
     LL_SPI_Disable(state->spi.registers);
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
+                                     const nx_stm32_spi_dma_config_t* config,
+                                     nx_stm32_spi_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || receipt == NULL)
+        return NX_ERROR_INVALID;
+    if (state->initialized || state->spi.registers != NULL ||
+        state->active != NULL || state->spi.active || state->wake != NULL)
+        return NX_ERROR_BUSY;
+    if (config == NULL || config->regions == NULL ||
+        config->region_count == 0U || config->priority > 15U)
+        return NX_ERROR_INVALID;
+    bool first = config->spi.registers == SPI1;
+    if ((!first && config->spi.registers != SPI2) ||
+        config->dma != (first ? DMA2 : DMA1) ||
+        config->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
+        config->rx != (first ? DMA2_Stream0 : DMA1_Stream3))
+        return NX_ERROR_UNSUPPORTED;
+    nx_result_t result =
+        nx_stm32_spi_cold_acquire(&state->spi, &config->spi, receipt);
+    if (result != NX_SUCCESS)
+        return result;
+    state->dma = config->dma;
+    state->tx = config->tx;
+    state->rx = config->rx;
+    state->regions = config->regions;
+    state->region_count = config->region_count;
+    for (size_t i = 0U; i < config->spi.endpoint_count; ++i) {
+        nx_stm32_spi_dma_endpoint_state_t* endpoint =
+            (nx_stm32_spi_dma_endpoint_state_t*)config->spi.endpoints[i]
+                .endpoint;
+        endpoint->dma = state;
+    }
+    result = nx_stm32_spi_dma_initialize(state);
+    if (result != NX_SUCCESS) {
+        receipt->rollback_pending = true;
+        (void)nx_stm32_spi_cold_rollback(&state->spi, &config->spi, receipt);
+        return result;
+    }
+#ifndef NEXUS_STM32_MODEL
+    NVIC_SetPriority(dma_irq(state, true), config->priority);
+    NVIC_SetPriority(dma_irq(state, false), config->priority);
+#endif
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_spi_dma_close(nx_stm32_spi_dma_state_t* state,
+                                   const nx_stm32_spi_dma_config_t* config,
+                                   nx_stm32_spi_cold_receipt_t* receipt) {
+    if (state == NULL || config == NULL || receipt == NULL)
+        return NX_ERROR_INVALID;
+    nx_result_t result = stop(state);
+    return result == NX_SUCCESS
+               ? nx_stm32_spi_close(&state->spi, &config->spi, receipt)
+               : result;
+}
+
+static bool pair_config(const nx_stm32_spi_dma_config_t* config) {
+    if (config == NULL || !nx_stm32_spi_config_valid(&config->spi) ||
+        config->spi.pin_count > 16U || config->regions == NULL ||
+        config->region_count == 0U || config->priority > 15U)
+        return false;
+    bool first = config->spi.registers == SPI1;
+    return config->dma == (first ? DMA2 : DMA1) &&
+           config->tx == (first ? DMA2_Stream3 : DMA1_Stream4) &&
+           config->rx == (first ? DMA2_Stream0 : DMA1_Stream3);
+}
+
+nx_result_t
+nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
+                              const nx_stm32_spi_dma_config_t* config,
+                              nx_stm32_spi_dma_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || cold == NULL || !pair_config(config))
+        return NX_ERROR_INVALID;
+    if (cold->constructed || cold->vectors || cold->pin_leases != 0U ||
+        cold->clock_added != 0U || state->initialized ||
+        state->active != NULL || state->spi.active || state->wake != NULL)
+        return NX_ERROR_BUSY;
+    const bool first = config->spi.registers == SPI1;
+    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
+                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const unsigned irq = vectors[i];
+        const uint32_t mask = 1UL << (irq % 32U);
+        if (((NVIC->ISER[irq / 32U] | NVIC->ISPR[irq / 32U] |
+              NVIC->IABR[irq / 32U]) &
+             mask) != 0U)
+            return NX_ERROR_BUSY;
+    }
+    if (((config->tx->CR | config->rx->CR) & DMA_SxCR_EN) != 0U)
+        return NX_ERROR_BUSY;
+    if (config->kernel_bound && NVIC_GetPriorityGrouping() > 3U)
+        return NX_ERROR_PERMISSION;
+    volatile uint32_t* gate = first ? &RCC->APB2ENR : &RCC->APB1ENR;
+    const uint32_t mask = first ? RCC_APB2ENR_SPI1EN : RCC_APB1ENR_SPI2EN;
+    cold->clock_added = ~*gate & mask;
+    NX_PLATFORM_REGISTER_WRITE(*gate, *gate | mask);
+    nx_arch_dsb();
+    if ((*gate & mask) == 0U)
+        return NX_ERROR_IO;
+    if ((config->spi.registers->CR1 & SPI_CR1_SPE) != 0U ||
+        (config->spi.registers->SR & SPI_SR_BSY) != 0U)
+        return NX_ERROR_BUSY;
+    for (unsigned i = 0U; i < 2U; ++i)
+        cold->priorities[i] = NVIC->IPR[vectors[i]];
+    cold->vectors = true;
+    for (size_t i = 0U; i < config->spi.pin_count; ++i) {
+        const nx_stm32_spi_pin_config_t* pin = &config->spi.pins[i];
+        nx_result_t status = nx_stm32_gpio_clock_enable(pin->port_index);
+        if (status != NX_SUCCESS)
+            return status;
+        *pin->snapshot = nx_stm32_pin_capture(pin->registers, pin->pin);
+        cold->pin_leases |= (uint16_t)(1U << i);
+        if (i >= 3U) {
+            const uint32_t bit = 1U << pin->pin;
+            NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, bit);
+            nx_arch_dsb();
+            if ((pin->registers->ODR & bit) == 0U)
+                return NX_ERROR_IO;
+        }
+        status =
+            nx_stm32_pin_configure(pin->registers, pin->pin, i >= 3U ? 1U : 2U,
+                                   pin->alternate, 0U, false);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    state->spi.registers = config->spi.registers;
+    state->spi.rcc = RCC;
+    state->spi.clock_hz = config->spi.clock_hz;
+    state->dma = config->dma;
+    state->tx = config->tx;
+    state->rx = config->rx;
+    state->regions = config->regions;
+    state->region_count = config->region_count;
+    for (size_t i = 0U; i < config->spi.endpoint_count; ++i) {
+        const nx_stm32_spi_endpoint_config_t* entry = &config->spi.endpoints[i];
+        const nx_stm32_spi_pin_config_t* pin = &config->spi.pins[3U + i];
+        *entry->chip_select =
+            (nx_stm32_gpio_state_t){pin->registers, 1U << pin->pin, true, true};
+        *entry->endpoint = (nx_stm32_spi_endpoint_state_t){
+            &state->spi, entry->chip_select, 1U << pin->pin,
+            entry->frequency_hz, entry->mode};
+        ((nx_stm32_spi_dma_endpoint_state_t*)entry->endpoint)->dma = state;
+    }
+    nx_result_t status = nx_stm32_spi_dma_initialize(state);
+    if (status != NX_SUCCESS)
+        return status;
+    cold->constructed = true;
+    if ((*gate & mask) == 0U)
+        return NX_ERROR_IO;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const unsigned irq = vectors[i];
+        const uint8_t priority = (uint8_t)(config->priority << 4U);
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[irq], priority);
+        nx_arch_dsb();
+        if (NVIC->IPR[irq] != priority ||
+            (NVIC->ISER[irq / 32U] & (1UL << (irq % 32U))) == 0U)
+            return NX_ERROR_IO;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
+                                        const nx_stm32_spi_dma_config_t* config,
+                                        nx_stm32_spi_dma_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || cold == NULL || !pair_config(config))
+        return NX_ERROR_INVALID;
+    if (cold->constructed) {
+        nx_result_t status = stop(state);
+        if (status != NX_SUCCESS)
+            return status;
+        cold->constructed = false;
+    }
+    const bool first = config->spi.registers == SPI1;
+    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
+                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    if (cold->vectors) {
+        for (unsigned i = 0U; i < 2U; ++i) {
+            const unsigned irq = vectors[i];
+            const uint32_t mask = 1UL << (irq % 32U);
+            NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[irq / 32U], mask);
+            NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[irq / 32U], mask);
+            nx_arch_dsb();
+            if (((NVIC->ISER[irq / 32U] | NVIC->ISPR[irq / 32U] |
+                  NVIC->IABR[irq / 32U]) &
+                 mask) != 0U)
+                return NX_ERROR_BUSY;
+            NX_PLATFORM_PRIORITY_WRITE(NVIC->IPR[irq], cold->priorities[i]);
+            nx_arch_dsb();
+            if (NVIC->IPR[irq] != cold->priorities[i])
+                return NX_ERROR_IO;
+        }
+        cold->vectors = false;
+    }
+    /* Every retained CS must prove inactive before any selected pad is
+     * restored. A failed latch write never downgrades its recovery lease. */
+    for (size_t i = 3U; i < config->spi.pin_count; ++i) {
+        if ((cold->pin_leases & (1U << i)) == 0U)
+            continue;
+        const nx_stm32_spi_pin_config_t* pin = &config->spi.pins[i];
+        const uint32_t bit = 1U << pin->pin;
+        NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, bit);
+        nx_arch_dsb();
+        if ((pin->registers->ODR & bit) == 0U)
+            return NX_ERROR_IO;
+    }
+    for (size_t count = config->spi.pin_count; count != 0U; --count) {
+        const uint16_t owned = (uint16_t)(1U << (count - 1U));
+        if ((cold->pin_leases & owned) == 0U)
+            continue;
+        const nx_stm32_spi_pin_config_t* pin = &config->spi.pins[count - 1U];
+        const uint32_t mask = 3U << (pin->pin * 2U);
+        const uint32_t mode = pin->registers->MODER & mask;
+        if (mode != 0U && mode != mask) {
+            NX_PLATFORM_REGISTER_WRITE(pin->registers->MODER,
+                                       pin->registers->MODER | mask);
+            nx_arch_dsb();
+            if ((pin->registers->MODER & mask) != mask)
+                return NX_ERROR_IO;
+        }
+        nx_stm32_pin_restore(pin->registers, pin->pin, *pin->snapshot);
+        if (nx_stm32_pin_capture(pin->registers, pin->pin) != *pin->snapshot)
+            return NX_ERROR_IO;
+        cold->pin_leases &= (uint16_t)~owned;
+        if (count > 3U)
+            config->spi.endpoints[count - 4U].chip_select->initialized = false;
+    }
+    if (cold->clock_added != 0U) {
+        volatile uint32_t* gate = first ? &RCC->APB2ENR : &RCC->APB1ENR;
+        NX_PLATFORM_REGISTER_WRITE(*gate, *gate & ~cold->clock_added);
+        nx_arch_dsb();
+        if ((*gate & cold->clock_added) != 0U)
+            return NX_ERROR_IO;
+        cold->clock_added = 0U;
+    }
+    state->spi.registers = NULL;
     return NX_SUCCESS;
 }
 

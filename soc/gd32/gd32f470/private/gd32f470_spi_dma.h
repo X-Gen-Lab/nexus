@@ -6,7 +6,7 @@
 #ifndef NEXUS_GD32F470_SPI_DMA_H
 #define NEXUS_GD32F470_SPI_DMA_H
 
-#include "gd32f470_provider.h"
+#include "gd32f470_spi_cold.h"
 #include "nexus/io/dma.h"
 
 typedef struct nx_gd32_spi_dma_endpoint_state nx_gd32_spi_dma_endpoint_state_t;
@@ -42,9 +42,44 @@ struct nx_gd32_spi_dma_endpoint_state {
     nx_gd32_spi_dma_state_t* dma;
 };
 
+/** \brief Immutable selected DMA domains and publisher priority. */
+typedef struct {
+    nx_gd32_spi_config_t spi;
+    const nx_dma_memory_region_t* regions;
+    size_t region_count;
+    uint8_t priority;
+    bool kernel_bound;
+} nx_gd32_spi_dma_config_t;
+
+/** \brief Pins and IRQ priority leases remain until actual close succeeds. */
+typedef struct {
+    nx_gd32_spi_cold_t spi;
+    uint8_t priorities[2];
+    bool vectors;
+} nx_gd32_spi_dma_cold_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+/** \brief Prepare exact SPI0/SPI4 pads, endpoints and DMA publishers.
+ * \param[in,out] state: Cold serialized owner with no outstanding request.
+ * \param[in] config: Immutable exact resources, retained through close.
+ * \param[in,out] cold: Zero initial receipt; failed admission retains effects.
+ * \return Success or error requiring close to consume any actual acquisitions.
+ * \note Privileged task, interrupts unmasked; no allocation or discovery.
+ */
+nx_result_t nx_gd32_spi_dma_prepare(nx_gd32_spi_dma_state_t* state,
+                                    const nx_gd32_spi_dma_config_t* config,
+                                    nx_gd32_spi_dma_cold_t* cold);
+/** \brief Drain provider, withdraw vectors and restore exact cold resources.
+ * \param[in,out] state: Same owner after external callers have been joined.
+ * \param[in] config: Unchanged selected resource description.
+ * \param[in,out] cold: Actual receipt retained until every effect is restored.
+ * \return Success or BUSY/IO retaining responsibility for explicit retry.
+ */
+nx_result_t nx_gd32_spi_dma_close(nx_gd32_spi_dma_state_t* state,
+                                  const nx_gd32_spi_dma_config_t* config,
+                                  nx_gd32_spi_dma_cold_t* cold);
 extern const nx_spi_ops_t nx_gd32_spi_dma_ops;
 extern const nx_spi_endpoint_ops_t nx_gd32_spi_dma_endpoint_ops;
 /**

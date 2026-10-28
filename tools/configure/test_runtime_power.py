@@ -1,7 +1,6 @@
 """Exact selected lifecycle lease, with System time retained during I/O pause."""
 from dataclasses import FrozenInstanceError
 from pathlib import Path
-import json
 import tempfile
 import unittest
 
@@ -34,8 +33,9 @@ class RuntimePowerConfigurationTests(unittest.TestCase):
         self.assertEqual(result.runtime_power.controllers, ('bus4',))
         with self.assertRaises(FrozenInstanceError):
             result.runtime_power.mode = 'stop'
-        self.assertEqual(result['runtime_power']['controllers'], ('bus4',))
-        self.assertFalse(result['physical_qualified'])
+        self.assertEqual(result.to_dict()['runtime_power']['controllers'],
+                         ['bus4'])
+        self.assertFalse(result.physical_qualified)
 
     def test_selected_generated_api_uses_existing_clock_domain(self):
         header, source = bindings.emit(self.selected())
@@ -52,7 +52,7 @@ class RuntimePowerConfigurationTests(unittest.TestCase):
     def test_unselected_default_keeps_no_runtime_state_or_public_api(self):
         result = gate.resolve_ir(self.assembly(''))
         header, source = bindings.emit(result)
-        self.assertNotIn('runtime_power', result)
+        self.assertIsNone(result.runtime_power)
         for name in ('nx_platform_runtime_', 'nx_clock_domain_', 'nx_clock_lease_t'):
             self.assertNotIn(name, header + source)
 
@@ -89,13 +89,11 @@ class RuntimePowerConfigurationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.resolve_ir(self.assembly(base=self.base + additional))
 
-    def test_explicit_null_power_is_not_an_absent_selection(self):
-        normalized = gate.load_assembly(self.assembly(), gate.ROOT, {})
-        normalized['power'] = None
-        path = self.directory / 'null-power.json'
-        path.write_text(json.dumps(normalized))
-        with self.assertRaises(ValueError):
-            gate.resolve_ir(path)
+    def test_explicit_non_table_power_is_not_an_absent_selection(self):
+        for value in ("[]", "true", '"fixed-run"'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                gate.resolve_ir(self.assembly("", base=
+                    "power = " + value + "\n" + self.base))
 
     def test_failure_never_publishes_partial_runtime_bundle(self):
         output = self.directory / 'out'

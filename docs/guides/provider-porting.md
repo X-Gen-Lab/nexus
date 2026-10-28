@@ -76,7 +76,9 @@ forwarder merely to match a source directory.
    its configuration tests in `tools/configure/tests/providers/<family>/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
    Return an explicit frozen `Construction` record, including the private state
-   type and failed-init cleanup responsibility; do not require family-name
+   type and failed-init cleanup responsibility. Initialize and stop actions use
+   `DirectCall` values under the [constructor contract](../design/official-stm32-provider.md#build-time-provider-contract);
+   raw C expressions are not accepted in those fields. Do not require family-name
    inference in common generation. Unsupported modes reject; there is no runtime
    registration or plugin discovery.
 5. Add explicit CMake targets and private SDK dependencies. Update declared
@@ -104,7 +106,8 @@ directly; `__init__.py` explicitly exports it with constructors and emitters.
 The leaf `providers/common.py` owns validation helpers and immutable
 `Construction`; leaf contracts and common helpers do not import the top-level
 resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
-policy, `ir.py` adapts typed IR, and `matrix.py` orchestrates support catalogues.
+policy, `ir.py` owns named immutable decisions and their one-way JSON projection,
+and `matrix.py` orchestrates support catalogues.
 The descriptor explicitly lists `configuration_modules`, including `contract.py`,
 so edits trigger reconfiguration and remain in the Source SDK closure.
 

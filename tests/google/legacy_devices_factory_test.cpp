@@ -92,9 +92,9 @@ TEST_F(LegacyDeviceFactory, ExactStaticAssemblyStartsAndRestoresEveryLease) {
     const auto* converter = static_cast<const nx_legacy_adc_state_t*>(
         nx_factory_adc(NX_ADC_ID_INPUT)->context);
 #ifdef NX_LEGACY_FACTORY_F103
-    EXPECT_EQ(4U, converter->startup_delay_us);
+    EXPECT_EQ(4U, converter->config->startup_delay_us);
 #else
-    EXPECT_EQ(2000U, converter->startup_delay_us);
+    EXPECT_EQ(2000U, converter->config->startup_delay_us);
 #endif
     nx_pwm_state_t pwm{};
     ASSERT_EQ(NX_SUCCESS,

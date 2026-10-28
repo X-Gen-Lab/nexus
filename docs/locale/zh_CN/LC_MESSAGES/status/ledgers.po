@@ -1,28 +1,33 @@
-# Authored translation; independently semantically reviewed.
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source docs\n"
-"Report-Msgid-Bugs-To: \n"
-"Language-Team: Nexus agent-reviewed documentation\n"
+"Project-Id-Version: Nexus documentation\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 7bacb1fc91ca7e6c543cb487ce7a2e9839c31e182fd09abdbfed1b06d8122250\n"
+"X-Nexus-Source-SHA256: 5b9deebacf91a5006a4eef30beaefd1c00fc31f990560f7a03091450cf7f9bc9\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:9
 msgid "原台账、退出条件与派生视图"
 msgstr "原台账、退出条件与派生视图"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:11
 msgid ""
-"下面的页面来自十份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 "
-"SHA-256 可核对。 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。"
+"下面的页面来自十一份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源"
+" SHA-256 可核对。 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。"
 msgstr ""
-"下面的页面来自十份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 "
-"SHA-256 可核对。 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。"
+"下面的页面来自十一份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源"
+" SHA-256 可核对。 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。"
+
+msgid ""
+"`soc-ip-layout` 的 R01–R48 保留目录和共享 IP 重构的原状态。R43–R48 记录 精确 P "
+"的软件执行、分段计划、SDK、资源与候选；其 `not_executed` 物理值不因 页面生成改变。最新结果导航见 "
+"[软件证据入口](software-verification.md)。"
+msgstr ""
+"`soc-ip-layout` 的 R01–R48 保留目录和共享 IP 重构的原状态。R43–R48 记录 精确 P "
+"的软件执行、分段计划、SDK、资源与候选；其 `not_executed` 物理值不因 页面生成改变。最新结果导航见 "
+"[软件证据入口](software-verification.md)。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:30
 msgid "正确解读状态"

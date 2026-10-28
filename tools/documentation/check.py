@@ -377,8 +377,10 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     from tools.configure import configure, runtime
                     import tomllib
                     raw = tomllib.loads(destination.read_text())
-                    result = (configure.resolve(destination, root) if "schema" in raw
-                              else runtime.resolve(destination))
+                    if "schema" in raw:
+                        configure.resolve_ir(destination, root)
+                    else:
+                        runtime.resolve(destination)
                     config_records.append({"source": str(destination), "kind": "literalinclude",
                                            "resolved": True})
             plain = FENCE.sub("", contents)

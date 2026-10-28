@@ -25,6 +25,10 @@
 #define NX_U575_GPDMA_TCEM                      0U
 #define NX_U575_GPDMA_WITHDRAW(s)               true
 #endif
+#ifndef NX_U575_GPDMA_FACTS_BYTES
+#define NX_U575_GPDMA_FACTS_BYTES           sizeof(nx_stm32u575_uart_gpdma_facts_t)
+#define NX_U575_GPDMA_COLD_VALID(s, config) true
+#endif
 
 #if !defined(NX_U575_GPDMA_ENABLE) || !defined(NX_U575_GPDMA_SUSPEND) ||       \
     !defined(NX_U575_GPDMA_RESET)
@@ -805,6 +809,73 @@ failed:
     u->closing = true;
     (void)stop(s);
     return result;
+}
+
+nx_result_t nx_stm32u575_uart_gpdma_prepare(
+    nx_stm32u575_uart_gpdma_state_t* s,
+    const nx_stm32u575_uart_gpdma_config_t* config) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (s == NULL || !span(config, sizeof(*config)) ||
+        overlap(config, sizeof(*config), s, sizeof(*s)))
+        return NX_ERROR_INVALID;
+    nx_stm32u575_uart_state_t* u = &s->uart;
+    /* Check old ownership before reading a proposed binding or changing any
+     * field. A stopped owner can be reused; retained work can only be joined.
+     */
+    if (u->retained || u->initialized || u->active != NULL || u->wake != NULL ||
+        u->wake_publishers != 0U || s->effects != 0U)
+        return NX_ERROR_BUSY;
+    if (!span(config->facts, NX_U575_GPDMA_FACTS_BYTES) ||
+        !span(config->rx_storage, config->rx_capacity) ||
+        config->rx_capacity > 4096U || config->poll_limit == 0U ||
+        overlap(config->facts, NX_U575_GPDMA_FACTS_BYTES, s, sizeof(*s)) ||
+        overlap(config->rx_storage, config->rx_capacity, s, sizeof(*s)) ||
+        overlap(config->rx_storage, config->rx_capacity, config,
+                sizeof(*config)) ||
+        overlap(config->rx_storage, config->rx_capacity, config->facts,
+                NX_U575_GPDMA_FACTS_BYTES) ||
+        overlap(config->rx_storage, config->rx_capacity, USART1_NS,
+                sizeof(*USART1_NS)) ||
+        overlap(config->rx_storage, config->rx_capacity, GPDMA1_NS,
+                DMA_CONTROL_BYTES) ||
+        overlap(config->rx_storage, config->rx_capacity, NVIC, sizeof(*NVIC)) ||
+        overlap(config->rx_storage, config->rx_capacity, &g_nx_stm32u575_system,
+                sizeof(g_nx_stm32u575_system)) ||
+        overlap(config->rx_storage, config->rx_capacity,
+                g_nx_stm32u575_system.rcc,
+                sizeof(*g_nx_stm32u575_system.rcc)) ||
+        !NX_U575_GPDMA_COLD_VALID(s, config))
+        return NX_ERROR_INVALID;
+    const nx_stm32u575_uart_gpdma_facts_t* facts = config->facts;
+    if (facts->engine != GPDMA1_NS || facts->channel != GPDMA1_Channel0_NS ||
+        facts->irq != GPDMA1_Channel0_IRQn || facts->request != 25U ||
+        facts->priority != 5U || config->clock_hz != 4000000U ||
+        config->baud < 62U || config->baud > 250000U)
+        return NX_ERROR_UNSUPPORTED;
+    const uint8_t group = (uint8_t)NX_U575_IRQ_GROUP();
+    const nx_irq_source_t uart_source = {(int16_t)USART1_IRQn, 5U, group};
+    const nx_irq_source_t dma_source = {(int16_t)facts->irq, facts->priority,
+                                        group};
+    nx_result_t result =
+        nx_irq_wake_validate(NULL, &config->irq_policy, &uart_source);
+    if (result == NX_SUCCESS)
+        result = nx_irq_wake_validate(NULL, &config->irq_policy, &dma_source);
+    if (result != NX_SUCCESS)
+        return result;
+    u->registers = USART1_NS;
+    u->rx_storage = config->rx_storage;
+    u->rx_capacity = config->rx_capacity;
+    u->baud = config->baud;
+    u->irq = USART1_IRQn;
+    u->profile = NX_UART_RX_BYTES;
+    u->irq_policy = config->irq_policy;
+    s->dma_irq_policy = config->irq_policy;
+    s->facts = facts;
+    result = nx_stm32u575_usart1_pins_prepare();
+    return result == NX_SUCCESS ? nx_stm32u575_uart_gpdma_initialize(
+                                      s, config->clock_hz, config->poll_limit)
+                                : result;
 }
 
 #endif /* NX_STM32U575_UART_GPDMA_IMPL_H */

@@ -8,7 +8,7 @@ source_language: zh_CN
 (status-ledgers)=
 # 原台账、退出条件与派生视图
 
-下面的页面来自十份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
+下面的页面来自十一份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 SHA-256 可核对。
 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。
 
@@ -21,11 +21,16 @@ ledgers/os
 ledgers/platform-refinement
 ledgers/io-evolution
 ledgers/soc-refinement
+ledgers/soc-ip-layout
 ledgers/build-system
 ledgers/documentation-system
 ledgers/developer-experience
 ledgers/platform-delivery-completion
 ```
+
+`soc-ip-layout` 的 R01–R48 保留目录和共享 IP 重构的原状态。R43–R48 记录
+精确 P 的软件执行、分段计划、SDK、资源与候选；其 `not_executed` 物理值不因
+页面生成改变。最新结果导航见 [软件证据入口](software-verification.md)。
 
 ## 正确解读状态
 

@@ -1,4 +1,5 @@
 """STM32G474 checked timer-capture and encoder construction."""
+from tools.configure.calls import DirectCall
 from tools.configure.providers.common import Construction
 
 
@@ -24,7 +25,7 @@ def constructor(item):
     lines += [f"static nx_result_t prepare_{name}(void) {{",
               f"    if ({state}.config != NULL || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
               "    nx_result_t status;"]
-    for pin in item["pins"]:
+    for pin in item.pins:
         lines += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {int(pin['pin'][2:])}u, 2u);",
                   "    if (status != NX_SUCCESS) { return status; }"]
     kind = item.kind
@@ -59,5 +60,5 @@ def constructor(item):
     return Construction(
         state_type=("nx_timer_capture_controller_t" if capture else
                     "nx_stm32g474_encoder_state_t"),
-        definitions=lines, initialize=f"prepare_{name}()",
-        stop=[f"stop_{name}()"], retain_on_failed_init=True)
+        definitions=lines, initialize=DirectCall(f"prepare_{name}"),
+        stop=[DirectCall(f"stop_{name}")], retain_on_failed_init=True)

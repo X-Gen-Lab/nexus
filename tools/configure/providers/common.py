@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
+from tools.configure.calls import DirectCall
+
 UINT32_MAX = (1 << 32) - 1
 
 
@@ -123,40 +125,42 @@ def validate_user_io_context(assembly, part):
 
 
 @dataclass(frozen=True)
-class Construction(Mapping):
+class Construction:
     """One provider's explicit static storage and cold lifecycle contract.
 
-    Mapping reads serve maintained constructor fixtures. Production assembly
-    uses the named fields; no family inference or runtime metadata is emitted.
+    Production assembly uses named fields; no family inference or runtime
+    metadata is emitted.
     """
     state_type: str
     definitions: tuple[str, ...]
-    initialize: str
-    stop: tuple[str, ...]
+    initialize: DirectCall
+    stop: tuple[DirectCall, ...]
     retain_on_failed_init: bool
     exports: tuple[str, ...] = ()
     pin_snapshots: Mapping[str, str] = field(default_factory=dict)
     face_context: str | None = None
     face_definitions: tuple[str, ...] = ()
 
-    _FIELDS = ("state_type", "definitions", "initialize", "stop",
-               "retain_on_failed_init", "exports", "pin_snapshots",
-               "face_context", "face_definitions")
-
     def __post_init__(self):
         if (not isinstance(self.state_type, str) or
                 re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", self.state_type)
                 is None):
             fail("Construction requires an explicit C state type")
-        if not isinstance(self.initialize, str) or not self.initialize:
-            fail("Construction requires an explicit initializer")
+        if not isinstance(self.initialize, DirectCall):
+            fail("Construction initializer requires an explicit direct call")
+        if not isinstance(self.stop, (tuple, list)):
+            fail("Construction stop requires an ordered direct call sequence")
+        stops = tuple(self.stop)
+        if any(not isinstance(value, DirectCall) for value in stops):
+            fail("Construction stop requires explicit direct calls")
+        object.__setattr__(self, "stop", stops)
         if type(self.retain_on_failed_init) is not bool:
             fail("Construction requires boolean failed-init responsibility")
         if (self.face_context is not None and
                 re.fullmatch(r"&[A-Za-z_][A-Za-z0-9_]*",
                              self.face_context) is None):
             fail("Construction face context requires an explicit static object")
-        for name in ("definitions", "stop", "exports", "face_definitions"):
+        for name in ("definitions", "exports", "face_definitions"):
             values = tuple(getattr(self, name))
             if any(not isinstance(value, str) for value in values):
                 fail(f"Construction {name} requires C source strings")
@@ -167,29 +171,11 @@ class Construction(Mapping):
             fail("Construction pin snapshots require explicit names")
         object.__setattr__(self, "pin_snapshots", MappingProxyType(snapshots))
 
-    def __getitem__(self, key):
-        if key not in self._FIELDS:
-            raise KeyError(key)
-        return getattr(self, key)
-
-    def __iter__(self):
-        return iter(self._FIELDS)
-
-    def __len__(self):
-        return len(self._FIELDS)
-
-
 def owned_claims(result, owners):
     """Instance names never acquire Board/SoC reservations or kernel claims."""
-    try:
-        plan = result.resource_plan
-    except (AttributeError, KeyError):
-        # Narrow direct-constructor fixtures expose only the legacy mapping.
-        plan = None
-    claims = plan.claims if plan is not None else result["claims"]
-    return (claim for claim in claims
-            if claim.get("mode") not in {"reserved", "kernel"} and
-            owners.intersection(claim["owner"].split(";")))
+    return (claim for claim in result.resource_plan.claims
+            if claim.mode not in {"reserved", "kernel"} and
+            owners.intersection(claim.owner.split(";")))
 
 
 @dataclass(frozen=True)
@@ -278,8 +264,8 @@ def mode_traits(kind, mode):
 
 def kernel_policy_constant(result):
     """Emit the configured kernel policy, not a physical CPU mask primitive."""
-    profile = result.get("kernel_profile")
-    return ("NX_IRQ_KERNEL_" + profile["kernel_policy"].upper()
+    profile = result.kernel
+    return ("NX_IRQ_KERNEL_" + profile.kernel_policy.upper()
             if profile is not None else "NX_IRQ_KERNEL_NONE")
 
 

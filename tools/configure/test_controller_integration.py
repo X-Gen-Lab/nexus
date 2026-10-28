@@ -24,7 +24,7 @@ class ControllerIntegrationTests(unittest.TestCase):
                     item.integration, dma=selected))
                 with self.assertRaisesRegex(ValueError, "integration"):
                     provider.constructor(changed, result,
-                        result["board_bindings"], result["routes"], result.devices)
+                        result.board_bindings, result.routes, result.devices)
 
     def test_cold_resource_projection_reads_the_canonical_plan(self):
         result = gate.resolve_ir(gate.ROOT /
@@ -58,8 +58,8 @@ class ControllerIntegrationTests(unittest.TestCase):
                 self.assertIs(selected.irq, item.options.irq)
                 self.assertIs(selected.irq_profile, result.irq)
                 self.assertIs(selected.clock_plan, result.clock_plan)
-                self.assertIs(selected.clock_inputs, result["clock"])
-                self.assertIs(selected.pins, item["pins"])
+                self.assertIs(selected.clock_inputs, result.clock)
+                self.assertIs(selected.pins, item.pins)
                 self.assertTrue(any(selected.hardware is binding for binding
                     in maintained(result.soc_family).CONTROLLER_BINDINGS))
                 with self.assertRaises(FrozenInstanceError):
@@ -85,8 +85,8 @@ class ControllerIntegrationTests(unittest.TestCase):
         self.assertIsNotNone(part)
         self.assertEqual(part.part, "STM32F407VET6")
         self.assertEqual(part.package, "LQFP100")
-        self.assertIs(part.flash, result["flash"])
-        self.assertIs(part.memory, result["memory"])
+        self.assertIs(part.flash, result.flash)
+        self.assertIs(part.memory, result.memory)
         with self.assertRaises(TypeError):
             part.flash["size"] = 1
         self.assertIn(".size = 524288u", bindings.emit(result)[1])

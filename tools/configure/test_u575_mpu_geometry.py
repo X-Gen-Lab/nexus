@@ -29,7 +29,7 @@ class U575MpuGeometryTests(unittest.TestCase):
                 result = configure.resolve_ir(self.fixture(backend))
                 self.assertEqual(result.cpu_profile.definitions[
                     "NEXUS_CPU_MPU_REGIONS"], 8)
-                self.assertEqual(result["cpu"]["mpu_regions"], 8)
+                self.assertEqual(result.cpu["mpu_regions"], 8)
 
     def test_generated_header_and_cmake_share_exact_eight(self):
         for backend in ("baremetal", "freertos"):
@@ -56,7 +56,7 @@ class U575MpuGeometryTests(unittest.TestCase):
     def test_protected_kernel_keeps_exact_cpu_geometry(self):
         result = configure.resolve_ir(self.fixture("freertos"))
         protected = kernel.resolve({"memory_protection": True},
-                                   result.cpu_profile, result["clock"]["core_hz"])
+                                   result.cpu_profile, result.clock["core_hz"])
         self.assertTrue(protected.memory_protection)
         self.assertEqual(result.cpu_profile.definitions[
             "NEXUS_CPU_MPU_REGIONS"], 8)

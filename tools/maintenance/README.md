@@ -16,13 +16,69 @@ inherit another owner's policy. H743 high-clock and SPI DMA reviews and G474 ADC
 review/workaround records keep their exact profile, revision and scope fields.
 They neither admit an unknown revision nor establish physical qualification.
 
+Add `--candidate /path/to/sealed/candidate.json` to associate an existing
+software candidate with this exact assembly. The query runs the existing full
+candidate verifier, including referenced payloads, qualifications and linked
+artifacts. It does not execute new tests or publish a candidate. Both the
+observed current Git source and the referenced tested source are reported;
+moving a checkout does not change its commit/tree identity. A dirty checkout,
+changed source or different recursive dependency state cannot inherit a pass.
+
+The `evidence.relation` is `exact_source_and_configuration` only when clean
+source identity and the complete resolved configuration match. That relation
+projects the candidate's existing software scopes into `validation`. A valid
+candidate with another source is `historical_source`; a different configuration
+is `configuration_mismatch`. Both retain `not_assessed` for the current software
+selection. Missing, changed or invalid evidence rejects the query rather than
+becoming historical success. Physical HIL remains separately unassessed, even
+when the software candidate is valid. No candidate changes the aggregate family
+table or qualifies other Boards, controllers, modes or routes.
+
+Without `--candidate`, queries keep their configuration-only behavior and need
+no Git or evidence observation. A portable candidate must first be restored with
+the existing artifact tools; this command reads the seal and its payloads without
+modifying them. Candidate validation may use disposable temporary SDK files.
+
 ```sh
 python tools/maintenance/capabilities.py --check
 python tools/maintenance/capabilities.py --write
 python tools/maintenance/capabilities.py \
   --assembly tools/configure/assemblies/h743-high-peripherals.toml
+python tools/maintenance/capabilities.py \
+  --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml \
+  --candidate /path/to/sealed/candidate.json
 python -B -m unittest tools.testing.test_maintenance -v
 ```
+
+`local_ci.py --report /path/to/report.json` verifies an existing complete
+execution of the checked-in `tools/dev/plans/software.json`. Use the Python
+interpreter recorded by that execution. The verifier requires the same clean
+source before, after and now; exact plan order, arguments and checker bytes;
+actual successful command and unique attempt receipts; and unchanged stdout,
+stderr and logs. Empty actual output is accepted only with its completed
+receipt. Partial, interrupted, skipped, changed or combined historical plans
+cannot publish a pass for a new commit.
+
+The default operation is offline and read-only. Explicit `--publish` uses the
+existing GitHub transport and configured `GH_TOKEN` to post the fixed status
+`nexus/local-software-plan` to the verified commit. It observes an open PR to
+this repository's `main` before and after verification, rejecting ordinary
+head/base drift. Status creation is bound to that SHA; it is not an atomic PR
+merge operation and a later head cannot inherit the old status. A new receipt
+retains the request and confirmed response, or an unconfirmed outcome if the
+remote operation fails. No credentials are included in the receipt.
+
+```sh
+.venv/bin/python tools/maintenance/local_ci.py --report /path/to/report.json
+.venv/bin/python tools/maintenance/local_ci.py --report /path/to/report.json \
+  --publish --repository X-Gen-Lab/nexus --pull-request "$NEXUS_PR_NUMBER" \
+  --output /path/to/new-status-receipt.json
+```
+
+This status means only the maintained local software plan passed for its exact
+source. It neither represents GitHub Actions jobs nor establishes a sealed
+candidate, physical HIL, release publication or branch protection. Required
+checks must name this actual producer and be verified separately on the server.
 
 `work_packages.py` derives a review/navigation plan from existing provider,
 capability, resolver fixture, SDK-required-source and reviewed lifecycle-test

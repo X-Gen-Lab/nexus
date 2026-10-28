@@ -12,6 +12,7 @@ import tarfile
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 
 from tools.documentation import delivery
 
@@ -67,19 +68,113 @@ class DeliveryTests(unittest.TestCase):
                                 source_root=self.source,
                                 release_id="1.0.0-docs-test")
 
-    def test_package_records_distinct_source_and_qualification(self):
+    def test_package_has_no_implicit_historical_qualification(self):
         result = self.package()
         manifest = delivery.verify(result["directory"])
-        self.assertEqual(manifest["version"], "1.0.0")
-        self.assertEqual(manifest["qualified_code"]["commit"], "a" * 40)
-        self.assertNotEqual(manifest["documentation_source"]["commit"],
-                            manifest["qualified_code"]["commit"])
+        self.assertEqual(manifest["schema_version"], 2)
+        self.assertEqual(manifest["qualification_references"], [])
+        self.assertNotIn("qualified_code", manifest)
         self.assertEqual(manifest["physical_status"], "not_executed")
         paths = [record["path"] for record in manifest["files"]]
         self.assertNotIn(delivery.MANIFEST, paths)
         self.assertNotIn(delivery.CHECKSUMS, paths)
         self.assertIn("api/index.html", paths)
         self.assertTrue(Path(result["archive"]).is_file())
+
+    def test_explicit_candidate_references_preserve_separate_scope_and_source(self):
+        from tools.evidence import candidate
+        first = self.base / "first-candidate.json"
+        second = self.base / "second-candidate.json"
+        projections = [self.candidate_projection(first, "a"),
+                       self.candidate_projection(second, "b")]
+        projections[0]["candidate_id"] = "fixture:qualified-a"
+        with patch.object(candidate, "verified_projection",
+                          side_effect=projections) as verifier:
+            result = delivery.package(self.build, self.base / "output",
+                source_root=self.source, release_id="1.0.0-docs-test",
+                qualification_references=(first, second))
+        self.assertEqual(verifier.call_count, 2)
+        manifest = delivery.verify(result["directory"])
+        references = manifest["qualification_references"]
+        self.assertEqual(len(references), 2)
+        self.assertEqual(references[0]["candidate_id"], "fixture:qualified-a")
+        self.assertEqual([item["source"]["commit"] for item in references],
+                         ["a" * 40, "b" * 40])
+        self.assertNotEqual(manifest["documentation_source"]["commit"],
+                            references[0]["source"]["commit"])
+        self.assertEqual(references[0]["configuration_sha256"], "a" * 64)
+        self.assertEqual(references[0]["physical_status"], "not_executed")
+        self.assertEqual(references[0]["qualified_scopes"],
+                         sorted(candidate.REQUIRED_SCOPES))
+        self.assertNotIn("resolved", references[0])
+        self.assertEqual(references[0]["verification"]["offline"],
+                         "reference_metadata_only")
+        self.assertFalse(references[0]["verification"]["original_evidence_included"])
+
+    def candidate_projection(self, path, letter):
+        from tools.evidence import candidate
+        return {"candidate": {"path": str(path), "sha256": letter * 64,
+                               "size": 123},
+                "candidate_id": "fixture-" + letter,
+                "source": {"commit": letter * 40, "tree": letter * 40,
+                           "dirty": False, "submodules": []},
+                "configuration_sha256": letter * 64,
+                "artifacts": {role: {"sha256": letter * 64, "size": 12}
+                              for role in ("elf", "bin", "map")},
+                "qualified_scopes": sorted(candidate.REQUIRED_SCOPES),
+                "physical_status": "not_executed",
+                "product_promotion": "not_performed",
+                "signature_status": "unsigned", "resolved": {}}
+
+    def test_unverified_or_duplicate_candidate_is_rejected_before_output(self):
+        from tools.evidence import candidate
+        first = self.base / "first-candidate.json"
+        with patch.object(candidate, "verified_projection",
+                          side_effect=ValueError("missing original evidence")):
+            with self.assertRaisesRegex(ValueError, "missing original"):
+                delivery.package(self.build, self.base / "output",
+                    source_root=self.source, release_id="1.0.0-docs-test",
+                    qualification_references=(first,))
+        self.assertFalse((self.base / "output").exists())
+
+        projection = self.candidate_projection(first, "a")
+        with patch.object(candidate, "verified_projection", return_value=projection):
+            with self.assertRaisesRegex(ValueError, "duplicate"):
+                delivery.package(self.build, self.base / "output",
+                    source_root=self.source, release_id="1.0.0-docs-test",
+                    qualification_references=(first, first))
+        self.assertFalse((self.base / "output").exists())
+
+    def test_rehashed_reference_cannot_claim_new_scope_or_physical_acceptance(self):
+        projection = self.candidate_projection(self.base / "candidate.json", "a")
+        projection.pop("resolved")
+        projection["verification"] = dict(delivery.REFERENCE_VERIFICATION)
+        for key, value in (("physical_status", "passed"),
+                           ("qualified_scopes", ["all_platforms"]),
+                           ("configuration_sha256", "")):
+            with self.subTest(key=key):
+                bad = json.loads(json.dumps(projection))
+                bad[key] = value
+                with self.assertRaisesRegex(ValueError, "scope|boundary"):
+                    delivery._qualification_references([bad])
+
+    def test_historical_schema_one_remains_verifiable_without_new_legacy_writer(self):
+        result = self.package()
+        directory = Path(result["directory"])
+        manifest_path = directory / delivery.MANIFEST
+        manifest = json.loads(manifest_path.read_bytes())
+        manifest["schema_version"] = 1
+        manifest.pop("qualification_references")
+        manifest["qualified_code"] = {
+            "commit": "a" * 40, "tree": "b" * 40,
+            "index": "docs/delivery/build-system-results.json",
+            "index_sha256": "c" * 64}
+        manifest_path.write_bytes(delivery._json_bytes(manifest))
+        payload = delivery._payload(directory)
+        (directory / delivery.CHECKSUMS).write_bytes(delivery._checksums(payload))
+        restored = delivery.verify(directory)
+        self.assertEqual(restored["schema_version"], 1)
+        self.assertEqual(restored["qualified_code"]["commit"], "a" * 40)
 
     def test_source_interface_version_and_epochs_use_checked_policy(self):
         result = self.package()

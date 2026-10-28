@@ -41,7 +41,7 @@ python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/q
 本次解析，不从同系列其他路线补齐。上例是 F407ZG 的 USART1
 有限 `dma-tx` 选择，不能扩展为 F407 全外设或全部 UART 模式支持。
 
-`validation` 分开列出以下阶段。查询只执行生产 resolver 和合同投影，不搜索旧
+`validation` 分开列出以下阶段。默认查询只执行生产 resolver 和合同投影，不搜索旧
 报告，也不运行编译、测试、烧录或测量。因此，下面的 `not_assessed` 表示本次查询
 没有评估该阶段，不表示实现失败或历史上从未执行。
 
@@ -60,6 +60,30 @@ python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/q
 现有记录从[软件证据入口](../status/software-verification.md)进入，实际执行范围
 以各记录中的不可变源码为准。配置、软件和物理阶段是不同证据，并非会自动晋级的
 单个“支持等级”。
+
+## 显式关联已封存候选
+
+需要核对已有执行证据时，在同一查询追加原候选路径：
+
+```sh
+python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --candidate /path/to/sealed/candidate.json
+```
+
+工具调用原候选 verifier 核对全部 payload、qualification 和链接产物，不运行新的
+测试。报告同时保存 `current_source` 和 `evidence.reference.source`，不会用被引用
+源码覆盖当前 checkout。`evidence.relation` 只在干净 commit/tree/submodules 与
+精确解析配置全部相同时为 `exact_source_and_configuration`；此时才把原候选的
+四类软件阶段投影为 `passed`。这是原执行的只读关联，不是本次新执行。
+
+有效候选属于其他源码时标 `historical_source`，配置不同时标
+`configuration_mismatch`；这两种情况保留当前选择的 `not_assessed`。原件缺失、
+被修改或校验失败会拒绝查询，不能降级为已验证引用。未提供 `--candidate` 时
+无需 Git 或证据观察。可搬移候选需先用现有 artifact 工具恢复原 closure，再提供
+其中的 `candidate.json`；只有包摘要或下载位置不能建立通过状态。
+
+任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的
+family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确
+配置通过不等于所有 Board、backend、时钟或模式通过。
 
 <!-- nexus-capabilities:start -->
 | SoC | Controller | Kind | Mode | Reviewed SoC routes | Declared reference Boards | Resolver fixtures | Selected production source |

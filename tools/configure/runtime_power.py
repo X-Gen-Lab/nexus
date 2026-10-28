@@ -5,7 +5,7 @@ from tools.configure.providers.common import fail
 def resolve(value, result):
     """Optional lifecycle policy belongs to the selected concrete SoC."""
     from tools.configure.providers import maintained
-    resolve_selected = getattr(maintained(result["soc_family"]),
+    resolve_selected = getattr(maintained(result.soc_family),
                                "resolve_runtime_power", None)
     if resolve_selected is None:
         fail("power has no maintained lifecycle for the selected SoC")

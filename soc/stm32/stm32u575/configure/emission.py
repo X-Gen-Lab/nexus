@@ -20,7 +20,7 @@ def includes(result):
         for item in result.controllers) else []
     if any(item.kind == "rtc" for item in result.controllers):
         if any(pin["pin"] in {"PC14", "PC15"}
-               for item in result.controllers for pin in item["pins"]):
+               for item in result.controllers for pin in item.pins):
             raise ValueError("Retained LSE RTC conflicts with selected PC14/PC15 owner")
         selected.append('#include "stm32u575_rtc.h"')
     if any(item.kind == "lptim" for item in result.controllers):
@@ -53,16 +53,15 @@ def shared_irqs(result):
 def _leases(result):
     groups = {}
     for item in result.controllers:
-        for pin in item['pins']:
+        for pin in item.pins:
             name, number = pin['pin'][1], int(pin['pin'][2:])
             groups.setdefault(name, set()).add(number)
-    if "claims" in result:
-        owners = {item.id for item in result.controllers}
-        owners.update(item["id"] for item in result["devices"])
-        for claim in owned_claims(result, owners):
-            if claim["key"].startswith("pin:"):
-                pin = claim["key"][4:]
-                groups.setdefault(pin[1], set()).add(int(pin[2:]))
+    owners = {item.id for item in result.controllers}
+    owners.update(item.id for item in result.devices)
+    for claim in owned_claims(result, owners):
+        if claim.key.startswith("pin:"):
+            pin = claim.key[4:]
+            groups.setdefault(pin[1], set()).add(int(pin[2:]))
     return [(name, sum(1 << n for n in numbers),
         sum(3 << (2 * n) for n in numbers),
         sum(15 << (4 * n) for n in numbers if n < 8),

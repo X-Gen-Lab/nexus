@@ -39,9 +39,9 @@ def diagnostic_helpers():
 
 
 def emit(result):
-    provider = maintained(result["soc_family"])
     if not isinstance(result, ConfigurationIR):
-        result = ConfigurationIR.from_validated(result)
+        raise TypeError("Bindings emission requires ConfigurationIR")
+    provider = maintained(result.soc_family)
     runtime = result.runtime_power is not None
     selections = result.controllers
     context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
@@ -161,16 +161,16 @@ def emit(result):
                 construction = pwm_shared.constructor(owner)
                 source.append(f'static {construction.state_type} {physical};')
                 source.extend(construction.definitions)
-                initialize.append(construction.initialize)
+                initialize.append(construction.initialize.render())
                 initialization_indices.append(selection_index)
                 retained_initialization.append(construction.retain_on_failed_init)
-                stop.extend((len(initialize), expression)
+                stop.extend((len(initialize), expression.render())
                             for expression in construction.stop)
                 physical_constructed.add(physical)
             source.extend(pwm_shared.face(item, owner))
             continue
-        construction = provider.constructor(item, result, result["board_bindings"],
-                                            result["routes"], result.devices)
+        construction = provider.constructor(item, result, result.board_bindings,
+                                            result.routes, result.devices)
         source += [f'static {construction.state_type} s_nx_port_{name};']
         source.extend(construction.face_definitions)
         face_context = construction.face_context or f"&s_nx_port_{name}"
@@ -186,10 +186,10 @@ def emit(result):
             gpio_phase.add_snapshots(result, item,
                                      construction.pin_snapshots,
                                      pin_snapshots)
-        initialize.append(construction.initialize)
+        initialize.append(construction.initialize.render())
         initialization_indices.append(selection_index)
         retained_initialization.append(construction.retain_on_failed_init)
-        stop.extend((len(initialize), expression)
+        stop.extend((len(initialize), expression.render())
                     for expression in construction.stop)
     for device in result.devices:
         kind = device.kind

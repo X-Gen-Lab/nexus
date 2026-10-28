@@ -27,7 +27,9 @@ class U575UartChainTests(unittest.TestCase):
         source = "\n".join(construction.definitions)
         self.assertIn("_Alignas(32)", source)
         self.assertIn("nx_stm32u575_uart_chain_node_t", source)
-        self.assertIn("nx_stm32u575_uart_chain_initialize", source)
+        self.assertIn("nx_stm32u575_uart_gpdma_config_t", source)
+        self.assertIn("nx_stm32u575_uart_chain_prepare", construction.initialize.render())
+        self.assertNotIn(".uart.registers =", source)
 
     def test_selected_plan_names_symbolic_placement_not_guessed_addresses(self):
         item = self.item()

@@ -64,13 +64,13 @@ def _apb1(result):
 
 def _pins(result):
     pins = {int(pin["pin"][2:])
-            for item in result.controllers for pin in item["pins"]
+            for item in result.controllers for pin in item.pins
             if pin["pin"].startswith("PA")}
-    for device in result["devices"]:
-        if device.get("cs_binding") is not None:
-            binding = result["board_bindings"][device["cs_binding"]]
+    for device in result.devices:
+        if device.kind == "spi" and device.options.cs_binding is not None:
+            binding = result.board_bindings[device.options.cs_binding]
             pins.update(int(pin["pin"][2:])
-                        for pin in result["routes"][binding["route"]]["pins"])
+                        for pin in result.routes[binding["route"]]["pins"])
     return tuple(sorted(pins))
 
 

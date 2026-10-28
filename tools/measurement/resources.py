@@ -14,7 +14,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, fields,
     file_identity, identifier, load_json, regular_file)
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import Elf32, interval_bytes, intervals_union
-from tools.configure.memory import resource_budget
+from tools.configure.memory import resource_budget_projection
 
 
 def integer(value, name: str, *, minimum: int = 0) -> int:
@@ -195,7 +195,7 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
     validate_budget(budget, memory)
     if "memory_budgets" in resolved:
         try:
-            expected = resource_budget(resolved)
+            expected = resource_budget_projection(resolved)
         except (KeyError, TypeError, StopIteration, ValueError) as error:
             raise EvidenceError("invalid resolved memory budget contract") from error
         if budget != expected:

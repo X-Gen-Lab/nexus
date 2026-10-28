@@ -313,6 +313,9 @@ def main(arguments=None, *, root=ROOT):
             command.add_argument("--output", type=Path,
                 default=Path(root).parent / ".nexus-documentation-artifacts" / Path(root).name / "packages")
             command.add_argument("--release-id")
+            command.add_argument("--qualification-reference", type=Path,
+                                 action="append", default=[],
+                                 help="Verify and reference an original sealed candidate; repeat for multiple scopes")
         elif name == "preview":
             command.add_argument("--build", type=Path, default=Path(root) / "build/documentation")
             command.add_argument("--host", default="127.0.0.1")
@@ -372,7 +375,8 @@ def main(arguments=None, *, root=ROOT):
             revision = observe_git_source(root)["commit"]
             release_id = args.release_id or "docs-" + revision[:12]
             print(json.dumps(delivery.package(args.build, args.output,
-                source_root=root, release_id=release_id), indent=2))
+                source_root=root, release_id=release_id,
+                qualification_references=args.qualification_reference), indent=2))
         elif args.action in {"verify", "restore"}:
             from tools.documentation import delivery
             record = (delivery.verify(args.path) if args.action == "verify" else

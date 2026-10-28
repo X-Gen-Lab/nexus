@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -14,7 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.dev.process import run as run_command
 from tools.evidence.common import (EvidenceError, atomic_json, command, fields,
-    file_identity, load_json, regular_file, stream_digest, verify_file_identity)
+    file_identity, load_json, parse_json, regular_file, sha256_value,
+    stream_digest, verify_file_identity)
 from tools.evidence.identity import canonical_digest, observe_git_source
 
 CHECKERS = {
@@ -142,6 +145,139 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
     # This is orchestration evidence, never an alternative candidate validator.
     atomic_json(output / "report.json", report)
     return report
+
+
+def verify_execution(plan: dict, report_path: Path, root: Path) -> dict:
+    """Verify a complete original execution for the current clean source.
+
+    This admits an existing maintained plan's commands, not a new execution or
+    software candidate. Partial plans and interrupted reports are not merged.
+    Original attempt receipts and even empty actual output remain mandatory.
+    """
+    from tools.dev import timings
+
+    validate_plan(plan)
+    if plan.get("formal") is not True:
+        raise EvidenceError("local software gate requires a formal plan")
+    root = Path(root).resolve()
+    report_path = regular_file(report_path)
+    output = report_path.parent
+    observed = {}
+
+    def observe_file(identity, *, empty=False):
+        fields(identity, {"path", "size", "sha256"})
+        sha256_value(identity["sha256"])
+        if type(identity["size"]) is not int or identity["size"] < int(not empty):
+            raise EvidenceError("invalid execution evidence byte count")
+        path = regular_file(identity["path"], nonempty=not empty)
+        with path.open("rb") as stream:
+            digest = stream_digest(stream)
+        if path.stat().st_size != identity["size"] or digest != identity["sha256"]:
+            raise EvidenceError("execution evidence changed")
+        previous = observed.setdefault(str(path), identity)
+        if previous != identity:
+            raise EvidenceError("execution evidence has conflicting identities")
+        return path
+
+    def read_json(identity):
+        path = observe_file(identity)
+        with path.open("rb") as stream:
+            contents = stream.read(4 * 1024 * 1024 + 1)
+        if (len(contents) > 4 * 1024 * 1024 or
+                len(contents) != identity["size"] or
+                hashlib.sha256(contents).hexdigest() != identity["sha256"]):
+            raise EvidenceError("execution JSON changed or exceeds its bound")
+        return parse_json(contents)
+
+    report_identity = file_identity(report_path)
+    report = read_json(report_identity)
+    fields(report, {"schema_version", "kind", "status", "source_before",
+                    "source_after", "plan_sha256", "formal", "stages",
+                    "physical_status", "software_qualified"})
+    source = observe_git_source(root)
+    if (source["dirty"] is not False or
+            any(not line.startswith(" ") for line in source["submodules"]) or
+            report["source_before"] != source or report["source_after"] != source):
+        raise EvidenceError("local software gate requires the same clean source")
+    if (type(report["schema_version"]) is not int or report["schema_version"] != 1 or
+            report["kind"] != "qualification_plan_execution" or
+            report["status"] != "executed_passed" or report["formal"] is not True or
+            report["plan_sha256"] != canonical_digest(plan) or
+            report["physical_status"] != "not_executed" or
+            report["software_qualified"] is not False or
+            not isinstance(report["stages"], list) or
+            len(report["stages"]) != len(plan["stages"])):
+        raise EvidenceError("complete matching formal execution required")
+    for stage, actual in zip(plan["stages"], report["stages"]):
+        fields(actual, {"name", "checker", "argv", "checker_source", "exit_code",
+                        "duration_s", "status", "raw", "command_receipt"})
+        script, *prefix = CHECKERS[stage["checker"]]
+        expected_argv = command(
+            [sys.executable, "-B", str(root / script), *prefix, *stage["args"]],
+            {"root": str(root), "output": str(output)})
+        if (actual["name"] != stage["name"] or
+                actual["checker"] != stage["checker"] or
+                actual["argv"] != expected_argv or actual["status"] != "passed" or
+                type(actual["exit_code"]) is not int or actual["exit_code"] != 0 or
+                type(actual["duration_s"]) not in (int, float) or
+                not math.isfinite(actual["duration_s"]) or actual["duration_s"] < 0 or
+                actual["checker_source"] != file_identity(root / script)):
+            raise EvidenceError("stage differs from the executed owned checker")
+        observe_file(actual["checker_source"])
+        raw = output / (stage["name"] + ".raw")
+        if (actual["raw"]["path"] != str(raw) or
+                actual["command_receipt"]["path"] !=
+                str(raw.with_suffix(".command.json"))):
+            raise EvidenceError("stage evidence navigation differs from execution")
+        observe_file(actual["raw"], empty=True)
+        receipt = read_json(actual["command_receipt"])
+        attempt_path = Path(receipt.get("attempt_receipt", ""))
+        attempt_root = output / (raw.stem + ".attempts")
+        if (attempt_path.name != "receipt.json" or
+                attempt_path.parent.parent != attempt_root):
+            raise EvidenceError("original unique attempt receipt required")
+        attempt = read_json(file_identity(attempt_path))
+        if attempt != {key: value for key, value in receipt.items()
+                       if key != "attempt_receipt"}:
+            raise EvidenceError("command view differs from its original attempt")
+        if (receipt.get("command") != expected_argv or
+                receipt.get("cwd") != str(root) or
+                receipt.get("stage") != stage["checker"] or
+                receipt.get("outcome") != "completed" or
+                type(receipt.get("exit_code")) is not int or
+                receipt["exit_code"] != 0 or
+                type(receipt.get("child_returncode")) is not int or
+                receipt["child_returncode"] != 0 or
+                type(receipt.get("timeout_seconds")) not in (int, float) or
+                receipt.get("timeout_seconds") != stage.get("timeout_s", 1800) or
+                receipt.get("withdrawal_complete") is not True or
+                receipt.get("withdrawal_stable") is not True or
+                receipt.get("withdrawn_processes") != []):
+            raise EvidenceError("completed owned checker receipt required")
+        for name in ("stdout", "stderr"):
+            identity = receipt.get(name, {})
+            fields(identity, {"path", "bytes", "sha256"})
+            if identity["path"] != str(attempt_path.parent / (name + ".txt")):
+                raise EvidenceError("attempt output navigation differs")
+            observe_file({"path": identity["path"], "size": identity["bytes"],
+                          "sha256": identity["sha256"]}, empty=True)
+        # The runner's conventional log is the decoded stdout followed by
+        # stderr; a newly hashed replacement summary is not that execution.
+        actual_output = "".join(Path(receipt[name]["path"]).read_text(
+            errors="replace") for name in ("stdout", "stderr"))
+        if raw.read_text() != actual_output:
+            raise EvidenceError("execution log differs from actual output")
+        # Reuse the receipt reader's timestamp, cost and raw-output contract.
+        timings.summarize([attempt_path])
+    for identity in tuple(observed.values()):
+        observe_file(identity, empty=identity["size"] == 0)
+    if observe_git_source(root) != source:
+        raise EvidenceError("source changed during execution verification")
+    return {"schema_version": 1, "kind": "verified_qualification_plan_execution",
+            "status": "verified", "source": source, "report": report_identity,
+            "plan_sha256": canonical_digest(plan),
+            "stage_count": len(plan["stages"]), "software_qualified": False,
+            "physical_status": "not_executed"}
 
 
 def provenance(source: dict, inputs: list[Path], artifacts: list[Path],

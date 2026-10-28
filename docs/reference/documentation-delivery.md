@@ -39,10 +39,25 @@ manifest 分开记录三类身份：
 
 - `documentation_source`：构建时完整 commit／tree 和文档目录的限定树摘要。
 - `code_source`：同一 checkout 的完整 commit／tree 和平台代码目录的限定树摘要。
-- `qualified_code`：当前交付索引中原已验证代码的 commit／tree 及索引文件摘要。
+- `qualification_references[]`：显式选入的原候选；每项保留自身源码、配置摘要、
+  ELF／BIN／map 摘要及字节数、六个 qualified scopes 和候选文件身份。
 
-前两项可能来自同一 Git 提交，但覆盖的目录不同。第三项引用既有软件证据，不能
-因文档提交而变成当前 HEAD 的新固件验证。`physical_status` 固定为 `not_executed`。
+前两项可能来自同一 Git 提交，但覆盖的目录不同。schema 2 的第三项是显式列表，
+默认没有引用；不再从固定历史结果索引推断资格。每份候选必须先通过现有
+`tools.evidence.candidate.verified_projection()` 的完整原件校验；缺失或篡改原件、
+重复候选与非法 scope 在输出前拒绝。不同候选保持各自源码、配置及产物身份，
+不能合并成全平台通过。`physical_status` 固定为 `not_executed`。
+
+文档包只保存已校验的精简引用，不复制候选配置、源码 SDK 或大型原始日志。
+离线 `verify()` 校验该引用的结构和被封存字节，不重新校验未随包复制的候选闭包，
+也不赋予当前 HEAD 新软件资格。原 candidate locator 是原主机位置，不是下载 URL。
+若需要重新确认软件候选，必须取回原件并运行原 candidate verifier。
+每项 `verification.at_packaging` 为 `original_candidate_closure`，
+`verification.offline` 为 `reference_metadata_only`，
+`verification.original_evidence_included` 为 `false`；离线包不伪报原件重验成功。
+
+旧 schema 1 包仅保留只读验证／恢复，仍按原 `qualified_code` 字段解释。
+新打包只产生 schema 2，不能把旧索引身份默认为新交付的受测代码。
 
 ## 文件与摘要合同
 
@@ -83,12 +98,17 @@ Python 调用接口如下，CLI 入口由统一 docs 命令提供：
 from tools.documentation import delivery
 
 result = delivery.package(build_dir, output_dir, source_root=source_root,
-                          release_id=release_id)
+                          release_id=release_id,
+                          qualification_references=(candidate_path,))
 manifest = delivery.verify(result["archive"],
                            expected_manifest_sha256=result["manifest_sha256"])
 delivery.restore(result["archive"], independent_root,
                  expected_manifest_sha256=result["manifest_sha256"])
 ```
+
+CLI 的 `--qualification-reference /path/to/candidate.json` 可重复使用，逐项核对
+不同精确候选；不提供该选项时保存空列表。显式引用原件缺失时应修复定位或明确
+不选入，工具不会悄悄降级为已验证引用。
 
 这是接口说明片段，路径由调用方显式提供；可执行命令和实际验收结果以统一 docs CLI
 及其本次交付 receipt 为准。

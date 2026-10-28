@@ -38,7 +38,7 @@ class LegacyTransportTests(unittest.TestCase):
                     path = self.assembly(family, mode)
                     ir = configure.resolve_ir(path)
                     self.assertEqual(ir.controllers[0].mode, mode)
-                    keys = {claim["key"] for claim in ir["claims"]}
+                    keys = {claim.key for claim in ir.claims}
                     tx = ("dma:DMA1:stream7" if family == "stm32f103" else
                           "dma:DMA0:stream3")
                     rx = ("dma:DMA1:stream6" if family == "stm32f103" else

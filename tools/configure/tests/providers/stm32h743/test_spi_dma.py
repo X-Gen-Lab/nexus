@@ -71,7 +71,7 @@ class H743SpiDmaConfiguration(unittest.TestCase):
                 self.assertFalse(spi.options.irq.calls_os)
                 with self.assertRaises(FrozenInstanceError):
                     spi.options.max_hz = 1
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
 
     def test_static_emission_uses_dedicated_faces_and_three_irqs(self):
         with tempfile.TemporaryDirectory() as directory:

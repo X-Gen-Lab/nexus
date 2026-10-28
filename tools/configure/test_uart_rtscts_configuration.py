@@ -76,7 +76,7 @@ class UartRtsCtsConfiguration(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     frame.flow = "none"
                 self.assertEqual(item.options.rx_capacity, 64)
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
 
     def test_explicit_complete_frame_matches_the_mode_derived_frame(self):
         for family in PADS:
@@ -171,12 +171,12 @@ class UartRtsCtsConfiguration(unittest.TestCase):
         for family, pads in PADS.items():
             with self.subTest(family=family):
                 result = self.normal(family)
-                selected = [claim for claim in result["claims"]
-                            if claim["owner"] == "console"]
+                selected = [claim for claim in result.claims
+                            if claim.owner == "console"]
                 self.assertTrue({"pin:" + pin for pin in pads}.issubset(
-                    {claim["key"] for claim in selected}))
+                    {claim.key for claim in selected}))
                 self.assertEqual(tuple(pin["function"] for pin in
-                                       result.controllers[0]["pins"]),
+                                       result.controllers[0].pins),
                                  ("tx", "rx", "cts", "rts"))
                 package = configure.ROOT / "boards" / (
                     "stm32" + family + "zi_rtscts_reference")
@@ -198,8 +198,8 @@ class UartRtsCtsConfiguration(unittest.TestCase):
                 result = self.normal(family)
                 item, = result.controllers
                 provider = maintained("stm32" + family)
-                route = {key: item[key] for key in
-                         ("controller", "kind", "pins")}
+                route = {"controller": item.controller, "kind": item.kind,
+                         "pins": item.pins}
                 selection = {"mode": MODE, "baud": 115200,
                              "rx_profile": "bytes", "irq_priority": 5}
                 provider.validate_selection(selection, route)

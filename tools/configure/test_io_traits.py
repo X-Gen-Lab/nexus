@@ -9,7 +9,9 @@ from tools.configure.ir import ControllerIR
 
 def controller(kind, mode, provider="stm32f407", **options):
     values = {"id": "selected", "kind": kind, "controller": "SELECTED",
-              "binding": "selected", "mode": mode, **options}
+              "binding": "selected", "mode": mode,
+              "pins": (), "route": "metadata-unit-fixture",
+              "mask": 0, "initial": 0, **options}
     return ControllerIR.create(values, provider)
 
 

@@ -1,5 +1,5 @@
 // FIG-03 current: build-time inputs and artifacts.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: tools/configure/authored.py, configure.py, ir.py and bindings.py.
 // Edges denote configuration/production flow, not runtime I/O.
 digraph configurationGeneration {
     graph [label="FIG-03 Current configuration and generation", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
@@ -11,24 +11,31 @@ digraph configurationGeneration {
     assembly [label="one authored TOML assembly", fillcolor="#f8fafc"];
     socFacts [label="SoC / CPU / route facts", fillcolor="#f8fafc"];
     boardFacts [label="Board wiring and provenance", fillcolor="#f8fafc"];
+    authored [label="strict TOML fields -> frozen AuthoredAssembly"];
     resolver [label="strict field / mode / resource / identity checks"];
-    typedIr [label="immutable typed IR"];
+    typedIr [label="immutable named IR: each decision stored once"];
+    construction [label="SoC Construction: static definitions and cold calls"];
     bundle [label="transactional generation and atomic publish"];
-    outputs [label="static instances / factory / config / budgets"];
+    outputs [label="static instances / factory / config / budgets / resolved.json"];
     targets [label="CMake: sole software target graph"];
     ninja [label="Ninja: compile / link / resource checks"];
     firmware [label="ELF / BIN / map / resource reports", fillcolor="#f0fdf4"];
     rejected [label="rejected input or generation failure", fillcolor="#fff7ed"];
     invalidated [label="invalidate owned bundle, no partial outputs", fillcolor="#fff7ed"];
-    assembly -> resolver [label="product selection"];
-    socFacts -> resolver [label="silicon capability"];
-    boardFacts -> resolver [label="Board authorization"];
+    assembly -> authored [label="sole assembly input"];
+    authored -> resolver [label="unresolved\nselections"];
+    socFacts -> resolver [label="silicon\ncapability"];
+    boardFacts -> resolver [label="Board\nauthorization"];
     resolver -> typedIr [label="validated"];
-    typedIr -> bundle [label="generate selected content"];
+    typedIr -> construction [label="named fields"];
+    construction -> bundle [label="render binding C bytes"];
+    typedIr -> bundle [label="one-way JSON /\nconfig / memory projection"];
     bundle -> outputs [label="atomic publish"];
     outputs -> targets [label="configuration and generated sources"];
     targets -> ninja [label="execute target graph"];
     ninja -> firmware [label="actual artifacts of this execution"];
+    authored -> rejected [label="invalid syntax / fields"];
+    construction -> rejected [label="emission failure"];
     resolver -> rejected [label="invalid / conflict / input changed"];
     bundle -> rejected [label="generation or publish failure"];
     rejected -> invalidated [label="invalidate owned outputs only"];

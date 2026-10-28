@@ -17,19 +17,28 @@ static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
+    return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
+}
 static bool valid(const nx_legacy_pwm_state_t* p) {
-    return p != NULL && p->registers != NULL && p->gate != NULL &&
-           p->pin_mode != NULL && p->pin_lock != NULL && p->pin_latch != NULL &&
-           p->pin_set != NULL && p->clock_started != NULL &&
-           p->gate_mask != 0U && p->tick_hz != 0U &&
-           8000000U % p->tick_hz == 0U && 8000000U / p->tick_hz <= 65536U &&
-           p->period_ticks != 0U && p->period_ticks <= 65535U &&
-           p->duty_ticks <= p->period_ticks && (p->inactive & ~PIN_BIT) == 0U &&
-           p->poll_limit != 0U;
+    if (p == NULL || p->config == NULL ||
+        (uintptr_t)p->config > UINTPTR_MAX - sizeof(*p->config) ||
+        (uintptr_t)p->config % _Alignof(nx_legacy_pwm_config_t) != 0U ||
+        overlap(p, sizeof(*p), p->config, sizeof(*p->config)))
+        return false;
+    return p->config->registers != NULL && p->config->gate != NULL &&
+           p->config->pin_mode != NULL && p->config->pin_lock != NULL &&
+           p->config->pin_latch != NULL && p->config->pin_set != NULL &&
+           p->config->clock_started != NULL && p->config->gate_mask != 0U &&
+           p->tick_hz != 0U && 8000000U % p->tick_hz == 0U &&
+           8000000U / p->tick_hz <= 65536U && p->period_ticks != 0U &&
+           p->period_ticks <= 65535U && p->duty_ticks <= p->period_ticks &&
+           (p->inactive & ~PIN_BIT) == 0U && p->config->poll_limit != 0U;
 }
 static bool clock_ready(const nx_legacy_pwm_state_t* p) {
-    return *p->clock_started &&
-           (NX_LEGACY_READ(p->gate) & p->gate_mask) == p->gate_mask;
+    return *p->config->clock_started &&
+           (NX_LEGACY_READ(p->config->gate) & p->config->gate_mask) ==
+               p->config->gate_mask;
 }
 static bool write_checked(volatile uint32_t* r, uint32_t value) {
     NX_LEGACY_WRITE(r, value);
@@ -37,20 +46,20 @@ static bool write_checked(volatile uint32_t* r, uint32_t value) {
     return NX_LEGACY_READ(r) == value;
 }
 static bool idle(nx_legacy_pwm_state_t* p) {
-    NX_LEGACY_WRITE(p->pin_set,
+    NX_LEGACY_WRITE(p->config->pin_set,
                     p->inactive | ((PIN_BIT & ~p->inactive) << 16U));
     nx_arch_dsb();
-    if ((NX_LEGACY_READ(p->pin_latch) & PIN_BIT) != p->inactive)
+    if ((NX_LEGACY_READ(p->config->pin_latch) & PIN_BIT) != p->inactive)
         return false;
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    bool done =
-        write_checked(p->pin_mode, (NX_LEGACY_READ(p->pin_mode) & ~PIN_MASK) |
-                                       (2U << PIN_SHIFT));
+    bool done = write_checked(
+        p->config->pin_mode,
+        (NX_LEGACY_READ(p->config->pin_mode) & ~PIN_MASK) | (2U << PIN_SHIFT));
     nx_arch_irq_restore(saved);
     return done;
 }
 static bool cold(const nx_legacy_pwm_state_t* p) {
-    nx_legacy_pwm_registers_t* r = p->registers;
+    nx_legacy_pwm_registers_t* r = p->config->registers;
     return NX_LEGACY_READ(&r->control1) == 0U &&
            NX_LEGACY_READ(&r->control2) == 0U &&
            NX_LEGACY_READ(&r->slave) == 0U &&
@@ -61,12 +70,12 @@ static bool cold(const nx_legacy_pwm_state_t* p) {
 }
 /** \brief Hold TRGO on disabled CEN while UG loads shadow registers. */
 static nx_result_t epoch(nx_legacy_pwm_state_t* p) {
-    nx_legacy_pwm_registers_t* r = p->registers;
+    nx_legacy_pwm_registers_t* r = p->config->registers;
     if (!write_checked(&r->control2, 16U) || !write_checked(&r->status, 0U))
         return NX_ERROR_IO;
     NX_LEGACY_WRITE(&r->event, 1U);
     nx_arch_dsb();
-    uint32_t remaining = p->poll_limit;
+    uint32_t remaining = p->config->poll_limit;
     do {
         NX_LEGACY_POLL(2U, p);
         if ((NX_LEGACY_READ(&r->status) & 1U) != 0U)
@@ -86,14 +95,14 @@ nx_result_t nx_legacy_pwm_initialize(nx_legacy_pwm_state_t* p) {
         return NX_ERROR_INVALID;
     if (!clock_ready(p))
         return NX_ERROR_STATE;
-    uint32_t mode = (NX_LEGACY_READ(p->pin_mode) >> PIN_SHIFT) & 15U;
+    uint32_t mode = (NX_LEGACY_READ(p->config->pin_mode) >> PIN_SHIFT) & 15U;
     if (p->retained || p->initialized || !cold(p) ||
-        (NX_LEGACY_READ(p->pin_lock) & PIN_BIT) != 0U ||
+        (NX_LEGACY_READ(p->config->pin_lock) & PIN_BIT) != 0U ||
         (mode != 0U && mode != 4U))
         return NX_ERROR_BUSY;
     p->retained = true;
     p->fault = p->running = false;
-    nx_legacy_pwm_registers_t* r = p->registers;
+    nx_legacy_pwm_registers_t* r = p->config->registers;
     if (!idle(p) || !write_checked(&r->control1, PWM_PRELOAD) ||
         !write_checked(&r->prescaler, 8000000U / p->tick_hz - 1U) ||
         !write_checked(&r->reload, p->period_ticks - 1U) ||
@@ -114,7 +123,7 @@ nx_result_t nx_legacy_pwm_close(nx_legacy_pwm_state_t* p) {
         return NX_SUCCESS;
     if (!clock_ready(p))
         return NX_ERROR_STATE;
-    nx_legacy_pwm_registers_t* r = p->registers;
+    nx_legacy_pwm_registers_t* r = p->config->registers;
     /* Detach the pad at its preloaded Board level even if a controller leaf
      * refuses withdrawal. Still attempt every independent source cleanup. */
     bool valid = idle(p);
@@ -132,7 +141,7 @@ nx_result_t nx_legacy_pwm_close(nx_legacy_pwm_state_t* p) {
     return NX_SUCCESS;
 }
 static bool base_matches(const nx_legacy_pwm_state_t* p) {
-    nx_legacy_pwm_registers_t* r = p->registers;
+    nx_legacy_pwm_registers_t* r = p->config->registers;
     return NX_LEGACY_READ(&r->prescaler) == 8000000U / p->tick_hz - 1U &&
            NX_LEGACY_READ(&r->reload) == p->period_ticks - 1U &&
            NX_LEGACY_READ(&r->channel_mode1) == PWM_MODE &&
@@ -150,7 +159,7 @@ static nx_result_t set(void* context, uint32_t period, uint32_t duty) {
     if (!p->initialized || p->fault || !clock_ready(p) ||
         period != p->period_ticks || !base_matches(p))
         return NX_ERROR_STATE;
-    if (!write_checked(&p->registers->compare1, duty))
+    if (!write_checked(&p->config->registers->compare1, duty))
         return NX_ERROR_IO;
     p->duty_ticks = duty;
     return NX_SUCCESS;
@@ -164,8 +173,8 @@ static nx_result_t stop(void* context) {
     if (!clock_ready(p))
         return NX_ERROR_STATE;
     bool safe = idle(p);
-    bool channel = write_checked(&p->registers->enable, 0U);
-    bool counter = write_checked(&p->registers->control1, PWM_PRELOAD);
+    bool channel = write_checked(&p->config->registers->enable, 0U);
+    bool counter = write_checked(&p->config->registers->control1, PWM_PRELOAD);
     if (!safe || !channel || !counter) {
         p->fault = true;
         return NX_ERROR_IO;
@@ -184,10 +193,12 @@ static nx_result_t start(void* context) {
         return NX_SUCCESS;
     nx_result_t result = epoch(p);
     if (result == NX_SUCCESS &&
-        (!write_checked(p->pin_mode, (NX_LEGACY_READ(p->pin_mode) & ~PIN_MASK) |
-                                         (10U << PIN_SHIFT)) ||
-         !write_checked(&p->registers->enable, PWM_ENABLE) ||
-         !write_checked(&p->registers->control1, PWM_PRELOAD | PWM_ENABLE)))
+        (!write_checked(p->config->pin_mode,
+                        (NX_LEGACY_READ(p->config->pin_mode) & ~PIN_MASK) |
+                            (10U << PIN_SHIFT)) ||
+         !write_checked(&p->config->registers->enable, PWM_ENABLE) ||
+         !write_checked(&p->config->registers->control1,
+                        PWM_PRELOAD | PWM_ENABLE)))
         result = NX_ERROR_IO;
     if (result != NX_SUCCESS) {
         p->fault = true;
@@ -197,27 +208,27 @@ static nx_result_t start(void* context) {
     p->running = true;
     return NX_SUCCESS;
 }
-static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
-    return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
-}
 static nx_result_t state(const void* context, nx_pwm_state_t* out) {
     const nx_legacy_pwm_state_t* p = context;
     if (!valid(p) || out == NULL ||
         (uintptr_t)out % _Alignof(nx_pwm_state_t) != 0U ||
         (uintptr_t)out > UINTPTR_MAX - sizeof(*out) ||
         overlap(out, sizeof(*out), p, sizeof(*p)) ||
-        overlap(out, sizeof(*out), p->registers, sizeof(*p->registers)) ||
-        overlap(out, sizeof(*out), (const void*)p->gate, sizeof(*p->gate)) ||
-        overlap(out, sizeof(*out), (const void*)p->pin_mode,
-                sizeof(*p->pin_mode)) ||
-        overlap(out, sizeof(*out), (const void*)p->pin_lock,
-                sizeof(*p->pin_lock)) ||
-        overlap(out, sizeof(*out), (const void*)p->pin_latch,
-                sizeof(*p->pin_latch)) ||
-        overlap(out, sizeof(*out), (const void*)p->pin_set,
-                sizeof(*p->pin_set)) ||
-        overlap(out, sizeof(*out), (const void*)p->clock_started,
-                sizeof(*p->clock_started)))
+        overlap(out, sizeof(*out), p->config, sizeof(*p->config)) ||
+        overlap(out, sizeof(*out), p->config->registers,
+                sizeof(*p->config->registers)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->gate,
+                sizeof(*p->config->gate)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->pin_mode,
+                sizeof(*p->config->pin_mode)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->pin_lock,
+                sizeof(*p->config->pin_lock)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->pin_latch,
+                sizeof(*p->config->pin_latch)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->pin_set,
+                sizeof(*p->config->pin_set)) ||
+        overlap(out, sizeof(*out), (const void*)p->config->clock_started,
+                sizeof(*p->config->clock_started)))
         return NX_ERROR_INVALID;
     if (!p->initialized)
         return NX_ERROR_STATE;

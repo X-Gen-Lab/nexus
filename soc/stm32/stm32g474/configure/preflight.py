@@ -50,10 +50,10 @@ def selected_preflight(result, *, dma_conditions=None):
         if item.kind == 'exti':
             line = int(item.controller.removeprefix('EXTI'))
             source += _reject(f'((NX_G474_READ(&EXTI->IMR1) | NX_G474_READ(&EXTI->EMR1) | NX_G474_READ(&EXTI->RTSR1) | NX_G474_READ(&EXTI->FTSR1) | NX_G474_READ(&EXTI->PR1)) & {1 << line}u) != 0u')
-    for key in sorted({item['key'] for item in claims if item['key'].startswith('irq:')}):
+    for key in sorted({item.key for item in claims if item.key.startswith('irq:')}):
         vector = key.removeprefix('irq:') + '_IRQn'
         source += _reject(f'!NX_G474_IRQ_AVAILABLE((IRQn_Type){vector})')
-    for key in sorted({item['key'] for item in claims if item['key'].startswith('dma:')}):
+    for key in sorted({item.key for item in claims if item.key.startswith('dma:')}):
         match = re.fullmatch('dma:(DMA[0-9]+):stream([0-7])', key)
         if match is None:
             fail('No maintained selected DMA lane admission: ' + key)

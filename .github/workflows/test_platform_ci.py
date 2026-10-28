@@ -1327,11 +1327,11 @@ class SoftwareQualificationContracts(unittest.TestCase):
             q.mkdir(parents=True)
             env.update(Q=str(q), NEXUS_CHECKOUT_VALIDATED='true',
                        NEXUS_JOB_RESULT='success', REAL_EVIDENCE_STORE='true')
-            # Use the actual maintained resolver and its canonical full IR.
+            # Seal the real resolver's one-way serialized artifact projection.
             navigation = {}
-            resolved = configure.resolve(
+            resolved = configure.resolve_ir(
                 ROOT / 'tools/configure/assemblies/qiming-baremetal.toml',
-                ROOT, input_paths=navigation)
+                ROOT, input_paths=navigation).to_dict()
             report_argument = re.search(r'--report "([^"\n]+)"',
                                         self.step('reproduce')['run']).group(1)
             report_path = Path(report_argument.replace('$Q', str(q)).replace('$E', env['E']))

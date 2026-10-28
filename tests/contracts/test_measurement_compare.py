@@ -5,10 +5,22 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json
 from tools.measurement.compare import compare, tool_identity, profile_input
+
+
+def authored_fixture(root):
+    assembly = root / "fixture.toml"
+    contents = ('schema = 2\nboard_package = "board"\n'
+                'backend = "baremetal"\nclock = "fixed"\n'
+                'optimization = "O3"\n'
+                '[memory]\nmain_stack_bytes = 2048\n')
+    assembly.write_text(contents)
+    (root / "fixture-empty.toml").write_text(contents)
+    return assembly
 
 
 class MeasurementMatrixTests(unittest.TestCase):
@@ -43,9 +55,7 @@ class MeasurementMatrixTests(unittest.TestCase):
             subprocess.run(["git", "-C", str(source), "add", "."], check=True)
             subprocess.run(["git", "-C", str(source), "-c", "user.name=Test",
                 "-c", "user.email=test@example.invalid", "commit", "-qm", "fixture"], check=True)
-            assembly = root / "fixture.json"
-            atomic_json(assembly, {"board_package": "board.json"})
-            atomic_json(root / "fixture-empty.json", {"board_package": "board.json"})
+            assembly = authored_fixture(root)
             report = compare(source, assembly, root / "build",
                 compiler=str(Path(sys.executable).resolve()),
                 cmake=str(Path(cmake).resolve()), ninja=str(Path(ninja).resolve()),
@@ -56,6 +66,13 @@ class MeasurementMatrixTests(unittest.TestCase):
             self.assertNotEqual(commands[1]["exit_code"], 0)
             self.assertEqual(commands[1]["argv"][-2:], ["--parallel", "1"])
             self.assertEqual(report["build_parallelism"], 1)
+            selected = Path(next(argument.split("=", 1)[1]
+                for argument in commands[0]["argv"]
+                if argument.startswith("-DNEXUS_ASSEMBLY_FILE=")))
+            self.assertEqual(selected.suffix, ".toml")
+            document = tomllib.loads(selected.read_text())
+            self.assertEqual(document["schema"], 2)
+            self.assertEqual(document["optimization"], "Os")
 
     def test_authored_toml_profiles_preserve_endpoint_and_board_paths(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -69,11 +86,52 @@ class MeasurementMatrixTests(unittest.TestCase):
                 '[spi.bus]\nbinding = "spi0"\nmode = "short-poll"\n'
                 '[spi_device.sensor]\ncontroller = "bus"\n'
                 'cs_binding = "cs0"\nmode = 3\n')
-            result = profile_input(root, base, "spi", root / "output")
-            self.assertEqual(result["devices"][0]["id"], "sensor")
-            self.assertEqual(result["devices"][0]["mode"], 3)
+            result = tomllib.loads(profile_input(
+                root, base, "spi", root / "output"))
+            self.assertEqual(result["spi_device"]["sensor"]["mode"], 3)
             self.assertEqual(result["board_package"], "../board with spaces")
-            self.assertEqual(result["controllers"][0]["id"], "bus")
+            self.assertEqual(result["spi"]["bus"]["binding"], "spi0")
+
+    def test_root_path_relocation_preserves_quoted_and_multiline_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            base = root / "profile.toml"
+            selected = root / "profile-empty.toml"
+            body = ('[memory]\nmain_stack_bytes = 2048\n'
+                    '# board_package = "nested comment remains"\n')
+            selected.write_text('schema = 2\n"board_package" = """\\\n'
+                                'board with # and spaces\\\n"""\n'
+                                "'layout' = '''flash layout.json'''\n"
+                                'backend = "baremetal"\nclock = "fixed"\n'
+                                'optimization = "O2"\n' + body)
+            rendered = profile_input(root, base, "empty", root / "output")
+            result = tomllib.loads(rendered)
+            self.assertEqual(result["board_package"],
+                             "../board with # and spaces")
+            self.assertEqual(result["layout"], "../flash layout.json")
+            self.assertEqual(result["optimization"], "O2")
+            self.assertTrue(rendered.endswith(body))
+
+    def test_json_profile_cannot_bypass_the_production_toml_boundary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            atomic_json(root / "profile-empty.json", {"board_package": "board"})
+            with self.assertRaisesRegex(ValueError, "TOML"):
+                profile_input(root, root / "profile.json", "empty", root / "out")
+
+    def test_board_id_becomes_one_explicit_relocated_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "boards/reviewed"
+            package.mkdir(parents=True)
+            (package / "board.json").write_text("{}")
+            (root / "profile-empty.toml").write_text(
+                'schema = 2\nboard = "reviewed"\nbackend = "baremetal"\n'
+                'clock = "fixed"\n[memory]\nmain_stack_bytes = 2048\n')
+            result = tomllib.loads(profile_input(
+                root, root / "profile.toml", "empty", root / "out"))
+            self.assertNotIn("board", result)
+            self.assertEqual(result["board_package"], "../boards/reviewed")
 
     def test_unknown_toml_profile_fields_fail_before_external_build(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -104,9 +162,7 @@ class MeasurementMatrixTests(unittest.TestCase):
             subprocess.run(["git", "-C", str(source), "add", "."], check=True)
             subprocess.run(["git", "-C", str(source), "-c", "user.name=Test",
                 "-c", "user.email=test@example.invalid", "commit", "-qm", "fixture"], check=True)
-            assembly = root / "fixture.json"
-            atomic_json(assembly, {"board_package": "board.json"})
-            atomic_json(root / "fixture-empty.json", {"board_package": "board.json"})
+            assembly = authored_fixture(root)
             report = compare(source, assembly, root / "build", compiler=str(Path(sys.executable).resolve()),
                 cmake=str(Path(cmake).resolve()), ninja=str(Path(ninja).resolve()),
                 workloads=("empty",), optimizations=("Os",))

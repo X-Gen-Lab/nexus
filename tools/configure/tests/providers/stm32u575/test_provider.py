@@ -5,7 +5,8 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from tools.configure.ir import ControllerIR
+from tools.configure.ir import ControllerIR, InterruptProfileIR
+from tools.configure.resource_graph import ResourcePlanIR
 from tools.configure.providers.common import ConfigurationError
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -25,12 +26,16 @@ def gpio(**changes):
         "pins": [{"pin": "PC7", "function": "output", "af": 0}]}, **changes}
 
 
-class Result(dict):
+class Result:
     def __init__(self, *items):
-        super().__init__(irq={"external_count": 126, "priority_bits": 4,
-                              "syscall_priority": None}, devices=[])
-        self.controllers = tuple(ControllerIR.create(item, "stm32u575")
+        self.controllers = tuple(ControllerIR.create(
+            {"route": item["binding"], "mask": 0, "initial": 0, **item}, "stm32u575")
                                  for item in items)
+        self.irq = InterruptProfileIR(4, 15, None, None, 126, "primask")
+        self.backend = "baremetal"
+        self.kernel = None
+        self.devices = ()
+        self.resource_plan = ResourcePlanIR(())
 
 
 class U575ProviderTests(unittest.TestCase):
@@ -187,7 +192,7 @@ class U575ProviderTests(unittest.TestCase):
         result = Result(gpio(), uart())
         for item in result.controllers:
             construction = self.provider.constructor(item, result, {}, {}, ())
-            source = "\n".join(construction["definitions"])
+            source = "\n".join(construction.definitions)
             self.assertLess(source.index(".retained"),
                             source.index(".registers ="))
             self.assertEqual(self.provider.operations(item),
@@ -317,11 +322,11 @@ class U575GpdmaSelectionTests(unittest.TestCase):
         result = self.resolve()
         port = next(item for item in result.controllers if item.kind == "uart")
         self.assertEqual((port.controller, port.mode), ("USART1", "dma-tx"))
-        claims = {item["key"] for item in result["claims"]}
+        claims = {item.key for item in result.claims}
         self.assertTrue({"dma:GPDMA1:channel0", "irq:GPDMA1_Channel0",
                          "irq:USART1"}.issubset(claims))
         self.assertEqual(result.dma_topology.lanes[0].engine, "GPDMA1")
-        dependencies = [entry for entry in result["source_dependencies"]
+        dependencies = [entry for entry in result.source_dependencies
                         if entry["path"] == "vendors/st/stm32u5_hal"]
         self.assertEqual(len(dependencies), 1)
         self.assertEqual(dependencies[0]["commit"],
@@ -337,10 +342,11 @@ class U575GpdmaSelectionTests(unittest.TestCase):
         self.assertIn("GPDMA1_Channel0_IRQHandler", source)
         self.assertIn("nx_stm32u575_uart_gpdma_irq(&s_nx_port_console)", source)
         self.assertIn("nx_stm32u575_uart_gpdma_uart_irq(&s_nx_port_console)", source)
-        self.assertIn(".dma_irq_policy", source)
-        self.assertLess(source.index(".uart.retained"),
-                        source.index(".uart.registers = USART1"))
-        self.assertIn("nx_stm32u575_uart_gpdma_initialize", source)
+        self.assertIn("static const nx_stm32u575_uart_gpdma_config_t", source)
+        self.assertIn("nx_stm32u575_uart_gpdma_prepare(&s_nx_port_console", source)
+        self.assertNotIn(".uart.registers =", source)
+        self.assertNotIn(".uart.retained", source)
+        self.assertNotIn("nx_stm32u575_usart1_pins_prepare", source)
         self.assertNotIn("nx_stm32u575_uart_irq(&s_nx_port_console)", source)
 
     def test_preflight_claims_vector_without_reading_unclocked_gpdma(self):

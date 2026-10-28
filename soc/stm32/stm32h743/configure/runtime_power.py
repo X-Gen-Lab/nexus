@@ -9,15 +9,15 @@ def resolve_runtime_power(value, result):
             value['mode'] != 'fixed-run' or
             value['controllers'] != ['bus4']):
         fail('power requires fixed-run and exactly controllers=["bus4"]')
-    controllers = result['controllers']
-    if (result['soc_family'] != 'stm32h743' or result['backend'] != 'baremetal' or
-            result['clock_profile'] != 'hsi64-fixed-cache-off' or
-            len(controllers) != 1 or controllers[0]['id'] != 'bus4' or
-            controllers[0]['kind'] != 'spi' or controllers[0]['mode'] != 'dma' or
-            controllers[0]['controller'] != 'SPI4' or
-            len(result['devices']) != 1 or
-            result['devices'][0]['controller'] != 'bus4' or
-            result['devices'][0].get('mode', 0) != 0):
+    controllers = result.controllers
+    if (result.soc_family != 'stm32h743' or result.backend != 'baremetal' or
+            result.clock_profile != 'hsi64-fixed-cache-off' or
+            len(controllers) != 1 or controllers[0].id != 'bus4' or
+            controllers[0].kind != 'spi' or controllers[0].mode != 'dma' or
+            controllers[0].controller != 'SPI4' or
+            len(result.devices) != 1 or
+            result.devices[0].controller != 'bus4' or
+            result.devices[0].options.mode != 0):
         fail('power supports only baremetal H743 fixed64 cache-off SPI4 finite DMA')
     return RuntimePowerIR('fixed-run', ('bus4',))
 

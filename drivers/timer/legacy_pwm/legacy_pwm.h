@@ -19,7 +19,7 @@ typedef struct {
     volatile uint32_t channel_mode1, channel_mode2, enable, counter;
     volatile uint32_t prescaler, reload, repetition, compare1;
 } nx_legacy_pwm_registers_t;
-/** \brief One fixed PA6 channel with Board-declared inactive level. */
+/** \brief Immutable reviewed timer and pad resources for the owner lifetime. */
 typedef struct {
     nx_legacy_pwm_registers_t* registers;
     volatile uint32_t* gate;
@@ -28,8 +28,15 @@ typedef struct {
     volatile uint32_t* pin_latch;
     volatile uint32_t* pin_set;
     const volatile bool* clock_started;
-    uint32_t gate_mask, tick_hz, period_ticks, duty_ticks, inactive;
-    uint32_t poll_limit;
+    uint32_t gate_mask, poll_limit;
+} nx_legacy_pwm_config_t;
+/** \brief One fixed PA6 channel with Board-declared inactive level.
+ * \note Config cannot overlap state or API output. Period, duty and safe
+ * level belong to this selected owner, never to the shared hardware facts.
+ */
+typedef struct {
+    const nx_legacy_pwm_config_t* config;
+    uint32_t tick_hz, period_ticks, duty_ticks, inactive;
     bool initialized, retained, running, fault;
 } nx_legacy_pwm_state_t;
 extern const nx_pwm_ops_t nx_legacy_pwm_ops;

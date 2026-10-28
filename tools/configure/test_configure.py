@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import unittest
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
 
 
@@ -19,7 +20,7 @@ class ResolverTests(unittest.TestCase):
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, destination)
-        self.assembly = self.root / "assembly.json"
+        self.assembly = self.root / "assembly.toml"
         self.data = {"schema_version": 1, "board_package": "boards/native_reference",
                      "backend": "native", "clock_profile": "model",
                      "controllers": [], "devices": [],
@@ -30,11 +31,13 @@ class ResolverTests(unittest.TestCase):
         self.routes_path = self.root / "soc/native/routes.json"
 
     def write(self, path, data):
-        path.write_text(json.dumps(data), encoding="utf-8")
+        path.write_text(render_toml(data, kinds={"led0": "gpio",
+            "spi0": "spi", "uart0": "uart"}) if path.suffix == ".toml"
+            else json.dumps(data), encoding="utf-8")
 
     def resolve(self):
         self.write(self.assembly, self.data)
-        return gate.resolve(self.assembly, self.root)
+        return gate.resolve_ir(self.assembly, self.root)
 
     def mutate(self, path, callback):
         data = json.loads(path.read_text())
@@ -42,7 +45,8 @@ class ResolverTests(unittest.TestCase):
         self.write(path, data)
 
     def selected(self, **extra):
-        return {"id": "led", "binding": "led0", "mode": "output", **extra}
+        return {"id": "led", "binding": "led0", "mode": "output",
+                "authored_kind": "gpio", **extra}
 
     def rejected(self, match):
         with self.assertRaisesRegex(gate.ConfigurationError, match):
@@ -50,16 +54,16 @@ class ResolverTests(unittest.TestCase):
 
     def test_minimal_has_exact_identity_and_no_tasks(self):
         result = self.resolve()
-        self.assertEqual(result["part"], "NATIVE_MODEL")
-        self.assertFalse(result["physical_qualified"])
-        self.assertEqual(result["controllers"], [])
-        self.assertEqual(len(result["inputs"]), 5)
-        self.assertNotIn("tasks", result)
+        self.assertEqual(result.part, "NATIVE_MODEL")
+        self.assertFalse(result.physical_qualified)
+        self.assertEqual(result.controllers, ())
+        self.assertEqual(len(result.inputs), 5)
+        self.assertNotIn("tasks", result.to_dict())
 
     def test_duplicate_json_keys_rejected(self):
-        self.assembly.write_text('{"schema_version":1,"schema_version":1}')
+        self.soc_path.write_text('{"schema_version":1,"schema_version":1}')
         with self.assertRaisesRegex(gate.ConfigurationError, "Duplicate"):
-            gate.resolve(self.assembly, self.root)
+            gate.resolve_ir(self.assembly, self.root)
 
     def test_unknown_assembly_key_rejected(self):
         self.data["business_worker"] = True
@@ -169,7 +173,7 @@ class ResolverTests(unittest.TestCase):
             binding.pop("mask", None)
             binding["initial"] = 1
         self.mutate(self.board_path, update)
-        self.assertEqual(self.resolve()["part"], "NATIVE_MODEL")
+        self.assertEqual(self.resolve().part, "NATIVE_MODEL")
 
     def test_gpio_effective_mask_is_materialized_in_the_typed_decision(self):
         self.mutate(self.board_path,
@@ -180,9 +184,9 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(ir.controllers[0].options.mask, 1)
 
     def test_spi_builtin_cs_initial_is_not_a_gpio_bitmask(self):
-        result = gate.resolve(gate.ROOT /
+        result = gate.resolve_ir(gate.ROOT /
                               "tools/configure/assemblies/liangshan-baremetal.toml")
-        self.assertEqual(result["board_bindings"]["spi_flash"]["initial"], 1)
+        self.assertEqual(result.board_bindings["spi_flash"]["initial"], 1)
 
     def test_unknown_nested_pin_key_rejected(self):
         self.mutate(self.routes_path, lambda item: item["routes"][0]["pins"][0].update(auto=True))
@@ -247,15 +251,15 @@ class ResolverTests(unittest.TestCase):
         before = self.resolve()
         self.mutate(self.board_path, lambda item: item["unknowns"].append("another limit"))
         after = self.resolve()
-        self.assertNotEqual(before["configuration_sha256"], after["configuration_sha256"])
+        self.assertNotEqual(before.configuration_sha256, after.configuration_sha256)
 
     def test_relocated_identical_input_has_identical_config(self):
         before = self.resolve()
         destination = self.root.parent / (self.root.name + "-relocated")
         shutil.copytree(self.root, destination)
         self.addCleanup(shutil.rmtree, destination)
-        after = gate.resolve(destination / "assembly.json", destination)
-        self.assertEqual(before["configuration_sha256"], after["configuration_sha256"])
+        after = gate.resolve_ir(destination / "assembly.toml", destination)
+        self.assertEqual(before.configuration_sha256, after.configuration_sha256)
 
     def test_unsupported_image_offset_rejected(self):
         self.data["layout"] = "layout.json"
@@ -271,9 +275,8 @@ class ResolverTests(unittest.TestCase):
                                  for char in text), path.name)
         # Inspect the MCU-specific runtime hooks as well as the Native bundle.
         from tools.configure import bindings
-        result = self.resolve()
-        result["soc_family"] = "stm32f407"
-        result["part"] = "STM32F407VET6"
+        result = gate.resolve_ir(gate.ROOT /
+            "tools/configure/assemblies/qiming-baremetal-empty.toml")
         _, source = bindings.emit(result)
         self.assertIn(r"\brief C runtime", source)
         self.assertNotIn("\x08", source)
@@ -289,7 +292,7 @@ class ResolverTests(unittest.TestCase):
 
     def test_irrelevant_controller_settings_rejected(self):
         self.data["controllers"] = [self.selected(baud=115200)]
-        self.rejected("Unsupported gpio configuration fields")
+        self.rejected("gpio.led:.*unknown.*baud")
 
     def test_reserved_c_identifier_rejected(self):
         self.data["controllers"] = [self.selected(id="for")]
@@ -309,7 +312,7 @@ class ResolverTests(unittest.TestCase):
         self.data["controllers"] = [{"id":"spi", "binding":"spi0", "mode":"short-poll"}]
         self.mutate(self.soc_path, lambda item: item["controllers"]["SPI0"].update(irq=["SPI0_IRQn"]))
         result = self.resolve()
-        self.assertFalse(any(item["key"].startswith("irq:") for item in result["claims"]))
+        self.assertFalse(any(item.key.startswith("irq:") for item in result.claims))
 
     def test_uart_storage_capacity_bounded(self):
         self.data["controllers"] = [{"id":"uart", "binding":"uart0", "mode":"irq-byte-event",
@@ -329,18 +332,18 @@ class AdvancedResolverTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.assembly = Path(self.temporary.name) / "assembly.json"
+        self.assembly = Path(self.temporary.name) / "assembly.toml"
 
     def fixture(self, name):
         directory = gate.ROOT / "tests/contracts/stm32_assembly"
-        result = gate.load_assembly(directory / ("ve-" + name + ".toml"))
+        result = gate.load_assembly(directory / ("ve-" + name + ".toml")).to_dict()
         result["board_package"] = str(directory / result["board_package"])
         return result
 
     def reject(self, data, message):
-        self.assembly.write_text(json.dumps(data))
+        self.assembly.write_text(render_toml(data))
         with self.assertRaisesRegex(gate.ConfigurationError, message):
-            gate.resolve(self.assembly)
+            gate.resolve_ir(self.assembly)
 
     def test_shared_exti_priority_contradiction_rejected(self):
         data = self.fixture("exti")
@@ -387,7 +390,7 @@ class AdvancedResolverTests(unittest.TestCase):
             with self.subTest(transport=transport):
                 data = self.fixture(transport)
                 data["devices"][0]["capacity"] = 32
-                self.reject(data, "device:.*unknown.*capacity")
+                self.reject(data, "device.*unknown.*capacity")
 
     def test_i2c_spi_options_rejected(self):
         for field, value in (("mode", 3), ("max_hz", 50000),
@@ -395,7 +398,7 @@ class AdvancedResolverTests(unittest.TestCase):
             with self.subTest(field=field):
                 data = self.fixture("i2c")
                 data["devices"][0][field] = value
-                self.reject(data, "I2C device:.*unknown.*" + field)
+                self.reject(data, "i2c_device.*unknown.*" + field)
 
     def test_i2c_endpoint_requires_address(self):
         data = self.fixture("i2c")
@@ -405,31 +408,31 @@ class AdvancedResolverTests(unittest.TestCase):
     def test_spi_i2c_address_rejected(self):
         data = self.fixture("spi")
         data["devices"][0]["address"] = 80
-        self.reject(data, "SPI device:.*unknown.*address")
+        self.reject(data, "spi_device.*unknown.*address")
 
     def test_gd32_builtin_spi_cs_remains_supported(self):
         directory = gate.ROOT / "tests/contracts/gd32_assembly"
-        data = gate.load_assembly(directory / "spi.toml")
+        data = gate.load_assembly(directory / "spi.toml").to_dict()
         data["board_package"] = str(directory / data["board_package"])
         data["devices"] = [{"id": "sensor", "controller": "spi0",
                             "driver": "spi-endpoint", "mode": 3,
                             "max_hz": 1000000}]
-        self.assembly.write_text(json.dumps(data))
-        result = gate.resolve(self.assembly)
-        self.assertNotIn("cs_binding", result["devices"][0])
-        self.assertIn("pin:PF6", {item["key"] for item in result["claims"]})
+        self.assembly.write_text(render_toml(data))
+        result = gate.resolve_ir(self.assembly)
+        self.assertIsNone(result.devices[0].options.cs_binding)
+        self.assertIn("pin:PF6", {item.key for item in result.claims})
 
     def test_invalid_device_reconfiguration_invalidates_old_bundle(self):
         for transport, field, value in (("spi", "capacity", 32),
                                         ("i2c", "mode", 3)):
             with self.subTest(transport=transport, field=field):
                 data = self.fixture(transport)
-                self.assembly.write_text(json.dumps(data))
+                self.assembly.write_text(render_toml(data))
                 output = Path(self.temporary.name) / (transport + "-bundle")
                 gate.configure(self.assembly, output)
                 self.assertTrue((output / "bindings.c").is_file())
                 data["devices"][0][field] = value
-                self.assembly.write_text(json.dumps(data))
+                self.assembly.write_text(render_toml(data))
                 with self.assertRaisesRegex(gate.ConfigurationError, field):
                     gate.configure(self.assembly, output)
                 self.assertFalse(output.exists())

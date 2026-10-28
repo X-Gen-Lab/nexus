@@ -9,40 +9,13 @@
 #include "stm32f407_provider.h"
 #include <assert.h>
 #include <stdio.h>
+#include <sys/mman.h>
 
 nx_stm32_system_t g_nx_stm32_system;
-GPIO_TypeDef g_nx_stm32_gpioa_model;
 nx_stm32_io_nvic_model_t g_nx_stm32_io_nvic;
-static RCC_TypeDef s_rcc;
-static EXTI_TypeDef s_exti;
-static SYSCFG_TypeDef s_mux;
-static TIM_TypeDef s_timer;
-static GPIO_TypeDef s_gpioe;
-static SPI_TypeDef s_spi;
-static I2C_TypeDef s_i2c;
-static GPIO_TypeDef s_gpiob;
 static unsigned s_disable;
 static unsigned s_clear;
 static unsigned s_clock_failure;
-
-#undef RCC
-#define RCC (&s_rcc)
-#undef EXTI
-#define EXTI (&s_exti)
-#undef SYSCFG
-#define SYSCFG (&s_mux)
-#undef TIM3
-#define TIM3 (&s_timer)
-#undef GPIOE
-#define GPIOE (&s_gpioe)
-#undef SPI1
-#define SPI1 (&s_spi)
-#undef I2C1
-#define I2C1 (&s_i2c)
-#undef GPIOB
-#define GPIOB (&s_gpiob)
-#undef NVIC_ClearPendingIRQ
-#define NVIC_ClearPendingIRQ(irq) nx_stm32_model_nvic_clear((int)(irq))
 
 #include "stm32_constructors.h"
 
@@ -68,6 +41,10 @@ nx_arch_irq_state_t nx_arch_irq_save(void) {
 /** \brief Restore the deterministic incoming model state. */
 void nx_arch_irq_restore(nx_arch_irq_state_t state) {
     (void)state;
+}
+/** \brief Cold hardware access uses a privileged model owner. */
+bool nx_arch_is_privileged(void) {
+    return true;
 }
 /** \brief Constructors are tested only from task context. */
 bool nx_arch_in_isr(void) {
@@ -102,106 +79,112 @@ void nx_stm32_model_nvic_clear(int irq) {
 
 /** \brief Force a late line conflict after GPIO/clock acquisition. */
 static void exti_rollback_test(void) {
-    s_rcc.AHB1ENR = 1U << 2U;
-    s_rcc.APB2ENR = RCC_APB2ENR_USART1EN;
-    g_nx_stm32_gpioa_model.MODER = 0x55555555U;
-    g_nx_stm32_gpioa_model.OTYPER = 0xA5A5U;
-    g_nx_stm32_gpioa_model.OSPEEDR = 0xAAAAAAAAU;
-    g_nx_stm32_gpioa_model.PUPDR = 0x55555555U;
-    g_nx_stm32_gpioa_model.AFR[0] = 0x12345678U;
+    RCC->AHB1ENR = 1U << 2U;
+    RCC->APB2ENR = RCC_APB2ENR_USART1EN;
+    GPIOA->MODER = 0x55555555U;
+    GPIOA->OTYPER = 0xA5A5U;
+    GPIOA->OSPEEDR = 0xAAAAAAAAU;
+    GPIOA->PUPDR = 0x55555555U;
+    GPIOA->AFR[0] = 0x12345678U;
     uint16_t before = nx_stm32_pin_capture(GPIOA, 6U);
-    s_exti.IMR = 1U << 6U;
-    assert(prepare_edge6() == NX_ERROR_BUSY);
+    EXTI->IMR = 1U << 6U;
+    assert(nx_test_prepare_edge6() == NX_ERROR_BUSY);
     assert(!s_nx_port_edge6.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
-    assert(s_rcc.AHB1ENR == (1U << 2U));
-    assert(s_rcc.APB2ENR == RCC_APB2ENR_USART1EN);
-    assert(s_exti.IMR == (1U << 6U));
-    s_exti.IMR = 0U;
+    assert(RCC->AHB1ENR == (1U << 2U));
+    assert(RCC->APB2ENR == RCC_APB2ENR_USART1EN);
+    assert(EXTI->IMR == (1U << 6U));
+    EXTI->IMR = 0U;
     /* A real edge can become pending immediately after source publication. */
     NVIC->pending_on_enable = 1U;
-    assert(prepare_edge5() == NX_SUCCESS);
+    assert(nx_test_prepare_edge5() == NX_SUCCESS);
     assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 1U);
     assert(NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
     NVIC->pending_on_enable = 0U;
-    assert(prepare_edge6() == NX_SUCCESS);
+    assert(nx_test_prepare_edge6() == NX_SUCCESS);
     assert(NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
-    s_exti.PR = (1U << 5U) | (1U << 6U);
+    EXTI->PR = (1U << 5U) | (1U << 6U);
     EXTI9_5_IRQHandler();
     assert(s_nx_port_edge5.count == 1U && s_nx_port_edge6.count == 1U);
     s_disable = 0U;
     s_clear = 0U;
-    assert(stop_edge6() == NX_SUCCESS && s_disable == 0U);
+    assert(nx_test_stop_edge6() == NX_SUCCESS && s_disable == 0U);
     assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 1U &&
            NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
-    assert(stop_edge5() == NX_SUCCESS && s_disable == 1U && s_clear == 1U);
+    assert(nx_test_stop_edge5() == NX_SUCCESS && s_disable == 1U &&
+           s_clear == 1U);
     assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 0U &&
            NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 0U);
 }
 
 /** \brief Preserve a conflicting live timer and restore the acquired pin. */
 static void pwm_rollback_test(void) {
-    s_rcc.APB1ENR = RCC_APB1ENR_TIM2EN;
-    s_rcc.AHB1ENR = 1U << 2U;
+    RCC->APB1ENR = RCC_APB1ENR_TIM2EN;
+    RCC->AHB1ENR = 1U << 2U;
     uint16_t before = nx_stm32_pin_capture(GPIOA, 6U);
-    s_timer.CR1 = TIM_CR1_CEN;
-    s_timer.PSC = 12U;
-    s_timer.ARR = 10U;
-    assert(prepare_pwm0() == NX_ERROR_BUSY);
+    TIM3->CR1 = TIM_CR1_CEN;
+    TIM3->PSC = 12U;
+    TIM3->ARR = 10U;
+    assert(nx_test_prepare_pwm0() == NX_ERROR_BUSY);
     assert(!s_nx_port_pwm0.initialized && !s_nx_idle_pwm0.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
-    assert(s_timer.CR1 == TIM_CR1_CEN && s_timer.PSC == 12U &&
-           s_timer.ARR == 10U);
-    assert(s_rcc.APB1ENR == RCC_APB1ENR_TIM2EN);
-    assert(s_rcc.AHB1ENR == (1U << 2U));
-    s_timer.CR1 = 0U;
-    assert(prepare_pwm0() == NX_SUCCESS);
+    assert(TIM3->CR1 == TIM_CR1_CEN && TIM3->PSC == 12U && TIM3->ARR == 10U);
+    assert(RCC->APB1ENR == RCC_APB1ENR_TIM2EN);
+    assert(RCC->AHB1ENR == (1U << 2U));
+    TIM3->CR1 = 0U;
+    assert(nx_test_prepare_pwm0() == NX_SUCCESS);
     assert(nx_pwm_port_start(&s_nx_face_pwm0) == NX_SUCCESS);
-    assert(stop_pwm0() == NX_SUCCESS);
+    assert(nx_test_stop_pwm0() == NX_SUCCESS);
     assert(!s_nx_port_pwm0.initialized && !s_nx_idle_pwm0.initialized);
     assert((GPIOA->MODER & (3U << 12U)) == (1U << 12U));
     assert(GPIOA->BSRR == (1U << 22U));
-    assert((s_rcc.APB1ENR & RCC_APB1ENR_TIM3EN) == 0U);
+    assert((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U);
 }
 
 /** \brief Restore previously changed pins when a later acquisition fails. */
 static void spi_rollback_test(void) {
-    s_rcc.AHB1ENR = 1U << 2U;
-    s_rcc.APB2ENR = RCC_APB2ENR_USART1EN;
+    RCC->AHB1ENR = 1U << 2U;
+    RCC->APB2ENR = RCC_APB2ENR_USART1EN;
     uint16_t before = nx_stm32_pin_capture(GPIOA, 5U);
     s_clock_failure = 2U;
-    assert(prepare_spi0() == NX_ERROR_IO);
+    assert(nx_test_prepare_spi0() == NX_ERROR_IO);
     assert(nx_stm32_pin_capture(GPIOA, 5U) == before);
-    assert(s_rcc.AHB1ENR == (1U << 2U));
-    assert(s_rcc.APB2ENR == RCC_APB2ENR_USART1EN);
+    assert(RCC->AHB1ENR == (1U << 2U));
+    assert(RCC->APB2ENR == RCC_APB2ENR_USART1EN);
     assert(!s_nx_cs_sensor0.initialized);
-    assert(prepare_spi0() == NX_SUCCESS);
-    assert(s_nx_cs_sensor0.initialized && s_spi.CR1 == 0U);
-    assert(stop_spi0() == NX_SUCCESS);
-    assert(!s_nx_cs_sensor0.initialized && s_gpioe.BSRR == 8U);
-    assert((s_rcc.APB2ENR & RCC_APB2ENR_SPI1EN) == 0U);
+    assert(nx_test_prepare_spi0() == NX_SUCCESS);
+    assert(s_nx_cs_sensor0.initialized && SPI1->CR1 == 0U);
+    assert(nx_test_stop_spi0() == NX_SUCCESS);
+    assert(!s_nx_cs_sensor0.initialized && GPIOE->BSRR == 8U);
+    assert((RCC->APB2ENR & RCC_APB2ENR_SPI1EN) == 0U);
 }
 
 /** \brief The generated I2C owner retains exactly its reviewed line facts. */
 static void i2c_route_test(void) {
-    s_rcc.APB1ENR = RCC_APB1ENR_TIM2EN;
-    s_rcc.AHB1ENR = 1U << 2U;
-    assert(prepare_i2c0() == NX_SUCCESS);
+    RCC->APB1ENR = RCC_APB1ENR_TIM2EN;
+    RCC->AHB1ENR = 1U << 2U;
+    assert(nx_test_prepare_i2c0() == NX_SUCCESS);
     assert(s_nx_port_i2c0.line_gpio == GPIOB);
     assert(s_nx_port_i2c0.line_mask == ((1U << 6U) | (1U << 7U)));
     assert(s_nx_port_i2c0.registers == I2C1);
-    assert(stop_i2c0() == NX_SUCCESS);
+    assert(nx_test_stop_i2c0() == NX_SUCCESS);
     assert(!s_nx_port_i2c0.initialized);
-    assert(s_rcc.APB1ENR == RCC_APB1ENR_TIM2EN);
+    assert(RCC->APB1ENR == RCC_APB1ENR_TIM2EN);
 }
 
 /** \brief Execute actual generated construction, failure and release paths. */
 int main(void) {
-    g_nx_stm32_system.rcc = &s_rcc;
+    const size_t length = 0x80000U;
+    void* mapping =
+        mmap((void*)UINT32_C(0x40000000), length, PROT_READ | PROT_WRITE,
+             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+    assert(mapping == (void*)UINT32_C(0x40000000));
+    g_nx_stm32_system.rcc = RCC;
     exti_rollback_test();
     pwm_rollback_test();
     spi_rollback_test();
     i2c_route_test();
+    assert(munmap(mapping, length) == 0);
     puts("STM32 generated constructor rollback and release model passed");
     return 0;
 }

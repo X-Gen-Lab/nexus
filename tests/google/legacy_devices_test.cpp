@@ -52,12 +52,12 @@ extern "C" void nx_legacy_model_write(volatile uint32_t* r, uint32_t v) {
         if (flash_port != nullptr && r == &flash_port->registers->control &&
             (v & 128U) != 0U)
             nx_native_clock_advance(advance_on_relock);
-        if (pwm_port != nullptr && r == pwm_port->pin_set)
-            *pwm_port->pin_latch =
-                (*pwm_port->pin_latch | (v & 0xffffU)) & ~(v >> 16U);
-        if (pwm_port != nullptr && r == &pwm_port->registers->event &&
+        if (pwm_port != nullptr && r == pwm_port->config->pin_set)
+            *pwm_port->config->pin_latch =
+                (*pwm_port->config->pin_latch | (v & 0xffffU)) & ~(v >> 16U);
+        if (pwm_port != nullptr && r == &pwm_port->config->registers->event &&
             (v & 1U) != 0U && !hold_update)
-            pwm_port->registers->status |= 1U;
+            pwm_port->config->registers->status |= 1U;
         if (flash_port != nullptr && r == &flash_port->registers->control &&
             (v & 64U) != 0U) {
             flash_port->registers->status |= 1U;
@@ -83,11 +83,12 @@ extern "C" void nx_legacy_model_poll(unsigned kind, void* context) {
     if (kind == 1U) {
         auto* p = static_cast<nx_legacy_adc_state_t*>(context);
         if (!hold_calibration)
-            p->registers->control2 &= ~12U;
-        if ((p->registers->control2 & (1U << 22U)) != 0U && !hold_conversion) {
-            p->registers->control2 &= ~(1U << 22U);
-            p->registers->data = adc_value;
-            p->registers->status |= 2U;
+            p->config->registers->control2 &= ~12U;
+        if ((p->config->registers->control2 & (1U << 22U)) != 0U &&
+            !hold_conversion) {
+            p->config->registers->control2 &= ~(1U << 22U);
+            p->config->registers->data = adc_value;
+            p->config->registers->status |= 2U;
         }
     }
 }
@@ -139,6 +140,7 @@ class LegacyAdc : public testing::Test {
     nx_legacy_adc_registers_t registers{};
     uint32_t gate = 1U, divider = 0U, mode = 0x44444444U, lock = 0U;
     volatile bool started = true;
+    nx_legacy_adc_config_t config{};
     nx_legacy_adc_state_t state{};
     const nx_adc_port_t face{&nx_legacy_adc_ops, &state};
     void SetUp() override {
@@ -146,19 +148,20 @@ class LegacyAdc : public testing::Test {
         flash_port = nullptr;
         pwm_port = nullptr;
         adc_port = &state;
-        state.registers = &registers;
-        state.gate = &gate;
-        state.gate_mask = 1U;
-        state.divider = &divider;
-        state.divider_mask = 0xc000U;
-        state.pin_mode = &mode;
-        state.pin_lock = &lock;
-        state.clock_started = &started;
+        state.config = &config;
+        config.registers = &registers;
+        config.gate = &gate;
+        config.gate_mask = 1U;
+        config.divider = &divider;
+        config.divider_mask = 0xc000U;
+        config.pin_mode = &mode;
+        config.pin_lock = &lock;
+        config.clock_started = &started;
         state.reference_mv = 3300U;
-        state.poll_limit = 20U;
+        config.poll_limit = 20U;
         ignored = nullptr;
         polls = 0U;
-        state.startup_delay_us = 4U;
+        config.startup_delay_us = 4U;
         hold_calibration = hold_conversion = false;
         adc_value = 1234U;
     }
@@ -238,17 +241,61 @@ TEST_F(LegacyAdc, AliasedOutputAndNeverDeadlineCannotStartConversion) {
     EXPECT_EQ(1U, registers.control2);
 }
 TEST_F(LegacyAdc, Gd303ErratumDelayRetainsMillisecondMarginBeforeCalibration) {
-    state.startup_delay_us = 2000U;
-    state.poll_limit = 4000U;
+    config.startup_delay_us = 2000U;
+    config.poll_limit = 4000U;
     Start();
     EXPECT_GE(nx_time_now_us(), 2000U);
     EXPECT_EQ(1U, registers.control2);
+}
+TEST_F(LegacyAdc, HardwareDescriptionCannotAliasSampleOrInfoOutput) {
+    Start();
+    const auto before = config;
+    size_t count = 17U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_adc_port_sample(&face, reinterpret_cast<uint16_t*>(&config),
+                                 1U, 100U, &count));
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_adc_port_info(&face, reinterpret_cast<nx_adc_info_t*>(&config)));
+    EXPECT_EQ(17U, count);
+    EXPECT_EQ(0, std::memcmp(&before, &config, sizeof(config)));
+    EXPECT_EQ(1U, registers.control2);
+    EXPECT_EQ(NX_SUCCESS, nx_legacy_adc_close(&state));
+    EXPECT_EQ(0, std::memcmp(&before, &config, sizeof(config)));
+}
+TEST_F(LegacyAdc, HardwareDescriptionOverlappingStateRejectsBeforeAccess) {
+    state.config = reinterpret_cast<const nx_legacy_adc_config_t*>(&state);
+    const auto before = state;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_legacy_adc_initialize(&state));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(0U, registers.control2);
+    EXPECT_EQ(0x44444444U, mode);
+}
+TEST_F(LegacyAdc, IndependentDescriptionsKeepConverterStateSeparate) {
+    Start();
+    nx_legacy_adc_registers_t other_registers{};
+    uint32_t other_mode = 0x44444444U;
+    auto other_config = config;
+    other_config.registers = &other_registers;
+    other_config.pin_mode = &other_mode;
+    nx_legacy_adc_state_t other{};
+    other.config = &other_config;
+    other.reference_mv = 3000U;
+    ASSERT_EQ(NX_SUCCESS, nx_legacy_adc_initialize(&other));
+    EXPECT_EQ(&config, state.config);
+    EXPECT_EQ(&other_config, other.config);
+    ASSERT_EQ(NX_SUCCESS, nx_legacy_adc_close(&state));
+    EXPECT_TRUE(other.initialized);
+    EXPECT_TRUE(other.retained);
+    EXPECT_EQ(1U, other_registers.control2);
+    EXPECT_EQ(NX_SUCCESS, nx_legacy_adc_close(&other));
 }
 class LegacyPwm : public testing::Test {
   protected:
     nx_legacy_pwm_registers_t registers{};
     uint32_t gate = 2U, mode = 0x44444444U, lock = 0U, latch = 0U, set = 0U;
     volatile bool started = true;
+    nx_legacy_pwm_config_t config{};
     nx_legacy_pwm_state_t state{};
     const nx_pwm_port_t face{&nx_legacy_pwm_ops, &state};
     void SetUp() override {
@@ -256,19 +303,20 @@ class LegacyPwm : public testing::Test {
         flash_port = nullptr;
         adc_port = nullptr;
         pwm_port = &state;
-        state.registers = &registers;
-        state.gate = &gate;
-        state.gate_mask = 2U;
-        state.pin_mode = &mode;
-        state.pin_lock = &lock;
-        state.pin_latch = &latch;
-        state.pin_set = &set;
-        state.clock_started = &started;
+        state.config = &config;
+        config.registers = &registers;
+        config.gate = &gate;
+        config.gate_mask = 2U;
+        config.pin_mode = &mode;
+        config.pin_lock = &lock;
+        config.pin_latch = &latch;
+        config.pin_set = &set;
+        config.clock_started = &started;
         state.tick_hz = 1000000U;
         state.period_ticks = 1000U;
         state.duty_ticks = 100U;
         state.inactive = 0U;
-        state.poll_limit = 5U;
+        config.poll_limit = 5U;
         ignored = nullptr;
         hold_update = false;
     }
@@ -342,6 +390,26 @@ TEST_F(LegacyPwm, FailedTimerWithdrawalStillDetachesPinAtBoardInactiveLevel) {
     EXPECT_TRUE(state.retained);
     ignored = nullptr;
     EXPECT_EQ(NX_SUCCESS, nx_legacy_pwm_close(&state));
+}
+TEST_F(LegacyPwm, ReadOnlyDescriptionCannotBeUsedAsStateOutput) {
+    Start();
+    const auto before = config;
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_pwm_port_state(&face, reinterpret_cast<nx_pwm_state_t*>(&config)));
+    EXPECT_EQ(0, std::memcmp(&before, &config, sizeof(config)));
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_port_start(&face));
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_port_set(&face, 1000U, 200U));
+    ASSERT_EQ(NX_SUCCESS, nx_legacy_pwm_close(&state));
+    EXPECT_EQ(0, std::memcmp(&before, &config, sizeof(config)));
+}
+TEST_F(LegacyPwm, DescriptionOverlappingStateRejectsBeforeHardwareAccess) {
+    state.config = reinterpret_cast<const nx_legacy_pwm_config_t*>(&state);
+    const auto before = state;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_legacy_pwm_initialize(&state));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(0U, registers.control1);
+    EXPECT_EQ(0x44444444U, mode);
 }
 TEST_F(LegacyFlash, HalfWordProgramAndWholePageEraseSettleAndRelock) {
     Start();

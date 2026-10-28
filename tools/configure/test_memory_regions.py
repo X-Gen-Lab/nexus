@@ -39,7 +39,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
         script = (
             "import json, runpy, sys\n"
             "module = runpy.run_path(sys.argv[1])\n"
-            "budget = module['resource_budget'](json.loads(sys.argv[2]))\n"
+            "budget = module['resource_budget_projection'](json.loads(sys.argv[2]))\n"
             "print(json.dumps(budget))\n"
         )
         result = subprocess.run(
@@ -58,16 +58,16 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
         shutil.copyfile(Path(memory.__file__), copied)
         script = textwrap.dedent("""\
             import json, runpy, sys
-            emit = runpy.run_path(sys.argv[1])["dma_regions"]
+            emit = runpy.run_path(sys.argv[1])["dma_regions_from_facts"]
             facts = {"memory": [{"origin": 0x20000000, "size": 1024,
                                 "dma_engines": {"DMA1": True, "BDMA": False}}]}
-            rendered, count = emit("port", facts, engine="DMA1")
-            unreachable = emit("port", facts, engine="BDMA")
+            rendered, count = emit("port", facts["memory"], engine="DMA1")
+            unreachable = emit("port", facts["memory"], engine="BDMA")
             errors = []
             for options in ({}, {"engine": "unknown"},
-                            {"engine": "DMA1", "include_flash": True}):
+                            {"engine": "DMA1", "flash": {}}):
                 try:
-                    emit("port", facts, **options)
+                    emit("port", facts["memory"], **options)
                 except ValueError as error:
                     errors.append(str(error))
                 else:
@@ -98,7 +98,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
         self.assertEqual(selected, {"addsram": 128, "tcm": 64})
         with self.assertRaises(FrozenInstanceError):
             ir.memory_budget.regions[0].limit_bytes = 256
-        domains = {item["id"]: item for item in ir["memory"]}
+        domains = {item["id"]: item for item in ir.memory}
         self.assertTrue(domains["addsram"]["linker"])
         self.assertTrue(domains["tcm"]["linker"])
         self.assertFalse(domains["tcm"]["dma"])
@@ -135,7 +135,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
         self.assertIn("set(NEXUS_MEMORY_TCM 0)", cmake)
         ir = gate.resolve_ir(path)
         self.assertEqual(ir.memory_budget.regions, ())
-        self.assertEqual([item["id"] for item in ir["memory"] if item["linker"]],
+        self.assertEqual([item["id"] for item in ir.memory if item["linker"]],
                          ["sram"])
 
     def test_extra_selection_cannot_replace_the_authoritative_primary_ram(self):
@@ -174,7 +174,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
                 output = self.root / board
                 gate.configure(path, output)
                 ir = gate.resolve_ir(path)
-                domains = {item["id"]: item for item in ir["memory"]}
+                domains = {item["id"]: item for item in ir.memory}
                 self.assertTrue(domains["ccm"]["linker"])
                 self.assertFalse(domains["ccm"]["dma"])
                 declarations, count = emission.dma_regions("selected", ir,

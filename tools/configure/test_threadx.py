@@ -60,8 +60,8 @@ class ThreadXPolicyTests(unittest.TestCase):
         self.assertEqual(policy.tick_reload, 167999)
         self.assertEqual(policy.interrupt_mask, "basepri")
         self.assertEqual(policy.syscall_priority, 5)
-        self.assertNotIn("idle_stack_words", policy)
-        self.assertNotIn("memory_protection", policy)
+        self.assertFalse(hasattr(policy, "idle_stack_words"))
+        self.assertFalse(hasattr(policy, "memory_protection"))
 
     def test_native_clock_is_explicit_host_monotonic_not_fake_systick(self):
         policy = self.resolve(arch="native", hz=1)
@@ -136,12 +136,10 @@ class ThreadXPolicyTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             policy.definitions["NEXUS_OS_TICK_HZ"] = 1
 
-    def test_roundtrip_dispatch_retains_threadx_type_and_identity(self):
+    def test_policy_keeps_backend_specific_identity(self):
         policy = self.resolve()
-        restored = kernel.from_validated(policy.to_dict())
-        self.assertEqual(restored, policy)
-        self.assertEqual(restored.backend, "threadx")
-        self.assertNotIn("idle_stack_words", restored)
+        self.assertEqual(policy.backend, "threadx")
+        self.assertFalse(hasattr(policy, "idle_stack_words"))
 
     def test_generated_policy_has_exact_threadx_contracts(self):
         policy = self.resolve({"syscall_priority": 6})

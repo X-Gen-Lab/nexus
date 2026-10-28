@@ -1,5 +1,5 @@
 // FIG-03 current: build-time inputs and artifacts.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: tools/configure/authored.py, configure.py, ir.py and bindings.py.
 // Edges denote configuration/production flow, not runtime I/O.
 digraph configurationGeneration {
     graph [label="FIG-03 当前配置与原子生成", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
@@ -11,24 +11,31 @@ digraph configurationGeneration {
     assembly [label="一份 authored TOML", fillcolor="#f8fafc"];
     socFacts [label="SoC / CPU / routes 事实", fillcolor="#f8fafc"];
     boardFacts [label="Board 接线与来源事实", fillcolor="#f8fafc"];
+    authored [label="严格 TOML 字段检查 → 冻结用户意图"];
     resolver [label="严格解析：字段、模式、资源、输入身份"];
-    typedIr [label="不可变 typed IR"];
+    typedIr [label="不可变具名 IR：每个决策只存一次"];
+    construction [label="SoC 构造：静态定义与冷态调用"];
     bundle [label="事务生成与原子发布"];
-    outputs [label="静态实例 / factory / 配置 / 内存预算"];
+    outputs [label="静态实例 / factory / 配置 / 内存预算 / resolved.json"];
     targets [label="CMake：唯一软件目标图"];
     ninja [label="Ninja：编译、链接、资源检查"];
     firmware [label="ELF / BIN / map / 资源报告", fillcolor="#f0fdf4"];
     rejected [label="拒绝 / 生成失败", fillcolor="#fff7ed"];
     invalidated [label="owned bundle 失效，不暴露半成品", fillcolor="#fff7ed"];
-    assembly -> resolver [label="产品选择"];
+    assembly -> authored [label="唯一装配入口"];
+    authored -> resolver [label="尚未准入的选择"];
     socFacts -> resolver [label="芯片能力"];
     boardFacts -> resolver [label="Board 授权"];
     resolver -> typedIr [label="验证通过"];
-    typedIr -> bundle [label="生成选定内容"];
+    typedIr -> construction [label="具名字段"];
+    construction -> bundle [label="生成 binding C 字节"];
+    typedIr -> bundle [label="单向 JSON / 配置 / 内存投影"];
     bundle -> outputs [label="成功发布"];
     outputs -> targets [label="配置与生成源"];
     targets -> ninja [label="执行目标图"];
     ninja -> firmware [label="本次实际产物"];
+    authored -> rejected [label="语法 / 字段非法"];
+    construction -> rejected [label="生成失败"];
     resolver -> rejected [label="非法 / 冲突 / 变化"];
     bundle -> rejected [label="生成或发布失败"];
     rejected -> invalidated [label="仅清理拥有的输出"];

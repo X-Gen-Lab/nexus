@@ -19,7 +19,7 @@ class U575DeviceSelectionTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[5]
         result = configure.resolve_ir(
             root / "tests/contracts/u575_assembly/peripherals.toml", root)
-        claims = {item["key"]: item["owner"] for item in result["claims"]}
+        claims = {item.key: item.owner for item in result.claims}
         self.assertEqual("storage", claims.get("irq:FLASH"))
         self.assertEqual("control", claims.get("clock:HSI16"))
         self.assertEqual("control", claims.get("clock-mux:I2C1"))
@@ -34,8 +34,8 @@ class U575DeviceSelectionTests(unittest.TestCase):
         self.assertEqual(construction.state_type, "nx_i2c_v2_state_t")
         source = "\n".join(construction.definitions)
         self.assertIn("static const nx_i2c_v2_config_t", source)
-        self.assertIn("nx_stm32u575_i2c_prepare", construction.initialize)
-        self.assertIn("nx_stm32u575_i2c_close", construction.stop[0])
+        self.assertIn("nx_stm32u575_i2c_prepare", construction.initialize.render())
+        self.assertIn("nx_stm32u575_i2c_close", construction.stop[0].render())
 
     def test_exact_selected_modes_and_pin_routes(self):
         items = [

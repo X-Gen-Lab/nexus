@@ -24,8 +24,9 @@ Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 private pr
 register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller factory
 不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。
 
-维护的 assembly 已统一为 TOML schema 2。schema 1 JSON 读取仅供明确迁移与工具
-派生输入，不与 TOML 维护同一份配置。冷启动仍显式执行 `nx_platform_start()`，
+平台输入只接受 TOML schema 2，旧 schema 1 JSON 装配必须迁为完整 TOML。
+`resolved.json` 仅是审计／独立产物检查的单向输出，不能回填生成器。历史证据保留
+原字节及只读校验，不重新开放旧配置入口。冷启动仍显式执行 `nx_platform_start()`，
 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
 在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 

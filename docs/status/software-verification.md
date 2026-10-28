@@ -22,16 +22,24 @@ source_language: zh_CN
 | --- | --- | --- |
 | 当前代码源码 | 站点 `documentation-manifest.json` 的 `code_source` | 本站描述的 checkout、tree、dirty 状态和代码路径 |
 | 当前文档源码 | 同一 manifest 的 `documentation_source` | 本次正式文档包的精确 commit/tree；不替代预览构建记录 |
-| 被引用资格源码 | 同一 manifest 的 `qualified_code` 与其结果索引 | 旧的精确代码执行；不是当前代码／文档 HEAD 自动继承的资格 |
+| 被引用资格源码 | schema 2 manifest 的 `qualification_references[]`；每项保存原候选身份与 scope | 旧的精确代码执行；不是当前代码／文档 HEAD 自动继承的资格 |
 
 成功打包后，公开站点和离线包的 manifest 由实际构建输入生成。Git HEAD 可以因文档提交改变；
 这里不手填一个很快漂移的 HEAD 常量。未打包的工作树可执行 `git rev-parse HEAD`
 核对 checkout，但命令输出本身不是 qualification receipt。
 
+schema 2 不再隐式引用某个历史索引。打包者逐个显式选入原封存候选，工具调用
+同一候选 verifier 核对原始闭包后记录 source、configuration、ELF／BIN／map、
+qualified scopes 与候选文件摘要。没有选入候选时列表为空，不表示软件失败。
+文档包离线校验保护这份引用的字节和结构，不重新执行或代替原候选资格校验。
+原 locator 只说明当时的存储位置，不是公开下载地址。schema 1 历史包保留原
+`qualified_code` 的只读校验，不能用它生产新的默认资格引用。
+
 ## 已有独立结果索引
 
 | 范围 | 精确代码源码 | 原权威及执行说明 |
 | --- | --- | --- |
+| SoC/IP 目录整理与原候选 | P `92e669233957a2e450a528394e8f4dd0794c7049`；E `0f15022e4d5f5c51991b134d0b9d6082dcf88de9` | [执行说明](../delivery/verification.md)、[48 项原台账](../design/soc-ip-layout-execution.csv)、[派生视图](ledgers/soc-ip-layout.md)；同一 P 的 A90＋B69 分段覆盖，原候选只覆盖其精确配置，物理 HIL 未执行 |
 | 开发体验迭代 P 与示例 E | P `c8df1c49d4f771a55490b3a8be32a9d1f24faa1e`；E `acb923cae407c8cfc4ac5788f8026d35c84cc841` | [结果索引](../delivery/developer-experience-results.json)保留本地完整 gate、SDK 独立消费、示例 ARM 和原始归档；不是正式软件候选 |
 | 构建系统及其实际软件 scopes | `cc6a065c002041234a212a964be863a69198f9b4` | [结果索引](../delivery/build-system-results.json)、[执行记录](../delivery/build-system-verification.md) |
 | SoC 扩展软件切片 | `98270512ea2ff7eefe8ff79720018e582be3a949` | [结果索引](../delivery/soc-extensions-results.json)、[执行记录](../delivery/soc-extensions-verification.md) |

@@ -8,8 +8,7 @@ import unittest
 from tools.configure import bindings, configure
 from tools.configure.providers.common import ConfigurationError
 
-from tools.configure.ir import ControllerIR
-from .test_provider import Result, gpio, uart
+from .test_provider import Result, fixture_controller, gpio, uart
 
 
 class G474MainstreamTests(unittest.TestCase):
@@ -29,9 +28,9 @@ class G474MainstreamTests(unittest.TestCase):
                 {"pin": rx, "function": "rx", "af": af}])
             with self.subTest(controller=controller):
                 self.provider.validate_selection(values, values)
-                item = ControllerIR.create(values, "stm32g474")
+                item = fixture_controller(values)
                 code = "\n".join(self.provider.constructor(
-                    item, Result(values), {}, {}, ())["definitions"])
+                    item, Result(values), {}, {}, ()).definitions)
                 self.assertIn(f".registers = {controller};", code)
                 self.assertIn(f".irq = {controller}_IRQn;", code)
                 self.assertIn(f"void {controller}_IRQHandler", code)
@@ -43,9 +42,9 @@ class G474MainstreamTests(unittest.TestCase):
                 {"pin": f"P{bank}{pin}", "function": "output", "af": 0}])
             with self.subTest(bank=bank):
                 self.provider.validate_selection(values, values)
-                item = ControllerIR.create(values, "stm32g474")
+                item = fixture_controller(values)
                 code = "\n".join(self.provider.constructor(
-                    item, Result(values), {}, {}, ())["definitions"])
+                    item, Result(values), {}, {}, ()).definitions)
                 self.assertIn(f".registers = GPIO{bank};", code)
 
     def test_multibank_factory_has_per_controller_gates_and_pin_snapshots(self):
@@ -135,14 +134,14 @@ class G474MainstreamTests(unittest.TestCase):
                 self.assertEqual("pwm", self.provider.mode_implementation(
                     "pwm", "fixed-pwm"))
                 self.provider.validate_selection(values, values)
-                item = ControllerIR.create(values, "stm32g474")
+                item = fixture_controller(values)
                 construction = self.provider.constructor(
                     item, Result(values), {"pwm": {"mask": 64, "initial": 0}}, {}, ())
-                code = "\n".join(construction["definitions"])
+                code = "\n".join(construction.definitions)
                 self.assertIn(f".registers = {controller};", code)
                 self.assertIn(f"RCC_APB1RSTR1_{controller}RST", code)
                 self.assertIn("nx_stm32g474_pwm_initialize", code)
-                self.assertIn("nx_stm32g474_pwm_close", "\n".join(construction["stop"]))
+                self.assertIn("nx_stm32g474_pwm_close", "\n".join(call.render() for call in construction.stop))
 
     def test_fixed_pwm_real_factory_has_both_gates_and_rejects_invalid_base(self):
         root = Path(__file__).resolve().parents[5]

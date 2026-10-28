@@ -258,11 +258,11 @@ def collect(root=ROOT):
     configurations = []
     expected_inputs = {}
     for name in fixtures:
-        resolved = configure.resolve(root / name, root)
+        resolved = configure.resolve_ir(root / name, root)
         configurations.append({"assembly": name,
-                               "configuration_sha256": resolved["configuration_sha256"],
-                               "inputs": copy.deepcopy(resolved["inputs"])})
-        for item in resolved["inputs"]:
+                               "configuration_sha256": resolved.configuration_sha256,
+                               "inputs": [dict(item) for item in resolved.inputs]})
+        for item in resolved.inputs:
             source_name(item["path"])
             prior = expected_inputs.setdefault(item["path"], item["sha256"])
             if prior != item["sha256"]:

@@ -60,9 +60,9 @@ class MpuGpioPolicyTests(unittest.TestCase):
 
     def test_real_normal_ir_contains_exact_explicit_reservations(self):
         result = self.resolve(self.assembly())
-        self.assertEqual(dict(result["memory_budgets"]["mpu"]), SIZES)
+        self.assertEqual({key: getattr(result.memory_budget.mpu, key) for key in SIZES}, SIZES)
         self.assertEqual(result.kernel.user_io, "gpio-write")
-        script = memory.linker(result.to_dict())
+        script = memory.linker(result)
         for name in ("privileged_flash", "privileged_ram", "user_flash",
                      "user_ram", "syscall_flash"):
             self.assertIn("__nexus_" + name + "_start__", script)
@@ -78,7 +78,7 @@ class MpuGpioPolicyTests(unittest.TestCase):
         result = self.resolve(text)
         self.assertEqual(result.memory_budget.mpu.user_flash_bytes, 4096)
         self.assertEqual(result.memory_budget.mpu.user_ram_bytes, 8192)
-        script = memory.linker(result.to_dict())
+        script = memory.linker(result)
         self.assertIn('USER_FLASH (rx) : ORIGIN = 0x08020100, LENGTH = 4096',
                       script)
         self.assertIn('USER_RAM (rw) : ORIGIN = 0x20010000, LENGTH = 8192',
@@ -131,8 +131,8 @@ class MpuGpioPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as value:
             directory = Path(value)
             (directory / "cpu.json").write_text(json.dumps({
-                "schema_version": 1, "cpu": dict(resolved["cpu"]),
-                "irq": {key: resolved["irq"][key]
+                "schema_version": 1, "cpu": dict(resolved.cpu),
+                "irq": {key: getattr(resolved.irq, key)
                         for key in ("priority_bits", "external_count")},
                 "clock_hz": 4000000}))
             assembly = directory / "runtime.toml"

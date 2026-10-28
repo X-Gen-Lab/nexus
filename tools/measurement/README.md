@@ -26,11 +26,16 @@ missing reviewed routes are not invented to complete a benchmark matrix.
 Different modes or workloads may show marginal linked cost, but they are not
 equivalent-profile optimization regressions. Keep those comparisons separate
 from `soc_costs.py compare`, which enforces equivalent recorded profiles.
+Profiles use the production TOML schema-2 entry only. Derived inputs preserve
+the authored tables while relocating root Board/layout paths and replacing the
+explicit optimization choice; they never re-enter through a JSON assembly.
 
 `compare.py --parallel 1` 显式限制构建并发并将其写入矩阵，默认只用一个 job。
 每个负载和优化组合使用新构建目录与真实 ELF；所需板级配置必须已经存在，
 不会为了凑齐矩阵而虚构路线。不同模式或负载的差量可以说明链接成本，不能当作
 等价条件下的优化回归；等价比较仍由 `soc_costs.py compare` 严格核对记录条件。
+配置只走生产 TOML schema 2 入口。派生输入保留原有表，仅迁移根级 Board／layout
+路径并替换显式优化选择，不再通过 JSON 装配入口重新进入解析器。
 
 `soc_costs.py observe` binds the exact ELF, resolved configuration, resource
 budget, complete actual compile database, selected source bytes and tools. Its

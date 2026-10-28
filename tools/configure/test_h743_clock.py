@@ -30,10 +30,10 @@ class H743ClockConfigurationTests(unittest.TestCase):
             with self.subTest(hz=hz):
                 result = gate.resolve_ir(self.assembly(
                     f"hsi{hz // 1000000}-fixed-cache-off"))
-                self.assertEqual(dict(result["clock"]), {
+                self.assertEqual(dict(result.clock), {
                     "source": "hsi", "input_hz": 64000000,
                     "core_hz": hz, "apb1_hz": hz, "apb2_hz": hz})
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
 
     def test_cpu_and_uart_initialize_share_selected_clock_for_both_backends(self):
         for backend in ("baremetal", "freertos"):

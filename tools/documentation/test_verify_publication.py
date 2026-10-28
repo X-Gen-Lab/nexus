@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.fixture = fixture.DeliveryTests(
-            "test_package_records_distinct_source_and_qualification")
+            "test_package_has_no_implicit_historical_qualification")
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
         self.root = self.fixture.base

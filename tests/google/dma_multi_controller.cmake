@@ -34,6 +34,10 @@ foreach(dma_multi_family stm32f407 gd32f470)
             "${dma_multi_vendor}/GD32F4xx_standard_peripheral/Include")
         target_compile_definitions(${dma_multi_target} PRIVATE
             GD32F470 HXTAL_VALUE=25000000)
+        if(dma_multi_family STREQUAL "gd32f470" AND dma_multi_kind STREQUAL "spi")
+            target_sources(${dma_multi_target} PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/gpio.c")
+        endif()
         if(dma_multi_family STREQUAL "stm32f407")
             target_include_directories(${dma_multi_target} SYSTEM PRIVATE
                 "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

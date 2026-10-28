@@ -18,47 +18,60 @@ static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
+    return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
+}
 static bool valid(const nx_legacy_adc_state_t* p) {
-    return p != NULL && p->registers != NULL && p->gate != NULL &&
-           p->divider != NULL && p->pin_mode != NULL && p->pin_lock != NULL &&
-           p->clock_started != NULL && p->gate_mask != 0U &&
-           p->reference_mv >= 2700U && p->reference_mv <= 3600U &&
-           p->poll_limit != 0U && p->startup_delay_us >= 4U &&
-           p->startup_delay_us <= 2000U;
+    if (p == NULL || p->config == NULL ||
+        (uintptr_t)p->config > UINTPTR_MAX - sizeof(*p->config) ||
+        (uintptr_t)p->config % _Alignof(nx_legacy_adc_config_t) != 0U ||
+        overlap(p, sizeof(*p), p->config, sizeof(*p->config)))
+        return false;
+    return p->config->registers != NULL && p->config->gate != NULL &&
+           p->config->divider != NULL && p->config->pin_mode != NULL &&
+           p->config->pin_lock != NULL && p->config->clock_started != NULL &&
+           p->config->gate_mask != 0U && p->reference_mv >= 2700U &&
+           p->reference_mv <= 3600U && p->config->poll_limit != 0U &&
+           p->config->startup_delay_us >= 4U &&
+           p->config->startup_delay_us <= 2000U;
 }
 static bool clock_ready(const nx_legacy_adc_state_t* p) {
-    return *p->clock_started &&
-           (NX_LEGACY_READ(p->gate) & p->gate_mask) == p->gate_mask &&
-           (NX_LEGACY_READ(p->divider) & p->divider_mask) == 0U;
+    return *p->config->clock_started &&
+           (NX_LEGACY_READ(p->config->gate) & p->config->gate_mask) ==
+               p->config->gate_mask &&
+           (NX_LEGACY_READ(p->config->divider) & p->config->divider_mask) == 0U;
 }
 static bool write_checked(volatile uint32_t* r, uint32_t value) {
     NX_LEGACY_WRITE(r, value);
     nx_arch_dsb();
     return NX_LEGACY_READ(r) == value;
 }
-static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
-    return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
-}
 static bool alias(const nx_legacy_adc_state_t* p, const void* ptr,
                   size_t size) {
     return ptr == NULL || (uintptr_t)ptr > UINTPTR_MAX - size ||
            overlap(ptr, size, p, sizeof(*p)) ||
-           overlap(ptr, size, p->registers, sizeof(*p->registers)) ||
-           overlap(ptr, size, (const void*)p->gate, sizeof(*p->gate)) ||
-           overlap(ptr, size, (const void*)p->divider, sizeof(*p->divider)) ||
-           overlap(ptr, size, (const void*)p->pin_mode, sizeof(*p->pin_mode)) ||
-           overlap(ptr, size, (const void*)p->pin_lock, sizeof(*p->pin_lock)) ||
-           overlap(ptr, size, (const void*)p->clock_started,
-                   sizeof(*p->clock_started));
+           overlap(ptr, size, p->config, sizeof(*p->config)) ||
+           overlap(ptr, size, p->config->registers,
+                   sizeof(*p->config->registers)) ||
+           overlap(ptr, size, (const void*)p->config->gate,
+                   sizeof(*p->config->gate)) ||
+           overlap(ptr, size, (const void*)p->config->divider,
+                   sizeof(*p->config->divider)) ||
+           overlap(ptr, size, (const void*)p->config->pin_mode,
+                   sizeof(*p->config->pin_mode)) ||
+           overlap(ptr, size, (const void*)p->config->pin_lock,
+                   sizeof(*p->config->pin_lock)) ||
+           overlap(ptr, size, (const void*)p->config->clock_started,
+                   sizeof(*p->config->clock_started));
 }
 /** \brief Bounded calibration waits never assume a progressing converter. */
 static nx_result_t calibration(nx_legacy_adc_state_t* p, uint32_t command) {
-    NX_LEGACY_WRITE(&p->registers->control2, ADC_POWER | command);
+    NX_LEGACY_WRITE(&p->config->registers->control2, ADC_POWER | command);
     nx_arch_dsb();
-    uint32_t remaining = p->poll_limit;
+    uint32_t remaining = p->config->poll_limit;
     do {
         NX_LEGACY_POLL(1U, p);
-        if ((NX_LEGACY_READ(&p->registers->control2) & command) == 0U)
+        if ((NX_LEGACY_READ(&p->config->registers->control2) & command) == 0U)
             return NX_SUCCESS;
     } while (--remaining != 0U);
     return NX_ERROR_TIMEOUT;
@@ -70,20 +83,21 @@ nx_result_t nx_legacy_adc_initialize(nx_legacy_adc_state_t* p) {
         return NX_ERROR_INVALID;
     if (!clock_ready(p))
         return NX_ERROR_STATE;
-    nx_legacy_adc_registers_t* r = p->registers;
-    uint32_t pin_mode = NX_LEGACY_READ(p->pin_mode) & 15U;
+    nx_legacy_adc_registers_t* r = p->config->registers;
+    uint32_t pin_mode = NX_LEGACY_READ(p->config->pin_mode) & 15U;
     if (p->retained || p->initialized || p->active ||
         NX_LEGACY_READ(&r->control1) != 0U ||
         NX_LEGACY_READ(&r->control2) != 0U ||
         NX_LEGACY_READ(&r->sequence1) != 0U ||
         NX_LEGACY_READ(&r->sequence2) != 0U ||
         NX_LEGACY_READ(&r->sequence3) != 0U ||
-        (NX_LEGACY_READ(p->pin_lock) & 1U) != 0U ||
+        (NX_LEGACY_READ(p->config->pin_lock) & 1U) != 0U ||
         (pin_mode != 0U && pin_mode != 4U))
         return NX_ERROR_BUSY;
     p->retained = true;
     p->fault = false;
-    if (!write_checked(p->pin_mode, NX_LEGACY_READ(p->pin_mode) & ~15U) ||
+    if (!write_checked(p->config->pin_mode,
+                       NX_LEGACY_READ(p->config->pin_mode) & ~15U) ||
         !write_checked(&r->sample2, (NX_LEGACY_READ(&r->sample2) & ~7U) | 7U) ||
         !write_checked(&r->control2, ADC_POWER))
         return NX_ERROR_IO;
@@ -91,8 +105,8 @@ nx_result_t nx_legacy_adc_initialize(nx_legacy_adc_state_t* p) {
      * minimum, with margin for the reviewed IRC8 factory-trim tolerance.
      * Supply decoupling and bead workarounds remain Board responsibilities. */
     nx_time_us_t stable =
-        nx_deadline_after(nx_time_now_us(), p->startup_delay_us);
-    uint32_t remaining = p->poll_limit;
+        nx_deadline_after(nx_time_now_us(), p->config->startup_delay_us);
+    uint32_t remaining = p->config->poll_limit;
     while (!nx_deadline_expired(stable, nx_time_now_us())) {
         NX_LEGACY_POLL(1U, p);
         if (--remaining == 0U)
@@ -116,10 +130,10 @@ nx_result_t nx_legacy_adc_close(nx_legacy_adc_state_t* p) {
         return NX_ERROR_BUSY;
     if (!clock_ready(p))
         return NX_ERROR_STATE;
-    if (!write_checked(&p->registers->control2, 0U) ||
-        !write_checked(&p->registers->control1, 0U))
+    if (!write_checked(&p->config->registers->control2, 0U) ||
+        !write_checked(&p->config->registers->control1, 0U))
         return NX_ERROR_IO;
-    NX_LEGACY_WRITE(&p->registers->status, 0U);
+    NX_LEGACY_WRITE(&p->config->registers->status, 0U);
     p->initialized = false;
     p->retained = false;
     p->fault = false;
@@ -170,7 +184,7 @@ static nx_result_t shot(void* context, uint16_t* output, size_t capacity,
     *count = 0U;
     if (nx_deadline_expired(deadline, nx_time_now_us()))
         return NX_ERROR_TIMEOUT;
-    nx_legacy_adc_registers_t* r = p->registers;
+    nx_legacy_adc_registers_t* r = p->config->registers;
     if (NX_LEGACY_READ(&r->control1) != 0U ||
         NX_LEGACY_READ(&r->control2) != ADC_POWER ||
         NX_LEGACY_READ(&r->sequence1) != 0U ||

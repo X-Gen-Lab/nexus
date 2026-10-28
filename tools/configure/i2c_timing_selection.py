@@ -6,6 +6,7 @@ Only the currently implemented analog-filter-on / DNF-zero hardware mode is
 admitted. Its conservative delay model follows the maintained AN4235 review.
 """
 from tools.configure import i2c_timing
+from tools.configure.ir import I2cTimingSelectionIR, freeze
 from tools.configure.providers.common import fail, integer
 
 
@@ -51,6 +52,15 @@ def resolve(selection, clock, provider, *, clock_plan=None):
     calculation = i2c_timing.resolve(values)
     if calculation.cr1_filter_bits != 0:
         fail("I2C timing requires an unimplemented hardware filter mode")
-    return {**calculation.to_dict(), "assumptions": values,
-            "source": source, "provenance": "authored_declared_assumptions",
-            "physical_qualified": False}
+    return I2cTimingSelectionIR(
+        timingr=calculation.timingr,
+        cr1_filter_bits=calculation.cr1_filter_bits,
+        provenance="authored_declared_assumptions", physical_qualified=False,
+        source=source, bus_hz_min=calculation.bus_hz_min,
+        bus_hz_max=calculation.bus_hz_max, low_ns_min=calculation.low_ns_min,
+        high_ns_min=calculation.high_ns_min,
+        scldel_ns_min=calculation.scldel_ns_min,
+        sdadel_ns_min=calculation.sdadel_ns_min,
+        sdadel_ns_max=calculation.sdadel_ns_max,
+        time_unit=calculation.time_unit, rate_scope=calculation.rate_scope,
+        reference=calculation.reference, assumptions=freeze(values))

@@ -10,6 +10,7 @@
 
 #include "nexus/io/dma.h"
 #include "stm32f407_provider.h"
+#include "stm32f407_spi_cold.h"
 
 /**
  * \brief           Exact caller-owned DMA TX instance; no stream allocator.
@@ -74,6 +75,30 @@ struct nx_stm32_spi_dma_endpoint_state {
     nx_stm32_spi_dma_state_t* dma;
 };
 
+/** \brief Immutable selected SPI assembly and DMA resources. */
+typedef struct {
+    nx_stm32_spi_config_t spi;
+    DMA_TypeDef* dma;
+    DMA_Stream_TypeDef* tx;
+    DMA_Stream_TypeDef* rx;
+    const nx_dma_memory_region_t* regions;
+    size_t region_count;
+    uint8_t priority;
+    bool kernel_bound;
+} nx_stm32_spi_dma_config_t;
+
+/** \brief Exact paired-controller cold effects; pin snapshots stay shared.
+ * \note Each bit names a selected pad, never a maximum-size object pool.
+ *       A failed pin, vector, priority or gate withdrawal retains its marker.
+ */
+typedef struct {
+    uint32_t clock_added;
+    uint16_t pin_leases;
+    uint8_t priorities[2];
+    bool vectors;
+    bool constructed;
+} nx_stm32_spi_dma_cold_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -95,6 +120,45 @@ extern const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops;
  *                  or explicit caller-owned single cells through submit_memory.
  */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state);
+
+/** \brief Prepare exact static SPI pins, endpoints and selected DMA vectors.
+ * \param[in,out] state: Cold exclusive privileged task owner, no active loans.
+ * \param[in] config: Static facts and the enclosing Platform pin snapshots.
+ * \param[in,out] receipt: Static cold effects retained through failed cleanup.
+ * \return Success or error; failed withdrawal keeps Platform responsible.
+ */
+nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
+                                     const nx_stm32_spi_dma_config_t* config,
+                                     nx_stm32_spi_cold_receipt_t* receipt);
+/** \brief Join DMA and wire references before returning pins and SPI clock.
+ * \param[in,out] state: The same serialized owner as prepare.
+ * \param[in] config: Unchanged static assembly resources.
+ * \param[in,out] receipt: The same retained cold effects supplied to prepare.
+ * \return Success only after complete driver and cold-resource withdrawal.
+ */
+nx_result_t nx_stm32_spi_dma_close(nx_stm32_spi_dma_state_t* state,
+                                   const nx_stm32_spi_dma_config_t* config,
+                                   nx_stm32_spi_cold_receipt_t* receipt);
+
+/** \brief Acquire one member of a selected independent SPI controller pair.
+ * \param[in,out] state: Serialized cold owner, no active requests or vectors.
+ * \param[in] config: Exact controller, route and shared Platform snapshots.
+ * \param[in,out] cold: Zero or fully withdrawn cold effects, private per owner.
+ * \return Success or error; every partial effect remains in cold until close.
+ */
+nx_result_t
+nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
+                              const nx_stm32_spi_dma_config_t* config,
+                              nx_stm32_spi_dma_cold_t* cold);
+/** \brief Join publisher, IRQ, priority, pin and gate ownership in that order.
+ * \param[in,out] state: Same exclusive owner as prepare.
+ * \param[in] config: Unchanged selected static resources.
+ * \param[in,out] cold: Actual retained markers from prepare or failed close.
+ * \return Success only after every marker is withdrawn; failure allows retry.
+ */
+nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
+                                        const nx_stm32_spi_dma_config_t* config,
+                                        nx_stm32_spi_dma_cold_t* cold);
 
 /**
  * \brief           Observe one selected finite DMA source without polling

@@ -34,7 +34,7 @@ class H743ContinuousConfiguration(unittest.TestCase):
                 self.assertEqual((1, "UINT32_MAX"),
                                  (record.buffer_alignment,
                                   record.max_transfer_units))
-                self.assertFalse(result["physical_qualified"])
+                self.assertFalse(result.physical_qualified)
         with tempfile.TemporaryDirectory() as directory:
             path = self.source(directory, lambda text: text.replace(
                 'mode = "rx-dma-continuous"',

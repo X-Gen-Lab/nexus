@@ -3,6 +3,7 @@
 This mechanism does not infer a Board connector, powered role, class protocol or
 physical qualification. Selected endpoints are separate static typed identities.
 """
+from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
 from tools.configure.gpio_phase import withdraw_pin
@@ -137,7 +138,7 @@ def constructor(item, result, prefix):
     state = "s_nx_port_" + name
     children = [child for child in result.devices if child.controller == item.id]
     options = item.options
-    pins = item["pins"]
+    pins = item.pins
     lines = [f"static nx_{prefix}_usb_clock_state_t s_nx_usb_clock_{name};",
              f"static nx_usb_endpoint_t s_nx_usb_endpoints_{name}[{len(children)}];",
              f"static nx_usb_event_t s_nx_usb_events_{name}[{options.event_capacity}];",
@@ -176,14 +177,14 @@ def constructor(item, result, prefix):
                   f"        .transfer = {transfer}, "
                   f".max_packet = {option.max_packet}u,",
                   f"        .fifo_start = {option.fifo_start}u, .fifo_words = {option.fifo_words}u", "    };"]
-    policy = result["irq"]
+    policy = result.irq
     kernel = kernel_policy_constant(result)
-    ceiling = policy["syscall_priority"] or 0
+    ceiling = policy.syscall_priority or 0
     lines += [f"    {state} = (nx_usb_controller_t){{",
               f"        .endpoints = s_nx_usb_endpoints_{name}, .endpoint_count = {len(children)}u,",
               f"        .events = s_nx_usb_events_{name}, .capacity = {options.event_capacity}u,",
               f"        .snapshot = {{ .epoch = {state}.snapshot.epoch }},",
-              f"        .irq_policy = {{ {kernel}, {policy['external_count']}u, {policy['priority_bits']}u, {ceiling}u }},",
+              f"        .irq_policy = {{ {kernel}, {policy.external_count}u, {policy.priority_bits}u, {ceiling}u }},",
               f"        .irq = {{ .priority = {options.irq.priority}u }},",
               f"        .poll_limit = {options.poll_limit}u, .drain_timeout_us = {options.drain_timeout_us}u,",
               f"        .rx_fifo_words = {options.rx_fifo_words}u, .vbus_sensing = false", "    };"]
@@ -205,7 +206,7 @@ def constructor(item, result, prefix):
               f"void {vector}_IRQHandler(void) {{ nx_usb_controller_irq(&{state}); }}"]
     return Construction(
         state_type="nx_usb_controller_t", definitions=lines,
-        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
         retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
                        f"s_nx_usb_pin_snapshots_{name}[{index}]"
@@ -214,7 +215,7 @@ def constructor(item, result, prefix):
 
 def gpio_clock_mask(result):
     ports = {pin["pin"][1] for item in result.controllers
-             if item.kind == "usb_device" for pin in item["pins"]}
+             if item.kind == "usb_device" for pin in item.pins}
     return sum(1 << (ord(port) - ord('A')) for port in ports)
 
 

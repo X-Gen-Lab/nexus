@@ -2,11 +2,12 @@
 import importlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
 import tempfile
 
 from tools.configure import bindings, configure
-from tools.configure.ir import ControllerIR
+from tools.configure.ir import ControllerIR, InterruptProfileIR
 from tools.configure.providers.common import ConfigurationError
 from tools.configure.selection import validate_clock_profiles
 
@@ -15,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[5]
 
 def uart(**changes):
     return {**{"id": "console", "binding": "uart1", "kind": "uart",
-               "controller": "USART2", "mode": "irq-bytes", "baud": 115200,
+               "controller": "USART2", "route": "usart2-pa2-pa3",
+               "mode": "irq-bytes", "baud": 115200,
+               "mask": 0, "initial": 0,
                "rx_profile": "bytes", "rx_capacity": 64, "irq_priority": 5,
                "calls_os": False, "pins": [
                    {"pin": "PA2", "function": "tx", "af": 0},
@@ -24,19 +27,23 @@ def uart(**changes):
 
 def gpio(**changes):
     return {**{"id": "led", "binding": "led0", "kind": "gpio",
-               "controller": "GPIOA", "mode": "output", "mask": 32,
+               "controller": "GPIOA", "route": "gpio-pa5",
+               "mode": "output", "mask": 32,
                "initial": 0, "pins": [
                    {"pin": "PA5", "function": "output", "af": 0}]}, **changes}
 
 
-class Result(dict):
+class Result:
     def __init__(self, *items, backend="baremetal"):
-        super().__init__(irq={"external_count": 43, "priority_bits": 4,
-                              "syscall_priority": 5 if backend == "freertos"
-                              else None}, devices=[], board_bindings={},
-                         routes={}, kernel_profile=(
-                             {"kernel_policy": "basepri"}
-                             if backend == "freertos" else None))
+        self.irq = InterruptProfileIR(4, 15,
+            5 if backend == "freertos" else None,
+            "GCC/ARM_CM3" if backend == "freertos" else None, 43,
+            "basepri" if backend == "freertos" else "primask")
+        self.devices = ()
+        self.board_bindings = {}
+        self.routes = {}
+        self.kernel = (SimpleNamespace(kernel_policy="basepri")
+                       if backend == "freertos" else None)
         self.controllers = tuple(ControllerIR.create(item, "stm32f103")
                                  for item in items)
 
@@ -122,7 +129,7 @@ class F103ProviderTests(unittest.TestCase):
         self.assertIn("static uint8_t s_nx_rx_console[64];", source)
         self.assertIn("8000000u, 1000000u", source)
         self.assertTrue(construction.retain_on_failed_init)
-        self.assertEqual(construction.stop,
+        self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_uart_port_stop(&s_nx_face_console)",))
 
     def test_constructor_uses_explicit_kernel_irq_policy(self):
@@ -185,17 +192,20 @@ class F103ProviderTests(unittest.TestCase):
 
     def test_watchdog_constructor_cannot_forget_pending_lsi_debug_lease(self):
         item = {"id": "iwdg", "binding": "iwdg", "kind": "watchdog",
-                "controller": "IWDG", "mode": "independent", "pins": []}
+                "controller": "IWDG", "route": "iwdg",
+                "mode": "independent", "pins": [], "mask": 0, "initial": 0}
         ir = ControllerIR.create(item, "stm32f103")
         construction = self.provider.constructor(ir, Result(item), {}, {}, ())
         source = "\n".join(construction.definitions)
         self.assertIn(".preparation_retained", source)
-        self.assertEqual(construction.stop,
+        self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_stm32f103_watchdog_stop(&s_nx_port_iwdg)",))
 
     def test_exti_raw_edge_capacity_and_exact_line_are_checked(self):
         item = {"id": "edge0", "binding": "exti0", "kind": "exti",
-                "controller": "EXTI0", "mode": "edge-event", "edge": "both",
+                "controller": "EXTI0", "route": "exti0-pa0",
+                "mode": "edge-event", "edge": "both",
+                "mask": 0, "initial": 0,
                 "event_capacity": 3, "irq_priority": 5, "calls_os": False,
                 "pins": [{"pin": "PA0", "function": "input", "af": 0}]}
         self.provider.validate_selection(item, item)
@@ -213,7 +223,7 @@ class F103ProviderTests(unittest.TestCase):
 
     def test_spi_endpoint_and_cs_are_static_and_one_owned_lease(self):
         path = ROOT / "tools/configure/assemblies/stm32-f103-spi.toml"
-        result = configure.resolve(path, ROOT)
+        result = configure.resolve_ir(path, ROOT)
         _, source = bindings.emit(result)
         self.assertIn("nx_stm32f103_spi_endpoint_ops", source)
         self.assertIn("s_nx_cs_peripheral", source)
@@ -230,12 +240,12 @@ class F103ProviderTests(unittest.TestCase):
             assembly = Path(directory) / "conflict.toml"
             assembly.write_text(text)
             with self.assertRaisesRegex(ConfigurationError, "conflict"):
-                configure.resolve(assembly, ROOT)
+                configure.resolve_ir(assembly, ROOT)
 
     def test_maintained_assembly_resolves_static_typed_factory(self):
         assembly = ROOT / "tools/configure/assemblies/stm32-f103-baremetal.toml"
-        result = configure.resolve(assembly, ROOT)
-        self.assertEqual(result["soc_family"], "stm32f103")
+        result = configure.resolve_ir(assembly, ROOT)
+        self.assertEqual(result.soc_family, "stm32f103")
         _, source = bindings.emit(result)
         self.assertIn("nx_stm32f103_uart_ops", source)
         self.assertIn("s_nx_port_uart1", source)

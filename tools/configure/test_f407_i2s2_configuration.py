@@ -127,12 +127,12 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
             with self.subTest(part=part):
                 result = self.resolve(self.assembly(name, selected=False))
                 self.assertIsNone(result.i2s2)
-                self.assertEqual(result["part"], part)
+                self.assertEqual(result.part, part)
                 self.assertEqual(result.controllers, ())
                 self.assertEqual(result.devices, ())
                 self.assertFalse(any(claim.owner == "i2s2"
                                      for claim in result.resource_plan.claims))
-                self.assertEqual(result["components"], ())
+                self.assertEqual(result.components, ())
 
     def test_selected_exact_parts_have_immutable_role_and_physical_claims(self):
         for name, part in FIXTURES:
@@ -145,8 +145,8 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
                 self.assertIsInstance(role.claims, tuple)
                 with self.assertRaises((AttributeError, TypeError)):
                     role.profile = "unreviewed"
-                with self.assertRaises(TypeError):
-                    result.values["i2s2"] = None
+                with self.assertRaises(dataclasses.FrozenInstanceError):
+                    result.i2s2 = None
                 claims = [claim for claim in result.resource_plan.claims
                           if claim.owner == "i2s2"]
                 self.assertEqual({claim.key for claim in claims}, CLAIMS)
@@ -158,8 +158,8 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
                                  {claim.key for claim in claims})
                 self.assertEqual(result.controllers, ())
                 self.assertEqual(result.devices, ())
-                self.assertEqual(result["components"], ())
-                self.assertFalse(result["physical_qualified"])
+                self.assertEqual(result.components, ())
+                self.assertFalse(result.physical_qualified)
 
     def test_role_adds_only_its_seven_normalized_resource_reservations(self):
         base = self.resolve(self.assembly(selected=False))
@@ -183,7 +183,7 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
     def test_unreviewed_part_backend_and_clock_are_rejected(self):
         foreign = self.assembly(name="nucleo-u575-baremetal-empty.toml",
                                 selected=False)
-        self.assertEqual(self.resolve(foreign)["part"], "STM32U575ZIT6Q")
+        self.assertEqual(self.resolve(foreign).part, "STM32U575ZIT6Q")
         with self.assertRaisesRegex(ValueError, "I2S2"):
             self.resolve(self.assembly(name="nucleo-u575-baremetal-empty.toml"))
         with self.assertRaisesRegex(ValueError, "I2S2"):

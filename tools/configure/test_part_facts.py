@@ -1,8 +1,10 @@
 """Exact part policy and emitted physical geometry share validated facts."""
 import copy
+from dataclasses import replace
 import unittest
 
 from tools.configure import bindings, configure as gate
+from tools.configure.ir import freeze
 from tools.configure.providers import descriptor
 
 
@@ -10,14 +12,20 @@ class PartFactsTests(unittest.TestCase):
     def test_ethernet_memory_window_uses_the_selected_physical_domain(self):
         for fixture in ("stm32-zg", "gd32"):
             with self.subTest(fixture=fixture):
-                result = gate.resolve(gate.ROOT /
+                result = gate.resolve_ir(gate.ROOT /
                     f"tests/contracts/ethernet_assembly/{fixture}.toml")
-                memory = next(region for region in result["memory"]
-                              if region["id"] == "sram")
-                memory["size"] = 65536
+                regions = tuple(freeze({**region, "size": 65536})
+                                if region["id"] == "sram" else region
+                                for region in result.physical_part.memory)
+                result = replace(result, physical_part=replace(
+                    result.physical_part, memory=regions))
                 source = bindings.emit(result)[1]
                 self.assertTrue("{ 0x20000000u, 65536u," in source)
-                memory["dma"] = False
+                regions = tuple(freeze({**region, "dma": False})
+                                if region["id"] == "sram" else region
+                                for region in result.physical_part.memory)
+                result = replace(result, physical_part=replace(
+                    result.physical_part, memory=regions))
                 with self.assertRaisesRegex(ValueError, "Ethernet.*memory"):
                     bindings.emit(result)
 
@@ -32,7 +40,7 @@ class PartFactsTests(unittest.TestCase):
         )
         for family, fixture, size, count, unit in fixtures:
             with self.subTest(family=family):
-                result = gate.resolve(gate.ROOT / "tests/contracts" / fixture)
+                result = gate.resolve_ir(gate.ROOT / "tests/contracts" / fixture)
                 source = bindings.emit(result)[1]
                 symbol = "g_nx_" + family + "_flash_geometry"
                 self.assertTrue(f"const nx_flash_geometry_t {symbol} = {{"
@@ -58,9 +66,10 @@ class PartFactsTests(unittest.TestCase):
             gate.validate_soc(facts, "STM32F407VET6")
 
     def test_unknown_f407_part_cannot_fall_through_to_zg_geometry(self):
-        result = gate.resolve(gate.ROOT /
+        result = gate.resolve_ir(gate.ROOT /
                               "tests/contracts/stm32_assembly/ve-flash.toml")
-        result["part"] = "UNREVIEWED_PART"
+        result = replace(result, physical_part=replace(
+            result.physical_part, part="UNREVIEWED_PART"))
         with self.assertRaisesRegex(ValueError, "part"):
             bindings.emit(result)
 
@@ -68,7 +77,7 @@ class PartFactsTests(unittest.TestCase):
         for density, size, count in (("ve", 524288, 8),
                                      ("zg", 1048576, 12)):
             with self.subTest(density=density):
-                result = gate.resolve(gate.ROOT /
+                result = gate.resolve_ir(gate.ROOT /
                     f"tests/contracts/stm32_assembly/{density}-flash.toml")
                 source = bindings.emit(result)[1]
                 self.assertIn("static const nx_flash_sector_t "
@@ -77,7 +86,7 @@ class PartFactsTests(unittest.TestCase):
                 self.assertIn(f".size = {size}u", source)
                 self.assertIn(f".sector_count = {count}u", source)
                 offset = 0
-                for block in result["flash"]["erase_blocks"]:
+                for block in result.flash["erase_blocks"]:
                     self.assertIn(f"{{ {offset}u, {block}u }}", source)
                     offset += block
                 self.assertEqual(offset, size)

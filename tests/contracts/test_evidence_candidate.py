@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.evidence import candidate as candidate_tools
 from tools.evidence.candidate import (REQUIRED_SCOPES, collect_evidence_closure,
     collect_identities, seal, validate_manifest, validate_qualification, verify)
 from tools.evidence.common import EvidenceError, atomic_json, file_identity, load_json
@@ -216,6 +217,77 @@ class CandidateGateTests(unittest.TestCase):
         (destination / "payloads" / self.checks[0]["raw"]["sha256"]).unlink()
         with self.assertRaises(EvidenceError):
             verify(destination / "candidate.json")
+
+    def projection_fixture(self):
+        manifest, _, resolved = self.prepared()
+        manifest_path = self.root / "manifest.json"
+        atomic_json(manifest_path, manifest)
+        # External OCI/scope trust is isolated in this byte-verifier fixture.
+        # Its genuine linked artifacts and receipts are not platform evidence.
+        with patch.object(candidate_tools, "verify_environment", return_value={}), \
+                patch.object(candidate_tools, "validate_scope_proof",
+                             return_value=([], None)):
+            seal(manifest_path, self.root / "sealed")
+        return self.root / "sealed/candidate.json", manifest, load_json(resolved)
+
+    def test_verified_projection_preserves_exact_source_config_and_artifacts(self):
+        path, manifest, resolved = self.projection_fixture()
+        before = path.read_bytes()
+        with patch.object(candidate_tools, "validate_scope_proof",
+                          return_value=([], None)):
+            projected = candidate_tools.verified_projection(path)
+        self.assertEqual(projected["kind"], "verified_software_candidate_reference")
+        self.assertEqual(projected["candidate"], file_identity(path))
+        self.assertEqual(projected["source"], self.source)
+        self.assertEqual(projected["resolved"], resolved)
+        self.assertEqual(projected["configuration_sha256"],
+                         resolved["configuration_sha256"])
+        self.assertEqual(projected["qualified_scopes"], sorted(REQUIRED_SCOPES))
+        self.assertEqual(projected["physical_status"], "not_executed")
+        self.assertEqual(projected["product_promotion"], "not_performed")
+        self.assertEqual(projected["signature_status"], "unsigned")
+        for role, identity in projected["artifacts"].items():
+            self.assertEqual(identity["sha256"], manifest["artifacts"][role]["sha256"])
+            self.assertEqual(identity, file_identity(identity["path"]))
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_projection_rejects_missing_raw_even_when_summary_says_qualified(self):
+        path, _, _ = self.projection_fixture()
+        (path.parent / "payloads" / self.checks[0]["raw"]["sha256"]).unlink()
+        with self.assertRaises(EvidenceError):
+            candidate_tools.verified_projection(path)
+
+    def test_projection_rejects_unbound_identity_and_unverified_status_claims(self):
+        path, _, _ = self.projection_fixture()
+        original = load_json(path)
+        mutations = (("candidate_id", "another-valid-identity"),
+                     ("candidate_id", "invalid identity"),
+                     ("signature_status", "verified"),
+                     ("product_promotion", "performed"),
+                     ("qualified_scopes", [*original["qualified_scopes"],
+                                           original["qualified_scopes"][0]]))
+        for field, value in mutations:
+            atomic_json(path, {**original, field: value})
+            with self.subTest(field=field, value=value), \
+                    patch.object(candidate_tools, "validate_scope_proof",
+                                 return_value=([], None)), \
+                    self.assertRaises(EvidenceError):
+                candidate_tools.verified_projection(path)
+
+    def test_projection_rejects_candidate_change_during_verification(self):
+        path, _, _ = self.projection_fixture()
+        original_verify = candidate_tools.verify
+
+        def changed_candidate(candidate_path):
+            result = original_verify(candidate_path)
+            candidate_path.write_bytes(candidate_path.read_bytes() + b"\n")
+            return result
+
+        with patch.object(candidate_tools, "validate_scope_proof",
+                          return_value=([], None)), \
+                patch.object(candidate_tools, "verify", side_effect=changed_candidate):
+            with self.assertRaisesRegex(EvidenceError, "changed"):
+                candidate_tools.verified_projection(path)
 
 
 if __name__ == "__main__":

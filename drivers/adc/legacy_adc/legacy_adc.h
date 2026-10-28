@@ -20,7 +20,7 @@ typedef struct {
     volatile uint32_t high, low, sequence1, sequence2, sequence3;
     volatile uint32_t injected_sequence, injected_data[4], data;
 } nx_legacy_adc_registers_t;
-/** \brief Independent channel zero polling, no DMA or retained output. */
+/** \brief Immutable hardware description, borrowed for the owner lifetime. */
 typedef struct {
     nx_legacy_adc_registers_t* registers;
     volatile uint32_t* gate;
@@ -28,8 +28,16 @@ typedef struct {
     volatile uint32_t* pin_mode;
     volatile uint32_t* pin_lock;
     const volatile bool* clock_started;
-    uint32_t gate_mask, divider_mask, reference_mv, poll_limit;
+    uint32_t gate_mask, divider_mask, poll_limit;
     uint32_t startup_delay_us;
+} nx_legacy_adc_config_t;
+/** \brief Independent channel zero polling, no DMA or retained output.
+ * \note The static config cannot overlap state or API output storage.
+ * Reference voltage is bound at preparation and unchanged while retained.
+ */
+typedef struct {
+    const nx_legacy_adc_config_t* config;
+    uint32_t reference_mv;
     bool initialized, retained, active, fault;
 } nx_legacy_adc_state_t;
 extern const nx_adc_ops_t nx_legacy_adc_ops;

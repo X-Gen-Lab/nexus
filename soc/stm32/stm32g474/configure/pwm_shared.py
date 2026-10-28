@@ -1,4 +1,5 @@
 """One selected physical TIM3 construction, two existing readonly PWM faces."""
+from tools.configure.calls import Address, DirectCall
 from tools.configure.providers.common import Construction, fail, integer
 
 
@@ -117,8 +118,8 @@ def constructor(owner):
     ]
     return Construction(
         state_type="nx_stm32g474_pwm_shared_state_t",
-        definitions=definitions, initialize=f"nx_prepare_physical_{name}()",
-        stop=(f"nx_stm32g474_pwm_shared_close(&{state})",),
+        definitions=definitions, initialize=DirectCall(f"nx_prepare_physical_{name}"),
+        stop=(DirectCall("nx_stm32g474_pwm_shared_close", (Address(state),)),),
         retain_on_failed_init=True)
 
 

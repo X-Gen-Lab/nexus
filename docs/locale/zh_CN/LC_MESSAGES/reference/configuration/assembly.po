@@ -1,4 +1,4 @@
-# Authored translation; independent review is recorded in metadata.
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,23 +8,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e3e0f46b508706832312e3520c9bc626927ca3e776e6e87b245e4812b4422e0c\n"
+"X-Nexus-Source-SHA256: fcb2244e8408c5ae4fa37a25a1ff1a548be3f6c265317b6105d36ed0d7b1aaa8\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
 msgstr "装配输入与拒绝规则"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:11
 msgid ""
-"The authored configuration authority is one schema-2 TOML assembly. SoC and "
-"Board facts remain maintained JSON; `resolved.json` is output, not an "
-"authored alternative. CMake owns software dependencies. Failed TOML "
-"resolution never falls back to Kconfig, cache variables, schema-1 JSON or "
-"old generated headers."
+"The authored configuration authority is one schema-2 TOML assembly. SoC "
+"and Board facts remain maintained JSON; `resolved.json` is output, not "
+"an authored alternative. CMake owns software dependencies. Failed TOML "
+"resolution never falls back to Kconfig, cache variables, schema-1 JSON "
+"or old generated headers. Legacy JSON assemblies are rejected as inputs,"
+" not retained as an alternate authoring interface."
 msgstr ""
-"配置权威是一份人工编写的 schema-2 TOML 装配。SoC 和 Board 事实保持维护中的 JSON；`resolved.json` "
-"是输出，不是另一份人工编写的输入。CMake 拥有软件依赖。TOML 解析失败绝不回退 Kconfig、缓存变量、schema-1 JSON "
-"或旧生成头。"
+"人工编写的配置权威是一份 schema-2 TOML assembly。SoC 和 Board facts 仍为维护的 "
+"JSON；`resolved.json` 是输出，不是另一种人工编写入口。CMake 拥有软件依赖。TOML 解析失败不会回退到 "
+"Kconfig、cache 变量、schema-1 JSON 或旧生成头文件。旧 JSON 装配作为输入会被拒绝，不保留为另一种编写接口。"
+
+msgid ""
+"The parser creates immutable `AuthoredAssembly` intent. Production "
+"consumers use `resolve_ir()` and named immutable `ConfigurationIR` "
+"decisions; only audit and artifact-boundary consumers request "
+"`to_dict()`. Typed source epoch 2 and the schema-1 JSON output "
+"projection are separate contracts. The [source compatibility "
+"policy](../../design/source-compatibility.md) owns their version "
+"declarations; neither introduces firmware metadata or runtime dispatch."
+msgstr ""
+"解析器创建不可变 `AuthoredAssembly` 意图。生产消费者使用 `resolve_ir()` 与具名、不可变的 "
+"`ConfigurationIR` 决策；只有审计和产物边界消费者调用 `to_dict()`。Typed source epoch 2 与 "
+"schema-1 JSON 输出投影是不同合同，其版本声明由[源码兼容策略](../../design/source-compatibility"
+".md)维护；两者均不引入固件元数据或运行时分发。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:16
 msgid ""

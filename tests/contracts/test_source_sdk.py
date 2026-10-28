@@ -699,8 +699,8 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
         for current, previous in moves.items():
             with self.subTest(assembly=current):
                 self.assertTrue((directory / current).is_file())
-                result = configure.resolve(directory / current, ROOT)
-                self.assertEqual(result["backend"], "baremetal")
+                result = configure.resolve_ir(directory / current, ROOT)
+                self.assertEqual(result.backend, "baremetal")
                 self.assertFalse((ROOT / "tests/contracts" / previous).exists())
         for current, previous in (
                 ("g474-fdcan", "fdcan_board"),

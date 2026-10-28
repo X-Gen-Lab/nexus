@@ -85,6 +85,24 @@ nx_result_t nx_native_rtc_start(nx_native_rtc_state_t* state);
  *       advance, global identity, pool or implicit reconstruction is performed.
  */
 nx_result_t nx_native_lptim_start(nx_native_lptim_state_t* state);
+/** \brief Select fresh construction or joined reopen on the cold path.
+ * \param[in,out] state: Stable owner; validate its span before reading state.
+ * \param[in] clock: Copied only for fresh construction, ignored on reopen.
+ * \return The constructor/start result; rejection preserves owner bytes.
+ * \note Reopen preserves the original clock and calendar, never reconstructs
+ *       the owner or resets its epoch, and honors retained BUSY responsibility.
+ */
+nx_result_t nx_native_rtc_prepare(nx_native_rtc_state_t* state,
+                                  const nx_clock_t* clock);
+/** \brief Select fresh construction or joined reopen without rebinding units.
+ * \param[in,out] state: Stable owner validated before reading its lifecycle.
+ * \param[in] clock: Copied only on first construction, ignored on reopen.
+ * \param[in] tick_hz: Positive initial rate, ignored on same-owner reopen.
+ * \return Constructor/start result, with no writes on rejection.
+ * \note The original rate, clock, faults and nonwrapping epoch survive stop.
+ */
+nx_result_t nx_native_lptim_prepare(nx_native_lptim_state_t* state,
+                                    const nx_clock_t* clock, uint32_t tick_hz);
 #ifdef __cplusplus
 }
 #endif

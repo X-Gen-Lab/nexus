@@ -53,7 +53,7 @@ def _text(value, context):
 
 
 @dataclass(frozen=True)
-class ResourceClaimIR(Mapping):
+class ResourceClaimIR:
     key: str
     owner: str
     mode: str
@@ -62,19 +62,6 @@ class ResourceClaimIR(Mapping):
     attributes: tuple[tuple[str, int | bool | str], ...]
     personality: str | None
 
-    _FIELDS = ("key", "owner", "mode", "source", "policy", "attributes",
-               "personality")
-
-    def __getitem__(self, key):
-        if key not in self._FIELDS:
-            raise KeyError(key)
-        return getattr(self, key)
-
-    def __iter__(self):
-        return iter(self._FIELDS)
-
-    def __len__(self):
-        return len(self._FIELDS)
 
 
 @dataclass(frozen=True)

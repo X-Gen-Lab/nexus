@@ -17,6 +17,8 @@ execute_process(COMMAND "${Python3_EXECUTABLE}"
     COMMAND_ERROR_IS_FATAL ANY)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/configure/bindings.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/configure/emission.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/calls.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py")
 add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
@@ -47,5 +49,6 @@ target_compile_options(contract_stm32_system_model PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/model_poll.h")
 target_compile_options(contract_stm32_io_model PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/io_poll.h")
+target_compile_definitions(contract_stm32_constructor_model PRIVATE _GNU_SOURCE)
 target_compile_options(contract_stm32_constructor_model PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/io_poll.h")
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/constructor_model.h")

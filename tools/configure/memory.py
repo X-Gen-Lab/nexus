@@ -29,8 +29,7 @@ def select(regions, budgets, maintained, *, obj, integer, fail):
 def flash_geometry(result, *, symbol, sector_symbol, program_unit,
                    program_flags="0u", static=True):
     """Emit one readonly physical geometry from the selected immutable facts."""
-    physical = getattr(result, "physical_part", None)
-    flash = physical.flash if physical is not None else result["flash"]
+    flash = result.physical_part.flash
     lines = [f"static const nx_flash_sector_t {sector_symbol}[] = {{"]
     offset = 0
     for block in flash["erase_blocks"]:
@@ -46,34 +45,52 @@ def flash_geometry(result, *, symbol, sector_symbol, program_unit,
                    f"    .program_flags = {program_flags}", "};"]
 
 
+def _budget_limits(memory, static_limit, regions):
+    primary = next(region["id"] for region in memory if region["linker"])
+    return {region["id"]: (
+        static_limit if static_limit is not None else region["size"])
+        if region["id"] == primary else regions.get(region["id"], 0)
+        for region in memory}
+
+
 def budget_limits(result):
-    budgets = result["memory_budgets"]
-    primary = next(region["id"] for region in result["memory"]
-                   if region["linker"])
-    choices = budgets.get("regions", {})
-    return {region["id"]: (budgets.get("static_ram_bytes", region["size"])
-            if region["id"] == primary else
-            choices.get(region["id"], {}).get("limit_bytes", 0))
-            for region in result["memory"]}
+    budget = result.memory_budget
+    return _budget_limits(result.memory, budget.static_ram_limit_bytes,
+                          {item.id: item.limit_bytes for item in budget.regions})
+
+
+def _resource_budget(flash_limit, ram_limits, stack, heap):
+    return {"schema_version": 1, "flash_loaded_max": flash_limit,
+            "flash_footprint_max": flash_limit, "ram_reserved_max": ram_limits,
+            "msp_max": stack, "heap_max": heap}
 
 
 def resource_budget(result):
-    """Project the sole resolved reservation and memory-limit contract.
+    """Export the selected typed reservation and memory-limit contract."""
+    budget = result.memory_budget
+    flash_limit = (budget.flash_load_limit_bytes
+                   if budget.flash_load_limit_bytes is not None
+                   else result.layout["size"])
+    return _resource_budget(flash_limit, budget_limits(result),
+                            budget.main_stack_bytes, budget.libc_heap_bytes)
 
-    Generation and ELF verification share this pure projection. The emitted
-    budget is a derived input; editing it cannot widen authored allowances.
+
+def resource_budget_projection(resolved):
+    """Read a sealed JSON contract for independent ELF budget verification.
+
+    This never reconstructs executable configuration or admits hardware modes.
+    The caller validates the physical memory and complete expected budget.
     """
-    budgets = result["memory_budgets"]
-    flash_limit = budgets.get("flash_load_bytes", result["layout"]["size"])
-    return {"schema_version": 1, "flash_loaded_max": flash_limit,
-            "flash_footprint_max": flash_limit,
-            "ram_reserved_max": budget_limits(result),
-            "msp_max": budgets["main_stack_bytes"],
-            "heap_max": budgets.get("libc_heap_bytes", 0)}
+    budget = resolved["memory_budgets"]
+    limits = _budget_limits(resolved["memory"], budget.get("static_ram_bytes"),
+        {name: item["limit_bytes"] for name, item in budget.get("regions", {}).items()})
+    return _resource_budget(
+        budget.get("flash_load_bytes", resolved["layout"]["size"]), limits,
+        budget["main_stack_bytes"], budget.get("libc_heap_bytes", 0))
 
 
 def selections(result):
-    selected = {region["id"] for region in result["memory"] if region["linker"]}
+    selected = {region["id"] for region in result.memory if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))
             for name in ("addsram", "tcm", "ccm", "sram1", "sram4")]
 
@@ -136,23 +153,23 @@ def _mpu_linker(result):
     User initializers have a distinct cold-start copy/zero ABI; ordinary data,
     kernel metadata and the boot stack remain in the primary privileged RAM.
     """
-    budgets = result["memory_budgets"]
-    reservations = budgets["mpu"]
-    flash = result["layout"]
-    ram = next(region for region in result["memory"] if region["linker"])
+    budgets = result.memory_budget
+    reservations = budgets.mpu
+    flash = result.layout
+    ram = next(region for region in result.memory if region["linker"])
     flash_origin = flash["origin"]
-    svc_origin = flash_origin + reservations["privileged_flash_bytes"]
-    user_flash_origin = svc_origin + reservations["syscall_flash_bytes"]
+    svc_origin = flash_origin + reservations.privileged_flash_bytes
+    user_flash_origin = svc_origin + reservations.syscall_flash_bytes
     ram_origin = ram["origin"]
-    user_ram_origin = ram_origin + reservations["privileged_ram_bytes"]
+    user_ram_origin = ram_origin + reservations.privileged_ram_bytes
     domains = (
         ("PRIV_FLASH", "rx", flash_origin,
-         reservations["privileged_flash_bytes"]),
-        ("SVC_FLASH", "rx", svc_origin, reservations["syscall_flash_bytes"]),
+         reservations.privileged_flash_bytes),
+        ("SVC_FLASH", "rx", svc_origin, reservations.syscall_flash_bytes),
         ("USER_FLASH", "rx", user_flash_origin,
-         reservations["user_flash_bytes"]),
-        ("PRIV_RAM", "rw", ram_origin, reservations["privileged_ram_bytes"]),
-        ("USER_RAM", "rw", user_ram_origin, reservations["user_ram_bytes"]),
+         reservations.user_flash_bytes),
+        ("PRIV_RAM", "rw", ram_origin, reservations.privileged_ram_bytes),
+        ("USER_RAM", "rw", user_ram_origin, reservations.user_ram_bytes),
     )
     domain_lines = "\n".join(
         f"    {name} ({access}) : ORIGIN = 0x{origin:08x}, LENGTH = {size}"
@@ -177,11 +194,11 @@ def _mpu_linker(result):
                            ("syscalls_flash", "syscall_flash")))
     identities = "\n".join(
         f"__nx_resolved_sha256_{index} = 0x"
-        f"{result['configuration_sha256'][index * 8:(index + 1) * 8]};"
+        f"{result.configuration_sha256[index * 8:(index + 1) * 8]};"
         for index in range(8))
     # Optional physical domains are outside this exact policy. Preserve their
     # existing fail-closed input-section checks in the privileged primary RAM.
-    extras = [region for region in result["memory"] if region["id"] != ram["id"]]
+    extras = [region for region in result.memory if region["id"] != ram["id"]]
     extra_sections = _extra_sections(extras).replace(
         "> RAM :ram", "> PRIV_RAM :ram")
     return f'''/* Explicit selected MPU reservations; physical facts unchanged. */
@@ -207,8 +224,8 @@ __nx_flash_live_start = __nx_flash_start;
 __nx_flash_image_load_start = __nx_flash_start;
 _estack = ORIGIN(PRIV_RAM) + LENGTH(PRIV_RAM);
 _sp = _estack;
-_Min_Stack_Size = {budgets["main_stack_bytes"]};
-_Min_Heap_Size = {budgets.get("libc_heap_bytes", 0)};
+_Min_Stack_Size = {budgets.main_stack_bytes};
+_Min_Heap_Size = {budgets.libc_heap_bytes};
 __nx_msp_start = _estack - _Min_Stack_Size;
 __nx_msp_end = _estack;
 {identities}
@@ -244,13 +261,13 @@ SECTIONS {{
 
 
 def linker(result):
-    if result["memory_budgets"].get("mpu") is not None:
+    if result.memory_budget.mpu is not None:
         return _mpu_linker(result)
-    ram = next(region for region in result["memory"] if region["linker"])
-    flash = result["layout"]
-    stack = result["memory_budgets"]["main_stack_bytes"]
-    heap = result["memory_budgets"].get("libc_heap_bytes", 0)
-    extras = [region for region in result["memory"] if region["id"] != ram["id"]]
+    ram = next(region for region in result.memory if region["linker"])
+    flash = result.layout
+    stack = result.memory_budget.main_stack_bytes
+    heap = result.memory_budget.libc_heap_bytes
+    extras = [region for region in result.memory if region["id"] != ram["id"]]
     selected = [region for region in extras if region["linker"]]
     extra_phdrs = "\n".join(f"    {region['id']}_{name} PT_LOAD FLAGS(6);"
                             for region in selected for name in ("data", "ram"))
@@ -260,7 +277,7 @@ def linker(result):
     extra_sections = _extra_sections(extras)
     # Optional exact SoC sections remain independent from generic placement.
     from tools.configure.providers import maintained
-    fragments = getattr(maintained(result["soc_family"]),
+    fragments = getattr(maintained(result.soc_family),
                         "linker_fragments", None)
     (flash_image_record, flash_ram_phdr, flash_ram_section,
      flash_workspace_bss) = (fragments(result) if fragments else ("", "", "", ""))
@@ -288,14 +305,14 @@ _Min_Stack_Size = {stack};
 _Min_Heap_Size = {heap};
 __nx_msp_start = _estack - _Min_Stack_Size;
 __nx_msp_end = _estack;
-__nx_resolved_sha256_0 = 0x{result["configuration_sha256"][0:8]};
-__nx_resolved_sha256_1 = 0x{result["configuration_sha256"][8:16]};
-__nx_resolved_sha256_2 = 0x{result["configuration_sha256"][16:24]};
-__nx_resolved_sha256_3 = 0x{result["configuration_sha256"][24:32]};
-__nx_resolved_sha256_4 = 0x{result["configuration_sha256"][32:40]};
-__nx_resolved_sha256_5 = 0x{result["configuration_sha256"][40:48]};
-__nx_resolved_sha256_6 = 0x{result["configuration_sha256"][48:56]};
-__nx_resolved_sha256_7 = 0x{result["configuration_sha256"][56:64]};
+__nx_resolved_sha256_0 = 0x{result.configuration_sha256[0:8]};
+__nx_resolved_sha256_1 = 0x{result.configuration_sha256[8:16]};
+__nx_resolved_sha256_2 = 0x{result.configuration_sha256[16:24]};
+__nx_resolved_sha256_3 = 0x{result.configuration_sha256[24:32]};
+__nx_resolved_sha256_4 = 0x{result.configuration_sha256[32:40]};
+__nx_resolved_sha256_5 = 0x{result.configuration_sha256[40:48]};
+__nx_resolved_sha256_6 = 0x{result.configuration_sha256[48:56]};
+__nx_resolved_sha256_7 = 0x{result.configuration_sha256[56:64]};
 SECTIONS {{
     .isr_vector : {{ KEEP(*(.isr_vector)) KEEP(*(.vectors)) }} > FLASH :flash
     .text : {{ *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > FLASH :flash
@@ -320,18 +337,24 @@ SECTIONS {{
 
 
 def dma_regions(name, result, include_flash=False, *, engine=None):
+    """Render the selected physical memory without reconstructing a decision."""
+    return dma_regions_from_facts(name, result.memory,
+        flash=result.flash if include_flash else None, engine=engine)
+
+
+def dma_regions_from_facts(name, memory, *, flash=None, engine=None):
     """Emit exact DMA domains; invalid physical reachability raises ValueError.
 
     Keep this module usable by independent ELF budget checkers without provider
     configuration imports. The configuration entry point owns error reporting.
     """
-    if include_flash and any("dma_engines" in region
-                             for region in result["memory"]):
+    if (flash is not None) and any("dma_engines" in region
+                             for region in memory):
         # RAM bus reachability never implies access to the Flash bus. New
         # heterogeneous engines need reviewed Flash facts before enabling it.
         raise ValueError("Engine-specific Flash reachability is not declared")
     regions = []
-    for region in result["memory"]:
+    for region in memory:
         if "dma_engines" in region:
             if engine is None or engine not in region["dma_engines"]:
                 raise ValueError(
@@ -341,13 +364,12 @@ def dma_regions(name, result, include_flash=False, *, engine=None):
             reachable = region["dma"]
         if reachable:
             regions.append(region)
-    if not regions and not include_flash:
+    if not regions and not (flash is not None):
         return [], 0
     lines = [f"static const nx_dma_memory_region_t s_nx_dma_regions_{name}[] = {{"]
     for region in regions:
         lines.append(f"    {{ (uintptr_t)0x{region['origin']:08x}u, {region['size']}u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }},")
-    if include_flash:
-        flash = result["flash"]
+    if (flash is not None):
         lines.append(f"    {{ (uintptr_t)0x{flash['origin']:08x}u, {flash['size']}u, NX_DMA_MEMORY_READ }},")
     lines.append("};")
-    return lines, len(regions) + int(include_flash)
+    return lines, len(regions) + int((flash is not None))

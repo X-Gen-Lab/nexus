@@ -33,10 +33,10 @@ def instance_declarations(item, result):
     source = []
     kind = item.kind
     if kind in {"spi", "i2c"}:
-        for device in result["devices"]:
-            if device["controller"] != item["id"]:
+        for device in result.devices:
+            if device.controller != item.id:
                 continue
-            child_name = device["id"].replace("-", "_")
+            child_name = device.id.replace("-", "_")
             if item.interface_kind == "spi_dma_transaction":
                 name = item.id.replace("-", "_")
                 source += [f"static nx_native_spi_dma_endpoint_state_t s_nx_endpoint_{child_name} = {{ .controller = &s_nx_port_{name} }};"]
@@ -46,9 +46,9 @@ def instance_declarations(item, result):
             initializer = ""
             if kind == "i2c":
                 name = item.id.replace("-", "_")
-                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {device['address']}u }}"
-            if "model_bytes" in device:
-                source.append(f'static uint8_t s_nx_model_{child_name}[{device["model_bytes"]}];')
+                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {device.options.address}u }}"
+            if device.options.model_bytes is not None:
+                source.append(f'static uint8_t s_nx_model_{child_name}[{device.options.model_bytes}];')
             source += [f'static nx_native_{kind}_endpoint_state_t s_nx_endpoint_{child_name}{initializer};']
             source += enhanced_endpoints.face(
                 device, f"s_nx_endpoint_{child_name}",

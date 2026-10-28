@@ -1,13 +1,13 @@
-# Authored translation; independent review is recorded in metadata.
+# Independently reviewed translations; exact canonical source identity below.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
+"Project-Id-Version: Nexus documentation\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b1fce9a4e31432cd1323234763e83f60e26e3700dc541d5bf88044c93b596330\n"
+"X-Nexus-Source-SHA256: a6b4e8651695e4de512a08ad3ce897e59317b3e8e124de58598da6903d2f6ab0\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -115,16 +115,15 @@ msgstr ""
 "finite USART1 `dma-tx` on F407ZG; it does not extend support to every F407 "
 "peripheral or UART mode."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:44
 msgid ""
-"`validation` 分开列出以下阶段。查询只执行生产 resolver 和合同投影，不搜索旧 报告，也不运行编译、测试、烧录或测量。因此，下面的 "
-"`not_assessed` 表示本次查询 没有评估该阶段，不表示实现失败或历史上从未执行。"
+"`validation` 分开列出以下阶段。默认查询只执行生产 resolver 和合同投影，不搜索旧 "
+"报告，也不运行编译、测试、烧录或测量。因此，下面的 `not_assessed` 表示本次查询 没有评估该阶段，不表示实现失败或历史上从未执行。"
 msgstr ""
-"`validation` separates the stages below. The query only runs the production "
-"resolver and contract projection; it does not search historical reports or "
-"compile, test, flash or measure. Therefore `not_assessed` means this query "
-"did not assess that stage, not that implementation failed or execution has "
-"never occurred."
+"`validation` separates the stages below. By default, the query only runs"
+" the production resolver and contract projection; it neither searches "
+"old reports nor compiles, tests, flashes or measures. Thus "
+"`not_assessed` means this query did not assess that stage, not that the "
+"implementation failed or was never executed historically."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "阶段"
@@ -216,6 +215,57 @@ msgstr ""
 "immutable source and actual scope. Configuration, software and physical "
 "stages are separate evidence, not one automatically promoted support level."
 
+msgid "显式关联已封存候选"
+msgstr "Explicitly associate a sealed candidate"
+
+msgid "需要核对已有执行证据时，在同一查询追加原候选路径："
+msgstr ""
+"To inspect existing execution evidence, append the original candidate "
+"path to the same query:"
+
+msgid ""
+"工具调用原候选 verifier 核对全部 payload、qualification 和链接产物，不运行新的 测试。报告同时保存 "
+"`current_source` 和 `evidence.reference.source`，不会用被引用 源码覆盖当前 "
+"checkout。`evidence.relation` 只在干净 commit/tree/submodules 与 精确解析配置全部相同时为 "
+"`exact_source_and_configuration`；此时才把原候选的 四类软件阶段投影为 "
+"`passed`。这是原执行的只读关联，不是本次新执行。"
+msgstr ""
+"The tool invokes the original candidate verifier to check all payloads, "
+"qualifications and linked artifacts, without running new tests. The "
+"report keeps both `current_source` and `evidence.reference.source`; the "
+"referenced source does not replace the current checkout. "
+"`evidence.relation` becomes `exact_source_and_configuration` only when "
+"clean commit/tree/submodules and the complete exact resolved "
+"configuration match; only then are the original candidate’s four "
+"software stages projected as `passed`. This is a read-only association "
+"with original execution, not a new execution."
+
+msgid ""
+"有效候选属于其他源码时标 `historical_source`，配置不同时标 "
+"`configuration_mismatch`；这两种情况保留当前选择的 `not_assessed`。原件缺失、 "
+"被修改或校验失败会拒绝查询，不能降级为已验证引用。未提供 `--candidate` 时 无需 Git 或证据观察。可搬移候选需先用现有 "
+"artifact 工具恢复原 closure，再提供 其中的 `candidate.json`；只有包摘要或下载位置不能建立通过状态。"
+msgstr ""
+"A valid candidate from another source is marked `historical_source`; a "
+"different configuration is marked `configuration_mismatch`. Both retain "
+"`not_assessed` for the current selection. Missing, modified or invalid "
+"original evidence rejects the query rather than downgrading to a "
+"verified reference. Without `--candidate`, no Git or evidence "
+"observation is needed. Restore a portable candidate’s original closure "
+"using the existing artifact tools before providing its `candidate.json`;"
+" a package digest or download location alone cannot establish a passing "
+"state."
+
+msgid ""
+"任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的 family／mode"
+" 行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确 配置通过不等于所有 Board、backend、时钟或模式通过。"
+msgstr ""
+"No software candidate changes `physical_hil`, "
+"`physical_qualified=false`, or family/mode rows in the aggregate table "
+"below. Hardware status still requires an actual station and observations"
+" of the same image; one passing exact configuration does not imply all "
+"Boards, backends, clocks or modes passed."
+
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "SoC"
 msgstr "SoC"
@@ -280,6 +330,9 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/gd303-devices.toml`"
 
+msgid "`drivers/adc/legacy_adc/legacy_adc.c`"
+msgstr "`drivers/adc/legacy_adc/legacy_adc.c`"
+
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "EXTI0"
 msgstr "EXTI0"
@@ -327,6 +380,9 @@ msgstr "poll-word"
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "`flash-internal`"
 msgstr "`flash-internal`"
+
+msgid "`drivers/flash/legacy_flash/legacy_flash.c`"
+msgstr "`drivers/flash/legacy_flash/legacy_flash.c`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "FWDGT"
@@ -420,6 +476,9 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, "
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
 
+msgid "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
+msgstr "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
+
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "SPI0"
 msgstr "SPI0"
@@ -456,6 +515,9 @@ msgstr "fixed-pwm"
 msgid "`pwm-pa6`"
 msgstr "`pwm-pa6`"
 
+msgid "`drivers/timer/legacy_pwm/legacy_pwm.c`"
+msgstr "`drivers/timer/legacy_pwm/legacy_pwm.c`"
+
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "USART0"
 msgstr "USART0"
@@ -481,6 +543,9 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-"
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
 "dma-duplex.toml`"
+
+msgid "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
+msgstr "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "dma-tx"
@@ -2126,6 +2191,10 @@ msgstr "`gpio-pg10`"
 msgid "`i2c1-pb8-pb9`"
 msgstr "`i2c1-pb8-pb9`"
 
+msgid "`drivers/i2c/i2c_v2/i2c_v2.c`"
+msgstr "`drivers/i2c/i2c_v2/i2c_v2.c`"
+
+
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
@@ -3021,21 +3090,3 @@ msgstr "`soc/native/drivers/uart_word.c`"
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"
-
-msgid "`drivers/adc/legacy_adc/legacy_adc.c`"
-msgstr "`drivers/adc/legacy_adc/legacy_adc.c`"
-
-msgid "`drivers/flash/legacy_flash/legacy_flash.c`"
-msgstr "`drivers/flash/legacy_flash/legacy_flash.c`"
-
-msgid "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
-msgstr "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
-
-msgid "`drivers/timer/legacy_pwm/legacy_pwm.c`"
-msgstr "`drivers/timer/legacy_pwm/legacy_pwm.c`"
-
-msgid "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
-msgstr "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
-
-msgid "`drivers/i2c/i2c_v2/i2c_v2.c`"
-msgstr "`drivers/i2c/i2c_v2/i2c_v2.c`"

@@ -1,4 +1,5 @@
 """Authored UART frames and word interfaces keep their real public types."""
+from dataclasses import replace
 from pathlib import Path
 import re
 import tempfile
@@ -163,9 +164,9 @@ class UARTFormatConfiguration(unittest.TestCase):
     def test_word_capabilities_use_word_units_and_nominal_traits_ids(self):
         frame = 'data_bits=9\nparity="none"\nstop_bits=1\nflow="none"'
         result = self.resolve("native-uart.toml", frame, words=True)
-        data = result.to_dict()
-        data["factory"] = {"capabilities": True}
-        header, source = factory.emit(data)
+        selected = replace(result, factory=replace(result.factory,
+                                                  capabilities=True))
+        header, source = factory.emit(selected)
         self.assertIn("nx_factory_uart_word_traits_t", header)
         self.assertIn("nx_factory_uart_word_capability", header)
         self.assertIn("NX_UART_WORD_ID_UART0", source)

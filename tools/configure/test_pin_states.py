@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import matrix, bindings, configure, dependencies, factory
 
 
@@ -17,21 +18,21 @@ class PinStateConfigurationTests(unittest.TestCase):
     def resolve(self, change=None):
         if change is None:
             return configure.resolve_ir(configure.ROOT / CANONICAL)
-        data = configure.load_assembly(configure.ROOT / CANONICAL)
+        data = configure.load_assembly(configure.ROOT / CANONICAL).to_dict()
         board = json.loads((configure.ROOT / BOARD).read_text())
         change(data, board)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "board.json").write_text(json.dumps(board))
             data["board_package"] = str(root)
-            path = root / "assembly.json"
-            path.write_text(json.dumps(data))
+            path = root / "assembly.toml"
+            path.write_text(render_toml(data))
             return configure.resolve_ir(path)
 
     def test_exact_canonical_options_are_immutable_register_values(self):
         result = self.resolve()
-        self.assertEqual((result.soc_family, result["part"], result.backend,
-                          result["clock_profile"]),
+        self.assertEqual((result.soc_family, result.part, result.backend,
+                          result.clock_profile),
                          ("stm32g474", "STM32G474RET6", "baremetal",
                           "hse24-pll170"))
         item, = result.controllers
@@ -47,7 +48,7 @@ class PinStateConfigurationTests(unittest.TestCase):
         self.assertEqual(item.options.sleep.mode, 3072)
         with self.assertRaises(FrozenInstanceError):
             item.options.mask = 1
-        self.assertFalse(result["physical_qualified"])
+        self.assertFalse(result.physical_qualified)
 
     def test_face_is_selected_only_and_does_not_compete_with_gpio(self):
         selected = self.resolve()
@@ -150,7 +151,8 @@ class PinStateConfigurationTests(unittest.TestCase):
             board["bindings"].append({"id": "other", "controller": "GPIOA",
                                       "route": "gpio-pa0", "initial": 0})
             data["controllers"].append({"id": "other", "binding": "other",
-                                         "mode": "output"})
+                                         "mode": "output",
+                                         "authored_kind": "gpio"})
         result = self.resolve(change)
         self.assertEqual({item.id for item in result.controllers},
                          {"status", "other"})

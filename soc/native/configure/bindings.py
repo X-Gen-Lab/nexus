@@ -1,5 +1,6 @@
 """Emit exact host model storage and wiring, without runtime hardware policy."""
-from tools.configure.ir import controller_ir
+from tools.configure.ir import ControllerIR
+from tools.configure.calls import Address, DirectCall, Symbol
 
 from tools.configure.providers.common import Construction
 
@@ -11,40 +12,42 @@ def symbol(name):
 def constructor(item, result, board_bindings, routes, devices):
     """Construct one validated static instance using narrow provider calls."""
     del board_bindings, routes
-    item = controller_ir(item, 'native')
-    name = symbol(item["id"])
-    kind = item["kind"]
+    if not isinstance(item, ControllerIR) or item.provider != "native":
+        raise ValueError("Native construction requires its resolved controller")
+    name = symbol(item.id)
+    kind = item.kind
     state = f"&s_nx_port_{name}"
     face = f"&s_nx_face_{name}"
+    state_address = Address(f"s_nx_port_{name}")
+    face_address = Address(f"s_nx_face_{name}")
     definitions = []
     stop = []
     if kind in {"rtc", "lptim"}:
-        extra = f", {item.options.tick_hz}u" if kind == "lptim" else ""
+        arguments = (state_address, Address("s_nx_native_time_clock"))
+        if kind == "lptim":
+            arguments += (item.options.tick_hz,)
         return Construction(
             state_type=f"nx_native_{kind}_state_t", definitions=[],
-            initialize=(f"(s_nx_port_{name}.constructed ? "
-                        f"nx_native_{kind}_start({state}) : "
-                        f"nx_native_{kind}_construct({state}, "
-                        f"&s_nx_native_time_clock{extra}))"),
-            stop=[f"nx_{kind}_port_stop({face})"],
+            initialize=DirectCall(f"nx_native_{kind}_prepare", arguments),
+            stop=[DirectCall(f"nx_{kind}_port_stop", (face_address,))],
             retain_on_failed_init=False)
     if kind == "gpio":
-        mask = item["mask"] or sum(1 << int(pin["pin"][2:])
-                                   for pin in item["pins"])
-        initial = item["initial"]
-        output = "true" if item["mode"] == "output" else "false"
-        initialize = (f"nx_native_gpio_configure_instance({state}, {mask}u, "
-                      f"{initial}u, {output})")
-        stop = [f"nx_native_gpio_stop_instance({state}, {initial}u)"]
+        mask = item.mask or sum(1 << int(pin["pin"][2:])
+                                   for pin in item.pins)
+        initial = item.initial
+        initialize = DirectCall("nx_native_gpio_configure_instance",
+            (state_address, mask, initial, item.mode == "output"))
+        stop = [DirectCall("nx_native_gpio_stop_instance",
+                          (state_address, initial))]
     elif kind == "uart":
         capacity = item.options.rx_capacity
         if item.mode == "irq-words":
             return Construction(
                 state_type="nx_native_uart_word_state_t",
                 definitions=[f"static uint16_t s_nx_rx_{name}[{capacity}];"],
-                initialize=(f"nx_native_uart_word_initialize({state}, "
-                            f"s_nx_rx_{name}, {capacity}u, NULL, 0u)"),
-                stop=[f"nx_uart_word_port_stop({face})"],
+                initialize=DirectCall("nx_native_uart_word_initialize",
+                    (state_address, Symbol(f"s_nx_rx_{name}"), capacity, None, 0)),
+                stop=[DirectCall("nx_uart_word_port_stop", (face_address,))],
                 retain_on_failed_init=False)
         events = item.options.rx_profile == "events"
         data_type = "nx_uart_rx_event_t" if events else "uint8_t"
@@ -54,9 +57,9 @@ def constructor(item, result, board_bindings, routes, devices):
                        f"    .profile = {profile}, .rx_storage = s_nx_rx_{name},",
                        f"    .rx_capacity = {capacity}u, .automatic_irq = true",
                        "};"]
-        initialize = (f"nx_native_uart_configure_instance({state}, "
-                      f"&s_nx_config_{name})")
-        stop = [f"nx_uart_port_stop({face})"]
+        initialize = DirectCall("nx_native_uart_configure_instance",
+                                (state_address, Address(f"s_nx_config_{name}")))
+        stop = [DirectCall("nx_uart_port_stop", (face_address,))]
     elif kind == "spi" and item.interface_kind == "spi_dma_transaction":
         sequence = f"s_nx_sequence_{name}"
         return Construction(
@@ -72,8 +75,8 @@ def constructor(item, result, board_bindings, routes, devices):
                 "    if (status != NX_SUCCESS) { return status; }",
                 f"    return nx_spi_dma_sequence_initialize(&{sequence},",
                 f"        &nx_native_spi_dma_sequence_backend, {state});", "}"],
-            initialize=f"prepare_{name}()",
-            stop=[f"nx_spi_dma_transaction_stop({face})"],
+            initialize=DirectCall(f"prepare_{name}"),
+            stop=[DirectCall("nx_spi_dma_transaction_stop", (face_address,))],
             retain_on_failed_init=True)
     elif kind in {"spi", "i2c"}:
         definitions = [f"static nx_result_t prepare_{name}(void) {{",
@@ -90,11 +93,11 @@ def constructor(item, result, board_bindings, routes, devices):
                             f"        &s_nx_endpoint_{child}, {state}, {memory}, {size}u{address});",
                             "    if (status != NX_SUCCESS) { return status; }"]
         definitions += ["    return NX_SUCCESS;", "}"]
-        initialize = f"prepare_{name}()"
-        stop = [f"nx_spi_port_stop({face})" if kind == "spi"
-                else f"nx_native_i2c_stop_instance({state})"]
+        initialize = DirectCall(f"prepare_{name}")
+        stop = [DirectCall("nx_spi_port_stop", (face_address,)) if kind == "spi"
+                else DirectCall("nx_native_i2c_stop_instance", (state_address,))]
     elif kind == "flash":
-        flash = result["flash"]
+        flash = result.flash
         offset = 0
         definitions = [f"static uint8_t s_nx_model_flash_{name}[{flash['size']}];",
                        f"static const nx_flash_sector_t s_nx_sectors_{name}[] = {{"]
@@ -106,21 +109,24 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {flash['origin']}u, {flash['size']}u, 1u,",
                         f"    s_nx_sectors_{name}, {len(flash['erase_blocks'])}u, 0u",
                         "};"]
-        initialize = (f"nx_native_flash_initialize_instance({state}, "
-                      f"s_nx_model_flash_{name}, &s_nx_geometry_{name})")
-        stop = [f"nx_native_flash_stop_instance({state})"]
+        initialize = DirectCall("nx_native_flash_initialize_instance",
+            (state_address, Symbol(f"s_nx_model_flash_{name}"),
+             Address(f"s_nx_geometry_{name}")))
+        stop = [DirectCall("nx_native_flash_stop_instance", (state_address,))]
     elif kind == "watchdog":
-        initialize = f"nx_native_watchdog_initialize_instance({state})"
+        initialize = DirectCall("nx_native_watchdog_initialize_instance",
+                                (state_address,))
         # Independent watchdog effects intentionally survive platform stop.
     elif kind == "exti":
         capacity = item.options.event_capacity
         edge = {"rising": "NX_EXTI_RISING", "falling": "NX_EXTI_FALLING",
                 "both": "NX_EXTI_BOTH"}[item.options.edge]
-        line = int(item["pins"][0]["pin"][2:])
+        line = int(item.pins[0]["pin"][2:])
         definitions = [f"static nx_exti_event_t s_nx_events_{name}[{capacity}];"]
-        initialize = (f"nx_native_exti_configure_instance({state}, {line}u, "
-                      f"{edge}, s_nx_events_{name}, {capacity}u)")
-        stop = [f"nx_exti_port_stop({face})"]
+        initialize = DirectCall("nx_native_exti_configure_instance",
+            (state_address, line, Symbol(edge), Symbol(f"s_nx_events_{name}"),
+             capacity))
+        stop = [DirectCall("nx_exti_port_stop", (face_address,))]
     elif kind == "pwm":
         definitions = [f"static nx_result_t prepare_{name}(void) {{",
                        f"    nx_result_t status = nx_native_pwm_configure_instance({state},",
@@ -128,15 +134,15 @@ def constructor(item, result, board_bindings, routes, devices):
                        "    if (status != NX_SUCCESS) { return status; }",
                        f"    return nx_pwm_port_set({face}, {item.options.period_ticks}u, {item.options.duty_ticks}u);",
                        "}"]
-        initialize = f"prepare_{name}()"
-        stop = [f"nx_native_pwm_stop_instance({state})"]
+        initialize = DirectCall(f"prepare_{name}")
+        stop = [DirectCall("nx_native_pwm_stop_instance", (state_address,))]
     elif kind == "adc":
         channels = item.options.channels
         definitions = [f"static const uint16_t s_nx_adc_model_{name}[{len(channels)}] = {{0}};"]
-        initialize = (f"nx_native_adc_configure_instance({state}, "
-                      f"s_nx_adc_model_{name}, {len(channels)}u, 12u, "
-                      f"{item.options.reference_mv}u)")
-        stop = [f"nx_native_adc_stop_instance({state})"]
+        initialize = DirectCall("nx_native_adc_configure_instance",
+            (state_address, Symbol(f"s_nx_adc_model_{name}"), len(channels),
+             12, item.options.reference_mv))
+        stop = [DirectCall("nx_native_adc_stop_instance", (state_address,))]
     else:
         raise ValueError(f"Native construction is not maintained for {kind}")
     return Construction(

@@ -1,30 +1,29 @@
 """Protected U575 memory emits exact domains for the real reset startup."""
 
+from dataclasses import replace
 import re
 import unittest
 
-from tools.configure import memory
+from tools.configure import configure, memory
+from tools.configure.ir import MemoryBudgetIR, MpuMemoryReservationsIR, freeze
 
 
 def resolved(protected=True):
-    budgets = {"main_stack_bytes": 2048, "libc_heap_bytes": 0}
-    if protected:
-        budgets["mpu"] = {
-            "privileged_flash_bytes": 131072,
-            "syscall_flash_bytes": 256,
-            "user_flash_bytes": 2097152 - 131072 - 256,
-            "privileged_ram_bytes": 163840,
-            "user_ram_bytes": 32768,
-        }
-    return {
-        "soc_family": "stm32u575", "controllers": [],
-        "layout": {"origin": 0x08000000, "size": 2097152},
-        "memory": [{"id": "sram1", "origin": 0x20000000,
-                    "size": 196608, "linker": True},
-                   {"id": "sram4", "origin": 0x28000000,
-                    "size": 16384, "linker": False}],
-        "memory_budgets": budgets, "configuration_sha256": "12" * 32,
-    }
+    result = configure.resolve_ir(configure.ROOT /
+        "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml")
+    reservations = MpuMemoryReservationsIR(
+        privileged_flash_bytes=131072, syscall_flash_bytes=256,
+        user_flash_bytes=2097152 - 131072 - 256,
+        privileged_ram_bytes=163840, user_ram_bytes=32768) if protected else None
+    return replace(result,
+        layout=freeze({"origin": 0x08000000, "size": 2097152}),
+        physical_part=replace(result.physical_part, memory=freeze([
+            {"id": "sram1", "origin": 0x20000000,
+             "size": 196608, "linker": True},
+            {"id": "sram4", "origin": 0x28000000,
+             "size": 16384, "linker": False}])),
+        memory_budget=MemoryBudgetIR(2048, 0, None, None, mpu=reservations),
+        configuration_sha256="12" * 32)
 
 
 class MpuMemoryLinkerTests(unittest.TestCase):

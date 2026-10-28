@@ -27,6 +27,20 @@ class DocumentationConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported mode"):
             self.check("```toml\n" + stale + "```\n")
 
+    def test_relative_board_package_stays_relative_to_document(self):
+        package = self.document.parent / "board with spaces"
+        package.mkdir()
+        source = gate.ROOT / "boards/native_reference/board.json"
+        (package / "board.json").write_bytes(source.read_bytes())
+        assembly = (gate.ROOT /
+                    "tools/configure/assemblies/native-gpio.toml").read_text()
+        assembly = assembly.replace('board = "native_reference"',
+                                    '\'board_package\' = "board with spaces"')
+        self.assertIn("board_package", assembly)
+        rows = self.check("```toml\n" + assembly + "```\n")
+        self.assertEqual(rows[0]["kind"], "assembly")
+        self.assertEqual(len(rows[0]["configuration_sha256"]), 64)
+
     def test_partial_examples_require_explicit_reason(self):
         fragment = '[gpio.led0]\nbinding="led0"\nmode="output"\n'
         with self.assertRaisesRegex(ValueError, "fragment"):

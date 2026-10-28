@@ -88,6 +88,79 @@ class NativeReopen : public testing::Test {
     }
 };
 
+TEST_F(NativeReopen, PreparationConstructsFreshOwnersWithoutReadingTime) {
+    nx_native_rtc_state_t fresh_rtc{};
+    nx_native_lptim_state_t fresh_counter{};
+    EXPECT_EQ(nx_native_rtc_prepare(&fresh_rtc, &clock), NX_SUCCESS);
+    EXPECT_EQ(nx_native_lptim_prepare(&fresh_counter, &clock, 8192),
+              NX_SUCCESS);
+    EXPECT_EQ(fresh_rtc.generation, 1u);
+    EXPECT_EQ(fresh_counter.generation, 1u);
+    EXPECT_EQ(fresh_counter.tick_hz, 8192u);
+    EXPECT_TRUE(fresh_rtc.opened);
+    EXPECT_TRUE(fresh_counter.opened);
+}
+
+TEST_F(NativeReopen, PreparationPreservesBindingAndEpochAcrossReopen) {
+    SetCalendar();
+    ASSERT_EQ(nx_rtc_port_stop(&rtc), NX_SUCCESS);
+    ASSERT_EQ(nx_lptim_port_stop(&lptim), NX_SUCCESS);
+    auto value = Bytes(calendar.calendar);
+    uint64_t rtc_generation = calendar.generation;
+    uint64_t counter_generation = counter.generation;
+    EXPECT_EQ(nx_native_rtc_prepare(&calendar, nullptr), NX_SUCCESS);
+    EXPECT_EQ(nx_native_lptim_prepare(&counter, nullptr, 1), NX_SUCCESS);
+    EXPECT_EQ(calendar.generation, rtc_generation + 1);
+    EXPECT_EQ(counter.generation, counter_generation + 1);
+    EXPECT_EQ(Bytes(calendar.calendar), value);
+    EXPECT_EQ(calendar.clock.read, ReadClock);
+    EXPECT_EQ(counter.clock.context, &source);
+    EXPECT_EQ(counter.tick_hz, 32768u);
+}
+
+TEST_F(NativeReopen, PreparationCannotOverwriteOpenOrBorrowedState) {
+    auto rtc_before = Bytes(calendar);
+    auto counter_before = Bytes(counter);
+    EXPECT_EQ(nx_native_rtc_prepare(&calendar, &clock), NX_ERROR_STATE);
+    EXPECT_EQ(nx_native_lptim_prepare(&counter, &clock, 8192), NX_ERROR_STATE);
+    EXPECT_EQ(Bytes(calendar), rtc_before);
+    EXPECT_EQ(Bytes(counter), counter_before);
+    SetCalendar();
+    PrepareAlarm(0);
+    PrepareShot(0);
+    ASSERT_EQ(nx_rtc_port_submit(&rtc, &alarms[0]), NX_SUCCESS);
+    ASSERT_EQ(nx_lptim_port_submit(&lptim, &shots[0]), NX_SUCCESS);
+    rtc_before = Bytes(calendar);
+    counter_before = Bytes(counter);
+    EXPECT_EQ(nx_native_rtc_prepare(&calendar, nullptr), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_native_lptim_prepare(&counter, nullptr, 0), NX_ERROR_BUSY);
+    EXPECT_EQ(Bytes(calendar), rtc_before);
+    EXPECT_EQ(Bytes(counter), counter_before);
+}
+
+TEST_F(NativeReopen, PreparationValidatesOwnersBeforeTestingConstructed) {
+    nx_native_rtc_state_t fresh_rtc{};
+    nx_native_lptim_state_t fresh_counter{};
+    auto rtc_before = Bytes(fresh_rtc);
+    auto counter_before = Bytes(fresh_counter);
+    EXPECT_EQ(nx_native_rtc_prepare(nullptr, &clock), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_native_lptim_prepare(nullptr, &clock, 8192), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_native_rtc_prepare(&fresh_rtc, nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_native_lptim_prepare(&fresh_counter, &clock, 0),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_native_rtc_prepare(reinterpret_cast<nx_native_rtc_state_t*>(
+                                  reinterpret_cast<uintptr_t>(&fresh_rtc) + 1),
+                              &clock),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(nx_native_lptim_prepare(
+                  reinterpret_cast<nx_native_lptim_state_t*>(UINTPTR_MAX - 7),
+                  &clock, 8192),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(Bytes(fresh_rtc), rtc_before);
+    EXPECT_EQ(Bytes(fresh_counter), counter_before);
+}
+
 TEST_F(NativeReopen, InvalidAndUnconstructedStorageRejectWithoutWriting) {
     nx_native_rtc_state_t fresh_rtc{};
     nx_native_lptim_state_t fresh_counter{};

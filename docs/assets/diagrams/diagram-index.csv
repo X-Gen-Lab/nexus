@@ -1,7 +1,7 @@
 diagram_id,title,kind,source_dot,rendered_svg,render_status,review_status,code_basis,task_id,scope
 FIG-01,全平台分层与外部边界,current,platform-architecture.dot,platform-architecture.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-43,产品外置；可选组件与OS；运行访问和构建事实逐边区分
 FIG-02,选定编译目标依赖,reference,build-targets.dot,build-targets.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-44,H743 baremetal IRQ UART；准确PUBLIC/PRIVATE/INTERFACE/OBJECT关系
-FIG-03,配置与原子生成,current,configuration-generation.dot,configuration-generation.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-45,构建输入/产物链，生成失败使owned bundle失效
+FIG-03,配置与原子生成,current,configuration-generation.dot,configuration-generation.svg,rendered,source_reviewed,tools/configure/authored.py; configure.py; ir.py; bindings.py; bundle.py,DOC-45,TOML唯一入口、冻结用户意图、具名IR、单向投影与原子发布；不表示运行时调用或硬件资格
 FIG-04,factory与静态实例,reference,factory-instances.dot,factory-instances.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-46,按需选入的两同类实例示意；同模式ops共享，controller/endpoint独立
 FIG-05,显式启动停机与失败撤回,current,platform-lifecycle.dot,platform-lifecycle.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-47,生成生命周期骨架；每个SoC私有启动/清理保持具体合同
 FIG-06,Core请求状态与借用,current,request-lifecycle.dot,request-lifecycle.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-48,Core helper允许的迁移与调用前提；不承诺各provider恢复API

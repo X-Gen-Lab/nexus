@@ -286,7 +286,7 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
         fail("CPU emission requires an empty temporary directory")
     if kernel_profile is None:
         kernel_profile = kernel.resolve(None, profile, clock_hz)
-    if kernel_profile is not None and kernel_profile.get("lowpower_port") == "timebase":
+    if kernel_profile is not None and getattr(kernel_profile, "lowpower_port", None) == "timebase":
         fail("CPU-only lowpower runtime requires reviewed SoC timer facts")
     profile = kernel.bind(profile, kernel_profile)
     resolved = {"schema_version": 1, "platform_metadata": platform_metadata,

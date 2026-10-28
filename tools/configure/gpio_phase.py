@@ -12,11 +12,11 @@ from tools.configure.providers.common import fail, owned_claims
 
 
 def selected_pins(result):
-    owners = {item["id"] for item in result.controllers}
-    owners.update(item["id"] for item in result.devices)
-    pins = {claim["key"].removeprefix("pin:")
+    owners = {item.id for item in result.controllers}
+    owners.update(item.id for item in result.devices)
+    pins = {claim.key.removeprefix("pin:")
             for claim in owned_claims(result, owners)
-            if claim["key"].startswith("pin:")}
+            if claim.key.startswith("pin:")}
     return tuple(sorted(pins, key=lambda pin: (pin[1], int(pin[2:]))))
 
 
@@ -87,11 +87,11 @@ def add_snapshots(result, item, offered, snapshots):
     if not isinstance(offered, Mapping):
         fail("Cold pin snapshot metadata must be a mapping")
     owners = {item.id}
-    owners.update(device["id"] for device in result.devices
-                  if device["controller"] == item.id)
-    owned = {claim["key"].removeprefix("pin:")
+    owners.update(device.id for device in result.devices
+                  if device.controller == item.id)
+    owned = {claim.key.removeprefix("pin:")
              for claim in owned_claims(result, owners)
-             if claim["key"].startswith("pin:")}
+             if claim.key.startswith("pin:")}
     for pin, slot in offered.items():
         if pin not in owned:
             fail("Cold snapshot refers to an unselected owner pin")

@@ -29,8 +29,13 @@ They do not establish current support or qualification.
 - SoC facts and Board `board.json` are machine-maintained JSON. One authored TOML
   assembly resolves through a validated typed IR into one atomic bundle. CMake
   targets own software dependencies. Do not introduce Kconfig/cache fallback,
-  competing configuration authorities or a second source build graph. Legacy
-  schema-1 JSON fixtures may be read during migration, never silently mixed.
+  competing configuration authorities or a second source build graph. Authored
+  platform input is TOML schema 2 only; reject legacy JSON assemblies. Production
+  resolution and emitters use immutable named records, without a mapping facade
+  or duplicate decision values. JSON facts and keyed immutable indexes remain
+  explicit leaf data; resolved JSON is a one-way audit/artifact projection.
+  Frozen historical evidence retains its original bytes and read-only verifiers;
+  that retention never reopens a legacy production configuration path.
 - Reject unknown fields, unsupported modes, resource conflicts and stale inputs.
   Never repair configuration by silently selecting a different mode or Board.
 - Distinguish a chip capability from a reviewed PCB route and physical HIL.

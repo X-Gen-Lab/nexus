@@ -278,7 +278,7 @@ class KernelProfileTests(unittest.TestCase):
         bound = module.bind(profile, policy)
         self.assertEqual(bound.irq.syscall_priority, 7)
         self.assertEqual(bound.compile_options, profile.compile_options)
-        self.assertEqual(bound["cpu"], profile["cpu"])
+        self.assertEqual(bound.cpu, profile.cpu)
 
 
 class KernelAssemblyTests(unittest.TestCase):

@@ -100,13 +100,21 @@ flowchart LR
 代码或软件依赖图。未知键、失效输入、非法模式、引脚／IRQ／timer 冲突、越界容量
 都会拒绝；失败重配置使旧 bundle 失效，不静默使用上一次成功结果。
 
-SoC/Board 事实采用 JSON，使用者编写 schema-2 TOML。严格 resolver 产生不可变
-typed IR；各生成器消费同一结果。`resolved.json` 是该结果的序列化，不能作为手工
-配置回填。迁移期 schema-1 JSON 夹具有显式入口，不与 TOML 混合叠加。
+SoC/Board 事实采用 JSON，平台装配只接受 schema-2 TOML。`AuthoredAssembly`
+保存冻结的用户意图；`resolve_ir()` 严格校验事实、模式和资源后直接产生不可变
+`ConfigurationIR`。生产 resolver、factory 和 emitter 使用具名字段，不提供
+Mapping 接口或保存第二份 `values` 决策副本。`to_dict()` 派生 `resolved.json`
+供审计与独立产物检查，不能回填为配置；旧 schema-1 JSON 装配入口已删除。
+历史证据仍保持原格式和只读校验，不建立当前代码资格。
 
-IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record，
-ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping，
-不能声称所有字段均有名义强类型。`soc/<vendor>/<family>/configure/`（Native 为
+IR 身份、预算和 controller／endpoint／CPU／kernel／resource options 使用冻结
+record；IRQ 为嵌套 record，ADC channels/sample times 为 tuple。原 JSON 硬件
+事实与按身份索引的只读 mapping 仍是明确的叶数据，resolver 内局部校验草稿也仍
+可使用 dict；这不等于每个 JSON 字段都有名义类型。`source_fields` 只记录投影
+字段存在性，不保存决策值副本。Python typed source epoch 为 2，JSON 投影仍为
+schema 1；两者各自计代，不改变 MCU C factory 接口。
+
+`soc/<vendor>/<family>/configure/`（Native 为
 `soc/native/configure/`）明确
 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及
 constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、

@@ -29,6 +29,36 @@ class CompatibilityTests(unittest.TestCase):
         self.assertFalse(report["physical_qualification"])
         self.assertGreaterEqual(len(report["inputs"]), 7)
 
+    def test_typed_source_epoch_is_separate_from_json_projection(self):
+        from tools.configure import configure
+        from tools.configure.ir import ConfigurationIR
+
+        result = configure.resolve_ir(
+            ROOT / "tools/configure/assemblies/native-gpio.toml")
+        observed = compatibility.observe(ROOT)
+        self.assertIsInstance(result, ConfigurationIR)
+        self.assertEqual(result.source_epoch, 2)
+        self.assertEqual(result.to_dict()["schema_version"], 1)
+        self.assertNotIn("source_epoch", result.to_dict())
+        self.assertEqual(observed["schemas"]["typed_ir"], 2)
+        self.assertEqual(observed["schemas"]["assembly_projection"], 1)
+
+    def test_changed_ir_epoch_or_projection_is_rejected(self):
+        for before, after in (
+                ("source_epoch: ClassVar[int] = 2",
+                 "source_epoch: ClassVar[int] = 3"),
+                ("schema_version: int = 1", "schema_version: int = 2"),
+                ("source_epoch: ClassVar[int] = 2",
+                 "source_epoch: ClassVar[int] = True")):
+            with self.subTest(after=after), tempfile.TemporaryDirectory() as directory:
+                root = self.fixture(directory)
+                path = root / "tools/configure/ir.py"
+                source = path.read_text()
+                self.assertTrue(before in source, "IR epoch declaration missing")
+                path.write_text(source.replace(before, after))
+                with self.assertRaisesRegex(ValueError, "schema|epoch"):
+                    compatibility.check(root)
+
     def test_snapshot_policy_checks_actual_supported_factory_epoch(self):
         self.assertIs(metadata.policy_contract(self.policy, expected_factory_epoch=1), self.policy)
         for epoch in (0, 2, True, "1"):
@@ -178,6 +208,7 @@ class CompatibilityTests(unittest.TestCase):
         root = Path(directory)
         names = [compatibility.POLICY, "CMakeLists.txt", "tools/configure/authored.py",
                  "tools/configure/configure.py", "tools/configure/runtime.py",
+                 "tools/configure/ir.py",
                  "tools/configure/assembly.schema.json", "tools/configure/factory.py", "cmake/package/package_source_sdk.py",
                  "cmake/package/NexusConfigVersion.cmake.in", "boards/native_reference/board.json",
                  "soc/native/soc.json", "soc/native/routes.json"]
