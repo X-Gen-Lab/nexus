@@ -12,9 +12,11 @@
 #include <stdint.h>
 typedef struct {
     uint32_t ISER[3];
+    uint32_t ICER[3];
     uint32_t ISPR[3];
+    uint32_t ICPR[3];
     uint32_t IABR[3];
-    uint8_t priority[96];
+    uint8_t IPR[96];
     uint32_t pending_on_enable;
 } nx_stm32_io_nvic_model_t;
 extern nx_stm32_io_nvic_model_t g_nx_stm32_io_nvic;
@@ -48,9 +50,9 @@ void nx_stm32_model_nvic_clear(int irq);
 #define NVIC_GetPendingIRQ(irq)   nx_stm32_model_nvic_bit(NVIC->ISPR, (int)(irq))
 #define NVIC_GetActive(irq)       nx_stm32_model_nvic_bit(NVIC->IABR, (int)(irq))
 #define NVIC_ClearPendingIRQ(irq) nx_stm32_model_nvic_clear((int)(irq))
-#define NVIC_GetPriority(irq)     (NVIC->priority[(unsigned)(irq)])
+#define NVIC_GetPriority(irq)     ((uint32_t)NVIC->IPR[(unsigned)(irq)] >> 4U)
 #define NVIC_SetPriority(irq, value)                                           \
-    (NVIC->priority[(unsigned)(irq)] = (uint8_t)(value))
+    (NVIC->IPR[(unsigned)(irq)] = (uint8_t)((value) << 4U))
 #define NVIC_EnableIRQ(irq)             nx_stm32_model_nvic_enable((int)(irq))
 #define NX_STM32_IO_POLL(kind, port)    nx_stm32_model_io_poll(kind, port)
 #define NX_STM32_CLEAR_FLAGS(reg, mask) ((reg) &= ~(unsigned)(mask))

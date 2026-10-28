@@ -228,6 +228,23 @@ typedef struct {
     bool active;
     bool fault;
 } nx_stm32h743_adc_state_t;
+/** \brief Immutable exact ADC1 resources and inspected supply facts. */
+typedef struct {
+    ADC_TypeDef* registers;
+    ADC_TypeDef* peer;
+    ADC_Common_TypeDef* common;
+    GPIO_TypeDef* gpio;
+    uint32_t reference_mv;
+    uint32_t supply_mv;
+    uint32_t poll_limit;
+} nx_stm32h743_adc_config_t;
+/** \brief Bind a cold ADC1 owner before acquiring its existing C lifecycle.
+ * \param[in,out] port: Exclusive static state; live rebinding is refused.
+ * \param[in] config: Immutable resources; the config pointer is not retained.
+ * \return Status; retained effects require stop and platform pad restoration.
+ */
+nx_result_t nx_stm32h743_adc_prepare(nx_stm32h743_adc_state_t* port,
+                                     const nx_stm32h743_adc_config_t* config);
 extern const nx_adc_ops_t nx_stm32h743_adc_ops;
 /** \brief Acquire cold ADC12 domain, regulator and offset/linearity
  * calibration. \note Privileged unmasked task; Board owns VDDA and analog

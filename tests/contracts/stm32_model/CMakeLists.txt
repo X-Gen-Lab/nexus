@@ -8,6 +8,7 @@ add_executable(contract_stm32_system_model
 add_executable(contract_stm32_io_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/uart.c"
     "${stm32_root}/drivers/spi.c" "${stm32_root}/drivers/i2c.c"
+    "${stm32_root}/drivers/i2c_cold.c"
     "${stm32_root}/drivers/flash.c" "${stm32_root}/drivers/watchdog.c"
     "${stm32_root}/drivers/exti.c" "${stm32_root}/drivers/timer.c"
     "${stm32_root}/drivers/adc.c" "../stm32_io_test.c")
@@ -24,6 +25,7 @@ add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
     "${stm32_root}/drivers/timer.c" "${stm32_root}/drivers/spi.c"
     "${stm32_root}/drivers/i2c.c"
+    "${stm32_root}/drivers/i2c_cold.c"
     "../stm32_constructor_test.c")
 target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")

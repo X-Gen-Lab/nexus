@@ -95,6 +95,22 @@ rejected. Historical evidence keeps its original bytes and read-only verificatio
 CMake owns the source dependency graph; resolution does not discover software
 from device names or generate product workers.
 
+Firmware execution is C11 plus necessary architecture assembly. Python runs on
+the host to validate inputs and generate static C/H; the MCU has no Python
+interpreter. Hardware algorithms belong in C: register access, admission, waits,
+resource acquisition, rollback, stop and recovery. Generation connects immutable
+configuration, exact instances, factory getters and fixed IRQ handlers. Constant
+addresses and thin typed call sequences can remain generated without adding a
+runtime interpreter or another dispatch layer.
+
+This boundary is the migration target and a rule for new behavior. Some existing
+constructors and platform resource/preflight paths still emit C hardware helper
+bodies. Selected paths have moved to concrete C preparation; their full-family
+coverage remains open in the [delivery-completion ledger](../design/platform-delivery-completion.csv).
+Generated C and maintained C are compiled by the same toolchain. Moving an
+algorithm changes its maintenance and test ownership; actual performance and
+space changes require linked images and, for timing, real measurements.
+
 ![Actual compile-target dependency relationships](../assets/diagrams/build-targets.svg)
 
 FIG-02 is the checked compile graph. Vendor and provider includes remain private;

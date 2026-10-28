@@ -7,6 +7,28 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f103_provider.h"
+/** \brief Cold binding observes no hardware and never activates the IWDG. */
+nx_result_t nx_stm32f103_watchdog_prepare(
+    nx_stm32f103_watchdog_state_t* p, IWDG_TypeDef* registers, RCC_TypeDef* rcc,
+    FLASH_TypeDef* flash, DBGMCU_TypeDef* debug, uint32_t poll_limit) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || registers == NULL || rcc == NULL || flash == NULL ||
+        debug == NULL || poll_limit == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->state.enabled || p->preparation_retained) {
+        return NX_ERROR_BUSY;
+    }
+    p->registers = registers;
+    p->rcc = rcc;
+    p->flash = flash;
+    p->debug = debug;
+    p->poll_limit = poll_limit;
+    return NX_SUCCESS;
+}
 static void bounds(nx_watchdog_state_t* state, uint32_t divisor,
                    uint32_t count) {
     uint64_t clocks = (uint64_t)divisor * count * 1000000U;

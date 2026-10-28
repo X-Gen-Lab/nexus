@@ -18,6 +18,14 @@ They do not establish current support or qualification.
 
 - Keep the default C11 path statically assembled and allocation-free: Core,
   Arch, SoC, typed I/O, optional OS/owner adapters, optional common components.
+- Maintain firmware hardware algorithms directly in C11 (with necessary Arch
+  assembly): register access/readback, admission, waiting, peripheral lifecycle,
+  rollback and recovery. Host Python validates configuration and generates static
+  configuration, storage, faces, factory and fixed connections. Generated thin
+  IRQ entries and explicit typed call ordering are permitted. Do not maintain
+  hardware algorithms as generated C strings or introduce a runtime register
+  script interpreter. Track remaining migration by complete selected paths,
+  including preflight, platform resources, shared owners and resume.
 - Public device APIs use Nexus types and immutable interface faces. Vendor SDKs
   and mutable provider state remain private. Instances share read-only typed
   operations tables; callbacks receive the instance context, never the table.

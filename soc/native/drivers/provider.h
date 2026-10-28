@@ -163,6 +163,21 @@ typedef struct nx_native_i2c_endpoint_state {
     uint8_t address;
 } nx_native_i2c_endpoint_state_t;
 
+/** \brief Immutable selected SPI endpoint connections for cold preparation. */
+typedef struct {
+    nx_native_spi_endpoint_state_t* endpoint;
+    uint8_t* memory;
+    size_t size;
+} nx_native_spi_endpoint_config_t;
+
+/** \brief Immutable selected I2C endpoint connections for cold preparation. */
+typedef struct {
+    nx_native_i2c_endpoint_state_t* endpoint;
+    uint8_t* memory;
+    size_t size;
+    uint8_t address;
+} nx_native_i2c_endpoint_config_t;
+
 extern const nx_gpio_ops_t nx_native_gpio_ops;
 extern const nx_uart_ops_t nx_native_uart_ops;
 extern const nx_spi_ops_t nx_native_spi_ops;
@@ -218,6 +233,11 @@ void nx_native_uart_fault_instance(nx_native_uart_state_t* state,
                                    bool start_failure, bool hold_drain);
 size_t nx_native_uart_transmitted_instance(const nx_native_uart_state_t* state);
 nx_result_t nx_native_spi_port_configure_instance(nx_native_spi_state_t* state);
+/** \brief Validate all endpoint connections before opening an idle model. */
+nx_result_t
+nx_native_spi_prepare(nx_native_spi_state_t* state,
+                      const nx_native_spi_endpoint_config_t* endpoints,
+                      size_t count);
 /** \brief Close an idle bus; active controller occupancy retains its state. */
 nx_result_t nx_native_spi_stop_instance(nx_native_spi_state_t* state);
 nx_result_t
@@ -229,6 +249,11 @@ void nx_native_spi_fault_instance(nx_native_spi_state_t* state,
 bool nx_native_spi_cs_active_instance(
     const nx_native_spi_endpoint_state_t* state);
 nx_result_t nx_native_i2c_port_configure_instance(nx_native_i2c_state_t* state);
+/** \brief Validate all addressed model connections before opening the bus. */
+nx_result_t
+nx_native_i2c_prepare(nx_native_i2c_state_t* state,
+                      const nx_native_i2c_endpoint_config_t* endpoints,
+                      size_t count);
 /** \brief Close an idle bus without claiming physical stuck-bus recovery. */
 nx_result_t nx_native_i2c_stop_instance(nx_native_i2c_state_t* state);
 nx_result_t nx_native_i2c_configure_instance(
@@ -264,6 +289,10 @@ nx_result_t nx_native_exti_emit_instance(nx_native_exti_state_t* state,
 nx_result_t nx_native_pwm_configure_instance(nx_native_pwm_state_t* state,
                                              uint32_t tick_hz,
                                              uint32_t period_ticks);
+/** \brief Stage the complete fixed PWM selection with output stopped. */
+nx_result_t nx_native_pwm_prepare(nx_native_pwm_state_t* state,
+                                  uint32_t tick_hz, uint32_t period_ticks,
+                                  uint32_t duty_ticks);
 /** \brief Drive inactive output and withdraw the platform timer binding. */
 nx_result_t nx_native_pwm_stop_instance(nx_native_pwm_state_t* state);
 nx_result_t nx_native_adc_configure_instance(nx_native_adc_state_t* state,

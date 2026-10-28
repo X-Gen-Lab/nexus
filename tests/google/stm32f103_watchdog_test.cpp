@@ -36,6 +36,21 @@ TEST_F(F103Watchdog, OneSecondUsesNominal40KhzAnd30To60KhzBounds) {
     EXPECT_TRUE(g_f103_model.watchdog_enabled);
     EXPECT_EQ(1U, g_f103_model.feeds);
 }
+TEST_F(F103Watchdog, ColdPreparePreservesIrreversibleOwnerAndNeverFeeds) {
+    state.state.enabled = true;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32f103_watchdog_prepare(&state, &g_f103_model.watchdog, RCC,
+                                            FLASH, &g_f103_model.debug, 8U));
+    EXPECT_EQ(state.poll_limit, 3U);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+    EXPECT_EQ(g_f103_model.feeds, 0U);
+    state.state.enabled = false;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32f103_watchdog_prepare(&state, &g_f103_model.watchdog, RCC,
+                                            FLASH, &g_f103_model.debug, 8U));
+    EXPECT_EQ(state.poll_limit, 8U);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+}
 TEST_F(F103Watchdog, InvalidTimeoutRejectsBeforeHardwareEffects) {
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_watchdog_port_enable(&face, 99, false, &observed));

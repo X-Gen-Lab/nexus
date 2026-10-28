@@ -206,14 +206,88 @@ trace, so a trace cannot be reused with changed workload/acquisition conditions.
 | `duration` | `s` | `monotonic_timestamp` | Retain the actual elapsed workload interval and monotonic-clock calibration |
 
 Each trace is a strict schema-2 `physical_hil_trace` object with `metric`, `unit`,
-`method`, `admission_sha256`, `context_sha256` and `samples`. Non-cycle samples
+`method`, `admission_sha256`, `context_sha256` and `samples`. Scalar non-cycle samples
 are objects `{sequence, value}`: sequence starts at zero and is contiguous;
 values are finite, nonnegative and bounded by unsigned 64-bit range. Stack use
 and lost-event counts require integers and stay within their context bound.
-A trace contains 1..100000 samples; a run contains 1..7 unique maintained metrics,
+A scalar trace contains 1..100000 samples; a run contains 1..10 unique maintained metrics,
 exactly matching the admission's budgets. The validator derives minimum, maximum,
 mean and count from the retained samples; it never trusts supplied statistics.
 Every sample must satisfy the corresponding lower and upper budget.
+
+**Paired voltage/current power and energy.**
+
+The default generic plan retains its seven existing cases. Opt in to paired raw
+voltage/current acquisition with `measure.py plan --power` to add `power_mean`
+(`W`), `power_peak` (`W`) and `energy` (`J`). This is an unbound checklist: budgets
+remain null and physical status remains `not_executed`. Equipment adapters and
+actual measurements still require the existing station and workload admission.
+
+Power uses the existing schema-2 context, trace, validation and comparison
+pipeline. Each metric's context selects `method=paired_voltage_current`; its
+`instrument` identity binds a calibration JSON. The usual `resolution` and
+`observation_window_s` are required. Additional `power` conditions are:
+
+| Field | Contract |
+| --- | --- |
+| `supply_domain`, `included_loads[]` | Explicit measured supply and nonempty, unique load identities |
+| `probe_influence` | Describe probe, UART/USB, board loads and other measurement influence |
+| `anti_alias_filter`, `bandwidth_hz` | Describe actual filtering and bandwidth; bandwidth must not exceed sampling Nyquist |
+| `sample_period_ns`, `interval_tolerance_ns` | Positive cadence and bounded allowed interval error |
+| `maximum_pair_skew_ns` | Bounded maximum V/I timestamp difference |
+| `window_start_ns`, `window_end_ns` | Nonnegative, strictly ordered endpoints, containing a whole number of sample periods |
+
+The instrument JSON has schema 1 and kind
+`physical_hil_power_calibration`, with `station_id`, `instrument_id`,
+`calibration_id`, `calibrated_utc`, `valid_until_utc`, `timebase`, `voltage` and
+`current`. The validity interval must cover the actual run. `timebase` records
+`unit=ns`, positive `resolution_ns` and nonnegative `accuracy_ppm` below one
+million. Timing tolerances cannot claim finer resolution than the instrument.
+Each channel records `unit`, positive `gain`, `offset`, `minimum`, `maximum`
+and positive `resolution` in its input units. Accepted voltage units are `V` and
+`mV`; current units are `A`, `mA` and `uA`. Samples must be in the declared input
+range. SI conversion is `(raw * gain + offset) * unit_scale`; this contract
+supports bounded nonnegative consumption, not signed regenerative energy.
+
+A power trace's `samples` contain `{sequence, capture}`, where `capture` is an
+ordinary retained file identity (`path`, `sha256`, `size`), never a summary value.
+The capture has schema 1, kind `physical_hil_power_capture`, the current
+`admission_sha256` and `context_sha256`, `dropped_samples=0`, `overrange=false`
+and a `samples` array. Each sample contains `sequence`, `voltage_time_ns`,
+`current_time_ns`, `voltage` and `current`. Sequences are contiguous from zero;
+V timestamps strictly increase with the reviewed cadence, V/I skew is bounded,
+and both timestamp streams remain inside the admitted window. First and last V
+timestamps exactly cover its endpoints. The expected number of samples derives
+from the window and cadence; missing, repeated, reordered, overrange or dropped
+samples reject. The window duration must match `observation_window_s` and fit the recorded run duration; instrument nanosecond endpoints are not an independently verified UTC anchor.
+At most 128 captures and 100000 aggregate paired points are accepted per metric. The same raw bytes, identified by SHA-256 and size, cannot be repeated within one metric even through another path. One capture may supply different derived metrics such as mean power, sampled peak power and energy.
+
+The validator multiplies calibrated V and I at each pair and integrates those
+sampled products with the trapezoidal rule. `power_mean` is integrated energy
+divided by the window duration; `power_peak` is the largest *sampled* product;
+`energy` is the integral in joules. The output retains each raw capture and
+calibration identity, sample count, duration and integration method. Numeric
+budgets apply to these derived observations; calibration declarations are not
+independently authenticated and no propagated uncertainty or between-sample
+peak bound is claimed. Choose sample rate, bandwidth, ranges and engineering
+margin against the actual equipment and workload.
+
+Use existing `measure.py validate` and `compare`. Comparison revalidates all raw
+inputs and additionally keeps the power supply, loads, instrument/calibration,
+window and cadence equal through the existing exact-condition comparison.
+Failure reports cannot overwrite nested raw capture files. Tool tests use
+synthetic data and establish no physical power, energy or timing result.
+
+功耗采集通过 `measure.py plan --power` 显式加入，默认七项保持不变。新增平均功率、
+采样峰值功率和能量必须来自与站点准入和采集上下文绑定的原始配对电压／电流；
+不接受汇总数值。校准文件明确单位、范围、增益、偏移、有效期及时间基准，采集条件
+明确供电域、板载／探针影响、带宽、采样周期、配对偏差和完整窗口。缺样、重复、
+乱序、超量程、错误单位、过期校准和身份不符均拒绝。
+
+工具对校准后的逐对 V×I 作梯形积分，得到焦耳能量；平均功率为能量除以窗口时长，
+峰值只表示采样点中的最大功率。预算针对这些派生观察，不证明校准真实性、传播后
+的不确定度或采样点之间的峰值。比较继续使用同一准入、负载、供电、校准和窗口合同。
+同一指标内不得通过不同路径重复同一摘要和字节数的原始采集；一份采集可以分别用于平均功率、采样峰值和能量。软件回归没有操作设备，所有未执行的实板功耗与时序仍保持 `not_executed`。
 
 Cycle samples contain `{sequence, begin, end}` and reject a supplied `value`.
 Each endpoint contains exactly `counter`, `cycle_domain`, `cycle_epoch`,

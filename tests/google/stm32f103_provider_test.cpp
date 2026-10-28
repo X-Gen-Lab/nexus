@@ -73,6 +73,61 @@ TEST_F(F103Provider, ExactOversample16NearestDivisorAndNoDma) {
     EXPECT_TRUE(state.initialized);
     EXPECT_TRUE(state.retained);
 }
+TEST_F(F103Provider, ColdGpioPreparationPreservesRetainedSelection) {
+    nx_stm32f103_gpio_state_t selected{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f103_gpio_prepare(&selected, 32U, true, 32U));
+    EXPECT_EQ(selected.registers, &g_f103_model.gpio);
+    EXPECT_TRUE(selected.initialized);
+    uint32_t before = g_f103_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32f103_gpio_prepare(&selected, 16U, false, 0U));
+    EXPECT_EQ(selected.mask, 32U);
+    EXPECT_TRUE(selected.output);
+    EXPECT_EQ(g_f103_model.writes, before);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f103_gpio_stop(&selected, 0U));
+}
+TEST_F(F103Provider, InvalidColdGpioSelectionHasNoRegisterEffects) {
+    nx_stm32f103_gpio_state_t selected{};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32f103_gpio_prepare(&selected, 1U, true, 1U));
+    EXPECT_EQ(selected.registers, nullptr);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+}
+TEST_F(F103Provider, ColdUartPreparationRejectsRetainedStateBeforeRebinding) {
+    const nx_stm32f103_uart_config_t config{&registers,
+                                            ring,
+                                            sizeof(ring),
+                                            115200U,
+                                            {NX_IRQ_KERNEL_NONE, 43U, 4U, 0U}};
+    state.retained = true;
+    state.baud = 9600U;
+    EXPECT_EQ(nx_stm32f103_uart_prepare(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(state.baud, 9600U);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+    state.retained = false;
+    ASSERT_EQ(nx_stm32f103_uart_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_TRUE(state.initialized);
+    EXPECT_EQ(state.baud, 115200U);
+    EXPECT_EQ(state.rx_storage, ring);
+    ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+}
+TEST_F(F103Provider, ColdUartInvalidRingRejectsBeforePinConfiguration) {
+    const nx_stm32f103_uart_config_t config{
+        &registers, nullptr, 2U, 115200U, {NX_IRQ_KERNEL_NONE, 43U, 4U, 0U}};
+    EXPECT_EQ(nx_stm32f103_uart_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(F103Provider, ColdUartAliasedRingRejectsBeforePinConfiguration) {
+    const nx_stm32f103_uart_config_t config{&registers,
+                                            reinterpret_cast<uint8_t*>(&state),
+                                            sizeof(state),
+                                            115200U,
+                                            {NX_IRQ_KERNEL_NONE, 43U, 4U, 0U}};
+    EXPECT_EQ(nx_stm32f103_uart_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+    EXPECT_EQ(state.rx_storage, ring);
+}
 TEST_F(F103Provider, UnsupportedProfileRejectsBeforeWrites) {
     state.profile = NX_UART_RX_BLOCKS;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,

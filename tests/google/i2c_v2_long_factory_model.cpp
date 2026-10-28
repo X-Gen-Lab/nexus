@@ -69,8 +69,6 @@ constexpr uint32_t byte_mask = I2C_CR2_NBYTES;
 #if defined(NX_I2C_LONG_U575)
 
 SPI_TypeDef u5_spi{};
-ADC_TypeDef u5_adc{};
-ADC_Common_TypeDef u5_adc_common{};
 #endif
 void tick() {
 #if defined(NX_I2C_LONG_G474)
@@ -148,12 +146,11 @@ extern "C" void nx_i2c_long_factory_reset(void) {
     nx_u575_devices_reset();
     g_u575_i2c_registers = {};
     u5_spi = {};
-    u5_adc = {};
-    u5_adc_common = {};
     g_u575_i2c = &g_u575_i2c_registers;
     g_u575_spi = &u5_spi;
-    g_u575_adc = &u5_adc;
-    g_u575_adc_common = &u5_adc_common;
+    /* Generated readonly ADC configuration uses these same fixed addresses. */
+    g_u575_adc = ADC4;
+    g_u575_adc_common = ADC4_COMMON;
     g_u575_physical_flash = &g_u575_model.flash;
     g_u575_model.flash.NSCR = FLASH_NSCR_LOCK | FLASH_NSCR_OPTLOCK;
     g_u575_model.rcc.AHB3ENR = RCC_AHB3ENR_PWREN;

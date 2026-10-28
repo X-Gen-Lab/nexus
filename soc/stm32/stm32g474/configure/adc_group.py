@@ -209,16 +209,7 @@ def constructor(item, result, binding):
         f"    .watchdog = {'true' if options.watchdog else 'false'},",
         f"    .watchdog_low = {lower}u, .watchdog_high = {upper}u,",
         "    .priority = 5u, .exclusive = true", "};",
-        f"static nx_result_t prepare_{name}(void) {{",
-        f"    if ({state}.retained) {{ return NX_ERROR_BUSY; }}",
-        "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~15u);",
-        "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | 15u);",
-        "    nx_arch_dsb();",
-        "    if ((NX_G474_READ(&GPIOA->PUPDR) & 15u) != 0u ||",
-        "        (NX_G474_READ(&GPIOA->MODER) & 15u) != 15u) {",
-        "        return NX_ERROR_IO;", "    }",
-        f"    return nx_stm32g474_adc_group_initialize(&{state}, &{config});",
-        "}", "void ADC1_2_IRQHandler(void);",
+        "void ADC1_2_IRQHandler(void);",
         r"/** \brief Observe selected ADC group OVR/AWD/JEOS facts. */",
         "void ADC1_2_IRQHandler(void) { "
         f"nx_stm32g474_adc_group_adc_irq(&{state}); }}"]
@@ -228,5 +219,6 @@ def constructor(item, result, binding):
                   "void DMA1_Channel1_IRQHandler(void) { "
                   f"nx_stm32g474_adc_group_dma_irq(&{state}); }}"]
     return Construction("nx_stm32g474_adc_group_state_t", tuple(lines),
-                        DirectCall(f"prepare_{name}"),
+                        DirectCall("nx_stm32g474_adc_group_initialize",
+                                   (Address(state), Address(config))),
                         (DirectCall("nx_stm32g474_adc_group_close", (Address(state),)),), True)

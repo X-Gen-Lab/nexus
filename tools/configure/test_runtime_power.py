@@ -1,10 +1,11 @@
 """Exact selected lifecycle lease, with System time retained during I/O pause."""
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 import tempfile
 import unittest
 
 from tools.configure import bindings, configure as gate
+from soc.stm32.stm32h743.configure.runtime_power import resolve_runtime_power
 
 
 class RuntimePowerConfigurationTests(unittest.TestCase):
@@ -48,6 +49,50 @@ class RuntimePowerConfigurationTests(unittest.TestCase):
         self.assertEqual(source.count('static nx_clock_lease_t '), 1)
         self.assertIn('nx_clock_domain_acquire(', source)
         self.assertIn('nx_clock_domain_release(', source)
+
+    def test_logical_controller_name_does_not_select_physical_hardware(self):
+        for name in ('sensor_link', 'bus7'):
+            with self.subTest(name=name):
+                base = self.base.replace('bus4', name)
+                power = ('[power]\nmode="fixed-run"\ncontrollers=["' +
+                         name + '"]\n')
+                result = gate.resolve_ir(self.assembly(power, base))
+                self.assertEqual(result.runtime_power.controllers, (name,))
+                self.assertEqual(result.controllers[0].id, name)
+                self.assertEqual(result.controllers[0].controller, 'SPI4')
+                self.assertEqual(result.devices[0].controller, name)
+                header, source = bindings.emit(result)
+                self.assertIn('nx_platform_runtime_pause(', header)
+                self.assertIn('s_nx_port_' + name, source)
+                self.assertNotIn('s_nx_port_bus4', source)
+
+    def test_renamed_controller_requires_matching_power_reference(self):
+        with self.assertRaises(ValueError):
+            gate.resolve_ir(self.assembly(base=
+                self.base.replace('bus4', 'sensor_link')))
+
+    def test_logical_id_freedom_keeps_the_exact_hardware_contract(self):
+        base = self.base.replace('bus4', 'sensor_link')
+        power = {'mode': 'fixed-run', 'controllers': ['sensor_link']}
+        result = gate.resolve_ir(self.assembly(
+            '[power]\nmode="fixed-run"\ncontrollers=["sensor_link"]\n', base))
+        controller = result.controllers[0]
+        endpoint = result.devices[0]
+        unsupported = (
+            replace(result, cpu_profile=replace(result.cpu_profile,
+                                                backend='freertos')),
+            replace(result, clock_profile='hsi64-fixed-cache-on'),
+            replace(result, controllers=(replace(controller,
+                                                 controller='SPI5'),)),
+            replace(result, controllers=(replace(controller,
+                                                 mode='short-poll'),)),
+            replace(result, devices=(replace(endpoint, options=replace(
+                endpoint.options, mode=1)),)),
+        )
+        for index, selected in enumerate(unsupported):
+            with self.subTest(case=index), self.assertRaisesRegex(
+                    ValueError, 'supports only'):
+                resolve_runtime_power(power, selected)
 
     def test_unselected_default_keeps_no_runtime_state_or_public_api(self):
         result = gate.resolve_ir(self.assembly(''))

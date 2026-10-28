@@ -41,6 +41,11 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
+include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_basic_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/gd32_cold_pins.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/gd32_i2c_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/g474_pin_state.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
@@ -221,6 +226,7 @@ nexus_google_test(nexus_gd32_multi_test SOURCES gd32_multi_test.cpp
     "${gd_multi_root}/drivers/uart.c" "${gd_multi_root}/drivers/spi.c"
     "${gd_multi_root}/drivers/gpio.c"
     "${gd_multi_root}/drivers/i2c.c"
+    "${gd_multi_root}/drivers/i2c_cold.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
@@ -415,6 +421,9 @@ target_compile_options(nexus_gd32_uart_stream_test PRIVATE
 nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
     SOURCES i2c_register_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
+        stm32_i2c_storage_model.c
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
         "${NEXUS_SOURCE_DIR}/arch/include")
@@ -429,6 +438,8 @@ target_compile_options(nexus_stm32_i2c_register_test PRIVATE
 
 nexus_google_test(nexus_gd32_i2c_register_test
     SOURCES i2c_register_test.cpp "${gd_multi_root}/drivers/i2c.c"
+        "${gd_multi_root}/drivers/i2c_cold.c"
+        "${gd_multi_root}/drivers/gpio.c" gd32_i2c_storage_model.c
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
@@ -451,7 +462,12 @@ foreach(i2c_family generic stm32 gd32)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_async_register_model.h")
     if(i2c_family STREQUAL "stm32")
         target_sources(${i2c_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_async.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_async.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
+            stm32_i2c_storage_model.c)
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32f4_official(${i2c_target})
         target_include_directories(${i2c_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${i2c_target} SYSTEM PRIVATE
@@ -462,9 +478,13 @@ foreach(i2c_family generic stm32 gd32)
             NX_I2C_TEST_STM32 NEXUS_STM32_MODEL STM32F407xx)
     elseif(i2c_family STREQUAL "gd32")
         target_sources(${i2c_target} PRIVATE
-            "${gd_multi_root}/drivers/i2c_async.c")
+            "${gd_multi_root}/drivers/i2c_async.c"
+            "${gd_multi_root}/drivers/i2c_cold.c"
+            "${gd_multi_root}/drivers/gpio.c"
+            "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c"
+            "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c")
         target_include_directories(${i2c_target} PRIVATE
-            "${gd_multi_root}/private"
+            "${gd_multi_root}" "${gd_multi_root}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
         target_include_directories(${i2c_target} SYSTEM PRIVATE
             "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"

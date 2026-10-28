@@ -36,6 +36,19 @@ typedef struct {
     uint8_t line, priority, saved_mux;
     bool initialized, retained, closing, loss;
 } nx_gd32f303_exti_state_t;
+/** \brief Selected EXTI event storage, edge and independently checked policy.
+ */
+typedef struct {
+    nx_exti_event_t* storage;
+    size_t capacity;
+    nx_irq_policy_t irq_policy;
+    nx_exti_edge_t edge;
+    uint8_t line;
+    uint8_t priority;
+} nx_gd32f303_exti_config_t;
+/** \brief Prepare exact GPIOA EXTI after rejecting retained publishers. */
+nx_result_t nx_gd32f303_exti_prepare(nx_gd32f303_exti_state_t* port,
+                                     const nx_gd32f303_exti_config_t* config);
 #define NX_GD303_EXTI      ((nx_gd32f303_exti_registers_t*)(uintptr_t)EXTI)
 #define NX_GD303_EXTI_MUX  ((nx_gd32f303_exti_mux_t*)(uintptr_t)AFIO)
 #define NX_GD303_EXTI_GPIO ((nx_gd32f303_exti_gpio_t*)(uintptr_t)GPIOA)

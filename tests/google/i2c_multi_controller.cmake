@@ -3,17 +3,25 @@
 foreach(i2c_multi_family stm32f407 gd32f470)
     set(i2c_multi_target "nexus_${i2c_multi_family}_i2c_multi_controller_test")
     nexus_google_test(${i2c_multi_target} SOURCES i2c_multi_controller_test.cpp
+        i2c_instruction_barrier_model.c
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async/i2c_v1_async.c"
         "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/i2c_async.c"
+        "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/i2c_cold.c"
+        "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/gpio.c"
         LIBRARIES Nexus::IO
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
             "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async"
+            "${NEXUS_SOC_SOURCE_${i2c_multi_family}}"
             "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/private"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_compile_options(${i2c_multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_multi_controller_model.h")
     if(i2c_multi_family STREQUAL "stm32f407")
+        target_sources(${i2c_multi_target} PRIVATE
+            stm32_i2c_storage_model.c)
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32f4_official(${i2c_multi_target})
         target_include_directories(${i2c_multi_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         target_compile_definitions(${i2c_multi_target} PRIVATE
@@ -21,6 +29,9 @@ foreach(i2c_multi_family stm32f407 gd32f470)
     else()
         set(i2c_multi_vendor
             "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+        target_sources(${i2c_multi_target} PRIVATE
+            "${i2c_multi_vendor}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c"
+            "${i2c_multi_vendor}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c")
         target_include_directories(${i2c_multi_target} SYSTEM PRIVATE
             "${i2c_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
             "${i2c_multi_vendor}/GD32F4xx_standard_peripheral/Include")

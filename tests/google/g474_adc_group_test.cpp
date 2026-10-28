@@ -171,6 +171,34 @@ class G474ADCGroup : public testing::Test {
         }
     }
 };
+TEST_F(G474ADCGroup, ColdInitializationOwnsOnlyTheTwoAnalogPadTransitions) {
+    GPIOA->MODER = 0xA5A5A5A0U;
+    GPIOA->PUPDR = 0x5A5A5A5FU;
+    Initialize();
+    EXPECT_EQ(0xA5A5A5AFU, GPIOA->MODER);
+    EXPECT_EQ(0x5A5A5A50U, GPIOA->PUPDR);
+}
+TEST_F(G474ADCGroup, RefusedAnalogPadRetainsCleanupBeforeCalibration) {
+    GPIOA->MODER = 0U;
+    g_ag.refused = &GPIOA->MODER;
+    g_ag.held_bits = 15U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_stm32g474_adc_group_initialize(&hardware, &config));
+    EXPECT_FALSE(hardware.initialized);
+    EXPECT_TRUE(hardware.retained);
+    EXPECT_EQ(0U, ADC12_COMMON->CCR);
+    EXPECT_EQ(ADC_CR_DEEPPWD, ADC1->CR);
+}
+TEST_F(G474ADCGroup, ForeignConverterRejectsBeforeAnalogPadChanges) {
+    GPIOA->MODER = 0U;
+    GPIOA->PUPDR = 15U;
+    ADC2->CR = ADC_CR_ADEN;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32g474_adc_group_initialize(&hardware, &config));
+    EXPECT_EQ(0U, GPIOA->MODER);
+    EXPECT_EQ(15U, GPIOA->PUPDR);
+    EXPECT_FALSE(hardware.retained);
+}
 TEST_F(G474ADCGroup, InvalidPrivateZeroRankInfoRejectsWithoutAccessOrOutput) {
     EXPECT_EXIT(
         ([&]() {

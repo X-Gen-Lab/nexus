@@ -6,12 +6,53 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_basic_cold.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_gpio.h"
 
 #ifndef NX_STM32_GPIO_CLOCK_READ
 #define NX_STM32_GPIO_CLOCK_READ(reg) (*(reg))
 #endif
+
+nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
+                                  const nx_stm32_gpio_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->mask == 0U ||
+        (config->mask & ~UINT32_C(0xFFFF)) != 0U ||
+        (config->initial & ~config->mask) != 0U)
+        return NX_ERROR_INVALID;
+    if (port->initialized)
+        return NX_ERROR_BUSY;
+    unsigned index;
+    for (index = 0U; index < 9U; ++index) {
+        GPIO_TypeDef* bank =
+            (GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE +
+                                       (uintptr_t)index * UINT32_C(0x400));
+        if (config->registers == bank)
+            break;
+    }
+#ifdef NEXUS_STM32_MODEL
+    if (config->registers == GPIOA)
+        index = 0U;
+#endif
+    if (index == 9U || g_nx_stm32_system.rcc == NULL)
+        return NX_ERROR_INVALID;
+    uint32_t bit = 1U << index;
+    uint32_t saved_clock = g_nx_stm32_system.rcc->AHB1ENR & bit;
+    nx_result_t result = nx_stm32_gpio_clock_enable(index);
+    if (result != NX_SUCCESS) {
+        g_nx_stm32_system.rcc->AHB1ENR =
+            (g_nx_stm32_system.rcc->AHB1ENR & ~bit) | saved_clock;
+        nx_arch_dsb();
+        return result;
+    }
+    port->registers = config->registers;
+    port->mask = config->mask;
+    port->output = config->output;
+    /* All initialize rejection conditions precede the first pin write. */
+    return nx_stm32_gpio_initialize(port, config->initial);
+}
 
 /** \brief Preload output levels before exposing the configured output mode. */
 nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,

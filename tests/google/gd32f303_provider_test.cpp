@@ -49,6 +49,25 @@ TEST_F(GD303Provider, ForeignMaskRejectsBeforeClock) {
     EXPECT_EQ(NX_ERROR_INVALID, nx_gd32f303_pins_acquire(&lease, 1U << 13U));
     EXPECT_EQ(0U, g_gd303_writes);
 }
+TEST_F(GD303Provider, ColdGpioPreparationPreservesRetainedSelection) {
+    nx_gd32f303_gpio_state_t selected{};
+    RCU_APB2EN = RCU_APB2EN_PAEN;
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_gpio_prepare(&selected, 32U, true, 32U));
+    uint32_t before = g_gd303_writes;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_gd32f303_gpio_prepare(&selected, 16U, false, 0U));
+    EXPECT_EQ(selected.mask, 32U);
+    EXPECT_TRUE(selected.output);
+    EXPECT_EQ(g_gd303_writes, before);
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_gpio_stop(&selected, 0U));
+}
+TEST_F(GD303Provider, InvalidColdGpioSelectionHasNoRegisterEffects) {
+    nx_gd32f303_gpio_state_t selected{};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_gd32f303_gpio_prepare(&selected, 1U, true, 1U));
+    EXPECT_EQ(selected.mask, 0U);
+    EXPECT_EQ(g_gd303_writes, 0U);
+}
 
 class GD303UART : public GD303Provider {
   protected:
@@ -80,6 +99,52 @@ TEST_F(GD303UART, ExactDividerAndReadonlySharedOperations) {
     EXPECT_EQ(USART_CTL0_UEN | USART_CTL0_REN | USART_CTL0_TEN |
                   USART_CTL0_RBNEIE | USART_CTL0_PERRIE,
               USART_CTL0(USART0));
+}
+TEST_F(GD303UART, ColdUartPreparationRejectsRetainedStateBeforeRebinding) {
+    RCU_APB2EN = RCU_APB2EN_PAEN | RCU_APB2EN_AFEN | RCU_APB2EN_USART0EN;
+    USART_STAT0(USART0) = USART_STAT0_TC | USART_STAT0_TBE;
+    const nx_gd32f303_uart_config_t config{
+        reinterpret_cast<nx_gd32f303_uart_registers_t*>(
+            static_cast<uintptr_t>(USART0)),
+        ring,
+        sizeof(ring),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 60U, 4U, 0U}};
+    state.retained = true;
+    state.baud = 9600U;
+    EXPECT_EQ(nx_gd32f303_uart_prepare(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(state.baud, 9600U);
+    EXPECT_EQ(g_gd303_writes, 0U);
+    state.retained = false;
+    ASSERT_EQ(nx_gd32f303_uart_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_TRUE(state.initialized);
+    EXPECT_EQ(state.rx_storage, ring);
+    ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+}
+TEST_F(GD303UART, ColdUartInvalidRingRejectsBeforePinConfiguration) {
+    const nx_gd32f303_uart_config_t config{
+        reinterpret_cast<nx_gd32f303_uart_registers_t*>(
+            static_cast<uintptr_t>(USART0)),
+        nullptr,
+        2U,
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 60U, 4U, 0U}};
+    EXPECT_EQ(nx_gd32f303_uart_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(g_gd303_writes, 0U);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(GD303UART, ColdUartAliasedRingRejectsBeforePinConfiguration) {
+    RCU_APB2EN = RCU_APB2EN_PAEN | RCU_APB2EN_AFEN | RCU_APB2EN_USART0EN;
+    const nx_gd32f303_uart_config_t config{
+        reinterpret_cast<nx_gd32f303_uart_registers_t*>(
+            static_cast<uintptr_t>(USART0)),
+        reinterpret_cast<uint8_t*>(&state),
+        sizeof(state),
+        115200U,
+        {NX_IRQ_KERNEL_NONE, 60U, 4U, 0U}};
+    EXPECT_EQ(nx_gd32f303_uart_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(g_gd303_writes, 0U);
+    EXPECT_EQ(state.rx_storage, nullptr);
 }
 TEST_F(GD303UART, FinalWireTcPrecedesSettlementAndReferenceRelease) {
     Start();

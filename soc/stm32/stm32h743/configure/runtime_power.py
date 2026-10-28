@@ -7,20 +7,22 @@ def resolve_runtime_power(value, result):
     """Admit only the explicit single SPI4 finite-DMA software reference."""
     if (not isinstance(value, dict) or set(value) != {'mode', 'controllers'} or
             value['mode'] != 'fixed-run' or
-            value['controllers'] != ['bus4']):
-        fail('power requires fixed-run and exactly controllers=["bus4"]')
+            not isinstance(value['controllers'], list) or
+            len(value['controllers']) != 1 or
+            not isinstance(value['controllers'][0], str)):
+        fail('power requires fixed-run and exactly one selected controller ID')
+    selected_id = value['controllers'][0]
     controllers = result.controllers
     if (result.soc_family != 'stm32h743' or result.backend != 'baremetal' or
             result.clock_profile != 'hsi64-fixed-cache-off' or
-            len(controllers) != 1 or controllers[0].id != 'bus4' or
+            len(controllers) != 1 or controllers[0].id != selected_id or
             controllers[0].kind != 'spi' or controllers[0].mode != 'dma' or
             controllers[0].controller != 'SPI4' or
             len(result.devices) != 1 or
-            result.devices[0].controller != 'bus4' or
+            result.devices[0].controller != selected_id or
             result.devices[0].options.mode != 0):
         fail('power supports only baremetal H743 fixed64 cache-off SPI4 finite DMA')
-    return RuntimePowerIR('fixed-run', ('bus4',))
-
+    return RuntimePowerIR('fixed-run', (selected_id,))
 
 
 def runtime_functions(result, context_guard, initialize):

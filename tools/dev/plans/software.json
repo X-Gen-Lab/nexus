@@ -846,7 +846,9 @@
         "--tool",
         "clang-tidy",
         "--report",
-        "{output}/tidy.json"
+        "{output}/tidy.json",
+        "--parallel",
+        "2"
       ],
       "timeout_s": 7200
     },
@@ -862,7 +864,9 @@
         "--tool",
         "cppcheck",
         "--report",
-        "{output}/cppcheck.json"
+        "{output}/cppcheck.json",
+        "--parallel",
+        "2"
       ],
       "timeout_s": 7200
     },

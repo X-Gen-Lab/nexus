@@ -5,7 +5,7 @@ import unittest
 
 from tools.configure import bindings, configure, factory
 from tools.configure import selection as selection_rules
-from tools.configure.providers import common
+from tools.configure.providers import common, maintained
 
 
 class AdcMappingTests(unittest.TestCase):
@@ -59,6 +59,43 @@ class AdcMappingTests(unittest.TestCase):
         claims = {claim.key for claim in result.resource_plan.claims}
         self.assertIn("controller:TIM6", claims)
         self.assertIn("dma:DMA1:stream1", claims)
+
+    def test_adc_lifecycle_is_c_owned_for_both_current_modes(self):
+        root = Path(__file__).resolve().parents[5]
+        for filename, implementation in (("acquisition.toml", "adc"),
+                                         ("acquisition-dma.toml", "adc_stream")):
+            with self.subTest(filename=filename):
+                result = configure.resolve_ir(
+                    root / "tests/contracts/g474_assembly" / filename)
+                item = next(item for item in result.controllers
+                            if item.kind == "adc")
+                construction = maintained(result.soc_family).constructor(
+                    item, result, result.board_bindings, result.routes,
+                    result.devices)
+                self.assertEqual(construction.initialize.function,
+                                 f"nx_stm32g474_{implementation}_prepare")
+                source = "\n".join(construction.definitions)
+                self.assertIn(f"static const nx_stm32g474_{implementation}_config_t", source)
+                self.assertNotIn("NX_G474_WRITE(&GPIOA->PUPDR", source)
+                self.assertNotIn("NX_G474_WRITE(&GPIOA->MODER", source)
+                self.assertNotIn(".reference_mv = 3300u;", source)
+
+    def test_control_construction_contains_no_runtime_hardware_algorithm(self):
+        root = Path(__file__).resolve().parents[5]
+        for relative in ("tests/contracts/g474_control_assembly/pwm-group.toml",
+                         "cmake/package/verification/io_evolution/g474-pwm-adc.toml"):
+            with self.subTest(relative=relative):
+                result = configure.resolve_ir(root / relative)
+                item = result.controllers[0]
+                construction = maintained(result.soc_family).constructor(
+                    item, result, result.board_bindings, result.routes,
+                    result.devices)
+                source = "\n".join(construction.definitions)
+                self.assertNotIn("NX_G474_WRITE", source)
+                self.assertNotIn("NX_G474_READ", source)
+                self.assertNotIn("while (", source)
+                self.assertNotIn("static nx_result_t prepare_", source)
+                self.assertNotIn("static nx_result_t stop_", source)
 
     def test_channel_and_sample_profile_cannot_fall_back(self):
         import importlib

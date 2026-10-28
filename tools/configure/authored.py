@@ -2,8 +2,10 @@
 import tomllib
 from dataclasses import dataclass
 from collections.abc import Mapping
+from types import MappingProxyType
 
 from tools.configure.ir import Record, freeze
+from tools.configure.contracts import CONTROLLER_CONTRACTS, CONTROLLER_KINDS
 
 
 @dataclass(frozen=True)
@@ -34,42 +36,11 @@ class AuthoredAssembly(Record):
     def projection(self):
         return {name: getattr(self, name) for name in self.source_fields}
 
-INSTANCE_FIELDS = {
-    "rtc": {"binding", "mode"},
-    "lptim": {"binding", "mode", "tick_hz", "irq"},
-    "adc_group": {"binding", "mode", "channels", "sample_times",
-                  "reference_mv", "exclusive", "silicon_profile", "trigger",
-                  "period_us", "watchdog", "irq"},
-    "pwm_adc": {"binding", "mode", "tick_hz", "period_ticks", "trigger_ticks",
-                "deadtime_ticks", "channels", "sample_times", "reference_mv",
-                "exclusive", "irq"},
-    "can_fd": {"binding", "mode", "bitrate", "data_bitrate", "event_capacity",
-               "drain_timeout_us", "poll_limit", "filters", "exclusive", "irq"},
-    "encoder": {"binding", "mode", "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
-    "pwm_group": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq"},
-    "timer_capture": {"binding", "mode", "tick_hz", "edge", "filter", "exclusive", "irq"},
-    "advanced_pwm": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks",
-                     "break_active_high", "idle_high", "idle_complement_high", "exclusive", "irq"},
-    "eth": {"binding", "mode", "tx_count", "rx_count", "rx_storage_bytes",
-            "address", "init_timeout_us", "drain_timeout_us", "irq"},
-    "usb_device": {"binding", "mode", "event_capacity", "rx_fifo_words",
-                   "vbus_sensing", "poll_limit", "drain_timeout_us",
-                   "clock_timeout_us", "irq"},
-    "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
-            "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
-    "gpio": {"binding", "mode"},
-    "uart": {"binding", "mode", "baud", "rx", "irq", "frame", "stream",
-             "fifo"},
-    "spi": {"binding", "mode", "max_hz", "irq"},
-    "i2c": {"binding", "mode", "max_hz", "irq", "timing"},
-    "flash": {"binding", "mode"},
-    "watchdog": {"binding", "mode"},
-    "exti": {"binding", "mode", "edge", "event_capacity", "irq"},
-    "pwm": {"binding", "mode", "period_ticks", "duty_ticks", "tick_hz"},
-    "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq", "stream"},
-}
-INSTANCE_FIELDS["eth_frames"] = set(INSTANCE_FIELDS["eth"])
-KINDS = set(INSTANCE_FIELDS)
+# Exact field objects are shared with selection and public interface metadata.
+INSTANCE_FIELDS = MappingProxyType(
+    {kind: contract.authored_fields
+     for kind, contract in CONTROLLER_CONTRACTS.items()})
+KINDS = frozenset(CONTROLLER_KINDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
                  "flash_load_limit_bytes", "regions", "mpu"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},

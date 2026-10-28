@@ -19,6 +19,21 @@ class QualificationPlanTests(unittest.TestCase):
         self.plan = load_json(ROOT / "tools/dev/plans/software.json")
         self.stages = self.plan["stages"]
 
+    def test_formal_analyzers_have_explicit_bounded_parallelism(self):
+        selected = [stage for stage in self.stages
+                    if stage["checker"] == "quality_tools"]
+        self.assertEqual({stage["name"] for stage in selected},
+                         {"tidy", "cppcheck"})
+        for stage in selected:
+            with self.subTest(stage=stage["name"]):
+                arguments = stage["args"]
+                self.assertIn("--parallel", arguments)
+                self.assertEqual(arguments[arguments.index("--parallel") + 1],
+                                 "2")
+                self.assertNotIn("--source", arguments)
+                self.assertNotIn("--filter", arguments)
+        validate_plan(self.plan)
+
     def test_each_native_preset_configures_builds_all_and_runs_full_ctest(self):
         for preset in ("native-debug", "native-release", "native-asan",
                        "native-tsan"):

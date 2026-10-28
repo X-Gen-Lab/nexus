@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
 from tools.configure.calls import DirectCall
-from tools.configure.providers import common, maintained
+from tools.configure.providers import common, descriptor, maintained
 
 
 class ConstructionContractTests(unittest.TestCase):
@@ -19,8 +19,11 @@ class ConstructionContractTests(unittest.TestCase):
             result.devices)
 
     def test_every_family_returns_explicit_immutable_construction(self):
+        seen = set()
         for relative in (
                 "tools/configure/assemblies/native.toml",
+                "tools/configure/assemblies/stm32-f103-baremetal.toml",
+                "tools/configure/assemblies/gd32-f303-baremetal-io.toml",
                 "tools/configure/assemblies/qiming-baremetal.toml",
                 "tools/configure/assemblies/liangshan-baremetal.toml",
                 "tests/contracts/g474_assembly/exti.toml",
@@ -28,6 +31,7 @@ class ConstructionContractTests(unittest.TestCase):
                 "tests/contracts/u575_assembly/io.toml"):
             with self.subTest(relative=relative):
                 result = self.resolve(relative)
+                seen.add(result.soc_family)
                 for item in result.controllers:
                     construction = self.construction(result, item)
                     self.assertIsInstance(construction,
@@ -44,6 +48,8 @@ class ConstructionContractTests(unittest.TestCase):
                         construction["definitions"]
                     with self.assertRaises(FrozenInstanceError):
                         construction.state_type = "foreign_state_t"
+
+        self.assertEqual(seen, {item.family for item in descriptor.families()})
 
     def test_shared_engines_and_secondary_controllers_keep_explicit_types(self):
         for relative in (

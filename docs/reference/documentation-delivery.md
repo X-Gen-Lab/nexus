@@ -110,6 +110,21 @@ CLI 的 `--qualification-reference /path/to/candidate.json` 可重复使用，�
 不同精确候选；不提供该选项时保存空列表。显式引用原件缺失时应修复定位或明确
 不选入，工具不会悄悄降级为已验证引用。
 
+`package`、`verify` 与 `restore` 可显式传入 `--report /path/to/result.json`，
+原子写入机器可读结果。schema 1 的 `nexus_documentation_delivery_result` 分别
+记录 `action`、`status`、`result` 和 `errors`，`qualification` 固定为 `false`。
+报告路径须位于源码、命令输入和输出闭包之外；安全准入后的执行失败写入真实失败
+报告，拒绝的非法报告路径不写入。人读 stdout 仍可包含包装器命令与日志，自动化
+直接读取报告文件，不能将整段 stdout 当作 JSON。消费者同时要求进程成功退出和
+本次报告的 `status=passed`；命令或路径准入失败时可能没有可安全写入的新报告，
+旧报告不能代替本次执行。
+
+`verify` 和 `restore` 的 `--expected-manifest-sha256` 要求保存于包外的原始
+manifest 摘要。只校验包内自带摘要与显式核对原始摘要是不同范围；报告如实记录
+实际命令结果。装包已经成功而外层后处理失败时，可先验证原归档，再从同一不可变
+归档继续恢复或发布；保留原失败记录，不覆盖包字节，也不把多次执行拼成一次正式
+软件计划通过。
+
 这是接口说明片段，路径由调用方显式提供；可执行命令和实际验收结果以统一 docs CLI
 及其本次交付 receipt 为准。
 

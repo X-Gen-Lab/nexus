@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure, factory
+from tools.configure.providers import maintained
 
 
 class G474ControlConfiguration(unittest.TestCase):
@@ -37,15 +38,36 @@ class G474ControlConfiguration(unittest.TestCase):
                          "controller:COMP1", "pin:PA1", "pin:PA4",
                          "pin:PA8", "pin:PA9", "pin:PA10"} <= claims)
 
-    def test_cold_provider_owns_comparator_settle_and_failure_cleanup(self):
-        _, source = bindings.emit(self.resolve())
-        self.assertIn("nx_stm32g474_pwm_group_initialize(", source)
-        self.assertIn("nx_stm32g474_pwm_group_close(", source)
+    def test_cold_assembly_connects_immutable_config_to_concrete_c_lifecycle(self):
+        result = self.resolve()
+        item, = result.controllers
+        construction = maintained(result.soc_family).constructor(
+            item, result, result.board_bindings, result.routes, result.devices)
+        self.assertEqual(construction.initialize.render(),
+                         "nx_stm32g474_pwm_group_prepare(&s_nx_port_wave, "
+                         "&s_nx_config_wave, &s_nx_cold_wave)")
+        self.assertEqual(tuple(call.render() for call in construction.stop),
+                         ("nx_stm32g474_pwm_group_release(&s_nx_port_wave, "
+                          "&s_nx_cold_wave)",))
+        self.assertTrue(construction.retain_on_failed_init)
+        definitions = "\n".join(construction.definitions)
+        self.assertIn("static const nx_stm32g474_pwm_group_config_t "
+                      "s_nx_config_wave", definitions)
+        self.assertIn("1000000u, 1000u, 170u", definitions)
+        self.assertIn("COMP_CSR_EN | COMP_CSR_INMSEL_2 | COMP_CSR_INMSEL_1",
+                      definitions)
+        self.assertIn("static nx_stm32g474_control_cold_t s_nx_cold_wave;",
+                      definitions)
+        self.assertNotIn("COMP1->CSR", definitions)
+        self.assertNotIn("NX_G474_SYSTEM_POLL", definitions)
+        self.assertNotIn("nx_stm32g474_pwm_group_initialize(", definitions)
+        # Actual C behavior is exercised by G474ControlFactory startup,
+        # partial-start rollback and retained comparator/vector failure tests.
+        _, source = bindings.emit(result)
+        self.assertIn(construction.initialize.render(), source)
+        self.assertIn(construction.stop[0].render(), source)
         self.assertIn("nx_stm32g474_pwm_group_irq(", source)
         self.assertIn("TIM1_BRK_TIM15_IRQHandler", source)
-        self.assertIn("COMP1->CSR", source)
-        self.assertIn("NX_G474_SYSTEM_POLL", source)
-        self.assertIn("6u", source)
         self.assertNotIn("nx_pwm_group_start(", source)
 
     def test_bad_geometry_and_implicit_ownership_have_no_fallback(self):

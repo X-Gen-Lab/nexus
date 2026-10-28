@@ -41,6 +41,21 @@ static nx_result_t delay(nx_stm32g474_adc_state_t* p, uint32_t us) {
     } while (--remaining != 0U);
     return NX_ERROR_TIMEOUT;
 }
+nx_result_t nx_stm32g474_adc_prepare(nx_stm32g474_adc_state_t* p,
+                                     const nx_stm32g474_adc_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (p->retained || p->initialized || p->active)
+        return NX_ERROR_BUSY;
+    p->registers = config->registers;
+    p->peer = config->peer;
+    p->common = config->common;
+    p->reference_mv = config->reference_mv;
+    p->poll_limit = config->poll_limit;
+    return nx_stm32g474_adc_initialize(p);
+}
 nx_result_t nx_stm32g474_adc_initialize(nx_stm32g474_adc_state_t* p) {
     if (!task())
         return NX_ERROR_CONTEXT;
@@ -60,6 +75,20 @@ nx_result_t nx_stm32g474_adc_initialize(nx_stm32g474_adc_state_t* p) {
         return NX_ERROR_STATE;
     p->retained = true;
     p->fault = false;
+#ifndef NX_G474_GPIOA
+#define NX_G474_GPIOA GPIOA
+#endif
+    /* The platform holds the pad snapshot until close succeeds. Keep the
+     * analog transition here so every caller observes the same readback.
+     */
+    NX_G474_WRITE(&NX_G474_GPIOA->PUPDR,
+                  NX_G474_READ(&NX_G474_GPIOA->PUPDR) & ~3U);
+    NX_G474_WRITE(&NX_G474_GPIOA->MODER,
+                  NX_G474_READ(&NX_G474_GPIOA->MODER) | 3U);
+    nx_arch_dsb();
+    if ((NX_G474_READ(&NX_G474_GPIOA->MODER) & 3U) != 3U ||
+        (NX_G474_READ(&NX_G474_GPIOA->PUPDR) & 3U) != 0U)
+        return NX_ERROR_IO;
     LL_ADC_SetCommonClock(p->common, LL_ADC_CLOCK_ASYNC_DIV128);
     nx_arch_dsb();
     if (NX_G474_READ(&p->common->CCR) != (10U << ADC_CCR_PRESC_Pos))

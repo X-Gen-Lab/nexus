@@ -17,7 +17,6 @@ def constructor(item, result, board_bindings, routes, devices):
     name = symbol(item.id)
     kind = item.kind
     state = f"&s_nx_port_{name}"
-    face = f"&s_nx_face_{name}"
     state_address = Address(f"s_nx_port_{name}")
     face_address = Address(f"s_nx_face_{name}")
     definitions = []
@@ -69,19 +68,13 @@ def constructor(item, result, board_bindings, routes, devices):
                 f"static nx_spi_dma_sequence_state_t {sequence} = {{",
                 f"    .backend = &nx_native_spi_dma_sequence_backend, .context = {state}",
                 "};"],
-            definitions=[f"static nx_result_t prepare_{name}(void) {{",
-                f"    if ({sequence}.active != NULL || {sequence}.cs_held || {sequence}.pending_release) {{ return NX_ERROR_BUSY; }}",
-                f"    nx_result_t status = nx_native_spi_dma_initialize({state});",
-                "    if (status != NX_SUCCESS) { return status; }",
-                f"    return nx_spi_dma_sequence_initialize(&{sequence},",
-                f"        &nx_native_spi_dma_sequence_backend, {state});", "}"],
-            initialize=DirectCall(f"prepare_{name}"),
+            definitions=[],
+            initialize=DirectCall("nx_native_spi_dma_prepare",
+                                  (state_address, Address(sequence))),
             stop=[DirectCall("nx_spi_dma_transaction_stop", (face_address,))],
             retain_on_failed_init=True)
     elif kind in {"spi", "i2c"}:
-        definitions = [f"static nx_result_t prepare_{name}(void) {{",
-                       f"    nx_result_t status = nx_native_{kind}_port_configure_instance({state});",
-                       "    if (status != NX_SUCCESS) { return status; }"]
+        endpoints = []
         for device in devices:
             if device.controller != item.id:
                 continue
@@ -89,11 +82,15 @@ def constructor(item, result, board_bindings, routes, devices):
             memory = f"s_nx_model_{child}" if device.options.model_bytes is not None else "NULL"
             size = device.options.model_bytes or 0
             address = f", {device.options.address}u" if kind == "i2c" else ""
-            definitions += [f"    status = nx_native_{kind}_configure_instance(",
-                            f"        &s_nx_endpoint_{child}, {state}, {memory}, {size}u{address});",
-                            "    if (status != NX_SUCCESS) { return status; }"]
-        definitions += ["    return NX_SUCCESS;", "}"]
-        initialize = DirectCall(f"prepare_{name}")
+            endpoints.append(f"    {{ &s_nx_endpoint_{child}, {memory}, "
+                             f"{size}u{address} }},")
+        if endpoints:
+            definitions = [
+                f"static const nx_native_{kind}_endpoint_config_t "
+                f"s_nx_endpoints_{name}[] = {{", *endpoints, "};"]
+        initialize = DirectCall(f"nx_native_{kind}_prepare", (
+            state_address, Symbol(f"s_nx_endpoints_{name}") if endpoints
+            else None, len(endpoints)))
         stop = [DirectCall("nx_spi_port_stop", (face_address,)) if kind == "spi"
                 else DirectCall("nx_native_i2c_stop_instance", (state_address,))]
     elif kind == "flash":
@@ -128,13 +125,9 @@ def constructor(item, result, board_bindings, routes, devices):
              capacity))
         stop = [DirectCall("nx_exti_port_stop", (face_address,))]
     elif kind == "pwm":
-        definitions = [f"static nx_result_t prepare_{name}(void) {{",
-                       f"    nx_result_t status = nx_native_pwm_configure_instance({state},",
-                       f"        {item.options.tick_hz}u, {item.options.period_ticks}u);",
-                       "    if (status != NX_SUCCESS) { return status; }",
-                       f"    return nx_pwm_port_set({face}, {item.options.period_ticks}u, {item.options.duty_ticks}u);",
-                       "}"]
-        initialize = DirectCall(f"prepare_{name}")
+        initialize = DirectCall("nx_native_pwm_prepare", (
+            state_address, item.options.tick_hz, item.options.period_ticks,
+            item.options.duty_ticks))
         stop = [DirectCall("nx_native_pwm_stop_instance", (state_address,))]
     elif kind == "adc":
         channels = item.options.channels

@@ -56,6 +56,29 @@ class H743Adc : public testing::Test {
         g_h743_model.adc = &registers;
     }
 };
+TEST_F(H743Adc, ColdPrepareKeepsLiveResourcesUntilSuccessfulStop) {
+    const nx_stm32h743_adc_config_t config{
+        &registers, &peer, &common, &g_h743_model.gpio_a, 3300U, 3300U, 64U};
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_adc_prepare(&state, &config));
+    ADC_TypeDef foreign{};
+    auto other = config;
+    other.registers = &foreign;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_adc_prepare(&state, &other));
+    EXPECT_EQ(&registers, state.registers);
+    EXPECT_EQ(0U, foreign.CR);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_adc_stop(&state));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_adc_prepare(&state, &config));
+}
+TEST_F(H743Adc, ColdPrepareRejectsInvalidSupplyBeforeAnyHardwareWrite) {
+    const nx_stm32h743_adc_config_t invalid{
+        &registers, &peer, &common, &g_h743_model.gpio_a, 3300U, 2000U, 64U};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_adc_prepare(nullptr, &invalid));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_adc_prepare(&state, nullptr));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_adc_prepare(&state, &invalid));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_FALSE(state.retained);
+}
 TEST_F(H743Adc, OffsetAndLinearityCalibrationPrecedeSingleShotPublication) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_adc_initialize(&state));
     EXPECT_TRUE(g_h743_model.adc_calibrated);

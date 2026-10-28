@@ -22,6 +22,8 @@ def includes(result):
         source.append('#include "stm32g474_acquisition.h"')
     if any(item.kind == "i2c" for item in result.controllers):
         source.append('#include "i2c_v2.h"')
+    if any(item.kind in {"pwm_group", "pwm_adc"} for item in result.controllers):
+        source.append('#include "stm32g474_control_cold.h"')
     if any(item.kind == "pwm_group" for item in result.controllers):
         source.append('#include "stm32g474_pwm_group.h"')
     if result.pwm_shared_owners:

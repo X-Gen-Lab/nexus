@@ -6,8 +6,26 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_basic_cold.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_iwdg.h"
+
+nx_result_t nx_stm32_watchdog_prepare(nx_stm32_watchdog_state_t* port,
+                                      uint32_t poll_limit) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || poll_limit == 0U)
+        return NX_ERROR_INVALID;
+    if (port->state.enabled || port->state.irreversible ||
+        port->preparation_retained || port->lsi_owned || port->debug_owned)
+        return NX_ERROR_BUSY;
+    port->registers = IWDG;
+    port->flash = FLASH;
+    port->debug = DBGMCU;
+    port->rcc = RCC;
+    port->poll_limit = poll_limit;
+    return NX_SUCCESS;
+}
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))

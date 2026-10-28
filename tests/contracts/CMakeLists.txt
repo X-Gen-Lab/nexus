@@ -49,7 +49,7 @@ nexus_behavior_test(contract_uart_adapter SOURCES components_uart.c
 set(gd32_driver_root "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers")
 set(gd32_vendor_root "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
 set(gd32_driver_sources)
-foreach(unit gpio uart spi i2c flash watchdog exti timer adc)
+foreach(unit gpio uart spi i2c i2c_cold flash watchdog exti timer adc)
     list(APPEND gd32_driver_sources "${gd32_driver_root}/${unit}.c")
 endforeach()
 nexus_behavior_test(contract_gd32_io SOURCES gd32_io_test.c

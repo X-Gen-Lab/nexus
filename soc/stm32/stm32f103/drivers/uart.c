@@ -356,6 +356,40 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     nx_arch_irq_restore(guard);
     return result;
 }
+/** \brief Platform owns pin/gate rollback after any retained preparation. */
+nx_result_t
+nx_stm32f103_uart_prepare(nx_stm32f103_uart_state_t* p,
+                          const nx_stm32f103_uart_config_t* config) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || config == NULL || config->registers == NULL ||
+        !span(config->rx_storage, config->rx_capacity) ||
+        config->rx_capacity > 4096U || config->baud == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->active != NULL || p->wake != NULL ||
+        p->wake_publishers != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (overlap(config->rx_storage, config->rx_capacity, p, sizeof(*p)) ||
+        overlap(config->rx_storage, config->rx_capacity, config->registers,
+                sizeof(*config->registers))) {
+        return NX_ERROR_INVALID;
+    }
+    p->registers = config->registers;
+    p->rx_storage = config->rx_storage;
+    p->rx_capacity = config->rx_capacity;
+    p->baud = config->baud;
+    p->irq = USART2_IRQn;
+    p->profile = NX_UART_RX_BYTES;
+    p->irq_policy = config->irq_policy;
+    nx_result_t result = nx_stm32f103_usart2_pins_prepare();
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    return nx_stm32f103_uart_initialize(p, 8000000U, 1000000U);
+}
 nx_result_t nx_stm32f103_uart_initialize(nx_stm32f103_uart_state_t* p,
                                          uint32_t clock, uint32_t limit) {
     if (!task_context())

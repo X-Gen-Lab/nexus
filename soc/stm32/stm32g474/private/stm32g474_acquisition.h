@@ -35,6 +35,14 @@ typedef struct {
     volatile bool active;
     volatile bool fault;
 } nx_stm32g474_adc_state_t;
+/** \brief Immutable exact ADC resources; the platform owns PA0 snapshots. */
+typedef struct {
+    ADC_TypeDef* registers;
+    ADC_TypeDef* peer;
+    ADC_Common_TypeDef* common;
+    uint32_t reference_mv;
+    uint32_t poll_limit;
+} nx_stm32g474_adc_config_t;
 typedef struct {
     nx_stm32g474_adc_state_t adc;
     TIM_TypeDef* timer;
@@ -54,6 +62,33 @@ typedef struct {
     volatile bool completed;
     bool stopping;
 } nx_stm32g474_adc_stream_state_t;
+/** \brief Immutable TIM6/DMA1 channel1 resources for one finite producer. */
+typedef struct {
+    nx_stm32g474_adc_config_t adc;
+    TIM_TypeDef* timer;
+    DMA_TypeDef* dma;
+    DMA_Channel_TypeDef* channel;
+    DMAMUX_Channel_TypeDef* mux;
+    const nx_dma_memory_region_t* regions;
+    size_t region_count;
+    nx_irq_policy_t irq_policy;
+} nx_stm32g474_adc_stream_config_t;
+/** \brief Bind a cold state and configure PA0 before calibrating the ADC.
+ * \param[in,out] port: Exclusive static state; live rebinding is rejected.
+ * \param[in] config: Immutable exact resources; no config pointer is retained.
+ * \return Status; partial acquisition requires close and platform pad restore.
+ * \note The platform holds the GPIO/ADC clocks and original PA0 snapshot.
+ */
+nx_result_t nx_stm32g474_adc_prepare(nx_stm32g474_adc_state_t* port,
+                                     const nx_stm32g474_adc_config_t* config);
+/** \brief Bind one cold finite engine and admit DMA before ADC setup.
+ * \param[in,out] port: Exclusive static engine with no loans or publishers.
+ * \param[in] config: Immutable resources; not retained after this call.
+ * \return Status; failures retain the existing close responsibility.
+ */
+nx_result_t
+nx_stm32g474_adc_stream_prepare(nx_stm32g474_adc_stream_state_t* port,
+                                const nx_stm32g474_adc_stream_config_t* config);
 extern const nx_adc_ops_t nx_stm32g474_adc_ops;
 extern const nx_adc_ops_t nx_stm32g474_adc_stream_ops;
 /** \brief Calibrate the cold ADC; its bulb sampler remains disabled.

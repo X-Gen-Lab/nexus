@@ -30,6 +30,10 @@ def includes(result):
     source = []
     source += ['#include "gd32f470_provider.h"', '#include "gd32f4xx.h"',
                '#include "system.h"']
+    if any(item.kind in {"uart", "i2c"} for item in selections):
+        source.append('#include "gd32f470_cold_pins.h"')
+    if any(item.kind == "i2c" for item in selections):
+        source.append('#include "gd32f470_i2c_cold.h"')
     if any(item.mode == "irq-words" for item in selections):
         source.append('#include "gd32f470_uart_word.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in selections):

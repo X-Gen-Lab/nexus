@@ -13,6 +13,25 @@ static bool checked(volatile uint32_t* reg, uint32_t value, uint32_t mask) {
     nx_arch_dsb();
     return (NX_F103_READ(reg) & mask) == (value & mask);
 }
+/** \brief Retained cold state rejects before replacing the selected facts. */
+nx_result_t nx_stm32f103_gpio_prepare(nx_stm32f103_gpio_state_t* p,
+                                      uint32_t mask, bool output,
+                                      uint32_t initial) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || (mask != 16U && mask != 32U) || (initial & ~mask) != 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized) {
+        return NX_ERROR_BUSY;
+    }
+    p->registers = NX_F103_GPIOA;
+    p->mask = mask;
+    p->output = output;
+    return nx_stm32f103_gpio_initialize(p, initial);
+}
 nx_result_t nx_stm32f103_gpio_initialize(nx_stm32f103_gpio_state_t* p,
                                          uint32_t initial) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||

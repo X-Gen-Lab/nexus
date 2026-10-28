@@ -47,6 +47,8 @@ foreach(multi_family stm32 gd32)
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+    target_sources(${multi_target} PRIVATE
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_cold.c")
     target_compile_options(${multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
         "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")

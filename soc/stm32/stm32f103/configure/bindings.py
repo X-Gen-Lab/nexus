@@ -1,6 +1,6 @@
 """Cold static F103 contexts; typed factory never constructs on the I/O path."""
 from .transport import PROFILE
-from tools.configure.calls import Address, DirectCall
+from tools.configure.calls import Address, DirectCall, Symbol
 from tools.configure.ir import ControllerIR
 from tools.configure.providers.common import Construction, fail, kernel_policy_constant
 
@@ -20,13 +20,9 @@ def constructor(item, result, board_bindings, routes, devices):
     definitions = []
     initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = {item.controller};",
-                        f"    {state}.mask = {item.options.mask}u;",
-                        f"    {state}.output = {'true' if item.mode == 'output' else 'false'};",
-                        f"    return nx_stm32f103_gpio_initialize(&{state}, {item.options.initial}u);",
-                        "}"]
+        initialize = DirectCall("nx_stm32f103_gpio_prepare", (
+            Address(state), item.options.mask, item.mode == "output",
+            item.options.initial))
         stop = DirectCall("nx_stm32f103_gpio_stop", (Address(state), item.options.initial))
     elif item.kind == "uart":
         options = item.options
@@ -35,21 +31,15 @@ def constructor(item, result, board_bindings, routes, devices):
             raise ValueError("F103 USART requires an explicit bounded byte ring")
         irq = result.irq
         definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = {item.controller};",
-                        f"    {state}.rx_storage = s_nx_rx_{name};",
-                        f"    {state}.rx_capacity = {capacity}u;",
-                        f"    {state}.baud = {options.baud}u;",
-                        f"    {state}.irq = {item.controller}_IRQn;",
-                        f"    {state}.profile = NX_UART_RX_BYTES;",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-                        "    nx_result_t status = nx_stm32f103_usart2_pins_prepare();",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32f103_uart_initialize(&{state}, 8000000u, 1000000u);",
-                        "}", f"void {item.controller}_IRQHandler(void);",
+                        f"static const nx_stm32f103_uart_config_t s_nx_uart_config_{name} = {{",
+                        f"    .registers = {item.controller}, .rx_storage = s_nx_rx_{name},",
+                        f"    .rx_capacity = {capacity}u, .baud = {options.baud}u,",
+                        f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }}",
+                        "};", f"void {item.controller}_IRQHandler(void);",
                         r"/** \brief One selected controller, at most one TX/RX byte. */",
                         f"void {item.controller}_IRQHandler(void) {{ nx_stm32f103_uart_irq(&{state}); }}"]
+        initialize = DirectCall("nx_stm32f103_uart_prepare", (
+            Address(state), Address(f"s_nx_uart_config_{name}")))
         stop = DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "spi":
         children = [child for child in devices if child.controller == item.id]
@@ -90,35 +80,26 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    return nx_stm32f103_gpio_stop(&{cs}, 16u);", "}"]
         stop = DirectCall(f"stop_{name}")
     elif item.kind == "watchdog":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.state.enabled || {state}.preparation_retained) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = IWDG;",
-                        f"    {state}.rcc = RCC;",
-                        f"    {state}.flash = FLASH;",
-                        f"    {state}.debug = DBGMCU;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        "    return NX_SUCCESS;", "}"]
+        initialize = DirectCall("nx_stm32f103_watchdog_prepare", (
+            Address(state), Symbol("IWDG"), Symbol("RCC"), Symbol("FLASH"),
+            Symbol("DBGMCU"), 1000000))
         stop = DirectCall("nx_stm32f103_watchdog_stop", (Address(state),))
     elif item.kind == "exti":
         options = item.options
         irq = result.irq
         line = int(item.controller[-1])
-        definitions += [f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = EXTI;",
-                        f"    {state}.mux = AFIO;",
-                        f"    {state}.gpio = GPIOA;",
-                        f"    {state}.storage = s_nx_events_{name};",
-                        f"    {state}.capacity = {options.event_capacity}u;",
-                        f"    {state}.line = {line}u;",
-                        f"    {state}.priority = {options.irq.priority}u;",
-                        f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-                        f"    return nx_stm32f103_exti_initialize(&{state});",
-                        "}", f"void EXTI{line}_IRQHandler(void);",
-                        r"/** \brief One selected line, one bounded coalesced edge fact. */",
-                        f"void EXTI{line}_IRQHandler(void) {{ nx_stm32f103_exti_irq(&{state}); }}"]
+        definitions += [
+            f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
+            f"static const nx_stm32f103_exti_config_t s_nx_exti_config_{name} = {{",
+            f"    .storage = s_nx_events_{name}, .capacity = {options.event_capacity}u,",
+            f"    .line = {line}u, .priority = {options.irq.priority}u,",
+            f"    .edge = NX_EXTI_{options.edge.upper()},",
+            f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }}",
+            "};", f"void EXTI{line}_IRQHandler(void);",
+            r"/** \brief One selected line and one bounded coalesced fact. */",
+            f"void EXTI{line}_IRQHandler(void) {{ nx_stm32f103_exti_irq(&{state}); }}"]
+        initialize = DirectCall("nx_stm32f103_exti_prepare", (
+            Address(state), Address(f"s_nx_exti_config_{name}")))
         stop = DirectCall("nx_exti_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind in {"adc", "pwm", "flash"}:
         if item.kind == "flash":

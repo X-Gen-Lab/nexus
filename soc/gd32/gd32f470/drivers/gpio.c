@@ -6,9 +6,14 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "gd32f470_cold_pins.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
 #include "private/system.h"
+
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
 
 /** \brief           Validate before the first clock or pin effect. */
 nx_result_t nx_gd32_gpio_initialize(nx_gd32_gpio_state_t* port, unsigned index,
@@ -191,4 +196,137 @@ nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
     uint32_t observed = RCU_AHB1EN;
     nx_gd32_peripheral_barrier();
     return (observed & bit) != 0U ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+/** \brief Validate the complete immutable set before any selected effect. */
+static bool cold_pins_valid(const nx_gd32_cold_pin_config_t* pins,
+                            size_t count) {
+    if (pins == NULL || count == 0U || count > 16U)
+        return false;
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_gd32_cold_pin_config_t* pin = &pins[i];
+        if (!valid_gpio(pin->registers) || pin->pin > 15U ||
+            pin->alternate > 15U || pin->mode > 3U || pin->pull > 2U)
+            return false;
+        for (size_t prior = 0U; prior < i; ++prior) {
+            if (pin->registers == pins[prior].registers &&
+                pin->pin == pins[prior].pin)
+                return false;
+        }
+    }
+    return true;
+}
+
+/** \brief The exact selected bank bit is independent of peripheral clocks. */
+static uint32_t cold_pin_gate(const nx_gd32_cold_pin_config_t* pin) {
+    return UINT32_C(1) << ((pin->registers - GPIOA) / 0x400U);
+}
+
+/** \brief Require the same privileged task contract as Platform startup. */
+static bool cold_pins_context(void) {
+    return nx_arch_is_privileged() && !nx_gd32_in_isr() &&
+           !nx_gd32_irq_masked();
+}
+
+/** \brief Prove drive removal before touching the former mux or latch. */
+static bool cold_pin_withdraw(const nx_gd32_cold_pin_config_t* pin) {
+    const uint32_t mask = 3U << (pin->pin * 2U);
+    const uint32_t mode = GPIO_CTL(pin->registers) & mask;
+    if (mode != 0U && mode != mask) {
+        NX_PLATFORM_REGISTER_WRITE(GPIO_CTL(pin->registers),
+                                   GPIO_CTL(pin->registers) | mask);
+        nx_arch_dsb();
+        if ((GPIO_CTL(pin->registers) & mask) != mask)
+            return false;
+    }
+    return true;
+}
+
+nx_result_t nx_gd32_cold_pins_prepare(const nx_gd32_cold_pin_config_t* pins,
+                                      size_t count, uint16_t* saved,
+                                      nx_gd32_cold_pins_receipt_t* receipt) {
+    if (!cold_pins_context())
+        return NX_ERROR_CONTEXT;
+    if (!cold_pins_valid(pins, count) || saved == NULL || receipt == NULL)
+        return NX_ERROR_INVALID;
+    if (receipt->captured != 0U)
+        return NX_ERROR_BUSY;
+    uint32_t mask = 0U;
+    for (size_t i = 0U; i < count; ++i)
+        mask |= cold_pin_gate(&pins[i]);
+    receipt->saved_clocks = RCU_AHB1EN & mask;
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_gd32_cold_pin_config_t* pin = &pins[i];
+        const uint32_t gate = cold_pin_gate(pin);
+        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN, RCU_AHB1EN | gate);
+        nx_arch_dsb();
+        if ((RCU_AHB1EN & gate) == 0U)
+            return NX_ERROR_IO;
+        saved[i] = nx_gd32_pin_capture(pin->registers, pin->pin);
+        receipt->captured |= (uint16_t)(1U << i);
+        nx_result_t status =
+            nx_gd32_pin_configure(pin->registers, pin->pin, pin->mode,
+                                  pin->alternate, pin->pull, pin->open_drain);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_gd32_cold_pins_rollback(const nx_gd32_cold_pin_config_t* pins,
+                                       size_t count, const uint16_t* saved,
+                                       nx_gd32_cold_pins_receipt_t* receipt) {
+    if (!cold_pins_context())
+        return NX_ERROR_CONTEXT;
+    if (!cold_pins_valid(pins, count) || saved == NULL || receipt == NULL ||
+        ((uint32_t)receipt->captured >> count) != 0U)
+        return NX_ERROR_INVALID;
+    uint32_t mask = 0U;
+    uint32_t retained = 0U;
+    nx_result_t result = NX_SUCCESS;
+    for (size_t i = count; i != 0U; --i) {
+        const nx_gd32_cold_pin_config_t* pin = &pins[i - 1U];
+        const uint32_t gate = cold_pin_gate(pin);
+        const uint16_t owned = (uint16_t)(1U << (i - 1U));
+        mask |= gate;
+        if ((receipt->captured & owned) == 0U)
+            continue;
+        bool restored = cold_pin_withdraw(pin);
+        if (restored) {
+            nx_gd32_pin_restore(pin->registers, pin->pin, saved[i - 1U]);
+            nx_arch_dsb();
+            restored =
+                nx_gd32_pin_capture(pin->registers, pin->pin) == saved[i - 1U];
+        }
+        if (restored) {
+            receipt->captured &= (uint16_t)~owned;
+        } else {
+            retained |= gate;
+            result = NX_ERROR_IO;
+        }
+    }
+    const uint32_t desired = receipt->saved_clocks | retained;
+    NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN, (RCU_AHB1EN & ~mask) | desired);
+    nx_arch_dsb();
+    if ((RCU_AHB1EN & mask) != desired)
+        return NX_ERROR_IO;
+    return result;
+}
+
+nx_result_t nx_gd32_cold_pins_release(const nx_gd32_cold_pin_config_t* pins,
+                                      size_t count) {
+    if (!cold_pins_context())
+        return NX_ERROR_CONTEXT;
+    if (!cold_pins_valid(pins, count))
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_gd32_cold_pin_config_t* pin = &pins[i];
+        if (!cold_pin_withdraw(pin))
+            return NX_ERROR_IO;
+        nx_result_t status =
+            nx_gd32_pin_configure(pin->registers, pin->pin, 0U, 0U, 0U, false);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
 }

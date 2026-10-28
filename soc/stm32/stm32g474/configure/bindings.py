@@ -146,75 +146,19 @@ def constructor(item, result, board_bindings, routes, devices):
         if board_bindings[item.binding].get("mask") != 1810 or board_bindings[item.binding].get("initial") != 0:
             fail("G474 coherent PWM requires explicit three-pin inactive-low Board facts")
         cfg = "s_nx_config_" + name
-        comp = "s_nx_comp_" + name
-        vector = "s_nx_vector_" + name
-        priority = "s_nx_priority_" + name
+        receipt = "s_nx_cold_" + name
         definitions += [
             f"static const nx_stm32g474_pwm_group_config_t {cfg} = {{",
             f"    {item.options.tick_hz}u, {item.options.period_ticks}u, {item.options.deadtime_ticks}u,",
             "    COMP_CSR_EN | COMP_CSR_INMSEL_2 | COMP_CSR_INMSEL_1, true };",
-            f"static struct {{ uint32_t saved; bool retained; }} {comp};",
-            f"static bool {vector};",
-            f"static uint8_t {priority};",
-            f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized || {comp}.retained || {vector}) {{ return NX_ERROR_BUSY; }}",
-            "    (void)NX_G474_READ(&RCC->APB2ENR);",
-            "    (void)NX_G474_READ(&RCC->APB2ENR);",
-            "    if ((NX_G474_READ(&RCC->APB2RSTR) & (RCC_APB2RSTR_TIM1RST | RCC_APB2RSTR_SYSCFGRST)) != 0u ||",
-            "        (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u || !NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) { return NX_ERROR_BUSY; }",
-            f"    {comp}.saved = NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE;",
-            f"    {comp}.retained = true;",
-            "    NX_G474_WRITE(&GPIOA->BSRR, 1792u << 16u);",
-            "    nx_arch_dsb();",
-            "    if ((NX_G474_READ(&GPIOA->ODR) & 1792u) != 0u) { return NX_ERROR_IO; }",
-            "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~((3u << 2u) | (3u << 8u)));",
-            "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | (3u << 2u) | (3u << 8u));",
-            "    nx_arch_dsb();",
-            "    if ((NX_G474_READ(&GPIOA->PUPDR) & ((3u << 2u) | (3u << 8u))) != 0u ||",
-            "        (NX_G474_READ(&GPIOA->MODER) & ((3u << 2u) | (3u << 8u))) != ((3u << 2u) | (3u << 8u))) { return NX_ERROR_IO; }",
-            f"    NX_G474_WRITE(&COMP1->CSR, {cfg}.comparator_csr);",
-            "    nx_arch_dsb();",
-            f"    if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {cfg}.comparator_csr) {{ return NX_ERROR_IO; }}",
-            "    uint64_t began = nx_stm32g474_system_now(&g_nx_stm32g474_system);",
-            "    uint32_t polls = 1000000u;",
-            "    while (nx_stm32g474_system_now(&g_nx_stm32g474_system) - began < 6u) {",
-            "        if (polls-- == 0u) { return NX_ERROR_TIMEOUT; }",
-            "        NX_G474_SYSTEM_POLL(&g_nx_stm32g474_system);",
-            "    }",
-            f"    nx_result_t status = nx_stm32g474_pwm_group_initialize(&{state}, &{cfg});",
-            "    if (status != NX_SUCCESS) { return status; }"]
-        for number in (8, 9, 10):
-            definitions += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {number}u, 6u);",
-                            "    if (status != NX_SUCCESS) { return status; }"]
-        definitions += [
-            f"    {priority} = (uint8_t)NX_G474_IRQ_PRIORITY(TIM1_BRK_TIM15_IRQn);",
-            f"    {vector} = true;",
-            "    return NX_G474_IRQ_CONTROL(TIM1_BRK_TIM15_IRQn, true, 5u);", "}",
+            f"static nx_stm32g474_control_cold_t {receipt};",
             "void TIM1_BRK_TIM15_IRQHandler(void);",
             r"/** \brief One exclusive TIM1/COMP1 latched break observation. */",
-            f"void TIM1_BRK_TIM15_IRQHandler(void) {{ nx_stm32g474_pwm_group_irq(&{state}); }}",
-            f"static nx_result_t stop_{name}(void) {{",
-            "    nx_result_t status;",
-            f"    if ({state}.initialized) {{",
-            f"        status = nx_pwm_group_stop(&s_nx_face_{name});",
-            "        if (status != NX_SUCCESS) { return status; }", "    }",
-            f"    if ({vector}) {{",
-            "        status = NX_G474_IRQ_CONTROL(TIM1_BRK_TIM15_IRQn, false, 0u);",
-            "        if (status != NX_SUCCESS) { return status; }",
-            "        if (!NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) { return NX_ERROR_BUSY; }",
-            f"        NX_G474_IRQ_PRIORITY_WRITE(TIM1_BRK_TIM15_IRQn, {priority});",
-            "        nx_arch_dsb(); nx_arch_isb();",
-            f"        if (NX_G474_IRQ_PRIORITY(TIM1_BRK_TIM15_IRQn) != {priority}) {{ return NX_ERROR_IO; }}",
-            f"        {vector} = false;", "    }",
-            f"    status = nx_stm32g474_pwm_group_close(&{state});",
-            "    if (status != NX_SUCCESS) { return status; }",
-            f"    if ({comp}.retained) {{",
-            f"        NX_G474_WRITE(&COMP1->CSR, {comp}.saved);",
-            "        nx_arch_dsb();",
-            f"        if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {comp}.saved) {{ return NX_ERROR_IO; }}",
-            f"        {comp}.retained = false;", "    }",
-            "    return NX_SUCCESS;", "}"]
-        stop = DirectCall(f"stop_{name}")
+            f"void TIM1_BRK_TIM15_IRQHandler(void) {{ nx_stm32g474_pwm_group_irq(&{state}); }}"]
+        initialize = DirectCall("nx_stm32g474_pwm_group_prepare",
+                                (Address(state), Address(cfg), Address(receipt)))
+        stop = DirectCall("nx_stm32g474_pwm_group_release",
+                          (Address(state), Address(receipt)))
     elif item.kind == "pwm":
         pin = item.pins[0]["pin"]
         idle = "s_nx_idle_" + name
@@ -272,40 +216,34 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = DirectCall("nx_stm32g474_flash_close", (Address(state),))
     elif item.kind == "adc":
         stream = item.mode == "trigger-dma"
-        target = state + (".adc" if stream else "")
+        config = "s_nx_config_" + name
         if stream:
             lines, count = dma_regions(name, result)
             if count == 0:
                 fail("G474 ADC DMA requires an explicit visible SRAM domain")
             definitions += lines
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({target}.retained || {target}.initialized || {target}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {target}.registers = ADC1;",
-                        f"    {target}.peer = ADC2;",
-                        f"    {target}.common = ADC12_COMMON;",
-                        f"    {target}.reference_mv = {item.options.reference_mv}u;",
-                        f"    {target}.poll_limit = 1000000u;",
-                        "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~3u);",
-                        "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | 3u);",
-                        "    nx_arch_dsb();",
-                        "    if ((NX_G474_READ(&GPIOA->MODER) & 3u) != 3u || (NX_G474_READ(&GPIOA->PUPDR) & 3u) != 0u) { return NX_ERROR_IO; }"]
+        config_type = ("nx_stm32g474_adc_stream_config_t" if stream else
+                       "nx_stm32g474_adc_config_t")
+        definitions += [f"static const {config_type} {config} = {{"]
+        if stream:
+            definitions.append("    .adc = {")
+        definitions += ["    .registers = ADC1, .peer = ADC2, .common = ADC12_COMMON,",
+                        f"    .reference_mv = {item.options.reference_mv}u, .poll_limit = 1000000u"]
         if stream:
             irq = result.irq
-            definitions += [f"    {state}.timer = TIM6;",
-                            f"    {state}.dma = DMA1;",
-                            f"    {state}.channel = DMA1_Channel1;",
-                            f"    {state}.mux = DMAMUX1_Channel0;",
-                            f"    {state}.regions = s_nx_dma_regions_{name};",
-                            f"    {state}.region_count = {count}u;",
-                            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-                            f"    return nx_stm32g474_adc_stream_initialize(&{state});", "}",
-                            "void DMA1_Channel1_IRQHandler(void);",
+            definitions += ["    }, .timer = TIM6, .dma = DMA1,",
+                            "    .channel = DMA1_Channel1, .mux = DMAMUX1_Channel0,",
+                            f"    .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
+                            f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }}"]
+        definitions.append("};")
+        implementation = "adc_stream" if stream else "adc"
+        initialize = DirectCall(f"nx_stm32g474_{implementation}_prepare",
+                                (Address(state), Address(config)))
+        stop = DirectCall(f"nx_stm32g474_{implementation}_close", (Address(state),))
+        if stream:
+            definitions += ["void DMA1_Channel1_IRQHandler(void);",
                             r"/** \brief One selected finite ADC block terminal observation. */",
                             f"void DMA1_Channel1_IRQHandler(void) {{ nx_stm32g474_adc_stream_irq(&{state}); }}"]
-            stop = DirectCall("nx_stm32g474_adc_stream_close", (Address(state),))
-        else:
-            definitions += [f"    return nx_stm32g474_adc_initialize(&{state});", "}"]
-            stop = DirectCall("nx_stm32g474_adc_close", (Address(state),))
     elif item.kind == "watchdog":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",

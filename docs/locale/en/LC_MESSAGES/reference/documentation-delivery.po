@@ -1,4 +1,4 @@
-# Independently reviewed translations; exact canonical source identity below.
+# Authored bilingual updates; exact current message coverage is verified.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8200f0266dff732c36cb6285ad11c9d7f40821ceac9abcdeb31e49072a57c3d4\n"
+"X-Nexus-Source-SHA256: f5455691f26b001ea0a0f0f93689c1a7155b827f52cffcb2966bbeb99247aded\n"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:1
+#: docs/reference/documentation-delivery.md:1
 msgid "文档包、发布与独立恢复"
 msgstr "Documentation packages, publication and independent restoration"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:3
+#: docs/reference/documentation-delivery.md:3
 msgid ""
 "本页说明 `tools/documentation/delivery.py` 的交付合同。目标是让同一份文档可以在线 "
 "阅读、离线阅读并从归档独立恢复，同时保留准确的源码和软件验证身份。文档交付 不增加固件测试资格，不代表物理 HIL、产品发布、安全认证或长期支持承诺。"
@@ -25,73 +25,73 @@ msgstr ""
 "delivery grants no new firmware qualification and establishes neither "
 "physical HIL, product release, safety certification nor long-term support."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:7
+#: docs/reference/documentation-delivery.md:7
 msgid "输入与身份"
 msgstr "Inputs and identity"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:9
+#: docs/reference/documentation-delivery.md:9
 msgid "交付输入是严格构建后的 HTML 根目录和当前 Git 源码。构建根必须包含："
 msgstr ""
 "Delivery consumes the strictly built HTML root and the current Git source. "
 "The build root must contain:"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "文件"
 msgstr "File"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "用途"
 msgstr "Purpose"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`index.html`"
 msgstr "`index.html`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "文档总入口"
 msgstr "Documentation entry"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`en/index.html`"
 msgstr "`en/index.html`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "英文入口"
 msgstr "English entry"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`zh_CN/index.html`"
 msgstr "`zh_CN/index.html`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "中文入口"
 msgstr "Chinese entry"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`api/index.html`"
 msgstr "`api/index.html`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "公共 API 入口"
 msgstr "Public API entry"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`licenses/LICENSE.txt`"
 msgstr "`licenses/LICENSE.txt`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "随包许可"
 msgstr "Packaged license"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "`documentation-build.json`"
 msgstr "`documentation-build.json`"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:0
+#: docs/reference/documentation-delivery.md:0
 msgid "构建时观测的源码和工具身份"
 msgstr "Source and tool identities observed during the build"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:20
+#: docs/reference/documentation-delivery.md:20
 msgid ""
 "本地图源、SVG、CSS、JavaScript、字体、下载说明和其他许可随实际构建产物一起登记。 网页资源使用相对路径，不能依赖在线 CDN。正常的 "
 "HTTP(S) 参考链接可以保留；离线 阅读的页面、脚本、样式和图片必须已经在包中。"
@@ -102,7 +102,7 @@ msgstr ""
 "HTTP(S) reference links may remain; pages, scripts, styles and images needed"
 " for offline reading must already be in the package."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:24
+#: docs/reference/documentation-delivery.md:24
 msgid ""
 "构建记录采用 schema 1，`kind` 为 `nexus_documentation_build`。其 `source` 使用 "
 "`tools.evidence.identity.observe_git_source()` 的实际观测结果，`tools` 保存实际工具 "
@@ -116,66 +116,70 @@ msgstr ""
 "rejects dirty source, missing or mismatched pinned submodules, and stale "
 "builds that do not match the current source."
 
+#: docs/reference/documentation-delivery.md:29
 msgid ""
-"版本号由既有严格 policy loader 从 `dependencies/platform-compatibility.json` 读取， "
-"该 JSON 是唯一人工维护的版本权威。CMake 调用同一 loader 派生版本，不从 `project(nexus VERSION "
-"...)` 文本反向推断版本。manifest 同时记录该 policy 的摘要、 接口 epoch 和 schema "
-"epochs；版本不一致、重复 JSON 键和非法常量均拒绝。 版本身份另外使用 明确的 `release_id`；格式示例为 "
-"`1.0.0-docs-g<commit>`，不表示当前平台版本。 这个身份只允许字母、数字、点、 下划线和短横线，不能携带目录或 URL。"
+"版本号由既有严格 policy loader 从 `dependencies/platform-compatibility.json` 读取， 该 "
+"JSON 是唯一人工维护的版本权威。CMake 调用同一 loader 派生版本，不从 `project(nexus VERSION ...)` "
+"文本反向推断版本。manifest 同时记录该 policy 的摘要、 接口 epoch 和 schema epochs；版本不一致、重复 JSON "
+"键和非法常量均拒绝。 版本身份另外使用 明确的 `release_id`；格式示例为 `1.0.0-docs-g<commit>`，不表示当前平台版本。"
+" 这个身份只允许字母、数字、点、 下划线和短横线，不能携带目录或 URL。"
 msgstr ""
 "The existing strict policy loader reads the version from "
 "`dependencies/platform-compatibility.json`, which is the sole authored "
-"version authority. CMake calls the same loader to derive the version "
-"rather than inferring it from the `project(nexus VERSION ...)` text. The"
-" manifest also records the policy digest, interface epoch and schema "
-"epochs; inconsistent versions, duplicate JSON keys and invalid constants"
-" are rejected. A separate explicit `release_id` identifies the release; "
-"`1.0.0-docs-g<commit>` is a format example and does not imply the "
-"current platform version. This identity permits only letters, digits, "
-"dots, underscores and hyphens, and cannot contain a directory or URL."
+"version authority. CMake calls the same loader to derive the version rather "
+"than inferring it from the `project(nexus VERSION ...)` text. The manifest "
+"also records the policy digest, interface epoch and schema epochs; "
+"inconsistent versions, duplicate JSON keys and invalid constants are "
+"rejected. A separate explicit `release_id` identifies the release; "
+"`1.0.0-docs-g<commit>` is a format example and does not imply the current "
+"platform version. This identity permits only letters, digits, dots, "
+"underscores and hyphens, and cannot contain a directory or URL."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:36
+#: docs/reference/documentation-delivery.md:38
 msgid "manifest 分开记录三类身份："
 msgstr "The manifest distinguishes three identities:"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:38
+#: docs/reference/documentation-delivery.md:40
 msgid "`documentation_source`：构建时完整 commit／tree 和文档目录的限定树摘要。"
 msgstr ""
 "`documentation_source`: the full build-time commit/tree and the scoped tree "
 "digest of documentation directories."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:39
+#: docs/reference/documentation-delivery.md:41
 msgid "`code_source`：同一 checkout 的完整 commit／tree 和平台代码目录的限定树摘要。"
 msgstr ""
 "`code_source`: the full commit/tree of the same checkout and the scoped tree"
 " digest of platform code directories."
 
+#: docs/reference/documentation-delivery.md:42
 msgid ""
-"`qualification_references[]`：显式选入的原候选；每项保留自身源码、配置摘要、 ELF／BIN／map "
-"摘要及字节数、六个 qualified scopes 和候选文件身份。"
+"`qualification_references[]`：显式选入的原候选；每项保留自身源码、配置摘要、 ELF／BIN／map 摘要及字节数、六个 "
+"qualified scopes 和候选文件身份。"
 msgstr ""
-"`qualification_references[]`: explicitly selected original candidates; "
-"each retains its own source, configuration digest, ELF/BIN/map digests "
-"and sizes, six qualified scopes and candidate file identity."
+"`qualification_references[]`: explicitly selected original candidates; each "
+"retains its own source, configuration digest, ELF/BIN/map digests and sizes,"
+" six qualified scopes and candidate file identity."
 
+#: docs/reference/documentation-delivery.md:45
 msgid ""
 "前两项可能来自同一 Git 提交，但覆盖的目录不同。schema 2 的第三项是显式列表， "
 "默认没有引用；不再从固定历史结果索引推断资格。每份候选必须先通过现有 "
-"`tools.evidence.candidate.verified_projection()` 的完整原件校验；缺失或篡改原件、 "
-"重复候选与非法 scope 在输出前拒绝。不同候选保持各自源码、配置及产物身份， 不能合并成全平台通过。`physical_status` "
-"固定为 `not_executed`。"
+"`tools.evidence.candidate.verified_projection()` 的完整原件校验；缺失或篡改原件、 重复候选与非法 "
+"scope 在输出前拒绝。不同候选保持各自源码、配置及产物身份， 不能合并成全平台通过。`physical_status` 固定为 "
+"`not_executed`。"
 msgstr ""
 "The first two identities may come from the same Git commit but cover "
-"different directories. The third identity in schema 2 is an explicit "
-"list, empty by default; qualification is no longer inferred from a fixed"
-" historical result index. Each candidate must first pass the existing "
+"different directories. The third identity in schema 2 is an explicit list, "
+"empty by default; qualification is no longer inferred from a fixed "
+"historical result index. Each candidate must first pass the existing "
 "`tools.evidence.candidate.verified_projection()` verification of the "
 "complete original closure; missing or tampered originals, duplicate "
 "candidates and invalid scopes are rejected before output. Different "
-"candidates keep their own source, configuration and artifact identities;"
-" they cannot be merged into a whole-platform pass. `physical_status` "
-"remains `not_executed`."
+"candidates keep their own source, configuration and artifact identities; "
+"they cannot be merged into a whole-platform pass. `physical_status` remains "
+"`not_executed`."
 
+#: docs/reference/documentation-delivery.md:51
 msgid ""
 "文档包只保存已校验的精简引用，不复制候选配置、源码 SDK 或大型原始日志。 离线 `verify()` "
 "校验该引用的结构和被封存字节，不重新校验未随包复制的候选闭包， 也不赋予当前 HEAD 新软件资格。原 candidate locator "
@@ -184,34 +188,34 @@ msgid ""
 "`verification.offline` 为 `reference_metadata_only`， "
 "`verification.original_evidence_included` 为 `false`；离线包不伪报原件重验成功。"
 msgstr ""
-"The documentation package retains only verified compact references, "
-"without copying candidate configurations, source SDKs or large raw logs."
-" Offline `verify()` checks the structure and sealed bytes of those "
-"references; it does not reverify the candidate closure omitted from the "
-"package or grant new software qualification to the current HEAD. The "
-"original candidate locator identifies a location on the original host, "
-"not a download URL. To recheck a software candidate, recover its "
-"originals and run the original candidate verifier. Each entry sets "
-"`verification.at_packaging` to `original_candidate_closure`, "
-"`verification.offline` to `reference_metadata_only`, and "
-"`verification.original_evidence_included` to `false`; an offline package"
-" does not falsely report successful reverification of originals."
+"The documentation package retains only verified compact references, without "
+"copying candidate configurations, source SDKs or large raw logs. Offline "
+"`verify()` checks the structure and sealed bytes of those references; it "
+"does not reverify the candidate closure omitted from the package or grant "
+"new software qualification to the current HEAD. The original candidate "
+"locator identifies a location on the original host, not a download URL. To "
+"recheck a software candidate, recover its originals and run the original "
+"candidate verifier. Each entry sets `verification.at_packaging` to "
+"`original_candidate_closure`, `verification.offline` to "
+"`reference_metadata_only`, and `verification.original_evidence_included` to "
+"`false`; an offline package does not falsely report successful "
+"reverification of originals."
 
+#: docs/reference/documentation-delivery.md:59
 msgid ""
 "旧 schema 1 包仅保留只读验证／恢复，仍按原 `qualified_code` 字段解释。 新打包只产生 schema "
 "2，不能把旧索引身份默认为新交付的受测代码。"
 msgstr ""
-"Historical schema 1 packages retain only read-only "
-"verification/restoration and are interpreted using their original "
-"`qualified_code`. New packaging produces schema 2 only; a historical "
-"index identity cannot implicitly become the tested code of a new "
-"delivery."
+"Historical schema 1 packages retain only read-only verification/restoration "
+"and are interpreted using their original `qualified_code`. New packaging "
+"produces schema 2 only; a historical index identity cannot implicitly become"
+" the tested code of a new delivery."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:45
+#: docs/reference/documentation-delivery.md:62
 msgid "文件与摘要合同"
 msgstr "File and digest contract"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:47
+#: docs/reference/documentation-delivery.md:64
 msgid ""
 "`documentation-manifest.json` 的 `files` 只列实际 payload，每项包含标准化相对路径、 字节数和 "
 "SHA-256。manifest、`SHA256SUMS`、归档本身及执行 receipt 不进入这个表， 避免摘要自引用。`SHA256SUMS` "
@@ -223,7 +227,7 @@ msgstr ""
 "to avoid digest self-reference. `SHA256SUMS` covers payload and manifest, "
 "but not itself."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:51
+#: docs/reference/documentation-delivery.md:68
 msgid ""
 "manifest 摘要和归档摘要由交付命令返回，保存在包外的执行证据及远程发布记录中。 独立恢复时传入保存的 manifest 摘要；这能检测 "
 "payload 和 manifest 是否偏离原交付。 摘要校验不是签名，不能认证作者或抵抗已经控制全部信任来源的攻击者。"
@@ -234,7 +238,7 @@ msgstr ""
 "payload or manifest. Digest verification is not a signature: it cannot "
 "authenticate authors or defeat an attacker controlling every trust source."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:55
+#: docs/reference/documentation-delivery.md:72
 msgid ""
 "构建 metadata 的 `status` 必须为 `passed`。`failed`、`running`、缺失状态和陈旧 "
 "成功记录不能装包；即使手工重算 manifest 与摘要，独立验证仍拒绝失败构建记录。"
@@ -244,45 +248,45 @@ msgstr ""
 "verification still rejects a failed build record even if someone manually "
 "recalculates the manifest and digests."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:58
+#: docs/reference/documentation-delivery.md:75
 msgid "验证同时检查："
 msgstr "Verification also checks:"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:60
+#: docs/reference/documentation-delivery.md:77
 msgid "manifest schema、源码身份、语言、工具记录和软件资格引用是否完整。"
 msgstr ""
 "Completeness of manifest schema, source identity, languages, tool records "
 "and software qualification references."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:61
+#: docs/reference/documentation-delivery.md:78
 msgid "文件闭包是否精确；缺失文件、额外文件、重复记录、摘要或字节数不符均拒绝。"
 msgstr ""
 "An exact file closure: missing or extra files, duplicate entries, digest "
 "mismatches and byte-count mismatches reject."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:62
+#: docs/reference/documentation-delivery.md:79
 msgid "必需入口和许可是否存在；页面、资源、anchor 是否可在包内找到。"
 msgstr ""
 "Required entries and licenses, with pages, resources and anchors resolvable "
 "within the package."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:63
+#: docs/reference/documentation-delivery.md:80
 msgid "路径是否标准化；绝对路径、目录逃逸、symlink、tar hardlink 和重复成员均拒绝。"
 msgstr ""
 "Normalized paths: absolute paths, directory escape, symlinks, tar hardlinks "
 "and duplicate members reject."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:64
+#: docs/reference/documentation-delivery.md:81
 msgid "归档是否只包含正常文件，数量和总字节数是否超过工具上限。"
 msgstr ""
 "Only regular archive files, with member count and total bytes within tool "
 "limits."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:66
+#: docs/reference/documentation-delivery.md:83
 msgid "装包与恢复"
 msgstr "Packaging and restoration"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:68
+#: docs/reference/documentation-delivery.md:85
 msgid ""
 "`package()` 在独立临时目录完成验证、文件复制和归档，再安装到新的输出路径。 输出目录不能与源码或输入 payload 重叠；发布 "
 "webroot 也不能包含输入包，或位于 输入包内部。拒绝必须发生在写入前，避免污染被绑定的输入字节。 过程前后再次检查源码和构建 "
@@ -297,7 +301,7 @@ msgstr ""
 "identical tar.gz bytes; archive order, timestamps, owners and modes are "
 "fixed."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:74
+#: docs/reference/documentation-delivery.md:91
 msgid ""
 "`restore()` 先验证归档所有成员和文件闭包，再写入新的独立目录。不会使用 "
 "`extractall()`，不会覆盖已有目录，失败不会留下半恢复的目标。恢复目录不需要原 Git checkout、Python "
@@ -310,34 +314,72 @@ msgstr ""
 "checkout, Python virtual environment or network; executing verification "
 "requires the tool."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:78
+#: docs/reference/documentation-delivery.md:95
 msgid "Python 调用接口如下，CLI 入口由统一 docs 命令提供："
 msgstr ""
 "The Python interface is below; the unified docs command provides the CLI "
 "entry:"
 
+#: docs/reference/documentation-delivery.md:109
 msgid ""
 "CLI 的 `--qualification-reference /path/to/candidate.json` 可重复使用，逐项核对 "
 "不同精确候选；不提供该选项时保存空列表。显式引用原件缺失时应修复定位或明确 不选入，工具不会悄悄降级为已验证引用。"
 msgstr ""
-"The CLI option `--qualification-reference /path/to/candidate.json` may "
-"be repeated to verify each distinct exact candidate. Without this option"
-" an empty list is retained. If an explicitly referenced original is "
-"missing, correct its locator or explicitly omit it; the tool does not "
-"silently downgrade it to a verified reference."
+"The CLI option `--qualification-reference /path/to/candidate.json` may be "
+"repeated to verify each distinct exact candidate. Without this option an "
+"empty list is retained. If an explicitly referenced original is missing, "
+"correct its locator or explicitly omit it; the tool does not silently "
+"downgrade it to a verified reference."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:91
+#: docs/reference/documentation-delivery.md:113
+msgid ""
+"`package`、`verify` 与 `restore` 可显式传入 `--report /path/to/result.json`， "
+"原子写入机器可读结果。schema 1 的 `nexus_documentation_delivery_result` 分别 记录 "
+"`action`、`status`、`result` 和 `errors`，`qualification` 固定为 `false`。 "
+"报告路径须位于源码、命令输入和输出闭包之外；安全准入后的执行失败写入真实失败 报告，拒绝的非法报告路径不写入。人读 stdout "
+"仍可包含包装器命令与日志，自动化 直接读取报告文件，不能将整段 stdout 当作 JSON。消费者同时要求进程成功退出和 本次报告的 "
+"`status=passed`；命令或路径准入失败时可能没有可安全写入的新报告， 旧报告不能代替本次执行。"
+msgstr ""
+"`package`, `verify` and `restore` accept an explicit `--report "
+"/path/to/result.json` and atomically write a machine-readable result. Schema"
+" 1 `nexus_documentation_delivery_result` records `action`, `status`, "
+"`result` and `errors`; `qualification` is always `false`. Reports must "
+"remain outside source inputs and command input/output closures. Execution "
+"failures after safe admission write an actual failure report; an invalid "
+"rejected report path is not written. Human stdout may still contain wrapper "
+"commands and logs. Automation reads the report file instead of parsing the "
+"entire stdout stream as JSON. Consumers require both a successful process "
+"exit and `status=passed` in the current report. Command or path admission "
+"failures may have no safely writable new report; an old report cannot "
+"replace the current execution."
+
+#: docs/reference/documentation-delivery.md:122
+msgid ""
+"`verify` 和 `restore` 的 `--expected-manifest-sha256` 要求保存于包外的原始 manifest "
+"摘要。只校验包内自带摘要与显式核对原始摘要是不同范围；报告如实记录 实际命令结果。装包已经成功而外层后处理失败时，可先验证原归档，再从同一不可变 "
+"归档继续恢复或发布；保留原失败记录，不覆盖包字节，也不把多次执行拼成一次正式 软件计划通过。"
+msgstr ""
+"`--expected-manifest-sha256` on `verify` and `restore` requires the original"
+" manifest digest stored outside the package. Checking only the checksums "
+"supplied inside a package and explicitly checking the original digest are "
+"distinct scopes; reports retain the actual command result. If packaging "
+"succeeds but outer post-processing fails, verify the original archive and "
+"continue restoration or publication from the same immutable archive. Retain "
+"the original failure, preserve package bytes and never combine multiple "
+"executions into one passed formal software plan."
+
+#: docs/reference/documentation-delivery.md:128
 msgid "这是接口说明片段，路径由调用方显式提供；可执行命令和实际验收结果以统一 docs CLI 及其本次交付 receipt 为准。"
 msgstr ""
 "This is an interface fragment with paths explicitly supplied by the caller. "
 "Executable commands and actual acceptance results come from the unified docs"
 " CLI and this delivery's receipts."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:94
+#: docs/reference/documentation-delivery.md:131
 msgid "旧书签与版本边界"
 msgstr "Legacy bookmarks and version boundaries"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:96
+#: docs/reference/documentation-delivery.md:133
 msgid ""
 "`docs/reference/redirects.csv` 是旧 URL 迁移的唯一人工维护输入。每行明确旧地址、 目标页、来源文档与固定 "
 "revision，并选择历史合同边界或同一当前合同的位置迁移。 禁止把旧 HAL／OSAL／Kconfig API "
@@ -351,7 +393,7 @@ msgstr ""
 "move as an API change. Keep old addresses in the ledger; subsequent changes "
 "check source, destination and actual bookmark behavior together."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:101
+#: docs/reference/documentation-delivery.md:138
 msgid ""
 "正式双语构建使用 `install_alias_catalog()` 验证这份 CSV，生成包内说明页和 `documentation-"
 "aliases.json`。catalog 是派生文件，记录原 CSV 摘要并进入 manifest payload；不能单独手写另一份 alias "
@@ -365,7 +407,7 @@ msgstr ""
 "and cannot be formal bilingual packages. Historical test fixtures without a "
 "catalog remain verifiable but do not establish legacy URL acceptance."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:106
+#: docs/reference/documentation-delivery.md:143
 msgid ""
 "旧 URL 恰好与新正文路径同名时，生成器保留版本目录中的当前正文，派生 `canonical_collisions` 记录对应当前源路径／摘要和 "
 "HTML 摘要。必须存在真实当前 源文件及 HTML，不能用手填标记绕过一致性检查。根目录仍按原 CSV 语义提供说明。 当前 "
@@ -379,7 +421,7 @@ msgstr ""
 " Both languages currently have such collisions for `development/index.html` "
 "and `tutorials/index.html`."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:111
+#: docs/reference/documentation-delivery.md:148
 msgid ""
 "发布除保留不可变 `versions/<release_id>/` 外，还在站点根生成旧书签说明页。 `en/index.html` 和 "
 "`zh_CN/index.html` 明确引向当前版本；根 `api/index.html` 说明 旧 API "
@@ -395,7 +437,7 @@ msgstr ""
 "language/API entries, yielding 290 verified root gateways. All links are "
 "relative, without scripts, meta refresh or external redirect services."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:117
+#: docs/reference/documentation-delivery.md:154
 msgid ""
 "未知字段或语义、重复／非标准 URL、保留命名空间、目标缺失、alias 链、语言或 来源语义不一致均在写入前拒绝。已有无关页面、symlink "
 "和父目录冲突不能覆盖。 根 `documentation-gateways.json` 只登记工具生成的说明页及入口摘要；重新发布前 "
@@ -411,7 +453,7 @@ msgstr ""
 "package and its own digest closure, is unsigned, cannot authenticate a "
 "publisher, and grants no board or HIL qualification."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:123
+#: docs/reference/documentation-delivery.md:160
 msgid ""
 "`post_deploy()` 对当前发布版本逐个真实读取全部根 alias 与三个语言／API 入口， 核对源 catalog "
 "派生的准确字节。版本目录里的说明页成功，不代替站点根书签验收。 检查历史不可变版本并显式关闭 stable 验收时，receipt 如实记录根 "
@@ -424,11 +466,11 @@ msgstr ""
 "version with stable verification explicitly disabled, the receipt truthfully"
 " records that root gateways were not checked."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:127
+#: docs/reference/documentation-delivery.md:164
 msgid "不可变发布与 stable"
 msgstr "Immutable publication and stable"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:129
+#: docs/reference/documentation-delivery.md:166
 msgid ""
 "`publish()` 将已验证的目录安装到 `<webroot>/versions/<release_id>/`，然后更新 "
 "`<webroot>/stable/index.html`。stable 的中英文和 API 入口使用 `../versions/.../` "
@@ -446,7 +488,7 @@ msgstr ""
 "relative links. An archive of the same name cannot be replaced with "
 "different bytes."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:135
+#: docs/reference/documentation-delivery.md:172
 msgid ""
 "同一个 `release_id` 已存在时，工具必须验证其 manifest 和全部 payload。只有原 "
 "字节完全相同才能重复执行；相同身份但不同字节的发布会被拒绝。新内容使用新身份， "
@@ -459,7 +501,7 @@ msgstr ""
 "permissions remain separate; previews do not automatically become stable, "
 "and documentation versions are not software-candidate state machines."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:147
+#: docs/reference/documentation-delivery.md:184
 msgid ""
 "发布后的验收必须访问实际站点 URL。`post_deploy()` 通过 HTTP(S) 读取 manifest、 校验文件以及每个登记的 "
 "payload，检查与包外保存摘要的一致性，并验证实际下载 字节和包内链接。默认检查 stable 是否选择本次版本；传入归档摘要时，还检查下载 "
@@ -476,7 +518,7 @@ msgstr ""
 "bytes and digest. Local HTTP verification does not replace public-site "
 "acceptance."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:153
+#: docs/reference/documentation-delivery.md:190
 msgid ""
 "新验收开始前，工具将自己拥有的旧 receipt 标为 `running`。失败写入 `failed`， 不能留下上次的 `verified` "
 "冒充本次成功；无关文件和 symlink 不能作为 receipt。"
@@ -485,7 +527,7 @@ msgstr ""
 "`running`. Failure writes `failed`; a prior `verified` cannot remain as a "
 "false current success. Unrelated files and symlinks cannot act as receipts."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:156
+#: docs/reference/documentation-delivery.md:193
 msgid ""
 "历史不可变版本不一定是当前 stable。仅验证历史版本时可以显式设置 `verify_stable=False`，receipt 同时记录未检查 "
 "stable，不能作为最新发布入口的验收。"
@@ -495,11 +537,11 @@ msgstr ""
 "records that stable was not checked and cannot establish acceptance of the "
 "latest publication entry."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:159
+#: docs/reference/documentation-delivery.md:196
 msgid "长期保留与退出条件"
 msgstr "Long-term retention and exit conditions"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:161
+#: docs/reference/documentation-delivery.md:198
 msgid ""
 "远程发布保留不可变文档归档、归档与 manifest 摘要、精确源码身份和恢复 receipt。 "
 "交付者需实际上传、重新下载、校验并恢复；“配置了上传”不等于“完成长期存储”。 "
@@ -512,7 +554,7 @@ msgstr ""
 " a second independent root, check language entries, API, diagrams and "
 "licenses, and record results against actual files."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:165
+#: docs/reference/documentation-delivery.md:202
 msgid ""
 "文档发行说明可以指向 Release 附件，也可以指向独立资产分支的不可变 Git commit。 "
 "取得性以实际成功的渠道为准：附件上传失败不能写成附件已发布。Git 渠道必须使用 包含完整 commit 的下载地址，记录准确 "
@@ -534,7 +576,7 @@ msgstr ""
 "cannot guarantee that a provider never deletes objects; maintainers still "
 "keep independent copies according to the download instructions."
 
-#: ../../../workspace/nexus-build-system-20261012/docs/reference/documentation-delivery.md:174
+#: docs/reference/documentation-delivery.md:211
 msgid ""
 "软件工具回归使用 stdlib `unittest`，覆盖脏／陈旧源码、缺失入口、内容篡改、路径 逃逸、链接成员、同身份冲突、独立恢复、真实 HTTP "
 "成功与篡改拒绝。新的回归执行 不能继承历史测试数量。没有实板执行的物理状态始终保留为 `not_executed`。"

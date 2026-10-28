@@ -215,6 +215,21 @@ typedef struct {
     bool active;
     bool fault;
 } nx_stm32u575_adc_state_t;
+/** \brief Immutable selected ADC4 resources; no runtime config loan. */
+typedef struct {
+    ADC_TypeDef* registers;
+    ADC_Common_TypeDef* common;
+    uint32_t reference_mv;
+    uint32_t poll_limit;
+} nx_stm32u575_adc_config_t;
+/** \brief Bind cold ADC4 state and configure PC0 before calibration.
+ * \param[in,out] port: Exclusive static state; retained rebinding rejects.
+ * \param[in] config: Immutable exact resources; its pointer is not retained.
+ * \return Status; failures retain close and platform pin-restore duties.
+ * \note The platform owns GPIOC/ADC clocks, VDDA and the PC0 snapshot.
+ */
+nx_result_t nx_stm32u575_adc_prepare(nx_stm32u575_adc_state_t* port,
+                                     const nx_stm32u575_adc_config_t* config);
 extern const nx_adc_ops_t nx_stm32u575_adc_ops;
 /** \brief Require externally prepared VDDA/ASV, then LDO/calibration/ready. */
 nx_result_t nx_stm32u575_adc_initialize(nx_stm32u575_adc_state_t* port);

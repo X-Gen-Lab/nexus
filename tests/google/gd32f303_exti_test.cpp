@@ -61,6 +61,20 @@ class GD303Exti : public testing::Test {
         nx_gd32f303_exti_irq(&state);
     }
 };
+TEST_F(GD303Exti, ColdPrepareKeepsRetainedStorageAndInitializesExactRoute) {
+    const nx_gd32f303_exti_config_t config{
+        other_ring,   2U, {NX_IRQ_KERNEL_NONE, 60U, 4U, 0U},
+        NX_EXTI_BOTH, 0U, 5U};
+    state.retained = true;
+    EXPECT_EQ(nx_gd32f303_exti_prepare(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(state.storage, ring);
+    EXPECT_EQ(g_gd303_writes, 0U);
+    state.retained = false;
+    ASSERT_EQ(nx_gd32f303_exti_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_EQ(state.storage, other_ring);
+    EXPECT_TRUE(state.initialized);
+    ASSERT_EQ(nx_exti_port_stop(&face), NX_SUCCESS);
+}
 TEST_F(GD303Exti, ExactRouteUsesIndependentVectorsAndPreservesOtherFields) {
     AFIO_EXTISS0 = 0x1234U;
     Start();

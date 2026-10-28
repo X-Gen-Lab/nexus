@@ -111,6 +111,14 @@ and `matrix.py` orchestrates support catalogues.
 The descriptor explicitly lists `configuration_modules`, including `contract.py`,
 so edits trigger reconfiguration and remain in the Source SDK closure.
 
+`tools/configure/contracts.py` owns immutable controller-category fields, factory
+kind order and public header mappings. Authoring, selection and factory consume
+that same metadata; exact SoC capabilities remain in the family contract. Memory
+budgets, Flash layout and source dependencies are separate resolver phases with
+frozen named results. The controller and endpoint resolution paths still require
+their own complete migration; extracting these phases does not establish full
+configuration refactor completion.
+
 ## Keep facts and admission policy distinct
 
 The exact `soc.json` variant supplies physical Flash origin, size, erase blocks
@@ -118,6 +126,12 @@ and RAM domains. Each family's `contract.PARTS` explicitly admits its full part
 numbers through the frozen `PartPolicy`: the package and optional memory-domain
 allowlist are software policy, not duplicate size tables. Unknown parts, a
 different package or optional domains inconsistent with the physical facts reject.
+
+Validation covers every maintained variant in the fact package, including parts
+not selected by the current assembly. Each variant uses the same package, Flash
+geometry, memory overlap, DMA reachability and `PartPolicy` checks. Selection
+returns the existing selected facts; it does not repair a malformed unselected
+part or copy another part's geometry.
 
 Trace an added part or mode through these maintained inputs before adding its
 constructor:
@@ -173,6 +187,35 @@ The read-only [work-package view](../../tools/maintenance/README.md) connects
 exact maintained modes to resolver fixtures, selected ops sources and reviewed
 lifecycle properties. Its entries are navigation, not executed tests or new
 support declarations. Run actual applicable gates separately.
+
+## Keep hardware behavior in C
+
+Firmware mechanisms use C11, with necessary assembly for startup and CPU context.
+Python runs on the development host: it validates authored inputs, resolves
+resources and emits static C/H declarations, instances, typed factory getters,
+fixed IRQ entry connections and explicit typed calls. The MCU executes compiled
+firmware and contains no Python interpreter.
+
+Maintain register reads and writes, hardware admission, waits, pin/clock/IRQ/DMA
+acquisition, rollback, stop and recovery in concrete C adapters. Generated
+definitions may retain constant register addresses and immutable resource data;
+a fixed IRQ trampoline may directly call its selected handler. Do not move these
+algorithms into a runtime action interpreter or add a registry, hidden worker or
+mandatory lock. Test the production C algorithm through hardware ports using
+GoogleTest/GoogleMock; Python unittest verifies configuration and static wiring.
+
+The migration is incomplete. Selected SPI, I2C, ADC, GPIO and Native paths now
+delegate more cold behavior to C, while other constructors, platform preflight,
+resource emission and specialized paths still emit C helper bodies. Audit the
+complete start/failure/stop/resume path, including shared helpers. A `DirectCall`
+in one constructor does not prove whole-family completion. The complete scope
+and actual exits remain in the [delivery-completion ledger](../design/platform-delivery-completion.csv).
+
+H743 fixed-run power references the selected logical controller ID in
+`power.controllers`; the ID need not be `bus4`. Renaming the controller requires
+updating both endpoint and power references. This preserves the exact single
+SPI4 finite-DMA, baremetal, HSI64/cache-off contract; changing a logical name does
+not admit another physical controller, clock profile or backend.
 
 ## Review performance and ownership
 

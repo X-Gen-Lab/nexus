@@ -96,16 +96,18 @@ class GD303ProviderTests(unittest.TestCase):
             with self.assertRaises(ConfigurationError):
                 self.provider.validate_selection(gpio(**changes), gpio(**changes))
 
-    def test_constructor_retained_guard_precedes_state_inputs(self):
+    def test_constructor_connects_c_guard_and_immutable_uart_selection(self):
         result = Result(uart())
         construction = self.provider.constructor(
             result.controllers[0], result, {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertLess(source.index(".retained"), source.index(".registers ="))
+        self.assertNotIn(".retained", source)
+        self.assertIn("static const nx_gd32f303_uart_config_t", source)
         self.assertIn("static uint8_t s_nx_rx_serial[64]", source)
         self.assertIn("USART0_IRQHandler", source)
-        self.assertIn("nx_gd32f303_usart0_pins_prepare()", source)
-        self.assertIn("8000000u", source)
+        self.assertEqual(construction.initialize.render(),
+                         "nx_gd32f303_uart_prepare(&s_nx_port_serial, "
+                         "&s_nx_uart_config_serial)")
         self.assertEqual(construction.stop,
                          (DirectCall("nx_uart_port_stop", (Address("s_nx_face_serial"),)),))
         self.assertTrue(construction.retain_on_failed_init)
@@ -162,7 +164,7 @@ class GD303ProviderTests(unittest.TestCase):
         source = bindings.emit(result)[1]
         self.assertIn("s_nx_platform_pins, 240u", source)
         self.assertIn("nx_gd32f303_spi_endpoint_ops", source)
-        self.assertIn("nx_gd32f303_watchdog_initialize", source)
+        self.assertIn("nx_gd32f303_watchdog_prepare", source)
         self.assertIn("s_nx_cs_peripheral.retained", source)
         self.assertLess(source.index("nx_gd32f303_pins_preflight(240u)"),
                         source.index("nx_gd32f303_system_start("))

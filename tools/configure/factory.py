@@ -1,13 +1,14 @@
 """Generate pure, typed static lookup without registration or construction."""
 
 from tools.configure.ir import ConfigurationIR
+from tools.configure.contracts import CONTROLLER_CONTRACTS, CONTROLLER_KINDS
 from tools.configure import io_traits, selected_contracts
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats, usb_profiles
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group", "eth_frames", "rtc", "lptim")
+KINDS = CONTROLLER_KINDS
 
 
 def symbol(name):
@@ -28,8 +29,9 @@ def interface_type(class_name, shape):
 
 
 def public_header(kind):
-    return {"pwm": "timer", "eth": "ethernet", "eth_frames": "ethernet_frames",
-            "spi_device": "spi", "i2c_device": "i2c",
+    if kind in CONTROLLER_CONTRACTS:
+        return CONTROLLER_CONTRACTS[kind].header
+    return {"spi_device": "spi", "i2c_device": "i2c",
             "usb_endpoint": "usb_device",
             "spi_transaction_device": "spi_transaction",
             "i2c_long_device": "i2c_long",

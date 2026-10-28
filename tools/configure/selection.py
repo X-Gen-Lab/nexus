@@ -1,5 +1,6 @@
 """Cross-domain selection checks above the leaf provider contracts."""
 
+from tools.configure.contracts import CONTROLLER_CONTRACTS
 from tools.configure.providers.common import (
     UINT32_MAX, cpu_abi, fail, integer, mode_traits, sequence)
 
@@ -47,38 +48,8 @@ def validate_interrupt_profile(profile, provider):
 def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
-    fields = {
-        "rtc": set(), "lptim": {"tick_hz"},
-        "adc_group": {"channels", "sample_times", "reference_mv", "exclusive",
-                      "silicon_profile", "trigger", "period_us", "watchdog",
-                      "irq_priority", "calls_os"},
-        "pwm_adc": {"tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks",
-                    "channels", "sample_times", "reference_mv", "exclusive",
-                    "irq_priority", "calls_os"},
-        "can_fd": {"bitrate", "data_bitrate", "event_capacity", "filters",
-                   "drain_timeout_us", "poll_limit", "exclusive",
-                   "irq_priority", "calls_os", "message_ram_words"},
-        "encoder": {"counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
-        "pwm_group": {"tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq_priority", "calls_os"},
-        "timer_capture": {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"},
-        "advanced_pwm": {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
-                         "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"},
-        "eth": {"tx_count", "rx_count", "rx_storage_bytes", "address",
-                "init_timeout_us", "drain_timeout_us", "irq_priority", "calls_os"},
-        "eth_frames": {"tx_count", "rx_count", "rx_storage_bytes", "address",
-                       "init_timeout_us", "drain_timeout_us", "irq_priority",
-                       "calls_os"},
-        "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
-                       "poll_limit", "drain_timeout_us", "clock_timeout_us",
-                       "irq_priority", "calls_os"},
-        "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
-                "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame", "stream", "irq_probe", "fifo"},
-        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os", "timing"}, "flash": set(), "watchdog": set(),
-        "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
-        "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
-        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os", "stream"},
-    }
+    fields = {name: contract.selected_fields
+              for name, contract in CONTROLLER_CONTRACTS.items()}
     if kind == "lptim" and selection["mode"] == "irq-counter16-oneshot":
         fields["lptim"] |= {"irq_priority", "calls_os"}
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())

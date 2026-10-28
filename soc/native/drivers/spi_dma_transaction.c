@@ -57,6 +57,38 @@ nx_result_t nx_native_spi_dma_initialize(nx_native_spi_dma_state_t* state) {
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
+
+/** \brief Keep outer loans intact before acquiring the selected engine. */
+nx_result_t nx_native_spi_dma_prepare(nx_native_spi_dma_state_t* state,
+                                      nx_spi_dma_sequence_state_t* sequence) {
+    if (state == NULL || sequence == NULL ||
+        (sequence->backend != NULL &&
+         sequence->backend != &nx_native_spi_dma_sequence_backend) ||
+        (sequence->context != NULL && sequence->context != state)) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_request_state_t phase = nx_request_state(&sequence->phase_request.base);
+    if (sequence->active != NULL || sequence->cs_held ||
+        sequence->pending_release ||
+        (sequence->stopping && !sequence->stopped) ||
+        (phase != NX_REQUEST_READY && phase != NX_REQUEST_SETTLED)) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t result = nx_native_spi_dma_initialize(state);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    result = nx_spi_dma_sequence_initialize(
+        sequence, &nx_native_spi_dma_sequence_backend, state);
+    if (result != NX_SUCCESS) {
+        /* No request or IRQ can borrow this freshly acquired cold engine. */
+        state->opened = false;
+    }
+    return result;
+}
 /** \brief Every future segment rejects before the first model CS or borrow. */
 static nx_result_t validate(void* context, void* endpoint,
                             const nx_spi_dma_transaction_request_t* request) {
