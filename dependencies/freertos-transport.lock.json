@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "freertos-transport",
+  "dependency": "freertos",
+  "upstream_base": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0",
+  "selected_commit": "062e1e0d8b176ae73d257ac928766b33bea17b6f",
+  "changed_paths": [
+    ".gitmodules"
+  ],
+  "baseline_modules_sha256": "fd4a188f73aa3233d9065de227950fd8f5e7809c46bba7228b06b4b7cc323810",
+  "selected_modules_sha256": "4eaf11be8014b6dc8b648db2dc78a84d35be11c3420ef5f88591c5296e4ecddc",
+  "patch_sha256": "f14ecdc5076ba0c36089f8e9abf3b03a6c7c163def1d7c943ebc830407a4305c",
+  "policy": "only-approved-nested-fetch-urls"
+}

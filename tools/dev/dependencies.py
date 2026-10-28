@@ -7,6 +7,7 @@ import argparse
 import email.parser
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -27,6 +28,7 @@ from tools.maintenance.source_catalogue import (
     ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
 )
 from tools.configure.providers import descriptor
+from tools.maintenance import source_catalogue
 
 MODULES = tuple(dependency.path for dependency in ALL_SOURCE_DEPENDENCIES)
 RUNTIME_MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
@@ -52,46 +54,212 @@ def required_submodules(scope: str, family: str | None = None,
     return tuple(dict.fromkeys(selected))
 
 
+def _git(root: Path, *arguments: str, check: bool = True):
+    """Keep untrusted Git diagnostics and credential-bearing remotes private."""
+    environment = {key: value for key, value in os.environ.items()
+                   if not key.startswith("GIT_")}
+    environment.update({"GIT_CONFIG_NOSYSTEM": "1",
+                        "GIT_CONFIG_GLOBAL": os.devnull,
+                        "GIT_OPTIONAL_LOCKS": "0",
+                        "GIT_NO_REPLACE_OBJECTS": "1"})
+    try:
+        result = subprocess.run(["git", "-c", "core.fsmonitor=false", "-C",
+                                 str(root), *arguments], env=environment,
+                                capture_output=True, text=True, timeout=300,
+                                check=False)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise EvidenceError("dependency Git operation could not complete") from error
+    if check and result.returncode:
+        raise EvidenceError("dependency Git operation failed: " + arguments[0])
+    return result
+
+
+def _safe_directory(path: Path):
+    if (not path.is_absolute() or ".." in path.parts or
+            any(part.is_symlink() for part in (path, *path.parents))):
+        raise EvidenceError("dependency directory must be canonical and not symlinked")
+    if path.exists() and not path.is_dir():
+        raise EvidenceError("dependency directory collides with an existing file")
+
+
+def _clean_repository(path: Path):
+    if (path / ".git").is_symlink():
+        raise EvidenceError("dependency Git marker must not be symlinked")
+    actual = _git(path, "rev-parse", "--show-toplevel").stdout.strip()
+    if actual != str(path):
+        raise EvidenceError("dependency directory is not its own Git root")
+    if _git(path, "diff", "--cached", "--quiet", "HEAD", check=False).returncode:
+        raise EvidenceError("dependency index contains uncommitted changes")
+    dirty = _git(path, "status", "--porcelain", "--untracked-files=all",
+                 "--ignore-submodules=all").stdout
+    if dirty:
+        raise EvidenceError("dependency source contains uncommitted files")
+
+
+def _gitlinks(path: Path, parent: str | None, *, upstream: bool = False):
+    declaration = _git(path, "show", "HEAD:.gitmodules", check=False)
+    expected = source_catalogue.children(parent)
+    if declaration.returncode and expected:
+        raise EvidenceError("dependency module declaration is missing")
+    try:
+        source_catalogue.declared_modules(declaration.stdout.encode(), parent,
+                                         upstream=upstream)
+    except ValueError as error:
+        raise EvidenceError("dependency module declaration differs from catalogue") from error
+    links = {}
+    for entry in _git(path, "ls-tree", "-rz", "HEAD").stdout.split("\0"):
+        if entry:
+            metadata, relative = entry.split("\t", 1)
+            mode, kind, commit = metadata.split()
+            if mode == "160000":
+                if kind != "commit":
+                    raise EvidenceError("dependency Gitlink has an invalid kind")
+                links[relative] = commit
+    if set(links) != {source_catalogue.relative_path(item) for item in expected}:
+        raise EvidenceError("dependency Gitlinks differ from declared graph")
+    return links
+
+
+def _source_origin(path: Path, item, *, migrating: bool):
+    result = _git(path, "config", "--get-all", "remote.origin.url", check=False)
+    accepted = {item.fetch_url}
+    if migrating:
+        accepted.add(item.upstream_url)
+    urls = result.stdout.splitlines()
+    if result.returncode or len(urls) != 1 or urls[0] not in accepted:
+        raise EvidenceError("dependency origin is not approved: " + item.path)
+    _exact_transport(path, item)
+
+
+def _configured_source(owner: Path, item, *, migrating: bool):
+    key = "submodule." + source_catalogue.module_name(item) + ".url"
+    result = _git(owner, "config", "--get-all", key, check=False)
+    if result.returncode == 1 and not result.stdout:
+        return
+    accepted = {item.fetch_url}
+    if migrating:
+        accepted.add(item.upstream_url)
+    urls = result.stdout.splitlines()
+    if result.returncode or len(urls) != 1 or urls[0] not in accepted:
+        raise EvidenceError("cached dependency URL is not approved: " + item.path)
+
+
+def _revisions(root: Path, item, expected: str, actual: str, *, migrating: bool):
+    if item.identifier != "freertos":
+        return frozenset({expected})
+    from tools.maintenance import freertos_transport
+    checkout = root / item.path
+    try:
+        provisional = freertos_transport.provisional_migration_revisions(
+            root, expected)
+    except ValueError as error:
+        raise EvidenceError("FreeRTOS transport review material is invalid") from error
+    if actual != expected and (not migrating or actual not in provisional):
+        raise EvidenceError("dependency revision is not approved: " + item.path)
+    present = _git(checkout, "cat-file", "-e", expected + "^{commit}",
+                   check=False).returncode == 0
+    if not present and migrating:
+        # Fetch objects from the reviewed URL without changing origin, HEAD or
+        # the index. The target tree must pass review before checkout can move.
+        _advertised(checkout, item, expected)
+        _git(checkout, "fetch", "--no-tags", "--no-write-fetch-head",
+             "--recurse-submodules=no", item.fetch_url, expected)
+    try:
+        return freertos_transport.migration_revisions(root, expected)
+    except ValueError as error:
+        raise EvidenceError("FreeRTOS transport migration proof failed") from error
+
+
+def _inspect_sources(root: Path, selected, *, migrating: bool):
+    _safe_directory(root)
+    _clean_repository(root)
+    top = _gitlinks(root, None)
+    records = []
+
+    def visit(item, expected):
+        path = root / item.path
+        owner = root if item.parent is None else root / item.parent
+        _configured_source(owner, item, migrating=migrating)
+        _safe_directory(path)
+        initialized = (path / ".git").exists()
+        if not initialized:
+            if path.exists() and any(path.iterdir()):
+                raise EvidenceError("uninitialized dependency directory is not empty: " + item.path)
+            if not migrating:
+                raise EvidenceError("dependency is missing: " + item.path)
+            records.append({"path": item.path, "commit": expected})
+            return
+        _clean_repository(path)
+        _source_origin(path, item, migrating=migrating)
+        actual = _git(path, "rev-parse", "HEAD").stdout.strip()
+        allowed = _revisions(root, item, expected, actual, migrating=migrating)
+        if actual != expected and (not migrating or actual not in allowed):
+            raise EvidenceError("dependency revision is not approved: " + item.path)
+        links = _gitlinks(path, item.path, upstream=actual != expected)
+        records.append({"path": item.path, "commit": expected})
+        for child in source_catalogue.children(item.path):
+            visit(child, links[source_catalogue.relative_path(child)])
+
+    for name in selected:
+        item = source_catalogue.dependency(name)
+        if item.parent is not None:
+            raise EvidenceError("dependency selection must use top-level modules")
+        visit(item, top[item.path])
+    return records
+
+
+def _exact_transport(root: Path, item):
+    effective = _git(root, "ls-remote", "--get-url", item.fetch_url).stdout.strip()
+    if effective != item.fetch_url:
+        raise EvidenceError("dependency fetch URL must not be rewritten: " + item.path)
+
+
+def _advertised(root: Path, item, commit: str):
+    _exact_transport(root, item)
+    reference = "refs/tags/nexus/pins/" + commit
+    arguments = ("ls-remote", "--exit-code", item.fetch_url)
+    if item.fetch_url != item.upstream_url:
+        arguments += (reference, reference + "^{}")
+    result = _git(root, *arguments)
+    if not result.stdout.strip():
+        raise EvidenceError("dependency fetch URL has no advertised references: " + item.path)
+    if item.fetch_url != item.upstream_url:
+        refs = dict(line.split("\t", 1)[::-1]
+                    for line in result.stdout.splitlines())
+        if refs.get(reference + "^{}", refs.get(reference)) != commit:
+            raise EvidenceError("dependency retained pin is unavailable: " + item.path)
+
+
+def _available_sources(root: Path, records):
+    for record in records:
+        _advertised(root, source_catalogue.dependency(record["path"]),
+                    record["commit"])
+
+
 def prepare(root: Path, scope: str, *, family: str | None = None,
             backend: str = "baremetal", allow_network: bool = False) -> dict:
+    root = Path(root).absolute()
     selected = required_submodules(scope, family, backend)
+    closure = _inspect_sources(root, selected, migrating=allow_network)
     if allow_network:
-        subprocess.run(["git", "-C", str(root), "submodule", "update", "--init",
-                        "--recursive", "--", *selected], check=True, timeout=300)
-    records = []
-    for module in selected:
-        result = subprocess.run(["git", "-C", str(root), "submodule", "status",
-                                 "--", module], capture_output=True, text=True,
-                                timeout=30, check=False)
-        if result.returncode or not result.stdout or result.stdout[0] != " ":
-            raise EvidenceError("dependency missing or not at locked Gitlink: " + module)
-        status = subprocess.run(["git", "-C", str(root / module), "status",
-                                 "--porcelain", "--untracked-files=all"],
-                                capture_output=True, text=True, timeout=30,
-                                check=False)
-        if status.returncode or status.stdout:
-            raise EvidenceError("dependency source is dirty: " + module)
-        records.append({"path": module, "commit": result.stdout.split()[0]})
-    recursive = subprocess.run(
-        ["git", "-C", str(root), "submodule", "status", "--recursive", "--",
-         *selected], capture_output=True, text=True, timeout=30, check=True)
-    closure = []
-    for line in recursive.stdout.splitlines():
-        match = re.fullmatch(r" ([0-9a-f]{40}|[0-9a-f]{64}) ([^\r\n]+?)(?: \(.+\))?", line)
-        if match is None:
-            raise EvidenceError("selected recursive dependency is missing or changed")
-        commit, path = match.groups()
-        if not any(path == module or path.startswith(module + "/") for module in selected):
-            raise EvidenceError("recursive dependency escaped selected source closure")
-        status = subprocess.run(["git", "-C", str(root / path), "status",
-                                 "--porcelain", "--untracked-files=all"],
-                                capture_output=True, text=True, timeout=30,
-                                check=True)
-        if status.stdout:
-            raise EvidenceError("recursive dependency source is dirty: " + path)
-        closure.append({"path": path, "commit": commit})
-    if not set(selected).issubset({item["path"] for item in closure}):
-        raise EvidenceError("selected recursive source closure is incomplete")
+        _available_sources(root, closure)
+        advertised = {record["path"] for record in closure}
+        _git(root, "submodule", "sync", "--", *selected)
+        _git(root, "-c", "submodule.recurse=false", "submodule", "update",
+             "--init", "--checkout", "--jobs", "2", "--", *selected)
+        # The parent's new .gitmodules must be present before recursive sync;
+        # otherwise its old URLs would overwrite the reviewed child transport.
+        closure = _inspect_sources(root, selected, migrating=True)
+        _available_sources(root, [record for record in closure
+                                  if record["path"] not in advertised])
+        _git(root, "submodule", "sync", "--recursive", "--", *selected)
+        _git(root, "submodule", "update", "--init", "--recursive",
+             "--checkout", "--jobs", "2", "--", *selected)
+        closure = _inspect_sources(root, selected, migrating=False)
+    if "ext/freertos" in selected:
+        from tools.maintenance import freertos_transport
+        freertos_transport.verify(root, parent_index=False)
+    records = [record for record in closure if record["path"] in selected]
     return {"schema_version": 1, "kind": "dependency_preparation",
             "scope": scope, "family": family, "backend": backend,
             "network_authorized": allow_network, "submodules": records,

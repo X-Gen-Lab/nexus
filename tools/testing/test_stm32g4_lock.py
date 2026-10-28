@@ -1,5 +1,6 @@
 """The exact G474 device-source closure rejects altered or partial inputs."""
 from __future__ import annotations
+from dataclasses import replace
 import copy
 import json
 import os
@@ -9,7 +10,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from tools.maintenance import stm32g4_lock
+from unittest.mock import patch
+from tools.maintenance import stm32g4_lock, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,7 +31,8 @@ class STM32G4LockTests(unittest.TestCase):
         self.git("init", "--quiet")
         self.git("config", "user.name", "Device lock test")
         self.git("config", "user.email", "device-test@local.invalid")
-        self.git("remote", "add", "origin", self.lock["repository"])
+        self.git("remote", "add", "origin",
+                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
         self.git("add", ".")
         self.git("commit", "--quiet", "-m", "actual selected device source")
         self.lock["commit"] = self.git("rev-parse", "HEAD")
@@ -65,6 +68,27 @@ class STM32G4LockTests(unittest.TestCase):
         result = stm32g4_lock.verify(ROOT / "vendors/st/cmsis_device_g4",
                                     ROOT / "dependencies/stm32g4.lock.json")
         self.assertEqual(result["verified_files"], 5)
+
+    def test_approved_transport_is_separate_from_official_repository(self):
+        item = source_catalogue.dependency("stm32g4_cmsis")
+        approved = replace(item,
+            fetch_url="https://github.com/Reviewed-Test/cmsis-device-g4.git")
+        entries = tuple(approved if record == item else record
+                        for record in source_catalogue.ALL_DEPENDENCIES)
+        self.git("remote", "set-url", "origin", approved.fetch_url)
+        with patch.object(source_catalogue, "ALL_DEPENDENCIES", entries):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+            self.git("remote", "set-url", "origin", self.lock["repository"])
+            with self.assertRaises(ValueError):
+                self.verify()
+
+    def test_url_rewrite_cannot_admit_a_foreign_raw_origin(self):
+        fetch = source_catalogue.dependency("stm32g4_cmsis").fetch_url
+        alias = "https://unreviewed.invalid/device.git"
+        self.git("remote", "set-url", "origin", alias)
+        self.git("config", "url." + fetch + ".insteadOf", alias)
+        with self.assertRaises(ValueError):
+            self.verify()
 
     def test_unknown_or_missing_schema_fields_reject(self):
         for name in self.lock:
@@ -179,7 +203,8 @@ class STM32G4LockTests(unittest.TestCase):
         self.git("remote", "set-url", "origin", "https://example.com/device.git")
         with self.assertRaises(ValueError):
             self.verify()
-        self.git("remote", "set-url", "origin", self.lock["repository"])
+        self.git("remote", "set-url", "origin",
+                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
         (self.source / "untracked.txt").write_text("not locked\n")
         with self.assertRaises(ValueError):
             self.verify()

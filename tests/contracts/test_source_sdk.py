@@ -103,6 +103,21 @@ class CMSISCoreSelectionTests(unittest.TestCase):
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_transport_verifier_and_nested_declarations_are_required(self):
+        required = {"tools/maintenance/freertos_transport.py",
+                    "ext/freertos/.gitmodules",
+                    "ext/freertos/portable/ThirdParty/"
+                    "Partner-Supported-Ports/LICENSE",
+                    "ext/freertos/portable/ThirdParty/"
+                    "Community-Supported-Ports/LICENSE"}
+        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
+                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertTrue(source_sdk.selected(
+            "dependencies/reviews/freertos/upstream.gitmodules"))
+        self.assertTrue(source_sdk.selected(
+            "dependencies/reviews/freertos/transport.patch"))
+        self.assertNotIn("ext/googletest", source_sdk.REQUIRED_DEPENDENCIES)
+
     def test_required_configuration_payload_follows_the_generator_closure(self):
         import importlib.util
         from tools.configure import dependencies
@@ -906,7 +921,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.git(self.root, "init", "--quiet")
         from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES
         (self.root / ".gitmodules").write_text("".join(
-            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.origin}\n'
+            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.fetch_url}\n'
             for item in ALL_SOURCE_DEPENDENCIES))
         (self.root / "baseline").write_text("committed source baseline\n")
         self.git(self.root, "add", ".")
@@ -918,7 +933,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.git(self.root, "clone", "--quiet", "--shared",
                  str(ROOT / self.path), str(self.checkout))
         self.git(self.checkout, "remote", "set-url", "origin",
-                 "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git")
+                 source_sdk.dependency(self.path).fetch_url)
         self.git(self.root, "add", self.path)
         self.git(self.root, "submodule", "init", "--", self.path)
         # This test exercises the source-snapshot boundary using one real,
@@ -1011,6 +1026,48 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         extra.unlink()
         self.commit(self.checkout, "different local dependency revision")
         with self.assertRaisesRegex(ValueError, "pinned dependency"):
+            source_sdk.dependency_records(self.root, entries)
+
+    def test_parent_staged_index_does_not_replace_a_dependency_index(self):
+        alternate = self.root / ".git/selected-index"
+        shutil.copy2(self.root / ".git/index", alternate)
+        self.git(self.root, "update-index", "--force-remove", self.path)
+        with mock.patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
+            entries, index = source_sdk.dependency_snapshot(self.root, True)
+            self.assertIn(self.path, entries)
+            records = source_sdk.dependency_records(self.root, entries)
+            self.assertEqual(records[0]["commit"], entries[self.path][2])
+            source_sdk.verify_preparation_snapshot(self.root, self.baseline,
+                                                   index)
+
+    def test_dependency_tree_ignores_local_commit_replacement(self):
+        original = self.git(self.checkout, "rev-parse", "HEAD").strip()
+        expected = source_sdk.tree_entries(self.checkout)
+        (self.checkout / "unreviewed-payload.h").write_text("unreviewed\n")
+        self.git(self.checkout, "add", "unreviewed-payload.h")
+        self.commit(self.checkout, "unreviewed alternate source")
+        changed = self.git(self.checkout, "rev-parse", "HEAD").strip()
+        self.git(self.checkout, "checkout", "--quiet", "--detach", original)
+        self.git(self.checkout, "replace", original, changed)
+        actual = source_sdk.tree_entries(self.checkout)
+        self.assertEqual(set(actual) - set(expected), set())
+        self.assertEqual(actual, expected)
+
+    def test_committed_blob_reader_ignores_local_blob_replacement(self):
+        entries = source_sdk.tree_entries(self.checkout)
+        selected = {"LICENSE.md": entries["LICENSE.md"]}
+        expected = source_sdk.committed_blobs(self.checkout, selected)
+        changed = self.git(self.checkout, "hash-object", "-w", "--stdin",
+                           input=b"unreviewed replacement notice\n").strip()
+        self.git(self.checkout, "replace", selected["LICENSE.md"][2], changed)
+        self.assertEqual(source_sdk.committed_blobs(self.checkout, selected),
+                         expected)
+
+    def test_selected_source_cannot_use_an_unapproved_fetch_origin(self):
+        entries, _ = source_sdk.dependency_snapshot(self.root, True)
+        self.git(self.checkout, "remote", "set-url", "origin",
+                 "https://github.com/unreviewed/stm32f4xx-hal-driver.git")
+        with self.assertRaisesRegex(ValueError, "fetch origin"):
             source_sdk.dependency_records(self.root, entries)
 
     def test_staged_index_change_during_preparation_rejects(self):
@@ -1119,6 +1176,47 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
 
 
 class SourceSDKTests(unittest.TestCase):
+    def test_recursive_dependency_membership_matches_reviewed_catalogue(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        original = identity.read_bytes()
+        child = "ext/freertos/portable/ThirdParty/Community-Supported-Ports"
+        try:
+            for change in ("missing-child", "unregistered-child"):
+                with self.subTest(change=change):
+                    manifest = json.loads(original)
+                    if change == "missing-child":
+                        manifest["dependencies"] = [
+                            row for row in manifest["dependencies"]
+                            if row["path"] != child]
+                    else:
+                        manifest["dependencies"].append({
+                            "path": "ext/freertos/include",
+                            "commit": "a" * 40, "tree": "b" * 40})
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    rejected = self.verify()
+                    self.assertNotEqual(rejected.returncode, 0)
+                    self.assertIn("dependency set", rejected.stderr)
+        finally:
+            identity.write_bytes(original)
+
+    def test_rehashed_nested_fetch_declaration_is_not_an_origin_override(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        original_identity = identity.read_bytes()
+        target = self.sdk / "ext/freertos/.gitmodules"
+        original = target.read_bytes()
+        try:
+            changed = original.replace(b"https://github.com/",
+                                       b"https://unreviewed.invalid/")
+            self.assertNotEqual(changed, original)
+            self.rehash_manifest_file(json.loads(original_identity), target,
+                                      changed)
+            rejected = self.verify()
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn("dependency", rejected.stderr)
+        finally:
+            target.write_bytes(original)
+            identity.write_bytes(original_identity)
+
     def test_rehashed_import_cannot_add_an_unreviewed_firmware_file(self):
         import hashlib
         manifest = self.sdk / ".nexus-source-sdk.json"
@@ -2294,7 +2392,7 @@ class SourceSDKTests(unittest.TestCase):
                 lock_path = self.sdk / ("dependencies/" + lock_name + ".lock.json")
                 lock = json.loads(lock_path.read_text())
                 self.run_ok(["git", "-C", str(private), "remote", "set-url", "origin",
-                             lock["repository"]])
+                             source_sdk.dependency(dependency).fetch_url])
                 self.run_ok(["git", "-C", str(private), "config", "core.sparseCheckout", "true"])
                 names = set(lock["files"]) | {lock["license"]["path"]}
                 (private / ".git/info/sparse-checkout").write_text(

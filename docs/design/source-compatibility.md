@@ -82,6 +82,78 @@ resolver 选择规则；如果 authority 的表达形式改变，检查会明确
 变更需明确 major/epoch 的变化和外部迁移；可选源码能力用 minor，保持公开合同的
 缺陷修复用 patch。没有实际迁移实现时，禁止接受旧格式后静默选择新行为。
 
+## 依赖来源、获取与选版
+
+`tools/maintenance/source_catalogue.py` 是已审 Git 依赖目录：`upstream_url`
+标识官方来源与版本观察地址，`fetch_url` 标识本提交允许的获取地址，Gitlink 选择
+实际 commit。源码锁继续约束官方来源、许可和内容；锁中的 commit 必须与 Gitlink
+相等，不能覆盖它。更换托管地址不意味着升级库或改变 CMake 依赖图。
+
+目录包含 14 个顶层 Git 子模块和 FreeRTOS 的两个嵌套子模块。13 个顶层运行时依赖
+及其递归闭包参与源码 SDK；GoogleTest/GoogleMock 只供主机测试使用。嵌套模块的
+section name 和相对路径分别核对，不能假设两者相同。GD32 官方归档继续按已审
+子树、逐文件锁和原许可管理，不伪装成官方 Git 仓库的 fork。
+
+`X-Gen-Lab` 托管目录中全部 16 个官方 Git 依赖的 fork；`fetch_url` 与
+`.gitmodules` 指向已验证的组织仓库。获取地址使用目录中的实际仓库名，不从磁盘
+路径或上游 URL 推导名称。官方 `upstream_url` 保留来源与版本观察职责，Gitlink
+继续选择准确 commit。每个 Nexus 提交只认可一个明确获取地址，不使用全局
+`url.insteadOf`、浮动分支或自动回退到其他仓库。
+
+FreeRTOS 使用仅修改根 `.gitmodules` 中两个已知 URL 的组织提交，集成引用为
+`nexus/transport-v11.1.0-r1`。它的唯一父提交是已锁定官方基线，嵌套 Gitlink、源码、
+许可和文件模式保持原样。`dependencies/freertos-transport.lock.json` 与
+`dependencies/reviews/freertos/` 中的基线文件和补丁记录该审查；补丁不在配置或构建
+期间动态应用。官方发行 tag 仍指向官方基线，组织提交不代表新的官方发行版。
+
+开发 checkout 与 SDK 打包执行实际 Git 父链、完整树差异和两处 URL 替换检查，
+不能只信锁文件声明的 `changed_paths`。SDK 内的审查材料和文件映射验证导出字节，
+无 Git 的消费环境不能据此声称重新验证了完整父链或源码树。消费者须先通过独立
+可信的发行身份、候选记录或预先批准的归档摘要确认 SDK，再执行包内 Python/CMake。
+包内自带 manifest 与内容一致，本身不证明来源可信，也不等于签名验证。
+
+## 托管迁移、同步与恢复
+
+迁移先验证 fork 的官方父仓库关系、匿名读取、固定 commit 与所需引用可达，再
+更新 Nexus 获取策略。组织仓库为受维护提交保留 `refs/tags/nexus/pins/<完整SHA>`；
+联网准备在改动 checkout 前核对引用返回的对象与所选 SHA。FreeRTOS 同时保留官方
+基线和组织集成提交。仓库或引用存在不代表当前连接能写入它，也不代表分支或 tag
+保护已经启用；这些状态需实际读回。生产源码和已发布引用不得因同步上游而被重写。
+
+已有 checkout 从已审官方地址迁往已审组织地址时，准备工具先检查工作区、实际
+仓库根、origin 和允许的旧/新 commit。普通源码修改、未跟踪依赖文件、未知 origin
+或未知 HEAD 都应停止处理。已登记的旧 Gitlink 可以作为迁移起点；不能将一次
+正常的子模块版本切换误判为用户源码修改。工具不 stash、reset、clean 或强制更新。
+
+已有 checkout 先切换到要消费的准确 Nexus 提交，再从仓库根运行显式准备入口。
+工具按所选提交识别已登记的旧依赖状态；以下命令允许下载，离线检查省略
+`--allow-network`：
+
+```sh
+python tools/dev/dev.py prepare --scope native --allow-network
+python tools/dev/dev.py prepare --preset stm32-nucleo-h743-baremetal-uart --allow-network
+```
+
+完整递归迁移按以下顺序执行；选择性准备使用同样的顺序，只处理所选模块。
+这是准备工具的顺序说明，手动调用不能替代前述工作区和来源检查：
+
+```sh
+git submodule sync
+git -c submodule.recurse=false submodule update --init --checkout --jobs 2
+git submodule sync --recursive
+git submodule update --init --recursive --checkout --jobs 2
+```
+
+先更新顶层 FreeRTOS，再同步它的嵌套声明，避免旧 `.gitmodules` 把官方地址写回。
+成功后逐项核对递归路径、Gitlink、实际 HEAD、origin 和干净状态。缺失对象、下载
+失败或来源不符必须失败，保留实际执行记录，不改用 `--remote` 或隐式备用地址。
+配置、构建和提交门禁均不自动联网准备依赖。
+
+回滚使用正常的新提交，一起恢复获取策略、Gitlink、审查锁和相应示例 pin；不改写
+旧提交、tag 或证据。fork 不等于备份：Nexus 自身的 Git bundle 不包含子模块对象，
+需要另存依赖 Git 对象，或保留可验证的完整源码 SDK，并实际验证异地恢复。服务
+不可用时消费已批准的离线包，不把临时换源隐藏在普通构建中。
+
 ## Codex 的每周依赖流程
 
 `tools/maintenance/dependency_proposals.py` 默认只观察当前实际 Gitlink、锁、归档和
@@ -97,8 +169,12 @@ GoogleTest、ARM 工具链、开发环境/Python 工具锁和 GitHub Actions 的
     --plan /abs/candidate-proposal.json
 ```
 
-显式 upstream 模式只查询锁所对应的公共 GitHub origin 的 heads/tags。使用无 shell、
-禁止 credential helper/交互/global config 的 `git ls-remote`；每个请求最长 10 秒，
+显式 upstream 模式只查询目录中官方 `upstream_url` 的 heads/tags，组织 fork 的
+`fetch_url` 不替代版本来源。普通依赖的 `upstream_revision` 等于所选 Gitlink；
+FreeRTOS 地址迁移提交分别记录 `selected_revision` 与官方 `upstream_base`，
+避免把组织提交误判为官方缺失版本。真正升级官方基线后，新的组织集成提交也必须
+重新准备并审查。使用无 shell、禁止 credential helper/交互/global config 的
+`git ls-remote`；每个请求最长 10 秒，
 stdout/stderr 总捕获上限 1 MiB，refs 最多 8192 条。复用已有有界 subprocess
 capture/kill/reap 机制，不执行 HIL admission 或设备动作。输出目录必须新建且无
 symlink；源码内只允许 build 目录。原始 stream、argv、实际退出码、时间和工具/

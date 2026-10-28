@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     fields, parse_json, regular, snapshot,
 )
+from tools.maintenance import source_catalogue  # noqa: E402
 
 REVIEWED_DEVICES = {
     "STM32F103RBT6": {
@@ -133,12 +134,14 @@ def stable_snapshot(path):
 def verify_git(source, lock, review):
     """Check the full checkout before and after reading the selected closure."""
     marker = source / ".git"
+    approved_fetch = source_catalogue.upstream_dependency(
+        review["origin"]).fetch_url
     if (marker.is_symlink() or not marker.exists() or
             Path(git(source, "rev-parse", "--show-toplevel")) != source or
             git(source, "rev-parse", "HEAD") != lock["commit"] or
-            git(source, "remote", "get-url", "origin") != review["origin"] or
+            git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=all")):
-        raise ValueError("Checkout differs from clean official locked revision")
+        raise ValueError("Checkout differs from clean locked revision or approved origin")
 
 
 def verify(source, lock_path, *, packaged_commit=None):

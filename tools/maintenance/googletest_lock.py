@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     VERSION, fields, parse_json, regular, snapshot,
 )
+from tools.maintenance import source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/google/googletest.git"
 DIRECTORY = "ext/googletest"
@@ -69,6 +70,7 @@ def verify(source, lock_path):
         raise ValueError("GoogleTest sources require exact regular directories")
     raw, lock_identity = snapshot(lock_path)
     lock = contract(parse_json(raw))
+    approved_fetch = source_catalogue.dependency("googletest").fetch_url
     marker = source / ".git"
     if not source.is_dir() or marker.is_symlink() or not marker.exists():
         raise ValueError("GoogleTest submodule is not initialized; run " + PREPARE)
@@ -82,7 +84,7 @@ def verify(source, lock_path):
         parser.read_string(modules_raw.decode("utf-8"))
         section = parser['submodule "' + DIRECTORY + '"']
         if (parser.defaults() or dict(section) !=
-                {"path": DIRECTORY, "url": ORIGIN}):
+                {"path": DIRECTORY, "url": approved_fetch}):
             raise ValueError("GoogleTest submodule origin declaration differs")
     except (configparser.Error, UnicodeError, KeyError) as error:
         raise ValueError("Invalid GoogleTest submodule origin declaration") from error
@@ -92,8 +94,8 @@ def verify(source, lock_path):
         raise ValueError("GoogleTest parent index gitlink differs from source lock")
     if git(source, "rev-parse", "HEAD") != lock["commit"]:
         raise ValueError("GoogleTest checkout commit differs from source lock")
-    if git(source, "config", "--get-all", "remote.origin.url") != ORIGIN:
-        raise ValueError("GoogleTest checkout origin differs from source lock")
+    if git(source, "config", "--get-all", "remote.origin.url") != approved_fetch:
+        raise ValueError("GoogleTest checkout origin differs from approved fetch URL")
     if git(source, "status", "--porcelain", "--untracked-files=all"):
         raise ValueError("GoogleTest checkout is dirty")
     cmake = regular(source / "CMakeLists.txt").read_text(encoding="utf-8")
@@ -107,6 +109,7 @@ def verify(source, lock_path):
             git(root, "ls-files", "--stage", "--", DIRECTORY,
                 parent_index=True) != expected or
             git(source, "rev-parse", "HEAD") != lock["commit"] or
+            git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=all")):
         raise ValueError("GoogleTest source identity changed during verification")
     git_directory = Path(git(source, "rev-parse", "--absolute-git-dir"))

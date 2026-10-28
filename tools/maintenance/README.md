@@ -187,3 +187,11 @@ gates are retained as pending or referenced/unreviewed; a passed marker never
 authorizes an upgrade. The tool never writes locks or merges source changes.
 See [source compatibility and maintenance](../../docs/design/source-compatibility.md)
 for scope, commands and the complete upgrade process.
+
+`source_catalogue.py` separates official `upstream_url`, approved `fetch_url`
+and the selected Gitlink. Upstream observations follow the official URL even
+when retrieval uses a reviewed fork. The catalogue explicitly includes nested
+FreeRTOS modules; host-only GoogleTest remains outside the production SDK.
+Hosting activation and the reviewed FreeRTOS transport commit are separate
+from upgrading the official base. The linked contract also defines checkout
+migration order, rejection of local changes and offline SDK trust boundaries.

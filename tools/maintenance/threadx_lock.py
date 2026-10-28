@@ -18,6 +18,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import fields, parse_json, snapshot  # noqa: E402
+from tools.maintenance import source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/eclipse-threadx/threadx.git"
 PORTS = frozenset({"linux", "cortex_m4"})
@@ -148,6 +149,7 @@ def verify(source, lock_path, port, *, packaged_commit=None):
     raw, lock_identity = snapshot(lock_path)
     lock = parse_json(raw)
     selected = contract(lock)
+    approved_fetch = source_catalogue.dependency("threadx").fetch_url
     for prefix, expected, unused in (
             ("common/src", set(lock["common"]), frozenset()),
             ("common/inc", {x for x in lock["headers"] if x.startswith("common/")}, frozenset()),
@@ -163,7 +165,7 @@ def verify(source, lock_path, port, *, packaged_commit=None):
         if (not (source / ".git").exists() or
                 Path(git(source, "rev-parse", "--show-toplevel")) != source or
                 git(source, "rev-parse", "HEAD") != lock["commit"] or
-                git(source, "remote", "get-url", "origin") != ORIGIN or
+                git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
                 git(source, "rev-parse", lock["tag"] + "^{commit}") != lock["commit"]):
             raise ValueError("ThreadX checkout differs from exact official locked revision")
     elif packaged_commit != lock["commit"]:
@@ -177,6 +179,7 @@ def verify(source, lock_path, port, *, packaged_commit=None):
         raise ValueError("ThreadX lock changed during verification")
     if packaged_commit is None and (
             git(source, "rev-parse", "HEAD") != lock["commit"] or
+            git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=normal")):
         raise ValueError("ThreadX checkout changed or is not clean")
     return {"kind": "nexus-threadx-source-verification", "commit": lock["commit"],

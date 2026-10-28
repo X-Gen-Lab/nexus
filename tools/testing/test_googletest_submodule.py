@@ -1,5 +1,6 @@
 """Exercise offline GoogleTest admission against real Git source boundaries."""
 from __future__ import annotations
+from dataclasses import replace
 import json
 import os
 from pathlib import Path
@@ -8,9 +9,11 @@ import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+from tools.maintenance import source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
 ORIGIN = "https://github.com/google/googletest.git"
+FETCH = source_catalogue.dependency("googletest").fetch_url
 
 
 class GoogleTestSubmoduleTests(unittest.TestCase):
@@ -24,7 +27,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.lock_path.parent.mkdir()
         self.git(self.root, "init", "--quiet")
         self.git(self.source, "init", "--quiet")
-        self.git(self.source, "remote", "add", "origin", ORIGIN)
+        self.git(self.source, "remote", "add", "origin", FETCH)
         (self.source / "CMakeLists.txt").write_text(
             "cmake_minimum_required(VERSION 3.31)\n"
             "project(googletest-distribution LANGUAGES CXX)\n"
@@ -43,7 +46,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.write_lock()
         self.modules = self.root / ".gitmodules"
         self.modules.write_text('[submodule "ext/googletest"]\n'
-            '\tpath = ext/googletest\n\turl = ' + ORIGIN + '\n')
+            '\tpath = ext/googletest\n\turl = ' + FETCH + '\n')
         self.git(self.root, "add", ".gitmodules", "dependencies", "ext/googletest")
         self.git(self.root, "commit", "--quiet", "-m", "parent fixture")
         self.git(self.root, "submodule", "absorbgitdirs", "ext/googletest")
@@ -73,6 +76,22 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.assertEqual(result["commit"], self.lock["commit"])
         self.assertEqual(result["source_kind"], "git_submodule")
         self.assertEqual(before, self.git(self.root, "status", "--porcelain"))
+
+    def test_approved_fetch_origin_keeps_official_lock_provenance(self):
+        record = source_catalogue.dependency("googletest")
+        approved = replace(record,
+            fetch_url="https://github.com/Reviewed-Test/googletest.git")
+        records = tuple(approved if item == record else item
+                        for item in source_catalogue.ALL_DEPENDENCIES)
+        self.modules.write_text(self.modules.read_text().replace(
+            FETCH, approved.fetch_url))
+        self.git(self.source, "remote", "set-url", "origin", approved.fetch_url)
+        with patch.object(source_catalogue, "ALL_DEPENDENCIES", records):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+            self.assertEqual(self.lock["url"], approved.upstream_url)
+            self.git(self.source, "remote", "set-url", "origin", ORIGIN)
+            with self.assertRaisesRegex(ValueError, "origin"):
+                self.verify()
 
     def test_uninitialized_directory_cannot_inherit_parent_git_identity(self):
         (self.source / ".git").unlink()
@@ -128,7 +147,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
 
     def test_changed_declaration_or_checkout_origin_rejects(self):
         original = self.modules.read_text()
-        self.modules.write_text(original.replace(ORIGIN, "https://invalid.test/src"))
+        self.modules.write_text(original.replace(FETCH, "https://invalid.test/src"))
         with self.assertRaisesRegex(ValueError, "origin"):
             self.verify()
         self.modules.write_text(original)
@@ -174,6 +193,8 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         verifier = self.root / "tools/maintenance/googletest_lock.py"
         verifier.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "tools/maintenance/googletest_lock.py", verifier)
+        shutil.copy2(ROOT / "tools/maintenance/source_catalogue.py",
+                     verifier.with_name("source_catalogue.py"))
         metadata = self.root / "tools/configure/metadata.py"
         metadata.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "tools/configure/metadata.py", metadata)
@@ -230,6 +251,22 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.assertIn("prepare --scope native --allow-network", result.stderr)
         self.assertNotIn("CMAKE_CXX_COMPILER:", (self.root /
             "build/CMakeCache.txt").read_text())
+
+    def test_changed_transport_policy_reruns_admission_on_ordinary_build(self):
+        result = self.configure()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        catalogue = self.root / "tools/maintenance/source_catalogue.py"
+        with catalogue.open("a") as stream:
+            stream.write('\nfrom dataclasses import replace\n'
+                'ALL_DEPENDENCIES = tuple(replace(item, fetch_url='
+                '"https://github.com/Reviewed-Test/googletest.git") '
+                'if item.identifier == "googletest" else item '
+                'for item in ALL_DEPENDENCIES)\n')
+        result = subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build")], capture_output=True, text=True,
+            timeout=60)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("origin declaration differs", result.stderr)
 
     def test_cross_compiling_rejects_before_loading_the_framework(self):
         result = self.configure(cross=True)

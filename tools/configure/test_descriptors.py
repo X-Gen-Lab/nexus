@@ -163,7 +163,7 @@ class CMSISCoreDescriptorContracts(unittest.TestCase):
         core, = [item for item in SOURCE_DEPENDENCIES
                  if item.identifier == "cmsis_core"]
         self.assertEqual(core.path, "vendors/arm/CMSIS_6")
-        self.assertEqual(core.origin,
+        self.assertEqual(core.upstream_url,
                          "https://github.com/ARM-software/CMSIS_6.git")
         self.assertEqual(core.notice, "LICENSE")
         self.assertFalse(any(item.identifier == "cmsis5"

@@ -30,6 +30,7 @@ macro(nexus_host_google_test)
         "${_nexus_google_lock}" "${_nexus_google_verifier}"
         "${_nexus_google_source}/.gitmodules"
         "${_nexus_google_source}/ext/googletest/.git"
+        "${_nexus_google_source}/tools/maintenance/source_catalogue.py"
         "${_nexus_google_source}/tools/configure/metadata.py")
     string(JSON _nexus_google_count LENGTH
         "${_nexus_google_identity}" configure_inputs)
