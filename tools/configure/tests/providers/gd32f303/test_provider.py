@@ -129,11 +129,12 @@ class GD303ProviderTests(unittest.TestCase):
     def test_gpio_and_uart_share_one_platform_pin_lease(self):
         result = Result(gpio(), uart())
         declaration = "\n".join(self.provider.state_declarations(result))
-        self.assertEqual(declaration.count("nx_gd32f303_pin_lease_t"), 1)
+        self.assertEqual(declaration.count("nx_gd32f303_platform_resources_t"), 1)
+        self.assertIn(".pins = 1568u", declaration)
         start = "\n".join(self.provider.start_resources(result))
         stop = "\n".join(self.provider.stop_system(result))
-        self.assertIn("s_nx_platform_pins, 1568u", start)
-        self.assertLess(stop.index("nx_gd32f303_pins_release"),
+        self.assertIn("nx_gd32f303_platform_resources_acquire(&s_nx_cold_resources, &s_nx_cold_selection)", start)
+        self.assertLess(stop.index("nx_gd32f303_platform_resources_release"),
                         stop.index("nx_gd32f303_system_stop"))
         self.assertNotIn("pins_acquire", "\n".join(
             self.provider.start_resources(Result())))
@@ -162,11 +163,13 @@ class GD303ProviderTests(unittest.TestCase):
         self.assertEqual({item.kind for item in result.controllers},
                          {"spi", "watchdog"})
         source = bindings.emit(result)[1]
-        self.assertIn("s_nx_platform_pins, 240u", source)
+        self.assertIn(".pins = 240u", source)
         self.assertIn("nx_gd32f303_spi_endpoint_ops", source)
         self.assertIn("nx_gd32f303_watchdog_prepare", source)
-        self.assertIn("s_nx_cs_peripheral.retained", source)
-        self.assertLess(source.index("nx_gd32f303_pins_preflight(240u)"),
+        self.assertIn(".cs = &s_nx_cs_peripheral", source)
+        self.assertIn("nx_gd32f303_spi_prepare", source)
+        self.assertNotIn("s_nx_cs_peripheral.retained", source)
+        self.assertLess(source.index("nx_gd32f303_platform_preflight(&s_nx_cold_selection)"),
                         source.index("nx_gd32f303_system_start("))
 
     def test_spi_rejects_foreign_route_and_unrealizable_frequency(self):

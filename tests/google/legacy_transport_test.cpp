@@ -15,6 +15,7 @@ nx_stm32f103_system_t g_nx_stm32f103_system = {};
 using UartState = nx_stm32f103_uart_dma_state_t;
 using DuplexState = nx_stm32f103_uart_duplex_state_t;
 using I2cState = nx_stm32f103_i2c_async_state_t;
+using I2cConfig = nx_stm32f103_i2c_async_config_t;
 static constexpr int kTxIrq = DMA1_Channel7_IRQn;
 static constexpr int kRxIrq = DMA1_Channel6_IRQn;
 #else
@@ -26,6 +27,7 @@ nx_gd32f303_system_t g_nx_gd32f303_system = {};
 using UartState = nx_gd32f303_uart_dma_state_t;
 using DuplexState = nx_gd32f303_uart_duplex_state_t;
 using I2cState = nx_gd32f303_i2c_async_state_t;
+using I2cConfig = nx_gd32f303_i2c_async_config_t;
 static constexpr int kTxIrq = DMA0_Channel3_IRQn;
 static constexpr int kRxIrq = DMA0_Channel4_IRQn;
 #endif
@@ -206,6 +208,13 @@ class LegacyTransport : public testing::Test {
         return UINT32_C(0x4a00);
 #else
         return UINT32_C(0x4a0);
+#endif
+    }
+    nx_result_t I2cPrepare(I2cState* state, const I2cConfig* selected) {
+#if defined(NX_LEGACY_F103)
+        return nx_stm32f103_i2c_async_prepare(state, selected);
+#else
+        return nx_gd32f303_i2c_async_prepare(state, selected);
 #endif
     }
     nx_result_t I2cStart() {
@@ -427,4 +436,30 @@ TEST_F(LegacyTransport, DrivenPb6RejectsBeforeAnyGateWrite) {
     EXPECT_EQ(I2cStart(), NX_ERROR_BUSY);
     EXPECT_EQ(s_writes, before);
     EXPECT_FALSE(i2c.retained);
+}
+
+TEST_F(LegacyTransport, StaticI2cPrepareRejectsBorrowedWakeBeforeRebinding) {
+    I2cState state{};
+    nx_irq_wake_t wake{};
+    state.core.wake = &wake;
+    const I2cConfig selected{config.irq_policy};
+    EXPECT_EQ(NX_ERROR_BUSY, I2cPrepare(&state, &selected));
+    EXPECT_EQ(nullptr, state.core.registers);
+    EXPECT_EQ(&wake, state.core.wake);
+    EXPECT_EQ(0U, s_writes);
+}
+TEST_F(LegacyTransport, StaticI2cPrepareBindsExactResourcesAndClosesThem) {
+    I2cState state{};
+    const I2cConfig selected{config.irq_policy};
+    ASSERT_EQ(NX_SUCCESS, I2cPrepare(&state, &selected));
+    EXPECT_EQ(i2c.core.registers, state.core.registers);
+    EXPECT_EQ(i2c.core.line_inputs, state.core.line_inputs);
+    EXPECT_EQ(192U, state.core.line_mask);
+    EXPECT_TRUE(state.retained);
+#if defined(NX_LEGACY_F103)
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f103_i2c_async_stop(&state));
+#else
+    EXPECT_EQ(NX_SUCCESS, nx_gd32f303_i2c_async_stop(&state));
+#endif
+    EXPECT_FALSE(state.retained);
 }

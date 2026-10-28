@@ -189,3 +189,23 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
     if (s_spi_fault != nullptr)
         s_spi_fault->Observe();
 }
+
+TEST_F(F103Spi, StaticPrepareRejectsRetainedCsBeforeStateBindingOrPinWrites) {
+    state = {};
+    uint32_t before = g_f103_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f103_spi_prepare(&state, &cs));
+    EXPECT_EQ(nullptr, state.registers);
+    EXPECT_EQ(before, g_f103_model.writes);
+}
+TEST_F(F103Spi, StaticPrepareAndCloseKeepChipSelectInactiveAndWithdrawOwner) {
+    state = {};
+    cs = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f103_spi_prepare(&state, &cs));
+    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(cs.retained);
+    EXPECT_EQ(16U, g_f103_model.gpio.ODR & 16U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f103_spi_close(&state, &cs));
+    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(cs.retained);
+    EXPECT_EQ(16U, g_f103_model.gpio.ODR & 16U);
+}

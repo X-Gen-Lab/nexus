@@ -21,6 +21,7 @@ namespace {
 bool in_isr;
 bool masked;
 bool privileged;
+nx_time_us_t model_time;
 volatile uint32_t* refused;
 uint32_t refused_bits;
 testing::MockFunction<void(volatile uint32_t*, uint32_t)>* writes;
@@ -47,6 +48,7 @@ class Gd32I2cCold : public testing::Test {
         in_isr = false;
         masked = false;
         privileged = true;
+        model_time = 0U;
         refused = nullptr;
         refused_bits = 0U;
         writes = &observer;
@@ -72,6 +74,11 @@ class Gd32I2cCold : public testing::Test {
     }
 };
 } /* namespace */
+
+/** \brief Model the external monotonic clock for retained driver faces. */
+extern "C" nx_time_us_t nx_time_now_us(void) {
+    return ++model_time;
+}
 
 /** \brief Inject only external MMIO refusal; execute the real C algorithm. */
 extern "C" void nx_gd32_cold_model_write(volatile uint32_t* reg,

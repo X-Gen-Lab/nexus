@@ -38,7 +38,7 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
     port->rate_hz = 100000U;
     result = nx_stm32_i2c_initialize(port);
     if (result == NX_SUCCESS) {
-        receipt->prepared = true;
+        receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
         result = nx_stm32_i2c_cold_verify(config, receipt);
         if (result != NX_SUCCESS)
             (void)nx_stm32_i2c_close(port, config, receipt);
@@ -56,7 +56,7 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
     if (port == NULL || config == NULL || receipt == NULL ||
         config->asynchronous)
         return NX_ERROR_INVALID;
-    if (receipt->prepared) {
+    if ((receipt->effects & NX_STM32_I2C_COLD_PREPARED) != 0U) {
         if (port->registers != config->registers)
             return NX_ERROR_INVALID;
         if (port->active)
@@ -66,7 +66,7 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
         if (port->registers->CR1 != 0U)
             return NX_ERROR_IO;
         port->initialized = false;
-        receipt->prepared = false;
+        receipt->effects &= (uint8_t)~NX_STM32_I2C_COLD_PREPARED;
     }
     nx_result_t result = nx_stm32_i2c_cold_release(config, receipt);
     if (result == NX_SUCCESS)

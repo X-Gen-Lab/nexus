@@ -170,20 +170,20 @@ class F103ProviderTests(unittest.TestCase):
 
     def test_pin_lease_uses_crl_nibbles_and_never_modern_moder(self):
         source = "\n".join(self.provider.state_declarations(Result(uart(), gpio())))
-        self.assertIn("GPIOA->CRL", source)
-        self.assertIn("GPIOA->BSRR", source)
-        self.assertNotIn("MODER", source)
-        self.assertNotIn("AFR[", source)
-        self.assertNotIn("AFIO->MAPR,", source)
-        self.assertLess(source.index("s_nx_f103_saved_odr |"),
-                        source.index("| s_nx_f103_saved_crl"))
+        self.assertEqual(source.count("nx_stm32f103_platform_resources_t"), 1)
+        self.assertIn(".pins = 44u", source)
+        self.assertIn("NX_STM32F103_PLATFORM_UART", source)
+        for hardware in ("GPIOA->CRL", "GPIOA->BSRR", "MODER", "AFR[",
+                         "AFIO->MAPR", "static nx_result_t"):
+            self.assertNotIn(hardware, source)
 
     def test_selected_hardware_preflight_precedes_system_effects(self):
         source = "\n".join(self.provider.start_system(Result(uart(), gpio())))
-        self.assertLess(source.index("USART2_IRQn"),
+        self.assertLess(source.index("nx_stm32f103_platform_preflight("),
                         source.index("nx_stm32f103_system_start("))
-        self.assertIn("AFIO_MAPR_USART2_REMAP", source)
-        self.assertIn("GPIOA->LCKR", source)
+        self.assertIn("&s_nx_cold_selection", source)
+        self.assertNotIn("NX_F103_READ", source)
+        self.assertNotIn("NX_F103_WRITE", source)
 
     def test_board_does_not_invent_hse_or_physical_inspection(self):
         board = json.loads((ROOT / "boards/stm32f103_reference/board.json").read_text())
@@ -235,9 +235,11 @@ class F103ProviderTests(unittest.TestCase):
         self.assertIn("nx_stm32f103_spi_endpoint_ops", source)
         self.assertIn("s_nx_cs_peripheral", source)
         self.assertIn(".cs_mask = 16u", source)
-        self.assertIn("nx_stm32f103_gpio_initialize(&s_nx_cs_peripheral, 16u)", source)
-        self.assertIn("(240u & ~s_nx_f103_saved_odr)", source)
-        self.assertIn("nx_stm32f103_spi_initialize", source)
+        self.assertIn("nx_stm32f103_spi_prepare(&s_nx_port_bus, &s_nx_cs_peripheral)", source)
+        self.assertIn(".pins = 240u", source)
+        self.assertEqual(source.count("nx_stm32f103_platform_resources_t"), 1)
+        self.assertIn("nx_stm32f103_spi_close", source)
+        self.assertNotIn(".retained ||", source)
         self.assertNotIn("malloc(", source)
 
     def test_spi_sck_and_led_pin_conflict_is_not_silently_repaired(self):

@@ -379,3 +379,15 @@ TEST_F(F103Provider, RemappedUsartPinsRejectBeforeEffects) {
     EXPECT_EQ(NX_ERROR_STATE, nx_stm32f103_usart2_pins_prepare());
     EXPECT_EQ(0U, g_f103_model.writes);
 }
+
+TEST_F(F103Provider, RefusedPa4ModeWriteCannotPublishChipSelectInitialized) {
+    nx_stm32f103_gpio_state_t selected{};
+    g_f103_model.ignore_write = &g_f103_model.gpio.CRL;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_stm32f103_gpio_prepare(&selected, 16U, true, 16U));
+    EXPECT_TRUE(selected.retained);
+    EXPECT_FALSE(selected.initialized);
+    EXPECT_EQ(4U, (g_f103_model.gpio.CRL >> 16U) & 15U);
+    g_f103_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f103_gpio_stop(&selected, 16U));
+}

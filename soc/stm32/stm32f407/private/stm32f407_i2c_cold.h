@@ -28,18 +28,27 @@ typedef struct {
     bool asynchronous;
 } nx_stm32_i2c_config_t;
 
-/** \brief Effects retained until every pad and publisher is restored. */
+/** \brief Semantic effects; clock bits preserve the original enabled state. */
+enum {
+    NX_STM32_I2C_COLD_OWNED = 1U << 0U,
+    NX_STM32_I2C_COLD_PERIPHERAL_CLOCK = (1U << 1U) | (1U << 2U),
+    NX_STM32_I2C_COLD_GPIO_CLOCK = 1U << 3U,
+    NX_STM32_I2C_COLD_VECTORS = 1U << 4U,
+    NX_STM32_I2C_COLD_PREPARED = 1U << 5U
+};
+
+/** \brief Retain exact publisher bytes and two original gate facts in six
+ * bytes. \note Lifecycle calls serialize this private receipt; IRQs never
+ * modify it. Pad values live only in the existing Platform-owned snapshot
+ * slots.
+ */
 typedef struct {
-    uint32_t gpio_clock;
-    uint32_t peripheral_clock;
     uint8_t priorities[4];
     uint8_t captured;
-    bool owned;
-    bool vectors;
-    bool prepared;
+    uint8_t effects;
 } nx_stm32_i2c_cold_receipt_t;
 
-/** \brief Acquire only exact resources in privileged unmasked Thread mode.
+/** \brief Acquire exact polling resources in privileged unmasked Thread mode.
  * \param[in] config: Immutable resources with two distinct snapshot slots.
  * \param[in,out] receipt: Cold owner retained after unsuccessful restoration.
  * \return Success or rejection; acquired effects require cold release.
@@ -49,7 +58,7 @@ typedef struct {
 nx_result_t nx_stm32_i2c_cold_acquire(const nx_stm32_i2c_config_t* config,
                                       nx_stm32_i2c_cold_receipt_t* receipt);
 
-/** \brief Restore acquired pads, publishers and clock gates after drain.
+/** \brief Restore polling pads and clock gates after all calls join.
  * \param[in] config: The same immutable resources used for acquisition.
  * \param[in,out] receipt: Cleared only after observed restoration.
  * \return Success or failure retaining cleanup responsibility for retry.
@@ -58,15 +67,48 @@ nx_result_t nx_stm32_i2c_cold_acquire(const nx_stm32_i2c_config_t* config,
 nx_result_t nx_stm32_i2c_cold_release(const nx_stm32_i2c_config_t* config,
                                       nx_stm32_i2c_cold_receipt_t* receipt);
 
-/** \brief Observe selected clocks and every initialized publisher.
+/** \brief Observe polling clocks and the prepared peripheral.
  * \param[in] config: The unchanged selected resources.
  * \param[in] receipt: The prepared owner retaining all acquired effects.
- * \return Success only when gates, priorities and enabled sources match.
+ * \return Success only when selected gates and the prepared peripheral match.
  * \note Failure does not erase effects; the concrete owner must close them.
  */
 nx_result_t
 nx_stm32_i2c_cold_verify(const nx_stm32_i2c_config_t* config,
                          const nx_stm32_i2c_cold_receipt_t* receipt);
+
+/** \brief Acquire async pads, gates and initially idle IRQ/DMA publishers.
+ * \param[in] config: Exact asynchronous I2C1/I2C2 static resources.
+ * \param[in,out] receipt: Initially clear; retained after failed restoration.
+ * \return Success or failure preserving any remaining cleanup obligation.
+ * \note Privileged unmasked Thread context; Platform serializes shared gates
+ *       and admits pads before this call. Publishers retain all raw priorities.
+ */
+nx_result_t
+nx_stm32_i2c_async_cold_acquire(const nx_stm32_i2c_config_t* config,
+                                nx_stm32_i2c_cold_receipt_t* receipt);
+
+/** \brief Join async publishers before restoring pads and original gates.
+ * \param[in] config: Unchanged asynchronous resources used for acquisition.
+ * \param[in,out] receipt: Cleared only after observed complete restoration.
+ * \return Success or failure retaining effects for retry.
+ * \note The engine and all callers have drained in privileged unmasked Thread
+ *       context. An active/pending publisher never permits early pin release.
+ */
+nx_result_t
+nx_stm32_i2c_async_cold_release(const nx_stm32_i2c_config_t* config,
+                                nx_stm32_i2c_cold_receipt_t* receipt);
+
+/** \brief Observe async clocks, peripheral and every initialized publisher.
+ * \param[in] config: Unchanged asynchronous static resources.
+ * \param[in] receipt: Prepared owner retaining all acquired effects.
+ * \return Success only when selected gates, enables and priorities match.
+ * \note Called by the serialized privileged prepare path; failure retains
+ *       ownership until the concrete close path proves withdrawal.
+ */
+nx_result_t
+nx_stm32_i2c_async_cold_verify(const nx_stm32_i2c_config_t* config,
+                               const nx_stm32_i2c_cold_receipt_t* receipt);
 
 /** \brief Prepare a cold polling owner without a generated hardware body.
  * \param[in,out] port: Serialized initially cold owner.

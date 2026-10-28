@@ -69,6 +69,87 @@ void SystemInit(void);
 void TIMER1_IRQHandler(void);
 /** \brief Exact high-word overflow vector; no low-word service gap issue. */
 void TIMER4_IRQHandler(void);
+/** \brief Exact selected cold resources; no register script or discovery. */
+#define NX_GD32F303_PLATFORM_UART   (1U << 0U)
+#define NX_GD32F303_PLATFORM_SPI    (1U << 1U)
+#define NX_GD32F303_PLATFORM_ADC    (1U << 2U)
+#define NX_GD32F303_PLATFORM_PWM    (1U << 3U)
+#define NX_GD32F303_PLATFORM_FLASH  (1U << 4U)
+#define NX_GD32F303_PLATFORM_DMA_TX (1U << 5U)
+#define NX_GD32F303_PLATFORM_DMA_RX (1U << 6U)
+/** \brief Immutable maintained GPIOA and controller selection. */
+typedef struct {
+    uint16_t pins;
+    uint8_t peripherals;
+    uint8_t exti_lines;
+} nx_gd32f303_platform_config_t;
+/** \brief One selected GPIOA bank lease; never a maximum instance pool. */
+typedef struct {
+    uint32_t saved_ctl[2];
+    uint16_t mask;
+    uint16_t saved_latch;
+    bool gate_added;
+    bool retained;
+    bool captured;
+} nx_gd32f303_pin_lease_t;
+/** \brief Reject a powered foreign pin before any global clock effect.
+ * \param[in] mask: Exact selected PA0..PA7/PA9/PA10 mask; no unpowered MMIO
+ * probe. \return Task SUCCESS/error without writes; acquisition rechecks after
+ * power.
+ */
+nx_result_t nx_gd32f303_pins_preflight(uint32_t mask);
+/** \brief Acquire GPIOA exact mask after checking every powered pin/lock.
+ * \param[in,out] lease: Static state through successful release.
+ * \param[in] mask: Exact selected subset of PA0..PA7/PA9/PA10; no SWJ
+ * ownership. \return Cold task SUCCESS or error; retained means release must be
+ * retried. \note Preserves preexisting clock and all unrelated pins. No PCB
+ * policy.
+ */
+nx_result_t nx_gd32f303_pins_acquire(nx_gd32f303_pin_lease_t* lease,
+                                     uint32_t mask);
+/** \brief Restore selected nibbles/latch before withdrawing an added gate.
+ * \param[in,out] lease: Same lease after all pin users/IRQs have joined.
+ * \return SUCCESS after actual readback; failure preserves unfinished owner.
+ */
+nx_result_t nx_gd32f303_pins_release(nx_gd32f303_pin_lease_t* lease);
+/** \brief Named unfinished leases, independent of physical register bits. */
+#define NX_GD32F303_OWN_AFIO   (1U << 0U)
+#define NX_GD32F303_OWN_USART0 (1U << 6U)
+#define NX_GD32F303_OWN_SPI0   (1U << 4U)
+#define NX_GD32F303_OWN_ADC0   (1U << 1U)
+#define NX_GD32F303_OWN_TIMER2 (1U << 2U)
+#define NX_GD32F303_OWN_DMA0   (1U << 3U)
+/** \brief One compact receipt, retained until all readbacks succeed. */
+typedef struct {
+    nx_gd32f303_pin_lease_t pins;
+    uint8_t owned;
+} nx_gd32f303_platform_resources_t;
+/**
+ * \brief Inspect exact selected hardware without acquiring or changing it.
+ * \param[in] config: Immutable maintained selection, privileged unmasked task.
+ * \return SUCCESS or CONTEXT/INVALID/BUSY; rejection has no register writes.
+ * \note System admission remains separate and precedes time-domain startup.
+ */
+nx_result_t
+nx_gd32f303_platform_preflight(const nx_gd32f303_platform_config_t* config);
+/**
+ * \brief Acquire only selected gates and one pin receipt after System starts.
+ * \param[in,out] resources: Cold static owner; no outstanding resource receipt.
+ * \param[in] config: Immutable selection, read only during this call.
+ * \return SUCCESS/error; failure can retain gates and requires release retry.
+ * \note One privileged unmasked bootstrap task; no active device consumers.
+ */
+nx_result_t nx_gd32f303_platform_resources_acquire(
+    nx_gd32f303_platform_resources_t* resources,
+    const nx_gd32f303_platform_config_t* config);
+/**
+ * \brief Restore pins before returning only gates added by this exact owner.
+ * \param[in,out] resources: Same receipt after all device/IRQ users join.
+ * \return SUCCESS after readback; failure retains unfinished cleanup duties.
+ * \note Privileged unmasked task; retry does not revoke any device borrow.
+ */
+nx_result_t nx_gd32f303_platform_resources_release(
+    nx_gd32f303_platform_resources_t* resources);
 #ifndef NX_GD303_READ
 #define NX_GD303_READ(reg) (*(reg))
 #endif

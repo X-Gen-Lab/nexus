@@ -65,6 +65,13 @@ releasing their storage. There is no hidden worker, fallback transport or DMA.
 The separate `dma-tx` and `dma-duplex` profiles add reviewed fixed-channel DMA;
 the IRQ-byte profile above retains its own smaller implementation.
 
+The concrete C Platform owner admits the exact selected controllers, leases
+GPIOA and AFIO resources, and restores pins before returning owned gates.
+Generation emits immutable facts, exact storage and typed lifecycle calls.
+The Platform receipt uses 20 bytes; each separate pin lease uses 16 bytes.
+Readback failure retains unfinished cleanup for retry. I2C0 keeps its own
+PB6/PB7 lease, and no second owner captures the same selected pad.
+
 ## Finite channel DMA and I2C IRQ messages
 
 USART0 TX uses DMA0 channel3. `dma-tx` retains an explicit byte ring and never

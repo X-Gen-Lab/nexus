@@ -63,8 +63,10 @@ One pending wrap is corrected in the timestamp snapshot. Prescaler UG is
 issued with MMS=CEN while CEN=0, so it cannot export an unselected TRGO pulse. An observed W0C failure
 invalidates the time epoch, retains every owner, observes the fault and parks.
 
-Generated assembly leases only selected CRL fields and output latches. GPIO
-preloads the latch before enabling output. Timer stop withdraws the source and
+The concrete C Platform owner leases only selected CRL fields and output
+latches. Generation emits its immutable selection and one eight-byte receipt;
+preflight, acquisition, readback, restoration and retained retry remain in C.
+GPIO preloads the latch before enabling output. Timer stop withdraws the source and
 observes cleared flags before its final NVIC disable/pending proof. Stop first quiesces controller and
 notification references, then restores selected pins and owned gates. Failed
 readback retains unfinished cleanup responsibility. Every consumer joins before

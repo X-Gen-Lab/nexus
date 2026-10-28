@@ -1,5 +1,5 @@
 # Actual GD32F303 code; only external register and vector boundaries are modeled.
-foreach(gd303_suite system provider watchdog spi exti)
+foreach(gd303_suite system provider watchdog spi exti platform)
 set(gd303_target nexus_gd32f303_${gd303_suite}_test)
 nexus_google_test(${gd303_target}
     SOURCES gd32f303_${gd303_suite}_test.cpp

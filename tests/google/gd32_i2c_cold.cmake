@@ -22,7 +22,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         nx_arch_in_isr=nx_gd32_i2c_cold_in_isr
         nx_arch_irq_is_masked=nx_gd32_i2c_cold_masked
         nx_arch_dsb=nx_gd32_i2c_cold_dsb
-        nx_arch_isb=nx_gd32_i2c_cold_isb)
+        nx_arch_isb=nx_gd32_i2c_cold_isb
+        nx_time_now_us=nx_gd32_i2c_cold_now)
     target_compile_options(nexus_gd32_i2c_cold_test PRIVATE
         "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
         "-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_cold_pins_model.h")

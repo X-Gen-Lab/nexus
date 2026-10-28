@@ -68,7 +68,7 @@ nx_result_t nx_stm32f103_gpio_initialize(nx_stm32f103_gpio_state_t* p,
     if (!checked(&p->registers->CRL,
                  (NX_F103_READ(&p->registers->CRL) & ~(15U << shift)) |
                      (mode << shift),
-                 15U << 20U)) {
+                 15U << shift)) {
         return NX_ERROR_IO;
     }
     p->initialized = true;

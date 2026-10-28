@@ -79,6 +79,62 @@ nx_result_t nx_stm32f103_validate_identity(void);
 void SystemInit(void);
 /** \brief One static reserved TIM2 owner. */
 void TIM2_IRQHandler(void);
+/** \brief Exact selected cold resources; no register script or discovery. */
+#define NX_STM32F103_PLATFORM_UART   (1U << 0U)
+#define NX_STM32F103_PLATFORM_SPI    (1U << 1U)
+#define NX_STM32F103_PLATFORM_ADC    (1U << 2U)
+#define NX_STM32F103_PLATFORM_PWM    (1U << 3U)
+#define NX_STM32F103_PLATFORM_FLASH  (1U << 4U)
+#define NX_STM32F103_PLATFORM_DMA_TX (1U << 5U)
+#define NX_STM32F103_PLATFORM_DMA_RX (1U << 6U)
+/** \brief Immutable maintained GPIOA and controller selection. */
+typedef struct {
+    uint16_t pins;
+    uint8_t peripherals;
+    uint8_t exti_lines;
+} nx_stm32f103_platform_config_t;
+/** \brief Named unfinished leases, independent of physical register bits. */
+#define NX_STM32F103_OWN_GPIOA  (1U << 2U)
+#define NX_STM32F103_OWN_AFIO   (1U << 0U)
+#define NX_STM32F103_OWN_SPI1   (1U << 4U)
+#define NX_STM32F103_OWN_ADC1   (1U << 1U)
+#define NX_STM32F103_OWN_USART2 (1U << 3U)
+#define NX_STM32F103_OWN_TIM3   (1U << 5U)
+#define NX_STM32F103_OWN_DMA1   (1U << 6U)
+#define NX_STM32F103_OWN_PINS   (1U << 7U)
+/** \brief One compact receipt, retained until all readbacks succeed. */
+typedef struct {
+    uint32_t saved_crl;
+    uint8_t saved_odr;
+    uint8_t pins;
+    uint8_t owned;
+} nx_stm32f103_platform_resources_t;
+/**
+ * \brief Inspect exact selected hardware without acquiring or changing it.
+ * \param[in] config: Immutable maintained selection, privileged unmasked task.
+ * \return SUCCESS or CONTEXT/INVALID/BUSY; rejection has no register writes.
+ * \note System admission remains separate and precedes time-domain startup.
+ */
+nx_result_t
+nx_stm32f103_platform_preflight(const nx_stm32f103_platform_config_t* config);
+/**
+ * \brief Acquire only selected gates and one pin receipt after System starts.
+ * \param[in,out] resources: Cold static owner; no outstanding resource receipt.
+ * \param[in] config: Immutable selection, read only during this call.
+ * \return SUCCESS/error; failure can retain gates and requires release retry.
+ * \note One privileged unmasked bootstrap task; no active device consumers.
+ */
+nx_result_t nx_stm32f103_platform_resources_acquire(
+    nx_stm32f103_platform_resources_t* resources,
+    const nx_stm32f103_platform_config_t* config);
+/**
+ * \brief Restore pins before returning only gates added by this exact owner.
+ * \param[in,out] resources: Same receipt after all device/IRQ users join.
+ * \return SUCCESS after readback; failure retains unfinished cleanup duties.
+ * \note Privileged unmasked task; retry does not revoke any device borrow.
+ */
+nx_result_t nx_stm32f103_platform_resources_release(
+    nx_stm32f103_platform_resources_t* resources);
 #ifndef NX_F103_READ
 #define NX_F103_READ(reg) (*(reg))
 #endif

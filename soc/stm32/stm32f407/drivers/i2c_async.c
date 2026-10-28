@@ -22,7 +22,7 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
     if (port->registers != NULL || port->active != NULL || port->initialized ||
         port->wake != NULL || port->wake_publishers != 0U)
         return NX_ERROR_BUSY;
-    nx_result_t result = nx_stm32_i2c_cold_acquire(config, receipt);
+    nx_result_t result = nx_stm32_i2c_async_cold_acquire(config, receipt);
     if (result != NX_SUCCESS)
         return result;
     port->registers = (volatile uint32_t*)config->registers;
@@ -32,11 +32,11 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
     port->dma = config->dma;
     result = nx_stm32_i2c_async_initialize(port, config->priority);
     if (result == NX_SUCCESS) {
-        receipt->prepared = true;
-        result = nx_stm32_i2c_cold_verify(config, receipt);
+        receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
+        result = nx_stm32_i2c_async_cold_verify(config, receipt);
         if (result != NX_SUCCESS)
             (void)nx_stm32_i2c_async_close(port, config, receipt);
-    } else if (nx_stm32_i2c_cold_release(config, receipt) == NX_SUCCESS) {
+    } else if (nx_stm32_i2c_async_cold_release(config, receipt) == NX_SUCCESS) {
         *port = (nx_i2c_v1_state_t){0};
     }
     return result;
@@ -50,15 +50,15 @@ nx_result_t nx_stm32_i2c_async_close(nx_i2c_v1_state_t* port,
     if (port == NULL || config == NULL || receipt == NULL ||
         !config->asynchronous)
         return NX_ERROR_INVALID;
-    if (receipt->prepared) {
+    if ((receipt->effects & NX_STM32_I2C_COLD_PREPARED) != 0U) {
         if (port->registers != (volatile uint32_t*)config->registers)
             return NX_ERROR_INVALID;
         nx_result_t result = nx_i2c_v1_async_ops.stop(port);
         if (result != NX_SUCCESS)
             return result;
-        receipt->prepared = false;
+        receipt->effects &= (uint8_t)~NX_STM32_I2C_COLD_PREPARED;
     }
-    nx_result_t result = nx_stm32_i2c_cold_release(config, receipt);
+    nx_result_t result = nx_stm32_i2c_async_cold_release(config, receipt);
     if (result == NX_SUCCESS)
         *port = (nx_i2c_v1_state_t){0};
     return result;

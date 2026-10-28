@@ -7,6 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "gd32f303_provider.h"
+_Static_assert(UINT16_MAX >= 0x6f3U, "exact GPIOA lease mask fits");
+_Static_assert(sizeof(nx_gd32f303_pin_lease_t) == 16U,
+               "exact GPIOA snapshot RAM budget");
 static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
@@ -62,7 +65,7 @@ nx_result_t nx_gd32f303_pins_acquire(nx_gd32f303_pin_lease_t* p,
     nx_result_t preflight = nx_gd32f303_pins_preflight(mask);
     if (preflight != NX_SUCCESS)
         return preflight;
-    p->mask = mask;
+    p->mask = (uint16_t)mask;
     p->captured = false;
     p->gate_added = (NX_GD303_READ(&RCU_APB2EN) & RCU_APB2EN_PAEN) == 0U;
     p->retained = true;
@@ -77,7 +80,7 @@ nx_result_t nx_gd32f303_pins_acquire(nx_gd32f303_pin_lease_t* p,
     }
     p->saved_ctl[0] = NX_GD303_READ(&GPIO_CTL0(GPIOA));
     p->saved_ctl[1] = NX_GD303_READ(&GPIO_CTL1(GPIOA));
-    p->saved_latch = NX_GD303_READ(&GPIO_OCTL(GPIOA)) & mask;
+    p->saved_latch = (uint16_t)(NX_GD303_READ(&GPIO_OCTL(GPIOA)) & mask);
     p->captured = true;
     return NX_SUCCESS;
 }

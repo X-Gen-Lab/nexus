@@ -66,19 +66,9 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"static const nx_spi_endpoint_t s_nx_device_face_{child_name} = {{",
                         f"    &nx_stm32f103_spi_endpoint_ops, &{endpoint}", "};",
                         f"const nx_spi_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active || {cs}.retained) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = SPI1; {state}.rcc = RCC;",
-                        f"    {state}.clock_hz = 8000000u;",
-                        f"    {cs}.registers = GPIOA; {cs}.mask = 16u; {cs}.output = true;",
-                        f"    nx_result_t status = nx_stm32f103_gpio_initialize(&{cs}, 16u);",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32f103_spi_initialize(&{state});", "}",
-                        f"static nx_result_t stop_{name}(void) {{",
-                        f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32f103_gpio_stop(&{cs}, 16u);", "}"]
-        stop = DirectCall(f"stop_{name}")
+                        ]
+        initialize = DirectCall("nx_stm32f103_spi_prepare", (Address(state), Address(cs)))
+        stop = DirectCall("nx_stm32f103_spi_close", (Address(state), Address(cs)))
     elif item.kind == "watchdog":
         initialize = DirectCall("nx_stm32f103_watchdog_prepare", (
             Address(state), Symbol("IWDG"), Symbol("RCC"), Symbol("FLASH"),
