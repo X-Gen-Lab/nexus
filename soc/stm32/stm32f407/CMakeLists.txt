@@ -53,6 +53,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
     elseif(kind STREQUAL "spi" AND "dma" IN_LIST modes)
         list(APPEND stm32_sources drivers/spi_dma.c)
     elseif(kind STREQUAL "i2c")
+        list(APPEND stm32_sources drivers/i2c_cold.c)
         if("irq-messages" IN_LIST modes OR "dma-messages" IN_LIST modes)
             list(APPEND stm32_sources drivers/i2c_async.c
                 "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async/i2c_v1_async.c")

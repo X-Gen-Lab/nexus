@@ -7,9 +7,59 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "gd32f470_i2c_async.h"
+#include "gd32f470_i2c_cold.h"
 #include "gd32f4xx_dma.h"
 #include "nexus/arch/arch.h"
 #include <stddef.h>
+
+nx_result_t nx_gd32_i2c_async_prepare(nx_i2c_v1_state_t* port,
+                                      const nx_gd32_i2c_config_t* config,
+                                      nx_gd32_i2c_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || cold == NULL || !config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (port->registers != NULL || port->active != NULL || port->initialized ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    nx_result_t result = nx_gd32_i2c_cold_acquire(config, cold);
+    if (result != NX_SUCCESS)
+        return result;
+    port->registers = (volatile uint32_t*)(uintptr_t)config->registers;
+    port->line_inputs = &GPIO_ISTAT(GPIOB);
+    port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
+    port->peripheral_mhz = 50U;
+    port->dma = config->dma;
+    result = nx_gd32_i2c_async_initialize(port, config->priority);
+    if (result == NX_SUCCESS) {
+        cold->prepared = true;
+        result = nx_gd32_i2c_cold_commit(config, cold);
+    } else if (nx_gd32_i2c_cold_release(config, cold) == NX_SUCCESS) {
+        *port = (nx_i2c_v1_state_t){0};
+    }
+    return result;
+}
+
+nx_result_t nx_gd32_i2c_async_close(nx_i2c_v1_state_t* port,
+                                    const nx_gd32_i2c_config_t* config,
+                                    nx_gd32_i2c_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || cold == NULL || !config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (cold->prepared) {
+        if (port->registers != (volatile uint32_t*)(uintptr_t)config->registers)
+            return NX_ERROR_INVALID;
+        nx_result_t result = nx_i2c_v1_async_ops.stop(port);
+        if (result != NX_SUCCESS)
+            return result;
+        cold->prepared = false;
+    }
+    nx_result_t result = nx_gd32_i2c_cold_release(config, cold);
+    if (result == NX_SUCCESS)
+        *port = (nx_i2c_v1_state_t){0};
+    return result;
+}
 
 _Static_assert(I2C_CTL1_REG_OFFSET == 1U * sizeof(uint32_t),
                "I2C I2C_CTL1_REG_OFFSET layout");

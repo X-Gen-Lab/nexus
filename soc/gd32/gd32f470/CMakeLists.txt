@@ -66,6 +66,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
             list(APPEND gd_sources drivers/spi_dma.c)
         endif()
     elseif(kind STREQUAL "i2c")
+        list(APPEND gd_sources drivers/i2c_cold.c)
         list(APPEND gd_sdk_units i2c)
         if("irq-messages" IN_LIST modes OR "dma-messages" IN_LIST modes)
             list(APPEND gd_sources drivers/i2c_async.c

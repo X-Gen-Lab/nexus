@@ -66,6 +66,21 @@ static nx_result_t native_pwm_set(void* context, uint32_t period_ticks,
     return NX_SUCCESS;
 }
 
+/** \brief Invalid duty must not replace an existing immutable timer base. */
+nx_result_t nx_native_pwm_prepare(nx_native_pwm_state_t* port, uint32_t tick_hz,
+                                  uint32_t period_ticks, uint32_t duty_ticks) {
+    if (port == NULL || tick_hz == 0U || period_ticks == 0U ||
+        duty_ticks > period_ticks) {
+        return NX_ERROR_INVALID;
+    }
+    nx_result_t result =
+        nx_native_pwm_configure_instance(port, tick_hz, period_ticks);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    return native_pwm_set(port, period_ticks, duty_ticks);
+}
+
 /** \brief Enable the configured fixed output; no synthetic measured frequency.
  */
 static nx_result_t native_pwm_start(void* context) {

@@ -150,6 +150,22 @@ static nx_result_t toggle(void* context, uint32_t mask) {
     uint32_t high = NX_GD303_READ(&GPIO_OCTL(GPIOA)) & mask;
     return write(p, mask & ~high, high);
 }
+/** \brief Retained cold state rejects before replacing the selected facts. */
+nx_result_t nx_gd32f303_gpio_prepare(nx_gd32f303_gpio_state_t* p, uint32_t mask,
+                                     bool output, uint32_t initial) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || (mask != 16U && mask != 32U) || (initial & ~mask) != 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized) {
+        return NX_ERROR_BUSY;
+    }
+    p->mask = mask;
+    p->output = output;
+    return nx_gd32f303_gpio_initialize(p, initial);
+}
 nx_result_t nx_gd32f303_gpio_initialize(nx_gd32f303_gpio_state_t* p,
                                         uint32_t initial) {
     if (!task_context())

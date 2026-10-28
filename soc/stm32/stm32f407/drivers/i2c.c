@@ -6,12 +6,73 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_i2c_cold.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_i2c.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
+
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+
+nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
+                                 const nx_stm32_i2c_config_t* config,
+                                 nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (port->registers != NULL || port->active || port->initialized)
+        return NX_ERROR_BUSY;
+    nx_result_t result = nx_stm32_i2c_cold_acquire(config, receipt);
+    if (result != NX_SUCCESS)
+        return result;
+    port->registers = config->registers;
+    port->line_gpio = GPIOB;
+    port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
+    port->peripheral_mhz = config->clock_hz / 1000000U;
+    port->rate_hz = 100000U;
+    result = nx_stm32_i2c_initialize(port);
+    if (result == NX_SUCCESS) {
+        receipt->prepared = true;
+        result = nx_stm32_i2c_cold_verify(config, receipt);
+        if (result != NX_SUCCESS)
+            (void)nx_stm32_i2c_close(port, config, receipt);
+    } else if (nx_stm32_i2c_cold_release(config, receipt) == NX_SUCCESS) {
+        *port = (nx_stm32_i2c_state_t){0};
+    }
+    return result;
+}
+
+nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
+                               const nx_stm32_i2c_config_t* config,
+                               nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (receipt->prepared) {
+        if (port->registers != config->registers)
+            return NX_ERROR_INVALID;
+        if (port->active)
+            return NX_ERROR_BUSY;
+        NX_PLATFORM_REGISTER_WRITE(port->registers->CR1, 0U);
+        nx_arch_dsb();
+        if (port->registers->CR1 != 0U)
+            return NX_ERROR_IO;
+        port->initialized = false;
+        receipt->prepared = false;
+    }
+    nx_result_t result = nx_stm32_i2c_cold_release(config, receipt);
+    if (result == NX_SUCCESS)
+        *port = (nx_stm32_i2c_state_t){0};
+    return result;
+}
 
 #ifndef NX_STM32_I2C_READ_DATA
 #define NX_STM32_I2C_READ_DATA(port) LL_I2C_ReceiveData8((port)->registers)

@@ -313,6 +313,14 @@ nx_stm32g474_adc_group_initialize(nx_stm32g474_adc_group_state_t* p,
     p->fault = false;
     p->stopping = false;
     p->phase = AG_IDLE;
+    /* The platform retains both original pad snapshots until cold close. */
+    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~15U);
+    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | 15U);
+    nx_arch_dsb();
+    if ((NX_G474_READ(&GPIOA->PUPDR) & 15U) != 0U ||
+        (NX_G474_READ(&GPIOA->MODER) & 15U) != 15U) {
+        return NX_ERROR_IO;
+    }
     uint32_t sources = internal_sources(c);
     if (!write_checked(&ADC12_COMMON->CCR, LL_ADC_CLOCK_ASYNC_DIV8 | sources) ||
         !write_checked(&ADC1->CR, ADC_CR_ADVREGEN)) {

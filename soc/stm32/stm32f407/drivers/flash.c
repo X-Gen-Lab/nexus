@@ -6,8 +6,51 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_basic_cold.h"
 #include "stm32f407_provider.h"
 #include <string.h>
+
+nx_result_t nx_stm32_flash_prepare(nx_stm32_flash_state_t* port,
+                                   const nx_flash_geometry_t* geometry,
+                                   uint32_t supply_mv) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || geometry == NULL || geometry->sectors == NULL ||
+        geometry->base_address != FLASH_BASE || geometry->program_unit != 4U ||
+        geometry->program_flags != 0U ||
+        !((geometry->size == 0x80000U && geometry->sector_count == 8U) ||
+          (geometry->size == 0x100000U && geometry->sector_count == 12U)))
+        return NX_ERROR_INVALID;
+    if (supply_mv < 2700U || supply_mv > 3600U)
+        return NX_ERROR_UNSUPPORTED;
+    if (port->active)
+        return NX_ERROR_BUSY;
+    uint32_t offset = 0U;
+    for (size_t i = 0U; i < geometry->sector_count; ++i) {
+        uint32_t size = i < 4U ? 0x4000U : i == 4U ? 0x10000U : 0x20000U;
+        if (geometry->sectors[i].offset != offset ||
+            geometry->sectors[i].size != size)
+            return NX_ERROR_INVALID;
+        offset += size;
+    }
+    port->registers = FLASH;
+    port->geometry = geometry;
+    port->memory = (volatile uint8_t*)(uintptr_t)FLASH_BASE;
+    port->supply_mv = supply_mv;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_flash_close(nx_stm32_flash_state_t* port) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    if (port->registers == NULL)
+        return NX_SUCCESS;
+    return port->active || (port->registers->SR & FLASH_SR_BSY) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))

@@ -8,7 +8,61 @@
  */
 #include "nexus/arch/arch.h"
 #include "stm32f407_i2c_async.h"
+#include "stm32f407_i2c_cold.h"
 #include <stddef.h>
+
+nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
+                                       const nx_stm32_i2c_config_t* config,
+                                       nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        !config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (port->registers != NULL || port->active != NULL || port->initialized ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    nx_result_t result = nx_stm32_i2c_cold_acquire(config, receipt);
+    if (result != NX_SUCCESS)
+        return result;
+    port->registers = (volatile uint32_t*)config->registers;
+    port->line_inputs = &GPIOB->IDR;
+    port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
+    port->peripheral_mhz = (uint8_t)(config->clock_hz / 1000000U);
+    port->dma = config->dma;
+    result = nx_stm32_i2c_async_initialize(port, config->priority);
+    if (result == NX_SUCCESS) {
+        receipt->prepared = true;
+        result = nx_stm32_i2c_cold_verify(config, receipt);
+        if (result != NX_SUCCESS)
+            (void)nx_stm32_i2c_async_close(port, config, receipt);
+    } else if (nx_stm32_i2c_cold_release(config, receipt) == NX_SUCCESS) {
+        *port = (nx_i2c_v1_state_t){0};
+    }
+    return result;
+}
+
+nx_result_t nx_stm32_i2c_async_close(nx_i2c_v1_state_t* port,
+                                     const nx_stm32_i2c_config_t* config,
+                                     nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        !config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (receipt->prepared) {
+        if (port->registers != (volatile uint32_t*)config->registers)
+            return NX_ERROR_INVALID;
+        nx_result_t result = nx_i2c_v1_async_ops.stop(port);
+        if (result != NX_SUCCESS)
+            return result;
+        receipt->prepared = false;
+    }
+    nx_result_t result = nx_stm32_i2c_cold_release(config, receipt);
+    if (result == NX_SUCCESS)
+        *port = (nx_i2c_v1_state_t){0};
+    return result;
+}
 
 _Static_assert(offsetof(I2C_TypeDef, CR1) == 0U * sizeof(uint32_t),
                "I2C CR1 layout");

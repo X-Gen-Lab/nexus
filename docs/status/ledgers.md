@@ -41,9 +41,11 @@ ledgers/platform-delivery-completion
 - `not_implemented`、`not_executed`、失败和有条件扩展保持原值。
 - 不同专项重复覆盖同一机制，不能相加数量或计算全项目完成百分比。
 
-`platform-delivery-completion` 的 N01–N14 是开发体验迭代之后的独立任务范围。
-它不改写原 75 项的退出条件或 P/E 软件执行身份。N11 需要真实设备；N13 需要
-当前 clean source 的完整计划和两次离线构建，不能由旧候选或开发测试代替。
+`platform-delivery-completion` 是开发体验迭代之后的同一后续任务权威，保留
+N01–N14，并追加 A01–J04 与 X01–X05 的完整工作分解。它不改写原 75 项的
+退出条件或 P/E 软件执行身份；逐项完整退出条件继续保留，单个外设迁移不能关闭
+整个家族任务。N11 与 H 组物理任务需要真实设备；N13 与 J 组软件封存需要当前
+clean source 的完整计划和离线复现，不能由旧候选或开发测试代替。
 
 `platform-refinement` 保留较早的 60 项完善记录；`io-evolution` 是当前 42 项增量
 台账。两份台账复用 `IO-` 编号，但来源、任务和退出条件不同，必须同时注明 CSV

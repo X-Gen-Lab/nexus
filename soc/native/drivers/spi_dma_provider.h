@@ -41,6 +41,13 @@ typedef struct nx_native_spi_dma_endpoint_state {
  *                  state instead of clearing a request, CS or wake publisher.
  */
 nx_result_t nx_native_spi_dma_initialize(nx_native_spi_dma_state_t* state);
+/**
+ * \brief           Prepare the exact outer owner and idle Native engine.
+ * \note            Task-only with all lifecycle users joined. Live outer
+ *                  loans and foreign owner identities reject before changes.
+ */
+nx_result_t nx_native_spi_dma_prepare(nx_native_spi_dma_state_t* state,
+                                      nx_spi_dma_sequence_state_t* sequence);
 extern const nx_spi_dma_sequence_backend_t nx_native_spi_dma_sequence_backend;
 /** \brief Check logical and actual Native endpoint controller identity. */
 bool nx_native_spi_dma_owner_contains(

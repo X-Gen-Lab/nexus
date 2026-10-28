@@ -17,15 +17,24 @@ H1–H6 require connected equipment. Implementation, software execution and phys
 execution are separate columns. A software mechanism does not close a physical
 exit condition.
 
-The subsequent [N01–N14 delivery-completion ledger](platform-delivery-completion.csv)
-and its [readable view](../status/ledgers/platform-delivery-completion.md) track a
-separate follow-up scope. They preserve the original 75-task ledger and its fixed
-P/E evidence. This follow-up closes concrete diagnostics, configuration,
-consumer-workflow and measurement gaps, then verifies its own final source.
+The subsequent [delivery-completion ledger](platform-delivery-completion.csv)
+and its [readable view](../status/ledgers/platform-delivery-completion.md) remain
+one follow-up authority. It preserves N01–N14 and appends the accepted A01–J04
+work breakdown, including X01–X05: complete maintained-mode cold lifecycle,
+configuration contracts, public consumption, execution efficiency, delivery,
+HIL and environment recovery. These tasks preserve the original 75-task ledger
+and its fixed P/E evidence. Each row keeps its full exit condition; a migrated
+peripheral or prepared instrument does not close a whole-family or physical task.
 Hardware execution and a formal software candidate have separate exits; neither
-inherits an earlier iteration's status. The existing architecture diagram still
-applies because these changes refine maintained mechanisms rather than add a
-new runtime layer.
+inherits an earlier iteration's status.
+
+The implementation order is coverage and baselines, C lifecycle and configuration
+contracts, family and cross-controller migration, public recipes, then frozen
+integration. Tool efficiency, delivery reports and environment recovery can
+proceed in parallel. Physical execution follows actual station admission.
+The current architecture diagram still applies: these tasks refine existing
+mechanisms without adding a runtime layer. Actual status remains in the same CSV;
+the work breakdown is not another support matrix or a project-wide percentage.
 
 The [follow-up development index](../delivery/platform-delivery-completion-results.json)
 records current observations without relabeling old P/E results. Its pending

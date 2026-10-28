@@ -47,6 +47,31 @@ static bool quiescent(nx_stm32g474_adc_stream_state_t* p) {
      */
     return nx_stm32g474_adc_quiesce(&p->adc) == NX_SUCCESS;
 }
+nx_result_t nx_stm32g474_adc_stream_prepare(
+    nx_stm32g474_adc_stream_state_t* p,
+    const nx_stm32g474_adc_stream_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (p->adc.retained || p->adc.initialized || p->adc.active || p->running ||
+        p->stream != NULL || p->filling || p->wake != NULL ||
+        p->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    p->adc.registers = config->adc.registers;
+    p->adc.peer = config->adc.peer;
+    p->adc.common = config->adc.common;
+    p->adc.reference_mv = config->adc.reference_mv;
+    p->adc.poll_limit = config->adc.poll_limit;
+    p->timer = config->timer;
+    p->dma = config->dma;
+    p->channel = config->channel;
+    p->mux = config->mux;
+    p->regions = config->regions;
+    p->region_count = config->region_count;
+    p->irq_policy = config->irq_policy;
+    return nx_stm32g474_adc_stream_initialize(p);
+}
 nx_result_t
 nx_stm32g474_adc_stream_initialize(nx_stm32g474_adc_stream_state_t* p) {
     if (!task())

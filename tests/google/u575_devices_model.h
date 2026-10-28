@@ -23,10 +23,12 @@ extern uint32_t g_u575_spi_reset_gap;
 void nx_u575_spi_poll(void* port);
 #define NX_U575_SPI_POLL(port) nx_u575_spi_poll(port)
 extern EXTI_TypeDef g_u575_exti;
+extern ADC_TypeDef g_u575_adc_registers;
+extern ADC_Common_TypeDef g_u575_adc_common_registers;
 extern ADC_TypeDef* g_u575_adc;
 extern ADC_Common_TypeDef* g_u575_adc_common;
 #undef ADC4
-#define ADC4 g_u575_adc
+#define ADC4 (&g_u575_adc_registers)
 extern bool g_u575_adc_hold;
 extern bool g_u575_adc_refuse_calibration;
 extern FLASH_TypeDef* g_u575_physical_flash;
@@ -63,7 +65,7 @@ void nx_u575_adc_poll(void* port);
 #undef I2C1
 #define I2C1 ((I2C_TypeDef*)&g_u575_i2c_registers)
 #undef ADC4_COMMON
-#define ADC4_COMMON g_u575_adc_common
+#define ADC4_COMMON (&g_u575_adc_common_registers)
 void nx_u575_spi_write8(volatile uint32_t* reg, uint8_t value);
 uint8_t nx_u575_spi_read8(volatile uint32_t* reg);
 #define NX_U575_SPI_WRITE8(reg, value) nx_u575_spi_write8((reg), (value))

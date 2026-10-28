@@ -15,8 +15,8 @@ class U575PeripheralFactory : public testing::Test {
   protected:
     SPI_TypeDef spi{};
     nx_i2c_v2_registers_t& i2c{g_u575_i2c_registers};
-    ADC_TypeDef adc{};
-    ADC_Common_TypeDef common{};
+    ADC_TypeDef& adc{g_u575_adc_registers};
+    ADC_Common_TypeDef& common{g_u575_adc_common_registers};
     void SetUp() override {
         nx_u575_devices_reset();
         g_u575_spi = &spi;

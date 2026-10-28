@@ -6,6 +6,7 @@ code, creates workers, selects application policy, or invents a hardware route.
 """
 from collections.abc import Mapping
 from contextlib import contextmanager
+from dataclasses import dataclass
 from functools import lru_cache
 import hashlib
 import importlib.util
@@ -24,8 +25,9 @@ if __package__ in (None, ""):
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
+from tools.configure.ir import MemoryBudgetIR
 from tools.configure import resource_graph, trigger_graph, dma_topology
-from tools.configure.contracts import COMPONENTS
+from tools.configure.contracts import COMPONENTS, CONTROLLER_KINDS
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
@@ -39,9 +41,7 @@ ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
-KINDS = {"rtc", "lptim", "gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "pwm", "adc", "can", "usb_device", "eth", "eth_frames",
-         "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group"}
+KINDS = frozenset(CONTROLLER_KINDS)
 C_KEYWORDS = C11_KEYWORDS | {"main"}
 
 
@@ -249,35 +249,14 @@ def contained_file(package, name):
     return path
 
 
-def validate_soc(soc, part):
-    obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
-              "controllers"}, {"provenance", "source_lock", "reserved_resources",
-                               "can_domain", "references", "adc_group_review"},
-        "SoC")
-    integer(soc["schema_version"], 1, 1, "SoC schema")
-    identity(soc["id"], "SoC id")
-    if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
-        fail(f"Unmaintained exact part: {part}")
-    provider = maintained(soc["id"])
-    from tools.configure.providers.common import exact_part
-    policy = exact_part(provider.PARTS, part)
-    reference = getattr(provider, "FACT_REFERENCES", None)
-    if reference is not None and soc.get("references") != reference:
-        fail("SoC references differ from the maintained source index")
-    # Review every physical package, including unselected variants referenced by
-    # route facts. A controller pad is not evidence that a package bonds it out.
-    for exact, package in soc["variants"].items():
-        identity(exact, "variant")
-        exact_part(provider.PARTS, exact)
-        if not isinstance(package, dict):
-            fail("Physical variant must be an object")
-        if provider.MODEL and "pins" not in package:
-            continue
-        pins = package.get("pins")
-        physical_facts.package_pins(pins, package.get("pad_conditions", {}),
-                                    getattr(provider, "CONDITIONAL_PACKAGE_PADS", ()))
-    variant = obj(soc["variants"][part], {"package", "flash", "memory"},
+def _validate_physical_variant(value, provider, policy):
+    """Validate each maintained part before any route can refer to its facts."""
+    variant = obj(value, {"package", "flash", "memory"},
                   {"pins", "pad_conditions"}, "variant")
+    if not provider.MODEL or "pins" in variant:
+        physical_facts.package_pins(
+            variant.get("pins"), variant.get("pad_conditions", {}),
+            getattr(provider, "CONDITIONAL_PACKAGE_PADS", ()))
     text(variant["package"], "package")
     flash = obj(variant["flash"], {"origin", "size", "erase_blocks"}, (),
                 "physical Flash")
@@ -289,11 +268,12 @@ def validate_soc(soc, part):
     memory = sequence(variant["memory"], "memory domains")
     if not memory:
         fail("At least one memory domain is required")
-    unique([region.get("id") for region in memory], "memory IDs")
-    ranges = [(flash["origin"], flash["origin"] + flash["size"], "Flash")]
     for region in memory:
         obj(region, {"id", "origin", "size", "linker"},
             {"dma", "dma_engines"}, "memory")
+    unique([region["id"] for region in memory], "memory IDs")
+    ranges = [(flash["origin"], flash["origin"] + flash["size"], "Flash")]
+    for region in memory:
         identity(region["id"], "memory id")
         physical_facts.memory_access(region,
                                      getattr(provider, "DMA_MEMORY_ENGINES", ()))
@@ -306,6 +286,31 @@ def validate_soc(soc, part):
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
     policy.validate(variant)
+    return variant
+
+
+def validate_soc(soc, part):
+    obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
+              "controllers"}, {"provenance", "source_lock", "reserved_resources",
+                               "can_domain", "references", "adc_group_review"},
+        "SoC")
+    integer(soc["schema_version"], 1, 1, "SoC schema")
+    identity(soc["id"], "SoC id")
+    if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
+        fail(f"Unmaintained exact part: {part}")
+    provider = maintained(soc["id"])
+    from tools.configure.providers.common import exact_part
+    exact_part(provider.PARTS, part)
+    reference = getattr(provider, "FACT_REFERENCES", None)
+    if reference is not None and soc.get("references") != reference:
+        fail("SoC references differ from the maintained source index")
+    # Routes can reference unselected packages too. Every physical contract must
+    # be valid independently of which part this assembly happens to select.
+    for exact, package in soc["variants"].items():
+        identity(exact, "variant")
+        _validate_physical_variant(package, provider,
+                                   exact_part(provider.PARTS, exact))
+    variant = soc["variants"][part]
     cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS,
               cpu_profiles.CPU_OPTIONAL_FIELDS,
               "CPU facts")
@@ -609,6 +614,165 @@ def board_directory(path):
     return path.resolve()
 
 
+@dataclass(frozen=True)
+class _MemoryResolution:
+    """Typed budgets and immutable physical domains from one memory decision."""
+    budget: MemoryBudgetIR
+    default_ram: Mapping
+    regions: tuple[Mapping, ...]
+    gpio_user: bool
+
+
+@dataclass(frozen=True)
+class _FlashLayoutResolution:
+    """One selected image and its optional authored input identity."""
+    layout: Mapping
+    input_path: Path | None
+
+
+@dataclass(frozen=True)
+class _SourceResolution:
+    """Locked sources and additional files consumed by dependency admission."""
+    dependencies: tuple[Mapping, ...]
+    inputs: tuple[Path, ...]
+
+
+def _resolve_memory(assembly, variant, provider, part, kernel_profile):
+    """Admit budgets and optional domains against exact physical capacity."""
+    from tools.configure.ir import (MemoryRegionBudgetIR,
+                                    MpuMemoryReservationsIR, freeze, thaw)
+    budgets = obj(thaw(assembly.memory_budgets), {"main_stack_bytes"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
+                  "memory budgets")
+    for name, value in budgets.items():
+        if name in {"regions", "mpu"}:
+            continue
+        integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
+    if budgets["main_stack_bytes"] % 8:
+        fail("Main stack must have 8-byte alignment")
+    ram = next(region for region in variant["memory"] if region["linker"])
+    gpio_user = (assembly.backend == "freertos" and
+                 kernel_profile.user_io == "gpio-write")
+    if gpio_user:
+        provider.validate_user_io_context(assembly, part)
+    if ("mpu" in budgets) != gpio_user:
+        fail("Explicit protected MPU reservations require GPIO user I/O")
+    if gpio_user:
+        fields = {"privileged_flash_bytes", "user_flash_bytes",
+                  "syscall_flash_bytes", "privileged_ram_bytes",
+                  "user_ram_bytes"}
+        reservations = obj(budgets["mpu"], fields, (), "MPU reservations")
+        for name, value in reservations.items():
+            integer(value, 32, UINT32_MAX, "MPU reservation " + name)
+            if value % 32:
+                fail("MPU reservations require exact 32-byte granules")
+        if (sum(reservations[name] for name in (
+                "privileged_flash_bytes", "user_flash_bytes",
+                "syscall_flash_bytes")) > variant["flash"]["size"] or
+                reservations["privileged_ram_bytes"] +
+                reservations["user_ram_bytes"] > ram["size"]):
+            fail("MPU reservations exceed physical Flash/SRAM1")
+        if (budgets.get("regions") or budgets["main_stack_bytes"] +
+                budgets.get("libc_heap_bytes", 0) >=
+                reservations["privileged_ram_bytes"] or
+                budgets.get("static_ram_bytes", ram["size"]) >
+                reservations["privileged_ram_bytes"]):
+            fail("MPU privileged reservations cannot cover optional RAM or exhaust MSP")
+    if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
+        fail("Reserved stack/heap exhaust default RAM")
+    if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
+        fail("Static RAM budget exceeds physical linker domain")
+    if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
+        fail("Flash budget exceeds exact physical density")
+    selected_memory = memory_regions.select(
+        variant["memory"], budgets, provider.PARTS[part].optional_memory,
+        obj=obj, integer=integer, fail=fail)
+    memory_budget = MemoryBudgetIR(
+        budgets["main_stack_bytes"], budgets.get("libc_heap_bytes", 0),
+        budgets.get("static_ram_bytes"), budgets.get("flash_load_bytes"),
+        tuple(MemoryRegionBudgetIR(name, item["limit_bytes"])
+              for name, item in sorted(budgets.get("regions", {}).items())),
+        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None)
+    return _MemoryResolution(memory_budget, freeze(ram),
+                             freeze(selected_memory), gpio_user)
+
+
+def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read):
+    """Select one reset-address image on reviewed physical erase boundaries."""
+    from tools.configure.ir import freeze
+    layout = physical_flash.copy()
+    layout_path = None
+    if layout_name is not None:
+        layout_path = (assembly_directory / text(layout_name, "layout path")).resolve()
+        layout_doc = obj(read(layout_path), {"schema_version", "regions"}, (), "layout")
+        integer(layout_doc["schema_version"], 1, 1, "layout schema")
+        boundaries = {physical_flash["origin"]}
+        cursor = physical_flash["origin"]
+        for size in physical_flash["erase_blocks"]:
+            cursor += size
+            boundaries.add(cursor)
+        spans = []
+        region_ids = []
+        images = []
+        for region in sequence(layout_doc["regions"], "layout regions"):
+            obj(region, {"id", "origin", "size", "kind"}, (), "layout region")
+            identity(region["id"], "region ID")
+            region_ids.append(region["id"])
+            start, end = address_range(region["origin"], region["size"], "region")
+            if start not in boundaries or end not in boundaries:
+                fail("Flash region is not on exact erase boundaries")
+            if any(start < b and a < end for a, b in spans):
+                fail("Flash layout overlap")
+            spans.append((start, end))
+            if region["kind"] not in {"image", "data"}:
+                fail("Unknown Flash region kind")
+            if region["kind"] == "image":
+                images.append(region)
+        if len(images) != 1 or images[0]["origin"] != physical_flash["origin"]:
+            fail("Only one reset-address image is maintained; offsets/bootloaders are unsupported")
+        unique(region_ids, "Flash region IDs")
+        layout = {**physical_flash, **images[0]}
+    return _FlashLayoutResolution(freeze(layout), layout_path)
+
+
+def _resolve_source_dependencies(soc, provider, family, root, backend, read,
+                                 source_dependency):
+    """Resolve exact selected Git/archive pins without selecting source targets."""
+    from tools.configure.ir import freeze
+    inputs = []
+    source_dependencies = []
+    if "source_lock" in soc:
+        lock = soc["source_lock"]
+        if isinstance(lock, str):
+            if lock != getattr(provider, "SOURCE_IMPORT_LOCK", None):
+                fail("SoC source import lock differs from maintained provider")
+            source_dependencies.append(
+                imported_dependency_identity(root, lock, read))
+            inputs.append(contained_file(root, lock))
+            # A reviewed archive may consume separately pinned CMSIS inputs.
+            # Its original archive identity cannot stand in for those bytes.
+            for _, path in descriptor.maintained(family).git_dependencies:
+                source_dependencies.append(source_dependency(path))
+        else:
+            dependencies = descriptor.maintained(family).git_dependencies
+            if not dependencies:
+                fail("SoC has no maintained Git source dependency contract")
+            obj(lock, {key for key, _ in dependencies}, (), "SoC source lock")
+            if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
+                   for value in lock.values()):
+                fail("SDK Git dependencies require exact commit identities")
+            for key, path in dependencies:
+                source_dependencies.append(source_dependency(path, lock[key]))
+    if backend == "freertos":
+        source_dependencies.append(source_dependency("ext/freertos"))
+    elif backend == "threadx":
+        source_dependencies.append(source_dependency("ext/threadx"))
+    manifest = root / ".nexus-source-sdk.json"
+    if manifest.is_file():
+        inputs.append(manifest)
+    return _SourceResolution(freeze(source_dependencies), tuple(inputs))
+
+
 def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
@@ -701,52 +865,10 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     optimization = assembly.optimization
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
-    budgets = obj(thaw(assembly.memory_budgets), {"main_stack_bytes"},
-                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
-                  "memory budgets")
-    for name, value in budgets.items():
-        if name in {"regions", "mpu"}:
-            continue
-        integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
-    if budgets["main_stack_bytes"] % 8:
-        fail("Main stack must have 8-byte alignment")
-    ram = next(region for region in variant["memory"] if region["linker"])
-    gpio_user = (backend == "freertos" and
-                 kernel_profile.user_io == "gpio-write")
-    if gpio_user:
-        provider.validate_user_io_context(assembly, part)
-    if ("mpu" in budgets) != gpio_user:
-        fail("Explicit protected MPU reservations require GPIO user I/O")
-    if gpio_user:
-        fields = {"privileged_flash_bytes", "user_flash_bytes",
-                  "syscall_flash_bytes", "privileged_ram_bytes",
-                  "user_ram_bytes"}
-        reservations = obj(budgets["mpu"], fields, (), "MPU reservations")
-        for name, value in reservations.items():
-            integer(value, 32, UINT32_MAX, "MPU reservation " + name)
-            if value % 32:
-                fail("MPU reservations require exact 32-byte granules")
-        if (sum(reservations[name] for name in (
-                "privileged_flash_bytes", "user_flash_bytes",
-                "syscall_flash_bytes")) > variant["flash"]["size"] or
-                reservations["privileged_ram_bytes"] +
-                reservations["user_ram_bytes"] > ram["size"]):
-            fail("MPU reservations exceed physical Flash/SRAM1")
-        if (budgets.get("regions") or budgets["main_stack_bytes"] +
-                budgets.get("libc_heap_bytes", 0) >=
-                reservations["privileged_ram_bytes"] or
-                budgets.get("static_ram_bytes", ram["size"]) >
-                reservations["privileged_ram_bytes"]):
-            fail("MPU privileged reservations cannot cover optional RAM or exhaust MSP")
-    if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
-        fail("Reserved stack/heap exhaust default RAM")
-    if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
-        fail("Static RAM budget exceeds physical linker domain")
-    if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
-        fail("Flash budget exceeds exact physical density")
-    selected_memory = memory_regions.select(
-        variant["memory"], budgets, provider.PARTS[part].optional_memory,
-        obj=obj, integer=integer, fail=fail)
+    selected_memory = _resolve_memory(assembly, variant, provider, part,
+                                      kernel_profile)
+    ram = selected_memory.default_ram
+    gpio_user = selected_memory.gpio_user
     bindings = resolve_bindings(board, routes, part)
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
@@ -1043,7 +1165,6 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
             selected[0]["mode"] != "output" or
             selected[0]["mask"] != 0x80):
         fail("GPIO user I/O requires the single exact PC7 output binding")
-    layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
     if adc_group_contract is not None:
         inputs.append(adc_group_contract[2])
@@ -1051,67 +1172,13 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
         inputs.append(contained_file(board_dir, name))
-    if assembly.layout is not None:
-        layout_path = (assembly_path.parent / text(assembly.layout, "layout path")).resolve()
-        layout_doc = obj(read(layout_path), {"schema_version", "regions"}, (), "layout")
-        integer(layout_doc["schema_version"], 1, 1, "layout schema")
-        boundaries = {variant["flash"]["origin"]}
-        cursor = variant["flash"]["origin"]
-        for size in variant["flash"]["erase_blocks"]:
-            cursor += size
-            boundaries.add(cursor)
-        spans = []
-        region_ids = []
-        images = []
-        for region in sequence(layout_doc["regions"], "layout regions"):
-            obj(region, {"id", "origin", "size", "kind"}, (), "layout region")
-            identity(region["id"], "region ID")
-            region_ids.append(region["id"])
-            start, end = address_range(region["origin"], region["size"], "region")
-            if start not in boundaries or end not in boundaries:
-                fail("Flash region is not on exact erase boundaries")
-            if any(start < b and a < end for a, b in spans):
-                fail("Flash layout overlap")
-            spans.append((start, end))
-            if region["kind"] not in {"image", "data"}:
-                fail("Unknown Flash region kind")
-            if region["kind"] == "image":
-                images.append(region)
-        if len(images) != 1 or images[0]["origin"] != variant["flash"]["origin"]:
-            fail("Only one reset-address image is maintained; offsets/bootloaders are unsupported")
-        unique(region_ids, "Flash region IDs")
-        layout = {**variant["flash"], **images[0]}
-        inputs.append(layout_path)
-    source_dependencies = []
-    if "source_lock" in soc:
-        lock = soc["source_lock"]
-        if isinstance(lock, str):
-            if lock != getattr(provider, "SOURCE_IMPORT_LOCK", None):
-                fail("SoC source import lock differs from maintained provider")
-            source_dependencies.append(
-                imported_dependency_identity(root, lock, read))
-            inputs.append(contained_file(root, lock))
-            # A reviewed archive may consume separately pinned CMSIS inputs.
-            # Its original archive identity cannot stand in for those bytes.
-            for _, path in descriptor.maintained(family).git_dependencies:
-                source_dependencies.append(source_dependency(path))
-        else:
-            dependencies = descriptor.maintained(family).git_dependencies
-            if not dependencies:
-                fail("SoC has no maintained Git source dependency contract")
-            obj(lock, {key for key, _ in dependencies}, (), "SoC source lock")
-            if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
-                   for value in lock.values()):
-                fail("SDK Git dependencies require exact commit identities")
-            for key, path in dependencies:
-                source_dependencies.append(source_dependency(path, lock[key]))
-    if backend == "freertos":
-        source_dependencies.append(source_dependency("ext/freertos"))
-    elif backend == "threadx":
-        source_dependencies.append(source_dependency("ext/threadx"))
-    manifest = root / ".nexus-source-sdk.json"
-    if manifest.is_file():
-        inputs.append(manifest)
+    selected_layout = _resolve_flash_layout(
+        assembly.layout, assembly_path.parent, variant["flash"], read)
+    if selected_layout.input_path is not None:
+        inputs.append(selected_layout.input_path)
+    selected_sources = _resolve_source_dependencies(
+        soc, provider, family, root, backend, read, source_dependency)
+    inputs.extend(selected_sources.inputs)
     records = bind_input_identities(inputs, root, snapshots, input_paths)
     components = resolve_components(assembly)
     resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
@@ -1125,22 +1192,15 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     from dataclasses import replace
     from tools.configure.ir import (
         CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
-        EndpointIR, FactoryOptions, MemoryBudgetIR, MemoryRegionBudgetIR,
-        MpuMemoryReservationsIR, PhysicalPartIR, PwmSharedOwnerIR,
+        EndpointIR, FactoryOptions, PhysicalPartIR, PwmSharedOwnerIR,
         RuntimePowerIR, freeze)
     controllers = tuple(ControllerIR.create(item, family) for item in selected)
     devices = tuple(EndpointIR.create(item, controllers)
                     for item in endpoint_selections)
-    memory_budget = MemoryBudgetIR(
-        budgets["main_stack_bytes"], budgets.get("libc_heap_bytes", 0),
-        budgets.get("static_ram_bytes"), budgets.get("flash_load_bytes"),
-        tuple(MemoryRegionBudgetIR(name, item["limit_bytes"])
-              for name, item in sorted(budgets.get("regions", {}).items())),
-        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None)
     resolved = ConfigurationIR(
         board=board["id"], soc_family=family,
         cpu_profile=cpu_profile, kernel=kernel_profile,
-        controllers=controllers, devices=devices, memory_budget=memory_budget,
+        controllers=controllers, devices=devices, memory_budget=selected_memory.budget,
         factory=FactoryOptions(factory_options.get("capabilities", False)),
         can_domain=(CanDomainIR(can_domain["split"], tuple(
             CanFilterIR(**item) for item in can_domain["filters"]))
@@ -1149,11 +1209,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         clock_plan=(ClockPlanIR.from_validated(clock_plan)
                     if clock_plan is not None else None),
         physical_part=PhysicalPartIR(part, variant["package"],
-            freeze(variant["flash"]), freeze(selected_memory)),
+            freeze(variant["flash"]), selected_memory.regions),
         clock=freeze(clock), clock_profile=assembly.clock_profile,
-        layout=freeze(layout), board_bindings=freeze(bindings),
+        layout=selected_layout.layout, board_bindings=freeze(bindings),
         routes=freeze(routes), platform_metadata=freeze(platform_metadata),
-        inputs=freeze(records), source_dependencies=freeze(source_dependencies),
+        inputs=freeze(records), source_dependencies=selected_sources.dependencies,
         components=tuple(components),
         can_controllers=tuple(provider.CAN_CONTROLLERS) if can_domain else (),
         optimization=optimization,

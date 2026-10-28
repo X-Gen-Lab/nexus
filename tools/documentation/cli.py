@@ -53,8 +53,11 @@ def prepare_output(root, destination):
 def _record(path, record):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp-" + uuid.uuid4().hex)
-    temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
-    temporary.replace(path)
+    try:
+        temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _staged_sources(root):
@@ -111,6 +114,26 @@ def _safe_report(root, path):
     if path in check.dependencies(root, require_files=False):
         raise ValueError("report cannot overwrite a rendered document input")
     return path
+
+
+def _delivery_report_path(args):
+    """Keep command results outside the bytes being verified or published."""
+    protected = ([args.build, args.output, *args.qualification_reference]
+                 if args.action == "package" else [args.path])
+    if args.action == "restore":
+        protected.append(args.output)
+    for source in protected:
+        source = source.resolve()
+        if args.report == source or args.report.is_relative_to(source):
+            raise ValueError("delivery report cannot overlap command inputs or outputs")
+
+
+def _delivery_result(action, *, result=None, error=None):
+    """Describe command completion without granting firmware qualification."""
+    return {"schema_version": 1, "kind": "nexus_documentation_delivery_result",
+            "action": action, "status": "failed" if error else "passed",
+            "qualification": False, "result": result,
+            "errors": [str(error)] if error else []}
 
 
 def normalize_generated_svg(folder):
@@ -296,6 +319,9 @@ def main(arguments=None, *, root=ROOT):
     for name in ("check", "build", "doctor", "package", "preview", "verify", "restore", "test"):
         command = sub.add_parser(name)
         command.add_argument("--tool-prefix", type=Path)
+        if name in {"package", "verify", "restore"}:
+            command.add_argument("--report", type=Path,
+                                 help="Atomically write the command result as JSON")
         if name == "check":
             command.add_argument("--staged", action="store_true")
             command.add_argument("--external", action="store_true")
@@ -322,6 +348,8 @@ def main(arguments=None, *, root=ROOT):
             command.add_argument("--port", type=int, default=8000)
         elif name in {"verify", "restore"}:
             command.add_argument("path", type=Path)
+            command.add_argument("--expected-manifest-sha256",
+                                 help="Require the original manifest digest")
             if name == "restore":
                 command.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
@@ -330,6 +358,10 @@ def main(arguments=None, *, root=ROOT):
     try:
         if getattr(args, "report", None):
             args.report = _safe_report(root, args.report)
+            if args.action in {"package", "verify", "restore"}:
+                _delivery_report_path(args)
+                failure_report = args.report
+                args.report.unlink(missing_ok=True)
             if args.action == "check":
                 failure_report = args.report
                 args.report.unlink(missing_ok=True)
@@ -374,13 +406,20 @@ def main(arguments=None, *, root=ROOT):
             from tools.documentation import delivery
             revision = observe_git_source(root)["commit"]
             release_id = args.release_id or "docs-" + revision[:12]
-            print(json.dumps(delivery.package(args.build, args.output,
+            record = delivery.package(args.build, args.output,
                 source_root=root, release_id=release_id,
-                qualification_references=args.qualification_reference), indent=2))
+                qualification_references=args.qualification_reference)
+            if args.report:
+                _record(args.report, _delivery_result(args.action, result=record))
+            print(json.dumps(record, indent=2))
         elif args.action in {"verify", "restore"}:
             from tools.documentation import delivery
-            record = (delivery.verify(args.path) if args.action == "verify" else
-                      delivery.restore(args.path, args.output))
+            options = {"expected_manifest_sha256": args.expected_manifest_sha256}
+            record = (delivery.verify(args.path, **options)
+                      if args.action == "verify" else
+                      delivery.restore(args.path, args.output, **options))
+            if args.report:
+                _record(args.report, _delivery_result(args.action, result=record))
             print(json.dumps(record, indent=2))
         elif args.action == "preview":
             if not (args.build / "documentation-build.json").is_file():
@@ -400,11 +439,13 @@ def main(arguments=None, *, root=ROOT):
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         if failure_report is not None:
             try:
-                _record(failure_report, {
+                record = (_delivery_result(args.action, error=error)
+                          if args.action in {"package", "verify", "restore"} else {
                     "schema_version": 1,
                     "kind": "nexus_documentation_source_check",
                     "status": "failed", "errors": [str(error)],
                     "admission_completed": False, "qualification": False})
+                _record(failure_report, record)
             except OSError as report_error:
                 print("Failure report could not be written: "
                       + str(report_error), file=sys.stderr)

@@ -29,8 +29,12 @@ def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
+    if any(item.kind in {"gpio", "flash", "watchdog"} for item in selections):
+        source.append('#include "stm32f407_basic_cold.h"')
     if any(item.kind == "spi" for item in selections):
         source.append('#include "stm32f407_spi_cold.h"')
+    if any(item.kind == "i2c" for item in selections):
+        source.append('#include "stm32f407_i2c_cold.h"')
     if any(item.mode == "irq-words" for item in selections):
         source.append('#include "stm32f407_uart_word.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in selections):

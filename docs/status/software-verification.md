@@ -39,12 +39,22 @@ qualified scopes 与候选文件摘要。没有选入候选时列表为空，不
 
 | 范围 | 精确代码源码 | 原权威及执行说明 |
 | --- | --- | --- |
+| 组织托管依赖与受控交付 | N2 `ce616ea9b30fd2bbd9511f73e2f3b5d8028224b4`；E1 `cef24bd1c7bc500fb28a17a6e1ff9cc7d5511711` | 原正式软件计划 159 阶段通过；外部示例 98 条命令通过；精确配置候选的六个 scope 已通过，原候选仍无签名，物理 HIL 未执行，产品晋升未执行 |
 | 类型化 IR、冷态接入与交付统一 | P2 `fc01d863c3374643c276195ae19a24e6f8b8c8ee`；E `acb5179ec09e0c2fae1911d32655296df39acedc` | [精确执行说明](../delivery/verification.md)；Q02 完整 159 阶段通过，E 完整本地执行通过；精确配置候选及六个 scope 已通过；Q01 失败单独保留，远端状态发布未确认，物理 HIL 未执行 |
 | SoC/IP 目录整理与原候选 | P `92e669233957a2e450a528394e8f4dd0794c7049`；E `0f15022e4d5f5c51991b134d0b9d6082dcf88de9` | [执行说明](../delivery/verification.md)、[48 项原台账](../design/soc-ip-layout-execution.csv)、[派生视图](ledgers/soc-ip-layout.md)；同一 P 的 A90＋B69 分段覆盖，原候选只覆盖其精确配置，物理 HIL 未执行 |
 | 开发体验迭代 P 与示例 E | P `c8df1c49d4f771a55490b3a8be32a9d1f24faa1e`；E `acb923cae407c8cfc4ac5788f8026d35c84cc841` | [结果索引](../delivery/developer-experience-results.json)保留本地完整 gate、SDK 独立消费、示例 ARM 和原始归档；不是正式软件候选 |
 | 构建系统及其实际软件 scopes | `cc6a065c002041234a212a964be863a69198f9b4` | [结果索引](../delivery/build-system-results.json)、[执行记录](../delivery/build-system-verification.md) |
 | SoC 扩展软件切片 | `98270512ea2ff7eefe8ff79720018e582be3a949` | [结果索引](../delivery/soc-extensions-results.json)、[执行记录](../delivery/soc-extensions-verification.md) |
 | 较早 SoC refinement 基线 | `3728b334b02eb2eb70bcf5d4caafbb9746837dd3` | [结果索引](../delivery/soc-refinement-results.json)、[执行记录](../delivery/soc-refinement-verification.md) |
+
+N2/E1 的原本地候选导航分别记录在外部示例仓库的
+`build/controlled-dependencies-ce616ea9/delivery-index.json` 和
+`build/documentation-controlled-dependencies-ce616ea9/delivery-index.json`。
+前者定位原候选、产物与可移植证据；后者定位双语文档包和独立离线恢复记录，
+文档发布仍为 `published=false`。这些路径是原主机留存位置，不是公开下载 URL。
+Nexus 合并提交 `3ea252c6` 与受测 N2 的 Git tree 相同，示例合并提交 `4a9f5f75`
+与受测 E1 的 Git tree 相同；关联保留原受测提交，不改写候选源码。本次后续 C
+生命周期迁移仍须建立自身最终源码的完整执行与交付证据。
 
 各索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加
 测试次数、ARM 镜像数或任务数量，也不能据此计算全项目完成率。后续文档 commit

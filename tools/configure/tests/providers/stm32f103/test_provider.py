@@ -119,15 +119,18 @@ class F103ProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(ConfigurationError, "provider"):
             self.provider.constructor(item, Result(), {}, {}, ())
 
-    def test_constructor_guard_precedes_state_mutation(self):
+    def test_constructor_connects_c_guard_and_immutable_uart_selection(self):
         item = ControllerIR.create(uart(), "stm32f103")
         construction = self.provider.constructor(item, Result(uart()), {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertLess(source.index(".retained"), source.index(".registers ="))
-        self.assertIn(".registers = USART2;", source)
+        self.assertNotIn(".retained", source)
+        self.assertIn("static const nx_stm32f103_uart_config_t", source)
+        self.assertIn(".registers = USART2,", source)
         self.assertIn("void USART2_IRQHandler", source)
         self.assertIn("static uint8_t s_nx_rx_console[64];", source)
-        self.assertIn("8000000u, 1000000u", source)
+        self.assertEqual(construction.initialize.render(),
+                         "nx_stm32f103_uart_prepare(&s_nx_port_console, "
+                         "&s_nx_uart_config_console)")
         self.assertTrue(construction.retain_on_failed_init)
         self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_uart_port_stop(&s_nx_face_console)",))
@@ -197,7 +200,9 @@ class F103ProviderTests(unittest.TestCase):
         ir = ControllerIR.create(item, "stm32f103")
         construction = self.provider.constructor(ir, Result(item), {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertIn(".preparation_retained", source)
+        self.assertNotIn(".preparation_retained", source)
+        self.assertEqual(construction.initialize.function,
+                         "nx_stm32f103_watchdog_prepare")
         self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_stm32f103_watchdog_stop(&s_nx_port_iwdg)",))
 
@@ -218,7 +223,9 @@ class F103ProviderTests(unittest.TestCase):
         construction = self.provider.constructor(
             ControllerIR.create(item, "stm32f103"), Result(item), {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertIn(".mux = AFIO;", source)
+        self.assertIn("static const nx_stm32f103_exti_config_t", source)
+        self.assertEqual(construction.initialize.function,
+                         "nx_stm32f103_exti_prepare")
         self.assertIn("void EXTI0_IRQHandler", source)
 
     def test_spi_endpoint_and_cs_are_static_and_one_owned_lease(self):

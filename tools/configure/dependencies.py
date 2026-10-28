@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "__init__", "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
+    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
@@ -14,7 +14,7 @@ COMMON = (
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
 )
 PLATFORM = (
-    "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory", "contracts",
+    "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",

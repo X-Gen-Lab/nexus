@@ -9,7 +9,6 @@ from tools.configure.gpio_phase import withdraw_pin
 from tools.configure.memory import dma_regions
 from tools.configure.providers.common import Construction, fail, mode_traits
 from tools.configure.providers import hardware, maintained
-from tools.configure import enhanced_endpoints
 
 
 def validate_soc(soc, provider):
@@ -131,45 +130,14 @@ def _clock_hz(item, result):
     return result.clock[f"apb{bus}_hz"]
 
 
-def _endpoint_faces(item, result, prefix, policy):
-    name = _symbol(item.id)
-    children = [device for device in result.devices if device.controller == item.id]
-    declarations = []
-    assignments = []
-    for index, device in enumerate(children):
-        child = _symbol(device.id)
-        endpoint = "s_nx_endpoint_" + (name if index == 0 else child)
-        implementation = "spi_dma" if item.kind == "spi" else "i2c_async"
-        if index:
-            initializer = (f" = {{ .port = &s_nx_port_{name}, .address = {device.options.address}u }}"
-                           if item.kind == "i2c" else "")
-            declarations.append(f"static nx_{prefix}_{implementation}_endpoint_state_t {endpoint}{initializer};")
-        operations = (f"nx_{prefix}_spi_dma_endpoint_ops" if item.kind == "spi" else
-                      "nx_i2c_v1_async_endpoint_ops")
-        declarations += enhanced_endpoints.face(device, endpoint,
-                                                 operations, item.provider)
-        if item.kind != "i2c":
-            pins = (result.routes[result.board_bindings[device.options.cs_binding]["route"]]["pins"]
-                    if device.options.cs_binding is not None else [pin for pin in item.pins if pin["function"] == "cs"])
-            if len(pins) != 1:
-                fail("Paired SPI requires one explicit reviewed CS per child")
-            wire = pins[0]["pin"]
-            mask = 1 << int(wire[2:])
-            mode = device.options.mode
-            rate = device.options.max_hz
-            storage, setup = policy.spi_endpoint(
-                name, child, endpoint, wire, mask, mode, rate)
-            declarations += storage
-            assignments += setup
-    return declarations, assignments, children
-
-
 def constructor(item, result, prefix):
     name = _symbol(item.id)
     state = "s_nx_port_" + name
     provider = maintained(result.soc_family)
     if provider.PREFIX != prefix or item.provider != result.soc_family:
         fail("Paired constructor differs from the selected provider")
+    if item.kind != "uart":
+        fail("Paired SPI/I2C require their dedicated C lifecycle constructors")
     policy, gpio = provider.SECONDARY_INTEGRATION, provider.GPIO_PHASE
     pins = _pins(item, result)
     if len(pins) > 16:
@@ -185,14 +153,8 @@ def constructor(item, result, prefix):
                    f"static uint8_t s_nx_pair_priorities_{name}[{len(vectors)}];",
                    f"static bool s_nx_pair_vectors_{name};",
                    f"static bool s_nx_pair_constructed_{name};"]
-    endpoint_assignments, children = [], []
-    if item.kind != "uart":
-        endpoint_lines, endpoint_assignments, children = _endpoint_faces(
-            item, result, prefix, policy)
-        definitions += endpoint_lines
-    else:
-        storage = "uint8_t" if item.options.rx_profile == "bytes" else "nx_uart_rx_event_t"
-        definitions += [f"static {storage} s_nx_rx_{name}[{item.options.rx_capacity}];"]
+    storage = "uint8_t" if item.options.rx_profile == "bytes" else "nx_uart_rx_event_t"
+    definitions += [f"static {storage} s_nx_rx_{name}[{item.options.rx_capacity}];"]
     body = [f"static nx_result_t prepare_{name}(void) {{", "    nx_result_t status;",
             f"    if (s_nx_pair_constructed_{name} || s_nx_pair_vectors_{name} || s_nx_pair_pin_leases_{name} != 0u) {{ return NX_ERROR_BUSY; }}"]
     for _, irq, _ in vectors:
@@ -227,45 +189,20 @@ def constructor(item, result, prefix):
         _check(body, f"nx_{prefix}_gpio_clock_enable({ord(port)-ord('A')}u)")
         body += [f"    s_nx_pair_pin_saved_{name}[{index}] = nx_{prefix}_pin_capture(GPIO{port}, {number}u);",
                  f"    s_nx_pair_pin_leases_{name} |= {1 << index}u;"]
-        if function in {"cs", "tx"}:
+        if function == "tx":
             bop, odr = gpio.output_set(port), gpio.output_read(port)
             body += [f"    NX_PLATFORM_REGISTER_WRITE({bop}, {1 << number}u);", "    nx_arch_dsb();",
                      f"    if (({odr} & {1 << number}u) == 0u) {{ return NX_ERROR_IO; }}"]
-        mode = 1 if function == "cs" else 2
         pull = 1 if function == "rx" else 0
-        open_drain = "true" if item.kind == "i2c" else "false"
-        _check(body, f"nx_{prefix}_pin_configure(GPIO{port}, {number}u, {mode}u, {pin['af']}u, {pull}u, {open_drain})")
-    if item.kind == "uart":
-        body += [f"    {state}.resources.regions = s_nx_dma_regions_{name};",
-                 f"    {state}.resources.region_count = {region_count}u;"]
-        setup, call = policy.setup_uart(
-            item, name, state, dma_paths(item), _clock_hz(item, result))
-        body += setup
-        _check(body, call)
-        body += [f"    s_nx_pair_constructed_{name} = true;"]
-    elif item.kind == "i2c":
-        if mode_traits(item.kind, item.mode).dma:
-            definitions += [f"static const nx_i2c_v1_dma_t s_nx_pair_dma_{name} = {policy.I2C_DMA_PREFIX}_{controller}_DMA(s_nx_dma_regions_{name}, {region_count}u);"]
-        body += [f"    {state}.registers = (volatile uint32_t*){controller};",
-                 f"    {state}.line_inputs = {policy.I2C_LINE_INPUTS};",
-                 f"    {state}.line_mask = {sum(1 << int(pin['pin'][2:]) for pin in item.pins)}u;",
-                 f"    {state}.peripheral_mhz = {_clock_hz(item, result) // 1000000}u;",
-                 f"    {state}.dma = {'&s_nx_pair_dma_' + name if mode_traits(item.kind, item.mode).dma else 'NULL'};"]
-        _check(body, f"nx_{prefix}_i2c_async_initialize(&{state}, {item.options.irq.priority}u)")
-        body += [f"    s_nx_pair_constructed_{name} = true;"]
-    else:
-        body += [f"    {state}.regions = s_nx_dma_regions_{name};",
-                 f"    {state}.region_count = {region_count}u;"]
-        setup, call, after = policy.setup_spi(
-            item, result, name, state, dma_paths(item), _clock_hz(item, result),
-            children, endpoint_assignments)
-        body += setup
-        _check(body, call)
-        body += [f"    s_nx_pair_constructed_{name} = true;", *after]
-    # Providers have no failure return after their first MMIO effect. Preserve
-    # the completed cold session before inspecting writes or publisher state.
-    if item.kind == "i2c":
-        body += endpoint_assignments
+        _check(body, f"nx_{prefix}_pin_configure(GPIO{port}, {number}u, 2u, {pin['af']}u, {pull}u, false)")
+    body += [f"    {state}.resources.regions = s_nx_dma_regions_{name};",
+             f"    {state}.resources.region_count = {region_count}u;"]
+    setup, call = policy.setup_uart(
+        item, name, state, dma_paths(item), _clock_hz(item, result))
+    body += setup
+    _check(body, call)
+    # Preserve the completed session before inspecting publisher readback.
+    body += [f"    s_nx_pair_constructed_{name} = true;"]
     body += [f"    if (({apb} & {gate}) == 0u) {{ return NX_ERROR_IO; }}"]
     for _, irq, _ in vectors:
         bank, mask = irq // 32, 1 << (irq % 32)
@@ -288,15 +225,6 @@ def constructor(item, result, prefix):
                  "        nx_arch_dsb();",
                  f"        if (NVIC->IPR[{irq}] != s_nx_pair_priorities_{name}[{index}]) {{ return NX_ERROR_IO; }}"]
     stop += [f"        s_nx_pair_vectors_{name} = false;", "    }"]
-    # All active-low CS outputs observe inactive drive before any pin release.
-    for index, pin in enumerate(pins):
-        if pin["function"] != "cs":
-            continue
-        wire, bit = pin["pin"], 1 << int(pin["pin"][2:])
-        bop, odr = gpio.output_set(wire[1]), gpio.output_read(wire[1])
-        stop += [f"    if ((s_nx_pair_pin_leases_{name} & {1 << index}u) != 0u) {{",
-                 f"        NX_PLATFORM_REGISTER_WRITE({bop}, {bit}u);", "        nx_arch_dsb();",
-                 f"        if (({odr} & {bit}u) == 0u) {{ return NX_ERROR_IO; }}", "    }"]
     for index, pin in reversed(list(enumerate(pins))):
         wire, bit = pin["pin"], 1 << index
         stop += [f"    if ((s_nx_pair_pin_leases_{name} & {bit}u) != 0u) {{"]
@@ -315,10 +243,8 @@ def constructor(item, result, prefix):
         definitions += [f"void {vector}_IRQHandler(void);",
                         "/** \\brief Dispatch the exact independently owned controller. */",
                         f"void {vector}_IRQHandler(void) {{ {callback}(&{state}{',' + extra if extra else ''}); }}"]
-    implementation = {"uart": "uart_dma", "spi": "spi_dma",
-                      "i2c": "i2c_async"}[item.kind]
     return Construction(
-        state_type=f"nx_{prefix}_{implementation}_state_t",
+        state_type=f"nx_{prefix}_uart_dma_state_t",
         definitions=definitions, initialize=DirectCall(f"prepare_{name}"),
         stop=[DirectCall(f"stop_{name}")], retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:

@@ -2,7 +2,6 @@
 from tools.configure.ir import controller_ir
 from tools.configure.calls import Address, DirectCall, Symbol
 from tools.configure.memory import dma_regions
-from tools.configure.gpio_phase import rollback_pin, withdraw_pin
 from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, mode_traits
 from tools.configure.providers import hardware
@@ -39,54 +38,45 @@ def _endpoint_face(kind, name, state, implementation=None):
 
 
 def prepared(name, pins, initialize, after=(), before=()):
-    """Wire cold pin helpers and rollback around one validated constructor."""
+    """Connect a concrete constructor to the C-owned pin transaction."""
     unique_pins = {pin["pin"]: (pin, mode, pull, drain, initial)
                    for pin, mode, pull, drain, initial in pins}
-    mask = sum(1 << (ord(port) - ord("A"))
-               for port in {pin[1] for pin in unique_pins})
-    lines = [f"static nx_result_t prepare_{name}(void) {{",
-             "    nx_result_t status = NX_SUCCESS;",
-             "    uint32_t retained_gpio_clocks = 0u;",
-             f"    uint32_t saved_clocks = RCU_AHB1EN & {mask}u;"]
-    for pin in unique_pins:
-        lines += [f"    uint16_t saved_{pin} = 0u;", f"    bool captured_{pin} = false;"]
+    if not 1 <= len(unique_pins) <= 16:
+        raise ValueError("GD470 constructor requires one to sixteen selected pins")
+    config = f"s_nx_cold_pins_{name}"
+    lines = [f"static const nx_gd32_cold_pin_config_t {config}[] = {{"]
     for pin, mode, pull, drain, initial in unique_pins.values():
-        wire = pin["pin"]
-        lines += [f"    status = nx_gd32_gpio_clock_enable({ord(wire[1]) - ord('A')}u);",
-                  "    if (status != NX_SUCCESS) { goto rollback; }",
-                  f"    saved_{wire} = nx_gd32_pin_capture(GPIO{wire[1]}, {wire[2:]}u);",
-                  f"    captured_{wire} = true;"]
         if initial is not None:
-            bit = 1 << int(wire[2:])
-            value = bit if initial else bit << 16
-            lines.append(f"    GPIO_BOP(GPIO{wire[1]}) = {value}u;")
-        lines += [f"    status = nx_gd32_pin_configure(GPIO{wire[1]}, {wire[2:]}u, {mode}u, {pin['af']}u, {pull}u, {'true' if drain else 'false'});",
-                  "    if (status != NX_SUCCESS) { goto rollback; }"]
+            raise ValueError("GD470 UART/I2C pins have no output-latch policy")
+        wire = pin["pin"]
+        lines.append(
+            f"    {{ GPIO{wire[1]}, {wire[2:]}u, {pin['af']}u, {mode}u, "
+            f"{pull}u, {'true' if drain else 'false'} }},")
+    lines += ["};", f"static nx_result_t prepare_{name}(void) {{",
+             "    nx_result_t status = NX_SUCCESS;",
+              f"    uint16_t saved_pins[{len(unique_pins)}] = {{0u}};",
+              "    nx_gd32_cold_pins_receipt_t pins = {0u};",
+              f"    status = nx_gd32_cold_pins_prepare({config}, "
+              f"{len(unique_pins)}u, saved_pins, &pins);",
+              "    if (status != NX_SUCCESS) { goto rollback; }"]
     lines += list(before)
     lines += [f"    status = {initialize};", "    if (status != NX_SUCCESS) { goto rollback; }"]
     lines += list(after)
-    lines += ["    return NX_SUCCESS;", "rollback:"]
-    for wire in reversed(unique_pins):
-        lines += [f"    if (captured_{wire}) {{"]
-        lines += rollback_pin("gd32f470", wire, f"saved_{wire}")
-        lines += ["    }"]
-    lines += [f"    RCU_AHB1EN = (RCU_AHB1EN & ~{mask}u) | saved_clocks | retained_gpio_clocks;",
-              "    nx_arch_dsb();", "    return status;", "}"]
+    lines += ["    return NX_SUCCESS;", "rollback:",
+              f"    (void)nx_gd32_cold_pins_rollback({config}, "
+              f"{len(unique_pins)}u, saved_pins, &pins);",
+              "    return status;", "}"]
     return lines
 
 
 def released(name, pins, stop, cs_pins=()):
+    if cs_pins:
+        raise ValueError("GD470 SPI CS lifecycle belongs to its concrete adapter")
     lines = [f"static nx_result_t stop_{name}(void) {{",
              f"    nx_result_t status = {stop};",
              "    if (status != NX_SUCCESS) { return status; }"]
-    for pin in cs_pins:
-        wire = pin["pin"]
-        lines.append(f"    GPIO_BOP(GPIO{wire[1]}) = {1 << int(wire[2:])}u;")
-    for pin in pins:
-        wire = pin["pin"]
-        lines += withdraw_pin("gd32f470", wire, indent=4)
-        lines.append(f"    (void)nx_gd32_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 0u, 0u, 0u, false);")
-    return lines + ["    return NX_SUCCESS;", "}"]
+    return lines + [f"    return nx_gd32_cold_pins_release(s_nx_cold_pins_{name}, "
+                    f"{len({pin['pin'] for pin in pins})}u);", "}"]
 
 
 def _spi_constructor(item, result, board_bindings, routes, devices):
@@ -176,6 +166,87 @@ def _spi_constructor(item, result, board_bindings, routes, devices):
         state_type=f"nx_gd32_{implementation}_state_t", definitions=definitions,
         initialize=DirectCall(f"nx_gd32_{implementation}_prepare", arguments),
         stop=stop, retain_on_failed_init=True, pin_snapshots=snapshots)
+
+
+def _i2c_constructor(item, result, devices):
+    """Describe exact resources; concrete C owns every I2C cold transition."""
+    selected = item.integration
+    if (selected is None or selected.hardware is None or
+            selected.hardware.kind != "i2c" or
+            selected.hardware.controller != item.controller or
+            selected.clock_hz != 50000000 or len(selected.pins) != 2):
+        raise ValueError("I2C requires its reviewed controller integration")
+    if item.mode not in {"poll-messages", "irq-messages", "dma-messages"}:
+        raise ValueError("I2C requires its maintained execution mode")
+    asynchronous = mode_traits(item.kind, item.mode).irq
+    dma = mode_traits(item.kind, item.mode).dma
+    if asynchronous and selected.irq is None:
+        raise ValueError("I2C requires its selected IRQ integration")
+    if dma:
+        secondary_controllers.dma_paths(item)
+    elif selected.dma:
+        raise ValueError("I2C polling/IRQ integration cannot retain DMA lanes")
+    name = _symbol(item.id)
+    saved = f"s_nx_i2c_pin_state_{name}"
+    config = f"s_nx_i2c_config_{name}"
+    receipt = f"s_nx_i2c_cold_{name}"
+    definitions = [f"static uint16_t {saved}[2];",
+                   f"static nx_gd32_i2c_cold_t {receipt};",
+                   f"static const nx_gd32_cold_pin_config_t s_nx_i2c_pins_{name}[] = {{"]
+    snapshots = {}
+    pull = 0 if secondary_controllers.applies(item, result, "gd32") else 1
+    for index, pin in enumerate(selected.pins):
+        wire = pin["pin"]
+        slot = f"{saved}[{index}u]"
+        snapshots[wire] = slot
+        definitions.append(f"    {{ GPIO{wire[1]}, {int(wire[2:])}u, {pin['af']}u, 2u, {pull}u, true }},")
+    definitions += ["};"]
+    if dma:
+        regions, count = dma_regions(name, result, include_flash=True)
+        definitions += regions
+        definitions += [f"static const nx_i2c_v1_dma_t s_nx_i2c_dma_{name} =",
+                        f"    NX_GD32_{item.controller}_DMA(s_nx_dma_regions_{name}, {count}u);"]
+    children = [child for child in devices if child.controller == item.id]
+    if not children:
+        raise ValueError("I2C requires at least one reviewed address endpoint")
+    definitions += [f"static const nx_gd32_i2c_config_t {config} = {{",
+                    f"    .registers = {item.controller}, .pins = s_nx_i2c_pins_{name},",
+                    f"    .dma = {'&s_nx_i2c_dma_' + name if dma else 'NULL'},",
+                    f"    .snapshots = {saved}, .address = {children[0].options.address}u,",
+                    f"    .priority = {selected.irq.priority if asynchronous else 0}u,",
+                    f"    .asynchronous = {'true' if asynchronous else 'false'}", "};"]
+    implementation = "i2c_async" if asynchronous else "i2c"
+    for index, child in enumerate(children):
+        child_name = _symbol(child.id)
+        endpoint = (f"s_nx_endpoint_{name}" if index == 0 else
+                    f"s_nx_endpoint_{child_name}")
+        if index:
+            definitions += [f"static nx_gd32_{implementation}_endpoint_state_t {endpoint} = {{",
+                            f"    .port = &s_nx_port_{name}, .address = {child.options.address}u", "};"]
+        definitions += _endpoint_face("i2c", child_name, endpoint,
+                                      implementation)
+    if asynchronous:
+        for vector, _ in selected.hardware.irqs:
+            definitions += [f"void {vector}_IRQHandler(void);",
+                            r"/** \brief Fixed selected I2C message publisher. */",
+                            f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&s_nx_port_{name}); }}"]
+    if dma:
+        for lane, receive in zip(selected.dma, ("true", "false")):
+            vector = f"{lane.engine}_Channel{lane.lane}"
+            definitions += [f"void {vector}_IRQHandler(void);",
+                            r"/** \brief Fixed selected I2C DMA publisher. */",
+                            f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+    arguments = (Address(f"s_nx_port_{name}"), Address(config),
+                 Address(receipt))
+    initialize_arguments = arguments if asynchronous else (
+        Address(f"s_nx_port_{name}"), Address(f"s_nx_endpoint_{name}"),
+        Address(config), Address(receipt))
+    return Construction(
+        state_type=f"nx_gd32_{implementation}_state_t",
+        definitions=definitions,
+        initialize=DirectCall(f"nx_gd32_{implementation}_prepare", initialize_arguments),
+        stop=[DirectCall(f"nx_gd32_{implementation}_close", arguments)],
+        retain_on_failed_init=True, pin_snapshots=snapshots)
 
 
 def _controller_constructor(item, result, board_bindings, routes, devices):
@@ -279,65 +350,6 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact GD USART0 TX DMA terminal observation. */",
                              f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_{'duplex_dma' if receive else 'dma'}_irq(&s_nx_port_{name}); }}"]
-        initialize = DirectCall(f"prepare_{name}")
-        stop = [DirectCall(f"stop_{name}")]
-    elif kind == "i2c" and mode_traits(kind, item.mode).irq:
-        if item.controller != "I2C0":
-            raise ValueError("Only reviewed I2C0 asynchronous mode is maintained")
-        port = item.pins[0]["pin"][1]
-        mask = sum(1 << int(pin["pin"][2:]) for pin in item.pins)
-        before = [f"    s_nx_port_{name}.registers = (volatile uint32_t*)I2C0;",
-                  f"    s_nx_port_{name}.line_inputs = &GPIO_ISTAT(GPIO{port});",
-                  f"    s_nx_port_{name}.line_mask = {mask}u;",
-                  f"    s_nx_port_{name}.peripheral_mhz = 50u;"]
-        dma = mode_traits(kind, item.mode).dma
-        if dma:
-            region_lines, region_count = dma_regions(name, result, include_flash=True)
-            declarations += region_lines
-            declarations += [f"static const nx_i2c_v1_dma_t s_nx_i2c_dma_{name} =",
-                             f"    NX_GD32_I2C0_DMA(s_nx_dma_regions_{name}, {region_count}u);"]
-            before.append(f"    s_nx_port_{name}.dma = &s_nx_i2c_dma_{name};")
-        else:
-            before.append(f"    s_nx_port_{name}.dma = NULL;")
-        for index, child in enumerate(children):
-            child_name = _symbol(child.id)
-            endpoint = f"s_nx_endpoint_{name}" if not index else f"s_nx_endpoint_{child_name}"
-            if index:
-                declarations.append(f"static nx_gd32_i2c_async_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }};")
-            declarations += _endpoint_face("i2c", child_name, endpoint, "i2c_async")
-        call = f"nx_gd32_i2c_async_initialize(&s_nx_port_{name}, {item.options.irq.priority}u)"
-        declarations += prepared(name, [(pin, 2, 1, True, None) for pin in item.pins], call, before=before)
-        declarations += released(name, item.pins, f"nx_i2c_port_stop(&s_nx_face_{name})")
-        port_binding = hardware.maintained("gd32f470", item.controller)
-        for vector, _ in port_binding.irqs:
-            declarations += [f"void {vector}_IRQHandler(void);",
-                             r"/** \brief Selected finite I2C message publisher. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&s_nx_port_{name}); }}"]
-        if dma:
-            for path, receive in zip(port_binding.dma(item.mode), ("true", "false")):
-                vector = hardware.dma_vector("gd32f470", path)
-                declarations += [f"void {vector}_IRQHandler(void);",
-                                 r"/** \brief Selected I2C DMA boundary publisher. */",
-                                 f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
-        initialize = DirectCall(f"prepare_{name}")
-        stop = [DirectCall(f"stop_{name}")]
-    elif kind == "i2c":
-        if item.controller not in {"I2C0", "I2C1"} or not children:
-            raise ValueError("GD32 I2C requires maintained controller and explicit address")
-        descriptor = item.controller.lower()
-        after = []
-        for index, child in enumerate(children):
-            child_name = _symbol(child.id)
-            endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
-            if index:
-                declarations.append(f"static nx_gd32_i2c_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }};")
-            declarations += _endpoint_face("i2c", child_name, endpoint)
-        line_gpio = item.pins[0]["pin"][1]
-        line_mask = sum(1 << int(pin["pin"][2:]) for pin in item.pins)
-        call = (f"nx_gd32_i2c_initialize_at(&s_nx_port_{name}, &s_nx_endpoint_{name}, "
-                f"&nx_gd32_{descriptor}_controller, {children[0].options.address}u, 100000u, GPIO{line_gpio}, {line_mask}u)")
-        declarations += prepared(name, [(pin, 2, 1, True, None) for pin in item.pins], call, after)
-        declarations += released(name, item.pins, f"nx_gd32_i2c_stop(&s_nx_port_{name})")
         initialize = DirectCall(f"prepare_{name}")
         stop = [DirectCall(f"stop_{name}")]
     elif kind == "flash":
@@ -454,6 +466,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed GD32 instance, including explicit GPIO construction."""
     item = controller_ir(item, "gd32f470")
+    if item.kind == "i2c":
+        return _i2c_constructor(item, result, devices)
     if item.kind == "spi":
         construction = _spi_constructor(item, result, board_bindings, routes, devices)
         return enhanced_endpoints.dma_construction(item, construction, "gd32")

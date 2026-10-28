@@ -65,6 +65,60 @@ class PartFactsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "package"):
             gate.validate_soc(facts, "STM32F407VET6")
 
+    def test_unselected_variant_obeys_the_complete_physical_contract(self):
+        def unknown_field(variant):
+            variant["capacity_override"] = 1
+
+        def package(variant):
+            variant["package"] = "LQFP100"
+
+        def flash_geometry(variant):
+            variant["flash"]["erase_blocks"].pop()
+
+        def dma_access(variant):
+            variant["memory"][0]["dma"] = "true"
+
+        def overlap(variant):
+            variant["memory"][1]["origin"] = variant["memory"][0]["origin"]
+
+        def optional_memory(variant):
+            variant["memory"] = [region for region in variant["memory"]
+                                 if region["id"] != "ccm"]
+
+        def linker_domains(variant):
+            for region in variant["memory"]:
+                region["linker"] = False
+
+        for mutate, error in ((unknown_field, "unknown"),
+                              (package, "package"),
+                              (flash_geometry, "geometry"),
+                              (dma_access, "DMA"),
+                              (overlap, "Overlapping"),
+                              (optional_memory, "Optional memory"),
+                              (linker_domains, "default RAM")):
+            with self.subTest(contract=mutate.__name__):
+                facts = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+                mutate(facts["variants"]["STM32F407ZGT6"])
+                with self.assertRaisesRegex(ValueError, error):
+                    gate.validate_soc(facts, "STM32F407VET6")
+
+    def test_full_variant_validation_preserves_selected_fact_identity(self):
+        for provider in descriptor.families():
+            facts = gate.load(gate.ROOT / provider.source_directory / "soc.json")
+            original = copy.deepcopy(facts)
+            for part, variant in facts["variants"].items():
+                with self.subTest(family=provider.family, part=part):
+                    self.assertIs(gate.validate_soc(facts, part), variant)
+                    self.assertEqual(facts, original)
+
+    def test_malformed_memory_entries_are_configuration_rejections(self):
+        for selected in ("STM32F407VET6", "STM32F407ZGT6"):
+            with self.subTest(selected=selected):
+                facts = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+                facts["variants"]["STM32F407ZGT6"]["memory"] = [False]
+                with self.assertRaisesRegex(ValueError, "memory"):
+                    gate.validate_soc(facts, selected)
+
     def test_unknown_f407_part_cannot_fall_through_to_zg_geometry(self):
         result = gate.resolve_ir(gate.ROOT /
                               "tests/contracts/stm32_assembly/ve-flash.toml")

@@ -17,6 +17,7 @@ from tools.evidence.common import (
 )
 from tools.evidence.identity import canonical_digest, resolved_identity
 from tools.hil.admit import admit, require, validate_fixture
+from tools.hil import power
 
 
 # These describe observations, not firmware configuration or Board capabilities.
@@ -30,13 +31,16 @@ METRICS = {
     "loss": ("count", ("receiver_event_counter",), True),
     "duration": ("s", ("monotonic_timestamp",), False),
 }
+LEGACY_METRICS = tuple(METRICS)
+METRICS.update({name: (unit, (power.METHOD,), False)
+                for name, (unit, _) in power.METRICS.items()})
 MAX_TRACES = len(METRICS)
 MAX_SAMPLES = 100000
 MAX_OBSERVATION = 2 ** 64 - 1
 MEASUREMENT_SCHEMA = 2
 
 
-def measurement_plan(fixture: dict, resolved: dict) -> dict:
+def measurement_plan(fixture: dict, resolved: dict, *, include_power=False) -> dict:
     """An unbound checklist cannot supply budgets or measured values."""
     validate_fixture(fixture)
     require(resolved["board"] == fixture["board"] and
@@ -52,6 +56,7 @@ def measurement_plan(fixture: dict, resolved: dict) -> dict:
             {"id": name, "unit": unit, "methods": list(methods),
              "budget": None, "status": "not_executed"}
             for name, (unit, methods, _) in METRICS.items()
+            if include_power or name in LEGACY_METRICS
         ],
         "conditions": [
             "bind reviewed station, workload, firmware and numeric budgets",
@@ -207,7 +212,7 @@ def _cycle_sample(sample, conditions, context):
 
 
 def _context(identity: dict, admission_digest: str, budgets: dict,
-             admission: dict) -> dict:
+             admission: dict, started: str, finished: str) -> dict:
     """Bind load and acquisition conditions separately from statistics."""
     context = load_json(verify_file_identity(identity))
     fields(context, {"schema_version", "kind", "admission_sha256", "workload",
@@ -243,6 +248,7 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
                           "reference"},
               "stack_used_peak": {"stack_capacity_bytes"},
               "loss": {"expected_events"}}
+    extras.update({name: {"power"} for name in power.METRICS})
     for name, conditions in measurements.items():
         require(name in METRICS, "unmaintained acquisition metric")
         fields(conditions, {"method", "instrument", "resolution",
@@ -252,7 +258,11 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
         verify_file_identity(conditions["instrument"])
         _positive_number(conditions["resolution"], "capture resolution")
         _positive_number(conditions["observation_window_s"], "capture window")
-        if name == "cycles":
+        if name in power.METRICS:
+            conditions["_validated_power"] = power.validate_conditions(
+                conditions["power"], conditions["instrument"], admission,
+                started, finished, conditions["observation_window_s"])
+        elif name == "cycles":
             require(type(conditions["counter_bits"]) is int and
                     conditions["counter_bits"] == 32,
                     "Cortex-M DWT requires a 32-bit counter")
@@ -304,9 +314,31 @@ def _trace(identity: dict, admission_digest: str, context_identity: dict,
     samples = trace["samples"]
     require(isinstance(samples, list) and 0 < len(samples) <= MAX_SAMPLES,
             "measurement trace is empty or exceeds bounded sample count")
+    if name in power.METRICS:
+        acquisition = conditions["power"]
+        points = ((acquisition["window_end_ns"] -
+                   acquisition["window_start_ns"]) //
+                  acquisition["sample_period_ns"] + 1)
+        require(len(samples) <= power.MAX_CAPTURES and
+                len(samples) * points <= power.MAX_SAMPLES,
+                "power capture enumeration exceeds bounded sample count")
     values = []
+    captures = []
+    capture_identities = set()
     for sequence, sample in enumerate(samples):
-        if name == "cycles":
+        if name in power.METRICS:
+            fields(sample, {"sequence", "capture"})
+            capture = power.derive_capture(sample["capture"], admission_digest,
+                context_identity["sha256"], conditions["power"],
+                conditions["instrument"], conditions["_validated_power"])
+            capture_identity = (capture["raw"]["sha256"],
+                                capture["raw"]["size"])
+            require(capture_identity not in capture_identities,
+                    "duplicate power capture cannot add another observation")
+            capture_identities.add(capture_identity)
+            captures.append(capture)
+            value = capture[power.METRICS[name][1]]
+        elif name == "cycles":
             value = _cycle_sample(sample, conditions, context)
         else:
             fields(sample, {"sequence", "value"})
@@ -320,12 +352,15 @@ def _trace(identity: dict, admission_digest: str, context_identity: dict,
                 "invalid measurement sample: " + name)
         values.append(value)
     # Mean is accumulated as scaled terms to avoid overflowing a finite sum.
-    return name, {
+    result = {
         "unit": unit, "method": trace["method"], "samples": len(values),
         "minimum": min(values), "maximum": max(values),
         "mean": math.fsum(value / len(values) for value in values),
         "raw": identity,
     }
+    if captures:
+        result["captures"] = captures
+    return name, result
 
 
 def validate_measurements(raw: dict, admission: dict, *,
@@ -357,7 +392,7 @@ def validate_measurements(raw: dict, admission: dict, *,
     require(raw["admission_sha256"] == admission_digest,
             "measurement record is not bound to admission")
     context = _context(raw["context"], admission_digest, admission["budgets"],
-                       admission)
+                       admission, raw["started_utc"], raw["finished_utc"])
     traces = raw["traces"]
     require(isinstance(traces, list) and 0 < len(traces) <= MAX_TRACES,
             "measurement trace enumeration empty or excessive")
@@ -379,8 +414,9 @@ def validate_measurements(raw: dict, admission: dict, *,
         "status": "passed",
         "physical_status": "qualified_for_recorded_measurements",
         "metrics": metrics, "context": raw["context"],
-            "limits": ("Recorded samples do not prove physical clock-owner "
-                   "truth, independence, WCET, unobserved load or release"),
+        "limits": ("Recorded samples do not prove physical clock-owner "
+                   "truth, calibration authenticity, between-sample peaks, "
+                   "independence, WCET, unobserved load or release"),
     }
 
 
@@ -507,6 +543,8 @@ def main(argv=None) -> int:
     plan = subparsers.add_parser("plan")
     plan.add_argument("--fixture", type=Path, required=True)
     plan.add_argument("--resolved", type=Path, required=True)
+    plan.add_argument("--power", action="store_true",
+                      help="Include paired raw voltage/current acquisition cases")
     validate = subparsers.add_parser("validate")
     validate.add_argument("--admission", type=Path, required=True)
     validate.add_argument("--raw-evidence", type=Path, required=True)
@@ -534,7 +572,8 @@ def main(argv=None) -> int:
     try:
         if args.command == "plan":
             resolved, identity = resolved_identity(args.resolved)
-            report = measurement_plan(load_json(args.fixture), resolved)
+            report = measurement_plan(load_json(args.fixture), resolved,
+                                      include_power=args.power)
             report.update(fixture=file_identity(args.fixture),
                           resolved=identity)
         elif args.command == "compare":
@@ -563,6 +602,10 @@ def main(argv=None) -> int:
                     if args.report.resolve() in protected:
                         parser.exit(
                             1, "measurement report would overwrite inputs\n")
+            for identity in raw.get("traces", []):
+                protected.update(_identity_paths(load_json(identity["path"])))
+                if args.report.resolve() in protected:
+                    parser.exit(1, "measurement report would overwrite inputs\n")
             if args.report.resolve() in protected:
                 parser.exit(1, "measurement report would overwrite inputs\n")
             report = validate_measurements(raw, admission)

@@ -272,8 +272,23 @@ model_bytes=128
         output = self.root / "multi-gd32"
         gate.configure(source, output)
         generated = (output / "bindings.c").read_text()
-        for descriptor in ("usart0", "usart1", "spi0", "spi4", "i2c0", "i2c1"):
+        for descriptor in ("usart0", "usart1", "spi0", "spi4"):
             self.assertIn(f"&nx_gd32_{descriptor}_controller", generated)
+        for suffix, registers in (("a", "I2C0"), ("b", "I2C1")):
+            name = "bus_i2c_" + suffix
+            declaration = ("static const nx_gd32_i2c_config_t "
+                           f"s_nx_i2c_config_{name} = {{")
+            config = generated.split(declaration, 1)[1].split("};", 1)[0]
+            self.assertIn(f".registers = {registers},", config)
+            self.assertIn(f".pins = s_nx_i2c_pins_{name},", config)
+            self.assertIn(
+                f"nx_gd32_i2c_prepare(&s_nx_port_{name}, "
+                f"&s_nx_endpoint_{name}, &s_nx_i2c_config_{name}, "
+                f"&s_nx_i2c_cold_{name})", generated)
+            self.assertIn(
+                f"nx_gd32_i2c_close(&s_nx_port_{name}, "
+                f"&s_nx_i2c_config_{name}, &s_nx_i2c_cold_{name})",
+                generated)
         self.assertIn("void USART0_IRQHandler(void)", generated)
         self.assertIn("void USART1_IRQHandler(void)", generated)
         self.assertIn("nx_gd32_uart_irq(&s_nx_port_link_b)", generated)

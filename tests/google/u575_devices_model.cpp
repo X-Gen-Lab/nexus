@@ -20,6 +20,8 @@ bool g_u575_spi_hold;
 uint32_t g_u575_spi_reset_gap;
 static uint32_t spi_eot_tick;
 EXTI_TypeDef g_u575_exti;
+ADC_TypeDef g_u575_adc_registers;
+ADC_Common_TypeDef g_u575_adc_common_registers;
 ADC_TypeDef* g_u575_adc;
 ADC_Common_TypeDef* g_u575_adc_common;
 bool g_u575_adc_hold;
@@ -264,6 +266,9 @@ void nx_u575_devices_reset(void) {
     g_u575_i2c = nullptr;
     g_u575_i2c_registers = {};
     g_u575_spi = nullptr;
+    std::memset(&g_u575_adc_registers, 0, sizeof(g_u575_adc_registers));
+    std::memset(&g_u575_adc_common_registers, 0,
+                sizeof(g_u575_adc_common_registers));
     g_u575_adc = nullptr;
     g_u575_adc_common = nullptr;
     g_u575_physical_flash = nullptr;

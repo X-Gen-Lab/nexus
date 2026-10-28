@@ -61,6 +61,20 @@ class F103Exti : public testing::Test {
         nx_stm32f103_exti_irq(&state);
     }
 };
+TEST_F(F103Exti, ColdPrepareKeepsRetainedStorageAndInitializesExactRoute) {
+    const nx_stm32f103_exti_config_t config{
+        other_storage, 2U, {NX_IRQ_KERNEL_NONE, 43U, 4U, 0U},
+        NX_EXTI_BOTH,  0U, 5U};
+    state.retained = true;
+    EXPECT_EQ(nx_stm32f103_exti_prepare(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(state.storage, storage);
+    EXPECT_EQ(g_f103_model.writes, 0U);
+    state.retained = false;
+    ASSERT_EQ(nx_stm32f103_exti_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_EQ(state.storage, other_storage);
+    EXPECT_TRUE(state.initialized);
+    ASSERT_EQ(nx_exti_port_stop(&face), NX_SUCCESS);
+}
 TEST_F(F103Exti, InitializeConfiguresExactInputVectorAndPreservesOtherLines) {
     EXTI->IMR = EXTI->RTSR = EXTI->FTSR = 1U << 9U;
     AFIO->EXTICR[0] = 0x5674U;

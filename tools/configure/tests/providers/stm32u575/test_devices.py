@@ -67,7 +67,11 @@ class U575DeviceSelectionTests(unittest.TestCase):
         construction = stm32u575.constructor(
             result.controllers[0], result, {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertIn("nx_stm32u575_adc_initialize", source)
+        self.assertEqual(construction.initialize.function,
+                         "nx_stm32u575_adc_prepare")
+        self.assertIn("static const nx_stm32u575_adc_config_t", source)
+        self.assertNotIn("NX_U575_WRITE", source)
+        self.assertNotIn("static nx_result_t prepare_", source)
         self.assertNotIn("SVMCR", source)
         minimum = {**item, "reference_mv": 1000}
         stm32u575.validate_selection(minimum, minimum)

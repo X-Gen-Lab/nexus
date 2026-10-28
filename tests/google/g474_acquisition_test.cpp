@@ -169,6 +169,62 @@ class G474Adc : public testing::Test {
         ASSERT_EQ(NX_SUCCESS, nx_stm32g474_adc_initialize(&state));
     }
 };
+TEST_F(G474Adc, ColdPrepareBindsResourcesAndRefusesLiveRebinding) {
+    const nx_stm32g474_adc_config_t config{&registers, &peer, &common, 3300U,
+                                           32U};
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_adc_prepare(&state, &config));
+    EXPECT_EQ(&registers, state.registers);
+    ADC_TypeDef foreign{};
+    auto other = config;
+    other.registers = &foreign;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_adc_prepare(&state, &other));
+    EXPECT_EQ(&registers, state.registers);
+    EXPECT_EQ(0U, foreign.CR);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_adc_close(&state));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_adc_prepare(&state, &config));
+}
+TEST_F(G474Adc, ColdPrepareRejectsContextAndInvalidConfigBeforePadEffects) {
+    nx_stm32g474_adc_config_t config{&registers, &peer, &common, 3300U, 32U};
+    g_g474_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32g474_adc_prepare(&state, &config));
+    g_g474_model.privileged = true;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32g474_adc_prepare(nullptr, &config));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32g474_adc_prepare(&state, nullptr));
+    config.reference_mv = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32g474_adc_prepare(&state, &config));
+    EXPECT_EQ(0U, g_g474_model.gpio.MODER);
+    EXPECT_EQ(0U, common.CCR);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(G474Adc, ColdInitializationConfiguresOnlyTheOwnedAnalogPad) {
+    g_g474_model.gpio.MODER = 0xA5A5A5A0U;
+    g_g474_model.gpio.PUPDR = 0x5A5A5A53U;
+    Start();
+    EXPECT_EQ(0xA5A5A5A3U, g_g474_model.gpio.MODER);
+    EXPECT_EQ(0x5A5A5A50U, g_g474_model.gpio.PUPDR);
+    EXPECT_TRUE(state.initialized);
+}
+TEST_F(G474Adc, AnalogReadbackFailureRetainsCleanupBeforeCalibration) {
+    g_g474_model.ignore_write = &g_g474_model.gpio.MODER;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32g474_adc_initialize(&state));
+    EXPECT_FALSE(state.initialized);
+    EXPECT_TRUE(state.retained);
+    EXPECT_EQ(0U, common.CCR);
+    EXPECT_EQ(ADC_CR_DEEPPWD, registers.CR);
+    g_g474_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_adc_close(&state));
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(G474Adc, ForeignConverterRejectsBeforeChangingAnalogPad) {
+    g_g474_model.gpio.MODER = 0xA5A5A5A0U;
+    g_g474_model.gpio.PUPDR = 0x5A5A5A53U;
+    peer.CR = ADC_CR_ADEN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_adc_initialize(&state));
+    EXPECT_EQ(0xA5A5A5A0U, g_g474_model.gpio.MODER);
+    EXPECT_EQ(0x5A5A5A53U, g_g474_model.gpio.PUPDR);
+    EXPECT_FALSE(state.retained);
+}
 TEST_F(G474Adc, CalibrationAndSingleShotUseExactChannelAndClock) {
     Start();
     EXPECT_EQ(10U << ADC_CCR_PRESC_Pos, common.CCR);
@@ -410,6 +466,45 @@ class G474AdcStream : public G474Adc {
         nx_stm32g474_adc_stream_irq(&engine);
     }
 };
+TEST_F(G474AdcStream, ColdPrepareAdmitsDmaBeforeAnalogAndCalibratesOnce) {
+    const nx_stm32g474_adc_stream_config_t config{
+        {&registers, &peer, &common, 3300U, 32U},
+        &timer,
+        &dma,
+        &channel,
+        &mux,
+        &region,
+        1U,
+        {NX_IRQ_KERNEL_NONE, 102U, 4U, 0U}};
+    engine = {};
+    channel.CCR = DMA_CCR_EN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_adc_stream_prepare(&engine, &config));
+    EXPECT_EQ(0U, g_g474_model.gpio.MODER);
+    EXPECT_FALSE(engine.adc.retained);
+    channel.CCR = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_adc_stream_prepare(&engine, &config));
+    EXPECT_EQ(3U, g_g474_model.gpio.MODER & 3U);
+    EXPECT_EQ(5U, mux.CCR);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_adc_stream_prepare(&engine, &config));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_adc_stream_close(&engine));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_adc_stream_prepare(&engine, &config));
+}
+TEST_F(G474AdcStream, ColdPreparePreservesAnOutstandingPublisherBinding) {
+    const nx_stm32g474_adc_stream_config_t config{
+        {&registers, &peer, &common, 3300U, 32U},
+        &timer,
+        &dma,
+        &channel,
+        &mux,
+        &region,
+        1U,
+        {NX_IRQ_KERNEL_NONE, 102U, 4U, 0U}};
+    engine.wake_publishers = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_adc_stream_prepare(&engine, &config));
+    EXPECT_EQ(1U, engine.wake_publishers);
+    EXPECT_EQ(0U, g_g474_model.gpio.MODER);
+    EXPECT_FALSE(engine.adc.retained);
+}
 TEST_F(G474AdcStream, NormalDmaPublishesOnlyAfterTaskObservedDetach) {
     StartStream();
     EXPECT_EQ(5U, mux.CCR);

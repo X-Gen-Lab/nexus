@@ -44,6 +44,34 @@ static IRQn_Type vector(const nx_stm32f103_exti_state_t* p) {
     return p->line == 0U ? EXTI0_IRQn : EXTI1_IRQn;
 }
 
+/** \brief One cold C path owns binding and exact hardware initialization. */
+nx_result_t
+nx_stm32f103_exti_prepare(nx_stm32f103_exti_state_t* p,
+                          const nx_stm32f103_exti_config_t* config) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || config == NULL || config->storage == NULL ||
+        config->capacity == 0U || config->capacity > 4096U ||
+        config->line > 1U || config->priority > 15U ||
+        config->edge < NX_EXTI_RISING || config->edge > NX_EXTI_BOTH) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->wake != NULL ||
+        p->wake_publishers != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    p->registers = EXTI;
+    p->mux = NX_F103_AFIO;
+    p->gpio = NX_F103_GPIOA;
+    p->storage = config->storage;
+    p->capacity = config->capacity;
+    p->line = config->line;
+    p->priority = config->priority;
+    p->edge = config->edge;
+    p->irq_policy = config->irq_policy;
+    return nx_stm32f103_exti_initialize(p);
+}
 nx_result_t nx_stm32f103_exti_initialize(nx_stm32f103_exti_state_t* p) {
     if (!task_context())
         return NX_ERROR_CONTEXT;

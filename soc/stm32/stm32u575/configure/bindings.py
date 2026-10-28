@@ -273,17 +273,13 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = DirectCall("nx_stm32u575_i2c_close",
                           (Address(state), Address(clock)))
     elif item.kind == "adc":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = ADC4;",
-                        f"    {state}.common = ADC4_COMMON;",
-                        f"    {state}.reference_mv = {item.options.reference_mv}u;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        "    NX_U575_WRITE(&GPIOC->MODER, NX_U575_READ(&GPIOC->MODER) | 3u);",
-                        "    NX_U575_WRITE(&GPIOC->PUPDR, NX_U575_READ(&GPIOC->PUPDR) & ~3u);",
-                        "    nx_arch_dsb();",
-                        "    if ((NX_U575_READ(&GPIOC->MODER) & 3u) != 3u || (NX_U575_READ(&GPIOC->PUPDR) & 3u) != 0u) { return NX_ERROR_IO; }",
-                        f"    return nx_stm32u575_adc_initialize(&{state});", "}"]
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_stm32u575_adc_config_t {config} = {{",
+                        "    .registers = ADC4, .common = ADC4_COMMON,",
+                        f"    .reference_mv = {item.options.reference_mv}u, .poll_limit = 1000000u",
+                        "};"]
+        initialize = DirectCall("nx_stm32u575_adc_prepare",
+                                (Address(state), Address(config)))
         stop = DirectCall("nx_stm32u575_adc_close", (Address(state),))
     elif item.kind == "flash":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",

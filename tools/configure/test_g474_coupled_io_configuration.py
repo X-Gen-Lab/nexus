@@ -6,6 +6,7 @@ import tomllib
 import unittest
 
 from tools.configure import bindings, configure, factory, ir
+from tools.configure.providers import maintained
 
 
 class G474CoupledIOConfiguration(unittest.TestCase):
@@ -59,8 +60,8 @@ class G474CoupledIOConfiguration(unittest.TestCase):
         self.assertNotIn("NX_PWM_GROUP_ID_WINDOW", header)
         self.assertNotIn("initialize(", getters)
         source = bindings.emit(result)[1]
-        self.assertIn("nx_stm32g474_pwm_adc_initialize(", source)
-        self.assertIn("nx_stm32g474_pwm_adc_close(", source)
+        self.assertIn("nx_stm32g474_pwm_adc_prepare(", source)
+        self.assertIn("nx_stm32g474_pwm_adc_release(", source)
         self.assertIn("nx_stm32g474_pwm_adc_dma_irq(", source)
         self.assertIn("nx_stm32g474_pwm_adc_break_irq(", source)
         self.assertNotIn("&nx_stm32g474_adc_ops, &s_nx_port_window", source)
@@ -109,13 +110,35 @@ class G474CoupledIOConfiguration(unittest.TestCase):
                     ValueError, "conflict|owner|TIM1|ADC1|PA0"):
                 self.resolve("pwm-adc", extra=extra)
 
-    def test_joint_constructor_closes_before_comparator_or_gate_release(self):
+    def test_joint_cold_assembly_keeps_one_config_and_retained_c_receipt(self):
         result = self.resolve("pwm-adc")
+        item, = result.controllers
+        construction = maintained(result.soc_family).constructor(
+            item, result, result.board_bindings, result.routes, result.devices)
+        self.assertEqual(construction.initialize.render(),
+                         "nx_stm32g474_pwm_adc_prepare(&s_nx_port_window, "
+                         "&s_nx_config_window, &s_nx_comp_window)")
+        self.assertEqual(tuple(call.render() for call in construction.stop),
+                         ("nx_stm32g474_pwm_adc_release(&s_nx_port_window, "
+                          "&s_nx_comp_window)",))
+        self.assertTrue(construction.retain_on_failed_init)
+        definitions = "\n".join(construction.definitions)
+        self.assertIn("static const nx_stm32g474_pwm_adc_config_t "
+                      "s_nx_config_window", definitions)
+        self.assertIn(".regions = s_nx_dma_regions_window, .region_count = 1u",
+                      definitions)
+        self.assertIn(".trigger_ticks = 50u, .deadtime_ticks = 170u", definitions)
+        self.assertIn(".trigger_identity = 1u, .exclusive = true", definitions)
+        self.assertIn("static nx_stm32g474_control_cold_t s_nx_comp_window;",
+                      definitions)
+        self.assertNotIn("NX_G474_WRITE", definitions)
+        self.assertNotIn("nx_stm32g474_pwm_adc_initialize(", definitions)
+        self.assertNotIn("nx_stm32g474_pwm_adc_close(", definitions)
+        # G474PWMADCFactory's refused-counter and active-vector tests execute
+        # real C teardown and prove comparator, pads and gates stay retained.
         source = bindings.emit(result)[1]
-        start = source.index("static nx_result_t stop_window(void)")
-        close = source.index("nx_stm32g474_pwm_adc_close(", start)
-        restore = source.index("NX_G474_WRITE(&COMP1->CSR", close)
-        self.assertLess(close, restore)
+        self.assertIn(construction.initialize.render(), source)
+        self.assertIn(construction.stop[0].render(), source)
         self.assertNotIn("static bool s_nx_vector_window;", source)
         self.assertIn("DMA1_Channel1_IRQHandler", source)
         self.assertIn("TIM1_BRK_TIM15_IRQHandler", source)

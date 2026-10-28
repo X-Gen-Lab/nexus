@@ -68,6 +68,49 @@ nx_native_spi_configure_instance(nx_native_spi_endpoint_state_t* endpoint,
     return NX_SUCCESS;
 }
 
+/** \brief Validate the entire cold selection before publishing any binding. */
+nx_result_t
+nx_native_spi_prepare(nx_native_spi_state_t* port,
+                      const nx_native_spi_endpoint_config_t* endpoints,
+                      size_t count) {
+    if (port == NULL || (endpoints == NULL && count != 0U)) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->active) {
+        return NX_ERROR_BUSY;
+    }
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_native_spi_endpoint_config_t* config = &endpoints[i];
+        if (config->endpoint == NULL ||
+            (config->memory == NULL && config->size != 0U) ||
+            (config->memory != NULL &&
+             (config->size == 0U || config->size > 256U))) {
+            return NX_ERROR_INVALID;
+        }
+        if (config->endpoint->cs) {
+            return NX_ERROR_BUSY;
+        }
+        for (size_t previous = 0U; previous < i; ++previous) {
+            if (endpoints[previous].endpoint == config->endpoint) {
+                return NX_ERROR_INVALID;
+            }
+        }
+    }
+    nx_result_t result = nx_native_spi_port_configure_instance(port);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_native_spi_endpoint_config_t* config = &endpoints[i];
+        result = nx_native_spi_configure_instance(config->endpoint, port,
+                                                  config->memory, config->size);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return NX_SUCCESS;
+}
+
 /** \brief Prepare the default bus and explicit default device fixture. */
 nx_result_t nx_native_spi_configure(uint8_t* registers, size_t length) {
     nx_result_t result = nx_native_spi_configure_instance(&s_endpoint, &s_spi,

@@ -435,6 +435,44 @@ class U575Adc : public testing::Test {
         g_u575_adc_common = nullptr;
     }
 };
+TEST_F(U575Adc, ColdPrepareBindsResourcesAndRejectsLiveRebinding) {
+    const nx_stm32u575_adc_config_t config{&registers, &common, 3300U, 8U};
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_adc_prepare(&state, &config));
+    ADC_TypeDef foreign{};
+    auto other = config;
+    other.registers = &foreign;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_adc_prepare(&state, &other));
+    EXPECT_EQ(&registers, state.registers);
+    EXPECT_EQ(0U, foreign.CR);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_adc_close(&state));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_adc_prepare(&state, &config));
+}
+TEST_F(U575Adc, ColdPrepareRejectsInvalidResourcesBeforeAnalogEffects) {
+    const nx_stm32u575_adc_config_t invalid{&registers, &common, 0U, 8U};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_adc_prepare(nullptr, &invalid));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_adc_prepare(&state, nullptr));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_adc_prepare(&state, &invalid));
+    EXPECT_EQ(0U, g_u575_model.writes);
+    EXPECT_FALSE(state.retained);
+}
+TEST_F(U575Adc, ColdInitializationConfiguresOnlyPc0Analog) {
+    GPIOC->MODER = 0xA5A5A5A0U;
+    GPIOC->PUPDR = 0x5A5A5A53U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_adc_initialize(&state));
+    EXPECT_EQ(0xA5A5A5A3U, GPIOC->MODER);
+    EXPECT_EQ(0x5A5A5A50U, GPIOC->PUPDR);
+}
+TEST_F(U575Adc, RefusedAnalogPadRetainsCleanupBeforeStartingRegulator) {
+    GPIOC->MODER = 0U;
+    g_u575_model.ignore_write = &GPIOC->MODER;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_adc_initialize(&state));
+    EXPECT_TRUE(state.retained);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(0U, registers.CR);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_adc_close(&state));
+}
 TEST_F(U575Adc, CalibratesBeforeReadyAndSamplesOnlyReviewedChannel) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_adc_initialize(&state));
     EXPECT_EQ(2U, registers.CHSELR);

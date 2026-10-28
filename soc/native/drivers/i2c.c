@@ -66,6 +66,46 @@ nx_native_i2c_configure_instance(nx_native_i2c_endpoint_state_t* endpoint,
     return NX_SUCCESS;
 }
 
+/** \brief Bind reviewed addressed models after whole-selection admission. */
+nx_result_t
+nx_native_i2c_prepare(nx_native_i2c_state_t* port,
+                      const nx_native_i2c_endpoint_config_t* endpoints,
+                      size_t count) {
+    if (port == NULL || (endpoints == NULL && count != 0U)) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->active) {
+        return NX_ERROR_BUSY;
+    }
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_native_i2c_endpoint_config_t* config = &endpoints[i];
+        if (config->endpoint == NULL || config->memory == NULL ||
+            config->size == 0U || config->size > 256U || config->address < 8U ||
+            config->address >= 0x78U) {
+            return NX_ERROR_INVALID;
+        }
+        for (size_t previous = 0U; previous < i; ++previous) {
+            if (endpoints[previous].endpoint == config->endpoint) {
+                return NX_ERROR_INVALID;
+            }
+        }
+    }
+    nx_result_t result = nx_native_i2c_port_configure_instance(port);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_native_i2c_endpoint_config_t* config = &endpoints[i];
+        result = nx_native_i2c_configure_instance(config->endpoint, port,
+                                                  config->memory, config->size,
+                                                  config->address);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return NX_SUCCESS;
+}
+
 /** \brief Prepare the default bus and explicit default address fixture. */
 nx_result_t nx_native_i2c_configure(uint8_t* memory, size_t length,
                                     uint8_t address) {

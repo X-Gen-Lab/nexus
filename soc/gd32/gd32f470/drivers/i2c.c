@@ -6,6 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "gd32f470_i2c_cold.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
 #include "private/system.h"
@@ -66,6 +67,56 @@ static void configure(nx_gd32_i2c_state_t* port) {
         port->controller->clock_hz / 1000000U + 1U;
     I2C_SADDR0(port->controller->registers) = UINT32_C(1) << 14;
     I2C_CTL0(port->controller->registers) = I2C_CTL0_I2CEN | I2C_CTL0_ACKEN;
+}
+
+nx_result_t nx_gd32_i2c_prepare(nx_gd32_i2c_state_t* port,
+                                nx_gd32_i2c_endpoint_state_t* endpoint,
+                                const nx_gd32_i2c_config_t* config,
+                                nx_gd32_i2c_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_gd32_in_isr() || nx_gd32_irq_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || endpoint == NULL || config == NULL || cold == NULL ||
+        config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (port->controller != NULL || port->initialized || port->active)
+        return NX_ERROR_BUSY;
+    nx_result_t result = nx_gd32_i2c_cold_acquire(config, cold);
+    if (result != NX_SUCCESS)
+        return result;
+    *port = (nx_gd32_i2c_state_t){
+        .controller = config->registers == I2C0 ? &nx_gd32_i2c0_controller
+                                                : &nx_gd32_i2c1_controller,
+        .line_gpio = GPIOB,
+        .line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin),
+        .bus_hz = 100000U,
+        .initialized = true};
+    i2c_deinit(config->registers);
+    configure(port);
+    *endpoint = (nx_gd32_i2c_endpoint_state_t){port, config->address};
+    cold->prepared = true;
+    return nx_gd32_i2c_cold_commit(config, cold);
+}
+
+nx_result_t nx_gd32_i2c_close(nx_gd32_i2c_state_t* port,
+                              const nx_gd32_i2c_config_t* config,
+                              nx_gd32_i2c_cold_t* cold) {
+    if (!nx_arch_is_privileged() || nx_gd32_in_isr() || nx_gd32_irq_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || cold == NULL || config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (cold->prepared) {
+        if (port->controller == NULL ||
+            port->controller->registers != config->registers)
+            return NX_ERROR_INVALID;
+        nx_result_t result = nx_gd32_i2c_stop(port);
+        if (result != NX_SUCCESS)
+            return result;
+        cold->prepared = false;
+    }
+    nx_result_t result = nx_gd32_i2c_cold_release(config, cold);
+    if (result == NX_SUCCESS)
+        *port = (nx_gd32_i2c_state_t){0};
+    return result;
 }
 
 /** \brief Acquire selected standard-mode I2C after Board open-drain setup. */

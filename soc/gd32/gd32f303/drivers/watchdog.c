@@ -68,6 +68,22 @@ static nx_result_t restore(nx_gd32f303_watchdog_state_t* p) {
     p->preparation_retained = p->debug_owned || p->lsi_owned;
     return success ? NX_SUCCESS : NX_ERROR_IO;
 }
+/** \brief Keep irreversible or retained ownership before rebinding limits. */
+nx_result_t nx_gd32f303_watchdog_prepare(nx_gd32f303_watchdog_state_t* p,
+                                         uint32_t poll_limit) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || poll_limit == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->initialized || p->state.enabled || p->preparation_retained) {
+        return NX_ERROR_BUSY;
+    }
+    p->poll_limit = poll_limit;
+    return nx_gd32f303_watchdog_initialize(p);
+}
 nx_result_t nx_gd32f303_watchdog_initialize(nx_gd32f303_watchdog_state_t* p) {
     if (!task_context())
         return NX_ERROR_CONTEXT;

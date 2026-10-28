@@ -332,16 +332,14 @@ def constructor(item, result, board_bindings, routes, devices):
         supply = board_bindings.get(item.binding, {}).get("supply_mv")
         if type(supply) is not int or not 2400 <= supply <= 3300 or not 2000 <= item.options.reference_mv <= supply:
             fail("H743 ADC requires explicit Board supply_mv2400..3300 and reference2000..supply")
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = ADC1;",
-                        f"    {state}.peer = ADC2;",
-                        f"    {state}.common = ADC12_COMMON;",
-                        f"    {state}.gpio = GPIOA;",
-                        f"    {state}.reference_mv = {item.options.reference_mv}u;",
-                        f"    {state}.supply_mv = {supply}u;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        f"    return nx_stm32h743_adc_initialize(&{state});", "}"]
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_stm32h743_adc_config_t {config} = {{",
+                        "    .registers = ADC1, .peer = ADC2, .common = ADC12_COMMON,",
+                        "    .gpio = GPIOA,",
+                        f"    .reference_mv = {item.options.reference_mv}u, .supply_mv = {supply}u,",
+                        "    .poll_limit = 1000000u", "};"]
+        initialize = DirectCall("nx_stm32h743_adc_prepare",
+                                (Address(state), Address(config)))
         stop = DirectCall("nx_stm32h743_adc_stop", (Address(state),))
     elif item.kind == "flash":
         supply = board_bindings.get(item.binding, {}).get("supply_mv")

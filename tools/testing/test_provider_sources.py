@@ -204,7 +204,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, _ = self.configure_sources(
                     family, [("i2c", "irq-messages")])
-                expected = {"gpio.c", "i2c.c", "i2c_async.c"}
+                expected = {"gpio.c", "i2c.c", "i2c_async.c", "i2c_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                 self.assertEqual(provider,

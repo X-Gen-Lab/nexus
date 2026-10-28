@@ -61,11 +61,15 @@ foreach(i2c_pair_family stm32 gd32)
         target_compile_definitions(${i2c_pair_target} PRIVATE
             _init=nx_i2c_pair_fixture_init _fini=nx_i2c_pair_fixture_fini)
         if(i2c_pair_family STREQUAL "stm32")
+            target_sources(${i2c_pair_target} PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_cold.c")
             target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
                 "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
             target_compile_definitions(${i2c_pair_target} PRIVATE
                 STM32F407xx NX_I2C_PAIR_STM32)
         else()
+            target_sources(${i2c_pair_target} PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/i2c_cold.c")
             set(i2c_pair_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
             target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
                 "${i2c_pair_gd}/CMSIS/GD/GD32F4xx/Include"

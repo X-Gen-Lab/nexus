@@ -49,6 +49,16 @@ TEST_F(GD303Watchdog, EnableUsesActualReloadFormulaAndHonestUnknownBounds) {
     EXPECT_TRUE(observed.enabled);
     EXPECT_EQ(NX_ERROR_STATE, nx_gd32f303_watchdog_stop(&state));
 }
+TEST_F(GD303Watchdog, ColdPreparePreservesLiveOwnerBeforeChangingBudget) {
+    EXPECT_EQ(nx_gd32f303_watchdog_prepare(&state, 8U), NX_ERROR_BUSY);
+    EXPECT_EQ(state.poll_limit, 4U);
+    EXPECT_EQ(g_gd303_writes, 0U);
+    nx_gd32f303_watchdog_state_t selected{};
+    ASSERT_EQ(nx_gd32f303_watchdog_prepare(&selected, 8U), NX_SUCCESS);
+    EXPECT_TRUE(selected.initialized);
+    EXPECT_EQ(selected.poll_limit, 8U);
+    EXPECT_EQ(FWDGT_CTL, 0U);
+}
 TEST_F(GD303Watchdog, TypNominalRangeRejectsWithoutActivation) {
     nx_watchdog_state_t observed{};
     for (uint32_t value : {24U, 26208026U}) {

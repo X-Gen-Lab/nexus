@@ -29,7 +29,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
     # Unused upstream GPIO reset helpers do not belong to this selected path.
     target_link_options(nexus_gd32_official_gpio_test PRIVATE -Wl,--gc-sections)
+    # Upstream 32-bit register masks use unsigned long. LP64 host builds keep
+    # the existing vendor-only conversion policy; owned provider warnings stay
+    # strict. The unchanged reset leaf is also required by GPIO model links.
     set_source_files_properties(
         "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c"
+        "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c"
         PROPERTIES COMPILE_OPTIONS "-Wno-conversion;-Wno-sign-conversion")
 endif()

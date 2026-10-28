@@ -59,6 +59,20 @@ static nx_result_t reset(nx_stm32u575_adc_state_t* p) {
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }
+nx_result_t nx_stm32u575_adc_prepare(nx_stm32u575_adc_state_t* p,
+                                     const nx_stm32u575_adc_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (p->retained || p->initialized || p->active)
+        return NX_ERROR_BUSY;
+    p->registers = config->registers;
+    p->common = config->common;
+    p->reference_mv = config->reference_mv;
+    p->poll_limit = config->poll_limit;
+    return nx_stm32u575_adc_initialize(p);
+}
 nx_result_t nx_stm32u575_adc_initialize(nx_stm32u575_adc_state_t* p) {
     if (!task())
         return NX_ERROR_CONTEXT;
@@ -77,6 +91,13 @@ nx_result_t nx_stm32u575_adc_initialize(nx_stm32u575_adc_state_t* p) {
         return NX_ERROR_BUSY;
     p->retained = true;
     p->fault = false;
+    /* Platform retains PC0's original mux and pull until close succeeds. */
+    NX_U575_WRITE(&GPIOC->MODER, NX_U575_READ(&GPIOC->MODER) | 3U);
+    NX_U575_WRITE(&GPIOC->PUPDR, NX_U575_READ(&GPIOC->PUPDR) & ~3U);
+    nx_arch_dsb();
+    if ((NX_U575_READ(&GPIOC->MODER) & 3U) != 3U ||
+        (NX_U575_READ(&GPIOC->PUPDR) & 3U) != 0U)
+        return NX_ERROR_IO;
     if (!write_checked(&r->SMPR1, 7U) || !write_checked(&r->CHSELR, 2U))
         return NX_ERROR_IO;
     if (!clear_flags(r, ADC_ISR_LDORDY | ADC_ISR_ADRDY | ADC_ISR_EOC |

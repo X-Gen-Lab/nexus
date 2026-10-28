@@ -27,6 +27,7 @@ nexus_google_test(nexus_g474_pwm_adc_factory_test
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_adc_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_group.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_adc.c"

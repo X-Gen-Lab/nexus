@@ -19,12 +19,9 @@ def constructor(item, result, board_bindings, routes, devices):
     definitions = []
     initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.mask = {item.options.mask}u;",
-            f"    {state}.output = {'true' if item.mode == 'output' else 'false'};",
-            f"    return nx_gd32f303_gpio_initialize(&{state}, {item.options.initial}u);",
-            "}"]
+        initialize = DirectCall("nx_gd32f303_gpio_prepare", (
+            Address(state), item.options.mask, item.mode == "output",
+            item.options.initial))
         stop = DirectCall("nx_gd32f303_gpio_stop", (Address(state), item.options.initial))
     elif item.kind == "uart":
         capacity = item.options.rx_capacity
@@ -32,27 +29,20 @@ def constructor(item, result, board_bindings, routes, devices):
             fail("GD303 requires an explicit bounded byte ring")
         irq = result.irq
         definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];",
-            f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.registers = (nx_gd32f303_uart_registers_t*)(uintptr_t)USART0;",
-            f"    {state}.rx_storage = s_nx_rx_{name};",
-            f"    {state}.rx_capacity = {capacity}u;",
-            f"    {state}.baud = {item.options.baud}u;",
-            f"    {state}.irq = USART0_IRQn;",
-            f"    {state}.profile = NX_UART_RX_BYTES;",
-            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-            "    nx_result_t status = nx_gd32f303_usart0_pins_prepare();",
-            "    if (status != NX_SUCCESS) { return status; }",
-            f"    return nx_gd32f303_uart_initialize(&{state}, 8000000u, 1000000u);",
-            "}", "void USART0_IRQHandler(void);",
+            f"static const nx_gd32f303_uart_config_t s_nx_uart_config_{name} = {{",
+            "    .registers = (nx_gd32f303_uart_registers_t*)(uintptr_t)USART0,",
+            f"    .rx_storage = s_nx_rx_{name}, .rx_capacity = {capacity}u,",
+            f"    .baud = {item.options.baud}u,",
+            f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }}",
+            "};", "void USART0_IRQHandler(void);",
             r"/** \brief Exact selected USART0; at most one TX/RX byte. */",
             f"void USART0_IRQHandler(void) {{ nx_gd32f303_uart_irq(&{state}); }}"]
+        initialize = DirectCall("nx_gd32f303_uart_prepare", (
+            Address(state), Address(f"s_nx_uart_config_{name}")))
         stop = DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "watchdog":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.initialized || {state}.state.enabled || {state}.preparation_retained) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.poll_limit = 1000000u;",
-            f"    return nx_gd32f303_watchdog_initialize(&{state});", "}"]
+        initialize = DirectCall("nx_gd32f303_watchdog_prepare", (
+            Address(state), 1000000))
         stop = DirectCall("nx_gd32f303_watchdog_stop", (Address(state),))
     elif item.kind == "spi":
         children = [child for child in devices if child.controller == item.id]
@@ -106,21 +96,16 @@ def constructor(item, result, board_bindings, routes, devices):
         line = int(item.controller[-1])
         definitions += [
             f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
-            f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.registers = NX_GD303_EXTI;",
-            f"    {state}.mux = NX_GD303_EXTI_MUX;",
-            f"    {state}.gpio = NX_GD303_EXTI_GPIO;",
-            f"    {state}.storage = s_nx_events_{name};",
-            f"    {state}.capacity = {options.event_capacity}u;",
-            f"    {state}.line = {line}u;",
-            f"    {state}.priority = {options.irq.priority}u;",
-            f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
-            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-            f"    return nx_gd32f303_exti_initialize(&{state});", "}",
-            f"void EXTI{line}_IRQHandler(void);",
-            r"/** \brief One exact line and one bounded coalesced fact. */",
+            f"static const nx_gd32f303_exti_config_t s_nx_exti_config_{name} = {{",
+            f"    .storage = s_nx_events_{name}, .capacity = {options.event_capacity}u,",
+            f"    .line = {line}u, .priority = {options.irq.priority}u,",
+            f"    .edge = NX_EXTI_{options.edge.upper()},",
+            f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }}",
+            "};", f"void EXTI{line}_IRQHandler(void);",
+            r"/** \brief One selected line and one bounded coalesced fact. */",
             f"void EXTI{line}_IRQHandler(void) {{ nx_gd32f303_exti_irq(&{state}); }}"]
+        initialize = DirectCall("nx_gd32f303_exti_prepare", (
+            Address(state), Address(f"s_nx_exti_config_{name}")))
         stop = DirectCall("nx_exti_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind in {"adc", "pwm", "flash"}:
         if item.kind == "flash":

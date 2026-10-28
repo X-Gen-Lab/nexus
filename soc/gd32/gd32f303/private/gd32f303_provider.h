@@ -72,6 +72,14 @@ typedef struct {
     bool initialized;
     bool retained;
 } nx_gd32f303_uart_state_t;
+/** \brief Readonly selected USART0 byte-ring connections and IRQ policy. */
+typedef struct {
+    nx_gd32f303_uart_registers_t* registers;
+    uint8_t* rx_storage;
+    size_t rx_capacity;
+    uint32_t baud;
+    nx_irq_policy_t irq_policy;
+} nx_gd32f303_uart_config_t;
 /** \brief Exact v1 SPI0 registers, no FIFO or DMA contract inferred. */
 typedef struct {
     volatile uint32_t CTL0;
@@ -130,6 +138,9 @@ extern const nx_watchdog_ops_t nx_gd32f303_watchdog_ops;
  * \return SUCCESS or error; actual IRC40K physical bounds remain unknown.
  */
 nx_result_t nx_gd32f303_watchdog_initialize(nx_gd32f303_watchdog_state_t* port);
+/** \brief Bind an idle cold watchdog without reusing irreversible effects. */
+nx_result_t nx_gd32f303_watchdog_prepare(nx_gd32f303_watchdog_state_t* port,
+                                         uint32_t poll_limit);
 /** \brief Undo only preactivation leases; never disable an enabled watchdog.
  * \param[in,out] port: Serialized privileged unmasked owner, consumers joined.
  * \return STATE while irreversible; IO retains failed debug/IRC40K cleanup.
@@ -162,6 +173,10 @@ nx_result_t nx_gd32f303_pins_release(nx_gd32f303_pin_lease_t* lease);
 /** \brief Initialize PA4 or PA5 under an already-held Platform pin lease. */
 nx_result_t nx_gd32f303_gpio_initialize(nx_gd32f303_gpio_state_t* port,
                                         uint32_t initial);
+/** \brief Bind GPIOA selection only after retained cold ownership is clear. */
+nx_result_t nx_gd32f303_gpio_prepare(nx_gd32f303_gpio_state_t* port,
+                                     uint32_t mask, bool output,
+                                     uint32_t initial);
 /** \brief Apply explicit inactive latch; Platform later restores the lease. */
 nx_result_t nx_gd32f303_gpio_stop(nx_gd32f303_gpio_state_t* port,
                                   uint32_t inactive);
@@ -169,6 +184,9 @@ nx_result_t nx_gd32f303_gpio_stop(nx_gd32f303_gpio_state_t* port,
  * \return Task SUCCESS/error; Platform lease owns rollback and gate lifetime.
  */
 nx_result_t nx_gd32f303_usart0_pins_prepare(void);
+/** \brief Bind cold USART0 state and prepare its reviewed default pin route. */
+nx_result_t nx_gd32f303_uart_prepare(nx_gd32f303_uart_state_t* port,
+                                     const nx_gd32f303_uart_config_t* config);
 /** \brief Configure exact USART0 8N1 at IRC8/APB2 8MHz, no DMA.
  * \param[in,out] port: Static context plus nonoverlapping explicit byte ring.
  * \param[in] clock_hz: Must equal verified 8000000Hz live system profile.

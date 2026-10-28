@@ -48,6 +48,14 @@ typedef struct {
     bool initialized;
     bool retained;
 } nx_stm32f103_uart_state_t;
+/** \brief Readonly selected USART2 byte-ring connections and IRQ policy. */
+typedef struct {
+    USART_TypeDef* registers;
+    uint8_t* rx_storage;
+    size_t rx_capacity;
+    uint32_t baud;
+    nx_irq_policy_t irq_policy;
+} nx_stm32f103_uart_config_t;
 typedef struct {
     IWDG_TypeDef* registers;
     RCC_TypeDef* rcc;
@@ -59,6 +67,13 @@ typedef struct {
     bool preparation_retained;
 } nx_stm32f103_watchdog_state_t;
 extern const nx_watchdog_ops_t nx_stm32f103_watchdog_ops;
+/** \brief Bind the irreversible watchdog without activating or feeding it. */
+nx_result_t nx_stm32f103_watchdog_prepare(nx_stm32f103_watchdog_state_t* port,
+                                          IWDG_TypeDef* registers,
+                                          RCC_TypeDef* rcc,
+                                          FLASH_TypeDef* flash,
+                                          DBGMCU_TypeDef* debug,
+                                          uint32_t poll_limit);
 /**
  * \brief Restore failed preactivation leases,never disable an active IWDG.
  * \param[in,out] port: Static privileged unmasked owner,consumers joined.
@@ -91,6 +106,19 @@ typedef struct {
     bool closing;
     bool loss;
 } nx_stm32f103_exti_state_t;
+/** \brief Selected EXTI event storage, edge and independently checked policy.
+ */
+typedef struct {
+    nx_exti_event_t* storage;
+    size_t capacity;
+    nx_irq_policy_t irq_policy;
+    nx_exti_edge_t edge;
+    uint8_t line;
+    uint8_t priority;
+} nx_stm32f103_exti_config_t;
+/** \brief Prepare exact GPIOA EXTI after rejecting retained publishers. */
+nx_result_t nx_stm32f103_exti_prepare(nx_stm32f103_exti_state_t* port,
+                                      const nx_stm32f103_exti_config_t* config);
 extern const nx_exti_ops_t nx_stm32f103_exti_ops;
 /**
  * \brief Acquire PA0 or PA1 input and its independent EXTI vector.
@@ -145,11 +173,18 @@ extern const nx_uart_ops_t nx_stm32f103_uart_ops;
 /** \brief Configure leased PA4 or PA5,preloading before its CRL nibble. */
 nx_result_t nx_stm32f103_gpio_initialize(nx_stm32f103_gpio_state_t* port,
                                          uint32_t initial);
+/** \brief Bind exact GPIOA facts after rejecting retained cold ownership. */
+nx_result_t nx_stm32f103_gpio_prepare(nx_stm32f103_gpio_state_t* port,
+                                      uint32_t mask, bool output,
+                                      uint32_t initial);
 /** \brief Apply declared inactive output before withdrawing the face. */
 nx_result_t nx_stm32f103_gpio_stop(nx_stm32f103_gpio_state_t* port,
                                    uint32_t inactive);
 /** \brief Prepare exact default PA2TX/PA3RX after platform pin/gate lease. */
 nx_result_t nx_stm32f103_usart2_pins_prepare(void);
+/** \brief Bind cold USART2 state and prepare its reviewed default pin route. */
+nx_result_t nx_stm32f103_uart_prepare(nx_stm32f103_uart_state_t* port,
+                                      const nx_stm32f103_uart_config_t* config);
 /**
  * \brief Configure USART2 8N1,oversample16,byte ring and finite IRQ setup.
  * \param[in,out] port: Exact static context,nonoverlapping ring storage.

@@ -1,5 +1,5 @@
 """Cold-only generated glue for two independently selected G474 owners."""
-from tools.configure.calls import DirectCall
+from tools.configure.calls import Address, DirectCall
 from collections.abc import Mapping
 
 from tools.configure.providers.common import (
@@ -37,63 +37,20 @@ def _pwm_adc(item, result, binding):
         f"    .reference_mv = {options.reference_mv}u, .poll_limit = 1000000u,",
         f"    .trigger_identity = {trigger}u, .exclusive = true",
         "};",
-        f"static struct {{ uint32_t saved; bool retained; }} {comp};",
-        f"static nx_result_t prepare_{name}(void) {{",
-        f"    if ({state}.retained || {state}.initialized || {comp}.retained) {{ return NX_ERROR_BUSY; }}",
-        # Do not connect pads to a retained timer output. Reads occur only
-        # after Platform acquired and verified every selected peripheral gate.
-        "    (void)NX_G474_READ(&RCC->APB2ENR);",
-        "    (void)NX_G474_READ(&RCC->APB2ENR);",
-        "    if ((NX_G474_READ(&RCC->APB2RSTR) & (RCC_APB2RSTR_TIM1RST | RCC_APB2RSTR_SYSCFGRST)) != 0u ||",
-        "        NX_G474_READ(&TIM1->CR1) != 0u || NX_G474_READ(&TIM1->CCER) != 0u ||",
-        "        NX_G474_READ(&TIM1->DIER) != 0u || NX_G474_READ(&TIM1->BDTR) != 0u ||",
-        "        (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u ||",
-        "        !NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn) || !NX_G474_IRQ_AVAILABLE(DMA1_Channel1_IRQn) ||",
-        "        !NX_G474_IRQ_AVAILABLE(ADC1_2_IRQn)) { return NX_ERROR_BUSY; }",
-        f"    {comp}.saved = NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE;",
-        f"    {comp}.retained = true;",
-        "    NX_G474_WRITE(&GPIOA->BSRR, 1792u << 16u);",
-        "    nx_arch_dsb();",
-        "    if ((NX_G474_READ(&GPIOA->ODR) & 1792u) != 0u) { return NX_ERROR_IO; }",
-        "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~783u);",
-        "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | 783u);",
-        "    nx_arch_dsb();",
-        "    if ((NX_G474_READ(&GPIOA->PUPDR) & 783u) != 0u ||",
-        "        (NX_G474_READ(&GPIOA->MODER) & 783u) != 783u) { return NX_ERROR_IO; }",
-        "    NX_G474_WRITE(&COMP1->CSR, COMP_CSR_EN | COMP_CSR_INMSEL_2 | COMP_CSR_INMSEL_1);",
-        "    nx_arch_dsb();",
-        "    if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) !=",
-        "        (COMP_CSR_EN | COMP_CSR_INMSEL_2 | COMP_CSR_INMSEL_1)) { return NX_ERROR_IO; }",
-        "    uint64_t began = nx_stm32g474_system_now(&g_nx_stm32g474_system);",
-        "    uint32_t polls = 1000000u;",
-        "    while (nx_stm32g474_system_now(&g_nx_stm32g474_system) - began < 6u) {",
-        "        if (polls-- == 0u) { return NX_ERROR_TIMEOUT; }",
-        "        NX_G474_SYSTEM_POLL(&g_nx_stm32g474_system);", "    }",
-        "    nx_result_t status;",
-    ]
-    for pin in (8, 9, 10):
-        lines += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {pin}u, 6u);",
-                  "    if (status != NX_SUCCESS) { return status; }"]
-    lines += [
-        f"    return nx_stm32g474_pwm_adc_initialize(&{state}, &{config});", "}",
+        f"static nx_stm32g474_control_cold_t {comp};",
         "void DMA1_Channel1_IRQHandler(void);",
         r"/** \brief Observe one joint finite-window DMA terminal fact. */",
         f"void DMA1_Channel1_IRQHandler(void) {{ nx_stm32g474_pwm_adc_dma_irq(&{state}); }}",
         "void TIM1_BRK_TIM15_IRQHandler(void);",
         r"/** \brief One joint owner observes its TIM1/COMP break. */",
         f"void TIM1_BRK_TIM15_IRQHandler(void) {{ nx_stm32g474_pwm_adc_break_irq(&{state}); }}",
-        f"static nx_result_t stop_{name}(void) {{",
-        f"    nx_result_t status = nx_stm32g474_pwm_adc_close(&{state});",
-        "    if (status != NX_SUCCESS) { return status; }",
-        f"    if ({comp}.retained) {{",
-        f"        NX_G474_WRITE(&COMP1->CSR, {comp}.saved);",
-        "        nx_arch_dsb();",
-        f"        if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {comp}.saved) {{ return NX_ERROR_IO; }}",
-        f"        {comp}.retained = false;", "    }",
-        "    return NX_SUCCESS;", "}",
     ]
     return Construction("nx_stm32g474_pwm_adc_state_t", tuple(lines),
-                        DirectCall(f"prepare_{name}"), (DirectCall(f"stop_{name}"),), True)
+                        DirectCall("nx_stm32g474_pwm_adc_prepare",
+                                   (Address(state), Address(config), Address(comp))),
+                        (DirectCall("nx_stm32g474_pwm_adc_release",
+                                    (Address(state), Address(comp))),), True)
+
 
 
 def _can_fd(item, result, binding):

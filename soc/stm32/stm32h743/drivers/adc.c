@@ -90,6 +90,23 @@ static bool output(const nx_stm32h743_adc_state_t* p, const void* value,
            !overlap(value, bytes, p->common, sizeof(*p->common)) &&
            !overlap(value, bytes, p->gpio, sizeof(*p->gpio));
 }
+nx_result_t nx_stm32h743_adc_prepare(nx_stm32h743_adc_state_t* p,
+                                     const nx_stm32h743_adc_config_t* config) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (p->retained || p->initialized || p->active)
+        return NX_ERROR_BUSY;
+    p->registers = config->registers;
+    p->peer = config->peer;
+    p->common = config->common;
+    p->gpio = config->gpio;
+    p->reference_mv = config->reference_mv;
+    p->supply_mv = config->supply_mv;
+    p->poll_limit = config->poll_limit;
+    return nx_stm32h743_adc_initialize(p);
+}
 nx_result_t nx_stm32h743_adc_initialize(nx_stm32h743_adc_state_t* p) {
     if (!task())
         return NX_ERROR_CONTEXT;
