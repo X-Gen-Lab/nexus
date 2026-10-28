@@ -72,8 +72,9 @@ SDK updates require origin, version, license and content identity review plus th
 
 Source provenance and retrieval have separate owners: the reviewed catalogue
 records the official `upstream_url` and the approved `fetch_url`; the Gitlink
-selects the exact commit. Official repositories remain the fetch sources during
-the contract preparation stage. A future organization-fork activation requires
-verified repositories and an atomic policy change; it does not upgrade SDK code.
+selects the exact commit. All registered Git dependencies are fetched from
+verified `X-Gen-Lab` forks with retained `refs/tags/nexus/pins/<full-SHA>` refs.
+Official provenance and versions remain separately recorded; this hosting change
+does not upgrade SDK code.
 See the [dependency hosting and recovery contract](../docs/design/source-compatibility.md)
 for recursive FreeRTOS handling, explicit preparation and Source SDK trust.

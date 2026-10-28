@@ -1,0 +1,13 @@
+diff --git a/.gitmodules b/.gitmodules
+index aaa2390a63106b622a4f297d909e94469c2cc153..7fb8923552d621768c74070630b78755eadaabd1 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,6 +1,6 @@
+ [submodule "ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports"]
+ 	path = portable/ThirdParty/Partner-Supported-Ports
+-	url = https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports
++	url = https://github.com/X-Gen-Lab/FreeRTOS-Kernel-Partner-Supported-Ports.git
+ [submodule "ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports"]
+ 	path = portable/ThirdParty/Community-Supported-Ports
+-	url = https://github.com/FreeRTOS/FreeRTOS-Kernel-Community-Supported-Ports
++	url = https://github.com/X-Gen-Lab/FreeRTOS-Kernel-Community-Supported-Ports.git

@@ -94,16 +94,17 @@ resolver 选择规则；如果 authority 的表达形式改变，检查会明确
 section name 和相对路径分别核对，不能假设两者相同。GD32 官方归档继续按已审
 子树、逐文件锁和原许可管理，不伪装成官方 Git 仓库的 fork。
 
-目标托管策略由 `X-Gen-Lab` 托管官方依赖的 fork。本增量先建立来源与获取的严格
-合同，当前获取地址仍为官方仓库。启用组织获取地址前，须验证实际 fork、固定提交
-和所需引用，再原子切换 `fetch_url` 与 `.gitmodules`。每个 Nexus 提交只认可一个
-明确地址，不使用全局 `url.insteadOf`、浮动分支或自动回退到其他仓库。
+`X-Gen-Lab` 托管目录中全部 16 个官方 Git 依赖的 fork；`fetch_url` 与
+`.gitmodules` 指向已验证的组织仓库。获取地址使用目录中的实际仓库名，不从磁盘
+路径或上游 URL 推导名称。官方 `upstream_url` 保留来源与版本观察职责，Gitlink
+继续选择准确 commit。每个 Nexus 提交只认可一个明确获取地址，不使用全局
+`url.insteadOf`、浮动分支或自动回退到其他仓库。
 
-FreeRTOS 的目标迁移需要一个仅修改根 `.gitmodules` 中两个已知 URL 的组织提交。
-它的唯一父提交必须是已锁定官方基线，嵌套 Gitlink、源码、许可和文件模式保持原样。
-`dependencies/freertos-transport.lock.json` 与 `dependencies/reviews/freertos/`
-中的基线文件和补丁记录该审查；补丁不在配置或构建期间动态应用。官方发行 tag 仍
-指向官方基线，组织集成提交使用独立引用，不能冒充新的官方发行版。
+FreeRTOS 使用仅修改根 `.gitmodules` 中两个已知 URL 的组织提交，集成引用为
+`nexus/transport-v11.1.0-r1`。它的唯一父提交是已锁定官方基线，嵌套 Gitlink、源码、
+许可和文件模式保持原样。`dependencies/freertos-transport.lock.json` 与
+`dependencies/reviews/freertos/` 中的基线文件和补丁记录该审查；补丁不在配置或构建
+期间动态应用。官方发行 tag 仍指向官方基线，组织提交不代表新的官方发行版。
 
 开发 checkout 与 SDK 打包执行实际 Git 父链、完整树差异和两处 URL 替换检查，
 不能只信锁文件声明的 `changed_paths`。SDK 内的审查材料和文件映射验证导出字节，
@@ -114,15 +115,19 @@ FreeRTOS 的目标迁移需要一个仅修改根 `.gitmodules` 中两个已知 U
 ## 托管迁移、同步与恢复
 
 迁移先验证 fork 的官方父仓库关系、匿名读取、固定 commit 与所需引用可达，再
-更新 Nexus 获取策略。仓库存在不代表当前连接能写入它，也不代表分支或 tag 保护
-已经启用；这些状态需实际读回。生产源码和已发布引用不得因同步上游而被重写。
+更新 Nexus 获取策略。组织仓库为受维护提交保留 `refs/tags/nexus/pins/<完整SHA>`；
+联网准备在改动 checkout 前核对引用返回的对象与所选 SHA。FreeRTOS 同时保留官方
+基线和组织集成提交。仓库或引用存在不代表当前连接能写入它，也不代表分支或 tag
+保护已经启用；这些状态需实际读回。生产源码和已发布引用不得因同步上游而被重写。
 
 已有 checkout 从已审官方地址迁往已审组织地址时，准备工具先检查工作区、实际
 仓库根、origin 和允许的旧/新 commit。普通源码修改、未跟踪依赖文件、未知 origin
 或未知 HEAD 都应停止处理。已登记的旧 Gitlink 可以作为迁移起点；不能将一次
 正常的子模块版本切换误判为用户源码修改。工具不 stash、reset、clean 或强制更新。
 
-从仓库根运行已有显式准备入口；以下命令允许下载，离线检查省略 `--allow-network`：
+已有 checkout 先切换到要消费的准确 Nexus 提交，再从仓库根运行显式准备入口。
+工具按所选提交识别已登记的旧依赖状态；以下命令允许下载，离线检查省略
+`--allow-network`：
 
 ```sh
 python tools/dev/dev.py prepare --scope native --allow-network
@@ -134,9 +139,9 @@ python tools/dev/dev.py prepare --preset stm32-nucleo-h743-baremetal-uart --allo
 
 ```sh
 git submodule sync
-git submodule update --init --jobs 2
+git -c submodule.recurse=false submodule update --init --checkout --jobs 2
 git submodule sync --recursive
-git submodule update --init --recursive --jobs 2
+git submodule update --init --recursive --checkout --jobs 2
 ```
 
 先更新顶层 FreeRTOS，再同步它的嵌套声明，避免旧 `.gitmodules` 把官方地址写回。
