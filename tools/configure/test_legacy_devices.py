@@ -43,7 +43,8 @@ class LegacyDevicesTests(unittest.TestCase):
                 self.assertEqual(provider.FLASH_PROGRAM_UNIT, 2)
                 self.assertEqual(provider.FLASH_INPUT_ALIGNMENT, 1)
                 if family == "gd303":
-                    self.assertIn("NX_GD303_IRQ_AVAILABLE(EXTI1_IRQn)", source)
+                    self.assertIn(".exti_lines = 2u", source)
+                    self.assertIn("nx_gd32f303_platform_preflight", source)
                     self.assertNotIn("EXTI1__IRQn", source)
 
     def test_adc_rejects_unreviewed_channel_sample_and_reference(self):

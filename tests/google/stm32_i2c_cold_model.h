@@ -16,6 +16,7 @@ uint32_t nx_i2c_cold_irq_enabled(IRQn_Type irq);
 uint32_t nx_i2c_cold_irq_pending(IRQn_Type irq);
 uint32_t nx_i2c_cold_irq_active(IRQn_Type irq);
 void nx_i2c_cold_write(volatile uint32_t* reg, uint32_t value);
+void nx_i2c_cold_priority_write(volatile uint8_t* reg, uint8_t value);
 void nx_i2c_cold_irq_enable(IRQn_Type irq);
 void nx_i2c_cold_irq_disable(IRQn_Type irq);
 void nx_i2c_cold_irq_clear(IRQn_Type irq);
@@ -33,6 +34,8 @@ void nx_i2c_cold_irq_priority(IRQn_Type irq, uint32_t priority);
 #define NVIC_GetActive(irq)     nx_i2c_cold_irq_active(irq)
 #define NX_PLATFORM_REGISTER_WRITE(reg, value)                                 \
     nx_i2c_cold_write(&(reg), (uint32_t)(value))
+#define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \
+    nx_i2c_cold_priority_write(&(reg), (uint8_t)(value))
 #undef NVIC_EnableIRQ
 #undef NVIC_DisableIRQ
 #undef NVIC_ClearPendingIRQ

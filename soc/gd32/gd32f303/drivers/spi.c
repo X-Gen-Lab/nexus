@@ -255,3 +255,42 @@ static bool on_port(const void* context, const nx_spi_port_t* port) {
 const nx_spi_ops_t nx_gd32f303_spi_ops = {recover, NULL, NULL, stop, NULL};
 const nx_spi_endpoint_ops_t nx_gd32f303_spi_endpoint_ops = {
     transfer, NULL, NULL, on_port, NULL};
+
+nx_result_t nx_gd32f303_spi_prepare(nx_gd32f303_spi_state_t* p,
+                                    nx_gd32f303_gpio_state_t* cs) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || cs == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->active || p->held_cs != NULL ||
+        cs->retained || cs->initialized) {
+        return NX_ERROR_BUSY;
+    }
+    p->registers = (nx_gd32f303_spi_registers_t*)(uintptr_t)SPI0;
+    p->clock_hz = 8000000U;
+    p->poll_limit = 1000000U;
+    nx_result_t result = nx_gd32f303_spi_initialize(p);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    result = nx_gd32f303_gpio_prepare(cs, 16U, true, 16U);
+    return result == NX_SUCCESS ? nx_gd32f303_spi0_pins_prepare() : result;
+}
+nx_result_t nx_gd32f303_spi_close(nx_gd32f303_spi_state_t* p,
+                                  nx_gd32f303_gpio_state_t* cs) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || cs == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->active || p->held_cs != NULL) {
+        nx_result_t result = stop(p);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return cs->retained ? nx_gd32f303_gpio_stop(cs, 16U) : NX_SUCCESS;
+}

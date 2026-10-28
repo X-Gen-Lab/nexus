@@ -70,7 +70,7 @@ TEST_F(I2CCold, StaticFactsRejectBeforeAnyHardwareEffect) {
     EXPECT_EQ(0U, RCC->APB1ENR);
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(nullptr, state.registers);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, ContextRejectsBeforeClockOrPinChanges) {
@@ -84,6 +84,92 @@ TEST_F(I2CCold, ContextRejectsBeforeClockOrPinChanges) {
     EXPECT_EQ(NX_ERROR_CONTEXT, Prepare());
     EXPECT_EQ(0U, RCC->APB1ENR);
     EXPECT_EQ(0U, RCC->AHB1ENR);
+}
+
+TEST_F(I2CCold, CompleteColdReceiptUsesAtMostEightBytes) {
+    EXPECT_LE(sizeof(nx_stm32_i2c_cold_receipt_t), 8U);
+}
+
+TEST_F(I2CCold, EveryInitialGateCombinationPreservesUnrelatedResources) {
+    for (unsigned initial = 0U; initial < 4U; ++initial) {
+        SCOPED_TRACE(initial);
+        const uint32_t gpio =
+            RCC_AHB1ENR_GPIOCEN | ((initial & 1U) ? RCC_AHB1ENR_GPIOBEN : 0U);
+        const uint32_t peripheral = RCC_APB1ENR_TIM3EN | RCC_APB1ENR_I2C2EN |
+                                    ((initial & 2U) ? RCC_APB1ENR_I2C1EN : 0U);
+        RCC->AHB1ENR = gpio;
+        RCC->APB1ENR = peripheral;
+        ASSERT_EQ(NX_SUCCESS, Prepare());
+        ASSERT_EQ(NX_SUCCESS, Close());
+        EXPECT_EQ(gpio, RCC->AHB1ENR);
+        EXPECT_EQ(peripheral, RCC->APB1ENR);
+    }
+}
+
+TEST_F(I2CCold, SecondControllerGateEncodingPreservesEveryInitialState) {
+    config.registers = I2C2;
+    config.asynchronous = true;
+    pins[0].pin = 10U;
+    pins[1].pin = 11U;
+    GPIOB->IDR |= (1U << 10U) | (1U << 11U);
+    for (unsigned initial = 0U; initial < 4U; ++initial) {
+        SCOPED_TRACE(initial);
+        const uint32_t gpio =
+            RCC_AHB1ENR_GPIOCEN | ((initial & 1U) ? RCC_AHB1ENR_GPIOBEN : 0U);
+        const uint32_t peripheral = RCC_APB1ENR_TIM3EN | RCC_APB1ENR_I2C1EN |
+                                    ((initial & 2U) ? RCC_APB1ENR_I2C2EN : 0U);
+        RCC->AHB1ENR = gpio;
+        RCC->APB1ENR = peripheral;
+        NVIC->IPR[I2C2_EV_IRQn] = 0x64U;
+        NVIC->IPR[I2C2_ER_IRQn] = 0xA2U;
+        nx_i2c_v1_state_t async{};
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32_i2c_async_close(&async, &config, &receipt));
+        EXPECT_EQ(gpio, RCC->AHB1ENR);
+        EXPECT_EQ(peripheral, RCC->APB1ENR);
+        EXPECT_EQ(0x64U, NVIC->IPR[I2C2_EV_IRQn]);
+        EXPECT_EQ(0xA2U, NVIC->IPR[I2C2_ER_IRQn]);
+    }
+}
+
+TEST_F(I2CCold, RefusedPeripheralGateRestoreRetainsOriginalGpioChoice) {
+    for (unsigned initial = 0U; initial < 2U; ++initial) {
+        SCOPED_TRACE(initial);
+        const uint32_t gpio =
+            RCC_AHB1ENR_GPIOCEN | (initial ? RCC_AHB1ENR_GPIOBEN : 0U);
+        RCC->AHB1ENR = gpio;
+        RCC->APB1ENR = RCC_APB1ENR_TIM3EN;
+        ASSERT_EQ(NX_SUCCESS, Prepare());
+        refused = &RCC->APB1ENR;
+        EXPECT_EQ(NX_ERROR_IO, Close());
+        EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+        EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN);
+        refused = nullptr;
+        ASSERT_EQ(NX_SUCCESS, Close());
+        EXPECT_EQ(gpio, RCC->AHB1ENR);
+        EXPECT_EQ(RCC_APB1ENR_TIM3EN, RCC->APB1ENR);
+    }
+}
+
+TEST_F(I2CCold, RefusedGpioGateRestoreRetainsOriginalPeripheralChoice) {
+    for (unsigned initial = 0U; initial < 2U; ++initial) {
+        SCOPED_TRACE(initial);
+        const uint32_t peripheral =
+            RCC_APB1ENR_TIM3EN | (initial ? RCC_APB1ENR_I2C1EN : 0U);
+        RCC->AHB1ENR = RCC_AHB1ENR_GPIOCEN;
+        RCC->APB1ENR = peripheral;
+        ASSERT_EQ(NX_SUCCESS, Prepare());
+        refused = &RCC->AHB1ENR;
+        EXPECT_EQ(NX_ERROR_IO, Close());
+        EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+        EXPECT_EQ(peripheral, RCC->APB1ENR);
+        refused = nullptr;
+        ASSERT_EQ(NX_SUCCESS, Close());
+        EXPECT_EQ(RCC_AHB1ENR_GPIOCEN, RCC->AHB1ENR);
+        EXPECT_EQ(peripheral, RCC->APB1ENR);
+    }
 }
 
 TEST_F(I2CCold, PrepareAndCloseRestoreExactPadsAndPreexistingGates) {
@@ -102,7 +188,7 @@ TEST_F(I2CCold, PrepareAndCloseRestoreExactPadsAndPreexistingGates) {
     EXPECT_EQ(pull, GPIOB->PUPDR);
     EXPECT_EQ(RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN, RCC->AHB1ENR);
     EXPECT_EQ(RCC_APB1ENR_I2C1EN | RCC_APB1ENR_TIM3EN, RCC->APB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
     EXPECT_EQ(nullptr, state.registers);
 }
 
@@ -112,7 +198,7 @@ TEST_F(I2CCold, ForeignEnabledControllerRemainsUntouched) {
     EXPECT_EQ(I2C_CR1_PE | I2C_CR1_ACK, I2C1->CR1);
     EXPECT_EQ(0U, RCC->APB1ENR);
     EXPECT_EQ(0U, RCC->AHB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, DuplicatePrepareDoesNotReplaceLiveOwner) {
@@ -128,7 +214,7 @@ TEST_F(I2CCold, ActiveOperationRetainsClockAndPadsUntilJoined) {
     ASSERT_EQ(NX_SUCCESS, Prepare());
     state.active = true;
     EXPECT_EQ(NX_ERROR_BUSY, Close());
-    EXPECT_TRUE(receipt.owned);
+    EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
     EXPECT_NE(0U, I2C1->CR1 & I2C_CR1_PE);
     EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
     state.active = false;
@@ -139,11 +225,11 @@ TEST_F(I2CCold, FailedWithdrawalRetainsReceiptAndAllowsCloseRetry) {
     ASSERT_EQ(NX_SUCCESS, Prepare());
     refused = &GPIOB->MODER;
     EXPECT_EQ(NX_ERROR_IO, Close());
-    EXPECT_TRUE(receipt.owned);
+    EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
     EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN);
     refused = nullptr;
     EXPECT_EQ(NX_SUCCESS, Close());
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(0U, RCC->APB1ENR);
 }
@@ -151,7 +237,7 @@ TEST_F(I2CCold, FailedWithdrawalRetainsReceiptAndAllowsCloseRetry) {
 TEST_F(I2CCold, FailedPeripheralGateAcquireHasNoRetainedEffects) {
     refused = &RCC->APB1ENR;
     EXPECT_EQ(NX_ERROR_IO, Prepare());
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(nullptr, state.registers);
 }
@@ -165,8 +251,8 @@ TEST_F(I2CCold, AliasedSnapshotsRejectBeforeAcquisition) {
 TEST_F(I2CCold, AsynchronousPrepareCloseRestoresPublisherPriorities) {
     config.asynchronous = true;
     nx_i2c_v1_state_t async{};
-    NVIC->IPR[I2C1_EV_IRQn] = 0x70U;
-    NVIC->IPR[I2C1_ER_IRQn] = 0x90U;
+    NVIC->IPR[I2C1_EV_IRQn] = 0x73U;
+    NVIC->IPR[I2C1_ER_IRQn] = 0x9FU;
     ASSERT_EQ(NX_SUCCESS,
               nx_stm32_i2c_async_prepare(&async, &config, &receipt));
     EXPECT_TRUE(async.initialized);
@@ -175,10 +261,50 @@ TEST_F(I2CCold, AsynchronousPrepareCloseRestoresPublisherPriorities) {
     NVIC->IPR[I2C1_EV_IRQn] = 0x50U;
     NVIC->IPR[I2C1_ER_IRQn] = 0x50U;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
-    EXPECT_EQ(0x70U, NVIC->IPR[I2C1_EV_IRQn]);
-    EXPECT_EQ(0x90U, NVIC->IPR[I2C1_ER_IRQn]);
+    EXPECT_EQ(0x73U, NVIC->IPR[I2C1_EV_IRQn]);
+    EXPECT_EQ(0x9FU, NVIC->IPR[I2C1_ER_IRQn]);
     EXPECT_EQ(nullptr, async.registers);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+}
+
+TEST_F(I2CCold, ActivePublisherDuringCloseRetainsPadsAndBothGates) {
+    config.asynchronous = true;
+    nx_i2c_v1_state_t async{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    const auto mode = GPIOB->MODER;
+    const unsigned irq = static_cast<unsigned>(I2C1_EV_IRQn);
+    *const_cast<volatile uint32_t*>(&NVIC->IABR[irq / 32U]) = 1U << (irq % 32U);
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_i2c_async_close(&async, &config, &receipt));
+    EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+    EXPECT_EQ(mode, GPIOB->MODER);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+    EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN);
+    *const_cast<volatile uint32_t*>(&NVIC->IABR[irq / 32U]) = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
+    EXPECT_EQ(0U, receipt.effects);
+}
+
+TEST_F(I2CCold, PriorityRestoreRefusalRetainsAllOriginalPriorityBytes) {
+    config.asynchronous = true;
+    nx_i2c_v1_state_t async{};
+    NVIC->IPR[I2C1_EV_IRQn] = 0x73U;
+    NVIC->IPR[I2C1_ER_IRQn] = 0x9FU;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    const auto mode = GPIOB->MODER;
+    refused_priority = static_cast<int>(I2C1_ER_IRQn);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_i2c_async_close(&async, &config, &receipt));
+    EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+    EXPECT_EQ(mode, GPIOB->MODER);
+    EXPECT_EQ(0x73U, receipt.priorities[0]);
+    EXPECT_EQ(0x9FU, receipt.priorities[1]);
+    refused_priority = -1;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
+    EXPECT_EQ(0x73U, NVIC->IPR[I2C1_EV_IRQn]);
+    EXPECT_EQ(0x9FU, NVIC->IPR[I2C1_ER_IRQn]);
+    EXPECT_EQ(0U, receipt.effects);
 }
 
 TEST_F(I2CCold, PendingPublisherRejectsWithoutAcquiringHardware) {
@@ -190,7 +316,7 @@ TEST_F(I2CCold, PendingPublisherRejectsWithoutAcquiringHardware) {
               nx_stm32_i2c_async_prepare(&async, &config, &receipt));
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(0U, RCC->APB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, ActivePublisherRejectsWithoutErasingItsIndependentFact) {
@@ -204,7 +330,7 @@ TEST_F(I2CCold, ActivePublisherRejectsWithoutErasingItsIndependentFact) {
     EXPECT_EQ(0U, NVIC_GetPendingIRQ(I2C1_EV_IRQn));
     EXPECT_EQ(0U, NVIC_GetEnableIRQ(I2C1_EV_IRQn));
     EXPECT_EQ(0U, RCC->APB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 TEST_F(I2CCold, RefusedPublisherEnableDoesNotReportSuccessfulPrepare) {
     config.asynchronous = true;
@@ -215,7 +341,7 @@ TEST_F(I2CCold, RefusedPublisherEnableDoesNotReportSuccessfulPrepare) {
     refused_irq = -1;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
     EXPECT_EQ(0U, RCC->APB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, RefusedPublisherPriorityDoesNotReportSuccessfulPrepare) {
@@ -227,7 +353,7 @@ TEST_F(I2CCold, RefusedPublisherPriorityDoesNotReportSuccessfulPrepare) {
     refused_priority = -1;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
     EXPECT_EQ(0U, RCC->APB1ENR);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, BusyBusRollsBackAsynchronousAcquisition) {
@@ -241,7 +367,7 @@ TEST_F(I2CCold, BusyBusRollsBackAsynchronousAcquisition) {
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(0U, RCC->APB1ENR);
     EXPECT_EQ(nullptr, async.registers);
-    EXPECT_FALSE(receipt.owned);
+    EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
 TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
@@ -319,6 +445,14 @@ extern "C" void nx_i2c_cold_irq_clear(IRQn_Type irq) {
 extern "C" void nx_i2c_cold_irq_priority(IRQn_Type irq, uint32_t priority) {
     if ((int)irq != refused_priority)
         NVIC->IPR[(unsigned)irq] = (uint8_t)(priority << 4U);
+}
+
+/** \brief Raw restore writes can fail independently of peripheral shutdown. */
+extern "C" void nx_i2c_cold_priority_write(volatile uint8_t* reg,
+                                           uint8_t value) {
+    if (refused_priority < 0 || reg != &NVIC->IPR[refused_priority]) {
+        *reg = value;
+    }
 }
 extern "C" void nx_i2c_cold_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == refused)

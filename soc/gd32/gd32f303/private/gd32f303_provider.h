@@ -18,15 +18,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief One selected GPIOA bank lease; never a maximum instance pool. */
-typedef struct {
-    uint32_t mask;
-    uint32_t saved_ctl[2];
-    uint32_t saved_latch;
-    bool gate_added;
-    bool retained;
-    bool captured;
-} nx_gd32f303_pin_lease_t;
 /** \brief Exact authorized static GPIO context; shared readonly ops. */
 typedef struct {
     uint32_t mask;
@@ -117,6 +108,23 @@ extern const nx_spi_endpoint_ops_t nx_gd32f303_spi_endpoint_ops;
  * \return SUCCESS/error; retained hardware/CS effects require stop/recovery.
  */
 nx_result_t nx_gd32f303_spi_initialize(nx_gd32f303_spi_state_t* port);
+/**
+ * \brief Bind cold SPI0 and its single maintained explicit PA4 CS owner.
+ * \param[in,out] port: Unique cold controller with no retained execution.
+ * \param[in,out] chip_select: Distinct cold static GPIO state under Platform.
+ * \return SUCCESS/error; partial CS/controller effects require close retry.
+ * \note Privileged unmasked task; Platform owns original pad/gate snapshots.
+ */
+nx_result_t nx_gd32f303_spi_prepare(nx_gd32f303_spi_state_t* port,
+                                    nx_gd32f303_gpio_state_t* chip_select);
+/**
+ * \brief Join SPI0 before returning its sole selected CS owner inactive.
+ * \param[in,out] port: Same controller after all transaction consumers join.
+ * \param[in,out] chip_select: Same static selected PA4 owner.
+ * \return SUCCESS after all withdrawals; failure retains unfinished owners.
+ */
+nx_result_t nx_gd32f303_spi_close(nx_gd32f303_spi_state_t* port,
+                                  nx_gd32f303_gpio_state_t* chip_select);
 /** \brief Prepare PA5/6/7 default SPI0 route after complete pin admission. */
 nx_result_t nx_gd32f303_spi0_pins_prepare(void);
 #ifndef NX_GD303_SPI_POLL
@@ -151,25 +159,6 @@ nx_result_t nx_gd32f303_watchdog_stop(nx_gd32f303_watchdog_state_t* port);
 #endif
 extern const nx_gpio_ops_t nx_gd32f303_gpio_ops;
 extern const nx_uart_ops_t nx_gd32f303_uart_ops;
-/** \brief Reject a powered foreign pin before any global clock effect.
- * \param[in] mask: Exact selected PA5/PA9/PA10 mask; no unpowered MMIO probe.
- * \return Task SUCCESS/error without writes; acquisition rechecks after power.
- */
-nx_result_t nx_gd32f303_pins_preflight(uint32_t mask);
-/** \brief Acquire GPIOA exact mask after checking every powered pin/lock.
- * \param[in,out] lease: Static state through successful release.
- * \param[in] mask: Exact selected subset of PA4..PA7/PA9/PA10; no SWJ
- * ownership. \return Cold task SUCCESS or error; retained means release must be
- * retried. \note Preserves preexisting clock and all unrelated pins. No PCB
- * policy.
- */
-nx_result_t nx_gd32f303_pins_acquire(nx_gd32f303_pin_lease_t* lease,
-                                     uint32_t mask);
-/** \brief Restore selected nibbles/latch before withdrawing an added gate.
- * \param[in,out] lease: Same lease after all pin users/IRQs have joined.
- * \return SUCCESS after actual readback; failure preserves unfinished owner.
- */
-nx_result_t nx_gd32f303_pins_release(nx_gd32f303_pin_lease_t* lease);
 /** \brief Initialize PA4 or PA5 under an already-held Platform pin lease. */
 nx_result_t nx_gd32f303_gpio_initialize(nx_gd32f303_gpio_state_t* port,
                                         uint32_t initial);

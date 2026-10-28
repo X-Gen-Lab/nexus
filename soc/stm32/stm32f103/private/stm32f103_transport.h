@@ -20,6 +20,10 @@ typedef struct {
     bool pins_captured;
     bool core_owned;
 } nx_stm32f103_i2c_async_state_t;
+/** \brief Immutable selected IRQ policy; exact MMIO topology belongs to C. */
+typedef struct {
+    nx_irq_policy_t irq_policy;
+} nx_stm32f103_i2c_async_config_t;
 typedef nx_i2c_v1_endpoint_t nx_stm32f103_i2c_async_endpoint_state_t;
 #define nx_stm32f103_uart_dma_ops           nx_uart_v1_channel_dma_tx_ops
 #define nx_stm32f103_uart_duplex_ops        nx_uart_v1_channel_dma_ops
@@ -77,6 +81,16 @@ nx_stm32f103_uart_dma_initialize(nx_stm32f103_uart_dma_state_t* state,
 nx_result_t
 nx_stm32f103_uart_duplex_initialize(nx_stm32f103_uart_duplex_state_t* state,
                                     const nx_uart_v1_dma_config_t* config);
+/**
+ * \brief Bind exact I2C resources only after all old borrowers detach.
+ * \param[in,out] state: Cold static owner, privileged unmasked task only.
+ * \param[in] config: Immutable selected IRQ policy, read during this call.
+ * \return SUCCESS/error; partial hardware effects require stop retry.
+ * \note A live request, wake or publisher rejects before replacing any binding.
+ */
+nx_result_t
+nx_stm32f103_i2c_async_prepare(nx_stm32f103_i2c_async_state_t* state,
+                               const nx_stm32f103_i2c_async_config_t* config);
 /** \brief Admit exact default PB6/PB7 I2C1, 8MHz/80kHz IRQ messages.
  * \param[in,out] state: Static cold owner; no channel-DMA compatibility claim.
  * \return Success/error; non-idle hardware is never reset or adopted.

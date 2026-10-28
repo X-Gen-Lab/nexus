@@ -162,3 +162,27 @@ nx_result_t nx_gd32f303_i2c_async_initialize(nx_gd32f303_i2c_async_state_t* s) {
         (void)nx_gd32f303_i2c_async_stop(s);
     return result;
 }
+
+nx_result_t
+nx_gd32f303_i2c_async_prepare(nx_gd32f303_i2c_async_state_t* s,
+                              const nx_gd32f303_i2c_async_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (s == NULL || config == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (s->retained || s->core.initialized || s->core.active != NULL ||
+        s->core.wake != NULL || s->core.wake_publishers != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    nx_irq_policy_t policy = config->irq_policy;
+    s->core.registers = (volatile uint32_t*)(uintptr_t)I2C0;
+    s->core.line_inputs = &GPIO_ISTAT(GPIOB);
+    s->core.line_mask = PIN_MASK;
+    s->core.peripheral_mhz = 8U;
+    s->core.dma = NULL;
+    s->irq_policy = policy;
+    return nx_gd32f303_i2c_async_initialize(s);
+}

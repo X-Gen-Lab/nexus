@@ -269,3 +269,230 @@ void TIMER1_IRQHandler(void) {
 void TIMER4_IRQHandler(void) {
     nx_gd32f303_system_cascade_irq(&g_nx_gd32f303_system);
 }
+
+_Static_assert(sizeof(nx_gd32f303_platform_resources_t) == 20U,
+               "exact cold receipt RAM budget");
+_Static_assert((NX_GD32F303_OWN_AFIO | NX_GD32F303_OWN_USART0 |
+                NX_GD32F303_OWN_SPI0 | NX_GD32F303_OWN_ADC0 |
+                NX_GD32F303_OWN_TIMER2 | NX_GD32F303_OWN_DMA0) <= UINT8_MAX,
+               "every ownership bit fits in its receipt");
+_Static_assert(UINT16_MAX >= 0x6f3U, "validated GPIOA mask/latch fit");
+static bool platform_selection_valid(const nx_gd32f303_platform_config_t* c) {
+    if (c == NULL) {
+        return false;
+    }
+    uint32_t required = c->exti_lines;
+    if ((c->peripherals & NX_GD32F303_PLATFORM_UART) != 0U) {
+        required |= 1536U;
+    }
+    if ((c->peripherals & NX_GD32F303_PLATFORM_SPI) != 0U) {
+        required |= 240U;
+    }
+    if ((c->peripherals & NX_GD32F303_PLATFORM_ADC) != 0U) {
+        required |= 1U;
+    }
+    if ((c->peripherals & NX_GD32F303_PLATFORM_PWM) != 0U) {
+        required |= 64U;
+    }
+    return (required & ~(uint32_t)c->pins) == 0U &&
+           (c->pins & ~UINT16_C(0x6f3)) == 0U && (c->exti_lines & ~3U) == 0U &&
+           (c->peripherals & ~127U) == 0U &&
+           ((c->peripherals & NX_GD32F303_PLATFORM_DMA_TX) == 0U ||
+            (c->peripherals & NX_GD32F303_PLATFORM_UART) != 0U) &&
+           ((c->peripherals & NX_GD32F303_PLATFORM_DMA_RX) == 0U ||
+            (c->peripherals & NX_GD32F303_PLATFORM_DMA_TX) != 0U);
+}
+nx_result_t
+nx_gd32f303_platform_preflight(const nx_gd32f303_platform_config_t* c) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!platform_selection_valid(c)) {
+        return NX_ERROR_INVALID;
+    }
+    uint8_t selected = c->peripherals;
+    if (((selected & NX_GD32F303_PLATFORM_DMA_TX) != 0U &&
+         !NX_GD303_IRQ_AVAILABLE(DMA0_Channel3_IRQn)) ||
+        ((selected & NX_GD32F303_PLATFORM_DMA_RX) != 0U &&
+         !NX_GD303_IRQ_AVAILABLE(DMA0_Channel4_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if (c->pins != 0U) {
+        nx_result_t pins = nx_gd32f303_pins_preflight(c->pins);
+        if (pins != NX_SUCCESS) {
+            return pins;
+        }
+    }
+    uint32_t apb2 = NX_GD303_READ(&RCU_APB2EN);
+    if ((selected & NX_GD32F303_PLATFORM_UART) != 0U &&
+        ((apb2 & RCU_APB2EN_USART0EN) != 0U ||
+         !NX_GD303_IRQ_AVAILABLE(USART0_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_SPI) != 0U &&
+        ((apb2 & RCU_APB2EN_SPI0EN) != 0U ||
+         !NX_GD303_IRQ_AVAILABLE(SPI0_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_ADC) != 0U &&
+        ((apb2 & RCU_APB2EN_ADC0EN) != 0U ||
+         (NX_GD303_READ(&RCU_APB2RST) & RCU_APB2RST_ADC0RST) != 0U ||
+         (NX_GD303_READ(&RCU_CFG0) & (RCU_CFG0_ADCPSC | RCU_CFG0_ADCPSC_2)) !=
+             0U ||
+         (NX_GD303_READ(&RCU_CFG1) & RCU_CFG1_ADCPSC_3) != 0U ||
+         !NX_GD303_IRQ_AVAILABLE(ADC0_1_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_PWM) != 0U &&
+        ((NX_GD303_READ(&RCU_APB1EN) & RCU_APB1EN_TIMER2EN) != 0U ||
+         (NX_GD303_READ(&RCU_APB1RST) & RCU_APB1RST_TIMER2RST) != 0U ||
+         !NX_GD303_IRQ_AVAILABLE(TIMER2_IRQn) ||
+         ((apb2 & RCU_APB2EN_AFEN) != 0U &&
+          (NX_GD303_READ(&AFIO_PCF0) & AFIO_PCF0_TIMER2_REMAP) != 0U))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_FLASH) != 0U &&
+        !NX_GD303_IRQ_AVAILABLE(FMC_IRQn)) {
+        return NX_ERROR_BUSY;
+    }
+    for (unsigned line = 0U; line < 2U; ++line) {
+        uint32_t mask = 1U << line;
+        if ((c->exti_lines & mask) != 0U &&
+            (((NX_GD303_READ(&EXTI_INTEN) | NX_GD303_READ(&EXTI_EVEN) |
+               NX_GD303_READ(&EXTI_RTEN) | NX_GD303_READ(&EXTI_FTEN) |
+               NX_GD303_READ(&EXTI_PD)) &
+              mask) != 0U ||
+             !NX_GD303_IRQ_AVAILABLE((int)EXTI0_IRQn + (int)line))) {
+            return NX_ERROR_BUSY;
+        }
+    }
+    return nx_gd32f303_system_preflight(&g_nx_gd32f303_system);
+}
+/* The private byte keeps matching low APB2 bits and one shifted high byte.
+ * Compile-time checks bind this lossless representation to the exact SDK. */
+_Static_assert((RCU_APB2EN_AFEN) == (NX_GD32F303_OWN_AFIO),
+               "exact APB2 low receipt bits");
+_Static_assert(((RCU_APB2EN_USART0EN | RCU_APB2EN_SPI0EN | RCU_APB2EN_ADC0EN) >>
+                8U) == (NX_GD32F303_OWN_USART0 | NX_GD32F303_OWN_SPI0 |
+                        NX_GD32F303_OWN_ADC0),
+               "exact APB2 high receipt bits");
+static uint8_t platform_apb2_receipt(uint32_t gates) {
+    const uint32_t low = NX_GD32F303_OWN_AFIO;
+    const uint32_t high =
+        NX_GD32F303_OWN_USART0 | NX_GD32F303_OWN_SPI0 | NX_GD32F303_OWN_ADC0;
+    return (uint8_t)((gates & low) | ((gates >> 8U) & high));
+}
+static uint32_t platform_apb2_gates(uint8_t owned) {
+    const uint32_t low = NX_GD32F303_OWN_AFIO;
+    const uint32_t high =
+        NX_GD32F303_OWN_USART0 | NX_GD32F303_OWN_SPI0 | NX_GD32F303_OWN_ADC0;
+    return ((uint32_t)owned & low) | (((uint32_t)owned & high) << 8U);
+}
+nx_result_t
+nx_gd32f303_platform_resources_acquire(nx_gd32f303_platform_resources_t* p,
+                                       const nx_gd32f303_platform_config_t* c) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || !platform_selection_valid(c)) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->pins.retained || p->owned != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (!g_nx_gd32f303_system.started ||
+        g_nx_gd32f303_system.core_hz != 8000000U) {
+        return NX_ERROR_STATE;
+    }
+    uint8_t selected = c->peripherals;
+    if ((selected & NX_GD32F303_PLATFORM_DMA_TX) != 0U) {
+        if ((NX_GD303_READ(&RCU_AHBEN) & RCU_AHBEN_DMA0EN) == 0U) {
+            p->owned |= NX_GD32F303_OWN_DMA0;
+        }
+        if (!write_checked(&RCU_AHBEN,
+                           NX_GD303_READ(&RCU_AHBEN) | RCU_AHBEN_DMA0EN,
+                           RCU_AHBEN_DMA0EN)) {
+            return NX_ERROR_IO;
+        }
+    }
+    if (c->pins != 0U) {
+        nx_result_t pins = nx_gd32f303_pins_acquire(&p->pins, c->pins);
+        if (pins != NX_SUCCESS) {
+            return pins;
+        }
+    }
+    uint32_t apb2 = 0U;
+    if ((selected & NX_GD32F303_PLATFORM_UART) != 0U) {
+        apb2 |= RCU_APB2EN_USART0EN;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_SPI) != 0U) {
+        apb2 |= RCU_APB2EN_SPI0EN;
+    }
+    if ((selected & NX_GD32F303_PLATFORM_ADC) != 0U) {
+        apb2 |= RCU_APB2EN_ADC0EN;
+    }
+    if (apb2 != 0U || (selected & NX_GD32F303_PLATFORM_PWM) != 0U ||
+        c->exti_lines != 0U) {
+        apb2 |= RCU_APB2EN_AFEN;
+    }
+    if (apb2 != 0U) {
+        p->owned |= platform_apb2_receipt(~NX_GD303_READ(&RCU_APB2EN) & apb2);
+        if (!write_checked(&RCU_APB2EN, NX_GD303_READ(&RCU_APB2EN) | apb2,
+                           apb2)) {
+            return NX_ERROR_IO;
+        }
+    }
+    if ((selected & NX_GD32F303_PLATFORM_PWM) != 0U) {
+        if ((NX_GD303_READ(&RCU_APB1EN) & RCU_APB1EN_TIMER2EN) == 0U) {
+            p->owned |= NX_GD32F303_OWN_TIMER2;
+        }
+        if (!write_checked(&RCU_APB1EN,
+                           NX_GD303_READ(&RCU_APB1EN) | RCU_APB1EN_TIMER2EN,
+                           RCU_APB1EN_TIMER2EN) ||
+            (NX_GD303_READ(&AFIO_PCF0) & AFIO_PCF0_TIMER2_REMAP) != 0U) {
+            return NX_ERROR_IO;
+        }
+    }
+    return NX_SUCCESS;
+}
+nx_result_t
+nx_gd32f303_platform_resources_release(nx_gd32f303_platform_resources_t* p) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if ((p->owned & NX_GD32F303_OWN_DMA0) != 0U) {
+        if (!write_checked(&RCU_AHBEN,
+                           NX_GD303_READ(&RCU_AHBEN) &
+                               ~(uint32_t)RCU_AHBEN_DMA0EN,
+                           RCU_AHBEN_DMA0EN)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t)~NX_GD32F303_OWN_DMA0;
+    }
+    nx_result_t pins = nx_gd32f303_pins_release(&p->pins);
+    if (pins != NX_SUCCESS) {
+        return pins;
+    }
+    uint32_t apb2 = platform_apb2_gates(p->owned);
+    if (apb2 != 0U) {
+        if (!write_checked(&RCU_APB2EN, NX_GD303_READ(&RCU_APB2EN) & ~apb2,
+                           apb2)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t) ~(NX_GD32F303_OWN_AFIO | NX_GD32F303_OWN_USART0 |
+                                NX_GD32F303_OWN_SPI0 | NX_GD32F303_OWN_ADC0);
+    }
+    if ((p->owned & NX_GD32F303_OWN_TIMER2) != 0U) {
+        if (!write_checked(&RCU_APB1EN,
+                           NX_GD303_READ(&RCU_APB1EN) &
+                               ~(uint32_t)RCU_APB1EN_TIMER2EN,
+                           RCU_APB1EN_TIMER2EN)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t)~NX_GD32F303_OWN_TIMER2;
+    }
+    return NX_SUCCESS;
+}

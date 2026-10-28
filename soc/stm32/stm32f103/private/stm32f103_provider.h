@@ -160,6 +160,24 @@ extern const nx_spi_endpoint_ops_t nx_stm32f103_spi_endpoint_ops;
  * \note Polling only,no DMA or asynchronous buffer access.
  */
 nx_result_t nx_stm32f103_spi_initialize(nx_stm32f103_spi_state_t* port);
+/**
+ * \brief Bind cold SPI1 and its explicit PA4 CS before peripheral admission.
+ * \param[in,out] port: Unique cold static controller, no active or retained
+ * I/O. \param[in,out] chip_select: Distinct cold static GPIO state under
+ * Platform. \return SUCCESS/error; partial CS/controller effects require close
+ * retry. \note Privileged unmasked task; Platform owns the sole pad/gate
+ * snapshots.
+ */
+nx_result_t nx_stm32f103_spi_prepare(nx_stm32f103_spi_state_t* port,
+                                     nx_stm32f103_gpio_state_t* chip_select);
+/**
+ * \brief Join controller before applying the explicit inactive CS level.
+ * \param[in,out] port: Same controller after all transaction consumers join.
+ * \param[in,out] chip_select: Same static selected PA4 state.
+ * \return SUCCESS only after both concrete owners withdraw; failure retains.
+ */
+nx_result_t nx_stm32f103_spi_close(nx_stm32f103_spi_state_t* port,
+                                   nx_stm32f103_gpio_state_t* chip_select);
 #ifndef NX_F103_SPI_POLL
 #define NX_F103_SPI_POLL(port) ((void)(port))
 #endif

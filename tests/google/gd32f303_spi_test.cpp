@@ -200,3 +200,28 @@ TEST_F(GD303SPI, RefusedCsInactiveCannotReturnAfterACompletedByte) {
                                        &transferred);
     }));
 }
+
+TEST_F(GD303SPI, StaticPrepareRejectsLiveCsBeforeBindingAColdController) {
+    nx_gd32f303_spi_state_t cold{};
+    const auto before = g_gd303_writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32f303_spi_prepare(&cold, &cs));
+    EXPECT_EQ(nullptr, cold.registers);
+    EXPECT_EQ(before, g_gd303_writes);
+}
+TEST_F(GD303SPI, StaticPrepareAndCloseOwnExactControllerAndExplicitCs) {
+    ASSERT_EQ(NX_SUCCESS, nx_spi_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_gpio_stop(&cs, 16U));
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_pins_release(&lease));
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_pins_acquire(&lease, 0xf0U));
+    state = {};
+    cs = {};
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_spi_prepare(&state, &cs));
+    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(cs.retained);
+    EXPECT_EQ(16U, GPIO_OCTL(GPIOA) & 16U);
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_spi_close(&state, &cs));
+    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(cs.retained);
+    EXPECT_EQ(16U, GPIO_OCTL(GPIOA) & 16U);
+    EXPECT_EQ(NX_SUCCESS, nx_gd32f303_pins_release(&lease));
+}

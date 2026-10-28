@@ -117,6 +117,7 @@ nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
 #undef ADC1
 #undef TIM3
 #undef FLASH
+#undef SPI1
 #define GPIOA NX_F103_GPIOA
 #define AFIO  NX_F103_AFIO
 #define RCC   (&g_f103_model.rcc)
@@ -124,6 +125,7 @@ nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
 #define ADC1  (&g_f103_model.adc)
 #define TIM3  (&g_f103_model.pwm)
 #define FLASH (&g_f103_model.flash)
+#define SPI1  (&g_f103_model.spi)
 #ifdef __cplusplus
 }
 #endif

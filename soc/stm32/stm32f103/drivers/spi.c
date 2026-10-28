@@ -236,3 +236,38 @@ static nx_result_t stop(void* context) {
 const nx_spi_ops_t nx_stm32f103_spi_ops = {.recover = recover, .stop = stop};
 const nx_spi_endpoint_ops_t nx_stm32f103_spi_endpoint_ops = {
     .transfer = transfer, .on_port = on_port};
+
+nx_result_t nx_stm32f103_spi_prepare(nx_stm32f103_spi_state_t* p,
+                                     nx_stm32f103_gpio_state_t* cs) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || cs == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->active || cs->retained ||
+        cs->initialized) {
+        return NX_ERROR_BUSY;
+    }
+    p->registers = SPI1;
+    p->rcc = RCC;
+    p->clock_hz = 8000000U;
+    nx_result_t result = nx_stm32f103_gpio_prepare(cs, 16U, true, 16U);
+    return result == NX_SUCCESS ? nx_stm32f103_spi_initialize(p) : result;
+}
+nx_result_t nx_stm32f103_spi_close(nx_stm32f103_spi_state_t* p,
+                                   nx_stm32f103_gpio_state_t* cs) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || cs == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->retained || p->initialized || p->active) {
+        nx_result_t result = stop(p);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return cs->retained ? nx_stm32f103_gpio_stop(cs, 16U) : NX_SUCCESS;
+}

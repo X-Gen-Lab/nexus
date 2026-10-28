@@ -46,18 +46,8 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = DirectCall("nx_gd32f303_watchdog_stop", (Address(state),))
     elif item.kind == "spi":
         children = [child for child in devices if child.controller == item.id]
-        if not children:
-            fail("GD303 SPI0 requires an explicit reviewed CS endpoint")
-        body = [f"static nx_result_t prepare_{name}(void) {{",
-            f"    if ({state}.retained || {state}.initialized || {state}.active || {state}.held_cs != NULL) {{ return NX_ERROR_BUSY; }}",
-            f"    {state}.registers = (nx_gd32f303_spi_registers_t*)(uintptr_t)SPI0;",
-            f"    {state}.clock_hz = 8000000u;",
-            f"    {state}.poll_limit = 1000000u;",
-            f"    nx_result_t status = nx_gd32f303_spi_initialize(&{state});",
-            "    if (status != NX_SUCCESS) { return status; }"]
-        stops = [f"static nx_result_t stop_{name}(void) {{",
-            f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
-            "    if (status != NX_SUCCESS) { return status; }"]
+        if len(children) != 1:
+            fail("GD303 SPI0 requires one explicit reviewed PA4 CS endpoint")
         for child in children:
             child_name = child.id.replace("-", "_")
             binding = board_bindings[child.options.cs_binding]
@@ -75,21 +65,13 @@ def constructor(item, result, board_bindings, routes, devices):
             cs = f"s_nx_cs_{child_name}"
             endpoint = f"s_nx_endpoint_{child_name}"
             definitions += [f"static nx_gd32f303_gpio_state_t {cs};",
-                f"static nx_gd32f303_spi_endpoint_state_t {endpoint} = {{ .port = &{state} }};",
+                f"static nx_gd32f303_spi_endpoint_state_t {endpoint} = {{",
+                f"    .port = &{state}, .cs = &{cs}, .cs_mask = 16u,",
+                f"    .frequency_hz = {rate}u, .mode = {mode}u", "};",
                 f"static const nx_spi_endpoint_t s_nx_device_face_{child_name} = {{ &nx_gd32f303_spi_endpoint_ops, &{endpoint} }};",
                 f"const nx_spi_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
-            body += [f"    if ({cs}.retained || {cs}.initialized) {{ return NX_ERROR_BUSY; }}",
-                f"    {cs}.mask = 16u; {cs}.output = true;",
-                f"    status = nx_gd32f303_gpio_initialize(&{cs}, 16u);",
-                "    if (status != NX_SUCCESS) { return status; }",
-                f"    {endpoint}.cs = &{cs}; {endpoint}.cs_mask = 16u;",
-                f"    {endpoint}.frequency_hz = {rate}u; {endpoint}.mode = {mode}u;"]
-            stops += [f"    if ({cs}.retained) {{",
-                f"        status = nx_gd32f303_gpio_stop(&{cs}, 16u);",
-                "        if (status != NX_SUCCESS) { return status; }", "    }"]
-        definitions += body + ["    return nx_gd32f303_spi0_pins_prepare();", "}"]
-        definitions += stops + ["    return NX_SUCCESS;", "}"]
-        stop = DirectCall(f"stop_{name}")
+        initialize = DirectCall("nx_gd32f303_spi_prepare", (Address(state), Address(cs)))
+        stop = DirectCall("nx_gd32f303_spi_close", (Address(state), Address(cs)))
     elif item.kind == "exti":
         options = item.options
         irq = result.irq

@@ -266,3 +266,305 @@ nx_time_us_t nx_time_now_us(void) {
 void TIM2_IRQHandler(void) {
     nx_stm32f103_system_timer_irq(&g_nx_stm32f103_system);
 }
+
+_Static_assert(sizeof(nx_stm32f103_platform_resources_t) == 8U,
+               "exact cold receipt RAM budget");
+_Static_assert((NX_STM32F103_OWN_GPIOA | NX_STM32F103_OWN_AFIO |
+                NX_STM32F103_OWN_SPI1 | NX_STM32F103_OWN_ADC1 |
+                NX_STM32F103_OWN_USART2 | NX_STM32F103_OWN_TIM3 |
+                NX_STM32F103_OWN_DMA1 | NX_STM32F103_OWN_PINS) <= UINT8_MAX,
+               "every ownership bit fits in its receipt");
+_Static_assert(UINT8_MAX >= 0xffU, "all validated PA0..PA7 bits fit");
+static bool platform_selection_valid(const nx_stm32f103_platform_config_t* c) {
+    if (c == NULL) {
+        return false;
+    }
+    uint32_t required = c->exti_lines;
+    if ((c->peripherals & NX_STM32F103_PLATFORM_UART) != 0U) {
+        required |= 12U;
+    }
+    if ((c->peripherals & NX_STM32F103_PLATFORM_SPI) != 0U) {
+        required |= 240U;
+    }
+    if ((c->peripherals & NX_STM32F103_PLATFORM_ADC) != 0U) {
+        required |= 1U;
+    }
+    if ((c->peripherals & NX_STM32F103_PLATFORM_PWM) != 0U) {
+        required |= 64U;
+    }
+    return (required & ~(uint32_t)c->pins) == 0U &&
+           (c->pins & ~UINT16_C(0xff)) == 0U && (c->exti_lines & ~3U) == 0U &&
+           (c->peripherals & ~127U) == 0U &&
+           ((c->peripherals & NX_STM32F103_PLATFORM_DMA_TX) == 0U ||
+            (c->peripherals & NX_STM32F103_PLATFORM_UART) != 0U) &&
+           ((c->peripherals & NX_STM32F103_PLATFORM_DMA_RX) == 0U ||
+            (c->peripherals & NX_STM32F103_PLATFORM_DMA_TX) != 0U);
+}
+static bool platform_pins_available(uint32_t pins) {
+    if ((NX_F103_READ(&GPIOA->LCKR) & pins) != 0U) {
+        return false;
+    }
+    uint32_t modes = NX_F103_READ(&GPIOA->CRL);
+    for (unsigned pin = 0U; pin < 8U; ++pin) {
+        if ((pins & (1U << pin)) != 0U) {
+            uint32_t mode = (modes >> (pin * 4U)) & 15U;
+            if (mode != 0U && mode != 4U) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+nx_result_t
+nx_stm32f103_platform_preflight(const nx_stm32f103_platform_config_t* c) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!platform_selection_valid(c)) {
+        return NX_ERROR_INVALID;
+    }
+    uint8_t selected = c->peripherals;
+    if (((selected & NX_STM32F103_PLATFORM_DMA_TX) != 0U &&
+         !NX_F103_IRQ_AVAILABLE(DMA1_Channel7_IRQn)) ||
+        ((selected & NX_STM32F103_PLATFORM_DMA_RX) != 0U &&
+         !NX_F103_IRQ_AVAILABLE(DMA1_Channel6_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t system = nx_stm32f103_system_preflight(&g_nx_stm32f103_system);
+    if (system != NX_SUCCESS) {
+        return system;
+    }
+    uint32_t apb2 = NX_F103_READ(&RCC->APB2ENR);
+    if ((selected & NX_STM32F103_PLATFORM_UART) != 0U &&
+        ((NX_F103_READ(&RCC->APB1ENR) & RCC_APB1ENR_USART2EN) != 0U ||
+         !NX_F103_IRQ_AVAILABLE(USART2_IRQn) ||
+         ((apb2 & RCC_APB2ENR_AFIOEN) != 0U &&
+          (NX_F103_READ(&AFIO->MAPR) & AFIO_MAPR_USART2_REMAP) != 0U))) {
+        return NX_ERROR_BUSY;
+    }
+    for (unsigned line = 0U; line < 2U; ++line) {
+        uint32_t mask = 1U << line;
+        if ((c->exti_lines & mask) != 0U &&
+            (((NX_F103_READ(&EXTI->IMR) | NX_F103_READ(&EXTI->EMR) |
+               NX_F103_READ(&EXTI->RTSR) | NX_F103_READ(&EXTI->FTSR) |
+               NX_F103_READ(&EXTI->PR)) &
+              mask) != 0U ||
+             !NX_F103_IRQ_AVAILABLE((int)EXTI0_IRQn + (int)line))) {
+            return NX_ERROR_BUSY;
+        }
+    }
+    if ((selected & NX_STM32F103_PLATFORM_SPI) != 0U &&
+        ((apb2 & RCC_APB2ENR_SPI1EN) != 0U ||
+         (NX_F103_READ(&RCC->APB2RSTR) & RCC_APB2RSTR_SPI1RST) != 0U ||
+         !NX_F103_IRQ_AVAILABLE(SPI1_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_ADC) != 0U &&
+        ((apb2 & RCC_APB2ENR_ADC1EN) != 0U ||
+         (NX_F103_READ(&RCC->APB2RSTR) & RCC_APB2RSTR_ADC1RST) != 0U ||
+         (NX_F103_READ(&RCC->CFGR) & RCC_CFGR_ADCPRE) != 0U ||
+         !NX_F103_IRQ_AVAILABLE(ADC1_2_IRQn))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_PWM) != 0U &&
+        ((NX_F103_READ(&RCC->APB1ENR) & RCC_APB1ENR_TIM3EN) != 0U ||
+         (NX_F103_READ(&RCC->APB1RSTR) & RCC_APB1RSTR_TIM3RST) != 0U ||
+         !NX_F103_IRQ_AVAILABLE(TIM3_IRQn) ||
+         ((apb2 & RCC_APB2ENR_AFIOEN) != 0U &&
+          (NX_F103_READ(&AFIO->MAPR) & AFIO_MAPR_TIM3_REMAP) != 0U))) {
+        return NX_ERROR_BUSY;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_FLASH) != 0U &&
+        !NX_F103_IRQ_AVAILABLE(FLASH_IRQn)) {
+        return NX_ERROR_BUSY;
+    }
+    if (c->pins != 0U && (apb2 & RCC_APB2ENR_IOPAEN) != 0U &&
+        !platform_pins_available(c->pins)) {
+        return NX_ERROR_BUSY;
+    }
+    return NX_SUCCESS;
+}
+static uint32_t platform_pin_fields(uint32_t pins, uint32_t nibble) {
+    uint32_t result = 0U;
+    for (unsigned pin = 0U; pin < 8U; ++pin) {
+        if ((pins & (1U << pin)) != 0U) {
+            result |= nibble << (4U * pin);
+        }
+    }
+    return result;
+}
+/* The private byte keeps matching low APB2 bits and one shifted high byte.
+ * Compile-time checks bind this lossless representation to the exact SDK. */
+_Static_assert((RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN) ==
+                   (NX_STM32F103_OWN_GPIOA | NX_STM32F103_OWN_AFIO),
+               "exact APB2 low receipt bits");
+_Static_assert(((RCC_APB2ENR_SPI1EN | RCC_APB2ENR_ADC1EN) >> 8U) ==
+                   (NX_STM32F103_OWN_SPI1 | NX_STM32F103_OWN_ADC1),
+               "exact APB2 high receipt bits");
+static uint8_t platform_apb2_receipt(uint32_t gates) {
+    const uint32_t low = NX_STM32F103_OWN_GPIOA | NX_STM32F103_OWN_AFIO;
+    const uint32_t high = NX_STM32F103_OWN_SPI1 | NX_STM32F103_OWN_ADC1;
+    return (uint8_t)((gates & low) | ((gates >> 8U) & high));
+}
+static uint32_t platform_apb2_gates(uint8_t owned) {
+    const uint32_t low = NX_STM32F103_OWN_GPIOA | NX_STM32F103_OWN_AFIO;
+    const uint32_t high = NX_STM32F103_OWN_SPI1 | NX_STM32F103_OWN_ADC1;
+    return ((uint32_t)owned & low) | (((uint32_t)owned & high) << 8U);
+}
+nx_result_t nx_stm32f103_platform_resources_acquire(
+    nx_stm32f103_platform_resources_t* p,
+    const nx_stm32f103_platform_config_t* c) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL || !platform_selection_valid(c)) {
+        return NX_ERROR_INVALID;
+    }
+    if (p->owned != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (!g_nx_stm32f103_system.started ||
+        g_nx_stm32f103_system.core_hz != 8000000U) {
+        return NX_ERROR_STATE;
+    }
+    uint8_t selected = c->peripherals;
+    /* Selection validation proves that only eight GPIOA bits are stored. */
+    p->pins = (uint8_t)c->pins;
+    if ((selected & NX_STM32F103_PLATFORM_DMA_TX) != 0U) {
+        if ((NX_F103_READ(&RCC->AHBENR) & RCC_AHBENR_DMA1EN) == 0U) {
+            p->owned |= NX_STM32F103_OWN_DMA1;
+        }
+        if (!checked(&RCC->AHBENR,
+                     NX_F103_READ(&RCC->AHBENR) | RCC_AHBENR_DMA1EN,
+                     RCC_AHBENR_DMA1EN)) {
+            return NX_ERROR_IO;
+        }
+    }
+    if (c->pins == 0U) {
+        return NX_SUCCESS;
+    }
+    uint32_t apb2 = RCC_APB2ENR_IOPAEN;
+    uint32_t apb1 = 0U;
+    if ((selected & (NX_STM32F103_PLATFORM_UART | NX_STM32F103_PLATFORM_SPI |
+                     NX_STM32F103_PLATFORM_PWM)) != 0U ||
+        c->exti_lines != 0U) {
+        apb2 |= RCC_APB2ENR_AFIOEN;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_SPI) != 0U) {
+        apb2 |= RCC_APB2ENR_SPI1EN;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_ADC) != 0U) {
+        apb2 |= RCC_APB2ENR_ADC1EN;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_UART) != 0U) {
+        apb1 |= RCC_APB1ENR_USART2EN;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_PWM) != 0U) {
+        apb1 |= RCC_APB1ENR_TIM3EN;
+    }
+    p->owned |= platform_apb2_receipt(~NX_F103_READ(&RCC->APB2ENR) & apb2);
+    if (apb1 != 0U) {
+        uint32_t added = ~NX_F103_READ(&RCC->APB1ENR) & apb1;
+        if ((added & RCC_APB1ENR_USART2EN) != 0U) {
+            p->owned |= NX_STM32F103_OWN_USART2;
+        }
+        if ((added & RCC_APB1ENR_TIM3EN) != 0U) {
+            p->owned |= NX_STM32F103_OWN_TIM3;
+        }
+        if (!checked(&RCC->APB1ENR, NX_F103_READ(&RCC->APB1ENR) | apb1, apb1)) {
+            return NX_ERROR_IO;
+        }
+    }
+    if (!checked(&RCC->APB2ENR, NX_F103_READ(&RCC->APB2ENR) | apb2, apb2)) {
+        return NX_ERROR_IO;
+    }
+    /* Recheck after gate visibility before capturing or modifying any pad. */
+    uint32_t remaps = 0U;
+    if ((selected & NX_STM32F103_PLATFORM_UART) != 0U) {
+        remaps |= AFIO_MAPR_USART2_REMAP;
+    }
+    if ((selected & NX_STM32F103_PLATFORM_SPI) != 0U) {
+        remaps |= AFIO_MAPR_SPI1_REMAP;
+        if (NX_F103_READ(&SPI1->CR1) != 0U || NX_F103_READ(&SPI1->CR2) != 0U ||
+            (NX_F103_READ(&SPI1->SR) &
+             (SPI_SR_BSY | SPI_SR_RXNE | SPI_SR_OVR | SPI_SR_MODF)) != 0U) {
+            return NX_ERROR_BUSY;
+        }
+    }
+    if ((selected & NX_STM32F103_PLATFORM_PWM) != 0U) {
+        remaps |= AFIO_MAPR_TIM3_REMAP;
+    }
+    if ((remaps != 0U && (NX_F103_READ(&AFIO->MAPR) & remaps) != 0U) ||
+        !platform_pins_available(c->pins)) {
+        return NX_ERROR_BUSY;
+    }
+    p->saved_crl =
+        NX_F103_READ(&GPIOA->CRL) & platform_pin_fields(c->pins, 15U);
+    p->saved_odr = (uint8_t)(NX_F103_READ(&GPIOA->ODR) & c->pins);
+    p->owned |= NX_STM32F103_OWN_PINS;
+    return NX_SUCCESS;
+}
+nx_result_t
+nx_stm32f103_platform_resources_release(nx_stm32f103_platform_resources_t* p) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (p == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if ((p->owned & NX_STM32F103_OWN_DMA1) != 0U) {
+        if (!checked(&RCC->AHBENR,
+                     NX_F103_READ(&RCC->AHBENR) & ~(uint32_t)RCC_AHBENR_DMA1EN,
+                     RCC_AHBENR_DMA1EN)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t)~NX_STM32F103_OWN_DMA1;
+    }
+    if ((p->owned & NX_STM32F103_OWN_PINS) != 0U) {
+        uint32_t fields = platform_pin_fields(p->pins, 15U);
+        if (!checked(&GPIOA->CRL,
+                     (NX_F103_READ(&GPIOA->CRL) & ~fields) |
+                         platform_pin_fields(p->pins, 4U),
+                     fields)) {
+            return NX_ERROR_IO;
+        }
+        NX_F103_WRITE(
+            &GPIOA->BSRR,
+            (uint32_t)p->saved_odr |
+                (((uint32_t)p->pins & ~(uint32_t)p->saved_odr) << 16U));
+        nx_arch_dsb();
+        if ((NX_F103_READ(&GPIOA->ODR) & p->pins) != p->saved_odr ||
+            !checked(&GPIOA->CRL,
+                     (NX_F103_READ(&GPIOA->CRL) & ~fields) | p->saved_crl,
+                     fields)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t)~NX_STM32F103_OWN_PINS;
+    }
+    uint32_t apb1 = 0U;
+    if ((p->owned & NX_STM32F103_OWN_USART2) != 0U) {
+        apb1 |= RCC_APB1ENR_USART2EN;
+    }
+    if ((p->owned & NX_STM32F103_OWN_TIM3) != 0U) {
+        apb1 |= RCC_APB1ENR_TIM3EN;
+    }
+    if (apb1 != 0U) {
+        if (!checked(&RCC->APB1ENR, NX_F103_READ(&RCC->APB1ENR) & ~apb1,
+                     apb1)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &=
+            (uint8_t) ~(NX_STM32F103_OWN_USART2 | NX_STM32F103_OWN_TIM3);
+    }
+    uint32_t apb2 = platform_apb2_gates(p->owned);
+    if (apb2 != 0U) {
+        if (!checked(&RCC->APB2ENR, NX_F103_READ(&RCC->APB2ENR) & ~apb2,
+                     apb2)) {
+            return NX_ERROR_IO;
+        }
+        p->owned &= (uint8_t) ~(NX_STM32F103_OWN_GPIOA | NX_STM32F103_OWN_AFIO |
+                                NX_STM32F103_OWN_SPI1 | NX_STM32F103_OWN_ADC1);
+    }
+    p->pins = 0U;
+    return NX_SUCCESS;
+}

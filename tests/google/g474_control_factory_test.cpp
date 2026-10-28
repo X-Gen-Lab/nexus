@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "g474_control_factory_model.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include <cstring>
@@ -24,6 +25,10 @@ bool refuse_master_withdrawal;
 bool refuse_comparator_withdrawal;
 bool bootstrap_trigger;
 bool refuse_priority_restore;
+bool comparator_enable_observed;
+bool output_connection_observed;
+uint64_t comparator_enabled_at;
+uint64_t output_connected_at;
 unsigned unclocked_comparator_reads;
 uint32_t active_compare[4];
 testing::MockFunction<void(unsigned)>* effect_observer;
@@ -72,6 +77,10 @@ extern "C" void nx_g474_control_write(volatile uint32_t* address,
         if ((*address & COMP_CSR_EN) != 0U && (value & COMP_CSR_EN) == 0U) {
             observe(comparator_withdrawn);
         }
+        if ((*address & COMP_CSR_EN) == 0U && (value & COMP_CSR_EN) != 0U) {
+            comparator_enable_observed = true;
+            comparator_enabled_at = nx_time_now_us();
+        }
         *address = value & ~static_cast<uint32_t>(COMP_CSR_VALUE);
         return;
     }
@@ -110,6 +119,11 @@ extern "C" void nx_g474_control_write(volatile uint32_t* address,
         *address = value;
         return;
     }
+    if (address == &GPIOA->MODER && !output_connection_observed &&
+        (value & output_mask) != 0U) {
+        output_connection_observed = true;
+        output_connected_at = nx_time_now_us();
+    }
     if (address == &GPIOA->MODER && (*address & output_mask) != 0U &&
         (value & output_mask) == 0U) {
         observe(pins_withdrawn);
@@ -140,6 +154,10 @@ class G474ControlFactory : public testing::Test {
         refuse_comparator_withdrawal = false;
         bootstrap_trigger = false;
         refuse_priority_restore = false;
+        comparator_enable_observed = false;
+        output_connection_observed = false;
+        comparator_enabled_at = 0U;
+        output_connected_at = 0U;
         unclocked_comparator_reads = 0U;
         std::memset(active_compare, 0, sizeof(active_compare));
         effect_observer = nullptr;
@@ -183,6 +201,19 @@ TEST_F(G474ControlFactory, StartupPreparesExactRoutesBeforePublishingReady) {
     EXPECT_EQ(TIM1->CCER, 0U);
     EXPECT_EQ(TIM1->CR1 & TIM_CR1_CEN, 0U);
     EXPECT_FALSE(bootstrap_trigger);
+}
+
+TEST_F(G474ControlFactory,
+       ComparatorSettlesBeforeOutputConnectionAndPlatformReadiness) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_TRUE(comparator_enable_observed);
+    ASSERT_TRUE(output_connection_observed);
+    ASSERT_GE(output_connected_at, comparator_enabled_at);
+    const auto ready_at = nx_time_now_us();
+    ASSERT_GE(ready_at, comparator_enabled_at);
+    EXPECT_GE(output_connected_at - comparator_enabled_at, 6U);
+    EXPECT_GE(ready_at - comparator_enabled_at, 6U);
+    EXPECT_TRUE(g_g474_model.irq_enabled[TIM1_BRK_TIM15_IRQn]);
 }
 
 TEST_F(G474ControlFactory, ExistingGroupFaceStagesAndStartsTheActualTimer) {

@@ -269,6 +269,7 @@ static void active_deadline(void) {
 typedef struct {
     fixture_t* fixture;
     uint32_t done;
+    uint32_t completed;
 } concurrent_t;
 
 /**
@@ -282,8 +283,8 @@ static void producer_task(void* context) {
     nx_request_initialize(&request);
     nx_owner_ticket_t old = {0, 0};
     int operation = 1;
-    uint64_t bound = nx_native_now_us() + 5000000u;
     for (unsigned i = 0; i < 1000; ++i) {
+        uint64_t bound = nx_native_now_us() + 5000000u;
         CHECK(nx_request_prepare(&request, NX_DEADLINE_NEVER) == NX_SUCCESS);
         nx_owner_ticket_t ticket;
         nx_result_t admitted;
@@ -308,6 +309,8 @@ static void producer_task(void* context) {
         CHECK(nx_request_result(&request, &result, &transferred) == NX_SUCCESS);
         CHECK(result == NX_SUCCESS && transferred == 7);
         old = ticket;
+        /* Liveness observation adds no ownership publication edge. */
+        __atomic_fetch_add(&concurrent->completed, 1, __ATOMIC_RELAXED);
     }
     __atomic_fetch_add(&concurrent->done, 1, __ATOMIC_RELEASE);
 }
@@ -316,7 +319,14 @@ static void producer_task(void* context) {
 static void executor_task(void* context) {
     concurrent_t* concurrent = context;
     uint64_t bound = nx_native_now_us() + 5000000u;
+    uint32_t observed = 0;
     for (;;) {
+        uint32_t completed =
+            __atomic_load_n(&concurrent->completed, __ATOMIC_RELAXED);
+        if (completed != observed) {
+            observed = completed;
+            bound = nx_native_now_us() + 5000000u;
+        }
         CHECK(nx_native_now_us() < bound);
         nx_result_t result = nx_bus_owner_service(&concurrent->fixture->owner);
         CHECK(result == NX_SUCCESS || result == NX_ERROR_BUSY);
@@ -334,7 +344,7 @@ static void multi_producer(void) {
     fixture_t fixture;
     initialize(&fixture);
     fixture.auto_complete = true;
-    concurrent_t concurrent = {&fixture, 0};
+    concurrent_t concurrent = {&fixture, 0, 0};
     nx_native_task_t tasks[4] = {0};
     void* stacks[4];
     for (size_t i = 0; i < 4; ++i) {
