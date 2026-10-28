@@ -69,3 +69,11 @@ C++17 here is a consumer-header check, not a firmware-language change. The
 existing testing domain owns its regressions; it adds no formal plan stage.
 
 SDK updates require origin, version, license and content identity review plus the matching compile/link and device-contract regressions. Do not modify an imported vendor file to implement board wiring or product policy. Configuration does not download dependencies, and vendor code is not relicensed under the repository's MIT license.
+
+Source provenance and retrieval have separate owners: the reviewed catalogue
+records the official `upstream_url` and the approved `fetch_url`; the Gitlink
+selects the exact commit. Official repositories remain the fetch sources during
+the contract preparation stage. A future organization-fork activation requires
+verified repositories and an atomic policy change; it does not upgrade SDK code.
+See the [dependency hosting and recovery contract](../docs/design/source-compatibility.md)
+for recursive FreeRTOS handling, explicit preparation and Source SDK trust.

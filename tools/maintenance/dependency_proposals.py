@@ -24,7 +24,7 @@ from tools.configure.metadata import (  # noqa: E402
     fields, identity, parse_json, read_json, regular, snapshot,
 )
 from tools.maintenance.source_catalogue import (  # noqa: E402
-    ALL_SOURCE_DEPENDENCIES, declared_modules,
+    ALL_DEPENDENCIES, declared_modules, relative_path,
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
@@ -84,18 +84,37 @@ def inventory(root=ROOT):
         raise ValueError("Dependency proposals require a development Git checkout")
     commit = git(root, "rev-parse", "HEAD")
     module_bytes, module_identity = snapshot(root / ".gitmodules")
-    urls = declared_modules(module_bytes)
+    declared_modules(module_bytes)
     records = []
-    for dependency in ALL_SOURCE_DEPENDENCIES:
+    for dependency in ALL_DEPENDENCIES:
         name, path, notice = dependency.identifier, dependency.path, dependency.notice
-        entry = git(root, "ls-tree", "HEAD", "--", path).split()
+        owner = root if dependency.parent is None else root / dependency.parent
+        entry = git(owner, "ls-tree", "HEAD", "--",
+                    relative_path(dependency)).split()
         if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
             raise ValueError("Missing committed source Gitlink: " + path)
         checkout = root / path
-        if git(checkout, "rev-parse", "HEAD") != entry[2] or git(checkout, "status", "--porcelain", "--untracked-files=normal"):
+        if (not (checkout / ".git").exists() or
+                Path(git(checkout, "rev-parse", "--show-toplevel")) != checkout or
+                git(checkout, "rev-parse", "HEAD") != entry[2] or
+                git(checkout, "config", "--get-all", "remote.origin.url") !=
+                dependency.fetch_url or
+                git(checkout, "status", "--porcelain", "--untracked-files=all")):
             raise ValueError("Source checkout differs from locked clean Gitlink: " + path)
         references = [module_identity, identity(checkout / notice)]
-        if dependency.source_lock is not None:
+        upstream_revision = entry[2]
+        if dependency.parent is not None:
+            declaration, declaration_identity = snapshot(owner / ".gitmodules")
+            declared_modules(declaration, dependency.parent)
+            references.append(declaration_identity)
+        if name == "freertos":
+            from tools.maintenance import freertos_transport
+            review = freertos_transport.verify(root, selected_commit=entry[2])
+            upstream_revision = review["upstream_base"]
+            if review["mode"] == "metadata-only":
+                references.extend(identity(root / item)
+                                  for item in freertos_transport.REVIEW_FILES)
+        elif dependency.source_lock is not None:
             lock_path = root / dependency.source_lock
             lock_bytes, lock_identity = snapshot(lock_path)
             locked = parse_json(lock_bytes)
@@ -121,7 +140,9 @@ def inventory(root=ROOT):
                 references.extend(identity(checkout / filename)
                                   for filename in sorted(locked["files"]))
         records.append({"id": name, "revision": entry[2], "kind": "git_source",
-                        "path": path, "upstream_url": urls[path],
+                        "path": path, "upstream_url": dependency.upstream_url,
+                        "fetch_url": dependency.fetch_url,
+                        "upstream_revision": upstream_revision,
                         "identities": references,
                         "license_review": "current_notices_observed"})
     vendor_path = root / "vendors/gigadevice/gd32f4xx/source.lock.json"
@@ -190,7 +211,7 @@ def observe_upstream(current, output, runner=None):
     for item in current["dependencies"]:
         origin = item.get("upstream_url")
         if origin is not None and (not isinstance(origin, str) or not re.fullmatch(
-                r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\.git", origin)):
+                r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", origin)):
             raise ValueError("Upstream requires an exact public approved GitHub origin")
     if runner is None:
         # Reuse the maintained bounded subprocess capture and kill/reap
@@ -203,7 +224,9 @@ def observe_upstream(current, output, runner=None):
     output.mkdir(parents=True, exist_ok=False)
     observations = []
     for index, item in enumerate(current["dependencies"]):
-        record = {"dependency": item["id"], "current_revision": item["revision"],
+        record = {"dependency": item["id"],
+                  "current_revision": item.get("upstream_revision", item["revision"]),
+                  "selected_revision": item["revision"],
                   "status": "not_observed", "refs": []}
         origin = item.get("upstream_url")
         if origin is None:
@@ -271,7 +294,9 @@ def propose(plan, current):
         raise ValueError("Unknown dependency")
     selected = selected[0]
     revision = plan["proposed_revision"]
-    if not isinstance(revision, str) or not revision or len(revision) > 128 or revision == selected["revision"]:
+    upstream_revision = selected.get("upstream_revision", selected["revision"])
+    if (not isinstance(revision, str) or not revision or len(revision) > 128 or
+            revision in {selected["revision"], upstream_revision}):
         raise ValueError("Distinct pinned proposed revision required")
     if selected["kind"] == "git_source" and not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Git source proposal requires full commit")
@@ -309,6 +334,12 @@ def propose(plan, current):
             "owner": "codex", "mode": "weekly_read_only",
             "status": "requires_review_and_execution", "dependency": selected["id"],
             "current_revision": selected["revision"], "proposed_revision": revision,
+            "current_upstream_revision": upstream_revision,
+            "selected_revision": selected["revision"],
+            "proposed_selected_revision": None if upstream_revision !=
+                selected["revision"] else revision,
+            "transport_review": "required" if upstream_revision !=
+                selected["revision"] else "not_required",
             "source_url": plan["source_url"], "archive": archive,
             "declared_license": {"expression": expression, "notices": notices},
             "gate_matrix": matrix, "locks_changed": False,

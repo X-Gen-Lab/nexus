@@ -1,5 +1,6 @@
 """Reviewed H7/U5 sources require stable official or complete SDK identity."""
 from __future__ import annotations
+from dataclasses import replace
 import copy
 import io
 import importlib.util
@@ -11,7 +12,7 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
-from tools.maintenance import cmsis_device_lock
+from tools.maintenance import cmsis_device_lock, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -39,7 +40,8 @@ class DeviceLockContracts:
         self.lock_path = self.folder / "source.lock.json"
         self.write_lock()
         self.git_state = {"HEAD": self.lock["commit"],
-                          "origin": self.lock["repository"], "status": ""}
+                          "origin": source_catalogue.upstream_dependency(
+                              self.lock["repository"]).fetch_url, "status": ""}
         self.git_patch = mock.patch.object(cmsis_device_lock, "git",
                                           side_effect=self.git)
         self.git_patch.start()
@@ -56,6 +58,8 @@ class DeviceLockContracts:
         if arguments == ("rev-parse", "HEAD"):
             return self.git_state["HEAD"]
         if arguments == ("remote", "get-url", "origin"):
+            return self.git_state.get("resolved_origin", self.git_state["origin"])
+        if arguments == ("config", "--get-all", "remote.origin.url"):
             return self.git_state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return self.git_state["status"]
@@ -91,6 +95,25 @@ class DeviceLockContracts:
         self.assertEqual(result["license"], "Apache-2.0")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
+
+    def test_reviewed_transport_does_not_rewrite_official_device_lock(self):
+        item = source_catalogue.upstream_dependency(self.lock["repository"])
+        controlled = replace(item, fetch_url="https://github.com/Reviewed-Test/" +
+                             item.upstream_url.rsplit("/", 1)[1])
+        entries = tuple(controlled if record == item else record
+                        for record in source_catalogue.ALL_DEPENDENCIES)
+        self.git_state["origin"] = controlled.fetch_url
+        with mock.patch.object(source_catalogue, "ALL_DEPENDENCIES", entries):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+            self.git_state["origin"] = self.lock["repository"]
+            with self.assertRaises(ValueError):
+                self.verify()
+
+    def test_url_rewrite_cannot_hide_an_unapproved_declared_origin(self):
+        self.git_state["resolved_origin"] = self.git_state["origin"]
+        self.git_state["origin"] = "https://unreviewed.invalid/device.git"
+        with self.assertRaises(ValueError):
+            self.verify()
 
     def test_real_official_whole_checkout_and_cli_verify_read_only(self):
         self.git_patch.stop()

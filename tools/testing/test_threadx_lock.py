@@ -1,5 +1,6 @@
 """Exact official ThreadX closure rejects stale or incomplete source inputs."""
 from __future__ import annotations
+from dataclasses import replace
 import copy
 import hashlib
 import json
@@ -10,7 +11,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from tools.maintenance import threadx_lock
+from unittest.mock import patch
+from tools.maintenance import threadx_lock, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,7 +32,8 @@ class ThreadXLockTests(unittest.TestCase):
         self.git("init", "--quiet")
         self.git("config", "user.name", "ThreadX lock test")
         self.git("config", "user.email", "threadx-test@local.invalid")
-        self.git("remote", "add", "origin", self.lock["repository"])
+        self.git("remote", "add", "origin",
+                 source_catalogue.dependency("threadx").fetch_url)
         self.git("add", ".")
         self.git("commit", "--quiet", "-m", "actual locked source fixture")
         self.lock["commit"] = self.git("rev-parse", "HEAD")
@@ -65,6 +68,27 @@ class ThreadXLockTests(unittest.TestCase):
                                      ROOT / "dependencies/threadx.lock.json",
                                      "cortex_m4")
         self.assertEqual(result["verified_files"], 215)
+
+    def test_approved_transport_preserves_official_release_pair(self):
+        item = source_catalogue.dependency("threadx")
+        approved = replace(item,
+            fetch_url="https://github.com/Reviewed-Test/threadx.git")
+        entries = tuple(approved if record == item else record
+                        for record in source_catalogue.ALL_DEPENDENCIES)
+        self.git("remote", "set-url", "origin", approved.fetch_url)
+        with patch.object(source_catalogue, "ALL_DEPENDENCIES", entries):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+            self.git("remote", "set-url", "origin", self.lock["repository"])
+            with self.assertRaises(ValueError):
+                self.verify()
+
+    def test_url_rewrite_cannot_admit_a_foreign_raw_origin(self):
+        fetch = source_catalogue.dependency("threadx").fetch_url
+        alias = "https://unreviewed.invalid/threadx.git"
+        self.git("remote", "set-url", "origin", alias)
+        self.git("config", "url." + fetch + ".insteadOf", alias)
+        with self.assertRaises(ValueError):
+            self.verify()
 
     def test_unknown_port_rejects(self):
         for port in ("m4", "linux/../linux", "cortex_m7", "", True):

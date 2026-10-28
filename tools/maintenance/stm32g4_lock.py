@@ -19,6 +19,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import fields, parse_json, snapshot  # noqa: E402
+from tools.maintenance import source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/STMicroelectronics/cmsis-device-g4.git"
 PART = "STM32G474RET6"
@@ -77,11 +78,12 @@ def verify(source, lock_path, *, packaged_commit=None):
     raw, lock_identity = snapshot(lock_path)
     lock = parse_json(raw)
     selected = contract(lock)
+    approved_fetch = source_catalogue.dependency("stm32g4_cmsis").fetch_url
     if packaged_commit is None:
         if (not (source / ".git").exists() or
                 Path(git(source, "rev-parse", "--show-toplevel")) != source or
                 git(source, "rev-parse", "HEAD") != lock["commit"] or
-                git(source, "remote", "get-url", "origin") != ORIGIN):
+                git(source, "config", "--get-all", "remote.origin.url") != approved_fetch):
             raise ValueError("G4 checkout differs from exact official locked revision")
     elif packaged_commit != lock["commit"]:
         raise ValueError("Packaged G4 dependency commit differs from source lock")
@@ -95,7 +97,7 @@ def verify(source, lock_path, *, packaged_commit=None):
         identities[name] = actual
     if packaged_commit is None and (
             git(source, "rev-parse", "HEAD") != lock["commit"] or
-            git(source, "remote", "get-url", "origin") != ORIGIN or
+            git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=all")):
         raise ValueError("G4 checkout changed or is not clean")
     if snapshot(lock_path)[1] != lock_identity or any(

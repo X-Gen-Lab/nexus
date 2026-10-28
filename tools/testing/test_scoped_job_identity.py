@@ -1,5 +1,6 @@
 """Bind selected CI scopes to real recursive Git and configuration closures."""
 
+from dataclasses import replace
 import json
 import os
 from pathlib import Path
@@ -7,24 +8,33 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.dev.dependencies import prepare_preset
 from tools.evidence.common import EvidenceError, file_identity
 from tools.evidence.identity import canonical_digest
 from tools.maintenance.job_identity import capture
+from tools.maintenance import source_catalogue
 from tools.maintenance.source_catalogue import (
-    ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
+    ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES, children, dependency,
+    module_name, relative_path,
 )
 
 
 class SelectedIdentityTests(unittest.TestCase):
     def setUp(self):
+        baseline = tuple(replace(item, fetch_url=item.upstream_url)
+                         for item in source_catalogue.ALL_DEPENDENCIES)
+        policy = patch.object(source_catalogue, "ALL_DEPENDENCIES", baseline)
+        policy.start()
+        self.addCleanup(policy.stop)
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.area = Path(self.directory.name)
         self.root = self.area / 'source'
         self.root.mkdir()
-        self.environment = os.environ.copy()
+        self.environment = {key: value for key, value in os.environ.items()
+                            if not key.startswith("GIT_")}
         self.environment.update(GIT_AUTHOR_NAME='Fixture',
             GIT_AUTHOR_EMAIL='fixture@example.invalid',
             GIT_COMMITTER_NAME='Fixture',
@@ -39,12 +49,15 @@ class SelectedIdentityTests(unittest.TestCase):
         self.freertos = self.area / 'freertos'
         self.freertos.mkdir()
         self.git(self.freertos, 'init', '-q')
-        (self.freertos / '.gitmodules').write_text(
-            '[submodule "nested/child"]\n path = nested/child\n'
-            ' url = ' + str(self.module) + '\n')
+        nested = children('ext/freertos')
+        (self.freertos / '.gitmodules').write_text(''.join(
+            '[submodule "' + module_name(item) + '"]\n path = '
+            + relative_path(item) + '\n url = ' + item.fetch_url + '\n'
+            for item in nested))
         self.git(self.freertos, 'add', '.')
-        self.git(self.freertos, 'update-index', '--add', '--cacheinfo',
-                 '160000', self.module_sha, 'nested/child')
+        for item in nested:
+            self.git(self.freertos, 'update-index', '--add', '--cacheinfo',
+                     '160000', self.module_sha, relative_path(item))
         self.git(self.freertos, 'commit', '-qm', 'fixture recursive module')
         self.freertos_sha = self.git(self.freertos, 'rev-parse', 'HEAD')
         self.git(self.root, 'init', '-q')
@@ -54,7 +67,7 @@ class SelectedIdentityTests(unittest.TestCase):
         declarations = []
         for item in ALL_SOURCE_DEPENDENCIES:
             declarations.append('[submodule "' + item.path + '"]\n path = '
-                                + item.path + '\n url = ' + item.origin + '\n')
+                                + item.path + '\n url = ' + item.upstream_url + '\n')
             (self.root / item.path).mkdir(parents=True)
         (self.root / '.gitmodules').write_text(''.join(declarations))
         (self.root / 'board').mkdir()
@@ -100,7 +113,20 @@ class SelectedIdentityTests(unittest.TestCase):
             source = self.freertos if module == 'ext/freertos' else self.module
             self.git(self.root, 'config', 'submodule.' + module + '.url', str(source))
             self.git(self.root, '-c', 'protocol.file.allow=always', 'submodule',
-                     'update', '--init', '--recursive', '--', module)
+                     'update', '--init', '--', module)
+            checkout = self.root / module
+            item = dependency(module)
+            self.git(checkout, 'remote', 'set-url', 'origin', item.fetch_url)
+            self.git(self.root, 'config', 'submodule.' + module + '.url',
+                     item.fetch_url)
+            for child in children(module):
+                key = 'submodule.' + module_name(child) + '.url'
+                self.git(checkout, 'config', key, str(self.module))
+                self.git(checkout, '-c', 'protocol.file.allow=always', 'submodule',
+                         'update', '--init', '--', relative_path(child))
+                self.git(self.root / child.path, 'remote', 'set-url', 'origin',
+                         child.fetch_url)
+                self.git(checkout, 'config', key, child.fetch_url)
 
     def refresh_receipt(self):
         self.receipt = prepare_preset(self.root, 'fixture')
@@ -185,14 +211,15 @@ class SelectedIdentityTests(unittest.TestCase):
         self.refresh_receipt()
         self.write_configuration()
         self.git(self.root / 'ext/freertos', 'submodule', 'deinit', '-f', '--',
-                 'nested/child')
+                 relative_path(children('ext/freertos')[0]))
         with self.assertRaises(EvidenceError):
             self.capture()
         self.initialize('ext/freertos')
         record = self.capture()
         paths = {item['path'] for item in
                  record['dependency_scope']['recursive_submodules']}
-        self.assertIn('ext/freertos/nested/child', paths)
+        for child in children('ext/freertos'):
+            self.assertIn(child.path, paths)
 
     def test_failure_observation_never_claims_bad_scope_verified(self):
         self.receipt['scope'] = 'unknown'

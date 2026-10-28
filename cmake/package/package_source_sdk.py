@@ -23,11 +23,14 @@ sys.dont_write_bytecode = True
 SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
-    from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
+    from tools.maintenance.source_catalogue import (
+        ALL_DEPENDENCIES, SOURCE_DEPENDENCIES, children, declared_modules,
+        dependency, relative_path,
+    )
     from tools.maintenance import (
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
         stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-        stm32g4_lock, threadx_lock,
+        stm32g4_lock, threadx_lock, freertos_transport,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -140,7 +143,7 @@ REQUIRED_FILES = (
     "tools/configure/assemblies/liangshan-baremetal.toml",
     "tools/measurement/workload.c",
     "ext/freertos/tasks.c", "ext/freertos/queue.c", "ext/freertos/list.c",
-    "ext/freertos/LICENSE.md",
+    "ext/freertos/LICENSE.md", "ext/freertos/.gitmodules",
     "vendors/arm/CMSIS_6/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_6/LICENSE",
     "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
     "vendors/st/cmsis_device_f4/LICENSE.md",
@@ -148,6 +151,10 @@ REQUIRED_FILES = (
     "vendors/gigadevice/gd32f4xx/source.lock.json",
     "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",
     )
+REQUIRED_FILES += tuple(item.path + "/" + item.notice
+                        for item in ALL_DEPENDENCIES
+                        if item.scope == "runtime"
+                        and item.path + "/" + item.notice not in REQUIRED_FILES)
 MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
@@ -487,8 +494,23 @@ def stable_file(root, name):
     return data, (digest(data), after)
 
 
-def git(root, *args):
-    result = subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+def git_environment(*, parent_index=False):
+    """Read actual objects; only parent snapshot operations inherit its index."""
+    environment = {key: value for key, value in os.environ.items()
+                   if not key.startswith("GIT_")}
+    environment.update({"GIT_CONFIG_NOSYSTEM": "1",
+                        "GIT_CONFIG_GLOBAL": os.devnull,
+                        "GIT_OPTIONAL_LOCKS": "0",
+                        "GIT_NO_REPLACE_OBJECTS": "1"})
+    if parent_index and "GIT_INDEX_FILE" in os.environ:
+        environment["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    return environment
+
+
+def git(root, *args, parent_index=False):
+    result = subprocess.run(["git", "-c", "core.fsmonitor=false", "-C",
+                             str(root), *args], capture_output=True,
+                            env=git_environment(parent_index=parent_index))
     if result.returncode:
         raise SDKError("A complete Git checkout is required: " + result.stderr.decode(errors="replace").strip())
     return result.stdout
@@ -512,7 +534,7 @@ def dependency_snapshot(root, development_fixture=False):
     overlay. write-tree rejects conflicts and never stages or changes entries.
     Published sources continue to require the exact committed HEAD graph.
     """
-    index = (git(root, "write-tree").decode().strip()
+    index = (git(root, "write-tree", parent_index=True).decode().strip()
              if development_fixture else None)
     return tree_entries(root, index if index is not None else "HEAD"), index
 
@@ -521,7 +543,7 @@ def verify_preparation_snapshot(root, revision, index):
     """Reject source or staged dependency changes across package preparation."""
     if git(root, "rev-parse", "HEAD").decode().strip() != revision:
         raise SDKError("Source commit changed while preparing the package")
-    if index is not None and git(root, "write-tree").decode().strip() != index:
+    if index is not None and git(root, "write-tree", parent_index=True).decode().strip() != index:
         raise SDKError("Source index changed while preparing the development fixture")
 
 
@@ -608,34 +630,79 @@ def snapshot_files(source, entries, development_fixture=False):
     if development_fixture:
         names.update(name.decode() for name in git(
             source, "ls-files", "--cached", "--others", "--exclude-standard",
-            "-z").split(b"\0") if name and selected(name.decode()))
+            "-z", parent_index=True).split(b"\0")
+                     if name and selected(name.decode()))
     return names
+
+
+def runtime_dependency_closure():
+    """Expand only catalogue-owned descendants of required runtime sources."""
+    records = {}
+
+    def append(item):
+        if item.path in records:
+            raise SDKError("Duplicate dependency identity")
+        if item.scope != "runtime":
+            raise SDKError("Host-only dependency cannot enter the source SDK")
+        records[item.path] = item
+        for child in children(item.path):
+            append(child)
+
+    for path in REQUIRED_DEPENDENCIES:
+        append(dependency(path))
+    return records
+
+
+def dependency_declarations(root, item, entries=None):
+    """Bind recursive transport to reviewed declarations and committed links."""
+    descendants = children(item.path)
+    module_file = root / item.path / ".gitmodules"
+    if descendants or module_file.exists() or module_file.is_symlink():
+        try:
+            declared_modules(regular(root, item.path + "/.gitmodules").read_bytes(),
+                             parent=item.path)
+        except ValueError as error:
+            raise SDKError("Invalid recursive dependency declaration: " +
+                           item.path) from error
+    if entries is not None:
+        links = {name for name, row in entries.items()
+                 if row[1] == "commit"}
+        if links != {relative_path(child) for child in descendants}:
+            raise SDKError("Unregistered or missing recursive dependency Gitlink")
 
 
 def dependency_records(root, entries):
     declared_modules(regular(root, ".gitmodules").read_bytes())
+    closure = runtime_dependency_closure()
     records = []
-    for dep in REQUIRED_DEPENDENCIES:
-        row = entries.get(dep)
+    parent_entries = {None: entries}
+    for path, item in closure.items():
+        row = parent_entries[item.parent].get(relative_path(item))
         if not row or row[:2] != ("160000", "commit"):
-            raise SDKError(f"Source commit has no required dependency Gitlink: {dep}")
-        checkout = root / dep
+            raise SDKError(f"Source commit has no required dependency Gitlink: {path}")
+        checkout = root / safe_relative(path)
+        if (checkout.resolve() != checkout or not (checkout / ".git").exists()
+                or Path(git(checkout, "rev-parse", "--show-toplevel").decode()
+                        .strip()).resolve() != checkout):
+            raise SDKError(f"Initialize the pinned dependency before packaging: {path}")
         actual = git(checkout, "rev-parse", "HEAD").decode().strip()
-        if actual != row[2] or not (checkout / ".git").exists():
-            raise SDKError(f"Initialize the pinned dependency before packaging: {dep}")
-        output = git(root, "submodule", "status", "--recursive", "--", dep).decode()
-        for line in output.splitlines():
-            match = re.fullmatch(r" ([0-9a-f]{40}) (.+?)(?: \([^\n]+\))?", line)
-            if not match:
-                raise SDKError("Required recursive dependencies must be initialized at their recorded commits")
-            path, commit = match[2], match[1]
-            checkout = root / safe_relative(path)
-            if git(checkout, "status", "--porcelain", "--untracked-files=normal").strip():
-                raise SDKError(f"Dependency checkout is dirty: {path}")
-            records.append({"path": path, "commit": commit,
-                            "tree": git(checkout, "rev-parse", "HEAD^{tree}").decode().strip()})
-    if len({record["path"] for record in records}) != len(records):
-        raise SDKError("Duplicate dependency identity")
+        if actual != row[2]:
+            raise SDKError(f"Initialize the pinned dependency before packaging: {path}")
+        if git(checkout, "status", "--porcelain", "--untracked-files=all").strip():
+            raise SDKError(f"Dependency checkout is dirty: {path}")
+        origins = git(checkout, "config", "--local", "--get-all",
+                      "remote.origin.url").decode().splitlines()
+        if origins != [item.fetch_url]:
+            raise SDKError(f"Dependency fetch origin is not approved: {path}")
+        committed = tree_entries(checkout)
+        dependency_declarations(root, item, committed)
+        parent_entries[path] = committed
+        if item.identifier == "freertos":
+            freertos_transport.verify(root, selected_commit=actual,
+                                      require_git=True)
+        records.append({"path": path, "commit": actual,
+                        "tree": git(checkout, "rev-parse", "HEAD^{tree}")
+                        .decode().strip()})
     return records
 
 
@@ -643,8 +710,10 @@ def committed_blobs(root, entries):
     """Read Git blobs without checkout EOL/export transformations."""
     names = sorted(entries)
     request = "".join(entries[name][2] + "\n" for name in names).encode()
-    result = subprocess.run(["git", "-C", str(root), "cat-file", "--batch"],
-                            input=request, capture_output=True)
+    result = subprocess.run(["git", "-c", "core.fsmonitor=false", "-C",
+                             str(root), "cat-file", "--batch"],
+                            input=request, capture_output=True,
+                            env=git_environment())
     if result.returncode:
         raise SDKError("Cannot read the committed source objects")
     cursor = 0
@@ -711,7 +780,8 @@ def prepare(source, output, development_fixture=False):
         raise SDKError("The source must be the actual Git repository root")
     revision = git(source, "rev-parse", "HEAD").decode().strip()
     source_tree = git(source, "rev-parse", "HEAD^{tree}").decode().strip()
-    dirty = bool(git(source, "status", "--porcelain", "--untracked-files=normal").strip())
+    dirty = bool(git(source, "status", "--porcelain", "--untracked-files=normal",
+                     parent_index=True).strip())
     if dirty and not development_fixture:
         raise SDKError("Publishable source SDK preparation rejects a dirty source checkout")
     entries = tree_entries(source)
@@ -862,9 +932,19 @@ def verify(root):
         if not any(name.startswith(path + "/") for name in files):
             raise SDKError("Dependency provenance has no packaged source")
         paths.add(path)
-    if not set(REQUIRED_DEPENDENCIES).issubset(paths):
-        raise SDKError("Source SDK dependency set is incomplete")
+    closure = runtime_dependency_closure()
+    if paths != set(closure):
+        raise SDKError("Source SDK dependency set differs from the reviewed catalogue")
     declared_modules(regular(root, ".gitmodules").read_bytes())
+    for item in closure.values():
+        dependency_declarations(root, item)
+    freertos = next(record for record in records
+                    if record["path"] == "ext/freertos")
+    # Package preparation proves the Git parent/tree contract. Without Git,
+    # verify only exported materials and their selected identity. Consumers
+    # authenticate the archive externally before executing SDK-owned tools.
+    freertos_transport.verify(root, selected_commit=freertos["commit"],
+                              require_git=False)
     threadx = next(record for record in records if record["path"] == "ext/threadx")
     threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
                         "linux", packaged_commit=threadx["commit"])

@@ -351,19 +351,20 @@ class BuildDeliveryTests(unittest.TestCase):
         from tools.maintenance import source_catalogue
         declaration = "".join(
             '[submodule "' + item.path + '"]\n path = ' + item.path +
-            '\n url = ' + item.origin + '\n'
+            '\n url = ' + item.fetch_url + '\n'
             for item in source_catalogue.SOURCE_DEPENDENCIES)
+        google_url = source_catalogue.dependency("googletest").fetch_url
         google = ('[submodule "ext/googletest"]\n path = ext/googletest\n'
-                  ' url = https://github.com/google/googletest.git\n')
+                  ' url = ' + google_url + '\n')
         declared = source_catalogue.declared_modules(
             (declaration + google).encode())
         self.assertEqual(declared["ext/googletest"],
-                         "https://github.com/google/googletest.git")
+                         google_url)
         with self.assertRaises(ValueError):
             source_catalogue.declared_modules(declaration.encode())
         with self.assertRaises(ValueError):
             source_catalogue.declared_modules((declaration + google.replace(
-                "google/googletest.git", "unreviewed/googletest.git")).encode())
+                google_url, "https://github.com/unreviewed/googletest.git")).encode())
 
     def test_f407_scoped_prepare_includes_actual_official_ll_dependency(self):
         expected = ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",

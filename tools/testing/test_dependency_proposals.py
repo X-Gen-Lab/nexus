@@ -50,6 +50,15 @@ class DependencyProposalTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
                 proposals.inventory(ROOT)
             return
+        changed = [path for path in expected if
+                   proposals.git(ROOT, "ls-tree", "HEAD", "--", path).split()[2]
+                   != proposals.git(ROOT / path, "rev-parse", "HEAD")]
+        if changed:
+            # A staged migration is not the committed weekly inventory. The
+            # ordinary hook validates that boundary instead of inventing pins.
+            with self.assertRaisesRegex(ValueError, "locked clean Gitlink"):
+                proposals.inventory(ROOT)
+            return
         result = proposals.inventory(ROOT)
         self.assertEqual(result["owner"], "codex")
         self.assertEqual(result["mode"], "weekly_read_only")
@@ -166,6 +175,43 @@ class DependencyProposalTests(unittest.TestCase):
         self.assertEqual(result["observations"][0]["refs"][0]["revision"], "b"*40)
         self.assertTrue((output / "observations.json").is_file())
 
+    def test_upstream_observation_compares_official_base_not_transport_commit(self):
+        current = self.upstream_current()
+        item = current["dependencies"][0]
+        item.update(revision="c" * 40, upstream_revision="a" * 40,
+                    fetch_url="https://github.com/X-Gen-Lab/FreeRTOS-Kernel.git")
+        result = proposals.observe_upstream(current, self.folder / "split",
+                                             runner=self.capture)
+        observed = result["observations"][0]
+        self.assertEqual(observed["current_revision"], "a" * 40)
+        self.assertEqual(observed["selected_revision"], "c" * 40)
+        self.assertEqual(observed["source_url"], item["upstream_url"])
+
+    def test_official_base_is_not_a_new_version_of_transport_commit(self):
+        self.current["dependencies"][0].update(
+            revision="c" * 40, upstream_revision="a" * 40)
+        self.plan["proposed_revision"] = "a" * 40
+        with self.assertRaisesRegex(ValueError, "Distinct"):
+            proposals.propose(self.plan, self.current)
+
+    def test_upstream_upgrade_leaves_required_transport_revision_pending(self):
+        self.current["dependencies"][0].update(
+            revision="c" * 40, upstream_revision="a" * 40)
+        result = proposals.propose(self.plan, self.current)
+        self.assertEqual(result["current_upstream_revision"], "a" * 40)
+        self.assertEqual(result["selected_revision"], "c" * 40)
+        self.assertEqual(result["proposed_revision"], "b" * 40)
+        self.assertIsNone(result["proposed_selected_revision"])
+        self.assertEqual(result["transport_review"], "required")
+
+    def test_official_nested_url_without_git_suffix_is_observed(self):
+        current = self.upstream_current()
+        current["dependencies"][0]["upstream_url"] = (
+            "https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports")
+        result = proposals.observe_upstream(current, self.folder / "nested",
+                                             runner=self.capture)
+        self.assertEqual(result["observations"][0]["status"], "observed")
+
     def test_failed_network_stays_not_observed_with_actual_exit(self):
         def failure(step, substitutions, output):
             result = self.capture(step, substitutions, output)
@@ -236,15 +282,10 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.git(self.root, "init", "--quiet")
         self.threadx_lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
         self.g4_lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        dependencies = list(source_catalogue.ALL_SOURCE_DEPENDENCIES)
-        if not any(item.identifier == "stm32g4_cmsis" for item in dependencies):
-            dependencies.append(source_catalogue.SourceDependency(
-                "stm32g4_cmsis", "vendors/st/cmsis_device_g4",
-                "https://github.com/STMicroelectronics/cmsis-device-g4.git",
-                "LICENSE.md", "dependencies/stm32g4.lock.json"))
+        dependencies = list(source_catalogue.ALL_DEPENDENCIES)
         self.write(self.root / ".gitmodules", "".join(
-            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.origin}\n'
-            for item in dependencies).encode())
+            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.fetch_url}\n'
+            for item in source_catalogue.ALL_SOURCE_DEPENDENCIES).encode())
         for item in dependencies:
             checkout = self.root / item.path
             review = next((review for review in
@@ -262,13 +303,16 @@ class DependencyInventoryGitTests(unittest.TestCase):
             if item.identifier == "googletest":
                 review = {"commit": json.loads(
                     (ROOT / item.source_lock).read_text())["commit"]}
+            if item.identifier == "freertos" or item.parent is not None:
+                review = {"commit": self.git(ROOT / item.path,
+                                              "rev-parse", "HEAD")}
             if review is not None:
                 # Fixed device pins use real local official Git objects. A
                 # fabricated fixture commit must never relax the source lock.
                 checkout.parent.mkdir(parents=True, exist_ok=True)
                 self.git(self.root, "clone", "--quiet", "--shared",
                          str(ROOT / item.path), str(checkout))
-                self.git(checkout, "remote", "set-url", "origin", item.origin)
+                self.git(checkout, "remote", "set-url", "origin", item.fetch_url)
                 self.git(checkout, "checkout", "--quiet", "--detach",
                          review["commit"])
                 if item.source_lock is not None:
@@ -277,7 +321,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 continue
             checkout.mkdir(parents=True)
             self.git(checkout, "init", "--quiet")
-            self.git(checkout, "remote", "add", "origin", item.origin)
+            self.git(checkout, "remote", "add", "origin", item.fetch_url)
             paths = [item.notice]
             if item.identifier == "threadx":
                 paths.extend(self.threadx_lock["files"])
@@ -301,6 +345,10 @@ class DependencyInventoryGitTests(unittest.TestCase):
                      "dependencies/development-tools.txt", "dependencies/environment-tools.txt",
                      "dependencies/actions.lock.json", "vendors/gigadevice/gd32f4xx/source.lock.json"):
             self.write(self.root / name, (ROOT / name).read_bytes())
+        from tools.maintenance.freertos_transport import REVIEW_FILES
+        for name in REVIEW_FILES:
+            if (ROOT / name).is_file():
+                self.write(self.root / name, (ROOT / name).read_bytes())
         for notice in (ROOT / "vendors/gigadevice/gd32f4xx/LICENSES").iterdir():
             self.write(self.root / "vendors/gigadevice/gd32f4xx/LICENSES" / notice.name,
                        notice.read_bytes())
@@ -362,7 +410,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
         result = proposals.inventory(self.root)
         self.assertEqual(len([record for record in result["dependencies"]
                               if record.get("path")]),
-                         len(source_catalogue.ALL_SOURCE_DEPENDENCIES))
+                         len(source_catalogue.ALL_DEPENDENCIES))
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
             with self.subTest(part=part):
                 record = next(record for record in result["dependencies"]
@@ -395,7 +443,8 @@ class DependencyInventoryGitTests(unittest.TestCase):
                          "https://example.com/foreign-device.git")
                 with self.assertRaises(ValueError):
                     proposals.inventory(self.root)
-                self.git(checkout, "remote", "set-url", "origin", review["origin"])
+                self.git(checkout, "remote", "set-url", "origin",
+                         source_catalogue.dependency(review["directory"]).fetch_url)
                 self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
     def test_reviewed_device_inventory_requires_committed_gitlinks(self):
@@ -422,7 +471,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             proposals.inventory(self.root)
         self.git(self.root / "vendors/st/cmsis_device_g4", "remote", "set-url", "origin",
-                 self.g4_lock["repository"])
+                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
         self.git(self.root, "rm", "--cached", "vendors/st/cmsis_device_g4")
         self.commit(self.root, "actual parent without G4 gitlink")
         with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):

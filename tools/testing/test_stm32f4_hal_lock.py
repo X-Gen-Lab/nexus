@@ -11,6 +11,7 @@ import unittest
 from unittest import mock
 
 from tools.maintenance import stm32f4_hal_lock as official
+from tools.maintenance import source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -36,10 +37,12 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         for source in (self.source, self.cmsis):
             (source / ".git").mkdir()
         self.states = {
-            self.source: {"HEAD": official.COMMIT, "origin": official.ORIGIN,
+            self.source: {"HEAD": official.COMMIT, "origin": source_catalogue.dependency(
+                official.DIRECTORY).fetch_url,
                           "status": ""},
             self.cmsis: {"HEAD": official.CMSIS_COMMIT,
-                         "origin": official.CMSIS_ORIGIN, "status": ""},
+                         "origin": source_catalogue.dependency(
+                             official.CMSIS_DIRECTORY).fetch_url, "status": ""},
         }
         self.git_patch = mock.patch.object(official.cmsis_device_lock, "git",
                                           side_effect=self.git)
@@ -55,7 +58,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
             return str(source)
         if arguments == ("rev-parse", "HEAD"):
             return state["HEAD"]
-        if arguments == ("remote", "get-url", "origin"):
+        if arguments == ("config", "--get-all", "remote.origin.url"):
             return state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return state["status"]

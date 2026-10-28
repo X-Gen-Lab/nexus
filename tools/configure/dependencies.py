@@ -25,6 +25,7 @@ PLATFORM = (
 SDK = (
     "cmake/package/package_source_sdk.py",
     "tools/maintenance/cmsis_device_lock.py",
+    "tools/maintenance/freertos_transport.py",
     "tools/maintenance/stm32f1_hal_lock.py",
     "tools/maintenance/stm32f4_hal_lock.py",
     "tools/maintenance/stm32g4_lock.py", "tools/maintenance/threadx_lock.py",
