@@ -59,7 +59,7 @@ class G474ConfigurationTests(unittest.TestCase):
         start = source.index("nx_platform_start_result_t nx_platform_start")
         for index, name in ((1, "led"), (2, "console")):
             self.assertLess(source.index(f"s_nx_platform_initialized = {index}u;", start),
-                            source.index(f"result.primary = prepare_{name}();", start))
+                            source.index(f"result.primary = nx_stm32g474_{'gpio' if name == 'led' else 'uart'}_prepare(&s_nx_port_{name},", start))
         self.assertNotIn("nx_stm32_uart_ops", source)
 
     def test_fixed_lpuart_rejects_events_blocks_dma_and_priority_drift(self):

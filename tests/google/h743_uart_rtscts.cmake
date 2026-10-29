@@ -2,6 +2,7 @@
 nexus_google_test(nexus_h743_uart_rtscts_test
     SOURCES h743_uart_rtscts_test.cpp h743_uart_rtscts_model.cpp h743_model.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_fifo.c"

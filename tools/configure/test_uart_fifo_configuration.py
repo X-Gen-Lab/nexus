@@ -131,12 +131,13 @@ class UartFifoConfiguration(unittest.TestCase):
                 prefix = "nx_stm32" + family + "_uart_fifo"
                 self.assertIn('#include "stm32' + family + '_uart_fifo.h"',
                               source)
-                self.assertIn(prefix + "_initialize(", source)
+                self.assertIn(prefix + "_prepare(", source)
                 self.assertIn("&" + prefix + "_ops", source)
                 self.assertIn(prefix + "_irq(&s_nx_port_console)", source)
                 self.assertIn("static " + prefix +
                               "_state_t s_nx_port_console;", source)
-                self.assertIn("s_nx_port_console.uart.retained", source)
+                self.assertRegex(source, r"s_nx_platform_initialized = [0-9]+u;\s*"
+                                 r"result.primary = " + prefix + r"_prepare\(")
                 self.assertNotIn("static uint16_t s_nx_rx_", source)
 
 

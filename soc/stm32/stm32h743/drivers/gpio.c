@@ -6,6 +6,7 @@
  * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_provider.h"
 static nx_result_t write(void* context, uint32_t set, uint32_t reset) {
     nx_stm32h743_gpio_state_t* p = context;
@@ -188,4 +189,19 @@ nx_result_t nx_stm32h743_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
     }
     nx_arch_irq_restore(saved);
     return valid ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+nx_result_t
+nx_stm32h743_gpio_prepare(nx_stm32h743_gpio_state_t* port,
+                          const nx_stm32h743_gpio_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized)
+        return NX_ERROR_BUSY;
+    port->registers = config->registers;
+    port->mask = config->mask;
+    port->output = config->output;
+    return nx_stm32h743_gpio_initialize(port, config->initial);
 }

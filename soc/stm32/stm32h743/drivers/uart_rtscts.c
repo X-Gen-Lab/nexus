@@ -6,6 +6,7 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_uart_rtscts.h"
 #include "stm32h7xx_ll_usart.h"
 
@@ -156,4 +157,21 @@ nx_result_t nx_stm32h743_usart3_rtscts_pins_prepare(void) {
                         (NX_H743_READ(&gpio->MODER) & ~fields) | mode, fields)
                ? NX_SUCCESS
                : NX_ERROR_IO;
+}
+
+nx_result_t
+nx_stm32h743_uart_rtscts_prepare(nx_stm32h743_uart_rtscts_state_t* port,
+                                 const nx_stm32h743_uart_config_t* config,
+                                 const nx_stm32h743_uart_fifo_profile_t* fifo) {
+    if (port == NULL || config == NULL || fifo == NULL)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32h743_uart_configure(&port->uart, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32h743_usart3_rtscts_pins_prepare();
+    if (result != NX_SUCCESS)
+        return result;
+    port->fifo = fifo;
+    return nx_stm32h743_uart_rtscts_initialize(port, config->clock_hz,
+                                               1000000U);
 }

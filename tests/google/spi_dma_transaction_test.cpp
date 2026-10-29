@@ -315,4 +315,53 @@ TEST_F(SPIDMASequence, FixedDummyAndDiscardAreExplicitHalfwordCells) {
     nx_spi_dma_transaction_service(&port);
     EXPECT_EQ(request.base.transferred, 4U);
 }
+TEST_F(SPIDMASequence, ColdPreflightPreservesFailedStopResponsibility) {
+    hardware.stop_result = NX_ERROR_BUSY;
+    ASSERT_EQ(nx_spi_dma_transaction_stop(&port), NX_ERROR_BUSY);
+    ASSERT_TRUE(sequence.stopping);
+    ASSERT_FALSE(sequence.stopped);
+    const auto stops = hardware.stops;
+    EXPECT_EQ(nx_spi_dma_sequence_preflight(&sequence, &backend, &hardware),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(hardware.stops, stops);
+    EXPECT_EQ(hardware.begins, 0U);
+    EXPECT_TRUE(sequence.stopping);
+    EXPECT_FALSE(sequence.stopped);
+    EXPECT_EQ(sequence.backend, &backend);
+    EXPECT_EQ(sequence.context, &hardware);
+}
+
+TEST_F(SPIDMASequence, ColdPreflightCannotEraseARetainedInnerPhase) {
+    ASSERT_EQ(
+        nx_request_prepare(&sequence.phase_request.base, NX_DEADLINE_NEVER),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_request_admit(&sequence.phase_request.base, NX_REQUEST_ACTIVE),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_spi_dma_sequence_preflight(&sequence, &backend, &hardware),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&sequence.phase_request.base),
+              NX_REQUEST_ACTIVE);
+    EXPECT_EQ(hardware.begins, 0U);
+    EXPECT_EQ(hardware.stops, 0U);
+    nx_request_settle(&sequence.phase_request.base, NX_ERROR_CANCELLED, 0U);
+}
+
+TEST_F(SPIDMASequence, ColdPreflightAcceptsWithoutBindingOrReopeningStorage) {
+    nx_spi_dma_sequence_state_t cold{};
+    EXPECT_EQ(nx_spi_dma_sequence_preflight(&cold, &backend, &hardware),
+              NX_SUCCESS);
+    EXPECT_EQ(cold.backend, nullptr);
+    EXPECT_EQ(cold.context, nullptr);
+    EXPECT_EQ(hardware.begins, 0U);
+    EXPECT_EQ(hardware.stops, 0U);
+    ASSERT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
+    ASSERT_TRUE(sequence.stopping);
+    ASSERT_TRUE(sequence.stopped);
+    const auto stops = hardware.stops;
+    EXPECT_EQ(nx_spi_dma_sequence_preflight(&sequence, &backend, &hardware),
+              NX_SUCCESS);
+    EXPECT_TRUE(sequence.stopping);
+    EXPECT_TRUE(sequence.stopped);
+    EXPECT_EQ(hardware.stops, stops);
+}
 } /* namespace */

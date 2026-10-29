@@ -6,7 +6,7 @@
 #ifndef NEXUS_STM32H743_UART_FIFO_H
 #define NEXUS_STM32H743_UART_FIFO_H
 
-#include "stm32h743_provider.h"
+#include "stm32h743_cold.h"
 
 /** \brief Immutable exact-mode budgets; encodings 0..5 follow reviewed LL. */
 typedef struct {
@@ -47,6 +47,15 @@ nx_stm32h743_uart_fifo_initialize(nx_stm32h743_uart_fifo_state_t* port,
  *                  task service observes wire TC, joins sources and settles.
  */
 void nx_stm32h743_uart_fifo_irq(nx_stm32h743_uart_fifo_state_t* port);
+
+/** \brief Prepare selected byte-ring/FIFO state and its exact pad route.
+ * \note Task-only; Platform retains pads/gates after partial failure, and
+ *       immutable configuration/profile remain valid through public stop.
+ */
+nx_result_t
+nx_stm32h743_uart_fifo_prepare(nx_stm32h743_uart_fifo_state_t* port,
+                               const nx_stm32h743_uart_config_t* config,
+                               const nx_stm32h743_uart_fifo_profile_t* fifo);
 
 #ifdef __cplusplus
 }

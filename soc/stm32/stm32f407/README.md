@@ -99,6 +99,13 @@ future bus availability; missing line facts reject before register writes.
 
 Construction is a cold task operation with no other writers of the selected
 controllers. GPIO levels and reviewed AF fields are installed explicitly.
+The family `configure/` package emits readonly configuration, exact storage,
+factory faces and fixed typed calls. Private `platform_cold.c`, `uart_cold.c`
+and mode-specific cold headers maintain runtime admission, acquisition,
+rollback, stop and readback in C. A rejected owner with an empty receipt cannot
+stop or erase a live provider; partial effects retain their receipt until the
+same close proves withdrawal. These are software ownership contracts, not
+measured IRQ latency, throughput or physical Board qualification.
 Advanced constructors capture only affected pin fields and clock bits on the
 startup stack; a later acquisition failure restores those fields before the
 outer platform rolls back its earlier interfaces. Those local snapshots are

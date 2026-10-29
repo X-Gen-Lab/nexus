@@ -25,7 +25,7 @@ def resolve_runtime_power(value, result):
     return RuntimePowerIR('fixed-run', (selected_id,))
 
 
-def runtime_functions(result, context_guard, initialize):
+def runtime_functions(result, context_guard, initialize, admission):
     """Use the same emitted I/O helpers as cold startup and global cleanup."""
     from . import emission
     source = [
@@ -36,10 +36,16 @@ def runtime_functions(result, context_guard, initialize):
         'nx_platform_start_result_t nx_platform_runtime_resume(void) {',
         '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };',
         f'    if ({context_guard}) {{ result.primary = NX_ERROR_CONTEXT; return result; }}',
-        '    if (!s_nx_platform_started || s_nx_runtime_lease.owner != NULL) { result.primary = NX_ERROR_STATE; return result; }',
-        '    result.primary = nx_runtime_reopen();',
+        '    if (!s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }',
+        '    result.primary = nx_clock_domain_cold_resume_admit(&s_nx_runtime_lease);',
+        '    if (result.primary != NX_SUCCESS) { return result; }']
+    for _, expression in admission:
+        source += [f'    result.primary = {expression};',
+                   '    if (result.primary != NX_SUCCESS) { return result; }']
+    source += [
+        '    result.primary = nx_clock_domain_cold_reopen(&s_nx_runtime_domain);',
         '    if (result.primary != NX_SUCCESS) { return result; }',
-        '    result.primary = nx_runtime_acquire();',
+        '    result.primary = nx_clock_domain_cold_acquire(&s_nx_runtime_domain, &s_nx_runtime_lease);',
         '    if (result.primary != NX_SUCCESS) { return result; }']
     source.extend(emission.start_resources(result, cleanup='nx_platform_stop_io(NULL, true)'))
     for index, expression in enumerate(initialize):

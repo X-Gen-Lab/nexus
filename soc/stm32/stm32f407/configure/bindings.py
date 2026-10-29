@@ -2,7 +2,6 @@
 from tools.configure.ir import controller_ir
 from tools.configure.calls import DirectCall, Address, Symbol
 from tools.configure.memory import dma_regions, flash_geometry
-from tools.configure.gpio_phase import rollback_pin, withdraw_pin
 from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
@@ -12,38 +11,6 @@ from .contract import ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS, PARTS
 
 def _symbol(value):
     return value.replace("-", "_")
-
-
-def _check(lines, expression):
-    lines.extend([f"    status = {expression};",
-                  "    if (status != NX_SUCCESS) {",
-                  "        goto rollback;", "    }"])
-
-
-def _pin(lines, pin, mode, pull=0, open_drain=False):
-    name = pin["pin"]
-    port = name[1]
-    number = int(name[2:])
-    _check(lines, f"nx_stm32_gpio_clock_enable({ord(port) - ord('A')}u)")
-    _capture(lines, name)
-    _check(lines, f"nx_stm32_pin_configure(GPIO{port}, {number}u, {mode}u, "
-                  f"{pin['af']}u, {pull}u, "
-                  f"{'true' if open_drain else 'false'})")
-
-
-def _capture(lines, name):
-    lines += [f"    saved_{name} = nx_stm32_pin_capture(GPIO{name[1]}, {name[2:]}u);",
-              f"    captured_{name} = true;"]
-
-
-def _release(pins):
-    lines = []
-    for pin in pins:
-        wire = pin["pin"]
-        lines += withdraw_pin("stm32f407", wire, indent=4)
-        lines += [f"    (void)nx_stm32_pin_configure(GPIO{wire[1]}, "
-                  f"{wire[2:]}u, 0u, 0u, 0u, false);"]
-    return lines
 
 
 def _endpoint_face(kind, name, state, implementation=None):
@@ -236,71 +203,35 @@ def _i2c_constructor(item, result, devices):
 
 
 def _controller_constructor(item, result, board_bindings, routes, devices):
-    """Emit static contexts after resolver resource and mode validation.
-
-    No pin is inferred from a Board name. SPI/I2C child identities and CS/address
-    facts must already be reviewed and claimed by the resolver. Any unsupported
-    controller, channel or incomplete electrical/resource description fails.
-    """
-    item = controller_ir(item, 'stm32f407')
-    name = _symbol(item.id)
-    kind = item.kind
-    declarations = []
-    body = [f"static nx_result_t prepare_{name}(void) {{",
-            "    nx_result_t status = NX_SUCCESS;"]
-    stop = []
-    captured = [pin["pin"] for pin in item.pins]
-    rollback_extra = []
-    clock_bits = {"APB1ENR": "0u", "APB2ENR": "0u"}
+    """Select immutable resources; concrete C owns every cold transition."""
+    del board_bindings, routes, devices
+    item = controller_ir(item, "stm32f407")
+    name, kind = _symbol(item.id), item.kind
+    config = f"s_nx_control_config_{name}"
+    state = Address(f"s_nx_port_{name}")
+    definitions = []
     if kind == "exti":
         if item.controller not in {"EXTI0", "EXTI5", "EXTI6"} or len(item.pins) != 1:
             raise ValueError("EXTI line must use a reviewed package route")
         line = int(item.controller[4:])
-        pin = item.pins[0]
-        if int(pin["pin"][2:]) != line:
+        wire = item.pins[0]["pin"]
+        if int(wire[2:]) != line:
             raise ValueError("EXTI pin and mux line mismatch")
-        irq = "EXTI0_IRQn" if line == 0 else "EXTI9_5_IRQn"
         edge = {"rising": "NX_EXTI_RISING", "falling": "NX_EXTI_FALLING",
                 "both": "NX_EXTI_BOTH"}.get(item.options.edge)
-        capacity = item.options.event_capacity
-        priority = item.options.irq.priority
+        capacity, priority = item.options.event_capacity, item.options.irq.priority
         if edge is None or not isinstance(capacity, int) or not 1 <= capacity <= 4096:
             raise ValueError("EXTI requires an edge and bounded event_capacity")
         if not isinstance(priority, int) or not 0 <= priority <= 15:
             raise ValueError("EXTI requires a reviewed IRQ priority")
-        clock_bits["APB2ENR"] = "RCC_APB2ENR_SYSCFGEN"
-        declarations.append(f"static nx_exti_event_t s_nx_events_{name}[{capacity}];")
-        body += [f"    if ((EXTI->IMR & {1 << line}u) != 0u) {{",
-                 "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
-        _pin(body, pin, 0)
-        body += ["    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;", "    nx_arch_dsb();",
-                 f"    s_nx_port_{name}.registers = EXTI;",
-                 f"    s_nx_port_{name}.gpio = GPIO{pin['pin'][1]};",
-                 f"    s_nx_port_{name}.storage = s_nx_events_{name};",
-                 f"    s_nx_port_{name}.capacity = {capacity}u;", f"    s_nx_port_{name}.line = {line}u;",
-                 f"    s_nx_port_{name}.edge = {edge};"]
-        body += [f"    status = nx_stm32_exti_initialize(&s_nx_port_{name}, SYSCFG, {ord(pin['pin'][1]) - ord('A')}u);",
-                 "    if (status != NX_SUCCESS) {",
-                 f"        if (s_nx_port_{name}.initialized) {{ return status; }}",
-                 "        goto rollback;", "    }",
-                 # Cold preflight already rejected foreign pending state.
-                 # Once armed, a new edge or selected peer owns the hint.
-                 # Publication must neither clear nor reject that pending bit.
-                 "    nx_arch_dsb();", "    nx_arch_isb();",
-                 f"    NVIC_SetPriority({irq}, {priority}u);",
-                 f"    NVIC_EnableIRQ({irq});",
-                 "    nx_arch_dsb();", "    nx_arch_isb();",
-                 f"    if (NVIC_GetPriority({irq}) != {priority}u ||",
-                 f"            NVIC_GetEnableIRQ({irq}) == 0u ||",
-                 f"            NVIC_GetActive({irq}) != 0u) {{",
-                 "        return NX_ERROR_IO;", "    }"]
-        declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    bool owned = s_nx_port_{name}.initialized;",
-                         f"    if (!owned) {{ return NX_SUCCESS; }}",
-                         f"    nx_result_t status = nx_exti_port_stop(&s_nx_face_{name});",
-                         "    if (status != NX_SUCCESS) { return status; }"] + _release(item.pins) + [
-                         "    return NX_SUCCESS;", "}"]
-        stop = [DirectCall(f"stop_{name}")]
+        definitions += [f"static nx_exti_event_t s_nx_events_{name}[{capacity}];",
+                        f"static const nx_stm32_exti_config_t {config} = {{",
+                        f"    .gpio = GPIO{wire[1]}, .storage = s_nx_events_{name},",
+                        f"    .capacity = {capacity}u, .edge = {edge},",
+                        f"    .gpio_index = {ord(wire[1]) - ord('A')}u,",
+                        f"    .line = {line}u, .priority = {priority}u", "};"]
+        initialize = DirectCall("nx_stm32_exti_prepare", (state, Address(config)))
+        stop = DirectCall("nx_stm32_exti_close", (state,))
     elif kind == "pwm":
         if item.controller != "TIM3" or [pin["pin"] for pin in item.pins] != ["PA6"]:
             raise ValueError("Only reviewed TIM3 CH1 PA6 PWM route is maintained")
@@ -313,139 +244,63 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         timer_hz = LIMITS["timer_hz"]
         if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
             raise ValueError("PWM tick_hz is not an exact reviewed TIM3 divider")
-        inactive = item.initial
-        if inactive not in (0, 64):
+        if item.initial not in (0, 64):
             raise ValueError("PWM idle must be explicit PA6 masked output level")
-        clock_bits["APB1ENR"] = "RCC_APB1ENR_TIM3EN"
-        declarations.append(f"static nx_stm32_gpio_state_t s_nx_idle_{name};")
-        body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;",
-                 "    nx_arch_dsb();",
-                 f"    if ((TIM3->CCER & 1u) != 0u || ((TIM3->CR1 & TIM_CR1_CEN) != 0u &&",
-                 f"        (TIM3->PSC != {timer_hz // tick - 1}u || TIM3->ARR != {period - 1}u))) {{",
-                 "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
-        _check(body, "nx_stm32_gpio_clock_enable(0u)")
-        _capture(body, "PA6")
-        rollback_extra.append(f"    s_nx_idle_{name}.initialized = false;")
-        body += [f"    s_nx_idle_{name}.registers = GPIOA;",
-                 f"    s_nx_idle_{name}.mask = 64u;", f"    s_nx_idle_{name}.output = true;"]
-        _check(body, f"nx_stm32_gpio_initialize(&s_nx_idle_{name}, {inactive}u)")
-        body += [f"    s_nx_port_{name}.registers = TIM3;",
-                 f"    s_nx_port_{name}.inactive_gpio = &s_nx_idle_{name};",
-                 f"    s_nx_port_{name}.inactive_mask = 64u;",
-                 f"    s_nx_port_{name}.inactive_high = {'true' if inactive else 'false'};",
-                 f"    s_nx_port_{name}.channel = 1u;", f"    s_nx_port_{name}.period_ticks = {period}u;",
-                 f"    s_nx_port_{name}.duty_ticks = {duty}u;", f"    s_nx_port_{name}.tick_hz = {tick}u;",
-                 f"    s_nx_port_{name}.prescaler = {timer_hz // tick - 1}u;"]
-        _check(body, f"nx_stm32_pwm_initialize(&s_nx_port_{name})")
-        declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    nx_result_t status = nx_pwm_port_stop(&s_nx_face_{name});",
-                         "    if (status != NX_SUCCESS) { return status; }",
-                         f"    s_nx_port_{name}.initialized = false;",
-                         f"    s_nx_idle_{name}.initialized = false;",
-                         "    if ((TIM3->CCER & 0x1111u) == 0u) {",
-                         "        RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_TIM3EN;",
-                         "    }", "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
-        stop = [DirectCall(f"stop_{name}")]
+        definitions += [f"static nx_stm32_gpio_state_t s_nx_idle_{name};",
+                        f"static const nx_stm32_pwm_config_t {config} = {{",
+                        f"    .period_ticks = {period}u, .duty_ticks = {duty}u,",
+                        f"    .tick_hz = {tick}u, .prescaler = {timer_hz // tick - 1}u,",
+                        f"    .inactive_high = {str(bool(item.initial)).lower()}", "};"]
+        inactive = Address(f"s_nx_idle_{name}")
+        initialize = DirectCall("nx_stm32_pwm_prepare", (state, inactive, Address(config)))
+        stop = DirectCall("nx_stm32_pwm_close", (state, inactive))
     elif kind == "adc":
         traits = mode_traits(kind, item.mode)
-        stream, continuous = traits.dma, traits.continuous
-        stream_state = f"s_nx_port_{name}" + (".base" if continuous else "")
-        adc = stream_state + (".adc" if stream else "")
-        channels = list(item.options.channels)
-        reviewed = [int(pin["pin"][2:]) for pin in item.pins]
-        if item.controller != "ADC1" or channels != reviewed or tuple(channels) not in ADC_CHANNEL_SEQUENCES:
-            raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
-        sampling = list(item.options.sample_times)
+        channels, sampling = item.options.channels, item.options.sample_times
         reference = item.options.reference_mv
-        if not isinstance(sampling, list) or len(sampling) != len(channels) or not all(
+        reviewed = tuple(int(pin["pin"][2:]) for pin in item.pins)
+        if item.controller != "ADC1" or channels != reviewed or channels not in ADC_CHANNEL_SEQUENCES:
+            raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
+        if len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7
                 for value in sampling):
             raise ValueError("ADC requires one encoded sample_time (0..7) per channel")
         if not isinstance(reference, int) or not 1 <= reference <= 3600:
             raise ValueError("ADC requires a declared nominal reference voltage")
-        clock_bits["APB2ENR"] = "RCC_APB2ENR_ADC1EN"
         channel_values = ", ".join(f"{value}u" for value in channels)
         sampling_values = ", ".join(f"{value}u" for value in sampling)
-        declarations += [f"static const uint8_t s_nx_adc_channels_{name}[] = {{ {channel_values} }};",
-                         f"static const uint8_t s_nx_adc_samples_{name}[] = {{ {sampling_values} }};"]
-        body += ["    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;", "    nx_arch_dsb();",
-                 "    if ((ADC1->CR2 & ADC_CR2_ADON) != 0u) {",
-                 "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
-        for pin in item.pins:
-            _pin(body, pin, 3)
-        body += [
-                 f"    {adc}.registers = ADC1;", f"    {adc}.common = ADC;",
-                 f"    {adc}.channels = s_nx_adc_channels_{name};",
-                 f"    {adc}.sample_times = s_nx_adc_samples_{name};",
-                 f"    {adc}.channel_count = {len(channels)}u;", f"    {adc}.reference_mv = {reference}u;"]
-        if stream:
-            clock_bits["APB1ENR"] = "RCC_APB1ENR_TIM3EN"
+        definitions += [f"static const uint8_t s_nx_adc_channels_{name}[] = {{ {channel_values} }};",
+                        f"static const uint8_t s_nx_adc_samples_{name}[] = {{ {sampling_values} }};"]
+        config_type = "nx_stm32_adc_stream_config_t" if traits.dma else "nx_stm32_adc_config_t"
+        if traits.dma:
+            regions, count = dma_regions(name, result)
+            definitions += regions
+        definitions += [f"static const {config_type} {config} = {{"]
+        if traits.dma:
+            definitions += ["    .adc = {"]
+        definitions += [f"    .channels = s_nx_adc_channels_{name},",
+                        f"    .sample_times = s_nx_adc_samples_{name},",
+                        f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u"]
+        if traits.dma:
+            definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
+                            f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]
+        definitions += ["};"]
+        selected = "adc_continuous" if traits.continuous else "adc_stream" if traits.dma else "adc"
+        initialize = DirectCall(f"nx_stm32_{selected}_prepare", (state, Address(config)))
+        stop = DirectCall(f"nx_stm32_{selected}_close", (state,))
+        if traits.dma:
             path = hardware.maintained("stm32f407", item.controller).dma(item.mode)[0]
             vector = hardware.dma_vector("stm32f407", path)
-            region_lines, region_count = dma_regions(name, result)
-            declarations += region_lines
-            body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;", "    nx_arch_dsb();",
-                     f"    {stream_state}.timer = TIM3;",
-                     f"    {stream_state}.dma = DMA{path[0]};",
-                     f"    {stream_state}.memory = {vector};",
-                     f"    {stream_state}.regions = s_nx_dma_regions_{name};",
-                     f"    {stream_state}.region_count = {region_count}u;",
-                     f"    {stream_state}.timer_clock_hz = 84000000u;",
-                     f"    {stream_state}.adc_clock_hz = 21000000u;"]
-            _check(body, f"nx_stm32_adc_{'continuous' if continuous else 'stream'}_initialize(&s_nx_port_{name})")
-            body.append(f"    NVIC_SetPriority({vector}_IRQn, {item.options.irq.priority}u);")
-            declarations += [f"void {vector}_IRQHandler(void);",
-                             "/** \\brief Exact ADC DMA block terminal observation. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_stm32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
-        else:
-            _check(body, f"nx_stm32_adc_initialize(&s_nx_port_{name})")
-        stop_body = [f"static nx_result_t stop_{name}(void) {{"]
-        if stream:
-            stop_body += [f"    nx_result_t stopped = nx_adc_port_stream_stop(&s_nx_face_{name});",
-                          "    if (stopped != NX_SUCCESS) { return stopped; }",
-                          f"    NVIC_DisableIRQ({vector}_IRQn);",
-                          f"    NVIC_ClearPendingIRQ({vector}_IRQn);"]
-        stop_body += [f"    if ({adc}.active) {{ return NX_ERROR_BUSY; }}",
-                      "    ADC1->CR2 = 0u;", f"    {adc}.initialized = false;"]
-        if stream:
-            stop_body.append("    RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_TIM3EN;")
-        declarations += stop_body + _release(item.pins) + [
-                         "    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_ADC1EN;",
-                         "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
-        stop = [DirectCall(f"stop_{name}")]
+            definitions += [f"void {vector}_IRQHandler(void);",
+                            r"/** \brief Exact selected ADC DMA block publisher. */",
+                            f"void {vector}_IRQHandler(void) {{ nx_stm32_{selected}_irq(&s_nx_port_{name}); }}"]
     else:
         raise ValueError(f"No maintained STM32 constructor for {kind}")
-    body.append("    return status;")
-    if captured:
-        # Cold-path snapshots occupy the stack only. They never add a runtime
-        # factory, resident pin table or hidden shutdown ownership context.
-        pins = list(dict.fromkeys(captured))
-        mask = sum(1 << (ord(pin[1]) - ord("A")) for pin in
-                   {name[:2] for name in pins})
-        locals_ = ["    uint32_t retained_gpio_clocks = 0u;",
-                   f"    uint32_t saved_ahb1 = RCC->AHB1ENR & {mask}u;",
-                   f"    uint32_t saved_apb1 = RCC->APB1ENR & {clock_bits['APB1ENR']};",
-                   f"    uint32_t saved_apb2 = RCC->APB2ENR & {clock_bits['APB2ENR']};"]
-        for pin in pins:
-            locals_ += [f"    uint16_t saved_{pin} = 0u;",
-                        f"    bool captured_{pin} = false;"]
-        body[2:2] = locals_
-        body += ["rollback:"] + rollback_extra
-        for pin in reversed(pins):
-            body += [f"    if (captured_{pin}) {{"]
-            body += rollback_pin("stm32f407", pin, f"saved_{pin}")
-            body += ["    }"]
-        body += [f"    RCC->APB1ENR = (RCC->APB1ENR & ~(uint32_t)({clock_bits['APB1ENR']})) | saved_apb1;",
-                 f"    RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)({clock_bits['APB2ENR']})) | saved_apb2;",
-                 f"    RCC->AHB1ENR = (RCC->AHB1ENR & ~{mask}u) | saved_ahb1 | retained_gpio_clocks;",
-                 "    nx_arch_dsb();", "    return status;"]
-    body.append("}")
     from .contract import mode_implementation
-    implementation = mode_implementation(item.kind, item.mode)
     return Construction(
-        state_type=f"nx_stm32_{implementation}_state_t",
-        definitions=declarations + body, initialize=DirectCall(f"prepare_{name}"),
-        stop=stop, retain_on_failed_init=kind == "exti")
+        state_type=f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t",
+        definitions=definitions, initialize=initialize,
+        stop=[stop], retain_on_failed_init=True)
 
 
 def shared_irq_definitions(selections):
@@ -524,141 +379,127 @@ def _basic_constructor(item, result):
 
 
 def _uart_constructor(item, result):
+    """Connect selected static UART facts to concrete typed C cold owners."""
+    selected = item.integration
+    if (selected is None or selected.hardware is None or
+            selected.hardware.kind != "uart" or
+            selected.hardware.controller != item.controller or
+            selected.clock_hz is None or selected.irq is None or
+            len(selected.pins) != 2):
+        raise ValueError("UART requires its reviewed controller integration")
     name = _symbol(item.id)
     traits = mode_traits("uart", item.mode)
-    dma_uart, receive_uart = traits.tx_dma, traits.rx_dma
-    block_uart = traits.block_stream
+    tx_dma, rx_dma = traits.tx_dma, traits.rx_dma
+    blocks = traits.block_stream
     words = item.mode == "irq-words"
     implementation = ("uart_word" if words else
-                      "uart_duplex" if receive_uart and dma_uart else
-                      "uart_receive" if receive_uart else
-                      "uart_dma" if dma_uart else
-                      "uart_stream" if block_uart else "uart")
+                      "uart_duplex" if rx_dma and tx_dma else
+                      "uart_receive" if rx_dma else
+                      "uart_dma" if tx_dma else
+                      "uart_stream" if blocks else "uart")
+    cold_kind = "byte" if implementation == "uart" else implementation[5:]
+    saved = f"s_nx_uart_pin_state_{name}"
+    config = f"s_nx_uart_config_{name}"
+    receipt = f"s_nx_uart_cold_{name}"
     options = item.options
-    profile = ("NX_UART_RX_BLOCKS" if block_uart else
+    profile = ("NX_UART_RX_BLOCKS" if blocks else
                "NX_UART_RX_EVENTS" if options.rx_profile == "events" else
                "NX_UART_RX_BYTES")
-    storage = ("uint16_t" if words else
-               "nx_uart_rx_event_t" if options.rx_profile == "events" else
-               "uint8_t")
+    storage_type = ("uint16_t" if words else
+                    "nx_uart_rx_event_t" if options.rx_profile == "events"
+                    else "uint8_t")
     capacity = options.rx_capacity or 0
-    definitions = []
-    if not block_uart:
-        definitions.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
-    dma_state = f"s_nx_port_{name}" + (".receive" if receive_uart and dma_uart else "")
-    tx_state = f"s_nx_port_{name}.transmit"
-    uart_state = (dma_state + ".uart" if receive_uart or dma_uart or block_uart
-                  else dma_state)
-    rx_storage = 'NULL' if block_uart else f's_nx_rx_{name}'
-    definitions += [f'static nx_result_t prepare_{name}(void) {{',
-               f'    {uart_state}.registers = {item.controller};']
-    if not words:
-        definitions += [f'    {uart_state}.rx_storage = {rx_storage};',
-                        f'    {uart_state}.rx_capacity = {capacity}u;',
-                        f'    {uart_state}.baud = {item.options.baud}u;',
-                        f'    {uart_state}.profile = {profile};']
-    initialize = (f"nx_stm32_uart_word_initialize(&s_nx_port_{name}, "
-                  f"84000000u, {options.baud}u, s_nx_rx_{name}, {capacity}u)"
-                  if words else
-                  f"nx_stm32_{implementation}_initialize(&s_nx_port_{name}, "
-                  "84000000u)")
-    if not words and uart_formats.changed(item):
-        initialize = (f"nx_stm32_uart_initialize_format(&s_nx_port_{name}, "
-                      f"84000000u, {uart_formats.expression(options.frame)})")
-    stop_function = "nx_uart_word_port_stop" if words else "nx_uart_port_stop"
-    definitions += [f'    {uart_state}.irq = {item.controller}_IRQn;',
-               '    uint32_t saved_clock = RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN;',
-               '    uint32_t saved_uart_clock = RCC->APB2ENR & RCC_APB2ENR_USART1EN;',
-               '    nx_result_t clock = nx_stm32_gpio_clock_enable(0u);',
-               '    if (clock != NX_SUCCESS) {',
-               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;',
-               '        return clock;', '    }',
-               '    uint16_t saved_tx = nx_stm32_pin_capture(GPIOA, 9u);',
-               '    uint16_t saved_rx = nx_stm32_pin_capture(GPIOA, 10u);',
-               '    nx_result_t pins = nx_stm32_uart1_pins_prepare();',
-               f'    nx_result_t uart = pins == NX_SUCCESS ? {initialize} : pins;',
-               '    if (uart != NX_SUCCESS) {',
-               '        uint32_t retained_gpio_clocks = 0u;']
-    definitions += rollback_pin("stm32f407", "PA9", "saved_tx")
-    definitions += rollback_pin("stm32f407", "PA10", "saved_rx")
-    definitions += [
-               '        RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_USART1EN) | saved_uart_clock;',
-               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock | retained_gpio_clocks;',
-               '        nx_arch_dsb();', '        return uart;', '    }',
-               f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);',
-               '    return NX_SUCCESS;', '}',
-               f'static nx_result_t stop_{name}(void) {{',
-               f'    nx_result_t status = {stop_function}(&s_nx_face_{name});',
-               '    if (status != NX_SUCCESS) { return status; }']
-    definitions += withdraw_pin("stm32f407", "PA9", indent=4)
-    definitions += withdraw_pin("stm32f407", "PA10", indent=4)
-    definitions += [
-               '    (void)nx_stm32_pin_configure(GPIOA, 9u, 0u, 0u, 0u, false);',
-               '    (void)nx_stm32_pin_configure(GPIOA, 10u, 0u, 0u, 0u, false);',
-               '    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_USART1EN;',
-               '    nx_arch_dsb();', '    return NX_SUCCESS;', '}']
-    init = DirectCall(f"prepare_{name}")
-    irq = item.controller + '_IRQHandler'
-    irq_implementation = ("uart_word" if words else
-                         "uart_format" if uart_formats.changed(item) else
-                         "uart_duplex" if receive_uart and dma_uart else
-                      "uart_receive" if receive_uart else
-                          "uart_dma_uart" if dma_uart else
-                          "uart_stream" if block_uart else "uart")
-    irq_call = uart_formats.irq_call(item, f"nx_stm32_{irq_implementation}_irq(&s_nx_port_{name});")
-    definitions += [f'void {irq}(void);', '/** \\brief Fixed single-controller IRQ dispatch. */',
-               f'void {irq}(void) {{ {irq_call} }}']
-    if words or uart_formats.changed(item):
-        rejected = definitions.index('    if (uart != NX_SUCCESS) {') + 1
-        definitions[rejected:rejected] = [
-            f'        if (s_nx_port_{name}.initialized) {{ return uart; }}']
+    definitions = [f"static uint16_t {saved}[2];",
+                   f"static nx_stm32_uart_cold_receipt_t {receipt};"]
+    if not blocks:
+        definitions += [f"static {storage_type} s_nx_rx_{name}[{capacity}];"]
+    definitions += [f"static const nx_stm32_platform_pin_config_t s_nx_uart_pins_{name}[] = {{"]
+    snapshots = {}
+    for index, pin in enumerate(selected.pins):
+        wire = pin["pin"]
+        slot = f"{saved}[{index}u]"
+        snapshots[wire] = slot
+        definitions += [f"    {{ GPIO{wire[1]}, &{slot}, {ord(wire[1]) - ord('A')}u, {int(wire[2:])}u }},"]
+    definitions += ["};"]
+    vectors = [item.controller]
+    binding = selected.hardware
+    rx = tx = None
     if traits.dma:
-        from .contract import _FIXED_DMA
-        expected = _FIXED_DMA.get((item.controller, item.mode))
-        if tuple(item.dma) != expected:
-            raise ValueError("UART DMA differs from its reviewed fixed route")
-        region_lines, region_count = dma_regions(
-            name, result, include_flash=traits.tx_dma)
-        position = definitions.index(f"static nx_result_t prepare_{name}(void) {{")
-        definitions[position:position] = region_lines
-        port_binding = hardware.maintained("stm32f407", item.controller)
-        path = port_binding.dma(item.mode)[0]
-        prefix = [f"    {dma_state}.resources.dma = DMA{path[0]};",
-                  f"    {dma_state}.resources.regions = s_nx_dma_regions_{name};",
-                  f"    {dma_state}.resources.region_count = {region_count}u;"]
-        if receive_uart:
-            rx = port_binding.dma("rx-dma-idle")[0]
-            rx_vector = hardware.dma_vector("stm32f407", rx)
-            prefix += [f"    {dma_state}.receive = {rx_vector};",
-                       f"    {dma_state}.continuous = {'true' if traits.continuous else 'false'};"]
-        if dma_uart:
-            tx = port_binding.dma("dma-tx")[0]
-            tx_vector = hardware.dma_vector("stm32f407", tx)
-            prefix += [f"    {tx_state}.tx = {tx_vector};",
-                       f"    {tx_state}.dma_irq = {tx_vector}_IRQn;",
-                       f"    {tx_state}.stream = {tx[1]}u;",
-                       f"    {tx_state}.channel = {tx[2]}u;"]
-        position += len(region_lines) + 1
-        definitions[position:position] = prefix
-        priority_line = definitions.index(
-            f"    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);")
-        priorities = []
-        if receive_uart:
-            priorities.append(f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);")
-            definitions += [f"void {rx_vector}_IRQHandler(void);",
-                            "/** \\brief Exact selected DMA receive publisher. */",
-                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&{dma_state}); }}"]
-        if dma_uart:
-            priorities.append(f"    NVIC_SetPriority({tx_state}.dma_irq, {item.options.irq.priority}u);")
-            definitions += [f"void {tx_vector}_IRQHandler(void);",
-                            "/** \\brief Exact selected DMA TX observation. */",
-                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_{'duplex_dma' if receive_uart else 'dma'}_irq(&s_nx_port_{name}); }}"]
-        definitions[priority_line + 1:priority_line + 1] = priorities
+        paths = secondary_controllers.dma_paths(item)
+        expected = tuple((f"DMA{engine}", lane, request)
+                         for engine, lane, request in paths)
+        observed = tuple((lane.engine, lane.lane, lane.request)
+                         for lane in selected.dma)
+        if observed != expected:
+            raise ValueError("UART DMA differs from its reviewed integration")
+        region_lines, region_count = dma_regions(name, result,
+                                                  include_flash=tx_dma)
+        definitions += region_lines
+        if rx_dma:
+            rx = binding.dma("rx-dma-idle")[0]
+            vectors.append(hardware.dma_vector("stm32f407", rx))
+        if tx_dma:
+            tx = binding.dma("dma-tx")[0]
+            vectors.append(hardware.dma_vector("stm32f407", tx))
+    definitions += [f"static const IRQn_Type s_nx_uart_vectors_{name}[] = {{",
+                    "    " + ", ".join(vector + "_IRQn" for vector in vectors), "};"]
+    frame = "NULL"
+    if not words and uart_formats.changed(item):
+        frame = "&s_nx_uart_frame_" + name
+        definitions += [f"static const nx_uart_format_t s_nx_uart_frame_{name} =",
+                        "    " + uart_formats.expression(options.frame) + ";"]
+    config_type = ("nx_stm32_uart_dma_cold_config_t" if traits.dma else
+                   "nx_stm32_uart_cold_config_t")
+    definitions += [f"static const {config_type} {config} = {{"]
+    indent = "        " if traits.dma else "    "
+    if traits.dma:
+        definitions += ["    .uart = {"]
+    definitions += [indent + f".registers = {item.controller}, .pins = s_nx_uart_pins_{name},",
+                    indent + f".vectors = s_nx_uart_vectors_{name}, .vector_count = {len(vectors)}u,",
+                    indent + f".rx_storage = {'NULL' if blocks else 's_nx_rx_' + name}, .rx_capacity = {capacity}u,",
+                    indent + f".clock_hz = {selected.clock_hz}u, .baud = {options.baud}u,",
+                    indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
+                    indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
+                    indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
+    if traits.dma:
+        engine = (rx or tx)[0]
+        definitions += ["    },",
+                        f"    .resources = {{ DMA{engine}, s_nx_dma_regions_{name}, {region_count}u }},",
+                        f"    .receive = {hardware.dma_vector('stm32f407', rx) if rx else 'NULL'},",
+                        f"    .continuous = {'true' if traits.continuous else 'false'},"]
+        if tx:
+            vector = hardware.dma_vector("stm32f407", tx)
+            definitions += [f"    .transmit = {{ {vector}, {vector}_IRQn, {tx[1]}u, {tx[2]}u }}"]
+    definitions += ["};"]
+    irq_implementation = ("uart_word" if words else
+                          "uart_format" if uart_formats.changed(item) else
+                          "uart_duplex" if rx_dma and tx_dma else
+                          "uart_receive" if rx_dma else
+                          "uart_dma_uart" if tx_dma else
+                          "uart_stream" if blocks else "uart")
+    irq_call = uart_formats.irq_call(
+        item, f"nx_stm32_{irq_implementation}_irq(&s_nx_port_{name});")
+    definitions += [f"void {item.controller}_IRQHandler(void);",
+                    r"/** \brief Fixed selected UART publisher. */",
+                    f"void {item.controller}_IRQHandler(void) {{ {irq_call} }}"]
+    if rx:
+        vector = hardware.dma_vector("stm32f407", rx)
+        state = f"s_nx_port_{name}" + (".receive" if tx_dma else "")
+        definitions += [f"void {vector}_IRQHandler(void);",
+                        r"/** \brief Fixed selected RX-DMA publisher. */",
+                        f"void {vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&{state}); }}"]
+    if tx:
+        vector = hardware.dma_vector("stm32f407", tx)
+        method = "duplex_dma" if rx_dma else "dma"
+        definitions += [f"void {vector}_IRQHandler(void);",
+                        r"/** \brief Fixed selected TX-DMA publisher. */",
+                        f"void {vector}_IRQHandler(void) {{ nx_stm32_uart_{method}_irq(&s_nx_port_{name}); }}"]
+    arguments = (Address(f"s_nx_port_{name}"), Address(config), Address(receipt))
     return Construction(
-        state_type=f"nx_stm32_{implementation}_state_t",
-        definitions=definitions, initialize=init, stop=[DirectCall(f"stop_{name}")],
-        retain_on_failed_init=words or uart_formats.changed(item))
-
+        state_type=f"nx_stm32_{implementation}_state_t", definitions=definitions,
+        initialize=DirectCall(f"nx_stm32_uart_{cold_kind}_cold_prepare", arguments),
+        stop=[DirectCall(f"nx_stm32_uart_{cold_kind}_cold_close", arguments)],
+        retain_on_failed_init=True, pin_snapshots=snapshots)
 
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
@@ -670,23 +511,21 @@ def constructor(item, result, board_bindings, routes, devices):
         return enhanced_endpoints.dma_construction(item, construction, "stm32")
     if item.kind == "i2c":
         return _i2c_constructor(item, result, devices)
-    if secondary_controllers.applies(item, result, "stm32"):
-        construction = secondary_controllers.constructor(item, result, "stm32")
-        return enhanced_endpoints.dma_construction(item, construction, "stm32")
+    if item.kind == "uart":
+        return _uart_constructor(item, result)
     if item.kind in timer_advanced.KINDS:
-        return timer_advanced.constructor(item, result, "stm32")
+        from .timer import constructor as timer_constructor
+        return timer_constructor(item, result)
     if item.kind == "can":
-        return can.constructor(item, result, "stm32")
-    if item.kind in {"eth", "eth_frames"}:
-        return ethernet.constructor(item, result, "stm32")
-    if item.kind == "usb_device":
-        return usb_device.constructor(item, result, "stm32")
+        from .can import constructor as can_constructor
+        return can_constructor(item, result)
+    if item.kind in {"eth", "eth_frames", "usb_device"}:
+        from .packet import constructor as packet_constructor
+        return packet_constructor(item, result)
     if item.kind == "gpio":
         return _gpio_constructor(item)
     if item.kind in {"flash", "watchdog"}:
         return _basic_constructor(item, result)
-    if item.kind == "uart":
-        return _uart_constructor(item, result)
     construction = _controller_constructor(item, result, board_bindings,
                                             routes, devices)
     return enhanced_endpoints.dma_construction(item, construction, "stm32")

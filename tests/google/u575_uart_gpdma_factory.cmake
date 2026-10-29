@@ -13,19 +13,13 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT u5_generated EQUAL 0)
     message(FATAL_ERROR "U575 factory fixture rejected: ${u5_output}${u5_error}")
 endif()
-file(READ "${u5_gpdma_factory_bundle}/input_paths.json" u5_inputs)
-string(JSON u5_input_count LENGTH "${u5_inputs}")
-math(EXPR u5_last_input "${u5_input_count} - 1")
-foreach(index RANGE 0 ${u5_last_input})
-    string(JSON u5_input_name MEMBER "${u5_inputs}" ${index})
-    string(JSON u5_input_path GET "${u5_inputs}" "${u5_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${u5_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${u5_gpdma_factory_bundle}")
 nexus_google_test(nexus_u575_uart_gpdma_factory_test SOURCES u575_uart_gpdma_factory_test.cpp
     "${u5_gpdma_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/google/u575_model.cpp"
     "${NEXUS_SOURCE_DIR}/tests/google/u575_uart_gpdma_model.cpp"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_dma.c"

@@ -158,14 +158,14 @@ class UartRtsCtsConfiguration(unittest.TestCase):
                 self.assertIn('#include "stm32' + family + '_uart_rtscts.h"', source)
                 self.assertIn("static " + prefix + "_state_t s_nx_port_console;", source)
                 self.assertIn("&" + prefix + "_ops", source)
-                self.assertIn(prefix + "_initialize(", source)
+                self.assertIn(prefix + "_prepare(", source)
                 self.assertIn(prefix + "_irq(&s_nx_port_console);", source)
                 self.assertEqual(source.count("void " + controller +
                                               "_IRQHandler(void) {"), 1)
                 self.assertNotIn("&nx_stm32" + family + "_uart_fifo_ops", source)
-                self.assertIn("s_nx_port_console.uart.retained", source)
-                self.assertIn("nx_stm32" + family + "_" + controller.lower() +
-                              "_rtscts_pins_prepare();", source)
+                self.assertRegex(source, r"s_nx_platform_initialized = [0-9]+u;\s*"
+                                 r"result.primary = " + prefix + r"_prepare\(")
+                self.assertNotIn("static nx_result_t prepare_console", source)
 
     def test_four_pads_are_exclusive_claims_with_no_fabricated_pcb_revision(self):
         for family, pads in PADS.items():

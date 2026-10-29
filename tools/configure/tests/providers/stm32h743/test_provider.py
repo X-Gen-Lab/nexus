@@ -34,10 +34,14 @@ class H743DmaConfiguration(unittest.TestCase):
                 output = Path(directory) / "generated"
                 configure.configure(source, output)
                 body = (output / "bindings.c").read_text()
-                self.assertIn("result.primary = prepare_telemetry();", body)
                 self.assertIn(
-                    f"return nx_stm32h743_{driver}_initialize(&s_nx_port_telemetry,",
+                    f"result.primary = nx_stm32h743_{driver}_prepare("
+                    "&s_nx_port_telemetry, &s_nx_config_telemetry,",
                     body)
+                self.assertIn(
+                    "static const nx_stm32h743_uart_config_t "
+                    "s_nx_config_telemetry", body)
+                self.assertNotIn("prepare_telemetry(void)", body)
 
     def test_receive_route_is_exact_and_distinct_from_transmit(self):
         self.assertEqual(provider.mode_implementation("uart", "rx-dma-idle"),

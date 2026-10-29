@@ -12,7 +12,8 @@ def operations(item):
 
 
 def includes(result):
-    source = ['#include "stm32h743_provider.h"']
+    source = ['#include "stm32h743_cold.h"',
+              '#include "stm32h743_platform_cold.h"']
     if any(item.kind == "flash" for item in result.controllers):
         source.append('#include "stm32h743_flash_ram.h"')
     if result.clock_plan is not None:
@@ -89,26 +90,15 @@ def _dma(result):
                for item in result.controllers)
 
 
-def dma_admission_conditions(result, *, spi_only=False):
-    """Project already validated lanes; never infer another physical owner."""
-    conditions = []
+def dma_admission(result):
+    """Project explicit selected lane facts, without register expressions."""
     duplex = any(item.kind == "uart" and item.mode == "dma-duplex-continuous"
                  for item in result.controllers)
-    for lane in result.dma_topology.lanes:
-        if spi_only and lane.controller != "SPI4":
-            continue
-        stream = f"DMA1_Stream{lane.lane}"
-        conditions += [f"NX_H743_READ(&{stream}->CR) != 0u",
-                       f"NX_H743_READ(&DMAMUX1_Channel{lane.lane}->CCR) != 0u",
-                       f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane.lane}_IRQn)"]
-        if lane.controller == "SPI4" or (duplex and lane.controller == "USART3"):
-            for field in ("NDTR", "PAR", "M0AR", "M1AR"):
-                conditions.append(f"NX_H743_READ(&{stream}->{field}) != 0u")
-            mask = (0x0000003d, 0x00000f40,
-                    0x003d0000, 0x0f400000)[lane.lane]
-            conditions += [f"(NX_H743_READ(&{stream}->FCR) & 0x87u) != 1u",
-                           f"(NX_H743_READ(&DMA1->LISR) & {mask}u) != 0u"]
-    return conditions
+    lanes = sum(1 << lane.lane for lane in result.dma_topology.lanes)
+    strict = sum(1 << lane.lane for lane in result.dma_topology.lanes
+                 if lane.controller == "SPI4" or
+                 (duplex and lane.controller == "USART3"))
+    return lanes, strict
 
 
 def _extra_gates(result):
@@ -126,55 +116,48 @@ def _extra_gates(result):
 
 
 def state_declarations(result):
-    source = [f'static uint32_t s_nx_extra_{reg.lower()}_added;'
-              for reg, _ in _extra_gates(result)]
+    """Only exact selected storage and immutable static connections."""
+    source = []
     if result.clock_plan is not None:
         source.append('static nx_stm32h743_pll384_state_t s_nx_high_clock;')
     elif any(item.kind == "flash" for item in result.controllers):
         source.append('static nx_stm32h743_flash_timing_state_t s_nx_flash_timing;')
-    if _dma(result):
-        source.append('static uint32_t s_nx_dma_clocks_added;')
-    if _ports(result):
-        source.append('static uint32_t s_nx_gpio_clocks_added;')
+    ports = _ports(result)
+    if not ports:
+        return source
+    source += ['static uint32_t s_nx_gpio_clocks_added;']
     if _uart(result):
-        source.append('static uint32_t s_nx_uart_clocks_added;')
-    for bank, pins in _ports(result):
-        bits, fields, af = _fields(pins)
-        reg = f'GPIO{bank}'
-        lease = f's_nx_gpio{bank.lower()}_lease'
-        af_index = pins[0] // 8
-        source += ['static struct {',
-                   '    uint32_t mode, type, speed, pull, af0, af1, odr;',
-                   '    bool captured;', f'}} {lease};',
-                   f'static nx_result_t restore_gpio{bank.lower()}(void) {{',
-                   f'    if (!{lease}.captured) {{ return NX_SUCCESS; }}',
-                   # Drive is withdrawn before restoring mux/latch. Original
-                   # mode is restored last, selected fields only.
-                   f'    NX_H743_WRITE(&{reg}->MODER, (NX_H743_READ(&{reg}->MODER) & ~{fields}u) | {fields}u);',
-                   '    nx_arch_dsb();',
-                   f'    if ((NX_H743_READ(&{reg}->MODER) & {fields}u) != {fields}u) {{ return NX_ERROR_IO; }}',
-                   f'    NX_H743_WRITE(&{reg}->BSRR, {lease}.odr | (({bits}u & ~{lease}.odr) << 16u));',
-                   '    nx_arch_dsb();',
-                   f'    if ((NX_H743_READ(&{reg}->ODR) & {bits}u) != {lease}.odr) {{ return NX_ERROR_IO; }}']
-        for register, field, mask in ((f'AFR[0]', 'af0', sum(15 << (4 * pin) for pin in pins if pin < 8)),
-                                      (f'AFR[1]', 'af1', sum(15 << (4 * (pin % 8)) for pin in pins if pin >= 8)),
-                                      ('OTYPER', 'type', bits),
-                                      ('OSPEEDR', 'speed', fields),
-                                      ('PUPDR', 'pull', fields),
-                                      ('MODER', 'mode', fields)):
-            source += [f'    NX_H743_WRITE(&{reg}->{register}, (NX_H743_READ(&{reg}->{register}) & ~{mask}u) | {lease}.{field});',
-                       '    nx_arch_dsb();',
-                       f'    if ((NX_H743_READ(&{reg}->{register}) & {mask}u) != {lease}.{field}) {{ return NX_ERROR_IO; }}']
-        source += [f'    {lease}.captured = false;',
-                   '    return NX_SUCCESS;', '}']
-    return source
+        source += ['static uint32_t s_nx_uart_clocks_added;']
+    if _dma(result):
+        source += ['static uint32_t s_nx_dma_clocks_added;']
+    for register, _ in _extra_gates(result):
+        source += [f'static uint32_t s_nx_extra_{register.lower()}_added;']
+    for bank, _ in ports:
+        source += [f'static nx_stm32h743_gpio_lease_t s_nx_gpio{bank.lower()}_lease;']
+    source += ['static const nx_stm32h743_gpio_lease_config_t s_nx_gpio_leases[] = {']
+    for bank, pins in ports:
+        bits, _, _ = _fields(pins)
+        source += [f'    {{ GPIO{bank}, &s_nx_gpio{bank.lower()}_lease, {bits}u, {ord(bank) - ord("A")}u }},']
+    source += ['};', 'static const nx_stm32h743_platform_config_t s_nx_platform_config = {',
+        f'    .ports = s_nx_gpio_leases, .port_count = {len(ports)}u,',
+        '    .gpio_added = &s_nx_gpio_clocks_added,',
+        f'    .uart_added = {"&s_nx_uart_clocks_added" if _uart(result) else "NULL"},',
+        f'    .dma_added = {"&s_nx_dma_clocks_added" if _dma(result) else "NULL"},']
+    gates = dict(_extra_gates(result))
+    for field, register in (("apb2", "APB2ENR"), ("apb1", "APB1LENR"),
+                            ("ahb1", "AHB1ENR"), ("apb4", "APB4ENR")):
+        mask = gates.get(register)
+        source += [f'    .{field} = {{ {mask}, &s_nx_extra_{register.lower()}_added }},'
+                   if mask else f'    .{field} = {{ 0u, NULL }},']
+    lanes, strict = dma_admission(result)
+    return source + [f'    .dma_lanes = {lanes}u, .dma_strict = {strict}u', '};']
 
 
 def start_system(result):
     from .contract import cache_mask
     cache = f'{cache_mask(result.clock_profile)}u'
     if result.clock_plan is not None:
-        return preflight.emit(result, dma_conditions=dma_admission_conditions) + [
+        return preflight.emit(result) + [
             '    result.primary = nx_stm32h743_validate_identity();',
             '    if (result.primary != NX_SUCCESS) { return result; }',
             '    nx_stm32h743_start_result_t clock = nx_stm32h743_pll384_start(&s_nx_high_clock, 1000000u);',
@@ -191,7 +174,7 @@ def start_system(result):
             '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
             '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
             '        return result;', '    }']
-    source = preflight.emit(result, dma_conditions=dma_admission_conditions) + [
+    source = preflight.emit(result) + [
         '    result.primary = nx_stm32h743_validate_identity();',
         '    if (result.primary != NX_SUCCESS) { return result; }',
         f'    nx_stm32h743_start_result_t system = nx_stm32h743_system_start(&g_nx_stm32h743_system, {result.clock["core_hz"]}u, {cache}, 1000000u);',
@@ -212,100 +195,21 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    ports = _ports(result)
-    if not ports:
+    """Fixed C transaction and explicit Platform failure propagation."""
+    if not _ports(result):
         return []
-    gpio_gates = ' | '.join(f'RCC_AHB4ENR_GPIO{bank}EN' for bank, _ in ports)
-    source = []
-    for register, gates in _extra_gates(result):
-        slot = f's_nx_extra_{register.lower()}_added'
-        source += [f'    {slot} = ~NX_H743_READ(&RCC->{register}) & ({gates});',
-                   f'    NX_H743_WRITE(&RCC->{register}, NX_H743_READ(&RCC->{register}) | ({gates}));',
-                   '    nx_arch_dsb();',
-                   f'    if ((NX_H743_READ(&RCC->{register}) & ({gates})) != ({gates})) {{',
-                   '        result.primary = NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    source += [f'    s_nx_gpio_clocks_added = ~NX_H743_READ(&RCC->AHB4ENR) & ({gpio_gates});']
-    if _uart(result):
-        source += ['    s_nx_uart_clocks_added = ~NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN;']
-    if _dma(result):
-        source += ['    s_nx_dma_clocks_added = ~NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN;',
-                   '    NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) | RCC_AHB1ENR_DMA1EN);',
-                   '    nx_arch_dsb();',
-                   '    const bool dma_clock_ready = (NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u;',
-                   '    if (!dma_clock_ready || (NX_H743_READ(&RCC->AHB1RSTR) & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0u || ' + ' || '.join(dma_admission_conditions(result)) + ') {',
-                   '        result.primary = dma_clock_ready ? NX_ERROR_BUSY : NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    # Complete admission for every bank before taking any reversible pin lease.
-    for bank, _ in ports:
-        source += [f'    result.primary = nx_stm32h743_gpio_clock_enable({ord(bank) - ord("A")}u);',
-                   '    if (result.primary != NX_SUCCESS) {',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    for bank, pins in ports:
-        reg = f'GPIO{bank}'
-        mode = f'gpio{bank.lower()}_mode'
-        bits, _, _ = _fields(pins)
-        source.append(f'    const uint32_t {mode} = NX_H743_READ(&{reg}->MODER);')
-        conditions = [f'(NX_H743_READ(&{reg}->LCKR) & {bits}u) != 0u']
-        for pin in pins:
-            field = f'(({mode} >> {pin * 2}u) & 3u)'
-            conditions.append(f'({field} != 0u && {field} != 3u)')
-        source += ['    if (' + ' || '.join(conditions) + ') {',
-                   '        result.primary = NX_ERROR_BUSY;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    for bank, pins in ports:
-        reg = f'GPIO{bank}'
-        lease = f's_nx_gpio{bank.lower()}_lease'
-        bits, fields, af = _fields(pins)
-        for register, field, mask in (('MODER', 'mode', fields),
-                                      ('OTYPER', 'type', bits),
-                                      ('OSPEEDR', 'speed', fields),
-                                      ('PUPDR', 'pull', fields),
-                                      (f'AFR[0]', 'af0', sum(15 << (4 * pin) for pin in pins if pin < 8)),
-                                      (f'AFR[1]', 'af1', sum(15 << (4 * (pin % 8)) for pin in pins if pin >= 8)),
-                                      ('ODR', 'odr', bits)):
-            source.append(f'    {lease}.{field} = NX_H743_READ(&{reg}->{register}) & {mask}u;')
-        source.append(f'    {lease}.captured = true;')
-    return source
+    return ['    result.primary = nx_stm32h743_platform_acquire(&s_nx_platform_config);',
+            '    if (result.primary != NX_SUCCESS) {',
+            f'        result.cleanup = {cleanup};',
+            '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+            '        return result;', '    }']
 
 
 def stop_resources(result):
-    source = []
-    if _ports(result):
-        source += ['    if (s_nx_platform_started) {']
-        for bank, _ in reversed(_ports(result)):
-            source += [f'        nx_result_t restored_{bank.lower()} = restore_gpio{bank.lower()}();',
-                       f'        if (restored_{bank.lower()} != NX_SUCCESS) {{ return restored_{bank.lower()}; }}']
-        if _dma(result):
-            source += ['        NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) & ~s_nx_dma_clocks_added);',
-                       '        nx_arch_dsb();',
-                       '        if ((NX_H743_READ(&RCC->AHB1ENR) & s_nx_dma_clocks_added) != 0u) { return NX_ERROR_IO; }',
-                       '        s_nx_dma_clocks_added = 0u;']
-        if _uart(result):
-            source += ['        NX_H743_WRITE(&RCC->APB1LENR, NX_H743_READ(&RCC->APB1LENR) & ~s_nx_uart_clocks_added);',
-                       '        nx_arch_dsb();',
-                       '        if ((NX_H743_READ(&RCC->APB1LENR) & s_nx_uart_clocks_added) != 0u) { return NX_ERROR_IO; }',
-                       '        s_nx_uart_clocks_added = 0u;']
-        source += ['        NX_H743_WRITE(&RCC->AHB4ENR, NX_H743_READ(&RCC->AHB4ENR) & ~s_nx_gpio_clocks_added);',
-                   '        nx_arch_dsb();',
-                   '        if ((NX_H743_READ(&RCC->AHB4ENR) & s_nx_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }',
-                   '        s_nx_gpio_clocks_added = 0u;', '    }']
-    for register, _ in reversed(_extra_gates(result)):
-        slot = f's_nx_extra_{register.lower()}_added'
-        source += [f'    if ({slot} != 0u) {{',
-                   f'        NX_H743_WRITE(&RCC->{register}, NX_H743_READ(&RCC->{register}) & ~{slot});',
-                   '        nx_arch_dsb();',
-                   f'        if ((NX_H743_READ(&RCC->{register}) & {slot}) != 0u) {{ return NX_ERROR_IO; }}',
-                   f'        {slot} = 0u;', '    }']
-    return source
+    if not _ports(result):
+        return []
+    return ['    nx_result_t resources = nx_stm32h743_platform_release(&s_nx_platform_config);',
+            '    if (resources != NX_SUCCESS) { return resources; }']
 
 
 def stop_system(result, *, system_phase=None, resources=True):

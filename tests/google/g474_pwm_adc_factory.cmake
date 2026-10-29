@@ -11,19 +11,11 @@ if(NOT g4_pwm_adc_generated EQUAL 0)
     message(FATAL_ERROR
         "G474 joint fixture rejected: ${g4_pwm_adc_output}${g4_pwm_adc_error}")
 endif()
-file(READ "${g4_pwm_adc_bundle}/input_paths.json" g4_pwm_adc_inputs)
-string(JSON g4_pwm_adc_input_count LENGTH "${g4_pwm_adc_inputs}")
-math(EXPR g4_pwm_adc_last_input "${g4_pwm_adc_input_count} - 1")
-foreach(index RANGE 0 ${g4_pwm_adc_last_input})
-    string(JSON g4_pwm_adc_input_name MEMBER "${g4_pwm_adc_inputs}" ${index})
-    string(JSON g4_pwm_adc_input_path GET "${g4_pwm_adc_inputs}"
-        "${g4_pwm_adc_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${g4_pwm_adc_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_pwm_adc_bundle}")
 nexus_google_test(nexus_g474_pwm_adc_factory_test
     SOURCES g474_pwm_adc_factory_test.cpp g474_pwm_adc_factory_ports.cpp
         g474_pwm_adc_model.cpp "${g4_pwm_adc_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"

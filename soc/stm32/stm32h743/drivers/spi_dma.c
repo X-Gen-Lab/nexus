@@ -856,3 +856,68 @@ void nx_stm32h743_spi_dma_wire_irq(nx_stm32h743_spi_dma_state_t* s) {
         isolate(s, 2U);
     }
 }
+
+nx_result_t
+nx_stm32h743_spi_dma_prepare(nx_stm32h743_spi_dma_state_t* port,
+                             const nx_stm32h743_spi_dma_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->cs == NULL ||
+        config->endpoint == NULL || config->regions == NULL ||
+        config->region_count != 1U)
+        return NX_ERROR_INVALID;
+    nx_stm32h743_gpio_state_t* cs = config->cs;
+    if (port->retained || port->initialized || port->active != NULL ||
+        cs->retained || cs->initialized)
+        return NX_ERROR_BUSY;
+    port->wire.registers = SPI4;
+    port->wire.reset = &RCC->APB2RSTR;
+    port->wire.reset_mask = RCC_APB2RSTR_SPI4RST;
+    port->wire.clock_hz = 64000000U;
+    port->dma = DMA1;
+    port->rx = DMA1_Stream2;
+    port->tx = DMA1_Stream3;
+    port->rx_mux = DMAMUX1_Channel2;
+    port->tx_mux = DMAMUX1_Channel3;
+    port->regions = config->regions;
+    port->region_count = config->region_count;
+    port->face = config->face;
+    cs->registers = GPIOE;
+    cs->mask = 2048U;
+    cs->output = true;
+    config->endpoint->wire.port = &port->wire;
+    config->endpoint->wire.cs = cs;
+    config->endpoint->wire.cs_mask = 2048U;
+    config->endpoint->wire.frequency_hz = config->frequency_hz;
+    config->endpoint->wire.mode = 0U;
+    config->endpoint->dma = port;
+    config->endpoint->face = config->endpoint_face;
+    config->endpoint->cs_face = config->cs_face;
+    nx_result_t result = nx_stm32h743_gpio_initialize(cs, 2048U);
+    if (result != NX_SUCCESS)
+        return result;
+    for (unsigned pin = 12U; pin <= 14U; ++pin) {
+        result = nx_stm32h743_pin_alternate(GPIOE, pin, 5U);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    return nx_stm32h743_spi_dma_initialize(port);
+}
+
+nx_result_t
+nx_stm32h743_spi_dma_release(nx_stm32h743_spi_dma_state_t* port,
+                             const nx_stm32h743_spi_dma_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->cs == NULL)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32h743_spi_dma_ops.stop(port);
+    return result == NX_SUCCESS ? nx_stm32h743_gpio_stop(config->cs, 2048U)
+                                : result;
+}
+
+nx_result_t nx_stm32h743_spi_dma_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return NX_H743_IRQ_AVAILABLE(SPI4_IRQn) ? NX_SUCCESS : NX_ERROR_BUSY;
+}

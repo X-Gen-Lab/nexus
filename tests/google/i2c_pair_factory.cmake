@@ -1,7 +1,4 @@
 # Actual generated paired-controller objects; only external hardware is modeled.
-file(GLOB_RECURSE i2c_pair_codegen CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/*.py")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${i2c_pair_codegen})
 foreach(i2c_pair_family stm32 gd32)
     set(i2c_pair_official)
     if(i2c_pair_family STREQUAL "stm32")
@@ -32,21 +29,14 @@ foreach(i2c_pair_family stm32 gd32)
         if(NOT i2c_pair_generated EQUAL 0)
             message(FATAL_ERROR "I2C-pair factory rejected: ${i2c_pair_output}${i2c_pair_error}")
         endif()
-        file(READ "${i2c_pair_bundle}/input_paths.json" i2c_pair_inputs)
-        string(JSON i2c_pair_count LENGTH "${i2c_pair_inputs}")
-        math(EXPR i2c_pair_last "${i2c_pair_count} - 1")
-        foreach(index RANGE 0 ${i2c_pair_last})
-            string(JSON i2c_pair_key MEMBER "${i2c_pair_inputs}" ${index})
-            string(JSON i2c_pair_path GET "${i2c_pair_inputs}" "${i2c_pair_key}")
-            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-                "${i2c_pair_path}")
-        endforeach()
+        nexus_google_configuration_inputs("${i2c_pair_bundle}")
         nexus_google_test(${i2c_pair_target} ${i2c_pair_official}
             SOURCES i2c_pair_factory_test.cpp
             "${i2c_pair_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async/i2c_v1_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_cold.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"

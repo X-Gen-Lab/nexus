@@ -176,3 +176,18 @@ nx_result_t nx_stm32g474_pin_state_stop(nx_stm32g474_pin_state_t* state) {
     return result;
 }
 const nx_pin_state_ops_t nx_stm32g474_pin_state_ops = {select_state};
+
+/** \brief Never overwrite the immutable connection of a retained controller. */
+nx_result_t
+nx_stm32g474_pin_state_prepare(nx_stm32g474_pin_state_t* state,
+                               const nx_stm32g474_pin_state_config_t* config) {
+    if (state == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (state->control.retained || state->control.initialized)
+        return NX_ERROR_BUSY;
+    state->gpio = config->gpio;
+    state->rcc = config->rcc;
+    state->bank_mask = config->bank_mask;
+    state->plan = config->plan;
+    return nx_stm32g474_pin_state_initialize(state);
+}

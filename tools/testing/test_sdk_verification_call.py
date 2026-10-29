@@ -948,7 +948,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          ["1"] * (13 + len(self.SELECTED_INPUTS)))
 
     def test_default_uses_two_consumers_with_one_job_per_build(self):
-        status, report = self.execute()
+        with mock.patch.dict(os.environ):
+            os.environ.pop("NEXUS_BUILD_JOBS", None)
+            os.environ.pop("CMAKE_BUILD_PARALLEL_LEVEL", None)
+            status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
         self.assertEqual(report["source_tree"], "b" * 40)
@@ -958,6 +961,29 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          ["1"] * (13 + len(self.SELECTED_INPUTS)))
         self.assertEqual(report["parallel_jobs"], 2)
         self.assertEqual(report["consumer_workers"], 2)
+
+    def test_default_inherits_outer_job_allocation_without_reducing_matrix(self):
+        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
+                                         "CMAKE_BUILD_PARALLEL_LEVEL": "9"}):
+            status, report = self.execute()
+        self.assertEqual(status, 0)
+        self.assert_complete_matrix()
+        self.assertEqual(report["parallel_jobs"], 1)
+        self.assertEqual(report["consumer_workers"], 1)
+        self.assertTrue(self.builds())
+        self.assertEqual({command[command.index("--parallel") + 1]
+                          for command in self.builds()}, {"1"})
+
+    def test_default_rejects_invalid_outer_job_allocation_before_launch(self):
+        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "0"}), \
+                mock.patch.object(maintained_process, "run") as command, \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as failure:
+                self.consumer.main(["--prefix", str(self.prefix),
+                                    "--output", str(self.output)])
+        self.assertEqual(failure.exception.code, 2)
+        self.assertFalse(self.output.exists())
+        command.assert_not_called()
 
     def test_positive_budget_bounds_consumers_without_nested_build_jobs(self):
         status, report = self.execute(("--parallel", "3"))

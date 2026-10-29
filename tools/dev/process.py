@@ -25,13 +25,27 @@ def positive_integer(value, name):
     return result
 
 
-def execution_environment(environment):
-    """Bound Ninja by default while honoring an explicit caller budget."""
+def parallel_jobs(environment, requested=None, *, default=2):
+    """Resolve one invocation's allocation, not a machine-wide semaphore.
+
+    An explicit caller allocation overrides inherited defaults. Otherwise the
+    Nexus budget precedes CMake's budget, then the finite tool default applies.
+    Independent simultaneous invocations require their orchestrator to divide
+    the available capacity before launching them.
+    """
+    selected = (requested if requested is not None else
+                environment.get("NEXUS_BUILD_JOBS",
+                    environment.get("CMAKE_BUILD_PARALLEL_LEVEL", default)))
+    return positive_integer(selected, "parallel job allocation")
+
+
+def execution_environment(environment, *, jobs=None):
+    """Bound nested Ninja defaults and propagate an explicit job allocation."""
     result = dict(environment)
-    selected = result.get("NEXUS_BUILD_JOBS",
-                          result.get("CMAKE_BUILD_PARALLEL_LEVEL", "2"))
-    result["CMAKE_BUILD_PARALLEL_LEVEL"] = str(positive_integer(
-        selected, "NEXUS_BUILD_JOBS/CMAKE_BUILD_PARALLEL_LEVEL"))
+    selected = parallel_jobs(result, requested=jobs)
+    result["CMAKE_BUILD_PARALLEL_LEVEL"] = str(selected)
+    if jobs is not None:
+        result["NEXUS_BUILD_JOBS"] = str(selected)
     if "CTEST_PARALLEL_LEVEL" in result:
         positive_integer(result["CTEST_PARALLEL_LEVEL"], "CTEST_PARALLEL_LEVEL")
     return result

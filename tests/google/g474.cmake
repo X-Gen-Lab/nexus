@@ -70,19 +70,11 @@ if(NOT g4_acquisition_result EQUAL 0)
     message(FATAL_ERROR
         "G474 acquisition fixture rejected: ${g4_acquisition_output}${g4_acquisition_error}")
 endif()
-file(READ "${g4_acquisition_bundle}/input_paths.json" g4_acquisition_inputs)
-string(JSON g4_acquisition_count LENGTH "${g4_acquisition_inputs}")
-math(EXPR g4_acquisition_last "${g4_acquisition_count} - 1")
-foreach(index RANGE 0 ${g4_acquisition_last})
-    string(JSON g4_acquisition_name MEMBER "${g4_acquisition_inputs}" ${index})
-    string(JSON g4_acquisition_path GET "${g4_acquisition_inputs}"
-        "${g4_acquisition_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${g4_acquisition_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_acquisition_bundle}")
 nexus_google_test(nexus_g474_acquisition_factory_test
     SOURCES g474_acquisition_factory_test.cpp
         "${g4_acquisition_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc.c"

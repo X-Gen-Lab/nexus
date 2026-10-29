@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32h743_clock.h"
+#include "stm32h743_cold.h"
 #include "stm32h743_spi_wire.h"
 #ifndef NX_H743_SILICON_ID
 #define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
@@ -225,4 +226,15 @@ nx_result_t nx_stm32h743_spi_wire_disable(nx_stm32h743_spi_state_t* p) {
                    (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) == 0U
                ? NX_SUCCESS
                : NX_ERROR_IO;
+}
+
+nx_result_t nx_stm32h743_spi_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return (NX_H743_READ(&RCC->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U ||
+                   (NX_H743_READ(&RCC->APB2RSTR) & RCC_APB2RSTR_SPI4RST) !=
+                       0U ||
+                   (NX_H743_READ(&RCC->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
 }

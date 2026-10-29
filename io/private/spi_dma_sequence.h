@@ -45,6 +45,21 @@ typedef struct {
     void* endpoint;
 } nx_spi_dma_sequence_endpoint_t;
 /**
+ * \brief           Admit cold initialization without binding or hardware.
+ * \param[in]       state: Same static sequence, with all submitters joined.
+ * \param[in]       backend: Complete stable immutable hardware methods.
+ * \param[in]       context: Stable separately owned provider hardware state.
+ * \return          SUCCESS, INVALID, CONTEXT or BUSY; state remains unchanged.
+ * \note            Task-only. Call before provider preparation or acquiring a
+ *                  cleanup responsibility. Rejection preserves active phases,
+ *                  failed stop duty, outer loans and existing binding identity.
+ *                  No backend method, allocation or source acquisition occurs.
+ */
+nx_result_t
+nx_spi_dma_sequence_preflight(const nx_spi_dma_sequence_state_t* state,
+                              const nx_spi_dma_sequence_backend_t* backend,
+                              const void* context);
+/**
  * \brief           Initialize cold or fully quiescent mode-only owner storage.
  * \param[in,out]   state: Cold, quiescent same-binding or stopped state.
  * \param[in]       backend: Complete stable immutable hardware methods.

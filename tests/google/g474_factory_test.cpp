@@ -9,6 +9,7 @@
 #include "g474_factory_model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+#include "stm32g474_platform_cold.h"
 #include "stm32g474_provider.h"
 #include <cstring>
 #include <gtest/gtest.h>
@@ -376,4 +377,56 @@ TEST_F(G474Factory, StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity) {
         nx_gpio_port_write(nx_factory_gpio(NX_GPIO_ID_LED), 1U << 5U, 0U));
     Start();
     EXPECT_EQ(before, nx_factory_uart(NX_UART_ID_CONSOLE));
+}
+
+TEST_F(G474Factory, ResourceStartRejectsUnprivilegedBeforeAnyEffect) {
+    uint32_t added = 0U;
+    nx_stm32g474_platform_config_t config{};
+    config.clocks_apb1 = RCC_APB1ENR1_TIM3EN;
+    config.added_apb1 = &added;
+    const auto writes = g_g474_model.writes;
+    g_g474_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32g474_platform_resources_start(&config));
+    EXPECT_EQ(writes, g_g474_model.writes);
+    EXPECT_EQ(0U, added);
+    EXPECT_EQ(0U, RCC->APB1ENR1 & RCC_APB1ENR1_TIM3EN);
+    g_g474_model.privileged = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_platform_resources_stop(&config));
+}
+
+TEST_F(G474Factory, ResourceStopRejectsUnprivilegedWithoutDroppingLease) {
+    uint32_t added = RCC_APB1ENR1_TIM3EN;
+    RCC->APB1ENR1 |= added;
+    nx_stm32g474_platform_config_t config{};
+    config.clocks_apb1 = added;
+    config.added_apb1 = &added;
+    const auto writes = g_g474_model.writes;
+    g_g474_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32g474_platform_resources_stop(&config));
+    EXPECT_EQ(writes, g_g474_model.writes);
+    EXPECT_EQ(static_cast<uint32_t>(RCC_APB1ENR1_TIM3EN), added);
+    EXPECT_NE(0U, RCC->APB1ENR1 & RCC_APB1ENR1_TIM3EN);
+    g_g474_model.privileged = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_platform_resources_stop(&config));
+}
+
+TEST_F(G474Factory, PendingResourceReceiptsCannotBeOverwrittenByStart) {
+    uint32_t added = RCC_APB1ENR1_TIM3EN;
+    RCC->APB1ENR1 |= added;
+    bool mux_owned = true;
+    RCC->CCIPR |= RCC_CCIPR_I2C1SEL_1;
+    nx_stm32g474_platform_config_t config{};
+    config.clocks_apb1 = added;
+    config.added_apb1 = &added;
+    config.owned_i2c_mux = &mux_owned;
+    const auto writes = g_g474_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32g474_platform_resources_start(&config));
+    EXPECT_EQ(writes, g_g474_model.writes);
+    EXPECT_EQ(static_cast<uint32_t>(RCC_APB1ENR1_TIM3EN), added);
+    EXPECT_TRUE(mux_owned);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_platform_resources_stop(&config));
+    EXPECT_EQ(0U, added);
+    EXPECT_FALSE(mux_owned);
+    EXPECT_EQ(0U, RCC->APB1ENR1 & RCC_APB1ENR1_TIM3EN);
+    EXPECT_EQ(0U, RCC->CCIPR & RCC_CCIPR_I2C1SEL);
 }

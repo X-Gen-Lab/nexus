@@ -71,7 +71,7 @@ class PinStateConfigurationTests(unittest.TestCase):
         self.assertLess(source.index('#include "stm32g474_pin_state.h"'),
                         source.index("static nx_stm32g474_pin_state_t"))
         self.assertIn("static const nx_pin_state_plan_t", source)
-        self.assertIn("nx_stm32g474_pin_state_initialize", source)
+        self.assertIn("nx_stm32g474_pin_state_prepare", source)
         self.assertIn("nx_stm32g474_pin_state_stop", source)
         self.assertNotIn("nx_stm32g474_gpio_initialize", source)
 

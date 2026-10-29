@@ -114,7 +114,9 @@ class UARTFormatConfiguration(unittest.TestCase):
                 self.assertEqual(item.options.frame.stop_bits, 2)
                 self.assertEqual(io_traits.describe(item).fields["data_bits"], 7)
                 _, source = bindings.emit(result)
-                self.assertIn(f"nx_{prefix}_uart_initialize_format", source)
+                self.assertIn(f"nx_{prefix}_uart_byte_cold_prepare", source)
+                self.assertIn("static const nx_uart_format_t", source)
+                self.assertIn(".format = &s_nx_uart_frame_", source)
                 self.assertIn(f"nx_{prefix}_uart_format_irq", source)
                 self.assertIn("NX_UART_PARITY_EVEN", source)
                 self.assertIn("NX_UART_STOP_2", source)
@@ -133,7 +135,12 @@ class UARTFormatConfiguration(unittest.TestCase):
                 self.assertNotIn("NX_UART_ID_UART1 =", header)
                 _, generated = bindings.emit(result)
                 self.assertIn(f"nx_{prefix}_uart_word_state_t", generated)
-                self.assertIn(f"nx_{prefix}_uart_word_initialize", generated)
+                prepare = {
+                    "native": "nx_native_uart_word_initialize",
+                    "stm32": "nx_stm32_uart_word_cold_prepare",
+                    "gd32": "nx_gd32_uart_word_cold_prepare",
+                }[prefix]
+                self.assertIn(prepare, generated)
                 self.assertNotIn("(const nx_uart_port_t*)", source + generated)
 
     def test_wide_data_cannot_be_selected_on_byte_mode(self):
@@ -182,16 +189,21 @@ class UARTFormatConfiguration(unittest.TestCase):
                 item = next(item for item in result.controllers
                             if item.kind == "uart")
                 _, source = bindings.emit(result)
-                marker = (f"if (s_nx_port_{item.id}.initialized) "
-                          "{ return ")
-                self.assertIn(marker, source)
+                from tools.configure.providers import maintained
+                construction = maintained(result.soc_family).constructor(
+                    item, result, result.board_bindings, result.routes,
+                    result.devices)
+                self.assertTrue(construction.retain_on_failed_init)
+                prefix = "stm32" if result.soc_family == "stm32f407" else "gd32"
+                prepare = f"nx_{prefix}_uart_byte_cold_prepare"
+                self.assertIn(f"nx_{prefix}_uart_byte_cold_close", source)
                 start = source.index(
                     "static nx_platform_start_result_t "
                     "nx_platform_start_impl(nx_platform_diagnostic_t* "
                     "diagnostic) {")
                 self.assertLess(
                     source.index("s_nx_platform_initialized = 1u;", start),
-                    source.index("result.primary = prepare_", start))
+                    source.index("result.primary = " + prepare, start))
 
 
 if __name__ == "__main__":

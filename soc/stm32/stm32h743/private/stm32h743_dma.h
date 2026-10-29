@@ -6,7 +6,7 @@
 #ifndef NX_STM32H743_DMA_H
 #define NX_STM32H743_DMA_H
 #include "nexus/io/dma.h"
-#include "stm32h743_provider.h"
+#include "stm32h743_cold.h"
 #include "stm32h743_uart_dma_parts.h"
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +37,16 @@ nx_stm32h743_uart_dma_initialize(nx_stm32h743_uart_dma_state_t* state,
 void nx_stm32h743_uart_dma_irq(nx_stm32h743_uart_dma_state_t* state);
 /** \brief Observe TX wire completion and bounded independent RX reception. */
 void nx_stm32h743_uart_dma_uart_irq(nx_stm32h743_uart_dma_state_t* state);
+/** \brief Bind exact static DMA resources before this mode initializes.
+ * \note Task-only; Platform owns pads/gates and callers retain immutable
+ *       configuration, regions and storage through successful public stop.
+ */
+nx_result_t
+nx_stm32h743_uart_dma_prepare(nx_stm32h743_uart_dma_state_t* port,
+                              const nx_stm32h743_uart_config_t* config,
+                              const nx_dma_memory_region_t* regions,
+                              size_t region_count);
+
 #ifdef __cplusplus
 }
 #endif

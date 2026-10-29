@@ -11,10 +11,12 @@ extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #ifdef NX_ETH_FRAMES_FACTORY_STM32
+#include "stm32f407_eth_frames_cold.h"
 #include "stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_eth_frames_factory_nvic;
 #else
+#include "gd32f470_eth_frames_cold.h"
 #include "gd32f4xx_pmu.h"
 #include "gd32f4xx_rcu.h"
 #include "private/system.h"
@@ -32,6 +34,39 @@ extern const uint32_t __gVectors[] = {0U};
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
+namespace {
+#ifdef NX_ETH_FRAMES_FACTORY_STM32
+using FramesColdConfig = nx_stm32_eth_frames_cold_config_t;
+using FramesPinReceipt = nx_stm32_eth_pin_receipt_t;
+using FramesResourceReceipt = nx_stm32_eth_resource_receipt_t;
+using FramesPinConfig = nx_stm32_platform_pin_config_t;
+constexpr auto FramesColdPrepare = nx_stm32_eth_frames_cold_prepare;
+constexpr auto FramesColdClose = nx_stm32_eth_frames_cold_close;
+constexpr auto FramesResourcesCapture = nx_stm32_eth_resources_capture;
+constexpr auto FramesResourcesClose = nx_stm32_eth_resources_close;
+static volatile uint32_t& ColdGpioClocks() {
+    return RCC->AHB1ENR;
+}
+constexpr uint32_t ColdGpioMask =
+    RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOGEN;
+#else
+using FramesColdConfig = nx_gd32_eth_frames_cold_config_t;
+using FramesPinReceipt = nx_gd32_eth_pin_receipt_t;
+using FramesResourceReceipt = nx_gd32_eth_resource_receipt_t;
+using FramesPinConfig = nx_gd32_platform_pin_config_t;
+constexpr auto FramesColdPrepare = nx_gd32_eth_frames_cold_prepare;
+constexpr auto FramesColdClose = nx_gd32_eth_frames_cold_close;
+constexpr auto FramesResourcesCapture = nx_gd32_eth_resources_capture;
+constexpr auto FramesResourcesClose = nx_gd32_eth_resources_close;
+static volatile uint32_t& ColdGpioClocks() {
+    return RCU_AHB1EN;
+}
+constexpr uint32_t ColdGpioMask =
+    RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN | RCU_AHB1EN_PGEN;
+#endif
+} /* namespace */
+
 namespace {
 constexpr uintptr_t mmio_base = UINT32_C(0x40000000);
 constexpr uintptr_t mac_base = UINT32_C(0x40028000);
@@ -465,4 +500,85 @@ TEST_F(EthernetFramesFactory, FailedRealHseAcknowledgementCannotReachMacReset) {
     EXPECT_NE(NX_SUCCESS, nx_platform_start().primary);
     EXPECT_FALSE(mac->snapshot.mac.started);
     EXPECT_EQ(0U, Reg(UINT32_C(0x40023830)) & 0x1e000000U);
+}
+
+TEST_F(EthernetFramesFactory,
+       ExhaustedCColdEpochRejectsBeforeStorageOrHardwareChanges) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, Stop());
+    for (bool exhaust_clock : {false, true}) {
+        SCOPED_TRACE(exhaust_clock);
+        nx_eth_frames_mac_t selected = *mac;
+        if (exhaust_clock)
+            selected.clock_epoch = UINT32_MAX;
+        else
+            selected.rx_epoch = UINT64_MAX;
+        const nx_eth_frames_mac_t prior = selected;
+        uint16_t snapshots[9]{};
+        const FramesPinConfig pins[] = {
+            {GPIOA, &snapshots[0], 0U, 1U},  {GPIOA, &snapshots[1], 0U, 2U},
+            {GPIOA, &snapshots[2], 0U, 7U},  {GPIOC, &snapshots[3], 2U, 1U},
+            {GPIOC, &snapshots[4], 2U, 4U},  {GPIOC, &snapshots[5], 2U, 5U},
+            {GPIOG, &snapshots[6], 6U, 11U}, {GPIOG, &snapshots[7], 6U, 13U},
+            {GPIOG, &snapshots[8], 6U, 14U}};
+        FramesColdConfig config{};
+        config.pins = pins;
+        config.regions = selected.regions;
+        config.tx_descriptors = selected.tx_descriptors;
+        config.rx_descriptors = selected.rx_descriptors;
+        config.tx_slots = selected.tx_slots;
+        config.rx_slots = selected.rx_slots;
+        config.storage = selected.rx_slots[0].data;
+        config.rx_storage_bytes = selected.rx_slots[0].capacity;
+        config.tx_count = selected.tx_count;
+        config.rx_count = selected.rx_count;
+        config.init_timeout_us = 5000U;
+        config.drain_timeout_us = selected.drain_timeout_us;
+        config.irq_policy = selected.irq_policy;
+        config.priority = selected.source.priority;
+        config.clock_domain = selected.clock_domain;
+        std::memcpy(config.address, selected.address, sizeof(config.address));
+        FramesPinReceipt receipt{};
+        FramesResourceReceipt resources{};
+        FramesResourcesCapture(&resources, true);
+        const uint32_t gpio_clocks = ColdGpioClocks();
+        ColdGpioClocks() |= ColdGpioMask;
+        const auto* bytes = static_cast<const uint8_t*>(mapping);
+        const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+        const unsigned clock_writes = oracle.clock_writes;
+        const unsigned mac_writes = oracle.mac_writes;
+        EXPECT_EQ(NX_ERROR_INVALID,
+                  FramesColdPrepare(&selected, &config, &receipt));
+        EXPECT_EQ(0, std::memcmp(&prior, &selected, sizeof(prior)));
+        EXPECT_EQ(0U, receipt.leases);
+        EXPECT_FALSE(receipt.mux_leased);
+        EXPECT_EQ(clock_writes, oracle.clock_writes);
+        EXPECT_EQ(mac_writes, oracle.mac_writes);
+        EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+        EXPECT_EQ(NX_SUCCESS, FramesColdClose(&selected, &config, &receipt));
+        EXPECT_EQ(NX_SUCCESS, FramesResourcesClose(&resources));
+        ColdGpioClocks() = gpio_clocks;
+    }
+}
+
+TEST_F(EthernetFramesFactory, AbsentColdReceiptCannotStopActiveController) {
+    Start();
+    const nx_eth_frames_mac_t prior = *mac;
+    uint16_t snapshots[9]{};
+    const FramesPinConfig pins[] = {
+        {GPIOA, &snapshots[0], 0U, 1U},  {GPIOA, &snapshots[1], 0U, 2U},
+        {GPIOA, &snapshots[2], 0U, 7U},  {GPIOC, &snapshots[3], 2U, 1U},
+        {GPIOC, &snapshots[4], 2U, 4U},  {GPIOC, &snapshots[5], 2U, 5U},
+        {GPIOG, &snapshots[6], 6U, 11U}, {GPIOG, &snapshots[7], 6U, 13U},
+        {GPIOG, &snapshots[8], 6U, 14U}};
+    FramesColdConfig config{};
+    config.pins = pins;
+    FramesPinReceipt receipt{};
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_EQ(NX_ERROR_BUSY, FramesColdClose(mac, &config, &receipt));
+    EXPECT_EQ(0, std::memcmp(&prior, mac, sizeof(prior)));
+    EXPECT_EQ(0U, receipt.leases);
+    EXPECT_FALSE(receipt.mux_leased);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
 }

@@ -61,23 +61,12 @@ nx_result_t nx_native_spi_dma_initialize(nx_native_spi_dma_state_t* state) {
 /** \brief Keep outer loans intact before acquiring the selected engine. */
 nx_result_t nx_native_spi_dma_prepare(nx_native_spi_dma_state_t* state,
                                       nx_spi_dma_sequence_state_t* sequence) {
-    if (state == NULL || sequence == NULL ||
-        (sequence->backend != NULL &&
-         sequence->backend != &nx_native_spi_dma_sequence_backend) ||
-        (sequence->context != NULL && sequence->context != state)) {
-        return NX_ERROR_INVALID;
+    nx_result_t result = nx_spi_dma_sequence_preflight(
+        sequence, &nx_native_spi_dma_sequence_backend, state);
+    if (result != NX_SUCCESS) {
+        return result;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
-        return NX_ERROR_CONTEXT;
-    }
-    nx_request_state_t phase = nx_request_state(&sequence->phase_request.base);
-    if (sequence->active != NULL || sequence->cs_held ||
-        sequence->pending_release ||
-        (sequence->stopping && !sequence->stopped) ||
-        (phase != NX_REQUEST_READY && phase != NX_REQUEST_SETTLED)) {
-        return NX_ERROR_BUSY;
-    }
-    nx_result_t result = nx_native_spi_dma_initialize(state);
+    result = nx_native_spi_dma_initialize(state);
     if (result != NX_SUCCESS) {
         return result;
     }

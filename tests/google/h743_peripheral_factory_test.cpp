@@ -273,3 +273,101 @@ TEST_F(H743PeripheralFactory, SpiTrimFailurePreservesRefusedGeneratedCleanup) {
     EXPECT_EQ(0U, GPIOE->MODER);
     EXPECT_EQ(0U, TIM2->CR1 & TIM_CR1_CEN);
 }
+
+#include "stm32h743_cold.h"
+TEST_F(H743PeripheralFactory, ColdSpiCannotAcquireWireBeforeRejectingLiveCs) {
+    g_nx_stm32h743_system.started = true;
+    g_nx_stm32h743_system.core_hz = 64000000U;
+    RCC->APB2ENR = RCC_APB2ENR_SPI4EN;
+    RCC->AHB4ENR = RCC_AHB4ENR_GPIOEEN;
+    nx_stm32h743_spi_state_t port{};
+    nx_stm32h743_gpio_state_t cs{};
+    cs.initialized = true;
+    nx_stm32h743_spi_endpoint_state_t endpoint{};
+    const nx_stm32h743_spi_endpoint_config_t child{&endpoint, &cs,      GPIOE,
+                                                   2048U,     1000000U, 0U};
+    const nx_stm32h743_spi_config_t config{&child, 1U, 64000000U};
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_spi_prepare(&port, &config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_FALSE(port.initialized);
+    EXPECT_TRUE(cs.initialized);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_release(&port, &config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_TRUE(cs.initialized);
+    if (port.initialized || port.retained) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_ops.stop(&port));
+    }
+    g_nx_stm32h743_system.started = false;
+}
+TEST_F(H743PeripheralFactory, ColdSpiCleanupSkipsUnacquiredLaterChildren) {
+    g_nx_stm32h743_system.started = true;
+    g_nx_stm32h743_system.core_hz = 64000000U;
+    RCC->APB2ENR = RCC_APB2ENR_SPI4EN;
+    RCC->AHB4ENR = RCC_AHB4ENR_GPIOEEN;
+    nx_stm32h743_spi_state_t port{};
+    nx_stm32h743_gpio_state_t first{};
+    nx_stm32h743_gpio_state_t later{};
+    nx_stm32h743_spi_endpoint_state_t endpoints[2]{};
+    const nx_stm32h743_spi_endpoint_config_t children[]{
+        {&endpoints[0], &first, GPIOE, 2048U, 1000000U, 0U},
+        {&endpoints[1], &later, GPIOE, 32768U, 1000000U, 0U}};
+    const nx_stm32h743_spi_config_t config{children, 2U, 64000000U};
+    g_h743_model.ignore_write = &GPIOE->MODER;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32h743_spi_prepare(&port, &config));
+    EXPECT_TRUE(first.retained);
+    EXPECT_EQ(nullptr, later.registers);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_release(&port, &config));
+    EXPECT_FALSE(first.retained);
+    EXPECT_EQ(nullptr, later.registers);
+    g_nx_stm32h743_system.started = false;
+}
+TEST_F(H743PeripheralFactory, ColdSpiRetriesCsAfterTheWireHasAlreadyStopped) {
+    g_nx_stm32h743_system.started = true;
+    g_nx_stm32h743_system.core_hz = 64000000U;
+    RCC->APB2ENR = RCC_APB2ENR_SPI4EN;
+    RCC->AHB4ENR = RCC_AHB4ENR_GPIOEEN;
+    nx_stm32h743_spi_state_t port{};
+    nx_stm32h743_gpio_state_t cs{};
+    nx_stm32h743_spi_endpoint_state_t endpoint{};
+    const nx_stm32h743_spi_endpoint_config_t child{&endpoint, &cs,      GPIOE,
+                                                   2048U,     1000000U, 0U};
+    const nx_stm32h743_spi_config_t config{&child, 1U, 64000000U};
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_prepare(&port, &config));
+    GPIOE->ODR &= ~2048U;
+    g_h743_model.ignore_write = &GPIOE->BSRR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32h743_spi_release(&port, &config));
+    EXPECT_FALSE(port.initialized);
+    EXPECT_TRUE(port.cold_owned);
+    EXPECT_TRUE(cs.retained);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_release(&port, &config));
+    EXPECT_FALSE(port.cold_owned);
+    EXPECT_FALSE(cs.retained);
+    g_nx_stm32h743_system.started = false;
+}
+TEST_F(H743PeripheralFactory, ColdSpiValidatesEveryEndpointBeforeAnyOutput) {
+    g_nx_stm32h743_system.started = true;
+    g_nx_stm32h743_system.core_hz = 64000000U;
+    RCC->APB2ENR = RCC_APB2ENR_SPI4EN;
+    RCC->AHB4ENR = RCC_AHB4ENR_GPIOEEN;
+    nx_stm32h743_spi_state_t port{};
+    nx_stm32h743_gpio_state_t cs{};
+    nx_stm32h743_spi_endpoint_state_t endpoint{};
+    const nx_stm32h743_spi_endpoint_config_t children[2]{
+        {&endpoint, &cs, GPIOE, 2048U, 1000000U, 0U},
+        {nullptr, nullptr, GPIOE, 2048U, 1000000U, 0U}};
+    const nx_stm32h743_spi_config_t config{children, 2U, 64000000U};
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_spi_prepare(&port, &config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_FALSE(cs.initialized);
+    if (port.initialized || port.retained) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32h743_spi_ops.stop(&port));
+    }
+    if (cs.initialized || cs.retained) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32h743_gpio_stop(&cs, 2048U));
+    }
+    g_nx_stm32h743_system.started = false;
+}

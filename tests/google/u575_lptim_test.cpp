@@ -447,3 +447,13 @@ TEST_F(U575Lptim, IrqFactsDeferRequestPublicationAndWinBeforeTaskCancellation) {
             testing::ExitedWithCode(0), "");
     }
 }
+
+TEST_F(U575Lptim, ColdPrepareBindsReviewedResourcesWithoutResettingGeneration) {
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_lptim_prepare(&state));
+    EXPECT_EQ(&g_u575_lptim_model.registers, state.registers);
+    const auto generation = state.generation;
+    EXPECT_EQ(NX_SUCCESS, nx_lptim_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_lptim_prepare(&state));
+    EXPECT_GT(state.generation, generation);
+}

@@ -1,5 +1,13 @@
 # STM32H743 software reference
 
+Cold hardware behavior is maintained in C. The family configuration package
+emits static policy, exact instance storage and typed calls; `platform_cold.c`
+owns selected resource admission and shared GPIO/clock withdrawal. Provider
+prepare/close helpers own their mode-specific lifetime, including the fixed-run
+pause/resume resource path. Empty receipts cannot stop an unacquired live owner;
+failed restore retains its original state for retry. These implementation
+boundaries do not extend the clock, Cache, DMA or physical support listed below.
+
 This provider maintains exact STM32H743ZIT6 software references. The original
 NUCLEO-H743ZI2 GPIO/UART slice uses
 official Cortex-M7 startup, MMIO-only bounded LDO power entry, fixed HSI32 or

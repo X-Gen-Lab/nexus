@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a6b4e8651695e4de512a08ad3ce897e59317b3e8e124de58598da6903d2f6ab0\n"
+"X-Nexus-Source-SHA256: 22ad5f1356a95f6b75cda59f0b0f8a53b8634e900fdffec58101c027d9e56791\n"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:1
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
 msgstr "Derived capabilities and integration matrix"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:3
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:3
 msgid ""
 "本表由 `tools/maintenance/capabilities.py` 读取维护中的 `soc.json`、 `routes.json`、参考 "
 "Board `board.json`，并运行现有软件 assembly 的生产 resolver 和 binding emitter "
@@ -26,19 +26,19 @@ msgstr ""
 "facts, implementation and regressions, then `--write` refreshes derived "
 "prose and `--check` rejects stale content."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:8
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:8
 msgid "**Mode** 是 SoC 声明的有限模式；无 route 的模式不能据此选择连接。"
 msgstr ""
 "**Mode** is a bounded SoC-declared mode; a mode without routes does not "
 "authorize connections."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:9
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:9
 msgid "**Reviewed SoC routes** 描述已维护的芯片路线，不是 PCB 连续性或电气资格。"
 msgstr ""
 "**Reviewed SoC routes** describe maintained chip routes, not PCB "
 "continuity/electrical qualification."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:10
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:10
 msgid ""
 "**Declared reference Boards** 表示 Board 中存在对应 binding，不表示默认 assembly "
 "已启用它，也不表示实板验收通过。"
@@ -46,13 +46,13 @@ msgstr ""
 "**Declared reference Boards** means the Board has a binding, not that the "
 "default assembly enables it or physical acceptance passed."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:12
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:12
 msgid "**Resolver fixtures** 是当前实际通过解析的 TOML 软件夹具。"
 msgstr ""
 "**Resolver fixtures** are TOML software fixtures actually accepted by the "
 "current resolver."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:13
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:13
 msgid ""
 "**Selected production source** 从实际生成的 face 读取完整 ops 标识，匹配生产 C "
 "中已初始化的导出定义；注释、字符串、声明和相似前缀不算定义。这是有限源码 一致性证据，不替代编译、执行或物理测量。空白列明确没有该类证据。"
@@ -64,7 +64,7 @@ msgstr ""
 "compilation/execution/physical measurement. Blank columns explicitly lack "
 "such evidence."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:17
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:17
 msgid ""
 "`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native "
 "软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与 Board 列因此为空。未选择的主机模型库存不进入本表。"
@@ -75,7 +75,7 @@ msgstr ""
 "capability; their route and Board columns are therefore empty. Unselected "
 "host-model inventory is omitted."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:21
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:21
 msgid ""
 "表格不从旧候选继承新 HEAD 的软件资格，也不推断物理结果。三板实物未连接，HIL 保持 "
 "`not_executed`。精确模式限制及所有权合同见[支持范围](support.md)。"
@@ -85,11 +85,11 @@ msgstr ""
 "`not_executed`. Exact mode limits/ownership are in [support "
 "scope](support.md)."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:29
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:29
 msgid "查询实际选择与验收阶段"
 msgstr "Query an exact selection and its validation stages"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:31
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:31
 msgid ""
 "全局表适合寻找已有路线；产品是否可用要回到精确装配。从固定源码或 SDK 根目录 执行以下只读查询，选择自己的 TOML。命令正常退出时输出 "
 "JSON，不更新下方矩阵："
@@ -99,7 +99,7 @@ msgstr ""
 "and select your own TOML. Successful execution prints JSON without updating "
 "the matrix below:"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:38
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:38
 msgid ""
 "报告保留 Board、完整料号、封装、后端、时钟、CPU、IRQ、物理 PCB 修订、内存域、 资源所有者和输入哈希。每个 controller 与 "
 "endpoint 分别提供已选择的公开合同； 额外公共 face 单列在 `companion_interfaces`，不伪装成 "
@@ -115,91 +115,92 @@ msgstr ""
 "finite USART1 `dma-tx` on F407ZG; it does not extend support to every F407 "
 "peripheral or UART mode."
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:44
 msgid ""
 "`validation` 分开列出以下阶段。默认查询只执行生产 resolver 和合同投影，不搜索旧 "
 "报告，也不运行编译、测试、烧录或测量。因此，下面的 `not_assessed` 表示本次查询 没有评估该阶段，不表示实现失败或历史上从未执行。"
 msgstr ""
-"`validation` separates the stages below. By default, the query only runs"
-" the production resolver and contract projection; it neither searches "
-"old reports nor compiles, tests, flashes or measures. Thus "
-"`not_assessed` means this query did not assess that stage, not that the "
-"implementation failed or was never executed historically."
+"`validation` separates the stages below. By default, the query only runs the"
+" production resolver and contract projection; it neither searches old "
+"reports nor compiles, tests, flashes or measures. Thus `not_assessed` means "
+"this query did not assess that stage, not that the implementation failed or "
+"was never executed historically."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "阶段"
 msgstr "Stage"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "本次查询值"
 msgstr "Value in this query"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "判定通过还需要什么"
 msgstr "Evidence required for acceptance"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`configuration`"
 msgstr "`configuration`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`validated`"
 msgstr "`validated`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "本次完整输入实际通过 resolver；不建立执行资格"
 msgstr ""
 "The complete current input passes the resolver; this establishes no "
 "execution qualification"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`host_models`"
 msgstr "`host_models`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`not_assessed`"
 msgstr "`not_assessed`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "对应源码与模型范围的真实测试报告"
 msgstr "Actual test reports for the corresponding source and model scope"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`arm_image`"
 msgstr "`arm_image`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "精确配置、编译工具及 ELF、链接和资源报告"
 msgstr "Exact configuration, compiler, ELF, link and resource reports"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`installed_sdk`"
 msgstr "`installed_sdk`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "固定 SDK 的独立公开接口消费记录"
 msgstr "Independent public-interface consumption of a fixed SDK"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`software_candidate`"
 msgstr "`software_candidate`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "clean source、完整计划、两次离线构建与封存产物"
 msgstr "Clean source, complete plan, two offline builds and sealed artifacts"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`physical_hil`"
 msgstr "`physical_hil`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "MCU 为 `not_assessed`；Native 为 `not_applicable`"
 msgstr "`not_assessed` for MCU; `not_applicable` for Native"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "实际 station、板卡、镜像、观测和准入结果"
 msgstr "Actual station, Board, image, observations and admission results"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:57
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:57
 msgid ""
 "用 `configuration_sha256`、`input_identities` 和实际执行记录的源码、配置及工具 "
 "身份对应证据。源码变化、模式变化或 Board 变化后，不能继承另一条记录的通过值。 `physical_qualified` 保持 "
@@ -215,14 +216,17 @@ msgstr ""
 "immutable source and actual scope. Configuration, software and physical "
 "stages are separate evidence, not one automatically promoted support level."
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:64
 msgid "显式关联已封存候选"
 msgstr "Explicitly associate a sealed candidate"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:66
 msgid "需要核对已有执行证据时，在同一查询追加原候选路径："
 msgstr ""
-"To inspect existing execution evidence, append the original candidate "
-"path to the same query:"
+"To inspect existing execution evidence, append the original candidate path "
+"to the same query:"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:72
 msgid ""
 "工具调用原候选 verifier 核对全部 payload、qualification 和链接产物，不运行新的 测试。报告同时保存 "
 "`current_source` 和 `evidence.reference.source`，不会用被引用 源码覆盖当前 "
@@ -231,15 +235,15 @@ msgid ""
 "`passed`。这是原执行的只读关联，不是本次新执行。"
 msgstr ""
 "The tool invokes the original candidate verifier to check all payloads, "
-"qualifications and linked artifacts, without running new tests. The "
-"report keeps both `current_source` and `evidence.reference.source`; the "
-"referenced source does not replace the current checkout. "
-"`evidence.relation` becomes `exact_source_and_configuration` only when "
-"clean commit/tree/submodules and the complete exact resolved "
-"configuration match; only then are the original candidate’s four "
-"software stages projected as `passed`. This is a read-only association "
-"with original execution, not a new execution."
+"qualifications and linked artifacts, without running new tests. The report "
+"keeps both `current_source` and `evidence.reference.source`; the referenced "
+"source does not replace the current checkout. `evidence.relation` becomes "
+"`exact_source_and_configuration` only when clean commit/tree/submodules and "
+"the complete exact resolved configuration match; only then are the original "
+"candidate’s four software stages projected as `passed`. This is a read-only "
+"association with original execution, not a new execution."
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:78
 msgid ""
 "有效候选属于其他源码时标 `historical_source`，配置不同时标 "
 "`configuration_mismatch`；这两种情况保留当前选择的 `not_assessed`。原件缺失、 "
@@ -249,80 +253,80 @@ msgstr ""
 "A valid candidate from another source is marked `historical_source`; a "
 "different configuration is marked `configuration_mismatch`. Both retain "
 "`not_assessed` for the current selection. Missing, modified or invalid "
-"original evidence rejects the query rather than downgrading to a "
-"verified reference. Without `--candidate`, no Git or evidence "
-"observation is needed. Restore a portable candidate’s original closure "
-"using the existing artifact tools before providing its `candidate.json`;"
-" a package digest or download location alone cannot establish a passing "
-"state."
+"original evidence rejects the query rather than downgrading to a verified "
+"reference. Without `--candidate`, no Git or evidence observation is needed. "
+"Restore a portable candidate’s original closure using the existing artifact "
+"tools before providing its `candidate.json`; a package digest or download "
+"location alone cannot establish a passing state."
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:84
 msgid ""
-"任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的 family／mode"
-" 行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确 配置通过不等于所有 Board、backend、时钟或模式通过。"
+"任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的 family／mode "
+"行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确 配置通过不等于所有 Board、backend、时钟或模式通过。"
 msgstr ""
-"No software candidate changes `physical_hil`, "
-"`physical_qualified=false`, or family/mode rows in the aggregate table "
-"below. Hardware status still requires an actual station and observations"
-" of the same image; one passing exact configuration does not imply all "
-"Boards, backends, clocks or modes passed."
+"No software candidate changes `physical_hil`, `physical_qualified=false`, or"
+" family/mode rows in the aggregate table below. Hardware status still "
+"requires an actual station and observations of the same image; one passing "
+"exact configuration does not imply all Boards, backends, clocks or modes "
+"passed."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SoC"
 msgstr "SoC"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Controller"
 msgstr "Controller"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Kind"
 msgstr "Kind"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Mode"
 msgstr "Mode"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Reviewed SoC routes"
 msgstr "Reviewed SoC routes"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Declared reference Boards"
 msgstr "Declared reference Boards"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Resolver fixtures"
 msgstr "Resolver fixtures"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "Selected production source"
 msgstr "Selected production source"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "gd32f303"
 msgstr "gd32f303"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ADC0"
 msgstr "ADC0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "adc"
 msgstr "adc"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "single-shot"
 msgstr "single-shot"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc-pa0`"
 msgstr "`adc-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gd32f303-rct6-reference`"
 msgstr "`gd32f303-rct6-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/gd303-devices.toml`"
@@ -330,77 +334,79 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/gd303-devices.toml`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/adc/legacy_adc/legacy_adc.c`"
 msgstr "`drivers/adc/legacy_adc/legacy_adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI0"
 msgstr "EXTI0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "exti"
 msgstr "exti"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "edge-event"
 msgstr "edge-event"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti0-pa0`"
 msgstr "`exti0-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "—"
 msgstr "—"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI1"
 msgstr "EXTI1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti1-pa1`"
 msgstr "`exti1-pa1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f303/drivers/exti.c`"
 msgstr "`soc/gd32/gd32f303/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FMC"
 msgstr "FMC"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "flash"
 msgstr "flash"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "poll-word"
 msgstr "poll-word"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`flash-internal`"
 msgstr "`flash-internal`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/flash/legacy_flash/legacy_flash.c`"
 msgstr "`drivers/flash/legacy_flash/legacy_flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FWDGT"
 msgstr "FWDGT"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "watchdog"
 msgstr "watchdog"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "independent"
 msgstr "independent"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`fwdgt-internal`"
 msgstr "`fwdgt-internal`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/gd303-spi-watchdog-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/gd303-spi-watchdog.toml`, "
@@ -412,31 +418,31 @@ msgstr ""
 "`tools/configure/assemblies/gd32-f303-baremetal-spi-watchdog.toml`, "
 "`tools/configure/assemblies/gd32-f303-freertos-spi-watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f303/drivers/watchdog.c`"
 msgstr "`soc/gd32/gd32f303/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOA"
 msgstr "GPIOA"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "gpio"
 msgstr "gpio"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "input"
 msgstr "input"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pa4`, `gpio-pa5`"
 msgstr "`gpio-pa4`, `gpio-pa5`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "output"
 msgstr "output"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/gd303-io-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/gd303-io.toml`, "
@@ -448,27 +454,27 @@ msgstr ""
 "`tools/configure/assemblies/gd32-f303-baremetal-io.toml`, "
 "`tools/configure/assemblies/gd32-f303-freertos-io.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f303/drivers/gpio.c`"
 msgstr "`soc/gd32/gd32f303/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "I2C0"
 msgstr "I2C0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "i2c"
 msgstr "i2c"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-messages"
 msgstr "irq-messages"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c0-pb6-pb7`"
 msgstr "`i2c0-pb6-pb7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, "
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
@@ -476,65 +482,67 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, "
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
 msgstr "`drivers/i2c/i2c_v1_async/i2c_v1_async.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SPI0"
 msgstr "SPI0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "spi"
 msgstr "spi"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "short-poll"
 msgstr "short-poll"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi0-pa5-pa6-pa7`"
 msgstr "`spi0-pa5-pa6-pa7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f303/drivers/spi.c`"
 msgstr "`soc/gd32/gd32f303/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIMER2"
 msgstr "TIMER2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "pwm"
 msgstr "pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "fixed-pwm"
 msgstr "fixed-pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`pwm-pa6`"
 msgstr "`pwm-pa6`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/timer/legacy_pwm/legacy_pwm.c`"
 msgstr "`drivers/timer/legacy_pwm/legacy_pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "USART0"
 msgstr "USART0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "uart"
 msgstr "uart"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-duplex"
 msgstr "dma-duplex"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart0-pa9-pa10`"
 msgstr "`usart0-pa9-pa10`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-"
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
@@ -544,14 +552,15 @@ msgstr ""
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
 "dma-duplex.toml`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
 msgstr "`drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-tx"
 msgstr "dma-tx"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-tx.toml`, "
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-tx.toml`"
@@ -559,11 +568,11 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-tx.toml`, "
 "`tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-bytes"
 msgstr "irq-bytes"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-irq-"
 "bytes.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
@@ -579,59 +588,59 @@ msgstr ""
 "`tools/configure/assemblies/gd32-f303-baremetal-io.toml`, "
 "`tools/configure/assemblies/gd32-f303-freertos-io.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f303/drivers/uart.c`"
 msgstr "`soc/gd32/gd32f303/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "gd32f470"
 msgstr "gd32f470"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "low-rate-scan"
 msgstr "low-rate-scan"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc0-pa0-pa1`"
 msgstr "`adc0-pa0-pa1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/adc-scan.toml`"
 msgstr "`tests/contracts/gd32_assembly/adc-scan.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/adc.c`"
 msgstr "`soc/gd32/gd32f470/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc0-pa0`"
 msgstr "`adc0-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/adc.toml`"
 msgstr "`tests/contracts/gd32_assembly/adc.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "trigger-dma"
 msgstr "trigger-dma"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc0-pa0`, `adc0-pa0-pa1`"
 msgstr "`adc0-pa0`, `adc0-pa0-pa1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/blocks.toml`"
 msgstr "`tests/contracts/gd32_assembly/blocks.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/adc_stream.c`"
 msgstr "`soc/gd32/gd32f470/drivers/adc_stream.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "trigger-dma-continuous"
 msgstr "trigger-dma-continuous"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/adc-continuous.toml`, "
 "`tests/contracts/io_evolution_assembly/gd470-adc-stream-profile.toml`"
@@ -639,27 +648,27 @@ msgstr ""
 "`tests/contracts/gd32_assembly/adc-continuous.toml`, "
 "`tests/contracts/io_evolution_assembly/gd470-adc-stream-profile.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/adc_continuous.c`"
 msgstr "`soc/gd32/gd32f470/drivers/adc_continuous.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "CAN0"
 msgstr "CAN0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "can"
 msgstr "can"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "classic-irq"
 msgstr "classic-irq"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`can0-pa11-pa12`"
 msgstr "`can0-pa11-pa12`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/can_assembly/gd32-both.toml`, "
 "`tests/contracts/can_assembly/gd32-first.toml`"
@@ -667,39 +676,39 @@ msgstr ""
 "`tests/contracts/can_assembly/gd32-both.toml`, "
 "`tests/contracts/can_assembly/gd32-first.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`io/src/controllers/can_controller.c`"
 msgstr "`io/src/controllers/can_controller.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "CAN1"
 msgstr "CAN1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`can1-pb12-pb13`"
 msgstr "`can1-pb12-pb13`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/can_assembly/gd32-both.toml`"
 msgstr "`tests/contracts/can_assembly/gd32-both.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ENET"
 msgstr "ENET"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "eth"
 msgstr "eth"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "raw-rmii"
 msgstr "raw-rmii"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`rmii-a-c-g`"
 msgstr "`rmii-a-c-g`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/ethernet_assembly/gd32-freertos.toml`, "
 "`tests/contracts/ethernet_assembly/gd32.toml`"
@@ -707,91 +716,91 @@ msgstr ""
 "`tests/contracts/ethernet_assembly/gd32-freertos.toml`, "
 "`tests/contracts/ethernet_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`io/src/controllers/eth_mac.c`"
 msgstr "`io/src/controllers/eth_mac.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "eth_frames"
 msgstr "eth_frames"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "rmii-vlan-sg-ptp"
 msgstr "rmii-vlan-sg-ptp"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`rmii-frames-a-c-g`"
 msgstr "`rmii-frames-a-c-g`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/gd470-eth-frames.toml`"
 msgstr "`cmake/package/verification/io_evolution/gd470-eth-frames.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`io/src/controllers/eth_frames_mac.c`"
 msgstr "`io/src/controllers/eth_frames_mac.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI3"
 msgstr "EXTI3"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti3-pe3`"
 msgstr "`exti3-pe3`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/exti.toml`"
 msgstr "`tests/contracts/gd32_assembly/exti.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/exti.c`"
 msgstr "`soc/gd32/gd32f470/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`physical-flash`"
 msgstr "`physical-flash`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gd32f470zg-liangshan`"
 msgstr "`gd32f470zg-liangshan`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/flash.toml`"
 msgstr "`tests/contracts/gd32_assembly/flash.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/flash.c`"
 msgstr "`soc/gd32/gd32f470/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`independent-watchdog`"
 msgstr "`independent-watchdog`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/watchdog.toml`"
 msgstr "`tests/contracts/gd32_assembly/watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/watchdog.c`"
 msgstr "`soc/gd32/gd32f470/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOB"
 msgstr "GPIOB"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpiob0`, `gpiob1`"
 msgstr "`gpiob0`, `gpiob1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOD"
 msgstr "GPIOD"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpiod7`"
 msgstr "`gpiod7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/physical_platform_assembly/gd32-gpio.toml`, "
 "`tools/configure/assemblies/liangshan-baremetal-gpio.toml`, "
@@ -805,15 +814,15 @@ msgstr ""
 "`tools/configure/assemblies/liangshan-freertos-gpio.toml`, "
 "`tools/configure/assemblies/liangshan-freertos.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/gpio.c`"
 msgstr "`soc/gd32/gd32f470/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-messages"
 msgstr "dma-messages"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/i2c-dma.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, "
@@ -823,7 +832,7 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/i2c-irq.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
@@ -833,11 +842,11 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
 " `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "poll-messages"
 msgstr "poll-messages"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/blocks.toml`, "
 "`tests/contracts/gd32_assembly/dma.toml`, "
@@ -851,19 +860,19 @@ msgstr ""
 "`tests/contracts/gd32_assembly/multi.toml`, "
 "`tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/i2c.c`"
 msgstr "`soc/gd32/gd32f470/drivers/i2c.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "I2C1"
 msgstr "I2C1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c1-pb10-pb11`"
 msgstr "`i2c1-pb10-pb11`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, "
@@ -875,7 +884,7 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
 " `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
@@ -883,7 +892,7 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
 " `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/blocks.toml`, "
 "`tests/contracts/gd32_assembly/dma.toml`, "
@@ -895,15 +904,15 @@ msgstr ""
 "`tests/contracts/gd32_assembly/multi.toml`, "
 "`tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-full-duplex"
 msgstr "dma-full-duplex"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi0-pa5-pa7`"
 msgstr "`spi0-pa5-pa7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32.toml`"
@@ -911,23 +920,23 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/spi_dma.c`"
 msgstr "`soc/gd32/gd32f470/drivers/spi_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/spi.c`"
 msgstr "`soc/gd32/gd32f470/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SPI4"
 msgstr "SPI4"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi4-pf6-pf9`"
 msgstr "`spi4-pf6-pf9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/blocks.toml`, "
 "`tests/contracts/gd32_assembly/dma.toml`, "
@@ -941,7 +950,7 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`io/src/mechanisms/spi_dma_sequence.c`, "
 "`soc/gd32/gd32f470/drivers/spi_dma.c`"
@@ -949,7 +958,7 @@ msgstr ""
 "`io/src/mechanisms/spi_dma_sequence.c`, "
 "`soc/gd32/gd32f470/drivers/spi_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/multi.toml`, "
 "`tests/contracts/gd32_assembly/spi.toml`, "
@@ -963,23 +972,23 @@ msgstr ""
 "`tools/configure/assemblies/liangshan-baremetal-spi.toml`, "
 "`tools/configure/assemblies/liangshan-freertos-spi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIMER0"
 msgstr "TIMER0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "advanced_pwm"
 msgstr "advanced_pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "complementary-pwm"
 msgstr "complementary-pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`complementary-pa8-pb12-pb13`"
 msgstr "`complementary-pa8-pb12-pb13`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/timer_assembly/gd32-freertos.toml`, "
 "`tests/contracts/timer_assembly/gd32.toml`"
@@ -987,43 +996,43 @@ msgstr ""
 "`tests/contracts/timer_assembly/gd32-freertos.toml`, "
 "`tests/contracts/timer_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/advanced_pwm.c`"
 msgstr "`soc/gd32/gd32f470/drivers/advanced_pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`timer2-pa6`"
 msgstr "`timer2-pa6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/pwm.toml`"
 msgstr "`tests/contracts/gd32_assembly/pwm.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/timer.c`"
 msgstr "`soc/gd32/gd32f470/drivers/timer.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIMER3"
 msgstr "TIMER3"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "timer_capture"
 msgstr "timer_capture"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "edge-capture"
 msgstr "edge-capture"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`capture-pb6`"
 msgstr "`capture-pb6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/timer_capture.c`"
 msgstr "`soc/gd32/gd32f470/drivers/timer_capture.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex.toml`, "
@@ -1033,15 +1042,15 @@ msgstr ""
 "`tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/uart_duplex.c`"
 msgstr "`soc/gd32/gd32f470/drivers/uart_duplex.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-duplex-continuous"
 msgstr "dma-duplex-continuous"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex-continuous.toml`"
@@ -1049,7 +1058,7 @@ msgstr ""
 "`tests/contracts/gd32_assembly/dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/blocks.toml`, "
 "`tests/contracts/gd32_assembly/dma.toml`, "
@@ -1065,113 +1074,117 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/gd470-dma-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/uart_dma.c`"
 msgstr "`soc/gd32/gd32f470/drivers/uart_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-blocks"
 msgstr "irq-blocks"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "irq-byte-event"
-msgstr "irq-byte-event"
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/uart_rx_compact_assembly/gd470-irq-blocks.toml`"
+msgstr "`tests/contracts/uart_rx_compact_assembly/gd470-irq-blocks.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/gd32_assembly/multi.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart7e2.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-irq.toml`, "
-"`tools/configure/assemblies/liangshan-baremetal-uart.toml`, "
-"`tools/configure/assemblies/liangshan-baremetal.toml`, "
-"`tools/configure/assemblies/liangshan-freertos-uart.toml`, "
-"`tools/configure/assemblies/liangshan-freertos.toml`"
-msgstr ""
-"`tests/contracts/gd32_assembly/multi.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart7e2.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-irq.toml`, "
-"`tools/configure/assemblies/liangshan-baremetal-uart.toml`, "
-"`tools/configure/assemblies/liangshan-baremetal.toml`, "
-"`tools/configure/assemblies/liangshan-freertos-uart.toml`, "
-"`tools/configure/assemblies/liangshan-freertos.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f470/drivers/uart.c`"
-msgstr "`soc/gd32/gd32f470/drivers/uart.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "irq-words"
-msgstr "irq-words"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/io_evolution_assembly/gd470-uart9n1-probe.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart9n1.toml`"
-msgstr ""
-"`tests/contracts/io_evolution_assembly/gd470-uart9n1-probe.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart9n1.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f470/drivers/uart_word.c`"
-msgstr "`soc/gd32/gd32f470/drivers/uart_word.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "rx-dma-continuous"
-msgstr "rx-dma-continuous"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/gd32_assembly/rx-dma-continuous.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart-stream-profile.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-continuous.toml`"
-msgstr ""
-"`tests/contracts/gd32_assembly/rx-dma-continuous.toml`, "
-"`tests/contracts/io_evolution_assembly/gd470-uart-stream-profile.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-continuous.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f470/drivers/uart_receive.c`"
-msgstr "`soc/gd32/gd32f470/drivers/uart_receive.c`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "rx-dma-idle"
-msgstr "rx-dma-idle"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/gd32_assembly/rx-dma-idle.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-idle.toml`"
-msgstr ""
-"`tests/contracts/gd32_assembly/rx-dma-idle.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-idle.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "USART1"
-msgstr "USART1"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid "`usart1-pa2-pa3`"
-msgstr "`usart1-pa2-pa3`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`"
-msgstr ""
-"`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/gd32/gd32f470/drivers/uart_stream.c`"
 msgstr "`soc/gd32/gd32f470/drivers/uart_stream.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "irq-byte-event"
+msgstr "irq-byte-event"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/gd32_assembly/multi.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart7e2.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-irq.toml`, "
+"`tools/configure/assemblies/liangshan-baremetal-uart.toml`, "
+"`tools/configure/assemblies/liangshan-baremetal.toml`, "
+"`tools/configure/assemblies/liangshan-freertos-uart.toml`, "
+"`tools/configure/assemblies/liangshan-freertos.toml`"
+msgstr ""
+"`tests/contracts/gd32_assembly/multi.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart7e2.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-irq.toml`, "
+"`tools/configure/assemblies/liangshan-baremetal-uart.toml`, "
+"`tools/configure/assemblies/liangshan-baremetal.toml`, "
+"`tools/configure/assemblies/liangshan-freertos-uart.toml`, "
+"`tools/configure/assemblies/liangshan-freertos.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f470/drivers/uart.c`"
+msgstr "`soc/gd32/gd32f470/drivers/uart.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "irq-words"
+msgstr "irq-words"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/io_evolution_assembly/gd470-uart9n1-probe.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart9n1.toml`"
+msgstr ""
+"`tests/contracts/io_evolution_assembly/gd470-uart9n1-probe.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart9n1.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f470/drivers/uart_word.c`"
+msgstr "`soc/gd32/gd32f470/drivers/uart_word.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "rx-dma-continuous"
+msgstr "rx-dma-continuous"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/gd32_assembly/rx-dma-continuous.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart-stream-profile.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-continuous.toml`"
+msgstr ""
+"`tests/contracts/gd32_assembly/rx-dma-continuous.toml`, "
+"`tests/contracts/io_evolution_assembly/gd470-uart-stream-profile.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-continuous.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f470/drivers/uart_receive.c`"
+msgstr "`soc/gd32/gd32f470/drivers/uart_receive.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "rx-dma-idle"
+msgstr "rx-dma-idle"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/gd32_assembly/rx-dma-idle.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-idle.toml`"
+msgstr ""
+"`tests/contracts/gd32_assembly/rx-dma-idle.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-idle.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "USART1"
+msgstr "USART1"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`usart1-pa2-pa3`"
+msgstr "`usart1-pa2-pa3`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/gd32.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/gd32-freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/gd32.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/gd32_assembly/dma.toml`, "
 "`tests/contracts/gd32_assembly/multi.toml`, "
@@ -1181,23 +1194,23 @@ msgstr ""
 "`tests/contracts/gd32_assembly/multi.toml`, "
 "`tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "USBFS"
 msgstr "USBFS"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "usb_device"
 msgstr "usb_device"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "device-fs"
 msgstr "device-fs"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usbfs-pa11-pa12`"
 msgstr "`usbfs-pa11-pa12`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/usb_assembly/gd32-freertos.toml`, "
 "`tests/contracts/usb_assembly/gd32-interrupt.toml`, "
@@ -1207,23 +1220,23 @@ msgstr ""
 "`tests/contracts/usb_assembly/gd32-interrupt.toml`, "
 "`tests/contracts/usb_assembly/gd32.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`io/src/controllers/usb_device_controller.c`"
 msgstr "`io/src/controllers/usb_device_controller.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32f103"
 msgstr "stm32f103"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ADC1"
 msgstr "ADC1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32f103rb-nucleo-reference`"
 msgstr "`stm32f103rb-nucleo-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/f103-devices.toml`"
@@ -1231,7 +1244,7 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/f103-devices.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
 "`tools/configure/assemblies/stm32-f103-exti.toml`"
@@ -1239,15 +1252,15 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
 "`tools/configure/assemblies/stm32-f103-exti.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f103/drivers/exti.c`"
 msgstr "`soc/stm32/stm32f103/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FLASH"
 msgstr "FLASH"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
 "`tests/contracts/mainstream_assembly/f103-io-freertos.toml`, "
@@ -1267,15 +1280,15 @@ msgstr ""
 "`tools/configure/assemblies/stm32-f103-freertos.toml`, "
 "`tools/configure/assemblies/stm32-f103-watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f103/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32f103/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c1-pb6-pb7`"
 msgstr "`i2c1-pb6-pb7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-i2c.toml`, "
 "`tests/contracts/legacy_transport_assembly/stm32f103-freertos-i2c.toml`"
@@ -1283,15 +1296,15 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-i2c.toml`, "
 "`tests/contracts/legacy_transport_assembly/stm32f103-freertos-i2c.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "IWDG"
 msgstr "IWDG"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`iwdg`"
 msgstr "`iwdg`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-watchdog.toml`, "
 "`tools/configure/assemblies/stm32-f103-watchdog.toml`"
@@ -1299,19 +1312,19 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/f103-watchdog.toml`, "
 "`tools/configure/assemblies/stm32-f103-watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f103/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32f103/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SPI1"
 msgstr "SPI1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi1-pa5-pa6-pa7`"
 msgstr "`spi1-pa5-pa6-pa7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-spi-freertos.toml`, "
 "`tests/contracts/mainstream_assembly/f103-spi.toml`, "
@@ -1321,23 +1334,23 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/f103-spi.toml`, "
 "`tools/configure/assemblies/stm32-f103-spi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f103/drivers/spi.c`"
 msgstr "`soc/stm32/stm32f103/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIM3"
 msgstr "TIM3"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "USART2"
 msgstr "USART2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart2-pa2-pa3`"
 msgstr "`usart2-pa2-pa3`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-"
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
@@ -1347,7 +1360,7 @@ msgstr ""
 "duplex.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
 "dma-duplex.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-tx.toml`,"
 " `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-tx.toml`"
@@ -1355,7 +1368,7 @@ msgstr ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-tx.toml`,"
 " `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-irq-"
 "bytes.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
@@ -1379,19 +1392,19 @@ msgstr ""
 "`tools/configure/assemblies/stm32-f103-freertos.toml`, "
 "`tools/configure/assemblies/stm32-f103-watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f103/drivers/uart.c`"
 msgstr "`soc/stm32/stm32f103/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32f407"
 msgstr "stm32f407"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc1-ch0-pa0`, `adc1-scan-pa0-pa1`"
 msgstr "`adc1-ch0-pa0`, `adc1-scan-pa0-pa1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-adc-scan.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-scan.toml`"
@@ -1399,15 +1412,15 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-adc-scan.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-scan.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/adc.c`"
 msgstr "`soc/stm32/stm32f407/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc1-ch0-pa0`"
 msgstr "`adc1-ch0-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-adc.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc.toml`"
@@ -1415,7 +1428,7 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-adc.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-blocks.toml`, "
 "`tests/contracts/stm32_assembly/zg-blocks.toml`"
@@ -1423,11 +1436,11 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-blocks.toml`, "
 "`tests/contracts/stm32_assembly/zg-blocks.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/adc_stream.c`"
 msgstr "`soc/stm32/stm32f407/drivers/adc_stream.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-continuous.toml`"
@@ -1435,19 +1448,19 @@ msgstr ""
 "`tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/adc_continuous.c`"
 msgstr "`soc/stm32/stm32f407/drivers/adc_continuous.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`can1-pa11-pa12`"
 msgstr "`can1-pa11-pa12`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32f407zg-qiming-v31`"
 msgstr "`stm32f407zg-qiming-v31`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/can_assembly/stm32-both.toml`, "
 "`tests/contracts/can_assembly/stm32-first.toml`"
@@ -1455,23 +1468,23 @@ msgstr ""
 "`tests/contracts/can_assembly/stm32-both.toml`, "
 "`tests/contracts/can_assembly/stm32-first.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "CAN2"
 msgstr "CAN2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`can2-pb12-pb13`"
 msgstr "`can2-pb12-pb13`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/can_assembly/stm32-both.toml`"
 msgstr "`tests/contracts/can_assembly/stm32-both.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ETH"
 msgstr "ETH"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, "
 "`tests/contracts/ethernet_assembly/stm32-zg.toml`"
@@ -1479,19 +1492,19 @@ msgstr ""
 "`tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, "
 "`tests/contracts/ethernet_assembly/stm32-zg.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`"
 msgstr "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI5"
 msgstr "EXTI5"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti5-pa5`"
 msgstr "`exti5-pa5`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-exti.toml`, "
 "`tests/contracts/stm32_assembly/zg-exti.toml`"
@@ -1499,23 +1512,23 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-exti.toml`, "
 "`tests/contracts/stm32_assembly/zg-exti.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/exti.c`"
 msgstr "`soc/stm32/stm32f407/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI6"
 msgstr "EXTI6"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti6-pa6`"
 msgstr "`exti6-pa6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
 msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-flash.toml`, "
 "`tests/contracts/stm32_assembly/zg-flash.toml`"
@@ -1523,19 +1536,19 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-flash.toml`, "
 "`tests/contracts/stm32_assembly/zg-flash.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/flash.c`"
 msgstr "`soc/stm32/stm32f407/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pb2`"
 msgstr "`gpio-pb2`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32f407ve-sky-qingchun`"
 msgstr "`stm32f407ve-sky-qingchun`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
 "`tools/configure/assemblies/sky-baremetal.toml`, "
@@ -1547,19 +1560,19 @@ msgstr ""
 "`tools/configure/assemblies/sky-freertos-gpio.toml`, "
 "`tools/configure/assemblies/sky-freertos.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32f407/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOE"
 msgstr "GPIOE"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pe3`, `gpio-pe4`"
 msgstr "`gpio-pe3`, `gpio-pe4`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/physical_platform_assembly/stm32-gpio.toml`, "
 "`tools/configure/assemblies/qiming-baremetal-gpio.toml`, "
@@ -1573,15 +1586,15 @@ msgstr ""
 "`tools/configure/assemblies/qiming-freertos-gpio.toml`, "
 "`tools/configure/assemblies/qiming-freertos.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOG"
 msgstr "GPIOG"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pg9`"
 msgstr "`gpio-pg9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
 " `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
@@ -1595,7 +1608,7 @@ msgstr ""
 " `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c-dma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
 "freertos.toml`, "
@@ -1613,7 +1626,7 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c-irq.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-i2c.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c.toml`"
@@ -1621,19 +1634,19 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-i2c.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/i2c.c`"
 msgstr "`soc/stm32/stm32f407/drivers/i2c.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "I2C2"
 msgstr "I2C2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c2-pb10-pb11`"
 msgstr "`i2c2-pb10-pb11`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
@@ -1653,7 +1666,7 @@ msgstr ""
 " `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
 "freertos.toml`, "
@@ -1669,7 +1682,7 @@ msgstr ""
 "freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-watchdog.toml`, "
 "`tests/contracts/stm32_assembly/zg-watchdog.toml`"
@@ -1677,15 +1690,15 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-watchdog.toml`, "
 "`tests/contracts/stm32_assembly/zg-watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32f407/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "OTG_FS"
 msgstr "OTG_FS"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/usb_assembly/stm32-ve-freertos.toml`, "
 "`tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, "
@@ -1701,11 +1714,11 @@ msgstr ""
 "`tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, "
 "`tests/contracts/usb_assembly/stm32-zg.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma"
 msgstr "dma"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
@@ -1727,7 +1740,7 @@ msgstr ""
 "`tests/contracts/stm32_assembly/zg-blocks.toml`, "
 "`tests/contracts/stm32_assembly/zg-dma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`io/src/mechanisms/spi_dma_sequence.c`, "
 "`soc/stm32/stm32f407/drivers/spi_dma.c`"
@@ -1735,7 +1748,7 @@ msgstr ""
 "`io/src/mechanisms/spi_dma_sequence.c`, "
 "`soc/stm32/stm32f407/drivers/spi_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, "
 "`tests/contracts/stm32_assembly/ve-spi.toml`, "
@@ -1745,19 +1758,19 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-spi.toml`, "
 "`tests/contracts/stm32_assembly/zg-spi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/spi.c`"
 msgstr "`soc/stm32/stm32f407/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SPI2"
 msgstr "SPI2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi2-pb13-pb14-pb15`"
 msgstr "`spi2-pb13-pb14-pb15`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
@@ -1769,15 +1782,15 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/spi_dma.c`"
 msgstr "`soc/stm32/stm32f407/drivers/spi_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIM1"
 msgstr "TIM1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/timer_assembly/stm32-ve-freertos.toml`, "
 "`tests/contracts/timer_assembly/stm32-ve.toml`, "
@@ -1789,15 +1802,15 @@ msgstr ""
 "`tests/contracts/timer_assembly/stm32-zg-freertos.toml`, "
 "`tests/contracts/timer_assembly/stm32-zg.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/advanced_pwm.c`"
 msgstr "`soc/stm32/stm32f407/drivers/advanced_pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim3-ch1-pa6`"
 msgstr "`tim3-ch1-pa6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-pwm.toml`, "
 "`tests/contracts/stm32_assembly/zg-pwm.toml`"
@@ -1805,23 +1818,23 @@ msgstr ""
 "`tests/contracts/stm32_assembly/ve-pwm.toml`, "
 "`tests/contracts/stm32_assembly/zg-pwm.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/timer.c`"
 msgstr "`soc/stm32/stm32f407/drivers/timer.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIM4"
 msgstr "TIM4"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/timer_capture.c`"
 msgstr "`soc/stm32/stm32f407/drivers/timer_capture.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart1-pa9-pa10`"
 msgstr "`usart1-pa9-pa10`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/zg-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, "
@@ -1831,11 +1844,11 @@ msgstr ""
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_duplex.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_duplex.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
@@ -1843,7 +1856,7 @@ msgstr ""
 "`tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
@@ -1865,15 +1878,25 @@ msgstr ""
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, "
 "`tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_dma.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/stm32_assembly/ve-blocks.toml`, "
+"`tests/contracts/stm32_assembly/zg-blocks.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml`"
+msgstr ""
+"`tests/contracts/stm32_assembly/ve-blocks.toml`, "
+"`tests/contracts/stm32_assembly/zg-blocks.toml`, "
+"`tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_stream.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_stream.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, "
@@ -1897,11 +1920,11 @@ msgstr ""
 "`tools/configure/assemblies/sky-freertos-uart.toml`, "
 "`tools/configure/assemblies/sky-freertos.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1.toml`"
@@ -1909,11 +1932,11 @@ msgstr ""
 "`tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_word.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_word.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/f407-uart-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, "
@@ -1923,11 +1946,11 @@ msgstr ""
 "`tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_receive.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_receive.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, "
@@ -1937,7 +1960,7 @@ msgstr ""
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-idle.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
@@ -1953,15 +1976,15 @@ msgstr ""
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32g474"
 msgstr "stm32g474"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc1-in1-pa0`"
 msgstr "`adc1-in1-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/acquisition-freertos.toml`, "
 "`tests/contracts/g474_assembly/acquisition.toml`, "
@@ -1971,11 +1994,11 @@ msgstr ""
 "`tests/contracts/g474_assembly/acquisition.toml`, "
 "`tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/adc.c`"
 msgstr "`soc/stm32/stm32g474/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
 "`tests/contracts/g474_assembly/acquisition-dma.toml`"
@@ -1983,23 +2006,23 @@ msgstr ""
 "`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
 "`tests/contracts/g474_assembly/acquisition-dma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/adc_stream.c`"
 msgstr "`soc/stm32/stm32g474/drivers/adc_stream.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "adc_group"
 msgstr "adc_group"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "injected-sequence"
 msgstr "injected-sequence"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc1-sequence-pa0-pa1`"
 msgstr "`adc1-sequence-pa0-pa1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`cmake/package/verification/io_evolution/g474-adc-group-injected-"
 "software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-"
@@ -2009,15 +2032,15 @@ msgstr ""
 "software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-"
 "injected-timer.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/adc_group.c`"
 msgstr "`soc/stm32/stm32g474/drivers/adc_group.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "regular-sequence-dma"
 msgstr "regular-sequence-dma"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`cmake/package/verification/io_evolution/g474-adc-group-regular-"
 "software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-"
@@ -2027,7 +2050,7 @@ msgstr ""
 "software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-"
 "regular-timer.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/exti-freertos.toml`, "
 "`tests/contracts/g474_assembly/exti.toml`"
@@ -2035,47 +2058,47 @@ msgstr ""
 "`tests/contracts/g474_assembly/exti-freertos.toml`, "
 "`tests/contracts/g474_assembly/exti.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/exti.c`"
 msgstr "`soc/stm32/stm32g474/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FDCAN1"
 msgstr "FDCAN1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "can_fd"
 msgstr "can_fd"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "iso-fd-loopback"
 msgstr "iso-fd-loopback"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`fdcan1-pa11-pa12`"
 msgstr "`fdcan1-pa11-pa12`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/g474-can-fd-loopback.toml`"
 msgstr "`cmake/package/verification/io_evolution/g474-can-fd-loopback.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/fdcan.c`"
 msgstr "`soc/stm32/stm32g474/drivers/fdcan.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "iso-fd-normal"
 msgstr "iso-fd-normal"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/g474-can-fd-normal.toml`"
 msgstr "`cmake/package/verification/io_evolution/g474-can-fd-normal.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`internal-flash`"
 msgstr "`internal-flash`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
 "`tests/contracts/g474_assembly/acquisition-dma.toml`, "
@@ -2089,11 +2112,11 @@ msgstr ""
 "`tests/contracts/g474_assembly/acquisition.toml`, "
 "`tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/flash.c`"
 msgstr "`soc/stm32/stm32g474/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, "
 "`gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, "
@@ -2103,27 +2126,27 @@ msgstr ""
 "`gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, "
 "`gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32g474re-hse24-reference`"
 msgstr "`stm32g474re-hse24-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "named-states"
 msgstr "named-states"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pa5`"
 msgstr "`gpio-pa5`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tools/configure/assemblies/g474-pin-states.toml`"
 msgstr "`tools/configure/assemblies/g474-pin-states.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/pin_state.c`"
 msgstr "`soc/stm32/stm32g474/drivers/pin_state.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/io-freertos.toml`, "
 "`tests/contracts/g474_assembly/io.toml`, "
@@ -2135,11 +2158,11 @@ msgstr ""
 "`tests/contracts/g474_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/g474_assembly/mainstream.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32g474/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, "
 "`gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, "
@@ -2149,7 +2172,7 @@ msgstr ""
 "`gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, "
 "`gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/g474_assembly/mainstream.toml`"
@@ -2157,11 +2180,11 @@ msgstr ""
 "`tests/contracts/g474_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/g474_assembly/mainstream.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOC"
 msgstr "GPIOC"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, "
 "`gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, "
@@ -2171,31 +2194,31 @@ msgstr ""
 "`gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, "
 "`gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pd2`"
 msgstr "`gpio-pd2`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOF"
 msgstr "GPIOF"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pf0`, `gpio-pf1`"
 msgstr "`gpio-pf0`, `gpio-pf1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pg10`"
 msgstr "`gpio-pg10`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c1-pb8-pb9`"
 msgstr "`i2c1-pb8-pb9`"
 
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`drivers/i2c/i2c_v2/i2c_v2.c`"
 msgstr "`drivers/i2c/i2c_v2/i2c_v2.c`"
 
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
 "`tests/contracts/g474_assembly/spi.toml`, "
@@ -2207,19 +2230,19 @@ msgstr ""
 "`tests/contracts/g474_assembly/watchdog-freertos.toml`, "
 "`tests/contracts/g474_assembly/watchdog.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32g474/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "LPUART1"
 msgstr "LPUART1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`lpuart1-pa2-pa3`"
 msgstr "`lpuart1-pa2-pa3`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/io-freertos.toml`, "
 "`tests/contracts/g474_assembly/io.toml`"
@@ -2227,11 +2250,11 @@ msgstr ""
 "`tests/contracts/g474_assembly/io-freertos.toml`, "
 "`tests/contracts/g474_assembly/io.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/uart.c`"
 msgstr "`soc/stm32/stm32g474/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
 "`tests/contracts/g474_assembly/spi.toml`"
@@ -2239,51 +2262,51 @@ msgstr ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
 "`tests/contracts/g474_assembly/spi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/spi.c`"
 msgstr "`soc/stm32/stm32g474/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "pwm_group"
 msgstr "pwm_group"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "coherent-pwm"
 msgstr "coherent-pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim1-group-pa8-pa9-pa10-comp1-pa1-pa4`"
 msgstr "`tim1-group-pa8-pa9-pa10-comp1-pa1-pa4`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/g474_control_assembly/pwm-group.toml`"
 msgstr "`tests/contracts/g474_control_assembly/pwm-group.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/pwm_group.c`"
 msgstr "`soc/stm32/stm32g474/drivers/pwm_group.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "pwm_adc"
 msgstr "pwm_adc"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "finite-regular-dma"
 msgstr "finite-regular-dma"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4`"
 msgstr "`tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/g474-pwm-adc.toml`"
 msgstr "`cmake/package/verification/io_evolution/g474-pwm-adc.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/pwm_adc.c`"
 msgstr "`soc/stm32/stm32g474/drivers/pwm_adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/g474_assembly/pwm-freertos.toml`, "
 "`tests/contracts/g474_assembly/pwm.toml`"
@@ -2291,103 +2314,103 @@ msgstr ""
 "`tests/contracts/g474_assembly/pwm-freertos.toml`, "
 "`tests/contracts/g474_assembly/pwm.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/pwm.c`"
 msgstr "`soc/stm32/stm32g474/drivers/pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "shared-fixed-pwm"
 msgstr "shared-fixed-pwm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim3-ch1-pa6`, `tim3-ch2-pa7`"
 msgstr "`tim3-ch1-pa6`, `tim3-ch2-pa7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/g474-pwm-shared.toml`"
 msgstr "`cmake/package/verification/io_evolution/g474-pwm-shared.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/pwm_shared.c`"
 msgstr "`soc/stm32/stm32g474/drivers/pwm_shared.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "encoder"
 msgstr "encoder"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "quadrature"
 msgstr "quadrature"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim3-encoder-pa6-pa7`"
 msgstr "`tim3-encoder-pa6-pa7`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/g474_control_assembly/encoder.toml`"
 msgstr "`tests/contracts/g474_control_assembly/encoder.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/encoder.c`"
 msgstr "`soc/stm32/stm32g474/drivers/encoder.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim4-ch1-pb6`"
 msgstr "`tim4-ch1-pb6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "TIM5"
 msgstr "TIM5"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim5-ch1-pa0`"
 msgstr "`tim5-ch1-pa0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/g474_control_assembly/timer-capture.toml`"
 msgstr "`tests/contracts/g474_control_assembly/timer-capture.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32g474/drivers/timer_capture.c`"
 msgstr "`soc/stm32/stm32g474/drivers/timer_capture.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART4"
 msgstr "UART4"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`uart4-pc10-pc11`"
 msgstr "`uart4-pc10-pc11`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART5"
 msgstr "UART5"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`uart5-pc12-pd2`"
 msgstr "`uart5-pc12-pd2`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "USART3"
 msgstr "USART3"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart3-pb10-pb11`"
 msgstr "`usart3-pb10-pb11`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32h743"
 msgstr "stm32h743"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc1-pa3`"
 msgstr "`adc1-pa3`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32h743zi-hsi-reference`"
 msgstr "`stm32h743zi-hsi-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/h743_assembly/peripherals-freertos.toml`, "
 "`tests/contracts/h743_assembly/peripherals.toml`, "
@@ -2403,11 +2426,11 @@ msgstr ""
 "`tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, "
 "`tools/configure/assemblies/h743-high-peripherals.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/adc.c`"
 msgstr "`soc/stm32/stm32h743/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/h743_assembly/peripherals-freertos.toml`, "
 "`tests/contracts/h743_assembly/peripherals.toml`, "
@@ -2421,23 +2444,23 @@ msgstr ""
 "`tests/contracts/h743_assembly/peripherals32.toml`, "
 "`tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/exti.c`"
 msgstr "`soc/stm32/stm32h743/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/flash.c`"
 msgstr "`soc/stm32/stm32h743/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pb0`"
 msgstr "`gpio-pb0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
 msgstr "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`cmake/package/verification/io_evolution/h743-high-uart.toml`, "
 "`tests/contracts/h743_assembly/dma-cache-freertos.toml`, "
@@ -2487,31 +2510,31 @@ msgstr ""
 "`tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, "
 "`tools/configure/assemblies/nucleo-h743-freertos-uart.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32h743/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pe11`"
 msgstr "`gpio-pe11`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "IWDG1"
 msgstr "IWDG1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`iwdg1`"
 msgstr "`iwdg1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32h743/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`spi4-pe12-pe13-pe14`"
 msgstr "`spi4-pe12-pe13-pe14`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tools/configure/assemblies/h743-spi-dma-cache-on.toml`, "
 "`tools/configure/assemblies/h743-spi-dma-runtime-clock.toml`, "
@@ -2525,27 +2548,27 @@ msgstr ""
 "`tools/configure/assemblies/h743-spi-dma-uart-tx.toml`, "
 "`tools/configure/assemblies/h743-spi-dma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/spi_dma.c`"
 msgstr "`soc/stm32/stm32h743/drivers/spi_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/spi.c`"
 msgstr "`soc/stm32/stm32h743/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tim3-pa6`"
 msgstr "`tim3-pa6`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/pwm.c`"
 msgstr "`soc/stm32/stm32h743/drivers/pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart3-pd8-pd9`"
 msgstr "`usart3-pd8-pd9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml`, "
 "`tools/configure/assemblies/h743-uart-duplex-continuous.toml`"
@@ -2553,11 +2576,11 @@ msgstr ""
 "`tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml`, "
 "`tools/configure/assemblies/h743-uart-duplex-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_duplex.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_duplex.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/h743_assembly/dma-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/dma-cache.toml`, "
@@ -2579,11 +2602,11 @@ msgstr ""
 "`tests/contracts/h743_assembly/dma32.toml`, "
 "`tools/configure/assemblies/h743-spi-dma-uart-tx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_dma.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`cmake/package/verification/io_evolution/h743-high-uart.toml`, "
 "`tests/contracts/h743_assembly/io-freertos.toml`, "
@@ -2599,43 +2622,43 @@ msgstr ""
 "`tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, "
 "`tools/configure/assemblies/nucleo-h743-freertos-uart.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-fifo-bytes"
 msgstr "irq-fifo-bytes"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/h743-uart-fifo.toml`"
 msgstr "`cmake/package/verification/io_evolution/h743-uart-fifo.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_fifo.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_fifo.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-fifo-rtscts-bytes"
 msgstr "irq-fifo-rtscts-bytes"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart3-pd8-pd9-pd11-pd12-rtscts`"
 msgstr "`usart3-pd8-pd9-pd11-pd12-rtscts`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32h743zi-rtscts-reference`"
 msgstr "`stm32h743zi-rtscts-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/h743-uart-rtscts.toml`"
 msgstr "`cmake/package/verification/io_evolution/h743-uart-rtscts.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_rtscts.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_rtscts.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tools/configure/assemblies/h743-uart-continuous-cache-on.toml`, "
 "`tools/configure/assemblies/h743-uart-continuous.toml`"
@@ -2643,11 +2666,11 @@ msgstr ""
 "`tools/configure/assemblies/h743-uart-continuous-cache-on.toml`, "
 "`tools/configure/assemblies/h743-uart-continuous.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_continuous.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_continuous.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/h743_assembly/rx-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx-cache.toml`, "
@@ -2673,27 +2696,27 @@ msgstr ""
 "`tests/contracts/h743_assembly/rx32.toml`, "
 "`tools/configure/assemblies/h743-spi-dma-uart-rx.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/uart_receive.c`"
 msgstr "`soc/stm32/stm32h743/drivers/uart_receive.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32u575"
 msgstr "stm32u575"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ADC4"
 msgstr "ADC4"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc4-pc0`"
 msgstr "`adc4-pc0`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32u575-nucleo-zi-q`"
 msgstr "`stm32u575-nucleo-zi-q`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, "
 "`tests/contracts/u575_assembly/peripherals-freertos.toml`, "
@@ -2703,19 +2726,19 @@ msgstr ""
 "`tests/contracts/u575_assembly/peripherals-freertos.toml`, "
 "`tests/contracts/u575_assembly/peripherals.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/adc.c`"
 msgstr "`soc/stm32/stm32u575/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/exti.c`"
 msgstr "`soc/stm32/stm32u575/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/flash.c`"
 msgstr "`soc/stm32/stm32u575/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/u575_assembly/mainstream.toml`"
@@ -2723,11 +2746,11 @@ msgstr ""
 "`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/u575_assembly/mainstream.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32u575/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb13`, `gpio-pb14`, "
 "`gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, "
@@ -2737,7 +2760,7 @@ msgstr ""
 "`gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, "
 "`gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, "
 "`gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc6`, `gpio-pc7`, "
@@ -2747,7 +2770,7 @@ msgstr ""
 "`gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc6`, `gpio-pc7`, "
 "`gpio-pc8`, `gpio-pc9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/u575_assembly/io-freertos.toml`, "
 "`tests/contracts/u575_assembly/io.toml`, "
@@ -2765,7 +2788,7 @@ msgstr ""
 "`tools/configure/assemblies/nucleo-u575-freertos-uart.toml`, "
 "`tools/configure/assemblies/u575-mpu-gpio-write.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, "
 "`gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, "
@@ -2775,7 +2798,7 @@ msgstr ""
 "`gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, "
 "`gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, "
 "`gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, "
@@ -2785,7 +2808,7 @@ msgstr ""
 "`gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, "
 "`gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, "
 "`gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, "
@@ -2795,7 +2818,7 @@ msgstr ""
 "`gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, "
 "`gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, "
 "`gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, "
@@ -2805,79 +2828,79 @@ msgstr ""
 "`gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, "
 "`gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOH"
 msgstr "GPIOH"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-ph0`, `gpio-ph1`, `gpio-ph3`"
 msgstr "`gpio-ph0`, `gpio-ph1`, `gpio-ph3`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32u575/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "LPTIM2"
 msgstr "LPTIM2"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "lptim"
 msgstr "lptim"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "irq-counter16-oneshot"
 msgstr "irq-counter16-oneshot"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`lptim2-internal-pclk1`"
 msgstr "`lptim2-internal-pclk1`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32u575zi-lptim-reference`"
 msgstr "`stm32u575zi-lptim-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tools/configure/assemblies/u575-lptim-run.toml`"
 msgstr "`tools/configure/assemblies/u575-lptim-run.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/lptim.c`"
 msgstr "`soc/stm32/stm32u575/drivers/lptim.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "RTC0"
 msgstr "RTC0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "rtc"
 msgstr "rtc"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "retained-calendar-alarm"
 msgstr "retained-calendar-alarm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`rtc0-retained-lse-run`"
 msgstr "`rtc0-retained-lse-run`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32u575zi-rtc-reference`"
 msgstr "`stm32u575zi-rtc-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tools/configure/assemblies/u575-rtc-run.toml`"
 msgstr "`tools/configure/assemblies/u575-rtc-run.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/rtc.c`"
 msgstr "`soc/stm32/stm32u575/drivers/rtc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/spi.c`"
 msgstr "`soc/stm32/stm32u575/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/u575_assembly/pwm-freertos.toml`, "
 "`tests/contracts/u575_assembly/pwm.toml`"
@@ -2885,31 +2908,31 @@ msgstr ""
 "`tests/contracts/u575_assembly/pwm-freertos.toml`, "
 "`tests/contracts/u575_assembly/pwm.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/pwm.c`"
 msgstr "`soc/stm32/stm32u575/drivers/pwm.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-chain-tx"
 msgstr "dma-chain-tx"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tools/configure/assemblies/u575-uart-chain.toml`"
 msgstr "`tools/configure/assemblies/u575-uart-chain.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/uart_dma_chain.c`"
 msgstr "`soc/stm32/stm32u575/drivers/uart_dma_chain.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/u575-uart-gpdma.toml`"
 msgstr "`cmake/package/verification/io_evolution/u575-uart-gpdma.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/uart_dma.c`"
 msgstr "`soc/stm32/stm32u575/drivers/uart_dma.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/u575_assembly/io-freertos.toml`, "
 "`tests/contracts/u575_assembly/io.toml`, "
@@ -2925,63 +2948,63 @@ msgstr ""
 "`tools/configure/assemblies/nucleo-u575-baremetal-uart.toml`, "
 "`tools/configure/assemblies/nucleo-u575-freertos-uart.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/uart.c`"
 msgstr "`soc/stm32/stm32u575/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/u575-uart-fifo.toml`"
 msgstr "`cmake/package/verification/io_evolution/u575-uart-fifo.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/uart_fifo.c`"
 msgstr "`soc/stm32/stm32u575/drivers/uart_fifo.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`usart1-pa9-pa10-pa11-pa12-rtscts`"
 msgstr "`usart1-pa9-pa10-pa11-pa12-rtscts`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32u575zi-rtscts-reference`"
 msgstr "`stm32u575zi-rtscts-reference`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/u575-uart-rtscts.toml`"
 msgstr "`cmake/package/verification/io_evolution/u575-uart-rtscts.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/uart_rtscts.c`"
 msgstr "`soc/stm32/stm32u575/drivers/uart_rtscts.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "native (MODEL; physical=false)"
 msgstr "native (MODEL; physical=false)"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/native_assembly/multi.toml`"
 msgstr "`tests/contracts/native_assembly/multi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/adc.c`"
 msgstr "`soc/native/drivers/adc.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/exti.c`"
 msgstr "`soc/native/drivers/exti.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FLASH0"
 msgstr "FLASH0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "poll-byte"
 msgstr "poll-byte"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/flash.c`"
 msgstr "`soc/native/drivers/flash.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-gpio.toml`"
@@ -2989,69 +3012,69 @@ msgstr ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-gpio.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/gpio.c`"
 msgstr "`soc/native/drivers/gpio.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/i2c.c`"
 msgstr "`soc/native/drivers/i2c.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/watchdog.c`"
 msgstr "`soc/native/drivers/watchdog.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "LPTIM0"
 msgstr "LPTIM0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "counter16-oneshot"
 msgstr "counter16-oneshot"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`cmake/package/verification/io_evolution/native-time-pair.toml`"
 msgstr "`cmake/package/verification/io_evolution/native-time-pair.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/rtc_lptim.c`"
 msgstr "`soc/native/drivers/rtc_lptim.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "LPTIM1"
 msgstr "LPTIM1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "PWM0"
 msgstr "PWM0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/timer.c`"
 msgstr "`soc/native/drivers/timer.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "calendar-alarm"
 msgstr "calendar-alarm"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "RTC1"
 msgstr "RTC1"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "async-model"
 msgstr "async-model"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`"
 msgstr ""
 "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`io/src/mechanisms/spi_dma_sequence.c`"
 msgstr "`io/src/mechanisms/spi_dma_sequence.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-spi.toml`"
@@ -3059,15 +3082,15 @@ msgstr ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-spi.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/spi.c`"
 msgstr "`soc/native/drivers/spi.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART0"
 msgstr "UART0"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-uart.toml`"
@@ -3075,18 +3098,18 @@ msgstr ""
 "`tests/contracts/native_assembly/multi.toml`, "
 "`tools/configure/assemblies/native-uart.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/uart.c`"
 msgstr "`soc/native/drivers/uart.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`"
 msgstr "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/native/drivers/uart_word.c`"
 msgstr "`soc/native/drivers/uart_word.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/capabilities.md:0
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"

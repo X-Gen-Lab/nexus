@@ -76,17 +76,22 @@ class EthernetConfigurationTests(unittest.TestCase):
             with self.subTest(after=after), self.assertRaisesRegex(ValueError, "Ethernet"):
                 gate.resolve_ir(self.assembly(change=lambda text: text.replace(before, after)))
 
-    def test_failed_mac_cold_is_counted_before_prepare_and_pins_restore_after_stop(self):
+    def test_failed_mac_cold_is_counted_before_typed_prepare_and_close(self):
         output = self.root / "generated"
         gate.configure(self.assembly(), output)
         source = (output / "bindings.c").read_text()
         start = source.index("nx_platform_start_result_t nx_platform_start")
-        prepare = source.index("result.primary = prepare_mac();", start)
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start), prepare)
-        stop = source.index("static nx_result_t stop_mac(void)")
-        self.assertLess(source.index("nx_eth_port_stop", stop),
-                        source.index("nx_stm32_pin_restore", stop))
-        self.assertIn("nx_stm32_pin_capture", source[stop:])
+        prepare = source.index("result.primary = nx_stm32_eth_cold_prepare(", start)
+        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
+                        prepare)
+        self.assertIn("&s_nx_port_mac, &s_nx_eth_config_mac, "
+                      "&s_nx_eth_receipt_mac", source[prepare:])
+        close = source.index("nx_stm32_eth_cold_close(")
+        resources = source.index("nx_stm32_eth_resources_close(", close)
+        self.assertLess(close, resources)
+        self.assertIn("static const nx_stm32_eth_cold_config_t", source)
+        self.assertNotIn("nx_stm32_eth_initialize(", source)
+        self.assertNotIn("nx_stm32_pin_restore(", source)
 
     def test_unreviewed_ve_package_cannot_use_zg_port_g_route(self):
         package = self.root / "board"

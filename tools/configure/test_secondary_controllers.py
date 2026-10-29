@@ -68,8 +68,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 incomplete = replace(item, integration=replace(
                     item.integration, dma=()))
                 with self.assertRaisesRegex(ValueError, "DMA"):
-                    secondary_controllers.constructor(incomplete, result,
-                                                      prefix)
+                    secondary_controllers.dma_paths(incomplete)
 
     def test_maintained_constructor_model_uses_the_formal_typed_assembly(self):
         output = self.directory / "constructors.inc"
@@ -112,7 +111,13 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertIn("nx_device_secondary_sensor", source)
                 self.assertIn("nx_binding_secondary_spi", source)
                 self.assertIn("DMA0_Channel6_IRQHandler" if label == "gd32" else "DMA1_Stream6_IRQHandler", source)
-                self.assertIn("nx_gd32_uart_dma_initialize_at" if label == "gd32" else "s_nx_port_secondary_uart.transmit.tx = DMA1_Stream6", source)
+                if label == "gd32":
+                    self.assertIn("nx_gd32_uart_dma_cold_prepare", source)
+                else:
+                    self.assertIn("nx_stm32_uart_dma_cold_prepare", source)
+                    self.assertIn(
+                        ".transmit = { DMA1_Stream6, DMA1_Stream6_IRQn, 6u, 4u }",
+                        source)
                 self.assertNotIn("malloc", source)
                 self.assertNotIn("strcmp", source)
 

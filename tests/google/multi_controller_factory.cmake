@@ -1,8 +1,4 @@
 # Execute the real generated five-controller graph with exact SDK providers.
-file(GLOB_RECURSE multi_factory_codegen CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/*.py")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    ${multi_factory_codegen})
 foreach(multi_family stm32 gd32)
     set(multi_official)
     if(multi_family STREQUAL "stm32")
@@ -23,14 +19,7 @@ foreach(multi_family stm32 gd32)
     if(NOT multi_generated EQUAL 0)
         message(FATAL_ERROR "Five-controller factory rejected: ${multi_output}${multi_error}")
     endif()
-    file(READ "${multi_bundle}/input_paths.json" multi_inputs)
-    string(JSON multi_count LENGTH "${multi_inputs}")
-    math(EXPR multi_last "${multi_count} - 1")
-    foreach(index RANGE 0 ${multi_last})
-        string(JSON label MEMBER "${multi_inputs}" ${index})
-        string(JSON input_path GET "${multi_inputs}" "${label}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${multi_bundle}")
     set(multi_target "nexus_${multi_family}_multi_controller_factory_test")
     nexus_google_test(${multi_target} ${multi_official}
         SOURCES multi_controller_factory_test.cpp
@@ -79,6 +68,9 @@ foreach(multi_family stm32 gd32)
         "${multi_gd}/CMSIS/GD/GD32F4xx/Include"
         "${multi_gd}/GD32F4xx_standard_peripheral/Include")
     if(multi_family STREQUAL "stm32")
+        target_sources(${multi_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_cold.c")
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32f4_official(${multi_gpio})
         target_include_directories(${multi_target} SYSTEM PRIVATE
@@ -94,6 +86,9 @@ foreach(multi_family stm32 gd32)
             nx_stm32_pin_configure=nx_multi_actual_pin_configure
             nx_stm32_pin_restore=nx_multi_actual_pin_restore)
     else()
+        target_sources(${multi_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/uart_cold.c")
         target_compile_definitions(${multi_target} PRIVATE
             GD32F470 HXTAL_VALUE=25000000)
         target_compile_definitions(${multi_gpio} PRIVATE
@@ -136,19 +131,13 @@ foreach(multi_family stm32 gd32)
     if(NOT single_generated EQUAL 0)
         message(FATAL_ERROR "Single-SPI factory rejected: ${single_output}${single_error}")
     endif()
-    file(READ "${single_bundle}/input_paths.json" single_inputs)
-    string(JSON single_count LENGTH "${single_inputs}")
-    math(EXPR single_last "${single_count} - 1")
-    foreach(index RANGE 0 ${single_last})
-        string(JSON label MEMBER "${single_inputs}" ${index})
-        string(JSON input_path GET "${single_inputs}" "${label}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${single_bundle}")
     set(single_target "nexus_${multi_family}_single_spi_factory_test")
     nexus_google_test(${single_target} ${multi_official}
         SOURCES single_spi_factory_test.cpp
         "${single_bundle}/bindings.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_cold.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${single_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOC_SOURCE_${multi_soc}}/private"

@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include "u575_devices_model.h"
 #include <cstring>
@@ -689,4 +690,122 @@ TEST_F(U575Flash, SettledPulseRequiresFreshCompletionEvenWhenReadbackMatches) {
               nx_flash_port_program(&face, 0U, data, sizeof(data), 100U));
     EXPECT_EQ(0U, state.registers->NSSR & FLASH_NSSR_BSY);
     EXPECT_NE(0U, state.registers->NSCR & FLASH_NSCR_LOCK);
+}
+
+TEST_F(U575Spi, RejectedLiveChipSelectNeverAcquiresTheWire) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_spi_endpoint_state_t child{&cold, &cs, 16U, 1000000U, 0U};
+    nx_stm32u575_spi_endpoint_config_t endpoint_config{
+        &cs, &child, &g_u575_model.gpioa, 16U, 1000000U, 0U};
+    nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 5U, 5U};
+    nx_stm32u575_spi_config_t config{&endpoint_config, 1U, &pin, 1U};
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_spi_prepare(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(cold.retained);
+    EXPECT_FALSE(cold.initialized);
+}
+
+TEST_F(U575Spi, InvalidLaterEndpointRejectsBeforeAnyAcquisition) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_gpio_state_t first{};
+    nx_stm32u575_spi_endpoint_state_t child{&cold, &first, 16U, 1000000U, 0U};
+    nx_stm32u575_spi_endpoint_config_t endpoints[]{
+        {&first, &child, &g_u575_model.gpioa, 16U, 1000000U, 0U},
+        {nullptr, nullptr, &g_u575_model.gpioa, 32U, 1000000U, 0U}};
+    nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 5U, 5U};
+    nx_stm32u575_spi_config_t config{endpoints, 2U, &pin, 1U};
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_spi_prepare(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(cold.retained);
+    EXPECT_FALSE(first.retained);
+}
+
+TEST_F(U575Spi, RejectedLiveChipSelectIsNeverReleasedByColdCleanup) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_spi_endpoint_state_t child{&cold, &cs, 16U, 1000000U, 0U};
+    nx_stm32u575_spi_endpoint_config_t endpoint_config{
+        &cs, &child, &g_u575_model.gpioa, 16U, 1000000U, 0U};
+    nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 5U, 5U};
+    nx_stm32u575_spi_config_t config{&endpoint_config, 1U, &pin, 1U};
+    ASSERT_EQ(NX_ERROR_BUSY, nx_stm32u575_spi_prepare(&cold, &config));
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_spi_release(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_TRUE(cs.initialized);
+    EXPECT_TRUE(cs.retained);
+}
+
+TEST_F(U575Spi, PartialColdCleanupSkipsEveryUnacquiredLaterEndpoint) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_gpio_state_t first{};
+    nx_stm32u575_gpio_state_t later{};
+    nx_stm32u575_spi_endpoint_state_t children[]{
+        {&cold, &first, 32U, 1000000U, 0U}, {&cold, &later, 64U, 1000000U, 0U}};
+    nx_stm32u575_spi_endpoint_config_t endpoints[]{
+        {&first, &children[0], &g_u575_model.gpioa, 32U, 1000000U, 0U},
+        {&later, &children[1], &g_u575_model.gpioa, 64U, 1000000U, 0U}};
+    nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 7U, 5U};
+    nx_stm32u575_spi_config_t config{endpoints, 2U, &pin, 1U};
+    g_u575_model.ignore_write = &g_u575_model.gpioa.MODER;
+    ASSERT_EQ(NX_ERROR_IO, nx_stm32u575_spi_prepare(&cold, &config));
+    EXPECT_TRUE(first.retained);
+    EXPECT_EQ(nullptr, later.registers);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_spi_release(&cold, &config));
+    EXPECT_FALSE(first.retained);
+    EXPECT_EQ(nullptr, later.registers);
+}
+
+TEST_F(U575Spi, ColdCleanupRetriesCsAfterTheWireHasAlreadyJoined) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_gpio_state_t own_cs{};
+    nx_stm32u575_spi_endpoint_state_t child{&cold, &own_cs, 16U, 1000000U, 0U};
+    nx_stm32u575_spi_endpoint_config_t endpoint_config{
+        &own_cs, &child, &g_u575_model.gpioa, 16U, 1000000U, 0U};
+    nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 5U, 5U};
+    nx_stm32u575_spi_config_t config{&endpoint_config, 1U, &pin, 1U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_spi_prepare(&cold, &config));
+    g_u575_model.gpioa.ODR &= ~16U;
+    g_u575_model.ignore_write = &g_u575_model.gpioa.BSRR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_spi_release(&cold, &config));
+    EXPECT_FALSE(cold.initialized);
+    EXPECT_TRUE(own_cs.retained);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_spi_release(&cold, &config));
+    EXPECT_FALSE(own_cs.retained);
+}
+TEST_F(U575Spi, DuplicateCsStateRejectsTheCompleteSetBeforeAnyEffect) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_gpio_state_t shared{};
+    nx_stm32u575_spi_endpoint_state_t children[2]{};
+    const nx_stm32u575_spi_endpoint_config_t endpoints[]{
+        {&shared, &children[0], &g_u575_model.gpioa, 32U, 1000000U, 0U},
+        {&shared, &children[1], &g_u575_model.gpioa, 32U, 1000000U, 0U}};
+    const nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 7U, 5U};
+    const nx_stm32u575_spi_config_t config{endpoints, 2U, &pin, 1U};
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_spi_prepare(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(cold.retained);
+    EXPECT_FALSE(shared.retained);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_spi_release(&cold, &config));
+}
+TEST_F(U575Spi, DuplicateEndpointStateRejectsBeforeAnyCsEffect) {
+    nx_stm32u575_spi_state_t cold{};
+    nx_stm32u575_gpio_state_t pins[2]{};
+    nx_stm32u575_spi_endpoint_state_t child{};
+    const nx_stm32u575_spi_endpoint_config_t endpoints[]{
+        {&pins[0], &child, &g_u575_model.gpioa, 32U, 1000000U, 0U},
+        {&pins[1], &child, &g_u575_model.gpioa, 64U, 1000000U, 0U}};
+    const nx_stm32u575_alternate_config_t pin{&g_u575_model.gpioa, 7U, 5U};
+    const nx_stm32u575_spi_config_t config{endpoints, 2U, &pin, 1U};
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_spi_prepare(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(cold.retained);
+    EXPECT_FALSE(pins[0].retained);
+    EXPECT_FALSE(pins[1].retained);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_spi_release(&cold, &config));
 }

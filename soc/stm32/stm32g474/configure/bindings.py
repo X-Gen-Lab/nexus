@@ -26,85 +26,61 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
-    initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio" and item.mode == "named-states":
         options = item.options
         plan = "s_nx_pin_plan_" + name
+        config = "s_nx_config_" + name
         definitions += [f"static const nx_pin_state_plan_t {plan} = {{",
                         f"    .pins = {options.mask}u, .states = {{"]
         for value in (options.default, options.sleep):
             definitions.append("        { " + ", ".join(str(getattr(value, key)) + "u"
                 for key in ("mode", "output_type", "speed", "pull", "levels")) + " },")
-        definitions += ["    } };", f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.control.retained || {state}.control.initialized) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.gpio = {item.controller};",
-                        f"    {state}.rcc = RCC;",
-                        f"    {state}.bank_mask = RCC_AHB2ENR_GPIO{item.controller[-1]}EN;",
-                        f"    {state}.plan = &{plan};",
-                        f"    return nx_stm32g474_pin_state_initialize(&{state});",
-                        "}"]
+        definitions += ["    } };",
+                        f"static const nx_stm32g474_pin_state_config_t {config} = {{",
+                        f"    {item.controller}, RCC, &{plan}, RCC_AHB2ENR_GPIO{item.controller[-1]}EN }};"]
         return Construction(
             state_type="nx_stm32g474_pin_state_t", definitions=definitions,
-            initialize=DirectCall(f"prepare_{name}"),
+            initialize=DirectCall("nx_stm32g474_pin_state_prepare",
+                                  (Address(state), Address(config))),
             stop=[DirectCall("nx_stm32g474_pin_state_stop", (Address(state),))],
             retain_on_failed_init=True)
     if item.kind == "gpio":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = {item.controller};",
-                        f"    {state}.mask = {item.options.mask}u;",
-                        f"    {state}.output = {'true' if item.mode == 'output' else 'false'};",
-                        f"    return nx_stm32g474_gpio_initialize(&{state}, {item.options.initial}u);",
-                        "}"]
-        stop = DirectCall("nx_stm32g474_gpio_stop",
-                          (Address(state), item.options.initial))
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_stm32g474_gpio_config_t {config} = {{",
+                        f"    {item.controller}, {item.options.mask}u, {item.options.initial}u, {'true' if item.mode == 'output' else 'false'} }};"]
+        initialize = DirectCall("nx_stm32g474_gpio_prepare", (Address(state), Address(config)))
+        stop = DirectCall("nx_stm32g474_gpio_stop", (Address(state), item.options.initial))
     elif item.kind == "uart":
-        options = item.options
+        options, irq = item.options, result.irq
         capacity = options.rx_capacity
         if type(capacity) is not int or not 1 <= capacity <= 4096:
             raise ValueError("G474 LPUART requires an explicit bounded byte ring")
-        irq = result.irq
         tx, rx = item.pins
+        config = "s_nx_config_" + name
         definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = {item.controller};",
-                        f"    {state}.rx_storage = s_nx_rx_{name};",
-                        f"    {state}.rx_capacity = {capacity}u;",
-                        f"    {state}.baud = {options.baud}u;",
-                        f"    {state}.irq = {item.controller}_IRQn;",
-                        f"    {state}.profile = NX_UART_RX_BYTES;",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-                        ("    nx_result_t status = nx_stm32g474_lpuart1_pins_prepare();"
-                         if item.controller == "LPUART1" else
-                         f"    nx_result_t status = nx_stm32g474_uart_pins_prepare(GPIO{tx['pin'][1]}, {int(tx['pin'][2:])}u, GPIO{rx['pin'][1]}, {int(rx['pin'][2:])}u, {tx['af']}u);"),
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32g474_uart_initialize(&{state}, 170000000u, 1000000u);",
-                        "}", f"void {item.controller}_IRQHandler(void);",
+                        f"static const nx_stm32g474_uart_config_t {config} = {{",
+                        f"    {item.controller}, s_nx_rx_{name}, {capacity}u, {options.baud}u, {item.controller}_IRQn,",
+                        f"    {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }},",
+                        f"    GPIO{tx['pin'][1]}, GPIO{rx['pin'][1]}, {int(tx['pin'][2:])}u, {int(rx['pin'][2:])}u, {tx['af']}u }};",
+                        f"void {item.controller}_IRQHandler(void);",
                         r"/** \brief One selected controller, at most one TX/RX byte. */",
                         f"void {item.controller}_IRQHandler(void) {{ nx_stm32g474_uart_irq(&{state}); }}"]
+        initialize = DirectCall("nx_stm32g474_uart_prepare", (Address(state), Address(config)))
         stop = DirectCall("nx_uart_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "spi":
         children = [child for child in devices if child.controller == item.id]
         if not children:
             fail("G474 SPI requires a reviewed active-low CS endpoint")
-        body = [f"static nx_result_t prepare_{name}(void) {{",
-                f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
-                f"    {state}.registers = {item.controller};",
-                f"    {state}.clock_hz = 170000000u;",
-                f"    {state}.poll_limit = 1000000u;"]
-        register = "APB2RSTR" if item.controller == "SPI1" else "APB1RSTR1"
-        body += [f"    {state}.reset = &RCC->{register};",
-                 f"    {state}.reset_mask = RCC_{register}_{item.controller}RST;",
-                 f"    nx_result_t status = nx_stm32g474_spi_initialize(&{state});",
-                 "    if (status != NX_SUCCESS) { return status; }"]
-        stops = [f"static nx_result_t stop_{name}(void) {{",
-                 f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
-                 "    if (status != NX_SUCCESS) { return status; }"]
+        config = "s_nx_config_" + name
+        definitions += [f"static const nx_stm32g474_alternate_t s_nx_pins_{name}[] = {{"]
+        for pin in item.pins:
+            wire = pin["pin"]
+            definitions.append(f"    {{ GPIO{wire[1]}, {int(wire[2:])}u, {pin['af']}u }},")
+        definitions += ["};"]
+        records = []
         for child in children:
             child_name = child.id.replace("-", "_")
-            cs = f"s_nx_cs_{child_name}"
-            endpoint = f"s_nx_endpoint_{child_name}"
+            cs, endpoint = f"s_nx_cs_{child_name}", f"s_nx_endpoint_{child_name}"
             binding = board_bindings[child.options.cs_binding]
             pins = routes[binding["route"]]["pins"]
             if len(pins) != 1:
@@ -113,35 +89,24 @@ def constructor(item, result, board_bindings, routes, devices):
             mask = 1 << int(pin[2:])
             if binding.get("initial") != mask:
                 fail("G474 SPI active-low CS requires an initial high latch")
-            rate = child.options.max_hz
+            rate, mode = child.options.max_hz, child.options.mode
             if type(rate) is not int or not 664063 <= rate <= item.options.max_hz:
                 fail("G474 SPI endpoint rate is outside its hardware divider")
-            mode = child.options.mode
             if type(mode) is not int or not 0 <= mode <= 3:
                 fail("G474 SPI endpoint mode must be 0 through 3")
             definitions += [f"static nx_stm32g474_gpio_state_t {cs};",
                             f"static nx_stm32g474_spi_endpoint_state_t {endpoint} = {{ .port = &{state} }};",
                             f"static const nx_spi_endpoint_t s_nx_device_face_{child_name} = {{ &nx_stm32g474_spi_endpoint_ops, &{endpoint} }};",
                             f"const nx_spi_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
-            body += [f"    if ({cs}.retained || {cs}.initialized) {{ return NX_ERROR_BUSY; }}",
-                     f"    {cs}.registers = GPIO{pin[1]};",
-                     f"    {cs}.mask = {mask}u;",
-                     f"    {cs}.output = true;",
-                     f"    status = nx_stm32g474_gpio_initialize(&{cs}, {mask}u);",
-                     "    if (status != NX_SUCCESS) { return status; }",
-                     f"    {endpoint}.cs = &{cs};",
-                     f"    {endpoint}.cs_mask = {mask}u;",
-                     f"    {endpoint}.frequency_hz = {rate}u;",
-                     f"    {endpoint}.mode = {mode}u;"]
-            stops += [f"    status = nx_stm32g474_gpio_stop(&{cs}, {mask}u);",
-                      "    if (status != NX_SUCCESS) { return status; }"]
-        for pin in item.pins:
-            wire = pin["pin"]
-            body += [f"    status = nx_stm32g474_pin_alternate(GPIO{wire[1]}, {int(wire[2:])}u, {pin['af']}u);",
-                     "    if (status != NX_SUCCESS) { return status; }"]
-        definitions += body + ["    return NX_SUCCESS;", "}"]
-        definitions += stops + ["    return NX_SUCCESS;", "}"]
-        stop = DirectCall(f"stop_{name}")
+            records.append(f"    {{ &{endpoint}, &{cs}, GPIO{pin[1]}, {mask}u, {rate}u, {mode}u }},")
+        register = "APB2RSTR" if item.controller == "SPI1" else "APB1RSTR1"
+        definitions += [f"static const nx_stm32g474_spi_device_config_t s_nx_devices_{name}[] = {{",
+                        *records, "};",
+                        f"static const nx_stm32g474_spi_config_t {config} = {{",
+                        f"    {item.controller}, &RCC->{register}, RCC_{register}_{item.controller}RST,",
+                        f"    s_nx_pins_{name}, {len(item.pins)}u, s_nx_devices_{name}, {len(children)}u }};"]
+        initialize = DirectCall("nx_stm32g474_spi_prepare", (Address(state), Address(config)))
+        stop = DirectCall("nx_stm32g474_spi_close", (Address(state), Address(config)))
     elif item.kind == "pwm_group":
         if board_bindings[item.binding].get("mask") != 1810 or board_bindings[item.binding].get("initial") != 0:
             fail("G474 coherent PWM requires explicit three-pin inactive-low Board facts")
@@ -161,29 +126,17 @@ def constructor(item, result, board_bindings, routes, devices):
                           (Address(state), Address(receipt)))
     elif item.kind == "pwm":
         pin = item.pins[0]["pin"]
-        idle = "s_nx_idle_" + name
+        idle, config = "s_nx_idle_" + name, "s_nx_config_" + name
         binding = board_bindings.get(item.binding, {})
         mask = 1 << int(pin[2:])
         initial = binding.get("initial")
         if type(initial) is not int or initial not in {0, mask} or binding.get("mask") != mask:
             fail("G474 PWM requires explicit exact Board mask and inactive latch")
         definitions += [f"static nx_stm32g474_gpio_state_t {idle};",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {idle}.retained || {idle}.initialized) {{ return NX_ERROR_BUSY; }}",
-                        f"    {idle}.registers = GPIO{pin[1]};",
-                        f"    {idle}.mask = {1 << int(pin[2:])}u;",
-                        f"    {idle}.output = true;",
-                        f"    {state}.registers = {item.controller};",
-                        f"    {state}.idle = &{idle};",
-                        f"    {state}.reset = &RCC->APB1RSTR1;",
-                        f"    {state}.reset_mask = RCC_APB1RSTR1_{item.controller}RST;",
-                        f"    {state}.pin = {int(pin[2:])}u;",
-                        f"    {state}.inactive = {initial}u;",
-                        f"    {state}.period_ticks = {item.options.period_ticks}u;",
-                        f"    {state}.duty_ticks = {item.options.duty_ticks}u;",
-                        f"    {state}.tick_hz = {item.options.tick_hz}u;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        f"    return nx_stm32g474_pwm_initialize(&{state});", "}"]
+                        f"static const nx_stm32g474_pwm_config_t {config} = {{",
+                        f"    {item.controller}, &{idle}, GPIO{pin[1]}, &RCC->APB1RSTR1, RCC_APB1RSTR1_{item.controller}RST,",
+                        f"    {initial}u, {item.options.period_ticks}u, {item.options.duty_ticks}u, {item.options.tick_hz}u, {int(pin[2:])}u }};"]
+        initialize = DirectCall("nx_stm32g474_pwm_prepare", (Address(state), Address(config)))
         stop = DirectCall("nx_stm32g474_pwm_close", (Address(state),))
     elif item.kind == "i2c":
         timing = (f"0x{item.options.timing.timingr:08x}"
@@ -207,12 +160,7 @@ def constructor(item, result, board_bindings, routes, devices):
                                                      "nx_i2c_v2_endpoint_ops")]
         stop = DirectCall("nx_i2c_port_stop", (Address(f"s_nx_face_{name}"),))
     elif item.kind == "flash":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.active || {state}.restore_pending || (FLASH->SR & FLASH_SR_BSY) != 0u) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = FLASH;",
-                        f"    {state}.memory = (volatile uint8_t*)FLASH_BASE;",
-                        f"    {state}.supply_mv = 3300u;",
-                        "    return NX_SUCCESS;", "}"]
+        initialize = DirectCall("nx_stm32g474_flash_prepare", (Address(state),))
         stop = DirectCall("nx_stm32g474_flash_close", (Address(state),))
     elif item.kind == "adc":
         stream = item.mode == "trigger-dma"
@@ -245,38 +193,21 @@ def constructor(item, result, board_bindings, routes, devices):
                             r"/** \brief One selected finite ADC block terminal observation. */",
                             f"void DMA1_Channel1_IRQHandler(void) {{ nx_stm32g474_adc_stream_irq(&{state}); }}"]
     elif item.kind == "watchdog":
-        definitions += [f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = IWDG;",
-                        f"    {state}.rcc = RCC;",
-                        f"    {state}.flash = FLASH;",
-                        f"    {state}.debug = DBGMCU;",
-                        f"    {state}.poll_limit = 1000000u;",
-                        "    return NX_SUCCESS;", "}",
-                        f"static nx_result_t stop_{name}(void) {{",
-                        f"    return nx_stm32g474_watchdog_stop(&{state});",
-                        "}"]
-        stop = DirectCall(f"stop_{name}")
+        initialize = DirectCall("nx_stm32g474_watchdog_prepare", (Address(state),))
+        stop = DirectCall("nx_stm32g474_watchdog_stop", (Address(state),))
     elif item.kind == "exti":
-        options = item.options
-        irq = result.irq
+        options, irq = item.options, result.irq
         line = int(item.controller[-1])
+        config = "s_nx_config_" + name
         definitions += [f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
-                        f"static nx_result_t prepare_{name}(void) {{",
-                        f"    if ({state}.retained || {state}.initialized || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
-                        f"    {state}.registers = EXTI;",
-                        f"    {state}.mux = SYSCFG;",
-                        f"    {state}.gpio = GPIOA;",
-                        f"    {state}.storage = s_nx_events_{name};",
-                        f"    {state}.capacity = {options.event_capacity}u;",
-                        f"    {state}.line = {line}u;",
-                        f"    {state}.priority = {options.irq.priority}u;",
-                        f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
-                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-                        f"    return nx_stm32g474_exti_initialize(&{state});",
-                        "}", f"void EXTI{line}_IRQHandler(void);",
+                        f"static const nx_stm32g474_exti_config_t {config} = {{",
+                        f"    s_nx_events_{name}, {options.event_capacity}u,",
+                        f"    {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }},",
+                        f"    NX_EXTI_{options.edge.upper()}, {line}u, {options.irq.priority}u }};",
+                        f"void EXTI{line}_IRQHandler(void);",
                         r"/** \brief One selected line, one bounded coalesced edge fact. */",
                         f"void EXTI{line}_IRQHandler(void) {{ nx_stm32g474_exti_irq(&{state}); }}"]
+        initialize = DirectCall("nx_stm32g474_exti_prepare", (Address(state), Address(config)))
         stop = DirectCall("nx_exti_port_stop", (Address(f"s_nx_face_{name}"),))
     else:
         raise ValueError("Unmaintained G474 constructor")

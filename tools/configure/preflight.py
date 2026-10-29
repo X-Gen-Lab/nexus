@@ -8,13 +8,6 @@ from tools.configure.providers import maintained
 from tools.configure.providers.common import fail
 
 
-def _reject(condition, indent=4):
-    space = " " * indent
-    return [f"{space}if ({condition}) {{",
-            f"{space}    result.primary = NX_ERROR_BUSY; return result;",
-            f"{space}}}"]
-
-
 def selected(result, *, dma_conditions=None):
     """Project exact selected leases through the maintained family contract."""
     admission = getattr(maintained(result.soc_family), "selected_preflight", None)

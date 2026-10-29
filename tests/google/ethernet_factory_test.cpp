@@ -10,9 +10,11 @@ extern "C" {
 #include "nexus_factory.h"
 #ifdef NX_ETH_FACTORY_STM32
 #include "stm32f407_eth.h"
+#include "stm32f407_eth_cold.h"
 #include "stm32f407_provider.h"
 #else
 #include "gd32f470_eth.h"
+#include "gd32f470_eth_cold.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx_rcu.h"
 #include "gd32f4xx_syscfg.h"
@@ -24,6 +26,32 @@ extern "C" {
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 #include <vector>
+namespace {
+#ifdef NX_ETH_FACTORY_STM32
+using EthColdConfig = nx_stm32_eth_cold_config_t;
+using EthPinReceipt = nx_stm32_eth_pin_receipt_t;
+using EthResourceReceipt = nx_stm32_eth_resource_receipt_t;
+using EthPinConfig = nx_stm32_platform_pin_config_t;
+constexpr auto EthColdPrepare = nx_stm32_eth_cold_prepare;
+constexpr auto EthColdClose = nx_stm32_eth_cold_close;
+constexpr auto EthResourcesCapture = nx_stm32_eth_resources_capture;
+constexpr auto EthResourcesClose = nx_stm32_eth_resources_close;
+constexpr uint32_t ColdGpioMask =
+    RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOGEN;
+#else
+using EthColdConfig = nx_gd32_eth_cold_config_t;
+using EthPinReceipt = nx_gd32_eth_pin_receipt_t;
+using EthResourceReceipt = nx_gd32_eth_resource_receipt_t;
+using EthPinConfig = nx_gd32_platform_pin_config_t;
+constexpr auto EthColdPrepare = nx_gd32_eth_cold_prepare;
+constexpr auto EthColdClose = nx_gd32_eth_cold_close;
+constexpr auto EthResourcesCapture = nx_gd32_eth_resources_capture;
+constexpr auto EthResourcesClose = nx_gd32_eth_resources_close;
+constexpr uint32_t ColdGpioMask =
+    RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN | RCU_AHB1EN_PGEN;
+#endif
+} /* namespace */
+
 using testing::_;
 using testing::NiceMock;
 using testing::Return;
@@ -552,4 +580,93 @@ TEST_F(EthernetFactory, StuckTxEngineRetainsBorrowedStorageUntilRealDrain) {
     EXPECT_EQ(NX_SUCCESS, Stop());
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(nullptr, s_mac->tx_slots[0].request);
+}
+
+TEST_F(EthernetFactory,
+       CColdRejectsMissingStaticConfigBeforeHardwareOrStorage) {
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    const nx_eth_mac_t prior = *s_mac;
+    EthPinReceipt receipt{};
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, EthColdPrepare(s_mac, nullptr, &receipt));
+    EXPECT_EQ(NX_ERROR_INVALID, EthColdClose(s_mac, nullptr, &receipt));
+    EXPECT_EQ(0, std::memcmp(&prior, s_mac, sizeof(prior)));
+    EXPECT_EQ(0U, receipt.leases);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+}
+
+TEST_F(EthernetFactory,
+       ExhaustedCColdEpochRejectsBeforeStorageOrHardwareChanges) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, Stop());
+    nx_eth_mac_t selected = *s_mac;
+    selected.epoch = UINT64_MAX;
+    const nx_eth_mac_t prior = selected;
+    uint16_t snapshots[9]{};
+    const EthPinConfig pins[] = {
+        {GPIOA, &snapshots[0], 0U, 1U},  {GPIOA, &snapshots[1], 0U, 2U},
+        {GPIOA, &snapshots[2], 0U, 7U},  {GPIOC, &snapshots[3], 2U, 1U},
+        {GPIOC, &snapshots[4], 2U, 4U},  {GPIOC, &snapshots[5], 2U, 5U},
+        {GPIOG, &snapshots[6], 6U, 11U}, {GPIOG, &snapshots[7], 6U, 13U},
+        {GPIOG, &snapshots[8], 6U, 14U}};
+    EthColdConfig config{};
+    config.pins = pins;
+    config.regions = selected.regions;
+    config.tx_descriptors = selected.tx_descriptors;
+    config.rx_descriptors = selected.rx_descriptors;
+    config.tx_slots = selected.tx_slots;
+    config.rx_slots = selected.rx_slots;
+    config.storage = selected.rx_slots[0].data;
+    config.rx_storage_bytes = selected.rx_slots[0].capacity;
+    config.tx_count = selected.tx_count;
+    config.rx_count = selected.rx_count;
+    config.init_timeout_us = 5000U;
+    config.drain_timeout_us = selected.drain_timeout_us;
+    config.irq_policy = selected.irq_policy;
+    config.priority = selected.source.priority;
+    std::memcpy(config.address, selected.address, sizeof(config.address));
+    EthPinReceipt receipt{};
+    EthResourceReceipt resources{};
+    EthResourcesCapture(&resources, false);
+    const uint32_t gpio_clocks = ahb();
+    ahb() |= ColdGpioMask;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, EthColdPrepare(&selected, &config, &receipt));
+    EXPECT_EQ(0, std::memcmp(&prior, &selected, sizeof(prior)));
+    EXPECT_EQ(0U, receipt.leases);
+    EXPECT_FALSE(receipt.mux_leased);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    testing::Mock::VerifyAndClearExpectations(&ports);
+    EXPECT_EQ(NX_SUCCESS, EthColdClose(&selected, &config, &receipt));
+    EXPECT_EQ(NX_SUCCESS, EthResourcesClose(&resources));
+    ahb() = gpio_clocks;
+}
+
+TEST_F(EthernetFactory, AbsentColdReceiptCannotStopActiveController) {
+    Start();
+    const nx_eth_mac_t prior = *s_mac;
+    uint16_t snapshots[9]{};
+    const EthPinConfig pins[] = {
+        {GPIOA, &snapshots[0], 0U, 1U},  {GPIOA, &snapshots[1], 0U, 2U},
+        {GPIOA, &snapshots[2], 0U, 7U},  {GPIOC, &snapshots[3], 2U, 1U},
+        {GPIOC, &snapshots[4], 2U, 4U},  {GPIOC, &snapshots[5], 2U, 5U},
+        {GPIOG, &snapshots[6], 6U, 11U}, {GPIOG, &snapshots[7], 6U, 13U},
+        {GPIOG, &snapshots[8], 6U, 14U}};
+    EthColdConfig config{};
+    config.pins = pins;
+    EthPinReceipt receipt{};
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_EQ(NX_ERROR_BUSY, EthColdClose(s_mac, &config, &receipt));
+    EXPECT_EQ(0, std::memcmp(&prior, s_mac, sizeof(prior)));
+    EXPECT_EQ(0U, receipt.leases);
+    EXPECT_FALSE(receipt.mux_leased);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
 }

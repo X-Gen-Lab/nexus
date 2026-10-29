@@ -1,5 +1,6 @@
 # Offline host-only framework shared by Native contracts and HAL comparison.
 include_guard(GLOBAL)
+include("${CMAKE_CURRENT_LIST_DIR}/GeneratedConfiguration.cmake")
 get_filename_component(_nexus_google_source
     "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 

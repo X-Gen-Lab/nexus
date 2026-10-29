@@ -1,7 +1,7 @@
 """Static provider wiring and family system lifecycle emission."""
-from . import bindings
+from . import bindings, packet
 from tools.configure.providers.common import mode_traits
-from tools.configure import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight, gpio_phase
+from tools.configure import can, timer_advanced, preflight, gpio_phase
 
 
 def implementation(item):
@@ -29,12 +29,18 @@ def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
+    if any(item.pins for item in selections):
+        source.append('#include "stm32f407_platform_cold.h"')
+    if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
+        source.append('#include "stm32f407_control_cold.h"')
     if any(item.kind in {"gpio", "flash", "watchdog"} for item in selections):
         source.append('#include "stm32f407_basic_cold.h"')
     if any(item.kind == "spi" for item in selections):
         source.append('#include "stm32f407_spi_cold.h"')
     if any(item.kind == "i2c" for item in selections):
         source.append('#include "stm32f407_i2c_cold.h"')
+    if any(item.kind == "uart" for item in selections):
+        source.append('#include "stm32f407_uart_cold.h"')
     if any(item.mode == "irq-words" for item in selections):
         source.append('#include "stm32f407_uart_word.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in selections):
@@ -54,15 +60,15 @@ def includes(result):
            for item in selections):
         source.append('#include "stm32f407_i2c_async.h"')
     if any(item.kind in timer_advanced.KINDS for item in selections):
-        source.append('#include "stm32f407_timer_advanced.h"')
+        source.append('#include "stm32f407_timer_cold.h"')
     if any(item.kind == "eth" for item in selections):
-        source.append('#include "stm32f407_eth.h"')
+        source.append('#include "stm32f407_eth_cold.h"')
     if any(item.kind == "eth_frames" for item in selections):
-        source.append('#include "stm32f407_eth_frames.h"')
+        source.append('#include "stm32f407_eth_frames_cold.h"')
     if any(item.kind == "can" for item in selections):
-        source.append('#include "stm32f407_can.h"')
+        source.append('#include "stm32f407_can_cold.h"')
     if any(item.kind == "usb_device" for item in selections):
-        source.append('#include "stm32f407_usb_device.h"')
+        source.append('#include "stm32f407_usb_cold.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -104,9 +110,7 @@ def state_declarations(result):
     if any(item.kind == "exti" for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
-    source.extend(ethernet.state_declarations(result, "stm32"))
-    source.extend(timer_advanced.state_declarations(result, "stm32"))
-    source.extend(secondary_controllers.state_declarations(result, "stm32"))
+    source.extend(packet.state_declarations(result))
     return source
 
 
@@ -117,22 +121,17 @@ def shared_irqs(result):
 def stop_system(result, *, system_phase=None):
     selections = result.controllers
     dma_clock = has_dma(result)
-    source = can.stop_domain(result, "stm32")
-    source.extend(ethernet.stop_system(result, "stm32"))
-    source.extend(timer_advanced.stop_system(result, "stm32"))
-    source.extend(secondary_controllers.stop_system(result, "stm32"))
+    source = (['    nx_result_t can_domain = nx_stm32_can_domain_close(&s_nx_can_domain);',
+               '    if (can_domain != NX_SUCCESS) { return can_domain; }']
+              if result.can_domain is not None else [])
+    source.extend(packet.stop_system(result))
     source += gpio_phase.release(result)
     if any(item.kind == "exti" for item in selections):
-        source += ['    if (s_nx_platform_started) { RCC->APB2ENR &= ~s_nx_platform_syscfg_clock_added; }']
+        source += ['    nx_result_t syscfg = nx_stm32_platform_syscfg_release(&s_nx_platform_syscfg_clock_added);',
+                   '    if (syscfg != NX_SUCCESS) { return syscfg; }']
     if dma_clock:
-        source += ['    if (s_nx_platform_started) {',
-                   '        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,',
-                   '            RCC->AHB1ENR & ~s_nx_platform_dma_clocks_added);',
-                   '        nx_arch_dsb();',
-                   '        if ((RCC->AHB1ENR & s_nx_platform_dma_clocks_added) != 0u) {',
-                   '            return NX_ERROR_IO;', '        }',
-                   '        s_nx_platform_dma_clocks_added = 0u;',
-                   '    }']
+        source += ['    nx_result_t dma = nx_stm32_platform_dma_release(&s_nx_platform_dma_clocks_added);',
+                   '    if (dma != NX_SUCCESS) { return dma; }']
     source.append('    nx_arch_dsb();')
     if system_phase is not None:
         source.append(f'    {system_phase};')
@@ -164,16 +163,19 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    del cleanup
     selections = result.controllers
-    source = ethernet.start_resources(result, "stm32")
-    source.extend(timer_advanced.start_resources(result, "stm32"))
-    source.extend(secondary_controllers.start_resources(result, "stm32"))
+    source = packet.start_resources(result)
     mask = _dma_clock_mask(result)
+    def acquire(call):
+        return [f'    result.primary = {call};',
+                '    if (result.primary != NX_SUCCESS) {',
+                f'        result.cleanup = {cleanup};',
+                '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                '        return result;', '    }']
     if mask:
-        source += [f'    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & ({mask});',
-                   f'    RCC->AHB1ENR |= ({mask});',
-                   '    (void)RCC->AHB1ENR;', '    nx_arch_dsb();']
+        source += acquire('nx_stm32_platform_dma_acquire('
+                          f'({mask}), &s_nx_platform_dma_clocks_added)')
     if any(item.kind == "exti" for item in selections):
-        source.append('    s_nx_platform_syscfg_clock_added = ~RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN;')
+        source += acquire('nx_stm32_platform_syscfg_acquire('
+                          '&s_nx_platform_syscfg_clock_added)')
     return source

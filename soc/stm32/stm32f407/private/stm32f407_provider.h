@@ -158,6 +158,7 @@ typedef struct {
     uint8_t line;
     nx_exti_edge_t edge;
     bool initialized;
+    bool cold_owned;
 } nx_stm32_exti_state_t;
 typedef struct {
     TIM_TypeDef* registers;
@@ -171,6 +172,7 @@ typedef struct {
     bool inactive_high;
     bool initialized;
     bool running;
+    uint8_t cold_effects;
 } nx_stm32_pwm_state_t;
 typedef struct {
     ADC_TypeDef* registers;
@@ -181,6 +183,7 @@ typedef struct {
     uint32_t reference_mv;
     bool active;
     bool initialized;
+    uint8_t cold_effects;
 } nx_stm32_adc_state_t;
 
 #ifdef NEXUS_STM32_MODEL

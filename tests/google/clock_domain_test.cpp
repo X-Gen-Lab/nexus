@@ -220,4 +220,140 @@ TEST_F(ClockDomain, StaleControlAndNullInputsRejectWithoutWrites) {
     EXPECT_EQ(nx_clock_domain_reopen({&domain, barrier.epoch + 1U}),
               NX_ERROR_STATE);
 }
+TEST_F(ClockDomain, ColdUnusedCloseAndReleaseDoNotConstructStorage) {
+    nx_clock_domain_t unused = {};
+    nx_clock_lease_t token = {};
+    EXPECT_EQ(nx_clock_domain_cold_close(&unused), NX_SUCCESS);
+    EXPECT_EQ(nx_clock_domain_cold_release(&unused, &token), NX_SUCCESS);
+    EXPECT_FALSE(unused.initialized);
+    EXPECT_EQ(unused.epoch, 0U);
+    EXPECT_FALSE(nx_clock_domain_cold_has_lease(&token));
+    EXPECT_EQ(nx_clock_domain_cold_resume_admit(&token), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_cold_start(&unused, &token), NX_SUCCESS);
+    EXPECT_EQ(unused.capacity, 1U);
+    EXPECT_EQ(unused.count, 1U);
+    EXPECT_EQ(token.owner, &unused);
+}
+TEST_F(ClockDomain, ColdCloseRetainsResponsibilityUntilExplicitHardwareDrain) {
+    ASSERT_EQ(nx_clock_domain_cold_acquire(&domain, &first), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_cold_close(&domain), NX_SUCCESS);
+    EXPECT_TRUE(nx_clock_domain_cold_has_lease(&first));
+    EXPECT_EQ(nx_clock_domain_cold_resume_admit(&first), NX_ERROR_STATE);
+    EXPECT_EQ(nx_clock_domain_cold_reopen(&domain), NX_ERROR_BUSY);
+    EXPECT_EQ(domain.count, 1U);
+    EXPECT_EQ(first.owner, &domain);
+    EXPECT_EQ(nx_clock_domain_cold_close(&domain), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_SUCCESS);
+    EXPECT_EQ(domain.count, 0U);
+    EXPECT_TRUE(domain.closing);
+    EXPECT_FALSE(nx_clock_domain_cold_has_lease(&first));
+}
+TEST_F(ClockDomain, ColdReleaseRejectsForeignTokenWithoutRemovingItsOwner) {
+    nx_clock_domain_t foreign = {};
+    ASSERT_EQ(nx_clock_domain_construct(&foreign, 1U), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_acquire(&foreign, &first), NX_SUCCESS);
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_ERROR_STATE);
+    EXPECT_EQ(first.owner, &foreign);
+    EXPECT_EQ(foreign.head, &first);
+    EXPECT_EQ(foreign.count, 1U);
+    EXPECT_EQ(domain.count, 0U);
+    EXPECT_FALSE(domain.closing);
+}
+TEST_F(ClockDomain, ColdCopiedTokenCannotSatisfyHardwareResponsibility) {
+    ASSERT_EQ(nx_clock_domain_cold_acquire(&domain, &first), NX_SUCCESS);
+    auto copy = first;
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &copy), NX_ERROR_STATE);
+    EXPECT_EQ(domain.head, &first);
+    EXPECT_EQ(domain.count, 1U);
+    EXPECT_EQ(copy.owner, &domain);
+}
+TEST_F(ClockDomain, ColdStartAdvancesExactlyOneClosedEpochAfterDrain) {
+    ASSERT_EQ(nx_clock_domain_cold_acquire(&domain, &first), NX_SUCCESS);
+    const auto previous = domain.epoch;
+    ASSERT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_cold_start(&domain, &first), NX_SUCCESS);
+    EXPECT_EQ(domain.epoch, previous + 1U);
+    EXPECT_EQ(first.epoch, domain.epoch);
+    EXPECT_FALSE(domain.closing);
+    EXPECT_EQ(domain.count, 1U);
+}
+TEST_F(ClockDomain, ColdReopenAndStartNeverWrapAnExhaustedEpoch) {
+    domain.epoch = UINT64_MAX;
+    EXPECT_EQ(nx_clock_domain_cold_reopen(&domain), NX_ERROR_EXHAUSTED);
+    EXPECT_TRUE(domain.closing);
+    EXPECT_EQ(nx_clock_domain_cold_start(&domain, &first), NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(domain.epoch, UINT64_MAX);
+    EXPECT_EQ(first.owner, nullptr);
+    EXPECT_EQ(domain.count, 0U);
+}
+TEST_F(ClockDomain, ColdClosedForeignConsumerBlocksStartAndRetainsBothTokens) {
+    ASSERT_EQ(nx_clock_domain_cold_acquire(&domain, &first), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_cold_close(&domain), NX_SUCCESS);
+    EXPECT_EQ(nx_clock_domain_cold_start(&domain, &second), NX_ERROR_BUSY);
+    EXPECT_EQ(domain.head, &first);
+    EXPECT_EQ(domain.count, 1U);
+    EXPECT_EQ(first.owner, &domain);
+    EXPECT_EQ(second.owner, nullptr);
+}
+TEST_F(ClockDomain, ColdReleaseChecksRemainingConsumersAfterItsExactToken) {
+    ASSERT_EQ(nx_clock_domain_acquire(&domain, &first), NX_SUCCESS);
+    ASSERT_EQ(nx_clock_domain_acquire(&domain, &second), NX_SUCCESS);
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_ERROR_BUSY);
+    EXPECT_EQ(first.owner, nullptr);
+    EXPECT_EQ(second.owner, &domain);
+    EXPECT_TRUE(domain.closing);
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_clock_domain_release(&domain, &second), NX_SUCCESS);
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_SUCCESS);
+}
+TEST_F(ClockDomain,
+       ColdReadinessAndNoopPathsRejectInvalidContextWithoutEffects) {
+    nx_clock_domain_t unused = {};
+    nx_clock_lease_t token = {};
+    for (uint32_t exception : {3U, 16U}) {
+        exception_number = exception;
+        EXPECT_EQ(nx_clock_domain_cold_resume_admit(&token), NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_clock_domain_cold_acquire(&unused, &token),
+                  NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_clock_domain_cold_start(&unused, &token),
+                  NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_clock_domain_cold_close(&unused), NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_clock_domain_cold_release(&unused, &token),
+                  NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_clock_domain_cold_reopen(&unused), NX_ERROR_CONTEXT);
+        EXPECT_FALSE(unused.initialized);
+        EXPECT_EQ(token.owner, nullptr);
+    }
+    exception_number = 0U;
+    privileged = false;
+    EXPECT_EQ(nx_clock_domain_cold_start(&unused, &token), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_clock_domain_cold_resume_admit(&token), NX_ERROR_CONTEXT);
+    EXPECT_FALSE(unused.initialized);
+}
+TEST_F(ClockDomain, ColdLifecyclePreservesTheIncomingInterruptMask) {
+    auto saved = nx_arch_irq_save();
+    EXPECT_EQ(nx_clock_domain_cold_acquire(&domain, &first), NX_SUCCESS);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    EXPECT_EQ(nx_clock_domain_cold_close(&domain), NX_SUCCESS);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    EXPECT_EQ(nx_clock_domain_cold_release(&domain, &first), NX_SUCCESS);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    EXPECT_EQ(nx_clock_domain_cold_start(&domain, &first), NX_SUCCESS);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    nx_arch_irq_restore(saved);
+}
+TEST_F(ClockDomain, ColdInvalidTokenRejectsBeforeConstructingAnyDomain) {
+    nx_clock_domain_t unused = {};
+    EXPECT_EQ(nx_clock_domain_cold_acquire(&unused, nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_clock_domain_cold_start(&unused, nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_clock_domain_cold_release(&unused, nullptr), NX_ERROR_INVALID);
+    EXPECT_FALSE(unused.initialized);
+    auto* alias = reinterpret_cast<nx_clock_lease_t*>(&unused);
+    EXPECT_EQ(nx_clock_domain_cold_acquire(&unused, alias), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_clock_domain_cold_start(&unused, alias), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_clock_domain_cold_release(&unused, alias), NX_ERROR_INVALID);
+    EXPECT_FALSE(unused.initialized);
+    EXPECT_FALSE(nx_clock_domain_cold_has_lease(nullptr));
+    EXPECT_EQ(nx_clock_domain_cold_resume_admit(nullptr), NX_ERROR_INVALID);
+}
 } /* namespace */

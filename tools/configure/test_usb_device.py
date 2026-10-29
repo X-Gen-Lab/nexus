@@ -145,20 +145,23 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn("&nx_usb_fs_endpoint_ops, &s_nx_usb_endpoints_fs[", source)
         self.assertNotIn("malloc", source)
 
-    def test_cold_failure_is_counted_before_prepare_and_cleanup_order_is_proved(self):
+    def test_cold_failure_is_counted_before_typed_prepare_and_close(self):
         output = self.root / "generated"
         gate.configure(self.assembly(), output)
         source = (output / "bindings.c").read_text()
-        prepare = source.index("result.primary = prepare_fs();")
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", source.index(
-            "nx_platform_start_result_t nx_platform_start")), prepare)
-        stop = source.index("static nx_result_t stop_fs(void)")
-        device = source.index("nx_usb_device_stop(&s_nx_face_fs)", stop)
-        clock = source.index("nx_stm32_usb_clock_stop", device)
-        pins = source.index("nx_stm32_pin_restore", clock)
-        self.assertLess(device, clock)
-        self.assertLess(clock, pins)
-        self.assertIn("nx_stm32_pin_capture", source[pins:])
+        start = source.index("nx_platform_start_result_t nx_platform_start")
+        prepare = source.index("result.primary = nx_stm32_usb_cold_prepare(", start)
+        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
+                        prepare)
+        self.assertIn("&s_nx_port_fs, &s_nx_usb_config_fs, "
+                      "&s_nx_usb_pin_leases_fs", source[prepare:])
+        close = source.index("nx_stm32_usb_cold_close(")
+        resources = source.index("nx_stm32_platform_pins_release(", close)
+        self.assertLess(close, resources)
+        self.assertIn("static const nx_stm32_usb_cold_config_t", source)
+        self.assertIn("static const nx_stm32_usb_endpoint_config_t", source)
+        self.assertNotIn("nx_stm32_usb_clock_start(", source)
+        self.assertNotIn("nx_stm32_pin_restore(", source)
 
     def test_packet_type_direction_number_and_fifo_bounds_fail_closed(self):
         changes = (("rx_fifo_words=96", "rx_fifo_words=63"),

@@ -19,7 +19,7 @@ set(gd_peripheral "${gd_firmware}/GD32F4xx_standard_peripheral")
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
 # SystemInit needs RCU/FMC; the always-present monotonic timebase needs TIMER.
 set(gd_sdk_units rcu fmc timer)
-set(gd_sources timebase.c)
+set(gd_sources timebase.c drivers/platform_cold.c)
 foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames
         timer_capture advanced_pwm)
     nexus_controller_modes(modes "${kind}")
@@ -41,6 +41,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         list(APPEND gd_sdk_units gpio)
     endif()
     if(kind STREQUAL "uart")
+        list(APPEND gd_sources drivers/uart_cold.c)
         if("irq-words" IN_LIST modes)
             list(APPEND gd_sources drivers/uart_word.c)
         endif()

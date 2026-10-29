@@ -9,20 +9,14 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT runtime_generated EQUAL 0)
     message(FATAL_ERROR "H743 runtime assembly rejected: ${runtime_stdout}${runtime_stderr}")
 endif()
-file(READ "${runtime_bundle}/input_paths.json" runtime_inputs)
-string(JSON runtime_count LENGTH "${runtime_inputs}")
-math(EXPR runtime_last "${runtime_count} - 1")
-foreach(index RANGE 0 ${runtime_last})
-    string(JSON name MEMBER "${runtime_inputs}" ${index})
-    string(JSON path GET "${runtime_inputs}" "${name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
-endforeach()
+nexus_google_configuration_inputs("${runtime_bundle}")
 nexus_google_test(nexus_h743_runtime_clock_test SOURCES
     h743_runtime_clock_test.cpp h743_runtime_clock_model.cpp
     h743_spi_dma_factory_model.cpp h743_spi_dma_model.cpp h743_model.cpp
     "${runtime_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_dma.c"

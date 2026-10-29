@@ -144,6 +144,51 @@ class ConstructionContractTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 replace(original, retain_on_failed_init=value)
 
+    def test_admission_calls_are_typed_immutable_and_copied(self):
+        result = self.resolve("tools/configure/assemblies/native-gpio.toml")
+        original = self.construction(result, result.controllers[0])
+        calls = [DirectCall("nx_test_admit")]
+        construction = replace(original, admission=calls)
+        calls.clear()
+        self.assertEqual(construction.admission, (DirectCall("nx_test_admit"),))
+        with self.assertRaises(FrozenInstanceError):
+            construction.admission = ()
+        for invalid in (None, "nx_test_admit()", ("nx_test_admit()",)):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                replace(original, admission=invalid)
+
+    def test_admission_precedes_owned_effects_and_never_enters_cleanup(self):
+        result = self.resolve("tools/configure/assemblies/native-gpio.toml")
+        provider = maintained(result.soc_family)
+        original = self.construction(result, result.controllers[0])
+        check = DirectCall("nx_test_admit")
+        constructed = replace(original, admission=(check,),
+                              retain_on_failed_init=True)
+        with patch.object(provider, "constructor", return_value=constructed):
+            source = bindings.emit(result)[1]
+        start = source[source.index(
+            "static nx_platform_start_result_t nx_platform_start_impl("
+            "nx_platform_diagnostic_t* diagnostic) {"):]
+        admitted = start.index("result.primary = " + check.render())
+        self.assertLess(start.index("if (s_nx_platform_started)"), admitted)
+        self.assertLess(admitted, start.index("s_nx_platform_started = true;"))
+        self.assertLess(admitted, start.index("s_nx_platform_initialized = 1u;"))
+        initialized = start.index("result.primary = " + original.initialize.render())
+        self.assertLess(admitted, initialized)
+        self.assertNotIn("nx_platform_stop_impl", start[admitted:initialized])
+
+    def test_shared_physical_owner_has_one_admission_for_all_faces(self):
+        result = self.resolve(
+            "cmake/package/verification/io_evolution/g474-pwm-shared.toml")
+        shared = maintained(result.soc_family).PWM_SHARED
+        original = shared.constructor
+        def with_admission(owner):
+            return replace(original(owner),
+                           admission=(DirectCall("nx_test_shared_admit"),))
+        with patch.object(shared, "constructor", side_effect=with_admission):
+            source = bindings.emit(result)[1]
+        self.assertEqual(source.count("result.primary = nx_test_shared_admit();"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -111,14 +111,11 @@ def constructor(owner):
         f"    .duty_ticks = {{ {first.duty_ticks}u, {second.duty_ticks}u }},",
         f"    .inactive = {first.inactive | second.inactive}u, .poll_limit = 1000000u",
         "};",
-        f"static nx_result_t nx_prepare_physical_{name}(void) {{",
-        f"    if ({state}.retained || {state}.initialized || {state}.idle.retained) {{ return NX_ERROR_BUSY; }}",
-        f"    return nx_stm32g474_pwm_shared_initialize(&{state}, &{config});",
-        "}",
     ]
     return Construction(
         state_type="nx_stm32g474_pwm_shared_state_t",
-        definitions=definitions, initialize=DirectCall(f"nx_prepare_physical_{name}"),
+        definitions=definitions, initialize=DirectCall("nx_stm32g474_pwm_shared_initialize",
+                              (Address(state), Address(config))),
         stop=(DirectCall("nx_stm32g474_pwm_shared_close", (Address(state),)),),
         retain_on_failed_init=True)
 

@@ -249,19 +249,19 @@ class H743SelectedKernelConfigurationTests(unittest.TestCase):
             'baud = 115200\n[uart.console.rx]\nformat = "bytes"\n'
             'capacity = 64\n[uart.console.irq]\npriority = 5\ncalls_os = false\n')
         source = bindings.emit(result)[1]
-        self.assertIn("nx_stm32h743_uart_initialize(&s_nx_port_console, "
-                      "64000000u, 1000000u)", source)
-        self.assertNotIn("nx_stm32h743_uart_initialize(&s_nx_port_console, "
-                         "96000000u", source)
+        self.assertIn(".clock_hz = 64000000u,", source)
+        self.assertIn("nx_stm32h743_uart_prepare(&s_nx_port_console, "
+                      "&s_nx_config_console)", source)
+        self.assertNotIn(".clock_hz = 96000000u", source)
 
     def test_spi_projects_its_apb_kernel_while_retaining_the_upper_bound(self):
         result = self.spi(1000000)
         source = bindings.emit(result)[1]
-        self.assertIn("s_nx_port_bus4.clock_hz = 96000000u;", source)
+        self.assertIn(".clock_hz = 96000000u", source)
         domain = result.clock_plan.domains["spi4"]
         self.assertEqual((domain.source, domain.maximum_hz),
                          ("apb2", 99450000))
-        self.assertNotIn("s_nx_port_bus4.clock_hz = 384000000u;", source)
+        self.assertNotIn(".clock_hz = 384000000u", source)
 
     def test_spi_budget_must_be_representable_at_the_reviewed_upper_bound(self):
         # Even the slowest /256 clock is above250kHz for this source envelope.

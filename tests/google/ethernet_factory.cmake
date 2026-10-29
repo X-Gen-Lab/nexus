@@ -16,14 +16,7 @@ foreach(eth_family stm32 gd32)
     if(NOT eth_generated EQUAL 0)
         message(FATAL_ERROR "Ethernet factory fixture rejected: ${eth_output}${eth_error}")
     endif()
-    file(READ "${eth_bundle}/input_paths.json" eth_inputs)
-    string(JSON eth_input_count LENGTH "${eth_inputs}")
-    math(EXPR eth_last_input "${eth_input_count} - 1")
-    foreach(index RANGE 0 ${eth_last_input})
-        string(JSON eth_input_name MEMBER "${eth_inputs}" ${index})
-        string(JSON eth_input_path GET "${eth_inputs}" "${eth_input_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${eth_input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${eth_bundle}")
     set(eth_target "nexus_${eth_family}_eth_factory_test")
     nexus_google_test(${eth_target} SOURCES ethernet_factory_test.cpp
         "${eth_bundle}/bindings.c"
@@ -39,12 +32,16 @@ foreach(eth_family stm32 gd32)
     target_compile_definitions(${eth_target} PRIVATE
         _init=nx_eth_fixture_init _fini=nx_eth_fixture_fini)
     if(eth_family STREQUAL "stm32")
+        target_sources(${eth_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
         target_include_directories(${eth_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
         nexus_use_cmsis_core(${eth_target})
         target_compile_definitions(${eth_target} PRIVATE STM32F407xx NX_ETH_FACTORY_STM32)
     else()
+        target_sources(${eth_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
         set(eth_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_include_directories(${eth_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")

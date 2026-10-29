@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_flash_execution.h"
 #include "stm32h743_flash_ram.h"
 #include "stm32h743_provider.h"
@@ -391,3 +392,31 @@ nx_result_t nx_stm32h743_flash_stop(nx_stm32h743_flash_state_t* p) {
     return idle(p) ? NX_SUCCESS : NX_ERROR_BUSY;
 }
 const nx_flash_ops_t nx_stm32h743_flash_ops = {geometry, read, program, erase};
+
+nx_result_t
+nx_stm32h743_flash_prepare(nx_stm32h743_flash_state_t* port,
+                           nx_stm32h743_flash_ram_workspace_t* workspace,
+                           uint32_t supply_mv) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || workspace == NULL)
+        return NX_ERROR_INVALID;
+    if (port->active)
+        return NX_ERROR_BUSY;
+    port->registers = FLASH;
+    port->memory = (volatile uint8_t*)FLASH_BASE;
+    port->supply_mv = supply_mv;
+    port->poll_limit = 500000000U;
+    return nx_stm32h743_flash_ram_initialize(port, workspace);
+}
+
+nx_result_t nx_stm32h743_flash_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return ((NX_H743_READ(&FLASH->SR1) | NX_H743_READ(&FLASH->SR2)) &
+            (FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE)) != 0U ||
+                   (NX_H743_READ(&FLASH->OPTSR_CUR) &
+                    FLASH_OPTSR_SWAP_BANK_OPT) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}

@@ -47,6 +47,12 @@ N01–N14，并追加 A01–J04 与 X01–X05 的完整工作分解。它不改�
 整个家族任务。N11 与 H 组物理任务需要真实设备；N13 与 J 组软件封存需要当前
 clean source 的完整计划和离线复现，不能由旧候选或开发测试代替。
 
+本轮 C 冷态与工程交付观察继续写入
+[同一结果索引](../delivery/platform-delivery-completion-results.json)的
+`current_iteration_20261028`。`implemented` 家族行表示维护路径的 C 责任已经落地，
+其开发模型、ARM 和最终合并源码的资格仍分开记录。首个干净增量的 SDK／双语文档
+和后续提交的普通门禁不自动覆盖新增工作树；H 组实际物理执行仍为 `not_executed`。
+
 `platform-refinement` 保留较早的 60 项完善记录；`io-evolution` 是当前 42 项增量
 台账。两份台账复用 `IO-` 编号，但来源、任务和退出条件不同，必须同时注明 CSV
 或派生页面，不能按编号合并状态。增量台账的 `not_qualified` 保持原值；生成视图

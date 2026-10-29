@@ -73,6 +73,34 @@ void nx_stm32h743_spi_dma_irq(nx_stm32h743_spi_dma_state_t* state,
                               bool receive);
 /** \brief Mask SPI4 IRQ84 without clearing task-owned EOT/TXC/SUSP evidence. */
 void nx_stm32h743_spi_dma_wire_irq(nx_stm32h743_spi_dma_state_t* state);
+/** \brief Immutable exact SPI4 DMA owner, one endpoint and one CS face. */
+typedef struct {
+    nx_stm32h743_gpio_state_t* cs;
+    nx_stm32h743_spi_dma_endpoint_t* endpoint;
+    const nx_spi_port_t* face;
+    const nx_spi_endpoint_t* endpoint_face;
+    const nx_gpio_port_t* cs_face;
+    const nx_dma_memory_region_t* regions;
+    size_t region_count;
+    uint32_t frequency_hz;
+} nx_stm32h743_spi_dma_config_t;
+/** \brief Prepare exact fixed64 SPI4 with Platform-owned clocks/pad snapshots.
+ * \note Task-only; immutable config/faces/regions outlive successful release.
+ *       Any partial effects remain in the concrete owner for stop and retry.
+ */
+nx_result_t
+nx_stm32h743_spi_dma_prepare(nx_stm32h743_spi_dma_state_t* port,
+                             const nx_stm32h743_spi_dma_config_t* config);
+/** \brief Drain every DMA/wire publisher before withdrawing the CS output.
+ * \note Failed stop retains buffers and Platform resource responsibility.
+ */
+nx_result_t
+nx_stm32h743_spi_dma_release(nx_stm32h743_spi_dma_state_t* port,
+                             const nx_stm32h743_spi_dma_config_t* config);
+
+/** \brief Observe the exact SPI4 IRQ before effects; no publisher adoption. */
+nx_result_t nx_stm32h743_spi_dma_preflight(void);
+
 #ifdef __cplusplus
 }
 #endif

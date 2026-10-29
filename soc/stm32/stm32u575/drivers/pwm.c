@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include "stm32u5xx_ll_tim.h"
 #define PWM_MODE                                                               \
@@ -237,3 +238,29 @@ nx_result_t nx_stm32u575_pwm_close(nx_stm32u575_pwm_state_t* p) {
     return NX_SUCCESS;
 }
 const nx_pwm_ops_t nx_stm32u575_pwm_ops = {set, start, stop, state};
+
+nx_result_t nx_stm32u575_pwm_prepare(nx_stm32u575_pwm_state_t* port,
+                                     const nx_stm32u575_pwm_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->idle == NULL ||
+        config->gpio == NULL || config->pin > 15U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || config->idle->retained ||
+        config->idle->initialized)
+        return NX_ERROR_BUSY;
+    config->idle->registers = config->gpio;
+    config->idle->mask = 1U << config->pin;
+    config->idle->output = true;
+    port->registers = TIM3;
+    port->idle = config->idle;
+    port->reset = &RCC->APB1RSTR1;
+    port->reset_mask = RCC_APB1RSTR1_TIM3RST;
+    port->pin = config->pin;
+    port->inactive = config->inactive;
+    port->period_ticks = config->period_ticks;
+    port->duty_ticks = config->duty_ticks;
+    port->tick_hz = config->tick_hz;
+    port->poll_limit = 1000000U;
+    return nx_stm32u575_pwm_initialize(port);
+}

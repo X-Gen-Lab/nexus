@@ -35,20 +35,12 @@ if(NOT u5_peripheral_generated EQUAL 0)
     message(FATAL_ERROR
         "U575 peripheral assembly rejected: ${u5_peripheral_output}${u5_peripheral_error}")
 endif()
-file(READ "${u5_peripheral_bundle}/input_paths.json" u5_peripheral_inputs)
-string(JSON u5_peripheral_count LENGTH "${u5_peripheral_inputs}")
-math(EXPR u5_peripheral_last "${u5_peripheral_count} - 1")
-foreach(index RANGE 0 ${u5_peripheral_last})
-    string(JSON u5_peripheral_name MEMBER "${u5_peripheral_inputs}" ${index})
-    string(JSON u5_peripheral_path GET "${u5_peripheral_inputs}"
-        "${u5_peripheral_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${u5_peripheral_path}")
-endforeach()
+nexus_google_configuration_inputs("${u5_peripheral_bundle}")
 nexus_google_test(nexus_u575_peripheral_factory_test
     SOURCES u575_peripheral_factory_test.cpp u575_model.cpp u575_devices_model.cpp
         "${u5_peripheral_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/spi.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/i2c.c"
@@ -99,20 +91,12 @@ if(NOT u5_mainstream_generated EQUAL 0)
     message(FATAL_ERROR
         "U575 mainstream rejected: ${u5_mainstream_output}${u5_mainstream_error}")
 endif()
-file(READ "${u5_mainstream_bundle}/input_paths.json" u5_mainstream_inputs)
-string(JSON u5_mainstream_count LENGTH "${u5_mainstream_inputs}")
-math(EXPR u5_mainstream_last "${u5_mainstream_count} - 1")
-foreach(index RANGE 0 ${u5_mainstream_last})
-    string(JSON u5_mainstream_name MEMBER "${u5_mainstream_inputs}" ${index})
-    string(JSON u5_mainstream_path GET "${u5_mainstream_inputs}"
-        "${u5_mainstream_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${u5_mainstream_path}")
-endforeach()
+nexus_google_configuration_inputs("${u5_mainstream_bundle}")
 nexus_google_test(nexus_u575_mainstream_factory_test
     SOURCES u575_mainstream_factory_test.cpp u575_model.cpp
         "${u5_mainstream_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/watchdog.c"

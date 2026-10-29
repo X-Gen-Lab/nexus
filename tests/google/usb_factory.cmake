@@ -41,14 +41,7 @@ foreach(usb_family stm32 gd32)
         if(NOT usb_generated EQUAL 0)
             message(FATAL_ERROR "USB factory fixture rejected: ${usb_output}${usb_error}")
         endif()
-        file(READ "${usb_bundle}/input_paths.json" usb_inputs)
-        string(JSON usb_input_count LENGTH "${usb_inputs}")
-        math(EXPR usb_last_input "${usb_input_count} - 1")
-        foreach(index RANGE 0 ${usb_last_input})
-            string(JSON usb_input_name MEMBER "${usb_inputs}" ${index})
-            string(JSON usb_input_path GET "${usb_inputs}" "${usb_input_name}")
-            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${usb_input_path}")
-        endforeach()
+        nexus_google_configuration_inputs("${usb_bundle}")
         nexus_google_test(${usb_target} SOURCES ${usb_fixture_source}
             "${usb_bundle}/bindings.c"
             "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb_device.c"
@@ -63,12 +56,16 @@ foreach(usb_family stm32 gd32)
         target_compile_definitions(${usb_target} PRIVATE
             _init=nx_usb_fixture_init _fini=nx_usb_fixture_fini)
         if(usb_family STREQUAL "stm32")
+        target_sources(${usb_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
             target_include_directories(${usb_target} SYSTEM PRIVATE
                 "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
                 "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
             nexus_use_cmsis_core(${usb_target})
             target_compile_definitions(${usb_target} PRIVATE STM32F407xx NX_USB_FACTORY_STM32)
         else()
+            target_sources(${usb_target} PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
             set(usb_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
             target_include_directories(${usb_target} PRIVATE
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")

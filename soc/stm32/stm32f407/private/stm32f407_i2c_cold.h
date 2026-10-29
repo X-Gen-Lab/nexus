@@ -125,6 +125,7 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
  * \param[in] config: Unchanged selected resources.
  * \param[in,out] receipt: The same retained cold effects.
  * \return Success, busy or failure retaining effects for retry.
+ * \note An empty receipt never authorizes replacing an existing bound owner.
  */
 nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
                                const nx_stm32_i2c_config_t* config,
@@ -145,6 +146,7 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
  * \param[in] config: Unchanged selected resources.
  * \param[in,out] receipt: The same retained effects supplied to prepare.
  * \return Success or failure retaining loans, publishers and clock leases.
+ * \note An empty receipt never authorizes replacing an existing bound owner.
  */
 nx_result_t nx_stm32_i2c_async_close(nx_i2c_v1_state_t* port,
                                      const nx_stm32_i2c_config_t* config,

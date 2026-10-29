@@ -6,7 +6,7 @@ code, creates workers, selects application policy, or invents a hardware route.
 """
 from collections.abc import Mapping
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 import hashlib
 import importlib.util
@@ -25,7 +25,10 @@ if __package__ in (None, ""):
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
-from tools.configure.ir import MemoryBudgetIR
+from tools.configure.ir import (
+    CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
+    EndpointIR, FactoryOptions, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
+    RuntimePowerIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology
 from tools.configure.contracts import COMPONENTS, CONTROLLER_KINDS
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
@@ -773,103 +776,35 @@ def _resolve_source_dependencies(soc, provider, family, root, backend, read,
     return _SourceResolution(freeze(source_dependencies), tuple(inputs))
 
 
-def _resolve(assembly_path, root=ROOT, *, input_paths=None):
-    """Validate all input facts before producing the sole resolved decision."""
-    root = root.resolve()
-    verified_sdk = sdk.verify(root)
+@dataclass(frozen=True)
+class _DeviceGraphResolution:
+    """Complete controller/endpoint decisions; local builders never escape."""
+    controllers: tuple[ControllerIR, ...]
+    devices: tuple[EndpointIR, ...]
+    resources: resource_graph.ResourcePlanIR
+    triggers: trigger_graph.TriggerPlanIR
+    dma: dma_topology.DmaTopologyIR
+    can_domain: CanDomainIR | None
+    pwm_shared_owners: tuple[PwmSharedOwnerIR, ...]
+    inputs: tuple[Path, ...]
 
-    def source_dependency(relative, expected=None):
-        return (sdk_dependency_identity(verified_sdk, relative, expected)
-                if verified_sdk is not None else
-                dependency_identity(root, relative, expected))
-    if assembly_path.is_symlink():
-        fail("Assembly must not be a symlink")
-    snapshots = {}
-    read = lambda path: load(path, snapshots)
-    assembly_path = assembly_path.resolve()
-    policy_path = contained_file(root, metadata.POLICY)
-    platform_metadata = metadata.policy_contract(
-        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
-    assembly = load_assembly(assembly_path, root, snapshots)
-    from tools.configure.ir import thaw
+
+def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
+                          provider, clock, clock_plan, kernel_profile,
+                          irq_profile, memory, i2s2_role, read,
+                          snapshots) -> _DeviceGraphResolution:
+    """Validate coupled device choices, then publish one immutable graph.
+
+    USB FIFO placement, SPI sequence faces and ADC trigger identities depend on
+    the complete selected set. Keep their mutable normalizers local until all
+    cross-controller and endpoint checks have passed; expose only typed values.
+    """
+    family, part = board["soc_family"], board["soc"]
+    backend = assembly.backend
+    host = soc["cpu"]["arch"] == "native"
+    ram, gpio_user = memory.default_ram, memory.gpio_user
     controller_selections = thaw(assembly.controllers)
     endpoint_selections = thaw(assembly.devices)
-    factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
-                          {"capabilities"}, "factory policy")
-    if ("capabilities" in factory_options and
-            type(factory_options["capabilities"]) is not bool):
-        fail("Factory capabilities must be boolean")
-    board_name = text(assembly.board_package, "Board package")
-    board_dir = board_directory(assembly_path.parent / board_name)
-    board_path = board_dir / "board.json"
-    board = obj(read(board_path),
-                {"schema_version", "id", "soc", "soc_family", "source_revision",
-                 "physical_pcb_revision", "clocks", "bindings",
-                 "reserved_resources", "unknowns", "provenance"},
-                {"inputs"}, "Board")
-    integer(board["schema_version"], 1, 1, "Board schema")
-    identity(board["id"], "Board id")
-    family = identity(board["soc_family"], "SoC family")
-    provider = maintained(family)
-    part = identity(board["soc"], "exact part")
-    soc_dir = root / descriptor.maintained(family).source_directory
-    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
-        fail("SoC package escapes owned source")
-    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
-    soc, routes_doc = read(soc_path), read(routes_path)
-    variant = validate_soc(soc, part)
-    reference_path = None
-    references = None
-    if "references" in soc:
-        reference_path = contained_file(soc_dir, soc["references"])
-        references = fact_references.validate(read(reference_path),
-                                             soc["variants"])
-    if soc["id"] != family:
-        fail("Board SoC family differs from the package identity")
-    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
-    integer(routes_doc["schema_version"], 1, 1, "routes schema")
-    routes = resolve_routes(routes_doc, soc, part, provider)
-    validate_board_context(board)
-    backend = assembly.backend
-    if backend not in {"baremetal", "freertos", "native", "threadx"}:
-        fail(f"Unsupported OS backend: {backend}")
-    host = soc["cpu"]["arch"] == "native"
-    if (host and backend not in {"native", "threadx"}) or (
-            not host and backend == "native"):
-        fail("Native is a host model; its backend cannot qualify MCU execution")
-    if backend == "threadx":
-        threadx.validate_platform(board["id"], family)
-    cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
-                                       enum_abi=provider.ENUM_ABI)
-    validate_interrupt_profile(cpu_profile, provider)
-    clock = soc["clock_profiles"].get(assembly.clock_profile)
-    if clock is None:
-        fail(f"Unknown clock profile: {assembly.clock_profile}")
-    clock_plan = provider.clock_plan(assembly.clock_profile, clock)
-    clock = provider.normalize_clock(clock)
-    clocks.match_board(clock, board["clocks"])
-    i2s2_role = i2s2.resolve(thaw(assembly.i2s2), family=family,
-                            part=part, backend=backend,
-                            clock_profile=assembly.clock_profile)
-    if assembly.os is not None and not isinstance(assembly.os, Mapping):
-        fail("OS policy: expected object")
-    kernel_profile = kernel.resolve(thaw(assembly.os), cpu_profile,
-                                    clock["core_hz"])
-    if (backend == "freertos" and kernel_profile.lowpower_port == "timebase" and
-            not provider.TIMEBASE_ALARM):
-        fail("Timebase lowpower requires the maintained STM32F407/GD32F470 SoC alarm")
-    cpu_profile = kernel.bind(cpu_profile, kernel_profile)
-    irq_profile = cpu_profile.irq
-    if assembly.abi is not None and assembly.abi != cpu_abi(soc["cpu"]):
-        fail("Assembly ABI contradicts the selected SoC")
-    optimization = assembly.optimization
-    if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
-        fail(f"Unsupported optimization profile: {optimization}")
-    selected_memory = _resolve_memory(assembly, variant, provider, part,
-                                      kernel_profile)
-    ram = selected_memory.default_ram
-    gpio_user = selected_memory.gpio_user
-    bindings = resolve_bindings(board, routes, part)
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
         claim(**record)
@@ -1165,9 +1100,128 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
             selected[0]["mode"] != "output" or
             selected[0]["mask"] != 0x80):
         fail("GPIO user I/O requires the single exact PC7 output binding")
+    resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
+    triggers = trigger_graph.resolve_fixed(selected, routes)
+    for item in selected:
+        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
+            item["adc_group_resolution"]["trigger_identity"] = next(
+                index + 1 for index, edge in enumerate(triggers.edges)
+                if edge.target == item["id"] + ":adc")
+    dma_plan = dma_topology.resolve_selected(selected, provider)
+    controllers = tuple(ControllerIR.create(item, family) for item in selected)
+    devices = tuple(EndpointIR.create(item, controllers)
+                    for item in endpoint_selections)
+    return _DeviceGraphResolution(
+        controllers=controllers, devices=devices,
+        resources=resources, triggers=triggers, dma=dma_plan,
+        can_domain=(CanDomainIR(can_domain["split"], tuple(
+            CanFilterIR(**item) for item in can_domain["filters"]))
+            if can_domain is not None else None),
+        pwm_shared_owners=tuple(PwmSharedOwnerIR.from_validated(item)
+                               for item in pwm_shared_owners),
+        inputs=((adc_group_contract[2],)
+                if adc_group_contract is not None else ()))
+
+
+def _resolve(assembly_path, root=ROOT, *, input_paths=None):
+    """Validate all input facts before producing the sole resolved decision."""
+    root = root.resolve()
+    verified_sdk = sdk.verify(root)
+
+    def source_dependency(relative, expected=None):
+        return (sdk_dependency_identity(verified_sdk, relative, expected)
+                if verified_sdk is not None else
+                dependency_identity(root, relative, expected))
+    if assembly_path.is_symlink():
+        fail("Assembly must not be a symlink")
+    snapshots = {}
+    read = lambda path: load(path, snapshots)
+    assembly_path = assembly_path.resolve()
+    policy_path = contained_file(root, metadata.POLICY)
+    platform_metadata = metadata.policy_contract(
+        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
+    assembly = load_assembly(assembly_path, root, snapshots)
+    factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
+                          {"capabilities"}, "factory policy")
+    if ("capabilities" in factory_options and
+            type(factory_options["capabilities"]) is not bool):
+        fail("Factory capabilities must be boolean")
+    board_name = text(assembly.board_package, "Board package")
+    board_dir = board_directory(assembly_path.parent / board_name)
+    board_path = board_dir / "board.json"
+    board = obj(read(board_path),
+                {"schema_version", "id", "soc", "soc_family", "source_revision",
+                 "physical_pcb_revision", "clocks", "bindings",
+                 "reserved_resources", "unknowns", "provenance"},
+                {"inputs"}, "Board")
+    integer(board["schema_version"], 1, 1, "Board schema")
+    identity(board["id"], "Board id")
+    family = identity(board["soc_family"], "SoC family")
+    provider = maintained(family)
+    part = identity(board["soc"], "exact part")
+    soc_dir = root / descriptor.maintained(family).source_directory
+    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
+        fail("SoC package escapes owned source")
+    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
+    soc, routes_doc = read(soc_path), read(routes_path)
+    variant = validate_soc(soc, part)
+    reference_path = None
+    references = None
+    if "references" in soc:
+        reference_path = contained_file(soc_dir, soc["references"])
+        references = fact_references.validate(read(reference_path),
+                                             soc["variants"])
+    if soc["id"] != family:
+        fail("Board SoC family differs from the package identity")
+    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
+    integer(routes_doc["schema_version"], 1, 1, "routes schema")
+    routes = resolve_routes(routes_doc, soc, part, provider)
+    validate_board_context(board)
+    backend = assembly.backend
+    if backend not in {"baremetal", "freertos", "native", "threadx"}:
+        fail(f"Unsupported OS backend: {backend}")
+    host = soc["cpu"]["arch"] == "native"
+    if (host and backend not in {"native", "threadx"}) or (
+            not host and backend == "native"):
+        fail("Native is a host model; its backend cannot qualify MCU execution")
+    if backend == "threadx":
+        threadx.validate_platform(board["id"], family)
+    cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
+                                       enum_abi=provider.ENUM_ABI)
+    validate_interrupt_profile(cpu_profile, provider)
+    clock = soc["clock_profiles"].get(assembly.clock_profile)
+    if clock is None:
+        fail(f"Unknown clock profile: {assembly.clock_profile}")
+    clock_plan = provider.clock_plan(assembly.clock_profile, clock)
+    clock = provider.normalize_clock(clock)
+    clocks.match_board(clock, board["clocks"])
+    i2s2_role = i2s2.resolve(thaw(assembly.i2s2), family=family,
+                            part=part, backend=backend,
+                            clock_profile=assembly.clock_profile)
+    if assembly.os is not None and not isinstance(assembly.os, Mapping):
+        fail("OS policy: expected object")
+    kernel_profile = kernel.resolve(thaw(assembly.os), cpu_profile,
+                                    clock["core_hz"])
+    if (backend == "freertos" and kernel_profile.lowpower_port == "timebase" and
+            not provider.TIMEBASE_ALARM):
+        fail("Timebase lowpower requires the maintained STM32F407/GD32F470 SoC alarm")
+    cpu_profile = kernel.bind(cpu_profile, kernel_profile)
+    irq_profile = cpu_profile.irq
+    if assembly.abi is not None and assembly.abi != cpu_abi(soc["cpu"]):
+        fail("Assembly ABI contradicts the selected SoC")
+    optimization = assembly.optimization
+    if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
+        fail(f"Unsupported optimization profile: {optimization}")
+    selected_memory = _resolve_memory(assembly, variant, provider, part,
+                                      kernel_profile)
+    bindings = resolve_bindings(board, routes, part)
+    device_graph = _resolve_device_graph(
+        assembly, root=root, soc=soc, board=board, routes=routes,
+        bindings=bindings, provider=provider, clock=clock, clock_plan=clock_plan,
+        kernel_profile=kernel_profile, irq_profile=irq_profile,
+        memory=selected_memory, i2s2_role=i2s2_role, read=read, snapshots=snapshots)
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
-    if adc_group_contract is not None:
-        inputs.append(adc_group_contract[2])
+    inputs.extend(device_graph.inputs)
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -1181,31 +1235,15 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     inputs.extend(selected_sources.inputs)
     records = bind_input_identities(inputs, root, snapshots, input_paths)
     components = resolve_components(assembly)
-    resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
-    triggers = trigger_graph.resolve_fixed(selected, routes)
-    for item in selected:
-        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
-            item["adc_group_resolution"]["trigger_identity"] = next(
-                index + 1 for index, edge in enumerate(triggers.edges)
-                if edge.target == item["id"] + ":adc")
-    dma_plan = dma_topology.resolve_selected(selected, provider)
-    from dataclasses import replace
-    from tools.configure.ir import (
-        CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
-        EndpointIR, FactoryOptions, PhysicalPartIR, PwmSharedOwnerIR,
-        RuntimePowerIR, freeze)
-    controllers = tuple(ControllerIR.create(item, family) for item in selected)
-    devices = tuple(EndpointIR.create(item, controllers)
-                    for item in endpoint_selections)
     resolved = ConfigurationIR(
         board=board["id"], soc_family=family,
         cpu_profile=cpu_profile, kernel=kernel_profile,
-        controllers=controllers, devices=devices, memory_budget=selected_memory.budget,
+        controllers=device_graph.controllers, devices=device_graph.devices,
+        memory_budget=selected_memory.budget,
         factory=FactoryOptions(factory_options.get("capabilities", False)),
-        can_domain=(CanDomainIR(can_domain["split"], tuple(
-            CanFilterIR(**item) for item in can_domain["filters"]))
-            if can_domain is not None else None),
-        resource_plan=resources, trigger_plan=triggers, dma_topology=dma_plan,
+        can_domain=device_graph.can_domain,
+        resource_plan=device_graph.resources, trigger_plan=device_graph.triggers,
+        dma_topology=device_graph.dma,
         clock_plan=(ClockPlanIR.from_validated(clock_plan)
                     if clock_plan is not None else None),
         physical_part=PhysicalPartIR(part, variant["package"],
@@ -1215,14 +1253,14 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         routes=freeze(routes), platform_metadata=freeze(platform_metadata),
         inputs=freeze(records), source_dependencies=selected_sources.dependencies,
         components=tuple(components),
-        can_controllers=tuple(provider.CAN_CONTROLLERS) if can_domain else (),
+        can_controllers=(tuple(provider.CAN_CONTROLLERS)
+                         if device_graph.can_domain is not None else ()),
         optimization=optimization,
         physical_pcb_revision=board["physical_pcb_revision"],
         limitations=tuple(board["unknowns"]) + ("Physical qualification not executed",),
         physical_qualified=False,
         fact_references=freeze(references),
-        pwm_shared_owners=tuple(PwmSharedOwnerIR.from_validated(item)
-                               for item in pwm_shared_owners),
+        pwm_shared_owners=device_graph.pwm_shared_owners,
         i2s2=i2s2_role)
     resolved = resolved.with_integrations()
     if assembly.power is not None:

@@ -9,14 +9,7 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT u5_chain_generated EQUAL 0)
     message(FATAL_ERROR "U575 chain fixture rejected: ${u5_chain_output}${u5_chain_error}")
 endif()
-file(READ "${u5_chain_bundle}/input_paths.json" u5_chain_inputs)
-string(JSON u5_chain_count LENGTH "${u5_chain_inputs}")
-math(EXPR u5_chain_last "${u5_chain_count} - 1")
-foreach(index RANGE 0 ${u5_chain_last})
-    string(JSON u5_chain_name MEMBER "${u5_chain_inputs}" ${index})
-    string(JSON u5_chain_path GET "${u5_chain_inputs}" "${u5_chain_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${u5_chain_path}")
-endforeach()
+nexus_google_configuration_inputs("${u5_chain_bundle}")
 nexus_google_test(nexus_u575_uart_chain_test SOURCES
     u575_uart_chain_test.cpp u575_uart_chain_model.cpp
     u575_uart_gpdma_model.cpp u575_model.cpp
@@ -32,6 +25,7 @@ nexus_google_test(nexus_u575_uart_chain_factory_test SOURCES
     u575_uart_gpdma_model.cpp u575_model.cpp
     "${u5_chain_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_dma_chain.c"

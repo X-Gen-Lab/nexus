@@ -140,6 +140,7 @@ class Construction:
     pin_snapshots: Mapping[str, str] = field(default_factory=dict)
     face_context: str | None = None
     face_definitions: tuple[str, ...] = ()
+    admission: tuple[DirectCall, ...] = ()
 
     def __post_init__(self):
         if (not isinstance(self.state_type, str) or
@@ -148,6 +149,12 @@ class Construction:
             fail("Construction requires an explicit C state type")
         if not isinstance(self.initialize, DirectCall):
             fail("Construction initializer requires an explicit direct call")
+        if not isinstance(self.admission, (tuple, list)):
+            fail("Construction admission requires ordered direct calls")
+        admission = tuple(self.admission)
+        if any(not isinstance(value, DirectCall) for value in admission):
+            fail("Construction admission requires explicit direct calls")
+        object.__setattr__(self, "admission", admission)
         if not isinstance(self.stop, (tuple, list)):
             fail("Construction stop requires an ordered direct call sequence")
         stops = tuple(self.stop)

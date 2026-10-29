@@ -31,14 +31,18 @@ confirm the Board profile and own LED/console policy. See
 ## Private ownership
 
 `system.c` supplies the pre-RAM CPU-only `SystemInit`, checked clock startup and
-rollback, reserved TIM2 handler and the single time domain. The generated cold
-assembly owns clock gates, pin admission, startup ordering and partial rollback.
-It validates every selected pin before the first change and retains one
+rollback, reserved TIM2 handler and the single time domain. The concrete C
+owner in `drivers/platform_cold.c` admits selected resources, acquires clock and
+pin leases, and retains failed cleanup for retry. Python emits immutable resource
+records, exact storage and fixed calls to C lifecycle functions. Per-controller
+prepare/close functions keep hardware algorithms in their C implementation.
+The C owner validates every selected pin before the first change and retains one
 `uint16_t` original state per selected pin with validity/gate ownership until
 complete Platform release. Driver GPIO stop establishes its declared idle;
 Platform release subsequently restores the original input/analog lease. A
-failed restore readback retains only unfinished leases for ordinary cleanup
-retry. This storage is separate from any constructor's temporary local snapshot.
+failed restore readback retains original snapshots and clock leases for ordinary
+cleanup retry. This storage is separate from any constructor's temporary local
+snapshot. Empty selections emit no peripheral cold owner or pin-state storage.
 Before system stop, every peripheral and OS consumer must already have joined.
 Clock changes and deep-sleep continuity are excluded from this fixed profile.
 Reserved TIM2 admission checks trigger, slave and output controls both before
@@ -288,6 +292,11 @@ other clocks, alternate controllers or unreviewed PCB routes.
 GPIO 焊盘清单不建立 PCB 接线。新增独立软件夹具接入 ADC1 PA0/IN1 单次采样、
 TIM6 触发的有限普通 DMA block、I2C1 PB8/PB9 polling 及完整物理 Flash；
 未列模式仍拒绝，USB/以太网未接入。
+
+硬件准入、时钟与引脚租约、读回、回滚和恢复由 `drivers/platform_cold.c` 与各外设
+的 C prepare/close 函数负责。Python 仅生成不可变资源配置、精确静态存储和固定的
+类型化调用，不生成硬件算法。每个选中焊盘只保留一份原始状态；清理失败保留原始
+快照及未归还时钟，等待显式重试。空装配不链接外设冷态实现或保留引脚状态。
 
 FDCAN1 新增精确 STM32G474RET6 的 ISO-FD 正常/内部环回软件装配，
 500 kbit/s / 2 Mbit/s、固定 212 word 物理消息 RAM 与 3 个硬件优先级发送槽。

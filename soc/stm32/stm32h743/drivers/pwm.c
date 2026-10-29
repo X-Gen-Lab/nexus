@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -251,3 +252,39 @@ nx_result_t nx_stm32h743_pwm_close(nx_stm32h743_pwm_state_t* p) {
     return NX_SUCCESS;
 }
 const nx_pwm_ops_t nx_stm32h743_pwm_ops = {set, start, stop, state};
+
+nx_result_t nx_stm32h743_pwm_prepare(nx_stm32h743_pwm_state_t* port,
+                                     const nx_stm32h743_pwm_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->idle == NULL ||
+        config->pin > 15U)
+        return NX_ERROR_INVALID;
+    nx_stm32h743_gpio_state_t* idle = config->idle;
+    if (port->retained || port->initialized || idle->retained ||
+        idle->initialized)
+        return NX_ERROR_BUSY;
+    idle->registers = config->gpio;
+    idle->mask = 1U << config->pin;
+    idle->output = true;
+    port->registers = TIM3;
+    port->idle = idle;
+    port->reset = &RCC->APB1LRSTR;
+    port->reset_mask = RCC_APB1LRSTR_TIM3RST;
+    port->pin = config->pin;
+    port->inactive = config->inactive;
+    port->period_ticks = config->period_ticks;
+    port->duty_ticks = config->duty_ticks;
+    port->tick_hz = config->tick_hz;
+    port->poll_limit = 1000000U;
+    return nx_stm32h743_pwm_initialize(port);
+}
+
+nx_result_t nx_stm32h743_pwm_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return (NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_TIM3EN) != 0U ||
+                   (NX_H743_READ(&RCC->APB1LRSTR) & RCC_APB1LRSTR_TIM3RST) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}

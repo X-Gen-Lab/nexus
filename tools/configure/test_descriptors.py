@@ -45,7 +45,7 @@ class DescriptorBoundaryTests(unittest.TestCase):
                 ("gd32f470", "soc/gd32/gd32f470")):
             with self.subTest(family=family):
                 names = dependencies.source_names("platform", family)
-                for name in ("hardware", "secondary"):
+                for name in ("hardware", "preflight"):
                     helper = directory + f"/configure/{name}.py"
                     self.assertIn(helper, names)
                     self.assertNotIn(helper, dependencies.source_names(

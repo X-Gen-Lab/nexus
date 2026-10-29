@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 26175785e2283a7e629b08d4a806004ae530e738ceea8d1df70d4080b2572d0f\n"
+"X-Nexus-Source-SHA256: cc2dbaacad22d336b4f13e8f0c92273db8ca9259d63efc7d4fb6352f6b8da571\n"
 
-#: docs/explanation/platform-architecture.md:9
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:9
 msgid "How the platform is assembled and executed"
 msgstr "平台如何装配与执行"
 
-#: docs/explanation/platform-architecture.md:11
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:11
 msgid ""
 "Nexus is a statically assembled C11 MCU platform. It separates reusable "
 "mechanisms from external product policy. One authored TOML selects exact "
@@ -24,102 +24,102 @@ msgstr ""
 "Nexus 是静态装配的 C11 MCU 平台，将通用机制与外部产品策略分开。一份人工编写的 TOML 选择精确硬件与可选 adapter；不可变 "
 "I/O 接口面暴露所选私有提供者。应用负责执行与恢复。这些是当前设计边界，不代表整个平台已经取得物理资格。"
 
-#: docs/explanation/platform-architecture.md:17
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:17
 msgid ""
 "![Current platform layers and external product "
 "boundary](../assets/diagrams/platform-architecture.svg)"
 msgstr "![当前平台分层与外部产品边界](../assets/diagrams/platform-architecture.svg)"
 
-#: docs/explanation/platform-architecture.md:17
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:17
 msgid "Current platform layers and external product boundary"
 msgstr "当前平台分层与外部产品边界"
 
-#: docs/explanation/platform-architecture.md:19
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:19
 msgid ""
 "FIG-01 expresses current layer responsibilities. Arrows describe labeled "
 "dependencies or access; it is not an initialization sequence."
 msgstr "FIG-01 表达当前各层责任。箭头描述已标明的依赖或访问，不是初始化顺序。"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Layer"
 msgstr "层"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "State and responsibility"
 msgstr "状态与责任"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Core"
 msgstr "Core"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Results, monotonic deadline, request publication and stable epochs"
 msgstr "结果、绝对单调截止时间、请求发布与稳定 epoch"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Arch"
 msgstr "Arch"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid ""
 "Compile-time CPU primitives; incoming masks, barriers, optional "
 "Cache/MPU/SAU"
 msgstr "编译期 CPU 原语；输入中断掩码、屏障和可选缓存／MPU／SAU"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "SoC"
 msgstr "SoC"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid ""
 "Exact chip clocks, memory, startup, IRQ/DMA and controller implementation"
 msgstr "精确芯片时钟、内存、启动、IRQ／DMA 和控制器实现"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Board"
 msgstr "Board"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Reviewed PCB routes, oscillator/safe-level facts and explicit unknowns"
 msgstr "已审查 PCB 路由、晶振／安全电平事实及明确未知项"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "I/O"
 msgstr "I/O"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Typed public faces and operation contracts; no vendor layout"
 msgstr "类型化公共接口面与操作合同；不暴露厂商布局"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Optional OS/owner"
 msgstr "可选 OS／owner"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Explicit per-object wait, task or shared-resource execution storage"
 msgstr "显式逐对象等待、任务或共享资源执行存储"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Optional component"
 msgstr "可选组件"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Bounded algorithms through narrow ports"
 msgstr "通过窄端口实现有界算法"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "External product"
 msgstr "外部产品"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Main, workers, roles, private PCB, budgets, partitions and recovery"
 msgstr "main、执行任务、角色、私有 PCB、预算、分区与恢复"
 
-#: docs/explanation/platform-architecture.md:33
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:33
 msgid "Current source organization"
 msgstr "当前源码组织"
 
-#: docs/explanation/platform-architecture.md:35
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:35
 msgid ""
 "The source tree groups MCU families by vendor and CPU implementations by "
 "instruction-set architecture. These directories describe ownership at build "
@@ -129,7 +129,7 @@ msgstr ""
 "源码树按厂家组织 MCU 系列，按指令集架构组织 CPU "
 "实现。这些目录表达构建期所有权，不增加运行时分派或查找层。公共头文件路径、目标名称和人工配置中的系列标识保持稳定。"
 
-#: docs/explanation/platform-architecture.md:40
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:40
 msgid ""
 "The [source-adjacent contracts](source-map.md) own the directory map and "
 "layer README content. Native models implement the same public I/O contracts "
@@ -145,7 +145,7 @@ msgstr ""
 "target 直接编译这些私有源文件；目录不会给 FIG-01 增加运行时层。跨厂家 SoC 协作保留在 `soc/common/`，STM32 "
 "identity 访问保留在 `soc/stm32/common/`。"
 
-#: docs/explanation/platform-architecture.md:49
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:49
 msgid ""
 "Each family's `configure/` package owns its capability policy, constructors "
 "and lifecycle emission; Native uses `soc/native/configure/`. The explicit "
@@ -160,7 +160,7 @@ msgstr ""
 "和原子发布仍在 `tools/configure/`。配置测试仍在 "
 "`tools/configure/tests/providers/<family>/`。这些是构建期 Python 边界，独立于 C 执行路径。"
 
-#: docs/explanation/platform-architecture.md:57
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:57
 msgid ""
 "Common components and selected STM32 extensions have distinct source "
 "ownership. Components are explicit targets; a chip-specific target still "
@@ -169,51 +169,51 @@ msgid ""
 msgstr ""
 "通用组件与选定的 STM32 扩展具有不同的源码所有权。组件都是显式目标；芯片专用目标仍要求精确 SoC、模式和后端，其存在不会扩大公共支持矩阵。"
 
-#: docs/explanation/platform-architecture.md:62
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:62
 msgid "Platform and CPU-only Runtime"
 msgstr "Platform 与仅 CPU 的 Runtime"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Consumption entry"
 msgstr "消费入口"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Provided assembly"
 msgstr "提供的装配"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "External responsibility"
 msgstr "外部责任"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "`Nexus::Platform`"
 msgstr "`Nexus::Platform`"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid ""
 "Exact SoC/Board facts, selected providers, static factory and explicit "
 "lifecycle"
 msgstr "精确 SoC／Board 事实、所选 provider、静态 factory 与显式生命周期"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Product sources, workers, budgets, storage regions and recovery"
 msgstr "产品源码、执行任务、预算、存储区域与恢复"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "`Nexus::Runtime`"
 msgstr "`Nexus::Runtime`"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid "Core, Arch, public I/O faces and the explicitly selected OS adapter"
 msgstr "Core、Arch、公共 I/O 接口面与显式选择的 OS adapter"
 
-#: docs/explanation/platform-architecture.md:0
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:0
 msgid ""
 "Startup, vectors, memory/clock facts, Board wiring and concrete device "
 "providers"
 msgstr "启动、向量、内存／时钟事实、Board 接线及具体设备 provider"
 
-#: docs/explanation/platform-architecture.md:69
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:69
 msgid ""
 "One build directory admits one resolved assembly. Use separate build "
 "directories for different boards or CPU/security images; a product build "
@@ -223,7 +223,7 @@ msgstr ""
 "一个构建目录只接纳一份解析后的装配。不同板卡或 CPU／安全域镜像使用独立构建目录，由产品构建协调器或 CI 矩阵编排。Runtime 与 "
 "Platform 复用相同生产机制，但属于不同的消费模式。"
 
-#: docs/explanation/platform-architecture.md:74
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:74
 msgid ""
 "The common OS boundary is the wait/wake port. Task, queue, join and storage "
 "APIs remain backend-specific, including the real kernel control-block types."
@@ -233,11 +233,11 @@ msgstr ""
 "共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
 "仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"
 
-#: docs/explanation/platform-architecture.md:79
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:79
 msgid "Build-time decisions and runtime work"
 msgstr "构建期决策与运行时工作"
 
-#: docs/explanation/platform-architecture.md:81
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:81
 msgid ""
 "TOML schema 2 is the only authored platform input. The parser freezes user "
 "intent as `AuthoredAssembly`; `resolve_ir()` combines it with reviewed "
@@ -255,7 +255,7 @@ msgstr ""
 "`values`。硬件事实叶数据和按键索引仍使用不可变 mapping，resolver 的局部校验草稿也可用字典。这些是明确的数据边界，不承诺为每个 "
 "JSON 字段创建独立名义类型。"
 
-#: docs/explanation/platform-architecture.md:90
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:90
 msgid ""
 "Factory and emitters consume the same typed result. `to_dict()` derives the "
 "schema-1 `resolved.json` audit/artifact projection; it is never read back as"
@@ -270,7 +270,7 @@ msgstr ""
 " 分别计代。旧 JSON 装配会被拒绝。历史证据保留原字节与只读校验。CMake 拥有源码依赖图；解析不会从设备名称发现软件，也不会生成产品 "
 "worker。"
 
-#: docs/explanation/platform-architecture.md:98
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:98
 msgid ""
 "Firmware execution is C11 plus necessary architecture assembly. Python runs "
 "on the host to validate inputs and generate static C/H; the MCU has no "
@@ -285,50 +285,78 @@ msgstr ""
 "实现：寄存器访问、准入、等待、资源取得、回滚、停止和恢复。生成器连接不可变配置、精确实例、factory getter 和固定 IRQ "
 "handler。常量地址与简短的类型化调用序列可以继续生成，不增加运行时解释器或另一层分派。"
 
-#: docs/explanation/platform-architecture.md:106
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:106
 msgid ""
-"This boundary is the migration target and a rule for new behavior. Some "
-"existing constructors and platform resource/preflight paths still emit C "
-"hardware helper bodies. Selected paths have moved to concrete C preparation;"
-" their full-family coverage remains open in the {download}`delivery-"
-"completion ledger <../design/platform-delivery-completion.csv>`. Generated C"
-" and maintained C are compiled by the same toolchain. Moving an algorithm "
-"changes its maintenance and test ownership; actual performance and space "
-"changes require linked images and, for timing, real measurements."
+"The reviewed Native and seven MCU-family cold paths keep preflight, resource"
+" acquisition, preparation, failed-start cleanup and stop behavior in C. "
+"Shared enhanced-SPI admission calls read-only C checks before acquiring "
+"resources or marking failed-init cleanup responsibility. H743 fixed-run "
+"pause/resume uses C resource and runtime lease owners. Unreachable hardware "
+"generators and unused default MMIO macros have been removed; pure pruning "
+"and intentional output deletions retain separate comparisons. The "
+"{download}`delivery-completion ledger <../design/platform-delivery-"
+"completion.csv>` records implementation, exact development executions and "
+"final integration separately."
 msgstr ""
-"这一边界是迁移目标，也是新增行为的约束。部分既有构造器与平台资源/preflight 路径仍生成包含硬件行为的 C helper "
-"函数体。选定路径已迁入具体 C prepare；整个家族的覆盖仍由{download}`交付完善台账 <../design/platform-"
-"delivery-completion.csv>`跟踪。生成的 C 与维护的 C "
-"使用同一工具链编译。迁移算法改变其维护和测试归属；实际性能与空间变化须由链接产物验证，时序还须进行真实测量。"
+"已审查的 Native 和七个 MCU 家族冷态路径将预检、资源取得、准备、启动失败清理与停止行为放在 C 中。共享增强 SPI "
+"准入在取得资源或标记启动失败清理责任之前调用只读 C 检查。H743 fixed-run 暂停／恢复使用 C 资源 owner 和运行时租约 "
+"owner。不可达的硬件生成器与未使用的默认 MMIO 宏已删除；纯清理和有意的输出删除分别保留对照。{download}`交付完善台账 "
+"<../design/platform-delivery-completion.csv>`分别记录实现、精确的开发执行与最终集成。"
 
-#: docs/explanation/platform-architecture.md:114
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:116
+msgid ""
+"A cold receipt proves which resources this caller actually acquired. "
+"Rejection with an empty receipt cannot stop or overwrite an existing owner. "
+"Partial acquisition and failed restoration retain the original snapshot and "
+"unfinished effects for retry; a public peripheral stop does not discard the "
+"enclosing Platform lease. These checks run on the real C helpers in the "
+"register models. Factory lookup and ordinary I/O retain their existing "
+"direct typed paths."
+msgstr ""
+"冷态收据证明调用者实际取得了哪些资源。获取被拒绝且收据为空时，不能停止或覆盖已有 "
+"owner。部分取得和恢复失败会保留原始快照及未完成的效果，供后续重试；公开外设接口的停止不会丢弃外层 Platform "
+"租约。这些检查通过寄存器模型执行真实 C 辅助函数。Factory 查询与普通 I/O 继续使用现有直接类型化路径。"
+
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:123
+msgid ""
+"Generated static C and maintained C use the same firmware toolchain. Moving "
+"an algorithm changes its maintenance and test ownership; it does not promise"
+" a universal resource reduction. The recorded F407 I2C owner-guard "
+"comparison saves RAM while increasing IRQ/DMA Flash. Linked costs and "
+"physical timing retain their own source, configuration and measurement "
+"requirements."
+msgstr ""
+"生成的静态 C 与维护中的 C 使用同一固件工具链。迁移算法改变的是维护和测试责任，并不保证所有配置的资源占用都下降。已记录的 F407 I2C "
+"owner 防护对照节省 RAM，但增加 IRQ／DMA 的 Flash 占用。链接资源成本与物理时序各自保留源码、配置和测量要求。"
+
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:129
 msgid ""
 "![Actual compile-target dependency relationships](../assets/diagrams/build-"
 "targets.svg)"
 msgstr "![实际编译目标依赖关系](../assets/diagrams/build-targets.svg)"
 
-#: docs/explanation/platform-architecture.md:114
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:129
 msgid "Actual compile-target dependency relationships"
 msgstr "实际编译目标依赖关系"
 
-#: docs/explanation/platform-architecture.md:116
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:131
 msgid ""
 "FIG-02 is the checked compile graph. Vendor and provider includes remain "
 "private; public consumers receive Nexus types and selected compile/link "
 "policy."
 msgstr "FIG-02 是已核对的编译图。厂商和提供者包含路径保持私有；公共消费工程获得 Nexus 类型及所选编译／链接策略。"
 
-#: docs/explanation/platform-architecture.md:119
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:134
 msgid ""
 "![Authored inputs, atomic generation and firmware "
 "artifacts](../assets/diagrams/configuration-generation.svg)"
 msgstr "![编写的输入、原子生成与固件产物](../assets/diagrams/configuration-generation.svg)"
 
-#: docs/explanation/platform-architecture.md:119
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:134
 msgid "Authored inputs, atomic generation and firmware artifacts"
 msgstr "编写的输入、原子生成与固件产物"
 
-#: docs/explanation/platform-architecture.md:121
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:136
 msgid ""
 "FIG-03 shows current generation. Unknown and conflicting selections fail; no"
 " Kconfig/cache/old-header fallback repairs them. Runtime factory lookup "
@@ -341,30 +369,31 @@ msgstr ""
 "Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ "
 "分发固定到提供者实例，不为每个字节重复执行工厂查找。"
 
-#: docs/explanation/platform-architecture.md:127
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:142
 msgid ""
-"The constructor contract names private state, definitions, initialization, "
-"stop actions and failed-init responsibility explicitly. Its initializer and "
-"stop list use immutable `DirectCall` values with explicit static references "
-"or constants; no free-form C expression or function-pointer/member-call "
-"expression can enter those fields. Definitions and some remaining cold "
-"helper bodies are still emitted as C source. The C compiler establishes "
-"actual symbol and parameter types. Model tests and linked-image checks "
-"remain necessary: this narrow representation is not a complete typed C AST. "
-"Common generation does not infer these decisions from family names. Selected"
-" STM32F4 official LL operations remain inside private SoC state machines; "
+"The constructor contract names private state, definitions, read-only "
+"admission, initialization, stop actions and failed-init responsibility "
+"explicitly. Admission, initializer and stop lists use immutable `DirectCall`"
+" values with explicit static references or constants; no free-form C "
+"expression or function-pointer/member-call expression can enter those "
+"fields. Definitions remain generated static C source and fixed connections; "
+"hardware algorithms are maintained in C. The C compiler establishes actual "
+"symbol and parameter types. Model tests and linked-image checks remain "
+"necessary: this narrow representation is not a complete typed C AST. Common "
+"generation does not infer these decisions from family names. Selected "
+"STM32F4 official LL operations remain inside private SoC state machines; "
 "factory and public I/O contracts are unchanged. Full HAL Handle/callback "
 "transport requires separate mode-specific evaluation. See [official driver "
 "integration](../design/official-stm32-provider.md)."
 msgstr ""
-"构造合同明确命名私有状态、定义、初始化、停止动作和初始化失败责任。initializer 与 stop 列表使用不可变 "
-"`DirectCall`，参数为显式静态引用或常量；这些字段不接受任意 C 表达式或函数指针／成员调用表达式。定义及部分尚存的冷态辅助函数体仍作为 C "
-"源码生成。C 编译器建立实际符号与参数类型。模型测试和链接镜像检查仍不可省略：这种窄表示不是完整的类型化 C "
-"AST。公共生成器不从系列名称推断这些决策。选定 STM32F4 官方 LL 操作仍在私有 SoC 状态机内部，factory 与公共 I/O "
-"合同不变。完整 HAL Handle/callback 传输需要按具体模式单独评估。参见[官方驱动集成](../design/official-"
-"stm32-provider.md)。"
+"构造合同明确列出私有状态、定义、只读准入、初始化、停止动作和启动失败责任。准入、初始化与停止列表使用不可变 `DirectCall` "
+"值及显式静态引用或常量；这些字段不接受自由形式的 C 表达式或函数指针／成员调用表达式。定义仍是生成的静态 C 源码和固定连接；硬件算法直接维护在 C "
+"中。C 编译器确定实际符号和参数类型。模型测试与链接镜像检查仍然必要：这种窄表达不是完整的类型化 C AST。公共生成器不从家族名称推断这些决策。选定的"
+" STM32F4 官方 LL 操作仍位于私有 SoC 状态机内；factory 和公共 I/O 合同保持不变。完整 HAL "
+"Handle／callback 传输需要按模式单独评估。参见{doc}`官方驱动集成 <../design/official-"
+"stm32-provider>`。"
 
-#: docs/explanation/platform-architecture.md:141
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:156
 msgid ""
 "The legacy F103/GD303 selections share private algorithms only after exact "
 "vendor register, bit, clock and memory checks. A TX-only channel-DMA "
@@ -377,7 +406,7 @@ msgstr ""
 " 前缀和 IRQ byte ring；duplex 才增加有限 RX block 扩展。所选方法与直接 IRQ 入口让普通 section GC "
 "移除未使用的 block 代码，不增加运行时转发层或隐式模式回退。"
 
-#: docs/explanation/platform-architecture.md:147
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:162
 msgid ""
 "G474's selected ADC bulb mode, H743's Cache/domain policies and U575's TZEN0"
 " peripherals remain exact SoC contracts. Optional H743 D2 SRAM1 is budgeted "
@@ -392,23 +421,23 @@ msgstr ""
 "service，具有 rearm 间隙。独立 TZEN1 GPIO job 把最多八条命令复制到 Secure 存储，返回后不保留 NonSecure "
 "指针，不构成通用异步 I/O。"
 
-#: docs/explanation/platform-architecture.md:154
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:169
 msgid "Lifecycle and failure responsibility"
 msgstr "生命周期与失败责任"
 
-#: docs/explanation/platform-architecture.md:156
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:171
 msgid ""
 "![Current initialization, failure withdrawal and retained cleanup "
 "responsibility](../assets/diagrams/platform-lifecycle.svg)"
 msgstr "![当前初始化、失败撤回与保留的清理责任](../assets/diagrams/platform-lifecycle.svg)"
 
-#: docs/explanation/platform-architecture.md:156
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:171
 msgid ""
 "Current initialization, failure withdrawal and retained cleanup "
 "responsibility"
 msgstr "当前初始化、失败撤回与保留的清理责任"
 
-#: docs/explanation/platform-architecture.md:158
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:173
 msgid ""
 "FIG-05 shows explicit startup and reverse cleanup. A static face can exist "
 "before start and after stop; its pointer is not a capability to execute cold"
@@ -420,7 +449,7 @@ msgstr ""
 "FIG-05 表达显式启动与逆序清理。静态接口面可以在启动前和停止后存在；其指针不授予操作未启动硬件的权限。部分失败可能留下不可逆 watchdog "
 "效果或活跃借用。产品必须检查主要结果与清理结果，继续运行真实执行器，并保留隔离资源。平台启动从不启动调度器。"
 
-#: docs/explanation/platform-architecture.md:164
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:179
 msgid ""
 "Physical Flash reports exact geometry and `program_flags`. An ECC fresh-"
 "erase requirement belongs to the caller's provenance contract: all-FF "
@@ -434,7 +463,7 @@ msgstr ""
 "读回不能证明 ECC 未被编程，失败脉冲后必须重新擦除。全 FF 输入单元不产生脉冲。已启动的脉冲必须先排空才能返回；过期 deadline "
 "只能阻止后续脉冲，不能取消正在编程的硬件。产品负责可写 region、电压、执行停顿、watchdog 与掉电策略。"
 
-#: docs/explanation/platform-architecture.md:171
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:186
 msgid ""
 "Optional generated diagnosed start/stop entries write phase and controller "
 "location to caller-owned cold-path storage. They retain no diagnostic "
@@ -446,11 +475,11 @@ msgstr ""
 "入口将阶段和控制器位置写入调用方拥有的冷路径存储，不保留诊断指针，也不替代主要结果、清理结果或剩余效果责任。索引含义与失败责任见[诊断合同](../design/official-"
 "stm32-provider.md)。"
 
-#: docs/explanation/platform-architecture.md:177
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:192
 msgid "Costs and tradeoffs"
 msgstr "成本与取舍"
 
-#: docs/explanation/platform-architecture.md:179
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:194
 msgid ""
 "A 32-bit face contains two pointers: eight bytes of readonly storage. "
 "Provider/mode ops are shared; exact mutable state and selected buffers "
@@ -462,7 +491,7 @@ msgstr ""
 "32 位接口面包含两个指针，占用八字节只读存储。提供者／模式的 ops 共享；精确可变状态与所选缓冲区分开。间接调用允许同一公共接口服务独立具体提供者与"
 " GoogleMock 端口。成本是一次公共分发以及保留代码／只读表；实际 Flash／RAM 与时序必须在所选链接镜像上测量。"
 
-#: docs/explanation/platform-architecture.md:185
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:200
 msgid ""
 "Static assembly rejects conflicts early and prunes unselected drivers. It "
 "deliberately forgoes hotplug discovery, runtime string registries, arbitrary"
@@ -473,7 +502,7 @@ msgstr ""
 "静态装配提前拒绝冲突，裁剪未选择驱动。它不提供热插拔发现、运行时字符串注册表、任意动态时钟变化或自动恢复策略。可选共享 owner "
 "增加显式预算的槽与同步；直接单执行器路径不需要默认 OS 锁或执行任务。"
 
-#: docs/explanation/platform-architecture.md:190
+#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:205
 msgid ""
 "Read [factory](factory.md), [ownership](ownership.md), the [integration "
 "contract](../design/integration-contracts.md) and [exact "

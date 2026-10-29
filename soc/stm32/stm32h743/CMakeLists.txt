@@ -128,6 +128,7 @@ endif()
 set(NEXUS_STARTUP_SOURCE
     "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s" PARENT_SCOPE)
 set(h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/platform_cold.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S")
 if(NEXUS_MEMORY_SRAM1)
     list(APPEND h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")

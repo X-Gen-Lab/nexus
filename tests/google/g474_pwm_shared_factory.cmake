@@ -12,19 +12,12 @@ if(NOT g4_shared_generated EQUAL 0)
     message(FATAL_ERROR
         "Shared TIM3 factory rejected: ${g4_shared_output}${g4_shared_error}")
 endif()
-file(READ "${g4_shared_bundle}/input_paths.json" g4_shared_inputs)
-string(JSON g4_shared_count LENGTH "${g4_shared_inputs}")
-math(EXPR g4_shared_last "${g4_shared_count} - 1")
-foreach(index RANGE 0 ${g4_shared_last})
-    string(JSON g4_shared_name MEMBER "${g4_shared_inputs}" ${index})
-    string(JSON g4_shared_path GET "${g4_shared_inputs}" "${g4_shared_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${g4_shared_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_shared_bundle}")
 nexus_google_test(nexus_g474_pwm_shared_factory_test
     SOURCES g474_pwm_shared_factory_test.cpp
         g474_pwm_shared_factory_ports.cpp g474_pwm_shared_model.cpp
         "${g4_shared_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"

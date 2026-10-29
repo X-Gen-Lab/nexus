@@ -6,7 +6,7 @@ from tools.configure.providers.common import fail
 TIMER_ADVANCED = TimerPolicy(bindings=(
     TimerBinding("timer_capture", "TIM5", "TIM5", 50, 170000000,
                  (("PA0", "capture", 2),), ("clock:TIM5",)),
-), gpio_clock=None)
+))
 
 
 def validate_pin_states_selection(*, part, controller, backend, clock):

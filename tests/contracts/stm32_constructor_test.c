@@ -89,12 +89,19 @@ static void exti_rollback_test(void) {
     uint16_t before = nx_stm32_pin_capture(GPIOA, 6U);
     EXTI->IMR = 1U << 6U;
     assert(nx_test_prepare_edge6() == NX_ERROR_BUSY);
+    assert(s_nx_test_cleanup_edge6 == NX_SUCCESS);
     assert(!s_nx_port_edge6.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
     assert(RCC->AHB1ENR == (1U << 2U));
     assert(RCC->APB2ENR == RCC_APB2ENR_USART1EN);
     assert(EXTI->IMR == (1U << 6U));
     EXTI->IMR = 0U;
+    /* The standalone constructor facade does not execute Platform acquisition.
+     * Its shared-vector success path needs the outer GPIO/SYSCFG resource
+     * owner.
+     */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
     /* A real edge can become pending immediately after source publication. */
     NVIC->pending_on_enable = 1U;
     assert(nx_test_prepare_edge5() == NX_SUCCESS);
@@ -115,6 +122,12 @@ static void exti_rollback_test(void) {
            s_clear == 1U);
     assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 0U &&
            NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 0U);
+    assert((RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN) != 0U);
+    assert((RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN) != 0U);
+    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_SYSCFGEN;
+    RCC->AHB1ENR &= ~(uint32_t)RCC_AHB1ENR_GPIOAEN;
+    assert(RCC->APB2ENR == RCC_APB2ENR_USART1EN);
+    assert(RCC->AHB1ENR == (1U << 2U));
 }
 
 /** \brief Preserve a conflicting live timer and restore the acquired pin. */
@@ -126,6 +139,7 @@ static void pwm_rollback_test(void) {
     TIM3->PSC = 12U;
     TIM3->ARR = 10U;
     assert(nx_test_prepare_pwm0() == NX_ERROR_BUSY);
+    assert(s_nx_test_cleanup_pwm0 == NX_SUCCESS);
     assert(!s_nx_port_pwm0.initialized && !s_nx_idle_pwm0.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
     assert(TIM3->CR1 == TIM_CR1_CEN && TIM3->PSC == 12U && TIM3->ARR == 10U);
@@ -148,6 +162,7 @@ static void spi_rollback_test(void) {
     uint16_t before = nx_stm32_pin_capture(GPIOA, 5U);
     s_clock_failure = 2U;
     assert(nx_test_prepare_spi0() == NX_ERROR_IO);
+    assert(s_nx_test_cleanup_spi0 == NX_SUCCESS);
     assert(nx_stm32_pin_capture(GPIOA, 5U) == before);
     assert(RCC->AHB1ENR == (1U << 2U));
     assert(RCC->APB2ENR == RCC_APB2ENR_USART1EN);

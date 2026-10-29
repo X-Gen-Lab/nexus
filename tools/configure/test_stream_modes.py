@@ -55,8 +55,13 @@ class AdcContinuousConfigurationTests(unittest.TestCase):
                 output = self.root / family
                 gate.configure(assembly, output)
                 source = (output / "bindings.c").read_text()
-                self.assertIn(f"nx_{prefix}_adc_continuous_initialize", source)
-                self.assertIn("s_nx_port_samples.base.", source)
+                if family == "stm32f407":
+                    self.assertIn("nx_stm32_adc_continuous_prepare", source)
+                    self.assertIn("nx_stm32_adc_stream_config_t", source)
+                    self.assertIn("s_nx_adc_samples_samples[] = { 0u, 7u }", source)
+                else:
+                    self.assertIn("nx_gd32_adc_continuous_cold_prepare", source)
+                    self.assertIn(".samples = s_nx_adc_samples_samples", source)
                 self.assertIn("NX_FACTORY_CAP_RX_DMA", source)
                 self.assertIn("NX_FACTORY_CAP_BLOCK_STREAM", source)
 
@@ -136,7 +141,8 @@ class UartReceiveConfigurationTests(unittest.TestCase):
                     gate.configure(path, output)
                     source = (output / "bindings.c").read_text()
                     implementation = "uart_duplex" if duplex else "uart_receive"
-                    self.assertIn(f"nx_{prefix}_{implementation}_initialize", source)
+                    self.assertIn(
+                        f"nx_{prefix}_{implementation}_cold_prepare", source)
                     self.assertNotIn(".dma_transmit", source)
                     self.assertIn("NX_FACTORY_CAP_RX_DMA", source)
                     self.assertNotIn("static uint8_t s_nx_rx_link[", source)

@@ -1,7 +1,7 @@
 """Static provider wiring and family system lifecycle emission."""
-from . import bindings
+from . import bindings, packet
 from tools.configure.providers.common import mode_traits
-from tools.configure import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight, gpio_phase
+from tools.configure import can, usb_device, ethernet, timer_advanced, preflight, gpio_phase
 
 
 def implementation(item):
@@ -29,7 +29,7 @@ def includes(result):
     selections = result.controllers
     source = []
     source += ['#include "gd32f470_provider.h"', '#include "gd32f4xx.h"',
-               '#include "system.h"']
+               '#include "system.h"', '#include "gd32f470_platform_cold.h"']
     if any(item.kind in {"uart", "i2c"} for item in selections):
         source.append('#include "gd32f470_cold_pins.h"')
     if any(item.kind == "i2c" for item in selections):
@@ -42,8 +42,10 @@ def includes(result):
                    '    nx_gd32_spi_dma_sequence_backend;']
     if gpio_phase.applies(result):
         source += ['#include "gd32f4xx_gpio.h"', '#include "gd32f4xx_rcu.h"']
-    if any(item.kind == "uart" and item.mode == "dma-tx" for item in selections):
-        source.append('#include "gd32f470_dma.h"')
+    if any(item.kind in {"pwm", "adc"} for item in selections):
+        source.append('#include "gd32f470_control_cold.h"')
+    if any(item.kind == "uart" for item in selections):
+        source.append('#include "gd32f470_uart_cold.h"')
     if any(item.kind == "spi" for item in selections):
         source.append('#include "gd32f470_spi_cold.h"')
     if any(item.kind == "spi" and item.mode == "dma-full-duplex" for item in selections):
@@ -60,18 +62,18 @@ def includes(result):
            for item in selections):
         source.append('#include "gd32f470_i2c_async.h"')
     if any(item.kind in timer_advanced.KINDS for item in selections):
-        source.append('#include "gd32f470_timer_advanced.h"')
+        source.append('#include "gd32f470_timer_cold.h"')
         source.append('#include "gd32f4xx_timer.h"')
         source.append('#include "gd32f4xx_gpio.h"')
     if any(item.kind == "eth" for item in selections):
-        source.append('#include "gd32f470_eth.h"')
+        source.append('#include "gd32f470_eth_cold.h"')
     if any(item.kind == "eth_frames" for item in selections):
-        source.append('#include "gd32f470_eth_frames.h"')
+        source.append('#include "gd32f470_eth_frames_cold.h"')
         source.append('#include "gd32f4xx_syscfg.h"')
     if any(item.kind == "can" for item in selections):
-        source.append('#include "gd32f470_can.h"')
+        source.append('#include "gd32f470_can_cold.h"')
     if any(item.kind == "usb_device" for item in selections):
-        source.append('#include "gd32f470_usb_device.h"')
+        source.append('#include "gd32f470_usb_cold.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -110,10 +112,7 @@ def state_declarations(result):
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
     source.extend(can.state_declarations(result, "gd32"))
-    source.extend(ethernet.state_declarations(result, "gd32"))
-    source.extend(timer_advanced.state_declarations(result, "gd32"))
-    source.extend(secondary_controllers.state_declarations(result, "gd32"))
-    source.extend(usb_device.state_declarations(result, "gd32"))
+    source.extend(packet.state_declarations(result))
     return source
 
 
@@ -146,21 +145,15 @@ def shared_irqs(result):
 
 def stop_system(result, *, system_phase=None):
     dma_clock = has_dma(result)
-    source = can.stop_domain(result, "gd32")
-    source.extend(ethernet.stop_system(result, "gd32"))
-    source.extend(timer_advanced.stop_system(result, "gd32"))
-    source.extend(secondary_controllers.stop_system(result, "gd32"))
-    source.extend(usb_device.stop_system(result, "gd32"))
+    source = (['    nx_result_t can_domain = nx_gd32_can_domain_close(&s_nx_can_domain);',
+               '    if (can_domain != NX_SUCCESS) { return can_domain; }']
+              if result.can_domain is not None else [])
+    source.extend(packet.stop_system(result))
     source += gpio_phase.release(result)
     if dma_clock:
         source += ['    if (s_nx_platform_started) {',
-                   '        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN,',
-                   '            RCU_AHB1EN & ~s_nx_platform_dma_clocks_added);',
-                   '        nx_arch_dsb();',
-                   '        if ((RCU_AHB1EN & s_nx_platform_dma_clocks_added) != 0u) {',
-                   '            return NX_ERROR_IO;', '        }',
-                   '        s_nx_platform_dma_clocks_added = 0u;',
-                   '    }']
+                   '        nx_result_t dma = nx_gd32_platform_dma_release(&s_nx_platform_dma_clocks_added);',
+                   '        if (dma != NX_SUCCESS) { return dma; }', '    }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
     source += ['    if (s_nx_platform_started && nx_gd32_soc_stop() != 0) { return NX_ERROR_IO; }']
@@ -170,8 +163,6 @@ def stop_system(result, *, system_phase=None):
 def start_system(result):
     dma_clock = has_dma(result)
     source = preflight.emit(result)
-    if result.can_domain is not None:
-        source.append("    s_nx_can_gpio_clocks_added = 0u;")
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')
     source += gpio_phase.acquire(result)
@@ -186,14 +177,12 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    del cleanup
-    source = usb_device.start_resources(result, "gd32")
-    source.extend(ethernet.start_resources(result, "gd32"))
-    source.extend(timer_advanced.start_resources(result, "gd32"))
-    source.extend(secondary_controllers.start_resources(result, "gd32"))
+    source = packet.start_resources(result)
     mask = _dma_clock_mask(result)
     if mask:
-        source += [f'    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & ({mask});',
-                   f'    RCU_AHB1EN |= ({mask});',
-                   '    (void)RCU_AHB1EN;', '    nx_arch_dsb();']
+        source += [f'    result.primary = nx_gd32_platform_dma_acquire(({mask}), &s_nx_platform_dma_clocks_added);',
+                   '    if (result.primary != NX_SUCCESS) {',
+                   f'        result.cleanup = {cleanup};',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
     return source

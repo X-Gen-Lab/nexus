@@ -47,10 +47,18 @@ class H743DuplexConfiguration(unittest.TestCase):
             configure.configure(source, output)
             body = (output / "bindings.c").read_text()
             self.assertIn("nx_stm32h743_uart_duplex_state_t", body)
-            self.assertIn("nx_stm32h743_uart_duplex_initialize", body)
-            self.assertIn(".receive.uart.rx_storage = NULL", body)
-            self.assertIn(".receive.rx = DMA1_Stream1", body)
-            self.assertIn(".transmit.tx = DMA1_Stream0", body)
+            self.assertIn("nx_stm32h743_uart_duplex_prepare", body)
+            self.assertIn(".storage = NULL", body)
+            self.assertIn(".capacity = 0u", body)
+            result = configure.resolve_ir(source)
+            self.assertEqual(
+                [("DMA1", 0, 46), ("DMA1", 1, 45)],
+                [(lane.engine, lane.lane, lane.request)
+                 for lane in result.dma_topology.lanes])
+            self.assertIn("nx_stm32h743_uart_duplex_receive_irq("
+                          "&s_nx_port_console)", body)
+            self.assertIn("nx_stm32h743_uart_duplex_dma_irq("
+                          "&s_nx_port_console)", body)
             self.assertIn("DMA1_Stream0_IRQHandler", body)
             self.assertIn("DMA1_Stream1_IRQHandler", body)
             self.assertNotIn("static uint8_t s_nx_rx_", body)

@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "gd32f470_adc_stream.h"
+#include "gd32f470_control_cold.h"
 #include "gd32f4xx.h"
 #include "gd32f4xx_dma.h"
 extern uint64_t g_gd32_model_now;
@@ -102,12 +103,10 @@ class GD32ADCStream : public ::testing::Test {
             slots[i].data = reinterpret_cast<uint8_t*>(samples[i]);
             slots[i].capacity = sizeof(samples[i]);
         }
-        state.regions = regions;
-        state.region_count = 2;
         ASSERT_EQ(nx_stream_initialize(&stream, slots, 2), NX_SUCCESS);
-        ASSERT_EQ(
-            nx_gd32_adc_stream_initialize(&state, channels, 2, 3300, 10000, 5),
-            NX_SUCCESS);
+        const nx_gd32_adc_stream_cold_config_t config{
+            {channels, 2U, 3300U, 10000U}, regions, 2U, nullptr, 5U};
+        ASSERT_EQ(nx_gd32_adc_stream_cold_prepare(&state, &config), NX_SUCCESS);
     }
     void TearDown() override {
         if (mapping != MAP_FAILED) {
@@ -359,12 +358,10 @@ class GD32ADCContinuous : public ::testing::Test {
             slots[i].data = reinterpret_cast<uint8_t*>(samples[i]);
             slots[i].capacity = sizeof(samples[i]);
         }
-        state.base.regions = regions;
-        state.base.region_count = 3U;
-        state.sample_times = sample_times;
         ASSERT_EQ(nx_stream_initialize(&stream, slots, 3U), NX_SUCCESS);
-        ASSERT_EQ(nx_gd32_adc_continuous_initialize(&state, channels, 2U, 3300U,
-                                                    10000U, 5U),
+        const nx_gd32_adc_stream_cold_config_t config{
+            {channels, 2U, 3300U, 10000U}, regions, 3U, sample_times, 5U};
+        ASSERT_EQ(nx_gd32_adc_continuous_cold_prepare(&state, &config),
                   NX_SUCCESS);
     }
     void TearDown() override {
@@ -611,4 +608,38 @@ TEST_F(GD32ADCContinuous,
     EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_EXHAUSTED);
     EXPECT_EQ(stream.outstanding, 0U);
+}
+
+TEST_F(GD32ADCStream, ColdContextCannotMutateAnUnacquiredFiniteOwner) {
+    nx_gd32_adc_stream_state_t candidate{};
+    const nx_gd32_adc_stream_cold_config_t config{
+        {channels, 2U, 3300U, 10000U}, regions, 2U, nullptr, 5U};
+    g_gd32_model_mask = 1U;
+    const auto before = g_gd32_model_now;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_gd32_adc_stream_cold_prepare(&candidate, &config));
+    EXPECT_EQ(nullptr, candidate.regions);
+    EXPECT_EQ(0U, candidate.region_count);
+    EXPECT_FALSE(candidate.adc.initialized);
+    EXPECT_EQ(before, g_gd32_model_now);
+    EXPECT_EQ(1U, g_gd32_model_mask);
+    g_gd32_model_mask = 0U;
+}
+
+TEST_F(GD32ADCStream, ColdContextCannotMutateAnUnacquiredContinuousOwner) {
+    nx_gd32_adc_continuous_state_t candidate{};
+    const uint8_t sample_codes[]{1U, 1U};
+    const nx_gd32_adc_stream_cold_config_t config{
+        {channels, 2U, 3300U, 10000U}, regions, 2U, sample_codes, 5U};
+    g_gd32_model_mask = 1U;
+    const auto before = g_gd32_model_now;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_gd32_adc_continuous_cold_prepare(&candidate, &config));
+    EXPECT_EQ(nullptr, candidate.base.regions);
+    EXPECT_EQ(0U, candidate.base.region_count);
+    EXPECT_EQ(nullptr, candidate.sample_times);
+    EXPECT_FALSE(candidate.base.adc.initialized);
+    EXPECT_EQ(before, g_gd32_model_now);
+    EXPECT_EQ(1U, g_gd32_model_mask);
+    g_gd32_model_mask = 0U;
 }

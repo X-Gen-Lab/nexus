@@ -82,13 +82,17 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertIn('nx_eth_frames_mac_t s_nx_port_mac;', source)
                 self.assertIn('&nx_eth_frames_mac_ops, &s_nx_port_mac', source)
                 self.assertIn('&nx_eth_frames_mdio_ops, &s_nx_port_mac', source)
-                self.assertIn('nx_' + prefix + '_eth_frames_initialize(',
+                self.assertIn(f'nx_{prefix}_eth_frames_cold_prepare(', source)
+                self.assertIn(f'nx_{prefix}_eth_frames_cold_close(', source)
+                self.assertIn(f'static const nx_{prefix}_eth_frames_cold_config_t',
                               source)
-                self.assertIn('.rx_epoch = s_nx_port_mac.rx_epoch', source)
-                self.assertIn('.clock_epoch = s_nx_port_mac.clock_epoch',
-                              source)
+                self.assertIn('.clock_domain = 1u', source)
+                self.assertIn(f'nx_{prefix}_eth_resources_capture('
+                              '&s_nx_eth_resources, true)', source)
+                self.assertNotIn(f'nx_{prefix}_eth_frames_initialize(', source)
+                self.assertNotIn('s_nx_port_mac.rx_epoch', source)
+                self.assertNotIn('s_nx_port_mac.clock_epoch', source)
                 self.assertIn('nx_eth_frames_mac_irq(&s_nx_port_mac)', source)
-                self.assertIn('0x1e000000u', source)
                 self.assertNotIn('static nx_eth_descriptor_t ', source)
                 self.assertNotIn('dp83848', source.lower())
 

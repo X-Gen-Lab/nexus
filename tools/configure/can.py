@@ -4,13 +4,10 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
-from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
-from tools.configure.gpio_phase import withdraw_pin
 from tools.configure.providers import maintained
-from tools.configure.providers.common import (Construction, fail, integer, sequence,
-                               kernel_policy_constant)
+from tools.configure.providers.common import fail, integer, sequence
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote"}
@@ -23,10 +20,9 @@ OPERATIONS = {"normal": "NX_CAN_NORMAL", "loopback": "NX_CAN_LOOPBACK",
 
 @dataclass(frozen=True)
 class CanPolicy:
-    """Exact status-vector spelling and extra GPIO clock responsibility."""
+    """Exact status-vector spelling for the reviewed CAN domain."""
 
     error_suffix: str
-    gpio_clock: str | None = None
 
 
 def _integration(result, prefix):
@@ -139,7 +135,7 @@ def state_declarations(result, prefix):
     domain = result.can_domain
     if domain is None:
         return []
-    policy = _integration(result, prefix)
+    _integration(result, prefix)
     filters = domain.filters
     lines = []
     if filters:
@@ -154,85 +150,4 @@ def state_declarations(result, prefix):
     lines += ["static nx_can_filter_domain_t s_nx_can_domain = {",
               f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",
               f"    .filter_count = {len(filters)}u, .split = {domain.split}u", "};"]
-    if policy.gpio_clock is not None:
-        lines.append("static uint32_t s_nx_can_gpio_clocks_added;")
-    return lines
-
-
-def constructor(item, result, prefix):
-    """Lease pins until successful drain, including a failed cold start."""
-    integration = _integration(result, prefix)
-    if item.provider != result.soc_family:
-        fail("CAN owner differs from its exact selected provider")
-    name = item.id.replace("-", "_")
-    options = item.options
-    state = "s_nx_port_" + name
-    pins = item.pins
-    clock = integration.gpio_clock
-    mask = sum(1 << (ord(port) - ord('A')) for port in {p['pin'][1] for p in pins})
-    lines = [f"static nx_can_event_t s_nx_can_events_{name}[{options.event_capacity}];",
-             f"static uint16_t s_nx_can_pin_snapshots_{name}[{len(pins)}];",
-             f"static uint8_t s_nx_can_pin_leases_{name};",
-             f"static nx_result_t stop_{name}(void) {{",
-             f"    nx_result_t status = nx_can_port_stop(&s_nx_face_{name});",
-             "    if (status != NX_SUCCESS) { return status; }"]
-    for index, pin in reversed(list(enumerate(pins))):
-        wire = pin['pin']
-        lines += [f"    if ((s_nx_can_pin_leases_{name} & {1 << index}u) != 0u) {{"]
-        lines += withdraw_pin(result.soc_family, wire)
-        lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_can_pin_snapshots_{name}[{index}]);",
-                  f"        s_nx_can_pin_leases_{name} &= (uint8_t)~{1 << index}u;", "    }"]
-    lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
-              "    nx_result_t status;"]
-    policy = result.irq
-    kernel = kernel_policy_constant(result)
-    ceiling = policy.syscall_priority or 0
-    controller_index = result.can_controllers.index(item.controller)
-    t = options.timing
-    lines += [f"    {state} = (nx_can_controller_t){{",
-              "        .domain = &s_nx_can_domain,",
-              f"        .events = s_nx_can_events_{name}, .capacity = {options.event_capacity}u,",
-              f"        .timing = {{ {options.bitrate}u, {t.prescaler}u, {t.segment1}u, {t.segment2}u, {t.sjw}u }},",
-              f"        .drain_timeout_us = {options.drain_timeout_us}u, .poll_limit = {options.poll_limit}u,",
-              f"        .mode = {OPERATIONS[options.operation]}, .index = {controller_index}u,",
-              f"        .fifo_order = {str(options.fifo_order).lower()},",
-              f"        .irq_policy = {{ {kernel}, {policy.external_count}u, {policy.priority_bits}u, {ceiling}u }},",
-              "        .sources = { " + ', '.join('{ .priority = '+str(options.irq.priority)+'u }' for _ in range(4)) + " }", "    };"]
-    if clock is not None:
-        lines.append(f"    s_nx_can_gpio_clocks_added |= ~{clock} & {mask}u;")
-    for index, pin in enumerate(pins):
-        wire = pin['pin']
-        lines += [f"    status = nx_{prefix}_gpio_clock_enable({ord(wire[1])-ord('A')}u);",
-                  "    if (status != NX_SUCCESS) { return status; }",
-                  f"    s_nx_can_pin_snapshots_{name}[{index}] = nx_{prefix}_pin_capture(GPIO{wire[1]}, {wire[2:]}u);",
-                  f"    s_nx_can_pin_leases_{name} |= {1 << index}u;",
-                  f"    status = nx_{prefix}_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 2u, {pin['af']}u, 0u, false);",
-                  "    if (status != NX_SUCCESS) { return status; }"]
-    lines += ["    if (!s_nx_can_domain.configured) {",
-              f"        status = nx_{prefix}_can_domain_initialize(&s_nx_can_domain);",
-              "        if (status != NX_SUCCESS) { return status; }", "    }",
-              f"    return nx_{prefix}_can_initialize(&{state});", "}"]
-    for vector in item.can_irqs:
-        lines += [f"void {vector}_IRQHandler(void);",
-                  "/** \\brief Dispatch the exact selected classic CAN hardware source. */",
-                  f"void {vector}_IRQHandler(void) {{ nx_can_controller_irq(&{state}); }}"]
-    return Construction(
-        state_type="nx_can_controller_t", definitions=lines,
-        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
-        retain_on_failed_init=True,
-        pin_snapshots={pin["pin"]:
-                       f"s_nx_can_pin_snapshots_{name}[{index}]"
-                       for index, pin in enumerate(pins)})
-
-
-def stop_domain(result, prefix):
-    if result.can_domain is None:
-        return []
-    clock = _integration(result, prefix).gpio_clock
-    lines = ["    if (s_nx_can_domain.primary != 0u) {",
-             "        nx_result_t stopped = nx_can_filter_domain_stop(&s_nx_can_domain);",
-             "        if (stopped != NX_SUCCESS) { return stopped; }", "    }"]
-    if clock is not None:
-        lines += [f"    {clock} &= ~s_nx_can_gpio_clocks_added;",
-                  "    nx_arch_dsb();"]
     return lines

@@ -32,6 +32,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
+        list(APPEND stm32_sources drivers/uart_cold.c)
         if("irq-words" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_word.c)
         endif()
@@ -81,6 +82,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
 endforeach()
 list(REMOVE_DUPLICATES stm32_sources)
 if(stm32_sources)
+    list(APPEND stm32_sources drivers/platform_cold.c)
     add_library(nexus_soc_stm32f407 STATIC ${stm32_sources})
     target_link_libraries(nexus_soc_stm32f407 PUBLIC nexus_io
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)

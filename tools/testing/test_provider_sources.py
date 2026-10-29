@@ -73,13 +73,20 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             self.assertEqual(len(units), len({unit["file"] for unit in units}))
             return provider, sdk
 
+    # Cold lifecycle mechanisms are real C units now. Exact expected sets below
+    # include their reviewed ownership: selected F407/G474 platforms need the
+    # shared cold resource code. GD470 archives that baseline with its timebase
+    # even for an empty graph; ELF retention is a separate contract.
+    # UART modes share one cold unit. None of these mechanisms selects another
+    # device, GPIO face, DMA engine or stream. Keep complete set equality so an
+    # unrelated source added by CMake still fails these isolation contracts.
     def test_empty_stm32_compiles_no_device_provider(self):
         self.assertEqual(self.configure_sources("stm32f407", []),
                          (set(), set()))
 
-    def test_empty_gd32_retains_only_timebase_and_system_sdk(self):
+    def test_empty_gd32_compiles_only_cold_lifecycle_timebase_and_system_sdk(self):
         self.assertEqual(self.configure_sources("gd32f470", []), (
-            self.private_sources("gd32f470", {"timebase.c"}),
+            self.private_sources("gd32f470", {"timebase.c", "platform_cold.c"}),
             {"gd32f4xx_rcu", "gd32f4xx_fmc", "gd32f4xx_timer"},
         ))
 
@@ -88,7 +95,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("gpio", "output")])
-                expected = {"gpio.c"}
+                expected = {"gpio.c", "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
@@ -100,7 +107,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("uart", "irq-byte-event")])
-                expected = {"gpio.c", "uart.c"}
+                expected = {"gpio.c", "uart.c", "uart_cold.c",
+                            "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
@@ -114,8 +122,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("uart", "dma-tx"), ("spi", spi_mode)])
-                expected = {"gpio.c", "uart.c", "uart_dma.c", "spi.c",
-                            "spi_dma.c"}
+                expected = {"gpio.c", "uart.c", "uart_dma.c", "uart_cold.c",
+                            "spi.c", "spi_dma.c", "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
@@ -128,8 +136,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, _ = self.configure_sources(
                     family, [("uart", "irq-blocks"), ("adc", "trigger-dma")])
-                expected = {"gpio.c", "uart.c", "uart_stream.c", "adc.c",
-                            "adc_stream.c"}
+                expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "adc.c", "adc_stream.c", "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                 self.assertEqual(provider, self.private_sources(family, expected))
@@ -141,7 +149,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, sdk = self.configure_sources(
                     "gd32f470", [("adc", mode)])
                 # GPIO compilation supplies the lease, not a GPIO selection.
-                expected = {"timebase.c", "adc.c", "gpio.c"}
+                expected = {"timebase.c", "adc.c", "gpio.c", "platform_cold.c"}
                 if mode in ("trigger-dma", "trigger-dma-continuous"):
                     expected.add("adc_stream.c")
                 if mode == "trigger-dma-continuous":
@@ -159,7 +167,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, sdk = self.configure_sources(
                     "gd32f470", [(kind, mode)])
                 self.assertEqual(provider, self.private_sources(
-                    "gd32f470", {"timebase.c", source, "gpio.c"}))
+                    "gd32f470", {"timebase.c", source, "gpio.c",
+                                "platform_cold.c"}))
                 self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                        "gd32f4xx_timer", "gd32f4xx_gpio"})
 
@@ -170,7 +179,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(kind=kind):
                 self.assertEqual(self.configure_sources(
                     "stm32f407", [(kind, mode)]), (
-                        self.private_sources("stm32f407", {"gpio.c", source}),
+                        self.private_sources("stm32f407", {"gpio.c", source,
+                                                          "platform_cold.c"}),
                         set()))
 
     def test_pinless_devices_do_not_compile_gpio(self):
@@ -179,7 +189,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, sdk = self.configure_sources(
                     family, [("flash", "poll-word"),
                              ("watchdog", "independent")])
-                expected = {"flash.c", "watchdog.c"}
+                expected = {"flash.c", "watchdog.c", "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
@@ -194,7 +204,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, _ = self.configure_sources(
                     family, [("uart", "irq-byte-event"),
                              ("uart", "irq-blocks")])
-                expected = {"gpio.c", "uart.c", "uart_stream.c"}
+                expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                 self.assertEqual(provider, self.private_sources(family, expected))
@@ -204,7 +215,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, _ = self.configure_sources(
                     family, [("i2c", "irq-messages")])
-                expected = {"gpio.c", "i2c.c", "i2c_async.c", "i2c_cold.c"}
+                expected = {"gpio.c", "i2c.c", "i2c_async.c", "i2c_cold.c",
+                            "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
                 self.assertEqual(provider,
@@ -228,7 +240,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
         provider, _ = self.configure_sources(
             "stm32g474", [("i2c", "poll-messages")])
         self.assertEqual(provider,
-            self.private_sources("stm32g474", {"i2c.c"}) |
+            self.private_sources("stm32g474", {"i2c.c", "platform_cold.c"}) |
             {"drivers/i2c/i2c_v2/i2c_v2.c"})
 
 

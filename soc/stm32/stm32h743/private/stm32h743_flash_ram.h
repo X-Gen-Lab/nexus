@@ -254,6 +254,15 @@ void nx_stm32h743_flash_ram_hardfault(void);
  */
 nx_result_t
 nx_stm32h743_flash_ram_pulse(nx_stm32h743_flash_ram_workspace_t* execution);
+/** \brief Bind an idle flashword provider to its exact static RAM workspace.
+ * \note Task-only; Platform owns the same workspace, clock and flash timing
+ *       through failed cleanup. Active operations reject state replacement.
+ */
+nx_result_t
+nx_stm32h743_flash_prepare(nx_stm32h743_flash_state_t* port,
+                           nx_stm32h743_flash_ram_workspace_t* workspace,
+                           uint32_t supply_mv);
+
 #ifdef __cplusplus
 }
 #endif

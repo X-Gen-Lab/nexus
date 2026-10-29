@@ -87,7 +87,9 @@ class U575DeviceSelectionTests(unittest.TestCase):
         construction = stm32u575.constructor(
             result.controllers[0], result, {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertIn("0x08000000", source)
+        self.assertEqual(construction.initialize.function,
+                         "nx_stm32u575_flash_prepare")
+        self.assertNotIn("static nx_result_t prepare_", source)
         self.assertNotIn("NSKEYR", source)
         self.assertNotIn("region", source)
 

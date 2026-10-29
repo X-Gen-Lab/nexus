@@ -27,6 +27,21 @@ typedef struct {
     uint32_t bank_mask;
     nx_pin_state_control_t control;
 } nx_stm32g474_pin_state_t;
+/** \brief Immutable exact named-state connection; no new pin snapshot. */
+typedef struct {
+    GPIO_TypeDef* gpio;
+    RCC_TypeDef* rcc;
+    const nx_pin_state_plan_t* plan;
+    uint32_t bank_mask;
+} nx_stm32g474_pin_state_config_t;
+/** \brief Bind a fresh named-state face before acquiring its C controller.
+ * \param[in,out] state: Static storage with no retained/initialized epoch.
+ * \param[in] config: Reviewed static GPIO/RCC/plan, preserved through stop.
+ * \return Status; partial effects retain the existing private stop obligation.
+ */
+nx_result_t
+nx_stm32g474_pin_state_prepare(nx_stm32g474_pin_state_t* state,
+                               const nx_stm32g474_pin_state_config_t* config);
 extern const nx_pin_state_ops_t nx_stm32g474_pin_state_ops;
 /** \brief Acquire a cold input/analog pad set and prove default; retain on IO.
  */

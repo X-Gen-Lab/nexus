@@ -1,44 +1,28 @@
-"""STM32F407 register and packed pin-state policy for the cold lease."""
+"""STM32F407 static pad records and direct cold C lifecycle connections."""
 
 
-def clock():
-    return 'RCC->AHB1ENR'
+def static_declarations(result, pins, banks, slots):
+    """Only immutable pad/resource records and one existing-size C receipt."""
+    from .preflight import admission_declarations
+    del banks
+    source = ['static nx_stm32_platform_pin_receipt_t s_nx_platform_pins;',
+              'static const nx_stm32_platform_pin_config_t s_nx_platform_pins_config[] = {']
+    for pin in pins:
+        source.append(f'    {{ GPIO{pin[1]}, &{slots[pin]}, '
+                      f'{ord(pin[1]) - ord("A")}u, {int(pin[2:])}u }},')
+    source += ['};']
+    source += admission_declarations(result, 's_nx_platform_pins_config', len(pins))
+    return source
 
 
-def gate(port):
-    return f"RCC_AHB1ENR_GPIO{port}EN"
-
-
-def read(expression):
-    return expression
-
-
-def write(expression, value):
-    return f"NX_PLATFORM_REGISTER_WRITE({expression}, {value});"
-
-
-def mode(port):
-    return f"GPIO{port}->MODER"
-
-
-def lock(port):
-    return f"GPIO{port}->LCKR"
-
-
-def capture(pin):
-    return f"nx_stm32_pin_capture(GPIO{pin[1]}, {int(pin[2:])}u)"
-
-
-def restore(pin, saved):
-    return f"nx_stm32_pin_restore(GPIO{pin[1]}, {int(pin[2:])}u, {saved});"
-
-
-PIN_HELPERS = ()
-
-
-def output_set(port):
-    return f"GPIO{port}->BSRR"
-
-
-def output_read(port):
-    return f"GPIO{port}->ODR"
+def cold_call(operation):
+    """Connect a fixed C function; no register algorithm remains in this hook."""
+    arguments = '&s_nx_platform_config, &s_nx_platform_pins'
+    functions = {
+        'admit': 'nx_stm32_platform_pins_admit(&s_nx_platform_config, true)',
+        'acquire': f'nx_stm32_platform_pins_acquire({arguments})',
+        'release': f'nx_stm32_platform_pins_release({arguments})',
+        'clocks_release': 'nx_stm32_platform_gpio_clocks_release(&s_nx_platform_pins)',
+        'abort': 'nx_stm32_platform_pins_abort(&s_nx_platform_pins)',
+    }
+    return functions[operation]

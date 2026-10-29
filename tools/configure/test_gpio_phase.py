@@ -16,20 +16,6 @@ class ColdPinStorageTests(unittest.TestCase):
     def resolve(self, relative):
         return gate.resolve_ir(gate.ROOT / relative)
 
-    def test_constructor_requires_an_exact_maintained_family(self):
-        for family in ("stm32", "gd32", "unmaintained"):
-            for operation, arguments in (
-                    (gpio_phase.withdraw_pin, (family, "PA0")),
-                    (gpio_phase.rollback_pin, (family, "PA0", "saved"))):
-                with self.subTest(family=family, operation=operation.__name__):
-                    with self.assertRaisesRegex(ValueError,
-                                                "Unmaintained SoC provider"):
-                        operation(*arguments)
-
-    def test_family_without_a_cold_gpio_policy_cannot_emit_a_constructor(self):
-        with self.assertRaisesRegex(ValueError, "cold GPIO constructor policy"):
-            gpio_phase.withdraw_pin("native", "PA0")
-
     def test_five_controllers_reuse_their_existing_exact_pin_storage(self):
         for label in ("stm32-ve", "stm32-zg", "gd32"):
             with self.subTest(label=label):

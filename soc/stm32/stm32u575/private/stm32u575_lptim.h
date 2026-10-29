@@ -50,6 +50,8 @@ nx_result_t nx_stm32u575_lptim_initialize(nx_stm32u575_lptim_state_t* state);
  *       and stage remain single-task-owned; service publishes quarantine.
  */
 void nx_stm32u575_lptim_irq(nx_stm32u575_lptim_state_t* state);
+/** \brief Bind exact cold resources without resetting retained generations. */
+nx_result_t nx_stm32u575_lptim_prepare(nx_stm32u575_lptim_state_t* state);
 #ifdef __cplusplus
 }
 #endif

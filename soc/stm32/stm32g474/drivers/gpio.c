@@ -186,3 +186,19 @@ nx_result_t nx_stm32g474_lpuart1_pins_prepare(void) {
                                           12U);
 }
 const nx_gpio_ops_t nx_stm32g474_gpio_ops = {write, read, toggle};
+
+/** \brief Bind static GPIO facts; never replace an acquired pad owner. */
+nx_result_t
+nx_stm32g474_gpio_prepare(nx_stm32g474_gpio_state_t* port,
+                          const nx_stm32g474_gpio_config_t* config) {
+    if (port == NULL || config == NULL || config->registers == NULL ||
+        config->mask == 0U || (config->mask & ~UINT32_C(0xffff)) != 0U ||
+        (config->initial & ~config->mask) != 0U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized)
+        return NX_ERROR_BUSY;
+    port->registers = config->registers;
+    port->mask = config->mask;
+    port->output = config->output;
+    return nx_stm32g474_gpio_initialize(port, config->initial);
+}

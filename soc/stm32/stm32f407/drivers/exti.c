@@ -8,6 +8,13 @@
  */
 #include "stm32f407_provider.h"
 
+_Static_assert(sizeof(nx_stm32_exti_state_t) ==
+                   ((offsetof(nx_stm32_exti_state_t, initialized) +
+                     sizeof(bool) + _Alignof(nx_stm32_exti_state_t) - 1U) /
+                    _Alignof(nx_stm32_exti_state_t)) *
+                       _Alignof(nx_stm32_exti_state_t),
+               "cold EXTI ownership occupies existing trailing padding");
+
 #ifndef NX_STM32_CLEAR_FLAGS
 #define NX_STM32_CLEAR_FLAGS(reg, mask) ((reg) = (mask))
 #endif

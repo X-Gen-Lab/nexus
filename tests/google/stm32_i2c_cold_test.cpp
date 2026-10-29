@@ -210,6 +210,46 @@ TEST_F(I2CCold, DuplicatePrepareDoesNotReplaceLiveOwner) {
     EXPECT_EQ(NX_SUCCESS, Close());
 }
 
+TEST_F(I2CCold, RejectedPollingPrepareCannotEraseAnotherColdOwner) {
+    ASSERT_EQ(NX_SUCCESS, Prepare());
+    const nx_stm32_i2c_state_t original = state;
+    const uint32_t cr1 = I2C1->CR1;
+    const uint32_t mode = GPIOB->MODER;
+    nx_stm32_i2c_cold_receipt_t rejected{};
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_i2c_prepare(&state, &config, &rejected));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_i2c_close(&state, &config, &rejected));
+    EXPECT_EQ(original.registers, state.registers);
+    EXPECT_EQ(original.initialized, state.initialized);
+    EXPECT_EQ(original.line_gpio, state.line_gpio);
+    EXPECT_EQ(cr1, I2C1->CR1);
+    EXPECT_EQ(mode, GPIOB->MODER);
+    ASSERT_EQ(NX_SUCCESS, Close());
+}
+
+TEST_F(I2CCold, RejectedAsyncPrepareCannotEraseAnotherColdOwner) {
+    config.asynchronous = true;
+    nx_i2c_v1_state_t owner{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&owner, &config, &receipt));
+    const nx_i2c_v1_state_t original = owner;
+    const uint32_t cr1 = I2C1->CR1;
+    const uint32_t mode = GPIOB->MODER;
+    const uint32_t vectors = NVIC->ISER[0];
+    nx_stm32_i2c_cold_receipt_t rejected{};
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_i2c_async_prepare(&owner, &config, &rejected));
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_i2c_async_close(&owner, &config, &rejected));
+    EXPECT_EQ(original.registers, owner.registers);
+    EXPECT_EQ(original.initialized, owner.initialized);
+    EXPECT_EQ(original.line_inputs, owner.line_inputs);
+    EXPECT_EQ(original.line_mask, owner.line_mask);
+    EXPECT_EQ(cr1, I2C1->CR1);
+    EXPECT_EQ(mode, GPIOB->MODER);
+    EXPECT_EQ(vectors, NVIC->ISER[0]);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&owner, &config, &receipt));
+}
+
 TEST_F(I2CCold, ActiveOperationRetainsClockAndPadsUntilJoined) {
     ASSERT_EQ(NX_SUCCESS, Prepare());
     state.active = true;

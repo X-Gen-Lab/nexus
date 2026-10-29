@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "gd32f470_control_cold.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
 #include "private/system.h"
@@ -482,4 +483,37 @@ TEST_F(GD32ADCInitialize, RetryFrozenClockFailsBoundedlyBeforeAnyConversion) {
     EXPECT_EQ(count, 0U);
     EXPECT_EQ(ADC_CTL1(ADC0), 0U);
     EXPECT_FALSE(state.active);
+}
+
+TEST_F(GD32ADCInitialize,
+       StaticColdConfigRejectsZeroWaitBeforeTimeOrSDKEffects) {
+    const nx_gd32_adc_cold_config_t config{channels, 5U, 3300U, 0U};
+    EXPECT_CALL(boundary, ClockEnable(testing::_)).Times(0);
+    EXPECT_CALL(boundary, Reset()).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_gd32_adc_poll_cold_prepare(&state, &config));
+    EXPECT_EQ(100U, s_now);
+    ExpectRestored();
+}
+
+TEST_F(GD32ADCInitialize,
+       StaticColdConfigKeepsRealCalibrationRollbackAndRetry) {
+    const nx_gd32_adc_cold_config_t config{channels, 5U, 3300U, 100U};
+    s_fault = Fault::Reset;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_gd32_adc_poll_cold_prepare(&state, &config));
+    ExpectRestored();
+    s_fault = Fault::None;
+    ASSERT_EQ(NX_SUCCESS, nx_gd32_adc_poll_cold_prepare(&state, &config));
+    EXPECT_TRUE(state.initialized);
+    EXPECT_EQ(channels, state.channels);
+}
+
+TEST_F(GD32ADCInitialize, ColdContextRejectsBeforeReadingTheTimeDomain) {
+    const nx_gd32_adc_cold_config_t config{channels, 5U, 3300U, 100U};
+    s_mask = 1U;
+    EXPECT_CALL(boundary, ClockEnable(testing::_)).Times(0);
+    EXPECT_CALL(boundary, Reset()).Times(0);
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_gd32_adc_poll_cold_prepare(&state, &config));
+    EXPECT_EQ(100U, s_now);
+    EXPECT_EQ(1U, s_mask);
+    ExpectRestored();
 }

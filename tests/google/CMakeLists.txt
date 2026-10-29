@@ -43,8 +43,13 @@ endfunction()
 
 include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_platform_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_poll_factory.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_control_factory.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_uart_cold_factory.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_basic_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/gd32_cold_pins.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/gd32_platform_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/gd32_i2c_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/g474_pin_state.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
@@ -160,16 +165,7 @@ if(NOT native_factory_result EQUAL 0)
     message(FATAL_ERROR "Native factory fixture rejected: "
         "${native_factory_output}${native_factory_error}")
 endif()
-file(READ "${native_factory_generated}/input_paths.json" native_factory_inputs)
-string(JSON native_factory_count LENGTH "${native_factory_inputs}")
-if(native_factory_count GREATER 0)
-    math(EXPR native_factory_last "${native_factory_count} - 1")
-    foreach(index RANGE 0 ${native_factory_last})
-        string(JSON name MEMBER "${native_factory_inputs}" ${index})
-        string(JSON input GET "${native_factory_inputs}" "${name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
-    endforeach()
-endif()
+nexus_google_configuration_inputs("${native_factory_generated}")
 nexus_google_test(nexus_native_factory_test SOURCES native_factory_test.cpp
     "${native_factory_generated}/bindings.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -542,6 +538,7 @@ include(timer_advanced.cmake)
 include(timer_factory.cmake)
 
 include(multi_controller_factory.cmake)
+include(spi_sequence_factory.cmake)
 
 include(i2c_pair_factory.cmake)
 
@@ -637,3 +634,7 @@ include(u575_lpdma_copy.cmake)
 include(u575_stop2_copy.cmake)
 
 include(u575_lptim1_lpbam.cmake)
+
+include(gd32_uart_cold_factory.cmake)
+
+include(gd32_control_cold.cmake)

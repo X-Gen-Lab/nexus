@@ -9,16 +9,10 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT g4_exti_generated EQUAL 0)
     message(FATAL_ERROR "G474 EXTI fixture rejected: ${g4_exti_output}${g4_exti_error}")
 endif()
-file(READ "${g4_exti_bundle}/input_paths.json" g4_exti_inputs)
-string(JSON g4_exti_count LENGTH "${g4_exti_inputs}")
-math(EXPR g4_exti_last "${g4_exti_count} - 1")
-foreach(index RANGE 0 ${g4_exti_last})
-    string(JSON g4_exti_name MEMBER "${g4_exti_inputs}" ${index})
-    string(JSON g4_exti_path GET "${g4_exti_inputs}" "${g4_exti_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${g4_exti_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_exti_bundle}")
 nexus_google_test(nexus_g474_exti_test SOURCES g474_exti_test.cpp
     "${g4_exti_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/exti.c"

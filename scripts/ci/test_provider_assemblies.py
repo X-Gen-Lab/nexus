@@ -170,6 +170,22 @@ class ExplicitProjectAdmission(unittest.TestCase):
         self.assertEqual(failure.exception.code, 2)
         run.assert_not_called()
 
+    def test_cli_default_inherits_outer_build_jobs(self):
+        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
+                                         "CMAKE_BUILD_PARALLEL_LEVEL": "9"}), \
+                mock.patch.object(gate, "run", return_value=0) as run:
+            result = gate.main(["--fixture", str(USB), "--output", "unused"])
+        self.assertEqual(result, 0)
+        self.assertEqual(run.call_args.kwargs["parallel"], 1)
+
+    def test_explicit_cli_allocation_overrides_outer_default(self):
+        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1"}), \
+                mock.patch.object(gate, "run", return_value=0) as run:
+            result = gate.main(["--fixture", str(USB), "--output", "unused",
+                                "--parallel", "3"])
+        self.assertEqual(result, 0)
+        self.assertEqual(run.call_args.kwargs["parallel"], 3)
+
     def test_cli_passes_the_explicit_project_without_family_inference(self):
         with mock.patch.object(gate, "run", return_value=0) as run:
             self.assertEqual(gate.main([
@@ -319,6 +335,11 @@ class OutputAdmission(unittest.TestCase):
             self.assertEqual(gate.run(root, [], "unused", output), 1)
             self.assertIn("tool source", json.loads(
                 (output / "report.json").read_text())["error"])
+
+    def test_shared_job_budget_helper_is_a_snapshotted_input(self):
+        from tools.dev import process
+        inputs = {row["path"] for row in gate.source_inputs(ROOT, [])}
+        self.assertIn(str(Path(process.__file__).resolve()), inputs)
 
     def test_imported_compiler_identity_helper_is_a_snapshotted_input(self):
         inputs = gate.source_inputs(ROOT, [])

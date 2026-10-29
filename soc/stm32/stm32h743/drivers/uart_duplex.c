@@ -6,6 +6,7 @@
  * \date            2026-10-20
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_uart_continuous_impl.h"
 
 static bool task_context(void) {
@@ -128,3 +129,31 @@ void nx_stm32h743_uart_duplex_uart_irq(
 const nx_uart_ops_t nx_stm32h743_uart_duplex_ops = {
     submit, start_admitted, cancel,      service,  NULL,
     NULL,   stop,           attach_wake, rx_start, rx_stop};
+
+nx_result_t
+nx_stm32h743_uart_duplex_prepare(nx_stm32h743_uart_duplex_state_t* port,
+                                 const nx_stm32h743_uart_config_t* config,
+                                 const nx_dma_memory_region_t* regions,
+                                 size_t region_count) {
+    if (port == NULL || config == NULL || regions == NULL || region_count == 0U)
+        return NX_ERROR_INVALID;
+    nx_result_t result =
+        nx_stm32h743_uart_configure(&port->receive.uart, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32h743_usart3_pins_prepare();
+    if (result != NX_SUCCESS)
+        return result;
+    port->receive.dma = DMA1;
+    port->receive.rx = DMA1_Stream1;
+    port->receive.mux = DMAMUX1_Channel1;
+    port->receive.regions = regions;
+    port->receive.region_count = region_count;
+    port->transmit.dma = DMA1;
+    port->transmit.tx = DMA1_Stream0;
+    port->transmit.mux = DMAMUX1_Channel0;
+    port->transmit.regions = regions;
+    port->transmit.region_count = region_count;
+    return nx_stm32h743_uart_duplex_initialize(port, config->clock_hz,
+                                               1000000U);
+}

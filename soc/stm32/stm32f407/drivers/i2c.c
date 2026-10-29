@@ -56,6 +56,9 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
     if (port == NULL || config == NULL || receipt == NULL ||
         config->asynchronous)
         return NX_ERROR_INVALID;
+    /* A rejected prepare did not acquire this existing owner's state. */
+    if ((receipt->effects & NX_STM32_I2C_COLD_OWNED) == 0U)
+        return port->registers == NULL ? NX_SUCCESS : NX_ERROR_BUSY;
     if ((receipt->effects & NX_STM32_I2C_COLD_PREPARED) != 0U) {
         if (port->registers != config->registers)
             return NX_ERROR_INVALID;

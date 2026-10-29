@@ -1,6 +1,7 @@
 # Actual H743 provider sources with real fixed SDK register definitions.
 nexus_google_test(nexus_h743_clock_test SOURCES h743_clock_test.cpp
     h743_clock_model.cpp h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/clock.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
@@ -22,6 +23,7 @@ foreach(h7_suite system provider)
     set(h7_target "nexus_h743_${h7_suite}_test")
     nexus_google_test(${h7_target} SOURCES "h743_${h7_suite}_test.cpp"
         h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
         LIBRARIES Nexus::IO Nexus::Arch
@@ -37,6 +39,7 @@ endforeach()
 
 nexus_google_test(nexus_h743_peripheral_test SOURCES h743_peripheral_test.cpp
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/exti.c"
@@ -59,6 +62,7 @@ nexus_google_test(nexus_h743_conversion_test SOURCES h743_conversion_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_conversion_test SYSTEM PRIVATE
@@ -81,17 +85,11 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT h7_generated EQUAL 0)
     message(FATAL_ERROR "H743 factory fixture rejected: ${h7_output}${h7_error}")
 endif()
-file(READ "${h7_factory_bundle}/input_paths.json" h7_inputs)
-string(JSON h7_input_count LENGTH "${h7_inputs}")
-math(EXPR h7_last_input "${h7_input_count} - 1")
-foreach(index RANGE 0 ${h7_last_input})
-    string(JSON h7_input_name MEMBER "${h7_inputs}" ${index})
-    string(JSON h7_input_path GET "${h7_inputs}" "${h7_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${h7_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${h7_factory_bundle}")
 nexus_google_test(nexus_h743_factory_test SOURCES h743_factory_test.cpp
     "${h7_factory_bundle}/bindings.c" h743_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
     LIBRARIES Nexus::IO Nexus::Arch
@@ -117,17 +115,11 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT h7_generated EQUAL 0)
     message(FATAL_ERROR "H743 factory fixture rejected: ${h7_output}${h7_error}")
 endif()
-file(READ "${h7_factory_bundle}/input_paths.json" h7_inputs)
-string(JSON h7_input_count LENGTH "${h7_inputs}")
-math(EXPR h7_last_input "${h7_input_count} - 1")
-foreach(index RANGE 0 ${h7_last_input})
-    string(JSON h7_input_name MEMBER "${h7_inputs}" ${index})
-    string(JSON h7_input_path GET "${h7_inputs}" "${h7_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${h7_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${h7_factory_bundle}")
 nexus_google_test(nexus_h743_peripheral_factory_test SOURCES h743_peripheral_factory_test.cpp
     "${h7_factory_bundle}/bindings.c" h743_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
@@ -155,6 +147,7 @@ target_compile_options(nexus_h743_peripheral_factory_test PRIVATE
 # H7 independently binds the shared V2 layout and exact errata policy.
 nexus_google_test(nexus_h743_i2c_v2_test SOURCES h743_i2c_v2_test.cpp
     h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
     "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch

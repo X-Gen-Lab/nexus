@@ -424,3 +424,16 @@ TEST_F(U575Rtc, UnqualifiedApbProfileRejectsBeforeCalendarTuple) {
     EXPECT_EQ(0U, g_u575_rtc_model.calendar_reads);
     EXPECT_EQ(0U, g_u575_rtc_model.writes);
 }
+
+TEST_F(U575Rtc, ColdPrepareBindsReviewedResourcesWithoutResettingGeneration) {
+    state = {};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_rtc_prepare(&state));
+    EXPECT_EQ(&g_u575_rtc_model.rtc, state.registers);
+    EXPECT_EQ(&g_u575_rtc_model.power, state.power);
+    const auto generation = state.generation;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_rtc_prepare(&state));
+    EXPECT_GT(state.generation, generation);
+    EXPECT_EQ(0U, g_u575_rtc_model.writes);
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_stop(&port));
+}

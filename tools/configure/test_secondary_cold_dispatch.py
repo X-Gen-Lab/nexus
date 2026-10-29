@@ -6,7 +6,7 @@ from tools.configure.providers import maintained
 
 
 class SecondaryColdDispatchTests(unittest.TestCase):
-    def test_obsolete_spi_i2c_constructor_calls_are_rejected(self):
+    def test_paired_spi_i2c_emit_their_concrete_c_lifecycle(self):
         for family, prefix, relative in (
                 ("stm32f407", "stm32", "stm32-zg.toml"),
                 ("gd32f470", "gd32", "gd32.toml"),
@@ -20,9 +20,6 @@ class SecondaryColdDispatchTests(unittest.TestCase):
                 with self.subTest(family=family, controller=item.id):
                     self.assertTrue(secondary_controllers.applies(
                         item, result, prefix))
-                    with self.assertRaisesRegex(ValueError, "dedicated C"):
-                        secondary_controllers.constructor(item, result,
-                                                          prefix)
                     construction = maintained(family).constructor(
                         item, result, result.board_bindings, result.routes,
                         result.devices)

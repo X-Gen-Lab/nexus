@@ -38,38 +38,11 @@ def state():
             'static nx_clock_domain_t s_nx_runtime_domain;',
             'static nx_clock_lease_t s_nx_runtime_lease;',
             'nx_clock_domain_t* nx_platform_runtime_domain(void) {',
-            '    return &s_nx_runtime_domain;', '}',
-            '/** \\brief Acquire before selected peripheral resource effects. */',
-            'static nx_result_t nx_runtime_acquire(void) {',
-            '    if (!s_nx_runtime_domain.initialized) {',
-            '        nx_result_t status = nx_clock_domain_construct(&s_nx_runtime_domain, 1u);',
-            '        if (status != NX_SUCCESS) { return status; }',
-            '    }',
-            '    return nx_clock_domain_acquire(&s_nx_runtime_domain, &s_nx_runtime_lease);', '}',
-            '/** \\brief Close metadata only; never revoke an existing borrow. */',
-            'static nx_result_t nx_runtime_close(void) {',
-            '    if (!s_nx_runtime_domain.initialized) { return NX_SUCCESS; }',
-            '    nx_clock_barrier_t barrier;',
-            '    return nx_clock_domain_close(&s_nx_runtime_domain, &barrier);', '}',
-            '/** \\brief Called only after actual controller, pad and gate drain. */',
-            'static nx_result_t nx_runtime_release(void) {',
-            '    if (!s_nx_runtime_domain.initialized) { return NX_SUCCESS; }',
-            '    if (s_nx_runtime_lease.owner != NULL) {',
-            '        nx_result_t status = nx_clock_domain_release(&s_nx_runtime_domain, &s_nx_runtime_lease);',
-            '        if (status != NX_SUCCESS) { return status; }',
-            '    }',
-            '    nx_clock_barrier_t barrier;',
-            '    nx_result_t status = nx_clock_domain_close(&s_nx_runtime_domain, &barrier);',
-            '    return status == NX_SUCCESS ? nx_clock_domain_quiescent(barrier) : status;', '}',
-            '/** \\brief Epoch advance is explicit, drained and nonwrapping. */',
-            'static nx_result_t nx_runtime_reopen(void) {',
-            '    nx_clock_barrier_t barrier;',
-            '    nx_result_t status = nx_clock_domain_close(&s_nx_runtime_domain, &barrier);',
-            '    return status == NX_SUCCESS ? nx_clock_domain_reopen(barrier) : status;', '}']
+            '    return &s_nx_runtime_domain;', '}']
 
 
-def runtime_functions(result, context_guard, initialize):
+def runtime_functions(result, context_guard, initialize, admission):
     """Use the selected SoC's existing cold start and cleanup helpers."""
     from tools.configure.providers import maintained
     return maintained(result.soc_family).runtime_power_functions(
-        result, context_guard, initialize)
+        result, context_guard, initialize, admission)

@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -288,3 +289,12 @@ static nx_result_t sample(void* context, uint16_t* samples, size_t capacity,
     return result;
 }
 const nx_adc_ops_t nx_stm32h743_adc_ops = {.info = info, .sample = sample};
+
+nx_result_t nx_stm32h743_adc_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return (NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_ADC12EN) != 0U ||
+                   (NX_H743_READ(&RCC->AHB1RSTR) & RCC_AHB1RSTR_ADC12RST) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}

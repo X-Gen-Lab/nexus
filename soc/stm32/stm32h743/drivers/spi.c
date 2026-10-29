@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/fault.h"
+#include "stm32h743_cold.h"
 #include "stm32h743_spi_wire.h"
 #include "stm32h7xx_ll_spi.h"
 /* ES0392 2.22.5: CRC-disabled finite reception still requires CRCSIZE=7. */
@@ -340,3 +341,93 @@ static bool on_port(const void* context, const nx_spi_port_t* port) {
 const nx_spi_ops_t nx_stm32h743_spi_ops = {recover, NULL, NULL, stop, NULL};
 const nx_spi_endpoint_ops_t nx_stm32h743_spi_endpoint_ops = {
     transfer, NULL, NULL, on_port, NULL};
+
+nx_result_t nx_stm32h743_spi_prepare(nx_stm32h743_spi_state_t* port,
+                                     const nx_stm32h743_spi_config_t* config) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->endpoints == NULL ||
+        config->count == 0U || config->count > UINT16_MAX)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active || port->cold_owned)
+        return NX_ERROR_BUSY;
+    /* Validate the complete endpoint set before enabling the wire or changing
+     * an earlier CS. A later rejection cannot authorize partial outputs. */
+    for (size_t i = 0U; i < config->count; ++i) {
+        const nx_stm32h743_spi_endpoint_config_t* item = &config->endpoints[i];
+        if (item->cs == NULL || item->endpoint == NULL || item->gpio == NULL ||
+            item->mask == 0U || (item->mask & ~0xFFFFU) != 0U ||
+            item->mode > 3U || item->frequency_hz == 0U)
+            return NX_ERROR_INVALID;
+        if (item->cs->retained || item->cs->initialized)
+            return NX_ERROR_BUSY;
+        for (size_t j = 0U; j < i; ++j)
+            if (item->cs == config->endpoints[j].cs ||
+                item->endpoint == config->endpoints[j].endpoint)
+                return NX_ERROR_INVALID;
+    }
+    port->registers = SPI4;
+    port->clock_hz = config->clock_hz;
+    port->poll_limit = 1000000U;
+    port->reset = &RCC->APB2RSTR;
+    port->reset_mask = RCC_APB2RSTR_SPI4RST;
+    port->cold_owned = true;
+    port->cold_acquired = 0U;
+    nx_result_t result = nx_stm32h743_spi_initialize(port);
+    if (result != NX_SUCCESS)
+        return result;
+    for (size_t i = 0U; i < config->count; ++i) {
+        const nx_stm32h743_spi_endpoint_config_t* item = &config->endpoints[i];
+        nx_stm32h743_gpio_state_t* cs = item->cs;
+        if (cs == NULL || item->endpoint == NULL)
+            return NX_ERROR_INVALID;
+        if (cs->retained || cs->initialized)
+            return NX_ERROR_BUSY;
+        cs->registers = item->gpio;
+        cs->mask = item->mask;
+        cs->output = true;
+        /* This child owns cleanup even if its first pad write is refused. */
+        port->cold_acquired = (uint16_t)(i + 1U);
+        result = nx_stm32h743_gpio_initialize(cs, item->mask);
+        if (result != NX_SUCCESS)
+            return result;
+        item->endpoint->port = port;
+        item->endpoint->cs = cs;
+        item->endpoint->cs_mask = item->mask;
+        item->endpoint->frequency_hz = item->frequency_hz;
+        item->endpoint->mode = item->mode;
+    }
+    for (unsigned pin = 12U; pin <= 14U; ++pin) {
+        result = nx_stm32h743_pin_alternate(GPIOE, pin, 5U);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32h743_spi_release(nx_stm32h743_spi_state_t* port,
+                                     const nx_stm32h743_spi_config_t* config) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->endpoints == NULL ||
+        config->count == 0U)
+        return NX_ERROR_INVALID;
+    if (!port->cold_owned)
+        return NX_SUCCESS;
+    if (port->cold_acquired > config->count)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32h743_spi_ops.stop(port);
+    if (result != NX_SUCCESS)
+        return result;
+    /* The wire may already be stopped while a CS still owes withdrawal. */
+    while (port->cold_acquired != 0U) {
+        const nx_stm32h743_spi_endpoint_config_t* item =
+            &config->endpoints[port->cold_acquired - 1U];
+        result = nx_stm32h743_gpio_stop(item->cs, item->mask);
+        if (result != NX_SUCCESS)
+            return result;
+        --port->cold_acquired;
+    }
+    port->cold_owned = false;
+    return NX_SUCCESS;
+}

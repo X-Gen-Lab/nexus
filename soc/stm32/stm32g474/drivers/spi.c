@@ -277,3 +277,66 @@ static bool on_port(const void* context, const nx_spi_port_t* port) {
 const nx_spi_ops_t nx_stm32g474_spi_ops = {recover, NULL, NULL, stop, NULL};
 const nx_spi_endpoint_ops_t nx_stm32g474_spi_endpoint_ops = {
     transfer, NULL, NULL, on_port, NULL};
+
+/** \brief Static endpoint metadata drives one bounded C cold transaction. */
+nx_result_t nx_stm32g474_spi_prepare(nx_stm32g474_spi_state_t* port,
+                                     const nx_stm32g474_spi_config_t* config) {
+    if (port == NULL || config == NULL || config->registers == NULL ||
+        config->reset == NULL || config->pins == NULL ||
+        config->pin_count != 3U || config->devices == NULL ||
+        config->device_count == 0U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active)
+        return NX_ERROR_BUSY;
+    for (size_t i = 0U; i < config->device_count; ++i) {
+        const nx_stm32g474_spi_device_config_t* device = &config->devices[i];
+        if (device->endpoint == NULL || device->cs == NULL ||
+            device->gpio == NULL || device->mask == 0U || device->mode > 3U)
+            return NX_ERROR_INVALID;
+        if (device->cs->retained || device->cs->initialized)
+            return NX_ERROR_BUSY;
+    }
+    port->registers = config->registers;
+    port->clock_hz = 170000000U;
+    port->poll_limit = 1000000U;
+    port->reset = config->reset;
+    port->reset_mask = config->reset_mask;
+    nx_result_t status = nx_stm32g474_spi_initialize(port);
+    if (status != NX_SUCCESS)
+        return status;
+    for (size_t i = 0U; i < config->device_count; ++i) {
+        const nx_stm32g474_spi_device_config_t* device = &config->devices[i];
+        nx_stm32g474_gpio_config_t cs = {device->gpio, device->mask,
+                                         device->mask, true};
+        status = nx_stm32g474_gpio_prepare(device->cs, &cs);
+        if (status != NX_SUCCESS)
+            return status;
+        device->endpoint->cs = device->cs;
+        device->endpoint->cs_mask = device->mask;
+        device->endpoint->frequency_hz = device->frequency_hz;
+        device->endpoint->mode = device->mode;
+    }
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_stm32g474_alternate_t* pin = &config->pins[i];
+        status = nx_stm32g474_pin_alternate(pin->gpio, pin->pin, pin->af);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
+}
+/** \brief Drain physical SPI before any endpoint can release its CS. */
+nx_result_t nx_stm32g474_spi_close(nx_stm32g474_spi_state_t* port,
+                                   const nx_stm32g474_spi_config_t* config) {
+    if (port == NULL || config == NULL || config->devices == NULL)
+        return NX_ERROR_INVALID;
+    nx_result_t status = stop(port);
+    if (status != NX_SUCCESS)
+        return status;
+    for (size_t i = 0U; i < config->device_count; ++i) {
+        const nx_stm32g474_spi_device_config_t* device = &config->devices[i];
+        status = nx_stm32g474_gpio_stop(device->cs, device->mask);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    return NX_SUCCESS;
+}

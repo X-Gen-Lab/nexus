@@ -5,6 +5,20 @@ the only software dependency graph. Native arguments and actual failures pass
 through. The default build parallelism is two; set `NEXUS_BUILD_JOBS` or pass
 CMake's explicit `--parallel` to select a different finite budget.
 
+Selected-provider matrices and Source SDK consumer verification inherit
+`NEXUS_BUILD_JOBS`, then `CMAKE_BUILD_PARALLEL_LEVEL`, when their `--parallel`
+option is omitted. Their explicit option is the caller's allocation and
+supersedes that default. The SDK coordinator divides its total allocation into
+one job per consumer, including each consumer's nested configure/build/check
+commands. Selected-provider builds propagate their chosen allocation to nested
+Nexus/CMake defaults. Malformed or nonpositive selected budgets fail before
+execution. The analysis plan retains its reviewed explicit two-job allocation;
+standalone analyzer execution defaults to one job.
+
+This is a per-invocation budget. Concurrent independent invocations still need
+an orchestrator to divide runner CPU and memory capacity; no machine-wide CPU
+semaphore or automatic discovery is implied.
+
 Application creation uses versioned templates from the separate
 `X-Gen-Lab/nexus-examples` checkout. It does not copy a platform tree or download
 dependencies. Select its exact checked-out commit; branches and mutable names

@@ -6,7 +6,7 @@
 #ifndef NX_STM32H743_UART_RECEIVE_H
 #define NX_STM32H743_UART_RECEIVE_H
 #include "nexus/io/dma.h"
-#include "stm32h743_provider.h"
+#include "stm32h743_cold.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +60,16 @@ void nx_stm32h743_uart_receive_dma_irq(
 /** \brief Share ordinary IRQ TX; latch IDLE/error RX boundaries without RDR. */
 void nx_stm32h743_uart_receive_uart_irq(
     nx_stm32h743_uart_receive_state_t* state);
+/** \brief Bind exact static DMA resources before this mode initializes.
+ * \note Task-only; Platform owns pads/gates and callers retain immutable
+ *       configuration, regions and storage through successful public stop.
+ */
+nx_result_t
+nx_stm32h743_uart_receive_prepare(nx_stm32h743_uart_receive_state_t* port,
+                                  const nx_stm32h743_uart_config_t* config,
+                                  const nx_dma_memory_region_t* regions,
+                                  size_t region_count);
+
 #ifdef __cplusplus
 }
 #endif

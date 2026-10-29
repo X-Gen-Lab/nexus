@@ -23,6 +23,8 @@ nx_platform_start_result_t
 nx_empty_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic);
 nx_result_t
 nx_empty_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);
+/** \brief Both SDK fixtures use the same host-only NVIC register storage. */
+NVIC_Type g_gd32_model_nvic;
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -99,7 +101,6 @@ extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
 }
 #else
 extern "C" {
-NVIC_Type g_gd32_model_nvic;
 SCB_Type g_gd32_model_scb;
 }
 extern "C" nx_result_t nx_gd32_soc_preflight(void) {
@@ -141,6 +142,7 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
                           : nx_empty_platform_stop_diagnosed(diagnostic);
     }
     void SetUp() override {
+        g_gd32_model_nvic = {};
         void* admitted =
             mmap(reinterpret_cast<void*>(MMIO_BASE), MMIO_BYTES,
                  PROT_READ | PROT_WRITE,

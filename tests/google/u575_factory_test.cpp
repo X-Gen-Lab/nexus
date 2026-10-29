@@ -8,6 +8,8 @@
  */
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+#include "stm32u575_cold.h"
+#include "stm32u575_platform_cold.h"
 #include "stm32u575_provider.h"
 #include "u575_factory_model.h"
 #include <cstring>
@@ -208,4 +210,115 @@ TEST_F(U575Factory, IncompatibleSecurityRejectsWithoutOptionByteMutation) {
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_platform_start().primary);
     EXPECT_EQ(FLASH_OPTR_TZEN, FLASH->OPTR);
     EXPECT_EQ(0U, g_u575_model.writes);
+}
+
+TEST_F(U575Factory, InvalidColdRingRejectsBeforePadOrClockEffects) {
+    nx_stm32u575_uart_state_t cold{};
+    nx_stm32u575_uart_config_t config{};
+    config.controller = 1U;
+    config.baud = 115200U;
+    config.capacity = 64U;
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_uart_prepare(&cold, &config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_EQ(nullptr, cold.registers);
+    EXPECT_FALSE(cold.retained);
+}
+
+TEST_F(U575Factory, FailedGpioGateReleaseCannotLoseItsLeaseOnReacquire) {
+    nx_stm32u575_gpio_receipt_t receipt{};
+    nx_stm32u575_gpio_lease_t lease{GPIOA, &receipt, 1U, 0U};
+    uint32_t added = 0U;
+    nx_stm32u575_platform_config_t config{&lease,  1U,      0U,     &added,
+                                          nullptr, nullptr, nullptr};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_platform_acquire(&config));
+    EXPECT_EQ(RCC_AHB2ENR1_GPIOAEN, added);
+    g_u575_model.ignore_write = &RCC->AHB2ENR1;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_platform_release(&config));
+    EXPECT_FALSE(receipt.captured);
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_platform_acquire(&config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_EQ(RCC_AHB2ENR1_GPIOAEN, added);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&config));
+    EXPECT_EQ(0U, added);
+    EXPECT_EQ(0U, RCC->AHB2ENR1);
+}
+
+TEST_F(U575Factory, FailedPeripheralGateReleaseCannotLoseItsLeaseOnReacquire) {
+    nx_stm32u575_gpio_receipt_t receipt{};
+    nx_stm32u575_gpio_lease_t lease{GPIOA, &receipt, 1U, 0U};
+    uint32_t gpio_added = 0U;
+    uint32_t apb2_added = 0U;
+    nx_stm32u575_platform_config_t config{
+        &lease,      1U,     NX_U575_SELECT_USART1, &gpio_added, nullptr,
+        &apb2_added, nullptr};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_platform_acquire(&config));
+    g_u575_model.ignore_write = &RCC->APB2ENR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_platform_release(&config));
+    EXPECT_FALSE(receipt.captured);
+    EXPECT_EQ(RCC_APB2ENR_USART1EN, apb2_added);
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_platform_acquire(&config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_EQ(RCC_APB2ENR_USART1EN, apb2_added);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&config));
+    EXPECT_EQ(0U, RCC->AHB2ENR1);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+}
+TEST_F(U575Factory, LostGpioClockCannotProveRestorationOrDiscardTheSnapshot) {
+    nx_stm32u575_gpio_receipt_t receipt{};
+    nx_stm32u575_gpio_lease_t lease{GPIOA, &receipt, 1U, 0U};
+    uint32_t added = 0U;
+    nx_stm32u575_platform_config_t config{&lease,  1U,      0U,     &added,
+                                          nullptr, nullptr, nullptr};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_platform_acquire(&config));
+    RCC->AHB2ENR1 &= ~(uint32_t)RCC_AHB2ENR1_GPIOAEN;
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_platform_release(&config));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_TRUE(receipt.captured);
+    EXPECT_EQ(RCC_AHB2ENR1_GPIOAEN, added);
+    RCC->AHB2ENR1 |= RCC_AHB2ENR1_GPIOAEN;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&config));
+    EXPECT_FALSE(receipt.captured);
+    EXPECT_EQ(0U, added);
+}
+TEST_F(U575Factory, AliasedBankReceiptsRejectBeforeClockOrSnapshotEffects) {
+    nx_stm32u575_gpio_receipt_t receipt{};
+    const nx_stm32u575_gpio_lease_t leases[]{
+        {GPIOA, &receipt, 1U, 0U},
+        {&g_u575_model.extra_gpio[0], &receipt, 1U, 1U}};
+    uint32_t added = 0U;
+    const nx_stm32u575_platform_config_t config{
+        leases, 2U, 0U, &added, nullptr, nullptr, nullptr};
+    const auto writes = g_u575_model.writes;
+    const nx_result_t result = nx_stm32u575_platform_acquire(&config);
+    EXPECT_EQ(NX_ERROR_INVALID, result);
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(receipt.captured);
+    EXPECT_EQ(0U, added);
+    if (result != NX_ERROR_INVALID) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&config));
+    }
+}
+TEST_F(U575Factory, AliasedBankRegistersRejectBeforeClockOrSnapshotEffects) {
+    nx_stm32u575_gpio_receipt_t receipts[2]{};
+    const nx_stm32u575_gpio_lease_t leases[]{{GPIOA, &receipts[0], 1U, 0U},
+                                             {GPIOA, &receipts[1], 1U, 1U}};
+    uint32_t added = 0U;
+    const nx_stm32u575_platform_config_t config{
+        leases, 2U, 0U, &added, nullptr, nullptr, nullptr};
+    const auto writes = g_u575_model.writes;
+    const nx_result_t result = nx_stm32u575_platform_acquire(&config);
+    EXPECT_EQ(NX_ERROR_INVALID, result);
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(receipts[0].captured);
+    EXPECT_FALSE(receipts[1].captured);
+    EXPECT_EQ(0U, added);
+    if (result != NX_ERROR_INVALID) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&config));
+    }
 }

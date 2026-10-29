@@ -52,7 +52,7 @@ class G474ExtiConfigurationTests(unittest.TestCase):
         self.assertNotIn("EXTI9_5_IRQHandler", source)
         self.assertNotIn("EXTI15_10_IRQHandler", source)
         self.assertIn("nx_stm32g474_exti_ops", source)
-        self.assertIn("RCC_APB2ENR_SYSCFGEN", source)
+        self.assertIn(".added_syscfg = &s_nx_platform_syscfg_clock_added", source)
         self.assertNotIn("LPUART1_IRQHandler", source)
 
     def test_freertos_binding_uses_explicit_policy_without_a_worker(self):
@@ -68,12 +68,15 @@ class G474ExtiConfigurationTests(unittest.TestCase):
         gate.configure(self.assembly(), output)
         source = (output / "bindings.c").read_text()
         start = source[source.index("nx_platform_start_result_t nx_platform_start") :]
-        admission = start[:start.index("nx_platform_pins_acquire()")]
-        for register in ("IMR1", "EMR1", "RTSR1", "FTSR1", "PR1"):
-            self.assertIn(f"NX_G474_READ(&EXTI->{register})", admission)
+        admission = start[:start.index("nx_stm32g474_platform_pins_acquire(")]
+        self.assertIn("nx_stm32g474_platform_preflight(&s_nx_platform_config)", admission)
+        self.assertIn(".exti_lines = 3u", source)
         for vector in ("EXTI0", "EXTI1"):
-            self.assertIn(f"NX_G474_IRQ_AVAILABLE((IRQn_Type){vector}_IRQn)",
-                          admission)
+            for bank in range(4):
+                self.assertIn(f"NX_G474_PLATFORM_IRQ_MASK({vector}_IRQn, {bank}u)", source)
+        self.assertNotIn("NX_G474_READ(", source)
+        # The actual G474Exti Google fixture rejects pending/active sources
+        # before clock or pad effects and retains failed drain ownership.
 
     def test_duplicate_line_is_rejected_before_any_bundle_is_published(self):
         with self.assertRaises(ValueError):
