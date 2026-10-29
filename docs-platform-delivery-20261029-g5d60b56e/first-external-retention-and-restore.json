@@ -1,0 +1,78 @@
+{
+  "kind": "actual_exact_git_commit_external_artifact_retention_and_restore",
+  "storage_repository": "X-Gen-Lab/nexus",
+  "storage_branch_discovery": "documentation-assets",
+  "storage_commit": "2bdaae87a621f8d8c2f185569c0fdc608848c0a4",
+  "storage_parent": "e7d32687a598db753747f4905cb03afec3163b1d",
+  "namespace": "docs-platform-delivery-20261029-g5d60b56e",
+  "platform_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+  "examples_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+  "downloaded_new_members": 20,
+  "downloaded_new_member_bytes": 97115571,
+  "registry_and_verifier_additionally_downloaded": true,
+  "all_remote_byte_identities_verified": true,
+  "original112members_and_header_preserved": true,
+  "archives_independently_verified_and_restored": [
+    {
+      "role": "strict_bilingual_documentation",
+      "archive_sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0",
+      "verify_exit_code": 0,
+      "restore_exit_code": 0,
+      "destination": "/dev/shm/nexus-assets-remote-first-2bdaae87/first-docs-restored",
+      "verified_by": "unchanged_source_P_store_or_documentation_delivery_verifier",
+      "expanded_duplicate_cleanup_after_verified": true
+    },
+    {
+      "role": "strict_docs_actual_build_and_tool_execution",
+      "archive_sha256": "a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c",
+      "verify_exit_code": 0,
+      "restore_exit_code": 0,
+      "destination": "/dev/shm/nexus-assets-remote-first-2bdaae87/first-docs-raw-restored",
+      "verified_by": "unchanged_source_P_store_or_documentation_delivery_verifier",
+      "expanded_duplicate_cleanup_after_verified": true
+    },
+    {
+      "role": "complete_examples_scope_all_and_actual_execution",
+      "archive_sha256": "d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606",
+      "verify_exit_code": 0,
+      "restore_exit_code": 0,
+      "destination": "/dev/shm/nexus-assets-remote-first-2bdaae87/first-examples-restored",
+      "verified_by": "unchanged_source_P_store_or_documentation_delivery_verifier",
+      "expanded_duplicate_cleanup_after_verified": true
+    },
+    {
+      "role": "actual_external_created_product_and_installed_sdk_execution",
+      "archive_sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e",
+      "verify_exit_code": 0,
+      "restore_exit_code": 0,
+      "destination": "/dev/shm/nexus-assets-remote-first-2bdaae87/first-product-restored",
+      "verified_by": "unchanged_source_P_store_or_documentation_delivery_verifier",
+      "expanded_duplicate_cleanup_after_verified": true
+    }
+  ],
+  "original_envelope_bytes_unchanged": true,
+  "original_execution_paths_rewritten": false,
+  "new_qualification_or_test_execution": false,
+  "physical_status": "not_executed",
+  "oci_recipe_independently_reconstructed": false,
+  "official_release_published": false,
+  "site_deployment_established": false,
+  "candidate_seals_included": false,
+  "full159_final_execution_included": false,
+  "remote_downloads": "/workspace/nexus/build/c-cold-20261028/integration/assets-publication/remote-download-first-observations.json",
+  "all_execution_receipts_directory": "/workspace/nexus/build/c-cold-20261028/integration/assets-publication",
+  "download_root": "/dev/shm/nexus-assets-remote-first-2bdaae87",
+  "fresh_restore_duplicates_cleaned_only_after_maintained_full_verification": true,
+  "disk": {
+    "/workspace": {
+      "total": 33770192896,
+      "used": 29896908800,
+      "free": 2138521600
+    },
+    "/dev/shm": {
+      "total": 9441337344,
+      "used": 7886356480,
+      "free": 1554980864
+    }
+  }
+}

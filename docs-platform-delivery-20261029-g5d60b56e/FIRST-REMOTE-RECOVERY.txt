@@ -1,0 +1,15 @@
+First actual immutable-Git remote retrieval and independent restore
+
+Original payload commit: 2bdaae87a621f8d8c2f185569c0fdc608848c0a4
+All20 new payload members (97,115,571 bytes) were independently downloaded
+from that exact immutable commit and SHA256/size checked. Original docs,
+docs raw build evidence, examples complete build and real external-product
+archives all passed maintained full byte verification and independent restore.
+Docs verification additionally forced the original documentation-manifest SHA.
+
+first-external-retention-and-restore.json is the actual observation receipt.
+first-remote-recovery.tar.gz + original package preserve all88 original
+command/raw/unique-attempt/HTTP observations and operator helper failure history.
+Use unchanged exact-P store.py verify/restore with --archive for relocation.
+This receipt does not claim remote Actions, full159, final candidate seals,
+Pages, an official Release, OCI recipe reconstruction or physical HIL.

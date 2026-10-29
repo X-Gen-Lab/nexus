@@ -662,6 +662,26 @@
       "path": "docs-platform-delivery-20261029-g5d60b56e/SHA256SUMS",
       "bytes": 1734,
       "sha256": "7b8a8525ffeee0fd61634e7a7409cea7cd6dd2a98a0b24b7158d6a0197f9a030"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/first-remote-recovery.tar.gz",
+      "bytes": 28726,
+      "sha256": "42315fa64383da8f46ec7f5823c047b2855186ba63ab8902943bf79b8066f3b9"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/first-remote-recovery-package.json",
+      "bytes": 540,
+      "sha256": "cb7dc6c7a5238815f3c03e5e19c7b21854c0a4d1fa71f23040451dc22672d9ad"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/first-external-retention-and-restore.json",
+      "bytes": 3623,
+      "sha256": "8ac29155973474e93211347e91e6ecff7ef24ddd78702365db7e6af326eafb19"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/FIRST-REMOTE-RECOVERY.txt",
+      "bytes": 972,
+      "sha256": "2fb16cdc5675882b0c1bf13fa860f28b996183fae275841bbfa4e7aafbc357aa"
     }
   ],
   "physical_hil": "not_executed",

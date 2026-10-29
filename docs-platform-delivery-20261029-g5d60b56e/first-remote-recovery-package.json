@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/integration/assets-first-recovery-retention/store/42315fa64383da8f46ec7f5823c047b2855186ba63ab8902943bf79b8066f3b9.tar.gz",
+    "sha256": "42315fa64383da8f46ec7f5823c047b2855186ba63ab8902943bf79b8066f3b9",
+    "size": 28726
+  },
+  "bytes": 125734,
+  "files": 88,
+  "kind": "portable_evidence",
+  "manifest_sha256": "a0c2cff38b89e25b1b3ff3e2fb091eeabfe77150e8993b4239a2123392e09ac4",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}
