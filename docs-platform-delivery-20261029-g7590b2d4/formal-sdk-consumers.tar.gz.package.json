@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-consumers/store/154a8b112ef61eb6c62618b4105073204ab504dc2b4018eaa86e2fe6f6c35bfb.tar.gz",
+    "sha256": "154a8b112ef61eb6c62618b4105073204ab504dc2b4018eaa86e2fe6f6c35bfb",
+    "size": 13118321
+  },
+  "bytes": 15842398,
+  "files": 4,
+  "kind": "portable_evidence",
+  "manifest_sha256": "2b687ba72628a913f7c92b123015cfde2d346601af78736c9f7cc34b4f694363",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

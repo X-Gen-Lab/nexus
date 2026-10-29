@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/cpp-inner-annex-04-data/store/6ed686264c9ba38613ca8f022bc71ad393eae87198156adf0be12f34a65314a4.tar.gz",
+    "sha256": "6ed686264c9ba38613ca8f022bc71ad393eae87198156adf0be12f34a65314a4",
+    "size": 13109112
+  },
+  "bytes": 66409749,
+  "files": 149,
+  "kind": "portable_evidence",
+  "manifest_sha256": "b772458f6f91ec12ac0a2eec5e57f155f7aa977a9001e7ff8b7a06f9dc12ef74",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

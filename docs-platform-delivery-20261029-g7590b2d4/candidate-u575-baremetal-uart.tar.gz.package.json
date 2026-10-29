@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-baremetal-uart/7a8add1a3e38065dd841f3122a846eda84e1c2c1e91a13ff97e43ce53263802e.tar.gz",
+    "sha256": "7a8add1a3e38065dd841f3122a846eda84e1c2c1e91a13ff97e43ce53263802e",
+    "size": 35902216
+  },
+  "bytes": 98135934,
+  "files": 3248,
+  "kind": "portable_evidence",
+  "manifest_sha256": "b3b93ea9f424616e00f322452cb8b3bcaaa4d065c72a762e4172e29011740182",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

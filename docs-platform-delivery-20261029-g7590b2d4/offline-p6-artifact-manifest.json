@@ -1,0 +1,1133 @@
+{
+  "actual_cmp_commands": 16,
+  "container_commands": 32,
+  "environment_provenance": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/execution-environment-provenance.json",
+    "sha256": "a5bf9ee68bd3d4a158927afe65ada4f3f5a01d191669fbb38b3d717272395aa5",
+    "size": 407
+  },
+  "environment_recipe_reproducible": false,
+  "fresh_builds": 16,
+  "kind": "independent_offline_firmware_matrix",
+  "limitations": [
+    "Only the existing eight H743/U575 empty/UART baremetal/FreeRTOS software reference assemblies were reproduced.",
+    "Observed OCI root filesystem; declared recipe reconstruction remains not executed and recipe_reproducible=false.",
+    "No physical HIL, performance, power, safety, product, trust or LTS qualification.",
+    "Final candidate seal requires the complete original current-source 159-stage execution; partial/old reports are not substituted."
+  ],
+  "matrix_execution_receipt": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/offline-matrix.command.json",
+    "sha256": "2903f5c12286b0e83de6ef84635518bb7038fa7014678022e79267fcfb9b72f7",
+    "size": 1590
+  },
+  "observed_environment": {
+    "path": "/workspace/nexus/build/soc-ip-layout/delivery-environment/environment.json",
+    "sha256": "0013f6279c94ff3a6115987241644fa40e8e11ab40b4584b59dd9726483ce735",
+    "size": 1083
+  },
+  "physical_status": "not_executed",
+  "profile_count": 8,
+  "profiles": [
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "6e522771d847d179c2a9370c71d637c562a88ff61a2e37aa8b06dc49d4446628",
+          "size": 17584
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "e15e96ac410517d8eaa077fd12dddef7a3209b0de70913964ff028bb234b2075",
+          "size": 2784
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-h743-baremetal-empty.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "c227a92eb3f7ff8c66b3255a0c9a749fd8d80b08939ecebe1bbed8518deac5a7",
+      "container_elapsed_seconds": 41.81963722096407,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "6e690cec7ad6612adb35ad63d3ea55a31d8a9d195b3e684b28517f5d5ea25726",
+        "size": 38931
+      },
+      "measured_vfs_container_bytes": 1179316224,
+      "probe_after_cleanup_free_bytes": 3133562880,
+      "probe_before_free_bytes": 3133562880,
+      "profile": "h743-baremetal-empty",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-empty/11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd.tar.gz",
+          "sha256": "11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd",
+          "size": 22038705
+        },
+        "bytes": 153205975,
+        "files": 6317,
+        "kind": "portable_evidence",
+        "manifest_sha256": "6a747794c98a17f7a81939cb52bdfcaefa2165a6cf48841d1c59c02853d1ed80",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd",
+        "bytes": 153205975,
+        "files": 6317,
+        "status": "verified"
+      },
+      "resolved_sha256": "7cc97694d50da542cf73b9c2472c000b5036e4d984488ef5be67511775e72a37",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 2784,
+          "loaded_bytes": 2783,
+          "ranges": [
+            [
+              134217728,
+              134220463
+            ],
+            [
+              134220464,
+              134220512
+            ]
+          ]
+        },
+        "ram": {
+          "axi-sram": {
+            "capacity_bytes": 524288,
+            "linker_supported": true,
+            "ranges": [
+              [
+                603979776,
+                603979832
+              ],
+              [
+                604502016,
+                604504064
+              ]
+            ],
+            "reserved_bytes": 2104
+          },
+          "backup-sram": {
+            "capacity_bytes": 4096,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "dtcm": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "itcm": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram1": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram2": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram3": {
+            "capacity_bytes": 32768,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram4": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "axi-sram",
+            "end": 603979832,
+            "start": 603979832
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "axi-sram",
+            "end": 604504064,
+            "start": 604502016
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-baremetal-empty",
+      "workload": "empty"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "99b2a754d934921a3c3b96bf63021bcb28e769ec771ef604aeccaac13ab76b7e",
+          "size": 31024
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "74b3e3f82cffd6efe16834b2b83591a6eaa33d6716f3e08eb2341284c154344d",
+          "size": 10516
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-h743-baremetal-uart.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "e2a451ef0b3bbc1ef990be9841b2f26e3fe3d49fb9651e1736691f6e9b78e2fe",
+      "container_elapsed_seconds": 41.458212408964755,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "4c7120741c3f208537602846dc6aec893099b1217ffea5ec255411d5466b19e2",
+        "size": 57698
+      },
+      "measured_vfs_container_bytes": 1179222016,
+      "probe_after_cleanup_free_bytes": 3133546496,
+      "probe_before_free_bytes": 3133546496,
+      "profile": "h743-baremetal-uart",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-uart/87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5.tar.gz",
+          "sha256": "87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5",
+          "size": 22104071
+        },
+        "bytes": 153410426,
+        "files": 6323,
+        "kind": "portable_evidence",
+        "manifest_sha256": "1d4445969aab6ef25d9b67cb97e77175f47dbe2a422959063c25b03b2bd31e9d",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5",
+        "bytes": 153410426,
+        "files": 6323,
+        "status": "verified"
+      },
+      "resolved_sha256": "4f2e8a9172c2037cec1210eb7a605cec9e0f28b0af4b961581b384870531ad12",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 10516,
+          "loaded_bytes": 10516,
+          "ranges": [
+            [
+              134217728,
+              134228244
+            ]
+          ]
+        },
+        "ram": {
+          "axi-sram": {
+            "capacity_bytes": 524288,
+            "linker_supported": true,
+            "ranges": [
+              [
+                603979776,
+                603980096
+              ],
+              [
+                604502016,
+                604504064
+              ]
+            ],
+            "reserved_bytes": 2368
+          },
+          "backup-sram": {
+            "capacity_bytes": 4096,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "dtcm": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "itcm": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram1": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram2": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram3": {
+            "capacity_bytes": 32768,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram4": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "axi-sram",
+            "end": 603980096,
+            "start": 603980096
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "axi-sram",
+            "end": 604504064,
+            "start": 604502016
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-baremetal-uart",
+      "workload": "uart"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "4aa4b592001c61e0176e8e156648417becd370f1aff6a14156abef1b64842738",
+          "size": 24796
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "0c4f4e1bbfd0f852f6c9365fb2c80e62687c8aa9d58963a063808a643a62a650",
+          "size": 5188
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-h743-freertos-empty.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "331f4d42de250a2d4a81369fb14b82e18096aed2f2ed1f8907013f5225cf0be2",
+      "container_elapsed_seconds": 39.21223726897733,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "e8bca5107ea09deff64ce052de25b4e349f469a0c94079438435e5224fb2335a",
+        "size": 56581
+      },
+      "measured_vfs_container_bytes": 1179234304,
+      "probe_after_cleanup_free_bytes": 3133534208,
+      "probe_before_free_bytes": 3133534208,
+      "profile": "h743-freertos-empty",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-empty/2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e.tar.gz",
+          "sha256": "2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e",
+          "size": 22136999
+        },
+        "bytes": 153572597,
+        "files": 6339,
+        "kind": "portable_evidence",
+        "manifest_sha256": "c060473324dfb666ec6314ccd7dc53d985d78c69584caefccd4947b08aec6019",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e",
+        "bytes": 153572597,
+        "files": 6339,
+        "status": "verified"
+      },
+      "resolved_sha256": "d691bfd065e752d0c7cd8354d23266f15aa4381aeba855e07a1badf54475d3d2",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 5188,
+          "loaded_bytes": 5188,
+          "ranges": [
+            [
+              134217728,
+              134222916
+            ]
+          ]
+        },
+        "ram": {
+          "axi-sram": {
+            "capacity_bytes": 524288,
+            "linker_supported": true,
+            "ranges": [
+              [
+                603979776,
+                603980760
+              ],
+              [
+                604502016,
+                604504064
+              ]
+            ],
+            "reserved_bytes": 3032
+          },
+          "backup-sram": {
+            "capacity_bytes": 4096,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "dtcm": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "itcm": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram1": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram2": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram3": {
+            "capacity_bytes": 32768,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram4": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "axi-sram",
+            "end": 603980760,
+            "start": 603980760
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "axi-sram",
+            "end": 604504064,
+            "start": 604502016
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-freertos-empty",
+      "workload": "empty"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "bf214005a50ae6ef9264faa386d7e1da2df4e5a4c5ca6326cfc66030879d46a3",
+          "size": 38236
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "8f2055a326bd10455f61a2852f7b5188bbb5807cf95592c62aeb96fa4bb401f8",
+          "size": 12920
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-h743-freertos-uart.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "2e15de4712d3123d7ebc7b34ceb5493c67b7ae7873f80084c0498f56c745376a",
+      "container_elapsed_seconds": 41.355859140021494,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "0a72469d2b79f63ee46f229fc2561cf45926c937af402bb723391a7134fd14dd",
+        "size": 75232
+      },
+      "measured_vfs_container_bytes": 1179246592,
+      "probe_after_cleanup_free_bytes": 3133517824,
+      "probe_before_free_bytes": 3133517824,
+      "profile": "h743-freertos-uart",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-uart/1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f.tar.gz",
+          "sha256": "1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f",
+          "size": 22197705
+        },
+        "bytes": 153777264,
+        "files": 6345,
+        "kind": "portable_evidence",
+        "manifest_sha256": "be93e56e56295045ba7a5c83529eef396ba0e98339b9b28179851e4cee2ad422",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f",
+        "bytes": 153777264,
+        "files": 6345,
+        "status": "verified"
+      },
+      "resolved_sha256": "bc1e2fe18ce225b9fec1ddec63b67d95ddbf7f0543dc6dd938e938b03f83d2db",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 12920,
+          "loaded_bytes": 12920,
+          "ranges": [
+            [
+              134217728,
+              134230648
+            ]
+          ]
+        },
+        "ram": {
+          "axi-sram": {
+            "capacity_bytes": 524288,
+            "linker_supported": true,
+            "ranges": [
+              [
+                603979776,
+                603979828
+              ],
+              [
+                603979832,
+                603981024
+              ],
+              [
+                604502016,
+                604504064
+              ]
+            ],
+            "reserved_bytes": 3292
+          },
+          "backup-sram": {
+            "capacity_bytes": 4096,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "dtcm": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "itcm": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram1": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram2": {
+            "capacity_bytes": 131072,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram3": {
+            "capacity_bytes": 32768,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          },
+          "sram4": {
+            "capacity_bytes": 65536,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "axi-sram",
+            "end": 603981024,
+            "start": 603981024
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "axi-sram",
+            "end": 604504064,
+            "start": 604502016
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/h743-freertos-uart",
+      "workload": "uart"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "a5e66640ff22901cc7a04f20d5f9ff342ebc76e5fe34f499b0297036e0c8cf78",
+          "size": 16832
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "d26fdfdd9691769c136fe2313082384003b6672db9a19088844424a2ac0f8e86",
+          "size": 2300
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "25ddb4f5b9a239f1efdbc44f1fe051bc37ac3b7a6dbcf57d6e1366e0ad571194",
+      "container_elapsed_seconds": 41.30059973997413,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "4996429757e8e0cd7cbcdf623b0eda81f3f3f3de0a788c392f8c42194a159b98",
+        "size": 36639
+      },
+      "measured_vfs_container_bytes": 1179168768,
+      "probe_after_cleanup_free_bytes": 3133505536,
+      "probe_before_free_bytes": 3133505536,
+      "profile": "u575-baremetal-empty",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-empty/98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7.tar.gz",
+          "sha256": "98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7",
+          "size": 22040828
+        },
+        "bytes": 153377491,
+        "files": 6315,
+        "kind": "portable_evidence",
+        "manifest_sha256": "72578544c29542f88b5858d9e1a7d53ec8adf363a9470909adcc0d3e58ff9540",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7",
+        "bytes": 153377491,
+        "files": 6315,
+        "status": "verified"
+      },
+      "resolved_sha256": "a379f8a4a04ae671cc1428d3e8808a18221c43e60863dc51acfb90e8ac3c2b95",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 2300,
+          "loaded_bytes": 2299,
+          "ranges": [
+            [
+              134217728,
+              134219971
+            ],
+            [
+              134219972,
+              134220028
+            ]
+          ]
+        },
+        "ram": {
+          "sram1": {
+            "capacity_bytes": 196608,
+            "linker_supported": true,
+            "ranges": [
+              [
+                536870912,
+                536870976
+              ],
+              [
+                537065472,
+                537067520
+              ]
+            ],
+            "reserved_bytes": 2112
+          },
+          "sram4": {
+            "capacity_bytes": 16384,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "sram1",
+            "end": 536870976,
+            "start": 536870976
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "sram1",
+            "end": 537067520,
+            "start": 537065472
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-baremetal-empty",
+      "workload": "empty"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "16e437ddc50b09af83b9786d5409ca14dc4ab883660af8f23f92ed2afd4e6c08",
+          "size": 29912
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "331b49bb920ce94d11f4d7accbbe22ac8c7fc07e4749f26f12fae94f027f84ae",
+          "size": 9912
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-u575-baremetal-uart.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "d1b5ebd5c86c035839122b0582dd7b1de8a282d02cace498da9d1fcbddb996e4",
+      "container_elapsed_seconds": 42.599584030976985,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "a182b8fa9d39e99048159a779b2608d8a7ee18b5310b0fd83929a84d028e7328",
+        "size": 53934
+      },
+      "measured_vfs_container_bytes": 1179213824,
+      "probe_after_cleanup_free_bytes": 3133489152,
+      "probe_before_free_bytes": 3133489152,
+      "profile": "u575-baremetal-uart",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-uart/1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497.tar.gz",
+          "sha256": "1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497",
+          "size": 22100445
+        },
+        "bytes": 153570164,
+        "files": 6321,
+        "kind": "portable_evidence",
+        "manifest_sha256": "9737a6895e352a35326840410424eadf99f27f222c5f400d423d7ca33c5431c7",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497",
+        "bytes": 153570164,
+        "files": 6321,
+        "status": "verified"
+      },
+      "resolved_sha256": "f0b6c29d61c446d94e03febc609ad2e252086b5ba8892d15646535d23f94d2c2",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 9912,
+          "loaded_bytes": 9912,
+          "ranges": [
+            [
+              134217728,
+              134227640
+            ]
+          ]
+        },
+        "ram": {
+          "sram1": {
+            "capacity_bytes": 196608,
+            "linker_supported": true,
+            "ranges": [
+              [
+                536870912,
+                536871232
+              ],
+              [
+                537065472,
+                537067520
+              ]
+            ],
+            "reserved_bytes": 2368
+          },
+          "sram4": {
+            "capacity_bytes": 16384,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "sram1",
+            "end": 536871232,
+            "start": 536871232
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "sram1",
+            "end": 537067520,
+            "start": 537065472
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-baremetal-uart",
+      "workload": "uart"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "fc9e2d912293ad0bd92f42eb0c97280ba277632fe302ad5d507ec2edc05c6f0b",
+          "size": 24236
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "8ab9391ee7a555e37333c6913079359fda334923d2a19b8a61e2215376223f1b",
+          "size": 4724
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-u575-freertos-empty.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "44f1f500147ad1db0030a56c1c20ed8c94d4638e3efefdddb3cd71436c258ce1",
+      "container_elapsed_seconds": 40.68730372394202,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "d5c5c42731f43c8cd5fcc543a2407df1ba4954a1c7c4b32d21f16547b5141337",
+        "size": 56003
+      },
+      "measured_vfs_container_bytes": 1179373568,
+      "probe_after_cleanup_free_bytes": 3133476864,
+      "probe_before_free_bytes": 3133476864,
+      "profile": "u575-freertos-empty",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-empty/a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112.tar.gz",
+          "sha256": "a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112",
+          "size": 22143031
+        },
+        "bytes": 153741302,
+        "files": 6339,
+        "kind": "portable_evidence",
+        "manifest_sha256": "31a7a599b8fef486fa69eeeefe70373433f999274ee8613676bcdd858f21a616",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112",
+        "bytes": 153741302,
+        "files": 6339,
+        "status": "verified"
+      },
+      "resolved_sha256": "a99dc4cba6c221d05d107995175335d83355d9f601d40d9c497b069535ee6efd",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 4724,
+          "loaded_bytes": 4724,
+          "ranges": [
+            [
+              134217728,
+              134222452
+            ]
+          ]
+        },
+        "ram": {
+          "sram1": {
+            "capacity_bytes": 196608,
+            "linker_supported": true,
+            "ranges": [
+              [
+                536870912,
+                536871904
+              ],
+              [
+                537065472,
+                537067520
+              ]
+            ],
+            "reserved_bytes": 3040
+          },
+          "sram4": {
+            "capacity_bytes": 16384,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "sram1",
+            "end": 536871904,
+            "start": 536871904
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "sram1",
+            "end": 537067520,
+            "start": 537065472
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-freertos-empty",
+      "workload": "empty"
+    },
+    {
+      "actual_container_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        {
+          "actual_cmp_exit": 0,
+          "role": "elf",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "0a52a2802051ca8ae6cc3066cb6115a44a366983335326b46d8cf4c4958b4a5a",
+          "size": 33216
+        },
+        {
+          "actual_cmp_exit": 0,
+          "role": "bin",
+          "sealed_archive_bytes_equal": true,
+          "sha256": "2a8560bb637986c3abbed4849a66b5768ceb0c12db02c3e5acc3022111594765",
+          "size": 12340
+        }
+      ],
+      "assembly": "tools/configure/assemblies/nucleo-u575-freertos-uart.toml",
+      "bootstrap_required_bytes": 2146431478,
+      "configuration_sha256": "557818b120f0ffc4af21a494aa832adc0761d1e86c06bfed648cbb06ab545b4d",
+      "container_elapsed_seconds": 42.3690022440278,
+      "map": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+        "sha256": "9a13d968de43b402fe7283a9d5cfaed0e30261d1caeb65fe6069875fbc5d2ff3",
+        "size": 73299
+      },
+      "measured_vfs_container_bytes": 1179348992,
+      "probe_after_cleanup_free_bytes": 3133460480,
+      "probe_before_free_bytes": 3133460480,
+      "profile": "u575-freertos-uart",
+      "raw_package": {
+        "archive": {
+          "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-uart/50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74.tar.gz",
+          "sha256": "50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74",
+          "size": 22197137
+        },
+        "bytes": 153926151,
+        "files": 6345,
+        "kind": "portable_evidence",
+        "manifest_sha256": "9696381840c224d143ff5d65425f61eb5bc7743ffc50d5b590deec380746bb9c",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "raw_package_verified": {
+        "archive_sha256": "50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74",
+        "bytes": 153926151,
+        "files": 6345,
+        "status": "verified"
+      },
+      "resolved_sha256": "01a9640871d77ee18e4f46b38e4f9e7e2f7c38314e4362a09ed76dd152aacae1",
+      "resource_metrics": {
+        "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+        "cycles_latency": "not_measured",
+        "dynamic_high_water": "not_measured",
+        "flash": {
+          "capacity_bytes": 2097152,
+          "footprint_bytes": 12340,
+          "loaded_bytes": 12340,
+          "ranges": [
+            [
+              134217728,
+              134230068
+            ]
+          ]
+        },
+        "ram": {
+          "sram1": {
+            "capacity_bytes": 196608,
+            "linker_supported": true,
+            "ranges": [
+              [
+                536870912,
+                536870972
+              ],
+              [
+                536870976,
+                536872160
+              ],
+              [
+                537065472,
+                537067520
+              ]
+            ],
+            "reserved_bytes": 3292
+          },
+          "sram4": {
+            "capacity_bytes": 16384,
+            "linker_supported": false,
+            "ranges": [],
+            "reserved_bytes": 0
+          }
+        },
+        "reservations": {
+          "heap": {
+            "bytes": 0,
+            "domain": "sram1",
+            "end": 536872160,
+            "start": 536872160
+          },
+          "msp": {
+            "bytes": 2048,
+            "domain": "sram1",
+            "end": 537067520,
+            "start": 537065472
+          }
+        }
+      },
+      "restore_directory": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/profiles/u575-freertos-uart",
+      "workload": "uart"
+    }
+  ],
+  "raw_archive_total_bytes": 176958921,
+  "software_candidate_status": "not_sealed_waiting_for_complete_current_source_159_stage_execution",
+  "source": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414"
+  },
+  "source_sdk": {
+    "path": "/dev/shm/nexus-examples-final/build/p6-7590b2d4/local-ci/source-sdk/share/nexus/src/.nexus-source-sdk.json",
+    "sha256": "72f5c3938d2d9884010d45d8947a55633fc1fbf8261d15a1b259ec2a501c510a",
+    "size": 380046
+  },
+  "status": "passed",
+  "toolchain_provenance": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/toolchain-payload-origin.json",
+    "sha256": "57a6c90788421126362c35a2ccb7da81e8b00539df96908ed2075af176bd3562",
+    "size": 798
+  }
+}

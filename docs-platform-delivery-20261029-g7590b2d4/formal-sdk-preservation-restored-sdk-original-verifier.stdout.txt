@@ -1,0 +1,1 @@
+{"files": 3008, "kind": "nexus_source_sdk_summary", "publishable": true, "sdk_kind": "nexus-installed-source-sdk", "snapshot_sha256": "e1bb0cf21efc98acdaaad66706a1c7a7c4cc08109efab8a535e308d2b0f26d4b", "source_revision": "7590b2d457d6042112abb78a4f4df74d613df6ff"}

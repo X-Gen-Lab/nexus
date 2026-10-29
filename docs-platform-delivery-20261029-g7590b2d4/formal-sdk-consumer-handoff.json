@@ -1,0 +1,141 @@
+{
+  "kind": "final_formal_sdk_and_policy11_transport_handoff",
+  "status": "both_packages_verified_independently_restored_and_original_verifiers_passed",
+  "source_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+  "source_tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414",
+  "formal_inputs": {
+    "SDK_prefix": "/workspace/nexus-software-qualification-7590b2d4-20261029/sdk",
+    "consumer_raw": "/workspace/nexus-software-qualification-7590b2d4-20261029/sdk-consumers",
+    "consumer_report": "/workspace/nexus-software-qualification-7590b2d4-20261029/sdk-consumers/verification.json"
+  },
+  "SDK_snapshot": "e1bb0cf21efc98acdaaad66706a1c7a7c4cc08109efab8a535e308d2b0f26d4b",
+  "SDK_manifest_sha256": "72f5c3938d2d9884010d45d8947a55633fc1fbf8261d15a1b259ec2a501c510a",
+  "consumer_policy": "nexus-sdk-consumers-v11",
+  "consumers": 50,
+  "commands": 202,
+  "selected_images": 37,
+  "all_policy_images": 53,
+  "raw_bytes_pruned": false,
+  "packages": {
+    "source-sdk": {
+      "archive": {
+        "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/source-sdk/store/cd150c65b22ed4389f7855f9f761eadb7be0f8ce142fcb0a3b34eeef6ac040fa.tar.gz",
+        "sha256": "cd150c65b22ed4389f7855f9f761eadb7be0f8ce142fcb0a3b34eeef6ac040fa",
+        "size": 10690858
+      },
+      "bytes": 75552007,
+      "files": 3011,
+      "kind": "portable_evidence",
+      "manifest_sha256": "6d677bdf6bac6cd50c1a5fd0b47d277412513942a98d310e4d0c22c8f95b3372",
+      "product_promotion": false,
+      "schema_version": 1,
+      "signature_status": "unsigned"
+    },
+    "sdk-consumers": {
+      "archive": {
+        "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-consumers/store/154a8b112ef61eb6c62618b4105073204ab504dc2b4018eaa86e2fe6f6c35bfb.tar.gz",
+        "sha256": "154a8b112ef61eb6c62618b4105073204ab504dc2b4018eaa86e2fe6f6c35bfb",
+        "size": 13118321
+      },
+      "bytes": 15842398,
+      "files": 4,
+      "kind": "portable_evidence",
+      "manifest_sha256": "2b687ba72628a913f7c92b123015cfde2d346601af78736c9f7cc34b4f694363",
+      "product_promotion": false,
+      "schema_version": 1,
+      "signature_status": "unsigned"
+    }
+  },
+  "consumer_transport": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-transport",
+    "archive": {
+      "sha256": "ed61992af0d8d3034c2ba622818e56a23bc55d4ee214a599c33a640979bcb8be",
+      "size": 12664366
+    },
+    "raw_files": 9094,
+    "raw_directories": 9028
+  },
+  "operations": [
+    {
+      "name": "sdk-store-export",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-store-export.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-store-export.attempts/1793279466096601327-0492a38433e643559b1515a313c23fe9/receipt.json",
+      "duration_seconds": 8.695452801999636
+    },
+    {
+      "name": "sdk-store-verify",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-store-verify.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-store-verify.attempts/1793279474793351853-390f5ede1a2d40e885fc57228ce57f14/receipt.json",
+      "duration_seconds": 0.8669646310154349
+    },
+    {
+      "name": "sdk-independent-restore",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-independent-restore.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-independent-restore.attempts/1793279475662553343-d7379b44d75d43ef9583a3414a5ceb28/receipt.json",
+      "duration_seconds": 2.2220776139874943
+    },
+    {
+      "name": "restored-sdk-original-verifier",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-sdk-original-verifier.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-sdk-original-verifier.attempts/1793279477886007394-6431b7a045564d9282caa0ee42f20f15/receipt.json",
+      "duration_seconds": 2.1214434069988783
+    },
+    {
+      "name": "consumer-policy11-pack",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-policy11-pack.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-policy11-pack.attempts/1793279480053777581-91f1c729b6f342ebb61af2cfe0f791ed/receipt.json",
+      "duration_seconds": 18.03450688297744
+    },
+    {
+      "name": "consumer-store-export",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-store-export.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-store-export.attempts/1793279498089878379-6ec1808af0ab47b1ad1ac804886bdc64/receipt.json",
+      "duration_seconds": 0.7171905839932151
+    },
+    {
+      "name": "consumer-store-verify",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-store-verify.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-store-verify.attempts/1793279498808757439-0fa38550feb7423ab17a0c0503de315b/receipt.json",
+      "duration_seconds": 0.16559936001431197
+    },
+    {
+      "name": "consumer-independent-restore",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-independent-restore.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/consumer-independent-restore.attempts/1793279498976132237-00cd01fbf917401a95134c96b60eeaa8/receipt.json",
+      "duration_seconds": 0.31583624600898474
+    },
+    {
+      "name": "restored-consumer-original-verifier",
+      "actual_exit_code": 0,
+      "conventional_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-consumer-original-verifier.command.json",
+      "unique_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-consumer-original-verifier.attempts/1793279499293382378-0f1dc3b380b645739673c98449baedf4/receipt.json",
+      "duration_seconds": 1.7199409479799215
+    }
+  ],
+  "independent_restore_copies_removed_only_after_success": true,
+  "original_inputs_and_all_final_archives_unchanged": true,
+  "producer_commands_reexecuted": 0,
+  "removed_environment_variable_names": [
+    "GIT_PAGER"
+  ],
+  "duration_seconds": 34.93221460899804,
+  "physical_status": "not_executed",
+  "software_qualified": false,
+  "scope": "Portable preservation of this actual159/fresh50 producer bytes; no new SDK source export, builds, consumer execution, GHA identity, attestation or qualification promotion.",
+  "before_free": {
+    "/workspace/nexus": 2574827520,
+    "/dev/shm": 631189504
+  },
+  "after_free": {
+    "/workspace/nexus": 2534940672,
+    "/dev/shm": 631189504
+  }
+}

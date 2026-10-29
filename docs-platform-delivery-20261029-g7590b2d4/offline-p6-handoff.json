@@ -1,0 +1,87 @@
+{
+  "actual_cmp_commands": 16,
+  "actual_container_commands": 32,
+  "all_88868_native_regular_file_metadata_unchanged": true,
+  "formal159": "not_started_by_this_agent; full original current-source run still required",
+  "fresh_builds": 16,
+  "independent_archive_audit_receipt": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/summarize-offline.command.json",
+    "sha256": "715cb2d60591326dd687ac12107c9d10be2431a60a23c117964b8353299d51c1",
+    "size": 1609
+  },
+  "kind": "p6_offline_complete_and_native_unchanged",
+  "manifest": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/offline-artifact-manifest.json",
+    "sha256": "ae7e6b325700e9a794cb782f3e353a7487860bd6c6d5b2419c99895b96ccaf0b",
+    "size": 39357
+  },
+  "matrix_receipt": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/offline-matrix.command.json",
+    "sha256": "2903f5c12286b0e83de6ef84635518bb7038fa7014678022e79267fcfb9b72f7",
+    "size": 1590
+  },
+  "native_cache_after": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/native-cache-after.json",
+    "sha256": "640aea687beb8a821567a03d72ef53da72157e25081a16a3ff9702c19261dfce",
+    "size": 2546
+  },
+  "native_cache_audit_receipt": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/native-cache-after-audit.command.json",
+    "sha256": "e10c20b9cca44f78513d6929c62683bb404dd30097c47178b40ef9b0143ef8a9",
+    "size": 1635
+  },
+  "native_cache_before": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/native-cache-before.json",
+    "sha256": "0d0368725aec6152a0d733b0fffe8b53de302d2eb80c14315aaac24fb43adf50",
+    "size": 21783666
+  },
+  "native_cache_checkpointed": false,
+  "physical_status": "not_executed",
+  "profile_count": 8,
+  "raw_archive_total_bytes": 176958921,
+  "recipe_reproducible": false,
+  "resource_budgets": 8,
+  "software_candidate_sealed": false,
+  "source": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414"
+  },
+  "source_sdk": {
+    "path": "/dev/shm/nexus-examples-final/build/p6-7590b2d4/local-ci/source-sdk/share/nexus/src/.nexus-source-sdk.json",
+    "sha256": "72f5c3938d2d9884010d45d8947a55633fc1fbf8261d15a1b259ec2a501c510a",
+    "size": 380046
+  },
+  "space_after": {
+    "/dev/shm": {
+      "free": 1021964288,
+      "total": 9441337344,
+      "used": 8419373056
+    },
+    "/workspace/nexus": {
+      "free": 3133317120,
+      "total": 33770192896,
+      "used": 28902113280
+    }
+  },
+  "status": "passed"
+}

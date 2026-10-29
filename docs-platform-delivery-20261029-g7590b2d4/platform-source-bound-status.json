@@ -1,0 +1,436 @@
+{
+  "platform": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414",
+    "clean": true,
+    "pr": 41,
+    "branch": "refactor/c-cold-lifecycle-complete-20261028",
+    "remote_head_read_matches": true,
+    "pr_state": "OPEN",
+    "draft": true
+  },
+  "task_authority": {
+    "path": "/workspace/nexus/docs/design/platform-delivery-completion.csv",
+    "sha256": "15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65",
+    "size": 28787,
+    "rows": 78,
+    "original_N_rows": 14,
+    "extended_rows_including_X": 64,
+    "X_rows_already_included_in_64": 5,
+    "task_ids": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "N05",
+      "N06",
+      "N07",
+      "N08",
+      "N09",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "A01",
+      "A02",
+      "A03",
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C08",
+      "X01",
+      "X02",
+      "X03",
+      "X04",
+      "X05",
+      "D01",
+      "D02",
+      "D03",
+      "D04",
+      "D05",
+      "D06",
+      "D07",
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E05",
+      "E06",
+      "F01",
+      "F02",
+      "F03",
+      "F04",
+      "F05",
+      "F06",
+      "F07",
+      "G01",
+      "G02",
+      "G03",
+      "G04",
+      "G05",
+      "G06",
+      "H01",
+      "H02",
+      "H03",
+      "H04",
+      "H05",
+      "H06",
+      "H07",
+      "H08",
+      "H09",
+      "H10",
+      "I01",
+      "I02",
+      "I03",
+      "J01",
+      "J02",
+      "J03",
+      "J04"
+    ],
+    "original_exit_conditions_and_statuses_unchanged": true,
+    "interpretation": "Tracked status strings are the frozen original ledger snapshot; current source-bound observations below supplement evidence navigation and do not silently mark 78 original exits completed."
+  },
+  "formal_plan": {
+    "report": {
+      "path": "/workspace/nexus-software-qualification-7590b2d4-20261029/report.json",
+      "sha256": "0133fa0cc092787affcbe494fa2c35c2a608328b21d5a90d74f39585485bea6a",
+      "size": 205670
+    },
+    "verified_execution": {
+      "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/verification-04.json",
+      "sha256": "f79d6e8a5e831ee8cfb1639ef4471603cbb9b57a40ebde0a620b2b2d26b2ff4f",
+      "size": 2189
+    },
+    "owned_verification_command": {
+      "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/owned-verification-04.command.json",
+      "sha256": "ec6c11f4c81aa84d843acf81a8d55ae45258ef7bf003be5b6bc0ac535515ee1f",
+      "size": 2167
+    },
+    "outer_command": {
+      "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/full-plan-04.command.json",
+      "sha256": "4bfb5297e2ae9915c36e641c11efdfb0806843899b681f081ef109072270dc66",
+      "size": 1646
+    },
+    "source_before_equals_source_after": true,
+    "stages": 159,
+    "passed": 159,
+    "failed": 0,
+    "outer_duration_seconds": 6327.374221813021,
+    "sum_stage_duration_seconds": 6325.759783210931,
+    "verified_execution_status": "verified",
+    "software_qualified_field": false,
+    "physical_status": "not_executed",
+    "interpretation": "A passed and maintained-verified full local software plan. Original software_qualified=false remains unchanged at the orchestration layer; all8 separate unsigned exact candidate seal/verify/independent-restore sequences are now complete. Physical acceptance and official release retain separate contracts."
+  },
+  "fresh_docs": {
+    "handoff": {
+      "path": "/workspace/nexus/build/c-cold-20261028/docs/final-7590b2d4/handoff.json",
+      "sha256": "a8e4aa9426e35e4c911207e2aca9e52491dfa702ee26ac0d80ecb150d8a96584",
+      "size": 8899
+    },
+    "pages": 132,
+    "language_page_records": 264,
+    "tool_tests": 355,
+    "strict_bilingual_build": "passed",
+    "original_archive_and_independent_restore_manifest_verified": true,
+    "public_P6_retention": "pending",
+    "deployed_Pages": "not_performed"
+  },
+  "offline_reproduction": {
+    "handoff": {
+      "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/handoff-offline-complete.json",
+      "sha256": "e9a8be594fd2971b40a0a5a5d217a05ecc7c336f9e1b9e4960d7621423f955e7",
+      "size": 4201
+    },
+    "profiles": 8,
+    "fresh_network_disabled_builds": 16,
+    "actual_container_commands": 32,
+    "actual_ELF_BIN_comparisons": 16,
+    "resource_budgets": 8,
+    "status": "passed",
+    "candidate_seals": "8/8_completed_verified_and_independently_restored",
+    "candidate_seal_status_source": {
+      "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-recovery-confirmed-handoff.json",
+      "sha256": "e03995bbe24bc9574ef953c86300c07739242baa1fc251b39f68734f538be6a2",
+      "size": 57825
+    },
+    "recipe_reproducible": false,
+    "no_candidate_inherited_from_P4_P5": true,
+    "actual_completed_CLI_operations": 24,
+    "actual_CLI_exit_code_counts": {
+      "0": 24
+    },
+    "candidate_profiles": [
+      {
+        "profile": "h743-baremetal-empty",
+        "candidate_id": "p6-7590b2d4-h743-baremetal-empty",
+        "configuration_sha256": "c227a92eb3f7ff8c66b3255a0c9a749fd8d80b08939ecebe1bbed8518deac5a7",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-baremetal-empty/53cc68edb73945dfb0bca158c151704187c5eecfc5e697207cb89a7674b9b524.tar.gz",
+          "sha256": "53cc68edb73945dfb0bca158c151704187c5eecfc5e697207cb89a7674b9b524",
+          "size": 35882078
+        },
+        "manifest_sha256": "a430c92e3a647f9b5d8dcd603bd4714236039ecb1c50a8ef8587a17c78a650a2",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "h743-baremetal-uart",
+        "candidate_id": "p6-7590b2d4-h743-baremetal-uart",
+        "configuration_sha256": "e2a451ef0b3bbc1ef990be9841b2f26e3fe3d49fb9651e1736691f6e9b78e2fe",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-baremetal-uart/8255861664e4d65760617b29da5ac2e09d155c5a35692acd6b6559fbbe95e65d.tar.gz",
+          "sha256": "8255861664e4d65760617b29da5ac2e09d155c5a35692acd6b6559fbbe95e65d",
+          "size": 35902544
+        },
+        "manifest_sha256": "ca6672b2cff733cdbf991809da3d6edcbd1454af8e6b1e6ff4b3266c0b47666c",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "h743-freertos-empty",
+        "candidate_id": "p6-7590b2d4-h743-freertos-empty",
+        "configuration_sha256": "331f4d42de250a2d4a81369fb14b82e18096aed2f2ed1f8907013f5225cf0be2",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-freertos-empty/4894bb7014f088293019ef7355fc3363c31249f08ca73b58d73e29b003d5fb47.tar.gz",
+          "sha256": "4894bb7014f088293019ef7355fc3363c31249f08ca73b58d73e29b003d5fb47",
+          "size": 35889185
+        },
+        "manifest_sha256": "85e2b36b235aab73d452ff6dc28bf237cdc797ccd51635f64789be445784c9c4",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "h743-freertos-uart",
+        "candidate_id": "p6-7590b2d4-h743-freertos-uart",
+        "configuration_sha256": "2e15de4712d3123d7ebc7b34ceb5493c67b7ae7873f80084c0498f56c745376a",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-freertos-uart/24efc11b125bcdb79b3800abf742c0fd55825f84b88e4a5d924c499fb5b4bb9a.tar.gz",
+          "sha256": "24efc11b125bcdb79b3800abf742c0fd55825f84b88e4a5d924c499fb5b4bb9a",
+          "size": 35912067
+        },
+        "manifest_sha256": "0e0c08e5336761c7ceaa8bd32af4c614fad905198531c76a4a65074598a69062",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "u575-baremetal-empty",
+        "candidate_id": "p6-7590b2d4-u575-baremetal-empty",
+        "configuration_sha256": "25ddb4f5b9a239f1efdbc44f1fe051bc37ac3b7a6dbcf57d6e1366e0ad571194",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-baremetal-empty/6f34d511eb833af6c12aa81781633d9b80a36bac9f4affb6695130c952369686.tar.gz",
+          "sha256": "6f34d511eb833af6c12aa81781633d9b80a36bac9f4affb6695130c952369686",
+          "size": 35883729
+        },
+        "manifest_sha256": "749f79231012d65bd966db3c51dd6e125a1209b656790ac83228a979e663813d",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "u575-baremetal-uart",
+        "candidate_id": "p6-7590b2d4-u575-baremetal-uart",
+        "configuration_sha256": "d1b5ebd5c86c035839122b0582dd7b1de8a282d02cace498da9d1fcbddb996e4",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-baremetal-uart/7a8add1a3e38065dd841f3122a846eda84e1c2c1e91a13ff97e43ce53263802e.tar.gz",
+          "sha256": "7a8add1a3e38065dd841f3122a846eda84e1c2c1e91a13ff97e43ce53263802e",
+          "size": 35902216
+        },
+        "manifest_sha256": "b3b93ea9f424616e00f322452cb8b3bcaaa4d065c72a762e4172e29011740182",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "u575-freertos-empty",
+        "candidate_id": "p6-7590b2d4-u575-freertos-empty",
+        "configuration_sha256": "44f1f500147ad1db0030a56c1c20ed8c94d4638e3efefdddb3cd71436c258ce1",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-freertos-empty/24270319b1c9a19ef06010dfdb8fa8febf07d25f6ab5ede9ce0cd256b422eb28.tar.gz",
+          "sha256": "24270319b1c9a19ef06010dfdb8fa8febf07d25f6ab5ede9ce0cd256b422eb28",
+          "size": 35890546
+        },
+        "manifest_sha256": "260b7427bd48d17bb4308862d06f712fa21c4d52e02422ee9c00474cdc27e6f1",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      },
+      {
+        "profile": "u575-freertos-uart",
+        "candidate_id": "p6-7590b2d4-u575-freertos-uart",
+        "configuration_sha256": "557818b120f0ffc4af21a494aa832adc0761d1e86c06bfed648cbb06ab545b4d",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-freertos-uart/85a924c7b537785782d028aeb65fda679cab173c72acf5c0a9e0700442b5a175.tar.gz",
+          "sha256": "85a924c7b537785782d028aeb65fda679cab173c72acf5c0a9e0700442b5a175",
+          "size": 35910633
+        },
+        "manifest_sha256": "42dce281755ddfaaf1d40c75a27b0a2256d72ef15f20f5fefa5bdcb2ccf912b5",
+        "signature_status": "unsigned",
+        "physical_status": "not_executed",
+        "product_promotion": "not_performed",
+        "actual_CLI_phases": [
+          "seal",
+          "verify",
+          "restored-verify"
+        ]
+      }
+    ],
+    "outer_orchestrator": {
+      "interpretation": "All24 owned CLI operations have original completed/zero/withdrawn receipts and COMPLETE_CANDIDATES8 end marker exists. Session79327 was lost at exec-server reconnect; final outer exit was not observed. Original stale receipt is unchanged; no outer zero asserted.",
+      "original_receipt": {
+        "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/p6-candidate-delivery-resume02.command.json",
+        "sha256": "acddbd90d400351889905976233d2c10c6eb3768f18ac77c02fcae7ae7e625f2",
+        "size": 891
+      },
+      "original_stderr": {
+        "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/p6-candidate-delivery-resume02.attempts/1793278786065638206-5d9494718a104d048b82c4181ad4d470/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size": 0
+      },
+      "original_stdout": {
+        "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/p6-candidate-delivery-resume02.attempts/1793278786065638206-5d9494718a104d048b82c4181ad4d470/stdout.txt",
+        "sha256": "3b7b3c019a389359b0b82e16eaac724202c9d056e5af883fec0cd7db03532da7",
+        "size": 1576
+      },
+      "recorded_exit_code": null,
+      "recorded_outcome": "running"
+    },
+    "outer_orchestrator_note": "Original stale running/null receipt preserved. The lost outer final exit was not observed and is not invented. Eight completed candidate sequences are established by the24 actual owned child CLI operations and original verified/restored reports.",
+    "host_packet_package": {
+      "archive": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/full159-packet-store/366080cccc793f18209c701fafc4fe398d9eb16e99eec1170a0defe87ba91693.tar.gz",
+        "sha256": "366080cccc793f18209c701fafc4fe398d9eb16e99eec1170a0defe87ba91693",
+        "size": 24800603
+      },
+      "bytes": 163591884,
+      "files": 11550,
+      "kind": "portable_evidence",
+      "manifest_sha256": "46e4a15fe85dffc84de8274409e87655a165d80fa0f1f7beda89da391b1f5c9b",
+      "product_promotion": false,
+      "schema_version": 1,
+      "signature_status": "unsigned"
+    },
+    "host_packet_verified": {
+      "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/full159-packet-verified.json",
+      "sha256": "da320dc8289ddbfbd0fb344712b644985b6ac71eb7992ddfb0f9a194ccdf3e82",
+      "size": 155
+    },
+    "companion_navigation_package": {
+      "archive": {
+        "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/companion-navigation-store/92a08d95c3f725b6281f24fd0143f80a36a7a3e5bbda8ebd1f5371cefbd58f36.tar.gz",
+        "sha256": "92a08d95c3f725b6281f24fd0143f80a36a7a3e5bbda8ebd1f5371cefbd58f36",
+        "size": 3251710
+      },
+      "bytes": 38282494,
+      "files": 13,
+      "kind": "portable_evidence",
+      "manifest_sha256": "40c0c5c31ea782017d30aef6a3f00deed79d0d8dbcdcd6a85f1139b79b0ad14d",
+      "product_promotion": false,
+      "schema_version": 1,
+      "signature_status": "unsigned"
+    },
+    "companion_gate_audit": {
+      "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/companion-annex-gate-audit.json",
+      "sha256": "74f00df927b9fbe4ad6accc9ff78b0d78ec526a2b3d08e7f46f1a2704c3445a4",
+      "size": 21976
+    },
+    "candidate_archive_total_bytes": 287172998,
+    "candidate_qualified_scope": "Eight unsigned exact H743/U575 software-reference candidates; not general family/all-peripheral support, hardware qualification or product release."
+  },
+  "existing_public_retention": {
+    "source_scope": "P4 and P5 only; immutable historical identities",
+    "assets_commit": "1c373a4988112a5a62d692fe8d165371380dadb7",
+    "registry_members": 175,
+    "P5_index": "https://github.com/X-Gen-Lab/nexus/blob/1c373a4988112a5a62d692fe8d165371380dadb7/docs-platform-delivery-20261029-gd742cdb5/delivery-index.json",
+    "final_P6_append": "pending_final_public_archive_exact_commit_download_and_independent_restore",
+    "existing_leaf_or_175_members_rewritten": false
+  },
+  "historical_identity_rule": "P4/P5 failed or partial formal runs, public leaves, archives and original receipts remain bound to original source and original state; no report splicing or historical relabelling.",
+  "fresh_sdk_consumers": {
+    "verification": {
+      "path": "/workspace/nexus-software-qualification-7590b2d4-20261029/sdk-consumers/verification.json",
+      "sha256": "ceb14e880aabb4ae74d85e45e30762f26b3465462f2b14618e0f1d85f0ba85b2",
+      "size": 367395
+    },
+    "source_revision": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "consumer_roots": 50,
+    "commands": 202,
+    "selected_images": 37,
+    "status": "passed",
+    "duration_seconds": 354.8367384969897,
+    "snapshot_match_alone_is_not_byte_inventory_equality": true
+  },
+  "kind": "public_platform_only_projection_of_existing_source_bound_navigation",
+  "projection": "Explicit public allowlist from the unchanged original source-bound navigation. This is evidence navigation, not a new taskauthority orledger. Full mixed/private navigation remains privatelyretained.",
+  "artifact_navigation_only": true,
+  "not_a_second_task_status_authority": true,
+  "status": "platform_local_software_scope_complete_public_recovery_at_fixed_entry",
+  "public_recovery_entry": "public-recovery-proof.json",
+  "private_example_evidence_ref": {
+    "repository": "X-Gen-Lab/nexus-examples",
+    "visibility": "private",
+    "authenticated_artifact_entry": "https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json",
+    "branch": "delivery-assets",
+    "exact_private_storage_commit": "1baac7b7946a3d71e855e41365972b0781af5291",
+    "exact_commit_rule": "Actual immutable proofappend commit supplied by privateowner; only the authenticated artifactentry is public navigation, not private source/results."
+  },
+  "open_boundaries": {
+    "physical_HIL": "not_executed; realstation/workload/instrument evidence remains separate",
+    "two_independent_OCI_recipe_rebuilds": "not_executed; observed OCI retention/recovery is not recipe reconstruction",
+    "fresh_daemon_load": "not_executed",
+    "CodeQL": "No current remote source-bound CodeQL scan result is inferred fromlocaltidy/cpp/ordinarytests",
+    "Pages": "not_published_by_Git_artifactretention",
+    "server_rules": "not_established_by_this_workflow",
+    "official_Release": "not_published; unsigned softwarecandidates are not productpromotion orattestation"
+  },
+  "source_original_preservation": "Original fullnavigation bytes and original authored78taskauthority remain unchanged; no privateexamples results orsourceidentity are projected here."
+}

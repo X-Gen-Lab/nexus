@@ -1,0 +1,813 @@
+{
+  "kind": "measured_original_p5_p6_cold_guard_resource_comparison",
+  "limitations": [
+    "Two guard fixes are assessed by linked static resource reports, not runtime execution/performance.",
+    "Source SDK identity intentionally differs, so configuration SHA is not claimed equal; explicit compared hardware/product settings do match."
+  ],
+  "method": "Stream unchanged resolved/resource JSON bytes directly from each original verified standard-store archive, validate each member SHA/size against its sealed manifest, compare every resolved field and original measured static metrics. No build, extraction tree, source or prior evidence edits.",
+  "p5_artifact_manifest": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-d742cdb5/offline-artifact-manifest.json",
+    "sha256": "fec64a1b3d82237bfb891107ca331a2e28d35e45f876b2cc9235d61b8fd12887",
+    "size": 39355
+  },
+  "p5_source": {
+    "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "570f807e722649e976670f747950fe1acb61fcc7"
+  },
+  "p6_artifact_manifest": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/offline-artifact-manifest.json",
+    "sha256": "ae7e6b325700e9a794cb782f3e353a7487860bd6c6d5b2419c99895b96ccaf0b",
+    "size": 39357
+  },
+  "p6_source": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414"
+  },
+  "physical_status": "not_executed",
+  "profiles": [
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "1f8d83cdef23d6bfb0cd60a56bfa24d7b9f661b786b8fa0b963b3262ae6a4ec4",
+      "p5_flash_footprint_bytes": 2784,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-baremetal-empty/79d8e215c31389188e00df038e0138560aa138c41817d201937ddc0fd7db2d79.tar.gz",
+            "sha256": "79d8e215c31389188e00df038e0138560aa138c41817d201937ddc0fd7db2d79",
+            "size": 22036343
+          },
+          "manifest_sha256": "ca122e648e34e99d1550ce91b7a582abef4fc60272684e6dec041885cbb80de1",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "0e29f6491717bccc709f79a474a3f577f97beddc71fa02b4543c8b0e4d9415b2",
+          "size": 17310
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-baremetal-empty/79d8e215c31389188e00df038e0138560aa138c41817d201937ddc0fd7db2d79.tar.gz",
+            "sha256": "79d8e215c31389188e00df038e0138560aa138c41817d201937ddc0fd7db2d79",
+            "size": 22036343
+          },
+          "manifest_sha256": "ca122e648e34e99d1550ce91b7a582abef4fc60272684e6dec041885cbb80de1",
+          "member": "resource-budget-measured.json",
+          "sha256": "4ddc505383eca868adadd80b31c962f0295d9b8e5d65e6b751d92e0b1f78da87",
+          "size": 5558
+        }
+      },
+      "p6_configuration_sha256": "c227a92eb3f7ff8c66b3255a0c9a749fd8d80b08939ecebe1bbed8518deac5a7",
+      "p6_flash_footprint_bytes": 2784,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-empty/11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd.tar.gz",
+            "sha256": "11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd",
+            "size": 22038705
+          },
+          "manifest_sha256": "6a747794c98a17f7a81939cb52bdfcaefa2165a6cf48841d1c59c02853d1ed80",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "7cc97694d50da542cf73b9c2472c000b5036e4d984488ef5be67511775e72a37",
+          "size": 17310
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-empty/11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd.tar.gz",
+            "sha256": "11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd",
+            "size": 22038705
+          },
+          "manifest_sha256": "6a747794c98a17f7a81939cb52bdfcaefa2165a6cf48841d1c59c02853d1ed80",
+          "member": "resource-budget-measured.json",
+          "sha256": "725398e1eab01ae4bc247bd893d343ddde66489954d6578735a8fd376fd9a171",
+          "size": 5558
+        }
+      },
+      "profile": "h743-baremetal-empty",
+      "ram": {
+        "axi-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 2104,
+          "p6_reserved_bytes": 2104
+        },
+        "backup-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "dtcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "itcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram2": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram3": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 16,
+      "flash_loaded_delta_bytes": 16,
+      "p5_configuration_sha256": "edffe1ee75fd14eb38c7c009157397ca59deb1cdadec04d11f6d333c47bf0293",
+      "p5_flash_footprint_bytes": 10500,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-baremetal-uart/cd139105eec123e8b075509328555fc5d1e0c98c1be62f37a360e87778b218ca.tar.gz",
+            "sha256": "cd139105eec123e8b075509328555fc5d1e0c98c1be62f37a360e87778b218ca",
+            "size": 22102965
+          },
+          "manifest_sha256": "d2f1bcb1c57cf716ae72c19faa5753443dc762cb7e138eb915a1a7d7175d7e89",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "42c0d08adbaa820cbad9bc1aa3532c0df1d1829e94494956aaff43664e743276",
+          "size": 19872
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-baremetal-uart/cd139105eec123e8b075509328555fc5d1e0c98c1be62f37a360e87778b218ca.tar.gz",
+            "sha256": "cd139105eec123e8b075509328555fc5d1e0c98c1be62f37a360e87778b218ca",
+            "size": 22102965
+          },
+          "manifest_sha256": "d2f1bcb1c57cf716ae72c19faa5753443dc762cb7e138eb915a1a7d7175d7e89",
+          "member": "resource-budget-measured.json",
+          "sha256": "5dba85be97feb8e64c21d8bdfb9ed98150e822e21e24989bfb39f10598747cfc",
+          "size": 5487
+        }
+      },
+      "p6_configuration_sha256": "e2a451ef0b3bbc1ef990be9841b2f26e3fe3d49fb9651e1736691f6e9b78e2fe",
+      "p6_flash_footprint_bytes": 10516,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-uart/87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5.tar.gz",
+            "sha256": "87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5",
+            "size": 22104071
+          },
+          "manifest_sha256": "1d4445969aab6ef25d9b67cb97e77175f47dbe2a422959063c25b03b2bd31e9d",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "4f2e8a9172c2037cec1210eb7a605cec9e0f28b0af4b961581b384870531ad12",
+          "size": 19872
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-uart/87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5.tar.gz",
+            "sha256": "87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5",
+            "size": 22104071
+          },
+          "manifest_sha256": "1d4445969aab6ef25d9b67cb97e77175f47dbe2a422959063c25b03b2bd31e9d",
+          "member": "resource-budget-measured.json",
+          "sha256": "e332359b3c72c70370bc5b3914989c0ac33d7eb5dbf492f83c3c55fe99ff7653",
+          "size": 5487
+        }
+      },
+      "profile": "h743-baremetal-uart",
+      "ram": {
+        "axi-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 2368,
+          "p6_reserved_bytes": 2368
+        },
+        "backup-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "dtcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "itcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram2": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram3": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "5869329c30ec02663278793a4e04c558fd3ec99b64a20e64277e284f2f1d53cc",
+      "p5_flash_footprint_bytes": 5188,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-freertos-empty/d544b58b16960d9e2f5dc482865890d89f175036a830584f3ce43469a2a9fccf.tar.gz",
+            "sha256": "d544b58b16960d9e2f5dc482865890d89f175036a830584f3ce43469a2a9fccf",
+            "size": 22134883
+          },
+          "manifest_sha256": "5f12765def099e4b08aa1c533856dbe1dcfdf5dc8d148871e81b6bf5626715a2",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "5fc2c8a003a345a57cb1b6de9b42f3dd971ef1f791973f3f7db92d67200f2417",
+          "size": 20089
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-freertos-empty/d544b58b16960d9e2f5dc482865890d89f175036a830584f3ce43469a2a9fccf.tar.gz",
+            "sha256": "d544b58b16960d9e2f5dc482865890d89f175036a830584f3ce43469a2a9fccf",
+            "size": 22134883
+          },
+          "manifest_sha256": "5f12765def099e4b08aa1c533856dbe1dcfdf5dc8d148871e81b6bf5626715a2",
+          "member": "resource-budget-measured.json",
+          "sha256": "a6bd8a13d21bd6432e3cbb5ad788839154d1f062cec0f47c59956bd8f28c9695",
+          "size": 5485
+        }
+      },
+      "p6_configuration_sha256": "331f4d42de250a2d4a81369fb14b82e18096aed2f2ed1f8907013f5225cf0be2",
+      "p6_flash_footprint_bytes": 5188,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-empty/2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e.tar.gz",
+            "sha256": "2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e",
+            "size": 22136999
+          },
+          "manifest_sha256": "c060473324dfb666ec6314ccd7dc53d985d78c69584caefccd4947b08aec6019",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "d691bfd065e752d0c7cd8354d23266f15aa4381aeba855e07a1badf54475d3d2",
+          "size": 20089
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-empty/2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e.tar.gz",
+            "sha256": "2f51b4bd1bba398ff648febcad6f6b11df7da7ea2d770b12a53dfc0dd53fc83e",
+            "size": 22136999
+          },
+          "manifest_sha256": "c060473324dfb666ec6314ccd7dc53d985d78c69584caefccd4947b08aec6019",
+          "member": "resource-budget-measured.json",
+          "sha256": "9f3949c66c9bb269f76f57de31366e33a716c815097cb643d1d59ddd09623ad7",
+          "size": 5485
+        }
+      },
+      "profile": "h743-freertos-empty",
+      "ram": {
+        "axi-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 3032,
+          "p6_reserved_bytes": 3032
+        },
+        "backup-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "dtcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "itcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram2": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram3": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 16,
+      "flash_loaded_delta_bytes": 16,
+      "p5_configuration_sha256": "d2ac80f1c4b27323ca38faf849b33ec4457ad62e0b6ca5e0a98b890dc476854e",
+      "p5_flash_footprint_bytes": 12904,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-freertos-uart/b864e954574296d7cf7926c76e451cd6c625c16331047c18f5a2d6b3bffec552.tar.gz",
+            "sha256": "b864e954574296d7cf7926c76e451cd6c625c16331047c18f5a2d6b3bffec552",
+            "size": 22195932
+          },
+          "manifest_sha256": "8b17a4b4bb5a3f4cd1b5b826d2781ec3075e5229261cff50ba4f8f4e36666de7",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "027673b93ac45287561e2a55da57b80b7e0f5566544fb5cb3c805fe43de5c7ae",
+          "size": 22651
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/h743-freertos-uart/b864e954574296d7cf7926c76e451cd6c625c16331047c18f5a2d6b3bffec552.tar.gz",
+            "sha256": "b864e954574296d7cf7926c76e451cd6c625c16331047c18f5a2d6b3bffec552",
+            "size": 22195932
+          },
+          "manifest_sha256": "8b17a4b4bb5a3f4cd1b5b826d2781ec3075e5229261cff50ba4f8f4e36666de7",
+          "member": "resource-budget-measured.json",
+          "sha256": "aad77be9a0977b99582aa6b32ec17ecbdf2a49cdf6cfb05f08f81a5d5a5c5ef3",
+          "size": 5546
+        }
+      },
+      "p6_configuration_sha256": "2e15de4712d3123d7ebc7b34ceb5493c67b7ae7873f80084c0498f56c745376a",
+      "p6_flash_footprint_bytes": 12920,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-uart/1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f.tar.gz",
+            "sha256": "1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f",
+            "size": 22197705
+          },
+          "manifest_sha256": "be93e56e56295045ba7a5c83529eef396ba0e98339b9b28179851e4cee2ad422",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "bc1e2fe18ce225b9fec1ddec63b67d95ddbf7f0543dc6dd938e938b03f83d2db",
+          "size": 22651
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-uart/1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f.tar.gz",
+            "sha256": "1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f",
+            "size": 22197705
+          },
+          "manifest_sha256": "be93e56e56295045ba7a5c83529eef396ba0e98339b9b28179851e4cee2ad422",
+          "member": "resource-budget-measured.json",
+          "sha256": "dd0c74e14b38a353f5d24978c66122b64689c1c1722a5f30f75a791e62382e51",
+          "size": 5546
+        }
+      },
+      "profile": "h743-freertos-uart",
+      "ram": {
+        "axi-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 3292,
+          "p6_reserved_bytes": 3292
+        },
+        "backup-sram": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "dtcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "itcm": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram2": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram3": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "c3d84722a3ac26fa82f712fa750b026ef4768738f08b436ddd4ae4cd458d2485",
+      "p5_flash_footprint_bytes": 2300,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-baremetal-empty/1feb2dc0fd7d184c5eecc4b8694b2797cc35d6db22a2dd58bdebb69ba60ac542.tar.gz",
+            "sha256": "1feb2dc0fd7d184c5eecc4b8694b2797cc35d6db22a2dd58bdebb69ba60ac542",
+            "size": 22038778
+          },
+          "manifest_sha256": "a637d43d4c100a7f0f4886cfe8c1270feb37f576ad822f2d584fe649a019dd6e",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "4722b34ecfb1fbf32117e66648d463bc61666820f8a46f16c82ecbb86753f8c2",
+          "size": 79381
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-baremetal-empty/1feb2dc0fd7d184c5eecc4b8694b2797cc35d6db22a2dd58bdebb69ba60ac542.tar.gz",
+            "sha256": "1feb2dc0fd7d184c5eecc4b8694b2797cc35d6db22a2dd58bdebb69ba60ac542",
+            "size": 22038778
+          },
+          "manifest_sha256": "a637d43d4c100a7f0f4886cfe8c1270feb37f576ad822f2d584fe649a019dd6e",
+          "member": "resource-budget-measured.json",
+          "sha256": "034ff249a44dfcd6afd1119de1868fca254d039fa520c378a41545002607db7b",
+          "size": 4684
+        }
+      },
+      "p6_configuration_sha256": "25ddb4f5b9a239f1efdbc44f1fe051bc37ac3b7a6dbcf57d6e1366e0ad571194",
+      "p6_flash_footprint_bytes": 2300,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-empty/98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7.tar.gz",
+            "sha256": "98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7",
+            "size": 22040828
+          },
+          "manifest_sha256": "72578544c29542f88b5858d9e1a7d53ec8adf363a9470909adcc0d3e58ff9540",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "a379f8a4a04ae671cc1428d3e8808a18221c43e60863dc51acfb90e8ac3c2b95",
+          "size": 79381
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-empty/98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7.tar.gz",
+            "sha256": "98197c0068ed9c81ee7f6ac62763294ec34b23294edd738723f8d4600c87c0c7",
+            "size": 22040828
+          },
+          "manifest_sha256": "72578544c29542f88b5858d9e1a7d53ec8adf363a9470909adcc0d3e58ff9540",
+          "member": "resource-budget-measured.json",
+          "sha256": "4d004acb40727e1f0bf1a3eee29f9bd845f7aaafc25e2c56b2f673fb36ea11f1",
+          "size": 4684
+        }
+      },
+      "profile": "u575-baremetal-empty",
+      "ram": {
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 2112,
+          "p6_reserved_bytes": 2112
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "6e771d9f67b8734950611182ddcd9dcea3348a179f53b7a45387f8f4af5df44a",
+      "p5_flash_footprint_bytes": 9912,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-baremetal-uart/9d8b34d4aa60c6de152890b127c94f75e8fe41f5932fc07fe41d9372cf4ea6b5.tar.gz",
+            "sha256": "9d8b34d4aa60c6de152890b127c94f75e8fe41f5932fc07fe41d9372cf4ea6b5",
+            "size": 22099228
+          },
+          "manifest_sha256": "93a4949912e13259a2665ebb6c37868e7c3472dcf6ef1b20e4f9e69c98cb30f5",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "70a62d75348f675512ba3e2f127941373ab976318a4747a372c2a0deaa7532ff",
+          "size": 81957
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-baremetal-uart/9d8b34d4aa60c6de152890b127c94f75e8fe41f5932fc07fe41d9372cf4ea6b5.tar.gz",
+            "sha256": "9d8b34d4aa60c6de152890b127c94f75e8fe41f5932fc07fe41d9372cf4ea6b5",
+            "size": 22099228
+          },
+          "manifest_sha256": "93a4949912e13259a2665ebb6c37868e7c3472dcf6ef1b20e4f9e69c98cb30f5",
+          "member": "resource-budget-measured.json",
+          "sha256": "b2dae5b7b8c877e811502c05ce535f7b47f4cb5b238be4bf45c7c4cc72a51969",
+          "size": 4611
+        }
+      },
+      "p6_configuration_sha256": "d1b5ebd5c86c035839122b0582dd7b1de8a282d02cace498da9d1fcbddb996e4",
+      "p6_flash_footprint_bytes": 9912,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-uart/1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497.tar.gz",
+            "sha256": "1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497",
+            "size": 22100445
+          },
+          "manifest_sha256": "9737a6895e352a35326840410424eadf99f27f222c5f400d423d7ca33c5431c7",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "f0b6c29d61c446d94e03febc609ad2e252086b5ba8892d15646535d23f94d2c2",
+          "size": 81957
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-uart/1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497.tar.gz",
+            "sha256": "1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497",
+            "size": 22100445
+          },
+          "manifest_sha256": "9737a6895e352a35326840410424eadf99f27f222c5f400d423d7ca33c5431c7",
+          "member": "resource-budget-measured.json",
+          "sha256": "77c295838892dfc3f8f4ca181663e8ae77bf8fad95b216e7f0bcef0e78c89d0b",
+          "size": 4611
+        }
+      },
+      "profile": "u575-baremetal-uart",
+      "ram": {
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 2368,
+          "p6_reserved_bytes": 2368
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "ebae4c2dfc51210674ec106618b952c8bb5d9636dd38a2ddf0dc84fb441fee3a",
+      "p5_flash_footprint_bytes": 4724,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-freertos-empty/2fd22813678252c86aed91c2c6d6330ddef7ebd78ef15c47c00289b4cca9b43a.tar.gz",
+            "sha256": "2fd22813678252c86aed91c2c6d6330ddef7ebd78ef15c47c00289b4cca9b43a",
+            "size": 22140422
+          },
+          "manifest_sha256": "7cbe746e341c92c07c4ced10f26919c1bc3d5678bb7bbb3ff0a92eaf517093b4",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "0f50755155c2b00d95f24b819230368cd51d8dbce34e008e705a886869151aa2",
+          "size": 82257
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-freertos-empty/2fd22813678252c86aed91c2c6d6330ddef7ebd78ef15c47c00289b4cca9b43a.tar.gz",
+            "sha256": "2fd22813678252c86aed91c2c6d6330ddef7ebd78ef15c47c00289b4cca9b43a",
+            "size": 22140422
+          },
+          "manifest_sha256": "7cbe746e341c92c07c4ced10f26919c1bc3d5678bb7bbb3ff0a92eaf517093b4",
+          "member": "resource-budget-measured.json",
+          "sha256": "67055b35a00328b15c06e582a63bf1d9ab74bd6389ad0d122be123cc4dc185d5",
+          "size": 4611
+        }
+      },
+      "p6_configuration_sha256": "44f1f500147ad1db0030a56c1c20ed8c94d4638e3efefdddb3cd71436c258ce1",
+      "p6_flash_footprint_bytes": 4724,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-empty/a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112.tar.gz",
+            "sha256": "a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112",
+            "size": 22143031
+          },
+          "manifest_sha256": "31a7a599b8fef486fa69eeeefe70373433f999274ee8613676bcdd858f21a616",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "a99dc4cba6c221d05d107995175335d83355d9f601d40d9c497b069535ee6efd",
+          "size": 82257
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-empty/a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112.tar.gz",
+            "sha256": "a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112",
+            "size": 22143031
+          },
+          "manifest_sha256": "31a7a599b8fef486fa69eeeefe70373433f999274ee8613676bcdd858f21a616",
+          "member": "resource-budget-measured.json",
+          "sha256": "bdcc536f8c0cf319560f7ae0f1a6b5aa24bb02a30f79b00fb33fa7114ad99d6f",
+          "size": 4611
+        }
+      },
+      "profile": "u575-freertos-empty",
+      "ram": {
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 3040,
+          "p6_reserved_bytes": 3040
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    },
+    {
+      "assembly_identifier_equal": true,
+      "change_explanation": "Full configuration identity correctly changes because each fresh source SDK manifest has a distinct source identity; all other resolved fields equal. Original identities are retained, never rewritten.",
+      "configuration_sha256_equal": false,
+      "flash_footprint_delta_bytes": 0,
+      "flash_loaded_delta_bytes": 0,
+      "p5_configuration_sha256": "4912077c229ef2b27fcfac55cc639c3183febd1974d3dc40e2aa604c757a89e6",
+      "p5_flash_footprint_bytes": 12340,
+      "p5_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-freertos-uart/52383eba448ba44fe3bc48fd426be6f78e5f61302481c74240ade75ac344ebc5.tar.gz",
+            "sha256": "52383eba448ba44fe3bc48fd426be6f78e5f61302481c74240ade75ac344ebc5",
+            "size": 22196468
+          },
+          "manifest_sha256": "edd9c60de4fbb7fb7242891a5facd286bd33a60a0c661e35a0e4e17f3b7b8f4b",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "99d06904347f50d92271be57e394d231cc32811c70dcb47682ec7db9a618c744",
+          "size": 84833
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-d742cdb5-20261029/raw-store/u575-freertos-uart/52383eba448ba44fe3bc48fd426be6f78e5f61302481c74240ade75ac344ebc5.tar.gz",
+            "sha256": "52383eba448ba44fe3bc48fd426be6f78e5f61302481c74240ade75ac344ebc5",
+            "size": 22196468
+          },
+          "manifest_sha256": "edd9c60de4fbb7fb7242891a5facd286bd33a60a0c661e35a0e4e17f3b7b8f4b",
+          "member": "resource-budget-measured.json",
+          "sha256": "b16b3bf8ca05bfad6a78b55be81c7147c5396d9f4d10431753e0936a8afa4299",
+          "size": 4672
+        }
+      },
+      "p6_configuration_sha256": "557818b120f0ffc4af21a494aa832adc0761d1e86c06bfed648cbb06ab545b4d",
+      "p6_flash_footprint_bytes": 12340,
+      "p6_members": {
+        "host-measurement-view/resolved.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-uart/50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74.tar.gz",
+            "sha256": "50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74",
+            "size": 22197137
+          },
+          "manifest_sha256": "9696381840c224d143ff5d65425f61eb5bc7743ffc50d5b590deec380746bb9c",
+          "member": "host-measurement-view/resolved.json",
+          "sha256": "01a9640871d77ee18e4f46b38e4f9e7e2f7c38314e4362a09ed76dd152aacae1",
+          "size": 84833
+        },
+        "resource-budget-measured.json": {
+          "archive": {
+            "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-uart/50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74.tar.gz",
+            "sha256": "50a152b0cab260059801cb71142ee5208d719c8be1a66024d803fd85f3e1fb74",
+            "size": 22197137
+          },
+          "manifest_sha256": "9696381840c224d143ff5d65425f61eb5bc7743ffc50d5b590deec380746bb9c",
+          "member": "resource-budget-measured.json",
+          "sha256": "9828db61b42f0d4fbad13e7ea7acc232b7645a57602ecae1f959d3503886a2ee",
+          "size": 4672
+        }
+      },
+      "profile": "u575-freertos-uart",
+      "ram": {
+        "sram1": {
+          "delta": 0,
+          "p5_reserved_bytes": 3292,
+          "p6_reserved_bytes": 3292
+        },
+        "sram4": {
+          "delta": 0,
+          "p5_reserved_bytes": 0,
+          "p6_reserved_bytes": 0
+        }
+      },
+      "resolved_changed_fields": [
+        "/configuration_sha256",
+        "/inputs/0/sha256"
+      ],
+      "same_hardware_and_product_settings": true,
+      "total_reserved_ram_delta_bytes": 0
+    }
+  ]
+}

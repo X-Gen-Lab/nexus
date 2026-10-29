@@ -1,0 +1,72 @@
+{
+  "kind": "ordinary_increment_and_remote_readback",
+  "observed_at_utc": "2026-10-29T09:31:51.217451+00:00",
+  "ordinary_head": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+  "remote_head": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+  "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414",
+  "parent": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+  "ordinary_actual_exit_code": 0,
+  "ordinary_duration_seconds": 850.8266596400063,
+  "ordinary_receipt": "/workspace/nexus/build/c-cold-20261028/integration/commit-attempt-06-01.command.json",
+  "source_manifest": "/workspace/nexus/build/c-cold-20261028/integration/commit-source-06-01.json",
+  "source_sha_unchanged": true,
+  "ordinary_index_tree_is_commit_tree": true,
+  "normal_authenticated_git_push_actual_exit_code": 0,
+  "normal_git_push_force": false,
+  "normal_git_push_tool_session": 36579,
+  "remote_readback_receipt": "/workspace/nexus/build/c-cold-20261028/integration/p6-remote-readback.attempts/1793266310702109031-9a893080048e40a2bebe8fbfd776dad5/receipt.json",
+  "execution_json": {
+    "path": "/workspace/nexus/build/native-debug/tdd/execution.json",
+    "sha256": "9c51421ad235ef23e1ed835c30c8ba5e972c97dd497e2b41697497b64a75c85e"
+  },
+  "google_programs": 386,
+  "google_cases": 6819,
+  "tool_suites": [
+    {
+      "suite": "testing",
+      "discovered": 1673,
+      "executed": 1673,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "configure",
+      "discovered": 1156,
+      "executed": 1156,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "ci",
+      "discovered": 493,
+      "executed": 493,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "workflows",
+      "discovered": 159,
+      "executed": 159,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    }
+  ],
+  "software_qualified": false,
+  "physical_status": "not_executed"
+}

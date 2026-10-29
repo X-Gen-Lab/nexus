@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-freertos-empty/4894bb7014f088293019ef7355fc3363c31249f08ca73b58d73e29b003d5fb47.tar.gz",
+    "sha256": "4894bb7014f088293019ef7355fc3363c31249f08ca73b58d73e29b003d5fb47",
+    "size": 35889185
+  },
+  "bytes": 98063324,
+  "files": 3246,
+  "kind": "portable_evidence",
+  "manifest_sha256": "85e2b36b235aab73d452ff6dc28bf237cdc797ccd51635f64789be445784c9c4",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

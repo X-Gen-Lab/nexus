@@ -1,0 +1,1 @@
+Restored policy11 transport verified: 50 consumers / 53 images / 202 commands / 37 selected images; no producer replay

@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-freertos-empty/a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112.tar.gz",
+    "sha256": "a053189364d462e58aa6ece1deb30ba5afc900d93da290d36a49512a2d46e112",
+    "size": 22143031
+  },
+  "bytes": 153741302,
+  "files": 6339,
+  "kind": "portable_evidence",
+  "manifest_sha256": "31a7a599b8fef486fa69eeeefe70373433f999274ee8613676bcdd858f21a616",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

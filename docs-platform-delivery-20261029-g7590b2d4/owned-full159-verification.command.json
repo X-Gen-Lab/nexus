@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python3",
+    "-B",
+    "-c",
+    "from pathlib import Path; import json,hashlib; from tools.dev.qualification import verify_execution; root=Path('/workspace/nexus'); report=Path('/workspace/nexus-software-qualification-7590b2d4-20261029/report.json'); expected=json.loads((root/'build/c-cold-20261028/final-software-execution/verification-04.json').read_text()); assert hashlib.sha256(report.read_bytes()).hexdigest()=='0133fa0cc092787affcbe494fa2c35c2a608328b21d5a90d74f39585485bea6a'; actual=verify_execution(json.loads((root/'tools/dev/plans/software.json').read_text()),report,root); assert actual==expected; print('Maintained qualification verification: '+actual['status'])"
+  ],
+  "cwd": "/workspace/nexus",
+  "stage": "owned_maintained_qualification_verification",
+  "started_ns": 1793277154499190943,
+  "finished_ns": 1793277155271327551,
+  "duration_seconds": 0.7721377089910675,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "resource_usage": {
+    "method": "linux_wait4",
+    "scope": "waited_process_and_reaped_descendants",
+    "user_cpu_seconds": 0.41565599999999997,
+    "system_cpu_seconds": 0.347005,
+    "maximum_process_rss_bytes": 19230720
+  },
+  "stdout": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/owned-verification-04.attempts/1793277154498646999-a47c80f8565b48c5bfb87e4339c94526/stdout.txt",
+    "bytes": 48,
+    "sha256": "1f99188cb03fd9419198079c23bfe6a5f0336b4d3b56236151a633741f60d522"
+  },
+  "stderr": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/owned-verification-04.attempts/1793277154498646999-a47c80f8565b48c5bfb87e4339c94526/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/workspace/nexus/build/c-cold-20261028/final-software-execution/owned-verification-04.attempts/1793277154498646999-a47c80f8565b48c5bfb87e4339c94526/receipt.json"
+}

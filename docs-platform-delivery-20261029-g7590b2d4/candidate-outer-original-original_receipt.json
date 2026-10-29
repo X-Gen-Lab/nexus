@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python3",
+    "-B",
+    "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/finish_candidates.py",
+    "resume-after-gate",
+    "--inputs",
+    "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-formal-inputs.json"
+  ],
+  "cwd": "/workspace/nexus",
+  "stage": "p6-candidate-delivery-resume02",
+  "started_ns": 1793278786065722263,
+  "outcome": "running",
+  "exit_code": null,
+  "timeout_seconds": 7200.0,
+  "stdout_path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/p6-candidate-delivery-resume02.attempts/1793278786065638206-5d9494718a104d048b82c4181ad4d470/stdout.txt",
+  "stderr_path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/p6-candidate-delivery-resume02.attempts/1793278786065638206-5d9494718a104d048b82c4181ad4d470/stderr.txt"
+}

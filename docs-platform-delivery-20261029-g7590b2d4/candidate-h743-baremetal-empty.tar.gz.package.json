@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/h743-baremetal-empty/53cc68edb73945dfb0bca158c151704187c5eecfc5e697207cb89a7674b9b524.tar.gz",
+    "sha256": "53cc68edb73945dfb0bca158c151704187c5eecfc5e697207cb89a7674b9b524",
+    "size": 35882078
+  },
+  "bytes": 98031610,
+  "files": 3246,
+  "kind": "portable_evidence",
+  "manifest_sha256": "a430c92e3a647f9b5d8dcd603bd4714236039ecb1c50a8ef8587a17c78a650a2",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

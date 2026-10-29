@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/companion-navigation-store/92a08d95c3f725b6281f24fd0143f80a36a7a3e5bbda8ebd1f5371cefbd58f36.tar.gz",
+    "sha256": "92a08d95c3f725b6281f24fd0143f80a36a7a3e5bbda8ebd1f5371cefbd58f36",
+    "size": 3251710
+  },
+  "bytes": 38282494,
+  "files": 13,
+  "kind": "portable_evidence",
+  "manifest_sha256": "40c0c5c31ea782017d30aef6a3f00deed79d0d8dbcdcd6a85f1139b79b0ad14d",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

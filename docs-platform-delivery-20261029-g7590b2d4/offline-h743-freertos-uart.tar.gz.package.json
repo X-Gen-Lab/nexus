@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-freertos-uart/1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f.tar.gz",
+    "sha256": "1cecc79e0ae3c7f35e527a1ac93dc9f11e1006fa966d36f8c6b86404d62ad94f",
+    "size": 22197705
+  },
+  "bytes": 153777264,
+  "files": 6345,
+  "kind": "portable_evidence",
+  "manifest_sha256": "be93e56e56295045ba7a5c83529eef396ba0e98339b9b28179851e4cee2ad422",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

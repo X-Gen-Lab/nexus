@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/ordinary-p6-store/4046283b3f9041e0719ad19454d948dfaaecc8ad08b751149ad931108b3f8dcf.tar.gz",
+    "sha256": "4046283b3f9041e0719ad19454d948dfaaecc8ad08b751149ad931108b3f8dcf",
+    "size": 1861349
+  },
+  "bytes": 22790756,
+  "files": 3820,
+  "kind": "portable_evidence",
+  "manifest_sha256": "214ed2c775de3296040e0186b075e8333e19f1294a979757ceaceb686af63703",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

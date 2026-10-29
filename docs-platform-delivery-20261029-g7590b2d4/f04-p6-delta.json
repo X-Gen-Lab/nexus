@@ -1,0 +1,824 @@
+{
+  "kind": "F04_P6_bounded_definition_and_contract_delta",
+  "created_at_utc": "2026-10-29T09:42:54.934615+00:00",
+  "software_qualified": false,
+  "physical_status": "not_executed",
+  "source": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414",
+    "parent": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "tracked_status_before": "",
+    "tracked_status_after": ""
+  },
+  "scope": "Read-only immutable-blob byte comparison and Python AST preservation for the three changed test files; references existing actual executions. No tests, builds, analyzer execution, full inventory or universal semantic review rerun by this delta. Historical artifacts are not modified or relabeled.",
+  "historical_authorities": [
+    {
+      "source_commit": "364f36658634e157b899ab62aacdcfaac21dbd9f",
+      "source_tree": "b7ccec5311cbee001a706ebd0ded68cd248a7b1c",
+      "authority": "Original complete selected-source immutable Git-blob inventory",
+      "selected_files": 735,
+      "static_C_Google_definitions": 4691,
+      "identity": {
+        "path": "build/c-cold-20261028/workflow/f04-review/c-google-definition-inventory.json",
+        "bytes": 1310564,
+        "sha256": "efeddf8263e241da34ffc13154f7a83a18b38554ac66c3ca7a0a20d4c24f9b97"
+      }
+    },
+    {
+      "source_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+      "source_tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b",
+      "authority": "Original per-definition/assertion/helper/fixture map and independent integrity review",
+      "mapped_C_Google_definitions": 4691,
+      "bounded_manual_semantic_references": 253,
+      "automatic_mapping_semantic_independence_unknown": 4438,
+      "identity": {
+        "path": "build/c-cold-20261028/workflow/f04-review/f04-final-mapping-integrity.json",
+        "bytes": 1755,
+        "sha256": "9fa8ab5cc9db08ecae3d2a0ec45ab5500244ff1d59834e5764b0b954f0a71252"
+      }
+    },
+    {
+      "source_commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+      "source_tree": "570f807e722649e976670f747950fe1acb61fcc7",
+      "authority": "P5 original-exit delta review; original C mapping unchanged at that source",
+      "identity": {
+        "path": "build/c-cold-20261028/workflow/f04-review/f04-original-exit-p5-review.json",
+        "bytes": 19972,
+        "sha256": "3c20871c0a568e9741c0134dfe5df6edc5e703e72b654bea2e4578c51c213590"
+      }
+    }
+  ],
+  "change_counts": {
+    "all_changed_files": 7,
+    "production_C_files": 2,
+    "Google_test_files": 2,
+    "Python_test_files": 1,
+    "non_definition_files": 2,
+    "added_Google_definitions": 2,
+    "added_Python_test_methods": 2,
+    "added_definitions_total": 4,
+    "removed_existing_test_definitions": 0,
+    "test_files_with_new_definitions": 3
+  },
+  "changed_files": [
+    {
+      "path": "soc/stm32/stm32h743/platform_cold.c",
+      "role": "production_C",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 12200,
+        "git_blob": "41c2703524f19f191f0dda50ae1172f0ff2cabc5",
+        "sha256": "ae245e22377c5fed381b9cdf7dd8623d77ea3abefb377939dd612d3d2a9d3344"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 12262,
+        "git_blob": "238e7fd807c94a8b345b61dd01405d5305fd4154",
+        "sha256": "38d34ed144eeb2486ddececb3eb985f20059bb2c429655bf2f6bb5bdd2c75e6e"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "soc/stm32/stm32u575/platform_cold.c",
+      "role": "production_C",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 14002,
+        "git_blob": "f1a249be857fa5b7d6800e6b0096212f36c2718c",
+        "sha256": "114d48674cb4f0e51567e9ee8eefcf22c2902e8b6827393abd6fa7bab593c5d4"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 14071,
+        "git_blob": "f6079b3a2e4f0896b3264a4ad37bce1f749ada86",
+        "sha256": "563ecd9ee578c0118596835220209950f48348fa235b5676aef67cebb57decc0"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "tests/google/h743_factory_test.cpp",
+      "role": "Google_test",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 15361,
+        "git_blob": "a1b18c215ac270438748398f3ac67f526db2ac49",
+        "sha256": "ca114f59325069e6aa229d36b2cc64b3df80326ccc2b6a5da3e1a194f87da60d"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 16586,
+        "git_blob": "87da1fd8af021407b9aeafe7a35eacf9848e3e7a",
+        "sha256": "5e5f919fe0ad4200a73bbbcc55813509a4097df845da845c0599868507f5e4a7"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "tests/google/u575_factory_test.cpp",
+      "role": "Google_test",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 13201,
+        "git_blob": "f343147cbd025f748448c0bac81a542e6ebc74d1",
+        "sha256": "10d917d45e23c5d4c7cb2e8f615d0103303c141cdc87afd9b38573e71c6daaaf"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 14387,
+        "git_blob": "d55bc0f357235cb881867d2b12769be127ae0a83",
+        "sha256": "79c6468b2f3e103e0780730c2c2f4170ee2b34fec42bf386beeb0ee9655914f3"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "tools/dev/README.md",
+      "role": "non_definition_configuration_or_documentation",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 23501,
+        "git_blob": "e56fcc4c91bbb11fdbc4365ff2eb75137e32e433",
+        "sha256": "6f3f13af05ac2c249e5714701f4c45ece940c44f358028e577e96d27b2937c44"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 24048,
+        "git_blob": "45bcabd392a9c57b1c9d8cbe2b02f6032c588c6e",
+        "sha256": "561b28782844ce3cd640c1d0596d3cb51b0bdaffa596d2b4f559ad7d628ef200"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "tools/dev/plans/software.json",
+      "role": "non_definition_configuration_or_documentation",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 53479,
+        "git_blob": "c51ce67be72952960fa414b9fb99c60910f28efa",
+        "sha256": "2f04ff6e683b2175eae967c583a201571c83ab2d407cbd33ab8f5db71bb6d492"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 53479,
+        "git_blob": "b45271b36ad4e284e1eb7ba76e5c33fa9c25f6d8",
+        "sha256": "6b8d4a2dcb8632091b536e81883b3f018c9c2e138305a6a0057612061b644606"
+      },
+      "whole_file_changed": true
+    },
+    {
+      "path": "tools/testing/test_qualification_plan.py",
+      "role": "Python_test",
+      "p5": {
+        "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+        "bytes": 22036,
+        "git_blob": "c07dae06229851f735cb042fbdde2a78fa2553f4",
+        "sha256": "1a78b46dd9150f4d1badab7ddf74251d8b07b7641ba8d0bc96b5877ff1297001"
+      },
+      "p6": {
+        "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+        "bytes": 24513,
+        "git_blob": "a5a001f53480b3ab35f3a0538ea0aeed4fa5a911",
+        "sha256": "64fa4ae6e7bc64b70e99a22bb2b0ddc57e3a1fdf0064e6986edd6b37381b950f"
+      },
+      "whole_file_changed": true
+    }
+  ],
+  "retained_Google_source_byte_proof": [
+    {
+      "path": "tests/google/h743_factory_test.cpp",
+      "comparison": "P5 and P6 immutable Git blobs, line-preserving byte SequenceMatcher; all non-equal opcodes must be insertion. Remove the one inserted span then compare entire byte stream exactly.",
+      "p5_sha256": "ca114f59325069e6aa229d36b2cc64b3df80326ccc2b6a5da3e1a194f87da60d",
+      "p6_sha256": "5e5f919fe0ad4200a73bbbcc55813509a4097df845da845c0599868507f5e4a7",
+      "p6_without_added_span_sha256": "ca114f59325069e6aa229d36b2cc64b3df80326ccc2b6a5da3e1a194f87da60d",
+      "all_existing_bytes_equal": true,
+      "modified_or_deleted_existing_bytes": 0,
+      "inserted_span_bytes": 1225,
+      "old_inventory_definition_count": 21,
+      "p5_TEST_macro_count": 21,
+      "p6_TEST_macro_count": 22,
+      "new_identity": "H743ColdResources.MissingGateReceiptRejectsBeforeAnyClockEffects",
+      "old_definition_retention": "All old source bytes, including fixture, existing definitions, assertions and separators are retained; this is stronger than same-name/body-only matching for these two files. Historical file SHA remains historical."
+    },
+    {
+      "path": "tests/google/u575_factory_test.cpp",
+      "comparison": "P5 and P6 immutable Git blobs, line-preserving byte SequenceMatcher; all non-equal opcodes must be insertion. Remove the one inserted span then compare entire byte stream exactly.",
+      "p5_sha256": "10d917d45e23c5d4c7cb2e8f615d0103303c141cdc87afd9b38573e71c6daaaf",
+      "p6_sha256": "79c6468b2f3e103e0780730c2c2f4170ee2b34fec42bf386beeb0ee9655914f3",
+      "p6_without_added_span_sha256": "10d917d45e23c5d4c7cb2e8f615d0103303c141cdc87afd9b38573e71c6daaaf",
+      "all_existing_bytes_equal": true,
+      "modified_or_deleted_existing_bytes": 0,
+      "inserted_span_bytes": 1186,
+      "old_inventory_definition_count": 19,
+      "p5_TEST_macro_count": 19,
+      "p6_TEST_macro_count": 20,
+      "new_identity": "U575Factory.MissingGpioReceiptRejectsBeforeAnyClockEffects",
+      "old_definition_retention": "All old source bytes, including fixture, existing definitions, assertions and separators are retained; this is stronger than same-name/body-only matching for these two files. Historical file SHA remains historical."
+    }
+  ],
+  "retained_Python_method_AST_proof": {
+    "path": "tools/testing/test_qualification_plan.py",
+    "p5_class_methods": 32,
+    "p6_class_methods": 34,
+    "p5_test_methods": 27,
+    "p6_test_methods": 29,
+    "all_preexisting_same_name_method_AST_equal": true,
+    "removed_methods": [],
+    "changed_existing_methods": [],
+    "added_methods": [
+      "QualificationPlanTests.test_analyzer_failure_stops_before_native_execution_and_later_builds",
+      "QualificationPlanTests.test_analyzers_run_when_the_debug_compilation_inputs_are_ready"
+    ],
+    "method_comparison": "ast.dump(annotate_fields=True, include_attributes=False) of each complete class method, including decorators/body. Line and column positions deliberately excluded; this proves AST preservation, not byte-for-byte comments or runtime equivalence under all environments.",
+    "existing_method_AST_rows": [
+      {
+        "method": "QualificationPlanTests.setUp",
+        "p5_and_p6_ast_sha256": "9ed94ebb602cb04cc83ed20c6895976c020f6397b6115430ac5ff9c470f69f6b",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_actual_arm_artifact_recovery_boundaries_have_a_fixed_full_runner",
+        "p5_and_p6_ast_sha256": "2b0c59bd82cc46dc904cb92cf6a8c925bccd1a7300ff316cc60092f93ef310ee",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_all_four_tool_domains_share_the_fixed_complete_runner",
+        "p5_and_p6_ast_sha256": "f211c3320fc3d98520d553851628724f9db10bf0f77b2b8098673768310fde2f",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_canonical_provider_inputs_use_executable_owned_projects",
+        "p5_and_p6_ast_sha256": "ccc935a0ca6949cfcaaf928466e25aa4efdb6741c07d8473872543c7c4d5be36",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_each_expanded_provider_fixture_is_explicitly_qualified_once",
+        "p5_and_p6_ast_sha256": "07bcd68089a4fa6ce08d6cdfab234ed8c17c465ddb82b60a1578c0fb739aa8cc",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_each_io_evolution_preset_configures_and_builds_once",
+        "p5_and_p6_ast_sha256": "84b3d68dfa9ab663ca33406f38497c5fe48428520320897370be7ec293545769",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_each_native_preset_configures_builds_all_and_runs_full_ctest",
+        "p5_and_p6_ast_sha256": "cccebaa7a15c407cd88a2f6e8c7296ca87b24b8da162d1f3483555f4af5a5655",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_formal_analyzers_have_explicit_bounded_parallelism",
+        "p5_and_p6_ast_sha256": "3146cb0c83a4dccef8e3ce4c78206af957b02e7052b1b50521bf7d34665f7935",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_named_pin_state_canonical_has_one_real_arm_checker_stage",
+        "p5_and_p6_ast_sha256": "8ee81ab8c93bb32d94cf5a1c4efb9c820602f085228591bdc589f5e4fdce9279",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_native_time_presets_keep_real_host_targets_and_execution_boundaries",
+        "p5_and_p6_ast_sha256": "8f35fdf3858370105c6b0e3489418dafcb9de0673a558d51a191a8376726a2c5",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_redistributed_io_references_have_one_qualified_preset",
+        "p5_and_p6_ast_sha256": "b21d5667ed5da9808361b7e7a07a3051b7b92b1f14e916697c3c113e5b495ccd",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_sdk_boundary_script_bootstraps_without_import_environment",
+        "p5_and_p6_ast_sha256": "f379eaafced0eea4e15bca913db06f189fc9ee196dfeed45cd11899f7109bc9a",
+        "unchanged": true
+      },
+      {
+        "method": "QualificationPlanTests.test_source_sdk_illegal_input_boundaries_have_a_fixed_full_runner",
+        "p5_and_p6_ast_sha256": "fede3370c6d34e32cdd3a0df2fb9c202a40fa1e40377836af1afb052fd395e8f",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.execute",
+        "p5_and_p6_ast_sha256": "297dfdab73406d4fe5bc67a72020924aa9a272a79a8093b91cc440bbcfab5315",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.plan",
+        "p5_and_p6_ast_sha256": "ea6f7c9ff65cf50be6a89006a35bcaf30a3eb7afb2930ca2a54a49ebbf78a376",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.setUp",
+        "p5_and_p6_ast_sha256": "7a88c7991f99ee9de8fafd31d9905f57a6aa52ac9381fdc5db6f80cfd80dd993",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_absolute_executable_does_not_require_a_path_entry",
+        "p5_and_p6_ast_sha256": "657f2fd766dbe55c07eb2a6a3886be67420d55ce0fd5f940777a19bc2377787d",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_bare_tools_use_the_execution_environment",
+        "p5_and_p6_ast_sha256": "e0bf22cae14d58d1a04c2604cf0e7c8c4cf3a7c3fb64a446e8002b71e0585dc3",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_explicit_analysis_root_controls_relative_path_search",
+        "p5_and_p6_ast_sha256": "f40cc90e79911ebac86ec96337be6a17ba069cb0dce678d3c1cbcbd5d66d9224",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_explicit_analysis_root_controls_relative_tool_selection",
+        "p5_and_p6_ast_sha256": "0897bddbc0a9b2284cbba02ab03ada174e0f51845d65ca2fd01f50f10d55a355",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_later_missing_selection_overrides_an_existing_executable",
+        "p5_and_p6_ast_sha256": "0f4243fa1da2f08ee8eeca1db83f63b82cdc71b0989dc43240f3c6e99a24f3e3",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_missing_empty_and_unknown_selectors_do_not_start_stages",
+        "p5_and_p6_ast_sha256": "f6f562c0eb4c247e278aaf92928c288a0c64b9454143bd91b28f71e8f322ac5c",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_missing_late_tool_rejects_before_first_stage",
+        "p5_and_p6_ast_sha256": "8319de6d0704d141c1c33872937682bd55573414a9468340b846748113fb356f",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_missing_second_analyzer_prevents_all_stage_execution",
+        "p5_and_p6_ast_sha256": "83b712eb067f6439356cca14b03776173ad97284a9d9f47ce7800b59fd172d03",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_nonexecutable_file_and_directory_are_not_tools",
+        "p5_and_p6_ast_sha256": "85a50ffab4451f39deceec7ae394f3863f59d21c59368d39d02b1383f865fc95",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_plan_without_analyzer_does_not_require_one",
+        "p5_and_p6_ast_sha256": "e8e4ea7eb288db586f65f6ef851e52e241cffea44464dbfb8b8471f45fad00fe",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_presence_does_not_preapprove_actual_checker_success",
+        "p5_and_p6_ast_sha256": "fdd5f98705a9d84cee32cc105273f638555dfe7b9fb3027054148217322bd669",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_relative_path_entries_use_the_checker_working_directory",
+        "p5_and_p6_ast_sha256": "0b0284eb66fdf8b2acf720db467a965310b1c51756819758b9aaac17aeed31de",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_relative_tool_paths_use_the_checker_working_directory",
+        "p5_and_p6_ast_sha256": "3f22d5443537ce9324ebb318b124dab9681cc5bf5297fccd5774a14525b792ac",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_repeated_tool_selection_uses_the_last_spelling",
+        "p5_and_p6_ast_sha256": "f3ebdd6acf2a7e2489a0902d4da24016dfce58fe0f2a13d2970b89eb4e6e6111",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.test_separated_selection_can_replace_an_earlier_equals_selection",
+        "p5_and_p6_ast_sha256": "6127c8d87d14dcb270b288065a66330caf5fca002b05caadc0833b7f3ad68d7a",
+        "unchanged": true
+      },
+      {
+        "method": "QualityToolPreflightTests.tool",
+        "p5_and_p6_ast_sha256": "ddfebaa051e1860b2ed036b6e37ee55bcb46265b0e0657071de4544654e6e3e7",
+        "unchanged": true
+      }
+    ]
+  },
+  "new_definition_contract_oracle_mappings": [
+    {
+      "language": "C++ GoogleTest",
+      "identity": "tests/google/h743_factory_test.cpp::H743ColdResources.MissingGateReceiptRejectsBeforeAnyClockEffects",
+      "source": {
+        "path": "tests/google/h743_factory_test.cpp",
+        "first_inserted_line": 341,
+        "last_inserted_line": 364,
+        "inserted_span_sha256": "deecb82aaf0cf01003a138c285318e0cbe6adad449852c3ac67a9dd0ea8dc460",
+        "whole_file_sha256": "5e5f919fe0ad4200a73bbbcc55813509a4097df845da845c0599868507f5e4a7",
+        "git_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff"
+      },
+      "contract": "For each of four selected APB2/APB1/AHB1/APB4 gates, a missing added-mask receipt makes preflight, acquire and release reject before any observable register/lease effect.",
+      "oracle": "Literal NX_ERROR_INVALID for each public entry point; independent hardware-model read/write counters remain zero, captured stays false, added mask and all four receipt words remain zero. The missing position iterates over all four gates.",
+      "focused_execution": {
+        "xml": {
+          "path": "build/c-cold-20261028/cold-null-p6/h743-green.xml",
+          "bytes": 5897,
+          "sha256": "a5f1cf22db447de57046821511591b6b34fc1b131835a9d7d82123b725a65015"
+        },
+        "testcase": {
+          "name": "MissingGateReceiptRejectsBeforeAnyClockEffects",
+          "file": "/workspace/nexus/tests/google/h743_factory_test.cpp",
+          "line": "341",
+          "status": "run",
+          "result": "completed",
+          "time": "0.",
+          "timestamp": "2026-10-29T09:00:36.871",
+          "classname": "H743ColdResources"
+        },
+        "status": "passed"
+      },
+      "red_green_scope": "The new public behavior test passed against old P5 production C before the local analyzer-oriented fix. The actual RED was clang-tidy on the original source/context, not a fabricated behavioral RED."
+    },
+    {
+      "language": "C++ GoogleTest",
+      "identity": "tests/google/u575_factory_test.cpp::U575Factory.MissingGpioReceiptRejectsBeforeAnyClockEffects",
+      "source": {
+        "path": "tests/google/u575_factory_test.cpp",
+        "first_inserted_line": 248,
+        "last_inserted_line": 275,
+        "inserted_span_sha256": "59f9806ad08517092fd22ca6399d38716069fd759c402764f1989edea249de20",
+        "whole_file_sha256": "79c6468b2f3e103e0780730c2c2f4170ee2b34fec42bf386beeb0ee9655914f3",
+        "git_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff"
+      },
+      "contract": "A selected GPIO plus USART1/USART2/ADC4 configuration lacking the GPIO added-mask receipt rejects before side effects; a completely empty configuration remains accepted without effects.",
+      "oracle": "Literal NX_ERROR_INVALID for three invalid public calls and NX_SUCCESS for three empty-config calls; independent MMIO-model read/write counters stay zero, captured false, and APB1/APB2/AHB3 receipt words remain zero.",
+      "focused_execution": {
+        "xml": {
+          "path": "build/c-cold-20261028/cold-null-p6/u575-green.xml",
+          "bytes": 5287,
+          "sha256": "a27996aaf73ca6d902e22906a789ec0598ccfaee1caddd724f269ce37b70a2e2"
+        },
+        "testcase": {
+          "name": "MissingGpioReceiptRejectsBeforeAnyClockEffects",
+          "file": "/workspace/nexus/tests/google/u575_factory_test.cpp",
+          "line": "248",
+          "status": "run",
+          "result": "completed",
+          "time": "0.",
+          "timestamp": "2026-10-29T09:00:36.888",
+          "classname": "U575Factory"
+        },
+        "status": "passed"
+      },
+      "red_green_scope": "The new public behavior test passed against old P5 production C before the local analyzer-oriented fix. The actual RED was clang-tidy on the original source/context, not a fabricated behavioral RED."
+    },
+    {
+      "language": "Python unittest",
+      "identity": "tools/testing/test_qualification_plan.py::QualificationPlanTests.test_analyzer_failure_stops_before_native_execution_and_later_builds",
+      "source": {
+        "path": "tools/testing/test_qualification_plan.py",
+        "line": 209,
+        "end_line": 241,
+        "method_ast_sha256": "76884b9bad3dd12d746ff3007be240ef3232d0006d940f536b4134a885046588",
+        "source_segment_sha256": "657edfe777ffce832200dea50bb7e09a4905557da5b0813b6c50cb43dc75f26d",
+        "whole_file_sha256": "64fa4ae6e7bc64b70e99a22bb2b0ddc57e3a1fdf0064e6986edd6b37381b950f",
+        "git_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff"
+      },
+      "contract": "The maintained orchestrator stops at the first analyzer failure before Native contract execution, Release configuration, or Source SDK export.",
+      "oracle": "The real execute(self.plan, ...) orchestrator runs with explicitly mocked external command effects: only quality_tools.py receives exit7; expected report failed, last stage tidy/7, Debug build present, and specified later stages absent. No builds/analyzers are run by this fixture.",
+      "actual_red_green": {
+        "red_handoff": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/handoff.json",
+          "bytes": 4706,
+          "sha256": "27bac591a7a1fd6838c91d1954ce73d1613e7496b493077e0be8bd23d97ac653"
+        },
+        "red_raw": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/red.log",
+          "bytes": 5688,
+          "sha256": "bc1673ab92d1d64eccf548907b98a78301f4819557582787b4b0c1be785603ed"
+        },
+        "red_result": {
+          "tests": 2,
+          "failures": 2,
+          "exit_code": 1,
+          "plan_source": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+          "command": {
+            "argv": [
+              "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "-B",
+              "-m",
+              "unittest",
+              "tools.testing.test_qualification_plan.QualificationPlanTests.test_analyzers_run_when_the_debug_compilation_inputs_are_ready",
+              "tools.testing.test_qualification_plan.QualificationPlanTests.test_analyzer_failure_stops_before_native_execution_and_later_builds",
+              "-v"
+            ],
+            "cwd": "/workspace/nexus",
+            "exit_code": 1,
+            "scope": "Actual unittest execution against the unchanged old plan; external checker failure is injected by the regression fixture."
+          }
+        },
+        "green_raw": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/green.log",
+          "bytes": 5642,
+          "sha256": "687d44ae943a5a4c253f092700edfa7ddacdb4b65657779a71773a9a063a00c4"
+        },
+        "green_result": {
+          "command": {
+            "argv": [
+              "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "-B",
+              "-m",
+              "unittest",
+              "tools.testing.test_qualification_plan",
+              "-v"
+            ],
+            "cwd": "/workspace/nexus",
+            "exit_code": 0,
+            "duration_seconds": 1.3472178869997151,
+            "scope": "Complete unfiltered qualification-plan unittest module; no skipped cases or repository build invoked by this operation."
+          },
+          "actual_tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "raw": "green.log",
+          "whole_module_unfiltered": true
+        }
+      }
+    },
+    {
+      "language": "Python unittest",
+      "identity": "tools/testing/test_qualification_plan.py::QualificationPlanTests.test_analyzers_run_when_the_debug_compilation_inputs_are_ready",
+      "source": {
+        "path": "tools/testing/test_qualification_plan.py",
+        "line": 198,
+        "end_line": 207,
+        "method_ast_sha256": "153ebeafd6475d70a90130735385ce088d53d29af61182fef1e7c7eba87c33ee",
+        "source_segment_sha256": "3c81caae8f9fa04540895ace873d18475a93ef4c64cb9542b27d0316a8288f6b",
+        "whole_file_sha256": "64fa4ae6e7bc64b70e99a22bb2b0ddc57e3a1fdf0064e6986edd6b37381b950f",
+        "git_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff"
+      },
+      "contract": "Both analyzers run immediately after the Debug build has supplied current compilation inputs and before Native contract execution.",
+      "oracle": "Literal expected adjacent stage names [tidy, cppcheck] between build-native-debug and native_contracts-native-debug, plus literal {root}/build/native-debug argument for each analyzer; no golden implementation-generated expected value.",
+      "actual_red_green": {
+        "red_handoff": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/handoff.json",
+          "bytes": 4706,
+          "sha256": "27bac591a7a1fd6838c91d1954ce73d1613e7496b493077e0be8bd23d97ac653"
+        },
+        "red_raw": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/red.log",
+          "bytes": 5688,
+          "sha256": "bc1673ab92d1d64eccf548907b98a78301f4819557582787b4b0c1be785603ed"
+        },
+        "red_result": {
+          "tests": 2,
+          "failures": 2,
+          "exit_code": 1,
+          "plan_source": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+          "command": {
+            "argv": [
+              "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "-B",
+              "-m",
+              "unittest",
+              "tools.testing.test_qualification_plan.QualificationPlanTests.test_analyzers_run_when_the_debug_compilation_inputs_are_ready",
+              "tools.testing.test_qualification_plan.QualificationPlanTests.test_analyzer_failure_stops_before_native_execution_and_later_builds",
+              "-v"
+            ],
+            "cwd": "/workspace/nexus",
+            "exit_code": 1,
+            "scope": "Actual unittest execution against the unchanged old plan; external checker failure is injected by the regression fixture."
+          }
+        },
+        "green_raw": {
+          "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/green.log",
+          "bytes": 5642,
+          "sha256": "687d44ae943a5a4c253f092700edfa7ddacdb4b65657779a71773a9a063a00c4"
+        },
+        "green_result": {
+          "command": {
+            "argv": [
+              "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "-B",
+              "-m",
+              "unittest",
+              "tools.testing.test_qualification_plan",
+              "-v"
+            ],
+            "cwd": "/workspace/nexus",
+            "exit_code": 0,
+            "duration_seconds": 1.3472178869997151,
+            "scope": "Complete unfiltered qualification-plan unittest module; no skipped cases or repository build invoked by this operation."
+          },
+          "actual_tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "raw": "green.log",
+          "whole_module_unfiltered": true
+        }
+      }
+    }
+  ],
+  "focused_analyzer_evidence": {
+    "diagnosis": "Original analyzer treated opaque config validation conservatively and assumed missing receipt under nonzero selections; no reachable public null dereference established. P6 makes local receipt rejection explicit.",
+    "red": {
+      "analyzer_red": [
+        {
+          "label": "u575",
+          "exit_code": 1,
+          "receipt": "/workspace/nexus/build/c-cold-20261028/cold-null-p6/u575-analyzer-red.command.json",
+          "original_context": "/dev/shm/nexus-final-software-d742cdb5-20261029/tidy.contexts/run-q12rsiz0/264"
+        },
+        {
+          "label": "h743",
+          "exit_code": 1,
+          "receipt": "/workspace/nexus/build/c-cold-20261028/cold-null-p6/h743-analyzer-red.command.json",
+          "original_context": "/dev/shm/nexus-final-software-d742cdb5-20261029/tidy.contexts/run-q12rsiz0/287"
+        }
+      ],
+      "harness_note": "The first U575 runner assertion incorrectly compared CompletedProcess to int; actual underlying command receipt already records completed exit1 and is retained, not rerun or overwritten."
+    },
+    "green_context_count": 44,
+    "green_all_passed": true,
+    "authority": "Focused pre-existing 44 failing analyzer contexts only. Not a full analyzer qualification or new behavioral RED."
+  },
+  "non_definition_changes": {
+    "plan": {
+      "before_count": 159,
+      "after_count": 159,
+      "all_complete_stage_objects_equal_by_name": true,
+      "all_other_stage_relative_order_preserved": true,
+      "top_level_fields_unchanged": true,
+      "field_changes": [],
+      "mapping": "stage-mapping.json",
+      "tidy_positions": [
+        91,
+        7
+      ],
+      "cppcheck_positions": [
+        92,
+        8
+      ],
+      "debug_build_position": 6,
+      "debug_contracts_positions": [
+        7,
+        9
+      ]
+    },
+    "description": "159 full stage objects unchanged by name; only tidy/cppcheck order moves to positions7/8 immediately after Debug build6. README documents order. All actual formal qualification must be fresh P6.",
+    "plan_identities": {
+      "before_file_sha256": "2f04ff6e683b2175eae967c583a201571c83ab2d407cbd33ab8f5db71bb6d492",
+      "before_canonical_sha256": "3856cb6adc003932196e3b802eb148e00bbc5575cf9aca711e8268a4fb5e055c",
+      "after_file_sha256": "6b8d4a2dcb8632091b536e81883b3f018c9c2e138305a6a0057612061b644606",
+      "after_canonical_sha256": "612c56660593daa00a112d85ee468441bf59cd2a0cb4f4fcb05a27ef78aa214e"
+    }
+  },
+  "current_P6_ordinary_closure": {
+    "authority": {
+      "path": "build/c-cold-20261028/final-software-execution/ordinary-p6-current-7590b2d4/capture.json",
+      "bytes": 1018087,
+      "sha256": "219285c944468ce7d64ced944a9bc248fd11ef350ecced4c9714525519c0f1e9"
+    },
+    "source_commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "source_tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414",
+    "python_executed": 3481,
+    "tool_suites": [
+      {
+        "suite": "testing",
+        "discovered": 1673,
+        "executed": 1673,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      {
+        "suite": "configure",
+        "discovered": 1156,
+        "executed": 1156,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      {
+        "suite": "ci",
+        "discovered": 493,
+        "executed": 493,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      {
+        "suite": "workflows",
+        "discovered": 159,
+        "executed": 159,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      }
+    ],
+    "google_programs": 386,
+    "google_cases": 6819,
+    "current_tdd_command_closures": 778,
+    "scope": "Fresh ordinary commit-hook closure frozen by parent, independently distinct from historical static mapping and from formal159 qualification."
+  },
+  "composition_rule": "Retain each historical whole-file and definition identity at its own commit. Compose original C/Google navigation with these two appended Google definitions and bounded byte-retention proof; append the two Python contracts separately. Do not relabel original735 SHA values as matching P6, add runtime6819 to static4691, or infer a complete current735-file inventory was rerun.",
+  "references": [
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-google-definition-inventory.json",
+      "bytes": 1310564,
+      "sha256": "efeddf8263e241da34ffc13154f7a83a18b38554ac66c3ca7a0a20d4c24f9b97"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/summary.json",
+      "bytes": 5493,
+      "sha256": "006550a803e4ae287940a9d4497504608f6aa3b1138a8dbbfef2f206adf50018"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/manifest.json",
+      "bytes": 2771,
+      "sha256": "cc8b3c600402ac4fd063854ac8934d47883e00ecbc24fd38bcc4a01f7fcc2f59"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/files.json",
+      "bytes": 193654,
+      "sha256": "edcb7803c3b92f0692931f3ac9fcc6c10973d8352d98de93faf6efda72cd2cf9"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/identity-mapping.json",
+      "bytes": 1294860,
+      "sha256": "e614867956678a5f56421e1772bf5335ba254e19ff790c0abb9a8c35475d6afa"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/f04-final-mapping-integrity.json",
+      "bytes": 1755,
+      "sha256": "9fa8ab5cc9db08ecae3d2a0ec45ab5500244ff1d59834e5764b0b954f0a71252"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/f04-final-exit-review.json",
+      "bytes": 13477,
+      "sha256": "360588470832b353984160a2fde87321f9099a235e9897f32a46fd56d48efaa9"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/f04-original-exit-p5-review.json",
+      "bytes": 19972,
+      "sha256": "3c20871c0a568e9741c0134dfe5df6edc5e703e72b654bea2e4578c51c213590"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/handoff.json",
+      "bytes": 5632,
+      "sha256": "0e7a1e0c50b64a2f5cb1cb7a5efd4a967b86797c17d494e0d7daeb2b2a997e2e"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/red.json",
+      "bytes": 771,
+      "sha256": "cca4252e2ea199d04e35658e86c6dd15eaebb868fe1363ce9043e75a5e5adc07"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/focused-green.json",
+      "bytes": 39363,
+      "sha256": "2947eed4d1871668800d94c427223abbe647c87349ed2191b9cf704c3227f03f"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/dead-cleanup-independent-review.json",
+      "bytes": 3409,
+      "sha256": "cb13602ac44fae02e627e0610ddb69f21819541e7f54a8d7a9e38699fd88ffaa"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/handoff.json",
+      "bytes": 4706,
+      "sha256": "27bac591a7a1fd6838c91d1954ce73d1613e7496b493077e0be8bd23d97ac653"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/stage-mapping.json",
+      "bytes": 37960,
+      "sha256": "981d39306f4d8e306f585f3bfdecbfda99878e1eb2e65055ece20104f7d71bb1"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/red.log",
+      "bytes": 5688,
+      "sha256": "bc1673ab92d1d64eccf548907b98a78301f4819557582787b4b0c1be785603ed"
+    },
+    {
+      "path": "build/c-cold-20261028/cold-null-p6/plan-failfast/green.log",
+      "bytes": 5642,
+      "sha256": "687d44ae943a5a4c253f092700edfa7ddacdb4b65657779a71773a9a063a00c4"
+    },
+    {
+      "path": "build/c-cold-20261028/integration/commit-association-06.json",
+      "bytes": 2287,
+      "sha256": "9fcf5d41561eaa47cddc7535d8f51af14ccd519edbe600b641b3aa2203a88934"
+    },
+    {
+      "path": "build/c-cold-20261028/final-software-execution/ordinary-p6-current-7590b2d4/capture.json",
+      "bytes": 1018087,
+      "sha256": "219285c944468ce7d64ced944a9bc248fd11ef350ecced4c9714525519c0f1e9"
+    }
+  ],
+  "limitations": [
+    "No universal semantic independence is claimed: original253 bounded manual references and4438 automatic unknown semantic cases keep those limits.",
+    "This delta verifies only the changed Google file bytes and changed Python file method AST; it does not repeat735-file/4691-definition checks.",
+    "The two public invalid-input Google contracts already passed on P5 behavior; actual RED belongs to the analyzer and, separately, the plan-order regression.",
+    "Focused analyzer44-context success and ordinary3481Python/386Google6819case success cannot replace a complete fresh159-stage P6 plan or physical-board execution.",
+    "Plan-failfast RED/GREEN uses an isolated external-command fixture; no claim91 real builds or analyzers were executed by that regression.",
+    "Historical handoff status strings remain as originally written before commit; current source association is supplied by P6 ordinary capture."
+  ]
+}

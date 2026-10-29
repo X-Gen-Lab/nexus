@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-uart/87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5.tar.gz",
+    "sha256": "87d4af41f4729290a98c25aaec4aa45104c714496230bfb0018f6e1ced16b6b5",
+    "size": 22104071
+  },
+  "bytes": 153410426,
+  "files": 6323,
+  "kind": "portable_evidence",
+  "manifest_sha256": "1d4445969aab6ef25d9b67cb97e77175f47dbe2a422959063c25b03b2bd31e9d",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

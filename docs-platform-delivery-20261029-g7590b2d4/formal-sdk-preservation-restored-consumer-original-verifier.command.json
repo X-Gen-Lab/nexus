@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python3",
+    "-B",
+    "-c",
+    "from pathlib import Path; import json; from tools.release.transport import verify; root=Path('/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/sdk-consumers/independent-restore'); result=verify(root,'7590b2d457d6042112abb78a4f4df74d613df6ff'); assert result['consumer_policy']=='nexus-sdk-consumers-v11' and result['raw_bytes_pruned'] is False; report=json.loads((root/'verification.json').read_text()); assert len(report['consumers'])==50 and len(report['commands'])==202 and len(report['selected_images'])==37 and len(result['consumer_images'])==53; print('Restored policy11 transport verified: 50 consumers / 53 images / 202 commands / 37 selected images; no producer replay')"
+  ],
+  "cwd": "/workspace/nexus",
+  "stage": "restored-consumer-original-verifier",
+  "started_ns": 1793279499293709378,
+  "finished_ns": 1793279501013649635,
+  "duration_seconds": 1.7199409479799215,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "resource_usage": {
+    "method": "linux_wait4",
+    "scope": "waited_process_and_reaped_descendants",
+    "user_cpu_seconds": 1.6682649999999999,
+    "system_cpu_seconds": 0.033454,
+    "maximum_process_rss_bytes": 40419328
+  },
+  "stdout": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-consumer-original-verifier.attempts/1793279499293382378-0f1dc3b380b645739673c98449baedf4/stdout.txt",
+    "bytes": 119,
+    "sha256": "be3b120502386b6f05096ce77118f39339ba9a479966884e318daf52cb633fe2"
+  },
+  "stderr": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-consumer-original-verifier.attempts/1793279499293382378-0f1dc3b380b645739673c98449baedf4/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/workspace/nexus/build/c-cold-20261028/final-sdk-transport-7590b2d4/restored-consumer-original-verifier.attempts/1793279499293382378-0f1dc3b380b645739673c98449baedf4/receipt.json"
+}

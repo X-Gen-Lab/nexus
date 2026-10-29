@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python3",
+    "-B",
+    "/workspace/nexus/tools/evidence/candidate.py",
+    "seal",
+    "--manifest",
+    "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/candidate-work/u575-freertos-empty/input-manifest.json",
+    "--output",
+    "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/candidate-work/u575-freertos-empty/candidate"
+  ],
+  "cwd": "/workspace/nexus",
+  "stage": "u575-freertos-empty-seal",
+  "started_ns": 1793279103914926484,
+  "finished_ns": 1793279113468546323,
+  "duration_seconds": 9.553619890008122,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "resource_usage": {
+    "method": "linux_wait4",
+    "scope": "waited_process_and_reaped_descendants",
+    "user_cpu_seconds": 7.729991,
+    "system_cpu_seconds": 1.761555,
+    "maximum_process_rss_bytes": 133013504
+  },
+  "stdout": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-operations/u575-freertos-empty-seal.attempts/1793279103914831091-a09d67faa9af4241a87a0168361bc525/stdout.txt",
+    "bytes": 53,
+    "sha256": "01d30c1184c1152bd2bbecbae8e12115e73ceb71c417e47fc15c68d397ad75ee"
+  },
+  "stderr": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-operations/u575-freertos-empty-seal.attempts/1793279103914831091-a09d67faa9af4241a87a0168361bc525/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

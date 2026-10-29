@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/h743-baremetal-empty/11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd.tar.gz",
+    "sha256": "11717c76387b381654be86d044e1712d42743664f18f14c7b595d5480a1ed8bd",
+    "size": 22038705
+  },
+  "bytes": 153205975,
+  "files": 6317,
+  "kind": "portable_evidence",
+  "manifest_sha256": "6a747794c98a17f7a81939cb52bdfcaefa2165a6cf48841d1c59c02853d1ed80",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

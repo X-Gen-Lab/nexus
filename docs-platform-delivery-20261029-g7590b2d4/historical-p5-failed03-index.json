@@ -1,0 +1,87 @@
+{
+  "kind": "preserved_failed_P5_formal_attempt_retention_index",
+  "source_commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+  "source_tree": "570f807e722649e976670f747950fe1acb61fcc7",
+  "status": "failed",
+  "software_qualified": false,
+  "physical_status": "not_executed",
+  "passed_stages": 90,
+  "failed_stage": "tidy",
+  "diagnostic_summary": "H743 gate.added35 and U575 gpio_added9 real clang14 contexts; no suppression or report repair",
+  "failure_receipt": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failure-03.json",
+  "original_plan_file_sha256": "2f04ff6e683b2175eae967c583a201571c83ab2d407cbd33ab8f5db71bb6d492",
+  "original_plan_canonical_sha256": "3856cb6adc003932196e3b802eb148e00bbc5575cf9aca711e8268a4fb5e055c",
+  "report_path": "/dev/shm/nexus-final-software-d742cdb5-20261029/report.json",
+  "report_sha256": "4bf9f0d2bff9d69c918479c6a1d9e94ace92dcbe3c305ba1a27d9c1da04fbe5c",
+  "packages": [
+    {
+      "package_path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-plan-03-package.json",
+      "package_sha256": "78f9390ccdcd4fe69754c098f6901c526e6df9eff8ccf5436691643601c0d885",
+      "package": {
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-attempts-store/70c2f81ed4e603e185d5d60fa2e843c46f3b1af84bd1518a61e6d49c2b22faf8.tar.gz",
+          "sha256": "70c2f81ed4e603e185d5d60fa2e843c46f3b1af84bd1518a61e6d49c2b22faf8",
+          "size": 68866724
+        },
+        "bytes": 418075072,
+        "files": 47696,
+        "kind": "portable_evidence",
+        "manifest_sha256": "e2dc351ea2727f06e34370f18d0c8e2f387c66b6215c309785acc4b3337836d8",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      }
+    },
+    {
+      "package_path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-native-current-closures-03-package.json",
+      "package_sha256": "8eceb0077d74e7b5dce16285d344794951f385085b5e451d2aad64111409dcd6",
+      "package": {
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-attempts-store/24ab218110827d61dd8838ceb22ecf7aba8f8cc265e5a6a9032d8772bc35966f.tar.gz",
+          "sha256": "24ab218110827d61dd8838ceb22ecf7aba8f8cc265e5a6a9032d8772bc35966f",
+          "size": 3864671
+        },
+        "bytes": 38250318,
+        "files": 7805,
+        "kind": "portable_evidence",
+        "manifest_sha256": "24c88cfb451f0e57f5c1b95f6142771fc7588d09dbd373937cccf6aed3174e38",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      }
+    },
+    {
+      "package_path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-plan-03-context-package.json",
+      "package_sha256": "940326a6d6a56374fb5fae057a9af4a0344e52963d404f3d28877a5f6e087c03",
+      "package": {
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-attempts-store/dabe2009d11c5d93312ca131768734fed4ad7b982fca5300ee0cfacbd424a317.tar.gz",
+          "sha256": "dabe2009d11c5d93312ca131768734fed4ad7b982fca5300ee0cfacbd424a317",
+          "size": 177767
+        },
+        "bytes": 4947285,
+        "files": 30,
+        "kind": "portable_evidence",
+        "manifest_sha256": "0157bd65a759f52b7e8783e84e0b698b770ada6b42201c23a2b9b9dbd6f1d0df",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      }
+    }
+  ],
+  "full_independent_restore_receipt": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-plan-03-restore.json",
+  "complete_restore_and_member_comparison": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-p5-sdk-expanded-retirement.json",
+  "released_and_retired": [
+    "formal P5 sdk",
+    "formal P5 sdk-consumers",
+    "independent full restore temporary"
+  ],
+  "retained_leases": [
+    "original entire tidy.contexts tree/raw",
+    "Root Native bins/libs/current generated/headers/compileDB",
+    "early E5 source SDK prefix",
+    "P5 original16fresh offline archives"
+  ],
+  "cache_rehydration_for_P6": "/workspace/nexus/build/c-cold-20261028/final-software-execution/debug-cache-missing-rehydration-for-P6.json",
+  "scope": "Original90 successful stages remain evidence of a failed full attempt and cannot be combined with P6. Source-specific P6 receives a new formal execution. All source blobs/original plan and exact raw retain P5 identity."
+}

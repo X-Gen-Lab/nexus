@@ -1,0 +1,201 @@
+{
+  "cleanup": {
+    "RAM_free_after_compaction_bytes": 1118535680,
+    "duplicate_cleanup": "build/c-cold-20261028/docs/final-7590b2d4/expanded-duplicate-cleanup.json",
+    "expanded_outputs_removed_after_verification": true,
+    "external_RAM_package_restore_root_removed": true,
+    "heavy_documentation_IO_stopped": true,
+    "raw_cleanup": "build/c-cold-20261028/docs/final-7590b2d4/raw-expanded-cleanup.json",
+    "raw_embedded_original_manifest_SHA_forced": true,
+    "raw_member_inventory_equal_before_removal": true,
+    "work_root_removed": true,
+    "workspace_free_after_compaction_bytes": 3155537920
+  },
+  "current_pages": 132,
+  "documentation_package": {
+    "all_members_verified": true,
+    "archive_bytes": 15289549,
+    "archive_sha256": "b53a24ce808b3ffb8524353d5fd2e300e1a604604409f57b2341c0040596d4ea",
+    "existing_store_record": "build/c-cold-20261028/docs/final-7590b2d4/package-preservation.json",
+    "friendly_archive": "/workspace/nexus/build/c-cold-20261028/docs/final-7590b2d4/0.2.0-docs-g7590b2d457d6.tar.gz",
+    "original_documentation_manifest_sha256": "5fcd77bed048eb3316a7544cfb90443fe2bd385e84b7480ba55cf1e8b53c711a",
+    "original_manifest_forced_on_archive_and_independent_restore": true,
+    "original_successful_report": "build/c-cold-20261028/docs/final-7590b2d4/package.json",
+    "payload_files": 2487,
+    "qualification_references": []
+  },
+  "documentation_tool_tests": {
+    "discovered": 355,
+    "errors": 0,
+    "executed": 355,
+    "failures": 0,
+    "skipped": 0
+  },
+  "final_software_qualification": "Pending fresh canonical P6 complete plan and exact candidate closure; documentation qualification references remain empty.",
+  "kind": "final_frozen_source_documentation_delivery_handoff",
+  "language_page_records": 264,
+  "languages": [
+    "en",
+    "zh_CN"
+  ],
+  "navigation_preparation": "build/c-cold-20261028/docs/final-7590b2d4/navigation-preparation.json",
+  "ordinary_P6_gate": {
+    "Google_cases": 6819,
+    "Google_programs": 386,
+    "Python_cases": 3481,
+    "scope": "Parent-reported ordinary complete-index gate; distinct from final software qualification.",
+    "skipped": 0
+  },
+  "original_P4_P5_documentation_packages": "Unchanged; existing public asset identity preserved.",
+  "persistence_status": "execution_host_local_only_not_established",
+  "physical_status": "not_executed",
+  "published": false,
+  "qualification": false,
+  "raw_build_and_execution_records": {
+    "archive": {
+      "path": "/workspace/nexus/build/c-cold-20261028/docs/final-7590b2d4/raw-build-store/a2d4a4597218078edae9f1286ff4b4e80debf2995d288af4f1cf5313f5876ca4.tar.gz",
+      "sha256": "a2d4a4597218078edae9f1286ff4b4e80debf2995d288af4f1cf5313f5876ca4",
+      "size": 17610098
+    },
+    "bytes": 117349615,
+    "files": 2727,
+    "manifest_sha256": "f9cd08587284a7dcaae4922ae624f177e2e4a422ea6170c13929f954d0721368",
+    "package": "build/c-cold-20261028/docs/final-7590b2d4/raw-build-package.json",
+    "scope": "One original API/gettext/internal-build raw tree and exact preflight/build/package/restore execution receipts. Wrapper/store receipts remain directly alongside this handoff.",
+    "verify_report": "build/c-cold-20261028/docs/final-7590b2d4/raw-build-verify.json"
+  },
+  "release_id": "0.2.0-docs-g7590b2d457d6",
+  "scope": "Fresh strict bilingual documentation from canonical P6. Historical P4/P5 packages retain original identities; no inherited full software-candidate or physical qualification.",
+  "source": {
+    "commit": "7590b2d457d6042112abb78a4f4df74d613df6ff",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "17c18aea10066d5d7418f3a7fd3b42e619ee3414"
+  },
+  "source_and_git_HEAD_unchanged": true,
+  "stages": [
+    {
+      "duration_seconds": 1.5701568289950956,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 42246144,
+      "name": "doctor",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/doctor.command.json"
+    },
+    {
+      "duration_seconds": 12.623741823015735,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 50348032,
+      "name": "source-check",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/source-check.command.json"
+    },
+    {
+      "duration_seconds": 26.909226282004965,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 71860224,
+      "name": "tool-tests",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/tool-tests.command.json"
+    },
+    {
+      "duration_seconds": 129.58788838601322,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 421457920,
+      "name": "strict-build",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/strict-build.command.json"
+    },
+    {
+      "duration_seconds": 17.784066951018758,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 247406592,
+      "name": "package",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/package.command.json"
+    },
+    {
+      "duration_seconds": 8.611283449019538,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 175173632,
+      "name": "verify-archive",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/verify-archive.command.json"
+    },
+    {
+      "duration_seconds": 17.929329831997165,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 262737920,
+      "name": "independent-restore",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/independent-restore.command.json"
+    },
+    {
+      "duration_seconds": 8.611134038015734,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 174997504,
+      "name": "verify-restored",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/verify-restored.command.json"
+    },
+    {
+      "duration_seconds": 0.5159788900054991,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 36847616,
+      "name": "package-preserve",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/package-preserve.command.json"
+    },
+    {
+      "duration_seconds": 0.4156490490131546,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 36847616,
+      "name": "package-preserve-verify",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/package-preserve-verify.command.json"
+    },
+    {
+      "duration_seconds": 5.836120748019312,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 48242688,
+      "name": "raw-build-export",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/raw-build-export.command.json"
+    },
+    {
+      "duration_seconds": 1.1191376240167301,
+      "exit_code": 0,
+      "maximum_process_rss_bytes": 48242688,
+      "name": "raw-build-verify",
+      "outcome": "completed",
+      "receipt": "build/c-cold-20261028/docs/final-7590b2d4/raw-build-verify.command.json"
+    }
+  ],
+  "task_authority": {
+    "X_rows_included_in_64": 5,
+    "extended_rows_including_X": 64,
+    "original_N_rows": 14,
+    "original_exits_and_statuses_not_modified": true,
+    "path": "docs/design/platform-delivery-completion.csv",
+    "rows": 78,
+    "sha256": "15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65"
+  }
+}

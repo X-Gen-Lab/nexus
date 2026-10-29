@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/raw-store/u575-baremetal-uart/1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497.tar.gz",
+    "sha256": "1c290d688ddb0eb6ac96957fc67999b091b7f62ca0ac2d24392ba2e9dd191497",
+    "size": 22100445
+  },
+  "bytes": 153570164,
+  "files": 6321,
+  "kind": "portable_evidence",
+  "manifest_sha256": "9737a6895e352a35326840410424eadf99f27f222c5f400d423d7ca33c5431c7",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/full159-packet-store/366080cccc793f18209c701fafc4fe398d9eb16e99eec1170a0defe87ba91693.tar.gz",
+    "sha256": "366080cccc793f18209c701fafc4fe398d9eb16e99eec1170a0defe87ba91693",
+    "size": 24800603
+  },
+  "bytes": 163591884,
+  "files": 11550,
+  "kind": "portable_evidence",
+  "manifest_sha256": "46e4a15fe85dffc84de8274409e87655a165d80fa0f1f7beda89da391b1f5c9b",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

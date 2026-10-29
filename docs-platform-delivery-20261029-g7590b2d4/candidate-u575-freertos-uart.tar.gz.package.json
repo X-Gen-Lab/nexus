@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-store/u575-freertos-uart/85a924c7b537785782d028aeb65fda679cab173c72acf5c0a9e0700442b5a175.tar.gz",
+    "sha256": "85a924c7b537785782d028aeb65fda679cab173c72acf5c0a9e0700442b5a175",
+    "size": 35910633
+  },
+  "bytes": 98165999,
+  "files": 3248,
+  "kind": "portable_evidence",
+  "manifest_sha256": "42dce281755ddfaaf1d40c75a27b0a2256d72ef15f20f5fefa5bdcb2ccf912b5",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

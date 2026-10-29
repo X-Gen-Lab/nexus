@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python3",
+    "-B",
+    "/workspace/nexus/tools/evidence/candidate.py",
+    "verify",
+    "--candidate",
+    "/dev/shm/nexus-offline-matrix-7590b2d4-20261029/candidate-restored/u575-baremetal-empty/candidate.json"
+  ],
+  "cwd": "/workspace/nexus",
+  "stage": "u575-baremetal-empty-restored-verify",
+  "started_ns": 1793279038222618556,
+  "finished_ns": 1793279040495177445,
+  "duration_seconds": 2.27255869898363,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "resource_usage": {
+    "method": "linux_wait4",
+    "scope": "waited_process_and_reaped_descendants",
+    "user_cpu_seconds": 1.883871,
+    "system_cpu_seconds": 0.374683,
+    "maximum_process_rss_bytes": 133013504
+  },
+  "stdout": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-operations/u575-baremetal-empty-restored-verify.attempts/1793279038222479528-351e1d74c7db4895ad4dbf7f1d49b0bc/stdout.txt",
+    "bytes": 53,
+    "sha256": "01d30c1184c1152bd2bbecbae8e12115e73ceb71c417e47fc15c68d397ad75ee"
+  },
+  "stderr": {
+    "path": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-operations/u575-baremetal-empty-restored-verify.attempts/1793279038222479528-351e1d74c7db4895ad4dbf7f1d49b0bc/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/workspace/nexus/build/c-cold-20261028/offline-candidate-7590b2d4/candidate-operations/u575-baremetal-empty-restored-verify.attempts/1793279038222479528-351e1d74c7db4895ad4dbf7f1d49b0bc/receipt.json"
+}

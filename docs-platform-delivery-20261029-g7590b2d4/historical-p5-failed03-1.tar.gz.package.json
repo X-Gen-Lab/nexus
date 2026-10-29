@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/failed-attempts-store/24ab218110827d61dd8838ceb22ecf7aba8f8cc265e5a6a9032d8772bc35966f.tar.gz",
+    "sha256": "24ab218110827d61dd8838ceb22ecf7aba8f8cc265e5a6a9032d8772bc35966f",
+    "size": 3864671
+  },
+  "bytes": 38250318,
+  "files": 7805,
+  "kind": "portable_evidence",
+  "manifest_sha256": "24c88cfb451f0e57f5c1b95f6142771fc7588d09dbd373937cccf6aed3174e38",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}
