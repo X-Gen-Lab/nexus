@@ -1,5 +1,6 @@
 """Relocate the real source SDK and compile/run independent public consumers."""
 
+from functools import wraps
 import json
 import os
 from pathlib import Path
@@ -31,6 +32,31 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
     "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
 })
+
+
+def _isolated_sdk_prefix(test):
+    """Keep the reusable SDK seed immutable while a case alters its own copy."""
+    @wraps(test)
+    def isolated(self):
+        original = self.directory, self.prefix, self.sdk, self.identity
+        with tempfile.TemporaryDirectory(
+                prefix="isolated SDK case ", dir=original[0]) as name:
+            try:
+                self.directory = Path(name)
+                self.prefix = self.directory / "relocated prefix with spaces"
+                # Copy the exports too; hardlinks would let byte writes alter
+                # the seed, and copying src alone invalidates its package proof.
+                shutil.copytree(original[1], self.prefix)
+                self.sdk = self.prefix / "share/nexus/src"
+                self.identity = json.loads(
+                    (self.sdk / source_sdk.MANIFEST).read_text())
+                baseline = self.verify()
+                self.assertEqual(baseline.returncode, 0, baseline.stderr)
+                return test(self)
+            finally:
+                (self.directory, self.prefix, self.sdk,
+                 self.identity) = original
+    return isolated
 
 
 class CMSISCoreSelectionTests(unittest.TestCase):
@@ -1176,6 +1202,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
 
 
 class SourceSDKTests(unittest.TestCase):
+    @_isolated_sdk_prefix
     def test_recursive_dependency_membership_matches_reviewed_catalogue(self):
         identity = self.sdk / source_sdk.MANIFEST
         original = identity.read_bytes()
@@ -1199,6 +1226,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             identity.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_rehashed_nested_fetch_declaration_is_not_an_origin_override(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
@@ -1217,6 +1245,7 @@ class SourceSDKTests(unittest.TestCase):
             target.write_bytes(original)
             identity.write_bytes(original_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_import_cannot_add_an_unreviewed_firmware_file(self):
         import hashlib
         manifest = self.sdk / ".nexus-source-sdk.json"
@@ -1241,6 +1270,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.unlink(missing_ok=True)
                     manifest.write_bytes(original_manifest)
 
+    @_isolated_sdk_prefix
     def test_rehashed_import_cannot_add_an_unreviewed_auxiliary_file(self):
         import hashlib
         manifest = self.sdk / ".nexus-source-sdk.json"
@@ -1265,6 +1295,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.unlink(missing_ok=True)
                     manifest.write_bytes(original_manifest)
 
+    @_isolated_sdk_prefix
     def test_rehashed_vendor_import_bytes_still_must_match_original_lock(self):
         import hashlib
         manifest = self.sdk / ".nexus-source-sdk.json"
@@ -1290,6 +1321,55 @@ class SourceSDKTests(unittest.TestCase):
                 finally:
                     target.write_bytes(original)
                     manifest.write_bytes(original_manifest)
+
+    @_isolated_sdk_prefix
+    def test_mutable_prefix_is_a_complete_independent_copy(self):
+        import hashlib
+
+        seed_prefix = type(self).prefix
+        seed_sdk = type(self).sdk
+        self.assertNotEqual(self.prefix, seed_prefix)
+        self.assertNotEqual(self.sdk, seed_sdk)
+
+        def snapshot(prefix):
+            return {path.relative_to(prefix).as_posix(): (
+                path.stat().st_dev, path.stat().st_ino,
+                path.stat().st_mode,
+                hashlib.sha256(path.read_bytes()).hexdigest())
+                for path in prefix.rglob("*") if path.is_file()}
+
+        before = snapshot(seed_prefix)
+        copied = snapshot(self.prefix)
+        self.assertEqual(set(copied), set(before))
+        for name, original in before.items():
+            with self.subTest(file=name):
+                self.assertNotEqual(copied[name][:2], original[:2])
+                self.assertEqual(copied[name][2:], original[2:])
+        self.assertTrue((self.prefix /
+                         "lib/cmake/Nexus/NexusConfig.cmake").is_file())
+        self.assertEqual(self.verify().returncode, 0)
+        seed_command = [sys.executable, "-B",
+                        str(seed_sdk / "cmake/package/package_source_sdk.py"),
+                        "--verify", str(seed_sdk)]
+        for name, diagnostic in (
+                ("share/nexus/src/core/src/request.c", "file identity changed"),
+                ("lib/cmake/Nexus/NexusConfig.cmake",
+                 "Exported CMake package identity changed")):
+            with self.subTest(mutated=name):
+                target = self.prefix / name
+                original = target.read_bytes()
+                target.write_bytes(
+                    original + b"\n/* private fixture mutation */\n")
+                rejected = self.verify()
+                self.assertNotEqual(rejected.returncode, 0)
+                self.assertIn(diagnostic, rejected.stderr)
+                self.assertEqual(snapshot(seed_prefix), before)
+                self.assertEqual(self.run_process(seed_command).returncode, 0)
+                target.write_bytes(original)
+
+    def test_read_only_case_reuses_the_class_seed(self):
+        self.assertEqual(self.prefix, type(self).prefix)
+        self.assertEqual(self.sdk, type(self).sdk)
 
     @classmethod
     def setUpClass(cls):
@@ -1354,6 +1434,7 @@ class SourceSDKTests(unittest.TestCase):
                 "--output", str(directory / "cpu-generated")],
         }
 
+    @_isolated_sdk_prefix
     def test_standalone_resolvers_reject_source_byte_tamper(self):
         commands = self.standalone_resolver_commands()
         for command in commands.values():
@@ -1372,6 +1453,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             target.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_standalone_resolvers_reject_rehashed_required_module_omission(self):
         import hashlib
         commands = self.standalone_resolver_commands()
@@ -1703,6 +1785,7 @@ class SourceSDKTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("excludes development tests/contracts", " ".join((result.stdout + result.stderr).split()))
 
+    @_isolated_sdk_prefix
     def test_modified_required_file_is_rejected(self):
         target = self.sdk / "core/src/request.c"
         original = target.read_bytes()
@@ -1714,6 +1797,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             target.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_modified_exported_config_is_rejected(self):
         target = self.prefix / "lib/cmake/Nexus/NexusConfig.cmake"
         original = target.read_bytes()
@@ -1725,6 +1809,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             target.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_missing_license_is_rejected(self):
         target = self.sdk / "ext/freertos/LICENSE.md"
         original = target.read_bytes()
@@ -1736,6 +1821,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             target.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_rehashed_missing_arch_or_core_source_is_rejected(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
@@ -1769,6 +1855,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(original_source)
                     identity.write_bytes(original_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_default_target_source_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -1804,6 +1891,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_soc_extensions_and_reference_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -1843,6 +1931,7 @@ class SourceSDKTests(unittest.TestCase):
                     identity.write_bytes(old_identity)
         self.assertEqual(self.verify().returncode, 0)
 
+    @_isolated_sdk_prefix
     def test_rehashed_secondary_controller_generator_omission_rejects(self):
         name = "tools/configure/secondary_controllers.py"
         target = self.sdk / name
@@ -1865,6 +1954,7 @@ class SourceSDKTests(unittest.TestCase):
             target.write_bytes(old_source)
             identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_exposed_io_clock_and_cold_source_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -1933,6 +2023,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -1960,6 +2051,7 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_threadx_wrong_commit_or_source_identity_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -1995,6 +2087,7 @@ class SourceSDKTests(unittest.TestCase):
         after = {p.relative_to(self.sdk).as_posix() for p in self.sdk.rglob("*") if p.is_file()}
         self.assertEqual(after, before)
 
+    @_isolated_sdk_prefix
     def test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback(self):
         command = [sys.executable, str(self.sdk / "tools/maintenance/threadx_lock.py"),
                    "--source", str(self.sdk / "ext/threadx"),
@@ -2012,6 +2105,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             source.write_bytes(old_source)
 
+    @_isolated_sdk_prefix
     def test_rehashed_official_f4_source_notice_and_verifier_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2037,6 +2131,7 @@ class SourceSDKTests(unittest.TestCase):
                     file.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_official_f4_wrong_pairing_source_or_lock_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
@@ -2064,6 +2159,7 @@ class SourceSDKTests(unittest.TestCase):
             lock_path.write_bytes(original_lock)
             identity.write_bytes(original_identity)
 
+    @_isolated_sdk_prefix
     def test_installed_official_f4_cli_requires_complete_sdk_and_is_read_only(self):
         command = [sys.executable, "-B",
                    str(self.sdk / "tools/maintenance/stm32f4_hal_lock.py"),
@@ -2103,6 +2199,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             file.write_bytes(original)
 
+    @_isolated_sdk_prefix
     def test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2127,6 +2224,7 @@ class SourceSDKTests(unittest.TestCase):
                     file.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2158,6 +2256,7 @@ class SourceSDKTests(unittest.TestCase):
             lock_path.write_bytes(original_lock)
             identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback(self):
         before = {p.relative_to(self.sdk).as_posix()
                   for p in self.sdk.rglob("*") if p.is_file()}
@@ -2189,6 +2288,7 @@ class SourceSDKTests(unittest.TestCase):
             separators=(",", ":")).encode())
         (self.sdk / source_sdk.MANIFEST).write_text(json.dumps(manifest) + "\n")
 
+    @_isolated_sdk_prefix
     def test_rehashed_modern_soc_owned_firmware_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2221,6 +2321,7 @@ class SourceSDKTests(unittest.TestCase):
                     file.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_modern_device_source_notice_lock_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2247,6 +2348,7 @@ class SourceSDKTests(unittest.TestCase):
                     file.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_rehashed_modern_device_wrong_commit_changed_source_and_reduced_lock_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
@@ -2278,6 +2380,7 @@ class SourceSDKTests(unittest.TestCase):
                     lock.write_bytes(old_lock)
                     identity.write_bytes(old_identity)
 
+    @_isolated_sdk_prefix
     def test_installed_modern_device_cli_is_readonly_and_requires_complete_sdk(self):
         before = {p.relative_to(self.sdk).as_posix()
                   for p in self.sdk.rglob("*") if p.is_file()}
@@ -2304,6 +2407,7 @@ class SourceSDKTests(unittest.TestCase):
                  for p in self.sdk.rglob("*") if p.is_file()}
         self.assertEqual(after, before)
 
+    @_isolated_sdk_prefix
     def test_sdk_manifest_sources_exports_and_file_set_stay_unchanged_during_verify(self):
         # Inject at the external vendor-verifier boundary after the SDK has
         # read all hashes. The actual SDK verification runs without a fake map.
@@ -2348,6 +2452,7 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             extra.unlink(missing_ok=True)
 
+    @_isolated_sdk_prefix
     def test_final_file_read_cannot_hide_a_late_change_to_an_earlier_checked_input(self):
         last_export = self.prefix / "lib/cmake/Nexus/NexusConfigVersion.cmake"
         real_read = Path.read_bytes
@@ -2380,6 +2485,7 @@ class SourceSDKTests(unittest.TestCase):
                 finally:
                     target.write_bytes(old)
 
+    @_isolated_sdk_prefix
     def test_git_checkout_inside_sdk_cannot_bypass_whole_manifest(self):
         for family, dependency, lock_name, extra in (
                 ("G4", "vendors/st/cmsis_device_g4", "stm32g4", []),
@@ -2415,6 +2521,7 @@ class SourceSDKTests(unittest.TestCase):
                     other.write_bytes(original)
                     shutil.rmtree(source / ".git")
 
+    @_isolated_sdk_prefix
     def test_additional_file_and_symlink_are_rejected(self):
         extra = self.sdk / "unexpected.c"
         try:

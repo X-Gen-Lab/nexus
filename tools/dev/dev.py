@@ -46,6 +46,38 @@ def execute(command, environment):
     return ExecutionResult(result.returncode, result.receipt_path)
 
 
+def qualification_environment(arguments, environment):
+    """Cover the whole forwarded plan while preserving explicit caller limits."""
+    if ("NEXUS_COMMAND_TIMEOUT" in environment or
+            any(argument in ("-h", "--help") for argument in arguments)):
+        return environment
+    selected = None
+    for index, argument in enumerate(arguments):
+        if argument == "--":
+            break
+        if argument == "--plan":
+            if (index + 1 == len(arguments) or
+                    arguments[index + 1].startswith("-")):
+                return environment
+            selected = arguments[index + 1]
+        elif argument.startswith("--plan="):
+            selected = argument.split("=", 1)[1]
+    if not selected:
+        return environment
+    from tools.dev.qualification import validate_plan
+    from tools.evidence.common import load_json
+    try:
+        plan = validate_plan(load_json(ROOT / selected))
+    except (OSError, ValueError, KeyError, TypeError):
+        # The owned CLI retains plan/argument diagnostics and failure codes.
+        return environment
+    budget = sum(stage.get("timeout_s", 1800) for stage in plan["stages"])
+    result = dict(environment)
+    # Retain the ordinary floor and allow finite process startup/exit overhead.
+    result["NEXUS_COMMAND_TIMEOUT"] = str(max(1800, budget + 60))
+    return result
+
+
 def maintenance_checks(environment):
     for script in ("capabilities.py", "ownership.py"):
         result = execute([sys.executable, "tools/maintenance/" + script],
@@ -226,6 +258,8 @@ def main(argv=None):
                     command += ["--scope", "preset"]
             if args.action == "candidate":
                 command.append("--require-candidate")
+            if args.action in ("qualify", "candidate"):
+                environment = qualification_environment(native, environment)
             return execute(command + native, environment)
         if args.action == "check":
             if native:

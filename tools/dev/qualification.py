@@ -8,6 +8,7 @@ import hashlib
 import math
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -83,21 +84,60 @@ def validate_plan(plan: dict, *, require_candidate: bool = False) -> dict:
     return plan
 
 
+def preflight_quality_tools(plan: dict, root: Path, output: Path,
+                            environment: dict) -> None:
+    """Reject missing selected analyzers before executing any plan stage.
+
+    This only checks executable availability. The original checker still owns
+    its complete arguments, tool version, analysis scope and actual execution.
+    """
+    selector = argparse.ArgumentParser(add_help=False, allow_abbrev=False,
+                                       exit_on_error=False)
+    selector.add_argument("--tool")
+    selector.add_argument("--root", type=Path, default=root)
+    for stage in plan["stages"]:
+        if stage["checker"] != "quality_tools":
+            continue
+        arguments = command(["selector", *stage["args"]],
+                            {"root": str(root), "output": str(output)})[1:]
+        try:
+            selected, _ = selector.parse_known_args(arguments)
+        except argparse.ArgumentError as error:
+            raise EvidenceError(
+                f"quality tool selection invalid for {stage['name']}: "
+                f"{error}") from error
+        if not selected.tool:
+            raise EvidenceError(
+                f"quality tool selection missing for {stage['name']}")
+        working = (root / selected.root).resolve()
+        search = os.pathsep.join(
+            str(working / entry)
+            for entry in environment.get("PATH", os.defpath).split(os.pathsep))
+        executable = selected.tool
+        if os.path.dirname(executable):
+            executable = str(working / executable)
+        if shutil.which(executable, path=search) is None:
+            raise EvidenceError(
+                f"quality tool unavailable for {stage['name']}: "
+                f"{selected.tool}")
+
+
 def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = False) -> dict:
     validate_plan(plan, require_candidate=require_candidate)
     root, output = root.absolute(), output.absolute()
     if output.exists() or any(path.is_symlink() for path in [output, *output.parents]):
         raise EvidenceError("qualification output must be a new nonsymlink directory")
-    source = observe_git_source(root)
-    if plan.get("formal") and source["dirty"]:
-        raise EvidenceError("formal qualification requires clean Git source")
-    output.mkdir(parents=True)
-    stages = []
     environment = os.environ.copy()
     if plan.get("formal"):
         environment["CCACHE_DISABLE"] = "1"
         for key in ("CMAKE_C_COMPILER_LAUNCHER", "CMAKE_CXX_COMPILER_LAUNCHER"):
             environment.pop(key, None)
+    preflight_quality_tools(plan, root, output, environment)
+    source = observe_git_source(root)
+    if plan.get("formal") and source["dirty"]:
+        raise EvidenceError("formal qualification requires clean Git source")
+    output.mkdir(parents=True)
+    stages = []
     report = {"schema_version": 1, "kind": "qualification_plan_execution",
               "status": "running", "source_before": source,
               "plan_sha256": canonical_digest(plan),
