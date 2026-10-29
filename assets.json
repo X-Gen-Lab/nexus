@@ -852,6 +852,31 @@
       "path": "docs-platform-delivery-20261029-gd742cdb5/verification-tools-gd742cdb5.tar.gz",
       "bytes": 28064,
       "sha256": "67dad17ab95ba0964f5b9872052563b4be9158115196579c2ac5cdac80f8d0b0"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/first-remote-recovery.tar.gz",
+      "bytes": 62116,
+      "sha256": "dcf9cfe6c65653fe725746d244771c5767f12f7de399621a520818609375b35f"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/first-remote-recovery.package.json",
+      "bytes": 524,
+      "sha256": "35fb6ec38467e3c8fc6666194e94673969f91d2404809c804337e52b31a216b2"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/first-exact-download-and-stream-verification.json",
+      "bytes": 5159,
+      "sha256": "b27992c4bd8d73776ac0b74707e935d5321c243b7c8a5eb47f42c93ecd4b4ee6"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/first-independent-restores.json",
+      "bytes": 4823,
+      "sha256": "12ba8ff54baccf6db2645b1420a297864301a1939025b0cd3ce5f1d9a4b66708"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/FIRST-REMOTE-RECOVERY.txt",
+      "bytes": 1145,
+      "sha256": "738238de92efa363f9041df4606d2384fa29bb8416a4a9ee1f2332a3f9e00ca2"
     }
   ],
   "physical_hil": "not_executed",

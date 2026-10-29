@@ -1,0 +1,18 @@
+P5 first public batch actual remote recovery
+
+Payload commit807b54776b7e0b5c599eb29e71dd08dd74cb2b91
+All34new members/300,370,468 bytes were independently downloaded from exact
+commit URLs and SHA/size checked. All7original archives passed unchanged store
+verification and independent restore. Docs forced its original manifest hash;
+SourceSDK passed its restored own verifier; observed OCI passed runtime=False
+layout verification. OCI/E heavy restores used the explicitly coordinated
+NativeDebug passed/verified pure-object-eviction window, then every duplicate
+archive/expanded destination was retired before ASAN. Original source/leases
+and archives were not changed.
+
+The333-file recovery proof archive preserves original unique command receipts,
+raw output, HTTP member observations, capacity handoff and independent metadata
+review. Only the SourceSDK original archive is excluded from this small proof
+because its unchanged bytes are already retained in the payload batch itself.
+No full159/candidate seal, OCI recipe/fresh-daemon load, physical HIL, official
+Release, server rule or actual hosted documentation deployment is conferred.

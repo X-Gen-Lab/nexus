@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/p5-external-recovery-proof/store/dcf9cfe6c65653fe725746d244771c5767f12f7de399621a520818609375b35f.tar.gz",
+    "sha256": "dcf9cfe6c65653fe725746d244771c5767f12f7de399621a520818609375b35f",
+    "size": 62116
+  },
+  "bytes": 334997,
+  "files": 333,
+  "kind": "portable_evidence",
+  "manifest_sha256": "c97377f86c30dc049b0598c2effa0f694bb8c81b6cd870c132ebf5ea7627cf5c",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -1,0 +1,138 @@
+{
+  "kind": "P5_completed_assets_exact_commit_download_and_stream_verification",
+  "storage_commit": "807b54776b7e0b5c599eb29e71dd08dd74cb2b91",
+  "all34new_members_downloaded_and_SHA_verified": true,
+  "new_member_bytes": 300370468,
+  "all7original_archives_existing_store_verified": true,
+  "small_independent_restores": [
+    {
+      "role": "strict_bilingual_documentation",
+      "archive_sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_strict_docs_build_and_execution",
+      "archive_sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_external_created_product",
+      "archive_sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_ordinary_hook_gate_and_same_tree_canonical_association",
+      "archive_sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "fresh_P5_example_produced_verified_SourceSDK_not_formal50_claim",
+      "archive_sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    }
+  ],
+  "pending_coordinated_restores": [
+    {
+      "role": "complete_examples_scope_all_starters_and_onboarding",
+      "original_package": "examples.tar.gz.package.json",
+      "archive": {
+        "path": "examples.tar.gz",
+        "bytes": 53998408,
+        "sha256": "5600a925eb7b76047039f58b3294f6b18415a0b36379494181c12a6540699c76"
+      },
+      "parts": [
+        {
+          "path": "examples.tar.gz.part0000",
+          "bytes": 33554432,
+          "sha256": "8661384e80772da26e61a22b67ee742a12b1efe300469af5a3a6bdb922ff0ec2"
+        },
+        {
+          "path": "examples.tar.gz.part0001",
+          "bytes": 20443976,
+          "sha256": "13ead53bcf103066117d67d39a47fe455fe339c0852c4b077ecca3254459e322"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 296926445,
+      "files": 8026
+    },
+    {
+      "role": "observed_generic_OCI_layout_bytes_only",
+      "original_package": "observed-oci.tar.gz.package.json",
+      "archive": {
+        "path": "observed-oci.tar.gz",
+        "bytes": 196758793,
+        "sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443"
+      },
+      "parts": [
+        {
+          "path": "observed-oci.tar.gz.part0000",
+          "bytes": 33554432,
+          "sha256": "d6614521b05cedb54bd096974e40817f15133b026f5e22007fe4654fed962582"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0001",
+          "bytes": 33554432,
+          "sha256": "8a3addc955855a9e6132edc767736df1b08e8562d2e30257e0f2d5bb4fec9a55"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0002",
+          "bytes": 33554432,
+          "sha256": "09bff5c2343ea95d737d7d4db8b2a7c09970e6dd33ecdfd870fc05d25aabf83e"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0003",
+          "bytes": 33554432,
+          "sha256": "51d397b4a5fc6d09eb5ae433651f3f595f9ad282f07162304df48a915ccf9818"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0004",
+          "bytes": 33554432,
+          "sha256": "06da664b4ef9831ac248fbd09632f817dd4244fe55c61bc59de575df8fbf9264"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0005",
+          "bytes": 28986633,
+          "sha256": "51e09a3c61db6c38ffcf417bf79b07b89dc329fbe0cb5309edae0649df4ef236"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 561772790,
+      "files": 13
+    }
+  ],
+  "old136members_and_header_unchanged": true,
+  "heavy_restore_started": false,
+  "qualification": false,
+  "full159_and8candidates": "pending",
+  "physical_status": "not_executed",
+  "OCI_recipe_reconstruction": false,
+  "fresh_daemon_load": "not_executed",
+  "disk": {
+    "/workspace": {
+      "total": 33770192896,
+      "used": 31037468672,
+      "free": 997961728
+    },
+    "/dev/shm": {
+      "total": 9441337344,
+      "used": 8923115520,
+      "free": 518221824
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "kind": "P5_coordinated_independent_heavy_restore",
+  "authorization": "final_qualification NativeDebug actualpass + pure.o fully verified backup/evict; overlay>=1.5GB window explicitly granted",
+  "started_disk": {
+    "/workspace": {
+      "total": 33770192896,
+      "used": 30476615680,
+      "free": 1558814720
+    },
+    "/dev/shm": {
+      "total": 9441337344,
+      "used": 8923615232,
+      "free": 517722112
+    }
+  },
+  "restores": [
+    {
+      "role": "observed_generic_OCI_layout_bytes_only",
+      "archive_sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "complete_examples_scope_all_starters_and_onboarding",
+      "archive_sha256": "5600a925eb7b76047039f58b3294f6b18415a0b36379494181c12a6540699c76",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    }
+  ],
+  "current_disk": {
+    "/workspace": {
+      "total": 33770192896,
+      "used": 30487220224,
+      "free": 1548210176
+    },
+    "/dev/shm": {
+      "total": 9441337344,
+      "used": 8672854016,
+      "free": 768483328
+    }
+  },
+  "status": "all7actual_independent_restores_passed_and_duplicates_retired",
+  "all_restores": [
+    {
+      "role": "strict_bilingual_documentation",
+      "archive_sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_strict_docs_build_and_execution",
+      "archive_sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_external_created_product",
+      "archive_sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "actual_ordinary_hook_gate_and_same_tree_canonical_association",
+      "archive_sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "fresh_P5_example_produced_verified_SourceSDK_not_formal50_claim",
+      "archive_sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "observed_generic_OCI_layout_bytes_only",
+      "archive_sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    },
+    {
+      "role": "complete_examples_scope_all_starters_and_onboarding",
+      "archive_sha256": "5600a925eb7b76047039f58b3294f6b18415a0b36379494181c12a6540699c76",
+      "actual_restore_exit_code": 0,
+      "original_envelope_unchanged": true,
+      "restored_duplicate_retired_only_after_full_verification": true,
+      "remote_download_duplicate_retired_after_verified_restore": true
+    }
+  ],
+  "all_large_downloads_and_expansions_retired": true,
+  "source_prefix_and_existing_archives_untouched": true,
+  "qualified_firmware": false,
+  "physical_status": "not_executed",
+  "OCI_recipe_reconstruction": false,
+  "fresh_daemon_load": "not_executed",
+  "full159_and8candidates": "pending",
+  "finished_disk": {
+    "/workspace": {
+      "total": 33770192896,
+      "used": 30487220224,
+      "free": 1548210176
+    },
+    "/dev/shm": {
+      "total": 9441337344,
+      "used": 8672854016,
+      "free": 768483328
+    }
+  }
+}
