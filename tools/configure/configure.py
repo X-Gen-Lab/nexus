@@ -31,7 +31,8 @@ from tools.configure.ir import (
     EndpointIR, FactoryOptions, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology
-from tools.configure.contracts import COMPONENTS, CONTROLLER_KINDS
+from tools.configure.contracts import (
+    COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS)
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
@@ -906,18 +907,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
         context = f"controller {location} binding {binding} mode {mode}"
         with error_context(context):
             obj(selection, {"id", "binding", "mode"},
-                {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
-                 "period_ticks", "duty_ticks", "channels", "sample_cycles",
-                 "timeout_ms", "calls_os", "rx_profile", "sample_times",
-                 "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
-                 "bitrate", "timing", "drain_timeout_us", "poll_limit",
-                 "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
-                 "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
-                 "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
-                 "idle_complement_high", "frame", "stream", "irq_probe",
-                 "counting", "filter_a", "filter_b", "invert_a", "invert_b",
-                 "trigger_ticks", "data_bitrate", "filters", "silicon_profile",
-                 "trigger", "period_us", "watchdog", "fifo"}, "controller selection")
+                CONTROLLER_SELECTION_FIELDS | {"authored_kind"},
+                "controller selection")
             name = identity(selection["id"], "instance id")
             c_identity(name)
             instance_ids.append(name)

@@ -27,7 +27,10 @@ resolved immutable version before downloading; do not mix two versions.
 | --- | --- |
 | `documentation_source.commit` | Exact source containing these pages and their tools |
 | `code_source.commit` | Source described by the package; inspect its identity separately |
-| `qualified_code.commit` | Referenced software qualification baseline, with its original scope and results |
+| `qualification_references[]` | Explicitly verified candidate references in a schema 2 package, each with its original source and scope; may be empty |
+
+Historical schema 1 packages retain their original `qualified_code.commit` field
+for read-only recovery. Do not interpret it as a current schema 2 reference.
 
 The default GitHub branch may lag a reviewed documentation branch. A branch
 name, successful clone or documentation release is not a substitute for the
@@ -45,8 +48,10 @@ Git:
 
 ```sh
 nexus_source_revision=$(python -c 'import json, re; from pathlib import Path; manifest = json.loads(Path("nexus-documentation-manifest.json").read_text()); revision = manifest["documentation_source"]["commit"]; assert re.fullmatch(r"[0-9a-f]{40}", revision), "invalid documentation commit"; print(revision)')
-git clone --no-checkout https://github.com/X-Gen-Lab/nexus.git nexus
+git init nexus
 cd nexus
+git remote add origin https://github.com/X-Gen-Lab/nexus.git
+git fetch --no-tags origin "$nexus_source_revision"
 git checkout --detach "$nexus_source_revision"
 git submodule sync --recursive
 git submodule update --init --recursive
@@ -62,6 +67,13 @@ before starting a clean-source workflow. Stop on an unavailable commit or failed
 dependency retrieval; never substitute `main`, `HEAD` or a latest dependency.
 For a preview without a package manifest, record the full commit from its source
 banner or `documentation-build.json` and use that validated commit explicitly.
+
+Fetching the exact source commit avoids downloading unrelated artifact branches.
+The `documentation-assets` branch holds large historical evidence archives; it
+is not a source dependency. Retrieve only an archive identified by the
+[software evidence entry](../status/software-verification.md) when you need its
+original raw evidence. A verified Source SDK is another supported consumption
+path; it does not require the source repository's artifact history.
 
 On Windows, run the POSIX snippet in Git Bash, or read the same manifest field
 and perform the corresponding Git commands in your shell. Do not treat the shell

@@ -101,7 +101,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["irq_probe"] = irq["probe"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "adc_group", "i2c", "can", "can_fd", "pwm_adc", "usb_device", "eth", "eth_frames", "timer_capture", "advanced_pwm", "pwm_group", "lptim"} and "irq" in selection:
+            elif "irq" in INSTANCE_FIELDS[kind] and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:

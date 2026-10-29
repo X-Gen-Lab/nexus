@@ -2,7 +2,10 @@
 
 Nexus owns reusable embedded mechanisms. Applications, product roles, protocol
 register policy, workers, private PCB data, Flash reservations and recovery policy
-belong in external repositories. Public examples live in X-Gen-Lab/nexus-examples.
+belong in external repositories. Application examples live in the private
+X-Gen-Lab/nexus-examples repository; access to Nexus does not grant access to it.
+Public platform evidence and authenticated examples evidence keep separate
+publication boundaries.
 
 Codex owns all platform maintenance domains under the checked agent-managed
 policy. Named people are not required. Preserve automated gates and independent
@@ -110,7 +113,9 @@ overflow and instance isolation where the changed contract requires them.
 
 `python scripts/ci/tdd_gate.py --all --preset native-debug` builds the pinned,
 offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
-reports. The commit hook runs this gate for behavioral changes, rejects differing
+reports. Its initial `doctor --target contracts` checks the prepared locked Native
+and ARM tools before expensive suites, without installation or Docker. The commit
+hook runs this gate for behavioral changes, rejects differing
 unstaged/untracked behavior before and after execution, and requires an unchanged
 Git index tree. The hook reads the complete staged index, including deletions,
 and runs once per commit without filename batching. CI executes the gate independently of

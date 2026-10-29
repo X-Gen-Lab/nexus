@@ -262,6 +262,14 @@ Descriptions add no independent acceptance rules. The resolver additionally
 checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
+The ordered `CONTROLLER_CONTRACTS` declaration in `contracts.py` owns common
+category fields and header facts. Category enumeration, graph-envelope field
+admission and common IRQ normalization derive from those existing declarations;
+mode-specific options remain explicit. Typed option constructors, provider mode
+contracts and cross-resource arbitration retain their own responsibilities.
+This reduces repeated category lists without adding another configuration
+authority or firmware registry. CMake continues to own compiled sources.
+
 `authored.py` parses the sole platform input, TOML schema 2, into frozen
 `AuthoredAssembly`: unresolved user intent, not admitted hardware. The production
 entry `resolve_ir()` validates exact facts, selections and conflicts before
@@ -295,8 +303,10 @@ Each family's `configure/contract.py` owns its mode map, CPU/enum ABI, numerical
 fixed DMA/trigger routes, IRQ sharing and built-in CS rules. `__init__.py`
 reexports the explicit contract and constructors; sibling implementations import
 `contract.py` directly rather than the partially initialized package. `bindings.py`
-owns constructors, rollback and fixed IRQ wiring; `emission.py` owns system and
-shared-clock lifecycle emission. Each constructor returns the frozen
+owns static construction descriptions and fixed IRQ wiring; `emission.py` supplies
+static system/shared-clock bindings and explicit call ordering. Concrete C11
+adapters own hardware admission, register access/readback, preparation, stop,
+rollback and recovery. Each constructor returns the frozen
 `Construction` contract with explicit `state_type`, `definitions`, `initialize`,
 `stop`, `retain_on_failed_init`, `exports` and `pin_snapshots`. The common emitter
 consumes those named fields instead of inferring private C types or cleanup
@@ -307,8 +317,10 @@ expressions, casts, assignments and function-pointer/member-call expressions.
 The actual C compiler still validates symbol declarations and parameter types.
 This is a narrow call
 representation, not a complete C AST: `definitions`, `exports` and
-`face_definitions` still contain C source, including remaining family cold
-behavior. The record exists only during generation;
+`face_definitions` contain declarations, constant configuration, storage and
+interface faces. Generated thin IRQ entries and Platform start/stop preserve
+explicit typed call ordering; they do not implement peripheral or clock register
+algorithms. The record exists only during generation;
 no runtime registration or additional dispatch is emitted. The public resolver owns schema, reviewed facts,
 input snapshots and resource conflicts. The public binding emitter owns Nexus
 faces and common lifecycle progress. There is no package discovery or runtime

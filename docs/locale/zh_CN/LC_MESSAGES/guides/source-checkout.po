@@ -1,4 +1,4 @@
-#
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6272b366abe0217e06bb2cd8edc838274b8c1af99f08c03ac43db4ab30d80b65\n"
+"X-Nexus-Source-SHA256: f40bd23f41b9843c457eec4b3d18d42282407afad781191588bed32fc326e6fc\n"
 
 msgid "Obtain the exact source and pinned dependencies"
 msgstr "取得精确源码与锁定依赖"
@@ -58,13 +58,14 @@ msgstr "`code_source.commit`"
 msgid "Source described by the package; inspect its identity separately"
 msgstr "文档包描述的源码；应单独核对其身份"
 
-msgid "`qualified_code.commit`"
-msgstr "`qualified_code.commit`"
+msgid "`qualification_references[]`"
+msgstr "`qualification_references[]`"
 
-msgid ""
-"Referenced software qualification baseline, with its original scope and "
-"results"
-msgstr "被引用的软件资格基线，保留其原始范围与结果"
+msgid "Explicitly verified candidate references in a schema 2 package, each with its original source and scope; may be empty"
+msgstr "schema 2 包中显式验证的候选引用，各自保留原源码和范围；可以为空"
+
+msgid "Historical schema 1 packages retain their original `qualified_code.commit` field for read-only recovery. Do not interpret it as a current schema 2 reference."
+msgstr "历史 schema 1 包保留原始 `qualified_code.commit` 字段，用于只读恢复。不得将其解释为当前 schema 2 引用。"
 
 msgid ""
 "The default GitHub branch may lag a reviewed documentation branch. A branch "
@@ -108,6 +109,9 @@ msgstr ""
 " `U`（冲突）开头；开始干净源码工作流前，`git status --short` 必须为空。提交不可取得或依赖取得失败时立即停止，绝不能替换为 "
 "`main`、`HEAD` 或最新依赖。没有包清单的预览应从源码横幅或 `documentation-build.json` "
 "记录完整提交，并显式使用该已验证提交。"
+
+msgid "Fetching the exact source commit avoids downloading unrelated artifact branches. The `documentation-assets` branch holds large historical evidence archives; it is not a source dependency. Retrieve only an archive identified by the [software evidence entry](../status/software-verification.md) when you need its original raw evidence. A verified Source SDK is another supported consumption path; it does not require the source repository's artifact history."
+msgstr "获取精确源码提交可避免下载无关的产物分支。`documentation-assets` 分支存放大型历史证据归档，不是源码依赖。只有需要原始证据时，才按[软件证据入口](../status/software-verification.md)取得其标识的单个归档。经过验证的 Source SDK 是另一条维护的消费路径，不需要源码仓库的产物历史。"
 
 msgid ""
 "On Windows, run the POSIX snippet in Git Bash, or read the same manifest "

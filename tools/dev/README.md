@@ -214,10 +214,17 @@ claim every object was rebuilt. Identity capture is metadata, never qualificatio
 Capture failure returns an error and retains a separate failure report under
 `build/quality/developer-provenance-failures/` alongside the actual command receipt.
 
-`doctor --target tools|native|arm|candidate` rejects missing tools required by
-the selected target. `tools` is the default informational compiler diagnosis.
+`doctor --target tools|native|arm|contracts|candidate` rejects missing tools
+required by the selected target. `tools` is the default informational compiler
+diagnosis. The behavioral commit gate runs `contracts` once before tool tests:
+locked Native and ARM compilers must be on the prepared PATH. It neither installs
+tools nor requires Docker. Missing tools fail before the expensive suites.
 Candidate diagnosis checks availability, not the complete toolchain tree,
 source SDK, independent builds or software qualification.
+
+行为提交门禁先执行一次 `doctor --target contracts`，检查已准备的 PATH 中锁定的
+Native／ARM 编译器，再运行完整工具测试；缺少工具立即失败，不自动安装，也不要求
+Docker。该预检不代替测试执行或软件资格。
 
 Dependency preparation and qualification use explicit maintained checkers:
 
@@ -265,6 +272,27 @@ path aliases. Choose a new canonical directory for each attempt and retain faile
 or interrupted receipts. Check the complete plan report and every actual stage
 exit; successful early stages and a larger retry budget do not establish a
 complete run.
+
+Retention uses the maintained `qualification.execution_inputs` selector after
+the existing complete clean-source execution verifier. It follows only the
+executed stages' checker, conventional raw output, receipt view, unique attempt
+and original stdout/stderr, including empty streams. Selected Native stages also
+use `native_execution_inputs`: the current executable catalogue, full CTest and
+Google XML, discovery identities and original producer receipts must agree.
+Historical attempts are left untouched and excluded, rather than recursively
+copying every file under `tdd`. Source, plan and any declared environment remain
+bound to the original execution. The selector does not rerun tests, merge partial
+plans, admit relocated historical reports or create a cached success result.
+Artifact-only continuation belongs to the explicit
+[`store.py recover` operation](../evidence/README.md).
+
+证据归档先通过既有完整 clean-source 执行验证，再调用维护的
+`qualification.execution_inputs` 选择当前实际阶段的 checker、原始日志、receipt
+导航、唯一 attempt 和 stdout/stderr，空流也保留。Native 阶段另按当前可执行目录、
+完整 CTest/Google XML、发现的用例身份和生产者原始 receipt 精确选择，不递归复制
+整个历史 `tdd` 树。历史文件不变但不混入当前执行。源码、计划与显式环境仍绑定原执行；
+选择器不重跑测试、不合并部分计划、不接纳迁移后的历史报告，也不缓存测试成功。
+只有归档字节恢复使用上述独立的 `store.py recover` 续作合同。
 
 Before starting any stage, qualification checks that every selected quality
 analyzer is executable in the invocation's `PATH` or at its explicit tool path.

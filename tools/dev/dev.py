@@ -141,8 +141,8 @@ def doctor(environment, native):
     """Diagnose explicit target requirements; tools-only remains available."""
     parser = argparse.ArgumentParser(prog="dev.py doctor")
     parser.add_argument("--target",
-                        choices=("tools", "native", "arm", "candidate", "docs",
-                                 "workflows"),
+                        choices=("tools", "native", "arm", "contracts",
+                                 "candidate", "docs", "workflows"),
                         default="tools")
     args, remaining = parser.parse_known_args(native)
     if args.target == "workflows":
@@ -179,6 +179,7 @@ def doctor(environment, native):
     required = {
         "tools": (), "native": ("gcc", "g++"),
         "arm": ("arm-none-eabi-gcc",),
+        "contracts": ("gcc", "g++", "arm-none-eabi-gcc"),
         "candidate": ("gcc", "g++", "arm-none-eabi-gcc"),
     }[args.target]
     for name in ("gcc", "g++", "arm-none-eabi-gcc"):

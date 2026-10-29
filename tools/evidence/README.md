@@ -66,6 +66,53 @@ Dirty observation does not qualify a candidate or an OCI/offline reproduction.
 It excludes ignored or Git-hidden worktree data and does not lock out concurrent
 writers or prove that no change-and-restore occurred between observations.
 
+Local portable-evidence recovery can continue through `store.py recover`.
+An explicit plan lists the original package-envelope and archive identities:
+
+```json
+{
+  "schema_version": 1,
+  "kind": "evidence_recovery_plan",
+  "reserve_bytes": 67108864,
+  "packages": [
+    {
+      "name": "platform",
+      "package": {"path": "/input/package.json", "size": 1, "sha256": "<actual-sha256>"},
+      "archive": {"path": "/input/evidence.tar.gz", "size": 1, "sha256": "<actual-sha256>"}
+    }
+  ]
+}
+```
+
+Replace every size and hash with its actual identity. Paths can explicitly
+navigate transported archives; original envelope bytes stay unchanged. Recovery
+admits only the existing `portable_evidence` format, at most 128 unique packages,
+and no embedded commands or inner validators. It checks the complete manifest's
+expanded bytes, file-block allocation, directory/metadata overhead and explicit
+reserve before creating recovery outputs; it checks space again per package.
+`restore_capacity` exposes the same manifest-based estimate to other maintained
+coordinators. Add any nested validator's simultaneous restoration to the reserve.
+These estimates do not reserve disk space or establish tmpfs memory headroom.
+
+```sh
+python tools/evidence/store.py recover --plan /input/recovery-plan.json \
+  --destination /new/recovery --report /new/recovery-result.json
+python tools/evidence/store.py recover --plan /input/recovery-plan.json \
+  --destination /new/recovery --resume --report /new/resumed-result.json
+```
+
+The POSIX coordinator holds a nonblocking kernel file lock. Explicit `--resume`
+requires unchanged verifier source and plan fingerprints, package/archive bytes
+and complete existing payload members. Each invocation executes fresh owned
+store commands; completed copies are reverified, not recopied. Original unique
+command receipts and streams remain immutable, and the previous journal is
+copied into the new attempt. An interrupted active command with unknown process
+withdrawal rejects continuation; inspect its original receipt and resolve that
+operation first. Partial or unselected payload targets are retained and rejected.
+No raw evidence is pruned automatically. An unknown outer exit stays unknown;
+new byte verification does not rewrite its result. Recovery never runs or caches
+tests, promotes an inner report, or establishes candidate or physical acceptance.
+
 # 离线构建与外部工程
 
 复现输入分别绑定平台的干净 Git 版本、完整可发布 Source SDK、不可变 OCI
@@ -104,6 +151,22 @@ clean 源码记录仍精确包含 `root`、`commit`、`tree`、`dirty` 和 `subm
 五项。候选与外部工程消费仍要求 clean 源码。dirty 观察不能赋予候选或 OCI／离线
 复现资格；它不涵盖被忽略或被 Git 隐藏的工作区数据，也不锁住并发写入者，不能
 证明两次观察之间没有发生修改后恢复原值的操作。
+
+本地可移植证据通过 `store.py recover` 按显式计划逐包恢复；上例中的大小、SHA256
+须替换为原始 envelope 与归档的实际身份。只接受既有 `portable_evidence`，最多
+128 个唯一包，不接收内嵌命令或执行内部 verifier。移动归档只改变显式导航，原始
+envelope 字节保持不变。开始前按完整 manifest 的展开字节、文件块、目录及元数据
+开销和显式预留检查空间，每包执行前再次检查。`restore_capacity` 向其他维护工具
+提供同一估算；内部 validator 同时展开 SDK 等空间须另行加入 reserve。该观察不是
+磁盘预占，也不能证明 tmpfs 具有足够物理内存。
+
+协调器使用 POSIX 非阻塞内核锁。显式 `--resume` 要求 verifier 源码、计划指纹、
+包与归档身份不变，并逐成员复核已有 payload。每次都真实执行新的 store 命令；
+已有完整副本重新验证而不重复复制。原始独立 attempt receipt 与输出保留，上轮
+journal 原样复制到新 attempt。活动命令退出或进程撤回状态未知时拒绝继续，先检查
+原始 receipt 并处理该操作；部分或未选择的 payload 也保留并拒绝，不自动删证据。
+原来未知的外层退出码仍然未知；新字节验证不会补写其成功。该功能不执行或缓存测试，
+不升格内部报告，也不建立候选或实板资格。
 
 ## Independently downloadable qualification evidence
 

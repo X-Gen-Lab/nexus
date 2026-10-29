@@ -162,6 +162,10 @@ def main(arguments=None):
         matrix_snapshot = output / "io-property-inputs.json"
         matrix_snapshot.unlink(missing_ok=True)
         python = sys.executable
+        # The complete tool domains compile Native and ARM fixtures. Diagnose
+        # their existing locked prerequisites before executing those suites.
+        execute([python, "tools/dev/dev.py", "doctor", "--target", "contracts"],
+                env, output / "preflight-contracts.txt")
         tool_results = []
         for suite in TOOL_SUITES:
             tool_report = output / f"tools-{suite}.json"

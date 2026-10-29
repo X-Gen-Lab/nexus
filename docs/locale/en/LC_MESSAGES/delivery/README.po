@@ -1,4 +1,4 @@
-# Exact messages independently reviewed; approval bound by companion receipt.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: efcfe0707db50836aa3d6285efe8e55a32cdbbd82c315f0176cf02ac79d3607d\n"
+"X-Nexus-Source-SHA256: dde1a194723eccd3023f6bf3f27cac49bf5a8a1146f6f99eed83464fbd1403b0\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:1
 msgid "当前平台交付"
@@ -26,6 +26,9 @@ msgstr ""
 " operation tables; independent state remains inside each provider. Getting "
 "an interface does not start hardware. External projects own applications, "
 "product tasks, private PCBs, Flash partitions, recovery and security policy."
+
+msgid "最新封存基线是 `7590b2d4`。完整软件计划、SDK、八个精确配置候选和远程恢复 结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 该入口区分公开平台证据、需授权的私有示例证据及仍开放的物理、环境和发布退出； 下列旧索引保留其原始源码和历史状态，不覆盖后续封存观察。"
+msgstr "The latest sealed baseline is `7590b2d4`. See {ref}`final cold-lifecycle delivery <sealed-cold-lifecycle-baseline>` for the complete software plan, SDK, eight exact-configuration candidates and remote recovery. That entry distinguishes public platform evidence, private examples evidence requiring authorization, and remaining physical, environment and publication exits. Older indexes below preserve their original source and historical status; they do not override the later sealed observation."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:8
 msgid ""

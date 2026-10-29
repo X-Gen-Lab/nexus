@@ -1,4 +1,4 @@
-# Authored translation; independent semantic review completed.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a62df03a38c06091288449583cb81961635d0423c47a45b9b20453e56bc50ac9\n"
+"X-Nexus-Source-SHA256: 127193be835c0eb674f7b74361e422f6c26cc87ef371e835e7844a33e516c3ac\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/verification.md:1
 msgid "当前证据与验收边界"
@@ -22,6 +22,9 @@ msgstr ""
 "本页说明平台执行报告的范围与验收边界。每次迭代都按实际源码重新建立证据， 旧版本候选、历史测试数量和开发目录不继承为新 HEAD 的资格。实施台账的 "
 "`implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。 "
 "原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。"
+
+msgid "最新已封存的 `7590b2d4` 平台结果及公开／私有恢复入口见 {ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 本页后续 P2、SoC/IP 等记录保持原始源码与历史状态；其 pending 字段不覆盖 该后续封存观察，后续文档提交也不继承 `7590b2d4` 的固件资格。"
+msgstr "最新已封存的 `7590b2d4` 平台结果及公开／私有恢复入口见 {ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 本页后续 P2、SoC/IP 等记录保持原始源码与历史状态；其 pending 字段不覆盖 该后续封存观察，后续文档提交也不继承 `7590b2d4` 的固件资格。"
 
 msgid "类型化平台统一：精确源码与执行边界"
 msgstr "类型化平台统一：精确源码与执行边界"

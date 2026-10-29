@@ -1,4 +1,4 @@
-# Authored bilingual updates; exact current message coverage is verified.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -7,25 +7,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 022b8921c7994be31d1862ce910cce7a6123dfb4093d7632e09213db2256dfbe\n"
+"X-Nexus-Source-SHA256: 09352c05c96409fb00cd0854fd32a41bb3288c545a8f11ef576c56567d795c11\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
 msgstr "Platform delivery-completion ledger"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:11
-msgid ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-"
-"delivery-"
-"completion.csv`；SHA-256：`15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65`。"
-msgstr ""
-"This page derives from the original CSV; it is not a new status authority, "
-"execution record or software qualification. Original IDs, order and every "
-"original field come from the {download}`original ledger "
-"<../../design/platform-delivery-completion.csv>`. Source: "
-"`docs/design/platform-delivery-completion.csv`; SHA-256: "
-"`15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65`."
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`fac173a334141dfdf308e5b0bec89c11c9d43e1721b097fcc3810dabc61ab764`。"
+msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `fac173a334141dfdf308e5b0bec89c11c9d43e1721b097fcc3810dabc61ab764`."
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:15
 msgid ""
@@ -92,9 +81,8 @@ msgstr "implemented"
 msgid "`software_status`"
 msgstr "`software_status`"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "development_models_passed_remote_scan_pending"
-msgstr "development_models_passed_remote_scan_pending"
+msgid "native_regressions_passed_at_7590b2d4_codeql_access_403_still_open"
+msgstr "native_regressions_passed_at_7590b2d4_codeql_access_403_still_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`hardware_status`"
@@ -118,15 +106,8 @@ msgstr ""
 msgid "`evidence_paths`"
 msgstr "`evidence_paths`"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
-"next-20261024/provider/handoff.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
-"next-20261024/provider/handoff.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;tests/google/usb_device_test.cpp;/tmp/nexus-next-20261024/provider/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/completion-20261030/remote/codeql-access.log"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tests/google/usb_device_test.cpp;/tmp/nexus-next-20261024/provider/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/completion-20261030/remote/codeql-access.log"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`exit_condition`"
@@ -155,23 +136,15 @@ msgstr "N02"
 msgid "配置工具依赖收敛"
 msgstr "Reduce configuration-tool dependencies"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "ir_and_generated_equivalence_verified_sdk_pending"
-msgstr "ir_and_generated_equivalence_verified_sdk_pending"
+msgid "ir_generated_import_and_sdk_contracts_passed_at_7590b2d4"
+msgstr "ir_generated_import_and_sdk_contracts_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/;cmake/package/"
 msgstr "tools/configure/;cmake/package/"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
-"next-20261024/configuration/import-orders-green.log"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
-"next-20261024/configuration/import-orders-green.log"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/configuration/equivalence-green.json;/tmp/nexus-next-20261024/configuration/import-orders-green.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/configuration/equivalence-green.json;/tmp/nexus-next-20261024/configuration/import-orders-green.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "维护配置 IR 与生成结果等价；导入顺序测试通过；SDK 闭包完整。"
@@ -192,21 +165,15 @@ msgstr "Review this iteration's scan findings"
 msgid "reviewed_fixes_implemented"
 msgstr "reviewed_fixes_implemented"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "focused_regressions_passed_current_scan_pending"
-msgstr "focused_regressions_passed_current_scan_pending"
+msgid "final_local_analyzers_passed_at_7590b2d4_current_codeql_disposition_open"
+msgstr "final_local_analyzers_passed_at_7590b2d4_current_codeql_disposition_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/maintenance/;tools/measurement/;tests/"
 msgstr "tools/maintenance/;tools/measurement/;tests/"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/io-cost/handoff.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/io-cost/handoff.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/io-cost/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/completion-20261030/remote/codeql-access.log"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/io-cost/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/completion-20261030/remote/codeql-access.log"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "真缺陷修复并回归；合法用法与误报有明确依据；不靠扩大忽略范围消除新增问题。"
@@ -223,21 +190,15 @@ msgstr "N04"
 msgid "收束分支与 PR"
 msgstr "Consolidate branches and PRs"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "pending_merge"
-msgstr "pending_merge"
-
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "pending_post_merge_source_association"
-msgstr "pending_post_merge_source_association"
+msgid "main_7590b2d4_examples_b029cc4b_post_merge_source_association_passed"
+msgstr "main_7590b2d4_examples_b029cc4b_post_merge_source_association_passed"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
 msgstr "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "docs/delivery/platform-delivery-completion-results.json"
-msgstr "docs/delivery/platform-delivery-completion-results.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;build/c-cold-20261028/integration/final-main-sync/final-delivery-observation.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;build/c-cold-20261028/integration/final-main-sync/final-delivery-observation.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "最终 main 包含目标改动；示例 E 锁定明确的平台版本；合并后源码与验证对应。"
@@ -254,21 +215,15 @@ msgstr "N05"
 msgid "示例本地 CI 入口"
 msgstr "Provide an examples local-CI entry"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "local_contracts_passed_final_pinned_run_pending"
-msgstr "local_contracts_passed_final_pinned_run_pending"
+msgid "final_pinned_examples_b029cc4b_full_local_ci_passed_at_7590b2d4"
+msgstr "final_pinned_examples_b029cc4b_full_local_ci_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
 msgstr "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
-"examples/scripts/local_ci.py"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
-"examples/scripts/local_ci.py"
+msgid "docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-examples/scripts/local_ci.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-examples/scripts/local_ci.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "新 checkout 以固定依赖、新输出完整执行；缺工具失败，旧报告拒绝。"
@@ -285,23 +240,15 @@ msgstr "N06"
 msgid "当前支持与验收视图"
 msgstr "Expose exact support and validation"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_query_and_contracts_passed"
-msgstr "selected_query_and_contracts_passed"
+msgid "exact_support_queries_and_contracts_passed_at_7590b2d4_no_physical_promotion"
+msgstr "exact_support_queries_and_contracts_passed_at_7590b2d4_no_physical_promotion"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
 msgstr "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
-"next-20261024/documentation/exact-support-observed.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
-"next-20261024/documentation/exact-support-observed.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;tools/testing/test_support_selection.py;/tmp/nexus-next-20261024/documentation/exact-support-observed.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tools/testing/test_support_selection.py;/tmp/nexus-next-20261024/documentation/exact-support-observed.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "能够查询精确配置支持什么、如何验证，以及哪些是参考配置或尚未实测。"
@@ -318,23 +265,15 @@ msgstr "N07"
 msgid "私有 Board 与 provider 接入"
 msgstr "Integrate private Boards and providers"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "external_board_contracts_passed_final_sdk_pending"
-msgstr "external_board_contracts_passed_final_sdk_pending"
+msgid "external_board_provider_and_installed_sdk_contracts_passed_at_7590b2d4"
+msgstr "external_board_provider_and_installed_sdk_contracts_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/experience.py;docs/guides/board-porting.md"
 msgstr "tools/configure/experience.py;docs/guides/board-porting.md"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
-"next-20261024/examples/installed-board/result.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
-"next-20261024/examples/installed-board/result.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/configuration/final-focused-green.log;/tmp/nexus-next-20261024/examples/installed-board/result.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/configuration/final-focused-green.log;/tmp/nexus-next-20261024/examples/installed-board/result.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "新板与同类实例经维护入口接入；不改无关 family，不猜测 PCB 事实。"
@@ -351,23 +290,15 @@ msgstr "N08"
 msgid "配置诊断与变更影响"
 msgstr "Explain configuration errors and change impacts"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "focused_diagnostics_and_diff_passed"
-msgstr "focused_diagnostics_and_diff_passed"
+msgid "diagnostics_diff_and_rejection_contracts_passed_at_7590b2d4"
+msgstr "diagnostics_diff_and_rejection_contracts_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/;docs/guides/developer-workflow.md"
 msgstr "tools/configure/;docs/guides/developer-workflow.md"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/configure/test_experience.py;/tmp/nexus-"
-"next-20261024/configuration/final-focused-green.log"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/configure/test_experience.py;/tmp/nexus-"
-"next-20261024/configuration/final-focused-green.log"
+msgid "docs/delivery/platform-delivery-completion-results.json;tools/configure/test_experience.py;/tmp/nexus-next-20261024/configuration/final-focused-green.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tools/configure/test_experience.py;/tmp/nexus-next-20261024/configuration/final-focused-green.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "人读与 JSON 来自同一记录；冲突可定位；不自动换模式或补造未知事实。"
@@ -384,23 +315,15 @@ msgstr "N09"
 msgid "真实热点与执行效率优化"
 msgstr "Optimize measured hotspots and execution efficiency"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "measured_attempts_recorded_no_global_speedup_claim"
-msgstr "measured_attempts_recorded_no_global_speedup_claim"
+msgid "final_stage_costs_observed_at_7590b2d4_complete_controlled_cold_warm_comparison_open"
+msgstr "final_stage_costs_observed_at_7590b2d4_complete_controlled_cold_warm_comparison_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
 msgstr "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
-"next-20261024/configuration/git-after-measurements.jsonl"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
-"next-20261024/configuration/git-after-measurements.jsonl"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-next-20261024/configuration/git-after-measurements.jsonl;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-next-20261024/configuration/git-after-measurements.jsonl;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "同环境 cold/warm 对比；不同编译上下文和失败诊断完整；不缓存成功测试报告。"
@@ -421,9 +344,8 @@ msgstr "Establish comparable I/O performance baselines"
 msgid "implemented_tooling"
 msgstr "implemented_tooling"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "synthetic_compare_contracts_passed"
-msgstr "synthetic_compare_contracts_passed"
+msgid "linked_resource_and_compare_contracts_passed_at_7590b2d4_physical_comparison_open"
+msgstr "linked_resource_and_compare_contracts_passed_at_7590b2d4_physical_comparison_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "not_executed"
@@ -434,15 +356,8 @@ msgid "tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
 msgstr ""
 "tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
-"next-20261024/io-cost/handoff.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
-"next-20261024/io-cost/handoff.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-next-20261024/io-cost/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-next-20261024/io-cost/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "每项结论关联同一镜像的原始测量，并提供优化前后对照；默认未选能力无额外资源；物理部分未取得证据前保持 pending。"
@@ -460,21 +375,15 @@ msgstr "N11"
 msgid "三板硬件验收"
 msgstr "Execute three-Board hardware acceptance"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "existing_plans_current_source_preparation_pending"
-msgstr "existing_plans_current_source_preparation_pending"
+msgid "formal_plan_hil_tooling_prepared_at_7590b2d4_no_physical_execution"
+msgstr "formal_plan_hil_tooling_prepared_at_7590b2d4_no_physical_execution"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
 msgstr "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/hil/fixtures/;tools/hil/prepare.py"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/hil/fixtures/;tools/hil/prepare.py"
+msgid "docs/delivery/platform-delivery-completion-results.json;tools/hil/fixtures/;tools/hil/prepare.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tools/hil/fixtures/;tools/hil/prepare.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "每板保留固件、设备身份、仪器记录和逐 mode 结果；未知明确保留；工装准备不能代替真实硬件退出条件。"
@@ -492,23 +401,15 @@ msgstr "N12"
 msgid "H743 Flash 与 RAM 专项"
 msgstr "Audit H743 Flash and RAM"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_arm_checks_passed_full_sdk_and_candidate_pending"
-msgstr "selected_arm_checks_passed_full_sdk_and_candidate_pending"
+msgid "selected_flash_ram_models_arm_and_sdk_passed_at_7590b2d4_physical_exit_open"
+msgstr "selected_flash_ram_models_arm_and_sdk_passed_at_7590b2d4_physical_exit_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
 msgstr "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
-"next-20261024/provider/h743-linked-costs.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
-"next-20261024/provider/h743-linked-costs.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/provider/h743-arm-suite.json;/tmp/nexus-next-20261024/provider/h743-linked-costs.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/provider/h743-arm-suite.json;/tmp/nexus-next-20261024/provider/h743-linked-costs.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "当前精确 profile 有完整软件结论；实板另验 busy-bank、watchdog、掉电与 IRQ。"
@@ -525,25 +426,15 @@ msgstr "N13"
 msgid "当前正式软件候选"
 msgstr "Produce the current formal software candidate"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "existing_workflow"
-msgstr "existing_workflow"
-
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "pending_final_clean_source_execution"
-msgstr "pending_final_clean_source_execution"
+msgid "eight_exact_candidates_software_qualified_at_7590b2d4_other_configurations_not_promoted"
+msgstr "eight_exact_candidates_software_qualified_at_7590b2d4_other_configurations_not_promoted"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/release/;tools/evidence/"
 msgstr "tools/release/;tools/evidence/"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
+msgid "docs/delivery/platform-delivery-completion-results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -567,23 +458,15 @@ msgstr "Maintain documentation and original evidence"
 msgid "implemented_documentation"
 msgstr "implemented_documentation"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
-msgstr ""
-"source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
+msgid "sdk_docs_starters_upgrade_and_remote_recovery_passed_at_7590b2d4"
+msgstr "sdk_docs_starters_upgrade_and_remote_recovery_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "docs/;tools/documentation/;tools/evidence/"
 msgstr "docs/;tools/documentation/;tools/evidence/"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/documentation/final-checks.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
-"next-20261024/documentation/final-checks.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/documentation/final-checks.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/documentation/final-checks.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -603,21 +486,15 @@ msgstr "A01"
 msgid "Maintained coverage inventory"
 msgstr "Maintained coverage inventory"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "inventory_recorded"
-msgstr "inventory_recorded"
+msgid "maintained_selection_inventory_recorded_at_7590b2d4"
+msgstr "maintained_selection_inventory_recorded_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/matrix.py"
 msgstr "tools/configure/matrix.py"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/baseline-support.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/baseline-support.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/baseline-support.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/baseline-support.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -640,17 +517,11 @@ msgstr "End-to-end implementation ownership"
 msgid "partial"
 msgstr "partial"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "family_path_audits_observed_final_external_consumers_pending"
-msgstr "family_path_audits_observed_final_external_consumers_pending"
+msgid "final_c_path_audits_and_50_consumer_sdk_passed_at_7590b2d4"
+msgstr "final_c_path_audits_and_50_consumer_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -669,9 +540,8 @@ msgstr "A03"
 msgid "Behavior and linked cost baseline"
 msgstr "Behavior and linked cost baseline"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "exact_linked_cost_observations_recorded_final_source_pending"
-msgstr "exact_linked_cost_observations_recorded_final_source_pending"
+msgid "source_bound_linked_cost_observations_and_final_resource_checks_at_7590b2d4"
+msgstr "source_bound_linked_cost_observations_and_final_resource_checks_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -690,21 +560,15 @@ msgstr "B01"
 msgid "C firmware and host generator boundary"
 msgstr "C firmware and host generator boundary"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "source_and_bilingual_reviewed"
-msgstr "source_and_bilingual_reviewed"
+msgid "maintained_c_hardware_boundary_and_final_gate_passed_at_7590b2d4"
+msgstr "maintained_c_hardware_boundary_and_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "AGENTS.md;soc;drivers;tests/google"
 msgstr "AGENTS.md;soc;drivers;tests/google"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;AGENTS.md;docs/guides/provider-porting.md"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;AGENTS.md;docs/guides/provider-porting.md"
+msgid "docs/delivery/platform-delivery-completion-results.json;AGENTS.md;docs/guides/provider-porting.md;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;AGENTS.md;docs/guides/provider-porting.md;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -723,9 +587,8 @@ msgstr "B02"
 msgid "Concrete lifecycle contracts"
 msgstr "Concrete lifecycle contracts"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "family_c_context_and_retained_cleanup_contracts_regressed"
-msgstr "family_c_context_and_retained_cleanup_contracts_regressed"
+msgid "concrete_c_lifecycle_contracts_and_final_gate_passed_at_7590b2d4"
+msgstr "concrete_c_lifecycle_contracts_and_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -744,9 +607,8 @@ msgstr "B03"
 msgid "Unique resource receipts"
 msgstr "Unique resource receipts"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "family_owned_receipts_and_padding_bounds_regressed"
-msgstr "family_owned_receipts_and_padding_bounds_regressed"
+msgid "c_resource_receipt_ownership_and_final_gate_passed_at_7590b2d4"
+msgstr "c_resource_receipt_ownership_and_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -765,9 +627,8 @@ msgstr "B04"
 msgid "Lifecycle failure regressions"
 msgstr "Lifecycle failure regressions"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "real_c_refusal_partial_cleanup_retry_and_alien_owner_red_green"
-msgstr "real_c_refusal_partial_cleanup_retry_and_alien_owner_red_green"
+msgid "recorded_lifecycle_red_green_and_final_native_modes_passed_at_7590b2d4"
+msgstr "recorded_lifecycle_red_green_and_final_native_modes_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -786,9 +647,8 @@ msgstr "B05"
 msgid "Cold migration linked cost"
 msgstr "Cold migration linked cost"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_arm_budgets_checked_unselected_and_final_scope_pending"
-msgstr "selected_arm_budgets_checked_unselected_and_final_scope_pending"
+msgid "selected_unselected_arm_budget_and_retention_checks_passed_at_7590b2d4"
+msgstr "selected_unselected_arm_budget_and_retention_checks_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -807,21 +667,15 @@ msgstr "C01"
 msgid "Native complete maintained lifecycle"
 msgstr "Native complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "ordinary_debug_passed_final_integrated_modes_pending"
-msgstr "ordinary_debug_passed_final_integrated_modes_pending"
+msgid "maintained_native_c_lifecycle_four_modes_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_native_c_lifecycle_four_modes_and_sdk_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "soc;tests/google;tools/configure"
 msgstr "soc;tests/google;tools/configure"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/legacy"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/legacy"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/legacy;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/legacy;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -840,19 +694,11 @@ msgstr "C02"
 msgid "STM32F103 complete maintained lifecycle"
 msgstr "STM32F103 complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "legacy_pair_30_arm_352_asan_observed_final_head_pending"
-msgstr "legacy_pair_30_arm_352_asan_observed_final_head_pending"
+msgid "maintained_f103_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_f103_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-"
-"gate/package.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-"
-"gate/package.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -871,6 +717,9 @@ msgstr "C03"
 msgid "GD32F303 complete maintained lifecycle"
 msgstr "GD32F303 complete maintained lifecycle"
 
+msgid "maintained_gd303_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_gd303_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every maintained mode including RCU AFIO ADC divider channel DMA and "
@@ -888,19 +737,11 @@ msgstr "C04"
 msgid "STM32F407 complete maintained lifecycle"
 msgstr "STM32F407 complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "55_arm_3_extra_presets_153_debug_153_asan_final_head_pending"
-msgstr "55_arm_3_extra_presets_153_debug_153_asan_final_head_pending"
+msgid "maintained_f407_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_f407_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-"
-"family-package.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-"
-"family-package.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-family-package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-family-package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -919,21 +760,11 @@ msgstr "C05"
 msgid "GD32F470 complete maintained lifecycle"
 msgstr "GD32F470 complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"33_plus_8_matrix_18_presets_113_plus_87_cases_each_mode_final_gate_pending"
-msgstr ""
-"33_plus_8_matrix_18_presets_113_plus_87_cases_each_mode_final_gate_pending"
+msgid "maintained_gd470_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_gd470_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-"
-"gd470/build/gd470-cold/family-increment-paths.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-"
-"gd470/build/gd470-cold/family-increment-paths.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-gd470/build/gd470-cold/family-increment-paths.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-gd470/build/gd470-cold/family-increment-paths.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:437
@@ -944,19 +775,11 @@ msgstr "C06"
 msgid "STM32G474 complete maintained lifecycle"
 msgstr "STM32G474 complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "31_arm_612_debug_612_asan_observed_final_head_pending"
-msgstr "31_arm_612_debug_612_asan_observed_final_head_pending"
+msgid "maintained_g474_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_g474_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/modern;/dev/shm/nexus-"
-"next-g474/build/cold-g474/handoff.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/modern;/dev/shm/nexus-"
-"next-g474/build/cold-g474/handoff.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/modern;/dev/shm/nexus-next-g474/build/cold-g474/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/modern;/dev/shm/nexus-next-g474/build/cold-g474/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -975,19 +798,11 @@ msgstr "C07"
 msgid "STM32H743 complete maintained lifecycle"
 msgstr "STM32H743 complete maintained lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"modern_pair_47_matrix_8_presets_1636_debug_109_focused_asan_final_head_pending"
-msgstr ""
-"modern_pair_47_matrix_8_presets_1636_debug_109_focused_asan_final_head_pending"
+msgid "maintained_h743_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_h743_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/modern"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/modern"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/modern;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/modern;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1006,6 +821,9 @@ msgstr "C08"
 msgid "STM32U575 complete maintained lifecycle"
 msgstr "STM32U575 complete maintained lifecycle"
 
+msgid "maintained_u575_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+msgstr "maintained_u575_c_lifecycle_models_arm_and_sdk_passed_at_7590b2d4"
+
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Basic FIFO GPDMA chain ADC4 RTC LPTIM retained domains and resource paths "
@@ -1023,9 +841,8 @@ msgstr "X01"
 msgid "Platform preflight and resource lifecycle"
 msgstr "Platform preflight and resource lifecycle"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "seven_family_c_resources_integrated_shared_admission_audit_pending"
-msgstr "seven_family_c_resources_integrated_shared_admission_audit_pending"
+msgid "c_preflight_and_resource_contracts_final_gate_passed_at_7590b2d4"
+msgstr "c_preflight_and_resource_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "soc;tools/configure"
@@ -1048,9 +865,8 @@ msgstr "X02"
 msgid "Secondary and shared physical owners"
 msgstr "Secondary and shared physical owners"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "primary_secondary_c_owners_regressed_final_family_integration_pending"
-msgstr "primary_secondary_c_owners_regressed_final_family_integration_pending"
+msgid "secondary_shared_owner_contracts_final_gate_passed_at_7590b2d4"
+msgstr "secondary_shared_owner_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1069,10 +885,8 @@ msgstr "X03"
 msgid "Enhanced and packet endpoints"
 msgstr "Enhanced and packet endpoints"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "packet_domain_endpoint_c_failure_regressions_final_integration_pending"
-msgstr ""
-"packet_domain_endpoint_c_failure_regressions_final_integration_pending"
+msgid "packet_endpoint_and_shared_domain_contracts_final_gate_passed_at_7590b2d4"
+msgstr "packet_endpoint_and_shared_domain_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1091,9 +905,8 @@ msgstr "X04"
 msgid "H743 pause resume and Flash execution"
 msgstr "H743 pause resume and Flash execution"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "h743_fixed_run_c_resource_path_regressed_final_flash_closure_pending"
-msgstr "h743_fixed_run_c_resource_path_regressed_final_flash_closure_pending"
+msgid "h743_fixed_run_and_flash_ram_closure_passed_at_7590b2d4_physical_exit_open"
+msgstr "h743_fixed_run_and_flash_ram_closure_passed_at_7590b2d4_physical_exit_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1112,9 +925,8 @@ msgstr "X05"
 msgid "Lowpower I2S2 retained special paths"
 msgstr "Lowpower I2S2 retained special paths"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "retained_component_c_paths_reviewed_shared_residual_audit_pending"
-msgstr "retained_component_c_paths_reviewed_shared_residual_audit_pending"
+msgid "selected_retained_i2s2_and_lowpower_c_paths_final_gate_passed_at_7590b2d4"
+msgstr "selected_retained_i2s2_and_lowpower_c_paths_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1133,21 +945,15 @@ msgstr "D01"
 msgid "Canonical controller category contracts"
 msgstr "Canonical controller category contracts"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "focused_passed"
-msgstr "focused_passed"
+msgid "canonical_category_contracts_final_gate_passed_at_7590b2d4"
+msgstr "canonical_category_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure"
 msgstr "tools/configure"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/contracts/green-final.log"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/contracts/green-final.log"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/contracts/green-final.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/contracts/green-final.log;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1166,23 +972,11 @@ msgstr "D02"
 msgid "Resolver stage ownership"
 msgstr "Resolver stage ownership"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"frozen_fact_device_graph_and_direct_readonly_validation_passed_final_gate_pending"
-msgstr ""
-"frozen_fact_device_graph_and_direct_readonly_validation_passed_final_gate_pending"
+msgid "frozen_stage_and_device_graph_contracts_final_gate_passed_at_7590b2d4"
+msgstr "frozen_stage_and_device_graph_contracts_final_gate_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
-"graph-stage/handoff.json;build/c-cold-20261028/fact-stage-"
-"increment/handoff.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
-"graph-stage/handoff.json;build/c-cold-20261028/fact-stage-"
-"increment/handoff.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-graph-stage/handoff.json;build/c-cold-20261028/fact-stage-increment/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-graph-stage/handoff.json;build/c-cold-20261028/fact-stage-increment/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1201,17 +995,11 @@ msgstr "D03"
 msgid "Complete selected integration consumption"
 msgstr "Complete selected integration consumption"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "uniform_consumption_audit_passed_integrated_gates_pending"
-msgstr "uniform_consumption_audit_passed_integrated_gates_pending"
+msgid "canonical_selected_consumption_audit_and_final_gate_passed_at_7590b2d4"
+msgstr "canonical_selected_consumption_audit_and_final_gate_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1230,11 +1018,8 @@ msgstr "D04"
 msgid "Exact clock and DMA models"
 msgstr "Exact clock and DMA models"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"family_channel_stream_and_gpdma_contracts_regressed_final_integration_pending"
-msgstr ""
-"family_channel_stream_and_gpdma_contracts_regressed_final_integration_pending"
+msgid "exact_clock_and_dma_contracts_final_gate_passed_at_7590b2d4"
+msgstr "exact_clock_and_dma_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1253,17 +1038,11 @@ msgstr "D05"
 msgid "Validate all exact part variants"
 msgstr "Validate all exact part variants"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "red_green_and_boundary_passed"
-msgstr "red_green_and_boundary_passed"
+msgid "exact_part_rejection_and_boundary_contracts_final_gate_passed_at_7590b2d4"
+msgstr "exact_part_rejection_and_boundary_contracts_final_gate_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/config"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/config"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1282,9 +1061,8 @@ msgstr "D06"
 msgid "Logical runtime power references"
 msgstr "Logical runtime power references"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "renamed_reference_and_rejection_passed"
-msgstr "renamed_reference_and_rejection_passed"
+msgid "logical_runtime_reference_contracts_final_gate_passed_at_7590b2d4"
+msgstr "logical_runtime_reference_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1303,11 +1081,8 @@ msgstr "D07"
 msgid "Configuration and SDK input closure"
 msgstr "Configuration and SDK input closure"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"194_sdk_50_maintained_plus_5_focused_passed_new_payload_consumption_pending"
-msgstr ""
-"194_sdk_50_maintained_plus_5_focused_passed_new_payload_consumption_pending"
+msgid "configuration_payload_and_installed_sdk_closure_passed_at_7590b2d4"
+msgstr "configuration_payload_and_installed_sdk_closure_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1326,9 +1101,8 @@ msgstr "E01"
 msgid "All-mode public consumption"
 msgstr "All-mode public consumption"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "194_public_sdk_consumers_passed_final_mode_consumers_pending"
-msgstr "194_public_sdk_consumers_passed_final_mode_consumers_pending"
+msgid "maintained_public_consumption_and_50_consumer_sdk_passed_at_7590b2d4"
+msgstr "maintained_public_consumption_and_50_consumer_sdk_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "io;docs;X-Gen-Lab/nexus-examples"
@@ -1351,9 +1125,11 @@ msgstr "E02"
 msgid "Startup shutdown recipes"
 msgstr "Startup shutdown recipes"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "pending"
-msgstr "pending"
+msgid "pinned_examples_startup_shutdown_recipes_passed_at_7590b2d4_examples_b029cc4b"
+msgstr "pinned_examples_startup_shutdown_recipes_passed_at_7590b2d4_examples_b029cc4b"
+
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1372,6 +1148,9 @@ msgstr "E03"
 msgid "Failure and recovery recipes"
 msgstr "Failure and recovery recipes"
 
+msgid "pinned_examples_failure_recovery_recipes_passed_at_7590b2d4_examples_b029cc4b"
+msgstr "pinned_examples_failure_recovery_recipes_passed_at_7590b2d4_examples_b029cc4b"
+
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Timeout cancellation and failed drain retain loans; quarantine and recovery "
@@ -1389,9 +1168,8 @@ msgstr "E04"
 msgid "Advanced usage recipes"
 msgstr "Advanced usage recipes"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_advanced_c_paths_regressed_reusable_recipes_still_open"
-msgstr "selected_advanced_c_paths_regressed_reusable_recipes_still_open"
+msgid "selected_advanced_consumers_passed_at_7590b2d4_complete_external_recipe_exit_open"
+msgstr "selected_advanced_consumers_passed_at_7590b2d4_complete_external_recipe_exit_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1410,6 +1188,9 @@ msgstr "E05"
 msgid "External starters and examples"
 msgstr "External starters and examples"
 
+msgid "17_presets_four_starters_and_standalone_consumers_passed_at_7590b2d4_examples_b029cc4b"
+msgstr "17_presets_four_starters_and_standalone_consumers_passed_at_7590b2d4_examples_b029cc4b"
+
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All 17 maintained presets four starters and standalone public consumers use "
@@ -1427,17 +1208,11 @@ msgstr "E06"
 msgid "Bilingual current architecture docs"
 msgstr "Bilingual current architecture docs"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "194_132_page_strict_bilingual_package_restored_current_update_pending"
-msgstr "194_132_page_strict_bilingual_package_restored_current_update_pending"
+msgid "132_page_strict_bilingual_package_and_consumers_passed_at_7590b2d4"
+msgstr "132_page_strict_bilingual_package_and_consumers_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/docs"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/docs"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/docs;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/docs;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1456,10 +1231,8 @@ msgstr "F01"
 msgid "Validation contract and cost inventory"
 msgstr "Validation contract and cost inventory"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "coverage_and_stage_cost_inventory_recorded_full_check_disposition_open"
-msgstr ""
-"coverage_and_stage_cost_inventory_recorded_full_check_disposition_open"
+msgid "validation_domain_inventory_and_final_stage_costs_at_7590b2d4_full_disposition_scope_retained"
+msgstr "validation_domain_inventory_and_final_stage_costs_at_7590b2d4_full_disposition_scope_retained"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/dev;scripts/ci;tests"
@@ -1482,17 +1255,11 @@ msgstr "F02"
 msgid "Formal analyzer parallel budget"
 msgstr "Formal analyzer parallel budget"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "plan_contract_passed_speedup_unmeasured"
-msgstr "plan_contract_passed_speedup_unmeasured"
+msgid "bounded_tidy_cppcheck_all1135_contexts_each_passed_at_7590b2d4_speedup_not_measured"
+msgstr "bounded_tidy_cppcheck_all1135_contexts_each_passed_at_7590b2d4_speedup_not_measured"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/workflow"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028/workflow"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/workflow;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/workflow;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1511,9 +1278,8 @@ msgstr "F03"
 msgid "Nested process resource budget"
 msgstr "Nested process resource budget"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "132_focused_and_86_overlapping_review_cases_passed_final_gate_pending"
-msgstr "132_focused_and_86_overlapping_review_cases_passed_final_gate_pending"
+msgid "nested_budget_and_output_isolation_contracts_final_gate_passed_at_7590b2d4"
+msgstr "nested_budget_and_output_isolation_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1532,19 +1298,11 @@ msgstr "F04"
 msgid "Test and setup redundancy review"
 msgstr "Test and setup redundancy review"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"changed_test_contract_groups_reviewed_timer_oracle_mutation_passed_project_audit_open"
-msgstr ""
-"changed_test_contract_groups_reviewed_timer_oracle_mutation_passed_project_audit_open"
+msgid "original_exit_mapping_review_passed_at_d742cdb5_final_gate_passed_at_7590b2d4"
+msgstr "original_exit_mapping_review_passed_at_d742cdb5_final_gate_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/c-cold-20261028/workflow/f04-review/f04-original-exit-p5-review.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/c-cold-20261028/workflow/f04-review/f04-original-exit-p5-review.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1563,21 +1321,11 @@ msgstr "F05"
 msgid "Incremental rebuild and cache invalidation"
 msgstr "Incremental rebuild and cache invalidation"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "development_observations_native_m4_m33_passed_final_gate_pending"
-msgstr "development_observations_native_m4_m33_passed_final_gate_pending"
+msgid "incremental_invalidation_contracts_and_final_gate_passed_at_7590b2d4"
+msgstr "incremental_invalidation_contracts_and_final_gate_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;/dev/shm/nexus-next-"
-"workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-"
-"arm-03/summary.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;/dev/shm/nexus-next-"
-"workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-"
-"arm-03/summary.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-arm-03/summary.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-arm-03/summary.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1596,9 +1344,8 @@ msgstr "F06"
 msgid "Timing failure and process cleanup"
 msgstr "Timing failure and process cleanup"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "real_attempt_and_child_cleanup_records_retained_final_plan_pending"
-msgstr "real_attempt_and_child_cleanup_records_retained_final_plan_pending"
+msgid "actual_final_receipts_and_failures_retained_at_7590b2d4_candidate_outer_exit_unknown"
+msgstr "actual_final_receipts_and_failures_retained_at_7590b2d4_candidate_outer_exit_unknown"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1618,6 +1365,13 @@ msgid "Measured complete validation comparison"
 msgstr "Measured complete validation comparison"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending"
+msgstr "pending"
+
+msgid "complete_controlled_cold_warm_comparison_not_executed_at_7590b2d4"
+msgstr "complete_controlled_cold_warm_comparison_not_executed_at_7590b2d4"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Same environment comparison shows actual time/memory/coverage; final clean "
 "source executes complete applicable gates"
@@ -1634,11 +1388,8 @@ msgstr "G01"
 msgid "Maintained end-to-end orchestration"
 msgstr "Maintained end-to-end orchestration"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"existing_workflow_entries_retained_final_clean_source_execution_pending"
-msgstr ""
-"existing_workflow_entries_retained_final_clean_source_execution_pending"
+msgid "final_scopes_executed_at_7590b2d4_maintained_orchestration_consolidation_open"
+msgstr "final_scopes_executed_at_7590b2d4_maintained_orchestration_consolidation_open"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/documentation;tools/evidence;tools/release;docs"
@@ -1661,9 +1412,8 @@ msgstr "G02"
 msgid "Stable machine delivery results"
 msgstr "Stable machine delivery results"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "affected_122_tests_passed"
-msgstr "affected_122_tests_passed"
+msgid "atomic_result_and_manifest_contracts_final_gate_passed_at_7590b2d4"
+msgstr "atomic_result_and_manifest_contracts_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1682,10 +1432,8 @@ msgstr "G03"
 msgid "Accurate delivery failure recovery"
 msgstr "Accurate delivery failure recovery"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "194_immutable_sdk_docs_packages_verified_and_restored_new_head_pending"
-msgstr ""
-"194_immutable_sdk_docs_packages_verified_and_restored_new_head_pending"
+msgid "immutable_packages_and_independent_remote_recovery_passed_at_7590b2d4"
+msgstr "immutable_packages_and_independent_remote_recovery_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1704,11 +1452,11 @@ msgstr "G04"
 msgid "Latest delivery navigation"
 msgstr "Latest delivery navigation"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"current_iteration_navigation_updated_final_qualification_and_examples_open"
-msgstr ""
-"current_iteration_navigation_updated_final_qualification_and_examples_open"
+msgid "source_bound_7590b2d4_evidence_navigation_updated_doc_execution_identity_separate"
+msgstr "source_bound_7590b2d4_evidence_navigation_updated_doc_execution_identity_separate"
+
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1727,9 +1475,11 @@ msgstr "G05"
 msgid "Portable retention and independent restore"
 msgstr "Portable retention and independent restore"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "verified_local_archives_and_restore_public_obtainability_pending"
-msgstr "verified_local_archives_and_restore_public_obtainability_pending"
+msgid "public90_archives_and_private_examples_authenticated_recovery_passed_at_7590b2d4"
+msgstr "public90_archives_and_private_examples_authenticated_recovery_passed_at_7590b2d4"
+
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1747,6 +1497,9 @@ msgstr "G06"
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Bilingual publication verification"
 msgstr "Bilingual publication verification"
+
+msgid "bilingual_package_recovered_at_7590b2d4_actual_pages_publication_not_executed"
+msgstr "bilingual_package_recovered_at_7590b2d4_actual_pages_publication_not_executed"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -1768,6 +1521,14 @@ msgstr "Complete physical experiment catalogue"
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/hil;tools/testing"
 msgstr "tools/hil;tools/testing"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2003,9 +1764,8 @@ msgstr "I03"
 msgid "Environment restore and delivery status"
 msgstr "Environment restore and delivery status"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "observed_image_and_recipe_reproducibility_kept_distinct_not_rebuilt"
-msgstr "observed_image_and_recipe_reproducibility_kept_distinct_not_rebuilt"
+msgid "observed_oci_bytes_recovered_at_7590b2d4_recipe_rebuild_and_fresh_daemon_not_executed"
+msgstr "observed_oci_bytes_recovered_at_7590b2d4_recipe_rebuild_and_fresh_daemon_not_executed"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2024,29 +1784,15 @@ msgstr "J01"
 msgid "Whole-scope residual audit"
 msgstr "Whole-scope residual audit"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"reviewed_cold_paths_shared_spi_runtime_c_and_dead_generator_cleanup_passed_final_integration_pending"
-msgstr ""
-"reviewed_cold_paths_shared_spi_runtime_c_and_dead_generator_cleanup_passed_final_integration_pending"
+msgid "maintained_c_boundary_residual_audit_and_final_gate_passed_at_7590b2d4"
+msgstr "maintained_c_boundary_residual_audit_and_final_gate_passed_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "docs/delivery;tools/release"
 msgstr "docs/delivery;tools/release"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/generator-"
-"cleanup/handoff.json;build/c-cold-20261028/default-macro-"
-"cleanup/handoff.json;build/c-cold-20261028/spi-"
-"admission/handoff.json;build/c-cold-20261028/runtime-lease-c"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/generator-"
-"cleanup/handoff.json;build/c-cold-20261028/default-macro-"
-"cleanup/handoff.json;build/c-cold-20261028/spi-"
-"admission/handoff.json;build/c-cold-20261028/runtime-lease-c"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/generator-cleanup/handoff.json;build/c-cold-20261028/default-macro-cleanup/handoff.json;build/c-cold-20261028/spi-admission/handoff.json;build/c-cold-20261028/runtime-lease-c;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/generator-cleanup/handoff.json;build/c-cold-20261028/default-macro-cleanup/handoff.json;build/c-cold-20261028/spi-admission/handoff.json;build/c-cold-20261028/runtime-lease-c;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2065,19 +1811,11 @@ msgstr "J02"
 msgid "Final software integration qualification"
 msgstr "Final software integration qualification"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "p3_ordinary_gate_passed_p4_combined_source_qualification_pending"
-msgstr "p3_ordinary_gate_passed_p4_combined_source_qualification_pending"
+msgid "formal159_sdk_examples_b029cc4b_and_bilingual_docs_passed_at_7590b2d4"
+msgstr "formal159_sdk_examples_b029cc4b_and_bilingual_docs_passed_at_7590b2d4"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-"
-"gate/package.json"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-"
-"gate/package.json"
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2096,9 +1834,8 @@ msgstr "J03"
 msgid "Independent delivery closure verification"
 msgstr "Independent delivery closure verification"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "194_delivery_and_development_archives_verified_final_closure_pending"
-msgstr "194_delivery_and_development_archives_verified_final_closure_pending"
+msgid "source_bound_candidate_sdk_docs_and_raw_closures_recovered_at_7590b2d4"
+msgstr "source_bound_candidate_sdk_docs_and_raw_closures_recovered_at_7590b2d4"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2117,23 +1854,11 @@ msgstr "J04"
 msgid "Incremental commits and GitHub synchronization"
 msgstr "Incremental commits and GitHub synchronization"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "in_progress"
-msgstr "in_progress"
+msgid "six_reviewed_increments_synced_and_main_associated_at_7590b2d4_examples_b029cc4b"
+msgstr "six_reviewed_increments_synced_and_main_associated_at_7590b2d4_examples_b029cc4b"
 
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "three_increments_synced_through_364f3665_p4_final_integration_pending"
-msgstr "three_increments_synced_through_364f3665_p4_final_integration_pending"
-
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-"
-"lifecycle-complete-20261028"
-msgstr ""
-"docs/delivery/platform-delivery-completion-"
-"results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-"
-"lifecycle-complete-20261028"
+msgid "docs/delivery/platform-delivery-completion-results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-complete-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;build/c-cold-20261028/integration/final-main-sync/final-delivery-observation.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-complete-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;build/c-cold-20261028/integration/final-main-sync/final-delivery-observation.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""

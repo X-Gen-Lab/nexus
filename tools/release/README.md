@@ -89,6 +89,23 @@ builder's successful CI cannot qualify the repaired commit.
 
 ## Raw evidence and publication
 
+Before creating a release, the publisher reads the live repository identity and
+visibility, and the exact source and builder commit trees. It repeats the same
+observation before every upload and before publishing the draft. Missing or
+inconsistent identity, an unobserved revision, or a changed repository ID,
+visibility or commit tree stops publication. Existing CI, source, tag and asset
+byte checks still apply.
+
+`publication.py` also supplies this boundary to other maintained publishers.
+Callers must derive the complete origin list from verified producers and verify
+the artifact bytes themselves. A public source may be built inside a private
+workspace: directory names cannot authorize or prohibit disclosure. A private
+or internal source may only remain in the same repository; another private
+destination does not prove the same reader permissions. An authored `public`
+label never substitutes for the authenticated GitHub observation. These checks
+do not inspect arbitrary archive contents or lock remote visibility against an
+administrator changing it during an upload.
+
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
 requires 50 independent consumer roots and 53 executable images under
@@ -213,6 +230,68 @@ a prerelease. A failure leaves an explicit failure or draft for inspection.
 Cancellation and unsuccessful direct dependencies prevent the publisher from
 running; deliberately skipped qualification ancestors do not suppress a
 qualified publishing dispatch.
+
+## Explicit local software preview
+
+When Actions cannot run, `prepare-local` (also named `bundle-local`) prepares an
+**unsigned local preview**, with no fabricated Actions run ID, OIDC bundle or
+remote publication authorization. It uses the selected clean checkout's complete
+`tools/dev/plans/software.json` and rechecks its original formal execution. The
+plan, dependency locks, exact Git/submodule source, original command attempts,
+raw streams and current Native producer records remain bound together. A short
+external plan, a passing summary, an interrupted parent or old source execution
+cannot qualify a changed checkout.
+
+Supply existing `tools/evidence/store.py` package envelopes for the installed
+SDK, the complete current consumer transport and every explicitly selected
+candidate. Supply the original immutable documentation archive directly. The
+tool copies the original envelopes and compressed archives without rebuilding,
+resealing or rewriting their contents. It independently restores one package at
+a time and invokes the existing SDK, transport, documentation and candidate
+validators. The SDK snapshot/manifest must match the actual source-SDK producer;
+the transport's report and complete raw inventory must match the original
+consumer producer and its completed command receipts; every candidate must use
+that exact SDK. Documentation binds the same clean Git source and version.
+
+```sh
+python tools/release/delivery.py prepare-local --source /source/nexus \
+    --execution /qualification/report.json \
+    --sdk-package /packages/source-sdk.json \
+    --consumer-package /packages/sdk-consumers.json \
+    --documentation /packages/documentation.tar.gz \
+    --candidate-package /packages/selected-candidate.json \
+    --output /new/local-preview --expected-commit <exact-commit>
+python tools/release/delivery.py verify-local --source /source/nexus \
+    --output /new/local-preview --expected-commit <exact-commit>
+```
+
+Repeat `--candidate-package` for each selected configuration. Duplicate candidate
+IDs/configurations fail; a nonempty selection does not imply coverage of every
+supported MCU or mode. Capacity admission includes copied file blocks, directory
+metadata, the largest independent restoration and an embedded SDK verification
+workspace. It rechecks before each restore; this observation is not a quota or a
+guarantee against concurrent writers exhausting the filesystem.
+
+`local-release.json` records `signature_status: unsigned`,
+`trust: local_observation_no_oidc` and `publication_authorized: false`.
+`verify-local` rechecks the live original source/execution and the packaged byte
+and mode closure, including a final change check. Preserve original producer
+paths for this admission. For portable byte recovery, export the completed tree
+with the existing evidence store; a byte restore alone does not replace live
+source/execution admission or establish another host's trust. CodeQL, actual
+Pages deployment, server rules, fresh recipe builds/daemon and physical HIL keep
+their separate unassessed or unexecuted exits. The existing `publish` command
+continues to require its explicit remote CI, attestation and publication guards.
+
+Actions 额度不足时，`prepare-local`／`bundle-local` 可以整理和复核完整本地软件
+预览。它要求同一份干净源码及其实际执行的完整正式计划，保留原始 attempt、日志、
+依赖和当前 Native 生产者证据；不能把旧提交的执行结果用于新源码。现有 SDK、
+consumer transport、候选及双语文档逐项独立恢复，并核对精确源码、SDK 快照、
+原始生产者和字节／权限身份。它不会重新构建、封存候选或生成虚假的远端 CI 身份。
+
+本地预览明确无签名、无 OIDC，且 `publication_authorized` 为 `false`。复核准入仍需
+保留原始源码和生产者路径；可移植归档只证明恢复的字节闭包。真实 CodeQL、Pages、
+服务端规则、recipe／daemon 和实板退出条件独立保留，现有远端发布门禁保持有效。
 
 ## Historical release branches
 

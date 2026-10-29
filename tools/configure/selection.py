@@ -48,12 +48,12 @@ def validate_interrupt_profile(profile, provider):
 def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
-    fields = {name: contract.selected_fields
-              for name, contract in CONTROLLER_CONTRACTS.items()}
+    contract = CONTROLLER_CONTRACTS.get(kind)
+    fields = contract.selected_fields if contract is not None else frozenset()
     if kind == "lptim" and selection["mode"] == "irq-counter16-oneshot":
-        fields["lptim"] |= {"irq_priority", "calls_os"}
-    unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
-    if kind not in fields or unknown:
+        fields |= {"irq_priority", "calls_os"}
+    unknown = selection.keys() - {"id", "binding", "mode"} - fields
+    if contract is None or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
     if kind == "lptim":
         integer(selection.get("tick_hz"), 1, UINT32_MAX, "LPTIM tick_hz")

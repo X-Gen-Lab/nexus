@@ -4,15 +4,18 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import gzip
 import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
 import shutil
+import stat
 import sys
 import tarfile
 import tempfile
+import uuid
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -222,6 +225,267 @@ def restore_tree(package: dict, destination: Path, *,
             shutil.rmtree(temporary)
 
 
+def _restore_capacity(package, members, block_bytes, reserve_bytes):
+    if (type(block_bytes) is not int or block_bytes < 512 or
+            type(reserve_bytes) is not int or reserve_bytes < 0):
+        raise EvidenceError("invalid restore capacity budget")
+    files = [entry for entry in members.values() if entry["kind"] == "file"]
+    directories = len(members) - len(files)
+    expanded = sum(entry["size"] for entry in files)
+    if (type(package["files"]) is not int or package["files"] != len(files) or
+            type(package["bytes"]) is not int or package["bytes"] != expanded):
+        raise EvidenceError("restore capacity envelope differs from manifest")
+    allocated = sum((entry["size"] + block_bytes - 1) // block_bytes * block_bytes
+                    for entry in files) + directories * block_bytes
+    metadata = 2 * block_bytes * (len(members) + 2)
+    return {"required_bytes": allocated + metadata + reserve_bytes,
+            "expanded_bytes": expanded, "allocated_payload_bytes": allocated,
+            "metadata_reserve_bytes": metadata, "files": len(files),
+            "directories": directories}
+
+
+def restore_capacity(package: dict, *, archive_override: Path | None = None,
+                     block_bytes: int = 4096, reserve_bytes: int = 0) -> dict:
+    """Estimate one restore's allocation from the original complete manifest.
+
+    The caller selects the target filesystem block size and additional peak
+    reserve, including any nested validator restoration. This is an observation
+    for admission, not disk reservation or tmpfs memory qualification.
+    """
+    _, members = _members(package, archive_override)
+    return _restore_capacity(package, members, block_bytes, reserve_bytes)
+
+
+def _recovery_targets(destination, names):
+    payload = destination / "payload"
+    if payload.exists() and (payload.is_symlink() or not payload.is_dir() or
+            any(path.name not in names for path in payload.iterdir())):
+        raise EvidenceError("unselected or unsafe recovery payload targets")
+
+
+def _recovery_previous_active(previous, destination):
+    active = previous.get("active")
+    if active is None:
+        return
+    fields(active, {"name", "argv", "command_view"})
+    view = Path(active["command_view"])
+    if (view.parent != destination / "attempts" / previous.get("attempt", "") or
+            view.name != active["name"] + ".command.json" or not view.is_file()):
+        raise EvidenceError("unfinished original command requires withdrawal review")
+    receipt = load_json(view)
+    original = Path(receipt.get("attempt_receipt", ""))
+    if (receipt.get("outcome") == "running" or
+            type(receipt.get("exit_code")) is not int or
+            receipt.get("withdrawal_complete") is not True or
+            receipt.get("withdrawal_stable") is not True):
+        raise EvidenceError("unknown original command withdrawal; resume rejected")
+    if (receipt.get("command") != active["argv"] or
+            original.name != "receipt.json" or original.parent.parent !=
+            view.parent / (active["name"] + ".attempts") or
+            load_json(original) != {key: value for key, value in receipt.items()
+                                    if key != "attempt_receipt"}):
+        raise EvidenceError("original recovery command identity changed")
+    from tools.dev import timings
+    timings.summarize([original])
+
+
+def recover_packages(plan: dict, destination: Path, *, resume: bool = False) -> dict:
+    """Restore a fixed local package plan, or reverify its existing byte closure.
+
+    Recovery continues artifact work only. It never reuses test success, runs an
+    inner report as code, or promotes an unknown original command exit. Every
+    invocation executes a fresh owned store command and rechecks all members.
+    Original unique command attempts and the previous journal remain retained.
+    Capacity admission is a conservative observation, not a reservation.
+    """
+    from tools.evidence.identity import canonical_digest, observe_git_source
+
+    fields(plan, {"schema_version", "kind", "reserve_bytes", "packages"})
+    if (type(plan["schema_version"]) is not int or plan["schema_version"] != 1 or
+            plan["kind"] != "evidence_recovery_plan" or
+            type(plan["reserve_bytes"]) is not int or plan["reserve_bytes"] < 0 or
+            not isinstance(plan["packages"], list) or
+            not 1 <= len(plan["packages"]) <= 128):
+        raise EvidenceError("invalid evidence recovery plan")
+    destination = _safe_directory(destination)
+    prepared, names = [], set()
+    for entry in plan["packages"]:
+        fields(entry, {"name", "package", "archive"})
+        from tools.evidence.common import identifier
+        name = identifier(entry["name"], "recovery package name")
+        if name in names or ":" in name or name in (".", ".."):
+            raise EvidenceError("duplicate or unsafe recovery package name")
+        names.add(name)
+        envelope = verify_file_identity(entry["package"])
+        archive = verify_file_identity(entry["archive"])
+        if any(path == destination or destination in path.parents
+               for path in (envelope, archive)):
+            raise EvidenceError("recovery inputs cannot belong to its output tree")
+        package = load_json(envelope)
+        _, members = _members(package, archive)
+        if any(package["archive"][key] != entry["archive"][key]
+               for key in ("sha256", "size")):
+            raise EvidenceError("recovery archive differs from package identity")
+        prepared.append((entry, envelope, archive, package, members))
+    tools_root = Path(__file__).resolve().parents[2]
+    source = observe_git_source(tools_root)
+    fingerprint = canonical_digest(plan)
+    journal = destination / "recovery.json"
+    previous = None
+    if destination.exists():
+        if not resume:
+            raise EvidenceError("existing recovery output requires explicit resume")
+        previous = load_json(journal)
+        if (previous.get("kind") != "evidence_recovery" or
+                previous.get("source") != source or
+                previous.get("plan_sha256") != fingerprint or
+                previous.get("destination") != str(destination)):
+            raise EvidenceError("recovery source or plan fingerprint changed")
+    elif resume:
+        raise EvidenceError("resume requires the original recovery output")
+    _recovery_targets(destination, names)
+    if previous is not None:
+        _recovery_previous_active(previous, destination)
+
+    needed = plan["reserve_bytes"] + 1024 * 1024 * len(prepared)
+    for entry, _, _, package, members in prepared:
+        target = destination / "payload" / entry["name"]
+        if target.exists():
+            if inventory(target) != list(members.values()):
+                raise EvidenceError("existing recovery members differ from manifest")
+        else:
+            needed += _restore_capacity(package, members, 4096, 0)["required_bytes"]
+    ancestor = destination
+    while not ancestor.exists():
+        ancestor = ancestor.parent
+    free = shutil.disk_usage(ancestor).free
+    if free < needed:
+        raise EvidenceError(f"recovery capacity insufficient: need {needed}, free {free}")
+    with _recovery_lock(destination):
+        # A different coordinator may have completed between observation and
+        # lock acquisition. Re-read its journal; never overwrite another plan.
+        if journal.exists():
+            if not resume:
+                raise EvidenceError("existing recovery output requires explicit resume")
+            previous = load_json(journal)
+            if (previous.get("source") != source or
+                    previous.get("plan_sha256") != fingerprint or
+                    previous.get("kind") != "evidence_recovery" or
+                    previous.get("destination") != str(destination)):
+                raise EvidenceError("recovery source or plan fingerprint changed")
+            _recovery_previous_active(previous, destination)
+        _recovery_targets(destination, names)
+        return _recover_admitted(prepared, destination, source, fingerprint,
+                                 needed, free, plan["reserve_bytes"], previous)
+
+
+@contextmanager
+def _recovery_lock(destination: Path):
+    """Hold one POSIX coordinator lock; process death releases the kernel lock."""
+    try:
+        import fcntl
+    except ImportError as error:
+        raise EvidenceError("recovery coordinator requires POSIX file locking") from error
+    destination.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(destination / ".recovery.lock",
+                         os.O_RDWR | os.O_CREAT | os.O_NONBLOCK |
+                         getattr(os, "O_NOFOLLOW", 0), 0o600)
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise EvidenceError("recovery lock must be a regular file")
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise EvidenceError("another recovery coordinator is active") from error
+        yield
+    finally:
+        os.close(descriptor)
+
+
+def _recover_admitted(prepared, destination, source, fingerprint, needed, free,
+                      reserve, previous):
+    from tools.dev import process
+    from tools.evidence.identity import observe_git_source
+
+    tools_root = Path(__file__).resolve().parents[2]
+    journal = destination / "recovery.json"
+    attempt = uuid.uuid4().hex
+    control = destination / "attempts" / attempt
+    control.mkdir(parents=True)
+    previous_identity = None
+    if previous is not None:
+        shutil.copy2(journal, control / "previous.json")
+        previous_identity = file_identity(control / "previous.json")
+    state = {"schema_version": 1, "kind": "evidence_recovery",
+             "source": source, "plan_sha256": fingerprint,
+             "destination": str(destination), "attempt": attempt,
+             "previous": previous_identity, "status": "running", "packages": [],
+             "active": None,
+             "capacity": {"required_bytes": needed, "observed_free_bytes": free,
+                          "reserve_bytes": reserve},
+             "software_qualified": False, "physical_status": "not_executed"}
+    atomic_json(journal, state)
+    try:
+        for entry, envelope, archive, package, members in prepared:
+            # Reobserve immediately before each side effect. No checkpoint can
+            # authorize changed inputs, even when earlier packages completed.
+            verify_file_identity(entry["package"])
+            verify_file_identity(entry["archive"])
+            if observe_git_source(tools_root) != source:
+                raise EvidenceError("recovery verifier source changed")
+            target = destination / "payload" / entry["name"]
+            existing = target.exists()
+            remaining = reserve + 1024 * 1024
+            if not existing:
+                remaining += _restore_capacity(package, members, 4096, 0)["required_bytes"]
+            if shutil.disk_usage(destination).free < remaining:
+                raise EvidenceError("recovery capacity changed before restore")
+            operation = "verify" if existing else "restore"
+            report = control / (entry["name"] + ".json")
+            argv = [sys.executable, "-B", str(Path(__file__).resolve()), operation,
+                    "--package", str(envelope), "--archive", str(archive),
+                    "--report", str(report)]
+            if not existing:
+                argv += ["--destination", str(target)]
+            log = control / (entry["name"] + ".log")
+            state["active"] = {"name": entry["name"], "argv": argv,
+                               "command_view": str(log.with_suffix(".command.json"))}
+            atomic_json(journal, state)
+            result = process.run(argv, cwd=tools_root, env=os.environ.copy(),
+                                 log=log,
+                                 timeout=1800, stage="evidence_recovery")
+            if result.returncode:
+                raise EvidenceError("owned recovery command returned nonzero")
+            if inventory(target) != list(members.values()):
+                raise EvidenceError("recovered members differ from manifest")
+            verified = load_json(report)
+            if (verified.get("status") != "verified" or
+                    verified.get("archive_sha256") != package["archive"]["sha256"] or
+                    verified.get("files") != package["files"] or
+                    verified.get("bytes") != package["bytes"]):
+                raise EvidenceError("owned recovery report differs from package")
+            state["packages"].append({"name": entry["name"],
+                "operation": "existing_members_reverified" if existing else "restored",
+                "package": entry["package"], "archive": entry["archive"],
+                "report": file_identity(report),
+                "receipt": file_identity(result.receipt_path),
+                "manifest_sha256": package["manifest_sha256"]})
+            state["active"] = None
+            atomic_json(journal, state)
+        for entry, _, _, _, _ in prepared:
+            verify_file_identity(entry["package"])
+            verify_file_identity(entry["archive"])
+        if observe_git_source(tools_root) != source:
+            raise EvidenceError("recovery verifier source changed")
+        state["status"] = "recovered_verified"
+        atomic_json(journal, state)
+        return state
+    except BaseException:
+        state["status"] = "failed"
+        atomic_json(journal, state)
+        raise
+
+
 def _external_metrics(archive: Path) -> dict:
     members, files, byte_count = set(), 0, 0
     inventory_hash = hashlib.sha256()
@@ -361,10 +625,12 @@ def copy_archive(archive: Path, storage: Path) -> dict:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=("export", "verify", "restore",
-                                              "adopt", "copy"))
+                                              "adopt", "copy", "recover"))
     parser.add_argument("--source", type=Path)
     parser.add_argument("--store", type=Path)
     parser.add_argument("--package", type=Path)
+    parser.add_argument("--plan", type=Path)
+    parser.add_argument("--resume", action="store_true")
     parser.add_argument("--destination", type=Path)
     parser.add_argument("--archive", type=Path,
                         help="Explicit archive navigation after transport; expected identities stay unchanged")
@@ -372,12 +638,23 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     try:
         separate_outputs([args.report],
-                         [path for path in (args.source, args.package) if path is not None],
+                         [path for path in (args.source, args.package, args.plan)
+                          if path is not None],
                          [path for path in (args.source, args.destination)
                           if path is not None and (path.is_dir() or path == args.destination)])
-        if args.archive and args.operation in ("export", "adopt", "copy"):
+        if args.archive and args.operation in ("export", "adopt", "copy", "recover"):
             parser.error("--archive is only for verify/restore")
-        if args.operation == "export":
+        if (args.resume or args.plan) and args.operation != "recover":
+            parser.error("--resume/--plan are only for recover")
+        if args.operation == "recover":
+            if args.plan is None or args.destination is None:
+                parser.error("recover requires --plan and --destination")
+            plan = load_json(args.plan)
+            for entry in plan.get("packages", []):
+                separate_outputs([args.report], [Path(entry[key]["path"])
+                                 for key in ("package", "archive")])
+            result = recover_packages(plan, args.destination, resume=args.resume)
+        elif args.operation == "export":
             if args.source is None or args.store is None:
                 parser.error("export requires --source and --store")
             result = export_tree(args.source, args.store)
@@ -405,7 +682,8 @@ def main(argv=None) -> int:
             separate_outputs([args.report], [Path(result["archive"]["path"])])
         atomic_json(args.report, result)
         return 0
-    except (EvidenceError, OSError, ValueError, tarfile.TarError) as error:
+    except (EvidenceError, OSError, ValueError, KeyError, TypeError,
+            tarfile.TarError) as error:
         print("Evidence storage rejected: " + str(error), file=sys.stderr)
         return 1
 

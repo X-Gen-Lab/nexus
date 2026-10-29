@@ -335,6 +335,444 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     write(output / "release-manifest.json", release_manifest)
 
 
+LOCAL_MANIFEST = "local-release.json"
+LOCAL_POLICY = "nexus-local-software-preview-v1"
+LOCAL_UNASSESSED_EXITS = ["codeql", "pages_deployment", "server_branch_rules",
+                          "fresh_recipe_builds", "fresh_daemon", "physical_hil"]
+
+
+def _local_file(path):
+    """Keep even empty original output; it is not a missing artifact."""
+    from tools.evidence.common import regular_file
+    path = regular_file(path, nonempty=False)
+    return {"path": str(path), "size": path.stat().st_size,
+            "sha256": digest(path), "mode": path.stat().st_mode & 0o777}
+
+
+def _local_context(source, execution, expected_commit):
+    from tools.dev import qualification
+    from tools.evidence.common import EvidenceError, file_identity, load_json, parse_json
+    from tools.evidence.identity import canonical_digest, git_source
+    from tools.release import transport
+    source = Path(source).resolve()
+    observed = git_source(source)
+    if observed["commit"] != commit(expected_commit) or observed["dirty"]:
+        raise EvidenceError("Local admission requires the same clean source commit")
+    plan_path = source / "tools/dev/plans/software.json"
+    plan = load_json(plan_path)
+    # The source-owned full plan is the authority. No external shorter plan,
+    # caller-written success flag or old verification summary substitutes for
+    # original checker attempts, output and current selected producer records.
+    verified = qualification.verify_execution(plan, execution, source)
+    inputs = qualification.execution_inputs(plan, execution, source)
+    report = load_json(execution)
+    stages = {checker: [stage for stage in report["stages"]
+                        if stage["checker"] == checker]
+              for checker in ("source_sdk", "sdk_consumers")}
+    if any(len(selected) != 1 for selected in stages.values()):
+        raise EvidenceError("Full local plan requires one SDK and consumer producer")
+
+    def producer_output(checker):
+        argv = stages[checker][0]["argv"]
+        if argv.count("--output") != 1:
+            raise EvidenceError("Explicit owned producer output is required")
+        return Path(argv[argv.index("--output") + 1])
+
+    sdk_manifest = producer_output("source_sdk") / "share/nexus/src/.nexus-source-sdk.json"
+    summary = parse_json(Path(stages["source_sdk"][0]["raw"]["path"]).read_bytes())
+    if (summary.get("kind") != "nexus_source_sdk_summary" or
+            summary.get("sdk_kind") != "nexus-installed-source-sdk" or
+            summary.get("publishable") is not True or
+            summary.get("source_revision") != observed["commit"] or
+            type(summary.get("files")) is not int or summary["files"] <= 0):
+        raise EvidenceError("Original source SDK producer summary is required")
+    sdk = load_json(sdk_manifest)
+    if (sdk.get("kind") != "nexus-installed-source-sdk" or
+            sdk.get("source_revision") != observed["commit"] or
+            sdk.get("source_tree") != observed["tree"] or
+            sdk.get("publishable") is not True or sdk.get("source_dirty") is not False or
+            not isinstance(sdk.get("files_sha256"), dict) or
+            len(sdk["files_sha256"]) != summary["files"] or
+            sdk.get("snapshot_sha256") != canonical_digest(sdk["files_sha256"]) or
+            sdk.get("snapshot_sha256") != summary.get("snapshot_sha256")):
+        raise EvidenceError("SDK manifest differs from actual producer snapshot")
+    consumer_root = producer_output("sdk_consumers")
+    consumer_report = consumer_root / "verification.json"
+    consumer = load_json(consumer_report)
+    files, directories = transport.scan(consumer_root)
+    transport.report(consumer, observed["commit"], files)
+    if consumer.get("source_tree") != observed["tree"]:
+        raise EvidenceError("Consumer producer source tree differs")
+    sdk_root = sdk_manifest.parent
+    argv = stages["sdk_consumers"][0]["argv"]
+    if (argv.count("--prefix") != 1 or
+            Path(argv[argv.index("--prefix") + 1]) != sdk_root.parents[2] or
+            consumer["commands"][0]["argv"] != [argv[0], "-B",
+                str(sdk_root / "cmake/package/package_source_sdk.py"), "--verify", str(sdk_root)]):
+        raise EvidenceError("Consumer producer must verify the exact qualified SDK prefix")
+    logs, receipts = set(), set()
+    for actual in consumer["commands"]:
+        name = actual["log"]
+        if (Path(name).name != name or name in logs or
+                actual.get("receipt") in receipts):
+            raise EvidenceError("Consumer command log leaves its original producer")
+        logs.add(name)
+        receipts.add(actual.get("receipt"))
+        log = consumer_root / name
+        inputs.extend(qualification.completed_command_inputs(log,
+                      expected_argv=actual["argv"]))
+        receipt = load_json(log.with_suffix(".command.json"))
+        if str(consumer_root / actual.get("receipt", "")) != receipt["attempt_receipt"]:
+            raise EvidenceError("Consumer command differs from its original attempt")
+        if any(actual.get(key) != receipt.get(key) for key in (
+                "started_ns", "finished_ns", "duration_seconds", "outcome",
+                "child_returncode", "withdrawal_complete")):
+            raise EvidenceError("Consumer summary differs from its original receipt")
+    if (logs != {path.name for path in consumer_root.glob("command-*.log")} or
+            {str(Path(name).with_suffix(".command.json")) for name in logs} !=
+            {path.name for path in consumer_root.glob("command-*.command.json")}):
+        raise EvidenceError("Consumer commands do not cover the current original producer")
+    inputs.extend((sdk_manifest, consumer_report))
+    environment = {key: value for key, value in os.environ.items()
+                   if not key.startswith("GIT_")}
+    dependencies = subprocess.check_output(["git", "-C", str(source),
+        "ls-files", "-z", "--", "dependencies", ".gitmodules"], env=environment)
+    inputs.extend(source / os.fsdecode(name) for name in dependencies.split(b"\0") if name)
+    inputs.append(plan_path)
+    evidence = [_local_file(path) for path in sorted(set(inputs))]
+    if git_source(source) != observed:
+        raise EvidenceError("Source changed during local admission")
+    return {"source": observed, "version": load_policy(source)["semantic_version"],
+            "plan": file_identity(plan_path), "qualification": verified,
+            "evidence": evidence, "producers": {
+                "sdk_manifest": file_identity(sdk_manifest),
+                "sdk_snapshot_sha256": summary["snapshot_sha256"],
+                "consumer_report": file_identity(consumer_report),
+                "consumer_files_sha256": canonical_digest(files),
+                "consumer_directories_sha256": canonical_digest(directories)}}
+
+
+def _local_artifacts(source, context, artifacts, *, root=None, scratch):
+    """Reuse owned package validators on one independent restore at a time."""
+    from tools.documentation import delivery as documentation
+    from tools.evidence import candidate, store
+    from tools.evidence.common import EvidenceError, load_json
+    from tools.evidence.identity import canonical_digest
+    from tools.release import transport
+
+    def locate(name):
+        if root is None:
+            return Path(name)
+        relative = Path(name)
+        if (relative.is_absolute() or not relative.parts or
+                any(part in {".", ".."} for part in relative.parts) or
+                "\\" in name):
+            raise EvidenceError("Local artifact path escapes its member closure")
+        return Path(root) / relative
+
+    selected = [("sdk", artifacts["sdk"]), ("consumers", artifacts["consumers"])]
+    selected.extend(("candidate", item) for item in artifacts["candidates"])
+    configurations = set()
+    candidate_ids = set()
+    results = []
+    for role, item in selected:
+        envelope = locate(item["envelope"])
+        envelope_identity = _local_file(envelope)
+        if any(envelope_identity[key] != item["original_envelope"][key]
+               for key in ("sha256", "size", "mode")):
+            raise EvidenceError("Local package envelope bytes changed")
+        package = load_json(envelope)
+        if root is not None and item["archive"] != (
+                "archives/" + package["archive"]["sha256"] + ".tar.gz"):
+            raise EvidenceError("Local package archive differs from its member closure")
+        archive = locate(item["archive"])
+        archive_identity = _local_file(archive)
+        if any(archive_identity[key] != item["original_archive"][key]
+               for key in ("sha256", "size", "mode")):
+            raise EvidenceError("Local package archive bytes changed")
+        capacity = store.restore_capacity(package, archive_override=archive,
+                                           reserve_bytes=16 * 1024 * 1024)
+        # Candidate verification reconstructs its embedded SDK independently.
+        # Keep one additional verified SDK restore footprint available while
+        # the outer candidate tree is still present.
+        needed = capacity["required_bytes"]
+        if role == "candidate":
+            sdk_item = artifacts["sdk"]
+            sdk_needed = store.restore_capacity(load_json(locate(sdk_item["envelope"])),
+                archive_override=locate(sdk_item["archive"]))["required_bytes"]
+            needed += sdk_needed
+            if shutil.disk_usage(tempfile.gettempdir()).free < sdk_needed + 16 * 1024 * 1024:
+                raise EvidenceError("Insufficient candidate SDK verifier temporary capacity")
+        if shutil.disk_usage(scratch).free < needed:
+            raise EvidenceError(f"Insufficient local restore capacity: required={needed}")
+        with tempfile.TemporaryDirectory(prefix=".local-input-", dir=scratch) as name:
+            restored = Path(name) / "payload"
+            store.restore_tree(package, restored, archive_override=archive)
+            if role == "sdk":
+                identity = verify_sdk(source, restored, context["source"]["commit"])
+                version = load_policy(restored / "share/nexus/src")["semantic_version"]
+                if version != context["version"]:
+                    raise EvidenceError("SDK version differs from local release policy")
+                result = {"manifest_sha256": digest(
+                    restored / "share/nexus/src/.nexus-source-sdk.json"),
+                    "snapshot_sha256": identity.get("snapshot_sha256")}
+                if (result["manifest_sha256"] != context["producers"]["sdk_manifest"]["sha256"] or
+                        result["snapshot_sha256"] != context["producers"]["sdk_snapshot_sha256"]):
+                    raise EvidenceError("SDK differs from the actual qualified producer")
+            elif role == "consumers":
+                manifest = transport.verify(restored, context["source"]["commit"])
+                if (digest(restored / "verification.json") !=
+                        context["producers"]["consumer_report"]["sha256"] or
+                        canonical_digest(manifest["files"]) !=
+                        context["producers"]["consumer_files_sha256"] or
+                        canonical_digest(manifest["directories"]) !=
+                        context["producers"]["consumer_directories_sha256"]):
+                    raise EvidenceError("Consumer transport differs from the actual qualified producer")
+                result = {"consumer_policy": manifest["consumer_policy"],
+                          "manifest_sha256": canonical_digest(manifest)}
+            else:
+                sealed = candidate.verify(restored / "candidate.json")
+                if sealed["source"] != context["source"]:
+                    raise EvidenceError("Candidate source differs from local execution")
+                if ([item["manifest_sha256"] for item in sealed["sdk_packages"]] !=
+                        [results[0]["manifest_sha256"]]):
+                    raise EvidenceError("Candidate SDK differs from the qualified source SDK")
+                configuration = sealed["configuration_sha256"]
+                if (configuration in configurations or
+                        sealed["candidate_id"] in candidate_ids):
+                    raise EvidenceError("Duplicate candidate ID or configuration")
+                configurations.add(configuration)
+                candidate_ids.add(sealed["candidate_id"])
+                result = {key: sealed[key] for key in ("candidate_id",
+                    "configuration_sha256", "qualified_scopes", "physical_status",
+                    "signature_status")}
+                result["artifacts"] = {key: {field: identity[field] for field in
+                    ("sha256", "size")} for key, identity in sealed["artifacts"].items()}
+            results.append(result)
+    document = artifacts["documentation"]
+    archive = locate(document["archive"])
+    if (root is not None and document["archive"] !=
+            "documentation/" + document["original"]["sha256"] + ".tar.gz"):
+        raise EvidenceError("Documentation archive differs from its member closure")
+    archive_identity = _local_file(archive)
+    if any(archive_identity[key] != document["original"][key]
+           for key in ("sha256", "size", "mode")):
+        raise EvidenceError("Documentation archive bytes changed")
+    manifest = documentation.verify(archive)
+    if (any(manifest[role].get(key) != context["source"][key]
+            for role in ("documentation_source", "code_source")
+            for key in ("commit", "tree", "dirty", "submodules")) or
+            manifest["version"] != context["version"]):
+        raise EvidenceError("Documentation source/version differs from local execution")
+    return {"sdk": results[0], "consumers": results[1],
+            "candidates": results[2:], "documentation": {
+                "manifest_sha256": canonical_digest(manifest)}}
+
+
+def bundle_local(source, execution, sdk_package, consumer_package, documentation,
+                 candidate_packages, output, expected_commit):
+    """Prepare an unsigned local preview; never authorize a remote publication.
+
+    This preserves existing package and original evidence bytes. It does not
+    build, reseal candidates, run Actions or forge an OIDC attestation. Admission
+    requires the original current clean source and complete producer records;
+    the portable store may independently verify the resulting tree's bytes.
+    """
+    from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
+                                       load_json, regular_file, separate_outputs)
+    from tools.evidence.identity import canonical_digest, git_source
+    from tools.evidence import store
+    source, output = Path(source).resolve(), Path(output).absolute()
+    execution = regular_file(execution)
+    if not isinstance(candidate_packages, (list, tuple)) or not 0 < len(candidate_packages) <= 64:
+        raise EvidenceError("An explicit nonempty bounded candidate selection is required")
+    packages = [regular_file(path) for path in
+                (sdk_package, consumer_package, *candidate_packages)]
+    documentation = regular_file(documentation)
+    separate_outputs([output], [execution, documentation, *packages],
+                     [execution.parent])
+    if output.exists():
+        raise EvidenceError("Local preview output must be fresh")
+    context = _local_context(source, execution, expected_commit)
+    selections = []
+    for envelope in packages:
+        package = load_json(envelope)
+        archive = regular_file(package["archive"]["path"])
+        # Strict package validation remains the store's responsibility. Bound
+        # sizes before the first restore/copy, then verify all members below.
+        if (type(package.get("bytes")) is not int or package["bytes"] <= 0 or
+                type(package["archive"].get("size")) is not int or
+                package["archive"]["size"] <= 0):
+            raise EvidenceError("Local package capacity inputs are invalid")
+        selections.append({"envelope": str(envelope), "archive": str(archive),
+                           "original_envelope": _local_file(envelope),
+                           "original_archive": _local_file(archive)})
+    artifacts = {"sdk": selections[0], "consumers": selections[1],
+                 "candidates": selections[2:], "documentation": {
+                     "archive": str(documentation), "original": _local_file(documentation)}}
+    input_files = {identity["path"]: identity["size"] for identity in context["evidence"]}
+    input_files.update({str(path): path.stat().st_size for path in packages})
+    input_files.update({item["archive"]: Path(item["archive"]).stat().st_size
+                        for item in selections})
+    input_files[str(documentation)] = documentation.stat().st_size
+    capacity = [store.restore_capacity(load_json(path)) for path in packages]
+    temporary_bytes = max(item["required_bytes"] for item in capacity)
+    temporary_bytes += capacity[0]["required_bytes"]
+    # Copies allocate blocks and directory metadata even for tiny/empty raw
+    # streams. This is a conservative admission estimate, not a disk quota.
+    copy_bytes = sum(((size + 4095) // 4096 + 2) * 4096
+                     for size in input_files.values())
+    required = copy_bytes + temporary_bytes + 16 * 1024 * 1024
+    parent = output.parent
+    existing_parent = next(path for path in (parent, *parent.parents) if path.exists())
+    if shutil.disk_usage(existing_parent).free < required:
+        raise EvidenceError(f"Insufficient local release capacity: required={required}")
+    parent.mkdir(parents=True, exist_ok=True)
+    verified = _local_artifacts(source, context, artifacts, scratch=parent)
+    with tempfile.TemporaryDirectory(prefix=".local-preview-", dir=parent) as name:
+        staged = Path(name) / "payload"
+        staged.mkdir()
+
+        def preserve(original, relative, expected):
+            if _local_file(original) != expected:
+                raise EvidenceError("Original local preview input changed before copy")
+            destination = staged / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            if destination.exists():
+                observed = _local_file(destination)
+                if any(observed[key] != expected[key]
+                       for key in ("size", "sha256", "mode")):
+                    raise EvidenceError("Local payload name collision")
+            else:
+                shutil.copyfile(original, destination)
+                destination.chmod(Path(original).stat().st_mode & 0o777)
+            observed = _local_file(destination)
+            if (any(observed[key] != expected[key]
+                    for key in ("size", "sha256", "mode")) or
+                    _local_file(original) != expected):
+                raise EvidenceError("Local preview copy changed bytes")
+            return relative
+
+        evidence = []
+        for identity in context["evidence"]:
+            evidence.append({"original": identity, "payload": preserve(
+                identity["path"], "evidence/" + identity["sha256"] +
+                "." + format(identity["mode"], "03o"), identity)})
+        for index, item in enumerate(selections):
+            package = load_json(item["envelope"])
+            item["envelope"] = preserve(item["envelope"], f"packages/{index}.json",
+                                        item["original_envelope"])
+            item["archive"] = preserve(item["archive"],
+                "archives/" + package["archive"]["sha256"] + ".tar.gz",
+                item["original_archive"])
+            store.verify_package(package, archive_override=staged / item["archive"])
+            item["verified"] = (verified["sdk"] if index == 0 else
+                verified["consumers"] if index == 1 else verified["candidates"][index - 2])
+        document = artifacts["documentation"]
+        document["archive"] = preserve(document["archive"],
+            "documentation/" + document["original"]["sha256"] + ".tar.gz",
+            document["original"])
+        document["verified"] = verified["documentation"]
+        # Original reports/receipts are untouched. Observe again after copy so
+        # a concurrent source or producer change cannot approve this bundle.
+        if _local_context(source, execution, expected_commit) != context:
+            raise EvidenceError("Local execution inputs changed during preparation")
+        if git_source(source) != context["source"]:
+            raise EvidenceError("Source changed during local preview preparation")
+        record = {"schema_version": 1, "kind": "nexus_local_software_preview_bundle",
+            "policy": LOCAL_POLICY, "status": "verified_local_inputs",
+            "source": context["source"], "version": context["version"],
+            "plan": context["plan"], "qualification": context["qualification"],
+            "producers": context["producers"],
+            "evidence": evidence, "artifacts": artifacts,
+            "members": store.inventory(staged), "signature_status": "unsigned",
+            "trust": "local_observation_no_oidc", "physical_status": "not_executed",
+            "publication_authorized": False, "production_qualification": False,
+            "unassessed_publication_exits": LOCAL_UNASSESSED_EXITS}
+        record["record_sha256"] = canonical_digest(record)
+        atomic_json(staged / LOCAL_MANIFEST, record)
+        staged.rename(output)
+    return record
+
+
+def verify_local(source, output, expected_commit):
+    """Recheck exact live admission and every immutable packaged member."""
+    from tools.evidence.common import EvidenceError, fields, load_json
+    from tools.evidence.identity import canonical_digest
+    from tools.evidence import store
+    output = Path(output).absolute()
+    original_manifest = _local_file(output / LOCAL_MANIFEST)
+    record = load_json(output / LOCAL_MANIFEST, max_bytes=64 * 1024 * 1024)
+    fields(record, {"schema_version", "kind", "policy", "status", "source", "version",
+        "plan", "qualification", "producers", "evidence", "artifacts", "members", "signature_status",
+        "trust", "physical_status", "publication_authorized", "production_qualification",
+        "unassessed_publication_exits", "record_sha256"})
+    if (type(record["schema_version"]) is not int or record["schema_version"] != 1 or
+            record["kind"] != "nexus_local_software_preview_bundle" or
+            record["policy"] != LOCAL_POLICY or record["status"] != "verified_local_inputs" or
+            record["signature_status"] != "unsigned" or
+            record["trust"] != "local_observation_no_oidc" or
+            record["physical_status"] != "not_executed" or
+            record["publication_authorized"] is not False or
+            record["production_qualification"] is not False or
+            record["unassessed_publication_exits"] != LOCAL_UNASSESSED_EXITS or
+            record["record_sha256"] != canonical_digest({key: value for key, value in
+                record.items() if key != "record_sha256"})):
+        raise EvidenceError("Invalid unsigned local preview policy or record")
+    actual_members = [item for item in store.inventory(output)
+                      if item["path"] != LOCAL_MANIFEST]
+    if actual_members != record["members"]:
+        raise EvidenceError("Local preview member closure changed")
+    execution = Path(record["qualification"]["report"]["path"])
+    context = _local_context(source, execution, expected_commit)
+    if any(record[key] != context[key] for key in (
+            "source", "version", "plan", "qualification", "producers")):
+        raise EvidenceError("Verified local source/plan/execution differs from preparation")
+    if [item["original"] for item in record["evidence"]] != context["evidence"]:
+        raise EvidenceError("Local evidence closure differs from verified original execution")
+    for item in record["evidence"]:
+        fields(item, {"original", "payload"})
+        if item["payload"] != ("evidence/" + item["original"]["sha256"] +
+                "." + format(item["original"]["mode"], "03o")):
+            raise EvidenceError("Execution payload differs from its member closure")
+        identity = _local_file(output / item["payload"])
+        if any(identity[key] != item["original"][key] for key in ("size", "sha256", "mode")):
+            raise EvidenceError("Original execution copy bytes changed")
+    artifacts = record["artifacts"]
+    fields(artifacts, {"sdk", "consumers", "candidates", "documentation"})
+    if not isinstance(artifacts["candidates"], list) or not artifacts["candidates"]:
+        raise EvidenceError("An explicit candidate selection remains required")
+    selections = [artifacts["sdk"], artifacts["consumers"], *artifacts["candidates"]]
+    for index, item in enumerate(selections):
+        fields(item, {"envelope", "archive", "original_envelope", "original_archive", "verified"})
+        if item["envelope"] != f"packages/{index}.json":
+            raise EvidenceError("Package envelope differs from its member closure")
+        package = load_json(output / item["envelope"])
+        if item["archive"] != "archives/" + package["archive"]["sha256"] + ".tar.gz":
+            raise EvidenceError("Package archive differs from its member closure")
+    fields(artifacts["documentation"], {"archive", "original", "verified"})
+    capacity = [store.restore_capacity(load_json(output / item["envelope"]),
+                archive_override=output / item["archive"])["required_bytes"]
+                for item in selections]
+    required = max(capacity) + capacity[0] + 16 * 1024 * 1024
+    if shutil.disk_usage(output.parent).free < required:
+        raise EvidenceError(f"Insufficient local verification capacity: required={required}")
+    verified = _local_artifacts(source, context, artifacts, root=output,
+                                scratch=output.parent)
+    for role in ("sdk", "consumers", "documentation"):
+        if verified[role] != artifacts[role]["verified"]:
+            raise EvidenceError("Verified local artifact differs from preparation")
+    if verified["candidates"] != [item["verified"] for item in artifacts["candidates"]]:
+        raise EvidenceError("Verified candidates differ from preparation")
+    if _local_context(source, execution, expected_commit) != context:
+        raise EvidenceError("Local execution inputs changed during verification")
+    if (_local_file(output / LOCAL_MANIFEST) != original_manifest or
+            [item for item in store.inventory(output) if item["path"] != LOCAL_MANIFEST] !=
+            record["members"]):
+        raise EvidenceError("Local preview bytes changed during verification")
+    return record
+
+
 def _github_http_failure(method, url, error, token):
     """Retain bounded GitHub diagnostics without credentials or response dumps."""
     def safe_text(value, limit=256):
@@ -495,6 +933,7 @@ def guard(expected_commit, actual_commit, *, source=ROOT, api=None,
 
 def publish(output, expected_commit, ci_run_id, *, api, source=None,
             recover_tagged_source=False, builder_commit=None, builder_ci_run_id=None):
+    from tools.release.publication import observe_boundary, recheck_boundary
     version = load_policy(ROOT if source is None else source)["semantic_version"]
     tag = "v" + version
     output = Path(output)
@@ -547,6 +986,24 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None,
     require_refs(api, expected_commit, tag, builder_commit=builder_commit)
     if api.get("/releases/tags/" + tag) is not None:
         raise ValueError("Release already exists; inspect its bytes before any retry")
+    # The verified SDK, documentation and CI producers are all owned by this
+    # repository. A filesystem path (including a private build workspace) does
+    # not establish a second origin or authorize a visibility claim.
+    def repository(name):
+        if name.casefold() != api.repository.casefold():
+            raise ValueError("Release producer repository differs")
+        return api.get("")
+
+    def revision(name, selected):
+        if name.casefold() != api.repository.casefold():
+            raise ValueError("Release source repository differs")
+        return api.get("/commits/" + selected)
+
+    origins = [{"repository": api.repository, "commit": expected_commit}]
+    if builder_commit != expected_commit:
+        origins.append({"repository": api.repository, "commit": builder_commit})
+    boundary = observe_boundary(api.repository, origins,
+                                repository=repository, revision=revision)
     release = api.create({"tag_name": tag, "target_commitish": expected_commit,
         "name": "Nexus " + version + " software preview",
         "draft": True, "prerelease": True,
@@ -559,6 +1016,7 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None,
         "见 release-manifest.json。物理 HIL 尚未执行；不构成生产资格、安全认证、"
         "已签名固件发布或 LTS 承诺。"})
     for item in assets:
+        recheck_boundary(boundary, repository=repository, revision=revision)
         asset = api.upload(release, output / item["name"])
         if (asset.get("name") != item["name"] or asset.get("size") != item["size"] or
                 hashlib.sha256(api.asset_bytes(asset)).hexdigest() != item["sha256"]):
@@ -578,6 +1036,7 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None,
             raise ValueError("Builder CI was rerun during publication; release remains draft")
         require_jobs(api.get(builder_jobs_path))
     require_refs(api, expected_commit, tag, builder_commit=builder_commit)
+    recheck_boundary(boundary, repository=repository, revision=revision)
     return api.publish(release["id"])
 
 
@@ -607,6 +1066,19 @@ def main(arguments=None):
     child.add_argument("--recover-tagged-source", action="store_true")
     child.add_argument("--builder-commit")
     child.add_argument("--builder-ci-run-id", type=int)
+    child = commands.add_parser("bundle-local", aliases=["prepare-local"])
+    child.add_argument("--source", type=Path, default=ROOT)
+    child.add_argument("--execution", type=Path, required=True)
+    child.add_argument("--sdk-package", type=Path, required=True)
+    child.add_argument("--consumer-package", type=Path, required=True)
+    child.add_argument("--documentation", type=Path, required=True)
+    child.add_argument("--candidate-package", type=Path, action="append", required=True)
+    child.add_argument("--output", type=Path, required=True)
+    child.add_argument("--expected-commit", required=True)
+    child = commands.add_parser("verify-local")
+    child.add_argument("--source", type=Path, default=ROOT)
+    child.add_argument("--output", type=Path, required=True)
+    child.add_argument("--expected-commit", required=True)
     child = commands.add_parser("check-ci")
     child.add_argument("--record", type=Path, required=True)
     child.add_argument("--jobs", type=Path, required=True)
@@ -633,6 +1105,14 @@ def main(arguments=None):
                    args.ci_run_id, args.release_run_id, args.attempt,
                    recover_tagged_source=args.recover_tagged_source,
                    builder_commit=args.builder_commit, builder_ci_run_id=args.builder_ci_run_id)
+        elif args.command in {"bundle-local", "prepare-local"}:
+            result = bundle_local(args.source, args.execution, args.sdk_package,
+                args.consumer_package, args.documentation, args.candidate_package,
+                args.output, args.expected_commit)
+            print("Local preview: " + result["status"])
+        elif args.command == "verify-local":
+            result = verify_local(args.source, args.output, args.expected_commit)
+            print("Local preview: " + result["status"])
         elif args.command == "check-ci":
             require_ci(read(args.record), args.expected_commit)
             require_jobs(read(args.jobs))

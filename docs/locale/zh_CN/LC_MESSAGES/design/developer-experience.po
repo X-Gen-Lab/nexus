@@ -1,4 +1,4 @@
-# Authored bilingual updates; exact current message coverage is verified.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 39f512965f6e331bc7700282d3414f970ee1055d6e05545927677b0c1029df6d\n"
+"X-Nexus-Source-SHA256: b9a7f49ae158f5c3e3c6805bcf5cc8bfd2c4e6c6312972fa251d4e46c68be518\n"
 
 #: docs/design/developer-experience.md:9
 msgid "Developer experience and provider iteration"
@@ -64,18 +64,8 @@ msgstr ""
 "生命周期与配置合同、家族及跨控制器迁移、公共使用配方，最后冻结集成。工具效率、交付报告与环境恢复可并行推进。物理执行须在真实站点准入后开展。当前架构图仍然适用：这些任务完善既有机制，不增加运行时层。实际状态仍记录在同一"
 " CSV 中；工作分解不建立另一份支持矩阵，也不用于计算全项目完成百分比。"
 
-#: docs/design/developer-experience.md:39
-msgid ""
-"The {download}`follow-up development index <../delivery/platform-delivery-"
-"completion-results.json>` records current observations without relabeling "
-"old P/E results. Its pending final-source exits require actual complete "
-"gates, fixed examples consumption, offline reproduction and post-merge "
-"association; a prepared plan or successful configuration query cannot close "
-"them."
-msgstr ""
-"{download}`后续开发结果索引 <../delivery/platform-delivery-completion-"
-"results.json>`记录当前观测，不重标旧 P/E 结果。仍待最终源码证据的退出条件，需要实际完整 "
-"gate、固定版本示例消费、离线复现和合并后关联；已准备的计划或成功的配置查询不能关闭这些条件。"
+msgid "The {download}`follow-up development index <../delivery/platform-delivery-completion-results.json>` retains its original development observations without relabeling old P/E results. The subsequent {ref}`sealed cold-lifecycle baseline <sealed-cold-lifecycle-baseline>` records the final source, complete gates, fixed examples consumption, offline reproduction and post-merge association. Read the later source-bound observation before interpreting an older pending field; a prepared plan or successful configuration query alone cannot close an exit."
+msgstr "{download}`后续开发索引 <../delivery/platform-delivery-completion-results.json>`保留原始开发观察，不重标旧 P/E 结果。其后的{ref}`冷态生命周期封存基线 <sealed-cold-lifecycle-baseline>`记录最终源码、完整门禁、固定示例消费、离线复现及合并后的关联。解释较早 pending 字段前，应先读取后续绑定源码的观察；仅有准备计划或成功配置查询不能关闭退出。"
 
 #: docs/design/developer-experience.md:45
 msgid "Boundaries that stay explicit"
@@ -304,6 +294,27 @@ msgstr ""
 #: docs/design/developer-experience.md:97
 msgid "Close work with observations"
 msgstr "以实际观察关闭任务"
+
+msgid "Compare complete execution costs"
+msgstr "比较完整执行成本"
+
+msgid "Use `dev.py timings --compare` only after two independent complete executions of the same maintained formal plan, clean source and dependency pins. Each execution must bind the same verified OCI environment-report bytes using the optional `qualify --environment` input. That binding records observed input identity; it does not prove that checkers ran inside an isolated container. Historical reports without this original binding remain valid for their own executed scope, but cannot be retrofitted into this comparison."
+msgstr "只有在相同维护的正式计划、clean 源码和固定依赖上完成两次独立的完整执行后，才使用 `dev.py timings --compare`。每次执行必须通过可选的 `qualify --environment` 输入，绑定相同且已验证的 OCI environment-report 字节。该绑定记录已观察的输入身份，不证明 checker 在隔离容器中运行。缺少这种原始绑定的历史报告仍保留其原执行范围的有效性，但不能事后补入本比较。"
+
+msgid "From the clean platform root, set `NEXUS_MEASUREMENT_ROOT` to a new output parent with adequate capacity, `NEXUS_ENVIRONMENT` to the sealed OCI layout's `environment.json`, and `NEXUS_COLD_CACHE_STATE`/`NEXUS_WARM_CACHE_STATE` to the actual cache preparation descriptions. Prepare the intended cold and warm conditions explicitly before their respective executions. These commands run the complete plan; they do not reuse existing successful test reports:"
+msgstr "从 clean 平台根目录执行：将 `NEXUS_MEASUREMENT_ROOT` 设置为容量充足的新输出父目录，将 `NEXUS_ENVIRONMENT` 设置为封存 OCI layout 的 `environment.json`，并将 `NEXUS_COLD_CACHE_STATE`/`NEXUS_WARM_CACHE_STATE` 设置为实际缓存准备说明。在每次执行前显式准备相应 cold 或 warm 条件。以下命令运行完整计划，不复用已有的成功测试报告："
+
+msgid "Both runs must actually complete successfully with the exact plan, stage order, commands, raw streams and independent receipts. Formal plans disable compiler cache; declaring warm preparation does not enable it. The comparison reports the union of original stage-command wall intervals, excluding idle gaps and avoiding nested wall-time sums. Native producer checks additionally validate the current shared build outputs; they do not establish independent historical inner Native XML/artifacts for each cold/warm run. Cache state is declared, not measured cache hits; aggregate CPU, process-tree peak RSS and their deltas remain unknown. A cost comparison is not qualification and cannot qualify changed source. No complete cold/warm measurement is claimed merely because this command exists."
+msgstr "两次执行都必须实际完整成功，且计划、阶段顺序、命令、原始输出流和独立 receipt 精确匹配。正式计划禁用编译器缓存；声明 warm 准备不会启用它。比较报告使用原始阶段命令墙钟区间的并集，排除空闲间隔并避免嵌套墙钟时长相加。Native producer 检查还验证当前共享构建输出，不证明每次 cold/warm 执行分别保留独立历史内部 Native XML/产物。缓存状态是声明，不是测得的 cache hit；汇总 CPU、进程树峰值 RSS 及相应差值仍为未知。成本比较不是资格，不能赋予变更后源码资格。命令存在本身不表示完整 cold/warm 测量已执行。"
+
+msgid "Hand off an unsigned local software preview"
+msgstr "交接无签名的本地软件预览"
+
+msgid "When hosted Actions is unavailable, the explicit `prepare-local` command (`bundle-local` alias) in `tools/release/delivery.py` assembles a local preview from original complete software execution, SDK/consumer packages, documentation and sealed candidates. `verify-local` independently checks the prepared output. Use the [local preview contract and exact commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/README.md#explicit-local-software-preview) with a new output directory and the expected clean source commit. Input sources, dependency pins, original completed receipts, SDK identity and candidate/document scope must agree; successful reports are not reused to qualify another source."
+msgstr "托管 Actions 不可用时，`tools/release/delivery.py` 中显式的 `prepare-local` 命令（别名 `bundle-local`）从原始完整软件执行、SDK/consumer 包、文档与封存候选装配本地预览。`verify-local` 独立检查准备后的输出。使用[本地预览合同与精确命令](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/README.md#explicit-local-software-preview)，选用新输出目录和预期 clean 源码提交。输入源码、固定依赖、原始已结束 receipt、SDK 身份与 candidate/document 范围必须一致；成功报告不复用为其他源码的资格。"
+
+msgid "This path preserves original bytes and restores packages without rebuilding or resealing them. Its trust is `local_observation_no_oidc`, signature status is unsigned and `publication_authorized=false`. It does not fabricate Actions runs, OIDC or a formal release, and it does not weaken the existing publication guards. Actual remote publication remains a separate exit."
+msgstr "该路径保留原始字节，恢复包时不重建或重新封存。其 trust 为 `local_observation_no_oidc`，签名状态为 unsigned，且 `publication_authorized=false`。它不伪造 Actions run、OIDC 或正式 release，不削弱现有发布门禁。实际远程发布仍是独立退出。"
 
 #: docs/design/developer-experience.md:99
 msgid ""

@@ -117,7 +117,9 @@ schema 1；两者各自计代，不改变 MCU C factory 接口。
 `soc/<vendor>/<family>/configure/`（Native 为
 `soc/native/configure/`）明确
 拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及
-constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、
+静态构造描述、IRQ 转发和系统时钟绑定。具体 C11 adapter 负责硬件准入、寄存器
+读写与回读、prepare/start/stop、撤回和恢复；生成的 Platform 保留显式调用与
+逆序清理，不在 Python 中维护硬件算法。公共 resolver 保留 schema、事实、
 资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。
 新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family
 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现，

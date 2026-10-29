@@ -1427,25 +1427,12 @@ class ReleaseAdmissionTests(unittest.TestCase):
 
     def test_publisher_verifies_all_uploaded_bytes_before_publishing(self):
         from tools.release.delivery import publish
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "asset.tar.gz").write_bytes(b"verified archive")
-            manifest = {"tag": "v" + load_policy(ROOT)["semantic_version"],
-                        "source_commit": COMMIT, "ci_run_id": 123, "ci_run_attempt": 1,
-                        "assets": [{"name": "asset.tar.gz", "size": 16,
-                                    "sha256": hashlib.sha256(
-                                        b"verified archive").hexdigest()}]}
-            (root / "release-manifest.json").write_text(json.dumps(manifest))
-            api = unittest.mock.Mock()
-            api.get.side_effect = [self.run_record(), self.jobs_record(), {"object": {"sha": COMMIT,
-                "type": "commit"}}, {"object": {"sha": COMMIT, "type": "commit"}},
-                None, []]
-            api.create.return_value = {"id": 5, "upload_url": "upload"}
-            api.upload.return_value = {"id": 7, "name": "asset.tar.gz", "size": 16}
-            api.asset_bytes.return_value = b"changed bytes"
-            with self.assertRaisesRegex(ValueError, "[Uu]ploaded release asset"):
-                publish(root, COMMIT, 123, api=api)
-            api.publish.assert_not_called()
+        root, api = self.publisher_fixture()
+        api.asset_bytes.return_value = b"changed bytes"
+        api.asset_bytes.side_effect = None
+        with self.assertRaisesRegex(ValueError, "[Uu]ploaded release asset"):
+            publish(root, COMMIT, 123, api=api)
+        api.publish.assert_not_called()
 
     def publisher_fixture(self, version=None):
         version = load_policy(ROOT)["semantic_version"] if version is None else version
@@ -1459,9 +1446,16 @@ class ReleaseAdmissionTests(unittest.TestCase):
             "assets": [{"name": "asset.tar.gz", "size": 16,
                         "sha256": hashlib.sha256(b"verified archive").hexdigest()}]}))
         api = unittest.mock.Mock()
+        api.repository = "X-Gen-Lab/nexus"
         uploaded = []
 
         def get(path):
+            if path == "":
+                return {"id": 1, "full_name": api.repository,
+                        "visibility": "public", "private": False}
+            if path.startswith("/commits/"):
+                return {"sha": path.removeprefix("/commits/"),
+                        "commit": {"tree": {"sha": "d" * 40}}}
             if path == "/actions/runs/123":
                 return self.run_record()
             if "/jobs?" in path:
@@ -1494,6 +1488,49 @@ class ReleaseAdmissionTests(unittest.TestCase):
         self.assertTrue(api.create.call_args.args[0]["draft"])
         self.assertTrue(api.create.call_args.args[0]["prerelease"])
         api.publish.assert_called_once_with(5)
+
+    def test_publisher_requires_live_repository_visibility_before_creation(self):
+        from tools.release.delivery import publish
+        for response in (None, {"id": 1, "full_name": "X-Gen-Lab/nexus",
+                               "private": False},
+                         {"id": 1, "full_name": "foreign/repository",
+                          "visibility": "public", "private": False}):
+            with self.subTest(response=response):
+                root, api = self.publisher_fixture()
+                original = api.get.side_effect
+                api.get.side_effect = lambda path: (response if path == "" else
+                                                    original(path))
+                with self.assertRaises(ValueError):
+                    publish(root, COMMIT, 123, api=api)
+                api.create.assert_not_called()
+                api.upload.assert_not_called()
+
+    def test_publisher_rechecks_visibility_and_identity_before_each_upload(self):
+        from tools.release.delivery import publish
+        for mutation, after_uploads in (
+                (change, count) for change in ("id", "visibility", "tree")
+                for count in (0, 1, 2)):
+            with self.subTest(mutation=mutation, after_uploads=after_uploads):
+                root, api = self.publisher_fixture()
+                original = api.get.side_effect
+
+                def get(path):
+                    response = original(path)
+                    if api.create.called and api.upload.call_count >= after_uploads:
+                        if path == "" and mutation == "id":
+                            response["id"] = 2
+                        elif path == "" and mutation == "visibility":
+                            response.update(visibility="private", private=True)
+                        elif path.startswith("/commits/") and mutation == "tree":
+                            response["commit"]["tree"]["sha"] = "e" * 40
+                    return response
+
+                api.get.side_effect = get
+                with self.assertRaisesRegex(ValueError, "[Bb]oundary changed"):
+                    publish(root, COMMIT, 123, api=api)
+                api.create.assert_called_once()
+                self.assertEqual(api.upload.call_count, after_uploads)
+                api.publish.assert_not_called()
 
     def test_tag_mismatch_or_existing_release_cannot_create_or_upload(self):
         from tools.release.delivery import publish

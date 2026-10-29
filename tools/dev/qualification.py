@@ -122,7 +122,24 @@ def preflight_quality_tools(plan: dict, root: Path, output: Path,
                 f"{selected.tool}")
 
 
-def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = False) -> dict:
+def observe_environment_report(path: Path) -> dict:
+    """Bind verified sealed OCI input bytes, not process isolation or execution.
+
+    Only the existing OCI environment format is admitted. A caller-authored JSON
+    claim is not an observed environment. Runtime image availability and use by
+    individual checkers remain separate from this input-byte observation.
+    """
+    from tools.evidence.container import verify
+
+    identity = file_identity(path)
+    verify(Path(identity["path"]), runtime=False)
+    if file_identity(path) != identity:
+        raise EvidenceError("environment report changed during observation")
+    return identity
+
+
+def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = False,
+            environment_report: Path | None = None) -> dict:
     validate_plan(plan, require_candidate=require_candidate)
     root, output = root.absolute(), output.absolute()
     if output.exists() or any(path.is_symlink() for path in [output, *output.parents]):
@@ -133,6 +150,8 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
         for key in ("CMAKE_C_COMPILER_LAUNCHER", "CMAKE_CXX_COMPILER_LAUNCHER"):
             environment.pop(key, None)
     preflight_quality_tools(plan, root, output, environment)
+    environment_identity = (observe_environment_report(environment_report)
+                            if environment_report is not None else None)
     source = observe_git_source(root)
     if plan.get("formal") and source["dirty"]:
         raise EvidenceError("formal qualification requires clean Git source")
@@ -143,6 +162,8 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
               "plan_sha256": canonical_digest(plan),
               "formal": plan.get("formal", False), "stages": stages,
               "physical_status": "not_executed", "software_qualified": False}
+    if environment_identity is not None:
+        report["environment_report"] = environment_identity
     atomic_json(output / "report.json", report)
     for stage in plan["stages"]:
         checker, *prefix = CHECKERS[stage["checker"]]
@@ -182,6 +203,13 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
         report["status"] = "executed_passed"
     elif report["status"] == "running":
         report["status"] = "failed"
+    if environment_identity is not None:
+        try:
+            if observe_environment_report(environment_report) != environment_identity:
+                raise EvidenceError("environment input identity changed")
+        except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:
+            report.update(status="failed",
+                          failure="environment input changed: " + str(error))
     # This is orchestration evidence, never an alternative candidate validator.
     atomic_json(output / "report.json", report)
     return report
@@ -233,7 +261,13 @@ def verify_execution(plan: dict, report_path: Path, root: Path) -> dict:
     report = read_json(report_identity)
     fields(report, {"schema_version", "kind", "status", "source_before",
                     "source_after", "plan_sha256", "formal", "stages",
-                    "physical_status", "software_qualified"})
+                    "physical_status", "software_qualified"},
+           {"environment_report"})
+    environment_identity = report.get("environment_report")
+    if "environment_report" in report:
+        path = observe_file(environment_identity)
+        if observe_environment_report(path) != environment_identity:
+            raise EvidenceError("bound environment input identity changed")
     source = observe_git_source(root)
     if (source["dirty"] is not False or
             any(not line.startswith(" ") for line in source["submodules"]) or
@@ -311,6 +345,10 @@ def verify_execution(plan: dict, report_path: Path, root: Path) -> dict:
         timings.summarize([attempt_path])
     for identity in tuple(observed.values()):
         observe_file(identity, empty=identity["size"] == 0)
+    if environment_identity is not None:
+        if observe_environment_report(
+                Path(environment_identity["path"])) != environment_identity:
+            raise EvidenceError("bound environment input identity changed")
     if observe_git_source(root) != source:
         raise EvidenceError("source changed during execution verification")
     return {"schema_version": 1, "kind": "verified_qualification_plan_execution",
@@ -318,6 +356,172 @@ def verify_execution(plan: dict, report_path: Path, root: Path) -> dict:
             "plan_sha256": canonical_digest(plan),
             "stage_count": len(plan["stages"]), "software_qualified": False,
             "physical_status": "not_executed"}
+
+
+def _retained_identity(path: Path) -> dict:
+    """Observe retained files, including an actual zero-byte output stream."""
+    path = regular_file(path, nonempty=False)
+    with path.open("rb") as stream:
+        return {"path": str(path), "sha256": stream_digest(stream),
+                "size": path.stat().st_size}
+
+
+def _recheck_retained(identities) -> None:
+    if any(_retained_identity(Path(item["path"])) != item for item in identities):
+        raise EvidenceError("retained evidence identity changed during selection")
+
+
+def completed_command_inputs(log: Path, *, expected_argv=None) -> list[Path]:
+    """Select one completed command's original raw closure without tree scans.
+
+    A conventional view is navigation to its unique attempt, not evidence that
+    a running parent or another command completed. Empty original streams are
+    retained. This does not establish test coverage or source qualification.
+    """
+    from tools.dev import timings
+
+    log = regular_file(log, nonempty=False)
+    view = log.with_suffix(".command.json")
+    receipt = load_json(view)
+    original = Path(receipt.get("attempt_receipt", ""))
+    if (original.name != "receipt.json" or original.parent.parent !=
+            log.parent / (log.stem + ".attempts")):
+        raise EvidenceError("original unique command attempt required")
+    attempt = load_json(original)
+    if attempt != {key: value for key, value in receipt.items()
+                   if key != "attempt_receipt"}:
+        raise EvidenceError("command view differs from original attempt")
+    if (receipt.get("outcome") != "completed" or
+            type(receipt.get("exit_code")) is not int or receipt["exit_code"] != 0 or
+            type(receipt.get("child_returncode")) is not int or
+            receipt["child_returncode"] != 0 or
+            receipt.get("withdrawal_complete") is not True or
+            receipt.get("withdrawal_stable") is not True or
+            receipt.get("withdrawn_processes") != []):
+        raise EvidenceError("completed owned command required")
+    if expected_argv is not None and receipt.get("command") != expected_argv:
+        raise EvidenceError("command differs from current producer plan")
+    selected = [log, regular_file(view), regular_file(original)]
+    for stream in ("stdout", "stderr"):
+        identity = receipt.get(stream, {})
+        fields(identity, {"path", "bytes", "sha256"})
+        path = regular_file(identity["path"], nonempty=False)
+        if path != original.parent / (stream + ".txt"):
+            raise EvidenceError("command stream differs from original attempt")
+        selected.append(path)
+    identities = [_retained_identity(path) for path in selected]
+    timings.summarize([original])
+    text = "".join(path.read_text(errors="replace") for path in selected[-2:])
+    if log.read_text() != text:
+        raise EvidenceError("command log differs from original streams")
+    _recheck_retained(identities)
+    return selected
+
+
+def execution_inputs(plan: dict, report_path: Path, root: Path) -> list[Path]:
+    """Select the verified complete execution's exact raw files for retention.
+
+    Verification remains bound to the current clean source and original paths.
+    This is a byte-retention selector, not portable or historical admission.
+    """
+    verified = verify_execution(plan, report_path, root)
+    report = load_json(verify_file_identity(verified["report"]))
+    selected = {Path(verified["report"]["path"])}
+    for stage in report["stages"]:
+        selected.add(verify_file_identity(stage["checker_source"]))
+        selected.update(completed_command_inputs(Path(stage["raw"]["path"]),
+                                                 expected_argv=stage["argv"]))
+        if stage["checker"] == "native_contracts":
+            arguments = stage["argv"]
+            if arguments.count("--preset") != 1:
+                raise EvidenceError("Native stage requires one explicit preset")
+            index = arguments.index("--preset") + 1
+            if index >= len(arguments):
+                raise EvidenceError("Native stage preset missing")
+            preset = arguments[index]
+            from tools.dev.presets import binary_directory
+            selected.update(native_execution_inputs(binary_directory(root, preset),
+                                                    preset))
+    if report.get("environment_report") is not None:
+        selected.add(verify_file_identity(report["environment_report"]))
+    verify_file_identity(verified["report"])
+    if observe_git_source(root) != verified["source"]:
+        raise EvidenceError("source changed during execution input selection")
+    return sorted(selected)
+
+
+def native_execution_inputs(build: Path, preset: str) -> list[Path]:
+    """Select only the current Native producer's complete evidence closure.
+
+    Explicit manifests, current JUnit identities and original command receipts
+    replace recursive discovery of every historical attempt. The enclosing
+    qualification still binds these bytes to source; this never reruns tests.
+    """
+    from scripts.ci import native_contracts
+    from scripts.ci.tdd_gate import validate_google_report
+    from scripts.validation.junit import validate_junit
+
+    if preset not in ("native-debug", "native-release", "native-asan", "native-tsan"):
+        raise EvidenceError("unknown Native producer preset")
+    build = Path(build).absolute()
+    output = build / "tdd"
+    summary_path = regular_file(output / "execution.json")
+    manifest_path = regular_file(build / "google-contracts.json")
+    identities = [_retained_identity(summary_path), _retained_identity(manifest_path)]
+    summary, manifest = load_json(summary_path), load_json(manifest_path)
+    fields(summary, {"schema", "kind", "preset", "passed", "suites", "ctest", "scope"})
+    fields(manifest, {"schema", "executables"})
+    if (type(summary["schema"]) is not int or summary["schema"] != 1 or
+            type(manifest["schema"]) is not int or manifest["schema"] != 1 or
+            summary["kind"] != "development-contract-execution" or
+            summary["preset"] != preset or type(summary["passed"]) is not int or
+            not isinstance(summary["suites"], list)):
+        raise EvidenceError("current Native producer summary differs")
+    try:
+        binaries = native_contracts.google_binaries(build)
+        reports = {binary.name + ".xml" for binary in binaries}
+        if {path.name for path in (output / "google").iterdir()} != reports:
+            raise EvidenceError("current Google reports differ from the complete plan")
+        plan_log = output / "ctest-plan.txt"
+        ctest_plan = load_json(plan_log)
+        planned = native_contracts.ctest_names(ctest_plan, binaries, build)
+        ctest_path = regular_file(build / "ctest-results.xml")
+        identities.append(_retained_identity(ctest_path))
+        ctest = validate_junit(ctest_path)
+        if (ctest != summary["ctest"] or ctest["skipped"] or
+                {case["name"] for case in ctest["cases"]} != planned):
+            raise EvidenceError("current CTest execution differs from producer plan")
+        selected = {summary_path, manifest_path, ctest_path}
+        receipt = load_json(plan_log.with_suffix(".command.json"))
+        ctest_tool = receipt.get("command", [None])[0]
+        if not isinstance(ctest_tool, str) or not ctest_tool:
+            raise EvidenceError("current CTest producer command missing")
+        selected.update(completed_command_inputs(plan_log, expected_argv=[
+            ctest_tool, "--test-dir", str(build), "--show-only=json-v1"]))
+        selected.update(completed_command_inputs(output / "ctest-execution.txt",
+            expected_argv=[ctest_tool, "--preset", preset, "--output-on-failure",
+                           "--no-tests=error", "--parallel", "1", "--output-junit",
+                           str(ctest_path)]))
+        results = []
+        for index, binary in enumerate(binaries):
+            log = output / ("discovery-" + str(index) + ".txt")
+            selected.update(completed_command_inputs(log, expected_argv=[
+                str(binary), "--gtest_filter=*", "--gtest_list_tests"]))
+            discovered = native_contracts.discovered_cases(log.read_text())
+            xml = regular_file(output / "google" / (binary.name + ".xml"))
+            identities.append(_retained_identity(xml))
+            evidence = validate_google_report(xml, expected_cases=len(discovered))
+            if {(case["classname"], case["name"]) for case in evidence["cases"]} != discovered:
+                raise EvidenceError("Google identities differ from original discovery")
+            results.append({"binary": binary.name, **evidence})
+            selected.add(xml)
+        if (summary["suites"] != results or summary["passed"] !=
+                sum(result["passed"] for result in results)):
+            raise EvidenceError("current Google summary differs from actual reports")
+        _recheck_retained(identities)
+    except (ValueError, OSError, KeyError, TypeError, IndexError) as error:
+        raise EvidenceError("Native producer evidence rejected: " + str(error)) from error
+    return sorted(selected)
 
 
 def provenance(source: dict, inputs: list[Path], artifacts: list[Path],
@@ -389,10 +593,13 @@ def main(argv=None) -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--require-candidate", action="store_true")
+    parser.add_argument("--environment", type=Path,
+                        help="Observed sealed OCI input; does not prove isolation")
     args = parser.parse_args(argv)
     try:
         result = execute(load_json(args.plan), args.root, args.output,
-                         require_candidate=args.require_candidate)
+                         require_candidate=args.require_candidate,
+                         environment_report=args.environment)
         print("Qualification plan: " + result["status"])
         return 0 if result["status"] == "executed_passed" else 1
     except (EvidenceError, OSError, ValueError, subprocess.SubprocessError) as error:

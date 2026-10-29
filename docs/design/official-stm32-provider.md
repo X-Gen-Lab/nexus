@@ -55,7 +55,7 @@ qualification. GD32 remains a separate provider.
 | Official HAL/LL/CMSIS | Reviewed hardware operations and selected vendor algorithms |
 | Family provider | Exact peripheral behavior, private state, IRQ and error bridge |
 | Common I/O | Admission, public results, borrowed storage and final publication contracts |
-| Generated Platform | Static context/face construction, resource acquisition and reverse cleanup |
+| Generated Platform | Static context/face construction and explicit C-call ordering for resource acquisition, startup and reverse cleanup |
 | External product | Execution progress, workers, budgets, partitions and recovery policy |
 
 Only one state machine may own a live peripheral operation. An adapter must not
@@ -77,8 +77,9 @@ Arguments are explicit static `Symbol` or `Address` values, uint32 constants,
 booleans, NULL, or nested direct calls such as absolute-deadline construction.
 Free-form expressions, casts, assignments and function-pointer/member-call
 expressions reject.
-`definitions`, `exports` and `face_definitions` remain C source strings; they can
-still contain selected helper bodies. The real C compiler establishes symbol
+`definitions`, `exports` and `face_definitions` remain C source strings for
+declarations, static configuration, storage, faces and fixed forwarding. Concrete
+C adapters own hardware algorithms. The real C compiler establishes symbol
 and parameter types. This is a narrow Python generation contract, not a complete
 C AST; these Python records introduce no additional runtime metadata or dispatch
 into the MCU image.
@@ -117,9 +118,10 @@ for explicit cleanup or retry.
 
 The family emitter now supplies static configuration and calls these concrete C
 entries. The existing `Construction` record and generated Platform still order
-resource phases, controller starts and reverse cleanup. Other peripheral modes
-retain their corresponding family emission paths; this selected refactor does
-not move every platform lifecycle into a new common abstraction.
+C calls for resource phases, controller starts and reverse cleanup. Other
+maintained peripheral modes use their own family static bindings and concrete C
+preparation; this does not move every platform lifecycle into a new common
+abstraction.
 
 See the [private shared contract](../../drivers/i2c/i2c_v2/i2c_v2.h) and the
 [U575 integration](../../soc/stm32/stm32u575/drivers/i2c.c) for exact parameters
@@ -152,9 +154,10 @@ added.
 The family's frozen `LegacyTransportProfile` supplies exact wiring to the
 existing emitter without family-name fallback. For these UART modes the selected
 `Construction.initialize` calls concrete C preparation; generation supplies
-static configuration, faces and IRQ forwarding. AHB DMA gates and Platform phase
-ordering remain in the existing SoC emission and shared template. Legacy I2C V1
-and other peripheral cold paths retain their selected generated behavior.
+static configuration, faces and IRQ forwarding. Concrete C adapters now own AHB
+DMA gates, pin resources and retained cleanup. The generated Platform keeps
+explicit phase ordering and typed C calls. Legacy I2C V1 and the other maintained
+peripheral cold paths follow the same C hardware-algorithm boundary.
 
 See the [UART private contract](../../drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)
 for the exact storage, callback and lifetime requirements. Host tests exercise
@@ -188,11 +191,15 @@ into concrete C while preserving the same Platform snapshot slots and retained
 cleanup responsibility. GD470 also moves its conditional EXTI close into C.
 The hot transfer engines, public faces and direct IRQ ownership are unchanged.
 
-This is a bounded cold-path migration. Other GPIO, IRQ UART, ADC, PWM, EXTI and
-additional mode-specific paths may still emit C behavior in family helpers.
-Review each selected mode's real start/stop path; neither a typed call field nor
-a new directory establishes that all lifecycle behavior has moved out of the
-generator. Physical timing and final software qualification remain separate.
+The maintained Native, F103, F407, G474, H743, U575, GD303 and GD470 selections
+now keep hardware algorithms in C11, including selected GPIO, IRQ UART, ADC, PWM,
+EXTI, preflight, shared resources and retained cleanup. Host Python supplies static
+configuration, storage, faces and fixed typed calls; the generated Platform still
+owns explicit startup and reverse-cleanup ordering. Review the actual selected
+C path rather than inferring support from a call field or directory. The
+{ref}`sealed cold-lifecycle baseline <sealed-cold-lifecycle-baseline>`
+records the exact final source and software evidence; physical timing remains
+unexecuted.
 
 ## Conditions for full HAL transport
 

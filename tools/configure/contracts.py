@@ -18,13 +18,7 @@ class ControllerContract:
     header: str
 
 
-# Order preserves existing factory ID enumeration and generated declarations.
-CONTROLLER_KINDS = (
-    'gpio', 'uart', 'spi', 'i2c', 'flash', 'watchdog', 'exti', 'pwm', 'adc',
-    'can', 'usb_device', 'eth', 'timer_capture', 'advanced_pwm', 'pwm_group',
-    'encoder', 'pwm_adc', 'can_fd', 'adc_group', 'eth_frames', 'rtc', 'lptim',
-)
-
+# Declaration order preserves factory enumeration and generated declarations.
 CONTROLLER_CONTRACTS = MappingProxyType({
     'gpio': ControllerContract(
         frozenset(('binding', 'mode')),
@@ -184,3 +178,8 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset(('binding', 'irq', 'mode', 'tick_hz')),
         frozenset(('tick_hz',)), 'lptim'),
 })
+
+CONTROLLER_KINDS = tuple(CONTROLLER_CONTRACTS)
+# The graph checks the record envelope before its exact kind/mode contract.
+CONTROLLER_SELECTION_FIELDS = frozenset().union(
+    *(contract.selected_fields for contract in CONTROLLER_CONTRACTS.values()))

@@ -37,10 +37,12 @@ mechanisms without adding a runtime layer. Actual status remains in the same CSV
 the work breakdown is not another support matrix or a project-wide percentage.
 
 The [follow-up development index](../delivery/platform-delivery-completion-results.json)
-records current observations without relabeling old P/E results. Its pending
-final-source exits require actual complete gates, fixed examples consumption,
-offline reproduction and post-merge association; a prepared plan or successful
-configuration query cannot close them.
+retains its original development observations without relabeling old P/E results.
+The subsequent {ref}`sealed cold-lifecycle baseline <sealed-cold-lifecycle-baseline>`
+records the final source, complete gates, fixed examples consumption, offline
+reproduction and post-merge association. Read the later source-bound observation
+before interpreting an older pending field; a prepared plan or successful
+configuration query alone cannot close an exit.
 
 ## Boundaries that stay explicit
 
@@ -95,6 +97,68 @@ comparing equivalent complete images are later work; no HAL-versus-LL resource
 ranking or production replacement is claimed.
 
 ## Close work with observations
+
+### Compare complete execution costs
+
+Use `dev.py timings --compare` only after two independent complete executions
+of the same maintained formal plan, clean source and dependency pins. Each
+execution must bind the same verified OCI environment-report bytes using the
+optional `qualify --environment` input. That binding records observed input
+identity; it does not prove that checkers ran inside an isolated container.
+Historical reports without this original binding remain valid for their own
+executed scope, but cannot be retrofitted into this comparison.
+
+From the clean platform root, set `NEXUS_MEASUREMENT_ROOT` to a new output parent
+with adequate capacity, `NEXUS_ENVIRONMENT` to the sealed OCI layout's
+`environment.json`, and `NEXUS_COLD_CACHE_STATE`/`NEXUS_WARM_CACHE_STATE` to the
+actual cache preparation descriptions. Prepare the intended cold and warm
+conditions explicitly before their respective executions. These commands run
+the complete plan; they do not reuse existing successful test reports:
+
+```sh
+python tools/dev/dev.py qualify --plan tools/dev/plans/software.json \
+    --output "$NEXUS_MEASUREMENT_ROOT/cold" --environment "$NEXUS_ENVIRONMENT"
+python tools/dev/dev.py qualify --plan tools/dev/plans/software.json \
+    --output "$NEXUS_MEASUREMENT_ROOT/warm" --environment "$NEXUS_ENVIRONMENT"
+python tools/dev/dev.py timings --compare \
+    --plan tools/dev/plans/software.json --root "$PWD" \
+    --cold-report "$NEXUS_MEASUREMENT_ROOT/cold/report.json" \
+    --warm-report "$NEXUS_MEASUREMENT_ROOT/warm/report.json" \
+    --cold-environment "$NEXUS_ENVIRONMENT" \
+    --warm-environment "$NEXUS_ENVIRONMENT" \
+    --cold-cache-state "$NEXUS_COLD_CACHE_STATE" \
+    --warm-cache-state "$NEXUS_WARM_CACHE_STATE" \
+    --json "$NEXUS_MEASUREMENT_ROOT/comparison.json"
+```
+
+Both runs must actually complete successfully with the exact plan, stage order,
+commands, raw streams and independent receipts. Formal plans disable compiler
+cache; declaring warm preparation does not enable it. The comparison reports
+the union of original stage-command wall intervals, excluding idle gaps and
+avoiding nested wall-time sums. Native producer checks additionally validate
+the current shared build outputs; they do not establish independent historical
+inner Native XML/artifacts for each cold/warm run. Cache state is declared,
+not measured cache hits; aggregate
+CPU, process-tree peak RSS and their deltas remain unknown. A cost comparison is
+not qualification and cannot qualify changed source. No complete cold/warm
+measurement is claimed merely because this command exists.
+
+### Hand off an unsigned local software preview
+
+When hosted Actions is unavailable, the explicit `prepare-local` command
+(`bundle-local` alias) in `tools/release/delivery.py` assembles a local preview
+from original complete software execution, SDK/consumer packages, documentation
+and sealed candidates. `verify-local` independently checks the prepared output.
+Use the [local preview contract and exact commands](../../tools/release/README.md#explicit-local-software-preview)
+with a new output directory and the expected clean source commit. Input sources,
+dependency pins, original completed receipts, SDK identity and candidate/document
+scope must agree; successful reports are not reused to qualify another source.
+
+This path preserves original bytes and restores packages without rebuilding or
+resealing them. Its trust is `local_observation_no_oidc`, signature status is
+unsigned and `publication_authorized=false`. It does not fabricate Actions runs,
+OIDC or a formal release, and it does not weaken the existing publication guards.
+Actual remote publication remains a separate exit.
 
 The ledger records actual implementation and evidence paths, including limited
 development tests. The [development result index](../delivery/developer-experience-results.json)

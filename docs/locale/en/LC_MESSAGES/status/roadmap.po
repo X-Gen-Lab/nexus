@@ -1,4 +1,4 @@
-# Authored translation; independently semantically reviewed.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -10,20 +10,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6216cc2c48cb898598e84c0dcc8038beec663ed0e3d17237aeaff2482aa452d5\n"
+"X-Nexus-Source-SHA256: 85b2e0c18cf198ed2b15a7fdba05a329333657785f8d59aa926af5c4c0b8f771\n"
 
 msgid "迭代方向与进入条件"
 msgstr "Iteration directions and admission conditions"
 
-msgid ""
-"当前迭代以真实测量和原退出条件为依据。完整策略保留在 [后续迭代与团队执行](../delivery/next-iterations.md)，逐项状态由"
-" [原台账](ledgers.md)维护；本页提供任务入口，不重复更新状态。"
-msgstr ""
-"Current iteration follows actual measurements and original exit conditions. "
-"The complete strategy remains in [later iterations and team "
-"execution](../delivery/next-iterations.md); the [original "
-"ledgers](ledgers.md) maintain per-task status. This page provides task entry"
-" points without duplicating status updates."
+msgid "当前迭代以{ref}`最终冷态生命周期基线 <sealed-cold-lifecycle-baseline>`、 真实测量和原退出条件为依据。完整策略保留在 [后续迭代与团队执行](../delivery/next-iterations.md)，逐项状态由 [原台账](ledgers.md)维护；本页提供任务入口，不重复更新状态。"
+msgstr "The current iteration follows the {ref}`final cold-lifecycle baseline <sealed-cold-lifecycle-baseline>`, actual measurements and original exit conditions. The complete strategy remains in [subsequent iterations and team execution](../delivery/next-iterations.md), and the [original ledgers](ledgers.md) maintain individual statuses. This page provides task entry points without maintaining duplicate status."
 
 msgid "顺序"
 msgstr "Order"
@@ -34,8 +27,17 @@ msgstr "Work"
 msgid "进入与退出条件的权威"
 msgstr "Authority for admission and exit conditions"
 
-msgid "首先"
-msgstr "First"
+msgid "软件优先"
+msgstr "Software first"
+
+msgid "完善当前证据导航、交付工具和高级外部 recipe；按相同覆盖测量工具成本"
+msgstr "Improve current evidence navigation, delivery tools and advanced external recipes; measure tool costs under identical coverage"
+
+msgid "{ref}`封存基线与开放退出 <sealed-cold-lifecycle-baseline>`，现有 CLI、SDK 及外部示例合同"
+msgstr "{ref}`Sealed baseline and open exits <sealed-cold-lifecycle-baseline>`, existing CLI, SDK and external examples contracts"
+
+msgid "实板接入后"
+msgstr "After board connection"
 
 msgid "接入首发三板、来源参考板的真实 station，校准安全初值与 clock"
 msgstr ""
@@ -46,8 +48,8 @@ msgid "[HIL 状态](hardware.md)、原 station／qualification 合同"
 msgstr ""
 "[HIL status](hardware.md) and original station/qualification contracts"
 
-msgid "其次"
-msgstr "Next"
+msgid "随后测量"
+msgstr "Then measure"
 
 msgid "测量已有 IRQ／DMA／连续流／取消排空模式及完整负载退出"
 msgstr ""
@@ -73,14 +75,11 @@ msgstr ""
 msgid "独立设计"
 msgstr "Design separately"
 
-msgid "运行态交接、DVFS、deep STOP、真正的 userspace I/O transport"
-msgstr ""
-"Running-state handoff, DVFS, deep STOP and genuine userspace I/O transport"
+msgid "更广的运行态交接、DVFS、通用 deep STOP、userspace I/O transport"
+msgstr "Broader runtime handoff, DVFS, general deep STOP and userspace I/O transport"
 
-msgid "原 SOC-33–35 等仍未实现项；不能从当前固定 profile 推导完成"
-msgstr ""
-"Original unimplemented items such as SOC-33–35; completion cannot be "
-"inferred from current fixed profiles"
+msgid "原 SOC-33–35 的完整退出仍开放；已有 H743 RAM 维护和 U575 选定 Stop2 切片不代表通用支持"
+msgstr "Full original SOC-33–35 exits remain open; existing H743 RAM maintenance and selected U575 Stop2 slices do not establish general support"
 
 msgid "维护交付"
 msgstr "Maintain delivery"

@@ -16,7 +16,10 @@ Nexus owns reusable mechanisms. No MCU is flashed by this tutorial.
 ## Create and run an application
 
 Obtain a verified Source SDK and the external
-[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. Set
+[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That
+repository is private and requires its own GitHub access; public Nexus or SDK
+access does not grant template access. The independent SDK verification below
+does not require that private repository. Set
 `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that
 checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit
 recorded with the chosen platform delivery. These are separate identities: the

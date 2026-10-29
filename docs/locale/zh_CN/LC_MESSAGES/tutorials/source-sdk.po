@@ -1,4 +1,4 @@
-# Authored translation; independent review is recorded in metadata.
+# Exact changed messages reviewed against canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6aed4e5c6ffe695da5a3ce2a55dbc0e5b936a64b5f5bb888a6ae31f452588cae\n"
+"X-Nexus-Source-SHA256: b86b06ca46f3f505a28aa5f0086444e2629874c9ba967c7d8339a050b3f93637\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:9
 msgid "Build an independent Source SDK consumer"
@@ -28,22 +28,8 @@ msgstr ""
 msgid "Create and run an application"
 msgstr "创建并运行应用"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:18
-msgid ""
-"Obtain a verified Source SDK and the external [nexus-"
-"examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. Set "
-"`NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that"
-" checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples "
-"commit recorded with the chosen platform delivery. These are separate "
-"identities: the template's expected platform revision does not prove which "
-"SDK was used. Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; "
-"choose a new product directory outside both input checkouts:"
-msgstr ""
-"取得已验证的 Source SDK 和外部 [nexus-examples](https://github.com/X-Gen-Lab/nexus-"
-"examples) 检出。将 `NEXUS_SDK_PREFIX` 设为已安装 SDK 的前缀，`NEXUS_EXAMPLES_DIR` "
-"设为示例检出，`NEXUS_EXAMPLES_REVISION` 设为所选平台交付记录关联的完整40 "
-"位示例提交。这些身份分开记录：模板预期的平台版本不能证明实际使用了哪个 SDK。从 "
-"`$NEXUS_SDK_PREFIX/share/nexus/src` 执行下列命令；在两个输入检出之外选择新的产品目录："
+msgid "Obtain a verified Source SDK and the external [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That repository is private and requires its own GitHub access; public Nexus or SDK access does not grant template access. The independent SDK verification below does not require that private repository. Set `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit recorded with the chosen platform delivery. These are separate identities: the template's expected platform revision does not prove which SDK was used. Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product directory outside both input checkouts:"
+msgstr "取得经过验证的 Source SDK 和外部 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout。该仓库是私有仓库，需要单独的 GitHub 访问权限；公开 Nexus 或 SDK 的权限不包含模板权限。下方独立 SDK 验证不需要该私有仓库。将 `NEXUS_SDK_PREFIX` 设置为已安装 SDK prefix，将 `NEXUS_EXAMPLES_DIR` 设置为该 checkout，将 `NEXUS_EXAMPLES_REVISION` 设置为所选平台交付关联的精确 40 位示例 commit。这些是独立身份：模板预期的平台 revision 不证明实际用了哪个 SDK。从 `$NEXUS_SDK_PREFIX/share/nexus/src` 执行以下命令，在两个输入 checkout 外选择新的产品目录："
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:38
 msgid ""
@@ -199,6 +185,11 @@ msgstr ""
 "消费前搬移整个前缀，包括身份和许可。[Source SDK 合同](../design/source-compatibility.md)定义版本与接口 "
 "epoch 检查。内容文件缺失、额外、修改或符号链接文件会拒绝配置。使用 `--development-fixture` "
 "生成的包保持不可发布，消费者必须显式设置 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`。不得用该选项绕过发布资格。"
+
+
+# CMSIS6 actual-POT delta; independent review pending.
+msgid "The SDK retains the complete recursive CMSIS-Core `Include` tree and its Apache-2.0 `LICENSE` from the locked official v6.4.0 source. It does not include the entire CMSIS repository or automatically enable CMSIS-RTOS, CMSIS-Driver, DSP or NN. These private implementation headers are distinct from the public `Nexus::Core` mechanisms. Device/startup and HAL/LL remain separately locked; older bundled GigaDevice Core files retain their original bytes and notices without becoming the selected common Core. Verify the complete moved prefix, not a manually copied subset of headers. This dependency update does not expand supported chips or replace current-source compiler and consumer evidence."
+msgstr "SDK 保留锁定的官方 v6.4.0 来源中完整递归 CMSIS-Core `Include` 树及其 Apache-2.0 `LICENSE`。它不包含整个 CMSIS 仓库，也不自动启用 CMSIS-RTOS、CMSIS-Driver、DSP 或 NN。这些私有实现头与公共 `Nexus::Core` 中性机制不同。Device/startup 和 HAL/LL 仍分别锁定；GigaDevice 原包中的旧 Core 文件保留原始字节及通知，但不作为选中的共享 Core 来源。应验证移位后的完整 prefix，而不是手动复制的头文件子集。这项依赖更新不扩大芯片支持，也不替代当前源码的编译器与 consumer 执行证据。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:128
 msgid ""
@@ -356,8 +347,3 @@ msgid ""
 msgstr ""
 "修复打包限制时保留全部原始证据文件。不得为了获得成功而移动标签、删去证据或换用不同源码的 CI "
 "运行。仅触发工作流不能证明已发布：必须检查完成的工作流、发布清单与资产，再独立下载并验证 SDK。恢复不建立物理 HIL 或生产资格。"
-
-
-# CMSIS6 actual-POT delta; independent review pending.
-msgid "The SDK retains the complete recursive CMSIS-Core `Include` tree and its Apache-2.0 `LICENSE` from the locked official v6.4.0 source. It does not include the entire CMSIS repository or automatically enable CMSIS-RTOS, CMSIS-Driver, DSP or NN. These private implementation headers are distinct from the public `Nexus::Core` mechanisms. Device/startup and HAL/LL remain separately locked; older bundled GigaDevice Core files retain their original bytes and notices without becoming the selected common Core. Verify the complete moved prefix, not a manually copied subset of headers. This dependency update does not expand supported chips or replace current-source compiler and consumer evidence."
-msgstr "SDK 保留锁定的官方 v6.4.0 来源中完整递归 CMSIS-Core `Include` 树及其 Apache-2.0 `LICENSE`。它不包含整个 CMSIS 仓库，也不自动启用 CMSIS-RTOS、CMSIS-Driver、DSP 或 NN。这些私有实现头与公共 `Nexus::Core` 中性机制不同。Device/startup 和 HAL/LL 仍分别锁定；GigaDevice 原包中的旧 Core 文件保留原始字节及通知，但不作为选中的共享 Core 来源。应验证移位后的完整 prefix，而不是手动复制的头文件子集。这项依赖更新不扩大芯片支持，也不替代当前源码的编译器与 consumer 执行证据。"
