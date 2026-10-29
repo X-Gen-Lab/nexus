@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-examples-p5-evidence-6f09ae55/store/69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7.tar.gz",
+    "sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7",
+    "size": 3603912
+  },
+  "bytes": 20136902,
+  "files": 154,
+  "kind": "portable_evidence",
+  "manifest_sha256": "56f7ab145a6d096e6afa2373c95890d3ec7bd6fd05b6557f6d2943958dec72f8",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

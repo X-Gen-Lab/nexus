@@ -682,6 +682,176 @@
       "path": "docs-platform-delivery-20261029-g5d60b56e/FIRST-REMOTE-RECOVERY.txt",
       "bytes": 972,
       "sha256": "2fb16cdc5675882b0c1bf13fa860f28b996183fae275841bbfa4e7aafbc357aa"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/README.txt",
+      "bytes": 1574,
+      "sha256": "39e63e851ed6cbee8ce01d9e31b9dcc878655c7de05ddbf29b0abf56fba148d1"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/created-product.tar.gz",
+      "bytes": 3603912,
+      "sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/created-product.tar.gz.package.json",
+      "bytes": 507,
+      "sha256": "98abcdf4090d4a5aa04744d491d229f0b444ad193614980900e7a02a671b904f"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/delivery-index.json",
+      "bytes": 10798,
+      "sha256": "3ce7ecfd8a7448b6420b46e2616318b1993d9af7f3a08135a523450f38104e4c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/docs-handoff.json",
+      "bytes": 9186,
+      "sha256": "49b7f65c847bcb4a2139dbafc008b160d6ed89d167b8f995286dd751b847db00"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/documentation-manifest.json",
+      "bytes": 432634,
+      "sha256": "adfb5cb64e788db0f88c0b3120a611c672c5d4e7860cff86ae589b893c822608"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/documentation-raw.tar.gz",
+      "bytes": 17610908,
+      "sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/documentation-raw.tar.gz.package.json",
+      "bytes": 534,
+      "sha256": "bbdc85813f4ff6db961ba651a4710a86b226f18dec2ce52afe63a7df13daaba2"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/documentation.tar.gz",
+      "bytes": 15289567,
+      "sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/documentation.tar.gz.package.json",
+      "bytes": 847,
+      "sha256": "d82a87ee5445a08c1f5e8c641756c474fc1d9bc4cfb9359f925784fd88445e67"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-handoff.json",
+      "bytes": 1740,
+      "sha256": "f6ef8d265dccd57fa667d2ceb936176731d65c02738e6c298013f892a02a638c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-index.json",
+      "bytes": 3525,
+      "sha256": "c6bec4679ac01ae75622dd23c11303424c3412457314c28821ed852485be39bc"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-summary.json",
+      "bytes": 5047,
+      "sha256": "19776741d50194c2bb6a87e5ba5b079a5b3e25bb60dfe74330784c4dcb4e441c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.package.json",
+      "bytes": 510,
+      "sha256": "cba3078047f0a84038d560133caae8b08dda991062865ab8f8c0db3647bad6fb"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.part0000",
+      "bytes": 33554432,
+      "sha256": "8661384e80772da26e61a22b67ee742a12b1efe300469af5a3a6bdb922ff0ec2"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.part0001",
+      "bytes": 20443976,
+      "sha256": "13ead53bcf103066117d67d39a47fe455fe339c0852c4b077ecca3254459e322"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/f04-original-exit-p5-review.json",
+      "bytes": 19972,
+      "sha256": "3c20871c0a568e9741c0134dfe5df6edc5e703e72b654bea2e4578c51c213590"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci-handoff.json",
+      "bytes": 4641,
+      "sha256": "8492dac460ada7fb6d7b5c85485a05c93ff9ec7499453c090ef9ec5a85fa038c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci-layer-path-audit.json",
+      "bytes": 3066,
+      "sha256": "93f10d323c3be81f32edc8cf75e201bc49e3a4a031ed4bde19db9b9334344574"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci-retention-receipt.json",
+      "bytes": 2341,
+      "sha256": "39c51a9ec1e5b1d39a9c019862cbe78ae9c85d7fb17b51dbfbddf67c4529ef13"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.package.json",
+      "bytes": 538,
+      "sha256": "a02e48d3d63fbd8bb2fdca830c8f0fad9d8944454b1242969dceb148d982045c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0000",
+      "bytes": 33554432,
+      "sha256": "d6614521b05cedb54bd096974e40817f15133b026f5e22007fe4654fed962582"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0001",
+      "bytes": 33554432,
+      "sha256": "8a3addc955855a9e6132edc767736df1b08e8562d2e30257e0f2d5bb4fec9a55"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0002",
+      "bytes": 33554432,
+      "sha256": "09bff5c2343ea95d737d7d4db8b2a7c09970e6dd33ecdfd870fc05d25aabf83e"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0003",
+      "bytes": 33554432,
+      "sha256": "51d397b4a5fc6d09eb5ae433651f3f595f9ad282f07162304df48a915ccf9818"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0004",
+      "bytes": 33554432,
+      "sha256": "06da664b4ef9831ac248fbd09632f817dd4244fe55c61bc59de575df8fbf9264"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/observed-oci.tar.gz.part0005",
+      "bytes": 28986633,
+      "sha256": "51e09a3c61db6c38ffcf417bf79b07b89dc329fbe0cb5309edae0649df4ef236"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/ordinary-commit-association.json",
+      "bytes": 890,
+      "sha256": "e8db54d477374d7d54ca8d9ae248c285247dc8326d3af690dce3961f4841edb5"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/ordinary-p5.tar.gz",
+      "bytes": 1831869,
+      "sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/ordinary-p5.tar.gz.package.json",
+      "bytes": 539,
+      "sha256": "53921056b10224eb4d54b4a3a99cd67e447e5789ca791d7e3492111c71134b1a"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/p5-seven-source-paths.tar.gz",
+      "bytes": 59310,
+      "sha256": "56568b442211eb637a88a2ba98c98e38c547bbbb5c665896d1d59a26f21c9bb0"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/source-sdk.tar.gz",
+      "bytes": 10690212,
+      "sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/source-sdk.tar.gz.package.json",
+      "bytes": 536,
+      "sha256": "3f31186658f3559944a9a70610fc2899cd5c76a6566f5204564c3615eb29b863"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-gd742cdb5/verification-tools-gd742cdb5.tar.gz",
+      "bytes": 28064,
+      "sha256": "67dad17ab95ba0964f5b9872052563b4be9158115196579c2ac5cdac80f8d0b0"
     }
   ],
   "physical_hil": "not_executed",

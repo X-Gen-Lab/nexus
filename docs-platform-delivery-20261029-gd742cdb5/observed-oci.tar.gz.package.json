@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/integration/observed-oci-retention/store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.tar.gz",
+    "sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443",
+    "size": 196758793
+  },
+  "bytes": 561772790,
+  "files": 13,
+  "kind": "portable_evidence",
+  "manifest_sha256": "eef07324e796d054fc292efc1d27424dc80b2b7da711d5cb0d026341fe001473",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

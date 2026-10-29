@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "kind": "observed_oci_retention_handoff",
+  "status": "local_export_verify_restore_verified",
+  "receipt": {
+    "path": "build/c-cold-20261028/integration/observed-oci-retention/retention-receipt.json",
+    "size": 2341,
+    "sha256": "39c51a9ec1e5b1d39a9c019862cbe78ae9c85d7fb17b51dbfbddf67c4529ef13"
+  },
+  "path_audit": {
+    "path": "build/c-cold-20261028/integration/observed-oci-retention/layer-path-audit.json",
+    "size": 3066,
+    "sha256": "93f10d323c3be81f32edc8cf75e201bc49e3a4a031ed4bde19db9b9334344574"
+  },
+  "raw_operations": {
+    "path": "build/c-cold-20261028/integration/observed-oci-retention/operations.jsonl",
+    "size": 3466,
+    "sha256": "fe87a68ffe5183fc76a4b5be1b7ecb24793c794ae267095588f0185efac3ad33"
+  },
+  "package_envelope": {
+    "path": "build/c-cold-20261028/integration/observed-oci-retention/store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.json",
+    "size": 538,
+    "sha256": "a02e48d3d63fbd8bb2fdca830c8f0fad9d8944454b1242969dceb148d982045c"
+  },
+  "archive": {
+    "package": "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.json",
+    "archive": "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.tar.gz",
+    "archive_sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443",
+    "archive_bytes": 196758793,
+    "manifest_sha256": "eef07324e796d054fc292efc1d27424dc80b2b7da711d5cb0d026341fe001473",
+    "files": 13,
+    "bytes": 561772790
+  },
+  "tools": [
+    {
+      "path": "tools/evidence/container.py",
+      "size": 9850,
+      "sha256": "b4137d4abe98683d0d410e0a6038fbf82f6aafbd10f5360d1dad89762b83495e"
+    },
+    {
+      "path": "tools/evidence/store.py",
+      "size": 20496,
+      "sha256": "e3a9bde01dae28c3524daf9203a1512a66f317a99a62a7a0acf22e43a3013d7d"
+    },
+    {
+      "path": "tools/evidence/common.py",
+      "size": 11352,
+      "sha256": "6a59439c062078561e9b2110625ecec3e845b37e6bcce2a4261d318f1ce7b1ff"
+    }
+  ],
+  "actual_execution": {
+    "argv": [
+      "nice",
+      "-n",
+      "15",
+      "python3",
+      "-B",
+      "-"
+    ],
+    "api_order": [
+      "container.verify(source/environment.json, runtime=False)",
+      "store.export_tree(source, storage)",
+      "store.verify_package(package, archive_override=archive)",
+      "store.restore_tree(package, independent_tmpfs_destination, archive_override=archive)",
+      "container.verify(restored/environment.json, runtime=False)",
+      "compare both verified locks and unchanged source lock SHA",
+      "remove only verified independent_tmpfs_destination"
+    ]
+  },
+  "transport_navigation": {
+    "rule": "Keep the envelope and archive bytes unchanged; use explicit --archive to relocate absolute original envelope navigation. All handoff identities are source-relative; package archive paths here are relative to this handoff directory.",
+    "verify_argv": [
+      "python3",
+      "-B",
+      "tools/evidence/store.py",
+      "verify",
+      "--package",
+      "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.json",
+      "--archive",
+      "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.tar.gz",
+      "--report",
+      "verify-result.json"
+    ],
+    "restore_argv": [
+      "python3",
+      "-B",
+      "tools/evidence/store.py",
+      "restore",
+      "--package",
+      "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.json",
+      "--archive",
+      "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.tar.gz",
+      "--destination",
+      "NEW-RESTORE-DIRECTORY",
+      "--report",
+      "restore-result.json"
+    ],
+    "restored_container_verify_python": "from pathlib import Path; from tools.evidence.container import verify; verify(Path(\"NEW-RESTORE-DIRECTORY/environment.json\"), runtime=False)"
+  },
+  "safety": {
+    "sensitive_credential_paths_found": false,
+    "payload_contents_not_inspected": true,
+    "config_env_values_not_read": true,
+    "original_layout_not_mutated": true,
+    "tracked_files_index_head_not_modified_by_this_task": true,
+    "independent_restore_removed_after_verification": true,
+    "tests_build_installs_executed": false,
+    "docker_daemon_commands_executed": false,
+    "external_upload_executed": false
+  },
+  "scope": "Observed OCI layout bytes only. Does not establish recipe reconstruction, fresh daemon dockerload, or whole-host CI image restoration. Arbitrary file content was not secret-scanned.",
+  "disk_after_bytes": {
+    "overlay_available": 1782837248,
+    "tmpfs_available": 1516183552
+  },
+  "timestamp_utc": "2026-10-29T06:13:19Z"
+}

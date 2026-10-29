@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/p5-external-retention/source-sdk/store/3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5.tar.gz",
+    "sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5",
+    "size": 10690212
+  },
+  "bytes": 75548852,
+  "files": 3011,
+  "kind": "portable_evidence",
+  "manifest_sha256": "f97b12ca195f1e59bc7bd3320e0c0cf3597fa9b699a180aa3a45a5cfb2ad6cec",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

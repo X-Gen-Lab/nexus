@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/docs/final-d742cdb5/raw-build-store/3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8.tar.gz",
+    "sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8",
+    "size": 17610908
+  },
+  "bytes": 117354852,
+  "files": 2732,
+  "kind": "portable_evidence",
+  "manifest_sha256": "9233a36d042443cebb3034e346789d2c18b43ff2c773206fd5adfed761d035af",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

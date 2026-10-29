@@ -1,0 +1,19 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/docs/final-d742cdb5/store/e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41.tar.gz",
+    "sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41",
+    "size": 15289567
+  },
+  "bytes": 86043186,
+  "files": 2489,
+  "kind": "preserved_external_archive",
+  "member_inventory_sha256": "044723e3a8e28dac2b1537e4e8d8bee97f89e6b0fab731e86175c0ac29732a33",
+  "members": 2489,
+  "original": "/workspace/nexus/build/c-cold-20261028/docs/final-d742cdb5/0.2.0-docs-gd742cdb5a060.tar.gz",
+  "persistence_status": "not_established",
+  "schema_version": 1,
+  "scope": "archive bytes and safe member closure; inner reports retain their own qualification",
+  "signature_status": "unsigned",
+  "status": "all_members_read",
+  "storage": "independent_hardlink"
+}

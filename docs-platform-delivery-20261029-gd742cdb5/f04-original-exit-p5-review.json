@@ -1,0 +1,526 @@
+{
+  "kind": "F04_original_exit_P5_delta_acceptance_review",
+  "status": "original_F04_exit_review_passed_with_stated_mapping_level_scope",
+  "qualification": false,
+  "authority": "docs/design/platform-delivery-completion.csv#F04",
+  "original_exit": "Only immutable setup is shared; every retained merged or removed test has an independent contract/oracle mapping",
+  "source": {
+    "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "tree": "570f807e722649e976670f747950fe1acb61fcc7",
+    "dirty": false
+  },
+  "original_P4_reviews_preserved": true,
+  "conclusion": {
+    "contract_oracle_mapping_clause": "passed_at_explicit_source_bound_mapping_level",
+    "immutable_shared_setup_identified_SourceSDK_issue": "fixed_and_actual_full_file_validated_in_P5",
+    "nine_duplicate_inherited_executions": "retired_with_one_to_one_original_oracle_mapping_and_complete_before_after_module_execution",
+    "whole_project_all_cases_manually_proven_semantically_independent": false,
+    "automapped_C_unknown4438_is_additional_manual_scope_not_a_mapping_failure": true,
+    "requires_new_mutation_for_each_old_case": false,
+    "scope": "Original F04 test-retention/setup and contract/oracle mapping exit only; does not award clean-source formal159 qualification, actual processor execution, physical HIL or public release."
+  },
+  "SDK_delta": {
+    "path": "tests/contracts/test_source_sdk.py",
+    "sha256": "59daa4b307538548864a662b4640aaf16673e5c807cd2af45b7fd37f6338e459",
+    "all_original_module_method_bodies_identical": 118,
+    "old_selected_class_methods": 52,
+    "private_full_prefix_mutators": 32,
+    "read_only_seed_methods": 20,
+    "new_contract_methods": [
+      "test_mutable_prefix_is_a_complete_independent_copy",
+      "test_read_only_case_reuses_the_class_seed"
+    ],
+    "independent_oracle": "The copy baseline must really verify with exports intact; exact path/mode/hash sets match seed but every file has distinct(dev,inode). Mutating private core source or exported config produces independently authored identity diagnostics while complete seed snapshot remains unchanged and real seed verification succeeds. Reader identity contract constrains avoiding needless prefix copies.",
+    "setup": "Original per-class SDK producer runs once, unchanged. Decorator uses fresh per-method directory and complete prefix copy2 tree, rebinds all directory/prefix/sdk/identity aliases. Original negative bodies now mutate only private files; finally no longer rewrites seed. Parent Git input retained read-only.",
+    "actual_execution": {
+      "RED": "2cases/1aliasfailure/0error/0skip",
+      "focused_GREEN": "2of2",
+      "complete_module": "120of120/0skip/0fail/0error",
+      "final_formatted_focused": "2of2",
+      "source_before_format": "3d79518d7c596cbb4791b6fb4846bd633945bccc216e3885db6e97fd9dca4743",
+      "format_AST_equal": true
+    },
+    "old_to_current_method_mapping": [
+      {
+        "method": "test_recursive_dependency_membership_matches_reviewed_catalogue",
+        "P4_line": 1179,
+        "P5_line": 1206,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_nested_fetch_declaration_is_not_an_origin_override",
+        "P4_line": 1202,
+        "P5_line": 1230,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_import_cannot_add_an_unreviewed_firmware_file",
+        "P4_line": 1220,
+        "P5_line": 1249,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_import_cannot_add_an_unreviewed_auxiliary_file",
+        "P4_line": 1244,
+        "P5_line": 1274,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_vendor_import_bytes_still_must_match_original_lock",
+        "P4_line": 1268,
+        "P5_line": 1299,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_standalone_resolvers_reject_source_byte_tamper",
+        "P4_line": 1357,
+        "P5_line": 1438,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_standalone_resolvers_reject_rehashed_required_module_omission",
+        "P4_line": 1375,
+        "P5_line": 1457,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_cli_summary_cannot_be_confused_with_complete_manifest",
+        "P4_line": 1397,
+        "P5_line": 1479,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_c_and_cpp_consumer_build_and_run_without_original_source",
+        "P4_line": 1414,
+        "P5_line": 1496,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_sdk_exports_policy_version_and_rejects_other_versions",
+        "P4_line": 1427,
+        "P5_line": 1509,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_arm_consumer_compiles_real_startup_and_linker",
+        "P4_line": 1461,
+        "P5_line": 1543,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_gd32_consumer_compiles_real_startup_and_linker",
+        "P4_line": 1472,
+        "P5_line": 1554,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_g474_selected_baremetal_and_freertos_consumers_link",
+        "P4_line": 1483,
+        "P5_line": 1565,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_h743_selected_baremetal_and_freertos_consumers_link",
+        "P4_line": 1593,
+        "P5_line": 1675,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_u575_selected_baremetal_and_freertos_consumers_link",
+        "P4_line": 1599,
+        "P5_line": 1681,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_mainstream_consumers_use_their_actual_startup_and_abi",
+        "P4_line": 1604,
+        "P5_line": 1686,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_threadx_native_consumer_links_actual_official_kernel",
+        "P4_line": 1660,
+        "P5_line": 1742,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_relocated_threadx_three_board_consumers_link_actual_official_kernel",
+        "P4_line": 1665,
+        "P5_line": 1747,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_fixture_requires_explicit_consumer_opt_in",
+        "P4_line": 1673,
+        "P5_line": 1755,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_formal_consumer_cli_rejects_nonpublishable_fixture",
+        "P4_line": 1679,
+        "P5_line": 1761,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_expected_revision_conflict_is_rejected",
+        "P4_line": 1691,
+        "P5_line": 1773,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_different_source_package_version_is_rejected",
+        "P4_line": 1696,
+        "P5_line": 1778,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_development_contracts_are_explicitly_rejected",
+        "P4_line": 1701,
+        "P5_line": 1783,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_modified_required_file_is_rejected",
+        "P4_line": 1706,
+        "P5_line": 1789,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_modified_exported_config_is_rejected",
+        "P4_line": 1717,
+        "P5_line": 1801,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_missing_license_is_rejected",
+        "P4_line": 1728,
+        "P5_line": 1813,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_missing_arch_or_core_source_is_rejected",
+        "P4_line": 1739,
+        "P5_line": 1825,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_default_target_source_omissions_reject",
+        "P4_line": 1772,
+        "P5_line": 1859,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_soc_extensions_and_reference_omissions_reject",
+        "P4_line": 1807,
+        "P5_line": 1895,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_secondary_controller_generator_omission_rejects",
+        "P4_line": 1846,
+        "P5_line": 1935,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_exposed_io_clock_and_cold_source_omissions_reject",
+        "P4_line": 1868,
+        "P5_line": 1958,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject",
+        "P4_line": 1936,
+        "P5_line": 2027,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_threadx_wrong_commit_or_source_identity_reject",
+        "P4_line": 1963,
+        "P5_line": 2055,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_installed_threadx_cli_does_not_write_into_readonly_sdk",
+        "P4_line": 1987,
+        "P5_line": 2079,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback",
+        "P4_line": 1998,
+        "P5_line": 2091,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_official_f4_source_notice_and_verifier_omissions_reject",
+        "P4_line": 2015,
+        "P5_line": 2109,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_official_f4_wrong_pairing_source_or_lock_reject",
+        "P4_line": 2040,
+        "P5_line": 2135,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_installed_official_f4_cli_requires_complete_sdk_and_is_read_only",
+        "P4_line": 2067,
+        "P5_line": 2163,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject",
+        "P4_line": 2106,
+        "P5_line": 2203,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject",
+        "P4_line": 2130,
+        "P5_line": 2228,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback",
+        "P4_line": 2161,
+        "P5_line": 2260,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_modern_soc_owned_firmware_omissions_reject",
+        "P4_line": 2192,
+        "P5_line": 2292,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_modern_device_source_notice_lock_omissions_reject",
+        "P4_line": 2224,
+        "P5_line": 2325,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_rehashed_modern_device_wrong_commit_changed_source_and_reduced_lock_reject",
+        "P4_line": 2250,
+        "P5_line": 2352,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_installed_modern_device_cli_is_readonly_and_requires_complete_sdk",
+        "P4_line": 2281,
+        "P5_line": 2384,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_sdk_manifest_sources_exports_and_file_set_stay_unchanged_during_verify",
+        "P4_line": 2307,
+        "P5_line": 2411,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_final_file_read_cannot_hide_a_late_change_to_an_earlier_checked_input",
+        "P4_line": 2351,
+        "P5_line": 2456,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_git_checkout_inside_sdk_cannot_bypass_whole_manifest",
+        "P4_line": 2383,
+        "P5_line": 2489,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_additional_file_and_symlink_are_rejected",
+        "P4_line": 2418,
+        "P5_line": 2525,
+        "body_AST_identical": true,
+        "private_prefix": true
+      },
+      {
+        "method": "test_default_preparation_rejects_dirty_checkout",
+        "P4_line": 2429,
+        "P5_line": 2536,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_output_parent_alias_cannot_bypass_source_boundary",
+        "P4_line": 2444,
+        "P5_line": 2551,
+        "body_AST_identical": true,
+        "private_prefix": false
+      },
+      {
+        "method": "test_clean_checkout_with_missing_dependency_gitlinks_is_rejected",
+        "P4_line": 2452,
+        "P5_line": 2559,
+        "body_AST_identical": true,
+        "private_prefix": false
+      }
+    ]
+  },
+  "pair_duplicate_delta": {
+    "path": "tools/testing/test_u575_pair_evidence.py",
+    "sha256": "3731edccec21e77d816d089eec1c500b506236a1151f11f096ed6fe75ecfc0ee",
+    "authored_unique_methods": 61,
+    "all_unique_method_body_AST_identical": true,
+    "before_actual": 70,
+    "after_actual": 61,
+    "zero_failure_skip_error": true,
+    "retired_execution_ids": 9,
+    "mapping_authority": "build/c-cold-20261028/f04-duplicate-inheritance/handoff.json#retired_duplicate_mapping",
+    "setup": "Each TestCase receives the original fresh TemporaryDirectory through a non-TestCase _PairArchiveFixture. Two concrete TestCase groups no longer inherit test methods from one another. Four unique AdditionalArchiveBounds methods remain.",
+    "corrected_prior_claim": "Nine repeats had identical callable and fixture context, not extra board/transport coverage. Original70-case reports remain historical; never rewritten to61."
+  },
+  "P5_new_tool_test_delta": {
+    "budget": "qualification-aggregate-budget/independent-review.json reads eight new method bodies and actual17-case module GREEN. Literal900+1400/default1800 durations, repeated authored plans, explicit timeout and real Popen-not-called constraints are independent of the helper under test.",
+    "tool_presence": "qualification-tool-preflight/independent-review.json binds current source and actual27-case module GREEN; authored executable/missing paths, isolated real checker marker, exit7 and --root resolution cases constrain the new boundary. Presence never preapproves analyzer execution.",
+    "legacy_compile_plan_map": "P4 map retains its old dev.py/source hashes; no new identity is forged. P5 checker-entry preflight/budget changes are covered by these delta contract reviews and raw executions. Fixed159plan file/stage identities remain their own authority."
+  },
+  "unchanged_C_mapping_association": {
+    "source_files_checked": 560,
+    "changed": [],
+    "Google_definition_rows": 4691,
+    "explicit_assertions": 28922,
+    "helpers": 1228,
+    "scope": "Only exact unchanged C source navigation is reused; P4 report is not relabeled as new execution.253 bounded manual references/4438unknown semantic review fields stay intact."
+  },
+  "ordinary_gate": {
+    "association": "build/c-cold-20261028/integration/commit-association-05.json",
+    "ordinary_hooks_bypassed": false,
+    "Python": 3479,
+    "Google_programs": 386,
+    "Google_cases": 6817,
+    "all_passed": true,
+    "formal159": "pending_new_exactP5execution"
+  },
+  "remaining_F04_original_exit_blockers": [],
+  "nonblocking_future_strengthening": [
+    {
+      "path": "os/freertos/test_m7_integer_overlay.py",
+      "scope": "Explicit msr PRIMASK restoration/barrier ordering per inline function could strengthen its existing narrow source oracle. Current production sequence was read correct; original mapped contract is retained."
+    }
+  ],
+  "inputs": [
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/f04-final-exit-review.json",
+      "bytes": 13477,
+      "sha256": "360588470832b353984160a2fde87321f9099a235e9897f32a46fd56d48efaa9"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/acceptance-reconciliation.json",
+      "bytes": 35057,
+      "sha256": "d2e8791b8cb24e2293f54b89b322784a7e4683b6ec2bbd652b38efe8737a3763"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/handoff.json",
+      "bytes": 8042,
+      "sha256": "852f61d40437b8478ce2b3b5b89d595f5311e49235fcacea470b659b234189c3"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/c-per-definition-oracle/manifest.json",
+      "bytes": 2771,
+      "sha256": "cc8b3c600402ac4fd063854ac8934d47883e00ecbc24fd38bcc4a01f7fcc2f59"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/ci-zero-inline-oracle-mapping.json",
+      "bytes": 89273,
+      "sha256": "49e050ed674df79cc2040ed0092eeb7d629586e0b6c6b4381f447186f982cbdd"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-review/remaining-python-review/handoff.json",
+      "bytes": 10452,
+      "sha256": "f4ab36e9894a89b819a22a12edebd895596598aac1b8e3eba282715cc075f9b3"
+    },
+    {
+      "path": "build/c-cold-20261028/workflow/f04-shared-seed-isolation/handoff.json",
+      "bytes": 15340,
+      "sha256": "8bc44aba636a988dee21ab73faf714ed6c7b3c2c30dc2c169a226392b1937525"
+    },
+    {
+      "path": "build/c-cold-20261028/f04-duplicate-inheritance/handoff.json",
+      "bytes": 7890,
+      "sha256": "c89eec40a057050b7640762d1addfab3375188640574e4b88794ed64ad484680"
+    },
+    {
+      "path": "build/c-cold-20261028/qualification-aggregate-budget/handoff.json",
+      "bytes": 6354,
+      "sha256": "a73995b58e3a5e88863f349f6ca9ee7cfeb0fade537452627450ee6810185c1f"
+    },
+    {
+      "path": "build/c-cold-20261028/qualification-aggregate-budget/independent-review.json",
+      "bytes": 4047,
+      "sha256": "ffd40097f4eceae1ff0195c6a3b49ef4dc52fa92d249aad1c5a5efbe6794cae1"
+    },
+    {
+      "path": "build/c-cold-20261028/qualification-tool-preflight/handoff.json",
+      "bytes": 6445,
+      "sha256": "a86659dad6575f2c03b3c967d915b12d20ad35bd075d386308816ab68ff842b2"
+    },
+    {
+      "path": "build/c-cold-20261028/qualification-tool-preflight/independent-review.json",
+      "bytes": 5436,
+      "sha256": "b25236635a5e0611f57bae49aa3520b16886c1259a19b1064eb333e07a75df3a"
+    },
+    {
+      "path": "build/c-cold-20261028/integration/commit-association-05.json",
+      "bytes": 890,
+      "sha256": "e8db54d477374d7d54ca8d9ae248c285247dc8326d3af690dce3961f4841edb5"
+    }
+  ],
+  "review_side_effects": {
+    "new_tests": 0,
+    "new_builds": 0,
+    "source_index_HEAD_edits": 0,
+    "old_reports_rewritten": false,
+    "ignored_delta_review_only": true
+  }
+}

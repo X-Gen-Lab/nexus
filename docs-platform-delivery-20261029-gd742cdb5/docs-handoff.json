@@ -1,0 +1,191 @@
+{
+  "kind": "final_frozen_source_documentation_delivery_handoff",
+  "source": {
+    "root": "/workspace/nexus",
+    "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "tree": "570f807e722649e976670f747950fe1acb61fcc7",
+    "dirty": false,
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ]
+  },
+  "source_and_git_HEAD_unchanged": true,
+  "qualification": false,
+  "physical_status": "not_executed",
+  "published": false,
+  "release_id": "0.2.0-docs-gd742cdb5a060",
+  "scope": "Fresh strict bilingual documentation delivery from exact canonicalP5; no P4 build/package is relabeled, no software-candidate qualification or physical acceptance is inherited.",
+  "current_pages": 132,
+  "language_page_records": 264,
+  "languages": [
+    "en",
+    "zh_CN"
+  ],
+  "documentation_tool_tests": {
+    "discovered": 355,
+    "executed": 355,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "documentation_package": {
+    "friendly_archive": "/workspace/nexus/build/c-cold-20261028/docs/final-d742cdb5/0.2.0-docs-gd742cdb5a060.tar.gz",
+    "archive_sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41",
+    "archive_bytes": 15289567,
+    "original_documentation_manifest_sha256": "adfb5cb64e788db0f88c0b3120a611c672c5d4e7860cff86ae589b893c822608",
+    "payload_files": 2487,
+    "all_members_verified": true,
+    "original_manifest_forced_on_archive_and_independent_restore": true,
+    "qualification_references": [],
+    "original_successful_report": "build/c-cold-20261028/docs/final-d742cdb5/package-retry-01.json",
+    "existing_store_record": "build/c-cold-20261028/docs/final-d742cdb5/package-preservation.json"
+  },
+  "raw_build_and_execution_records": {
+    "archive": {
+      "path": "/workspace/nexus/build/c-cold-20261028/docs/final-d742cdb5/raw-build-store/3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8.tar.gz",
+      "sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8",
+      "size": 17610908
+    },
+    "manifest_sha256": "9233a36d042443cebb3034e346789d2c18b43ff2c773206fd5adfed761d035af",
+    "files": 2732,
+    "bytes": 117354852,
+    "package": "build/c-cold-20261028/docs/final-d742cdb5/raw-build-package.json",
+    "verify_report": "build/c-cold-20261028/docs/final-d742cdb5/raw-build-verify.json",
+    "scope": "One retained original API/gettext/build tool workspace plus exact preflight/build/package/restore execution records, including original rejected package destination. Wrapper preservation/export receipts remain directly alongside this handoff."
+  },
+  "preserved_failed_call": {
+    "receipt": "build/c-cold-20261028/docs/final-d742cdb5/package.command.json",
+    "report": "build/c-cold-20261028/docs/final-d742cdb5/package.json",
+    "exit_code": 2,
+    "reason": "The caller first selected an ignored package output inside platform source; maintained package guard rejected source overlap before producing an artifact. Original failed report/command retained.",
+    "recovery": "Strict HTML and source identity remained successful/unchanged. A new explicit independent /dev/shm package/restore output and unique package-retry-01 report succeeded; no HTML rebuild, source/verifier change, guard weakening or failed-report overwrite."
+  },
+  "cleanup": {
+    "duplicate_cleanup": "build/c-cold-20261028/docs/final-d742cdb5/expanded-duplicate-cleanup.json",
+    "raw_cleanup": "build/c-cold-20261028/docs/final-d742cdb5/raw-expanded-cleanup.json",
+    "expanded_outputs_removed_after_verification": true,
+    "external_RAM_package_restore_root_removed": true,
+    "work_root_removed": true,
+    "raw_embedded_original_manifest_SHA_forced": true,
+    "raw_member_inventory_equal_before_removal": true,
+    "workspace_free_after_compaction_bytes": 2482651136,
+    "heavy_documentation_IO_stopped": true
+  },
+  "persistence_status": "execution_host_local_only_not_established",
+  "P4_original_documentation_package": "Preserved under docs/final-5d60b56e with original source/archive/manifest identity and existing public asset paths; untouched.",
+  "F04_P5_original_exit_review": {
+    "path": "build/c-cold-20261028/workflow/f04-review/f04-original-exit-p5-review.json",
+    "sha256": "3c20871c0a568e9741c0134dfe5df6edc5e703e72b654bea2e4578c51c213590",
+    "scope": "Original immutable-shared-setup and contract/oracle mapping exit, incorporating32private SDK prefix cases and nine retired duplicate executions; not all4438Csemantic manual proof."
+  },
+  "ordinary_P5_gate": "build/c-cold-20261028/integration/commit-association-05.json",
+  "final_software_qualification": "Pending fresh canonicalP5 complete159 and exact candidate closure; documentation references remain empty.",
+  "stages": [
+    {
+      "name": "doctor",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 1.4192521389923058,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/doctor.command.json"
+    },
+    {
+      "name": "source-check",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 12.006464810998295,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/source-check.command.json"
+    },
+    {
+      "name": "tool-tests",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 25.413633038988337,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/tool-tests.command.json"
+    },
+    {
+      "name": "strict-build",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 132.00432568899123,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/strict-build.command.json"
+    },
+    {
+      "name": "package",
+      "exit_code": 2,
+      "outcome": "completed",
+      "duration_seconds": 0.364945177003392,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/package.command.json"
+    },
+    {
+      "name": "package-retry-01",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 19.852513163990807,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/package-retry-01.command.json"
+    },
+    {
+      "name": "verify-archive",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 9.143325569995795,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/verify-archive.command.json"
+    },
+    {
+      "name": "independent-restore",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 16.97539606799546,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/independent-restore.command.json"
+    },
+    {
+      "name": "verify-restored",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 8.24207087099785,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/verify-restored.command.json"
+    },
+    {
+      "name": "package-preserve",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 0.4669861900038086,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/package-preserve.command.json"
+    },
+    {
+      "name": "package-preserve-verify",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 0.41535901799215935,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/package-preserve-verify.command.json"
+    },
+    {
+      "name": "raw-build-export",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 5.93518784600019,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/raw-build-export.command.json"
+    },
+    {
+      "name": "raw-build-verify",
+      "exit_code": 0,
+      "outcome": "completed",
+      "duration_seconds": 1.118057226005476,
+      "receipt": "build/c-cold-20261028/docs/final-d742cdb5/raw-build-verify.command.json"
+    }
+  ]
+}

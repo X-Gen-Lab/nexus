@@ -1,0 +1,79 @@
+{
+  "kind": "observed_oci_credential_path_audit",
+  "source": "/workspace/nexus/build/soc-ip-layout/delivery-environment",
+  "environment_file_sha256": "0013f6279c94ff3a6115987241644fa40e8e11ab40b4584b59dd9726483ce735",
+  "oci_manifest_sha256": "e936b188b9e30cf37ce109a5407019c91fe2dbc62fb10afceb3f2abbfc823ac8",
+  "image_config_id": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+  "layers": [
+    {
+      "ordinal": 0,
+      "sha256": "15f1c8eb1ab18eae260c7fb6296434cbe1ff0e1e30fd814ae92a80dd54005e62",
+      "bytes": 81254400,
+      "members": 3271,
+      "links": 177,
+      "member_and_link_name_sha256": "9ac5db28171e06ec9774547e68456f82c06149711ace778327974b93e7a08727"
+    },
+    {
+      "ordinal": 1,
+      "sha256": "e1fa2746ad6d51e7de9171dfcbb1fe93d01d51c5d8d3623e0c3b223076dc5d23",
+      "bytes": 4127744,
+      "members": 553,
+      "links": 305,
+      "member_and_link_name_sha256": "b854917a0651be2332e766c067bb7b857407f303e7ccf772202dafe4c6da11aa"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "b361fa3b97940ee89a1aab8fde1027e47ab2c2e700ca2f8d5988ad2c64386e5c",
+      "bytes": 38145536,
+      "members": 1828,
+      "links": 20,
+      "member_and_link_name_sha256": "5190517308e1dd0b6afa9fa247aeea8328257ee715aa10da4416e243b3edc893"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "dca2a125b4903477bcb42084172cfc98865299810620ffd617bf6e12dd83d89f",
+      "bytes": 5120,
+      "members": 8,
+      "links": 5,
+      "member_and_link_name_sha256": "3d2757fd9b675941741d7d1455183761755263cfcba7952997cdbc80a3169549"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "e9cf1283636f8b4c204227b6df3794f126592e22943f41c1b3729dcb8fbb6bc5",
+      "bytes": 358365184,
+      "members": 7569,
+      "links": 1363,
+      "member_and_link_name_sha256": "d04bddc39eed0c1ba0fd2737dbb31bd8040fb40b1f67d1cadce3861745bc68b5"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "96dd053d12cabbdd35e277fa666db1ad3c384c835a562b98f8b2cb2551552a43",
+      "bytes": 3072,
+      "members": 3,
+      "links": 0,
+      "member_and_link_name_sha256": "c905182cd17e3e3018d66d8d9a3609eb2b31f4c518ae86984d9e1f109841f7ec"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "c9488addf0784c1996f8ab2dc03cbbefc04cb2b6aae572f954a5167ec9fb540f",
+      "bytes": 79860224,
+      "members": 4508,
+      "links": 0,
+      "member_and_link_name_sha256": "a096b92e22871df8c000356562bd12a7727bc8bce45b84d61b44e332838d4d46"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "ee684e0a7d8649cb05e5420a6666781a2ece554e0ed69290eec742cdd72e6158",
+      "bytes": 1536,
+      "members": 1,
+      "links": 0,
+      "member_and_link_name_sha256": "80818f197fa6ec72708b1eda83ce9787b84aa37b7a88df9f3f14eebe58256002"
+    }
+  ],
+  "suspicious_paths": [],
+  "suspicious_count": 0,
+  "method": "uncompressed TAR header path/link-target inspection only; no extracted member payloads; no config Env values read; no URL scanning",
+  "scope": "credential path preflight, not proof that arbitrary file content is secret-free",
+  "status": "passed",
+  "timestamp_utc": "2026-10-29T06:10:15Z"
+}

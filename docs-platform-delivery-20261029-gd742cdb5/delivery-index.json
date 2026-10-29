@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "kind": "existing_delivery_artifact_navigation",
+  "batch": "completed_P5_docs_examples_ordinary_SourceSDK_and_observed_OCI_only",
+  "platform": {
+    "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "tree": "570f807e722649e976670f747950fe1acb61fcc7"
+  },
+  "examples": {
+    "commit": "6f09ae5539d58161acdab944767e8067895ad9bb",
+    "tree": "1616b4faa55c2f63cc4eaac62b1b6dc23c790b84",
+    "platform_gitlink": "d742cdb5a0606bd4be22e14eff0738df3ba07549"
+  },
+  "storage_parent": "5fd10744da5416169c879147f47c7902916ef8ca",
+  "archives": [
+    {
+      "role": "strict_bilingual_documentation",
+      "original_package": "documentation.tar.gz.package.json",
+      "archive": {
+        "path": "documentation.tar.gz",
+        "bytes": 15289567,
+        "sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41"
+      },
+      "parts": [
+        {
+          "path": "documentation.tar.gz",
+          "bytes": 15289567,
+          "sha256": "e10f51ff99e4fb03eea3814e92f00acf436d7d41e0728840b702f9e24ab13b41"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 86043186,
+      "files": 2489
+    },
+    {
+      "role": "actual_strict_docs_build_and_execution",
+      "original_package": "documentation-raw.tar.gz.package.json",
+      "archive": {
+        "path": "documentation-raw.tar.gz",
+        "bytes": 17610908,
+        "sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8"
+      },
+      "parts": [
+        {
+          "path": "documentation-raw.tar.gz",
+          "bytes": 17610908,
+          "sha256": "3d803fdf6377423e0f3c623682158287ffd4c2a4cbf4de4d02876d1cb24ec0f8"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 117354852,
+      "files": 2732
+    },
+    {
+      "role": "complete_examples_scope_all_starters_and_onboarding",
+      "original_package": "examples.tar.gz.package.json",
+      "archive": {
+        "path": "examples.tar.gz",
+        "bytes": 53998408,
+        "sha256": "5600a925eb7b76047039f58b3294f6b18415a0b36379494181c12a6540699c76"
+      },
+      "parts": [
+        {
+          "path": "examples.tar.gz.part0000",
+          "bytes": 33554432,
+          "sha256": "8661384e80772da26e61a22b67ee742a12b1efe300469af5a3a6bdb922ff0ec2"
+        },
+        {
+          "path": "examples.tar.gz.part0001",
+          "bytes": 20443976,
+          "sha256": "13ead53bcf103066117d67d39a47fe455fe339c0852c4b077ecca3254459e322"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 296926445,
+      "files": 8026
+    },
+    {
+      "role": "actual_external_created_product",
+      "original_package": "created-product.tar.gz.package.json",
+      "archive": {
+        "path": "created-product.tar.gz",
+        "bytes": 3603912,
+        "sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7"
+      },
+      "parts": [
+        {
+          "path": "created-product.tar.gz",
+          "bytes": 3603912,
+          "sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 20136902,
+      "files": 154
+    },
+    {
+      "role": "actual_ordinary_hook_gate_and_same_tree_canonical_association",
+      "original_package": "ordinary-p5.tar.gz.package.json",
+      "archive": {
+        "path": "ordinary-p5.tar.gz",
+        "bytes": 1831869,
+        "sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661"
+      },
+      "parts": [
+        {
+          "path": "ordinary-p5.tar.gz",
+          "bytes": 1831869,
+          "sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 22579911,
+      "files": 3537
+    },
+    {
+      "role": "observed_generic_OCI_layout_bytes_only",
+      "original_package": "observed-oci.tar.gz.package.json",
+      "archive": {
+        "path": "observed-oci.tar.gz",
+        "bytes": 196758793,
+        "sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443"
+      },
+      "parts": [
+        {
+          "path": "observed-oci.tar.gz.part0000",
+          "bytes": 33554432,
+          "sha256": "d6614521b05cedb54bd096974e40817f15133b026f5e22007fe4654fed962582"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0001",
+          "bytes": 33554432,
+          "sha256": "8a3addc955855a9e6132edc767736df1b08e8562d2e30257e0f2d5bb4fec9a55"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0002",
+          "bytes": 33554432,
+          "sha256": "09bff5c2343ea95d737d7d4db8b2a7c09970e6dd33ecdfd870fc05d25aabf83e"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0003",
+          "bytes": 33554432,
+          "sha256": "51d397b4a5fc6d09eb5ae433651f3f595f9ad282f07162304df48a915ccf9818"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0004",
+          "bytes": 33554432,
+          "sha256": "06da664b4ef9831ac248fbd09632f817dd4244fe55c61bc59de575df8fbf9264"
+        },
+        {
+          "path": "observed-oci.tar.gz.part0005",
+          "bytes": 28986633,
+          "sha256": "51e09a3c61db6c38ffcf417bf79b07b89dc329fbe0cb5309edae0649df4ef236"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 561772790,
+      "files": 13
+    },
+    {
+      "role": "fresh_P5_example_produced_verified_SourceSDK_not_formal50_claim",
+      "original_package": "source-sdk.tar.gz.package.json",
+      "archive": {
+        "path": "source-sdk.tar.gz",
+        "bytes": 10690212,
+        "sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5"
+      },
+      "parts": [
+        {
+          "path": "source-sdk.tar.gz",
+          "bytes": 10690212,
+          "sha256": "3323308d6f78d9c0e8262e8814bc3367dc68c715529755349dba3ed97019b2f5"
+        }
+      ],
+      "original_envelope_unchanged": true,
+      "expanded_bytes": 75548852,
+      "files": 3011
+    }
+  ],
+  "source_change_paths": [
+    {
+      "path": "tests/contracts/test_source_sdk.py",
+      "sha256": "59daa4b307538548864a662b4640aaf16673e5c807cd2af45b7fd37f6338e459"
+    },
+    {
+      "path": "tools/dev/README.md",
+      "sha256": "6f3f13af05ac2c249e5714701f4c45ece940c44f358028e577e96d27b2937c44"
+    },
+    {
+      "path": "tools/dev/dev.py",
+      "sha256": "8b0e69edf7bc45d20997492f4e14ea5938b1743ee0316ae8073d78d05a3995f9"
+    },
+    {
+      "path": "tools/dev/qualification.py",
+      "sha256": "213fff79f9cb5158b308ca80f866a374a3a14a5ced20db7d24ec912aaa2953ff"
+    },
+    {
+      "path": "tools/testing/test_dev.py",
+      "sha256": "71cc1be55a4d2c6d33600469d1a785cad9522deb75302555b66b3b5df3b8fc85"
+    },
+    {
+      "path": "tools/testing/test_qualification_plan.py",
+      "sha256": "1a78b46dd9150f4d1badab7ddf74251d8b07b7641ba8d0bc96b5877ff1297001"
+    },
+    {
+      "path": "tools/testing/test_u575_pair_evidence.py",
+      "sha256": "3731edccec21e77d816d089eec1c500b506236a1151f11f096ed6fe75ecfc0ee"
+    }
+  ],
+  "source_change_archive": {
+    "path": "p5-seven-source-paths.tar.gz",
+    "sha256": "56568b442211eb637a88a2ba98c98e38c547bbbb5c665896d1d59a26f21c9bb0",
+    "bytes": 59310
+  },
+  "verifiers": {
+    "archive": {
+      "path": "verification-tools-gd742cdb5.tar.gz",
+      "bytes": 28064,
+      "sha256": "67dad17ab95ba0964f5b9872052563b4be9158115196579c2ac5cdac80f8d0b0"
+    },
+    "source_commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "source_files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1085,
+        "sha256": "b7152bd37691794b676615577f8c2b292288fa0691159c1e04f129e07f322913"
+      },
+      {
+        "path": "tools/evidence/store.py",
+        "bytes": 20496,
+        "sha256": "e3a9bde01dae28c3524daf9203a1512a66f317a99a62a7a0acf22e43a3013d7d"
+      },
+      {
+        "path": "tools/evidence/common.py",
+        "bytes": 11352,
+        "sha256": "6a59439c062078561e9b2110625ecec3e845b37e6bcce2a4261d318f1ce7b1ff"
+      },
+      {
+        "path": "tools/evidence/identity.py",
+        "bytes": 9258,
+        "sha256": "2598859d2e52aee4f36467365f1ef36302d667f00923d0534a53b68308b4c991"
+      },
+      {
+        "path": "tools/evidence/container.py",
+        "bytes": 9850,
+        "sha256": "b4137d4abe98683d0d410e0a6038fbf82f6aafbd10f5360d1dad89762b83495e"
+      },
+      {
+        "path": "tools/configure/metadata.py",
+        "bytes": 5036,
+        "sha256": "7ec12432a54dbc98d5ef833b93fabe754c1f6eab0ec4b25c9e407986c1d2e193"
+      },
+      {
+        "path": "tools/documentation/delivery.py",
+        "bytes": 56909,
+        "sha256": "af7fb50390cb6588b0191f1e54db096ec5bd26479fb7a812485e81911aae9736"
+      }
+    ]
+  },
+  "docs": {
+    "languages": [
+      "en",
+      "zh_CN"
+    ],
+    "pages": 132,
+    "language_page_records": 264,
+    "tool_tests": 355,
+    "manifest_sha256": "adfb5cb64e788db0f88c0b3120a611c672c5d4e7860cff86ae589b893c822608",
+    "qualification_references": []
+  },
+  "examples_actual": {
+    "commands": 104,
+    "presets": 17,
+    "standalones": 9,
+    "ARM_images": 41,
+    "starters": 4,
+    "external_actual_create_build_run": "passed"
+  },
+  "ordinary_gate": {
+    "python": 3479,
+    "google_programs": 386,
+    "google_cases": 6817,
+    "IO_properties": 203,
+    "association": "ordinary-commit-association.json"
+  },
+  "F04_original_exit": {
+    "review": "f04-original-exit-p5-review.json",
+    "status": "passed_at_declared_mapping_and_immutable_setup_scope",
+    "automapped_C_independence_unknown": 4438,
+    "all_cases_manually_proven_independent": false
+  },
+  "source_sdk": {
+    "producer": "fresh_P5_examples_scope_all",
+    "snapshot_sha256": "e5c61279ab574156f7f7b2c6e46821d705d2364d87a3dd634741a0e2d72a3d0c",
+    "source_revision": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+    "formal_all50_consumers": "pending_fresh_P5_formal_stage88"
+  },
+  "full_159_stage_execution": "pending_separate_final_result",
+  "eight_final_candidates": "pending_separate_seals",
+  "qualification": false,
+  "physical_status": "not_executed",
+  "observed_OCI": {
+    "archive_role": "observed_generic_OCI_layout_bytes_only",
+    "image_config_id": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+    "recipe_independently_reconstructed": false,
+    "fresh_daemon_load": "not_executed",
+    "runtime_verification_during_retention": false
+  },
+  "official_release": "not_published",
+  "rendered_site_deployment": "not_established_by_Git_asset_retention",
+  "scope": "Original archive/envelope bytes and source identities preserved. This is artifact navigation, not a replacement task or qualification authority. Existing P4 members keep their original identity; none is relabelled as P5. Later final results append separate final-index files."
+}

@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/c-cold-20261028/final-software-execution/ordinary-p5-store/3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661.tar.gz",
+    "sha256": "3bd1b56d9a562beae21994c3f87f6e30db73932cae4bafb85758b471239d1661",
+    "size": 1831869
+  },
+  "bytes": 22579911,
+  "files": 3537,
+  "kind": "portable_evidence",
+  "manifest_sha256": "7c511186a35e535e3676e20b2999a1434fa33d250fc1fafd57c2ae1523ccbe4c",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "observed_oci_portable_retention",
+  "status": "verified_local_bytes",
+  "source_layout": "/workspace/nexus/build/soc-ip-layout/delivery-environment",
+  "environment_file_sha256": "0013f6279c94ff3a6115987241644fa40e8e11ab40b4584b59dd9726483ce735",
+  "oci_manifest_sha256": "e936b188b9e30cf37ce109a5407019c91fe2dbc62fb10afceb3f2abbfc823ac8",
+  "image_config_id": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+  "rootfs_layers": [
+    "sha256:15f1c8eb1ab18eae260c7fb6296434cbe1ff0e1e30fd814ae92a80dd54005e62",
+    "sha256:e1fa2746ad6d51e7de9171dfcbb1fe93d01d51c5d8d3623e0c3b223076dc5d23",
+    "sha256:b361fa3b97940ee89a1aab8fde1027e47ab2c2e700ca2f8d5988ad2c64386e5c",
+    "sha256:dca2a125b4903477bcb42084172cfc98865299810620ffd617bf6e12dd83d89f",
+    "sha256:e9cf1283636f8b4c204227b6df3794f126592e22943f41c1b3729dcb8fbb6bc5",
+    "sha256:96dd053d12cabbdd35e277fa666db1ad3c384c835a562b98f8b2cb2551552a43",
+    "sha256:c9488addf0784c1996f8ab2dc03cbbefc04cb2b6aae572f954a5167ec9fb540f",
+    "sha256:ee684e0a7d8649cb05e5420a6666781a2ece554e0ed69290eec742cdd72e6158"
+  ],
+  "portable_package": {
+    "package": "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.json",
+    "archive": "store/d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443.tar.gz",
+    "archive_sha256": "d545a24eaaab85d07a7b3be19b7069b7c1236525b38c614102af20518188e443",
+    "archive_bytes": 196758793,
+    "manifest_sha256": "eef07324e796d054fc292efc1d27424dc80b2b7da711d5cb0d026341fe001473",
+    "files": 13,
+    "bytes": 561772790
+  },
+  "layer_path_audit": "layer-path-audit.json",
+  "operations": "operations.jsonl",
+  "checks": {
+    "original_container_verify_runtime_false": true,
+    "store_export": true,
+    "store_verify": true,
+    "independent_restore": true,
+    "restored_container_verify_runtime_false": true,
+    "restored_environment_lock_exact_equal": true,
+    "original_environment_lock_unchanged": true
+  },
+  "scope": "observed OCI layout byte preservation only; not recipe reconstruction, not fresh daemon/docker load, not whole-host CI image, not an external publication",
+  "recipe_reproducible": false,
+  "runtime_load_executed": false,
+  "external_retention_executed": false,
+  "timestamp_utc": "2026-10-29T06:12:48Z",
+  "elapsed_seconds": 107.853
+}

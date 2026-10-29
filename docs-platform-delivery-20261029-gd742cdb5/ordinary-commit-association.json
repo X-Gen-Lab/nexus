@@ -1,0 +1,20 @@
+{
+  "kind": "ordinary_local_to_canonical_commit_association",
+  "local_validated_commit": "3ddeeea1d6e6cd67a42ecc65e800c3b4b5c5e6cf",
+  "canonical_commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+  "same_tree": "570f807e722649e976670f747950fe1acb61fcc7",
+  "same_parent": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+  "normal_commit_receipt": "build/c-cold-20261028/integration/commit-attempt-05-01.command.json",
+  "source_files": [
+    "tests/contracts/test_source_sdk.py",
+    "tools/dev/README.md",
+    "tools/dev/dev.py",
+    "tools/dev/qualification.py",
+    "tools/testing/test_dev.py",
+    "tools/testing/test_qualification_plan.py",
+    "tools/testing/test_u575_pair_evidence.py"
+  ],
+  "ordinary_hooks_bypassed": false,
+  "full_clean_source_qualification": "pending fresh canonical P5 full159; P4 records not relabelled",
+  "created_utc": "2026-10-29T06:34:06.662749+00:00"
+}

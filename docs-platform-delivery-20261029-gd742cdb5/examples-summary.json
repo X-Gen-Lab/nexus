@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "kind": "external_examples_final_delivery_summary",
+  "status": "software_scope_passed",
+  "examples_commit": "6f09ae5539d58161acdab944767e8067895ad9bb",
+  "examples_tree": "1616b4faa55c2f63cc4eaac62b1b6dc23c790b84",
+  "platform_commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+  "platform_tree": "570f807e722649e976670f747950fe1acb61fcc7",
+  "branch": "delivery/final-platform-cold-c-20261028",
+  "pull_request": "https://github.com/X-Gen-Lab/nexus-examples/pull/18",
+  "source_worktree_clean": true,
+  "source_paths_changed_in_this_pin": 2,
+  "normal_commit": {
+    "argv": [
+      "git",
+      "commit",
+      "-m",
+      "chore(sdk): pin final platform workflow and test isolation"
+    ],
+    "exit_code": 0,
+    "started_ns": 1793256055401665364,
+    "ended_ns": 1793256079774488071,
+    "removed_environment_names": [
+      "GIT_PAGER"
+    ],
+    "bypass": false,
+    "commit": "6f09ae5539d58161acdab944767e8067895ad9bb",
+    "tree": "1616b4faa55c2f63cc4eaac62b1b6dc23c790b84",
+    "parent": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "subject": "chore(sdk): pin final platform workflow and test isolation"
+  },
+  "nonforce_atomic_git_sync": {
+    "expected_old": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "new_commit": "6f09ae5539d58161acdab944767e8067895ad9bb",
+    "branch": "delivery/final-platform-cold-c-20261028",
+    "new_parent": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "nonforce": true,
+    "atomic_push": true,
+    "normal_commit_sha_preserved": true,
+    "remote_after_verified": true,
+    "tree": "1616b4faa55c2f63cc4eaac62b1b6dc23c790b84"
+  },
+  "builtin_scopeall": {
+    "report": "/dev/shm/nexus-examples-final/build/p5-d742cdb5/local-ci/execution.json",
+    "status": "passed",
+    "complete_matrix": true,
+    "commands": 104,
+    "all_commands_exit_zero": true,
+    "parallel": 1,
+    "elapsed_seconds": 137.616159669,
+    "presets": 17,
+    "arm_presets": [
+      "stm32-qiming-baremetal",
+      "stm32-qiming-freertos",
+      "stm32-sky-baremetal",
+      "stm32-sky-freertos",
+      "gd32-liangshan-baremetal",
+      "gd32-liangshan-freertos",
+      "stm32-h743-nucleo-baremetal",
+      "stm32-h743-nucleo-freertos",
+      "stm32-u575-nucleo-baremetal",
+      "stm32-u575-nucleo-freertos",
+      "stm32-f103-reference-baremetal",
+      "stm32-f103-reference-freertos",
+      "gd32-f303-reference-baremetal",
+      "gd32-f303-reference-freertos",
+      "stm32-g474-reference-baremetal",
+      "stm32-g474-reference-freertos"
+    ],
+    "standalone_projects": 9,
+    "arm_elf_budgets_passed": 41,
+    "native_ctest": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 16,
+      "report_sha256": "60dae2175dab1bc9dae44b780cbd5cf7c07fa955814a3330d8b3e7060073dda4"
+    },
+    "google_aggregate": {
+      "tests": 76,
+      "passed": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "programs": 7
+    },
+    "installed_native_ctest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1,
+      "cases": [
+        {
+          "name": "installed_platform_reference",
+          "classname": "installed_platform_reference",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "1bc77cfbc690a97c9a4012a0b39460308219ce8d83020efc103df5a1f636e03b"
+    },
+    "owned_style": {
+      "status": "passed",
+      "files_checked": 239
+    }
+  },
+  "four_starters": {
+    "qiming": "scopeall stm32-qiming-baremetal-nexus_starter",
+    "sky": "scopeall stm32-sky-baremetal-nexus_starter",
+    "liangshan": "scopeall gd32-liangshan-baremetal-nexus_starter",
+    "native": "actual dev.py create native template copied from E5, installed SDK configure/build and fresh starter_application passed; no redundant direct build"
+  },
+  "external_user_onboarding": {
+    "report": "/dev/shm/nexus-examples-final/build/p5-d742cdb5/user-onboarding/execution.json",
+    "status": "passed",
+    "commands": 7,
+    "origin_examples_commit": "6f09ae5539d58161acdab944767e8067895ad9bb",
+    "origin_expected_platform": {
+      "commit": "d742cdb5a0606bd4be22e14eff0738df3ba07549",
+      "tree": "570f807e722649e976670f747950fe1acb61fcc7"
+    },
+    "cases_passed": 1,
+    "has_spaces_in_source_and_build_path": true,
+    "actual_output": "Nexus starter: transfer settled; platform stopped",
+    "sdk_before_after_verified": true
+  },
+  "source_sdk": {
+    "prefix": "/dev/shm/nexus-examples-final/build/p5-d742cdb5/local-ci/source-sdk",
+    "snapshot_sha256": "e5c61279ab574156f7f7b2c6e46821d705d2364d87a3dd634741a0e2d72a3d0c",
+    "source_payload_files": 3008,
+    "package_files": 2,
+    "publishable": true,
+    "source_dirty": false
+  },
+  "physical_hil": "not_executed",
+  "limitations": [
+    "Superseded P4/E4 records retain their original identities and do not qualify P5.",
+    "Software execution and linkage do not establish physical MCU behavior.",
+    "Independent offline reproduction, full formal platform plan, Pages and formal Release are separate exits."
+  ]
+}
