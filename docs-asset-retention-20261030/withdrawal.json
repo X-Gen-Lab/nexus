@@ -1,0 +1,130 @@
+{
+  "kind": "historical_example_assets_branch_tip_withdrawal",
+  "previous_public_commit": "ecb86832fced0192d620b9029ff2d54795fc6430",
+  "ordinary_commit_no_history_rewrite": true,
+  "old_commits_and_existing_copies_may_remain_accessible": true,
+  "withdrawn_original_members": [
+    {
+      "bytes": 44238,
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation-manifest.json",
+      "sha256": "a6858f504ebcad57ae244a1923d08abb9610334bf53029a2f5600153b45c41c1"
+    },
+    {
+      "bytes": 3712,
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation-receipt.json",
+      "sha256": "cccd3e28c0fac78355878b0207dfd2b23b87bab76f92f75121aa8f9c1eaa6ffc"
+    },
+    {
+      "bytes": 18242646,
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation.tar.gz",
+      "sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e"
+    },
+    {
+      "bytes": 8674,
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-delivery-final.json",
+      "sha256": "37daa9d328ef6d386eff5b61ad58dfe4f4c10fc8d4879be4309c0490a5f68ebb"
+    },
+    {
+      "bytes": 11132,
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence-manifest.json",
+      "sha256": "d530b9ce8484428f88dc7d1e13293913d979dec161afebed85992080f82b707a"
+    },
+    {
+      "bytes": 2163380,
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence.tar.gz",
+      "sha256": "3a6e286f3ccfd2dbbfb18ecf63871ebf3d71ae046db7b06f64925ef2f6156d3e"
+    },
+    {
+      "bytes": 11288,
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence-manifest.json",
+      "sha256": "b31a1500f6e135682ce7bdee668b9cdcd62bdea209ae03a649e0e23420f2a786"
+    },
+    {
+      "bytes": 2172960,
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence.tar.gz",
+      "sha256": "370afb8a8766101623201506a064e0ad792d38123c1b9b6c8d46bc521f5494e3"
+    },
+    {
+      "bytes": 513,
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build-package.json",
+      "sha256": "ae1ef1d17e68ec0cb64f428cfdf653829115195c204b089e63c494b5a69c5c84"
+    },
+    {
+      "bytes": 33554432,
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build.tar.gz.part0000",
+      "sha256": "f3f9619a68f8de4126a234d59378cf68278a4f202e04df59fe147a938449210a"
+    },
+    {
+      "bytes": 26554040,
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build.tar.gz.part0001",
+      "sha256": "49bfa501b3486625483b0432fc60da38b621a90157ec71f3745ca77a2336e72c"
+    },
+    {
+      "bytes": 1740,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-handoff.json",
+      "sha256": "f6ef8d265dccd57fa667d2ceb936176731d65c02738e6c298013f892a02a638c"
+    },
+    {
+      "bytes": 3525,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-index.json",
+      "sha256": "c6bec4679ac01ae75622dd23c11303424c3412457314c28821ed852485be39bc"
+    },
+    {
+      "bytes": 5047,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples-summary.json",
+      "sha256": "19776741d50194c2bb6a87e5ba5b079a5b3e25bb60dfe74330784c4dcb4e441c"
+    },
+    {
+      "bytes": 510,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.package.json",
+      "sha256": "cba3078047f0a84038d560133caae8b08dda991062865ab8f8c0db3647bad6fb"
+    },
+    {
+      "bytes": 33554432,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.part0000",
+      "sha256": "8661384e80772da26e61a22b67ee742a12b1efe300469af5a3a6bdb922ff0ec2"
+    },
+    {
+      "bytes": 20443976,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/examples.tar.gz.part0001",
+      "sha256": "13ead53bcf103066117d67d39a47fe455fe339c0852c4b077ecca3254459e322"
+    },
+    {
+      "bytes": 510,
+      "path": "docs-platform-delivery-20261029-g5d60b56e/user-product-package.json",
+      "sha256": "fa2f928fcdc9b9f7ec5e207f8fbf92525fe1b766f2318c7dfd34325d19dea337"
+    },
+    {
+      "bytes": 3605719,
+      "path": "docs-platform-delivery-20261029-g5d60b56e/user-product.tar.gz",
+      "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e"
+    },
+    {
+      "bytes": 507,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/created-product.tar.gz.package.json",
+      "sha256": "98abcdf4090d4a5aa04744d491d229f0b444ad193614980900e7a02a671b904f"
+    },
+    {
+      "bytes": 3603912,
+      "path": "docs-platform-delivery-20261029-gd742cdb5/created-product.tar.gz",
+      "sha256": "69cc8f22bbae15d8b0107ac06a550172f0ef9cdb537715deea08b43df9508cf7"
+    }
+  ],
+  "withdrawn_original_bytes": 143986893,
+  "private_preservation": {
+    "repository": "X-Gen-Lab/nexus-examples",
+    "visibility": "private",
+    "commit": "8aa825c7d2cd8f58f4fa84869f16700aea400783",
+    "index": "https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json",
+    "authenticated_exact_commit_readback_completed": true
+  },
+  "unrelated_original_platform_members_unchanged": 490,
+  "current_platform_proof_preserved": {
+    "commit": "ecb86832fced0192d620b9029ff2d54795fc6430",
+    "path": "docs-platform-delivery-20261029-g7590b2d4/public-recovery-proof.json",
+    "sha256": "a3ee8a89cd17b64ddb45a04bfdd5351ab174b2b066a2a024e26af1fee2269008"
+  },
+  "frozen_old_platform_indexes_not_rewritten": true,
+  "private_archive_audit_included": false,
+  "qualification_renewed": false
+}
