@@ -113,12 +113,18 @@ so edits trigger reconfiguration and remain in the Source SDK closure.
 
 `tools/configure/contracts.py` owns immutable controller-category fields, factory
 kind order and public header mappings. Authoring, selection and factory consume
-that same metadata; exact SoC capabilities remain in the family contract. Memory
-budgets, Flash layout and source dependencies have frozen named stage results.
-One frozen device-graph result completes controller, endpoint, USB FIFO, SPI face,
-ADC trigger, resource and DMA decisions before final assembly. Its local
-validation builders may still use dictionaries; the stage boundary does not
-claim that every normalizer is a separate typed stage.
+that same metadata; exact SoC capabilities remain in the family contract. Reviewed
+fact selection, memory budgets, Flash layout and source dependencies have frozen
+named stage results. One frozen device-graph result completes controller,
+endpoint, USB FIFO, SPI face, ADC trigger, resource and DMA decisions before final
+assembly. Its local validation builders may still use dictionaries; the stage
+boundary does not claim that every normalizer is a separate typed stage.
+
+`_FactResolution` views the selected readonly SoC variant for the exact Board part;
+it does not store a second part or variant decision. Common field validators consume
+`Mapping` and explicit `list`/`tuple` containers directly; JSON input retains the
+same strict field, type and domain checks. Providers consume those immutable
+containers directly.
 
 ## Keep facts and admission policy distinct
 

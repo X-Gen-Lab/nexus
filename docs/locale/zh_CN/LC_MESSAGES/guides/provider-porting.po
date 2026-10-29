@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c342c7d2c0b54856152859772972d99cfec8b846f3a2f37a8ec923ed141e6b7b\n"
+"X-Nexus-Source-SHA256: a97f49c25984cc1277ff0257f45f8c0d87a03db68a931e88a9ff8383d1377ba8\n"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:9
 msgid "Add a SoC, provider or reusable component"
@@ -328,23 +328,35 @@ msgid ""
 "`tools/configure/contracts.py` owns immutable controller-category fields, "
 "factory kind order and public header mappings. Authoring, selection and "
 "factory consume that same metadata; exact SoC capabilities remain in the "
-"family contract. Memory budgets, Flash layout and source dependencies have "
-"frozen named stage results. One frozen device-graph result completes "
-"controller, endpoint, USB FIFO, SPI face, ADC trigger, resource and DMA "
-"decisions before final assembly. Its local validation builders may still use"
-" dictionaries; the stage boundary does not claim that every normalizer is a "
-"separate typed stage."
+"family contract. Reviewed fact selection, memory budgets, Flash layout and "
+"source dependencies have frozen named stage results. One frozen device-graph"
+" result completes controller, endpoint, USB FIFO, SPI face, ADC trigger, "
+"resource and DMA decisions before final assembly. Its local validation "
+"builders may still use dictionaries; the stage boundary does not claim that "
+"every normalizer is a separate typed stage."
 msgstr ""
 "`tools/configure/contracts.py` 负责不可变的控制器类别字段、factory 类别顺序和公共头文件映射。编写、选择与 "
-"factory 消费同一份元数据；精确 SoC 能力仍归家族合同负责。内存预算、Flash "
+"factory 消费同一份元数据；精确 SoC 能力仍归家族合同负责。已审查的事实选择、内存预算、Flash "
 "布局和源码依赖具有冻结的具名阶段结果。一个冻结的设备图结果在最终装配之前完成控制器、端点、USB FIFO、SPI face、ADC "
 "trigger、资源和 DMA 决策。它的局部校验构建过程仍可使用字典；这个阶段边界不代表每个 normalizer 都已拆成独立的类型化阶段。"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:123
+msgid ""
+"`_FactResolution` views the selected readonly SoC variant for the exact "
+"Board part; it does not store a second part or variant decision. Common "
+"field validators consume `Mapping` and explicit `list`/`tuple` containers "
+"directly; JSON input retains the same strict field, type and domain checks. "
+"Providers consume those immutable containers directly."
+msgstr ""
+"`_FactResolution` 按 Board 的完整料号引用该 SoC 中选定的只读 variant 视图；不另存一份料号或 variant "
+"决策。公共字段校验器直接接收 `Mapping` 和明确的 `list`／`tuple` 容器；JSON "
+"输入保持相同的严格字段、类型及取值域检查。Provider 直接消费这些不可变容器。"
+
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:129
 msgid "Keep facts and admission policy distinct"
 msgstr "区分事实与准入策略"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:125
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:131
 msgid ""
 "The exact `soc.json` variant supplies physical Flash origin, size, erase "
 "blocks and RAM domains. Each family's `contract.PARTS` explicitly admits its"
@@ -357,7 +369,7 @@ msgstr ""
 "通过冻结的 `PartPolicy` 显式准入完整料号：封装与可选内存域 allowlist "
 "是软件策略，不是重复的容量表。未知料号、不同封装或与物理事实不一致的可选域均拒绝。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:131
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:137
 msgid ""
 "Validation covers every maintained variant in the fact package, including "
 "parts not selected by the current assembly. Each variant uses the same "
@@ -368,7 +380,7 @@ msgstr ""
 "校验覆盖事实包中的每个维护变体，包括当前装配未选中的料号。每个变体采用相同的封装、Flash 几何、内存重叠、DMA 可达性和 `PartPolicy`"
 " 检查。选择过程返回已有的所选事实；不会修复错误的未选料号，也不会复制另一料号的几何。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:137
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:143
 msgid ""
 "Trace an added part or mode through these maintained inputs before adding "
 "its constructor:"
@@ -470,7 +482,7 @@ msgid ""
 "runtime failure checks"
 msgstr "消费已校验数值，并保留独立 SDK／寄存器断言与运行时失败检查"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:152
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:158
 msgid ""
 "F407 Flash generation illustrates the boundary: its selected sector array "
 "and readonly geometry come from validated `result.flash.erase_blocks`, "
@@ -483,7 +495,7 @@ msgstr ""
 "`result.flash.erase_blocks`、起始地址和大小。C SDK "
 "断言仍核对物理基址，独立寄存器模型测试保留参考几何。删除重复生产表不会让配置取代硬件校验。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:158
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:164
 msgid ""
 "All seven maintained MCU families obtain generated readonly Flash geometry "
 "from the validated facts through `memory.flash_geometry`. Six retain their "
@@ -495,7 +507,7 @@ msgstr ""
 "geometry。六个家族保留既有全局 geometry symbol；F407 生成所选静态 geometry。Native "
 "仍是主机模型。精确源码与独立维护的测试 oracle 仍须执行适用的 provider 和最终链接映像检查。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:164
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:170
 msgid ""
 "`ConfigurationIR.physical_part` views the existing frozen Flash and memory "
 "objects. `ControllerIR.integration` composes canonical `ResourcePlanIR` "
@@ -516,7 +528,7 @@ msgstr ""
 "`clock_plan`。固定且经过审查的 SDK 地址、掩码与 Native 模型事实仍是显式叶子数据；它们不独立选择路由、owner "
 "或时钟。维护中构造器的消费审计检查这些选定记录与能力投影；它不引入新的路由 resolver，也不建立最终集成资格。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:175
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:181
 msgid ""
 "Family policy hooks remain declared configuration inputs. H743's reviewed "
 "clock domain relationships and selected Flash linker fragments live in its "
@@ -527,7 +539,7 @@ msgstr ""
 "家族策略 hook 仍是声明的配置输入。H743 经复核的时钟域关系与所选 Flash linker fragment 位于其 `configure/`"
 " 包；通用工具仍拥有解析、typed IR、资源仲裁与原子发布。hook 不得创建第二份源码图，也不得静默选择不同料号、路由或 profile。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:181
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:187
 msgid ""
 "The paired F407/GD470 controller bindings, DMA vector maps and concrete "
 "secondary controller hooks live with their SoC. Common code keeps resource "
@@ -542,7 +554,7 @@ msgstr ""
 "personality 与命名引脚状态同样要求显式 provider 策略。跨 Board／backend 资格仍属于既有 OS "
 "合同；搬移家族机制不会扩大已准入组合。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:188
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:194
 msgid ""
 "The read-only [work-package view](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/README.md) "
@@ -554,11 +566,11 @@ msgstr ""
 "SOURCE/tools/maintenance/README.md)将精确维护模式关联到 resolver 夹具、所选 ops "
 "源码与已审生命周期性质。视图条目用于导航，不是已执行测试或新增支持声明。实际适用门禁需要另行运行。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:193
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:199
 msgid "Keep hardware behavior in C"
 msgstr "硬件行为使用 C 实现"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:195
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:201
 msgid ""
 "Firmware mechanisms use C11, with necessary assembly for startup and CPU "
 "context. Python runs on the development host: it validates authored inputs, "
@@ -569,7 +581,7 @@ msgstr ""
 "固件机制使用 C11，启动和 CPU 上下文等位置保留必要的汇编。Python 在开发主机上运行：校验手写输入、解析资源，生成静态 C/H "
 "声明、实例、typed factory getter、固定 IRQ 入口连接及明确的类型化调用。MCU 执行编译后的固件，不包含 Python 解释器。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:201
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:207
 msgid ""
 "Maintain register reads and writes, hardware admission, waits, "
 "pin/clock/IRQ/DMA acquisition, rollback, stop and recovery in concrete C "
@@ -585,7 +597,7 @@ msgstr ""
 "handler。不得将这些算法搬进运行时动作解释器，也不得增加 registry、隐藏 worker 或强制锁。通过硬件端口使用 "
 "GoogleTest/GoogleMock 测试生产 C 算法；Python unittest 验证配置和静态连接。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:209
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:215
 msgid ""
 "The reviewed Native and seven MCU-family increments include their maintained"
 " cold paths. Shared enhanced-SPI admission uses read-only C checks before "
@@ -604,7 +616,7 @@ msgstr ""
 "不能证明整个家族或全源码已经完成。精确实现与执行范围继续记录在{download}`交付完善台账 <../design/platform-"
 "delivery-completion.csv>`中。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:219
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:225
 msgid ""
 "Write readonly mode-specific configuration and exactly sized mutable "
 "storage. The C prepare function validates context and foreign ownership "
@@ -620,7 +632,7 @@ msgstr ""
 "provider 前验证自身收据。空收据必须保持未取得的状态不变。部分准备后，close 必须保留每个尚未完成的引脚、时钟、IRQ 或 DMA "
 "权利，直到读回证明已经归还。既要测试外来空收据，也要测试真实的部分取得收据；还要测试调用者已停止公开外设后的清理。避免重复的持久引脚快照或容纳所有模式最大状态的联合体。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:228
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:234
 msgid ""
 "Keep schema fields and numerical policy in host validation. Keep runtime "
 "MMIO reads, clock checks, publisher joins, waits and recovery in C. Declare "
@@ -633,7 +645,7 @@ msgstr ""
 " 和显式 CMake target 中声明每个新增配置辅助模块及私有 C／头文件输入。主机模型成功不能替代实际 ARM 链接、迁址 SDK "
 "消费者或物理工位执行。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:234
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:240
 msgid ""
 "H743 fixed-run power references the selected logical controller ID in "
 "`power.controllers`; the ID need not be `bus4`. Renaming the controller "
@@ -646,11 +658,11 @@ msgstr ""
 "`bus4`。修改控制器名称时须同步修改端点和 power 引用。这仍严格限定为单个 SPI4 finite-"
 "DMA、baremetal、HSI64/cache-off；改变逻辑名称不会准入另一物理控制器、时钟配置或后端。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:240
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:246
 msgid "Review performance and ownership"
 msgstr "审查性能与所有权"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:242
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:248
 msgid ""
 "Measure the selected empty image and the same fixture after enabling the new"
 " mode. Report Flash LOAD, Flash footprint, each RAM domain and reserved "
@@ -662,7 +674,7 @@ msgstr ""
 "测量所选空镜像和同一夹具启用新模式后的镜像。分别报告 Flash LOAD、Flash 占用范围、各 RAM 域和预留任务／I/O 存储。高频 IRQ "
 "应直接访问固定提供者；接口查找属于冷路径。在合同要求时，准入判定和流元数据操作保持有界，并且不随队列长度增长。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:248
+#: ../../../../workspace/nexus/docs/guides/provider-porting.md:254
 msgid ""
 "A passing host register model proves its modeled software scope. New CPU, "
 "Cache, FPU/MVE, security or low-power behavior needs its own actual "

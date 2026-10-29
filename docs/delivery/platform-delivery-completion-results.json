@@ -231,6 +231,38 @@
           "bytes": 51377411,
           "obtainability": "execution_host_local_only"
         }
+      },
+      {
+        "commit": "364f36658634e157b899ab62aacdcfaac21dbd9f",
+        "tree": "b7ccec5311cbee001a706ebd0ded68cd248a7b1c",
+        "scope": "Third integrated C cold-lifecycle, typed device-graph, generator cleanup and workflow/documentation increment; P4 fact-stage changes are a later scope.",
+        "ordinary_gate": {
+          "python_cases": 3453,
+          "python_domains": {
+            "testing": 1657,
+            "configure": 1144,
+            "ci": 493,
+            "workflows": 159
+          },
+          "google_programs": 386,
+          "google_cases": 6818,
+          "skipped": 0,
+          "scope": "Ordinary complete-index Native Debug gate for the exact same tree as locally validated bad14f24; not final P4 qualification, four Native modes, SDK, examples, strict documentation or physical acceptance."
+        },
+        "local_validated_commit": "bad14f24be67d0ba5a5e8d617ff011316088be88",
+        "commit_association": "build/c-cold-20261028/integration/commit-association-03.json",
+        "retained_ordinary_gate": {
+          "receipt": "build/c-cold-20261028/integration/ordinary-gate/package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/integration/ordinary-gate/store/7051d861d421e8ae5e8871443b31021b19dd710bf4111bc5a8ed921e0136aaf4.tar.gz",
+            "sha256": "7051d861d421e8ae5e8871443b31021b19dd710bf4111bc5a8ed921e0136aaf4",
+            "size": 5235658
+          },
+          "manifest_sha256": "b916ea1aff7b71f3d132d5fbfab4879ccfa590b5096464ac47b970a7ea0bde89",
+          "files": 34712,
+          "bytes": 57782326,
+          "obtainability": "execution_host_local_only"
+        }
       }
     ],
     "family_development_scopes": {
@@ -440,6 +472,21 @@
         "fixed_reviewed_or_model_leaf_controllers": 376,
         "raw_record": "build/c-cold-20261028/integration/d03/results-01.json",
         "scope": "Read-only selected resource/DMA/IRQ/clock/pin canonical identity, actual constructor emission and capability/query projection audit. Fixed reviewed SDK leaves are not an alternative selected route or owner authority. Source Python before/after hashes matched. Final combined-source gates remain separate."
+      },
+      "d02_fact_selection": {
+        "status": "implemented_frozen_fact_and_device_graph_stages_direct_readonly_validation_final_qualification_pending",
+        "source_base": "364f36658634e157b899ab62aacdcfaac21dbd9f",
+        "raw_record": "build/c-cold-20261028/fact-stage-increment/handoff.json",
+        "stage_and_container_cases": 12,
+        "complete_central_module_cases": 49,
+        "complete_configure_cases": 1156,
+        "skipped": 0,
+        "exact_bundle_comparison": {
+          "assemblies": 299,
+          "files": 2990,
+          "fileset_and_bytes_equal": true
+        },
+        "scope": "One frozen _FactResolution owns admitted readonly Board/SoC/routes/bindings/references/input identities. Part/family/variant are views of the same admitted Board/SoC, without duplicate stored selection. Central configure.obj/CPU.fields accept Mapping and common.sequence accepts explicit list/tuple while retaining strict raw JSON field/type/domain rejection. Providers consume the immutable containers directly; this is not a separate nominal type for every JSON leaf. Scratch source execution, missing-API/protocol RED and final-source qualification remain separate."
       }
     },
     "retained_delivery_scopes": {
@@ -516,24 +563,25 @@
       "Actual reviewed merge, GitHub synchronization and publication association"
     ],
     "github_sync": {
-      "status": "two_committed_increments_synced_final_integration_pending",
+      "status": "three_committed_increments_synced_p4_integration_pending",
       "commits": [
         "194ca6cb828652135ad1369d8c1a489d75a89fb0",
-        "d21dfcab40058025928bbcc3e15b50e822f3125b"
+        "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "364f36658634e157b899ab62aacdcfaac21dbd9f"
       ],
       "pull_request": "https://github.com/X-Gen-Lab/nexus/pull/41",
-      "scope": "Later integrated worktree and final delivery are not yet represented by a completed final integration commit."
+      "scope": "The three exact committed increments are synchronized. P4 fact-stage/test consolidation worktree and final delivery require their own ordinary gate and clean-source qualification."
     },
     "documentation_status_closure": {
-      "status": "updated_scope_source_gettext_review_and_translation_admission_passed_strict_html_pending",
-      "source_scope": "Uncommitted documentation-only update on the integrated development checkout; exact changed file bytes are retained by the handoff manifest. This is not final clean-source documentation qualification.",
-      "source_manifest": "build/c-cold-20261028/docs/status-closure/handoff.json",
+      "status": "p4_fact_stage_and_p3_navigation_source_gettext_translation_review_passed_strict_html_pending",
+      "source_scope": "Uncommitted P4 guide/status data update after canonical P3; no new physical or final qualification is implied.",
+      "source_manifest": "build/c-cold-20261028/docs/fact-stage-p4/handoff.json",
       "current_pages": 132,
       "translation_language_page_records": 264,
       "semantic_reviewer": "root maintenance agent",
-      "fresh_gettext": "/dev/shm/nexus-docs-status-closure-20261028/gettext-final4",
-      "translation_report": "build/c-cold-20261028/docs/status-closure/translation-admission-04.json",
-      "source_and_diagram_report": "build/c-cold-20261028/docs/status-closure/full-source-check-04.json",
+      "fresh_gettext": "/dev/shm/nexus-docs-status-closure-20261028/gettext-p4",
+      "translation_report": "build/c-cold-20261028/docs/fact-stage-p4/translation-admission.json",
+      "source_and_diagram_report": "build/c-cold-20261028/docs/fact-stage-p4/full-source-check.json",
       "remaining": "Fresh strict English/Chinese HTML, immutable package and restore for the final frozen source."
     },
     "shared_cold_lifecycle": {

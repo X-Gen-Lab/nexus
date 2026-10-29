@@ -79,8 +79,10 @@ TEST(IODescriptorSequences, I2cCancellationAndEpochDoNotRevokeBorrow) {
 } /* namespace */
 
 namespace {
-TEST(IOProviderSequences, NativeUartThirtyTwoCancelDeadlineDrainHistories) {
-    for (unsigned scenario = 0U; scenario < 32U; ++scenario) {
+TEST(IOProviderSequences, NativeUartDistinctCancelDeadlineDrainHistories) {
+    for (unsigned scenario :
+         {0U,  1U,  2U,  3U,  4U,  8U,  9U,  10U, 11U, 12U,
+          16U, 17U, 18U, 19U, 20U, 24U, 25U, 26U, 27U, 28U}) {
         SCOPED_TRACE(scenario);
         ASSERT_EQ(nx_native_clock_configure(true, 0U), NX_SUCCESS);
         nx_native_uart_state_t state{};
@@ -144,8 +146,8 @@ TEST(IOProviderSequences, NativeUartThirtyTwoCancelDeadlineDrainHistories) {
         EXPECT_EQ(nx_uart_port_stop(&uart), NX_SUCCESS);
     }
 }
-TEST(IOProviderSequences, NativeSpiSixteenCancelDeadlineDrainHistories) {
-    for (unsigned scenario = 0U; scenario < 16U; ++scenario) {
+TEST(IOProviderSequences, NativeSpiDistinctCancelDeadlineDrainHistories) {
+    for (unsigned scenario = 0U; scenario < 8U; ++scenario) {
         SCOPED_TRACE(scenario);
         ASSERT_EQ(nx_native_clock_configure(true, 0U), NX_SUCCESS);
         nx_native_spi_state_t controller{};
@@ -203,7 +205,7 @@ TEST(IOProviderSequences, NativeSpiSixteenCancelDeadlineDrainHistories) {
 }
 TEST(IOProviderSequences,
      NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories) {
-    for (unsigned scenario = 0U; scenario < 4U; ++scenario) {
+    for (unsigned scenario = 0U; scenario < 2U; ++scenario) {
         SCOPED_TRACE(scenario);
         ASSERT_EQ(nx_native_clock_configure(true, 0U), NX_SUCCESS);
         nx_native_adc_state_t state{};

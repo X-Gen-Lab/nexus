@@ -283,7 +283,8 @@ def integer(value, minimum=0, maximum=UINT32_MAX, context="integer"):
 
 
 def sequence(value, context):
-    if not isinstance(value, list):
+    """Admit ordered JSON/frozen arrays without consuming other iterables."""
+    if not isinstance(value, (list, tuple)):
         fail(f"{context}: expected array")
     return value
 

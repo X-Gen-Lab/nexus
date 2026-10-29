@@ -7,6 +7,7 @@ does not create a SoC, board, startup, pin route or hardware qualification.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Mapping
 from dataclasses import dataclass
 import hashlib
 import json
@@ -82,7 +83,8 @@ _BUNDLE = ".nexus-cpu-bundle"
 
 
 def fields(value, required, context, optional=()):
-    if not isinstance(value, dict):
+    """Admit raw JSON objects and validated immutable fact mappings."""
+    if not isinstance(value, Mapping):
         fail(f"{context}: expected object")
     missing = required - value.keys()
     unknown = value.keys() - required - set(optional)

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3b786967a90d0ebdc05b30c29c104839bfcbf66975d5efd11330a171c064ae64\n"
+"X-Nexus-Source-SHA256: 022b8921c7994be31d1862ce910cce7a6123dfb4093d7632e09213db2256dfbe\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
@@ -18,14 +18,14 @@ msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-"
 "delivery-"
-"completion.csv`；SHA-256：`256deef275171d3480ef2f6f18393c5bd97e422a085f2a17b143bb84c8855d6b`。"
+"completion.csv`；SHA-256：`15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65`。"
 msgstr ""
 "This page derives from the original CSV; it is not a new status authority, "
 "execution record or software qualification. Original IDs, order and every "
 "original field come from the {download}`original ledger "
 "<../../design/platform-delivery-completion.csv>`. Source: "
 "`docs/design/platform-delivery-completion.csv`; SHA-256: "
-"`256deef275171d3480ef2f6f18393c5bd97e422a085f2a17b143bb84c8855d6b`."
+"`15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65`."
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:15
 msgid ""
@@ -1168,19 +1168,21 @@ msgstr "Resolver stage ownership"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
-"frozen_device_graph_4_cases_and_299_bundle_equivalence_full_configure_passed_final_gate_pending"
+"frozen_fact_device_graph_and_direct_readonly_validation_passed_final_gate_pending"
 msgstr ""
-"frozen_device_graph_4_cases_and_299_bundle_equivalence_full_configure_passed_final_gate_pending"
+"frozen_fact_device_graph_and_direct_readonly_validation_passed_final_gate_pending"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
-"graph-stage/handoff.json"
+"graph-stage/handoff.json;build/c-cold-20261028/fact-stage-"
+"increment/handoff.json"
 msgstr ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
-"graph-stage/handoff.json"
+"graph-stage/handoff.json;build/c-cold-20261028/fact-stage-"
+"increment/handoff.json"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2064,8 +2066,8 @@ msgid "Final software integration qualification"
 msgstr "Final software integration qualification"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "d21_ordinary_gate_passed_final_combined_source_scopes_pending"
-msgstr "d21_ordinary_gate_passed_final_combined_source_scopes_pending"
+msgid "p3_ordinary_gate_passed_p4_combined_source_qualification_pending"
+msgstr "p3_ordinary_gate_passed_p4_combined_source_qualification_pending"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
@@ -2120,9 +2122,8 @@ msgid "in_progress"
 msgstr "in_progress"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
-msgid "194_and_d21_committed_increments_synced_pr41_final_integration_pending"
-msgstr ""
-"194_and_d21_committed_increments_synced_pr41_final_integration_pending"
+msgid "three_increments_synced_through_364f3665_p4_final_integration_pending"
+msgstr "three_increments_synced_through_364f3665_p4_final_integration_pending"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""

@@ -39,7 +39,7 @@ qualified scopes 与候选文件摘要。没有选入候选时列表为空，不
 
 | 范围 | 精确代码源码 | 原权威及执行说明 |
 | --- | --- | --- |
-| C 冷态与工程交付增量 | `194ca6cb`；`d21dfcab`；后续各家族冻结工作树分别记录 | [同一结果索引](../delivery/platform-delivery-completion-results.json)的 `current_iteration_20261028` 保留各自源码、普通门禁、ARM、SDK、文档和归档；[原 64 项退出](../design/platform-delivery-completion.csv)没有缩减。开发结果不代表最终合并源码的完整资格 |
+| C 冷态与工程交付增量 | `194ca6cb`；`d21dfcab`；`364f3665`；后续工作树分别记录 | [同一结果索引](../delivery/platform-delivery-completion-results.json)的 `current_iteration_20261028` 保留各自源码、普通门禁、ARM、SDK、文档和归档；[原 64 项退出](../design/platform-delivery-completion.csv)没有缩减。开发结果不代表最终合并源码的完整资格 |
 | 组织托管依赖与受控交付 | N2 `ce616ea9b30fd2bbd9511f73e2f3b5d8028224b4`；E1 `cef24bd1c7bc500fb28a17a6e1ff9cc7d5511711` | 原正式软件计划 159 阶段通过；外部示例 98 条命令通过；精确配置候选的六个 scope 已通过，原候选仍无签名，物理 HIL 未执行，产品晋升未执行 |
 | 类型化 IR、冷态接入与交付统一 | P2 `fc01d863c3374643c276195ae19a24e6f8b8c8ee`；E `acb5179ec09e0c2fae1911d32655296df39acedc` | [精确执行说明](../delivery/verification.md)；Q02 完整 159 阶段通过，E 完整本地执行通过；精确配置候选及六个 scope 已通过；Q01 失败单独保留，远端状态发布未确认，物理 HIL 未执行 |
 | SoC/IP 目录整理与原候选 | P `92e669233957a2e450a528394e8f4dd0794c7049`；E `0f15022e4d5f5c51991b134d0b9d6082dcf88de9` | [执行说明](../delivery/verification.md)、[48 项原台账](../design/soc-ip-layout-execution.csv)、[派生视图](ledgers/soc-ip-layout.md)；同一 P 的 A90＋B69 分段覆盖，原候选只覆盖其精确配置，物理 HIL 未执行 |

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 81c8c4337c051e7dc4da798b2f9a1b17114076a9a690618eeae4755b5deb6328\n"
+"X-Nexus-Source-SHA256: c5cce9e77b92291bea98e13faf6257fddd265a78b5f6f75e2e27e18a63bed20b\n"
 
 #: ../../../../workspace/nexus/docs/status/software-verification.md:9
 msgid "软件验证、源码身份与证据"
@@ -145,10 +145,9 @@ msgid "C 冷态与工程交付增量"
 msgstr "C cold-lifecycle and engineering delivery increment"
 
 #: ../../../../workspace/nexus/docs/status/software-verification.md:0
-msgid "`194ca6cb`；`d21dfcab`；后续各家族冻结工作树分别记录"
+msgid "`194ca6cb`；`d21dfcab`；`364f3665`；后续工作树分别记录"
 msgstr ""
-"`194ca6cb`; `d21dfcab`; later frozen family worktrees are recorded "
-"separately"
+"`194ca6cb`; `d21dfcab`; `364f3665`; later worktrees are recorded separately"
 
 #: ../../../../workspace/nexus/docs/status/software-verification.md:0
 msgid ""
