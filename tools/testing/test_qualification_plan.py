@@ -1,17 +1,178 @@
 """The maintained software plan executes complete Native and SDK boundaries."""
 
 from pathlib import Path
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from scripts.ci import provider_assemblies
+from tools.dev import qualification
 from tools.dev.qualification import CHECKERS, validate_plan
 from tools.dev.presets import Presets
-from tools.evidence.common import load_json
+from tools.evidence.common import EvidenceError, load_json
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+class QualityToolPreflightTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        self.bin = self.root / "bin"
+        self.bin.mkdir()
+        self.started = self.root / "first-stage-started"
+        self.quality_started = self.root / "quality-stage-started"
+        for checker, marker in (("configure", self.started),
+                                ("quality_tools", self.quality_started)):
+            script = self.root / CHECKERS[checker][0]
+            script.parent.mkdir(parents=True, exist_ok=True)
+            script.write_text(
+                "from pathlib import Path\n"
+                f"Path({str(marker)!r}).write_text('started')\n")
+        self.source = {"dirty": False, "commit": "isolated-checker-fixture"}
+
+    def tool(self, name="analyzer", *, executable=True):
+        path = self.bin / name
+        path.write_text("#!/bin/sh\nexit 0\n")
+        path.chmod(0o755 if executable else 0o644)
+        return path
+
+    def plan(self, arguments=None):
+        stages = [{"name": "first", "checker": "configure", "args": []}]
+        if arguments is not None:
+            stages.append({"name": "late-quality", "checker": "quality_tools",
+                           "args": ["tidy", *arguments]})
+        return {"schema_version": 1, "stages": stages}
+
+    def execute(self, arguments=None, *, path=None, extra_stages=()):
+        plan = self.plan(arguments)
+        plan["stages"].extend(extra_stages)
+        with patch.dict(os.environ, {"PATH": str(self.bin) if path is None
+                                     else path}), patch.object(
+                qualification, "observe_git_source", return_value=self.source):
+            return qualification.execute(plan, self.root, self.root / "result")
+
+    def test_missing_late_tool_rejects_before_first_stage(self):
+        caught = None
+        try:
+            self.execute(["--tool", "missing-analyzer"])
+        except EvidenceError as error:
+            caught = error
+        self.assertFalse(self.started.exists(),
+                         "missing late tool already executed the first checker")
+        self.assertIsNotNone(caught, "missing analyzer was not rejected")
+        self.assertIn("late-quality", str(caught))
+        self.assertIn("missing-analyzer", str(caught))
+        self.assertFalse(self.quality_started.exists())
+        self.assertFalse((self.root / "result").exists())
+
+    def test_bare_tools_use_the_execution_environment(self):
+        selected = self.tool()
+        report = self.execute(["--tool", selected.name])
+        self.assertEqual(report["status"], "executed_passed")
+        self.assertEqual([stage["name"] for stage in report["stages"]],
+                         ["first", "late-quality"])
+        self.assertTrue(self.started.exists())
+        self.assertTrue(self.quality_started.exists())
+
+    def test_absolute_executable_does_not_require_a_path_entry(self):
+        selected = self.tool()
+        report = self.execute(["--tool=" + str(selected)], path="")
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_relative_tool_paths_use_the_checker_working_directory(self):
+        self.tool()
+        report = self.execute(["--tool", "bin/analyzer"], path="")
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_relative_path_entries_use_the_checker_working_directory(self):
+        self.tool()
+        report = self.execute(["--tool=analyzer"], path="bin")
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_explicit_analysis_root_controls_relative_tool_selection(self):
+        destination = self.root / "analysis-root" / "bin"
+        destination.mkdir(parents=True)
+        self.tool().replace(destination / "analyzer")
+        report = self.execute(["--root=missing-root", "--root", "analysis-root",
+                               "--tool", "bin/analyzer"], path="")
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_explicit_analysis_root_controls_relative_path_search(self):
+        destination = self.root / "analysis-root" / "bin"
+        destination.mkdir(parents=True)
+        self.tool().replace(destination / "analyzer")
+        report = self.execute(["--root=analysis-root", "--tool=analyzer"],
+                              path="bin")
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_repeated_tool_selection_uses_the_last_spelling(self):
+        selected = self.tool()
+        report = self.execute(["--tool", "missing-analyzer",
+                               "--tool=" + selected.name])
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_separated_selection_can_replace_an_earlier_equals_selection(self):
+        selected = self.tool()
+        report = self.execute(["--tool=missing-analyzer", "--tool",
+                               selected.name])
+        self.assertEqual(report["status"], "executed_passed")
+
+    def test_later_missing_selection_overrides_an_existing_executable(self):
+        selected = self.tool()
+        with self.assertRaisesRegex(EvidenceError, "missing-analyzer"):
+            self.execute(["--tool=" + selected.name,
+                          "--tool", "missing-analyzer"])
+        self.assertFalse(self.started.exists())
+
+    def test_missing_empty_and_unknown_selectors_do_not_start_stages(self):
+        for arguments in ([], ["--tool"], ["--tool="],
+                          ["--tool", "--report", "unused"],
+                          ["--analyzer=missing"],
+                          ["--tool=missing", "--tool"]):
+            with self.subTest(arguments=arguments):
+                with self.assertRaisesRegex(EvidenceError, "late-quality"):
+                    self.execute(arguments)
+                self.assertFalse(self.started.exists())
+        with self.assertRaisesRegex(EvidenceError, "invalid adapter argument"):
+            self.execute(["--tool", ""])
+        self.assertFalse(self.started.exists())
+
+    def test_nonexecutable_file_and_directory_are_not_tools(self):
+        self.tool("not-executable", executable=False)
+        (self.bin / "directory").mkdir()
+        for name in ("not-executable", "directory"):
+            with self.subTest(tool=name):
+                with self.assertRaisesRegex(EvidenceError, name):
+                    self.execute(["--tool", name])
+                self.assertFalse(self.started.exists())
+
+    def test_missing_second_analyzer_prevents_all_stage_execution(self):
+        selected = self.tool()
+        stages = [{"name": "second-quality", "checker": "quality_tools",
+                   "args": ["cppcheck", "--tool=missing-second"]}]
+        with self.assertRaisesRegex(EvidenceError, "second-quality"):
+            self.execute(["--tool", selected.name], extra_stages=stages)
+        self.assertFalse(self.started.exists())
+        self.assertFalse(self.quality_started.exists())
+
+    def test_plan_without_analyzer_does_not_require_one(self):
+        report = self.execute(path="")
+        self.assertEqual(report["status"], "executed_passed")
+        self.assertEqual(len(report["stages"]), 1)
+
+    def test_presence_does_not_preapprove_actual_checker_success(self):
+        selected = self.tool()
+        script = self.root / CHECKERS["quality_tools"][0]
+        with script.open("a") as stream:
+            stream.write("raise SystemExit(7)\n")
+        report = self.execute(["--tool", str(selected)])
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["stages"][-1]["exit_code"], 7)
 
 
 class QualificationPlanTests(unittest.TestCase):

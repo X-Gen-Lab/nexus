@@ -163,7 +163,9 @@ class PortableCompileAndMap(unittest.TestCase):
             u575_pair.map_inputs(b"LOAD linker stubs\n", "/old/build")
 
 
-class PairArchiveBoundary(unittest.TestCase):
+class _PairArchiveFixture:
+    """Create fresh archive storage per case without inheriting test methods."""
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -183,6 +185,8 @@ class PairArchiveBoundary(unittest.TestCase):
                          compressed_suffix)
         return path
 
+
+class PairArchiveBoundary(_PairArchiveFixture, unittest.TestCase):
     def test_real_store_transport_is_structurally_accepted(self):
         source = self.root / "source"
         source.mkdir()
@@ -394,7 +398,7 @@ class PairSchemaAndRuntime(unittest.TestCase):
         self.assertIsNone(u575_pair._bundle_checks(pair, blobs.__getitem__))
 
 
-class AdditionalArchiveBounds(PairArchiveBoundary):
+class AdditionalArchiveBounds(_PairArchiveFixture, unittest.TestCase):
     def test_member_count_bound(self):
         path = self.root / "count.gz"
         with gzip.open(path, "wb") as stream:

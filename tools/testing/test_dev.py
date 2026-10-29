@@ -2,6 +2,8 @@
 
 from contextlib import redirect_stderr, redirect_stdout
 import io
+import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -11,6 +13,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.dev import dev
+from tools.dev import qualification
 sys.path.insert(0, str(dev.ROOT / "cmake/package"))
 import package_source_sdk as source_sdk
 
@@ -132,6 +135,132 @@ class DeveloperCommandTests(unittest.TestCase):
             self.assertEqual(result, 2)
             execute.assert_not_called()
             self.assertIn("development checkout", output.getvalue())
+
+
+class QualificationDeadlineTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.environment = {key: value for key, value in os.environ.items()
+                            if key != "NEXUS_COMMAND_TIMEOUT"}
+
+    def plan(self, name="plan.json", *, first=900, second=1400):
+        stages = [{"name": "contracts", "checker": "tool_tests", "args": [],
+                   "timeout_s": first},
+                  {"name": "verify", "checker": "candidate_verify",
+                   "args": ["--candidate", "{output}/candidate/candidate.json"]}]
+        if second is not None:
+            stages[1]["timeout_s"] = second
+        path = self.root / name
+        path.write_text(json.dumps({"schema_version": 1, "stages": stages}))
+        return path
+
+    def forwarded(self, arguments, *, environment=None):
+        with patch.object(dev, "ROOT", self.root), \
+                patch.dict(os.environ, self.environment if environment is None
+                           else environment, clear=True), \
+                patch.object(dev, "execute", return_value=7) as execute:
+            result = dev.main(arguments)
+        self.assertEqual(result, 7)
+        return execute.call_args.args
+
+    def test_wrapper_covers_the_complete_declared_plan_budget(self):
+        plan = self.plan()
+        for action in ("qualify", "candidate"):
+            with self.subTest(action=action):
+                command, environment = self.forwarded(
+                    [action, "--plan", str(plan), "--output", "result"])
+                self.assertGreaterEqual(
+                    dev.process.command_timeout(environment), 900 + 1400)
+                self.assertGreater(dev.process.command_timeout(environment),
+                                   1800)
+                self.assertEqual(command[-4:],
+                                 ["--plan", str(plan), "--output", "result"])
+                self.assertEqual("--require-candidate" in command,
+                                 action == "candidate")
+
+    def test_omitted_stage_timeout_retains_the_owned_stage_default(self):
+        plan = self.plan(second=None)
+        _, environment = self.forwarded(["qualify", "--plan", str(plan)])
+        self.assertGreaterEqual(dev.process.command_timeout(environment),
+                                900 + 1800)
+
+    def test_last_explicit_plan_argument_wins_with_relative_and_equal_forms(self):
+        self.plan("first.json", first=100, second=100)
+        self.plan("last.json", first=2400, second=1200)
+        for arguments in (("--plan", "first.json", "--plan=last.json"),
+                          ("--plan=first.json", "--plan", "last.json")):
+            with self.subTest(arguments=arguments):
+                _, environment = self.forwarded(["qualify", *arguments])
+                self.assertGreaterEqual(dev.process.command_timeout(environment),
+                                        2400 + 1200)
+
+    def test_explicit_short_deadline_keeps_precedence_without_reading_plan(self):
+        environment = self.environment | {"NEXUS_COMMAND_TIMEOUT": "3.5"}
+        with patch.object(qualification, "validate_plan",
+                          side_effect=AssertionError("plan must not be read")):
+            _, forwarded = self.forwarded(
+                ["candidate", "--plan", "absent.json"],
+                environment=environment)
+        self.assertEqual(forwarded["NEXUS_COMMAND_TIMEOUT"], "3.5")
+
+    def test_invalid_explicit_deadline_reaches_the_owned_process_validator(self):
+        environment = self.environment | {"NEXUS_COMMAND_TIMEOUT": "nan"}
+        with patch.dict(os.environ, environment, clear=True), \
+                patch.object(dev.process.subprocess, "Popen") as launch, \
+                redirect_stdout(io.StringIO()), \
+                redirect_stderr(io.StringIO()) as errors:
+            result = dev.main(["qualify", "--plan", "absent.json"])
+        self.assertEqual(result, 2)
+        launch.assert_not_called()
+        self.assertIn("NEXUS_COMMAND_TIMEOUT", errors.getvalue())
+
+    def test_other_forwarded_actions_keep_their_existing_deadline(self):
+        for action, arguments in (("prepare", ["--scope", "preset"]),
+                                  ("cache", ["inspect"]),
+                                  ("docs", ["check"])):
+            with self.subTest(action=action):
+                _, environment = self.forwarded([action, *arguments])
+                self.assertNotIn("NEXUS_COMMAND_TIMEOUT", environment)
+                self.assertEqual(dev.process.command_timeout(environment), 1800)
+
+    def owned_cli(self, arguments):
+        def forward(command, environment):
+            del environment
+            try:
+                return qualification.main(command[2:])
+            except SystemExit as error:
+                return error.code
+
+        with patch.dict(os.environ, self.environment, clear=True), \
+                patch.object(dev, "execute", side_effect=forward), \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            try:
+                return dev.main(arguments)
+            except SystemExit as error:
+                return error.code
+
+    def test_missing_and_invalid_plans_keep_original_cli_rejection(self):
+        broken = self.root / "broken.json"
+        broken.write_text("{not json")
+        invalid = self.root / "invalid.json"
+        invalid.write_text('{"schema_version": 1, "stages": []}')
+        for arguments in (("--plan", str(self.root / "absent.json")),
+                          ("--plan", str(broken)),
+                          ("--plan=" + str(invalid),), (), ("--plan",)):
+            with self.subTest(arguments=arguments):
+                output = self.root / "not-executed"
+                self.assertNotEqual(self.owned_cli(
+                    ["qualify", *arguments, "--output", str(output)]), 0)
+                self.assertFalse(output.exists())
+
+    def test_help_does_not_read_plan_and_uses_original_cli(self):
+        with patch.object(qualification, "validate_plan",
+                          side_effect=AssertionError("help must not read plan")):
+            self.assertEqual(self.owned_cli(
+                ["qualify", "--plan", str(self.root / "absent.json"),
+                 "--help"]), 0)
 
 
 if __name__ == "__main__":

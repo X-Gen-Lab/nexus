@@ -253,15 +253,24 @@ NEXUS_COMMAND_TIMEOUT=14400 NEXUS_BUILD_JOBS=2 \
 
 The 14400-second budget is an invocation choice, not a new default or a completion
 guarantee for every host. `NEXUS_COMMAND_TIMEOUT` supplies the default for process
-calls without an explicit timeout; the outer `dev.py qualify` command uses that
-default, which is 1800 seconds when unset. Each plan stage retains its `timeout_s`,
-with a default of 1800 seconds when that field is absent. The maintained software
-plan uses effective stage budgets of 1800 or 7200 seconds. Its SDK stage writes
+calls without an explicit timeout. For `qualify` and `candidate`, an unset value
+uses the validated plan's total stage budgets plus 60 seconds, with an
+1800-second floor. An explicit caller value always takes precedence. Other
+commands retain the ordinary 1800-second default. Each plan stage retains its
+`timeout_s`, with a default of 1800 seconds when that field is absent. The
+maintained software plan uses effective stage budgets of 1800 or 7200 seconds.
+Its SDK stage writes
 `<output>/sdk`, and packaging rejects a prefix inside its input checkout or with
 path aliases. Choose a new canonical directory for each attempt and retain failed
 or interrupted receipts. Check the complete plan report and every actual stage
 exit; successful early stages and a larger retry budget do not establish a
 complete run.
+
+Before starting any stage, qualification checks that every selected quality
+analyzer is executable in the invocation's `PATH` or at its explicit tool path.
+Keep the pinned analyzer prefixes in that environment. This availability check
+does not replace the actual checker's version, resource or analysis checks, and
+never selects a fallback tool.
 
 The manual `formal-software.yml` workflow runs the complete maintained software
 plan on a fresh `main` checkout. The requested commit must equal both the source
