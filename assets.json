@@ -2551,6 +2551,11 @@
       "bytes": 19013,
       "path": "docs-platform-delivery-20261029-g7590b2d4/platform-source-bound-status.json",
       "sha256": "2ed27883755d3b4a3a56c7e998dce2c7ce10c7ff9cbe33ea4ac327d3b2a60494"
+    },
+    {
+      "bytes": 4318657,
+      "path": "docs-platform-delivery-20261029-g7590b2d4/public-recovery-proof.json",
+      "sha256": "a3ee8a89cd17b64ddb45a04bfdd5351ab174b2b066a2a024e26af1fee2269008"
     }
   ],
   "physical_hil": "not_executed",
