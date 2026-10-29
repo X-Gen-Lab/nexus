@@ -245,6 +245,34 @@ TEST_F(U575Factory, FailedGpioGateReleaseCannotLoseItsLeaseOnReacquire) {
     EXPECT_EQ(0U, added);
     EXPECT_EQ(0U, RCC->AHB2ENR1);
 }
+TEST_F(U575Factory, MissingGpioReceiptRejectsBeforeAnyClockEffects) {
+    nx_stm32u575_gpio_receipt_t receipt{};
+    const nx_stm32u575_gpio_lease_t lease{GPIOA, &receipt, 1U, 0U};
+    uint32_t apb1 = 0U, apb2 = 0U, ahb3 = 0U;
+    const nx_stm32u575_platform_config_t config{
+        &lease,
+        1U,
+        NX_U575_SELECT_USART1 | NX_U575_SELECT_USART2 | NX_U575_SELECT_ADC4,
+        nullptr,
+        &apb1,
+        &apb2,
+        &ahb3};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_platform_preflight(&config));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_platform_acquire(&config));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32u575_platform_release(&config));
+    EXPECT_EQ(0U, g_u575_model.reads);
+    EXPECT_EQ(0U, g_u575_model.writes);
+    EXPECT_FALSE(receipt.captured);
+    EXPECT_EQ(0U, apb1);
+    EXPECT_EQ(0U, apb2);
+    EXPECT_EQ(0U, ahb3);
+    const nx_stm32u575_platform_config_t empty{};
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_preflight(&empty));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_acquire(&empty));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_platform_release(&empty));
+    EXPECT_EQ(0U, g_u575_model.reads);
+    EXPECT_EQ(0U, g_u575_model.writes);
+}
 
 TEST_F(U575Factory, FailedPeripheralGateReleaseCannotLoseItsLeaseOnReacquire) {
     nx_stm32u575_gpio_receipt_t receipt{};

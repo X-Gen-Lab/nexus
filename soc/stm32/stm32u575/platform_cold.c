@@ -230,6 +230,8 @@ nx_stm32u575_platform_acquire(const nx_stm32u575_platform_config_t* config) {
         return NX_ERROR_BUSY;
     if (config->lease_count == 0U)
         return NX_SUCCESS;
+    if (config->gpio_added == NULL)
+        return NX_ERROR_INVALID;
     uint32_t gpio_mask = 0U;
     for (size_t i = 0U; i < config->lease_count; ++i) {
         if (config->leases[i].receipt->captured)

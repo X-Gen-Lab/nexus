@@ -272,6 +272,14 @@ Keep the pinned analyzer prefixes in that environment. This availability check
 does not replace the actual checker's version, resource or analysis checks, and
 never selects a fallback tool.
 
+The software plan runs Clang-Tidy and Cppcheck immediately after the complete
+Native Debug build, before its contract execution and subsequent Native, SDK
+and ARM work. Both analyzers consume the full `build/native-debug` compilation
+database and generated inputs already prepared by that build. Every distinct
+owned compilation context, analyzer argument, deadline and bounded parallel
+budget remains in scope. An analysis failure stops the plan at this first ready
+boundary; successful analysis still requires every remaining stage to execute.
+
 The manual `formal-software.yml` workflow runs the complete maintained software
 plan on a fresh `main` checkout. The requested commit must equal both the source
 and workflow SHA:

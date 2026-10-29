@@ -338,6 +338,30 @@ TEST_F(H743ColdResources, InvalidAliasAndUnprivilegedInputsHaveNoEffects) {
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32h743_platform_acquire(&config));
     EXPECT_EQ(0U, g_h743_model.writes);
 }
+TEST_F(H743ColdResources, MissingGateReceiptRejectsBeforeAnyClockEffects) {
+    uint32_t gate_receipts[4]{};
+    nx_stm32h743_gate_lease_config_t* const gates[]{&config.apb2, &config.apb1,
+                                                    &config.ahb1, &config.apb4};
+    const uint32_t masks[]{RCC_APB2ENR_SPI1EN, RCC_APB1LENR_TIM3EN,
+                           RCC_AHB1ENR_DMA1EN, RCC_APB4ENR_SYSCFGEN};
+    for (size_t i = 0U; i < 4U; ++i)
+        *gates[i] = {masks[i], &gate_receipts[i]};
+    for (size_t missing = 0U; missing < 4U; ++missing) {
+        SCOPED_TRACE(missing);
+        gates[missing]->added = nullptr;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_platform_preflight(&config));
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_platform_acquire(&config));
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_platform_release(&config));
+        EXPECT_EQ(0U, g_h743_model.reads);
+        EXPECT_EQ(0U, g_h743_model.writes);
+        EXPECT_EQ(0U, added);
+        EXPECT_FALSE(receipt.captured);
+        for (const auto value : gate_receipts)
+            EXPECT_EQ(0U, value);
+        gates[missing]->added = &gate_receipts[missing];
+    }
+    config.apb2 = config.apb1 = config.ahb1 = config.apb4 = {};
+}
 TEST_F(H743ColdResources, InvalidUartStorageRejectsBeforeStateOrPadEffects) {
     nx_stm32h743_uart_state_t port{};
     nx_stm32h743_uart_config_t invalid{nullptr,

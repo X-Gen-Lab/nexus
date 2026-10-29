@@ -195,6 +195,51 @@ class QualificationPlanTests(unittest.TestCase):
                 self.assertNotIn("--filter", arguments)
         validate_plan(self.plan)
 
+    def test_analyzers_run_when_the_debug_compilation_inputs_are_ready(self):
+        names = [stage["name"] for stage in self.stages]
+        built = names.index("build-native-debug")
+        contracts = names.index("native_contracts-native-debug")
+        self.assertEqual(names[built + 1:contracts], ["tidy", "cppcheck"],
+                         "Analyze the completed Debug inputs before later work")
+        for stage in self.stages[built + 1:contracts]:
+            arguments = stage["args"]
+            self.assertEqual(arguments[arguments.index("--build-dir") + 1],
+                             "{root}/build/native-debug")
+
+    def test_analyzer_failure_stops_before_native_execution_and_later_builds(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            tools = root / "bin"
+            tools.mkdir()
+            for name in ("clang-tidy", "cppcheck"):
+                tool = tools / name
+                tool.write_text("#!/bin/sh\nexit 0\n")
+                tool.chmod(0o755)
+            for script, *_ in CHECKERS.values():
+                path = root / script
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("# Isolated external-checker fixture.\n")
+
+            def run(argv, *, log, **kwargs):
+                # Inject an external analyzer failure, without running a build.
+                failed = Path(argv[2]).name == "quality_tools.py"
+                log.write_text("analyzer failed\n" if failed else "passed\n")
+                return subprocess.CompletedProcess(argv, 7 if failed else 0)
+
+            with patch.dict(os.environ, {"PATH": str(tools)}), patch.object(
+                    qualification, "observe_git_source",
+                    return_value={"dirty": False, "commit": "plan-fixture"}), \
+                    patch.object(qualification, "run_command", side_effect=run):
+                report = qualification.execute(self.plan, root, root / "result")
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["stages"][-1]["name"], "tidy")
+        self.assertEqual(report["stages"][-1]["exit_code"], 7)
+        attempted = [stage["name"] for stage in report["stages"]]
+        self.assertIn("build-native-debug", attempted)
+        self.assertNotIn("native_contracts-native-debug", attempted)
+        self.assertNotIn("configure-native-release", attempted)
+        self.assertNotIn("source-sdk", attempted)
+
     def test_each_native_preset_configures_builds_all_and_runs_full_ctest(self):
         for preset in ("native-debug", "native-release", "native-asan",
                        "native-tsan"):

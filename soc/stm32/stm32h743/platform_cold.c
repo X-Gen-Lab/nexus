@@ -126,6 +126,8 @@ static nx_result_t acquire_gate(volatile uint32_t* reg,
                                 const nx_stm32h743_gate_lease_config_t* gate) {
     if (gate->mask == 0U)
         return NX_SUCCESS;
+    if (gate->added == NULL)
+        return NX_ERROR_INVALID;
     *gate->added = ~NX_H743_READ(reg) & gate->mask;
     NX_H743_WRITE(reg, NX_H743_READ(reg) | gate->mask);
     nx_arch_dsb();

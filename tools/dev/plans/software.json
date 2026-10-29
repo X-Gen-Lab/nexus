@@ -61,6 +61,42 @@
       "timeout_s": 7200
     },
     {
+      "name": "tidy",
+      "checker": "quality_tools",
+      "args": [
+        "tidy",
+        "--root",
+        "{root}",
+        "--build-dir",
+        "{root}/build/native-debug",
+        "--tool",
+        "clang-tidy",
+        "--report",
+        "{output}/tidy.json",
+        "--parallel",
+        "2"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "cppcheck",
+      "checker": "quality_tools",
+      "args": [
+        "cppcheck",
+        "--root",
+        "{root}",
+        "--build-dir",
+        "{root}/build/native-debug",
+        "--tool",
+        "cppcheck",
+        "--report",
+        "{output}/cppcheck.json",
+        "--parallel",
+        "2"
+      ],
+      "timeout_s": 7200
+    },
+    {
       "name": "native_contracts-native-debug",
       "checker": "native_contracts",
       "args": [
@@ -832,42 +868,6 @@
       "name": "build-artifact-boundaries",
       "checker": "build_artifact_tests",
       "args": [],
-      "timeout_s": 7200
-    },
-    {
-      "name": "tidy",
-      "checker": "quality_tools",
-      "args": [
-        "tidy",
-        "--root",
-        "{root}",
-        "--build-dir",
-        "{root}/build/native-debug",
-        "--tool",
-        "clang-tidy",
-        "--report",
-        "{output}/tidy.json",
-        "--parallel",
-        "2"
-      ],
-      "timeout_s": 7200
-    },
-    {
-      "name": "cppcheck",
-      "checker": "quality_tools",
-      "args": [
-        "cppcheck",
-        "--root",
-        "{root}",
-        "--build-dir",
-        "{root}/build/native-debug",
-        "--tool",
-        "cppcheck",
-        "--report",
-        "{output}/cppcheck.json",
-        "--parallel",
-        "2"
-      ],
       "timeout_s": 7200
     },
     {
