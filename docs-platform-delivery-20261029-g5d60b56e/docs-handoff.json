@@ -1,0 +1,186 @@
+{
+  "cleanup": {
+    "duplicate_cleanup": "build/c-cold-20261028/docs/final-5d60b56e/expanded-duplicate-cleanup.json",
+    "expanded_outputs_removed_after_verification": true,
+    "raw_cleanup": "build/c-cold-20261028/docs/final-5d60b56e/raw-expanded-cleanup.json",
+    "tmpfs_free_after_cleanup_bytes": 917766144
+  },
+  "current_pages": 132,
+  "documentation_package": {
+    "all_members_verified": true,
+    "archive_bytes": 15289499,
+    "archive_sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0",
+    "existing_store_record": "build/c-cold-20261028/docs/final-5d60b56e/package-preservation.json",
+    "friendly_archive": "/workspace/nexus/build/c-cold-20261028/docs/final-5d60b56e/0.2.0-docs-g5d60b56e0968.tar.gz",
+    "member_inventory_sha256": "0eb306a93a6234fb73ae1b3d6595ac98035fa5f57462f2506f1ef46b9f97d702",
+    "original_documentation_manifest_sha256": "7cf0d25a072c100245a5d66dc28fe28d0d092a5a92a2faf89a735b215d447a2f",
+    "original_manifest_forced_on_archive_and_independent_restore": true,
+    "payload_files": 2487,
+    "qualification_references": [],
+    "store_archive": {
+      "path": "/workspace/nexus/build/c-cold-20261028/docs/final-5d60b56e/store/d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0.tar.gz",
+      "sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0",
+      "size": 15289499
+    }
+  },
+  "documentation_tool_tests": {
+    "discovered": 355,
+    "errors": 0,
+    "executed": 355,
+    "failures": 0,
+    "skipped": 0
+  },
+  "kind": "final_frozen_source_documentation_delivery_handoff",
+  "language_page_records": 264,
+  "languages": [
+    "en",
+    "zh_CN"
+  ],
+  "ordinary_p4_gate_raw": {
+    "archive": {
+      "path": "/workspace/nexus/build/c-cold-20261028/integration/ordinary-gate-p4/store/db6816929db6522d219efd7a17a0e4fd0f85a81eb2da586f7e479d87115e0f2e.tar.gz",
+      "sha256": "db6816929db6522d219efd7a17a0e4fd0f85a81eb2da586f7e479d87115e0f2e",
+      "size": 5441014
+    },
+    "bytes": 60486731,
+    "commit_association": "build/c-cold-20261028/integration/commit-association-04.json",
+    "files": 37046,
+    "manifest_sha256": "ada5b2c180960d6e92fc7e17d801011ef4ade597763512d391df711e73725460",
+    "package": "build/c-cold-20261028/integration/ordinary-gate-p4/package.json",
+    "scope": "Original complete-index gate raw sealed before formal plan could overwrite TDD output; retains local validated/canonical exact-tree association."
+  },
+  "persistence_status": "execution_host_local_only_not_established",
+  "physical_status": "not_executed",
+  "published": false,
+  "qualification": false,
+  "raw_build_and_execution_records": {
+    "archive": {
+      "path": "/workspace/nexus/build/c-cold-20261028/docs/final-5d60b56e/raw-build-store/a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c.tar.gz",
+      "sha256": "a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c",
+      "size": 17611930
+    },
+    "bytes": 117265182,
+    "files": 2725,
+    "manifest_sha256": "b838980284a4615426525848dd17d948d29d13897fd938c5b9ae0e9371f27ee0",
+    "package": "build/c-cold-20261028/docs/final-5d60b56e/raw-build-package.json",
+    "scope": "One retained original API/gettext/HTML tool workspace plus exact execution records. Final delivered HTML has one immutable delivery archive; expanded delivery/build/restore duplicates were individually SHA/size/name compared and removed.",
+    "verify_report": "build/c-cold-20261028/docs/final-5d60b56e/raw-build-verify.json"
+  },
+  "release_id": "0.2.0-docs-g5d60b56e0968",
+  "retention_recovery": {
+    "final_recovery_exit": 0,
+    "final_recovery_receipt": "build/c-cold-20261028/docs/final-5d60b56e/raw-cleanup-recovery-02.command.json",
+    "initial_cleanup_runner_exit": 1,
+    "initial_recovery_receipt": "build/c-cold-20261028/docs/final-5d60b56e/raw-cleanup-recovery.command.json",
+    "initial_recovery_runner_exit": 1,
+    "original_helper_diagnosis": "build/c-cold-20261028/docs/final-5d60b56e/retention-helper-failure.json",
+    "scope": "Two cleanup helper attempts failed conservatively after successful proper delivery/store verifiers; final cleanup recovered with original embedded manifest and exact inventory comparison. No archive/verifier/source was rewritten."
+  },
+  "scope": "Strict bilingual documentation delivery of exact canonical P, plus preservation of its ordinary gate raw. No firmware candidate, physical acceptance, hosted publication or OCI recipe reproducibility is inherited or established.",
+  "source": {
+    "commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+    "dirty": false,
+    "root": "/workspace/nexus",
+    "submodules": [
+      " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+    ],
+    "tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b"
+  },
+  "source_and_git_head_unchanged": true,
+  "stages": [
+    {
+      "duration_seconds": 1.5731131590000587,
+      "exit_code": 0,
+      "name": "doctor",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/doctor.command.json"
+    },
+    {
+      "duration_seconds": 12.503724725989741,
+      "exit_code": 0,
+      "name": "source-check",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/source-check.command.json"
+    },
+    {
+      "duration_seconds": 28.261860369995702,
+      "exit_code": 0,
+      "name": "tool-tests",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/tool-tests.command.json"
+    },
+    {
+      "duration_seconds": 124.87378944100055,
+      "exit_code": 0,
+      "name": "strict-build",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/strict-build.command.json"
+    },
+    {
+      "duration_seconds": 17.74936346600589,
+      "exit_code": 0,
+      "name": "package",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/package.command.json"
+    },
+    {
+      "duration_seconds": 8.806870653992519,
+      "exit_code": 0,
+      "name": "verify-archive",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/verify-archive.command.json"
+    },
+    {
+      "duration_seconds": 18.518169105009292,
+      "exit_code": 0,
+      "name": "independent-restore",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/independent-restore.command.json"
+    },
+    {
+      "duration_seconds": 8.894634791999124,
+      "exit_code": 0,
+      "name": "verify-restored",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/verify-restored.command.json"
+    },
+    {
+      "duration_seconds": 0.4155296620010631,
+      "exit_code": 0,
+      "name": "package-preserve",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/package-preserve.command.json"
+    },
+    {
+      "duration_seconds": 0.425489915010985,
+      "exit_code": 0,
+      "name": "package-preserve-verify",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/package-preserve-verify.command.json"
+    },
+    {
+      "duration_seconds": 5.415196225992986,
+      "exit_code": 0,
+      "name": "raw-build-export",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/raw-build-export.command.json"
+    },
+    {
+      "duration_seconds": 1.0743895129999146,
+      "exit_code": 0,
+      "name": "raw-build-verify",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/raw-build-verify.command.json"
+    },
+    {
+      "duration_seconds": 1.2738917480019154,
+      "exit_code": 0,
+      "name": "raw-cleanup-recovery-02",
+      "receipt": "build/c-cold-20261028/docs/final-5d60b56e/raw-cleanup-recovery-02.command.json"
+    }
+  ],
+  "status": "documentation_build_package_independent_restore_and_member_retention_passed"
+}

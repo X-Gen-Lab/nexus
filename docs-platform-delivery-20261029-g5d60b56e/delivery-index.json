@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "kind": "existing_delivery_artifact_navigation",
+  "batch": "verified_docs_and_examples_only",
+  "platform": {
+    "repository": "X-Gen-Lab/nexus",
+    "commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+    "tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b"
+  },
+  "examples": {
+    "repository": "X-Gen-Lab/nexus-examples",
+    "commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "platform_gitlink": "5d60b56e09686776c72ce95dfa9384357e57d2bf"
+  },
+  "original_storage_parent": "e7d32687a598db753747f4905cb03afec3163b1d",
+  "qualification": false,
+  "physical_status": "not_executed",
+  "oci_recipe_independently_reconstructed": false,
+  "official_platform_release": "not_published",
+  "rendered_site_publication": "not_established_by_this_git_asset_retention",
+  "full_159_stage_final_execution": "pending_separate_final_receipt",
+  "eight_final_software_candidates": "pending_separate_seals",
+  "documents": {
+    "languages": [
+      "en",
+      "zh_CN"
+    ],
+    "pages": 132,
+    "language_page_records": 264,
+    "tool_tests": 355,
+    "qualification_references": [],
+    "manifest_sha256": "7cf0d25a072c100245a5d66dc28fe28d0d092a5a92a2faf89a735b215d447a2f"
+  },
+  "examples_actual_scope": {
+    "commands": 104,
+    "presets": 17,
+    "standalones": 9,
+    "arm_images": 41,
+    "starters": 4,
+    "created_external_product_and_run": "passed"
+  },
+  "archives": [
+    {
+      "role": "strict_bilingual_documentation",
+      "original_package": "docs-package-preservation.json",
+      "archive": {
+        "path": "0.2.0-docs-g5d60b56e0968.tar.gz",
+        "bytes": 15289499,
+        "sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0"
+      },
+      "parts": [
+        {
+          "path": "0.2.0-docs-g5d60b56e0968.tar.gz",
+          "bytes": 15289499,
+          "sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0"
+        }
+      ],
+      "original_envelope_unchanged": true
+    },
+    {
+      "role": "strict_docs_actual_build_and_tool_execution",
+      "original_package": "docs-raw-build-package.json",
+      "archive": {
+        "path": "docs-build-evidence.tar.gz",
+        "bytes": 17611930,
+        "sha256": "a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c"
+      },
+      "parts": [
+        {
+          "path": "docs-build-evidence.tar.gz",
+          "bytes": 17611930,
+          "sha256": "a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c"
+        }
+      ],
+      "original_envelope_unchanged": true
+    },
+    {
+      "role": "complete_examples_scope_all_and_actual_execution",
+      "original_package": "examples-build-package.json",
+      "archive": {
+        "path": "examples-build.tar.gz",
+        "bytes": 60108472,
+        "sha256": "d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606"
+      },
+      "parts": [
+        {
+          "path": "examples-build.tar.gz.part0000",
+          "bytes": 33554432,
+          "sha256": "f3f9619a68f8de4126a234d59378cf68278a4f202e04df59fe147a938449210a"
+        },
+        {
+          "path": "examples-build.tar.gz.part0001",
+          "bytes": 26554040,
+          "sha256": "49bfa501b3486625483b0432fc60da38b621a90157ec71f3745ca77a2336e72c"
+        }
+      ],
+      "original_envelope_unchanged": true
+    },
+    {
+      "role": "actual_external_created_product_and_installed_sdk_execution",
+      "original_package": "user-product-package.json",
+      "archive": {
+        "path": "user-product.tar.gz",
+        "bytes": 3605719,
+        "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e"
+      },
+      "parts": [
+        {
+          "path": "user-product.tar.gz",
+          "bytes": 3605719,
+          "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e"
+        }
+      ],
+      "original_envelope_unchanged": true
+    }
+  ],
+  "verifiers": {
+    "archive": {
+      "path": "verification-tools-g5d60b56e.tar.gz",
+      "bytes": 25871,
+      "sha256": "a907cc5f802032c176eff10f9551fa00c3080b02c1c704ecbeb86ae80a498b13"
+    },
+    "source_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+    "source_files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1085,
+        "sha256": "b7152bd37691794b676615577f8c2b292288fa0691159c1e04f129e07f322913"
+      },
+      {
+        "path": "tools/evidence/store.py",
+        "bytes": 20496,
+        "sha256": "e3a9bde01dae28c3524daf9203a1512a66f317a99a62a7a0acf22e43a3013d7d"
+      },
+      {
+        "path": "tools/evidence/common.py",
+        "bytes": 11352,
+        "sha256": "6a59439c062078561e9b2110625ecec3e845b37e6bcce2a4261d318f1ce7b1ff"
+      },
+      {
+        "path": "tools/evidence/identity.py",
+        "bytes": 9258,
+        "sha256": "2598859d2e52aee4f36467365f1ef36302d667f00923d0534a53b68308b4c991"
+      },
+      {
+        "path": "tools/configure/metadata.py",
+        "bytes": 5036,
+        "sha256": "7ec12432a54dbc98d5ef833b93fabe754c1f6eab0ec4b25c9e407986c1d2e193"
+      },
+      {
+        "path": "tools/documentation/delivery.py",
+        "bytes": 56909,
+        "sha256": "af7fb50390cb6588b0191f1e54db096ec5bd26479fb7a812485e81911aae9736"
+      }
+    ]
+  },
+  "limits": [
+    "Original package/envelope/handoff absolute paths remain original evidence; store verify/restore use explicit --archive relocation without rewriting them.",
+    "This batch does not contain a completed159-stage plan, final8sealed candidates, GitHub Actions run, signed firmware, physical HIL or independent OCI recipe reconstruction.",
+    "Original copied handoffs retain historical local-only publication flags and references to evidence not selected in this batch. This leaf only navigates the exact archives listed here.",
+    "The cumulative root registry historical documentation_commit is not the identity of new payloads; use this leaf and original source-bound package manifests.",
+    "Append-only branch retention is separate from the guarded official SourceSDK GitHub Release and actual rendered-site deployment."
+  ]
+}

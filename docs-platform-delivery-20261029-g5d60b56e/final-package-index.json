@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "external_examples_final_archive_index",
+  "examples_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+  "examples_tree": "752829b139ff1f5335f0f6ea61c31414132a7429",
+  "platform_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+  "platform_tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b",
+  "source_summary": "/dev/shm/nexus-examples-final/build/final-platform/final-delivery-summary.json",
+  "source_summary_sha256": "cbfdbbf78e5ace807d9e584b8f3996080306346842f41c782c6cadb2aa15de2f",
+  "packages": {
+    "examples-build": {
+      "package": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/examples-build-package.json",
+      "package_sha256": "ae1ef1d17e68ec0cb64f428cfdf653829115195c204b089e63c494b5a69c5c84",
+      "verification": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/examples-build-verify.json",
+      "verified": true,
+      "identity": {
+        "archive": {
+          "path": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/store/d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606.tar.gz",
+          "sha256": "d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606",
+          "size": 60108472
+        },
+        "bytes": 328245865,
+        "files": 8108,
+        "kind": "portable_evidence",
+        "manifest_sha256": "52a0877ac1625019d202dc5bc86e5d549fa6ccfe7d0a243545b888e50a9bd6cc",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      }
+    },
+    "user-product": {
+      "package": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/user-product-package.json",
+      "package_sha256": "fa2f928fcdc9b9f7ec5e207f8fbf92525fe1b766f2318c7dfd34325d19dea337",
+      "verification": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/user-product-verify.json",
+      "verified": true,
+      "identity": {
+        "archive": {
+          "path": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/store/6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e.tar.gz",
+          "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e",
+          "size": 3605719
+        },
+        "bytes": 20194483,
+        "files": 154,
+        "kind": "portable_evidence",
+        "manifest_sha256": "4bff5fd019a94da045cfecaefb0827ac9af28989c4c305e2f04610c6d9c5f824",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      }
+    }
+  },
+  "physical_hil": "not_executed",
+  "immutable_sdk_prefix": "/dev/shm/nexus-examples-final/build/final-platform/local-ci-canonical-9d7d4d34/source-sdk",
+  "sdk_snapshot_sha256": "8ecc6535f6fb589ce63f9a35616bff905fae76d17e65477d664330cb9002523f",
+  "sdk_read_lease": "/root/offline_candidate retains read-only lease; do not delete prefix until explicit release",
+  "created_product_cleanup": {
+    "kind": "owned_temporary_product_expanded_cleanup",
+    "source": "/dev/shm/nexus-user-onboarding-5d60b56e",
+    "archive_sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e",
+    "files": 154,
+    "bytes": 20194483,
+    "pre_cleanup_source_equals_every_archive_file": true,
+    "external_product_created_exclusively_for_this_task": true,
+    "sdk_prefix_untouched": true,
+    "completed_ns": 1793245179596494515,
+    "expanded_removed": true
+  }
+}

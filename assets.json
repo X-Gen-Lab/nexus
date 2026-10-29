@@ -562,6 +562,106 @@
       "path": "docs-release-0.1.0-58297516d707-final-restore/verify-remote-restore.py",
       "bytes": 8972,
       "sha256": "41dd775c1043a74afb96b9e3c9109ece0582c212508b120e02358e6a44109bd8"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/0.2.0-docs-g5d60b56e0968.tar.gz",
+      "bytes": 15289499,
+      "sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/README.txt",
+      "bytes": 2225,
+      "sha256": "8ddbeb829fab6ad5e898141e701d5c7f81be72c62f2efb91f8d36b48263955cd"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/delivery-index.json",
+      "bytes": 6036,
+      "sha256": "44c5011142a45593cf34a79ec554483fabecd62d5bc59068f4d39c0406adfb38"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/docs-build-evidence.tar.gz",
+      "bytes": 17611930,
+      "sha256": "a390e33d57e05ca04ae9dbdbbaa250a4d71214a98b779489915887d71d56ae6c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/docs-handoff.json",
+      "bytes": 9000,
+      "sha256": "041161c2a64364fdf3f28d7d7b17c4a8b937560d94cf9e106e7f07addca4821d"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/docs-package-preservation.json",
+      "bytes": 847,
+      "sha256": "988deff69999c23dbd9bba2a5fd44b0eb2fa00277971cbba0552007576404e11"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/docs-package.json",
+      "bytes": 635,
+      "sha256": "fc8f09c130764234c54670fd889b5f7f661513f173a59778a5863767b925fd7d"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/docs-raw-build-package.json",
+      "bytes": 534,
+      "sha256": "b881fa3420e93c206871c9c1d2e9da4eedb68970655018178f8396768efef400"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/documentation-manifest.json",
+      "bytes": 432634,
+      "sha256": "7cf0d25a072c100245a5d66dc28fe28d0d092a5a92a2faf89a735b215d447a2f"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build-package.json",
+      "bytes": 513,
+      "sha256": "ae1ef1d17e68ec0cb64f428cfdf653829115195c204b089e63c494b5a69c5c84"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build.tar.gz.part0000",
+      "bytes": 33554432,
+      "sha256": "f3f9619a68f8de4126a234d59378cf68278a4f202e04df59fe147a938449210a"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/examples-build.tar.gz.part0001",
+      "bytes": 26554040,
+      "sha256": "49bfa501b3486625483b0432fc60da38b621a90157ec71f3745ca77a2336e72c"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/final-delivery-summary.json",
+      "bytes": 5848,
+      "sha256": "cbfdbbf78e5ace807d9e584b8f3996080306346842f41c782c6cadb2aa15de2f"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/final-handoff.json",
+      "bytes": 8238,
+      "sha256": "632834f62a05f7f92ad2b8e31898b3a9af2bc04211aa7732a75a0bb6fce67f25"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/final-package-index.json",
+      "bytes": 3313,
+      "sha256": "7043713d986055a6b581c04650e5d1c12880691a5d2b8e80adb80f4a239545b1"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/transport-receipt.json",
+      "bytes": 2013,
+      "sha256": "750c951ce0d7495813277dd6a2109e1a6acc25fb00bf4bcd8b832073b84e7ac4"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/user-product-package.json",
+      "bytes": 510,
+      "sha256": "fa2f928fcdc9b9f7ec5e207f8fbf92525fe1b766f2318c7dfd34325d19dea337"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/user-product.tar.gz",
+      "bytes": 3605719,
+      "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/verification-tools-g5d60b56e.tar.gz",
+      "bytes": 25871,
+      "sha256": "a907cc5f802032c176eff10f9551fa00c3080b02c1c704ecbeb86ae80a498b13"
+    },
+    {
+      "path": "docs-platform-delivery-20261029-g5d60b56e/SHA256SUMS",
+      "bytes": 1734,
+      "sha256": "7b8a8525ffeee0fd61634e7a7409cea7cd6dd2a98a0b24b7158d6a0197f9a030"
     }
   ],
   "physical_hil": "not_executed",

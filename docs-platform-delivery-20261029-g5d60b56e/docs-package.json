@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_documentation_delivery_result",
+  "action": "package",
+  "status": "passed",
+  "qualification": false,
+  "result": {
+    "directory": "/dev/shm/nexus-documentation-final-5d60b56e/packages/0.2.0-docs-g5d60b56e0968",
+    "archive": "/dev/shm/nexus-documentation-final-5d60b56e/packages/0.2.0-docs-g5d60b56e0968.tar.gz",
+    "manifest_sha256": "7cf0d25a072c100245a5d66dc28fe28d0d092a5a92a2faf89a735b215d447a2f",
+    "archive_sha256": "d3d1dc0b7e8d2d7d3332ed0dcac7197549a2f0f66fbdfacbc697af93617039d0",
+    "release_id": "0.2.0-docs-g5d60b56e0968",
+    "payload_files": 2487
+  },
+  "errors": []
+}

@@ -1,0 +1,36 @@
+{
+  "kind": "transport_of_existing_exact_examples_packages",
+  "source": "/dev/shm/nexus-examples-final-evidence-9d7d4d34",
+  "retained": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34",
+  "platform_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+  "examples_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+  "original_records_unchanged": true,
+  "packages": [
+    {
+      "name": "examples-build",
+      "source_archive": {
+        "path": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/store/d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606.tar.gz",
+        "sha256": "d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606",
+        "size": 60108472
+      },
+      "retained_archive": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/store/d0bce642ecbdf56b7930c2a15adaa9e0ac8ec95cbd7e61367f9aedc31a137606.tar.gz",
+      "original_package": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/examples-build-package.json",
+      "verification": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/examples-build-transport-verify.json",
+      "actual_exit_code": 0
+    },
+    {
+      "name": "user-product",
+      "source_archive": {
+        "path": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/store/6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e.tar.gz",
+        "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e",
+        "size": 3605719
+      },
+      "retained_archive": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/store/6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e.tar.gz",
+      "original_package": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/user-product-package.json",
+      "verification": "/workspace/nexus/build/c-cold-20261028/examples/final-9d7d4d34/user-product-transport-verify.json",
+      "actual_exit_code": 0
+    }
+  ],
+  "sdk_prefix_untouched": true,
+  "source_expanded_untouched": true
+}

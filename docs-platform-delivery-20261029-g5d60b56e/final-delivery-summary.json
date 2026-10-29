@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "kind": "external_examples_final_delivery_summary",
+  "status": "software_scope_passed",
+  "examples_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+  "examples_tree": "752829b139ff1f5335f0f6ea61c31414132a7429",
+  "platform_commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+  "platform_tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b",
+  "branch": "delivery/final-platform-cold-c-20261028",
+  "source_worktree_clean": true,
+  "source_paths": 24,
+  "normal_commit": {
+    "argv": [
+      "git",
+      "commit",
+      "-m",
+      "feat(examples): integrate C lifecycle platform and advanced H743 recipes"
+    ],
+    "exit_code": 0,
+    "started_ns": 1793243955040356475,
+    "ended_ns": 1793243980145745460,
+    "removed_environment_names": [
+      "GIT_PAGER"
+    ],
+    "ordinary_commit": true,
+    "bypass": false,
+    "local_commit": "a57821c099fce6d8132208de8dc4c6c8cbc2227f",
+    "tree": "752829b139ff1f5335f0f6ea61c31414132a7429",
+    "parent": "4a9f5f75b72605acc14f0d4bc5d675454e51c740",
+    "subject": "feat(examples): integrate C lifecycle platform and advanced H743 recipes"
+  },
+  "ordinary_gate_package": {
+    "archive": {
+      "path": "/dev/shm/nexus-examples-final/build/final-platform/ordinary-gate-store/76b6c92664480eec81227124c437068eb492c582bf0fbb2f6b0f4e4778bea273.tar.gz",
+      "sha256": "76b6c92664480eec81227124c437068eb492c582bf0fbb2f6b0f4e4778bea273",
+      "size": 38204
+    },
+    "bytes": 317878,
+    "files": 63,
+    "kind": "portable_evidence",
+    "manifest_sha256": "b380e0b53ee7d71db26944b4ac9e2af000a86a99742537878150d977a41ce64f",
+    "product_promotion": false,
+    "schema_version": 1,
+    "signature_status": "unsigned"
+  },
+  "canonical_association": {
+    "argv": [
+      "git",
+      "fetch",
+      "--no-recurse-submodules",
+      "origin",
+      "delivery/final-platform-cold-c-20261028"
+    ],
+    "exit_code": 0,
+    "started_ns": 1793244330709741954,
+    "ended_ns": 1793244331667397798,
+    "removed_environment_names": [
+      "GIT_PAGER"
+    ],
+    "local_commit": "a57821c099fce6d8132208de8dc4c6c8cbc2227f",
+    "canonical_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "tree": "752829b139ff1f5335f0f6ea61c31414132a7429",
+    "tree_equality_verified": true,
+    "branch": "delivery/final-platform-cold-c-20261028",
+    "worktree_clean": true
+  },
+  "builtin_scopeall": {
+    "report": "/dev/shm/nexus-examples-final/build/final-platform/local-ci-canonical-9d7d4d34/execution.json",
+    "status": "passed",
+    "complete_matrix": true,
+    "commands": 104,
+    "all_commands_exit_zero": true,
+    "parallel": 1,
+    "elapsed_seconds": 210.774510806,
+    "presets": 17,
+    "arm_presets": [
+      "stm32-qiming-baremetal",
+      "stm32-qiming-freertos",
+      "stm32-sky-baremetal",
+      "stm32-sky-freertos",
+      "gd32-liangshan-baremetal",
+      "gd32-liangshan-freertos",
+      "stm32-h743-nucleo-baremetal",
+      "stm32-h743-nucleo-freertos",
+      "stm32-u575-nucleo-baremetal",
+      "stm32-u575-nucleo-freertos",
+      "stm32-f103-reference-baremetal",
+      "stm32-f103-reference-freertos",
+      "gd32-f303-reference-baremetal",
+      "gd32-f303-reference-freertos",
+      "stm32-g474-reference-baremetal",
+      "stm32-g474-reference-freertos"
+    ],
+    "standalone_projects": 9,
+    "arm_elf_budgets_passed": 41,
+    "native_ctest": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 16,
+      "report_sha256": "83d798f1926357e94c0be2725eb191361909363e65171759fb79f52342ad3176"
+    },
+    "google_aggregate": {
+      "tests": 76,
+      "passed": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "programs": 7
+    },
+    "installed_native_ctest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1,
+      "cases": [
+        {
+          "name": "installed_platform_reference",
+          "classname": "installed_platform_reference",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "5e20a99dee87712589efd12728555bc71e528d670e4a4c8d735b7ffa01b7d068"
+    },
+    "owned_style": {
+      "status": "passed",
+      "files_checked": 239
+    }
+  },
+  "four_starters": {
+    "qiming": "scopeall stm32-qiming-baremetal-nexus_starter",
+    "sky": "scopeall stm32-sky-baremetal-nexus_starter",
+    "liangshan": "scopeall gd32-liangshan-baremetal-nexus_starter",
+    "native": {
+      "report": "/dev/shm/nexus-examples-final/build/final-platform/native-starter-canonical-9d7d4d34/execution.json",
+      "status": "passed",
+      "cases_passed": 1
+    }
+  },
+  "external_user_onboarding": {
+    "report": "/dev/shm/nexus-examples-final/build/final-platform/user-onboarding-canonical-9d7d4d34/execution.json",
+    "status": "passed",
+    "commands": 7,
+    "origin_examples_commit": "9d7d4d3430b8555766aba5bc7c76d5b49f8fd67d",
+    "origin_expected_platform": {
+      "commit": "5d60b56e09686776c72ce95dfa9384357e57d2bf",
+      "tree": "be71adaac61fc3cbf6a92f5f63e8c2a8ac84cb8b"
+    },
+    "cases_passed": 1,
+    "has_spaces_in_source_and_build_path": true,
+    "no_git_sdk_copy": true,
+    "actual_output": "Nexus starter: transfer settled; platform stopped"
+  },
+  "source_sdk": {
+    "prefix": "/dev/shm/nexus-examples-final/build/final-platform/local-ci-canonical-9d7d4d34/source-sdk",
+    "snapshot_sha256": "8ecc6535f6fb589ce63f9a35616bff905fae76d17e65477d664330cb9002523f",
+    "source_payload_files": 3008,
+    "package_files": 2,
+    "publishable": true,
+    "source_dirty": false
+  },
+  "physical_hil": "not_executed",
+  "limitations": [
+    "Source SDK publishability and executed local software scope do not establish physical behavior or independent offline/container reproducibility.",
+    "Formal platform 159-stage plan is separate; this summary only closes the external example software scope."
+  ]
+}

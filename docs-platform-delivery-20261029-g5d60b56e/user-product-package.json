@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/dev/shm/nexus-examples-final-evidence-9d7d4d34/store/6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e.tar.gz",
+    "sha256": "6d1b0e0790ce6aaf2bc7b9fb6130f91bdd919b96112fb6ece4c4912986a0ce1e",
+    "size": 3605719
+  },
+  "bytes": 20194483,
+  "files": 154,
+  "kind": "portable_evidence",
+  "manifest_sha256": "4bff5fd019a94da045cfecaefb0827ac9af28989c4c305e2f04610c6d9c5f824",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}
