@@ -107,8 +107,8 @@ TEST_P(BaselineIrqWakeProvider, ExplicitPrimaskPolicyBindsActualUartModel) {
     EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
 }
 
-INSTANTIATE_TEST_SUITE_P(M0M0PlusM23, BaselineIrqWakeProvider,
-                         testing::Values<uint16_t>(32U, 32U, 240U));
+INSTANTIATE_TEST_SUITE_P(BaselineVectorCounts, BaselineIrqWakeProvider,
+                         testing::Values<uint16_t>(32U, 240U));
 
 TEST(IrqWakeProvider, RejectedPolicyDoesNotReplaceExistingBorrowedSink) {
     nx_native_uart_state_t state = {};

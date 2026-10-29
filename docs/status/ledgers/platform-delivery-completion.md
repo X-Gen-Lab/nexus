@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`256deef275171d3480ef2f6f18393c5bd97e422a085f2a17b143bb84c8855d6b`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`15fa4acaaee8855544ec1f50b8fddf64e5363e5f63b53509f579455ddb5ccb65`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -575,11 +575,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | D02 |
 | `task` | Resolver stage ownership |
-| `implementation_status` | partial |
-| `software_status` | frozen_device_graph_4_cases_and_299_bundle_equivalence_full_configure_passed_final_gate_pending |
+| `implementation_status` | implemented |
+| `software_status` | frozen_fact_device_graph_and_direct_readonly_validation_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/configure |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-graph-stage/handoff.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-graph-stage/handoff.json;build/c-cold-20261028/fact-stage-increment/handoff.json |
 | `exit_condition` | Fact selection memory layout dependencies controllers endpoints and resources use named stage results without reinterpreting TOML |
 | `owner` | codex |
 
@@ -1161,7 +1161,7 @@ source_language: zh_CN
 | `task_id` | J02 |
 | `task` | Final software integration qualification |
 | `implementation_status` | partial |
-| `software_status` | d21_ordinary_gate_passed_final_combined_source_scopes_pending |
+| `software_status` | p3_ordinary_gate_passed_p4_combined_source_qualification_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/delivery;tools/release |
 | `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-gate/package.json |
@@ -1191,7 +1191,7 @@ source_language: zh_CN
 | `task_id` | J04 |
 | `task` | Incremental commits and GitHub synchronization |
 | `implementation_status` | in_progress |
-| `software_status` | 194_and_d21_committed_increments_synced_pr41_final_integration_pending |
+| `software_status` | three_increments_synced_through_364f3665_p4_final_integration_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/delivery;tools/release |
 | `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-complete-20261028 |

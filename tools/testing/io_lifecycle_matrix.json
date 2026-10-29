@@ -2568,7 +2568,7 @@
       "peripheral": "uart",
       "mode": "simulated-async",
       "target": "nexus_io_state_machine_test",
-      "case": "IOProviderSequences.NativeUartThirtyTwoCancelDeadlineDrainHistories",
+      "case": "IOProviderSequences.NativeUartDistinctCancelDeadlineDrainHistories",
       "test_source": "tests/google/io_state_machine_test.cpp",
       "production_sources": [
         "soc/native/drivers/uart.c",
@@ -2618,7 +2618,7 @@
         "nx_uart_port_submit(",
         "nx_uart_tx_prepare("
       ],
-      "invariant": "32 modeled histories combine partial/completed TX, cancellation, deadline, refused drain, duplicate settlement and slot lifetime.",
+      "invariant": "20 distinct modeled histories combine partial/completed TX, cancellation, deadline, refused drain, duplicate settlement and slot lifetime.",
       "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
     },
     {
@@ -2627,7 +2627,7 @@
       "peripheral": "spi",
       "mode": "simulated-async",
       "target": "nexus_io_state_machine_test",
-      "case": "IOProviderSequences.NativeSpiSixteenCancelDeadlineDrainHistories",
+      "case": "IOProviderSequences.NativeSpiDistinctCancelDeadlineDrainHistories",
       "test_source": "tests/google/io_state_machine_test.cpp",
       "production_sources": [
         "soc/native/drivers/spi.c",
@@ -2673,7 +2673,7 @@
         "nx_spi_port_stop(",
         "nx_spi_request_prepare("
       ],
-      "invariant": "16 modeled histories combine partial/completed SPI, deadline, cancellation and quarantine retry.",
+      "invariant": "8 distinct modeled histories combine partial/completed SPI, deadline, cancellation and quarantine retry.",
       "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
     },
     {

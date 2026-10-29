@@ -13,6 +13,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+from types import ModuleType
 import re
 import subprocess
 import sys
@@ -195,7 +196,7 @@ def load(path, snapshots=None):
 
 
 def obj(value, required, optional=(), context="object"):
-    if not isinstance(value, dict):
+    if not isinstance(value, Mapping):
         fail(f"{context}: expected object")
     missing = set(required) - value.keys()
     unknown = value.keys() - set(required) - set(optional)
@@ -777,6 +778,79 @@ def _resolve_source_dependencies(soc, provider, family, root, backend, read,
 
 
 @dataclass(frozen=True)
+class _FactResolution:
+    """One selected fact owner, with exact identity derived from Board data."""
+    board: Mapping
+    soc: Mapping
+    routes: Mapping
+    bindings: Mapping
+    provider: ModuleType
+    references: Mapping | None
+    inputs: tuple[Path, ...]
+
+    @property
+    def family(self):
+        return self.board["soc_family"]
+
+    @property
+    def part(self):
+        return self.board["soc"]
+
+    @property
+    def variant(self):
+        return self.soc["variants"][self.part]
+
+
+def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResolution:
+    """Select and admit one Board/SoC package before execution choices.
+
+    JSON facts remain read-only leaves. Their input paths stay with the single
+    selection so byte-identity sealing cannot omit a newly consumed fact file.
+    """
+    board_name = text(assembly.board_package, "Board package")
+    board_dir = board_directory(assembly_directory / board_name)
+    board_path = board_dir / "board.json"
+    board = obj(read(board_path),
+                {"schema_version", "id", "soc", "soc_family", "source_revision",
+                 "physical_pcb_revision", "clocks", "bindings",
+                 "reserved_resources", "unknowns", "provenance"},
+                {"inputs"}, "Board")
+    integer(board["schema_version"], 1, 1, "Board schema")
+    identity(board["id"], "Board id")
+    family = identity(board["soc_family"], "SoC family")
+    provider = maintained(family)
+    part = identity(board["soc"], "exact part")
+    soc_dir = root / descriptor.maintained(family).source_directory
+    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
+        fail("SoC package escapes owned source")
+    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
+    soc, routes_doc = read(soc_path), read(routes_path)
+    validate_soc(soc, part)
+    reference_path = None
+    references = None
+    if "references" in soc:
+        reference_path = contained_file(soc_dir, soc["references"])
+        references = fact_references.validate(read(reference_path),
+                                             soc["variants"])
+    if soc["id"] != family:
+        fail("Board SoC family differs from the package identity")
+    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
+    integer(routes_doc["schema_version"], 1, 1, "routes schema")
+    routes = resolve_routes(routes_doc, soc, part, provider)
+    validate_board_context(board)
+    bindings = resolve_bindings(board, routes, part)
+    inputs = [board_path, soc_path, routes_path]
+    if reference_path is not None:
+        inputs.append(reference_path)
+    for name in sequence(board.get("inputs", []), "declared Board inputs"):
+        inputs.append(contained_file(board_dir, name))
+    return _FactResolution(
+        board=freeze(board), soc=freeze(soc), routes=freeze(routes),
+        bindings=freeze(bindings), provider=provider,
+        references=freeze(references), inputs=tuple(inputs))
+
+
+@dataclass(frozen=True)
 class _DeviceGraphResolution:
     """Complete controller/endpoint decisions; local builders never escape."""
     controllers: tuple[ControllerIR, ...]
@@ -921,7 +995,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                         claim(key, name, mode, route["id"])
                         irq_owners[key] = (route["kind"], priority)
 
-            for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
+            for resource in (*hardware.get("resources", ()),
+                             *route.get("resources", ()),
+                             *route.get("mode_resources", {}).get(mode, ())):
                 claim(resource, name, mode, route["id"])
             if route["kind"] == "adc_group":
                 if provider.ADC_GROUP is None:
@@ -1146,37 +1222,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     if ("capabilities" in factory_options and
             type(factory_options["capabilities"]) is not bool):
         fail("Factory capabilities must be boolean")
-    board_name = text(assembly.board_package, "Board package")
-    board_dir = board_directory(assembly_path.parent / board_name)
-    board_path = board_dir / "board.json"
-    board = obj(read(board_path),
-                {"schema_version", "id", "soc", "soc_family", "source_revision",
-                 "physical_pcb_revision", "clocks", "bindings",
-                 "reserved_resources", "unknowns", "provenance"},
-                {"inputs"}, "Board")
-    integer(board["schema_version"], 1, 1, "Board schema")
-    identity(board["id"], "Board id")
-    family = identity(board["soc_family"], "SoC family")
-    provider = maintained(family)
-    part = identity(board["soc"], "exact part")
-    soc_dir = root / descriptor.maintained(family).source_directory
-    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
-        fail("SoC package escapes owned source")
-    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
-    soc, routes_doc = read(soc_path), read(routes_path)
-    variant = validate_soc(soc, part)
-    reference_path = None
-    references = None
-    if "references" in soc:
-        reference_path = contained_file(soc_dir, soc["references"])
-        references = fact_references.validate(read(reference_path),
-                                             soc["variants"])
-    if soc["id"] != family:
-        fail("Board SoC family differs from the package identity")
-    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
-    integer(routes_doc["schema_version"], 1, 1, "routes schema")
-    routes = resolve_routes(routes_doc, soc, part, provider)
-    validate_board_context(board)
+    facts = _resolve_facts(assembly, root=root,
+                           assembly_directory=assembly_path.parent, read=read)
+    board, soc, routes = facts.board, facts.soc, facts.routes
+    family, part, provider = facts.family, facts.part, facts.provider
+    variant, references = facts.variant, facts.references
     backend = assembly.backend
     if backend not in {"baremetal", "freertos", "native", "threadx"}:
         fail(f"Unsupported OS backend: {backend}")
@@ -1214,18 +1264,14 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail(f"Unsupported optimization profile: {optimization}")
     selected_memory = _resolve_memory(assembly, variant, provider, part,
                                       kernel_profile)
-    bindings = resolve_bindings(board, routes, part)
+    bindings = facts.bindings
     device_graph = _resolve_device_graph(
         assembly, root=root, soc=soc, board=board, routes=routes,
         bindings=bindings, provider=provider, clock=clock, clock_plan=clock_plan,
         kernel_profile=kernel_profile, irq_profile=irq_profile,
         memory=selected_memory, i2s2_role=i2s2_role, read=read, snapshots=snapshots)
-    inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
+    inputs = [assembly_path, *facts.inputs, policy_path]
     inputs.extend(device_graph.inputs)
-    if reference_path is not None:
-        inputs.append(reference_path)
-    for name in sequence(board.get("inputs", []), "declared Board inputs"):
-        inputs.append(contained_file(board_dir, name))
     selected_layout = _resolve_flash_layout(
         assembly.layout, assembly_path.parent, variant["flash"], read)
     if selected_layout.input_path is not None:
