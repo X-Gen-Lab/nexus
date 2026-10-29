@@ -11,19 +11,11 @@ if(NOT g4_control_generated EQUAL 0)
     message(FATAL_ERROR
         "G474 control fixture rejected: ${g4_control_output}${g4_control_error}")
 endif()
-file(READ "${g4_control_bundle}/input_paths.json" g4_control_inputs)
-string(JSON g4_control_input_count LENGTH "${g4_control_inputs}")
-math(EXPR g4_control_last_input "${g4_control_input_count} - 1")
-foreach(index RANGE 0 ${g4_control_last_input})
-    string(JSON g4_control_input_name MEMBER "${g4_control_inputs}" ${index})
-    string(JSON g4_control_input_path GET "${g4_control_inputs}"
-        "${g4_control_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${g4_control_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_control_bundle}")
 nexus_google_test(nexus_g474_control_factory_test
     SOURCES g474_control_factory_test.cpp
         "${g4_control_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"

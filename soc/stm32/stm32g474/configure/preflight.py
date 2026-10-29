@@ -1,64 +1,92 @@
-"""STM32G474 selected cold-resource admission policy."""
+"""Immutable G474 resource records; all hardware admission executes in C."""
 import re
 
-from tools.configure import gpio_phase
 from tools.configure.providers.common import fail, owned_claims
-from tools.configure.preflight import _reject
-
 
 PREFLIGHT_CALL = 'nx_stm32g474_system_preflight(&g_nx_stm32g474_system)'
 
 
-def selected_preflight(result, *, dma_conditions=None):
-    """Project exact selected leases; base preflight owns the reserved timer."""
-    source = []
+def admission_declarations(result, pins, pin_count):
+    from .emission import _peripheral_gates, _syscfg
+    selected = {name: set() for name in ('apb1', 'apb1_2', 'apb2', 'ahb1', 'ahb2', 'reset_apb1', 'mux')}
     owners = {item.id for item in result.controllers}
     claims = tuple(owned_claims(result, owners))
+    exti = 0
+    control = False
+    strict_dma = False
     for item in result.controllers:
+        controller = item.controller
         if item.kind in {'uart', 'spi', 'pwm', 'i2c'}:
-            controller = item.controller
-            register = 'APB1ENR2' if controller == 'LPUART1' else 'APB2ENR' if controller in {'USART1', 'SPI1'} else 'APB1ENR1'
-            source += _reject(f'(NX_G474_READ(&RCC->{register}) & RCC_{register}_{controller}EN) != 0u')
+            field, register = ('apb1_2', 'APB1ENR2') if controller == 'LPUART1' else (
+                ('apb2', 'APB2ENR') if controller in {'USART1', 'SPI1'} else ('apb1', 'APB1ENR1'))
+            selected[field].add(f'RCC_{register}_{controller}EN')
             if item.kind == 'pwm':
-                source += _reject(f'(NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_{controller}RST) != 0u')
-            if item.kind == 'uart':
-                source += _reject(f'(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_{controller}SEL) != 0u')
-            if item.kind == 'i2c':
-                source += _reject('(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u')
+                selected['reset_apb1'].add(f'RCC_APB1RSTR1_{controller}RST')
+            if item.kind in {'uart', 'i2c'}:
+                selected['mux'].add(f'RCC_CCIPR_{controller}SEL')
+        if item.kind in {'timer_capture', 'encoder'}:
+            selected['apb1'].add(f'RCC_APB1ENR1_{controller}EN')
+            selected['reset_apb1'].add(f'RCC_APB1RSTR1_{controller}RST')
         if item.kind == 'can_fd':
-            source += _reject('(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_FDCANEN) != 0u || (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_FDCANRST) != 0u || (NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_FDCANSEL) != 0u')
+            selected['apb1'].add('RCC_APB1ENR1_FDCANEN')
+            selected['reset_apb1'].add('RCC_APB1RSTR1_FDCANRST')
+            selected['mux'].add('RCC_CCIPR_FDCANSEL')
+        if item.kind in {'pwm_group', 'pwm_adc'}:
+            selected['apb2'].add('RCC_APB2ENR_TIM1EN')
+            control = True
         if item.kind in {'adc', 'pwm_adc', 'adc_group'}:
-            source += _reject('(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u')
-            source += _reject('(NX_G474_READ(&RCC->AHB2ENR) & RCC_AHB2ENR_ADC12EN) != 0u')
-            source += _reject('(NX_G474_READ(&RCC->AHB2ENR) & RCC_AHB2ENR_ADC345EN) != 0u')
-            if item.mode == 'trigger-dma':
-                source += _reject('(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u')
+            selected['mux'].add('RCC_CCIPR_ADC12SEL')
+            selected['ahb2'].update({'RCC_AHB2ENR_ADC12EN', 'RCC_AHB2ENR_ADC345EN'})
+            if item.mode == 'trigger-dma' or (item.kind == 'adc_group' and item.options.trigger == 'tim6-trgo'):
+                selected['apb1'].add('RCC_APB1ENR1_TIM6EN')
             if item.kind == 'adc_group':
-                source += _reject('!NX_G474_IRQ_AVAILABLE(ADC1_2_IRQn)')
+                strict_dma |= item.mode == 'regular-sequence-dma'
                 if item.options.trigger == 'tim6-trgo':
-                    source += _reject('(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u || (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_TIM6RST) != 0u')
-                if item.mode == 'regular-sequence-dma':
-                    source += _reject('!NX_G474_IRQ_AVAILABLE(DMA1_Channel1_IRQn)')
-                    source += ['    if ((NX_G474_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u) {']
-                    source += _reject('NX_G474_READ(&DMA1_Channel1->CCR) != 0u || NX_G474_READ(&DMA1_Channel1->CNDTR) != 0u || NX_G474_READ(&DMA1_Channel1->CPAR) != 0u || NX_G474_READ(&DMA1_Channel1->CMAR) != 0u', indent=8)
-                    source += ['    }']
+                    selected['reset_apb1'].add('RCC_APB1RSTR1_TIM6RST')
             if item.kind == 'pwm_adc':
-                source += _reject('(NX_G474_READ(&RCC->AHB1ENR) & (RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMAMUX1EN)) != 0u || (NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u')
-    for item in result.controllers:
-        if item.kind == 'flash':
-            source += _reject('(NX_G474_READ(&FLASH->ECCR) & FLASH_ECCR_ECCIE) != 0u')
+                selected['ahb1'].update({'RCC_AHB1ENR_DMA1EN', 'RCC_AHB1ENR_DMAMUX1EN'})
+                selected['apb2'].add('RCC_APB2ENR_TIM15EN')
         if item.kind == 'exti':
-            line = int(item.controller.removeprefix('EXTI'))
-            source += _reject(f'((NX_G474_READ(&EXTI->IMR1) | NX_G474_READ(&EXTI->EMR1) | NX_G474_READ(&EXTI->RTSR1) | NX_G474_READ(&EXTI->FTSR1) | NX_G474_READ(&EXTI->PR1)) & {1 << line}u) != 0u')
-    for key in sorted({item.key for item in claims if item.key.startswith('irq:')}):
-        vector = key.removeprefix('irq:') + '_IRQn'
-        source += _reject(f'!NX_G474_IRQ_AVAILABLE((IRQn_Type){vector})')
-    for key in sorted({item.key for item in claims if item.key.startswith('dma:')}):
-        match = re.fullmatch('dma:(DMA[0-9]+):stream([0-7])', key)
-        if match is None:
-            fail('No maintained selected DMA lane admission: ' + key)
-        dma, lane = match.groups()
-        source += _reject(f'(NX_G474_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u && NX_G474_READ(&{dma}_Channel{lane}->CCR) != 0u')
-        source += _reject('(NX_G474_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMAMUX1EN) != 0u && NX_G474_READ(&DMAMUX1_Channel0->CCR) != 0u')
-    return source + gpio_phase.preflight(result)
+            exti |= 1 << int(controller.removeprefix('EXTI'))
+    for owner in result.pwm_shared_owners:
+        selected['apb1'].add(f'RCC_APB1ENR1_{owner.controller}EN')
+        selected['reset_apb1'].add(f'RCC_APB1RSTR1_{owner.controller}RST')
+    dma = False
+    for key in sorted({claim.key for claim in claims if claim.key.startswith('dma:')}):
+        if re.fullmatch('dma:DMA1:stream1', key) is None:
+            fail('No maintained selected G474 DMA admission: ' + key)
+        dma = True
+    vectors = sorted({claim.key.removeprefix('irq:') + '_IRQn' for claim in claims if claim.key.startswith('irq:')})
+    for owner in result.pwm_shared_owners:
+        vectors.append(owner.controller + '_IRQn')
+    lines = ['static const nx_stm32g474_platform_config_t s_nx_platform_config = {',
+             f'    .pins = {pins}, .pin_count = {pin_count}u,']
+    for field, values in selected.items():
+        lines.append(f'    .admit_{field} = ' + (' | '.join(sorted(values)) if values else '0u') + ',')
+    lines += ['    .irq_masks = {']
+    for bank in range(4):
+        masks = [f'NX_G474_PLATFORM_IRQ_MASK({vector}, {bank}u)' for vector in sorted(set(vectors))]
+        lines.append('        ' + (' | '.join(masks) if masks else '0u') + ',')
+    lines += ['    },', f'    .exti_lines = {exti}u,']
+    groups = dict(_peripheral_gates(result))
+    for field, register in (('apb1', 'APB1ENR1'), ('apb1_2', 'APB1ENR2'),
+                             ('apb2', 'APB2ENR'), ('ahb1', 'AHB1ENR'), ('ahb2', 'AHB2ENR')):
+        lines.append(f'    .clocks_{field} = {groups.get(register, "0u")},')
+        slot = '&s_nx_platform_peripheral_' + register.lower() + '_added' if register in groups else 'NULL'
+        lines.append(f'    .added_{field} = {slot},')
+    def pointer(condition, name):
+        return '&s_nx_platform_' + name if condition else 'NULL'
+    lines += [f'    .added_syscfg = {pointer(_syscfg(result), "syscfg_clock_added")},',
+              f'    .owned_i2c_mux = {pointer(any(item.kind == "i2c" for item in result.controllers), "i2c_mux_owned")},',
+              f'    .owned_adc_mux = {pointer(any(item.kind in {"adc", "pwm_adc", "adc_group"} for item in result.controllers), "adc_mux_owned")},',
+              f'    .control_group = {str(control).lower()}, .dma_channel1 = {str(dma).lower()},',
+              f'    .strict_dma_channel1 = {str(strict_dma).lower()}, .flash = {str(any(item.kind == "flash" for item in result.controllers)).lower()}', '};']
+    return lines
 
+
+def selected_preflight(result, *, dma_conditions=None):
+    del dma_conditions
+    if not result.controllers:
+        return []
+    return ['    result.primary = nx_stm32g474_platform_preflight(&s_nx_platform_config);',
+            '    if (result.primary != NX_SUCCESS) { return result; }']

@@ -299,6 +299,37 @@ class ProcessExecutionTests(unittest.TestCase):
             record = json.loads((root / "pre-cancel.command.json").read_text())
             self.assertIsNone(record["child_returncode"])
 
+    def test_default_parallel_jobs_inherits_one_outer_allocation(self):
+        from tools.dev.process import parallel_jobs
+        self.assertEqual(parallel_jobs({}), 2)
+        self.assertEqual(parallel_jobs({}, default=1), 1)
+        self.assertEqual(parallel_jobs({"CMAKE_BUILD_PARALLEL_LEVEL": "3"}), 3)
+        self.assertEqual(parallel_jobs({"NEXUS_BUILD_JOBS": "1",
+                                       "CMAKE_BUILD_PARALLEL_LEVEL": "9"}), 1)
+
+    def test_explicit_job_allocation_is_inherited_by_actual_child(self):
+        from tools.dev.process import execution_environment, run
+        original = {"NEXUS_BUILD_JOBS": "1", "CMAKE_BUILD_PARALLEL_LEVEL": "9"}
+        environment = execution_environment(original, jobs=3)
+        self.assertEqual(original["NEXUS_BUILD_JOBS"], "1")
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            result = run([sys.executable, "-c",
+                          "import os; print(os.environ['NEXUS_BUILD_JOBS']); "
+                          "print(os.environ['CMAKE_BUILD_PARALLEL_LEVEL'])"],
+                         cwd=root, env=environment, log=root / "budget.txt",
+                         timeout=10)
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(result.stdout.splitlines(), ["3", "3"])
+
+    def test_invalid_selected_job_allocations_never_fall_back(self):
+        from tools.dev.process import parallel_jobs
+        for value in ("0", "-1", "", "1.5", "unlimited", "02"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                parallel_jobs({"NEXUS_BUILD_JOBS": value})
+            with self.subTest(explicit=value), self.assertRaises(ValueError):
+                parallel_jobs({}, requested=value)
+
     def test_environment_parallelism_is_bounded_and_explicit(self):
         from tools.dev.process import execution_environment
         self.assertEqual(execution_environment({})[

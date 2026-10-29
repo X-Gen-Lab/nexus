@@ -242,9 +242,12 @@ model_bytes=128
         generated = (output / "bindings.c").read_text()
         self.assertIn("nx_stm32_uart_dma_state_t", generated)
         self.assertIn("&nx_stm32_uart_dma_ops", generated)
-        self.assertIn("nx_stm32_uart_dma_initialize", generated)
+        self.assertIn("nx_stm32_uart_dma_cold_prepare", generated)
         self.assertIn("DMA2_Stream7_IRQHandler", generated)
-        self.assertIn("s_nx_port_uart1.uart.registers", generated)
+        self.assertIn("static const nx_stm32_uart_dma_cold_config_t", generated)
+        self.assertIn(".registers = USART1", generated)
+        self.assertIn(".transmit = { DMA2_Stream7, DMA2_Stream7_IRQn, 7u, 4u }", generated)
+        self.assertNotIn("s_nx_port_uart1.uart.registers =", generated)
         self.assertNotIn("0x10000000u", generated)
 
     def test_all_maintained_adc_toml_generate_from_immutable_ir(self):
@@ -294,7 +297,8 @@ model_bytes=128
         self.assertIn("nx_gd32_uart_irq(&s_nx_port_link_b)", generated)
         self.assertIn("{ GPIOB, &s_nx_spi_pin_state_bus_spi_b[3u], "
                       "1u, 0u, 0u }", generated)
-        self.assertIn("nx_gd32_pin_restore", generated)
+        self.assertIn("nx_gd32_platform_pins_release", generated)
+        self.assertNotIn("nx_gd32_pin_restore(", generated)
 
     def test_stm32_spi_dma_uses_exact_streams_and_endpoint_provider(self):
         source = gate.ROOT / "tests/contracts/stm32_assembly/zg-spi.toml"
@@ -323,7 +327,7 @@ model_bytes=128
         output = self.root / "gd-uart-dma"
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
-        for text in ("nx_gd32_uart_dma_state_t", "nx_gd32_uart_dma_initialize",
+        for text in ("nx_gd32_uart_dma_state_t", "nx_gd32_uart_dma_cold_prepare",
                      "&nx_gd32_uart_dma_ops", "void DMA1_Channel7_IRQHandler(void)",
                      "nx_gd32_uart_dma_uart_irq(&s_nx_port_link_a)",
                      "RCU_AHB1EN_DMA1EN"):
@@ -389,8 +393,8 @@ model_bytes=128
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
         for text in ("nx_stm32_adc_stream_state_t", "&nx_stm32_adc_stream_ops",
-                     "nx_stm32_adc_stream_initialize", "DMA2_Stream4_IRQHandler",
-                     "nx_adc_port_stream_stop(&s_nx_face_adc0)"):
+                     "nx_stm32_adc_stream_prepare", "DMA2_Stream4_IRQHandler",
+                     "nx_stm32_adc_stream_close"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
         self.assertTrue({"controller:TIM3", "dma:DMA2:stream4"} <= claims)
@@ -411,7 +415,7 @@ model_bytes=128
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
         for text in ("nx_gd32_adc_stream_state_t", "&nx_gd32_adc_stream_ops",
-                     "nx_gd32_adc_stream_initialize", "void DMA1_Channel0_IRQHandler(void)",
+                     "nx_gd32_adc_stream_cold_prepare", "void DMA1_Channel0_IRQHandler(void)",
                      "nx_gd32_adc_stream_stop(&s_nx_port_adc0)"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
@@ -431,7 +435,8 @@ model_bytes=128
         gate.configure(self.assembly, output)
         generated = (output / "bindings.c").read_text()
         for text in ("nx_gd32_uart_stream_state_t", "&nx_gd32_uart_stream_ops",
-                     "nx_gd32_uart_stream_initialize_at(&s_nx_port_link_b, &nx_gd32_usart1_controller",
+                     "nx_gd32_uart_stream_cold_prepare(&s_nx_port_link_b, &s_nx_uart_config_link_b",
+                     ".controller = &nx_gd32_usart1_controller",
                      "nx_gd32_uart_stream_irq(&s_nx_port_link_b)"):
             self.assertIn(text, generated)
         self.assertNotIn("s_nx_rx_link_b[", generated)

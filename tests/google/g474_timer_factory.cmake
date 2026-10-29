@@ -20,22 +20,16 @@ foreach(g4_timer_kind capture encoder)
         message(FATAL_ERROR
             "G474 timer fixture rejected: ${g4_timer_output}${g4_timer_error}")
     endif()
-    file(READ "${g4_timer_bundle}/input_paths.json" g4_timer_inputs)
-    string(JSON g4_timer_count LENGTH "${g4_timer_inputs}")
-    math(EXPR g4_timer_last "${g4_timer_count} - 1")
-    foreach(index RANGE 0 ${g4_timer_last})
-        string(JSON g4_timer_name MEMBER "${g4_timer_inputs}" ${index})
-        string(JSON g4_timer_path GET "${g4_timer_inputs}" "${g4_timer_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${g4_timer_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${g4_timer_bundle}")
     set(g4_timer_target "nexus_g474_${g4_timer_kind}_factory_test")
     nexus_google_test(${g4_timer_target} SOURCES g474_timer_factory_test.cpp
         g474_timer_factory_ports.c "${g4_timer_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/${g4_timer_driver}.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/${g4_timer_driver}_cold.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${g4_timer_bundle}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"

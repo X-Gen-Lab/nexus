@@ -219,6 +219,121 @@ void nx_stm32g474_uart_irq(nx_stm32g474_uart_state_t* port);
 #ifndef NX_G474_IRQ_GROUP
 #define NX_G474_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif
+/** \brief Immutable GPIO binding; Platform owns its original pad lease. */
+typedef struct {
+    GPIO_TypeDef* registers;
+    uint32_t mask;
+    uint32_t initial;
+    bool output;
+} nx_stm32g474_gpio_config_t;
+/** \brief Bind a fresh GPIO face without changing a retained epoch.
+ * \param[in,out] port: Static zeroed or successfully stopped state.
+ * \param[in] config: Reviewed static port, mask, direction and initial latch.
+ * \return Success or error; failed effects remain for Platform cleanup.
+ */
+nx_result_t nx_stm32g474_gpio_prepare(nx_stm32g474_gpio_state_t* port,
+                                      const nx_stm32g474_gpio_config_t* config);
+/** \brief Immutable UART/ring and exact reviewed TX/RX connection. */
+typedef struct {
+    USART_TypeDef* registers;
+    void* rx_storage;
+    size_t rx_capacity;
+    uint32_t baud;
+    IRQn_Type irq;
+    nx_irq_policy_t irq_policy;
+    GPIO_TypeDef* tx_gpio;
+    GPIO_TypeDef* rx_gpio;
+    uint8_t tx_pin;
+    uint8_t rx_pin;
+    uint8_t af;
+} nx_stm32g474_uart_config_t;
+/** \brief Bind one static byte ring, prepare pads and acquire its UART.
+ * \param[in,out] port: Unretained state; ring/wake observers have joined.
+ * \param[in] config: Immutable ring and physical route; no overlapping state.
+ * \return Success or error, preserving any partial effects for stop/retry.
+ */
+nx_result_t nx_stm32g474_uart_prepare(nx_stm32g474_uart_state_t* port,
+                                      const nx_stm32g474_uart_config_t* config);
+/** \brief Immutable AF connection, never a register action stream. */
+typedef struct {
+    GPIO_TypeDef* gpio;
+    uint8_t pin;
+    uint8_t af;
+} nx_stm32g474_alternate_t;
+/** \brief Static endpoint storage and its reviewed active-low CS/rate. */
+typedef struct {
+    nx_stm32g474_spi_endpoint_state_t* endpoint;
+    nx_stm32g474_gpio_state_t* cs;
+    GPIO_TypeDef* gpio;
+    uint32_t mask;
+    uint32_t frequency_hz;
+    uint8_t mode;
+} nx_stm32g474_spi_device_config_t;
+/** \brief One exact SPI instance and its statically selected endpoints. */
+typedef struct {
+    SPI_TypeDef* registers;
+    volatile uint32_t* reset;
+    uint32_t reset_mask;
+    const nx_stm32g474_alternate_t* pins;
+    size_t pin_count;
+    const nx_stm32g474_spi_device_config_t* devices;
+    size_t device_count;
+} nx_stm32g474_spi_config_t;
+/** \brief Acquire the cold SPI and prepare its endpoints and AF connections.
+ * \param[in,out] port: Static unretained physical state.
+ * \param[in] config: Static immutable endpoint/pad records, all storage live.
+ * \return Success or error; Platform cleanup owns partial pads and endpoints.
+ */
+nx_result_t nx_stm32g474_spi_prepare(nx_stm32g474_spi_state_t* port,
+                                     const nx_stm32g474_spi_config_t* config);
+/** \brief Drain the SPI before withdrawing every acquired endpoint CS.
+ * \param[in,out] port: Same serialized physical state.
+ * \param[in] config: Original static config and endpoint state.
+ * \return Success only after all selected CS sources are withdrawn.
+ */
+nx_result_t nx_stm32g474_spi_close(nx_stm32g474_spi_state_t* port,
+                                   const nx_stm32g474_spi_config_t* config);
+/** \brief Immutable fixed PWM base and external inactive-level owner. */
+typedef struct {
+    TIM_TypeDef* registers;
+    nx_stm32g474_gpio_state_t* idle;
+    GPIO_TypeDef* gpio;
+    volatile uint32_t* reset;
+    uint32_t reset_mask;
+    uint32_t inactive;
+    uint32_t period_ticks;
+    uint32_t duty_ticks;
+    uint32_t tick_hz;
+    uint8_t pin;
+} nx_stm32g474_pwm_config_t;
+/** \brief Bind the cold timer and its Board-defined inactive GPIO lease.
+ * \param[in,out] port: Static unretained timer state.
+ * \param[in] config: Immutable timer, pad and exact initial tick geometry.
+ * \return Success/error; close retains responsibility for partial effects.
+ */
+nx_result_t nx_stm32g474_pwm_prepare(nx_stm32g474_pwm_state_t* port,
+                                     const nx_stm32g474_pwm_config_t* config);
+/** \brief Immutable EXTI storage, line, edge and kernel IRQ policy. */
+typedef struct {
+    nx_exti_event_t* storage;
+    size_t capacity;
+    nx_irq_policy_t irq_policy;
+    nx_exti_edge_t edge;
+    uint8_t line;
+    uint8_t priority;
+} nx_stm32g474_exti_config_t;
+/** \brief Bind fresh event storage before acquiring the selected EXTI source.
+ * \param[in,out] port: Static state with no wake/publisher/retained borrow.
+ * \param[in] config: Immutable reviewed PA0/PA1 connection and event ring.
+ * \return Success/error; public stop drains any retained partial effects.
+ */
+nx_result_t nx_stm32g474_exti_prepare(nx_stm32g474_exti_state_t* port,
+                                      const nx_stm32g474_exti_config_t* config);
+/** \brief Bind a fresh, still disabled irreversible IWDG owner.
+ * \param[in,out] port: Static state; successful stop joined prior consumers.
+ * \return Success or busy/invalid; no watchdog activation occurs here.
+ */
+nx_result_t nx_stm32g474_watchdog_prepare(nx_stm32g474_watchdog_state_t* port);
 #ifdef __cplusplus
 }
 #endif

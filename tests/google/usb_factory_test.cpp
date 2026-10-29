@@ -8,6 +8,33 @@
  */
 #include "usb_factory_activation_test.h"
 #include "usb_factory_fixture.h"
+#ifdef NX_USB_FACTORY_STM32
+extern "C" {
+#include "stm32f407_usb_cold.h"
+}
+#else
+extern "C" {
+#include "gd32f470_usb_cold.h"
+}
+#endif
+
+namespace {
+#ifdef NX_USB_FACTORY_STM32
+using UsbColdConfig = nx_stm32_usb_cold_config_t;
+using UsbClockState = nx_stm32_usb_clock_state_t;
+using UsbPinConfig = nx_stm32_platform_pin_config_t;
+using UsbEndpointPlan = nx_stm32_usb_endpoint_config_t;
+constexpr auto UsbColdPrepare = nx_stm32_usb_cold_prepare;
+constexpr auto UsbColdClose = nx_stm32_usb_cold_close;
+#else
+using UsbColdConfig = nx_gd32_usb_cold_config_t;
+using UsbClockState = nx_gd32_usb_clock_state_t;
+using UsbPinConfig = nx_gd32_platform_pin_config_t;
+using UsbEndpointPlan = nx_gd32_usb_endpoint_config_t;
+constexpr auto UsbColdPrepare = nx_gd32_usb_cold_prepare;
+constexpr auto UsbColdClose = nx_gd32_usb_cold_close;
+#endif
+} /* namespace */
 
 TEST_F(UsbFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
     const auto* bytes = static_cast<const uint8_t*>(clocks);
@@ -209,3 +236,90 @@ TEST_F(UsbFactory, RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback) {
     EXPECT_EQ(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
 }
 #endif
+
+TEST_F(UsbFactory, CColdRejectsMissingStaticConfigBeforeHardwareOrStorage) {
+    const auto* bytes = static_cast<const uint8_t*>(clocks);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    const nx_usb_controller_t prior = *state;
+    uint8_t leases = 0U;
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, UsbColdPrepare(state, nullptr, &leases));
+    EXPECT_EQ(NX_ERROR_INVALID, UsbColdClose(state, nullptr, &leases));
+    EXPECT_EQ(0, std::memcmp(&prior, state, sizeof(prior)));
+    EXPECT_EQ(0U, leases);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+}
+
+TEST_F(UsbFactory, ExhaustedCColdEpochRejectsBeforeStorageOrHardwareChanges) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    nx_usb_controller_t selected = *state;
+    selected.snapshot.epoch = UINT64_MAX;
+    const nx_usb_controller_t prior = selected;
+    UsbClockState clock{};
+    uint16_t snapshots[2]{};
+    uint8_t leases = 0U;
+    const UsbPinConfig pins[] = {{GPIOA, &snapshots[0], 0U, 11U},
+                                 {GPIOA, &snapshots[1], 0U, 12U}};
+    UsbEndpointPlan plan[4]{};
+    ASSERT_EQ(4U, selected.endpoint_count);
+    for (size_t i = 0U; i < 4U; ++i) {
+        const nx_usb_endpoint_t* endpoint = &selected.endpoints[i];
+        plan[i] = {endpoint->number,     endpoint->in,
+                   endpoint->transfer,   endpoint->max_packet,
+                   endpoint->fifo_start, endpoint->fifo_words};
+    }
+    UsbColdConfig config{};
+    config.clock = &clock;
+    config.pins = pins;
+    config.endpoints = selected.endpoints;
+    config.plan = plan;
+    config.events = selected.events;
+    config.endpoint_count = selected.endpoint_count;
+    config.capacity = selected.capacity;
+    config.irq_policy = selected.irq_policy;
+    config.poll_limit = selected.poll_limit;
+    config.drain_timeout_us = selected.drain_timeout_us;
+    config.clock_timeout_us = 1000U;
+    config.rx_fifo_words = selected.rx_fifo_words;
+    config.priority = selected.irq.priority;
+    const auto* bytes = static_cast<const uint8_t*>(clocks);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, UsbColdPrepare(&selected, &config, &leases));
+    EXPECT_EQ(0, std::memcmp(&prior, &selected, sizeof(prior)));
+    EXPECT_EQ(0U, leases);
+    EXPECT_EQ(0U, clock.phase);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    testing::Mock::VerifyAndClearExpectations(&ports);
+    EXPECT_EQ(NX_SUCCESS, UsbColdClose(&selected, &config, &leases));
+}
+
+TEST_F(UsbFactory, AbsentColdReceiptCannotStopActiveController) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    const nx_usb_controller_t prior = *state;
+    uint16_t snapshots[2]{};
+    const UsbPinConfig pins[] = {{GPIOA, &snapshots[0], 0U, 11U},
+                                 {GPIOA, &snapshots[1], 0U, 12U}};
+    UsbColdConfig config{};
+    config.pins = pins;
+    config.clock = static_cast<UsbClockState*>(state->clock.context);
+    config.clock_timeout_us = 1000U;
+    uint8_t leases = 0U;
+    const auto* bytes = static_cast<const uint8_t*>(clocks);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, UsbColdClose(state, &config, &leases));
+    EXPECT_EQ(0, std::memcmp(&prior, state, sizeof(prior)));
+    EXPECT_EQ(0U, leases);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}

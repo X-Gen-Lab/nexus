@@ -35,15 +35,7 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT gd303_generated EQUAL 0)
     message(FATAL_ERROR "GD303 factory fixture rejected: ${gd303_output}${gd303_error}")
 endif()
-file(READ "${gd303_factory_bundle}/input_paths.json" gd303_inputs)
-string(JSON gd303_input_count LENGTH "${gd303_inputs}")
-math(EXPR gd303_last_input "${gd303_input_count} - 1")
-foreach(index RANGE 0 ${gd303_last_input})
-    string(JSON gd303_input_name MEMBER "${gd303_inputs}" ${index})
-    string(JSON gd303_input_path GET "${gd303_inputs}" "${gd303_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${gd303_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${gd303_factory_bundle}")
 nexus_google_test(nexus_gd32f303_factory_test SOURCES gd32f303_factory_test.cpp
     "${gd303_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.c"
@@ -78,15 +70,7 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT gd303_generated EQUAL 0)
     message(FATAL_ERROR "GD303 factory fixture rejected: ${gd303_output}${gd303_error}")
 endif()
-file(READ "${gd303_spi_factory_bundle}/input_paths.json" gd303_inputs)
-string(JSON gd303_input_count LENGTH "${gd303_inputs}")
-math(EXPR gd303_last_input "${gd303_input_count} - 1")
-foreach(index RANGE 0 ${gd303_last_input})
-    string(JSON gd303_input_name MEMBER "${gd303_inputs}" ${index})
-    string(JSON gd303_input_path GET "${gd303_inputs}" "${gd303_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${gd303_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${gd303_spi_factory_bundle}")
 nexus_google_test(nexus_gd32f303_spi_factory_test SOURCES gd32f303_spi_factory_test.cpp
     "${gd303_spi_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.c"

@@ -193,21 +193,26 @@ class U575ProviderTests(unittest.TestCase):
         for item in result.controllers:
             construction = self.provider.constructor(item, result, {}, {}, ())
             source = "\n".join(construction.definitions)
-            self.assertLess(source.index(".retained"),
-                            source.index(".registers ="))
+            self.assertEqual(construction.initialize.function,
+                             "nx_stm32u575_" + item.kind + "_prepare")
+            self.assertNotIn(".retained", source)
+            self.assertNotIn("static nx_result_t prepare_", source)
             self.assertEqual(self.provider.operations(item),
                              "nx_stm32u575_" + item.kind + "_ops")
             self.assertNotIn("malloc", source)
             self.assertNotIn("xTask", source)
         self.assertIn("USART1_IRQHandler", source)
-        self.assertIn("4000000u, 1000000u", source)
+        self.assertIn("static const nx_stm32u575_uart_config_t", source)
+        self.assertIn(".controller = 1u", source)
 
     def test_pin_leases_cover_ports_and_af_words_without_unused_tables(self):
         result = Result(gpio(), uart())
         source = "\n".join(self.provider.state_declarations(result))
-        self.assertIn("s_nx_gpioa_lease", source)
-        self.assertIn("s_nx_gpioc_lease", source)
-        self.assertIn("AFR[1]", source)
+        self.assertIn("s_nx_platform_receipts[2]", source)
+        self.assertEqual(source.count("{ GPIOA,"), 1)
+        self.assertEqual(source.count("{ GPIOC,"), 1)
+        self.assertIn("static const nx_stm32u575_gpio_lease_t", source)
+        self.assertNotIn("static nx_result_t restore_gpio", source)
         self.assertEqual(self.provider.state_declarations(Result()), [])
         self.assertEqual(self.provider.start_resources(Result()), [])
 
@@ -352,7 +357,8 @@ class U575GpdmaSelectionTests(unittest.TestCase):
     def test_preflight_claims_vector_without_reading_unclocked_gpdma(self):
         from tools.configure import preflight
         source = "\n".join(preflight.emit(self.resolve()))
-        self.assertIn("NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)", source)
+        self.assertIn("nx_stm32u575_uart_preflight(1u, true)", source)
+        self.assertIn("irq:GPDMA1_Channel0", {claim.key for claim in self.resolve().claims})
         self.assertNotIn("GPDMA1_Channel0->", source)
 
     def test_ordinary_irq_constructor_keeps_original_state_ops_and_vector(self):

@@ -3,7 +3,7 @@
   "kind": "nexus_platform_delivery_completion_development_index",
   "date": "2026-10-24",
   "time_zone": "Etc/UTC",
-  "scope": "N01-N14 development observations. Exact final-source gates, SDK consumers, examples pin, merge and candidate records have separate execution identities. This index does not inherit the earlier P/E qualification.",
+  "scope": "N01-N14 original development observations are retained below. The 2026-10-28 A-J/X increment has separate exact-source and development-worktree observations in current_iteration_20261028; none establishes qualification of the final combined head.",
   "platform_baseline": "9ac38931e9f15b27ebe50698a7daad8263928a20",
   "task_authority": "docs/design/platform-delivery-completion.csv",
   "previous_iteration": "docs/delivery/developer-experience-results.json",
@@ -156,18 +156,426 @@
     }
   },
   "pending_exits": {
-    "ordinary_complete_index_gate": "pending_final_source_execution",
+    "ordinary_complete_index_gate": "pending_final_combined_source_execution",
     "examples_locked_consumption": "pending_new_platform_pin",
-    "installed_sdk_consumers": "pending_final_source_execution",
-    "formal_software_plan": "pending_final_source_execution",
-    "two_independent_offline_builds": "pending_final_source_execution",
-    "seal_and_verify": "pending_final_source_execution",
+    "installed_sdk_consumers": "pending_final_combined_source_execution",
+    "formal_software_plan": "pending_final_combined_source_execution",
+    "two_independent_offline_builds": "pending_final_combined_source_execution",
+    "seal_and_verify": "pending_final_combined_source_execution",
     "post_merge_source_association": "pending_actual_merge",
     "physical_hil": "not_executed"
   },
   "evidence_archive_locator": {
-    "status": "pending_final_archive",
-    "scope": "One compact package of original current-iteration records, using the existing evidence store. Original execution-host paths identify members through that package index; they are not public download URLs.",
+    "status": "selected_194_and_development_scopes_archived_final_combined_closure_pending",
+    "scope": "Use current_iteration_20261028 retained_delivery_scopes and each observation archive for verified local navigation. Original N01-N14 and previous iteration paths retain their identities. No public obtainability or final combined software candidate is claimed.",
     "previous_iteration_archives": "unchanged; retain their original P/E identity"
+  },
+  "updated_date": "2026-10-28",
+  "platform_baseline_scope": "Original N01-N14 baseline; not the current iteration or the current checkout.",
+  "current_iteration_20261028": {
+    "kind": "c_firmware_lifecycle_and_delivery_development_increment",
+    "task_ids": "A01-J04 and X01-X05; original 64 exits unchanged",
+    "task_authority": "docs/design/platform-delivery-completion.csv",
+    "source_base": "3ea252c6144b7661e67f04235c0f737a28eda221",
+    "qualification": false,
+    "physical_hil": "not_executed",
+    "publication": "not_published",
+    "identity_rules": "Each observation retains its own commit/tree or frozen dirty-worktree manifest. Counts overlap and are not added across scopes. Later integration does not inherit an earlier execution identity.",
+    "committed_scopes": [
+      {
+        "commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "tree": "a0cec8678cd5611b2dd4e75a77251387521fd67b",
+        "scope": "First selected C lifecycle/configuration/tooling increment",
+        "ordinary_gate": {
+          "python_cases": 3424,
+          "google_programs": 357,
+          "google_cases": 6504,
+          "skipped": 0,
+          "scope": "Native Debug ordinary complete-index gate; not all four Native modes or the full software plan"
+        },
+        "sdk": {
+          "maintained_consumer_chains": 50,
+          "focused_cold_consumer_chains": 5,
+          "snapshot_sha256": "95286630193e218b6dbbaf5beacf18dbbdcf75334e092cacbf7564f0dcba620d",
+          "scope": "Actual installed C/C++ consumer chains, relocation verification and independent restore; not the later combined-source SDK"
+        },
+        "documentation": {
+          "current_pages": 132,
+          "strict_bilingual": "passed",
+          "package_verify_and_restore": "passed",
+          "publication": false,
+          "qualification_references": [],
+          "scope": "Actual Doxygen/gettext/English/Chinese strict build for this clean commit; later prose does not inherit this execution"
+        }
+      },
+      {
+        "commit": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "tree": "388c90dc7de8c619a13a547e185b96960996cc61",
+        "scope": "Legacy F103/GD303 full cold lifecycle and earlier I2C resource-cost increment",
+        "ordinary_gate": {
+          "python_cases": 3424,
+          "google_programs": 361,
+          "google_cases": 6552,
+          "skipped": 0,
+          "scope": "Ordinary complete-index Native Debug gate for this tree; later family and owner-guard changes require another execution"
+        },
+        "retained_ordinary_gate": {
+          "receipt": "build/c-cold-20261028/legacy/ordinary-gate/package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/legacy/ordinary-gate/store/d35e38599fea8bdc5fcdecaa646df640e3482c6569e826e28cbc261527d21888.tar.gz",
+            "sha256": "d35e38599fea8bdc5fcdecaa646df640e3482c6569e826e28cbc261527d21888",
+            "size": 4545891
+          },
+          "manifest_sha256": "e3d811d0e08de0ac952ff214f5710514702921ea53d21794896535e8ec61fdad",
+          "files": 31052,
+          "bytes": 51377411,
+          "obtainability": "execution_host_local_only"
+        }
+      }
+    ],
+    "family_development_scopes": {
+      "legacy_pair": {
+        "families": [
+          "stm32f103",
+          "gd32f303"
+        ],
+        "arm_fixtures": 30,
+        "asan_ubsan_cases": 352,
+        "qualification": false,
+        "scope": "One combined pair scope, not thirty fixtures or352 cases per family; actual C lifecycle/ownership models and ARM budgets"
+      },
+      "f407": {
+        "family": "stm32f407",
+        "arm_fixtures": 55,
+        "arm_matrix_commands": 179,
+        "additional_exact_presets": 3,
+        "additional_configure_build_commands": 6,
+        "debug_cases": 153,
+        "asan_ubsan_cases": 153,
+        "skipped": 0,
+        "source_manifest": "/dev/shm/nexus-next-f407/build/f407-full-increment-paths.json",
+        "archive": {
+          "receipt": "build/c-cold-20261028/f407/full-family-package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/f407/full-family-store/252cf6be31e2d3c45c1566cab5af961ca8f707ce4391b0d2c9cc537294891d48.tar.gz",
+            "sha256": "252cf6be31e2d3c45c1566cab5af961ca8f707ce4391b0d2c9cc537294891d48",
+            "size": 14362377
+          },
+          "manifest_sha256": "6619b50c8ed6593060d2099f3c39b5d39c6d44ed6de9726dc6a1d98270e787cf",
+          "files": 8376,
+          "bytes": 83416168,
+          "obtainability": "execution_host_local_only"
+        },
+        "scope": "Frozen 62-path family development delta, plus its four original pre-194 test before-images. Final merged tree and root-owned I2C guard are separate scopes."
+      },
+      "g474": {
+        "family": "stm32g474",
+        "arm_fixtures": 31,
+        "debug_cases": 612,
+        "asan_ubsan_cases": 612,
+        "source_manifest": "/dev/shm/nexus-next-g474/build/cold-g474/handoff.json",
+        "scope": "Frozen G474 family development scope, including selected and empty assemblies; not the final combined head"
+      },
+      "modern_pair": {
+        "families": [
+          "stm32h743",
+          "stm32u575"
+        ],
+        "arm_fixtures": 47,
+        "debug_cases": 1636,
+        "focused_asan_ubsan_cases": 109,
+        "scope": "Combined H743/U575 development observations: 47 matrix builds plus 8 maintained preset executions are overlapping scopes, not 55 independent capabilities. ASAN is a focused subset and does not establish a complete sanitizer matrix.",
+        "additional_maintained_presets": 8
+      },
+      "gd470": {
+        "family": "gd32f470",
+        "status": "family_implementation_integrated_final_gate_pending",
+        "source_manifest": "/dev/shm/nexus-next-gd470/build/gd470-cold/family-increment-paths.json",
+        "arm_scopes": {
+          "nonempty_primary_matrix": 33,
+          "nonempty_additional_matrix": 8,
+          "maintained_presets": 18,
+          "empty_presets_included": 2,
+          "observed_build_executions": 59,
+          "overlap": "These are overlapping build execution scopes, not 59 independent capabilities or configurations."
+        },
+        "models": [
+          {
+            "scope": "UART/control",
+            "programs": 11,
+            "debug_cases": 113,
+            "asan_ubsan_cases": 113
+          },
+          {
+            "scope": "packet/timer",
+            "programs": 6,
+            "debug_cases": 87,
+            "asan_ubsan_cases": 87
+          }
+        ],
+        "empty_scope": "Two maintained empty presets observed zero retained faces and no unselected providers.",
+        "scope": "Frozen 64-path development delta; shared test merges and the final integrated gate have separate identities."
+      }
+    },
+    "linked_costs": {
+      "earlier_committed_d21": {
+        "commit": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "reference_commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "profiles": 5,
+        "polling_flash_delta_bytes": -356,
+        "irq_dma_flash_delta_bytes": 76,
+        "scope": "Earlier reviewed compact I2C receipt before the later rejected-owner guard; not the final candidate costs"
+      },
+      "later_i2c_owner_guard": {
+        "status": "development_observed_pending_final_integrated_gate",
+        "reference_commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "normal_cases": 25,
+        "asan_ubsan_cases": 25,
+        "arm_fixtures": 5,
+        "polling_flash_delta_bytes": -340,
+        "irq_dma_flash_delta_bytes": 96,
+        "ram_delta_range_bytes": [
+          -24,
+          -16
+        ],
+        "raw_record": "build/c-cold-20261028/f407/i2c-owner-costs.json",
+        "scope": "Same five authored profiles with the added rejected-owner guard; RAM savings trade against IRQ/DMA Flash growth. Not measured latency, throughput or power."
+      }
+    },
+    "engineering": {
+      "f03_job_budget": {
+        "status": "implemented_focused_and_review_passed_final_gate_pending",
+        "focused_cases": 132,
+        "independent_review_cases": 86,
+        "overlap": "The review subset overlaps the focused suite; do not add them.",
+        "handoff": "/dev/shm/nexus-next-workflow/build/workflow/f03-handoff.json",
+        "review_log": "/dev/shm/nexus-next-workflow/build/workflow/f03-independent-review.log",
+        "scope": "Explicit per-invocation allocation overrides inherited Nexus/CMake defaults. SDK divides that allocation into one-job workers. Independent invocations still need orchestrator allocation; no global semaphore or measured universal speedup."
+      },
+      "f05_incremental": {
+        "status": "implemented_development_observations_native_m4_m33_passed_final_gate_pending",
+        "raw_record": "/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json",
+        "scope": "Six actual input-change observations each in Native-empty, STM32F407ZGT6 Cortex-M4 GPIO and STM32U575ZIT6Q Cortex-M33 GPIO external consumers. Object rebuild sets match actual dependency closure, original source/configuration identities restore, and no test pass report is cached. ARM compile/link/budgets establish software scope only; full four Native modes and final clean-source qualification remain separate.",
+        "native_raw_record": "/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json",
+        "arm_raw_record": "build/c-cold-20261028/workflow/incremental-arm-03/summary.json",
+        "scenario_order": [
+          "noop",
+          "private-c",
+          "public-header",
+          "toml",
+          "board",
+          "tool-lock"
+        ],
+        "rebuilt_object_counts": {
+          "stm32f407_m4": [
+            0,
+            1,
+            6,
+            5,
+            5,
+            0
+          ],
+          "stm32u575_m33": [
+            0,
+            1,
+            6,
+            2,
+            2,
+            0
+          ]
+        },
+        "arm_scenarios_passed": 12,
+        "arm_commands_executed": 34,
+        "arm_commands_exit_zero": 34,
+        "restored_source_files": 3644,
+        "restored_source_bytes": 256517352,
+        "source_scope": {
+          "root_head": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+          "dirty_frozen_overlay": true,
+          "final_clean_qualification": false
+        },
+        "compiler_cache": "OFF",
+        "cache_namespace": "Actual maintained cache.py namespace CLI observed tool-lock newline change alter the namespace and exact input restoration restore the namespace. No compiler-cache hit/miss execution or dependency-version upgrade claim."
+      },
+      "i01_environment": {
+        "status": "audited_not_rebuilt",
+        "raw_record": "build/c-cold-20261028/workflow/environment-i01/provenance-audit.json",
+        "recipe_reproducible": false,
+        "missing_locked_python_distributions": 13,
+        "declared_python_distributions": 15,
+        "scope": "Base four-layer prefix and five direct APT pins match the observed image; Python/tool acquisition provenance and two independent recipe reconstructions remain open. Do not rewrite the declared recipe or historical image to conceal this gap."
+      },
+      "f04_test_disposition": {
+        "status": "partial",
+        "obsolete_gd_internal_helper_text_tests_removed": 2,
+        "replacement_oracle": "Actual generated UART mode factory programs execute the real C providers and their failure/ownership paths; text of an unreachable internal Python helper is no longer the behavior contract.",
+        "scope": "Scoped current-increment test contract/oracle groups and known obsolete helper replacements are reviewed; later owners retain their own changes. Whole-project retained/merged/removed test disposition remains open.",
+        "reviewed_contract_groups": 13,
+        "python_file_snapshot_count": 44,
+        "changed_method_snapshot_count": 106,
+        "case_removals_by_oracle_review": 0,
+        "arbitrary_fixture_count_assertions_removed": 1,
+        "raw_record": "build/c-cold-20261028/workflow/f04-review/review.json",
+        "oracle_sensitivity": "Old timer expected-close oracle used the same constructor under test and accepted an in-memory wrong-close mutation; the new explicit reviewed symbol rejects both family subtests. Restored behavior and both complete focused modules pass9/9. This is a test mutation, not a production defect RED claim."
+      },
+      "d02_device_graph": {
+        "status": "implemented_frozen_cross_device_stage_final_integrated_gate_pending",
+        "stage_cases": 4,
+        "complete_configure_cases": 1144,
+        "skipped": 0,
+        "exact_bundle_comparison": {
+          "assemblies": 299,
+          "files": 2990,
+          "fileset_and_bytes_equal": true
+        },
+        "raw_record": "build/c-cold-20261028/device-graph-stage/handoff.json",
+        "scope": "One complete frozen device graph after local validated controller/endpoint builders; USB FIFO, SPI face, ADC trigger, resource and DMA decisions complete before final assembly. Existing memory/layout/dependency stages remain; this is not a separate nominal typed stage for every normalizer. API-only RED and first failed environment/stale-oracle run are retained separately."
+      },
+      "d03_selected_consumption": {
+        "status": "implemented_uniform_consumption_audit_passed_integrated_gates_pending",
+        "assemblies": 305,
+        "families": 8,
+        "controllers": 542,
+        "explicit_hardware_bindings": 166,
+        "fixed_reviewed_or_model_leaf_controllers": 376,
+        "raw_record": "build/c-cold-20261028/integration/d03/results-01.json",
+        "scope": "Read-only selected resource/DMA/IRQ/clock/pin canonical identity, actual constructor emission and capability/query projection audit. Fixed reviewed SDK leaves are not an alternative selected route or owner authority. Source Python before/after hashes matched. Final combined-source gates remain separate."
+      }
+    },
+    "retained_delivery_scopes": {
+      "sdk_prefix": {
+        "receipt": "build/c-cold-20261028/sdk-retention/prefix-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/8acb0087369a398543fb68176aac2620de07ec85c1740c325a8a3aeeea3f6004.tar.gz",
+          "sha256": "8acb0087369a398543fb68176aac2620de07ec85c1740c325a8a3aeeea3f6004",
+          "size": 10624526
+        },
+        "manifest_sha256": "71cdba82a2580e459b1738490de5791420f98c001b8ae28ce8713b1227851400",
+        "files": 2961,
+        "bytes": 75202534,
+        "obtainability": "execution_host_local_only"
+      },
+      "sdk_maintained_consumer_raw": {
+        "receipt": "build/c-cold-20261028/sdk-retention/maintained-consumers-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/9b952c06b2d240376f64678f5620dbb8aaa61bbabfafc0a6a0b715740e34bcbf.tar.gz",
+          "sha256": "9b952c06b2d240376f64678f5620dbb8aaa61bbabfafc0a6a0b715740e34bcbf",
+          "size": 13036594
+        },
+        "manifest_sha256": "45be8104fed53650ad9577c7ff41f1ca8c5a4e3bea6329f7305ca1d20d98c2b9",
+        "files": 9048,
+        "bytes": 72640556,
+        "obtainability": "execution_host_local_only"
+      },
+      "sdk_focused_consumer_raw": {
+        "receipt": "build/c-cold-20261028/sdk-retention/cold-consumers-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/ee4f00ee5153d0ff7c520e993492127c0f87b470eff57d7dd3dd6938cc083250.tar.gz",
+          "sha256": "ee4f00ee5153d0ff7c520e993492127c0f87b470eff57d7dd3dd6938cc083250",
+          "size": 1673964
+        },
+        "manifest_sha256": "0553b1784cb40c5b84b7004c37393c109e99d7fe589e85f26cde3736d009a5fd",
+        "files": 1049,
+        "bytes": 8816852,
+        "obtainability": "execution_host_local_only"
+      },
+      "documentation_complete_tree": {
+        "receipt": "build/c-cold-20261028/docs/strict04/complete-tree-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/docs/strict04/complete-tree-store/1a09cfaba35a81eadee05907dff8b6f61aca2254d7e1d277374fe8146dba6838.tar.gz",
+          "sha256": "1a09cfaba35a81eadee05907dff8b6f61aca2254d7e1d277374fe8146dba6838",
+          "size": 62307423
+        },
+        "manifest_sha256": "1f580050a73069afc653be4c80c9706d36018de62b106a55a090ff9754a9b324",
+        "files": 7636,
+        "bytes": 299350700,
+        "obtainability": "execution_host_local_only"
+      },
+      "documentation_raw_build": {
+        "receipt": "build/c-cold-20261028/docs/strict04/raw-build-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/docs/strict04/evidence-store/682ef342b6dd9f05ea3525fe7fe1d4ac7e54ab58d0258487efd50827bd253027.tar.gz",
+          "sha256": "682ef342b6dd9f05ea3525fe7fe1d4ac7e54ab58d0258487efd50827bd253027",
+          "size": 16397511
+        },
+        "manifest_sha256": "6749e26fd9eb5be9e22bd6b439861c5041616af4afa767a7ac9a25f81870667b",
+        "files": 2659,
+        "bytes": 112901242,
+        "obtainability": "execution_host_local_only"
+      },
+      "note": "Archives are verified local retention; they are not public download URLs or final-head qualification."
+    },
+    "remaining_exits": [
+      "Final integrated ordinary gate and all four complete Native modes",
+      "Final maintained ARM matrix and relocated installed SDK consumers",
+      "External examples pin and complete local execution",
+      "Fresh strict bilingual documents for the frozen combined source",
+      "Complete software plan, two independent offline builds and existing seal/verify",
+      "Independent OCI recipe reconstruction and provenance closure",
+      "Physical station execution for every applicable H task",
+      "Actual reviewed merge, GitHub synchronization and publication association"
+    ],
+    "github_sync": {
+      "status": "two_committed_increments_synced_final_integration_pending",
+      "commits": [
+        "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "d21dfcab40058025928bbcc3e15b50e822f3125b"
+      ],
+      "pull_request": "https://github.com/X-Gen-Lab/nexus/pull/41",
+      "scope": "Later integrated worktree and final delivery are not yet represented by a completed final integration commit."
+    },
+    "documentation_status_closure": {
+      "status": "updated_scope_source_gettext_review_and_translation_admission_passed_strict_html_pending",
+      "source_scope": "Uncommitted documentation-only update on the integrated development checkout; exact changed file bytes are retained by the handoff manifest. This is not final clean-source documentation qualification.",
+      "source_manifest": "build/c-cold-20261028/docs/status-closure/handoff.json",
+      "current_pages": 132,
+      "translation_language_page_records": 264,
+      "semantic_reviewer": "root maintenance agent",
+      "fresh_gettext": "/dev/shm/nexus-docs-status-closure-20261028/gettext-final4",
+      "translation_report": "build/c-cold-20261028/docs/status-closure/translation-admission-04.json",
+      "source_and_diagram_report": "build/c-cold-20261028/docs/status-closure/full-source-check-04.json",
+      "remaining": "Fresh strict English/Chinese HTML, immutable package and restore for the final frozen source."
+    },
+    "shared_cold_lifecycle": {
+      "status": "implemented_development_regressed_final_integrated_gate_pending",
+      "spi_admission": {
+        "raw_record": "build/c-cold-20261028/spi-admission/handoff.json",
+        "scope": "Shared read-only C sequence preflight runs before cold resource effects or failed-init marker; actual F407/GD470/Native factory rejection and retained-owner regressions; nonempty H743 resume admission precedes domain reopen."
+      },
+      "dead_generator_cleanup": {
+        "raw_record": "build/c-cold-20261028/generator-cleanup/handoff.json",
+        "scope": "Pure removal of unreachable hardware-generating paths;299 maintained assembly outputs compare identically except declared removal of the dead secondary.py dependency path."
+      },
+      "unused_default_macros": {
+        "raw_record": "build/c-cold-20261028/default-macro-cleanup/handoff.json",
+        "assemblies": 299,
+        "bindings_c_bytes_removed_each": 233,
+        "other_bundle_files_equal": 2691,
+        "scope": "Separate intentional literal deletion from bindings.c, with original bytes and per-file deltas retained; not represented as identical generated C."
+      },
+      "runtime_lease": {
+        "raw_directory": "build/c-cold-20261028/runtime-lease-c",
+        "clock_domain_cases": 28,
+        "generated_h743_runtime_factory_cases": 17,
+        "python_wiring_cases": 13,
+        "scope": "Seven private C cold helpers use the existing static domain/lease storage and explicit generated calls; ownership predicates no longer emitted by Python. Missing-API RED is not an old-behavior defect demonstration. Actual selected ARM runtime consumer trades+220Flash for unchangedAXI RAM; final integration remains separate.",
+        "raw_record": "build/c-cold-20261028/runtime-lease-c/handoff.json",
+        "arm_flash_delta_bytes": 220,
+        "arm_ram_delta_bytes": 0,
+        "arm_reference_flash_bytes": 15848,
+        "arm_current_flash_bytes": 16068,
+        "arm_axi_ram_bytes": 2536,
+        "final_bundle_comparison": {
+          "assemblies": 299,
+          "intentional_runtime_bindings_files_changed": 1,
+          "other_files_byte_equal": 2989
+        },
+        "residual_audit": {
+          "production_generator_sources": 119,
+          "reviewed_control_strings": 93,
+          "scope": "Reviewed live MMIO/wait/private ownership algorithm dispatch; fixed typed calls, progress/diagnostic markers and C queries remain permitted."
+        }
+      }
+    }
   }
 }

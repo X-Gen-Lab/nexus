@@ -3,8 +3,11 @@ from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
+from tools.configure.calls import DirectCall
+from tools.configure.providers import maintained
 from soc.stm32.stm32h743.configure.runtime_power import resolve_runtime_power
 
 
@@ -47,8 +50,29 @@ class RuntimePowerConfigurationTests(unittest.TestCase):
         self.assertIn('clock_domain_impl.h', source)
         self.assertEqual(source.count('static nx_clock_domain_t '), 1)
         self.assertEqual(source.count('static nx_clock_lease_t '), 1)
-        self.assertIn('nx_clock_domain_acquire(', source)
-        self.assertIn('nx_clock_domain_release(', source)
+        self.assertIn('nx_clock_domain_cold_acquire(', source)
+        self.assertIn('nx_clock_domain_cold_release(', source)
+        self.assertNotRegex(source, r's_nx_runtime_(?:domain|lease)\.')
+
+    def test_resume_admission_precedes_reopen_and_retains_rejection(self):
+        result = self.selected()
+        provider = maintained(result.soc_family)
+        original = provider.constructor
+        def with_admission(*args):
+            return replace(original(*args),
+                           admission=(DirectCall("nx_test_runtime_admit"),))
+        with patch.object(provider, "constructor", side_effect=with_admission):
+            source = bindings.emit(result)[1]
+        resume = source[source.index(
+            "nx_platform_start_result_t nx_platform_runtime_resume(void) {"):]
+        resumed = resume[:resume.index("\n}")]
+        admitted = resumed.index("result.primary = nx_test_runtime_admit();")
+        reopen = resumed.index("result.primary = nx_clock_domain_cold_reopen(&s_nx_runtime_domain);")
+        self.assertLess(resumed.index("nx_clock_domain_cold_resume_admit(&s_nx_runtime_lease)"), admitted)
+        self.assertLess(admitted, reopen)
+        self.assertIn("if (result.primary != NX_SUCCESS) { return result; }",
+                      resumed[admitted:reopen])
+        self.assertNotIn("nx_platform_stop_io", resumed[admitted:reopen])
 
     def test_logical_controller_name_does_not_select_physical_hardware(self):
         for name in ('sensor_link', 'bus7'):

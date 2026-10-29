@@ -82,7 +82,10 @@ class H743SpiDmaConfiguration(unittest.TestCase):
             self.assertIn("static nx_stm32h743_spi_dma_state_t s_nx_port_bus4;", body)
             self.assertIn("nx_stm32h743_spi_dma_endpoint_t", body)
             self.assertIn("&nx_stm32h743_spi_dma_endpoint_ops", body)
-            self.assertIn("nx_stm32h743_spi_dma_initialize(&s_nx_port_bus4)", body)
+            self.assertIn("nx_stm32h743_spi_dma_prepare(&s_nx_port_bus4, "
+                          "&s_nx_config_bus4)", body)
+            self.assertIn("static const nx_stm32h743_spi_dma_config_t "
+                          "s_nx_config_bus4", body)
             self.assertNotIn("nx_stm32h743_spi_initialize(", body)
             for name in ("DMA1_Stream2_IRQHandler", "DMA1_Stream3_IRQHandler",
                          "SPI4_IRQHandler"):
@@ -149,7 +152,7 @@ class H743SpiDmaConfiguration(unittest.TestCase):
             output = Path(directory) / "generated"
             configure.configure(source, output)
             body = (output / "bindings.c").read_text()
-            self.assertIn("nx_stm32h743_spi_dma_initialize", body)
+            self.assertIn("nx_stm32h743_spi_dma_prepare", body)
 
     def test_irq_endpoint_and_unknown_options_reject(self):
         for priority in (0, 4, 6, 15):

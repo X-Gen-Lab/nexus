@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/fault.h"
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include "stm32u5xx_ll_spi.h"
 #define BYTE_CONFIG (LL_SPI_DATAWIDTH_8BIT | (7U << SPI_CFG1_CRCSIZE_Pos))
@@ -311,3 +312,98 @@ static bool on_port(const void* context, const nx_spi_port_t* port) {
 const nx_spi_ops_t nx_stm32u575_spi_ops = {recover, NULL, NULL, stop, NULL};
 const nx_spi_endpoint_ops_t nx_stm32u575_spi_endpoint_ops = {
     transfer, NULL, NULL, on_port, NULL};
+
+nx_result_t nx_stm32u575_spi_prepare(nx_stm32u575_spi_state_t* port,
+                                     const nx_stm32u575_spi_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->endpoints == NULL ||
+        config->endpoint_count == 0U || config->endpoint_count > UINT16_MAX ||
+        config->pins == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active || port->cold_owned)
+        return NX_ERROR_BUSY;
+    /* Validate every static child before acquiring the first wire effect. */
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        const nx_stm32u575_spi_endpoint_config_t* endpoint =
+            &config->endpoints[i];
+        if (endpoint->cs == NULL || endpoint->endpoint == NULL ||
+            endpoint->registers == NULL || endpoint->mask == 0U ||
+            (endpoint->mask & ~UINT32_C(0xFFFF)) != 0U ||
+            endpoint->frequency_hz < 15625U ||
+            endpoint->frequency_hz > 2000000U || endpoint->mode > 3U)
+            return NX_ERROR_INVALID;
+        if (endpoint->cs->retained || endpoint->cs->initialized)
+            return NX_ERROR_BUSY;
+        for (size_t j = 0U; j < i; ++j)
+            if (endpoint->cs == config->endpoints[j].cs ||
+                endpoint->endpoint == config->endpoints[j].endpoint)
+                return NX_ERROR_INVALID;
+    }
+    for (size_t i = 0U; i < config->pin_count; ++i)
+        if (config->pins[i].registers == NULL || config->pins[i].pin > 15U ||
+            config->pins[i].alternate > 15U)
+            return NX_ERROR_INVALID;
+    port->registers = SPI1;
+    port->clock_hz = 4000000U;
+    port->poll_limit = 1000000U;
+    port->reset = &RCC->APB2RSTR;
+    port->reset_mask = RCC_APB2RSTR_SPI1RST;
+    port->cold_owned = true;
+    port->cold_acquired = 0U;
+    nx_result_t result = nx_stm32u575_spi_initialize(port);
+    if (result != NX_SUCCESS)
+        return result;
+    for (size_t i = 0U; i < config->endpoint_count; ++i) {
+        const nx_stm32u575_spi_endpoint_config_t* endpoint =
+            &config->endpoints[i];
+        endpoint->cs->registers = endpoint->registers;
+        endpoint->cs->mask = endpoint->mask;
+        endpoint->cs->output = true;
+        /* Record this child before its first possibly partial pad effect. */
+        port->cold_acquired = (uint16_t)(i + 1U);
+        result = nx_stm32u575_gpio_initialize(endpoint->cs, endpoint->mask);
+        if (result != NX_SUCCESS)
+            return result;
+        endpoint->endpoint->port = port;
+        endpoint->endpoint->cs = endpoint->cs;
+        endpoint->endpoint->cs_mask = endpoint->mask;
+        endpoint->endpoint->frequency_hz = endpoint->frequency_hz;
+        endpoint->endpoint->mode = endpoint->mode;
+    }
+    for (size_t i = 0U; i < config->pin_count; ++i) {
+        const nx_stm32u575_alternate_config_t* pin = &config->pins[i];
+        result = nx_stm32u575_pin_alternate(pin->registers, pin->pin,
+                                            pin->alternate);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32u575_spi_release(nx_stm32u575_spi_state_t* port,
+                                     const nx_stm32u575_spi_config_t* config) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->endpoints == NULL)
+        return NX_ERROR_INVALID;
+    if (!port->cold_owned)
+        return NX_SUCCESS;
+    if (port->cold_acquired > config->endpoint_count)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32u575_spi_ops.stop(port);
+    if (result != NX_SUCCESS)
+        return result;
+    /* Wire stop and child stop have independent ownership. A CS refusal must
+     * remain retryable after the ordinary wire has already become cold. */
+    while (port->cold_acquired != 0U) {
+        const nx_stm32u575_spi_endpoint_config_t* endpoint =
+            &config->endpoints[port->cold_acquired - 1U];
+        result = nx_stm32u575_gpio_stop(endpoint->cs, endpoint->mask);
+        if (result != NX_SUCCESS)
+            return result;
+        --port->cold_acquired;
+    }
+    port->cold_owned = false;
+    return NX_SUCCESS;
+}

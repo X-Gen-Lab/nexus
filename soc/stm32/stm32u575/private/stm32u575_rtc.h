@@ -64,6 +64,8 @@ nx_result_t nx_stm32u575_rtc_preflight(void);
  */
 nx_result_t nx_stm32u575_rtc_initialize(nx_stm32u575_rtc_state_t* state,
                                         const nx_clock_t* clock);
+/** \brief Bind exact cold resources without resetting retained generations. */
+nx_result_t nx_stm32u575_rtc_prepare(nx_stm32u575_rtc_state_t* state);
 #ifdef __cplusplus
 }
 #endif

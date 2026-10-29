@@ -246,3 +246,105 @@ nx_result_t nx_clock_domain_reopen(nx_clock_barrier_t control) {
     nx_arch_irq_restore(saved);
     return result;
 }
+
+/** \brief Validate static cold metadata before reading ownership predicates. */
+static nx_result_t cold_context(const nx_clock_domain_t* domain) {
+    if (!range_valid(domain, sizeof(*domain), _Alignof(nx_clock_domain_t))) {
+        return NX_ERROR_INVALID;
+    }
+    return context_valid(true) ? NX_SUCCESS : NX_ERROR_CONTEXT;
+}
+
+/** \brief Token arithmetic and alias rejection precede construction effects. */
+static nx_result_t cold_pair_context(const nx_clock_domain_t* domain,
+                                     const nx_clock_lease_t* lease) {
+    nx_result_t status = cold_context(domain);
+    if (status != NX_SUCCESS) {
+        return status;
+    }
+    return range_valid(lease, sizeof(*lease), _Alignof(nx_clock_lease_t)) &&
+                   !overlap(domain, sizeof(*domain), lease, sizeof(*lease))
+               ? NX_SUCCESS
+               : NX_ERROR_INVALID;
+}
+
+bool nx_clock_domain_cold_has_lease(const nx_clock_lease_t* lease) {
+    return range_valid(lease, sizeof(*lease), _Alignof(nx_clock_lease_t)) &&
+           lease->owner != NULL;
+}
+
+nx_result_t nx_clock_domain_cold_resume_admit(const nx_clock_lease_t* lease) {
+    if (!range_valid(lease, sizeof(*lease), _Alignof(nx_clock_lease_t))) {
+        return NX_ERROR_INVALID;
+    }
+    if (!context_valid(true)) {
+        return NX_ERROR_CONTEXT;
+    }
+    return nx_clock_domain_cold_has_lease(lease) ? NX_ERROR_STATE : NX_SUCCESS;
+}
+
+nx_result_t nx_clock_domain_cold_acquire(nx_clock_domain_t* domain,
+                                         nx_clock_lease_t* lease) {
+    nx_result_t status = cold_pair_context(domain, lease);
+    if (status != NX_SUCCESS) {
+        return status;
+    }
+    if (!domain->initialized) {
+        status = nx_clock_domain_construct(domain, 1U);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+    }
+    return nx_clock_domain_acquire(domain, lease);
+}
+
+nx_result_t nx_clock_domain_cold_close(nx_clock_domain_t* domain) {
+    nx_result_t status = cold_context(domain);
+    if (status != NX_SUCCESS || !domain->initialized) {
+        return status;
+    }
+    nx_clock_barrier_t barrier;
+    return nx_clock_domain_close(domain, &barrier);
+}
+
+nx_result_t nx_clock_domain_cold_release(nx_clock_domain_t* domain,
+                                         nx_clock_lease_t* lease) {
+    nx_result_t status = cold_pair_context(domain, lease);
+    if (status != NX_SUCCESS || !domain->initialized) {
+        return status;
+    }
+    if (nx_clock_domain_cold_has_lease(lease)) {
+        status = nx_clock_domain_release(domain, lease);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+    }
+    nx_clock_barrier_t barrier;
+    status = nx_clock_domain_close(domain, &barrier);
+    return status == NX_SUCCESS ? nx_clock_domain_quiescent(barrier) : status;
+}
+
+nx_result_t nx_clock_domain_cold_reopen(nx_clock_domain_t* domain) {
+    nx_result_t status = cold_context(domain);
+    if (status != NX_SUCCESS) {
+        return status;
+    }
+    nx_clock_barrier_t barrier;
+    status = nx_clock_domain_close(domain, &barrier);
+    return status == NX_SUCCESS ? nx_clock_domain_reopen(barrier) : status;
+}
+
+nx_result_t nx_clock_domain_cold_start(nx_clock_domain_t* domain,
+                                       nx_clock_lease_t* lease) {
+    nx_result_t status = cold_pair_context(domain, lease);
+    if (status != NX_SUCCESS) {
+        return status;
+    }
+    if (domain->initialized && domain->closing) {
+        status = nx_clock_domain_cold_reopen(domain);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+    }
+    return nx_clock_domain_cold_acquire(domain, lease);
+}

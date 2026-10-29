@@ -421,3 +421,19 @@ nx_result_t nx_stm32u575_rtc_initialize(nx_stm32u575_rtc_state_t* s,
     s->retained = s->opened = true;
     return NX_SUCCESS;
 }
+
+static nx_time_us_t cold_core_clock(void* context) {
+    (void)context;
+    return nx_time_now_us();
+}
+
+nx_result_t nx_stm32u575_rtc_prepare(nx_stm32u575_rtc_state_t* state) {
+    if (state == NULL)
+        return NX_ERROR_INVALID;
+    if (state->registers == NULL) {
+        state->registers = NX_U575_RTC;
+        state->power = NX_U575_RTC_PWR;
+    }
+    const nx_clock_t clock = {cold_core_clock, NULL};
+    return nx_stm32u575_rtc_initialize(state, &clock);
+}

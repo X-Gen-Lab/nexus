@@ -91,7 +91,11 @@ python cmake/package/verify_consumers.py \
   --prefix /relocated/nexus-sdk --output build/installed-sdk-check
 ```
 
-`--parallel N` is the total consumer job budget (default: `2`). Independent
+`--parallel N` is the explicit total consumer job budget. When omitted, the
+coordinator inherits `NEXUS_BUILD_JOBS`, then `CMAKE_BUILD_PARALLEL_LEVEL`, or
+uses `2` if neither is set. An explicit option overrides this inherited default.
+Concurrent independent invocations need an orchestrator allocation; this is not
+a global CPU semaphore. Independent
 consumers may configure, build and verify concurrently; each compiler build uses
 one job. `--parallel 1` retains serial execution. Each consumer still performs
 fresh installed-source verification. A failure cancels and joins all started

@@ -210,3 +210,18 @@ uint32_t nx_reset_cause(void) {
     return result;
 }
 const nx_watchdog_ops_t nx_stm32g474_watchdog_ops = {enable, feed, state};
+
+/** \brief Bind only; starting or adopting an irreversible watchdog is policy.
+ */
+nx_result_t nx_stm32g474_watchdog_prepare(nx_stm32g474_watchdog_state_t* port) {
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    if (port->state.enabled || port->lsi_added || port->debug_pending)
+        return NX_ERROR_BUSY;
+    port->registers = IWDG;
+    port->rcc = RCC;
+    port->flash = FLASH;
+    port->debug = DBGMCU;
+    port->poll_limit = 1000000U;
+    return NX_SUCCESS;
+}

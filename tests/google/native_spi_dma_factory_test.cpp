@@ -140,6 +140,51 @@ TEST_F(NativeSPIDMAFactory, ColdLookupHasStableIdentityWithoutOpeningHardware) {
     EXPECT_EQ(nx_factory_spi_dma_owner_binding(NX_SPI_DMA_TRANSACTION_ID_COUNT),
               nullptr);
 }
+TEST_F(NativeSPIDMAFactory, RejectedStartCannotCompleteEarlierFailedStop) {
+    auto* sequence = static_cast<nx_spi_dma_sequence_state_t*>(Bus()->context);
+    sequence->stopping = true;
+    sequence->stopped = false;
+    const auto rejected = nx_platform_start();
+    EXPECT_EQ(rejected.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(rejected.cleanup, NX_SUCCESS);
+    EXPECT_EQ(rejected.remaining_effects, 0U);
+    EXPECT_TRUE(sequence->stopping);
+    EXPECT_FALSE(sequence->stopped);
+    EXPECT_FALSE(Hardware(Bus())->opened);
+    /* This fixture owns the earlier stop duty and retries it explicitly. */
+    EXPECT_EQ(nx_spi_dma_transaction_stop(Bus()), NX_SUCCESS);
+}
+TEST_F(NativeSPIDMAFactory, LaterPhaseRejectionPrecedesEveryControllerEffect) {
+    const auto* other =
+        nx_factory_spi_dma_transaction(NX_SPI_DMA_TRANSACTION_ID_OTHER_BUS);
+    ASSERT_NE(other, nullptr);
+    auto* sequence = static_cast<nx_spi_dma_sequence_state_t*>(other->context);
+    sequence->stopping = false;
+    sequence->stopped = false;
+    nx_request_initialize(&sequence->phase_request.base);
+    ASSERT_EQ(
+        nx_request_admit(&sequence->phase_request.base, NX_REQUEST_QUEUED),
+        NX_SUCCESS);
+    /* The untouched first engine distinguishes pure rejection from opening
+     * and then cleaning up an unrelated earlier controller. */
+    const size_t previous_failure = Hardware(Bus())->fail_after;
+    Hardware(Bus())->fail_after = 17U;
+    const auto rejected = nx_platform_start();
+    EXPECT_EQ(rejected.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(rejected.cleanup, NX_SUCCESS);
+    EXPECT_EQ(rejected.remaining_effects, 0U);
+    EXPECT_EQ(Hardware(Bus())->fail_after, 17U);
+    EXPECT_FALSE(Hardware(Bus())->opened);
+    EXPECT_FALSE(Hardware(other)->opened);
+    EXPECT_FALSE(sequence->stopping);
+    EXPECT_FALSE(sequence->stopped);
+    EXPECT_EQ(nx_request_state(&sequence->phase_request.base),
+              NX_REQUEST_QUEUED);
+    /* No real transfer acquired this fixture-owned queued phase. */
+    nx_request_settle(&sequence->phase_request.base, NX_ERROR_CANCELLED, 0U);
+    Hardware(Bus())->fail_after = previous_failure;
+    EXPECT_EQ(nx_spi_dma_transaction_stop(other), NX_SUCCESS);
+}
 TEST_F(NativeSPIDMAFactory, GeneratedTwoCsUseActualHalfwordProviderAndOwner) {
     ASSERT_NO_FATAL_FAILURE(OpenOwner());
     const size_t first_count = Device(First())->assertions;

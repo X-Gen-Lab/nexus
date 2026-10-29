@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include <string.h>
 #define PAGE_BYTES 8192U
@@ -270,3 +271,15 @@ nx_result_t nx_stm32u575_flash_close(nx_stm32u575_flash_state_t* p) {
 }
 const nx_flash_ops_t nx_stm32u575_flash_ops = {
     .geometry = geometry, .read = read, .program = program, .erase = erase};
+
+nx_result_t nx_stm32u575_flash_prepare(nx_stm32u575_flash_state_t* port) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active)
+        return NX_ERROR_BUSY;
+    port->registers = FLASH;
+    port->memory = (volatile uint8_t*)0x08000000U;
+    return nx_stm32u575_flash_initialize(port);
+}

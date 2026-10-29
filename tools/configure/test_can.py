@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import can, configure as gate
+from tools.configure import configure as gate
+from tools.configure.providers import maintained
 
 
 class CanConfigurationTests(unittest.TestCase):
@@ -61,7 +62,10 @@ class CanConfigurationTests(unittest.TestCase):
                 item = next(item for item in result.controllers
                             if item.kind == "can")
                 with self.assertRaisesRegex(ValueError, "provider"):
-                    can.constructor(item, result, foreign)
+                    maintained("stm32f407" if foreign == "stm32" else
+                               "gd32f470").constructor(
+                        item, result, result.board_bindings, result.routes,
+                        result.devices)
 
     def test_generated_factory_and_partial_start_cleanup_are_explicit(self):
         path = self.authored(second=True)
@@ -72,10 +76,13 @@ class CanConfigurationTests(unittest.TestCase):
         self.assertIn('nx_factory_can(', header)
         self.assertIn('&nx_classic_can_ops, &s_nx_port_bus0', source)
         self.assertEqual(source.count('static nx_can_filter_domain_t '), 1)
-        self.assertIn('nx_stm32_can_domain_initialize', source)
-        self.assertIn('nx_can_port_stop(&s_nx_face_bus0)', source)
-        self.assertIn('nx_can_filter_domain_stop(&s_nx_can_domain)', source)
-        marker = 'result.primary = prepare_bus1();'
+        self.assertIn('nx_stm32_can_prepare(&s_nx_port_bus0,', source)
+        self.assertIn('nx_stm32_can_close(&s_nx_port_bus0,', source)
+        self.assertIn('nx_stm32_can_domain_close(&s_nx_can_domain)', source)
+        self.assertIn('.domain = &s_nx_can_domain,', source)
+        self.assertNotIn('static nx_result_t prepare_bus0', source)
+        self.assertNotIn('static nx_result_t stop_bus0', source)
+        marker = 'result.primary = nx_stm32_can_prepare(&s_nx_port_bus1,'
         begin = source.index('nx_platform_start_result_t nx_platform_start')
         prior = source.rfind('s_nx_platform_initialized = 2u;', begin,
                             source.index(marker))

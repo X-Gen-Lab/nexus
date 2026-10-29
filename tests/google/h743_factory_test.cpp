@@ -9,7 +9,7 @@
 #include "h743_factory_model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32h743_provider.h"
+#include "stm32h743_cold.h"
 #include <cstring>
 #include <gtest/gtest.h>
 extern "C" {
@@ -266,4 +266,101 @@ TEST_F(H743Factory, UnprivilegedRetryHasNoHardwareEffects) {
     EXPECT_EQ(writes, g_h743_model.writes);
     g_h743_model.privileged = true;
     EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+}
+
+/* Direct cold-resource contracts complement the generated whole-platform paths.
+ * Every bank has one caller-provided snapshot and one retained gate receipt. */
+#include "stm32h743_platform_cold.h"
+class H743ColdResources : public testing::Test {
+  protected:
+    nx_stm32h743_gpio_lease_t receipt{};
+    uint32_t added = 0U;
+    nx_stm32h743_gpio_lease_config_t bank{GPIOB, &receipt, 1U, 1U};
+    nx_stm32h743_platform_config_t config{
+        &bank, 1U, &added, nullptr, nullptr, {}, {}, {}, {}, 0U, 0U};
+    void SetUp() override {
+        nx_h743_model_reset();
+    }
+    void TearDown() override {
+        g_h743_model.ignore_write = nullptr;
+        g_h743_model.privileged = true;
+        EXPECT_EQ(NX_SUCCESS, nx_stm32h743_platform_release(&config));
+    }
+};
+TEST_F(H743ColdResources, FailedAdmissionCannotOverwriteItsEarlierGateLease) {
+    GPIOB->MODER = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_platform_acquire(&config));
+    ASSERT_EQ(RCC_AHB4ENR_GPIOBEN, added);
+    ASSERT_FALSE(receipt.captured);
+    GPIOB->MODER = 0U;
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_platform_acquire(&config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(RCC_AHB4ENR_GPIOBEN, added);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_platform_release(&config));
+    EXPECT_EQ(0U, RCC->AHB4ENR & RCC_AHB4ENR_GPIOBEN);
+}
+TEST_F(H743ColdResources, RefusedGateReleaseStillPreventsSnapshotReplacement) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_platform_acquire(&config));
+    GPIOB->MODER = 1U;
+    g_h743_model.ignore_write = &RCC->AHB4ENR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32h743_platform_release(&config));
+    EXPECT_FALSE(receipt.captured);
+    ASSERT_EQ(RCC_AHB4ENR_GPIOBEN, added);
+    g_h743_model.ignore_write = nullptr;
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_platform_acquire(&config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_platform_release(&config));
+    EXPECT_EQ(0U, added);
+    EXPECT_EQ(0U, RCC->AHB4ENR & RCC_AHB4ENR_GPIOBEN);
+}
+TEST_F(H743ColdResources, CapturedBankCannotBeReplacedByAnotherAcquire) {
+    GPIOB->AFR[0] = 5U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_platform_acquire(&config));
+    GPIOB->AFR[0] = 7U;
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_platform_acquire(&config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(5U, receipt.af0);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_platform_release(&config));
+    EXPECT_EQ(5U, GPIOB->AFR[0]);
+}
+TEST_F(H743ColdResources, InvalidAliasAndUnprivilegedInputsHaveNoEffects) {
+    nx_stm32h743_gpio_lease_config_t duplicate[2]{bank, bank};
+    config.ports = duplicate;
+    config.port_count = 2U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_platform_acquire(&config));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    config.ports = &bank;
+    config.port_count = 1U;
+    g_h743_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32h743_platform_acquire(&config));
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743ColdResources, InvalidUartStorageRejectsBeforeStateOrPadEffects) {
+    nx_stm32h743_uart_state_t port{};
+    nx_stm32h743_uart_config_t invalid{nullptr,
+                                       16U,
+                                       115200U,
+                                       64000000U,
+                                       {NX_IRQ_KERNEL_NONE, 150U, 4U, 0U},
+                                       NX_UART_RX_BYTES};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32h743_uart_prepare(&port, &invalid));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_EQ(nullptr, port.registers);
+    EXPECT_EQ(nullptr, port.rx_storage);
+}
+TEST_F(H743ColdResources, LostGpioGateCannotProvePadRestoration) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_platform_acquire(&config));
+    RCC->AHB4ENR &= ~(uint32_t)RCC_AHB4ENR_GPIOBEN;
+    const auto writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_platform_release(&config));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_TRUE(receipt.captured);
+    EXPECT_EQ(RCC_AHB4ENR_GPIOBEN, added);
+    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_platform_release(&config));
+    EXPECT_FALSE(receipt.captured);
+    EXPECT_EQ(0U, added);
 }

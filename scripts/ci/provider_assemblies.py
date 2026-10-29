@@ -28,6 +28,7 @@ try:
 except ImportError:
     import arch_compile
 from tools.configure.configure import resolve_ir
+from tools.dev import process as execution
 from tools.evidence.common import (EvidenceError, atomic_json, load_json,
                                    regular_file)
 from tools.evidence.identity import (git_source, resolved_identity,
@@ -303,7 +304,8 @@ def inspect(build, fixture, compiler, *, root=ROOT):
 def source_inputs(root, fixtures):
     """Snapshot maintained graph sources and selected locked SDK input bytes."""
     paths = {root / "CMakeLists.txt", Path(__file__).resolve(),
-             Path(arch_compile.__file__).resolve()}
+             Path(arch_compile.__file__).resolve(),
+             Path(execution.__file__).resolve()}
     directories = {root / name for name in (
         "arch", "core", "io", "os", "soc", "drivers", "boards", "components", "cmake",
         "tools/configure", "tools/measurement", "tools/evidence", "dependencies")}
@@ -341,7 +343,7 @@ def verify_snapshot(root, fixtures, original):
         raise EvidenceError("maintained source input snapshot changed during matrix")
 
 
-def run(root, assemblies, compiler, output, *, family=None, parallel=2,
+def run(root, assemblies, compiler, output, *, family=None, parallel=None,
         project=None):
     root = root.resolve()
     output = fresh_output(output, root)
@@ -356,7 +358,10 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=2,
             raise EvidenceError("selected source root differs from actual tool source")
         if any(name.startswith("GIT_") for name in os.environ):
             raise EvidenceError("Git environment overrides cannot qualify source identity")
-        if type(parallel) is not int or not 1 <= parallel <= 16:
+        parallel = execution.parallel_jobs(os.environ, requested=parallel)
+        recorder.env = execution.execution_environment(recorder.env, jobs=parallel)
+        report["parallel_jobs"] = parallel
+        if not 1 <= parallel <= 16:
             raise EvidenceError("parallel count must be 1..16")
         fixtures = validate_fixtures(root, assemblies, family=family,
                                      project=project)
@@ -421,13 +426,16 @@ def main(arguments=None):
     parser.add_argument("--family")
     parser.add_argument("--compiler", default="arm-none-eabi-gcc")
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--parallel", type=int, default=2)
+    parser.add_argument("--parallel", type=int,
+                        help="Explicit build jobs; default inherits "
+                             "NEXUS_BUILD_JOBS/CMAKE_BUILD_PARALLEL_LEVEL or 2")
     args = parser.parse_args(arguments)
     if args.project is not None and len(args.project) != 1:
         parser.error("project must be supplied exactly once")
     try:
+        parallel = execution.parallel_jobs(os.environ, requested=args.parallel)
         return run(args.root, args.fixture, args.compiler, args.output,
-                   family=args.family, parallel=args.parallel,
+                   family=args.family, parallel=parallel,
                    project=args.project[0] if args.project else None)
     except (OSError, ValueError) as error:
         print("Provider assembly gate rejected: " + str(error), file=sys.stderr)

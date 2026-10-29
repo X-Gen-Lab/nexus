@@ -9,19 +9,13 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT h7_fifo_result EQUAL 0)
     message(FATAL_ERROR "FIFO factory fixture rejected: ${h7_fifo_output}${h7_fifo_error}")
 endif()
-file(READ "${h7_fifo_bundle}/input_paths.json" h7_fifo_inputs)
-string(JSON h7_fifo_count LENGTH "${h7_fifo_inputs}")
-math(EXPR h7_fifo_last "${h7_fifo_count} - 1")
-foreach(index RANGE 0 ${h7_fifo_last})
-    string(JSON input_name MEMBER "${h7_fifo_inputs}" ${index})
-    string(JSON input_path GET "${h7_fifo_inputs}" "${input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
-endforeach()
+nexus_google_configuration_inputs("${h7_fifo_bundle}")
 nexus_google_test(nexus_h743_uart_rtscts_factory_test
     SOURCES h743_uart_rtscts_factory_test.cpp
         "${h7_fifo_bundle}/bindings.c"
         h743_uart_rtscts_model.cpp h743_model.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_rtscts.c"

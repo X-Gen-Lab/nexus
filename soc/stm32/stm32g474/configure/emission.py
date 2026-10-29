@@ -15,6 +15,8 @@ def operations(item):
 
 def includes(result):
     source = ['#include "stm32g474_provider.h"']
+    if result.controllers:
+        source.append('#include "stm32g474_platform_cold.h"')
     if any(item.kind == "gpio" and item.mode == "named-states"
            for item in result.controllers):
         source.append('#include "stm32g474_pin_state.h"')
@@ -93,35 +95,18 @@ def state_declarations(result):
         source += ['static bool s_nx_platform_i2c_mux_owned;']
     if any(item.kind in {"adc", "pwm_adc", "adc_group"} for item in result.controllers):
         source += ['static bool s_nx_platform_adc_mux_owned;']
+    if result.controllers and not gpio_phase.applies(result):
+        from .preflight import admission_declarations
+        source += admission_declarations(result, "NULL", 0)
     return source
 
 
 def start_system(result):
     source = []
-    for owner in result.pwm_shared_owners:
-        timer = owner.controller
-        source += [f'    if ((NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_{timer}EN) != 0u ||',
-                   f'        (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_{timer}RST) != 0u ||',
-                   f'        !NX_G474_IRQ_AVAILABLE({timer}_IRQn)) {{',
-                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
     if any(item.kind == "adc_group" for item in result.controllers):
         from . import adc_group
         source += adc_group.preflight(result)
     source += preflight.emit(result)
-    if any(item.kind in {"pwm_group", "pwm_adc"} for item in result.controllers):
-        source += ['    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM1EN) != 0u ||',
-                   '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) != 0u && (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u) ||',
-                   '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u && NX_G474_READ(&TIM15->DIER) != 0u) ||',
-                   '        !NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) {',
-                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
-    for item in result.controllers:
-        if item.kind not in {"timer_capture", "encoder"}:
-            continue
-        timer = item.controller
-        source += [f'    if ((NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_{timer}EN) != 0u ||',
-                   f'        (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_{timer}RST) != 0u ||',
-                   f'        !NX_G474_IRQ_AVAILABLE({timer}_IRQn)) {{',
-                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
     source += ['    result.primary = nx_stm32g474_validate_identity();',
                '    if (result.primary != NX_SUCCESS) { return result; }']
     source += gpio_phase.acquire(result)
@@ -136,80 +121,20 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    source = []
-    if any(item.kind == "i2c" for item in result.controllers):
-        source += ['    s_nx_platform_i2c_mux_owned = true;',
-                   '    NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) | RCC_CCIPR_I2C1SEL_1);',
-                   '    nx_arch_dsb();',
-                   '    if ((NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != RCC_CCIPR_I2C1SEL_1) {',
-                   '        result.primary = NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    if any(item.kind in {"adc", "pwm_adc", "adc_group"} for item in result.controllers):
-        source += ['    s_nx_platform_adc_mux_owned = true;',
-                   '    NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) | RCC_CCIPR_ADC12SEL_1);',
-                   '    nx_arch_dsb();',
-                   '    if ((NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != RCC_CCIPR_ADC12SEL_1) {',
-                   '        result.primary = NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    for register, gates in _peripheral_gates(result):
-        slot = f's_nx_platform_peripheral_{register.lower()}_added'
-        source += [f'    {slot} = ~NX_G474_READ(&RCC->{register}) & ({gates});',
-                   f'    NX_G474_WRITE(&RCC->{register}, NX_G474_READ(&RCC->{register}) | ({gates}));',
-                   '    nx_arch_dsb();',
-                   f'    if ((NX_G474_READ(&RCC->{register}) & ({gates})) != ({gates})) {{',
-                   '        result.primary = NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    if _syscfg(result):
-        source += ['    s_nx_platform_syscfg_clock_added = ~NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN;',
-                   '    NX_G474_WRITE(&RCC->APB2ENR, NX_G474_READ(&RCC->APB2ENR) | RCC_APB2ENR_SYSCFGEN);',
-                   '    nx_arch_dsb();',
-                   '    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) == 0u) {',
-                   '        result.primary = NX_ERROR_IO;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    if any(item.kind == "flash" for item in result.controllers):
-        source += ['    if ((NX_G474_FLASH_REMAP() & SYSCFG_MEMRMP_FB_MODE) != 0u || (NX_G474_READ(&FLASH->OPTR) & FLASH_OPTR_BFB2) != 0u) {',
-                   '        result.primary = NX_ERROR_UNSUPPORTED;',
-                   f'        result.cleanup = {cleanup};',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }']
-    return source
+    if not result.controllers:
+        return []
+    return ['    result.primary = nx_stm32g474_platform_resources_start(&s_nx_platform_config);',
+            '    if (result.primary != NX_SUCCESS) {',
+            f'        result.cleanup = {cleanup};',
+            '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+            '        return result;', '    }']
 
 
 def stop_system(result, *, system_phase=None):
     source = gpio_phase.release(result)
-    if _syscfg(result):
-        source += ['    if (s_nx_platform_syscfg_clock_added != 0u) {',
-                   '        NX_G474_WRITE(&RCC->APB2ENR, NX_G474_READ(&RCC->APB2ENR) & ~s_nx_platform_syscfg_clock_added);',
-                   '        nx_arch_dsb();',
-                   '        if ((NX_G474_READ(&RCC->APB2ENR) & s_nx_platform_syscfg_clock_added) != 0u) { return NX_ERROR_IO; }',
-                   '        s_nx_platform_syscfg_clock_added = 0u;', '    }']
-    for register, _ in reversed(_peripheral_gates(result)):
-        slot = f's_nx_platform_peripheral_{register.lower()}_added'
-        source += [f'    if ({slot} != 0u) {{',
-                   f'        NX_G474_WRITE(&RCC->{register}, NX_G474_READ(&RCC->{register}) & ~{slot});',
-                   '        nx_arch_dsb();',
-                   f'        if ((NX_G474_READ(&RCC->{register}) & {slot}) != 0u) {{ return NX_ERROR_IO; }}',
-                   f'        {slot} = 0u;', '    }']
-    if any(item.kind == "i2c" for item in result.controllers):
-        source += ['    if (s_nx_platform_i2c_mux_owned) {',
-                   '        NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) & ~(uint32_t)RCC_CCIPR_I2C1SEL);',
-                   '        nx_arch_dsb();',
-                   '        if ((NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u) { return NX_ERROR_IO; }',
-                   '        s_nx_platform_i2c_mux_owned = false;', '    }']
-    if any(item.kind in {"adc", "pwm_adc", "adc_group"} for item in result.controllers):
-        source += ['    if (s_nx_platform_adc_mux_owned) {',
-                   '        NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) & ~(uint32_t)RCC_CCIPR_ADC12SEL);',
-                   '        nx_arch_dsb();',
-                   '        if ((NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u) { return NX_ERROR_IO; }',
-                   '        s_nx_platform_adc_mux_owned = false;', '    }']
+    if result.controllers:
+        source += ['    nx_result_t resources = nx_stm32g474_platform_resources_stop(&s_nx_platform_config);',
+                   '    if (resources != NX_SUCCESS) { return resources; }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
     return source + ['    if (s_nx_platform_started) {',

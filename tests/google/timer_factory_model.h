@@ -27,6 +27,11 @@ uint32_t nx_timer_factory_read(volatile uint32_t* address);
 #endif
 #undef NVIC
 #define NVIC (&g_nx_timer_factory_nvic)
+#ifndef NX_TIMER_FACTORY_STM32
+/* Model the same grouping fact after redirecting the SDK NVIC leaf. */
+#undef NVIC_GetPriorityGrouping
+#define NVIC_GetPriorityGrouping() (NVIC->priority_group & 7U)
+#endif
 #define NX_PLATFORM_REGISTER_WRITE(reg, value)                                 \
     nx_timer_factory_write(&(reg), (uint32_t)(value))
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \

@@ -12,8 +12,10 @@ extern "C" {
 #include "timer_advanced_controller.h"
 #ifdef NX_TIMER_FACTORY_STM32
 #include "stm32f407_provider.h"
+#include "stm32f407_timer_cold.h"
 #else
 #include "gd32f470_provider.h"
+#include "gd32f470_timer_cold.h"
 #include "gd32f4xx_gpio.h"
 #include "gd32f4xx_rcu.h"
 #include "gd32f4xx_timer.h"
@@ -73,6 +75,26 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 #define CAP_IRQ     TIMER3_IRQHandler
 #define ADV_IRQ     TIMER0_BRK_TIMER8_IRQHandler
 #endif
+
+namespace {
+#ifdef NX_TIMER_FACTORY_STM32
+using TimerCold = nx_stm32_timer_cold_t;
+using CaptureColdConfig = nx_stm32_capture_cold_config_t;
+using AdvancedColdConfig = nx_stm32_advanced_cold_config_t;
+constexpr auto CaptureColdPrepare = nx_stm32_capture_cold_prepare;
+constexpr auto CaptureColdClose = nx_stm32_capture_cold_close;
+constexpr auto AdvancedColdPrepare = nx_stm32_advanced_cold_prepare;
+constexpr auto AdvancedColdClose = nx_stm32_advanced_cold_close;
+#else
+using TimerCold = nx_gd32_timer_cold_t;
+using CaptureColdConfig = nx_gd32_capture_cold_config_t;
+using AdvancedColdConfig = nx_gd32_advanced_cold_config_t;
+constexpr auto CaptureColdPrepare = nx_gd32_capture_cold_prepare;
+constexpr auto CaptureColdClose = nx_gd32_capture_cold_close;
+constexpr auto AdvancedColdPrepare = nx_gd32_advanced_cold_prepare;
+constexpr auto AdvancedColdClose = nx_gd32_advanced_cold_close;
+#endif
+} /* namespace */
 
 using testing::_;
 using testing::NiceMock;
@@ -459,6 +481,8 @@ TEST_F(TimerFactory, RefusedColdGateNeverBorrowsTimerOrPins) {
 }
 TEST_F(TimerFactory,
        ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact) {
+    /* A live peer source requires its APB gate; off-bank values are stale. */
+    ADV_GATE |= 1U << 16U;
     PEER_DIER = 1U;
     nx_platform_start_result_t result = nx_platform_start();
     EXPECT_EQ(result.primary, NX_ERROR_BUSY);
@@ -466,6 +490,57 @@ TEST_F(TimerFactory,
     EXPECT_EQ(PEER_DIER, 1U);
     EXPECT_EQ(advanced->config, nullptr);
     EXPECT_EQ(NVIC->IPR[24], 0x30U);
+}
+TEST_F(TimerFactory, OffPeerBankContentsDoNotAdmitAFalseForeignPublisher) {
+#ifdef NX_TIMER_FACTORY_STM32
+    ASSERT_EQ(ADV_GATE & RCC_APB2ENR_TIM9EN, 0U);
+#else
+    ASSERT_EQ(ADV_GATE & RCU_APB2EN_TIMER8EN, 0U);
+#endif
+    PEER_DIER = UINT32_MAX;
+    EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_EQ(PEER_DIER, UINT32_MAX);
+}
+
+TEST_F(TimerFactory, CaptureRejectedOwnerCannotStopAnExistingSession) {
+    nx_timer_capture_config_t foreign = {};
+    capture->config = &foreign;
+    capture->initialized = true;
+    const auto original = *capture;
+    uint16_t snapshot = 0U;
+    TimerCold cold = {};
+    CaptureColdConfig config = {};
+    config.snapshot = &snapshot;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x30000U);
+    EXPECT_EQ(CaptureColdPrepare(capture, &cold, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(CaptureColdClose(capture, &cold, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(std::memcmp(capture, &original, sizeof(original)), 0);
+    EXPECT_EQ(std::memcmp(bytes, before.data(), before.size()), 0);
+    EXPECT_EQ(s_writes, 0U);
+    *capture = {};
+}
+
+TEST_F(TimerFactory, AdvancedRejectedOwnerCannotStopAnExistingSession) {
+    nx_advanced_pwm_config_t foreign = {};
+    foreign.break_input = &BREAK_INPUT;
+    foreign.break_mask = 4096U;
+    advanced->config = &foreign;
+    advanced->initialized = true;
+    const auto original = *advanced;
+    uint16_t snapshots[3] = {};
+    TimerCold cold = {};
+    AdvancedColdConfig config = {};
+    config.snapshots = snapshots;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x30000U);
+    EXPECT_EQ(AdvancedColdPrepare(advanced, &cold, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(AdvancedColdClose(advanced, &cold, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(std::memcmp(advanced, &original, sizeof(original)), 0);
+    EXPECT_EQ(std::memcmp(bytes, before.data(), before.size()), 0);
+    EXPECT_EQ(s_writes, 0U);
+    *advanced = {};
 }
 TEST_F(TimerFactory, ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition) {
     NVIC->ISER[0] = 1U << 30U;

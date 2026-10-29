@@ -15,21 +15,14 @@ foreach(profile regular-software regular-timer injected-software injected-timer)
         message(FATAL_ERROR
             "G474 group fixture rejected: ${group_output}${group_error}")
     endif()
-    file(READ "${group_bundle}/input_paths.json" group_inputs)
-    string(JSON group_input_count LENGTH "${group_inputs}")
-    math(EXPR group_last_input "${group_input_count} - 1")
-    foreach(index RANGE 0 ${group_last_input})
-        string(JSON group_name MEMBER "${group_inputs}" ${index})
-        string(JSON group_path GET "${group_inputs}" "${group_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${group_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${group_bundle}")
     set(group_target "nexus_g474_adc_group_${target_suffix}_factory_test")
     nexus_google_test("${group_target}"
         SOURCES g474_adc_group_factory_test.cpp
             g474_adc_group_admission_factory_test.cpp
             g474_adc_group_factory_ports.cpp g474_adc_group_model.cpp
             "${group_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
             "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"

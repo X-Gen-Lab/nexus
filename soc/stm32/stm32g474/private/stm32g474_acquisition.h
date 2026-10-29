@@ -138,6 +138,12 @@ typedef struct {
     bool active;
     bool restore_pending;
 } nx_stm32g474_flash_state_t;
+/** \brief Bind a fresh physical Flash view; no operation or partition starts.
+ * \param[in,out] port: Static unretained state; no active/restore-pending
+ * pulse. \return Success or error without programming, erasing or adopting a
+ * pulse.
+ */
+nx_result_t nx_stm32g474_flash_prepare(nx_stm32g474_flash_state_t* port);
 extern const nx_flash_geometry_t g_nx_stm32g474_flash_geometry;
 extern const nx_flash_ops_t nx_stm32g474_flash_ops;
 /** \brief Retry failed idle Flash relock/cache restoration before release.

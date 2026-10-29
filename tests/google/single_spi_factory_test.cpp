@@ -26,6 +26,8 @@ extern "C" {
 #define SPI_GATE  RCU_APB2EN
 #define SPI_BIT   RCU_APB2EN_SPI4EN
 #endif
+/** \brief Both SDK fixtures share the host-only Cortex-M register model. */
+NVIC_Type g_gd32_model_nvic;
 }
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -241,6 +243,7 @@ class SingleSpiFactory : public testing::Test {
     NiceMock<SingleSpiPorts> ports;
     void* mapping = nullptr;
     void SetUp() override {
+        g_gd32_model_nvic = {};
         mapping =
             mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000U,
                  PROT_READ | PROT_WRITE,

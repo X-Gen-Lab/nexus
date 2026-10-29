@@ -73,41 +73,21 @@ def _can_fd(item, result, binding):
             lines.append(f"    {{ {value.id}u, {value.mask}u, NX_CAN_{value.format.upper()}, {value.fifo}u }},")
         lines.append("};")
     irq = result.irq
+    config = "s_nx_config_" + name
     lines += [
-        f"static nx_result_t prepare_{name}(void) {{",
-        f"    if ({state}.retained || {domain}.retained || {domain}.acquired_mask != 0u) {{ return NX_ERROR_BUSY; }}",
-        f"    {state}.registers = FDCAN1;",
-        f"    {state}.mode = NX_STM32G474_FDCAN_{'NORMAL' if item.mode == 'iso-fd-normal' else 'INTERNAL_LOOPBACK'};",
-        f"    {state}.domain = &{domain};",
-        f"    {state}.filters = {filters};",
-        f"    {state}.filter_count = {len(options.filters)}u;",
-        f"    {state}.events = s_nx_events_{name};",
-        f"    {state}.capacity = {options.event_capacity}u;",
-        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }};",
-        f"    {state}.drain_timeout_us = {options.drain_timeout_us}u;",
-        f"    {state}.poll_limit = {options.poll_limit}u;",
-        f"    nx_result_t status = nx_stm32g474_fdcan_domain_initialize(&{domain});",
-        "    if (status != NX_SUCCESS) { return status; }",
-        f"    status = nx_stm32g474_fdcan_initialize(&{state});",
-        "    if (status != NX_SUCCESS) { return status; }",
-        # Configuration and source admission precede connecting the TX pad.
-        "    NX_G474_WRITE(&GPIOA->BSRR, 4096u);",
-        "    nx_arch_dsb();",
-        "    if ((NX_G474_READ(&GPIOA->ODR) & 4096u) != 4096u) { return NX_ERROR_IO; }",
-        "    status = nx_stm32g474_pin_alternate(GPIOA, 11u, 9u);",
-        "    if (status != NX_SUCCESS) { return status; }",
-        "    return nx_stm32g474_pin_alternate(GPIOA, 12u, 9u);", "}",
+        f"static const nx_stm32g474_fdcan_config_t {config} = {{",
+        f"    .domain = &{domain}, .filters = {filters}, .filter_count = {len(options.filters)}u,",
+        f"    .events = s_nx_events_{name}, .capacity = {options.event_capacity}u,",
+        f"    .irq_policy = {{ {kernel_policy_constant(result)}, {irq.external_count}u, {irq.priority_bits}u, {irq.syscall_priority or 0}u }},",
+        f"    .drain_timeout_us = {options.drain_timeout_us}u, .poll_limit = {options.poll_limit}u,",
+        f"    .mode = NX_STM32G474_FDCAN_{'NORMAL' if item.mode == 'iso-fd-normal' else 'INTERNAL_LOOPBACK'} }};",
         "void FDCAN1_IT0_IRQHandler(void);",
         r"/** \brief Only the reviewed FDCAN line0 publishes actual facts. */",
         f"void FDCAN1_IT0_IRQHandler(void) {{ nx_stm32g474_fdcan_irq(&{state}); }}",
-        f"static nx_result_t stop_{name}(void) {{",
-        f"    if ({state}.retained) {{",
-        f"        nx_result_t status = nx_can_fd_port_stop(&s_nx_face_{name});",
-        "        if (status != NX_SUCCESS) { return status; }", "    }",
-        f"    return nx_stm32g474_fdcan_domain_stop(&{domain});", "}",
     ]
     return Construction("nx_stm32g474_fdcan_state_t", tuple(lines),
-                        DirectCall(f"prepare_{name}"), (DirectCall(f"stop_{name}"),), True)
+                        DirectCall("nx_stm32g474_fdcan_prepare", (Address(state), Address(config))),
+                        (DirectCall("nx_stm32g474_fdcan_close", (Address(state), Address(config))),), True)
 
 
 MODES = {"pwm_adc": ("finite-regular-dma",),

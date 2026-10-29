@@ -53,6 +53,39 @@ nx_stm32g474_encoder_initialize(nx_stm32g474_encoder_state_t* state,
                                 const nx_stm32g474_encoder_config_t* config);
 /** \brief End an observed stopped session with the unused vector quiet. */
 nx_result_t nx_stm32g474_encoder_close(nx_stm32g474_encoder_state_t* state);
+/** \brief Persistent TIM5 vector receipt, no duplicate controller state. */
+typedef struct {
+    uint8_t saved_priority;
+    bool vector_owned;
+} nx_stm32g474_capture_cold_t;
+/** \brief Prepare PA0, capture controller and its quiet vector in that order.
+ * \param[in,out] state: Static unbound capture storage.
+ * \param[in] config: Static reviewed capture clock/filter/edge geometry.
+ * \param[in,out] cold: Zeroed vector receipt, retained through failure/retry.
+ * \param[in] priority: Reviewed logical priority admitted by the resolver.
+ * \return Status; close must settle any partially acquired source/vector.
+ */
+nx_result_t
+nx_stm32g474_timer_capture_prepare(nx_timer_capture_controller_t* state,
+                                   const nx_timer_capture_config_t* config,
+                                   nx_stm32g474_capture_cold_t* cold,
+                                   uint8_t priority);
+/** \brief Drain the controller, disable/restore vector, then release state.
+ * \param[in,out] state: Same static capture owner, borrowers already joined.
+ * \param[in,out] cold: Same receipt; failure retains unproved ownership.
+ * \return Success only after every source and vector is quiet/read back.
+ */
+nx_result_t
+nx_stm32g474_timer_capture_close(nx_timer_capture_controller_t* state,
+                                 nx_stm32g474_capture_cold_t* cold);
+/** \brief Prepare exact PA6/PA7 AF2 before binding the TIM3 encoder.
+ * \param[in,out] state: Static unretained exact encoder state.
+ * \param[in] config: Static reviewed filter, polarity and counting facts.
+ * \return Status; existing close and Platform restore own partial effects.
+ */
+nx_result_t
+nx_stm32g474_encoder_prepare(nx_stm32g474_encoder_state_t* state,
+                             const nx_stm32g474_encoder_config_t* config);
 extern const nx_encoder_ops_t nx_stm32g474_encoder_ops;
 #ifdef __cplusplus
 }

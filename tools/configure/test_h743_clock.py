@@ -44,9 +44,9 @@ class H743ClockConfigurationTests(unittest.TestCase):
                 config = (output / "nexus_config.h").read_text()
                 self.assertIn("#define NEXUS_CORE_HZ 32000000u", config)
                 self.assertIn("#define NEXUS_SOC_CACHE_MASK 0u", config)
-                self.assertIn(
-                    "nx_stm32h743_uart_initialize(&s_nx_port_console, "
-                    "32000000u, 1000000u)", source)
+                self.assertIn(".clock_hz = 32000000u,", source)
+                self.assertIn("nx_stm32h743_uart_prepare(&s_nx_port_console, "
+                              "&s_nx_config_console)", source)
                 self.assertIn(
                     "nx_stm32h743_system_start(&g_nx_stm32h743_system, "
                     "32000000u, 0u, 1000000u)", source)
@@ -92,7 +92,8 @@ class H743ClockConfigurationTests(unittest.TestCase):
                 self.assertIn("static nx_stm32h743_flash_timing_state_t", source)
                 system = source.index("nx_stm32h743_system_start(")
                 timing = source.index("nx_stm32h743_flash_timing_initialize(")
-                controller = source.index("result.primary = prepare_")
+                controller = source.index("nx_platform_diagnostic_phase(diagnostic, false, "
+                                          "NX_PLATFORM_PHASE_CONTROLLER", timing)
                 self.assertLess(system, timing)
                 self.assertLess(timing, controller)
                 self.assertIn("nx_platform_stop_impl(diagnostic, true)",

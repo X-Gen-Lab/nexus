@@ -1,5 +1,14 @@
 # STM32U575 single-state reference
 
+The family configuration package emits static configuration, exact storage,
+typed factory faces and fixed calls. Runtime preflight, GPIO/clock ownership,
+provider preparation, partial cleanup and stop are maintained in C, including
+selected GPDMA-chain, RTC and LPTIM bindings. The retained-time/Stop2 components
+keep their existing explicit C owners and limits. Empty receipts never authorize
+stopping another live owner; failed withdrawal retains its own unfinished
+effects. This source boundary does not establish new security, low-power or
+physical qualification.
+
 This provider targets exact STM32U575ZIT6Q and the source-reviewed NUCLEO-U575ZI-Q
 MB1549 reference. The maintained slice is CPU startup, reset-like MSIS 4 MHz,
 reserved TIM2, exact-package GPIOA through GPIOH, USART1 PA9/PA10 and USART2

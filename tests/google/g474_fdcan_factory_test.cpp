@@ -223,3 +223,23 @@ TEST_F(G474FdcanFactory, ForeignDisabledLinePendingRejectsBeforeClockEffects) {
     EXPECT_TRUE(g_g474_model.irq_pending[22]);
     testing::Mock::VerifyAndClearExpectations(&observer);
 }
+
+TEST_F(G474FdcanFactory, RejectedColdDomainNeverBecomesCleanupResponsibility) {
+    for (uint32_t acquired : {0U, 1U}) {
+        nx_stm32g474_fdcan_domain_t foreign{};
+        foreign.retained = true;
+        foreign.acquired_mask = static_cast<uint8_t>(acquired);
+        nx_stm32g474_fdcan_state_t rejected{};
+        nx_stm32g474_fdcan_config_t config{};
+        config.domain = &foreign;
+        const auto writes = g_g474_model.writes;
+
+        EXPECT_EQ(NX_ERROR_BUSY,
+                  nx_stm32g474_fdcan_prepare(&rejected, &config));
+        EXPECT_EQ(NX_SUCCESS, nx_stm32g474_fdcan_close(&rejected, &config));
+        EXPECT_TRUE(foreign.retained);
+        EXPECT_EQ(acquired, foreign.acquired_mask);
+        EXPECT_EQ(nullptr, rejected.domain);
+        EXPECT_EQ(writes, g_g474_model.writes);
+    }
+}

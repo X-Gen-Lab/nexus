@@ -40,8 +40,8 @@ class H743FlashRamEmissionTests(unittest.TestCase):
     def test_normal_prepare_and_stop_route_through_the_owned_workspace(self):
         source = bindings.emit(self.resolve())[1]
         self.assertRegex(
-            source, r"return nx_stm32h743_flash_ram_initialize\("
-            r"&s_nx_port_storage, &" + WORKSPACE + r"\);")
+            source, r"nx_stm32h743_flash_prepare\("
+            r"&s_nx_port_storage, &" + WORKSPACE + r", 3300u\)")
         self.assertIn("nx_stm32h743_flash_ram_stop(&" + WORKSPACE + ")",
                       source)
         self.assertNotIn("return nx_stm32h743_flash_stop(&s_nx_port_storage);",
@@ -51,7 +51,7 @@ class H743FlashRamEmissionTests(unittest.TestCase):
         source = bindings.emit(self.resolve())[1]
         self.assertRegex(
             source, r"s_nx_platform_initialized = [0-9]+u;\s*"
-            r"result.primary = prepare_storage\(\);")
+            r"result.primary = nx_stm32h743_flash_prepare\(&s_nx_port_storage,")
 
     def test_physical_workspace_is_independent_of_the_public_instance_name(self):
         original = FLASH_ASSEMBLY.read_text()
@@ -66,8 +66,8 @@ class H743FlashRamEmissionTests(unittest.TestCase):
                                              "[flash.maintenance]"))
             source = bindings.emit(configure.resolve_ir(path))[1]
         self.assertIn(WORKSPACE, source)
-        self.assertIn("nx_stm32h743_flash_ram_initialize(&s_nx_port_maintenance, &"
-                      + WORKSPACE + ")", source)
+        self.assertIn("nx_stm32h743_flash_prepare(&s_nx_port_maintenance, &"
+                      + WORKSPACE + ", 3300u)", source)
         self.assertNotIn("&s_nx_port_storage", source)
 
     def test_selected_ram_code_has_rx_load_and_exact_copy_symbols(self):

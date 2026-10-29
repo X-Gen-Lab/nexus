@@ -281,9 +281,9 @@ class G474SharedPwmConfiguration(unittest.TestCase):
                     self.assertEqual(len(helpers), len(set(helpers)))
                     self.assertEqual(source.count("nx_stm32g474_pwm_shared_initialize("), 1)
                     self.assertEqual(source.count("nx_stm32g474_pwm_shared_close("), 1)
-                    self.assertEqual(source.count("nx_stm32g474_pwm_initialize("), 1)
+                    self.assertEqual(source.count("nx_stm32g474_pwm_prepare("), 1)
                     self.assertEqual(source.count("&nx_stm32g474_pwm_shared_ops"), 2)
-                    self.assertIn("s_nx_port_pwm_shared_tim3.registers = TIM4;", source)
+                    self.assertIn("TIM4, &s_nx_idle_pwm_shared_tim3,", source)
                     if not before:
                         self.assertIn("NX_PLATFORM_PHASE_CONTROLLER, 2u);", source)
 
@@ -320,7 +320,7 @@ class G474SharedPwmConfiguration(unittest.TestCase):
         self.assertNotIn("pwm_shared_owners", result.to_dict())
         source = bindings.emit(result)[1]
         self.assertNotIn("pwm_shared", source)
-        self.assertIn("nx_stm32g474_pwm_initialize(", source)
+        self.assertIn("nx_stm32g474_pwm_prepare(", source)
         self.assertIn("&nx_stm32g474_pwm_ops", source)
 
 

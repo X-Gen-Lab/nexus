@@ -39,6 +39,7 @@ endforeach()
 nexus_google_test(nexus_g474_pin_state_factory_test
     SOURCES g474_pin_state_factory_test.cpp g474_pin_state_model.cpp
         "${g4_pins_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pin_state.c"

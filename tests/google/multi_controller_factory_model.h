@@ -45,6 +45,10 @@ void nx_multi_factory_i2c_address(void* state);
     nx_multi_factory_write(&(reg), (uint32_t)(value))
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \
     nx_multi_factory_priority_write(&(reg), (uint8_t)(value))
+#ifndef NX_MULTI_FACTORY_STM32
+#define NX_UART_REG_WRITE(address, value)                                      \
+    nx_multi_factory_write((address), (uint32_t)(value))
+#endif
 #define NVIC_EnableIRQ(irq)       nx_multi_factory_irq_enable((int)(irq))
 #define NVIC_DisableIRQ(irq)      nx_multi_factory_irq_disable((int)(irq))
 #define NVIC_ClearPendingIRQ(irq) nx_multi_factory_irq_pending_clear((int)(irq))

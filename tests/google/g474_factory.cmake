@@ -13,16 +13,10 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT g4_generated EQUAL 0)
     message(FATAL_ERROR "G474 factory fixture rejected: ${g4_output}${g4_error}")
 endif()
-file(READ "${g4_factory_bundle}/input_paths.json" g4_inputs)
-string(JSON g4_input_count LENGTH "${g4_inputs}")
-math(EXPR g4_last_input "${g4_input_count} - 1")
-foreach(index RANGE 0 ${g4_last_input})
-    string(JSON g4_input_name MEMBER "${g4_inputs}" ${index})
-    string(JSON g4_input_path GET "${g4_inputs}" "${g4_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${g4_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_factory_bundle}")
 nexus_google_test(nexus_g474_factory_test SOURCES g474_factory_test.cpp
     "${g4_factory_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"

@@ -482,3 +482,11 @@ void nx_stm32u575_lptim_irq(nx_stm32u575_lptim_state_t* s) {
         }
     }
 }
+
+nx_result_t nx_stm32u575_lptim_prepare(nx_stm32u575_lptim_state_t* state) {
+    if (state == NULL)
+        return NX_ERROR_INVALID;
+    if (state->registers == NULL)
+        state->registers = NX_U575_LPTIM2;
+    return nx_stm32u575_lptim_initialize(state);
+}

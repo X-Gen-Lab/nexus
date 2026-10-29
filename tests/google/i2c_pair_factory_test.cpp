@@ -88,6 +88,7 @@ bool model_privileged;
 int refused_irq;
 volatile uint32_t* held_engine;
 volatile uint32_t* refused_register;
+uint32_t refused_bits;
 unsigned writes;
 std::array<void (*)(void), 2> event_vectors{FIRST_EV, SECOND_EV};
 std::array<void (*)(void), 2> error_vectors{FIRST_ER, SECOND_ER};
@@ -139,6 +140,7 @@ class I2CPairFactory : public testing::Test {
         refused_irq = -1;
         held_engine = nullptr;
         refused_register = nullptr;
+        refused_bits = 1U << 22U;
         writes = 0U;
         clock_port = &clocks;
         ON_CALL(clocks, Preflight()).WillByDefault(testing::Return(NX_SUCCESS));
@@ -397,6 +399,29 @@ TEST_F(I2CPairFactory, SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart) {
     EXPECT_TRUE(states[0]->initialized);
     EXPECT_TRUE(states[1]->initialized);
 }
+
+#ifndef NX_I2C_PAIR_IRQ
+TEST_F(I2CPairFactory, RefusedDmaClockAcquireStopsBeforeEitherController) {
+    const uint32_t previous = 1U << 2U;
+    DMA_GATE = previous;
+    refused_register = &DMA_GATE;
+    refused_bits = 1U << 21U;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(previous, DMA_GATE);
+    EXPECT_EQ(0U, GATE & controller_gate);
+    EXPECT_EQ(0U, PIN_MODE);
+    EXPECT_EQ(0U, NVIC->ISER[0]);
+    EXPECT_EQ(0U, NVIC->ISER[1]);
+    EXPECT_FALSE(states[0]->initialized);
+    EXPECT_FALSE(states[1]->initialized);
+    refused_register = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    Start();
+}
+#endif
 
 TEST_F(I2CPairFactory, OwnEventVectorCannotAdvanceThePeerRequest) {
     Start();
@@ -688,11 +713,9 @@ extern "C" void nx_i2c_pair_register_write(volatile uint32_t* reg,
             return;
         }
     }
-    const bool blocked = reg == refused_register &&
-                         (value & (1U << 22U)) != 0U &&
-                         (*reg & (1U << 22U)) == 0U;
-    if (!blocked)
-        *reg = value;
+    if (reg == refused_register)
+        value = (value & ~refused_bits) | (*reg & refused_bits);
+    *reg = value;
 }
 /** \brief Read actual selected DATA and apply its receive-status clear. */
 extern "C" uint8_t nx_i2c_v1_model_read(void* context) {

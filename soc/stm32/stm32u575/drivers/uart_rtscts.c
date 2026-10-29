@@ -6,6 +6,7 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_uart_rtscts.h"
 #include "stm32u5xx_ll_usart.h"
 
@@ -154,4 +155,21 @@ nx_result_t nx_stm32u575_usart1_rtscts_pins_prepare(void) {
                         (NX_U575_READ(&gpio->MODER) & ~fields) | mode, fields)
                ? NX_SUCCESS
                : NX_ERROR_IO;
+}
+
+nx_result_t nx_stm32u575_uart_rtscts_prepare(
+    nx_stm32u575_uart_fifo_state_t* port,
+    const nx_stm32u575_uart_config_t* config,
+    const nx_stm32u575_uart_fifo_profile_t* profile) {
+    if (port == NULL || config == NULL || profile == NULL ||
+        config->controller != 1U)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32u575_uart_bind(&port->uart, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32u575_usart1_rtscts_pins_prepare();
+    if (result != NX_SUCCESS)
+        return result;
+    port->fifo = profile;
+    return nx_stm32u575_uart_rtscts_initialize(port, 4000000U, 1000000U);
 }

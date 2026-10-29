@@ -2,6 +2,8 @@
 nexus_google_test(nexus_h743_uart_continuous_test SOURCES
     h743_uart_continuous_test.cpp h743_uart_continuous_model.cpp h743_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"
     LIBRARIES Nexus::IO Nexus::Arch
@@ -17,6 +19,8 @@ target_compile_options(nexus_h743_uart_continuous_test PRIVATE
 nexus_google_test(nexus_h743_uart_duplex_test SOURCES
     h743_uart_duplex_test.cpp h743_uart_continuous_model.cpp h743_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_duplex.c"
@@ -50,18 +54,12 @@ foreach(cache off on)
     if(NOT generated EQUAL 0)
         message(FATAL_ERROR "H743 continuous ${cache} rejected: ${generation_stdout}${generation_stderr}")
     endif()
-    file(READ "${bundle}/input_paths.json" inputs)
-    string(JSON input_count LENGTH "${inputs}")
-    math(EXPR last_input "${input_count} - 1")
-    foreach(index RANGE 0 ${last_input})
-        string(JSON input_name MEMBER "${inputs}" ${index})
-        string(JSON input_path GET "${inputs}" "${input_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${bundle}")
     set(target "nexus_h743_uart_${mode}_${cache}_factory_test")
     nexus_google_test(${target} SOURCES h743_uart_continuous_factory_test.cpp
         h743_uart_continuous_model.cpp h743_model.cpp "${bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"

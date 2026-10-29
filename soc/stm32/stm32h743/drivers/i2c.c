@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "i2c_v2.h"
+#include "stm32h743_cold.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -94,4 +95,15 @@ nx_result_t nx_stm32h743_i2c_prepare(nx_i2c_v2_state_t* port,
         return result;
     result = nx_stm32h743_i2c_pins_prepare();
     return result == NX_SUCCESS ? nx_i2c_v2_initialize(port) : result;
+}
+
+nx_result_t nx_stm32h743_i2c_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return (NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_I2C1EN) != 0U ||
+                   (NX_H743_READ(&RCC->APB1LRSTR) & RCC_APB1LRSTR_I2C1RST) !=
+                       0U ||
+                   (NX_H743_READ(&RCC->D2CCIP2R) & RCC_D2CCIP2R_I2C123SEL) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
 }

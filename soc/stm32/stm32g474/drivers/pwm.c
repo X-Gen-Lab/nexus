@@ -238,3 +238,28 @@ nx_result_t nx_stm32g474_pwm_close(nx_stm32g474_pwm_state_t* p) {
     return NX_SUCCESS;
 }
 const nx_pwm_ops_t nx_stm32g474_pwm_ops = {set, start, stop, state};
+
+/** \brief Prepare the exact static PWM base and inactive-level owner. */
+nx_result_t nx_stm32g474_pwm_prepare(nx_stm32g474_pwm_state_t* port,
+                                     const nx_stm32g474_pwm_config_t* config) {
+    if (port == NULL || config == NULL || config->idle == NULL ||
+        config->gpio == NULL || config->pin > 15U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || config->idle->retained ||
+        config->idle->initialized)
+        return NX_ERROR_BUSY;
+    config->idle->registers = config->gpio;
+    config->idle->mask = UINT32_C(1) << config->pin;
+    config->idle->output = true;
+    port->registers = config->registers;
+    port->idle = config->idle;
+    port->reset = config->reset;
+    port->reset_mask = config->reset_mask;
+    port->pin = config->pin;
+    port->inactive = config->inactive;
+    port->period_ticks = config->period_ticks;
+    port->duty_ticks = config->duty_ticks;
+    port->tick_hz = config->tick_hz;
+    port->poll_limit = 1000000U;
+    return nx_stm32g474_pwm_initialize(port);
+}

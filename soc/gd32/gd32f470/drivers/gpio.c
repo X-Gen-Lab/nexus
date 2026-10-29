@@ -143,18 +143,24 @@ void nx_gd32_pin_restore(uint32_t gpio, unsigned pin, uint16_t state) {
     uint32_t bit = 1U << pin;
     uint32_t shift = pin * 2U;
     uint32_t af_shift = (pin % 8U) * 4U;
-    GPIO_BOP(gpio) = (state & (1U << 11U)) != 0U ? bit : bit << 16U;
+    NX_PLATFORM_REGISTER_WRITE(GPIO_BOP(gpio),
+                               (state & (1U << 11U)) != 0U ? bit : bit << 16U);
     volatile uint32_t* af = pin < 8U ? &GPIO_AFSEL0(gpio) : &GPIO_AFSEL1(gpio);
-    *af = (*af & ~(15U << af_shift)) |
-          (((uint32_t)state >> 7U & 15U) << af_shift);
-    GPIO_OMODE(gpio) =
-        (GPIO_OMODE(gpio) & ~bit) | (((uint32_t)state >> 2U & 1U) << pin);
-    GPIO_OSPD(gpio) = (GPIO_OSPD(gpio) & ~(3U << shift)) |
-                      (((uint32_t)state >> 3U & 3U) << shift);
-    GPIO_PUD(gpio) = (GPIO_PUD(gpio) & ~(3U << shift)) |
-                     (((uint32_t)state >> 5U & 3U) << shift);
-    GPIO_CTL(gpio) =
-        (GPIO_CTL(gpio) & ~(3U << shift)) | (((uint32_t)state & 3U) << shift);
+    NX_PLATFORM_REGISTER_WRITE(*af,
+                               (*af & ~(15U << af_shift)) |
+                                   (((uint32_t)state >> 7U & 15U) << af_shift));
+    NX_PLATFORM_REGISTER_WRITE(GPIO_OMODE(gpio),
+                               (GPIO_OMODE(gpio) & ~bit) |
+                                   (((uint32_t)state >> 2U & 1U) << pin));
+    NX_PLATFORM_REGISTER_WRITE(GPIO_OSPD(gpio),
+                               (GPIO_OSPD(gpio) & ~(3U << shift)) |
+                                   (((uint32_t)state >> 3U & 3U) << shift));
+    NX_PLATFORM_REGISTER_WRITE(GPIO_PUD(gpio),
+                               (GPIO_PUD(gpio) & ~(3U << shift)) |
+                                   (((uint32_t)state >> 5U & 3U) << shift));
+    NX_PLATFORM_REGISTER_WRITE(GPIO_CTL(gpio),
+                               (GPIO_CTL(gpio) & ~(3U << shift)) |
+                                   (((uint32_t)state & 3U) << shift));
     nx_gd32_peripheral_barrier();
 }
 

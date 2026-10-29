@@ -45,9 +45,9 @@ class SelectedContractAuthorityTests(unittest.TestCase):
             ("g474-pwm-shared", {"pwm"},
              "nx_stm32g474_pwm_shared_initialize("),
             ("h743-uart-rtscts", {"uart"},
-             "nx_stm32h743_uart_rtscts_initialize("),
+             "nx_stm32h743_uart_rtscts_prepare("),
             ("u575-uart-rtscts", {"uart"},
-             "nx_stm32u575_uart_rtscts_initialize("))
+             "nx_stm32u575_uart_rtscts_prepare("))
         self.assertEqual({path.stem for path in
                           (configure.ROOT / root).glob("*.toml")},
                          {choice[0] for choice in choices} | {
@@ -104,7 +104,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                                  {(2, 83), (3, 84)} |
                                  ({uart} if uart is not None else set()))
                 body = bindings.emit(result)[1]
-                self.assertIn("nx_stm32h743_spi_dma_initialize(", body)
+                self.assertIn("nx_stm32h743_spi_dma_prepare(", body)
                 self.assertIn("&nx_stm32h743_spi_dma_endpoint_ops", body)
                 for row in records:
                     self.assertFalse(row.physical_qualified)

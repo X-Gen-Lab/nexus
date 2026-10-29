@@ -37,6 +37,7 @@ void DMA1_Stream4_IRQHandler(void);
 #include "gd32f4xx_dma.h"
 #include "gd32f4xx_gpio.h"
 #include "gd32f4xx_rcu.h"
+#include "gd32f4xx_usart.h"
 #define UART_STATE             nx_gd32_uart_dma_state_t
 #define SPI_STATE              nx_gd32_spi_dma_state_t
 #define DEVICE_STATE           nx_gd32_spi_dma_endpoint_state_t
@@ -94,6 +95,9 @@ static unsigned s_refused_pin_port;
 static unsigned s_refused_pin_number;
 static unsigned s_pin_restores[9][16];
 static bool s_privileged;
+#ifndef NX_MULTI_FACTORY_STM32
+static bool s_refuse_failed_uart_withdrawal;
+#endif
 
 extern "C" bool nx_multi_factory_is_privileged(void) {
     return s_privileged;
@@ -316,6 +320,13 @@ extern "C" void nx_multi_factory_irq_enable(int irq) {
     if (irq >= 0 && irq < 240)
         nx_multi_factory_write(&NVIC->ISER[(unsigned)irq / 32U],
                                1U << ((unsigned)irq % 32U));
+#ifndef NX_MULTI_FACTORY_STM32
+    if (s_refuse_failed_uart_withdrawal && irq == SECONDARY_UART_IRQ) {
+        NVIC->IPR[(unsigned)irq] = 0U;
+        s_refused = &USART_CTL0(USART1);
+        s_hold = USART_CTL0_UEN;
+    }
+#endif
 }
 extern "C" void nx_multi_factory_irq_disable(int irq) {
     if (irq >= 0 && irq < 240)
@@ -487,6 +498,9 @@ class MultipleFactory : public testing::Test {
         s_refused_pin_number = 16U;
         std::memset(s_pin_restores, 0, sizeof(s_pin_restores));
         s_privileged = true;
+#ifndef NX_MULTI_FACTORY_STM32
+        s_refuse_failed_uart_withdrawal = false;
+#endif
         s_now = 100U;
         ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Start()).WillByDefault(Return(0));
@@ -525,6 +539,9 @@ class MultipleFactory : public testing::Test {
         }
     }
     void TearDown() override {
+#ifndef NX_MULTI_FACTORY_STM32
+        s_refuse_failed_uart_withdrawal = false;
+#endif
         s_refused = s_held_engine = nullptr;
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
@@ -770,6 +787,25 @@ TEST_F(MultipleFactory, FailedSecondaryPinPrepareRestoresThePartialLease) {
     (void)testing::Mock::VerifyAndClearExpectations(&ports);
     EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
 }
+#ifndef NX_MULTI_FACTORY_STM32
+TEST_F(MultipleFactory, FailedUartPreparationKeepsItsUndrainedHardwareLease) {
+    s_refuse_failed_uart_withdrawal = true;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_ERROR_BUSY);
+    EXPECT_EQ(result.remaining_effects, 1U);
+    EXPECT_TRUE(uart_states[1]->uart.initialized);
+    EXPECT_TRUE(uart_states[1]->uart.stopping);
+    EXPECT_NE(USART_CTL0(USART1) & USART_CTL0_UEN, 0U);
+    EXPECT_NE(RCU_APB1EN & RCU_APB1EN_USART1EN, 0U);
+    EXPECT_EQ((gpio(0U, 0U) >> 4U) & 3U, 2U);
+    s_refuse_failed_uart_withdrawal = false;
+    s_refused = nullptr;
+    EXPECT_EQ(nx_uart_port_stop(uarts[1]), NX_SUCCESS);
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+#endif
+
 TEST_F(MultipleFactory, RefusedSelectedVectorJoinRetainsResourcesUntilRetry) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     unsigned irq = (unsigned)SECONDARY_I2C_RX_IRQ;

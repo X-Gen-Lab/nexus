@@ -59,5 +59,4 @@ from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
                        SECONDARY_FACTS)
 from .i2s2 import resolve_i2s2
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
-from . import secondary as SECONDARY_INTEGRATION
 from .integration import CAN_INTEGRATION

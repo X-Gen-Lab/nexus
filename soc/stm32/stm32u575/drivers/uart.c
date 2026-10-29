@@ -6,6 +6,7 @@
  * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include <limits.h>
 #ifndef NX_U575_IRQ_AVAILABLE
@@ -445,3 +446,40 @@ nx_result_t nx_stm32u575_uart_initialize(nx_stm32u575_uart_state_t* p,
 const nx_uart_ops_t nx_stm32u575_uart_ops = {
     submit,     start_admitted, cancel,      service, NULL,
     read_bytes, stop,           attach_wake, NULL,    NULL};
+
+nx_result_t nx_stm32u575_uart_bind(nx_stm32u575_uart_state_t* port,
+                                   const nx_stm32u575_uart_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL ||
+        (config->controller != 1U && config->controller != 2U))
+        return NX_ERROR_INVALID;
+    if (!span(config->storage, config->capacity) || config->capacity > 4096U ||
+        config->baud == 0U ||
+        overlap(config->storage, config->capacity, port, sizeof(*port)))
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active != NULL ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    port->registers = config->controller == 1U ? USART1 : USART2;
+    port->rx_storage = config->storage;
+    port->rx_capacity = config->capacity;
+    port->baud = config->baud;
+    port->irq = config->controller == 1U ? USART1_IRQn : USART2_IRQn;
+    port->profile = NX_UART_RX_BYTES;
+    port->irq_policy = config->irq_policy;
+    return NX_SUCCESS;
+}
+
+nx_result_t
+nx_stm32u575_uart_prepare(nx_stm32u575_uart_state_t* port,
+                          const nx_stm32u575_uart_config_t* config) {
+    nx_result_t result = nx_stm32u575_uart_bind(port, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = config->controller == 1U ? nx_stm32u575_usart1_pins_prepare()
+                                      : nx_stm32u575_usart2_pins_prepare();
+    return result == NX_SUCCESS
+               ? nx_stm32u575_uart_initialize(port, 4000000U, 1000000U)
+               : result;
+}

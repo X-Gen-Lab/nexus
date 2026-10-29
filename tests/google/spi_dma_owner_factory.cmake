@@ -13,16 +13,7 @@ if(NOT spi_owner_factory_result EQUAL 0)
     message(FATAL_ERROR "Native SPI DMA owner fixture rejected: "
         "${spi_owner_factory_output}${spi_owner_factory_error}")
 endif()
-file(READ "${spi_owner_factory_bundle}/input_paths.json" spi_owner_factory_inputs)
-string(JSON spi_owner_factory_count LENGTH "${spi_owner_factory_inputs}")
-math(EXPR spi_owner_factory_last "${spi_owner_factory_count} - 1")
-foreach(index RANGE 0 ${spi_owner_factory_last})
-    string(JSON spi_owner_factory_name MEMBER "${spi_owner_factory_inputs}" ${index})
-    string(JSON spi_owner_factory_path GET "${spi_owner_factory_inputs}"
-        "${spi_owner_factory_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${spi_owner_factory_path}")
-endforeach()
+nexus_google_configuration_inputs("${spi_owner_factory_bundle}")
 nexus_google_test(nexus_native_spi_dma_factory_test
     SOURCES native_spi_dma_factory_test.cpp
         "${spi_owner_factory_bundle}/bindings.c"

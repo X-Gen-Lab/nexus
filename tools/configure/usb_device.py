@@ -3,18 +3,14 @@
 This mechanism does not infer a Board connector, powered role, class protocol or
 physical qualification. Selected endpoints are separate static typed identities.
 """
-from tools.configure.calls import DirectCall
 from dataclasses import dataclass
 
-from tools.configure.gpio_phase import withdraw_pin
-from tools.configure.providers import maintained
-from tools.configure.providers.common import (Construction, fail, integer,
-                               kernel_policy_constant)
+from tools.configure.providers.common import fail, integer
 
 
 @dataclass(frozen=True)
 class UsbDevicePolicy:
-    """One SoC's reviewed FS controller, physical pads and cold clock leases."""
+    """One SoC's reviewed FS controller, physical pads and resources."""
 
     controller: str
     irq: int
@@ -23,7 +19,6 @@ class UsbDevicePolicy:
     endpoint_numbers: int
     pins: tuple
     resources: tuple
-    gpio_clock: str | None
 
 
 FIELDS = {"event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
@@ -130,121 +125,3 @@ def complete_plan(selected, devices, claim):
             claim("usb:" + controller["controller"] + ":endpoint:" +
                   str(item["number"]) + ":" + item["direction"], item["id"],
                   "device-fs", controller["route"])
-
-
-def constructor(item, result, prefix):
-    """Failed cold ownership remains counted until drain and reverse release."""
-    name = item.id.replace("-", "_")
-    state = "s_nx_port_" + name
-    children = [child for child in result.devices if child.controller == item.id]
-    options = item.options
-    pins = item.pins
-    lines = [f"static nx_{prefix}_usb_clock_state_t s_nx_usb_clock_{name};",
-             f"static nx_usb_endpoint_t s_nx_usb_endpoints_{name}[{len(children)}];",
-             f"static nx_usb_event_t s_nx_usb_events_{name}[{options.event_capacity}];",
-             f"static uint16_t s_nx_usb_pin_snapshots_{name}[{len(pins)}];",
-             f"static uint8_t s_nx_usb_pin_leases_{name};"]
-    for child in children:
-        identity = child.id.replace("-", "_")
-        lines += [f"static const nx_usb_endpoint_port_t s_nx_device_face_{identity} = {{",
-                  f"    &nx_usb_fs_endpoint_ops, &s_nx_usb_endpoints_{name}[{child.options.index}]",
-                  "};", f"const nx_usb_endpoint_port_t* const nx_device_{identity} = &s_nx_device_face_{identity};"]
-    lines += [f"static nx_result_t stop_{name}(void) {{",
-              f"    nx_result_t status = nx_usb_device_stop(&s_nx_face_{name});",
-              "    if (status != NX_SUCCESS) { return status; }",
-              f"    status = nx_{prefix}_usb_clock_stop(&s_nx_usb_clock_{name},",
-              f"        nx_deadline_after(nx_time_now_us(), {options.clock_timeout_us}u));",
-              "    if (status != NX_SUCCESS) { return status; }"]
-    for index, pin in reversed(list(enumerate(pins))):
-        wire = pin["pin"]
-        lines += [f"    if ((s_nx_usb_pin_leases_{name} & {1 << index}u) != 0u) {{"]
-        lines += withdraw_pin(result.soc_family, wire)
-        lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_usb_pin_snapshots_{name}[{index}]);",
-                  f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {wire[2:]}u) != s_nx_usb_pin_snapshots_{name}[{index}]) {{",
-                  "            return NX_ERROR_IO;", "        }",
-                  f"        s_nx_usb_pin_leases_{name} &= (uint8_t)~{1 << index}u;", "    }"]
-    lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
-              "    nx_result_t status;"]
-    for child in children:
-        option = child.options
-        transfer = {
-            "control": "NX_USB_PROFILE_CONTROL",
-            "bulk": "NX_USB_PROFILE_BULK",
-            "interrupt": "NX_USB_PROFILE_INTERRUPT",
-        }[option.transfer]
-        lines += [f"    s_nx_usb_endpoints_{name}[{option.index}] = (nx_usb_endpoint_t){{",
-                  f"        .number = {option.number}u, .in = {str(option.direction == 'in').lower()},",
-                  f"        .transfer = {transfer}, "
-                  f".max_packet = {option.max_packet}u,",
-                  f"        .fifo_start = {option.fifo_start}u, .fifo_words = {option.fifo_words}u", "    };"]
-    policy = result.irq
-    kernel = kernel_policy_constant(result)
-    ceiling = policy.syscall_priority or 0
-    lines += [f"    {state} = (nx_usb_controller_t){{",
-              f"        .endpoints = s_nx_usb_endpoints_{name}, .endpoint_count = {len(children)}u,",
-              f"        .events = s_nx_usb_events_{name}, .capacity = {options.event_capacity}u,",
-              f"        .snapshot = {{ .epoch = {state}.snapshot.epoch }},",
-              f"        .irq_policy = {{ {kernel}, {policy.external_count}u, {policy.priority_bits}u, {ceiling}u }},",
-              f"        .irq = {{ .priority = {options.irq.priority}u }},",
-              f"        .poll_limit = {options.poll_limit}u, .drain_timeout_us = {options.drain_timeout_us}u,",
-              f"        .rx_fifo_words = {options.rx_fifo_words}u, .vbus_sensing = false", "    };"]
-    for index, pin in enumerate(pins):
-        wire = pin["pin"]
-        lines += [f"    status = nx_{prefix}_gpio_clock_enable({ord(wire[1])-ord('A')}u);",
-                  "    if (status != NX_SUCCESS) { return status; }",
-                  f"    s_nx_usb_pin_snapshots_{name}[{index}] = nx_{prefix}_pin_capture(GPIO{wire[1]}, {wire[2:]}u);",
-                  f"    s_nx_usb_pin_leases_{name} |= {1 << index}u;",
-                  f"    status = nx_{prefix}_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 2u, {pin['af']}u, 0u, false);",
-                  "    if (status != NX_SUCCESS) { return status; }"]
-    lines += [f"    status = nx_{prefix}_usb_clock_start(&s_nx_usb_clock_{name}, true,",
-              f"        nx_deadline_after(nx_time_now_us(), {options.clock_timeout_us}u));",
-              "    if (status != NX_SUCCESS) { return status; }",
-              f"    return nx_{prefix}_usb_device_initialize(&{state}, &s_nx_usb_clock_{name});", "}"]
-    vector = maintained(result.soc_family).USB_DEVICE.controller
-    lines += [f"void {vector}_IRQHandler(void);",
-              "/** \\brief Dispatch the selected internal-PHY FS PIO controller. */",
-              f"void {vector}_IRQHandler(void) {{ nx_usb_controller_irq(&{state}); }}"]
-    return Construction(
-        state_type="nx_usb_controller_t", definitions=lines,
-        initialize=DirectCall(f"prepare_{name}"), stop=[DirectCall(f"stop_{name}")],
-        retain_on_failed_init=True,
-        pin_snapshots={pin["pin"]:
-                       f"s_nx_usb_pin_snapshots_{name}[{index}]"
-                       for index, pin in enumerate(pins)})
-
-
-def gpio_clock_mask(result):
-    ports = {pin["pin"][1] for item in result.controllers
-             if item.kind == "usb_device" for pin in item.pins}
-    return sum(1 << (ord(port) - ord('A')) for port in ports)
-
-
-def _gpio_clock(result):
-    hardware = getattr(maintained(result.soc_family), "USB_DEVICE", None)
-    return hardware.gpio_clock if hardware is not None else None
-
-
-def state_declarations(result, prefix):
-    return (["static uint32_t s_nx_usb_gpio_clocks_added;"] if
-            _gpio_clock(result) is not None and gpio_clock_mask(result) else [])
-
-
-def start_resources(result, prefix):
-    mask = gpio_clock_mask(result)
-    clock = _gpio_clock(result)
-    # Capture before any other selected controller enables a shared GPIO gate.
-    return ([f"    s_nx_usb_gpio_clocks_added = ~{clock} & {mask}u;"] if
-            clock is not None and mask else [])
-
-
-def stop_system(result, prefix):
-    clock = _gpio_clock(result)
-    if clock is None or not gpio_clock_mask(result):
-        return []
-    # Every selected port has drained before releasing this shared GPIO gate.
-    return ["    if (s_nx_platform_started) {",
-            f"        {clock} &= ~s_nx_usb_gpio_clocks_added;",
-            "        nx_arch_dsb();",
-            f"        if (({clock} & s_nx_usb_gpio_clocks_added) != 0u) {{",
-            "            return NX_ERROR_IO;", "        }",
-            "        s_nx_usb_gpio_clocks_added = 0u;", "    }"]

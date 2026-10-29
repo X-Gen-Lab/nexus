@@ -49,7 +49,7 @@ class U575LptimTests(unittest.TestCase):
         self.assertEqual(5, item.options.irq.priority)
         self.assertEqual((), item.pins)
         _, source = bindings.emit(result)
-        self.assertIn('nx_stm32u575_lptim_initialize(', source)
+        self.assertIn('nx_stm32u575_lptim_prepare(&s_nx_port_counter)', source)
         self.assertIn('nx_stm32u575_lptim_irq(', source)
         self.assertIn('LPTIM2_IRQHandler', source)
         self.assertIn('nx_lptim_port_stop(', source)

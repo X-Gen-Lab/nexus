@@ -7,27 +7,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1e64fdd5bdee6a94d32ad9e54dc1fb49878621a08543ca36e800213aceeb4d3a\n"
+"X-Nexus-Source-SHA256: 3b786967a90d0ebdc05b30c29c104839bfcbf66975d5efd11330a171c064ae64\n"
 
-#: docs/status/ledgers/platform-delivery-completion.md:9
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
 msgstr "Platform delivery-completion ledger"
 
-#: docs/status/ledgers/platform-delivery-completion.md:11
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:11
 msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-"
 "delivery-"
-"completion.csv`；SHA-256：`3e8d7f54e4550d67f8bbe220439ee6fde1088b3f9abeb1f2cbe396d1ab8c3b23`。"
+"completion.csv`；SHA-256：`256deef275171d3480ef2f6f18393c5bd97e422a085f2a17b143bb84c8855d6b`。"
 msgstr ""
 "This page derives from the original CSV; it is not a new status authority, "
 "execution record or software qualification. Original IDs, order and every "
 "original field come from the {download}`original ledger "
 "<../../design/platform-delivery-completion.csv>`. Source: "
 "`docs/design/platform-delivery-completion.csv`; SHA-256: "
-"`3e8d7f54e4550d67f8bbe220439ee6fde1088b3f9abeb1f2cbe396d1ab8c3b23`."
+"`256deef275171d3480ef2f6f18393c5bd97e422a085f2a17b143bb84c8855d6b`."
 
-#: docs/status/ledgers/platform-delivery-completion.md:15
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:15
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
 "已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
@@ -43,82 +43,82 @@ msgstr ""
 "original execution host. See the [software-evidence entry](../software-"
 "verification.md) for retrievable archives and member locations."
 
-#: docs/status/ledgers/platform-delivery-completion.md:21
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:21
 msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
 msgstr ""
 "**Original exit fields** are only fields actually present in the original "
 "CSV. Tasks, qualification prerequisites and contract links also retain their"
 " original wording; they cannot be used to invent an execution."
 
-#: docs/status/ledgers/platform-delivery-completion.md:24
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:24
 msgid "本表包含 78 条原记录，仅表示来源行数。"
 msgstr ""
 "This table contains 78 original records; this is only the source row count."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:32
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:32
 msgid "N01"
 msgstr "N01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "原字段"
 msgstr "Original field"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "原值"
 msgstr "Original value"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`task_id`"
 msgstr "`task_id`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`task`"
 msgstr "`task`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "USB EP0 告警闭环"
 msgstr "Close the USB EP0 alert"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`implementation_status`"
 msgstr "`implementation_status`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "implemented"
 msgstr "implemented"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`software_status`"
 msgstr "`software_status`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "development_models_passed_remote_scan_pending"
 msgstr "development_models_passed_remote_scan_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`hardware_status`"
 msgstr "`hardware_status`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "not_applicable"
 msgstr "not_applicable"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`implementation_paths`"
 msgstr "`implementation_paths`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "io/src/controllers/usb_device_controller.c;tests/google/usb_device_test.cpp"
 msgstr ""
 "io/src/controllers/usb_device_controller.c;tests/google/usb_device_test.cpp"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`evidence_paths`"
 msgstr "`evidence_paths`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
@@ -128,42 +128,42 @@ msgstr ""
 "results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
 "next-20261024/provider/handoff.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`exit_condition`"
 msgstr "`exit_condition`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "CodeQL 有证据处置；错误路径不误释放请求、clock 或借用。"
 msgstr ""
 "Address CodeQL with evidence; error paths must not incorrectly release "
 "requests, clocks or borrows."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "`owner`"
 msgstr "`owner`"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "codex"
 msgstr "codex"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:47
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:47
 msgid "N02"
 msgstr "N02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "配置工具依赖收敛"
 msgstr "Reduce configuration-tool dependencies"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "ir_and_generated_equivalence_verified_sdk_pending"
 msgstr "ir_and_generated_equivalence_verified_sdk_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/;cmake/package/"
 msgstr "tools/configure/;cmake/package/"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
@@ -173,34 +173,34 @@ msgstr ""
 "next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
 "next-20261024/configuration/import-orders-green.log"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "维护配置 IR 与生成结果等价；导入顺序测试通过；SDK 闭包完整。"
 msgstr ""
 "Preserve maintained configuration IR and generated-output equivalence; pass "
 "import-order tests and complete the SDK closure."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:62
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:62
 msgid "N03"
 msgstr "N03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "本轮扫描提示审查"
 msgstr "Review this iteration's scan findings"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "reviewed_fixes_implemented"
 msgstr "reviewed_fixes_implemented"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "focused_regressions_passed_current_scan_pending"
 msgstr "focused_regressions_passed_current_scan_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/maintenance/;tools/measurement/;tests/"
 msgstr "tools/maintenance/;tools/measurement/;tests/"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/io-cost/handoff.json"
@@ -208,61 +208,61 @@ msgstr ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/io-cost/handoff.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "真缺陷修复并回归；合法用法与误报有明确依据；不靠扩大忽略范围消除新增问题。"
 msgstr ""
 "Fix real defects with regressions; justify valid uses and false positives; "
 "do not expand ignores to hide new problems."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:77
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:77
 msgid "N04"
 msgstr "N04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "收束分支与 PR"
 msgstr "Consolidate branches and PRs"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "pending_merge"
 msgstr "pending_merge"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "pending_post_merge_source_association"
 msgstr "pending_post_merge_source_association"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
 msgstr "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "docs/delivery/platform-delivery-completion-results.json"
 msgstr "docs/delivery/platform-delivery-completion-results.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "最终 main 包含目标改动；示例 E 锁定明确的平台版本；合并后源码与验证对应。"
 msgstr ""
 "Final main contains the intended changes; examples E locks an explicit "
 "platform revision; post-merge source and validation correspond."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:92
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:92
 msgid "N05"
 msgstr "N05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "示例本地 CI 入口"
 msgstr "Provide an examples local-CI entry"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "local_contracts_passed_final_pinned_run_pending"
 msgstr "local_contracts_passed_final_pinned_run_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
 msgstr "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
 "examples/scripts/local_ci.py"
@@ -270,30 +270,30 @@ msgstr ""
 "docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
 "examples/scripts/local_ci.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "新 checkout 以固定依赖、新输出完整执行；缺工具失败，旧报告拒绝。"
 msgstr ""
 "A fresh checkout executes the complete scope with fixed dependencies and new"
 " output; missing tools fail and old reports reject."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:107
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:107
 msgid "N06"
 msgstr "N06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "当前支持与验收视图"
 msgstr "Expose exact support and validation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "selected_query_and_contracts_passed"
 msgstr "selected_query_and_contracts_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
 msgstr "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
@@ -303,30 +303,30 @@ msgstr ""
 "results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
 "next-20261024/documentation/exact-support-observed.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "能够查询精确配置支持什么、如何验证，以及哪些是参考配置或尚未实测。"
 msgstr ""
 "Query what an exact configuration supports, how to verify it, and which "
 "selections are references or physically unmeasured."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:122
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:122
 msgid "N07"
 msgstr "N07"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "私有 Board 与 provider 接入"
 msgstr "Integrate private Boards and providers"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "external_board_contracts_passed_final_sdk_pending"
 msgstr "external_board_contracts_passed_final_sdk_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/experience.py;docs/guides/board-porting.md"
 msgstr "tools/configure/experience.py;docs/guides/board-porting.md"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
@@ -336,30 +336,30 @@ msgstr ""
 "next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
 "next-20261024/examples/installed-board/result.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "新板与同类实例经维护入口接入；不改无关 family，不猜测 PCB 事实。"
 msgstr ""
 "Integrate new Boards and same-family instances through maintained entry "
 "points without changing unrelated families or guessing PCB facts."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:137
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:137
 msgid "N08"
 msgstr "N08"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "配置诊断与变更影响"
 msgstr "Explain configuration errors and change impacts"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "focused_diagnostics_and_diff_passed"
 msgstr "focused_diagnostics_and_diff_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/;docs/guides/developer-workflow.md"
 msgstr "tools/configure/;docs/guides/developer-workflow.md"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/configure/test_experience.py;/tmp/nexus-"
@@ -369,30 +369,30 @@ msgstr ""
 "results.json;tools/configure/test_experience.py;/tmp/nexus-"
 "next-20261024/configuration/final-focused-green.log"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "人读与 JSON 来自同一记录；冲突可定位；不自动换模式或补造未知事实。"
 msgstr ""
 "Human and JSON diagnostics share one record; conflicts are locatable; no "
 "automatic mode change or invented unknown facts."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:152
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:152
 msgid "N09"
 msgstr "N09"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "真实热点与执行效率优化"
 msgstr "Optimize measured hotspots and execution efficiency"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "measured_attempts_recorded_no_global_speedup_claim"
 msgstr "measured_attempts_recorded_no_global_speedup_claim"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
 msgstr "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
@@ -402,39 +402,39 @@ msgstr ""
 "next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
 "next-20261024/configuration/git-after-measurements.jsonl"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "同环境 cold/warm 对比；不同编译上下文和失败诊断完整；不缓存成功测试报告。"
 msgstr ""
 "Compare cold/warm runs in the same environment; preserve all distinct "
 "compiler contexts and failure diagnostics; never cache passing test reports."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:167
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:167
 msgid "N10"
 msgstr "N10"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "可比较 I/O 性能基线"
 msgstr "Establish comparable I/O performance baselines"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "implemented_tooling"
 msgstr "implemented_tooling"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "synthetic_compare_contracts_passed"
 msgstr "synthetic_compare_contracts_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "not_executed"
 msgstr "not_executed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
 msgstr ""
 "tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
@@ -444,31 +444,31 @@ msgstr ""
 "results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
 "next-20261024/io-cost/handoff.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "每项结论关联同一镜像的原始测量，并提供优化前后对照；默认未选能力无额外资源；物理部分未取得证据前保持 pending。"
 msgstr ""
 "Bind each conclusion to raw measurements of the same image and before/after "
 "comparisons; unselected capabilities add no default resources; physical work"
 " stays pending until evidence exists."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:182
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:182
 msgid "N11"
 msgstr "N11"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "三板硬件验收"
 msgstr "Execute three-Board hardware acceptance"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "existing_plans_current_source_preparation_pending"
 msgstr "existing_plans_current_source_preparation_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
 msgstr "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/hil/fixtures/;tools/hil/prepare.py"
@@ -476,31 +476,31 @@ msgstr ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/hil/fixtures/;tools/hil/prepare.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "每板保留固件、设备身份、仪器记录和逐 mode 结果；未知明确保留；工装准备不能代替真实硬件退出条件。"
 msgstr ""
 "For each Board retain firmware, equipment identity, instrument records and "
 "per-mode results; preserve unknowns explicitly; prepared tooling cannot "
 "replace the real hardware exit."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:197
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:197
 msgid "N12"
 msgstr "N12"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "H743 Flash 与 RAM 专项"
 msgstr "Audit H743 Flash and RAM"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "selected_arm_checks_passed_full_sdk_and_candidate_pending"
 msgstr "selected_arm_checks_passed_full_sdk_and_candidate_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
 msgstr "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
@@ -510,34 +510,34 @@ msgstr ""
 "next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
 "next-20261024/provider/h743-linked-costs.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "当前精确 profile 有完整软件结论；实板另验 busy-bank、watchdog、掉电与 IRQ。"
 msgstr ""
 "Complete the software conclusion for the exact current profile; separately "
 "verify busy-bank, watchdog, power loss and IRQ on hardware."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:212
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:212
 msgid "N13"
 msgstr "N13"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "当前正式软件候选"
 msgstr "Produce the current formal software candidate"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "existing_workflow"
 msgstr "existing_workflow"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "pending_final_clean_source_execution"
 msgstr "pending_final_clean_source_execution"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/release/;tools/evidence/"
 msgstr "tools/release/;tools/evidence/"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
@@ -545,7 +545,7 @@ msgstr ""
 "docs/delivery/platform-delivery-completion-"
 "results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "最终 clean source 执行完整 software plan；锁定环境两份独立断网构建实际比较 ELF/BIN；经既有流程 "
 "seal/verify。"
@@ -554,30 +554,30 @@ msgstr ""
 "ELF/BIN from two independent network-disabled builds in the locked "
 "environment; seal/verify through the existing workflow."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:227
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:227
 msgid "N14"
 msgstr "N14"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "文档与原始证据维护"
 msgstr "Maintain documentation and original evidence"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "implemented_documentation"
 msgstr "implemented_documentation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
 msgstr ""
 "source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "docs/;tools/documentation/;tools/evidence/"
 msgstr "docs/;tools/documentation/;tools/evidence/"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/documentation/final-checks.json"
@@ -585,7 +585,7 @@ msgstr ""
 "docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
 "next-20261024/documentation/final-checks.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "当前状态从既有索引派生；历史保留原身份；一份 raw 归档与小索引并验证恢复；外部用户实际完成 "
 "install/create/build/run/upgrade。"
@@ -594,28 +594,32 @@ msgstr ""
 " retain one raw archive and a small index with verified recovery; external "
 "users actually complete install/create/build/run/upgrade."
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:242
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:242
 msgid "A01"
 msgstr "A01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Maintained coverage inventory"
 msgstr "Maintained coverage inventory"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "inventory_recorded"
 msgstr "inventory_recorded"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure/matrix.py"
 msgstr "tools/configure/matrix.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/baseline-support.json"
-msgstr "build/c-cold-20261028/baseline-support.json"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/baseline-support.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/baseline-support.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every maintained part mode backend and clock/security condition is "
 "enumerated from existing facts and catalogue"
@@ -623,28 +627,32 @@ msgstr ""
 "Every maintained part mode backend and clock/security condition is "
 "enumerated from existing facts and catalogue"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:257
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:257
 msgid "A02"
 msgstr "A02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "End-to-end implementation ownership"
 msgstr "End-to-end implementation ownership"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "partial"
 msgstr "partial"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_paths_reviewed"
-msgstr "selected_paths_reviewed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "family_path_audits_observed_final_external_consumers_pending"
+msgstr "family_path_audits_observed_final_external_consumers_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028"
-msgstr "build/c-cold-20261028"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every maintained path maps authored input IR generator C lifecycle face "
 "tests and external consumer"
@@ -652,20 +660,20 @@ msgstr ""
 "Every maintained path maps authored input IR generator C lifecycle face "
 "tests and external consumer"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:272
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:272
 msgid "A03"
 msgstr "A03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Behavior and linked cost baseline"
 msgstr "Behavior and linked cost baseline"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "pending"
-msgstr "pending"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "exact_linked_cost_observations_recorded_final_source_pending"
+msgstr "exact_linked_cost_observations_recorded_final_source_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Exact historical and current observations are retained with source and "
 "configuration identity"
@@ -673,28 +681,32 @@ msgstr ""
 "Exact historical and current observations are retained with source and "
 "configuration identity"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:287
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:287
 msgid "B01"
 msgstr "B01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "C firmware and host generator boundary"
 msgstr "C firmware and host generator boundary"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "source_and_bilingual_reviewed"
 msgstr "source_and_bilingual_reviewed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "AGENTS.md;soc;drivers;tests/google"
 msgstr "AGENTS.md;soc;drivers;tests/google"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "AGENTS.md;docs/guides/provider-porting.md"
-msgstr "AGENTS.md;docs/guides/provider-porting.md"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;AGENTS.md;docs/guides/provider-porting.md"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;AGENTS.md;docs/guides/provider-porting.md"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "C owns hardware behavior; Python owns validation static declarations and "
 "connections; existing style remains"
@@ -702,20 +714,20 @@ msgstr ""
 "C owns hardware behavior; Python owns validation static declarations and "
 "connections; existing style remains"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:302
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:302
 msgid "B02"
 msgstr "B02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Concrete lifecycle contracts"
 msgstr "Concrete lifecycle contracts"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_c_contracts_tested"
-msgstr "selected_c_contracts_tested"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "family_c_context_and_retained_cleanup_contracts_regressed"
+msgstr "family_c_context_and_retained_cleanup_contracts_regressed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Context ownership preconditions partial effects cleanup retry and "
 "irreversible peripheral behavior are explicit"
@@ -723,20 +735,20 @@ msgstr ""
 "Context ownership preconditions partial effects cleanup retry and "
 "irreversible peripheral behavior are explicit"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:317
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:317
 msgid "B03"
 msgstr "B03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Unique resource receipts"
 msgstr "Unique resource receipts"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_receipts_reviewed_and_tested"
-msgstr "selected_receipts_reviewed_and_tested"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "family_owned_receipts_and_padding_bounds_regressed"
+msgstr "family_owned_receipts_and_padding_bounds_regressed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Pins clocks IRQ DMA and shared controller state have one restoration owner "
 "without duplicate persistent snapshots"
@@ -744,20 +756,20 @@ msgstr ""
 "Pins clocks IRQ DMA and shared controller state have one restoration owner "
 "without duplicate persistent snapshots"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:332
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:332
 msgid "B04"
 msgstr "B04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Lifecycle failure regressions"
 msgstr "Lifecycle failure regressions"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "selected_real_c_red_green"
-msgstr "selected_real_c_red_green"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "real_c_refusal_partial_cleanup_retry_and_alien_owner_red_green"
+msgstr "real_c_refusal_partial_cleanup_retry_and_alien_owner_red_green"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Real C tests cover refusal partial acquire cleanup failure retained retry "
 "and instance isolation before implementation"
@@ -765,16 +777,20 @@ msgstr ""
 "Real C tests cover refusal partial acquire cleanup failure retained retry "
 "and instance isolation before implementation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:347
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:347
 msgid "B05"
 msgstr "B05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Cold migration linked cost"
 msgstr "Cold migration linked cost"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "selected_arm_budgets_checked_unselected_and_final_scope_pending"
+msgstr "selected_arm_budgets_checked_unselected_and_final_scope_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Selected and unselected actual ARM images preserve bounded state and no "
 "mandatory allocation workers or locks"
@@ -782,28 +798,32 @@ msgstr ""
 "Selected and unselected actual ARM images preserve bounded state and no "
 "mandatory allocation workers or locks"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:362
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:362
 msgid "C01"
 msgstr "C01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Native complete maintained lifecycle"
 msgstr "Native complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "focused_passed_final_gate_pending"
-msgstr "focused_passed_final_gate_pending"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "ordinary_debug_passed_final_integrated_modes_pending"
+msgstr "ordinary_debug_passed_final_integrated_modes_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "soc;tests/google;tools/configure"
 msgstr "soc;tests/google;tools/configure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/legacy"
-msgstr "build/c-cold-20261028/legacy"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/legacy"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/legacy"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All maintained Native modes and enhanced endpoints have C behavior and "
 "public consumer regressions"
@@ -811,20 +831,30 @@ msgstr ""
 "All maintained Native modes and enhanced endpoints have C behavior and "
 "public consumer regressions"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:377
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:377
 msgid "C02"
 msgstr "C02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "STM32F103 complete maintained lifecycle"
 msgstr "STM32F103 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "basic_gpio_uart_watchdog_exti_focused_passed"
-msgstr "basic_gpio_uart_watchdog_exti_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "legacy_pair_30_arm_352_asan_observed_final_head_pending"
+msgstr "legacy_pair_30_arm_352_asan_observed_final_head_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-"
+"gate/package.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/legacy;build/c-cold-20261028/legacy/ordinary-"
+"gate/package.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every maintained mode including AFIO channel DMA IRQ I2C and all resource "
 "emission has C hardware behavior"
@@ -832,16 +862,16 @@ msgstr ""
 "Every maintained mode including AFIO channel DMA IRQ I2C and all resource "
 "emission has C hardware behavior"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:392
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:392
 msgid "C03"
 msgstr "C03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "GD32F303 complete maintained lifecycle"
 msgstr "GD32F303 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every maintained mode including RCU AFIO ADC divider channel DMA and "
 "resource emission has C hardware behavior"
@@ -849,24 +879,30 @@ msgstr ""
 "Every maintained mode including RCU AFIO ADC divider channel DMA and "
 "resource emission has C hardware behavior"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:407
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:407
 msgid "C04"
 msgstr "C04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "STM32F407 complete maintained lifecycle"
 msgstr "STM32F407 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "i2c_gpio_flash_watchdog_focused_passed"
-msgstr "i2c_gpio_flash_watchdog_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "55_arm_3_extra_presets_153_debug_153_asan_final_head_pending"
+msgstr "55_arm_3_extra_presets_153_debug_153_asan_final_head_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/f407"
-msgstr "build/c-cold-20261028/f407"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-"
+"family-package.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/f407;build/c-cold-20261028/f407/full-"
+"family-package.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All maintained modes primary and secondary controllers and platform resource"
 " lifecycle move hardware behavior to C"
@@ -874,41 +910,55 @@ msgstr ""
 "All maintained modes primary and secondary controllers and platform resource"
 " lifecycle move hardware behavior to C"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:422
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:422
 msgid "C05"
 msgstr "C05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "GD32F470 complete maintained lifecycle"
 msgstr "GD32F470 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "i2c_and_uart_pin_transaction_focused_passed"
-msgstr "i2c_and_uart_pin_transaction_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"33_plus_8_matrix_18_presets_113_plus_87_cases_each_mode_final_gate_pending"
+msgstr ""
+"33_plus_8_matrix_18_presets_113_plus_87_cases_each_mode_final_gate_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/gd470"
-msgstr "build/c-cold-20261028/gd470"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-"
+"gd470/build/gd470-cold/family-increment-paths.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/gd470;/dev/shm/nexus-next-"
+"gd470/build/gd470-cold/family-increment-paths.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:437
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:437
 msgid "C06"
 msgstr "C06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "STM32G474 complete maintained lifecycle"
 msgstr "STM32G474 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "adc_groups_coherent_coupled_focused_passed"
-msgstr "adc_groups_coherent_coupled_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "31_arm_612_debug_612_asan_observed_final_head_pending"
+msgstr "31_arm_612_debug_612_asan_observed_final_head_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/modern"
-msgstr "build/c-cold-20261028/modern"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/modern;/dev/shm/nexus-"
+"next-g474/build/cold-g474/handoff.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/modern;/dev/shm/nexus-"
+"next-g474/build/cold-g474/handoff.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Basic named-pin shared/coherent/coupled timer ADC groups encoder FDCAN and "
 "resource lifecycle close"
@@ -916,20 +966,30 @@ msgstr ""
 "Basic named-pin shared/coherent/coupled timer ADC groups encoder FDCAN and "
 "resource lifecycle close"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:452
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:452
 msgid "C07"
 msgstr "C07"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "STM32H743 complete maintained lifecycle"
 msgstr "STM32H743 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "adc_prepare_focused_passed"
-msgstr "adc_prepare_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"modern_pair_47_matrix_8_presets_1636_debug_109_focused_asan_final_head_pending"
+msgstr ""
+"modern_pair_47_matrix_8_presets_1636_debug_109_focused_asan_final_head_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/modern"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/modern"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Basic FIFO finite/continuous DMA cache flash and fixed-run resource paths "
 "have C behavior"
@@ -937,16 +997,16 @@ msgstr ""
 "Basic FIFO finite/continuous DMA cache flash and fixed-run resource paths "
 "have C behavior"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:467
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:467
 msgid "C08"
 msgstr "C08"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "STM32U575 complete maintained lifecycle"
 msgstr "STM32U575 complete maintained lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Basic FIFO GPDMA chain ADC4 RTC LPTIM retained domains and resource paths "
 "have C behavior"
@@ -954,20 +1014,24 @@ msgstr ""
 "Basic FIFO GPDMA chain ADC4 RTC LPTIM retained domains and resource paths "
 "have C behavior"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:482
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:482
 msgid "X01"
 msgstr "X01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Platform preflight and resource lifecycle"
 msgstr "Platform preflight and resource lifecycle"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "seven_family_c_resources_integrated_shared_admission_audit_pending"
+msgstr "seven_family_c_resources_integrated_shared_admission_audit_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "soc;tools/configure"
 msgstr "soc;tools/configure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Hardware reads admission pin capture restore readback clock and IRQ resource"
 " algorithms live in C"
@@ -975,16 +1039,20 @@ msgstr ""
 "Hardware reads admission pin capture restore readback clock and IRQ resource"
 " algorithms live in C"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:497
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:497
 msgid "X02"
 msgstr "X02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Secondary and shared physical owners"
 msgstr "Secondary and shared physical owners"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "primary_secondary_c_owners_regressed_final_family_integration_pending"
+msgstr "primary_secondary_c_owners_regressed_final_family_integration_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Each physical controller starts/stops once; selected ownership and multi-"
 "instance isolation remain exact"
@@ -992,20 +1060,21 @@ msgstr ""
 "Each physical controller starts/stops once; selected ownership and multi-"
 "instance isolation remain exact"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:512
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:512
 msgid "X03"
 msgstr "X03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Enhanced and packet endpoints"
 msgstr "Enhanced and packet endpoints"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "native_enhanced_endpoint_focused_passed"
-msgstr "native_enhanced_endpoint_focused_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "packet_domain_endpoint_c_failure_regressions_final_integration_pending"
+msgstr ""
+"packet_domain_endpoint_c_failure_regressions_final_integration_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "SPI outer engine CAN filter USB activation Ethernet and MDIO failure/stop "
 "ordering close"
@@ -1013,16 +1082,20 @@ msgstr ""
 "SPI outer engine CAN filter USB activation Ethernet and MDIO failure/stop "
 "ordering close"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:527
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:527
 msgid "X04"
 msgstr "X04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "H743 pause resume and Flash execution"
 msgstr "H743 pause resume and Flash execution"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "h743_fixed_run_c_resource_path_regressed_final_flash_closure_pending"
+msgstr "h743_fixed_run_c_resource_path_regressed_final_flash_closure_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Same C resource lifecycle is reused; actual public Flash retention and ARM "
 "closure remain verified separately"
@@ -1030,16 +1103,20 @@ msgstr ""
 "Same C resource lifecycle is reused; actual public Flash retention and ARM "
 "closure remain verified separately"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:542
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:542
 msgid "X05"
 msgstr "X05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Lowpower I2S2 retained special paths"
 msgstr "Lowpower I2S2 retained special paths"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "retained_component_c_paths_reviewed_shared_residual_audit_pending"
+msgstr "retained_component_c_paths_reviewed_shared_residual_audit_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Declaration-only selection remains Python; existing C paths regress; special"
 " retained components are explicitly audited"
@@ -1047,28 +1124,32 @@ msgstr ""
 "Declaration-only selection remains Python; existing C paths regress; special"
 " retained components are explicitly audited"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:557
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:557
 msgid "D01"
 msgstr "D01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Canonical controller category contracts"
 msgstr "Canonical controller category contracts"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "focused_passed"
 msgstr "focused_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/configure"
 msgstr "tools/configure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/contracts/green-final.log"
-msgstr "build/c-cold-20261028/contracts/green-final.log"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/contracts/green-final.log"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/contracts/green-final.log"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Authored fields selected fields kind order and public header mappings share "
 "immutable category metadata"
@@ -1076,24 +1157,32 @@ msgstr ""
 "Authored fields selected fields kind order and public header mappings share "
 "immutable category metadata"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:572
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:572
 msgid "D02"
 msgstr "D02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Resolver stage ownership"
 msgstr "Resolver stage ownership"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "three_stage_resolved_equivalence_passed"
-msgstr "three_stage_resolved_equivalence_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"frozen_device_graph_4_cases_and_299_bundle_equivalence_full_configure_passed_final_gate_pending"
+msgstr ""
+"frozen_device_graph_4_cases_and_299_bundle_equivalence_full_configure_passed_final_gate_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/config"
-msgstr "build/c-cold-20261028/config"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
+"graph-stage/handoff.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/config;build/c-cold-20261028/device-"
+"graph-stage/handoff.json"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Fact selection memory layout dependencies controllers endpoints and "
 "resources use named stage results without reinterpreting TOML"
@@ -1101,16 +1190,28 @@ msgstr ""
 "Fact selection memory layout dependencies controllers endpoints and "
 "resources use named stage results without reinterpreting TOML"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:587
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:587
 msgid "D03"
 msgstr "D03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Complete selected integration consumption"
 msgstr "Complete selected integration consumption"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "uniform_consumption_audit_passed_integrated_gates_pending"
+msgstr "uniform_consumption_audit_passed_integrated_gates_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/integration/d03/results-01.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All maintained constructors and resource emitters consume canonical selected"
 " IRQ DMA clock pin and owner records"
@@ -1118,16 +1219,22 @@ msgstr ""
 "All maintained constructors and resource emitters consume canonical selected"
 " IRQ DMA clock pin and owner records"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:602
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:602
 msgid "D04"
 msgstr "D04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Exact clock and DMA models"
 msgstr "Exact clock and DMA models"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"family_channel_stream_and_gpdma_contracts_regressed_final_integration_pending"
+msgstr ""
+"family_channel_stream_and_gpdma_contracts_regressed_final_integration_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Channel stream DMAMUX GPDMA and real kernel clock differences retain exact "
 "contracts without F4-shaped guesses"
@@ -1135,20 +1242,28 @@ msgstr ""
 "Channel stream DMAMUX GPDMA and real kernel clock differences retain exact "
 "contracts without F4-shaped guesses"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:617
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:617
 msgid "D05"
 msgstr "D05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Validate all exact part variants"
 msgstr "Validate all exact part variants"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "red_green_and_boundary_passed"
 msgstr "red_green_and_boundary_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/config"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/config"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Unselected package Flash memory DMA overlap and PartPolicy defects are "
 "rejected through common validation"
@@ -1156,20 +1271,20 @@ msgstr ""
 "Unselected package Flash memory DMA overlap and PartPolicy defects are "
 "rejected through common validation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:632
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:632
 msgid "D06"
 msgstr "D06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Logical runtime power references"
 msgstr "Logical runtime power references"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "renamed_reference_and_rejection_passed"
 msgstr "renamed_reference_and_rejection_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Renamed selected ID works with matching references; fixed physical SPI4 "
 "mode/backend/clock restrictions remain"
@@ -1177,20 +1292,22 @@ msgstr ""
 "Renamed selected ID works with matching references; fixed physical SPI4 "
 "mode/backend/clock restrictions remain"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:647
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:647
 msgid "D07"
 msgstr "D07"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Configuration and SDK input closure"
 msgstr "Configuration and SDK input closure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "input_and_private_payload_integrated_sdk_pending"
-msgstr "input_and_private_payload_integrated_sdk_pending"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"194_sdk_50_maintained_plus_5_focused_passed_new_payload_consumption_pending"
+msgstr ""
+"194_sdk_50_maintained_plus_5_focused_passed_new_payload_consumption_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every added module and private payload participates in identity stale-input "
 "invalidation and installed SDK consumption"
@@ -1198,20 +1315,24 @@ msgstr ""
 "Every added module and private payload participates in identity stale-input "
 "invalidation and installed SDK consumption"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:662
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:662
 msgid "E01"
 msgstr "E01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "All-mode public consumption"
 msgstr "All-mode public consumption"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "194_public_sdk_consumers_passed_final_mode_consumers_pending"
+msgstr "194_public_sdk_consumers_passed_final_mode_consumers_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "io;docs;X-Gen-Lab/nexus-examples"
 msgstr "io;docs;X-Gen-Lab/nexus-examples"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Each maintained mode works with only public and generated headers including "
 "exact storage and typed factory"
@@ -1219,16 +1340,20 @@ msgstr ""
 "Each maintained mode works with only public and generated headers including "
 "exact storage and typed factory"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:677
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:677
 msgid "E02"
 msgstr "E02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Startup shutdown recipes"
 msgstr "Startup shutdown recipes"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending"
+msgstr "pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Submitter admission service settle drain join and platform stop "
 "responsibilities are compilable and explicit"
@@ -1236,16 +1361,16 @@ msgstr ""
 "Submitter admission service settle drain join and platform stop "
 "responsibilities are compilable and explicit"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:692
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:692
 msgid "E03"
 msgstr "E03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Failure and recovery recipes"
 msgstr "Failure and recovery recipes"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Timeout cancellation and failed drain retain loans; quarantine and recovery "
 "responsibility remain explicit"
@@ -1253,16 +1378,20 @@ msgstr ""
 "Timeout cancellation and failed drain retain loans; quarantine and recovery "
 "responsibility remain explicit"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:707
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:707
 msgid "E04"
 msgstr "E04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Advanced usage recipes"
 msgstr "Advanced usage recipes"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "selected_advanced_c_paths_regressed_reusable_recipes_still_open"
+msgstr "selected_advanced_c_paths_regressed_reusable_recipes_still_open"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Continuous DMA cache FIFO shared SPI Flash RAM pause/resume and maintained "
 "lowpower slices have reusable recipes"
@@ -1270,16 +1399,16 @@ msgstr ""
 "Continuous DMA cache FIFO shared SPI Flash RAM pause/resume and maintained "
 "lowpower slices have reusable recipes"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:722
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:722
 msgid "E05"
 msgstr "E05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "External starters and examples"
 msgstr "External starters and examples"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All 17 maintained presets four starters and standalone public consumers use "
 "the final pinned platform"
@@ -1287,24 +1416,28 @@ msgstr ""
 "All 17 maintained presets four starters and standalone public consumers use "
 "the final pinned platform"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:737
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:737
 msgid "E06"
 msgstr "E06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Bilingual current architecture docs"
 msgstr "Bilingual current architecture docs"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "new_contract_bilingual_reviewed_strict_build_pending"
-msgstr "new_contract_bilingual_reviewed_strict_build_pending"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "194_132_page_strict_bilingual_package_restored_current_update_pending"
+msgstr "194_132_page_strict_bilingual_package_restored_current_update_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/docs"
-msgstr "build/c-cold-20261028/docs"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/docs"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/docs"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "English Chinese diagrams ownership call directions failures and exact "
 "support agree and examples compile"
@@ -1312,20 +1445,25 @@ msgstr ""
 "English Chinese diagrams ownership call directions failures and exact "
 "support agree and examples compile"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:752
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:752
 msgid "F01"
 msgstr "F01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Validation contract and cost inventory"
 msgstr "Validation contract and cost inventory"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "coverage_and_stage_cost_inventory_recorded_full_check_disposition_open"
+msgstr ""
+"coverage_and_stage_cost_inventory_recorded_full_check_disposition_open"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/dev;scripts/ci;tests"
 msgstr "tools/dev;scripts/ci;tests"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Each required check has purpose domain input output failure and measured "
 "cost; overlaps have explicit disposition"
@@ -1333,24 +1471,28 @@ msgstr ""
 "Each required check has purpose domain input output failure and measured "
 "cost; overlaps have explicit disposition"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:767
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:767
 msgid "F02"
 msgstr "F02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Formal analyzer parallel budget"
 msgstr "Formal analyzer parallel budget"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "plan_contract_passed_speedup_unmeasured"
 msgstr "plan_contract_passed_speedup_unmeasured"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/workflow"
-msgstr "build/c-cold-20261028/workflow"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/workflow"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/workflow"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Formal tidy/cppcheck use bounded existing parallelism without dropping "
 "semantic compiler contexts"
@@ -1358,16 +1500,20 @@ msgstr ""
 "Formal tidy/cppcheck use bounded existing parallelism without dropping "
 "semantic compiler contexts"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:782
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:782
 msgid "F03"
 msgstr "F03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Nested process resource budget"
 msgstr "Nested process resource budget"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "132_focused_and_86_overlapping_review_cases_passed_final_gate_pending"
+msgstr "132_focused_and_86_overlapping_review_cases_passed_final_gate_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Build provider SDK and analyzer concurrency obey total resource limits with "
 "isolated output paths"
@@ -1375,16 +1521,30 @@ msgstr ""
 "Build provider SDK and analyzer concurrency obey total resource limits with "
 "isolated output paths"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:797
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:797
 msgid "F04"
 msgstr "F04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Test and setup redundancy review"
 msgstr "Test and setup redundancy review"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"changed_test_contract_groups_reviewed_timer_oracle_mutation_passed_project_audit_open"
+msgstr ""
+"changed_test_contract_groups_reviewed_timer_oracle_mutation_passed_project_audit_open"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/f04-review/review.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Only immutable setup is shared; every retained merged or removed test has an"
 " independent contract/oracle mapping"
@@ -1392,16 +1552,32 @@ msgstr ""
 "Only immutable setup is shared; every retained merged or removed test has an"
 " independent contract/oracle mapping"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:812
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:812
 msgid "F05"
 msgstr "F05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Incremental rebuild and cache invalidation"
 msgstr "Incremental rebuild and cache invalidation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "development_observations_native_m4_m33_passed_final_gate_pending"
+msgstr "development_observations_native_m4_m33_passed_final_gate_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;/dev/shm/nexus-next-"
+"workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-"
+"arm-03/summary.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;/dev/shm/nexus-next-"
+"workflow/build/workflow/f05-summary.json;build/c-cold-20261028/workflow/incremental-"
+"arm-03/summary.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "No-op source public header TOML Board and tool-lock changes rebuild the "
 "correct scope without cached pass reports"
@@ -1409,16 +1585,20 @@ msgstr ""
 "No-op source public header TOML Board and tool-lock changes rebuild the "
 "correct scope without cached pass reports"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:827
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:827
 msgid "F06"
 msgstr "F06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Timing failure and process cleanup"
 msgstr "Timing failure and process cleanup"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "real_attempt_and_child_cleanup_records_retained_final_plan_pending"
+msgstr "real_attempt_and_child_cleanup_records_retained_final_plan_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Wall time stage sums retries diagnostics cancellation and actual child "
 "cleanup remain accurately observed"
@@ -1426,16 +1606,16 @@ msgstr ""
 "Wall time stage sums retries diagnostics cancellation and actual child "
 "cleanup remain accurately observed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:842
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:842
 msgid "F07"
 msgstr "F07"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Measured complete validation comparison"
 msgstr "Measured complete validation comparison"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Same environment comparison shows actual time/memory/coverage; final clean "
 "source executes complete applicable gates"
@@ -1443,20 +1623,26 @@ msgstr ""
 "Same environment comparison shows actual time/memory/coverage; final clean "
 "source executes complete applicable gates"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:857
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:857
 msgid "G01"
 msgstr "G01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Maintained end-to-end orchestration"
 msgstr "Maintained end-to-end orchestration"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"existing_workflow_entries_retained_final_clean_source_execution_pending"
+msgstr ""
+"existing_workflow_entries_retained_final_clean_source_execution_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/documentation;tools/evidence;tools/release;docs"
 msgstr "tools/documentation;tools/evidence;tools/release;docs"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Existing qualify/candidate examples docs release commands form one "
 "maintained source-bound workflow"
@@ -1464,20 +1650,20 @@ msgstr ""
 "Existing qualify/candidate examples docs release commands form one "
 "maintained source-bound workflow"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:872
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:872
 msgid "G02"
 msgstr "G02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Stable machine delivery results"
 msgstr "Stable machine delivery results"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "affected_122_tests_passed"
 msgstr "affected_122_tests_passed"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Explicit atomic report/manifest consumption rejects stale missing mismatched"
 " and failed results without parsing human stdout"
@@ -1485,20 +1671,21 @@ msgstr ""
 "Explicit atomic report/manifest consumption rejects stale missing mismatched"
 " and failed results without parsing human stdout"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:887
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:887
 msgid "G03"
 msgstr "G03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Accurate delivery failure recovery"
 msgstr "Accurate delivery failure recovery"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "immutable_package_resume_contract_passed"
-msgstr "immutable_package_resume_contract_passed"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "194_immutable_sdk_docs_packages_verified_and_restored_new_head_pending"
+msgstr ""
+"194_immutable_sdk_docs_packages_verified_and_restored_new_head_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Package postprocess verify restore upload publish phases stay distinct; "
 "immutable successful package can be resumed safely"
@@ -1506,16 +1693,22 @@ msgstr ""
 "Package postprocess verify restore upload publish phases stay distinct; "
 "immutable successful package can be resumed safely"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:902
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:902
 msgid "G04"
 msgstr "G04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Latest delivery navigation"
 msgstr "Latest delivery navigation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"current_iteration_navigation_updated_final_qualification_and_examples_open"
+msgstr ""
+"current_iteration_navigation_updated_final_qualification_and_examples_open"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Current code selected qualified candidates docs examples and historical "
 "evidence have discoverable exact identities"
@@ -1523,16 +1716,20 @@ msgstr ""
 "Current code selected qualified candidates docs examples and historical "
 "evidence have discoverable exact identities"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:917
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:917
 msgid "G05"
 msgstr "G05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Portable retention and independent restore"
 msgstr "Portable retention and independent restore"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "verified_local_archives_and_restore_public_obtainability_pending"
+msgstr "verified_local_archives_and_restore_public_obtainability_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Necessary source SDK binaries config logs verifiers docs and licenses remain"
 " obtainable outside original checkout and tmp"
@@ -1540,16 +1737,16 @@ msgstr ""
 "Necessary source SDK binaries config logs verifiers docs and licenses remain"
 " obtainable outside original checkout and tmp"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:932
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:932
 msgid "G06"
 msgstr "G06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Bilingual publication verification"
 msgstr "Bilingual publication verification"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Language versions links packages actual deployed bytes and publication "
 "status are independently verified"
@@ -1557,20 +1754,20 @@ msgstr ""
 "Language versions links packages actual deployed bytes and publication "
 "status are independently verified"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:947
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:947
 msgid "H01"
 msgstr "H01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Complete physical experiment catalogue"
 msgstr "Complete physical experiment catalogue"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "tools/hil;tools/testing"
 msgstr "tools/hil;tools/testing"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Each maintained board/revision profile backend mode workload instrument "
 "budget and raw requirement is explicit"
@@ -1578,16 +1775,16 @@ msgstr ""
 "Each maintained board/revision profile backend mode workload instrument "
 "budget and raw requirement is explicit"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:962
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:962
 msgid "H02"
 msgstr "H02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Reviewed physical fixture preparation"
 msgstr "Reviewed physical fixture preparation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "All selected exact reference targets have explicit fixture/tool readiness; "
 "software_reference never auto-promotes"
@@ -1595,16 +1792,16 @@ msgstr ""
 "All selected exact reference targets have explicit fixture/tool readiness; "
 "software_reference never auto-promotes"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:977
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:977
 msgid "H03"
 msgstr "H03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Real station admit and flash closure"
 msgstr "Real station admit and flash closure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Actual UID probe serial clock power wiring tool identity flash readback "
 "reset and UART records validate"
@@ -1612,16 +1809,16 @@ msgstr ""
 "Actual UID probe serial clock power wiring tool identity flash readback "
 "reset and UART records validate"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:992
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:992
 msgid "H04"
 msgstr "H04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Instrument and peer acquisition"
 msgstr "Instrument and peer acquisition"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Real waveform serial register stack fault and cleanup/cancel observations "
 "bind to the selected station and image"
@@ -1629,24 +1826,28 @@ msgstr ""
 "Real waveform serial register stack fault and cleanup/cancel observations "
 "bind to the selected station and image"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1007
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1007
 msgid "H05"
 msgstr "H05"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Power acquisition validation"
 msgstr "Power acquisition validation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "affected_53_tests_passed_no_skip"
 msgstr "affected_53_tests_passed_no_skip"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "build/c-cold-20261028/workflow/power-all-toolchain-green.log"
-msgstr "build/c-cold-20261028/workflow/power-all-toolchain-green.log"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/workflow/power-all-toolchain-green.log"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028/workflow/power-all-toolchain-green.log"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Retained calibrated bounded V/I samples yield repeatable power/energy with "
 "admission identity and failure regressions"
@@ -1654,16 +1855,16 @@ msgstr ""
 "Retained calibrated bounded V/I samples yield repeatable power/energy with "
 "admission identity and failure regressions"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1022
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1022
 msgid "H06"
 msgstr "H06"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Physical peripheral and failure execution"
 msgstr "Physical peripheral and failure execution"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every selected maintained peripheral executes positive work and actual "
 "failure stimuli within reviewed budgets"
@@ -1671,16 +1872,16 @@ msgstr ""
 "Every selected maintained peripheral executes positive work and actual "
 "failure stimuli within reviewed budgets"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1037
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1037
 msgid "H07"
 msgstr "H07"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Physical advanced DMA cache streams"
 msgstr "Physical advanced DMA cache streams"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Memory completion wire idle CPU visibility ownership settlement and "
 "stop/recovery are observed per exact mode"
@@ -1688,16 +1889,16 @@ msgstr ""
 "Memory completion wire idle CPU visibility ownership settlement and "
 "stop/recovery are observed per exact mode"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1052
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1052
 msgid "H08"
 msgstr "H08"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Physical OS latency and stack"
 msgstr "Physical OS latency and stack"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Each maintained backend observes IRQ-to-task service deadline complete "
 "task/MSP stack and endurance using its own contract"
@@ -1705,16 +1906,16 @@ msgstr ""
 "Each maintained backend observes IRQ-to-task service deadline complete "
 "task/MSP stack and endurance using its own contract"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1067
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1067
 msgid "H09"
 msgstr "H09"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Physical Flash lowpower security experiments"
 msgstr "Physical Flash lowpower security experiments"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Exact externally reserved Flash region domains clocks options paired images "
 "and recovery are independently verified"
@@ -1722,16 +1923,16 @@ msgstr ""
 "Exact externally reserved Flash region domains clocks options paired images "
 "and recovery are independently verified"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1082
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1082
 msgid "H10"
 msgstr "H10"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Physical baseline comparison and regression"
 msgstr "Physical baseline comparison and regression"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Same-context baseline/candidate raw measurements meet budgets and are "
 "archived for recurring real-station execution"
@@ -1739,20 +1940,34 @@ msgstr ""
 "Same-context baseline/candidate raw measurements meet budgets and are "
 "archived for recurring real-station execution"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1097
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1097
 msgid "I01"
 msgstr "I01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Environment input provenance"
 msgstr "Environment input provenance"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "provenance_audited_13_of_15_python_inputs_absent_not_rebuilt"
+msgstr "provenance_audited_13_of_15_python_inputs_absent_not_rebuilt"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "dependencies/build-recipe.lock.json;tools/evidence/recipe.py"
 msgstr "dependencies/build-recipe.lock.json;tools/evidence/recipe.py"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/environment-i01/provenance-"
+"audit.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/workflow/environment-i01/provenance-"
+"audit.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "OCI base/frontend packages toolchain and Python artifacts map to exact "
 "retained inputs and acquisition identities"
@@ -1760,16 +1975,16 @@ msgstr ""
 "OCI base/frontend packages toolchain and Python artifacts map to exact "
 "retained inputs and acquisition identities"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1112
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1112
 msgid "I02"
 msgstr "I02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Independent environment recipe reconstruction"
 msgstr "Independent environment recipe reconstruction"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Two clean reconstructions compare declared objects and retain all real "
 "differences and logs"
@@ -1777,16 +1992,20 @@ msgstr ""
 "Two clean reconstructions compare declared objects and retain all real "
 "differences and logs"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1127
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1127
 msgid "I03"
 msgstr "I03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Environment restore and delivery status"
 msgstr "Environment restore and delivery status"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "observed_image_and_recipe_reproducibility_kept_distinct_not_rebuilt"
+msgstr "observed_image_and_recipe_reproducibility_kept_distinct_not_rebuilt"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Recipe reproducibility and recovery of observed image remain distinct; "
 "status follows actual reconstruction evidence"
@@ -1794,20 +2013,40 @@ msgstr ""
 "Recipe reproducibility and recovery of observed image remain distinct; "
 "status follows actual reconstruction evidence"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1142
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1142
 msgid "J01"
 msgstr "J01"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Whole-scope residual audit"
 msgstr "Whole-scope residual audit"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"reviewed_cold_paths_shared_spi_runtime_c_and_dead_generator_cleanup_passed_final_integration_pending"
+msgstr ""
+"reviewed_cold_paths_shared_spi_runtime_c_and_dead_generator_cleanup_passed_final_integration_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "docs/delivery;tools/release"
 msgstr "docs/delivery;tools/release"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/generator-"
+"cleanup/handoff.json;build/c-cold-20261028/default-macro-"
+"cleanup/handoff.json;build/c-cold-20261028/spi-"
+"admission/handoff.json;build/c-cold-20261028/runtime-lease-c"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/generator-"
+"cleanup/handoff.json;build/c-cold-20261028/default-macro-"
+"cleanup/handoff.json;build/c-cold-20261028/spi-"
+"admission/handoff.json;build/c-cold-20261028/runtime-lease-c"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Every A-J path has migrated-and-verified originally-C-regressed or "
 "declaration-retained disposition; no residual omitted"
@@ -1815,16 +2054,30 @@ msgstr ""
 "Every A-J path has migrated-and-verified originally-C-regressed or "
 "declaration-retained disposition; no residual omitted"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1157
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1157
 msgid "J02"
 msgstr "J02"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Final software integration qualification"
 msgstr "Final software integration qualification"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "d21_ordinary_gate_passed_final_combined_source_scopes_pending"
+msgstr "d21_ordinary_gate_passed_final_combined_source_scopes_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-"
+"gate/package.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-"
+"gate/package.json"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Frozen clean source completes ordinary gates maintained ARM modes installed "
 "SDK examples and bilingual documentation"
@@ -1832,16 +2085,20 @@ msgstr ""
 "Frozen clean source completes ordinary gates maintained ARM modes installed "
 "SDK examples and bilingual documentation"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1172
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1172
 msgid "J03"
 msgstr "J03"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Independent delivery closure verification"
 msgstr "Independent delivery closure verification"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "194_delivery_and_development_archives_verified_final_closure_pending"
+msgstr "194_delivery_and_development_archives_verified_final_closure_pending"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Exact source config dependencies tools binaries raw reports docs and "
 "licenses form a verified restorable closure"
@@ -1849,32 +2106,35 @@ msgstr ""
 "Exact source config dependencies tools binaries raw reports docs and "
 "licenses form a verified restorable closure"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-#: docs/status/ledgers/platform-delivery-completion.md:1187
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:1187
 msgid "J04"
 msgstr "J04"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "Incremental commits and GitHub synchronization"
 msgstr "Incremental commits and GitHub synchronization"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid "in_progress"
 msgstr "in_progress"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid "remote_branch_created_commit_pending"
-msgstr "remote_branch_created_commit_pending"
-
-#: docs/status/ledgers/platform-delivery-completion.md:26
-msgid ""
-"https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-"
-"complete-20261028"
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "194_and_d21_committed_increments_synced_pr41_final_integration_pending"
 msgstr ""
-"https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-"
-"complete-20261028"
+"194_and_d21_committed_increments_synced_pr41_final_integration_pending"
 
-#: docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-"
+"lifecycle-complete-20261028"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-"
+"lifecycle-complete-20261028"
+
+#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
 "Reviewed increments synchronize to GitHub; code software hardware and "
 "publication exits remain independently accurate"

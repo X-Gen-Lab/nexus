@@ -114,10 +114,11 @@ so edits trigger reconfiguration and remain in the Source SDK closure.
 `tools/configure/contracts.py` owns immutable controller-category fields, factory
 kind order and public header mappings. Authoring, selection and factory consume
 that same metadata; exact SoC capabilities remain in the family contract. Memory
-budgets, Flash layout and source dependencies are separate resolver phases with
-frozen named results. The controller and endpoint resolution paths still require
-their own complete migration; extracting these phases does not establish full
-configuration refactor completion.
+budgets, Flash layout and source dependencies have frozen named stage results.
+One frozen device-graph result completes controller, endpoint, USB FIFO, SPI face,
+ADC trigger, resource and DMA decisions before final assembly. Its local
+validation builders may still use dictionaries; the stage boundary does not
+claim that every normalizer is a separate typed stage.
 
 ## Keep facts and admission policy distinct
 
@@ -161,14 +162,15 @@ host model. The exact source and independently maintained test oracle still need
 the applicable provider and linked-image checks.
 
 `ConfigurationIR.physical_part` views the existing frozen Flash and memory
-objects. `ControllerIR.integration` composes existing `ResourcePlanIR` claims,
-`DmaTopologyIR` lanes, IRQ options and profile, clock plan/inputs, selected pins
-and a family `ControllerBinding`. Its `clock_hz` is only the paired nominal APB
-input; a missing value is not guessed, and reviewed frequency bounds come from
-`clock_plan`. F407 SPI and the paired secondary-controller paths consume this
-view; other bindings can still use their existing typed or legacy-fixture
-adapter. Do not describe the view as a new route resolver or a completed rewrite
-of every constructor.
+objects. `ControllerIR.integration` composes canonical `ResourcePlanIR` claims,
+`DmaTopologyIR` lanes, IRQ options/profile, clock plan/inputs and selected pins.
+It references a family `ControllerBinding` where that family declares one. Its
+`clock_hz` is only the paired nominal APB input; a missing value is not guessed,
+and reviewed frequency bounds come from `clock_plan`. Fixed reviewed SDK
+addresses, masks and Native model facts remain explicit leaf data; they do not
+independently select a route, owner or clock. The maintained-constructor
+consumption audit checks these selected records and capability projections; it
+does not create a new route resolver or establish final integrated qualification.
 
 Family policy hooks remain declared configuration inputs. H743's reviewed clock
 domain relationships and selected Flash linker fragments live in its `configure/`
@@ -204,12 +206,30 @@ algorithms into a runtime action interpreter or add a registry, hidden worker or
 mandatory lock. Test the production C algorithm through hardware ports using
 GoogleTest/GoogleMock; Python unittest verifies configuration and static wiring.
 
-The migration is incomplete. Selected SPI, I2C, ADC, GPIO and Native paths now
-delegate more cold behavior to C, while other constructors, platform preflight,
-resource emission and specialized paths still emit C helper bodies. Audit the
-complete start/failure/stop/resume path, including shared helpers. A `DirectCall`
-in one constructor does not prove whole-family completion. The complete scope
-and actual exits remain in the [delivery-completion ledger](../design/platform-delivery-completion.csv).
+The reviewed Native and seven MCU-family increments include their maintained
+cold paths. Shared enhanced-SPI admission uses read-only C checks before resource
+acquisition or failed-init markers; H743 resume checks admission before reopening
+its runtime domain and acquiring its lease. Dead hardware emitters and unused default MMIO macros have
+been removed. Audit the whole start/failure/stop/resume path, including shared
+owners and optional retained components. A `DirectCall` in one constructor does
+not prove whole-family or whole-source completion. Exact implementation and
+execution scopes remain in the
+[delivery-completion ledger](../design/platform-delivery-completion.csv).
+
+Write readonly mode-specific configuration and exactly sized mutable storage.
+The C prepare function validates context and foreign ownership before effects;
+the C close function proves its receipt before touching an existing provider.
+An empty receipt must leave unowned state unchanged. After partial preparation,
+close must retain every unfinished pin, clock, IRQ or DMA claim until readback
+proves return. Test both an alien empty receipt and a genuine partial receipt;
+also test cleanup after the caller has already stopped the public peripheral.
+Avoid duplicate persistent pin snapshots or a maximum-sized union of all modes.
+
+Keep schema fields and numerical policy in host validation. Keep runtime MMIO
+reads, clock checks, publisher joins, waits and recovery in C. Declare each new
+configuration helper and private C/header input in the existing family
+descriptor and explicit CMake target. A successful host model does not replace
+an actual ARM link, relocated SDK consumer or physical station run.
 
 H743 fixed-run power references the selected logical controller ID in
 `power.controllers`; the ID need not be `bus4`. Renaming the controller requires

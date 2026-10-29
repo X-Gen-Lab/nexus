@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32H743_UART_DUPLEX_H
 #define NX_STM32H743_UART_DUPLEX_H
+#include "stm32h743_cold.h"
 #include "stm32h743_uart_continuous.h"
 #include "stm32h743_uart_dma_parts.h"
 #ifdef __cplusplus
@@ -43,6 +44,16 @@ void nx_stm32h743_uart_duplex_uart_irq(nx_stm32h743_uart_duplex_state_t* state);
 /** \brief Observe the selected RX bank boundary without cache maintenance. */
 void nx_stm32h743_uart_duplex_receive_irq(
     nx_stm32h743_uart_duplex_state_t* state);
+/** \brief Bind exact static DMA resources before this mode initializes.
+ * \note Task-only; Platform owns pads/gates and callers retain immutable
+ *       configuration, regions and storage through successful public stop.
+ */
+nx_result_t
+nx_stm32h743_uart_duplex_prepare(nx_stm32h743_uart_duplex_state_t* port,
+                                 const nx_stm32h743_uart_config_t* config,
+                                 const nx_dma_memory_region_t* regions,
+                                 size_t region_count);
+
 #ifdef __cplusplus
 }
 #endif

@@ -9,19 +9,13 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT u5_fifo_result EQUAL 0)
     message(FATAL_ERROR "FIFO factory fixture rejected: ${u5_fifo_output}${u5_fifo_error}")
 endif()
-file(READ "${u5_fifo_bundle}/input_paths.json" u5_fifo_inputs)
-string(JSON u5_fifo_count LENGTH "${u5_fifo_inputs}")
-math(EXPR u5_fifo_last "${u5_fifo_count} - 1")
-foreach(index RANGE 0 ${u5_fifo_last})
-    string(JSON input_name MEMBER "${u5_fifo_inputs}" ${index})
-    string(JSON input_path GET "${u5_fifo_inputs}" "${input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
-endforeach()
+nexus_google_configuration_inputs("${u5_fifo_bundle}")
 nexus_google_test(nexus_u575_uart_rtscts_factory_test
     SOURCES u575_uart_rtscts_factory_test.cpp
         "${u5_fifo_bundle}/bindings.c"
         u575_uart_rtscts_model.cpp u575_model.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_rtscts.c"

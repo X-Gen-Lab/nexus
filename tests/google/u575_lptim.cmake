@@ -23,18 +23,13 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT u575_lptim_generated EQUAL 0)
     message(FATAL_ERROR "U575 LPTIM assembly rejected: ${u575_lptim_output}${u575_lptim_error}")
 endif()
-file(READ "${u575_lptim_bundle}/input_paths.json" u575_lptim_inputs)
-string(JSON u575_lptim_count LENGTH "${u575_lptim_inputs}")
-math(EXPR u575_lptim_last "${u575_lptim_count} - 1")
-foreach(index RANGE 0 ${u575_lptim_last})
-    string(JSON name MEMBER "${u575_lptim_inputs}" ${index})
-    string(JSON input GET "${u575_lptim_inputs}" "${name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
-endforeach()
+nexus_google_configuration_inputs("${u575_lptim_bundle}")
 nexus_google_test(nexus_u575_lptim_factory_test
     SOURCES u575_lptim_factory_test.cpp u575_lptim_model.cpp u575_model.cpp
         "${u575_lptim_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/lptim.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${u575_lptim_bundle}"

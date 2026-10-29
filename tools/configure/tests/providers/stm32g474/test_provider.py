@@ -156,19 +156,23 @@ class G474ProviderTests(unittest.TestCase):
         self.assertTrue(any("HIL" in text for text in board["unknowns"]))
         self.assertEqual(board["bindings"][0]["initial"], 0)
 
-    def test_uart_ctor_is_guarded_before_overwriting_retained_state(self):
+    def test_uart_ctor_connects_static_ring_to_concrete_c_admission(self):
         item = fixture_controller(uart())
         construction = self.provider.constructor(item, Result(uart()), {}, {}, ())
         source = "\n".join(construction.definitions)
-        self.assertLess(source.index(".retained"), source.index(".registers ="))
-        self.assertIn("NX_UART_RX_BYTES", source)
+        self.assertIn("static const nx_stm32g474_uart_config_t", source)
+        self.assertIn("LPUART1, s_nx_rx_console, 64u, 115200u, LPUART1_IRQn", source)
+        self.assertIn("GPIOA, GPIOA, 2u, 3u, 12u", source)
         self.assertIn("static uint8_t s_nx_rx_console[64];", source)
-        self.assertIn("nx_stm32g474_lpuart1_pins_prepare()", source)
-        self.assertIn("170000000u, 1000000u", source)
+        self.assertEqual(construction.initialize.render(),
+                         "nx_stm32g474_uart_prepare(&s_nx_port_console, &s_nx_config_console)")
+        self.assertTrue(construction.retain_on_failed_init)
         self.assertEqual(tuple(call.render() for call in construction.stop),
                          ("nx_uart_port_stop(&s_nx_face_console)",))
         self.assertIn("LPUART1_IRQHandler", source)
         self.assertNotIn("DMA", source)
+        # Retained-state, ring and MMIO refusal behavior executes in real
+        # G474 provider/factory GoogleTest fixtures, not generated helper text.
 
     def test_constructor_projection_cannot_bypass_fixed_mode_validation(self):
         for changes in ({"mode": "irq-byte-event"}, {"rx_profile": "events"},
@@ -199,31 +203,24 @@ class G474ProviderTests(unittest.TestCase):
         self.assertEqual(self.provider.shared_irqs(result), [])
         self.assertNotIn("gpioa", "\n".join(self.provider.stop_system(result)))
 
-    def test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback(self):
-        result = configure.resolve_ir(
-            ROOT / "tests/contracts/g474_assembly/io.toml")
+    def test_static_pin_lease_connects_before_system_and_controller_calls(self):
+        result = configure.resolve_ir(ROOT / "tests/contracts/g474_assembly/io.toml")
         source = bindings.emit(result)[1]
-        self.assertIn("NX_G474_READ(&GPIOA->MODER)", source)
-        self.assertIn("NX_G474_READ(&RCC->AHB2ENR)", source)
-        acquire = source[source.index("nx_platform_pins_acquire(void)"):
-                         source.index("nx_platform_pins_release(void)")]
-        self.assertLess(acquire.index("NX_G474_WRITE(&RCC->AHB2ENR"),
-                        acquire.index("nx_platform_pins_admit(false)"))
-        self.assertLess(acquire.index("nx_platform_pins_admit(false)"),
-                        acquire.index("nx_platform_pin_capture("))
-        self.assertLess(acquire.index("nx_platform_pin_capture("),
-                        acquire.index("s_nx_platform_pins_captured = true"))
-        start = source[source.index("nx_platform_start_result_t "
-                                    "nx_platform_start(void)"):]
-        self.assertLess(start.index("nx_platform_pins_acquire()"),
+        self.assertIn("static uint16_t s_nx_platform_pin_state[3u]", source)
+        self.assertIn("static const nx_stm32g474_platform_pin_t", source)
+        start = source[source.index("nx_platform_start_result_t nx_platform_start(void)"):]
+        self.assertLess(start.index("nx_stm32g474_platform_preflight("),
+                        start.index("nx_stm32g474_platform_pins_acquire("))
+        self.assertLess(start.index("nx_stm32g474_platform_pins_acquire("),
                         start.index("nx_stm32g474_system_start("))
-        self.assertLess(start.index("nx_platform_pins_acquire()"),
-                        start.index("prepare_"))
-        release = source[source.index("nx_platform_pins_release(void)"):
-                         source.index("nx_result_t nx_platform_stop(void)")]
-        self.assertLess(release.index("nx_platform_pin_restore("),
-                        release.index("nx_platform_gpio_clocks_release()"))
-        self.assertIn("return NX_ERROR_IO;", release)
+        self.assertLess(start.index("nx_stm32g474_system_start("),
+                        start.index("nx_stm32g474_gpio_prepare("))
+        stop = source[source.index("static nx_result_t nx_platform_stop_impl("):]
+        self.assertLess(stop.index("nx_stm32g474_platform_pins_release("),
+                        stop.index("nx_stm32g474_platform_resources_stop("))
+        self.assertNotIn("NX_G474_WRITE(", source)
+        # Actual capture, withdrawal/readback, failed restore and retry are
+        # exercised by G474PinStateFactory and the other generated factories.
 
     def test_gpios_and_uart_use_real_readonly_tables_without_forwarders(self):
         for values in (gpio(), uart()):

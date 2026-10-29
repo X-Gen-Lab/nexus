@@ -18,7 +18,7 @@ class U575RtcTests(unittest.TestCase):
                          (item.kind, item.controller, item.mode))
         self.assertEqual((), item.pins)
         _, source = bindings.emit(result)
-        self.assertIn('nx_stm32u575_rtc_initialize(', source)
+        self.assertIn('nx_stm32u575_rtc_prepare(&s_nx_port_calendar)', source)
         self.assertIn('nx_rtc_port_stop(', source)
         self.assertIn('nx_stm32u575_rtc_preflight()', source)
         self.assertLess(source.index('nx_stm32u575_rtc_preflight()'),

@@ -168,9 +168,9 @@ class G474CoupledIOConfiguration(unittest.TestCase):
         self.assertIn("return nx_binding_fieldbus;", getters)
         self.assertNotIn("initialize(", getters)
         source = bindings.emit(result)[1]
-        self.assertIn("nx_stm32g474_fdcan_domain_initialize(", source)
-        self.assertIn("nx_stm32g474_fdcan_initialize(", source)
-        self.assertIn("nx_stm32g474_fdcan_domain_stop(", source)
+        self.assertIn("nx_stm32g474_fdcan_prepare(", source)
+        self.assertIn("nx_stm32g474_fdcan_close(", source)
+        self.assertIn("static const nx_stm32g474_fdcan_config_t", source)
         self.assertNotIn("HAL_FDCAN_Init(", source)
 
     def test_can_fd_owns_physical_ram_and_both_vectors_with_one_publisher(self):
@@ -244,10 +244,10 @@ class G474CoupledIOConfiguration(unittest.TestCase):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture)
                 source = bindings.emit(result)[1]
-                self.assertIn("s_nx_port_fieldbus.mode = " + value + ";", source)
+                self.assertIn(".mode = " + value + " };", source)
                 self.assertIn("static nx_stm32g474_fdcan_state_t s_nx_port_fieldbus;",
                               source)
-                self.assertEqual(source.count("nx_stm32g474_fdcan_initialize("), 1)
+                self.assertEqual(source.count("nx_stm32g474_fdcan_prepare("), 1)
                 header, getters = factory.emit(result)
                 self.assertIn("const nx_can_fd_port_t* nx_factory_can_fd(", header)
                 self.assertNotIn("initialize(", getters)

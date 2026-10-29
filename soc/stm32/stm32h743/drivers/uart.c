@@ -6,6 +6,7 @@
  * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32h743_cold.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -509,3 +510,65 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
 const nx_uart_ops_t nx_stm32h743_uart_ops = {
     submit,     start_admitted, cancel,      service, NULL,
     read_bytes, stop,           attach_wake, NULL,    NULL};
+
+nx_result_t
+nx_stm32h743_uart_configure(nx_stm32h743_uart_state_t* port,
+                            const nx_stm32h743_uart_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active != NULL ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    if (config->baud == 0U ||
+        (config->profile == NX_UART_RX_BYTES &&
+         (!span(config->storage, config->capacity) ||
+          config->capacity > 4096U)) ||
+        (config->profile == NX_UART_RX_BLOCKS &&
+         (config->storage != NULL || config->capacity != 0U)))
+        return NX_ERROR_INVALID;
+    if ((config->profile != NX_UART_RX_BYTES &&
+         config->profile != NX_UART_RX_BLOCKS) ||
+#if NEXUS_CORE_HZ == 384000000U
+        config->clock_hz != 64000000U)
+#else
+        (config->clock_hz != 64000000U && config->clock_hz != 32000000U))
+#endif
+        return NX_ERROR_UNSUPPORTED;
+    if (overlap(config->storage, config->capacity, port, sizeof(*port)) ||
+        overlap(config->storage, config->capacity, USART3,
+                sizeof(USART_TypeDef)))
+        return NX_ERROR_INVALID;
+    port->registers = USART3;
+    port->rx_storage = config->storage;
+    port->rx_capacity = config->capacity;
+    port->baud = config->baud;
+    port->irq = USART3_IRQn;
+    port->profile = config->profile;
+    port->irq_policy = config->irq_policy;
+    return NX_SUCCESS;
+}
+
+nx_result_t
+nx_stm32h743_uart_prepare(nx_stm32h743_uart_state_t* port,
+                          const nx_stm32h743_uart_config_t* config) {
+    nx_result_t result = nx_stm32h743_uart_configure(port, config);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32h743_usart3_pins_prepare();
+    return result == NX_SUCCESS
+               ? nx_stm32h743_uart_initialize(port, config->clock_hz, 1000000U)
+               : result;
+}
+
+nx_result_t nx_stm32h743_uart_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return (NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN) != 0U ||
+                   (NX_H743_READ(&RCC->D2CCIP2R) & RCC_D2CCIP2R_USART28SEL) !=
+                       0U ||
+                   !NX_H743_IRQ_AVAILABLE(USART3_IRQn)
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}

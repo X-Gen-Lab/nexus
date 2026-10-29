@@ -21,23 +21,16 @@ if(NOT g4_fdcan_generated EQUAL 0)
     message(FATAL_ERROR
         "G474 control fixture rejected: ${g4_fdcan_output}${g4_fdcan_error}")
 endif()
-file(READ "${g4_fdcan_bundle}/input_paths.json" g4_fdcan_inputs)
-string(JSON g4_fdcan_input_count LENGTH "${g4_fdcan_inputs}")
-math(EXPR g4_fdcan_last_input "${g4_fdcan_input_count} - 1")
-foreach(index RANGE 0 ${g4_fdcan_last_input})
-    string(JSON g4_fdcan_input_name MEMBER "${g4_fdcan_inputs}" ${index})
-    string(JSON g4_fdcan_input_path GET "${g4_fdcan_inputs}"
-        "${g4_fdcan_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${g4_fdcan_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${g4_fdcan_bundle}")
 nexus_google_test(${g4_fdcan_target}
     SOURCES g474_fdcan_factory_test.cpp
         "${g4_fdcan_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/fdcan.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/fdcan_cold.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_fdcan_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"

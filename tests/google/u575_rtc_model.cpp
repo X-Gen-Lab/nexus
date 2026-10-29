@@ -118,3 +118,9 @@ void nx_u575_rtc_model_write(volatile uint32_t* reg, uint32_t value) {
         ++m.forbidden_writes;
     }
 }
+
+/** \brief External selected Core-clock boundary for the concrete cold adapter.
+ */
+extern "C" nx_time_us_t nx_time_now_us(void) {
+    return g_u575_rtc_model.now;
+}

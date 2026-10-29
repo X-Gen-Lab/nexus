@@ -49,10 +49,16 @@ class H743ContinuousConfiguration(unittest.TestCase):
             configure.configure(source, output)
             body = (output / "bindings.c").read_text()
             self.assertIn("nx_stm32h743_uart_continuous_state_t", body)
-            self.assertIn("nx_stm32h743_uart_continuous_initialize", body)
-            self.assertIn(".uart.rx_storage = NULL", body)
-            self.assertIn(".uart.rx_capacity = 0u", body)
-            self.assertIn(".rx = DMA1_Stream1", body)
+            self.assertIn("nx_stm32h743_uart_continuous_prepare", body)
+            self.assertIn(".storage = NULL", body)
+            self.assertIn(".capacity = 0u", body)
+            result = configure.resolve_ir(source)
+            self.assertEqual(
+                [("DMA1", 1, 45)],
+                [(lane.engine, lane.lane, lane.request)
+                 for lane in result.dma_topology.lanes])
+            self.assertIn("nx_stm32h743_uart_continuous_dma_irq("
+                          "&s_nx_port_console)", body)
             self.assertIn("DMA1_Stream1_IRQHandler", body)
             self.assertNotIn("DMA1_Stream0_IRQHandler", body)
             self.assertNotIn("static uint8_t s_nx_rx_", body)

@@ -117,11 +117,6 @@ def emit(result):
               '#include "nexus_config.h"',
               '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus/arch/arch.h"']
-    source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
-               "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
-               "#endif", "#ifndef NX_PLATFORM_PRIORITY_WRITE",
-               "#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))",
-               "#endif"]
     if uart_formats.probed(result):
         source.append('#include "nexus/io/cycle_probe.h"')
         source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
@@ -140,6 +135,7 @@ def emit(result):
     if runtime:
         source.extend(runtime_power.state())
     initialize = []
+    admission = []
     initialization_indices = []
     retained_initialization = []
     stop = []
@@ -161,6 +157,8 @@ def emit(result):
                 construction = pwm_shared.constructor(owner)
                 source.append(f'static {construction.state_type} {physical};')
                 source.extend(construction.definitions)
+                admission.extend((selection_index, call.render())
+                                 for call in construction.admission)
                 initialize.append(construction.initialize.render())
                 initialization_indices.append(selection_index)
                 retained_initialization.append(construction.retain_on_failed_init)
@@ -181,6 +179,8 @@ def emit(result):
         source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
+        admission.extend((selection_index, call.render())
+                         for call in construction.admission)
         header.extend(construction.exports)
         if gpio_phase.applies(result):
             gpio_phase.add_snapshots(result, item,
@@ -228,9 +228,9 @@ def emit(result):
                    '    return NX_SUCCESS;', '}',
                    '/** \\brief One I/O withdrawal body, also used by runtime pause. */',
                    'static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
-                   '    nx_result_t closed = nx_runtime_close();',
+                   '    nx_result_t closed = nx_clock_domain_cold_close(&s_nx_runtime_domain);',
                    '    if (closed != NX_SUCCESS) { return closed; }',
-                   '    if (s_nx_runtime_lease.owner == NULL) { return nx_runtime_release(); }']
+                   '    if (!nx_clock_domain_cold_has_lease(&s_nx_runtime_lease)) { return nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease); }']
     for index in range(len(initialize), 0, -1):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         source.append(
@@ -243,8 +243,9 @@ def emit(result):
     source.append('    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
     if runtime:
         source.extend(provider.stop_resources(result))
-        source += ['    return nx_runtime_release();', '}']
-        source.extend(runtime_power.runtime_functions(result, context_guard, initialize))
+        source += ['    return nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease);', '}']
+        source.extend(runtime_power.runtime_functions(result, context_guard,
+                                                      initialize, admission))
     else:
         source.extend(provider.stop_system(
             result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
@@ -273,18 +274,22 @@ def emit(result):
                f'    if ({context_guard}) {{',
                '        result.primary = NX_ERROR_CONTEXT; return result; }',
                '    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }']
+    # Read-only C admission does not acquire a cleanup responsibility. Reject
+    # before any system/resource effect or initialized-instance marker.
+    for index, expression in admission:
+        source += ['    nx_platform_diagnostic_phase(diagnostic, false, '
+                   f'NX_PLATFORM_PHASE_CONTROLLER, {index}u);',
+                   f'    result.primary = {expression};',
+                   '    if (result.primary != NX_SUCCESS) { return result; }']
     source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX);')
     if runtime:
-        source += ['    if (s_nx_runtime_domain.initialized && s_nx_runtime_domain.closing) {',
-                   '        result.primary = nx_runtime_reopen();',
-                   '        if (result.primary != NX_SUCCESS) { return result; }', '    }',
-                   '    result.primary = nx_runtime_acquire();',
+        source += ['    result.primary = nx_clock_domain_cold_start(&s_nx_runtime_domain, &s_nx_runtime_lease);',
                    '    if (result.primary != NX_SUCCESS) { return result; }',
                    '    result = nx_runtime_start_system(diagnostic);',
                    '    if (result.primary != NX_SUCCESS) {',
                    '        if (result.remaining_effects == 0u) {',
-                   '            nx_result_t cleanup = nx_runtime_close();',
-                   '            if (cleanup == NX_SUCCESS) { cleanup = nx_runtime_release(); }',
+                   '            nx_result_t cleanup = nx_clock_domain_cold_close(&s_nx_runtime_domain);',
+                   '            if (cleanup == NX_SUCCESS) { cleanup = nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease); }',
                    '            if (cleanup != NX_SUCCESS) { result.cleanup = cleanup; result.remaining_effects = 1u; }',
                    '        }', '        return result;', '    }']
     else:

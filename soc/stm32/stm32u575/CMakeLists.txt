@@ -96,7 +96,8 @@ else()
 endif()
 set(NEXUS_STARTUP_SOURCE
     "${u5_device}/Source/Templates/gcc/startup_stm32u575xx.s" PARENT_SCOPE)
-set(u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
+set(u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/platform_cold.c")
 set(u5_system_definitions STM32U575xx)
 if(NEXUS_OS_MPU_GPIO)
     list(APPEND u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/mpu_user_init.c")

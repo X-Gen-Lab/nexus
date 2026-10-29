@@ -12,8 +12,10 @@ extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #ifdef NX_CAN_FACTORY_STM32
+#include "stm32f407_can_cold.h"
 #include "stm32f407_provider.h"
 #else
+#include "gd32f470_can_cold.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx_can.h"
 #endif
@@ -328,3 +330,90 @@ TEST_F(CanFactory, SecondPinFailureRestoresOnlyTheCapturedLeases) {
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
     EXPECT_EQ(result.remaining_effects, 0U);
 }
+
+#ifdef NX_CAN_FACTORY_STM32
+TEST_F(CanFactory, RejectedAlienReceiptCannotStopTheLiveGeneratedOwner) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    uint16_t saved[2] = {};
+    const nx_stm32_platform_pin_config_t pins[] = {{GPIOA, &saved[0], 0U, 11U},
+                                                   {GPIOA, &saved[1], 0U, 12U}};
+    nx_stm32_can_config_t config = {};
+    config.domain = first_state->domain;
+    config.events = first_state->events;
+    config.pins = pins;
+    config.capacity = first_state->capacity;
+    uint8_t alien = 0U;
+    const auto original = *first_state;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_EQ(nx_stm32_can_prepare(first_state, &config, &alien),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32_can_close(first_state, &config, &alien), NX_ERROR_BUSY);
+    EXPECT_EQ(std::memcmp(first_state, &original, sizeof(original)), 0);
+    EXPECT_EQ(std::memcmp(bytes, before.data(), before.size()), 0);
+    EXPECT_TRUE(first_state->snapshot.started);
+    EXPECT_EQ(first_state->domain->active_mask, 3U);
+}
+
+#endif
+
+TEST_F(CanFactory, RefusedPadRestoreRetainsDomainAndTheExactPadUntilRetry) {
+    bool changed = false;
+    bool refuse_restore = true;
+    ON_CALL(ports, Configure(1U, 13U)).WillByDefault([&](unsigned, unsigned) {
+        changed = true;
+        return NX_SUCCESS;
+    });
+    ON_CALL(ports, Capture(1U, 13U)).WillByDefault([&](unsigned, unsigned) {
+        return static_cast<uint16_t>(changed ? 0x456U : 0x123U);
+    });
+    ON_CALL(ports, Restore(1U, 13U, 0x123U))
+        .WillByDefault([&](unsigned, unsigned, uint16_t) {
+            if (!refuse_restore) {
+                changed = false;
+            }
+        });
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_TRUE(changed);
+#ifdef NX_CAN_FACTORY_STM32
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_CAN1EN, 0U);
+    EXPECT_NE(RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN, 0U);
+#else
+    EXPECT_NE(RCU_APB1EN & RCU_APB1EN_CAN0EN, 0U);
+    EXPECT_NE(RCU_AHB1EN & RCU_AHB1EN_PBEN, 0U);
+#endif
+    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    refuse_restore = false;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_FALSE(changed);
+#ifdef NX_CAN_FACTORY_STM32
+    EXPECT_EQ(RCC->APB1ENR & (RCC_APB1ENR_CAN1EN | RCC_APB1ENR_CAN2EN), 0U);
+#else
+    EXPECT_EQ(RCU_APB1EN & (RCU_APB1EN_CAN0EN | RCU_APB1EN_CAN1EN), 0U);
+#endif
+}
+
+#ifndef NX_CAN_FACTORY_STM32
+TEST_F(CanFactory, AbsentColdReceiptCannotStopActiveController) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    const nx_can_controller_t prior = *first_state;
+    const nx_can_filter_domain_t domain_before = *first_state->domain;
+    uint16_t snapshots[2]{};
+    const nx_gd32_platform_pin_config_t pins[] = {
+        {GPIOA, &snapshots[0], 0U, 11U}, {GPIOA, &snapshots[1], 0U, 12U}};
+    nx_gd32_can_config_t config{};
+    config.pins = pins;
+    uint8_t leases = 0U;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_can_close(first_state, &config, &leases));
+    EXPECT_EQ(0, std::memcmp(&prior, first_state, sizeof(prior)));
+    EXPECT_EQ(0, std::memcmp(&domain_before, first_state->domain,
+                             sizeof(domain_before)));
+    EXPECT_EQ(0U, leases);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
+#endif

@@ -20,15 +20,7 @@ foreach(eth_frames_family stm32 gd32)
         message(FATAL_ERROR
             "Enhanced Ethernet assembly rejected: ${eth_frames_output}${eth_frames_error}")
     endif()
-    file(READ "${eth_frames_bundle}/input_paths.json" eth_frames_inputs)
-    string(JSON eth_frames_input_count LENGTH "${eth_frames_inputs}")
-    math(EXPR eth_frames_last_input "${eth_frames_input_count} - 1")
-    foreach(index RANGE 0 ${eth_frames_last_input})
-        string(JSON eth_frames_input_name MEMBER "${eth_frames_inputs}" ${index})
-        string(JSON eth_frames_input_path GET "${eth_frames_inputs}" "${eth_frames_input_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${eth_frames_input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${eth_frames_bundle}")
     set(eth_frames_target
         "nexus_${eth_frames_family}_eth_frames_factory_test")
     nexus_google_test(${eth_frames_target}
@@ -51,6 +43,8 @@ foreach(eth_frames_family stm32 gd32)
     set_property(TARGET ${eth_frames_target} APPEND PROPERTY LINK_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/eth_frames_host_dma.ld")
     if(eth_frames_family STREQUAL "stm32")
+        target_sources(${eth_frames_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
         # Model excludes reset-only CPU assembly, never the actual clock/timer
         # transaction. CPP binds the real System context to the same MMIO map.
         target_compile_definitions(${eth_frames_target} PRIVATE
@@ -62,6 +56,8 @@ foreach(eth_frames_family stm32 gd32)
         nexus_use_cmsis_core(${eth_frames_target})
         nexus_stm32f4_official(${eth_frames_target})
     else()
+        target_sources(${eth_frames_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
         set(eth_frames_gd
             "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         set(eth_frames_sdk "${eth_frames_target}_sdk")

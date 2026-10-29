@@ -33,8 +33,23 @@ for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml", "ve-i2c.toml"):
         lines += generated.definitions
         # This test-only facade follows the actual typed call slots, including
         # ordered multi-call cleanup. It is not a production compatibility API.
-        lines += [f"static nx_result_t nx_test_prepare_{name}(void) {{",
-                  f"    return {generated.initialize.render()};", "}",
+        lines += [f"static nx_result_t s_nx_test_cleanup_{name};",
+                  f"static nx_result_t nx_test_prepare_{name}(void) {{"]
+        for index, call in enumerate(generated.admission):
+            lines += [f"    nx_result_t admitted_{index} = {call.render()};",
+                      f"    if (admitted_{index} != NX_SUCCESS) {{ return admitted_{index}; }}"]
+        lines += [f"    s_nx_test_cleanup_{name} = NX_SUCCESS;",
+                  f"    nx_result_t primary = {generated.initialize.render()};"]
+        if generated.retain_on_failed_init and generated.stop:
+            # Production Platform marks this constructor before prepare, then
+            # runs typed stop slots on failure. Preserve primary and the first
+            # cleanup error separately; never continue releasing dependencies.
+            lines.append("    if (primary != NX_SUCCESS) {")
+            for call in generated.stop:
+                lines += [f"        s_nx_test_cleanup_{name} = {call.render()};",
+                          f"        if (s_nx_test_cleanup_{name} != NX_SUCCESS) {{ return primary; }}"]
+            lines.append("    }")
+        lines += ["    return primary;", "}",
                   f"static nx_result_t nx_test_stop_{name}(void) {{"]
         if generated.stop:
             lines.append("    nx_result_t status;")

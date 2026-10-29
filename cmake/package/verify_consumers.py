@@ -656,13 +656,9 @@ def check_selected_image(sdk, source, build, run_checked, *,
 def positive_parallel(value):
     """Require a canonical positive job count, without a policy maximum."""
     try:
-        count = int(value)
-    except (TypeError, ValueError) as error:
-        raise argparse.ArgumentTypeError(
-            "parallel must be a positive integer") from error
-    if count < 1 or str(count) != value:
-        raise argparse.ArgumentTypeError("parallel must be a positive integer")
-    return count
+        return process.positive_integer(value, "parallel")
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
 
 
 def verify_consumer(kind, specification, prefix, output, identity, run_checked):
@@ -755,10 +751,15 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--parallel", type=positive_parallel, default=2,
-                        help="Total concurrent consumer jobs (default: 2); "
-                             "each build uses one job")
+    parser.add_argument("--parallel", type=positive_parallel,
+                        help="Total concurrent consumer jobs; default inherits "
+                             "NEXUS_BUILD_JOBS/CMAKE_BUILD_PARALLEL_LEVEL or 2; "
+                             "each child build uses one job")
     args = parser.parse_args(argv)
+    try:
+        args.parallel = process.parallel_jobs(os.environ, requested=args.parallel)
+    except ValueError as error:
+        parser.error(str(error))
     prefix, output = args.prefix.absolute(), args.output.absolute()
     records = []
     report = {"schema_version": 1, "kind": "source_sdk_consumer_verification",

@@ -65,7 +65,11 @@ class H743PeripheralCapabilityTests(unittest.TestCase):
                 configure.configure(source, output)
                 bindings = (output / "bindings.c").read_text()
                 self.assertIn(f".clock_hz = {nominal}u", bindings)
-                self.assertIn(f".frequency_hz = {rate}u", bindings)
+                self.assertIn(
+                    f"{{ &s_nx_endpoint_device4, &s_nx_cs_device4, "
+                    f"GPIOE, 2048u, {rate}u, 0u }}", bindings)
+                self.assertIn("nx_stm32h743_spi_prepare(&s_nx_port_bus4, "
+                              "&s_nx_config_bus4)", bindings)
 
     def test_sram1_requires_explicit_budget_and_extends_only_selected_dma(self):
         root = Path(__file__).resolve().parents[5]

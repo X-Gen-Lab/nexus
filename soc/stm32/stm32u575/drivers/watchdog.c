@@ -6,6 +6,7 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 
 #ifndef NX_U575_WATCHDOG_POLL
@@ -251,4 +252,19 @@ uint32_t nx_reset_cause(void) {
     if ((raw & RCC_CSR_LPWRRSTF) != 0U)
         result |= NX_RESET_LOW_POWER;
     return result;
+}
+
+nx_result_t nx_stm32u575_watchdog_prepare(nx_stm32u575_watchdog_state_t* port) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    if (port->state.enabled || port->lsi_added || port->debug_pending)
+        return NX_ERROR_BUSY;
+    port->registers = IWDG;
+    port->rcc = RCC;
+    port->flash = FLASH;
+    port->debug = DBGMCU;
+    port->poll_limit = 1000000U;
+    return NX_SUCCESS;
 }

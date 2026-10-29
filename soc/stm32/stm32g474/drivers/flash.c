@@ -284,3 +284,16 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
 }
 const nx_flash_ops_t nx_stm32g474_flash_ops = {
     .geometry = geometry, .read = read, .program = program, .erase = erase};
+
+/** \brief Keep the exact physical Flash binding and busy admission in C. */
+nx_result_t nx_stm32g474_flash_prepare(nx_stm32g474_flash_state_t* port) {
+    if (port == NULL)
+        return NX_ERROR_INVALID;
+    if (port->active || port->restore_pending ||
+        (NX_G474_READ(&FLASH->SR) & FLASH_SR_BSY) != 0U)
+        return NX_ERROR_BUSY;
+    port->registers = FLASH;
+    port->memory = (volatile uint8_t*)FLASH_BASE;
+    port->supply_mv = 3300U;
+    return NX_SUCCESS;
+}

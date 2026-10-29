@@ -2,6 +2,7 @@
 nexus_google_test(nexus_h743_flash_image_admission_test
     SOURCES h743_flash_image_admission_test.cpp h743_model.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/h743_flash_geometry.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"

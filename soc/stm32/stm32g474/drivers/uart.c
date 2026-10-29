@@ -482,3 +482,39 @@ nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
 const nx_uart_ops_t nx_stm32g474_uart_ops = {
     submit,     start_admitted, cancel,      service, NULL,
     read_bytes, stop,           attach_wake, NULL,    NULL};
+
+/** \brief Keep binding/admission in C before touching any leased UART pad. */
+nx_result_t
+nx_stm32g474_uart_prepare(nx_stm32g474_uart_state_t* port,
+                          const nx_stm32g474_uart_config_t* config) {
+    if (port == NULL || config == NULL || config->registers == NULL ||
+        config->rx_storage == NULL || config->rx_capacity == 0U ||
+        config->rx_capacity > 4096U || config->tx_gpio == NULL ||
+        config->rx_gpio == NULL || config->tx_pin > 15U ||
+        config->rx_pin > 15U || config->af > 15U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->active != NULL ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    uintptr_t ring = (uintptr_t)config->rx_storage;
+    uintptr_t state = (uintptr_t)port;
+    if (config->rx_capacity > UINTPTR_MAX - ring ||
+        sizeof(*port) > UINTPTR_MAX - state ||
+        (ring < state + sizeof(*port) && state < ring + config->rx_capacity))
+        return NX_ERROR_INVALID;
+    port->registers = config->registers;
+    port->rx_storage = config->rx_storage;
+    port->rx_capacity = config->rx_capacity;
+    port->baud = config->baud;
+    port->irq = config->irq;
+    port->profile = NX_UART_RX_BYTES;
+    port->irq_policy = config->irq_policy;
+    nx_result_t status = config->registers == LPUART1
+                             ? nx_stm32g474_lpuart1_pins_prepare()
+                             : nx_stm32g474_uart_pins_prepare(
+                                   config->tx_gpio, config->tx_pin,
+                                   config->rx_gpio, config->rx_pin, config->af);
+    if (status != NX_SUCCESS)
+        return status;
+    return nx_stm32g474_uart_initialize(port, 170000000U, 1000000U);
+}

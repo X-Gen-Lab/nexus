@@ -103,13 +103,28 @@ configuration, exact instances, factory getters and fixed IRQ handlers. Constant
 addresses and thin typed call sequences can remain generated without adding a
 runtime interpreter or another dispatch layer.
 
-This boundary is the migration target and a rule for new behavior. Some existing
-constructors and platform resource/preflight paths still emit C hardware helper
-bodies. Selected paths have moved to concrete C preparation; their full-family
-coverage remains open in the [delivery-completion ledger](../design/platform-delivery-completion.csv).
-Generated C and maintained C are compiled by the same toolchain. Moving an
-algorithm changes its maintenance and test ownership; actual performance and
-space changes require linked images and, for timing, real measurements.
+The reviewed Native and seven MCU-family cold paths keep preflight, resource
+acquisition, preparation, failed-start cleanup and stop behavior in C. Shared
+enhanced-SPI admission calls read-only C checks before acquiring resources or
+marking failed-init cleanup responsibility. H743 fixed-run pause/resume uses C
+resource and runtime lease owners. Unreachable hardware generators and unused
+default MMIO macros have been removed; pure pruning and intentional output
+deletions retain separate comparisons. The
+[delivery-completion ledger](../design/platform-delivery-completion.csv) records
+implementation, exact development executions and final integration separately.
+
+A cold receipt proves which resources this caller actually acquired. Rejection
+with an empty receipt cannot stop or overwrite an existing owner. Partial
+acquisition and failed restoration retain the original snapshot and unfinished
+effects for retry; a public peripheral stop does not discard the enclosing
+Platform lease. These checks run on the real C helpers in the register models.
+Factory lookup and ordinary I/O retain their existing direct typed paths.
+
+Generated static C and maintained C use the same firmware toolchain. Moving an
+algorithm changes its maintenance and test ownership; it does not promise a
+universal resource reduction. The recorded F407 I2C owner-guard comparison saves
+RAM while increasing IRQ/DMA Flash. Linked costs and physical timing retain
+their own source, configuration and measurement requirements.
 
 ![Actual compile-target dependency relationships](../assets/diagrams/build-targets.svg)
 
@@ -124,19 +139,19 @@ existing face. After explicit successful platform start, ordinary operations cal
 its shared ops table with its instance context. IRQ dispatch is fixed to provider
 instances and does not repeat factory lookup for every byte.
 
-The constructor contract names private state, definitions, initialization, stop
-actions and failed-init responsibility explicitly. Its initializer and stop list
-use immutable `DirectCall` values with explicit static references or constants;
-no free-form C expression or function-pointer/member-call expression can enter
-those fields.
-Definitions and some remaining cold helper bodies are still emitted as C source.
-The C compiler establishes actual symbol and parameter types. Model tests and
-linked-image checks remain necessary: this narrow representation is not a complete
-typed C AST. Common generation does not infer
-these decisions from family names. Selected STM32F4 official LL operations remain
-inside private SoC state machines; factory and public I/O contracts are unchanged.
-Full HAL Handle/callback transport requires separate mode-specific evaluation.
-See [official driver integration](../design/official-stm32-provider.md).
+The constructor contract names private state, definitions, read-only admission,
+initialization, stop actions and failed-init responsibility explicitly. Admission,
+initializer and stop lists use immutable `DirectCall` values with explicit static
+references or constants; no free-form C expression or function-pointer/member-call
+expression can enter those fields. Definitions remain generated static C source
+and fixed connections; hardware algorithms are maintained in C. The C compiler
+establishes actual symbol and parameter types. Model tests and linked-image
+checks remain necessary: this narrow representation is not a complete typed C
+AST. Common generation does not infer these decisions from family names. Selected
+STM32F4 official LL operations remain inside private SoC state machines; factory
+and public I/O contracts are unchanged. Full HAL Handle/callback transport
+requires separate mode-specific evaluation. See
+[official driver integration](../design/official-stm32-provider.md).
 
 The legacy F103/GD303 selections share private algorithms only after exact vendor
 register, bit, clock and memory checks. A TX-only channel-DMA instance owns a

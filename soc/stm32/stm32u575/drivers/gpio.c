@@ -6,6 +6,7 @@
  * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
 #include "stm32u575_gpio_mpu.h"
@@ -238,3 +239,18 @@ bool nx_stm32u575_gpio_mpu_validate(
            mask == 0x80U;
 }
 #endif
+
+nx_result_t
+nx_stm32u575_gpio_prepare(nx_stm32u575_gpio_state_t* port,
+                          const nx_stm32u575_gpio_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || config->registers == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized)
+        return NX_ERROR_BUSY;
+    port->registers = config->registers;
+    port->mask = config->mask;
+    port->output = config->output;
+    return nx_stm32u575_gpio_initialize(port, config->initial);
+}

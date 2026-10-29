@@ -21,11 +21,11 @@ static bool methods_valid(const nx_spi_dma_sequence_backend_t* backend,
 static bool backend_valid(const nx_spi_dma_sequence_state_t* state) {
     return state != NULL && methods_valid(state->backend, state->context);
 }
-/** \brief Reopening an owner never clears active or quarantined storage. */
+/** \brief Pure admission precedes every provider and cleanup acquisition. */
 nx_result_t
-nx_spi_dma_sequence_initialize(nx_spi_dma_sequence_state_t* state,
-                               const nx_spi_dma_sequence_backend_t* backend,
-                               void* context) {
+nx_spi_dma_sequence_preflight(const nx_spi_dma_sequence_state_t* state,
+                              const nx_spi_dma_sequence_backend_t* backend,
+                              const void* context) {
     if (state == NULL ||
         (uintptr_t)state % _Alignof(nx_spi_dma_sequence_state_t) != 0U ||
         sizeof(*state) > UINTPTR_MAX - (uintptr_t)state ||
@@ -52,6 +52,17 @@ nx_spi_dma_sequence_initialize(nx_spi_dma_sequence_state_t* state,
         (state->stopping && !state->stopped) ||
         (phase != NX_REQUEST_READY && phase != NX_REQUEST_SETTLED)) {
         return NX_ERROR_BUSY;
+    }
+    return NX_SUCCESS;
+}
+/** \brief Reopening an owner never clears active or quarantined storage. */
+nx_result_t
+nx_spi_dma_sequence_initialize(nx_spi_dma_sequence_state_t* state,
+                               const nx_spi_dma_sequence_backend_t* backend,
+                               void* context) {
+    nx_result_t result = nx_spi_dma_sequence_preflight(state, backend, context);
+    if (result != NX_SUCCESS) {
+        return result;
     }
     *state =
         (nx_spi_dma_sequence_state_t){.backend = backend, .context = context};

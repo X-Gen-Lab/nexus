@@ -9,14 +9,7 @@ foreach(can_family stm32 gd32)
     if(NOT can_generated EQUAL 0)
         message(FATAL_ERROR "CAN factory fixture rejected: ${can_output}${can_error}")
     endif()
-    file(READ "${can_bundle}/input_paths.json" can_inputs)
-    string(JSON can_input_count LENGTH "${can_inputs}")
-    math(EXPR can_last_input "${can_input_count} - 1")
-    foreach(index RANGE 0 ${can_last_input})
-        string(JSON can_input_name MEMBER "${can_inputs}" ${index})
-        string(JSON can_input_path GET "${can_inputs}" "${can_input_name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${can_input_path}")
-    endforeach()
+    nexus_google_configuration_inputs("${can_bundle}")
     set(can_target "nexus_${can_family}_can_factory_test")
     nexus_google_test(${can_target} SOURCES can_factory_test.cpp
         "${can_bundle}/bindings.c" LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -27,6 +20,8 @@ foreach(can_family stm32 gd32)
     target_compile_definitions(${can_target} PRIVATE
         _init=nx_can_fixture_init _fini=nx_can_fixture_fini)
     if(can_family STREQUAL "stm32")
+        target_sources(${can_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
         target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/can.c")
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
@@ -35,6 +30,8 @@ foreach(can_family stm32 gd32)
         nexus_use_cmsis_core(${can_target})
         target_compile_definitions(${can_target} PRIVATE STM32F407xx NX_CAN_TEST_STM32 NX_CAN_FACTORY_STM32)
     else()
+        target_sources(${can_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
         set(can_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")

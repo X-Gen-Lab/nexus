@@ -55,7 +55,39 @@ typedef struct {
     nx_can_fd_state_t snapshot;
     nx_stm32g474_fdcan_mode_t mode;
     bool retained;
+    /* Separate cold ownership survives public stop and failed initialization.
+     */
+    bool cold_domain_owned;
 } nx_stm32g474_fdcan_state_t;
+/** \brief Immutable exact FDCAN1 domain, rings and reviewed mode. */
+typedef struct {
+    nx_stm32g474_fdcan_domain_t* domain;
+    const nx_can_fd_filter_t* filters;
+    size_t filter_count;
+    nx_can_fd_event_t* events;
+    size_t capacity;
+    nx_irq_policy_t irq_policy;
+    uint32_t drain_timeout_us;
+    uint32_t poll_limit;
+    nx_stm32g474_fdcan_mode_t mode;
+} nx_stm32g474_fdcan_config_t;
+/** \brief Bind and initialize the domain/controller before connecting TX.
+ * \param[in,out] state: Static unretained physical controller state.
+ * \param[in] config: Reviewed immutable domain/filter/ring/poll resources.
+ * \return Status; close and Platform restore retain partial-failure effects.
+ */
+nx_result_t
+nx_stm32g474_fdcan_prepare(nx_stm32g474_fdcan_state_t* state,
+                           const nx_stm32g474_fdcan_config_t* config);
+/** \brief Release only the domain acquired by this cold preparation.
+ * \param[in,out] state: Same static controller with submitters joined.
+ * \param[in] config: Original static domain/configuration association.
+ * \return Success when this preparation owns no effects, or after its own
+ *         controller and domain release complete. Rejected foreign ownership
+ *         is never adopted or released.
+ */
+nx_result_t nx_stm32g474_fdcan_close(nx_stm32g474_fdcan_state_t* state,
+                                     const nx_stm32g474_fdcan_config_t* config);
 /** \brief Shared readonly optional table, independent of classic CAN storage.
  */
 extern const nx_can_fd_ops_t nx_stm32g474_fdcan_ops;

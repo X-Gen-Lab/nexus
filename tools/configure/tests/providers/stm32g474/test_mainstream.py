@@ -31,8 +31,9 @@ class G474MainstreamTests(unittest.TestCase):
                 item = fixture_controller(values)
                 code = "\n".join(self.provider.constructor(
                     item, Result(values), {}, {}, ()).definitions)
-                self.assertIn(f".registers = {controller};", code)
-                self.assertIn(f".irq = {controller}_IRQn;", code)
+                self.assertIn("static const nx_stm32g474_uart_config_t", code)
+                self.assertIn(f"{controller}, s_nx_rx_console,", code)
+                self.assertIn(f"{controller}_IRQn,", code)
                 self.assertIn(f"void {controller}_IRQHandler", code)
 
     def test_gpio_mask_must_equal_route_across_package_banks(self):
@@ -45,7 +46,8 @@ class G474MainstreamTests(unittest.TestCase):
                 item = fixture_controller(values)
                 code = "\n".join(self.provider.constructor(
                     item, Result(values), {}, {}, ()).definitions)
-                self.assertIn(f".registers = GPIO{bank};", code)
+                self.assertIn("static const nx_stm32g474_gpio_config_t", code)
+                self.assertIn(f"GPIO{bank}, {1 << pin}u,", code)
 
     def test_multibank_factory_has_per_controller_gates_and_pin_snapshots(self):
         root = Path(__file__).resolve().parents[5]
@@ -53,8 +55,9 @@ class G474MainstreamTests(unittest.TestCase):
             root / "tests/contracts/g474_assembly/mainstream.toml")
         code = bindings.emit(result)[1]
         self.assertEqual(sum(item.kind == "uart" for item in result.controllers), 5)
-        self.assertIn("nx_platform_pin_capture(GPIOB, 0u)", code)
-        self.assertIn("nx_platform_pin_restore(GPIOC, 0u,", code)
+        self.assertRegex(code, r"\{ GPIOB, &s_nx_platform_pin_state\[\d+u\], 1u, 0u \}")
+        self.assertRegex(code, r"\{ GPIOC, &s_nx_platform_pin_state\[\d+u\], 2u, 0u \}")
+        self.assertIn("nx_stm32g474_platform_pins_release(", code)
         for register, name in (("APB2ENR", "USART1"),
                                ("APB1ENR1", "USART2"),
                                ("APB1ENR1", "UART5")):
@@ -70,7 +73,8 @@ class G474MainstreamTests(unittest.TestCase):
         self.assertIn("RCC_APB2ENR_SPI1EN", code)
         self.assertIn("RCC_APB1ENR1_SPI2EN", code)
         self.assertIn("RCC_APB1RSTR1_SPI2RST", code)
-        self.assertIn("nx_stm32g474_pin_alternate(GPIOB, 15u, 5u)", code)
+        self.assertIn("{ GPIOB, 15u, 5u }", code)
+        self.assertIn("nx_stm32g474_spi_prepare(", code)
         self.assertNotIn("nx_stm32_spi", code)
 
     def test_spi_rate_exceeding_rated_g4_clock_is_rejected(self):
@@ -87,7 +91,7 @@ class G474MainstreamTests(unittest.TestCase):
         result = configure.resolve_ir(root / "tests/contracts/g474_assembly/watchdog.toml")
         code = bindings.emit(result)[1]
         self.assertIn("nx_stm32g474_watchdog_ops", code)
-        self.assertIn(".registers = IWDG;", code)
+        self.assertIn("nx_stm32g474_watchdog_prepare(", code)
         self.assertNotIn("nx_watchdog_port_enable(", code)
         self.assertNotIn("nx_watchdog_port_feed(", code)
 
@@ -138,9 +142,9 @@ class G474MainstreamTests(unittest.TestCase):
                 construction = self.provider.constructor(
                     item, Result(values), {"pwm": {"mask": 64, "initial": 0}}, {}, ())
                 code = "\n".join(construction.definitions)
-                self.assertIn(f".registers = {controller};", code)
+                self.assertIn(f"{controller}, &s_nx_idle_wave,", code)
                 self.assertIn(f"RCC_APB1RSTR1_{controller}RST", code)
-                self.assertIn("nx_stm32g474_pwm_initialize", code)
+                self.assertIn("nx_stm32g474_pwm_prepare", construction.initialize.render())
                 self.assertIn("nx_stm32g474_pwm_close", "\n".join(call.render() for call in construction.stop))
 
     def test_fixed_pwm_real_factory_has_both_gates_and_rejects_invalid_base(self):

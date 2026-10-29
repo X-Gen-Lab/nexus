@@ -69,6 +69,9 @@ def constructor(item, result, board_bindings, routes, devices):
                 f"    .backend = &nx_native_spi_dma_sequence_backend, .context = {state}",
                 "};"],
             definitions=[],
+            admission=(DirectCall("nx_spi_dma_sequence_preflight", (
+                Address(sequence), Address("nx_native_spi_dma_sequence_backend"),
+                state_address)),),
             initialize=DirectCall("nx_native_spi_dma_prepare",
                                   (state_address, Address(sequence))),
             stop=[DirectCall("nx_spi_dma_transaction_stop", (face_address,))],

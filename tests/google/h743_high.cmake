@@ -1,6 +1,7 @@
 set(h743_high_model_sources h743_model.cpp h743_clock_model.cpp
     h743_high_profile_model.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/platform_cold.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/clock.c")
 nexus_google_test(nexus_h743_high_system_test
     SOURCES h743_high_system_test.cpp ${h743_high_model_sources}
@@ -43,14 +44,7 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT h7_high_generated EQUAL 0)
     message(FATAL_ERROR "H743 high factory rejected: ${h7_high_output}${h7_high_error}")
 endif()
-file(READ "${h7_high_bundle}/input_paths.json" h7_high_inputs)
-string(JSON h7_high_input_count LENGTH "${h7_high_inputs}")
-math(EXPR h7_high_last_input "${h7_high_input_count} - 1")
-foreach(index RANGE 0 ${h7_high_last_input})
-    string(JSON h7_high_input_name MEMBER "${h7_high_inputs}" ${index})
-    string(JSON h7_high_input_path GET "${h7_high_inputs}" "${h7_high_input_name}")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${h7_high_input_path}")
-endforeach()
+nexus_google_configuration_inputs("${h7_high_bundle}")
 nexus_google_test(nexus_h743_high_factory_test
     SOURCES h743_high_factory_test.cpp "${h7_high_bundle}/bindings.c"
         ${h743_high_model_sources}

@@ -38,6 +38,15 @@ nx_stm32h743_uart_rtscts_initialize(nx_stm32h743_uart_rtscts_state_t* port,
                                     uint32_t clock, uint32_t limit);
 /** \brief Direct bounded vector; only task service can settle TX storage. */
 void nx_stm32h743_uart_rtscts_irq(nx_stm32h743_uart_rtscts_state_t* port);
+/** \brief Prepare selected byte-ring/FIFO state and its exact pad route.
+ * \note Task-only; Platform retains pads/gates after partial failure, and
+ *       immutable configuration/profile remain valid through public stop.
+ */
+nx_result_t
+nx_stm32h743_uart_rtscts_prepare(nx_stm32h743_uart_rtscts_state_t* port,
+                                 const nx_stm32h743_uart_config_t* config,
+                                 const nx_stm32h743_uart_fifo_profile_t* fifo);
+
 #ifdef __cplusplus
 }
 #endif

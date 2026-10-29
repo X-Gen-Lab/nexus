@@ -312,3 +312,25 @@ const nx_exti_ops_t nx_stm32g474_exti_ops = {
     .stop = stop,
     .attach_wake = attach_wake,
 };
+
+/** \brief Static construction cannot replace a retained event-ring epoch. */
+nx_result_t
+nx_stm32g474_exti_prepare(nx_stm32g474_exti_state_t* port,
+                          const nx_stm32g474_exti_config_t* config) {
+    if (port == NULL || config == NULL || config->storage == NULL ||
+        config->capacity == 0U || config->line > 1U)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->wake != NULL ||
+        port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    port->registers = EXTI;
+    port->mux = SYSCFG;
+    port->gpio = GPIOA;
+    port->storage = config->storage;
+    port->capacity = config->capacity;
+    port->line = config->line;
+    port->priority = config->priority;
+    port->edge = config->edge;
+    port->irq_policy = config->irq_policy;
+    return nx_stm32g474_exti_initialize(port);
+}

@@ -92,7 +92,7 @@ class G474ControlConfiguration(unittest.TestCase):
         self.assertIn("const nx_encoder_t* nx_factory_encoder(", header)
         self.assertIn("NX_ENCODER_ID_POSITION", header)
         source = bindings.emit(result)[1]
-        self.assertIn("nx_stm32g474_encoder_initialize(", source)
+        self.assertIn("nx_stm32g474_encoder_prepare(", source)
         self.assertIn("nx_stm32g474_encoder_close(", source)
         self.assertNotIn("TIM3_IRQHandler", source)
 
@@ -103,8 +103,8 @@ class G474ControlConfiguration(unittest.TestCase):
         header, _ = factory.emit(result)
         self.assertIn("NX_TIMER_CAPTURE_ID_CAPTURE", header)
         source = bindings.emit(result)[1]
-        self.assertIn("nx_stm32g474_timer_capture_initialize(", source)
-        self.assertIn("nx_stm32g474_timer_capture_release(", source)
+        self.assertIn("nx_stm32g474_timer_capture_prepare(", source)
+        self.assertIn("nx_stm32g474_timer_capture_close(", source)
         self.assertIn("TIM5_IRQHandler", source)
         self.assertNotIn("nx_timer_capture_start(", source)
 

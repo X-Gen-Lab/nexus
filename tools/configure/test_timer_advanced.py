@@ -50,7 +50,12 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         self.assertIn("const nx_advanced_pwm_t* nx_factory_advanced_pwm(", header)
         self.assertIn("static nx_timer_capture_controller_t s_nx_port_encoder;", source)
         self.assertIn("static nx_advanced_pwm_controller_t s_nx_port_power;", source)
-        self.assertIn("nx_stm32_timer_capture_release", source)
+        self.assertIn("nx_stm32_capture_cold_close(&s_nx_port_encoder,", source)
+        self.assertIn("nx_stm32_advanced_cold_close(&s_nx_port_power,", source)
+        self.assertIn("static const nx_stm32_capture_cold_config_t", source)
+        self.assertIn("static const nx_stm32_advanced_cold_config_t", source)
+        self.assertNotIn("static nx_result_t prepare_encoder", source)
+        self.assertNotIn("static nx_result_t stop_power", source)
         self.assertNotIn("static nx_timer_capture_event_t", source)
         self.assertNotIn("malloc", source)
 
@@ -65,8 +70,11 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                 start = source.split("nx_platform_start_result_t nx_platform_start(void) {", 1)[1]
                 self.assertIn("!nx_arch_is_privileged()", stop)
                 self.assertIn("!nx_arch_is_privileged()", start)
+                close = ("nx_gd32_advanced_cold_close(" if label == "gd32"
+                         else "nx_stm32_advanced_cold_close(")
+                self.assertIn(close, stop)
                 self.assertLess(stop.index("!nx_arch_is_privileged()"),
-                                stop.index("stop_power()"))
+                                stop.index(close))
                 system = "nx_gd32_soc_start(" if label == "gd32" else "nx_stm32_system_start("
                 self.assertLess(start.index("!nx_arch_is_privileged()"),
                                 start.index(system))

@@ -6,6 +6,7 @@
  * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 
 static uint32_t pending(const nx_stm32u575_exti_state_t* p) {
@@ -315,3 +316,25 @@ const nx_exti_ops_t nx_stm32u575_exti_ops = {
     .stop = stop,
     .attach_wake = attach_wake,
 };
+
+nx_result_t
+nx_stm32u575_exti_prepare(nx_stm32u575_exti_state_t* port,
+                          const nx_stm32u575_exti_config_t* config) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL)
+        return NX_ERROR_INVALID;
+    if (port->retained || port->initialized || port->wake != NULL ||
+        port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    port->registers = EXTI;
+    port->mux = EXTI;
+    port->gpio = GPIOA;
+    port->storage = config->storage;
+    port->capacity = config->capacity;
+    port->line = config->line;
+    port->priority = config->priority;
+    port->edge = config->edge;
+    port->irq_policy = config->irq_policy;
+    return nx_stm32u575_exti_initialize(port);
+}

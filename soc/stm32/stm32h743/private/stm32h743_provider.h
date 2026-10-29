@@ -106,6 +106,9 @@ typedef struct {
     bool retained;
     bool active;
     bool fault;
+    /* Cold CS acquisition is distinct from the drained SPI wire. */
+    uint16_t cold_acquired;
+    bool cold_owned;
 } nx_stm32h743_spi_state_t;
 typedef struct {
     nx_stm32h743_spi_state_t* port;
