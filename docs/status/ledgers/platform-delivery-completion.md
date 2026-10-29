@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`fac173a334141dfdf308e5b0bec89c11c9d43e1721b097fcc3810dabc61ab764`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -710,11 +710,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | E04 |
 | `task` | Advanced usage recipes |
-| `implementation_status` | partial |
-| `software_status` | selected_advanced_consumers_passed_at_7590b2d4_complete_external_recipe_exit_open |
+| `implementation_status` | implemented |
+| `software_status` | selected_advanced_recipes_implemented_examples_5fb06175_normal_gate_passed_platform_7590b2d4_no_hil_or_new_formal_qualification |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | io;docs;X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus-examples/pull/19;https://github.com/X-Gen-Lab/nexus-examples/pull/20;https://github.com/X-Gen-Lab/nexus-examples/blob/5fb06175aab72292fb075e8a9ea67096203a86dc/docs/developer-recipes.md |
 | `exit_condition` | Continuous DMA cache FIFO shared SPI Flash RAM pause/resume and maintained lowpower slices have reusable recipes |
 | `owner` | codex |
 

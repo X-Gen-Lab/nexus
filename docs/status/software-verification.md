@@ -92,8 +92,26 @@ GitHub 仓库授权读取，不向公开平台归档复制示例源码、私有�
 本次维护从上述平台和示例基线分支继续。[现有 78 项台账](../design/platform-delivery-completion.csv)
 只更新已有证据能够证明的状态与索引，并通过原 renderer 派生[可读视图](ledgers/platform-delivery-completion.md)。
 全部原编号、顺序、退出条件、物理状态、历史 Git 版本、原报告与候选字节保持；
-状态明确绑定 `7590b2d4`，不以新文档 HEAD 覆盖资格源码。软件增量必须用其
-新的提交与实际门禁判断，不能把该基线的 159 阶段结果重标到新源码。
+状态分别绑定原受测源码。正式资格仍属 `7590b2d4`，后续开发执行单独记录，
+不以新文档 HEAD 覆盖资格源码，不能把该基线的 159 阶段结果重标到新源码。
+
+平台增量 `dee8be5bb1052442a7853cf792b3fd589e17a9c9` 的普通完整索引门禁
+实际通过：3565 个 Python 用例（testing 1755、configure 1156、CI 493、workflows
+161），以及 386 个 Google 程序、6819 个用例，零失败或跳过。这是该提交的开发
+门禁，不是新的完整 159 阶段正式资格，也不扩大旧候选范围。
+
+私有示例后续提交 `ac9f07ba7494f472144f37660aabbd4185710394`（[PR 19](https://github.com/X-Gen-Lab/nexus-examples/pull/19)）
+与 `5fb06175aab72292fb075e8a9ea67096203a86dc`（[PR 20](https://github.com/X-Gen-Lab/nexus-examples/pull/20)）
+均已合并；示例当前主线为后者，SDK gitlink 仍固定已验证的 `7590b2d4`。最后普通
+门禁实际通过 85 个 Python 用例、21 项 CTest、12 个 Google 程序和 129 个用例，
+零跳过。H743 Flash/RAM 和 U575 retained WUT、SRAM4 copy、LPTIM1 单组 LPBAM
+已有独立工程、实际 ARM 链接与资源检查；H743 的 RAM 执行闭包亦经审核。这补齐
+E04 当前维护的选定高级 recipe，属于软件开发执行，不代表 HIL、通用 LPBAM、
+新平台正式资格或新的软件候选。
+
+初始 LPTIM 草稿早于对应测试的事实已在 PR 20 披露；后续真实 RED → GREEN
+修复保留原执行。不用重建的源码补造早期测试顺序。并行 TDD 现要求测试 owner
+先保留实际 RED、源码与二进制，再释放实现 owner 的交接屏障。
 
 | 退出 | 本次实际观察 |
 | --- | --- |

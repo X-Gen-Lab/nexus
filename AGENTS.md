@@ -111,6 +111,14 @@ host; Python tools retain stdlib unittest. Mock external dependencies and hardwa
 ports, not the implementation under test. Verify rejection, cancellation, drain,
 overflow and instance isolation where the changed contract requires them.
 
+Parallel TDD has an explicit handoff barrier: the test owner records the actual
+expected RED execution and snapshots the tested source and binary before
+releasing the implementation owner to change behavior. The implementation owner
+waits for that receipt, not a proposed test or a promised run. Reconstructed
+source is never contemporaneous evidence of an earlier RED execution. Disclose
+any draft that predates its tests; retain later genuine RED/GREEN fixes without
+rewriting the earlier chronology.
+
 `python scripts/ci/tdd_gate.py --all --preset native-debug` builds the pinned,
 offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
 reports. Its initial `doctor --target contracts` checks the prepared locked Native

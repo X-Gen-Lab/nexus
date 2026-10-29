@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b9a7f49ae158f5c3e3c6805bcf5cc8bfd2c4e6c6312972fa251d4e46c68be518\n"
+"X-Nexus-Source-SHA256: c9e13e4fb6e7da70103c8c8330dde508473539228de8753bd6c7fe743ba3ec84\n"
 
 #: docs/design/developer-experience.md:9
 msgid "Developer experience and provider iteration"
@@ -297,6 +297,9 @@ msgstr "以实际观察关闭任务"
 
 msgid "Compare complete execution costs"
 msgstr "比较完整执行成本"
+
+msgid "The ordinary behavioral TDD gate first runs the maintained `python tools/dev/dev.py doctor --target contracts` profile. It checks prepared, locked Native/ARM tools before expensive Python and Native suites, without installing tools or requiring Docker. Documentation-only staged changes retain the existing fast path. This preflight neither replaces tests nor establishes software qualification."
+msgstr "普通行为变更的 TDD 门禁首先运行维护的 `python tools/dev/dev.py doctor --target contracts` profile。在昂贵的 Python 和 Native suite 之前，检查已准备且锁定的 Native/ARM 工具，不安装工具，也不要求 Docker。仅文档的暂存变更沿用现有快速路径。此预检不代替测试，也不建立软件资格。"
 
 msgid "Use `dev.py timings --compare` only after two independent complete executions of the same maintained formal plan, clean source and dependency pins. Each execution must bind the same verified OCI environment-report bytes using the optional `qualify --environment` input. That binding records observed input identity; it does not prove that checkers ran inside an isolated container. Historical reports without this original binding remain valid for their own executed scope, but cannot be retrofitted into this comparison."
 msgstr "只有在相同维护的正式计划、clean 源码和固定依赖上完成两次独立的完整执行后，才使用 `dev.py timings --compare`。每次执行必须通过可选的 `qualify --environment` 输入，绑定相同且已验证的 OCI environment-report 字节。该绑定记录已观察的输入身份，不证明 checker 在隔离容器中运行。缺少这种原始绑定的历史报告仍保留其原执行范围的有效性，但不能事后补入本比较。"

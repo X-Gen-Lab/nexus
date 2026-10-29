@@ -100,6 +100,13 @@ ranking or production replacement is claimed.
 
 ### Compare complete execution costs
 
+The ordinary behavioral TDD gate first runs the maintained
+`python tools/dev/dev.py doctor --target contracts` profile. It checks prepared,
+locked Native/ARM tools before expensive Python and Native suites, without
+installing tools or requiring Docker. Documentation-only staged changes retain
+the existing fast path. This preflight neither replaces tests nor establishes
+software qualification.
+
 Use `dev.py timings --compare` only after two independent complete executions
 of the same maintained formal plan, clean source and dependency pins. Each
 execution must bind the same verified OCI environment-report bytes using the

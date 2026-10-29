@@ -7,14 +7,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 09352c05c96409fb00cd0854fd32a41bb3288c545a8f11ef576c56567d795c11\n"
+"X-Nexus-Source-SHA256: f9a71b5b691ed59ebc1cfa59cbaeb2a484fc0c41f3a6c68563654d448c84762d\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
 msgstr "Platform delivery-completion ledger"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`fac173a334141dfdf308e5b0bec89c11c9d43e1721b097fcc3810dabc61ab764`。"
-msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `fac173a334141dfdf308e5b0bec89c11c9d43e1721b097fcc3810dabc61ab764`."
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`。"
+msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`."
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:15
 msgid ""
@@ -1168,8 +1168,11 @@ msgstr "E04"
 msgid "Advanced usage recipes"
 msgstr "Advanced usage recipes"
 
-msgid "selected_advanced_consumers_passed_at_7590b2d4_complete_external_recipe_exit_open"
-msgstr "selected_advanced_consumers_passed_at_7590b2d4_complete_external_recipe_exit_open"
+msgid "selected_advanced_recipes_implemented_examples_5fb06175_normal_gate_passed_platform_7590b2d4_no_hil_or_new_formal_qualification"
+msgstr "selected_advanced_recipes_implemented_examples_5fb06175_normal_gate_passed_platform_7590b2d4_no_hil_or_new_formal_qualification"
+
+msgid "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus-examples/pull/19;https://github.com/X-Gen-Lab/nexus-examples/pull/20;https://github.com/X-Gen-Lab/nexus-examples/blob/5fb06175aab72292fb075e8a9ea67096203a86dc/docs/developer-recipes.md"
+msgstr "docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus-examples/pull/19;https://github.com/X-Gen-Lab/nexus-examples/pull/20;https://github.com/X-Gen-Lab/nexus-examples/blob/5fb06175aab72292fb075e8a9ea67096203a86dc/docs/developer-recipes.md"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 msgid ""
