@@ -9,7 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -95,7 +95,7 @@ class CMSISCoreSelectionTests(unittest.TestCase):
         })
 
     def selected(self):
-        with mock.patch.object(source_sdk, "tree_entries",
+        with mock_patch.object(source_sdk, "tree_entries",
                                return_value=self.entries):
             return source_sdk.dependency_entries(ROOT, self.dependency)
 
@@ -157,7 +157,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
         specification = importlib.util.spec_from_file_location(
             "sdk_configuration_closure", ROOT / "cmake/package/package_source_sdk.py")
         updated = importlib.util.module_from_spec(specification)
-        with mock.patch.object(dependencies, "COMMON",
+        with mock_patch.object(dependencies, "COMMON",
                                (*dependencies.COMMON, "new_shared_contract")):
             specification.loader.exec_module(updated)
             self.assertIn("tools/configure/new_shared_contract.py",
@@ -968,7 +968,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.git(self.root, "submodule", "init", "--", self.path)
         # This test exercises the source-snapshot boundary using one real,
         # clean official dependency. Full SDK tests below retain every source.
-        patch = mock.patch.object(source_sdk, "REQUIRED_DEPENDENCIES", (self.path,))
+        patch = mock_patch.object(source_sdk, "REQUIRED_DEPENDENCIES", (self.path,))
         patch.start()
         self.addCleanup(patch.stop)
 
@@ -1062,7 +1062,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         alternate = self.root / ".git/selected-index"
         shutil.copy2(self.root / ".git/index", alternate)
         self.git(self.root, "update-index", "--force-remove", self.path)
-        with mock.patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
+        with mock_patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
             entries, index = source_sdk.dependency_snapshot(self.root, True)
             self.assertIn(self.path, entries)
             records = source_sdk.dependency_records(self.root, entries)
@@ -2189,7 +2189,8 @@ class SourceSDKTests(unittest.TestCase):
         before_payload = payload_identity()
         result = self.run_process(command)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout)["verified_files"], 11)
+        self.assertEqual(json.loads(result.stdout)["verified_files"],
+                         len(OFFICIAL_F4_VERIFIED_FILES))
         self.assertEqual(json.loads(result.stdout)["source_kind"],
                          "installed_source_sdk")
         self.assertEqual(payload_identity(), before_payload)
@@ -2436,7 +2437,7 @@ class SourceSDKTests(unittest.TestCase):
                             file.chmod(old_mode ^ 0o100)
                         return result
                     try:
-                        with mock.patch.object(source_sdk.threadx_lock, "verify",
+                        with mock_patch.object(source_sdk.threadx_lock, "verify",
                                                side_effect=mutate):
                             with self.assertRaisesRegex(ValueError, "changed during"):
                                 source_sdk.verify(self.sdk)
@@ -2449,7 +2450,7 @@ class SourceSDKTests(unittest.TestCase):
             extra.write_text("int late_added;\n")
             return result
         try:
-            with mock.patch.object(source_sdk.threadx_lock, "verify",
+            with mock_patch.object(source_sdk.threadx_lock, "verify",
                                    side_effect=add_file):
                 with self.assertRaisesRegex(ValueError, "changed during"):
                     source_sdk.verify(self.sdk)
@@ -2481,7 +2482,7 @@ class SourceSDKTests(unittest.TestCase):
                     return data
 
                 try:
-                    with mock.patch.object(Path, "read_bytes", new=read_file):
+                    with mock_patch.object(Path, "read_bytes", new=read_file):
                         with self.assertRaisesRegex(ValueError, "changed during"):
                             source_sdk.verify(self.sdk)
                     self.assertEqual(calls, 2,

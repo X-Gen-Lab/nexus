@@ -1,6 +1,5 @@
 """Linked bus-master storage contracts, independent of host pointer substitution."""
 import importlib.util
-from pathlib import Path
 from types import SimpleNamespace
 import struct
 import unittest

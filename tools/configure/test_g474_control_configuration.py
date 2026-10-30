@@ -34,9 +34,9 @@ class G474ControlConfiguration(unittest.TestCase):
         self.assertIn("NX_PWM_GROUP_ID_WAVE", header)
         self.assertIn("return nx_binding_wave;", getters)
         claims = {claim.key for claim in result.claims}
-        self.assertTrue({"controller:TIM1", "controller:TIM15",
-                         "controller:COMP1", "pin:PA1", "pin:PA4",
-                         "pin:PA8", "pin:PA9", "pin:PA10"} <= claims)
+        self.assertLessEqual({"controller:TIM1", "controller:TIM15",
+                              "controller:COMP1", "pin:PA1", "pin:PA4",
+                              "pin:PA8", "pin:PA9", "pin:PA10"}, claims)
 
     def test_cold_assembly_connects_immutable_config_to_concrete_c_lifecycle(self):
         result = self.resolve()

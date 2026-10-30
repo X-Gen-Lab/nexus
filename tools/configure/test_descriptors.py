@@ -98,12 +98,14 @@ class DescriptorBoundaryTests(unittest.TestCase):
             dependencies.source_names("platform", "native")))
 
     def test_native_configuration_does_not_import_unselected_physical_families(self):
-        run = subprocess.run([sys.executable, "-B", "-c",
-            "import sys; from tools.configure.providers import maintained; "
-            "maintained('native'); "
-            "assert not any(name.endswith(('stm32f407', 'gd32f470', 'stm32g474')) "
-            "for name in sys.modules)"], capture_output=True, text=True,
-            check=False)
+        program = (
+            "import sys; from tools.configure.providers import maintained; " +
+            "maintained('native'); " +
+            "assert not any(name.endswith((" +
+            "'stm32f407', 'gd32f470', 'stm32g474')) " +
+            "for name in sys.modules)")
+        run = subprocess.run([sys.executable, "-B", "-c", program],
+                             capture_output=True, text=True, check=False)
         self.assertEqual(run.returncode, 0, run.stderr)
 
     def test_unknown_family_has_no_cortex_m_fallback(self):

@@ -7,7 +7,6 @@ from pathlib import Path
 import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
-from tools.evidence.identity import canonical_digest
 from tools.hil import measure
 from tools.testing import test_hil_measurements
 

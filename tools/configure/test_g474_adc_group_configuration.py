@@ -134,8 +134,8 @@ class G474ADCGroupConfiguration(unittest.TestCase):
             with self.subTest(group=group):
                 result = self.resolve(group + "-software")
                 keys = {claim.key for claim in result.claims}
-                self.assertTrue({"controller:ADC1", "controller:ADC2",
-                                 "controller:ADC345", "irq:ADC1_2"} <= keys)
+                self.assertLessEqual({"controller:ADC1", "controller:ADC2",
+                                      "controller:ADC345", "irq:ADC1_2"}, keys)
                 has_dma = group == "regular"
                 self.assertEqual("dma:DMA1:stream1" in keys, has_dma)
                 self.assertEqual("irq:DMA1_Channel1" in keys, has_dma)

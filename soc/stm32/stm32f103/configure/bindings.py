@@ -18,7 +18,6 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
-    initialize = DirectCall(f"prepare_{name}")
     if item.kind == "gpio":
         initialize = DirectCall("nx_stm32f103_gpio_prepare", (
             Address(state), item.options.mask, item.mode == "output",

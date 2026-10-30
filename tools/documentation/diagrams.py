@@ -9,6 +9,7 @@ consistency only; independent source review establishes diagram semantics.
 from __future__ import annotations
 
 import csv
+import math
 import os
 from pathlib import Path
 import re
@@ -73,8 +74,8 @@ def validate_svg(contents):
         viewport = tuple(float(value) for value in tree.attrib["viewBox"].split())
     except (KeyError, ValueError) as error:
         raise ValueError("SVG requires a numeric viewBox") from error
-    if (len(viewport) != 4 or not all(value == value and abs(value) < float("inf")
-                                   for value in viewport) or
+    if (len(viewport) != 4 or
+            not all(math.isfinite(value) for value in viewport) or
             viewport[2] <= 0 or viewport[3] <= 0):
         raise ValueError("SVG requires a finite positive viewBox")
     declared = [node.get("id") for node in tree.iter() if node.get("id")]

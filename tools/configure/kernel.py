@@ -6,7 +6,7 @@ They create no tasks, queues, Tick hardware, buffers or product recovery policy.
 from dataclasses import replace
 from types import MappingProxyType
 
-from tools.configure.ir import CpuProfileIR, KernelProfileIR
+from tools.configure.ir import KernelProfileIR
 from tools.configure.providers.common import fail, integer
 from tools.configure import lowpower
 

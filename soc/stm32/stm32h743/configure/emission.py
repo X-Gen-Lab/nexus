@@ -48,8 +48,8 @@ def instance_declarations(item, result):
     del result
     if item.kind == "flash":
         return ['__attribute__((section(".bss.nx_h743_flash_workspace")))',
-                "_Alignas(1024) nx_stm32h743_flash_ram_workspace_t "
-                "g_nx_stm32h743_flash_ram_workspace;"]
+                ("_Alignas(1024) nx_stm32h743_flash_ram_workspace_t "
+                 "g_nx_stm32h743_flash_ram_workspace;")]
     return []
 
 

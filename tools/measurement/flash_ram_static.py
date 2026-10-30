@@ -1138,8 +1138,8 @@ def _constant_memory(elf, functions, order, may_return, *, strict=False,
             "all_data_operands": "not_proved",
             "device_protocol": "not_proved",
             "alternative_limit": MAX_CONSTANT_ALTERNATIVES,
-            "limits": ["finite constant alternatives and operand products "
-                       "fail closed",
+            "limits": [("finite constant alternatives and operand products "
+                        "fail closed"),
                        "pointer-loaded and unresolved operands remain unproved",
                        "physical Flash range only; no alias/speculation proof"]}
 

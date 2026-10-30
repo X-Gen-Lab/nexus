@@ -459,7 +459,7 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
             self.assertIn('actual: en; translation: <strong>reviewed</strong>', english_view)
             self.assertIn('Returns an existing instance.', english_view)
             self.assertNotIn('href="../zh_CN/chinese.html"', english_view)
-            self.assertTrue('working tree modified; preview only' in english_view)
+            self.assertIn('working tree modified; preview only', english_view)
             build('html', 'zh_CN', root / 'zh_CN')
             chinese_view = (root / 'zh_CN/english.html').read_text(encoding='utf-8')
             self.assertIn('data-nexus-actual-language="zh_CN"', chinese_view)
@@ -487,7 +487,8 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
             self.assertIn('data-nexus-actual-language="en"', stale_view)
             self.assertIn('data-nexus-translation-status="stale"', stale_view)
             self.assertIn('Changed contract.', stale_view)
-            self.assertTrue('<div class="nexus-canonical-content" lang="en">' in stale_view)
+            self.assertIn('<div class="nexus-canonical-content" lang="en">',
+                          stale_view)
             (docs / 'locale/en/LC_MESSAGES/chinese.po').unlink()
             build('html', 'en', root / 'en')
             missing_view = (root / 'en/chinese.html').read_text(encoding='utf-8')

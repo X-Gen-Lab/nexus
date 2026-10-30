@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from tools.configure import authored, configure as gate
 
@@ -38,7 +38,7 @@ class KernelAssemblyTests(unittest.TestCase):
             if relative == "ext/threadx":
                 return {"path": relative, "commit": "1" * 40}
             return identity(root, relative, expected)
-        with mock.patch.object(gate, "dependency_identity", side_effect=dependency):
+        with patch.object(gate, "dependency_identity", side_effect=dependency):
             return gate.resolve_ir(path)
 
     def test_threadx_assembly_retains_distinct_type_claims_and_source_identity(self):

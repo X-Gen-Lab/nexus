@@ -4,8 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 from scripts.ci import u575_trustzone as gate
 from tools.evidence.common import EvidenceError
@@ -225,7 +224,7 @@ class PairContextCapture(unittest.TestCase):
                 library.write_bytes(b"changed after initial observation")
                 changed = True
             return actual_open(path, mode, *args, **kwargs)
-        with mock.patch.object(Path, "open", changed_external_file):
+        with unittest.mock.patch.object(Path, "open", changed_external_file):
             with self.assertRaisesRegex(EvidenceError, "changed"):
                 self.finish(before)
         self.assertEqual(reads, 2)

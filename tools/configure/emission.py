@@ -1,7 +1,5 @@
 """Compile/link bundle emission and shared private provider declarations."""
 import json
-from tools.configure.providers.common import fail
-from tools.configure.memory import dma_regions
 
 
 def emit_bundle(result, output):

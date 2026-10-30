@@ -70,6 +70,7 @@ class ReproductionTests(unittest.TestCase):
                     try:
                         os.killpg(int(pid_path.read_text()), signal.SIGKILL)
                     except ProcessLookupError:
+                        # The fixture group may already have exited.
                         pass
 
     def test_cancelled_attempt_cannot_leave_an_old_qualification(self):
@@ -190,6 +191,7 @@ class ReproductionTests(unittest.TestCase):
                     try:
                         os.killpg(int(pid_path.read_text()), signal.SIGKILL)
                     except ProcessLookupError:
+                        # The fixture group may already have exited.
                         pass
 
     def test_tree_identity_rejects_empty_and_symlink(self):

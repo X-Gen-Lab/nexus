@@ -6,12 +6,10 @@ import hashlib
 import io
 import json
 from pathlib import Path
-import subprocess
-import sys
 import tarfile
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from tools.documentation import install
 
@@ -35,7 +33,7 @@ class DocumentationInstallTests(unittest.TestCase):
     def test_offline_missing_blob_does_not_contact_network(self):
         locked = {"filename": "missing.whl", "sha256": "0" * 64,
                   "size": 3, "url": "https://example.invalid/missing.whl"}
-        with mock.patch.object(install.urllib.request, "urlopen") as network:
+        with patch.object(install.urllib.request, "urlopen") as network:
             with self.assertRaisesRegex(ValueError, "offline"):
                 install.fetch_blob(self.folder, locked, offline=True)
         network.assert_not_called()
@@ -45,7 +43,7 @@ class DocumentationInstallTests(unittest.TestCase):
         archive.write_bytes(b"bad")
         locked = {"filename": archive.name, "sha256": "0" * 64,
                   "size": 3, "url": "https://example.invalid/file"}
-        with mock.patch.object(install.urllib.request, "urlopen") as network:
+        with patch.object(install.urllib.request, "urlopen") as network:
             with self.assertRaises(ValueError):
                 install.fetch_blob(self.folder, locked, offline=False)
         network.assert_not_called()
@@ -167,7 +165,7 @@ class DocumentationInstallTests(unittest.TestCase):
         spec = specification.spec_from_file_location("legacy_docs", wrapper)
         module = specification.module_from_spec(spec)
         spec.loader.exec_module(module)
-        with mock.patch.object(module.subprocess, "call", return_value=7) as call:
+        with patch.object(module.subprocess, "call", return_value=7) as call:
             self.assertEqual(module.main(["--target", "all"]), 7)
         arguments = call.call_args.args[0]
         self.assertEqual(arguments[1], str(ROOT / "tools/dev/dev.py"))

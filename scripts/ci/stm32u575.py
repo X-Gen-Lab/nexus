@@ -6,7 +6,6 @@ evidence. They do not observe option bytes, execute the MCU or measure cycles.
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 import struct
 import sys

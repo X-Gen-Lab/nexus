@@ -13,7 +13,6 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
-import sys
 import tarfile
 import urllib.request
 

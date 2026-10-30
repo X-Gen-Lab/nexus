@@ -312,6 +312,25 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertIn("simulated full disk", errors)
         self.assertFalse(output.exists())
 
+    def test_init_control_exceptions_remove_only_the_owned_output(self):
+        output = self.root / "interrupted.toml"
+        foreign = self.root / "preserved.toml"
+        foreign.write_text("caller-owned configuration\n")
+        for signal in (KeyboardInterrupt("interrupted validation"),
+                       SystemExit(79)):
+            with self.subTest(exception=type(signal).__name__):
+                with patch.object(configure, "resolve_ir", side_effect=signal):
+                    with self.assertRaises(type(signal)) as raised:
+                        configure.main([
+                            "init", "--board", "native_reference",
+                            "--backend", "native", "--clock", "model",
+                            "--output", str(output),
+                            "--source-root", str(self.root)])
+                self.assertIs(raised.exception, signal)
+                self.assertFalse(output.exists())
+                self.assertEqual(foreign.read_text(),
+                                 "caller-owned configuration\n")
+
     def test_diff_describes_changed_budget_without_claiming_measurement(self):
         other = self.root / "other.toml"
         other.write_text(self.base.replace("2048", "4096"))

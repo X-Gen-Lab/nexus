@@ -35,10 +35,9 @@ from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS)
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
-from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
-                        validate_interrupt_profile,
-                        validate_selection, validate_controller_execution,
-                        normalize_controller)
+from tools.configure.selection import (
+    validate_clock_profiles, validate_interrupt_profile,
+    validate_selection, validate_controller_execution, normalize_controller)
 from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                mode_traits, route_dma,
                                sequence)

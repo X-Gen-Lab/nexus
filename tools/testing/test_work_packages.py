@@ -372,7 +372,8 @@ class CurrentWorkPackageTests(unittest.TestCase):
         for fixture in report["fixture_configurations"]:
             self.assertEqual(len(fixture["configuration_sha256"]), 64)
             self.assertTrue(fixture["inputs"])
-            self.assertTrue({item["path"] for item in fixture["inputs"]} <= inputs)
+            self.assertLessEqual({item["path"] for item in fixture["inputs"]},
+                                 inputs)
         for row in report["work_packages"]:
             self.assertEqual(row["software_status"], "not_executed")
             self.assertEqual(row["hardware_status"], "not_executed")
@@ -506,11 +507,11 @@ class CurrentWorkPackageTests(unittest.TestCase):
                 self.assertIn(fixture, values[0]["resolver_fixtures"])
                 self.assertIn(values[0]["provider_implementation"], {"rtc", "lptim"})
         inputs = {row["path"] for row in report["authority_inputs"]}
-        self.assertTrue({"soc/native/soc.json", "soc/native/routes.json",
-                         "soc/native/configure/__init__.py",
-                         "soc/native/configure/bindings.py",
-                         "soc/native/configure/emission.py",
-                         "soc/native/drivers/rtc_lptim.c", fixture} <= inputs)
+        self.assertLessEqual({"soc/native/soc.json", "soc/native/routes.json",
+                              "soc/native/configure/__init__.py",
+                              "soc/native/configure/bindings.py",
+                              "soc/native/configure/emission.py",
+                              "soc/native/drivers/rtc_lptim.c", fixture}, inputs)
         empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
         self.assertFalse(any(empty in row["resolver_fixtures"] for row in models))
         self.assertFalse(report["software_qualification"])

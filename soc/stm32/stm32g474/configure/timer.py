@@ -8,7 +8,6 @@ def constructor(item):
     capture = item.kind == "timer_capture"
     name = item.id.replace("-", "_")
     state, config = "s_nx_port_" + name, "s_nx_timer_config_" + name
-    vector, priority = "s_nx_vector_" + name, "s_nx_priority_" + name
     options = item.options
     lines = []
     if capture:

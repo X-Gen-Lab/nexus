@@ -1,7 +1,7 @@
 """Static provider wiring and family system lifecycle emission."""
-from . import bindings, packet
+from . import packet
 from tools.configure.providers.common import mode_traits
-from tools.configure import can, usb_device, ethernet, timer_advanced, preflight, gpio_phase
+from tools.configure import can, timer_advanced, preflight, gpio_phase
 
 
 def implementation(item):

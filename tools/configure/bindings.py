@@ -192,7 +192,6 @@ def emit(result):
         stop.extend((len(initialize), expression.render())
                     for expression in construction.stop)
     for device in result.devices:
-        kind = device.kind
         class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
     source.extend(provider.shared_irqs(result))

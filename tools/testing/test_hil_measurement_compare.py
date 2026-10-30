@@ -91,6 +91,7 @@ class HilMeasurementComparisonTests(unittest.TestCase):
             trace["method"] = value["measurements"][trace["metric"]]["method"]
             atomic_json(trace_path, trace)
             raw["traces"][index] = file_identity(trace_path)
+        return None
 
     def arguments(self, records, report):
         names = ("baseline_raw", "baseline_admission", "candidate_raw",

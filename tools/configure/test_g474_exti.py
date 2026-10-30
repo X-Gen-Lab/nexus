@@ -28,8 +28,8 @@ class G474ExtiConfigurationTests(unittest.TestCase):
                           ("exti", "EXTI1", "edge-event")])
         owned = {item.key for item in result.claims
                  if item.owner in {"edge0", "edge1"}}
-        self.assertTrue({"pin:PA0", "pin:PA1", "irq:EXTI0", "irq:EXTI1"}
-                        <= owned)
+        self.assertLessEqual(
+            {"pin:PA0", "pin:PA1", "irq:EXTI0", "irq:EXTI1"}, owned)
         self.assertFalse(result.physical_qualified)
 
     def test_invalid_edge_capacity_and_irq_are_rejected(self):

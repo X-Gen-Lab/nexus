@@ -14,7 +14,6 @@ from pathlib import Path, PurePosixPath
 import posixpath
 import re
 import shlex
-import shutil
 import sys
 import tarfile
 import tempfile
@@ -25,7 +24,6 @@ sys.path.insert(0, str(ROOT))
 from scripts.ci.u575_trustzone import imported_gateways, validate_pair
 from tools.evidence import store
 from tools.evidence.common import (EvidenceError, atomic_json, fields,
-    load_json,
     parse_json, regular_file, run_adapter, sha256_value, stream_digest)
 from tools.evidence.identity import canonical_digest, observe_git_source
 from tools.measurement.elf import Elf32

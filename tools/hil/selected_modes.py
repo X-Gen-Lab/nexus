@@ -170,7 +170,7 @@ def preparation_base(fixture, resolved):
             "station_prerequisites": ["independent_control_channel_unbound",
                 "separately reviewed physical fixture and actual PCB/probe/UID",
                 "observed silicon/cache/clock/security and reviewed wiring",
-                "reviewed instruments, bounded adapter, limits and "
+                "reviewed instruments, bounded adapter, limits and " +
                 "resource admission",
                 "fresh executed capture; physical status remains not_executed"]}
 

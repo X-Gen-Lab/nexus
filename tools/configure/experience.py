@@ -482,6 +482,7 @@ def run(gate, argv=None):
                     stream.write(contents)
                 result = resolve(args.output)
             except BaseException:
+                # Control exceptions must also withdraw our incomplete file.
                 args.output.unlink(missing_ok=True)
                 raise
         elif command == "generate":

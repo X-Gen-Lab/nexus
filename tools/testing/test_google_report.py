@@ -1,7 +1,6 @@
 """Reject fabricated, skipped, stale or empty GoogleTest execution reports."""
 
 from pathlib import Path
-import json
 import tempfile
 import time
 import unittest

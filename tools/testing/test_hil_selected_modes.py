@@ -607,8 +607,9 @@ class SelectedModeHilTests(unittest.TestCase):
 
     def test_chain_contract_names_real_block_boundaries(self):
         scenarios = set(self.module().SCENARIOS["U575-TX-CHAIN"])
-        self.assertTrue({"success_min", "block_max", "two_block_min",
-                         "two_block_max", "three_block_threshold"} <= scenarios)
+        self.assertLessEqual({"success_min", "block_max", "two_block_min",
+                              "two_block_max", "three_block_threshold"},
+                             scenarios)
         self.assertNotIn("success_max", scenarios)
 
     def test_chain_requires_actual_words_and_initial_channel_snapshot(self):

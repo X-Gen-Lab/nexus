@@ -560,6 +560,7 @@ class _Machine:
                  "a readback mismatch can return successful initialization")
 
     def run(self, entry, *, stop_call=None):
+        """Return True at the requested call, None after ordinary completion."""
         pc = entry
         for _ in range(200000):
             _require(pc in self.program.code,
@@ -736,7 +737,7 @@ class _Machine:
                 raise EvidenceError(
                     "H743 RAM closure: unsupported execution operation")
             if self.returned:
-                return
+                return None
             pc = next_pc
         raise EvidenceError(
             "H743 RAM closure: instruction execution bound exceeded")
@@ -1276,12 +1277,12 @@ def _verify_fixed_boundary(program, code, stack, workspace):
         'physical_execution': 'not_executed',
         'callee_obligations': [
             'AAPCS: r4-r11, caller saved frame and private SP preserved',
-            'C returns privileged MSP Thread, PRIMASK=1; all C memory operands '
-            'and private frames checked independently',
-            'incoming MSP and active Thread caller stack each own 260 bytes '
-            'for the 36-byte save plus 224-byte nested exception reserve',
-            'default original NMI/HardFault aliases do not return; RAM handlers '
-            'are independently checked nonreturning before any pulse']}
+            ('C returns privileged MSP Thread, PRIMASK=1; all C memory operands '
+             'and private frames checked independently'),
+            ('incoming MSP and active Thread caller stack each own 260 bytes '
+             'for the 36-byte save plus 224-byte nested exception reserve'),
+            ('default original NMI/HardFault aliases do not return; RAM handlers '
+             'are independently checked nonreturning before any pulse')]}
 
 
 def verify_h743_cpu_bridge(elf, observations):
@@ -1337,10 +1338,10 @@ def verify_h743_cpu_bridge(elf, observations):
         "callee_body": "not_proved", "qualification": False,
         "physical_execution": "not_executed",
         "callee_obligations": [
-            "AAPCS: r4-r11 and private SP preserved; "
-            "volatile registers unknown",
+            ("AAPCS: r4-r11 and private SP preserved; "
+             "volatile registers unknown"),
             "return stays privileged MSP-selected Thread with PRIMASK=1",
-            "actual C CFG, stack, VTOR/MPU restoration and drain "
-            "separately proved",
+            ("actual C CFG, stack, VTOR/MPU restoration and drain "
+             "separately proved"),
         ],
     }

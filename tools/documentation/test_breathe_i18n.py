@@ -7,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from tools.documentation import sphinx_ext
 
@@ -85,9 +85,9 @@ class BreatheDetailSourceTests(unittest.TestCase):
         from tools.documentation.breathe_i18n import SourcedDoxygenFileDirective
         text = nodes.paragraph('Detailed ownership.', 'Detailed ownership.')
         directive = object.__new__(SourcedDoxygenFileDirective)
-        with mock.patch.object(DoxygenFileDirective, 'run', return_value=[text]), \
-                mock.patch.object(directive, 'get_source_info',
-                                  return_value=('included/api.rst', 29)):
+        with patch.object(DoxygenFileDirective, 'run', return_value=[text]), \
+                patch.object(directive, 'get_source_info',
+                             return_value=('included/api.rst', 29)):
             self.assertEqual(directive.run(), [text])
         self.assertEqual((text.source, text.line), ('included/api.rst', 29))
 

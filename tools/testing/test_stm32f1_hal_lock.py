@@ -8,7 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tools.maintenance import stm32f1_hal_lock as official
 from tools.maintenance import source_catalogue
@@ -44,7 +44,7 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
                          "origin": source_catalogue.dependency(
                              official.CMSIS_DIRECTORY).fetch_url, "status": ""},
         }
-        self.git_patch = mock.patch.object(official.cmsis_device_lock, "git",
+        self.git_patch = mock_patch.object(official.cmsis_device_lock, "git",
                                           side_effect=self.git)
         self.git_patch.start()
         self.addCleanup(self.git_patch.stop)
@@ -171,7 +171,7 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
                 file.write_bytes(file.read_bytes())
             return result
 
-        with mock.patch.object(official.cmsis_device_lock, "stable_snapshot",
+        with mock_patch.object(official.cmsis_device_lock, "stable_snapshot",
                                side_effect=rewrite), self.assertRaises(ValueError):
             self.verify()
 

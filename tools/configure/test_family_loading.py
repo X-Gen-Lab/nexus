@@ -64,8 +64,8 @@ class FamilyLoadingTests(unittest.TestCase):
     def test_descriptors_declare_exact_paths_without_family_name_inference(self):
         fields = {field.name for field in dataclasses.fields(
             descriptor.FamilyDescriptor)}
-        self.assertTrue({"vendor", "source_directory",
-                         "configuration_directory"} <= fields)
+        self.assertLessEqual({"vendor", "source_directory",
+                              "configuration_directory"}, fields)
         for family, (vendor, directory) in PACKAGES.items():
             with self.subTest(family=family):
                 item = descriptor.maintained(family)

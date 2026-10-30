@@ -4,8 +4,7 @@ import tempfile
 import unittest
 
 from tools.configure.tests.assembly_fixture import render_toml
-from tools.configure import bindings, configure as gate, preflight, resource_graph
-from tools.configure.dma_topology import DmaTopologyIR
+from tools.configure import bindings, configure as gate, preflight
 
 
 class AdmissionInput(dict):

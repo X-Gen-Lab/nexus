@@ -1,7 +1,6 @@
 """Real path boundaries in the existing gate, without running provider tests."""
 
 import json
-from pathlib import Path
 import unittest
 
 from tools.testing import test_tdd_matrix_integration as integration
