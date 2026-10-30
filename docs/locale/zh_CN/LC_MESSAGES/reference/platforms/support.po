@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 28cb7cb5f711072cbe1bef3c1caa1cb163e3a80482de1c352c1c50b1835e70d2\n"
+"X-Nexus-Source-SHA256: a0a95d66c8b4d443b6664e1ffa402ccea3452335a1c879eff982cf6125181a55\n"
 
 msgid "Read exact platform support"
 msgstr "理解精确平台支持"
@@ -229,3 +229,7 @@ msgstr ""
 "SOURCE/soc/stm32/stm32f103/README.md) 将 CPU 可读的 128 KiB Flash "
 "密度检查与配置声明的完整料号分开。ES096 第 2.2.2 "
 "节说明，正常固件不能观测仅调试模式可读的设备组和修订。独立启动不要求连接调试器，也不能凭不可用的零读取值建立已审硅片修订。"
+
+
+msgid "F407 `dma-tx` selects official HAL finite TX and a disjoint LL IRQ-byte/event receiver under one private static owner. It keeps the existing public mode, shared ops, cancellation and drain contracts; other F407 UART modes retain their existing engines. Private UART/DMA/RCC source selection does not start HAL SysTick or establish whole-library support. Read the [exact transport contract](../../design/official-stm32-provider.md#selected-f407-hal-uart-transport) and current-source evidence before selecting it. Exact linked cost, final-source evidence and physical HIL remain separate exits."
+msgstr "F407 `dma-tx` 在一个私有静态 owner 内选择官方 HAL 有限 TX 和分离的 LL IRQ byte/event 接收器。它保留既有公共 mode、共享 ops、取消和 drain 合同；其他 F407 UART 模式保留既有引擎。私有 UART/DMA/RCC 源码选择不会启动 HAL SysTick，也不建立整库支持。选择前阅读[精确 transport 合同](../../design/official-stm32-provider.md#selected-f407-hal-uart-transport)和当前源码证据。精确链接成本、最终源码证据和物理 HIL 仍须分别验收。"

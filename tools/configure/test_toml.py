@@ -240,9 +240,9 @@ model_bytes=128
         output = self.root / "bundle"
         gate.configure(self.assembly, output, gate.ROOT)
         generated = (output / "bindings.c").read_text()
-        self.assertIn("nx_stm32_uart_dma_state_t", generated)
-        self.assertIn("&nx_stm32_uart_dma_ops", generated)
-        self.assertIn("nx_stm32_uart_dma_cold_prepare", generated)
+        self.assertIn("nx_stm32_uart_hal_state_t", generated)
+        self.assertIn("&nx_stm32_uart_hal_ops", generated)
+        self.assertIn("nx_stm32_uart_hal_cold_prepare", generated)
         self.assertIn("DMA2_Stream7_IRQHandler", generated)
         self.assertIn("static const nx_stm32_uart_dma_cold_config_t", generated)
         self.assertIn(".registers = USART1", generated)

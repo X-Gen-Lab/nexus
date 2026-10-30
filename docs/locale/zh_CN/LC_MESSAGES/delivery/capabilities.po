@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 22ad5f1356a95f6b75cda59f0b0f8a53b8634e900fdffec58101c027d9e56791\n"
+"X-Nexus-Source-SHA256: 8c57517504adafed8cf948ef9e344af4e22717e319e07949b99d4d896767eea2\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -1834,10 +1834,6 @@ msgstr ""
 "`tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32f407/drivers/uart_dma.c`"
-msgstr "`soc/stm32/stm32f407/drivers/uart_dma.c`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-blocks.toml`, "
 "`tests/contracts/stm32_assembly/zg-blocks.toml`, "
@@ -3068,3 +3064,6 @@ msgstr "`soc/native/drivers/uart_word.c`"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"
+
+msgid "`soc/stm32/stm32f407/drivers/uart_hal.c`"
+msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"

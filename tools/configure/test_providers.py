@@ -132,14 +132,14 @@ class ProviderContractTests(unittest.TestCase):
         soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
-                                    "Unmaintained SoC provider"):
+                                    "Unmaintained SoC integration descriptor"):
             gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_unknown_emitter_cannot_fall_back_to_native(self):
         result = gate.resolve_ir(gate.ROOT /
                               "tools/configure/assemblies/native-empty.toml")
         result = replace(result, soc_family="unmaintained")
-        with self.assertRaisesRegex(ValueError, "Unmaintained SoC provider"):
+        with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
             bindings.emit(result)
 
     def test_family_contract_has_explicit_abi_and_irq_identity(self):
@@ -153,7 +153,7 @@ class ProviderContractTests(unittest.TestCase):
                 self.assertEqual(provider.DMA_VECTOR, vector)
                 with self.assertRaises(TypeError):
                     provider.CPU_ABI["arch"] = "other"
-        with self.assertRaisesRegex(ValueError, "Unmaintained SoC provider"):
+        with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
             maintained("future")
 
     def test_facts_cannot_advertise_an_unimplemented_mode(self):
@@ -218,7 +218,7 @@ class ProviderContractTests(unittest.TestCase):
             board["soc_family"] = "unmaintained"
             (package / "board.json").write_text(json.dumps(board))
             with self.assertRaisesRegex(gate.ConfigurationError,
-                                        "Unmaintained SoC provider"):
+                                        "Unmaintained SoC integration descriptor"):
                 gate.configure(assembly, output)
             self.assertFalse(output.exists())
 

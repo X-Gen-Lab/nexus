@@ -259,6 +259,15 @@ void nx_stm32_uart_irq(nx_stm32_uart_state_t* port);
 /** \brief Advance only TX facts when an independent provider owns RX storage.
  */
 bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status);
+/** \brief Consume one RX observation independently of any TX transport.
+ * \param[in,out] port: Live byte/event receive owner and its fixed ring.
+ * \param[in] status: One retained SR observation before the DR read.
+ * \param[in] payload_mask: Exact selected frame payload width.
+ * \return True when the owner observed receive or loss information.
+ * \note Serialized UART IRQ only; this helper never dispatches a wake sink.
+ */
+bool nx_stm32_uart_rx_irq(nx_stm32_uart_state_t* port, uint32_t status,
+                          uint8_t payload_mask);
 /** \brief Initialize standard-mode I2C at a fixed 42 MHz peripheral clock. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port);
 /** \brief Initialize one statically allocated EXTI line and event ring. */

@@ -1,9 +1,13 @@
 """Immutable integration and hardware binding boundary regressions."""
 import dataclasses
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 import subprocess
 import sys
 import unittest
 
+from tools.configure import dependencies
 from tools.configure.providers import descriptor, hardware
 
 
@@ -177,6 +181,81 @@ class CMSISCoreDescriptorContracts(unittest.TestCase):
                 self.assertIn(("cmsis_core", "vendors/arm/CMSIS_6"),
                               item.git_dependencies)
 
+
+
+ROOT = Path(descriptor.__file__).resolve().parents[3]
+FAMILIES = (
+    ('native', 'soc.native'),
+    ('stm32f103', 'soc.stm32.stm32f103'),
+    ('stm32f407', 'soc.stm32.stm32f407'),
+    ('gd32f303', 'soc.gd32.gd32f303'),
+    ('gd32f470', 'soc.gd32.gd32f470'),
+    ('stm32g474', 'soc.stm32.stm32g474'),
+    ('stm32h743', 'soc.stm32.stm32h743'),
+    ('stm32u575', 'soc.stm32.stm32u575'),
+)
+class LocalDescriptorTests(unittest.TestCase):
+    def test_selected_local_data_participates_in_existing_input_closure(self):
+        for family, module in FAMILIES:
+            with self.subTest(family=family):
+                names = dependencies.source_names('platform', family)
+                self.assertIn(module.replace('.', '/') + '/descriptor.py', names)
+                for other, other_module in FAMILIES:
+                    if other != family:
+                        self.assertNotIn(other_module.replace('.', '/') +
+                                         '/descriptor.py', names)
+
+    def run_isolated(self, code, *arguments):
+        return subprocess.run(
+            [sys.executable, '-I', '-B', '-c',
+             'import sys;sys.path.insert(0,sys.argv.pop(1));' + code,
+             str(ROOT), *arguments], cwd=ROOT, capture_output=True, text=True)
+
+    def test_lookup_imports_only_exact_descriptor_not_family_behavior(self):
+        code = (
+            'from tools.configure.providers import descriptor;'
+            'value=descriptor.maintained("stm32f407");'
+            'assert "soc.stm32.stm32f407.descriptor" in sys.modules;'
+            'assert not any(".configure" in key and key.startswith("soc.") '
+            'for key in sys.modules);'
+            'assert not any(key.endswith(".descriptor") and '
+            'key.startswith("soc.") and key!="soc.stm32.stm32f407.descriptor" '
+            'for key in sys.modules)')
+        result = self.run_isolated(code)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_direct_local_import_has_no_provider_initialization_cycle(self):
+        code = (
+            'from importlib import import_module;'
+            'local=import_module(sys.argv[1]+".descriptor");'
+            'from tools.configure.providers import descriptor;'
+            'value=descriptor.maintained(sys.argv[2]);'
+            'assert local.DESCRIPTOR is value;'
+            'assert type(value) is descriptor.FamilyDescriptor;'
+            'assert value.family==sys.argv[2];'
+            'assert not any(".configure" in key and key.startswith("soc.") '
+            'for key in sys.modules)')
+        for family, module in FAMILIES:
+            with self.subTest(family=family):
+                result = self.run_isolated(code, module, family)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_returned_type_and_family_cannot_change_the_explicit_selection(self):
+        expected = descriptor.maintained('stm32f407')
+        for invalid in (object(), dataclasses.replace(expected, family='foreign')):
+            with self.subTest(value=type(invalid).__name__), patch.object(
+                    descriptor, 'import_module', create=True,
+                    return_value=SimpleNamespace(
+                        __name__="soc.stm32.stm32f407.descriptor",
+                        DESCRIPTOR=invalid)):
+                with self.assertRaisesRegex(ValueError, 'descriptor.*contract'):
+                    descriptor.maintained('stm32f407')
+
+    def test_unknown_family_is_rejected_before_any_module_import(self):
+        with patch.object(descriptor, 'import_module', create=True) as loader:
+            with self.assertRaisesRegex(ValueError, 'Unmaintained'):
+                descriptor.maintained('../unreviewed')
+            loader.assert_not_called()
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,13 +23,19 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
     set(cold_uart_rx 0)
     set(cold_uart_tx 0)
+    set(cold_uart_hal FALSE)
     if(cold_uart_mode MATCHES "^(rx-dma|dma-duplex)")
         set(cold_uart_rx 1)
         list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_receive.c")
     endif()
     if(cold_uart_mode MATCHES "^(dma-tx|dma-duplex)")
         set(cold_uart_tx 1)
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_dma.c")
+        if(cold_uart_mode STREQUAL "dma-tx")
+            set(cold_uart_hal TRUE)
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_hal.c")
+        else()
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_dma.c")
+        endif()
     endif()
     if(cold_uart_mode MATCHES "^dma-duplex")
         list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_duplex.c")
@@ -46,8 +52,11 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
         LIBRARIES Nexus::IO
         INCLUDES "${cold_uart_bundle}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
-            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
             "${NEXUS_SOURCE_DIR}/arch/include")
+    if(NOT cold_uart_hal)
+        target_include_directories(${cold_uart_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+    endif()
     target_include_directories(${cold_uart_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     target_compile_definitions(${cold_uart_target} PRIVATE STM32F407xx
@@ -58,6 +67,24 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
     elseif(cold_uart_mode STREQUAL "irq-blocks")
         target_compile_definitions(${cold_uart_target} PRIVATE NX_COLD_BLOCKS)
     endif()
-    target_compile_options(${cold_uart_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_cold_factory_model.h")
+    set(cold_uart_model
+        "${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_cold_factory_model.h")
+    target_compile_options(${cold_uart_target} PRIVATE "-include${cold_uart_model}")
+    if(cold_uart_hal)
+        target_compile_definitions(${cold_uart_target} PRIVATE NX_COLD_HAL)
+        # Official DMA flag helpers encode the mapped 32-bit silicon address.
+        target_compile_options(${cold_uart_target} PRIVATE
+            "$<$<COMPILE_LANGUAGE:C>:-Wno-pointer-to-int-cast>")
+        nexus_use_cmsis_core(${cold_uart_target})
+        nexus_stm32f407_uart_hal(${cold_uart_target})
+        target_link_options(${cold_uart_target} PRIVATE -Wl,--gc-sections)
+        set(cold_uart_vendor ${cold_uart_target}_stm32f407_hal)
+        target_include_directories(${cold_uart_vendor} PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}")
+        target_compile_options(${cold_uart_vendor} BEFORE PRIVATE
+            "-include${cold_uart_model}")
+        target_compile_options(${cold_uart_vendor} PRIVATE
+            -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast)
+        nexus_use_cmsis_host_model(${cold_uart_vendor})
+    endif()
 endforeach()

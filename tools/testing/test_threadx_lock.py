@@ -18,42 +18,100 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ThreadXLockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.seed_temporary = tempfile.TemporaryDirectory(
+            prefix="threadx source seed ")
+        cls.addClassCleanup(cls.seed_temporary.cleanup)
+        cls.seed_source = Path(cls.seed_temporary.name) / "official source"
+        cls.seed_source.mkdir()
+        cls.seed_lock = json.loads(
+            (ROOT / "dependencies/threadx.lock.json").read_text())
+        for name in [*cls.seed_lock["files"],
+                     cls.seed_lock["license"]["path"]]:
+            out = cls.seed_source / name
+            out.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "ext/threadx" / name, out)
+        cls._git(cls.seed_source, "init", "--quiet")
+        cls._git(cls.seed_source, "config", "user.name", "ThreadX lock test")
+        cls._git(cls.seed_source, "config", "user.email",
+                 "threadx-test@local.invalid")
+        cls._git(cls.seed_source, "remote", "add", "origin",
+                 source_catalogue.dependency("threadx").fetch_url)
+        cls._git(cls.seed_source, "add", ".")
+        cls._git(cls.seed_source, "commit", "--quiet", "-m",
+                 "actual locked source fixture")
+        cls.seed_lock["commit"] = cls._git(cls.seed_source, "rev-parse", "HEAD")
+        cls._git(cls.seed_source, "tag", cls.seed_lock["tag"])
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="threadx source lock ")
         self.addCleanup(self.temporary.cleanup)
         self.folder = Path(self.temporary.name)
         self.source = self.folder / "official source"
-        self.source.mkdir()
-        self.lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
-        for name in [*self.lock["files"], self.lock["license"]["path"]]:
-            out = self.source / name
-            out.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(ROOT / "ext/threadx" / name, out)
-        self.git("init", "--quiet")
-        self.git("config", "user.name", "ThreadX lock test")
-        self.git("config", "user.email", "threadx-test@local.invalid")
-        self.git("remote", "add", "origin",
-                 source_catalogue.dependency("threadx").fetch_url)
-        self.git("add", ".")
-        self.git("commit", "--quiet", "-m", "actual locked source fixture")
-        self.lock["commit"] = self.git("rev-parse", "HEAD")
-        self.git("tag", self.lock["tag"])
+        # Copy .git too: index, objects and config belong to this case. Never
+        # share hardlinks or cache a verifier result for mutable test inputs.
+        shutil.copytree(type(self).seed_source, self.source)
+        self.lock = copy.deepcopy(type(self).seed_lock)
         self.lock_path = self.folder / "threadx.lock.json"
         self.write_lock()
 
-    def git(self, *args):
+    @staticmethod
+    def _git(source, *args):
         environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-        result = subprocess.run(["git", "-C", str(self.source), *args],
+        result = subprocess.run(["git", "-C", str(source), *args],
                                 capture_output=True, text=True, env=environment,
                                 timeout=20)
-        self.assertEqual(result.returncode, 0, result.stderr)
+        if result.returncode:
+            raise AssertionError(result.stderr)
         return result.stdout.strip()
+
+    def git(self, *args):
+        return self._git(self.source, *args)
 
     def write_lock(self):
         self.lock_path.write_text(json.dumps(self.lock, indent=2) + "\n")
 
     def verify(self, port="linux"):
         return threadx_lock.verify(self.source, self.lock_path, port)
+
+    def test_class_seed_isolates_worktree_index_and_untracked_state(self):
+        seed = type(self).seed_source
+
+        def snapshot():
+            return {file.relative_to(seed).as_posix():
+                    hashlib.sha256(file.read_bytes()).hexdigest()
+                    for file in seed.rglob("*") if file.is_file()}
+
+        before = snapshot()
+        name = self.lock["common"][0]
+        original = (self.source / name).read_bytes()
+        (self.source / name).write_bytes(original + b"staged mutation\n")
+        self.git("add", name)
+        (self.source / name).write_bytes(original + b"unstaged mutation\n")
+        (self.source / "untracked.txt").write_text("private case\n")
+        self.git("remote", "set-url", "origin", "https://invalid.example/git")
+        with self.assertRaises(ValueError):
+            self.verify()
+
+        sibling = type(self)("test_unknown_port_rejects")
+        sibling.setUp()
+        self.addCleanup(sibling.doCleanups)
+        self.assertEqual((sibling.source / name).read_bytes(), original)
+        self.assertEqual(sibling.git("status", "--porcelain",
+                                     "--untracked-files=all"), "")
+        self.assertEqual(sibling.git("diff", "--cached", "--name-only"), "")
+        self.assertEqual(sibling.verify()["commit"], sibling.lock["commit"])
+        (sibling.source / name).write_bytes(original + b"later mutation\n")
+        with self.assertRaises(ValueError):
+            sibling.verify()
+        self.assertEqual(self.git("diff", "--cached", "--name-only"), name)
+        for relative in before:
+            first, second = self.source / relative, sibling.source / relative
+            self.assertFalse(os.path.samefile(seed / relative, first))
+            self.assertFalse(os.path.samefile(seed / relative, second))
+            self.assertFalse(os.path.samefile(first, second))
+        self.assertEqual(snapshot(), before)
 
     def test_real_git_source_and_both_ports_verify_without_changes(self):
         before = self.git("status", "--porcelain")

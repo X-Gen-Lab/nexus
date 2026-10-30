@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 879a616cbde2acad5642f7ded29494420bca2b4a16e7e2cc4154f820ea22d6a7\n"
+"X-Nexus-Source-SHA256: d165e3872c0be408afc18013bd4c2ed3f2136c67c28642db3d5f3c89932640f6\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/support.md:1
 msgid "精确支持范围"
@@ -1338,3 +1338,7 @@ msgstr ""
 "RX/SPI-I2C-electrical/Flash-power-cut/watchdog-reset/EXTI-waveform/PWM/ADC-"
 "precision execution is absent for every MCU target. Current support cannot "
 "replace physical HIL or product-release promotion."
+
+
+msgid "F407 的 `dma-tx` 显式选入官方 HAL 有限 TX 与分离的 LL IRQ byte/event RX， 由同一个私有静态 provider 管理。公共 face、共享 readonly ops、取消、drain 与借用合同保留，其他 UART 模式仍使用各自既有引擎。仅 UART/DMA/RCC C 单元 和已审查头文件进入私有构建，不调用 `HAL_Init`，也不启动 HAL SysTick，不授予其他 HAL 模块支持。 精确 callback ABI、IRQ 延后、held EN/TE、时钟和完整退出合同见 [官方驱动接入](../design/official-stm32-provider.md#selected-f407-hal-uart-transport)。 模型、factory、ARM/SDK、同合同资源比较和物理 HIL 分别验收；不能从复用推断成本下降。"
+msgstr "F407 `dma-tx` explicitly selects official HAL finite TX and disjoint LL IRQ byte/event RX under one private static provider. Public faces, shared readonly ops, cancellation, drain and borrow contracts remain; other UART modes retain their existing engines. Only UART/DMA/RCC C units and reviewed headers enter the private build; `HAL_Init` is not called and HAL SysTick is not started; no support is granted to other HAL modules. See [official driver integration](../design/official-stm32-provider.md#selected-f407-hal-uart-transport) for the exact callback ABI, IRQ deferral, held EN/TE, clock and full withdrawal contract. Models, factory, ARM/SDK, same-contract resource comparisons and physical HIL are accepted separately; reuse does not imply lower cost."

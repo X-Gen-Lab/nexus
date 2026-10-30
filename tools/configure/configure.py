@@ -703,8 +703,9 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
                              freeze(selected_memory), gpio_user)
 
 
-def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read):
-    """Select one reset-address image on reviewed physical erase boundaries."""
+def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
+                          *, offset_alignment=None):
+    """Select one image window without changing physical Flash geometry."""
     from tools.configure.ir import freeze
     layout = physical_flash.copy()
     layout_path = None
@@ -734,8 +735,16 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read)
                 fail("Unknown Flash region kind")
             if region["kind"] == "image":
                 images.append(region)
-        if len(images) != 1 or images[0]["origin"] != physical_flash["origin"]:
-            fail("Only one reset-address image is maintained; offsets/bootloaders are unsupported")
+        if len(images) != 1:
+            fail("Flash layout requires exactly one image region")
+        image = images[0]
+        if image["origin"] != physical_flash["origin"]:
+            if offset_alignment is None:
+                fail("Image offset requires an explicitly reviewed SoC startup")
+            integer(offset_alignment, 128, context="image vector alignment")
+            if (offset_alignment & (offset_alignment - 1) or
+                    image["origin"] % offset_alignment):
+                fail("Image vector base differs from the reviewed alignment")
         unique(region_ids, "Flash region IDs")
         layout = {**physical_flash, **images[0]}
     return _FlashLayoutResolution(freeze(layout), layout_path)
@@ -1193,7 +1202,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     inputs = [assembly_path, *facts.inputs, policy_path]
     inputs.extend(device_graph.inputs)
     selected_layout = _resolve_flash_layout(
-        assembly.layout, assembly_path.parent, variant["flash"], read)
+        assembly.layout, assembly_path.parent, variant["flash"], read,
+        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None))
     if selected_layout.input_path is not None:
         inputs.append(selected_layout.input_path)
     selected_sources = _resolve_source_dependencies(

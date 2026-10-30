@@ -18,6 +18,8 @@ foreach(sequence_family stm32 gd32)
     nexus_google_configuration_inputs("${sequence_bundle}")
 
     set(sequence_reference "nexus_${sequence_family}_multi_controller_factory_test")
+    # The STM32 clone shares the parent HAL objects only with this exact
+    # family/model/profile context. Each executable supplies its own ports.
     get_property(sequence_sources TARGET ${sequence_reference} PROPERTY SOURCES)
     get_property(sequence_libraries TARGET ${sequence_reference} PROPERTY LINK_LIBRARIES)
     get_property(sequence_includes TARGET ${sequence_reference} PROPERTY INCLUDE_DIRECTORIES)
@@ -54,6 +56,9 @@ foreach(sequence_family stm32 gd32)
         ${sequence_system} ${sequence_vendor_includes})
     target_compile_definitions(${sequence_target} PRIVATE ${sequence_definitions})
     target_compile_options(${sequence_target} PRIVATE ${sequence_options})
+    if(sequence_family STREQUAL "stm32")
+        target_link_options(${sequence_target} PRIVATE "-Wl,--gc-sections")
+    endif()
     if(sequence_family STREQUAL "gd32")
         # The retained polling participant now uses actual SPL primitives.
         # Only its unrelated reset remains the fixture's external hardware

@@ -13,7 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import (EvidenceError, atomic_json, fields,
     file_identity, identifier, load_json, regular_file)
 from tools.evidence.identity import resolved_identity, resolved_input_files
-from tools.measurement.elf import Elf32, interval_bytes, intervals_union
+from tools.measurement.elf import (Elf32, image_window, interval_bytes,
+                                   intervals_union)
 from tools.configure.memory import resource_budget_projection
 
 
@@ -131,7 +132,7 @@ def allocation(elf: Elf32, flash: dict, memory: list[dict],
             start = load["physical"]
             end = start + load["files"]
             if not flash_start <= start < end <= flash_end:
-                raise EvidenceError("ELF file-backed LOAD bytes leave physical Flash")
+                raise EvidenceError("ELF file-backed LOAD bytes leave selected Flash image")
             flash_spans.append((start, end))
         if not load["memory"]:
             continue
@@ -191,7 +192,8 @@ def allocation(elf: Elf32, flash: dict, memory: list[dict],
 
 def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
     """Recompute the same physical allocation from live or sealed inputs."""
-    flash, memory = memory_contract(resolved)
+    _, memory = memory_contract(resolved)
+    image = image_window(resolved)
     validate_budget(budget, memory)
     if "memory_budgets" in resolved:
         try:
@@ -201,14 +203,18 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
         if budget != expected:
             raise EvidenceError("resource budget differs from the resolved memory contract")
     validate_elf_configuration(elf, resolved)
+    metrics = allocation(elf, image, memory)
     vectors = [section for section in elf.sections if section["name"] == ".isr_vector"]
-    if len(vectors) != 1 or vectors[0]["size"] < 8 or vectors[0]["address"] != flash["origin"]:
-        raise EvidenceError("physical reset vector missing or relocated")
+    if len(vectors) != 1 or vectors[0]["size"] < 8 or vectors[0]["address"] != image["origin"]:
+        raise EvidenceError("selected image reset vector missing or relocated")
     vector = vectors[0]
+    if "vector_alignment" in image:
+        if (vector["size"] > image["vector_alignment"] or
+                elf.symbol(image["vector_symbol"]) != vector["address"]):
+            raise EvidenceError("startup vector table differs from reviewed image")
     stack, reset = struct.unpack_from("<II", elf.data, vector["offset"])
     if stack != elf.symbol("__nx_msp_end") or reset != elf.entry or reset != elf.symbol("Reset_Handler"):
         raise EvidenceError("physical reset vector differs from linked startup/MSP")
-    metrics = allocation(elf, flash, memory)
     violations = []
     def limit(name, measured, maximum):
         if measured > maximum:

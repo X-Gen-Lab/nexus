@@ -8,14 +8,31 @@
  */
 #include "nexus/arch/arch.h"
 #include "timer_advanced_controller.h"
+/* One specialization per translation unit. The wrapper owns all required
+ * NX bindings, including exports and post-include cold helpers. This template
+ * removes only its own helper/default macros; caller-supplied ports survive. */
+#if !defined(NX_CAPTURE_CR1) || !defined(NX_CAPTURE_CR2) ||                    \
+    !defined(NX_CAPTURE_SMCR) || !defined(NX_CAPTURE_PSC) ||                   \
+    !defined(NX_CAPTURE_ARR) || !defined(NX_CAPTURE_CCR) ||                    \
+    !defined(NX_CAPTURE_CCMR) || !defined(NX_CAPTURE_CCER) ||                  \
+    !defined(NX_CAPTURE_DIER) || !defined(NX_CAPTURE_EGR) ||                   \
+    !defined(NX_CAPTURE_SR) || !defined(NX_CAPTURE_INITIALIZE) ||              \
+    !defined(NX_CAPTURE_IRQ) || !defined(NX_CAPTURE_RELEASE) ||                \
+    !defined(NX_CAPTURE_OPS) || !defined(NX_CAPTURE_HZ) ||                     \
+    !defined(NX_CAPTURE_CLOCK_READY)
+#error "Capture implementation requires one complete concrete specialization"
+#endif
 #ifndef NX_TIMER_WRITE
-#define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#define NX_CAPTURE_DEFAULT_TIMER_WRITE 1
+#define NX_TIMER_WRITE(reg, value)     ((reg) = (uint32_t)(value))
 #endif
 #ifndef NX_TIMER_READ
-#define NX_TIMER_READ(reg) ((uint32_t)(reg))
+#define NX_CAPTURE_DEFAULT_TIMER_READ 1
+#define NX_TIMER_READ(reg)            ((uint32_t)(reg))
 #endif
 #ifndef NX_CAPTURE_COUNTER_BITS
-#define NX_CAPTURE_COUNTER_BITS 16U
+#define NX_CAPTURE_DEFAULT_CAPTURE_COUNTER_BITS 1
+#define NX_CAPTURE_COUNTER_BITS                 16U
 #endif
 #if NX_CAPTURE_COUNTER_BITS == 32U
 #define NX_CAPTURE_COUNTER_MAX UINT32_MAX
@@ -25,13 +42,16 @@
 #error "Unsupported capture counter width"
 #endif
 #ifndef NX_CAPTURE_CONTROL_OVERLAP
+#define NX_CAPTURE_DEFAULT_CAPTURE_CONTROL_OVERLAP 1
 #define NX_CAPTURE_CONTROL_OVERLAP(pointer, bytes) (false)
 #endif
 #ifndef NX_CAPTURE_VECTOR_QUIET
-#define NX_CAPTURE_VECTOR_QUIET() (true)
+#define NX_CAPTURE_DEFAULT_CAPTURE_VECTOR_QUIET 1
+#define NX_CAPTURE_VECTOR_QUIET()               (true)
 #endif
 #ifndef NX_CAPTURE_ACCESS_READY
-#define NX_CAPTURE_ACCESS_READY() (true)
+#define NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY 1
+#define NX_CAPTURE_ACCESS_READY()               (true)
 #endif
 /** \brief Serialized task controls require the actual privileged CPU context.
  */
@@ -379,3 +399,30 @@ const nx_timer_capture_ops_t NX_CAPTURE_OPS = {.start = capture_start,
                                                .stop = capture_stop,
                                                .read = capture_read,
                                                .state = capture_state};
+
+/* The specialization bindings remain owned by the concrete wrapper. */
+#undef NX_CAPTURE_COUNTER_MAX
+#ifdef NX_CAPTURE_DEFAULT_TIMER_WRITE
+#undef NX_TIMER_WRITE
+#undef NX_CAPTURE_DEFAULT_TIMER_WRITE
+#endif
+#ifdef NX_CAPTURE_DEFAULT_TIMER_READ
+#undef NX_TIMER_READ
+#undef NX_CAPTURE_DEFAULT_TIMER_READ
+#endif
+#ifdef NX_CAPTURE_DEFAULT_CAPTURE_COUNTER_BITS
+#undef NX_CAPTURE_COUNTER_BITS
+#undef NX_CAPTURE_DEFAULT_CAPTURE_COUNTER_BITS
+#endif
+#ifdef NX_CAPTURE_DEFAULT_CAPTURE_CONTROL_OVERLAP
+#undef NX_CAPTURE_CONTROL_OVERLAP
+#undef NX_CAPTURE_DEFAULT_CAPTURE_CONTROL_OVERLAP
+#endif
+#ifdef NX_CAPTURE_DEFAULT_CAPTURE_VECTOR_QUIET
+#undef NX_CAPTURE_VECTOR_QUIET
+#undef NX_CAPTURE_DEFAULT_CAPTURE_VECTOR_QUIET
+#endif
+#ifdef NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY
+#undef NX_CAPTURE_ACCESS_READY
+#undef NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY
+#endif

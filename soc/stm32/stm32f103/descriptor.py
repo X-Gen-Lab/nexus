@@ -1,0 +1,46 @@
+"""Exact stm32f103 integration metadata; CMake owns sources."""
+from tools.configure.providers.descriptor import FamilyDescriptor
+
+DESCRIPTOR = FamilyDescriptor(
+    family="stm32f103",
+    vendor="stm32",
+    source_directory="soc/stm32/stm32f103",
+    configuration_directory="soc/stm32/stm32f103/configure",
+    git_modules=(
+        ("cmsis_core", "cmsis_core"),
+        ("cmsis_device_f1", "stm32f1_cmsis"),
+        ("hal_driver_f1", "stm32f1_hal"),
+    ),
+    references="references.json",
+    owned_payload=(
+        "soc/stm32/stm32f103/CMakeLists.txt",
+        "soc/stm32/stm32f103/system.c",
+        "soc/stm32/stm32f103/drivers/gpio.c",
+        "soc/stm32/stm32f103/drivers/uart.c",
+        "soc/stm32/stm32f103/drivers/watchdog.c",
+        "soc/stm32/stm32f103/drivers/exti.c",
+        "soc/stm32/stm32f103/drivers/spi.c",
+        "soc/stm32/stm32f103/drivers/uart_dma.c",
+        "soc/stm32/stm32f103/drivers/i2c_async.c",
+        "soc/stm32/stm32f103/private/stm32f103_transport.h",
+        "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+        "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h",
+        "drivers/i2c/i2c_v1_async/i2c_v1_async.c",
+        "drivers/i2c/i2c_v1_async/i2c_v1_async.h",
+        "soc/stm32/stm32f103/drivers/devices.c",
+        "soc/stm32/stm32f103/private/stm32f103_devices.h",
+        "drivers/adc/legacy_adc/legacy_adc.h",
+        "drivers/timer/legacy_pwm/legacy_pwm.h",
+        "drivers/flash/legacy_flash/legacy_flash.h",
+        "drivers/adc/legacy_adc/legacy_adc.c",
+        "drivers/timer/legacy_pwm/legacy_pwm.c",
+        "drivers/flash/legacy_flash/legacy_flash.c",
+        "soc/stm32/stm32f103/private/stm32f103_system.h",
+        "soc/stm32/stm32f103/private/stm32f103_provider.h",
+        "boards/stm32f103_reference/board.json",
+    ),
+    configuration_helpers=(
+        "tools/configure/providers/legacy_transport.py",
+        "soc/stm32/stm32f103/configure/transport.py",
+    ),
+)

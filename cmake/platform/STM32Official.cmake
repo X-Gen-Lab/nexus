@@ -1,4 +1,4 @@
-# Reviewed inline LL only: no HAL_Init, tick, mutable Handle or vendor runtime.
+# LL primitives and the explicit F407 HAL transport have private build scopes.
 # Every consuming entry verifies current bytes; a previous success is no cache.
 include_guard(GLOBAL)
 
@@ -43,6 +43,46 @@ function(nexus_stm32f4_official target)
         list(APPEND inputs "${source}/vendors/st/stm32f4_hal/${name}")
     endforeach()
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${inputs})
+endfunction()
+
+# Only the selected F407 finite TX mode owns this UART/DMA runtime. Insert the
+# objects in the consumer archive, avoiding a second transport or link cycle.
+function(nexus_stm32f407_uart_hal target)
+    if(NOT ARGC EQUAL 1 OR NOT TARGET "${target}")
+        message(FATAL_ERROR "STM32F407 UART HAL requires one owned target")
+    endif()
+    nexus_stm32f4_official("${target}")
+    set(vendor "${target}_stm32f407_hal")
+    if(TARGET "${vendor}")
+        message(FATAL_ERROR "STM32F407 UART HAL transport already selected")
+    endif()
+    get_filename_component(source
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
+    set(private "${source}/soc/stm32/stm32f407/private")
+    add_library("${vendor}" OBJECT
+        "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c"
+        "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+        "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_rcc.c")
+    nexus_stm32f4_official("${vendor}")
+    target_compile_features("${vendor}" PRIVATE c_std_11)
+    set_target_properties("${vendor}" PROPERTIES C_EXTENSIONS OFF)
+    target_compile_definitions("${vendor}" PRIVATE STM32F407xx)
+    target_include_directories("${vendor}" PRIVATE "${private}"
+        "${private}/hal" "${source}/arch/include")
+    target_include_directories("${vendor}" SYSTEM PRIVATE
+        "${source}/vendors/st/cmsis_device_f4/Include")
+    include("${source}/cmake/platform/CMSISCore.cmake")
+    nexus_use_cmsis_core("${vendor}")
+    foreach(policy nexus_build_options Nexus::Arch)
+        if(TARGET "${policy}")
+            target_link_libraries("${vendor}" PRIVATE "${policy}")
+        endif()
+    endforeach()
+    target_compile_options("${vendor}" PRIVATE
+        "-include${private}/stm32f407_hal_profile.h"
+        -ffunction-sections -fdata-sections)
+    target_include_directories("${target}" PRIVATE "${private}/hal")
+    target_sources("${target}" PRIVATE "$<TARGET_OBJECTS:${vendor}>")
 endfunction()
 
 # Family-specific profiles share immutable-source verification, never register

@@ -70,7 +70,10 @@ forwarder merely to match a source directory.
    cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after
    checking each participating silicon contract. Cross-vendor SoC collaboration
    stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`.
-4. Add the family to the explicit maintained provider map in `tools/configure/`.
+4. Add a data-only `descriptor.py` at the SoC package root (Native uses
+   `soc/native/descriptor.py`), outside its `configure/` package. Add its exact
+   module to the central explicit map in `tools/configure/providers/descriptor.py`;
+   reuse the frozen `FamilyDescriptor`, without an eager parallel registry.
    Place its production configuration package in
    `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and
    its configuration tests in `tools/configure/tests/providers/<family>/`.
@@ -108,8 +111,23 @@ The leaf `providers/common.py` owns validation helpers and immutable
 resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
 policy, `ir.py` owns named immutable decisions and their one-way JSON projection,
 and `matrix.py` orchestrates support catalogues.
-The descriptor explicitly lists `configuration_modules`, including `contract.py`,
-so edits trigger reconfiguration and remain in the Source SDK closure.
+The descriptor's `configuration_modules` property combines the fixed package,
+`contract.py`, `bindings.py` and `emission.py` paths with explicitly declared
+`configuration_helpers` and the selected local descriptor file. These sources
+belong to reconfiguration inputs and the Source SDK source closure. Keep family records, order and public selections
+stable when relocating metadata. A single `descriptor.maintained()` lookup must not import
+another family or configure behavior; explicit enumeration and snapshot/SDK
+inventory may intentionally load all data-only descriptors.
+
+The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h`
+templates allow one specialization per translation unit. Required named exports,
+register, clock, IRQ and data bindings reject at compilation when missing.
+The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control
+requires its hardware flow binding. Wrapper-owned bindings, including ops names
+and post-include clock-readiness use, remain available after inclusion. Explicit
+caller read/write ports survive; cleanup removes only template-owned helper and
+default macros. Review each specialization's actual compilation, exported table
+and runtime contract; a template guard does not establish hardware timing.
 
 `tools/configure/contracts.py` owns immutable controller-category fields, factory
 kind order and public header mappings. Authoring, selection and factory consume

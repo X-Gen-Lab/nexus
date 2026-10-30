@@ -122,7 +122,9 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("uart", "dma-tx"), ("spi", spi_mode)])
-                expected = {"gpio.c", "uart.c", "uart_dma.c", "uart_cold.c",
+                transmit = ("uart_hal.c" if family == "stm32f407" else
+                            "uart_dma.c")
+                expected = {"gpio.c", "uart.c", transmit, "uart_cold.c",
                             "spi.c", "spi_dma.c", "platform_cold.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")

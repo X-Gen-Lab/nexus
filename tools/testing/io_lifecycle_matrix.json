@@ -6868,6 +6868,1030 @@
       ],
       "invariant": "Only proved source, queue, output and publisher quiescence permits cold static-session reuse.",
       "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.ExpiredRequestRejectsBeforeHalRetainsPayload",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.ExpiredRequestRejectsBeforeHalRetainsPayload",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/system.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_rcc.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_submit(&port,&request),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "EXPECT_EQ(state.handle.pTxBuffPtr,nullptr)",
+        "EXPECT_EQ(HAL_GetTick(),1U)"
+      ],
+      "calls": [
+        "nx_uart_port_submit(",
+        "HAL_RCC_GetPCLK2Freq(",
+        "HAL_GetTick("
+      ],
+      "invariant": "Expired admission retains no HAL payload or DMA effects; real RCC and System/HAL tick use the selected observed epoch.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.DmaPayloadCannotAliasWholeProviderMetadata",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.DmaPayloadCannotAliasWholeProviderMetadata",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_submit(&aliased_port,&request),NX_ERROR_INVALID)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "EXPECT_EQ(aliased->uart.active,nullptr)"
+      ],
+      "calls": [
+        "nx_uart_port_submit(",
+        "nx_stm32_uart_hal_initialize("
+      ],
+      "invariant": "The whole private HAL owner, including embedded Handles, cannot become its own borrowed TX payload.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RequestMetadataCannotMutateTheDeclaredDmaAuthority",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.RequestMetadataCannotMutateTheDeclaredDmaAuthority",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_submit(&port,aliased),NX_ERROR_INVALID)",
+        "EXPECT_EQ(table[1].permissions,0U)",
+        "EXPECT_EQ(nx_request_state(&aliased->base),NX_REQUEST_READY)"
+      ],
+      "calls": [
+        "nx_uart_port_submit(",
+        "nx_stm32_uart_hal_initialize("
+      ],
+      "invariant": "Request admission cannot mutate retained DMA-region permissions through aliased descriptor storage.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.MemoryCompletionStillBorrowsUntilWireAndService",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.MemoryCompletionStillBorrowsUntilWireAndService",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_ACTIVE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(state.handle.pTxBuffPtr,nullptr)",
+        "EXPECT_EQ(DMA2_Stream7->M0AR,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "DMA completion and UART wire TC do not independently publish SETTLED; task service withdraws request and hardware addresses before publication.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.CancelRetainsBorrowUntilAbortAndWireAreDrained",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.CancelRetainsBorrowUntilAbortAndWireAreDrained",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Cancellation retains the request through actual abort/memory and wire drain; no partial transferred count is invented.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.LateDmaErrorPreservesTheFirstCancellationCause",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.LateDmaErrorPreservesTheFirstCancellationCause",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(state.uart.terminal,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "A DMA error observed during final withdrawal cannot overwrite an earlier cancellation cause.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.LateDmaErrorPreservesTheFirstTimeoutCause",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.LateDmaErrorPreservesTheFirstTimeoutCause",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(state.uart.terminal,NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "An already observed absolute-deadline timeout remains the first cause through a later DMA error.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.LostWireTcAfterMemoryCompletionHasFiniteDrainGrace",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.LostWireTcAfterMemoryCompletionHasFiniteDrainGrace",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "EXPECT_EQ(nx_request_prepare(&request.base,2000000U),NX_ERROR_STATE)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_prepare("
+      ],
+      "invariant": "Missing wire TC has a finite drain grace and retains quarantine and the borrow until later observed recovery.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RefusedDmaAddressWithdrawalRetainsBorrowForRetry",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.RefusedDmaAddressWithdrawalRetainsBorrowForRetry",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "EXPECT_EQ(DMA2_Stream7->M0AR,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "An address-detach readback refusal retains the loan; successful retry proves M0AR withdrawal before settlement.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.FifoErrorInterruptMustBeWithdrawnBeforeSettlement",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.FifoErrorInterruptMustBeWithdrawnBeforeSettlement",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(DMA2_Stream7->FCR&DMA_SxFCR_FEIE,0U)",
+        "EXPECT_EQ(state.dma.XferCpltCallback,nullptr)",
+        "EXPECT_EQ(state.dma.XferErrorCallback,nullptr)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "Settlement requires the separate FIFO-error interrupt source and retained DMA callbacks to be withdrawn.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.FreshTeAfterThePrefilterCannotReachAHeldEnablePoll",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.FreshTeAfterThePrefilterCannotReachAHeldEnablePoll",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "ASSERT_TRUE(s_fresh_te_injected)",
+        "EXPECT_NE(state.dma.State,HAL_DMA_STATE_READY)",
+        "EXPECT_NE(DMA2->HISR&DMA_HISR_TEIF7,0U)",
+        "EXPECT_GT(s_wakes,before_deferred_wake)",
+        "EXPECT_EQ(s_wakes,before_task_progress)"
+      ],
+      "calls": [
+        "nx_uart_port_attach_wake(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Fresh TE after a TE-absent/HT observation survives HT acknowledgment, retains the held-EN loan without false HAL READY, and wakes only from the IRQ path.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.HeldEnableTeNeverRunsTheVendorIrqPollOrFalseReady",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.HeldEnableTeNeverRunsTheVendorIrqPollOrFalseReady",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_NE(DMA2_Stream7->CR&DMA_SxCR_EN,0U)",
+        "EXPECT_NE(state.dma.State,HAL_DMA_STATE_READY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)"
+      ],
+      "calls": [
+        "nx_uart_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "Observed held-EN TE keeps the vendor state and request retained; actual HAL progress is deferred until EN0 and wire completion, rather than falsely publishing READY.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.IrqDuringHalEntryDefersWithoutLosingRxFact",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.IrqDuringHalEntryDefersWithoutLosingRxFact",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_TRUE(s_vector_masked_during_entry)",
+        "EXPECT_EQ(state.hal_depth,0U)",
+        "EXPECT_NE(USART1->SR&USART_SR_RXNE,0U)",
+        "EXPECT_EQ(out.byte,0x63U)"
+      ],
+      "calls": [
+        "nx_uart_port_submit(",
+        "nx_uart_port_read_events("
+      ],
+      "invariant": "An IRQ during a retained HAL call is deferred by its vector, then resumes without losing the pending RX observation.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.WireOnlyCancelCompletionLeavesTheNextHalTransferUsable",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.WireOnlyCancelCompletionLeavesTheNextHalTransferUsable",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(state.handle.gState,HAL_UART_STATE_BUSY_TX)",
+        "EXPECT_EQ(state.dma.State,HAL_DMA_STATE_BUSY)",
+        "EXPECT_NE(DMA2_Stream7->CR&DMA_SxCR_EN,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_cancel(",
+        "nx_uart_port_submit(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Cancel completion cannot leave an unusable DMA ABORT Handle; after full withdrawal the next real HAL transfer actually engages.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RxAndTcSameIrqRetainBothFactsAndRestoreRxMask",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.RxAndTcSameIrqRetainBothFactsAndRestoreRxMask",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(out[0].byte,0x61U)",
+        "EXPECT_EQ(USART1->CR1&(USART_CR1_RXNEIE|USART_CR1_PEIE),saved1)",
+        "EXPECT_EQ(USART1->CR3&USART_CR3_EIE,saved3)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_uart_port_read_events(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "The single private provider preserves simultaneous disjoint LL RX and HAL TX TC facts and restores the exact RX-source masks.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RxErrorAndTcPreserveEventWithoutFailingTx",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.RxErrorAndTcPreserveEventWithoutFailingTx",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(out[0].flags,NX_UART_EVENT_FRAMING|NX_UART_EVENT_OVERRUN)",
+        "EXPECT_EQ(out[0].timestamp_us,100U)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_uart_port_read_events(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "RX framing/overrun events and their observed timestamp survive simultaneous TX completion without becoming a TX failure.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.EventOverflowRemainsOrderedBeforeLaterReception",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.EventOverflowRemainsOrderedBeforeLaterReception",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(out[0].byte,1U)",
+        "EXPECT_EQ(out[1].byte,2U)",
+        "EXPECT_EQ(out[2].flags,NX_UART_EVENT_LOSS|NX_UART_EVENT_NO_BYTE)",
+        "EXPECT_EQ(out[0].byte,5U)"
+      ],
+      "calls": [
+        "nx_uart_port_read_events("
+      ],
+      "invariant": "Buffered RX events precede the independent loss boundary, which precedes later reception after space is returned.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.ClosedRxCannotBeReactivatedByALateUartIrq",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.ClosedRxCannotBeReactivatedByALateUartIrq",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(USART1->CR1,before1)",
+        "EXPECT_EQ(USART1->CR3,before3)",
+        "EXPECT_EQ(state.uart.rx_count,0U)"
+      ],
+      "calls": [
+        "nx_uart_port_stop("
+      ],
+      "invariant": "A late fixed UART IRQ cannot reenable RX sources or enqueue data after the owner has closed.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.LiveHalfTransferUsesOnlyItsPrivateHandleCallback",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.LiveHalfTransferUsesOnlyItsPrivateHandleCallback",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(s_global_hal_half_callbacks,0U)",
+        "EXPECT_EQ(state.dma.State,HAL_DMA_STATE_BUSY)",
+        "EXPECT_EQ(DMA2_Stream7->CR&DMA_SxCR_HTIE,0U)"
+      ],
+      "calls": [
+        "nx_request_state("
+      ],
+      "invariant": "Normal HT while EN remains active is acknowledged without invoking a foreign global callback or ending the live transfer.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.ClosingOwnerCanDetachWakeWithoutRevokingBorrow",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.ClosingOwnerCanDetachWakeWithoutRevokingBorrow",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_attach_wake(&port,nullptr,5U),NX_SUCCESS)",
+        "EXPECT_EQ(s_wakes,before)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)"
+      ],
+      "calls": [
+        "nx_uart_port_attach_wake(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Closing permits future IRQ-hint detachment while retaining the active request until cancellation actually drains.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.InvalidRxDmaDomainQuarantinesWithoutForeignHalAbort",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalContract.InvalidRxDmaDomainQuarantinesWithoutForeignHalAbort",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(DMA1_Stream0->CR,foreign_cr)",
+        "EXPECT_EQ(foreign.XferAbortCallback,nullptr)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)"
+      ],
+      "calls": [
+        "nx_uart_port_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "An invalid private RX domain isolates owned vectors and retains quarantine without adopting or aborting a foreign DMA Handle; explicit restoration allows later joined recovery.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.ExactLeaseStartsStopsRestoresAndRestarts",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.ExactLeaseStartsStopsRestoresAndRestarts",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(receipt.clock_added,RCC_APB2ENR_USART1EN)",
+        "EXPECT_EQ(GPIOA->MODER&0x003C0000U,0x00280000U)",
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&receipt),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_close("
+      ],
+      "invariant": "The exact UART pin/APB/vector lease is assembled with per-instance Handles, returned and restartable through the concrete cold C lifecycle.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.BorrowedRequestCloseRetainsPinsClockAndReceiptUntilDrain",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.BorrowedRequestCloseRetainsPinsClockAndReceiptUntilDrain",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&receipt),NX_ERROR_BUSY)",
+        "EXPECT_NE(receipt.effects,0U)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&receipt),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_close(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "A cold close with a borrowed TX request retains pins, gate, wake and receipt until actual runtime drain succeeds.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RefusedUartDeinitRetainsPadsGateAndCleanupOwner",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.RefusedUartDeinitRetainsPadsGateAndCleanupOwner",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_TRUE(state.uart.initialized)",
+        "EXPECT_NE(receipt.effects,0U)",
+        "EXPECT_NE(RCC->APB2ENR&RCC_APB2ENR_USART1EN,0U)",
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&receipt),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_close("
+      ],
+      "invariant": "HAL DeInit return alone cannot release the cold lease when posted UART UE withdrawal is refused; the retained cleanup owner can retry.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RefusedDmaDeinitReferencesRetainTheLeaseForRetry",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.RefusedDmaDeinitReferencesRetainTheLeaseForRetry",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_TRUE(state.uart.initialized)",
+        "EXPECT_NE(receipt.effects,0U)",
+        "EXPECT_EQ(GPIOA->MODER&0x003C0000U,0x00280000U)",
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&receipt),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_close("
+      ],
+      "invariant": "DMA address/interrupt readback refusal after DeInit retains the same resource lease until a verified retry.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.ForeignRunningDmaIsNeverReconfiguredOrAcquired",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.ForeignRunningDmaIsNeverReconfiguredOrAcquired",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state,&config,&receipt),NX_ERROR_BUSY)",
+        "EXPECT_EQ(DMA2_Stream7->CR,before)",
+        "EXPECT_EQ(s_cold_writes,0U)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_prepare("
+      ],
+      "invariant": "A foreign enabled DMA stream is refused before any resource write or ownership adoption.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RefusedClockAcquisitionRetainsItsCleanupReceipt",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.RefusedClockAcquisitionRetainsItsCleanupReceipt",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state,&config,&receipt),NX_ERROR_IO)",
+        "EXPECT_NE(receipt.effects,0U)",
+        "EXPECT_EQ(receipt.clock_added,RCC_APB2ENR_USART1EN)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_prepare(",
+        "nx_stm32_uart_hal_cold_close("
+      ],
+      "invariant": "A refused UART gate acquisition records its actual cleanup responsibility and permits exact same-owner release.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.AlienEmptyReceiptCannotStopOrOverwriteLiveOwner",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_hal_test",
+      "case": "F407HalCold.AlienEmptyReceiptCannotStopOrOverwriteLiveOwner",
+      "test_source": "tests/contracts/stm32f407_uart_hal/hal_contract_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/contracts/stm32f407_uart_hal/model.h",
+        "tests/contracts/stm32f407_uart_hal/cpu_model.cpp",
+        "tests/contracts/stm32f407_uart_hal/dma_flags_port.c",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state,&config,&alien),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_stm32_uart_hal_cold_close(&state,&config,&alien),NX_ERROR_BUSY)",
+        "EXPECT_EQ(std::memcmp(&before,&state,sizeof(state)),0)"
+      ],
+      "calls": [
+        "nx_stm32_uart_hal_cold_prepare(",
+        "nx_stm32_uart_hal_cold_close("
+      ],
+      "invariant": "An empty alien receipt cannot stop, overwrite or acquire an already live private owner.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.TwoDmaUartRequestsUseSeparateReviewedEngines",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_multi_controller_factory_test",
+      "case": "MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines",
+      "test_source": "tests/google/multi_controller_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/platform_cold.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/google/multi_controller_hal_model.h",
+        "tests/google/multi_controller_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(uarts[index],&uart_requests[index]),NX_SUCCESS)",
+        "EXPECT_EQ(uart_states[1]->uart.active,&uart_requests[1])",
+        "EXPECT_EQ(nx_request_state(&uart_requests[0].base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(nx_request_state(&uart_requests[1].base),NX_REQUEST_SETTLED)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_uart_port_submit(",
+        "nx_platform_stop("
+      ],
+      "invariant": "The generated two-controller STM32 factory uses independent reviewed HAL engines and retains the held-engine request through partial Platform stop and real DMA/UART IRQ completion.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.hal.RejectedAlienReceiptCannotStopTheLiveGeneratedOwner",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_dma_tx_cold_factory_test",
+      "case": "UartColdFactory.RejectedAlienReceiptCannotStopTheLiveGeneratedOwner",
+      "test_source": "tests/google/stm32_uart_cold_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32/stm32f407/drivers/uart_hal.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_cold.c",
+        "soc/stm32/stm32f407/drivers/gpio.c",
+        "soc/stm32/stm32f407/drivers/platform_cold.c",
+        "core/src/request.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_uart.c",
+        "vendors/st/stm32f4_hal/Src/stm32f4xx_hal_dma.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_cold_factory_model.h",
+        "tests/google/stm32_control_cold_model.h",
+        "tests/google/stm32_platform_cold_model.h",
+        "tests/cmake/stm32_scs_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,COLD_PREPARE(state,&config,&alien))",
+        "EXPECT_EQ(NX_ERROR_BUSY,COLD_CLOSE(state,&config,&alien))",
+        "EXPECT_EQ(0,std::memcmp(state,&original,sizeof(original)))"
+      ],
+      "calls": [
+        "COLD_PREPARE(",
+        "COLD_CLOSE("
+      ],
+      "invariant": "The selected generated HAL dma-tx factory refuses alien cold preparation/closure while preserving the complete live owner and hardware snapshots.",
+      "limitations": "Only the named real-HAL test configuration and bounded hardware-port sequence are reviewed. Source anchors do not establish execution; fresh compiled-context capture and the existing full Google gate remain required. No inherited LL, other mode/route, exhaustive interleaving, physical DMA/IRQ timing, electrical, HIL or WCET qualification."
     }
   ],
   "unproven": [
@@ -6963,6 +7987,14 @@
     "tools/configure/emission.py",
     "tools/configure/factory.py",
     "tools/configure/timer_advanced.py",
-    "tools/configure/secondary_controllers.py"
+    "tools/configure/secondary_controllers.py",
+    "tests/google/stm32_uart_hal.cmake",
+    "tests/google/stm32_uart_cold_factory.cmake",
+    "tests/google/multi_controller_factory.cmake",
+    "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
+    "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
+    "dependencies/stm32f4-hal.lock.json"
   ]
 }

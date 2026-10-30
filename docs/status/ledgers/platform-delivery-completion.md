@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1295,11 +1295,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B01 |
 | `task` | 官方依赖配对 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_reviewed_f4_pin_pairing_25file_closure |
+| `software_status` | f4_pin_pair_license_and_export_compile_passed_other_family_review_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
 | `exit_condition` | 核对组织 fork、精确 gitlink、SDK、CMSIS Device/Core 和许可证配对。 |
 | `owner` | codex |
 
@@ -1310,11 +1310,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B02 |
 | `task` | 私有 HAL 模块构建 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_uart_dma_rcc_private_sources |
+| `software_status` | selected_arm_native_factory_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
 | `exit_condition` | 仅显式编译实际需要的官方 C 模块，避免整包选入。 |
 | `owner` | codex |
 
@@ -1325,11 +1325,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B03 |
 | `task` | HAL 配置与符号 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_private_callback_abi1 |
+| `software_status` | selected_private_configuration_and_real_hal_model_passed_full_symbols_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
 | `exit_condition` | 私有配置头、模块宏、callback 配置及全局符号冲突均经检查。 |
 | `owner` | codex |
 
@@ -1355,11 +1355,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B05 |
 | `task` | 公共编译边界 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_private_compile_boundary |
+| `software_status` | selected_native_arm_boundary_passed_full_consumers_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
 | `exit_condition` | 公共 consumer 不继承 vendor/private includes；生产目标不引入测试运行时。 |
 | `owner` | codex |
 
@@ -1370,11 +1370,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B06 |
 | `task` | 依赖及 SDK 闭包 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_f4_lock_and_export_closure |
+| `software_status` | actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
 | `exit_condition` | 锁、source catalogue、descriptor、SDK 文件和许可证闭包一致，升级经过受控验证。 |
 | `owner` | codex |
 
@@ -1385,11 +1385,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C01 |
 | `task` | 最小静态 context |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_static_handle_owner |
+| `software_status` | selected_generated_factory_and_real_hal_model_passed_resource_ab_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 仅保留所选 Handle、配置、请求和模式扩展，不增加通用最大状态。 |
 | `owner` | codex |
 
@@ -1400,11 +1400,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C02 |
 | `task` | 副作用前校验 |
-| `implementation_status` | partial_reference_payload_alias_guard |
-| `software_status` | reference_red_green_passed_not_production |
+| `implementation_status` | partial_selected_f407_admission_and_alias_guards |
+| `software_status` | actual_reference_and_complete_mode_red_green_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 在硬件影响前检查上下文、长度、对齐、内存域、deadline、模式和资源。 |
 | `owner` | codex |
 
@@ -1415,11 +1415,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C03 |
 | `task` | 准入先于保留引用 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_borrow_before_hal |
+| `software_status` | actual_synchronous_callback_and_start_model_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | admission 先于可能保留引用或同步回调的官方 API。 |
 | `owner` | codex |
 
@@ -1430,11 +1430,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C04 |
 | `task` | 启动失败撤离 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_accepted_failure_withdrawal |
+| `software_status` | actual_real_hal_failure_and_drain_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 已接受操作的启动失败按实际引用撤离，不能伪装为无借用拒绝。 |
 | `owner` | codex |
 
@@ -1445,11 +1445,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C05 |
 | `task` | 取消与期限映射 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_cancel_deadline_withdrawal |
+| `software_status` | actual_cancel_timeout_quarantine_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | cancel/timeout 明确推进撤离、drain 和 quarantine，借用不提前释放。 |
 | `owner` | codex |
 
@@ -1460,11 +1460,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C06 |
 | `task` | 冷态资源责任 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_cold_lease_and_deinit |
+| `software_status` | actual_partial_cleanup_and_two_owner_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | prepare/start、部分失败和 stop 重试保留准确责任，不释放其他 owner 资源。 |
 | `owner` | codex |
 
@@ -1475,11 +1475,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C07 |
 | `task` | Handle 安全复用 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_handle_irq_reference_join |
+| `software_status` | actual_late_callback_and_handle_reuse_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 旧硬件、IRQ 和 callback 栈撤离后才能复用 Handle，迟到事件不冒充当前请求。 |
 | `owner` | codex |
 
@@ -1490,11 +1490,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-C08 |
 | `task` | 主错误与清理结果 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_first_cause_and_cleanup |
+| `software_status` | actual_first_cause_and_cold_cleanup_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 主错误、清理错误、剩余责任分别保留；诊断不撤销借用。 |
 | `owner` | codex |
 
@@ -1505,11 +1505,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D01 |
 | `task` | 真实 IRQ 抢占合同 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_vector_deferral_protocol |
+| `software_status` | actual_selected_irq_preemption_models_passed_physical_latency_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 生产 IRQ 协议明确处理抢占，不能原样使用串行夹具的跳过 handler 假设。 |
 | `owner` | codex |
 
@@ -1520,11 +1520,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D02 |
 | `task` | 短临界区与 pending facts |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_short_guards_and_held_en_te_deferral |
+| `software_status` | actual_atomic_and_quiet_error_irq_models_passed_wcet_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | HAL 嵌套、短临界区和 pending facts 明确，不以长全局关中断覆盖 vendor 等待。 |
 | `owner` | codex |
 
@@ -1535,11 +1535,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D03 |
 | `task` | callback 实际上下文 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_per_handle_callback_facts |
+| `software_status` | actual_task_sync_irq_callback_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 同步、task 和 ISR callback 使用合法通知，仅记录有界事实。 |
 | `owner` | codex |
 
@@ -1550,11 +1550,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D04 |
 | `task` | HAL 可达等待与时钟 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_existing_epoch_bridge |
+| `software_status` | actual_clock_metadata_tick_wrap_and_real_hal_models_passed_full_power_review_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/system.c;tests/google/stm32_system_transaction_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-integration/clock-final-green/run.command.json |
 | `exit_condition` | 审核 bootstrap/runtime、毫秒量化、32 位回绕及低功耗暂停的实际时间推进。 |
 | `owner` | codex |
 
@@ -1565,11 +1565,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D05 |
 | `task` | OS 与时间基准隔离 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_no_hal_systick |
+| `software_status` | existing_epoch_and_selected_wake_models_passed_full_backend_contexts_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 保留既有 SysTick/OS 策略，验证 IRQ ceiling、wait/wake 和 observer join。 |
 | `owner` | codex |
 
@@ -1580,11 +1580,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-D06 |
 | `task` | Arch 屏障与状态恢复 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_saved_mask_and_barriers |
+| `software_status` | actual_saved_mask_and_selected_arm_compile_passed_physical_memory_order_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 恢复调用前中断状态，并区分 CPU 屏障、Cache 维护和请求发布。 |
 | `owner` | codex |
 
@@ -1595,11 +1595,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E01 |
 | `task` | 完整 UART 生产候选 |
-| `implementation_status` | partial_reference_only |
-| `software_status` | serialized_finite_tx_reference_passed_not_production |
+| `implementation_status` | implemented_selected_f407_dma_tx_hal_and_disjoint_irq_rx |
+| `software_status` | complete_mode_real_hal_model_native_factory_and_selected_arm_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 有限 TX HAL 评估扩为明确完整模式候选，不以 TX-only 代替既有 dma-tx。 |
 | `owner` | codex |
 
@@ -1610,11 +1610,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E02 |
 | `task` | UART 与 DMA 冷态接入 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_hal_cold_lease |
+| `software_status` | actual_initialization_readback_partial_failure_and_close_retry_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 官方初始化纳入既有 resource lease、MSP、失败读回与恢复。 |
 | `owner` | codex |
 
@@ -1625,11 +1625,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E03 |
 | `task` | DMA 与 UART TC |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_hal_dma_to_wire_tc |
+| `software_status` | actual_real_hal_dma_tc_uart_tc_and_count_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 复用 HAL 正常 DMA 到 TC 流程，验证完成、错误及实际计数。 |
 | `owner` | codex |
 
@@ -1640,11 +1640,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E04 |
 | `task` | RX 完整语义 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_disjoint_irq_rx |
+| `software_status` | actual_byte_event_loss_timestamp_wake_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 保留 RX bytes/events、frame/error/loss 顺序、时间戳和存储合同。 |
 | `owner` | codex |
 
@@ -1655,11 +1655,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E05 |
 | `task` | TX/RX 共同所有权 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_one_tx_rx_provider_owner |
+| `software_status` | actual_abort_dma_error_shared_irq_and_foreign_domain_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 审查 TX abort、DMA error、共享 IRQ 对 RX 的影响，不拼接未经审查的独立 owner。 |
 | `owner` | codex |
 
@@ -1670,11 +1670,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E06 |
 | `task` | UART 停止与再次提交 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_stop_and_resubmit |
+| `software_status` | actual_sync_late_irq_deinit_retry_and_resubmit_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 同步 callback、迟到 IRQ、wake detach、stop 和恢复后再次提交均有实际回归。 |
 | `owner` | codex |
 
@@ -1685,11 +1685,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E07 |
 | `task` | 完整 UART 成本决策 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_same_config_arm_flash_ram_comparison |
+| `software_status` | paired_arm_images_and_byte_identical_resolved_passed_stack_cycles_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml;tools/measurement/resources.py;tools/measurement/workload.c |
+| `evidence_paths` | build/vendor-first-20261030/cost/normalized-comparison.json;build/vendor-first-20261030/cost/final-default-artifacts/manifest.json;build/vendor-first-20261030/cost/final-symbol-check.json |
 | `exit_condition` | 同合同比较完整 provider 的 Flash/RAM/栈/执行成本后确定生产实现。 |
 | `owner` | codex |
 
@@ -1700,11 +1700,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-E08 |
 | `task` | UART 替换与清理 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_dma_tx_source_replacement |
+| `software_status` | selected_generated_source_and_arm_passed_sdk_consumers_and_full_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 接受后更新装配及 SDK，删除已完整替换的生产路径，未满足合同的候选保留结论。 |
 | `owner` | codex |
 
@@ -1716,10 +1716,10 @@ source_language: zh_CN
 | `task_id` | V-F01 |
 | `task` | GPIO 与 pin 迁移 |
 | `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 扩大 LL/SPL，保持安全电平顺序、权限与组合 set/reset 原子性。 |
 | `owner` | codex |
 
@@ -1731,10 +1731,10 @@ source_language: zh_CN
 | `task_id` | V-F02 |
 | `task` | SPI 短事务迁移 |
 | `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 官方配置及收发保持完整 CS 区间、dummy/discard 和 transferred。 |
 | `owner` | codex |
 
@@ -1761,10 +1761,10 @@ source_language: zh_CN
 | `task_id` | V-F04 |
 | `task` | I2C 消息序列迁移 |
 | `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 覆盖 repeated START、1/2/3 字节窗口、NACK/ARLO、STOP 和精确 errata。 |
 | `owner` | codex |
 
@@ -1776,10 +1776,10 @@ source_language: zh_CN
 | `task_id` | V-F05 |
 | `task` | ADC 与 group 迁移 |
 | `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 保留校准、触发、数据格式、组序列及 DMA 数据借用。 |
 | `owner` | codex |
 
@@ -1791,10 +1791,10 @@ source_language: zh_CN
 | `task_id` | V-F06 |
 | `task` | PWM/capture/encoder 迁移 |
 | `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 保留共享基座、同步更新、互补输出和安全停止。 |
 | `owner` | codex |
 
@@ -1851,10 +1851,10 @@ source_language: zh_CN
 | `task_id` | V-F10 |
 | `task` | RTC/LPTIM/watchdog 迁移 |
 | `implementation_status` | partial_f407_watchdog_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 保持时间连续性、唤醒合同和不可逆硬件影响。 |
 | `owner` | codex |
 
@@ -1896,10 +1896,10 @@ source_language: zh_CN
 | `task_id` | V-G03 |
 | `task` | F407 维护模式闭包 |
 | `implementation_status` | partial_selected_f407_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 覆盖现有 UART/SPI/I2C/ADC/控制器模式和 stream DMA 资源。 |
 | `owner` | codex |
 
@@ -1911,10 +1911,10 @@ source_language: zh_CN
 | `task_id` | V-G04 |
 | `task` | GD470 维护模式闭包 |
 | `implementation_status` | partial_selected_gd470_primitives |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 扩大 SPL 并独立验证路由、时钟、DMA 撤离和模式差异。 |
 | `owner` | codex |
 
@@ -1971,10 +1971,10 @@ source_language: zh_CN
 | `task_id` | V-H01 |
 | `task` | resolver 类别局部化 |
 | `implementation_status` | partial_controller_and_endpoint_localization |
-| `software_status` | 194_focused_and_710_files_schema_equivalent |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/configure/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/configure/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 类别归一化就近维护，公共入口保留共同仲裁和原子发布。 |
 | `owner` | codex |
 
@@ -1985,11 +1985,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H02 |
 | `task` | family descriptor 就近维护 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_soc_local_data_only_descriptors |
+| `software_status` | focused_descriptor_provider_sdk_closure_and_71bundle_equivalence_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/providers/descriptor.py;tools/configure/providers/__init__.py;soc/native/descriptor.py;soc/stm32/;soc/gd32/ |
+| `evidence_paths` | build/vendor-first-20261030/descriptor-localization/root-handoff.json |
 | `exit_condition` | 保留顶层显式映射及稳定闭包检查，避免新建平行源码图。 |
 | `owner` | codex |
 
@@ -2000,11 +2000,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H03 |
 | `task` | 语义模式选择 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | reviewed_existing_semantic_mode_selection_retained |
+| `software_status` | source_contract_reviewed_no_new_runtime_behavior_claim |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/selection.py;tools/configure/contracts.py |
+| `evidence_paths` | docs/design/integration-contracts.md;docs/guides/provider-porting.md |
 | `exit_condition` | 用户选择语义 mode，内部明确选实现，无并行权威和隐式回退。 |
 | `owner` | codex |
 
@@ -2015,11 +2015,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H04 |
 | `task` | 共享引擎归属 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | reviewed_existing_shared_engine_ownership_retained |
+| `software_status` | source_ownership_contract_reviewed_no_reimplementation_claim |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/ |
+| `evidence_paths` | docs/explanation/platform-architecture.md;docs/guides/provider-porting.md |
 | `exit_condition` | 按公共机制、vendor adapter、必要专用引擎和 SoC 集成整理实际职责。 |
 | `owner` | codex |
 
@@ -2030,11 +2030,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H05 |
 | `task` | 编译期模板合同 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_private_template_guards_and_macro_scope |
+| `software_status` | focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py |
+| `evidence_paths` | build/vendor-first-20261030/template-contracts/actual-root/handoff.json |
 | `exit_condition` | 输入、导出符号、宏作用域及各 specialization 的验证明确。 |
 | `owner` | codex |
 
@@ -2045,11 +2045,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H06 |
 | `task` | 偏移镜像与交接 profile |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_f407_gd470_offset_images |
+| `software_status` | configuration_linker_artifact_and_six_arm_links_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/configure/configure.py;tools/configure/memory.py;soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;tools/measurement/elf.py;tools/measurement/resources.py;tools/evidence/candidate.py;tools/evidence/reproduce.py |
+| `evidence_paths` | build/vendor-first-20261030/image-layout/handoff.json;build/vendor-first-20261030/image-layout/artifact-handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json |
 | `exit_condition` | 按既定明确范围验证向量、链接区域和入口条件，产品升级策略外置。 |
 | `owner` | codex |
 
@@ -2150,11 +2150,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J01 |
 | `task` | 真实 TDD 顺序 |
-| `implementation_status` | partial_reference_alias_red_green |
-| `software_status` | reference_actual_red_then_green_passed |
+| `implementation_status` | partial_selected_reference_and_complete_mode_actual_red_green |
+| `software_status` | actual_source_binary_red_green_snapshots_retained_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 新行为和修复先实际 RED，再 GREEN；并行开发遵守交接屏障。 |
 | `owner` | codex |
 
@@ -2165,11 +2165,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J02 |
 | `task` | adapter 合同测试 |
-| `implementation_status` | partial_selected_adapter_boundary_regressions |
-| `software_status` | focused_development_passed_final_index_gate_pending |
+| `implementation_status` | partial_selected_real_hal_adapter_models |
+| `software_status` | selected_real_adapter_regressions_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | GoogleTest/GoogleMock 检查真实 adapter，mock 仅位于明确外部边界。 |
 | `owner` | codex |
 
@@ -2180,11 +2180,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J03 |
 | `task` | 实际官方源码测试 |
-| `implementation_status` | partial_actual_spl_and_hal_reference_runs |
-| `software_status` | focused_development_passed_not_full_transport |
+| `implementation_status` | partial_actual_spl_and_selected_hal_source_models |
+| `software_status` | selected_official_uart_dma_rcc_model_and_arm_compile_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 实际编译执行所选官方源码，验证与 adapter 的组合。 |
 | `owner` | codex |
 
@@ -2195,11 +2195,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J04 |
 | `task` | 抢占与隔离回归 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_preemption_and_instance_isolation |
+| `software_status` | actual_selected_failure_sync_preemption_late_and_isolation_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 覆盖启动后失败、同步 callback、IRQ 抢占、迟到完成和实例隔离。 |
 | `owner` | codex |
 
@@ -2210,11 +2210,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J05 |
 | `task` | 故障撤离回归 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f407_failure_withdrawal_orderings |
+| `software_status` | actual_cancel_tc_error_refused_drain_repeat_stop_and_resubmit_models_passed_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 覆盖 cancel/TC/DMA error 排列、撤离拒绝、重复 stop 和恢复再提交。 |
 | `owner` | codex |
 
@@ -2225,11 +2225,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J06 |
 | `task` | 独立 ARM 上下文 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_driver_offset_and_hal_arm_contexts |
+| `software_status` | selected_real_hal_arm_and_six_offset_links_passed_full_matrix_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
 | `exit_condition` | 每个独立编译上下文验证 SDK、ABI、布局、链接和资源。 |
 | `owner` | codex |
 
@@ -2255,11 +2255,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J08 |
 | `task` | 高效完整门禁 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_fail_fast_native_preflight |
+| `software_status` | actual_red_green_and_9c0460b9_complete_index_gate_passed |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
 | `exit_condition` | 开发聚焦执行，完整增量走普通 hooks，冻结源执行完整计划并预算存储。 |
 | `owner` | codex |
 
@@ -2495,11 +2495,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L08 |
 | `task` | 提交合并与发布 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_first_increment_committed_and_pushed |
+| `software_status` | ordinary_complete_index_passed_at_9c0460b9_merge_release_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json |
 | `exit_condition` | 正常提交同步并合入已验证提交，发布消费同一份已验证产物。 |
 | `owner` | codex |
 

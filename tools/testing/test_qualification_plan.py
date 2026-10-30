@@ -297,6 +297,51 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertEqual(selected[0]["args"], [])
         validate_plan(self.plan)
 
+    def test_selected_image_artifacts_have_one_fixed_complete_runner(self):
+        self.assertEqual(CHECKERS.get("image_artifact_tests"),
+                         ("tests/contracts/test_image_artifacts.py",))
+        selected = [stage for stage in self.stages
+                    if stage["checker"] == "image_artifact_tests"]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["name"], "image-artifact-boundaries")
+        self.assertEqual(selected[0]["args"], [])
+        validate_plan(self.plan)
+
+    def test_selected_image_boundaries_follow_existing_artifact_recovery(self):
+        names = [stage["name"] for stage in self.stages]
+        self.assertIn("image-artifact-boundaries", names)
+        previous = names.index("build-artifact-boundaries")
+        self.assertEqual(names[previous:previous + 3],
+                         ["build-artifact-boundaries",
+                          "image-artifact-boundaries",
+                          "providers-mainstream_assembly"])
+
+    def test_image_artifact_script_bootstraps_without_import_environment(self):
+        script = ROOT / "tests/contracts/test_image_artifacts.py"
+        case = ("ImageArtifactTests."
+                "test_default_full_reset_image_retains_existing_accounting")
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-I", "-B", str(script), case],
+                cwd=directory, capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Ran 1 test", result.stderr)
+
+    def test_missing_arm_tool_cannot_be_a_skipped_image_artifact_pass(self):
+        script = ROOT / "tests/contracts/test_image_artifacts.py"
+        case = ("ImageArtifactTests."
+                "test_default_full_reset_image_retains_existing_accounting")
+        environment = os.environ.copy()
+        environment["PATH"] = ""
+        environment.pop("NEXUS_ARM_GCC", None)
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-I", "-B", str(script), case],
+                cwd=directory, env=environment, capture_output=True,
+                text=True, timeout=30)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Prepared ARM compiler required", result.stderr)
+
     def test_each_expanded_provider_fixture_is_explicitly_qualified_once(self):
         for directory in ("legacy_transport_assembly", "mainstream_assembly",
                           "g474_assembly", "h743_assembly", "u575_assembly"):

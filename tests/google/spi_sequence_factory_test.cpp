@@ -161,11 +161,37 @@ extern "C" void nx_multi_factory_i2c_address(void* context) {
 #ifdef NX_MULTI_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
+/* The hardware model supplies the same fixed HCLK observed by real RCC C. */
+uint32_t SystemCoreClock = 168000000U;
+const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
+                                   1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
+
 nx_result_t nx_multi_actual_gpio_clock_enable(unsigned);
 uint16_t nx_multi_actual_pin_capture(const GPIO_TypeDef*, uint8_t);
 void nx_multi_actual_pin_restore(GPIO_TypeDef*, uint8_t, uint16_t);
 nx_result_t nx_multi_actual_pin_configure(GPIO_TypeDef*, uint8_t, uint8_t,
                                           uint8_t, uint8_t, bool);
+}
+
+/** \brief Preserve the selected EN readback through actual HAL disable. */
+extern "C" void nx_multi_factory_hal_dma_disable(DMA_HandleTypeDef* handle) {
+    nx_multi_factory_dma_disable(&handle->Instance->CR, DMA_SxCR_EN);
+}
+/** \brief Observe the UART enable write without replacing HAL initialization.
+ */
+extern "C" void nx_multi_factory_hal_uart_enable(UART_HandleTypeDef* handle) {
+    SET_BIT(handle->Instance->CR1, USART_CR1_UE);
+}
+/** \brief Hardware clear-on-zero flags do not set unrelated status bits. */
+extern "C" void nx_multi_factory_hal_uart_clear(UART_HandleTypeDef* handle,
+                                                uint32_t flags) {
+    handle->Instance->SR &= ~flags;
+}
+/** \brief HAL uses the same modeled monotonic epoch; no separate tick exists.
+ */
+extern "C" uint32_t HAL_GetTick(void) {
+    return static_cast<uint32_t>(nx_time_now_us() / 1000U);
 }
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;

@@ -1,4 +1,4 @@
-"""Official LL source is closed, paired and privately consumed without HAL tick."""
+"""Selected official sources stay closed, paired and private without a tick."""
 from __future__ import annotations
 import copy
 import json
@@ -72,7 +72,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result["commit"], official.COMMIT)
         self.assertEqual(result["cmsis_commit"], official.CMSIS_COMMIT)
-        self.assertEqual(result["verified_files"], 11)
+        self.assertEqual(result["verified_files"], 25)
         self.assertEqual(result["license"], "BSD-3-Clause")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
@@ -83,7 +83,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         cmsis = ROOT / "vendors/st/cmsis_device_f4"
         lock = ROOT / "dependencies/stm32f4-hal.lock.json"
         result = official.verify(source, lock, cmsis)
-        self.assertEqual(result["verified_files"], 11)
+        self.assertEqual(result["verified_files"], 25)
         executed = subprocess.run([
             sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f4_hal_lock.py"),
             "--source", str(source), "--lock", str(lock),

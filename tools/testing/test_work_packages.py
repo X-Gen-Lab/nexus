@@ -332,8 +332,8 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertGreater(len(report["work_packages"]), 0)
         selected = next(row for row in report["work_packages"]
                         if row["identity"] == "stm32f407.USART1.dma-tx")
-        self.assertEqual(selected["provider_implementation"], "uart_dma")
-        self.assertIn("soc/stm32/stm32f407/drivers/uart_dma.c", selected["sdk_required_sources"])
+        self.assertEqual(selected["provider_implementation"], "uart_hal")
+        self.assertIn("soc/stm32/stm32f407/drivers/uart_hal.c", selected["sdk_required_sources"])
         self.assertTrue(selected["reviewed_properties"])
         self.assertTrue(report["authority_inputs"])
         inputs = {row["path"] for row in report["authority_inputs"]}

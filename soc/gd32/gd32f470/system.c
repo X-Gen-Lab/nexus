@@ -130,6 +130,8 @@ void SystemInit(void) {
         ~(uint32_t)(RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC);
     extern const uint32_t __gVectors[];
     SCB->VTOR = (uint32_t)(uintptr_t)__gVectors;
+    __DSB();
+    __ISB();
     SystemCoreClock = 16000000u;
 #if defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1
     /* TCM is only on DBUS. Keep unrelated AHB1 enables and establish access

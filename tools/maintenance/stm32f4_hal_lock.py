@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Verify STM32F4 LL and ETH definitions with their official CMSIS pairing.
+"""Verify selected STM32F4 LL/HAL sources with their official CMSIS pairing.
 
-STM32CubeF4 v1.28.3 pins both reviewed components. Only selected inline LL
-headers, transitive ETH definitions and their original notice are admitted.
-No vendor C, HAL initialization, tick, Handle instance or full LL implementation
-is selected implicitly.
+STM32CubeF4 v1.28.3 pins both reviewed components. The graph closes inline LL,
+ETH definitions and explicitly selected UART/DMA/RCC C with their transitive
+headers and notice. GPIO/Flash headers supply RCC declarations only; their C,
+global HAL initialization, SysTick and full LL implementations are not selected.
+Source admission does not qualify a transport or create mutable Handles.
 """
 from __future__ import annotations
 import argparse
@@ -35,6 +36,13 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_i2c.h",
     "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_hal_def.h",
     "Inc/Legacy/stm32_hal_legacy.h",
+    "Inc/stm32f4xx_hal.h", "Inc/stm32f4xx_hal_dma.h",
+    "Inc/stm32f4xx_hal_dma_ex.h", "Inc/stm32f4xx_hal_uart.h",
+    "Inc/stm32f4xx_hal_rcc.h", "Inc/stm32f4xx_hal_rcc_ex.h",
+    "Inc/stm32f4xx_hal_gpio.h", "Inc/stm32f4xx_hal_gpio_ex.h",
+    "Inc/stm32f4xx_hal_flash.h", "Inc/stm32f4xx_hal_flash_ex.h",
+    "Inc/stm32f4xx_hal_flash_ramfunc.h", "Src/stm32f4xx_hal_uart.c",
+    "Src/stm32f4xx_hal_dma.c", "Src/stm32f4xx_hal_rcc.c",
 })
 PAIRING = {
     "repository": "https://github.com/STMicroelectronics/STM32CubeF4.git",
@@ -47,26 +55,27 @@ def contract(lock):
     """Validate the fixed official release, pairing, source graph and notice."""
     fields(lock, {"schema_version", "kind", "repository", "commit", "release",
                   "selected_api", "pairing", "files", "license"},
-           "STM32F4 official LL source lock")
+           "STM32F4 official source lock")
     if (type(lock["schema_version"]) is not int or
             lock["schema_version"] != 1 or
             lock["kind"] != "nexus-reviewed-official-driver"):
         raise ValueError("Unsupported STM32F4 official driver lock schema")
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "v1.8.5" or
-            lock["selected_api"] != "stm32f407-ll-inline-eth-definitions" or
+            lock["selected_api"] != (
+                "stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx") or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F4 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:
-        raise ValueError("STM32F4 LL identities must close the reviewed graph")
+        raise ValueError("STM32F4 identities must close the reviewed graph")
     for record in lock["files"].values():
-        fields(record, {"bytes", "sha256"}, "STM32F4 LL source identity")
+        fields(record, {"bytes", "sha256"}, "STM32F4 source identity")
         value = record["sha256"]
         if (type(record["bytes"]) is not int or record["bytes"] <= 0 or
                 not isinstance(value, str) or len(value) != 64 or
                 any(character not in "0123456789abcdef" for character in value)):
-            raise ValueError("Nonempty exact STM32F4 LL file identity required")
-    fields(lock["license"], {"path", "expression"}, "STM32F4 LL license")
+            raise ValueError("Nonempty exact STM32F4 file identity required")
+    fields(lock["license"], {"path", "expression"}, "STM32F4 license")
     if lock["license"] != {"path": "LICENSE.md", "expression": "BSD-3-Clause"}:
         raise ValueError("Original reviewed STM32F4 BSD-3-Clause notice required")
     return set(lock["files"])

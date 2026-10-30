@@ -386,5 +386,41 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
+class CurrentHALCatalogueTests(unittest.TestCase):
+    def test_selected_hal_mode_has_its_own_reviewed_lifecycle_anchors(self):
+        root = Path(__file__).resolve().parents[2]
+        data, _, _ = matrix.catalogue_inputs(
+            root, root / "tools/testing/io_lifecycle_matrix.json")
+        provider = "soc/stm32/stm32f407/drivers/uart_hal.c"
+        rows = [row for row in data["properties"]
+                if (row["family"], row["peripheral"], row["mode"])
+                == ("stm32f407", "uart", "dma-tx")
+                and provider in row["production_sources"]]
+        required = {
+            "F407HalContract.ExpiredRequestRejectsBeforeHalRetainsPayload",
+            "F407HalContract.RequestMetadataCannotMutateTheDeclaredDmaAuthority",
+            "F407HalContract.MemoryCompletionStillBorrowsUntilWireAndService",
+            "F407HalContract.LateDmaErrorPreservesTheFirstCancellationCause",
+            "F407HalContract.LateDmaErrorPreservesTheFirstTimeoutCause",
+            "F407HalContract.RefusedDmaAddressWithdrawalRetainsBorrowForRetry",
+            "F407HalContract.FreshTeAfterThePrefilterCannotReachAHeldEnablePoll",
+            "F407HalContract.WireOnlyCancelCompletionLeavesTheNextHalTransferUsable",
+            "F407HalCold.BorrowedRequestCloseRetainsPinsClockAndReceiptUntilDrain",
+            "F407HalCold.RefusedDmaDeinitReferencesRetainTheLeaseForRetry",
+            "MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines",
+        }
+        self.assertFalse(required - {row["case"] for row in rows},
+                         "The selected HAL transport cannot inherit old LL rows")
+        for row in rows:
+            with self.subTest(property=row["id"]):
+                self.assertIn(row["target"], {
+                    "nexus_stm32_uart_hal_test",
+                    "nexus_stm32_uart_dma_tx_cold_factory_test",
+                    "nexus_stm32_multi_controller_factory_test",
+                })
+                self.assertNotIn("soc/stm32/stm32f407/drivers/uart_dma.c",
+                                 row["production_sources"])
+
+
 if __name__ == "__main__":
     unittest.main()

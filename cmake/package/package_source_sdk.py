@@ -331,6 +331,11 @@ REQUIRED_FILES += ("soc/common/uart_control.h",)
 REQUIRED_FILES += (
     "soc/stm32/stm32f407/private/stm32f407_system.h",
     "soc/stm32/stm32f407/private/stm32f407_stream.h",
+    "soc/stm32/stm32f407/drivers/uart_hal.c",
+    "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
+    "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
     "soc/gd32/gd32f470/timebase.c", "soc/gd32/gd32f470/private/system.h",
     "soc/gd32/gd32f470/private/gd32f470_adc_stream.h",
     "soc/gd32/gd32f470/private/gd32f470_spi_dma.h",

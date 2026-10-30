@@ -133,6 +133,13 @@ void SystemInit(void);
 /** \brief Reserved TIM2 vector; no other owner may use this timer. */
 void TIM2_IRQHandler(void);
 
+/** \brief Read modulo-32-bit milliseconds from the existing Nexus epoch.
+ * \return Zero outside a live epoch; no HAL or SysTick timebase is started.
+ * \note Selected private HAL calls occur only after Platform timebase startup.
+ *       Cold bootstrap uses its own finite poll limits, never this clock.
+ */
+uint32_t HAL_GetTick(void);
+
 /**
  * \brief           Check device group and exact Flash density.
  *

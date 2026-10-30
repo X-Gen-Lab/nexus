@@ -293,13 +293,12 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
     return notify;
 }
 
-/** \brief Perform one bounded RX observation and at most one TX byte write. */
-static inline void uart_irq_mask(nx_stm32_uart_state_t* port,
-                                 uint8_t payload_mask) {
+/** \brief One shared RX producer, independent of the selected TX transport. */
+bool nx_stm32_uart_rx_irq(nx_stm32_uart_state_t* port, uint32_t status,
+                          uint8_t payload_mask) {
     if (port == NULL || !port->initialized) {
-        return;
+        return false;
     }
-    uint32_t status = port->registers->SR;
     bool notify = false;
     if ((status & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_ORE |
                    USART_SR_NE)) != 0U) {
@@ -335,6 +334,17 @@ static inline void uart_irq_mask(nx_stm32_uart_state_t* port,
             ++port->rx_count;
         }
     }
+    return notify;
+}
+
+/** \brief Perform one bounded RX observation and at most one TX byte write. */
+static inline void uart_irq_mask(nx_stm32_uart_state_t* port,
+                                 uint8_t payload_mask) {
+    if (port == NULL || !port->initialized) {
+        return;
+    }
+    uint32_t status = port->registers->SR;
+    bool notify = nx_stm32_uart_rx_irq(port, status, payload_mask);
     notify = nx_stm32_uart_tx_irq(port, status) || notify;
     if (notify) {
         (void)nx_irq_wake_signal(port->wake);

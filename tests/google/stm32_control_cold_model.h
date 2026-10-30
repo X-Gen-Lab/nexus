@@ -22,8 +22,10 @@ void nx_control_model_enable(IRQn_Type irq);
 #define NX_STM32_EXTI_READ(reg) (*(reg))
 #define NX_STM32_CLEAR_FLAGS(reg, mask)                                        \
     nx_control_model_clear(&(reg), (uint32_t)(mask))
+#undef NVIC_SetPriority
 #define NVIC_SetPriority(irq, priority)                                        \
     nx_control_model_priority((irq), (priority))
+#undef NVIC_EnableIRQ
 #define NVIC_EnableIRQ(irq) nx_control_model_enable(irq)
 
 /** \brief ARM CLZ semantics, including the defined zero result. */

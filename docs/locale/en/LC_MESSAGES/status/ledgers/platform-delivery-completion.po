@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 50e4845c7be21c0748f728cad3418754f2ecc5fe6f023c3ca2b7f8aaf38f1c56\n"
+"X-Nexus-Source-SHA256: ad148a2babc9038b4093cacff4ab85a708fcf2e5422483d4ccd43e1e76bae8c0\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
@@ -1863,12 +1863,6 @@ msgstr ""
 "Reviewed increments synchronize to GitHub; code software hardware and "
 "publication exits remain independently accurate"
 
-
-# Vendor-first additions independently reviewed against the extracted source.
-
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`。"
-msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`."
-
 msgid "本表包含 175 条原记录，仅表示来源行数。"
 msgstr "This table contains 175 original records; this is only the source row count."
 
@@ -2007,9 +2001,6 @@ msgstr "V-C01"
 msgid "最小静态 context"
 msgstr "Minimal static context"
 
-msgid "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/"
-msgstr "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/"
-
 msgid "仅保留所选 Handle、配置、请求和模式扩展，不增加通用最大状态。"
 msgstr "Retain only selected Handles, configuration, requests and mode extensions without universal maximum state."
 
@@ -2018,15 +2009,6 @@ msgstr "V-C02"
 
 msgid "副作用前校验"
 msgstr "Validation before effects"
-
-msgid "partial_reference_payload_alias_guard"
-msgstr "partial_reference_payload_alias_guard"
-
-msgid "reference_red_green_passed_not_production"
-msgstr "reference_red_green_passed_not_production"
-
-msgid "build/vendor-first-20261030/hal-tests/handoff.json"
-msgstr "build/vendor-first-20261030/hal-tests/handoff.json"
 
 msgid "在硬件影响前检查上下文、长度、对齐、内存域、deadline、模式和资源。"
 msgstr "Check context, length, alignment, memory domain, deadline, mode and resources before hardware effects."
@@ -2091,9 +2073,6 @@ msgstr "V-D01"
 msgid "真实 IRQ 抢占合同"
 msgstr "Real IRQ preemption contract"
 
-msgid "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/"
-msgstr "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/"
-
 msgid "生产 IRQ 协议明确处理抢占，不能原样使用串行夹具的跳过 handler 假设。"
 msgstr "Production IRQ protocol handles preemption explicitly instead of copying the serialized fixture handler-skipping assumption."
 
@@ -2147,15 +2126,6 @@ msgstr "V-E01"
 
 msgid "完整 UART 生产候选"
 msgstr "Complete UART production candidate"
-
-msgid "partial_reference_only"
-msgstr "partial_reference_only"
-
-msgid "serialized_finite_tx_reference_passed_not_production"
-msgstr "serialized_finite_tx_reference_passed_not_production"
-
-msgid "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/"
-msgstr "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/"
 
 msgid "有限 TX HAL 评估扩为明确完整模式候选，不以 TX-only 代替既有 dma-tx。"
 msgstr "Extend finite TX HAL evaluation into an explicit complete-mode candidate without substituting TX-only for existing dma-tx."
@@ -2232,14 +2202,8 @@ msgstr "GPIO and pin migration"
 msgid "partial_f407_gd470_selected_primitives"
 msgstr "partial_f407_gd470_selected_primitives"
 
-msgid "focused_development_passed_final_index_gate_pending"
-msgstr "focused_development_passed_final_index_gate_pending"
-
 msgid "soc/;drivers/;io/;components/;cmake/package/verification/"
 msgstr "soc/;drivers/;io/;components/;cmake/package/verification/"
-
-msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json"
-msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json"
 
 msgid "扩大 LL/SPL，保持安全电平顺序、权限与组合 set/reset 原子性。"
 msgstr "Expand LL/SPL while preserving safe-level ordering, permission checks and combined set/reset atomicity."
@@ -2325,9 +2289,6 @@ msgstr "RTC/LPTIM/watchdog migration"
 msgid "partial_f407_watchdog_primitives"
 msgstr "partial_f407_watchdog_primitives"
 
-msgid "build/vendor-first-20261030/stm32/handoff.json"
-msgstr "build/vendor-first-20261030/stm32/handoff.json"
-
 msgid "保持时间连续性、唤醒合同和不可逆硬件影响。"
 msgstr "Preserve time continuity, wake contracts and irreversible hardware effects."
 
@@ -2373,9 +2334,6 @@ msgstr "GD470 maintained-mode closure"
 msgid "partial_selected_gd470_primitives"
 msgstr "partial_selected_gd470_primitives"
 
-msgid "build/vendor-first-20261030/gd32/handoff.json"
-msgstr "build/vendor-first-20261030/gd32/handoff.json"
-
 msgid "扩大 SPL 并独立验证路由、时钟、DMA 撤离和模式差异。"
 msgstr "Expand SPL and independently verify routes, clocks, DMA withdrawal and mode differences."
 
@@ -2415,14 +2373,8 @@ msgstr "Resolver category localization"
 msgid "partial_controller_and_endpoint_localization"
 msgstr "partial_controller_and_endpoint_localization"
 
-msgid "194_focused_and_710_files_schema_equivalent"
-msgstr "194_focused_and_710_files_schema_equivalent"
-
 msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/"
 msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/"
-
-msgid "build/vendor-first-20261030/configure/handoff.json"
-msgstr "build/vendor-first-20261030/configure/handoff.json"
 
 msgid "类别归一化就近维护，公共入口保留共同仲裁和原子发布。"
 msgstr "Maintain category normalization locally while common entry points retain arbitration and atomic publication."
@@ -2535,12 +2487,6 @@ msgstr "V-J01"
 msgid "真实 TDD 顺序"
 msgstr "Actual TDD order"
 
-msgid "partial_reference_alias_red_green"
-msgstr "partial_reference_alias_red_green"
-
-msgid "reference_actual_red_then_green_passed"
-msgstr "reference_actual_red_then_green_passed"
-
 msgid "tests/;tools/testing/;scripts/ci/;tools/dev/"
 msgstr "tests/;tools/testing/;scripts/ci/;tools/dev/"
 
@@ -2553,12 +2499,6 @@ msgstr "V-J02"
 msgid "adapter 合同测试"
 msgstr "Adapter contract tests"
 
-msgid "partial_selected_adapter_boundary_regressions"
-msgstr "partial_selected_adapter_boundary_regressions"
-
-msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
-msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
-
 msgid "GoogleTest/GoogleMock 检查真实 adapter，mock 仅位于明确外部边界。"
 msgstr "GoogleTest/GoogleMock checks real adapters with mocks only at explicit external boundaries."
 
@@ -2567,15 +2507,6 @@ msgstr "V-J03"
 
 msgid "实际官方源码测试"
 msgstr "Actual official-source tests"
-
-msgid "partial_actual_spl_and_hal_reference_runs"
-msgstr "partial_actual_spl_and_hal_reference_runs"
-
-msgid "focused_development_passed_not_full_transport"
-msgstr "focused_development_passed_not_full_transport"
-
-msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
-msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
 
 msgid "实际编译执行所选官方源码，验证与 adapter 的组合。"
 msgstr "Compile and execute selected official sources to verify their combination with the adapter."
@@ -2870,3 +2801,346 @@ msgstr "Pages and formal publication"
 
 msgid "实际执行 Pages/Release，记录真实执行与产物身份。"
 msgstr "Actually execute Pages/Release publication and record real execution and artifact identities."
+
+msgid "ordinary_complete_index_passed_at_9c0460b9_scoped_only"
+msgstr "ordinary_complete_index_passed_at_9c0460b9_scoped_only"
+
+msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+
+msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+
+msgid "build/vendor-first-20261030/configure/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+msgstr "build/vendor-first-20261030/configure/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+
+msgid "implemented_selected_f407_gd470_offset_images"
+msgstr "implemented_selected_f407_gd470_offset_images"
+
+msgid "configuration_linker_artifact_and_six_arm_links_passed_final_gate_pending"
+msgstr "configuration_linker_artifact_and_six_arm_links_passed_final_gate_pending"
+
+msgid "tools/configure/configure.py;tools/configure/memory.py;soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;tools/measurement/elf.py;tools/measurement/resources.py;tools/evidence/candidate.py;tools/evidence/reproduce.py"
+msgstr "tools/configure/configure.py;tools/configure/memory.py;soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;tools/measurement/elf.py;tools/measurement/resources.py;tools/evidence/candidate.py;tools/evidence/reproduce.py"
+
+msgid "build/vendor-first-20261030/image-layout/handoff.json;build/vendor-first-20261030/image-layout/artifact-handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json"
+msgstr "build/vendor-first-20261030/image-layout/handoff.json;build/vendor-first-20261030/image-layout/artifact-handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json"
+
+msgid "partial_fail_fast_native_preflight"
+msgstr "partial_fail_fast_native_preflight"
+
+msgid "actual_red_green_and_9c0460b9_complete_index_gate_passed"
+msgstr "actual_red_green_and_9c0460b9_complete_index_gate_passed"
+
+msgid "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+msgstr "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
+
+msgid "partial_first_increment_committed_and_pushed"
+msgstr "partial_first_increment_committed_and_pushed"
+
+msgid "ordinary_complete_index_passed_at_9c0460b9_merge_release_pending"
+msgstr "ordinary_complete_index_passed_at_9c0460b9_merge_release_pending"
+
+msgid "build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json"
+msgstr "build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json"
+
+msgid "partial_reviewed_f4_pin_pairing_25file_closure"
+msgstr "partial_reviewed_f4_pin_pairing_25file_closure"
+
+msgid "f4_pin_pair_license_and_export_compile_passed_other_family_review_pending"
+msgstr "f4_pin_pair_license_and_export_compile_passed_other_family_review_pending"
+
+msgid "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py"
+msgstr "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py"
+
+msgid "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json"
+msgstr "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json"
+
+msgid "partial_selected_f407_uart_dma_rcc_private_sources"
+msgstr "partial_selected_f407_uart_dma_rcc_private_sources"
+
+msgid "selected_arm_native_factory_passed_final_gate_pending"
+msgstr "selected_arm_native_factory_passed_final_gate_pending"
+
+msgid "partial_selected_f407_private_callback_abi1"
+msgstr "partial_selected_f407_private_callback_abi1"
+
+msgid "selected_private_configuration_and_real_hal_model_passed_full_symbols_pending"
+msgstr "selected_private_configuration_and_real_hal_model_passed_full_symbols_pending"
+
+msgid "partial_selected_f407_private_compile_boundary"
+msgstr "partial_selected_f407_private_compile_boundary"
+
+msgid "selected_native_arm_boundary_passed_full_consumers_pending"
+msgstr "selected_native_arm_boundary_passed_full_consumers_pending"
+
+msgid "partial_f4_lock_and_export_closure"
+msgstr "partial_f4_lock_and_export_closure"
+
+msgid "actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending"
+msgstr "actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending"
+
+msgid "partial_selected_f407_static_handle_owner"
+msgstr "partial_selected_f407_static_handle_owner"
+
+msgid "selected_generated_factory_and_real_hal_model_passed_resource_ab_pending"
+msgstr "selected_generated_factory_and_real_hal_model_passed_resource_ab_pending"
+
+msgid "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+msgstr "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+
+msgid "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+msgid "partial_selected_f407_admission_and_alias_guards"
+msgstr "partial_selected_f407_admission_and_alias_guards"
+
+msgid "actual_reference_and_complete_mode_red_green_passed_final_gate_pending"
+msgstr "actual_reference_and_complete_mode_red_green_passed_final_gate_pending"
+
+msgid "build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+msgid "partial_selected_f407_borrow_before_hal"
+msgstr "partial_selected_f407_borrow_before_hal"
+
+msgid "actual_synchronous_callback_and_start_model_passed_final_gate_pending"
+msgstr "actual_synchronous_callback_and_start_model_passed_final_gate_pending"
+
+msgid "partial_selected_f407_accepted_failure_withdrawal"
+msgstr "partial_selected_f407_accepted_failure_withdrawal"
+
+msgid "actual_real_hal_failure_and_drain_models_passed_final_gate_pending"
+msgstr "actual_real_hal_failure_and_drain_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_cancel_deadline_withdrawal"
+msgstr "partial_selected_f407_cancel_deadline_withdrawal"
+
+msgid "actual_cancel_timeout_quarantine_models_passed_final_gate_pending"
+msgstr "actual_cancel_timeout_quarantine_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_cold_lease_and_deinit"
+msgstr "partial_selected_f407_cold_lease_and_deinit"
+
+msgid "actual_partial_cleanup_and_two_owner_models_passed_final_gate_pending"
+msgstr "actual_partial_cleanup_and_two_owner_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_handle_irq_reference_join"
+msgstr "partial_selected_f407_handle_irq_reference_join"
+
+msgid "actual_late_callback_and_handle_reuse_models_passed_final_gate_pending"
+msgstr "actual_late_callback_and_handle_reuse_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_first_cause_and_cleanup"
+msgstr "partial_selected_f407_first_cause_and_cleanup"
+
+msgid "actual_first_cause_and_cold_cleanup_models_passed_final_gate_pending"
+msgstr "actual_first_cause_and_cold_cleanup_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_vector_deferral_protocol"
+msgstr "partial_selected_f407_vector_deferral_protocol"
+
+msgid "actual_selected_irq_preemption_models_passed_physical_latency_pending"
+msgstr "actual_selected_irq_preemption_models_passed_physical_latency_pending"
+
+msgid "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+msgstr "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+
+msgid "partial_selected_f407_short_guards_and_held_en_te_deferral"
+msgstr "partial_selected_f407_short_guards_and_held_en_te_deferral"
+
+msgid "actual_atomic_and_quiet_error_irq_models_passed_wcet_pending"
+msgstr "actual_atomic_and_quiet_error_irq_models_passed_wcet_pending"
+
+msgid "partial_selected_f407_per_handle_callback_facts"
+msgstr "partial_selected_f407_per_handle_callback_facts"
+
+msgid "actual_task_sync_irq_callback_models_passed_final_gate_pending"
+msgstr "actual_task_sync_irq_callback_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_existing_epoch_bridge"
+msgstr "partial_selected_f407_existing_epoch_bridge"
+
+msgid "actual_clock_metadata_tick_wrap_and_real_hal_models_passed_full_power_review_pending"
+msgstr "actual_clock_metadata_tick_wrap_and_real_hal_models_passed_full_power_review_pending"
+
+msgid "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/system.c;tests/google/stm32_system_transaction_test.cpp"
+msgstr "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/;soc/stm32/stm32f407/system.c;tests/google/stm32_system_transaction_test.cpp"
+
+msgid "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-integration/clock-final-green/run.command.json"
+msgstr "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-integration/clock-final-green/run.command.json"
+
+msgid "partial_selected_f407_no_hal_systick"
+msgstr "partial_selected_f407_no_hal_systick"
+
+msgid "existing_epoch_and_selected_wake_models_passed_full_backend_contexts_pending"
+msgstr "existing_epoch_and_selected_wake_models_passed_full_backend_contexts_pending"
+
+msgid "partial_selected_f407_saved_mask_and_barriers"
+msgstr "partial_selected_f407_saved_mask_and_barriers"
+
+msgid "actual_saved_mask_and_selected_arm_compile_passed_physical_memory_order_pending"
+msgstr "actual_saved_mask_and_selected_arm_compile_passed_physical_memory_order_pending"
+
+msgid "implemented_selected_f407_dma_tx_hal_and_disjoint_irq_rx"
+msgstr "implemented_selected_f407_dma_tx_hal_and_disjoint_irq_rx"
+
+msgid "complete_mode_real_hal_model_native_factory_and_selected_arm_passed_final_gate_pending"
+msgstr "complete_mode_real_hal_model_native_factory_and_selected_arm_passed_final_gate_pending"
+
+msgid "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+msgstr "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;soc/stm32/stm32f407/drivers/uart_hal.c;soc/stm32/stm32f407/private/stm32f407_uart_hal.h"
+
+msgid "implemented_selected_f407_hal_cold_lease"
+msgstr "implemented_selected_f407_hal_cold_lease"
+
+msgid "actual_initialization_readback_partial_failure_and_close_retry_models_passed_final_gate_pending"
+msgstr "actual_initialization_readback_partial_failure_and_close_retry_models_passed_final_gate_pending"
+
+msgid "implemented_selected_f407_hal_dma_to_wire_tc"
+msgstr "implemented_selected_f407_hal_dma_to_wire_tc"
+
+msgid "actual_real_hal_dma_tc_uart_tc_and_count_models_passed_final_gate_pending"
+msgstr "actual_real_hal_dma_tc_uart_tc_and_count_models_passed_final_gate_pending"
+
+msgid "implemented_selected_f407_disjoint_irq_rx"
+msgstr "implemented_selected_f407_disjoint_irq_rx"
+
+msgid "actual_byte_event_loss_timestamp_wake_models_passed_final_gate_pending"
+msgstr "actual_byte_event_loss_timestamp_wake_models_passed_final_gate_pending"
+
+msgid "implemented_selected_f407_one_tx_rx_provider_owner"
+msgstr "implemented_selected_f407_one_tx_rx_provider_owner"
+
+msgid "actual_abort_dma_error_shared_irq_and_foreign_domain_models_passed_final_gate_pending"
+msgstr "actual_abort_dma_error_shared_irq_and_foreign_domain_models_passed_final_gate_pending"
+
+msgid "implemented_selected_f407_stop_and_resubmit"
+msgstr "implemented_selected_f407_stop_and_resubmit"
+
+msgid "actual_sync_late_irq_deinit_retry_and_resubmit_models_passed_final_gate_pending"
+msgstr "actual_sync_late_irq_deinit_retry_and_resubmit_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_same_config_arm_flash_ram_comparison"
+msgstr "partial_selected_f407_same_config_arm_flash_ram_comparison"
+
+msgid "paired_arm_images_and_byte_identical_resolved_passed_stack_cycles_pending"
+msgstr "paired_arm_images_and_byte_identical_resolved_passed_stack_cycles_pending"
+
+msgid "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml;tools/measurement/resources.py;tools/measurement/workload.c"
+msgstr "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/;tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml;tools/measurement/resources.py;tools/measurement/workload.c"
+
+msgid "build/vendor-first-20261030/cost/normalized-comparison.json;build/vendor-first-20261030/cost/final-default-artifacts/manifest.json;build/vendor-first-20261030/cost/final-symbol-check.json"
+msgstr "build/vendor-first-20261030/cost/normalized-comparison.json;build/vendor-first-20261030/cost/final-default-artifacts/manifest.json;build/vendor-first-20261030/cost/final-symbol-check.json"
+
+msgid "partial_selected_f407_dma_tx_source_replacement"
+msgstr "partial_selected_f407_dma_tx_source_replacement"
+
+msgid "selected_generated_source_and_arm_passed_sdk_consumers_and_full_gate_pending"
+msgstr "selected_generated_source_and_arm_passed_sdk_consumers_and_full_gate_pending"
+
+msgid "partial_selected_reference_and_complete_mode_actual_red_green"
+msgstr "partial_selected_reference_and_complete_mode_actual_red_green"
+
+msgid "actual_source_binary_red_green_snapshots_retained_final_gate_pending"
+msgstr "actual_source_binary_red_green_snapshots_retained_final_gate_pending"
+
+msgid "tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp"
+msgstr "tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp"
+
+msgid "build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+msgid "partial_selected_real_hal_adapter_models"
+msgstr "partial_selected_real_hal_adapter_models"
+
+msgid "selected_real_adapter_regressions_passed_final_gate_pending"
+msgstr "selected_real_adapter_regressions_passed_final_gate_pending"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+msgid "partial_actual_spl_and_selected_hal_source_models"
+msgstr "partial_actual_spl_and_selected_hal_source_models"
+
+msgid "selected_official_uart_dma_rcc_model_and_arm_compile_passed_final_gate_pending"
+msgstr "selected_official_uart_dma_rcc_model_and_arm_compile_passed_final_gate_pending"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+msgid "partial_selected_f407_preemption_and_instance_isolation"
+msgstr "partial_selected_f407_preemption_and_instance_isolation"
+
+msgid "actual_selected_failure_sync_preemption_late_and_isolation_models_passed_final_gate_pending"
+msgstr "actual_selected_failure_sync_preemption_late_and_isolation_models_passed_final_gate_pending"
+
+msgid "partial_selected_f407_failure_withdrawal_orderings"
+msgstr "partial_selected_f407_failure_withdrawal_orderings"
+
+msgid "actual_cancel_tc_error_refused_drain_repeat_stop_and_resubmit_models_passed_final_gate_pending"
+msgstr "actual_cancel_tc_error_refused_drain_repeat_stop_and_resubmit_models_passed_final_gate_pending"
+
+msgid "partial_selected_driver_offset_and_hal_arm_contexts"
+msgstr "partial_selected_driver_offset_and_hal_arm_contexts"
+
+msgid "selected_real_hal_arm_and_six_offset_links_passed_full_matrix_pending"
+msgstr "selected_real_hal_arm_and_six_offset_links_passed_full_matrix_pending"
+
+msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
+
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`。"
+msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`."
+
+msgid "implemented_soc_local_data_only_descriptors"
+msgstr "implemented_soc_local_data_only_descriptors"
+
+msgid "focused_descriptor_provider_sdk_closure_and_71bundle_equivalence_passed_final_gate_pending"
+msgstr "focused_descriptor_provider_sdk_closure_and_71bundle_equivalence_passed_final_gate_pending"
+
+msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/providers/descriptor.py;tools/configure/providers/__init__.py;soc/native/descriptor.py;soc/stm32/;soc/gd32/"
+msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/providers/descriptor.py;tools/configure/providers/__init__.py;soc/native/descriptor.py;soc/stm32/;soc/gd32/"
+
+msgid "build/vendor-first-20261030/descriptor-localization/root-handoff.json"
+msgstr "build/vendor-first-20261030/descriptor-localization/root-handoff.json"
+
+msgid "reviewed_existing_semantic_mode_selection_retained"
+msgstr "reviewed_existing_semantic_mode_selection_retained"
+
+msgid "source_contract_reviewed_no_new_runtime_behavior_claim"
+msgstr "source_contract_reviewed_no_new_runtime_behavior_claim"
+
+msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/selection.py;tools/configure/contracts.py"
+msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;tools/configure/selection.py;tools/configure/contracts.py"
+
+msgid "docs/design/integration-contracts.md;docs/guides/provider-porting.md"
+msgstr "docs/design/integration-contracts.md;docs/guides/provider-porting.md"
+
+msgid "reviewed_existing_shared_engine_ownership_retained"
+msgstr "reviewed_existing_shared_engine_ownership_retained"
+
+msgid "source_ownership_contract_reviewed_no_reimplementation_claim"
+msgstr "source_ownership_contract_reviewed_no_reimplementation_claim"
+
+msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/"
+msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/"
+
+msgid "docs/explanation/platform-architecture.md;docs/guides/provider-porting.md"
+msgstr "docs/explanation/platform-architecture.md;docs/guides/provider-porting.md"
+
+msgid "implemented_selected_private_template_guards_and_macro_scope"
+msgstr "implemented_selected_private_template_guards_and_macro_scope"
+
+msgid "focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending"
+msgstr "focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending"
+
+msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py"
+msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py"
+
+msgid "build/vendor-first-20261030/template-contracts/actual-root/handoff.json"
+msgstr "build/vendor-first-20261030/template-contracts/actual-root/handoff.json"

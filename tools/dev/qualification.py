@@ -44,6 +44,7 @@ CHECKERS = {
     "sdk_consumers": ("cmake/package/verify_consumers.py",),
     "sdk_boundary_tests": ("tests/contracts/test_source_sdk.py",),
     "build_artifact_tests": ("tests/contracts/test_build_artifacts.py",),
+    "image_artifact_tests": ("tests/contracts/test_image_artifacts.py",),
     "resource_budget": ("tools/measurement/resources.py",),
     "retention": ("tools/measurement/retention.py",),
     "compatibility": ("tools/maintenance/compatibility.py",),

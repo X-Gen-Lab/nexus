@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 513cf06c7c8ac99115e84782b3b59aac1de2dc070ababdf72d7bc5166164a1af\n"
+"X-Nexus-Source-SHA256: 97e27138ba9045ec83495fe877cf7e4b347aee5165a867d829ca8b1b874e93ca\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -45,37 +45,9 @@ msgstr ""
 msgid "Implementation boundary"
 msgstr "实现边界"
 
-msgid ""
-"The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at "
-"`b6f0ed3829f3829eb358a2e7417d80bba1a42db7`. Its CMSIS Device pairing comes "
-"from STM32CubeF4 v1.28.3. The machine authority is [the official-driver "
-"lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/dependencies/stm32f4-hal.lock.json), checked against the selected Git"
-" dependency and imported SDK bytes. The lock records the reviewed LL headers"
-" and license; it is not a declaration that all HAL modules are compiled, "
-"supported or validated."
-msgstr ""
-"已审查的 F4 依赖是 STM32 HAL Driver v1.8.5，固定提交为 "
-"`b6f0ed3829f3829eb358a2e7417d80bba1a42db7`。它与 CMSIS Device 的配对来自 STM32CubeF4"
-" v1.28.3。机器权威是[官方驱动锁](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json)，校验时对照所选 Git 依赖与导入 "
-"SDK 字节。锁文件记录已审查的 LL 头和许可证，不表示全部 HAL 模块均已编译、支持或验证。"
-
 # CMSIS6 actual-POT delta; independent review pending.
 msgid "CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family entries while keeping their Device/startup, HAL/LL and imported vendor bytes. The internal `nexus_cmsis_core` target supplies CPU headers; it does not change public Nexus types, Arch context/ownership contracts or the selected peripheral state machine. [Vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) distinguishes the release, Core version macros, literal pack metadata and license identities. Actual include closure, firmware links and installed-SDK consumption require current-source evidence; a common Core pin does not transfer F4 qualification to G4, H7, U5 or GD32."
 msgstr "CMSIS Device 配对与共享的 Arm CMSIS-Core 来源分别维护。Core 迁移为七个维护中的 STM32/GD32 family 入口锁定官方 v6.4.0，同时保持各自的 Device/startup、HAL/LL 和供应商导入字节。内部 `nexus_cmsis_core` 目标提供 CPU 头，不改变公共 Nexus 类型、Arch 上下文／所有权合同或已选外设状态机。[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)分别记录发布版本、Core 版本宏、原始 pack 元数据和许可证身份。实际 include 闭包、固件链接和安装后 SDK 消费都需要当前源码的执行证据；使用同一 Core pin 不会把 F4 的资格转移给 G4、H7、U5 或 GD32。"
-
-msgid ""
-"The selected production approach uses official LL operations inside existing"
-" F407 provider state machines. It retains request admission, absolute "
-"deadlines, wire completion, cancellation, drain and quarantine. A full HAL "
-"Handle/callback transport is a separate evaluation and must not be described"
-" as an implemented platform-wide HAL migration. G4, H7 and U5 do not inherit"
-" F4 support or dependency qualification. GD32 remains a separate provider."
-msgstr ""
-"所选生产方案在现有 F407 provider 状态机内使用官方 LL 操作，保留 request 准入、绝对 "
-"deadline、线上完成、取消、排空与隔离。完整 HAL Handle/callback transport 是独立评估项，不能描述为已经实施的全平台"
-" HAL 迁移。G4、H7、U5 不继承 F4 支持或依赖资格。GD32 继续使用独立 provider。"
 
 msgid "Owner"
 msgstr "责任方"
@@ -482,17 +454,11 @@ msgstr ""
 "Bootloader 交接、动态变频、deep STOP、更广的 H743 DMA 和通用 U575 跨域 I/O，继续保留[SoC "
 "完善台账](soc-refinement.md)中各自未实现或部分实现的退出条件。官方驱动不会自动提供这些功能需要的平台合同。"
 
-
-# Vendor-first additions independently reviewed against the extracted source.
-
 msgid "Vendor-first target and current implementation"
 msgstr "官方库优先目标与当前实现"
 
 msgid "Official hardware libraries are the default input for further provider work. Reuse reviewed HAL transport when it satisfies the complete selected mode; otherwise bind suitable LL or SPL primitives to the required bounded mechanism. Nexus retains admission, borrowed storage, deadlines, result publication and resource responsibility. Direct register helpers remain justified exceptions for an exact SDK gap, erratum, atomic operation or demonstrated budget."
 msgstr "官方硬件库是后续 provider 工作的默认输入。已审查 HAL transport 满足完整所选模式时予以复用；否则将合适的 LL 或 SPL 原语静态绑定到所需有界机制。Nexus 保留准入、借用存储、deadline、结果发布和资源责任。直接寄存器 helper 仅作为精确 SDK 缺口、erratum、原子操作或实测预算的有理由例外。"
-
-msgid "This is the target for the vendor-first work, not a claim that production modes have already changed. The current STM32 targets select reviewed LL operations; the F4 Handle transport remains an explicit evaluation. GD32F470 already compiles selected official SPL C units. An include, primitive call or passing finite-TX fixture does not establish a complete vendor transport or family qualification."
-msgstr "这是官方库优先工作的目标，不表示生产模式已经改变。当前 STM32 目标选择已审查 LL 操作；F4 Handle transport 仍属于明确的评估范围。GD32F470 已编译所选官方 SPL C 单元。包含头文件、调用原语或通过有限 TX 夹具，不代表完整 vendor transport 或整个家族取得资格。"
 
 msgid "The {download}`existing delivery-completion ledger <platform-delivery-completion.csv>` appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while preserving the older rows and frozen results. Each new row starts with its real implementation, software and physical status; a plan has no execution evidence. The [derived ledger view](../status/ledgers/platform-delivery-completion.md) uses the same renderer. No second support or completion database is introduced."
 msgstr "{download}`现有交付完善台账 <platform-delivery-completion.csv>`追加 V-A01 至 V-L08、V-P01 至 V-P06 及 V-X01 至 V-X04，保留旧记录和冻结结果。各新记录分别保留真实实现、软件和物理状态；计划没有执行证据。[派生台账视图](../status/ledgers/platform-delivery-completion.md)继续使用同一 renderer，不引入第二套支持或完成状态数据库。"
@@ -556,9 +522,6 @@ msgstr "F103/GD303 errata、F407/GD470 stream DMA、G474 DMAMUX 与触发耦合�
 
 msgid "Production promotion gates"
 msgstr "生产推广门槛"
-
-msgid "The first STM32 candidate evaluates the complete existing F407 UART `dma-tx` contract. That mode includes RX configuration and storage. The current finite-TX reference therefore cannot replace it unchanged. Promotion must preserve RX bytes/events, frame/error/loss ordering, timestamps, wake, cancellation, the shared UART IRQ and complete stop. If the official receiver cannot satisfy that contract, the selected mode may retain a reviewed LL mechanism; a narrower new mode needs an explicit contract and actual use case."
-msgstr "首个 STM32 候选评价当前 F407 UART `dma-tx` 的完整合同。该模式包含 RX 配置与存储，所以当前有限 TX 参考不能直接替换。推广必须保留 RX bytes/events、frame/error/loss 顺序、时间戳、wake、取消、共享 UART IRQ 和完整 stop。官方接收机制若不能满足合同，该模式可以保留已审查 LL 机制；更窄的新模式需要明确合同和真实用例。"
 
 msgid "The serialized reference's `hal_depth` IRQ guard is not an MCU preemption design. Production must establish allowed HAL nesting, short guards, pending-fact handling and real IRQ service ordering. Do not mask all interrupts around vendor calls that may wait. An abort callback can run synchronously in task context; bridges record bounded facts and use notification permitted in the actual context. Product callbacks and final settlement do not run arbitrarily inside vendor callback stacks."
 msgstr "串行参考的 `hal_depth` IRQ guard 不是 MCU 抢占设计。生产实现必须明确允许的 HAL 嵌套、短 guard、pending-fact 处理和真实 IRQ 服务顺序。不得在可能等待的 vendor 调用周围屏蔽全部中断。abort callback 可以在 task 上下文同步执行；桥接记录有界事实，并使用实际上下文允许的通知。产品 callback 和最终结清不能任意在 vendor callback 调用栈内执行。"
@@ -649,3 +612,101 @@ msgstr "分别观测已连接设备的物理执行与真实外部环境/发布�
 
 msgid "Keep developer tests focused, execute the ordinary complete-index gate for each functional increment, and run the complete qualification plan for the frozen source. New behavior and fixes require actual RED then GREEN. Pure equivalent refactors use the applicable regressions and output checks without fabricated RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only. Preserve original attempts and compare complete providers, not only Handle sizes. Without connected equipment, physical rows remain `not_executed`."
 msgstr "开发测试保持聚焦，每个功能增量执行普通完整 index 门禁，冻结源码执行完整资格计划。新行为与修复要求实际 RED 后 GREEN。纯等价重构使用适用回归和输出检查，不制造 RED 失败。固件保持 C11；GoogleTest/GoogleMock 仅用于 host。保留原始执行，比较完整 provider，不只比较 Handle 大小。未连接设备时，物理记录保持 `not_executed`。"
+
+
+msgid "Selected F407VE/ZG and GD470 offset images now have reviewed configuration, startup, vector/linker and ELF-to-BIN boundaries; the [assembly reference](../reference/configuration/assembly.md#physical-flash-and-the-selected-image) distinguishes their image window from complete physical Flash. This is not boot authentication, Flash access control or running-image handoff qualification. The F407 handoff retains PRIMASK=1 and startup does not unmask it; an offset FreeRTOS link cannot establish a valid FreeRTOS handoff."
+msgstr "所选 F407VE/ZG 和 GD470 偏移镜像已有已审查的配置、startup、向量/linker 及 ELF-to-BIN 边界；[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)区分镜像窗口和完整物理 Flash。这不是启动认证、Flash 访问控制或运行态镜像交接资格。F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移 FreeRTOS 链接不能建立有效 FreeRTOS handoff。"
+
+
+msgid "The selected F407 UART `dma-tx` provider uses official HAL finite TX with a disjoint LL IRQ receiver under one private owner. Other F407 UART modes retain their existing engines; G4, H7 and U5 retain their reviewed LL integrations. GD32F470 compiles selected official SPL C units. Source selection, model tests, ARM links and physical execution remain separate evidence. An include, primitive call or finite-TX fixture alone does not establish a complete transport or family qualification."
+msgstr "所选 F407 UART `dma-tx` provider 在一个私有 owner 内使用官方 HAL 有限 TX 和分离的 LL IRQ 接收器。其他 F407 UART 模式保留既有引擎；G4、H7 和 U5 保留已审查的 LL 集成。GD32F470 编译所选官方 SPL C 单元。源码选择、模型测试、ARM 链接和物理执行仍是分别取得的证据。仅 include、原语调用或有限 TX 夹具不能建立完整 transport 或系列资格。"
+
+msgid "The selected F407 `dma-tx` implementation preserves the complete mode, including IRQ RX bytes/events, frame/error/loss ordering, timestamps, wake and storage. HAL owns finite TX DMA, the UART TC completion sequence and transmit abort; the private provider owns their integration with the disjoint LL receiver and Nexus lifetime. The older serialized finite-TX reference remains evaluation evidence for its narrower contract, not the production mode's qualification. Other modes require their own complete evaluation before replacement."
+msgstr "所选 F407 `dma-tx` 实现保留完整模式，包括 IRQ RX byte/event、frame/error/loss 顺序、时间戳、wake 和存储。HAL 拥有有限 TX DMA、UART TC 完成顺序和 TX abort；私有 provider 负责它们与分离的 LL 接收器及 Nexus 生命周期的集成。较早的串行有限 TX reference 仍只为其较窄合同提供评估证据，不是生产模式的资格。其他模式替换前须分别完成完整评估。"
+
+msgid "The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at `b6f0ed3829f3829eb358a2e7417d80bba1a42db7`. Its CMSIS Device pairing comes from STM32CubeF4 v1.28.3. The machine authority is [the official-driver lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json), checked against the selected Git dependency and imported SDK bytes. The selected API is `stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`. Its 25-file closure retains the earlier LL/ETH definitions and license, and adds the reviewed HAL headers plus UART, DMA and RCC C units. GPIO/Flash declarations are required by RCC compilation; their C implementations, PWR and global `stm32f4xx_hal.c` are not selected. This lock is not a declaration that all HAL modules are supported or validated."
+msgstr "已审查的 F4 依赖是 STM32 HAL Driver v1.8.5，提交为 `b6f0ed3829f3829eb358a2e7417d80bba1a42db7`。其 CMSIS Device 配对来自 STM32CubeF4 v1.28.3。机器权威是[官方驱动 lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json)，对照所选 Git 依赖和导入 SDK 字节校验。所选 API 为 `stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`。其 25 文件闭包保留原 LL/ETH 定义和许可证，并增加已审查 HAL 头文件及 UART、DMA、RCC C 单元。RCC 编译需要 GPIO/Flash 声明；不选入其 C 实现、PWR 或全局 `stm32f4xx_hal.c`。这个 lock 不声明所有 HAL 模块均受支持或已验证。"
+
+msgid "F407 uses official LL operations inside its existing provider state machines, with one selected HAL transport for UART `dma-tx`. That transport retains request admission, absolute deadlines, wire completion, cancellation, drain and quarantine. It does not replace F407 IRQ-word, IRQ-block, RX-DMA or duplex providers. G4, H7 and U5 do not inherit F4 support or dependency qualification. GD32 remains a separate provider."
+msgstr "F407 在既有 provider 状态机内部使用官方 LL 操作，并为 UART `dma-tx` 选择一个 HAL transport。该 transport 保留请求准入、绝对 deadline、线上完成、取消、drain 和 quarantine。它不替换 F407 IRQ-word、IRQ-block、RX-DMA 或 duplex provider。G4、H7 和 U5 不继承 F4 支持或依赖资格。GD32 仍是独立 provider。"
+
+msgid "Selected F407 HAL UART transport"
+msgstr "所选 F407 HAL UART transport"
+
+msgid "The same authored `dma-tx` mode selects a static private owner, immutable cold configuration, one `UART_HandleTypeDef`, one `DMA_HandleTypeDef` and a shared readonly Nexus ops table. The factory still returns the existing Nexus face; neither vendor types nor callback registration become a public interface. The private callback ABI sets `USE_HAL_UART_REGISTER_CALLBACKS=1` consistently for the adapter and selected official C units. TX completion/error/transmit-abort/MSP and TX half-transfer callbacks are explicitly bound per Handle, without a global product callback override or runtime controller registry."
+msgstr "同一个用户编写的 `dma-tx` 模式选择静态私有 owner、不可变冷态配置、一个 `UART_HandleTypeDef`、一个 `DMA_HandleTypeDef` 和共享 readonly Nexus ops 表。factory 仍返回既有 Nexus face；vendor 类型和 callback 注册都不成为公共接口。私有 callback ABI 在 adapter 和所选官方 C 单元中一致设置 `USE_HAL_UART_REGISTER_CALLBACKS=1`。TX completion/error/transmit-abort/MSP 及 TX half-transfer callback 逐 Handle 显式绑定，不提供全局产品 callback 覆盖或运行时控制器 registry。"
+
+msgid "One provider owns both UART behavior domains. The LL receiver consumes RX status/data once, then temporarily masks RXNE/parity/error enables while `HAL_UART_IRQHandler` observes TX facts. HAL receive state remains idle, RX buffer/size/count and `hdmarx` remain empty, and DMAR stays clear. This prevents HAL error/abort paths from claiming the IRQ receiver. An unexpected receive domain or Handle/route identity change closes admission and retains quarantine; it does not adopt or abort a foreign DMA owner."
+msgstr "一个 provider 拥有 UART 的两个行为域。LL 接收器只消费一次 RX status/data，随后在 `HAL_UART_IRQHandler` 观察 TX 事实期间暂时屏蔽 RXNE/parity/error enable。HAL receive state 保持 idle，RX buffer/size/count 与 `hdmarx` 保持空，DMAR 保持清零。这样 HAL error/abort 路径不会认领 IRQ 接收器。意外的接收域或 Handle/route 身份变化会关闭准入并保留 quarantine；它不会接管或 abort 其他 DMA owner。"
+
+msgid "Admission establishes the request and payload borrow before a HAL call can retain them or invoke a synchronous callback. Callbacks latch bounded facts; task service alone withdraws transfer pointers and publishes final settlement. DMA completion still differs from UART TC and from full reference withdrawal. Cancel, timeout and deinitialization failures retain the request or cold lease until the same owner proves actual drain. Stop checks peripheral enables, DMA addresses/counts and pending/active IRQ references before releasing pins or clocks. A Handle is reused only after this withdrawal; official `HAL_DMA_Init` restores the reusable idle state where required, without assigning READY by hand."
+msgstr "准入在 HAL 调用可能保留引用或同步 callback 之前建立 request 和 payload 借用。callback 锁存有界事实；只有 task service 才撤回传输指针并发布最终 settlement。DMA 完成仍不同于 UART TC，也不同于全部引用撤回。取消、timeout 和 deinitialization 失败保留 request 或冷态 lease，直到同一个 owner 证明实际 drain。stop 在释放引脚或时钟前检查外设 enable、DMA 地址/计数及 pending/active IRQ 引用。只有这次撤回之后才能复用 Handle；需要时由官方 `HAL_DMA_Init` 恢复可复用 idle state，不手动赋值 READY。"
+
+msgid "The production IRQ gate saves the incoming CPU mask for short state changes. If a relevant UART/DMA IRQ preempts a task HAL call, it disables only that selected vector, leaves its hardware fact pending and restores the vector when the retained HAL stack exits. It does not spin or let a level IRQ tail-chain indefinitely inside that task call. Every `HAL_DMA_IRQHandler` entry requires EN readback clear, including an IRQ with only HT or no observed error: an error can arrive after a flag snapshot. While EN remains set, an HT-only event is acknowledged and HTIE disabled with official primitives; its registered private no-op callback is not invoked and no transfer state advances. Observed errors or inconsistent terminal facts withdraw DMAT and request disable once. Refused disable masks that DMA vector and quarantines the borrow; task service retries and dispatches HAL only after EN is clear. This excludes the pinned handler's `SystemCoreClock/9600` wait (17,500 iterations at 168 MHz) from the selected IRQ path. This is a bounded-path design, not measured interrupt latency or WCET."
+msgstr "生产 IRQ gate 为短状态变更保存调用前 CPU mask。相关 UART/DMA IRQ 抢占 task HAL 调用时，只禁用该选定 vector，保留其硬件 pending 事实，并在保留的 HAL 调用栈退出后恢复 vector。它不会自旋，也不会让 level IRQ 在该 task 调用中无限 tail-chain。每次进入 `HAL_DMA_IRQHandler` 都要求 EN 回读清零，包括只有 HT 或未观察到错误的 IRQ：错误可能在 flag 快照之后到达。EN 仍为置位时，只有 HT 的事件通过官方原语确认并禁用 HTIE；不调用已注册的私有 no-op callback，也不推进传输状态。观察到错误或不一致终态事实时，撤回 DMAT 并请求 disable 一次。disable 拒绝则屏蔽该 DMA vector 并 quarantine 借用；task service 重试，并仅在 EN 清零后分派 HAL。这样所选 IRQ 路径不会执行所锁定 handler 的 `SystemCoreClock/9600` 等待（168 MHz 时为 17,500 次迭代）。这是有界路径设计，不是已测中断延迟或 WCET。"
+
+msgid "The target-private compile profile replaces CMSIS exclusive-retry RMW macros with one saved-mask word update. This profile requires a single CPU owner of the aligned UART control words and no NMI, fault/panic logger or other writer. It preserves the incoming mask and leaves vendor source unchanged. The same profile uses nearest OVER16 BRR rounding with overflow-safe quotient/remainder; cold validation rejects zero baud or an out-of-field divisor before UART enable. It does not grant dynamic clock or arbitrary format support."
+msgstr "目标私有编译 profile 将 CMSIS exclusive-retry RMW 宏替换为一次保存 mask 的 word 更新。此 profile 要求对齐的 UART 控制 word 只有一个 CPU owner，且没有 NMI、fault/panic logger 或其他 writer。它保留调用前 mask，不修改 vendor 源码。同一 profile 使用最接近的 OVER16 BRR 舍入，以不会溢出的商/余数计算；冷态校验在 UART enable 之前拒绝零 baud 或超出字段范围的 divisor。它不授予动态时钟或任意格式支持。"
+
+msgid "Only the selected HAL UART/DMA/RCC source units enter the provider's private build. `HAL_Init`, `HAL_InitTick` and a HAL SysTick handler are not selected. `HAL_GetTick` reads `uint32_t` milliseconds modulo `2^32` from the existing live TIM2 epoch; bootstrap retains its separate finite polling limits. `SystemCoreClock` follows the last confirmed 16 MHz HSI or 168 MHz PLL observation, including partial startup and cleanup failures. Official RCC frequency getters use the selected prescaler tables rather than a fabricated constant clock."
+msgstr "只有所选 HAL UART/DMA/RCC 源单元进入 provider 私有构建。不选入 `HAL_Init`、`HAL_InitTick` 或 HAL SysTick handler。`HAL_GetTick` 从既有活动 TIM2 epoch 读取以 `uint32_t` 按 `2^32` 回绕的毫秒数；bootstrap 保留独立的有限轮询上限。`SystemCoreClock` 跟随最后确认的 16 MHz HSI 或 168 MHz PLL 观测，包括部分 startup 和 cleanup 失败。官方 RCC frequency getter 使用所选 prescaler 表，而不是虚构常量时钟。"
+
+msgid "The actual adapter/official-source model and clock tests establish their recorded software scope. Generated factory execution, selected ARM/SDK links, stack/cycle comparisons and the complete current-source gate remain separate exits. Physical IRQ latency, wire timing and long-load HIL are not executed without connected equipment. Do not infer a resource improvement from vendor reuse or a passing model."
+msgstr "实际 adapter/官方源码模型和时钟测试建立其已记录的软件范围。生成 factory 的执行、所选 ARM/SDK 链接、栈/周期比较及完整当前源码 gate 仍是分别验收的退出条件。没有连接设备时，不执行物理 IRQ latency、wire timing 和长期负载 HIL。不能从复用 vendor 代码或模型通过推断资源改善。"
+
+msgid "A paired development ARM firmware measurement uses the same F407ZG baremetal `uart_rx_compact_assembly/f407-dma-tx.toml`, UART workload and `NX_UART_ID_UART1`, GCC 14.3 M4F hard-float, `-Os`, no LTO and compiler cache off. Both builds add measurement-only `-ffile-prefix-map=<each-source-root>=.` so different absolute source-root spellings in retained `__FILE__` diagnostics do not bias Flash cost. Their resolved configuration bytes are identical. The normalized pair is:"
+msgstr "成对的开发 ARM 固件测量使用同一个 F407ZG 裸机 `uart_rx_compact_assembly/f407-dma-tx.toml`、UART workload 和 `NX_UART_ID_UART1`，以及 GCC 14.3 M4F hard-float、`-Os`、无 LTO、关闭编译缓存。两个构建都增加仅用于测量的 `-ffile-prefix-map=<each-source-root>=.`，避免保留的 `__FILE__` 诊断中不同绝对源码根路径的拼写影响 Flash 成本。二者解析配置字节相同。归一化成对结果如下："
+
+msgid "Measurement (bytes)"
+msgstr "测量项（字节）"
+
+msgid "Old LL (`9c0460b9`)"
+msgstr "旧 LL（`9c0460b9`）"
+
+msgid "Selected HAL"
+msgstr "所选 HAL"
+
+msgid "Change"
+msgstr "变化"
+
+msgid "Flash LOAD / footprint"
+msgstr "Flash LOAD / footprint"
+
+msgid "12,592"
+msgstr "12,592"
+
+msgid "18,188"
+msgstr "18,188"
+
+msgid "+5,596"
+msgstr "+5,596"
+
+msgid "Static RAM"
+msgstr "静态 RAM"
+
+msgid "248"
+msgstr "248"
+
+msgid "456"
+msgstr "456"
+
+msgid "+208"
+msgstr "+208"
+
+msgid "MSP reservation"
+msgstr "MSP 预留"
+
+msgid "2,048"
+msgstr "2,048"
+
+msgid "0"
+msgstr "0"
+
+msgid "Libc heap reservation"
+msgstr "Libc heap 预留"
+
+msgid "The ordinary new build without that measurement-only option loads 18,200 Flash bytes and uses 456 static RAM bytes. Both the ordinary build and normalized pair fit this fixture's 64 KiB Flash and 32 KiB static RAM budgets; MSP remains a separate 2,048-byte reservation and heap remains zero. This compares the complete increment, including clock metadata and shared RX changes, not isolated HAL overhead. The engineering decision favors reviewed official finite-TX reuse for this F407 mode at the explicit cost; it is not a memory/performance win or a mandate to use HAL for every family."
+msgstr "不带该测量专用选项的普通新构建加载 18,200 字节 Flash，使用 456 字节静态 RAM。普通构建和归一化成对构建均满足此夹具的 64 KiB Flash 和 32 KiB 静态 RAM 预算；MSP 仍单独预留 2,048 字节，heap 仍为零。这里比较的是包括时钟元数据和共享 RX 变化的完整增量，不是单独 HAL 开销。工程决策是在明确成本下，为此 F407 模式优先复用已审查官方有限 TX；这不是内存/性能优势，也不要求每个系列都使用 HAL。"
+
+msgid "The observed final ordinary ELF retains no `HAL_Init`, `HAL_InitTick`, `HAL_IncTick`, `HAL_RCC_ClockConfig` or `HAL_RCC_OscConfig`, and contains no exclusive instructions. These are observations of this image, not all possible callers. Stack high-water, execution cycles and physical behavior remain unmeasured. Final-source or other-configuration costs require their own ELF/map/resources."
+msgstr "所观测最终普通 ELF 不保留 `HAL_Init`、`HAL_InitTick`、`HAL_IncTick`、`HAL_RCC_ClockConfig` 或 `HAL_RCC_OscConfig`，也没有 exclusive 指令。这些只描述该镜像，不适用于所有可能调用者。栈 high-water、执行周期和物理行为仍未测量。最终源码或其他配置的成本须分别取得 ELF/map/resources。"

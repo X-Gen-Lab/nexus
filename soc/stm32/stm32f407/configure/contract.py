@@ -33,6 +33,9 @@ PREFIX = 'stm32'
 MODEL = False
 FLASH_PROGRAM_UNIT = 4
 FLASH_INPUT_ALIGNMENT = 1
+# The reviewed official startup table fits a 512-byte vector reservation.
+OFFSET_IMAGE_ALIGNMENT = 512
+OFFSET_IMAGE_VECTOR_SYMBOL = 'g_pfnVectors'
 FACT_REFERENCES = descriptor.maintained("stm32f407").references
 ETH_CONTROLLER = 'ETH'
 CONTROLLER_INTERFACES = MappingProxyType({
@@ -77,7 +80,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('exti', 'edge-event'): 'exti',
     ('pwm', 'fixed-pwm'): 'pwm',
     ('adc', 'low-rate-scan'): 'adc',
-    ('uart', 'dma-tx'): 'uart_dma',
+    ('uart', 'dma-tx'): 'uart_hal',
     ('uart', 'irq-blocks'): 'uart_stream',
     ('uart', 'rx-dma-idle'): 'uart_receive',
     ('uart', 'dma-duplex'): 'uart_duplex',

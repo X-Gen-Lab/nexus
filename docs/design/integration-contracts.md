@@ -43,6 +43,7 @@ SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使�
 soc/<vendor>/<family>/
   soc.json                 # 精确 SKU、内存、时钟与控制器事实
   routes.json              # 已复核路由及模式的有限 allowlist
+  descriptor.py            # 本家族只读元数据；不导入 configure 行为
   CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
   configure/              # 家族能力、准入、构造与生命周期生成
   private/                 # 私有 SDK 接口与硬件实现
@@ -60,8 +61,14 @@ family descriptor 给出，配置仍使用原 family 标识；物理目录不构
 CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 `arch/native`，公共头路径保持稳定。
 
 八个 provider 的生产配置模块随 SoC 放置；Native 使用 `soc/native/configure`。
-显式 provider map、共享 leaf 合同、通用解析、资源仲裁、typed IR 与原子 bundle
-仍在 `tools/configure`。配置测试位于 `tools/configure/tests/providers/<family>`。
+各自的数据型 `descriptor.py` 位于 SoC package 根目录，不放入 `configure/`。
+`tools/configure/providers/descriptor.py` 保留冻结的通用 `FamilyDescriptor` 和显式
+family→模块映射；provider loader 委托这个入口，不另建 eager registry。
+单次 `descriptor.maintained()` 查找只加载所选元数据，核对精确类型、family 和模块身份，
+不加载配置行为。显式 `families()` 枚举、初始源码快照或 SDK 清单允许读取全部
+元数据，不能将局部查找约束误写为整个生成器只读一个数据片段。
+共享 leaf 合同、通用解析、资源仲裁、typed IR 与原子 bundle 仍在
+`tools/configure`；配置测试位于 `tools/configure/tests/providers/<family>`。
 模块位置不增加运行时注册、转发、分配或任务，也不改变 CMake 的源码依赖权威。
 
 `routes.json` 每条记录至少绑定精确 SKU、controller、pin/AF、clock domain、IRQ、允许传输模式、允许 DMA route 和来源。可复用路由记录，但必须限定适用 SKU/封装。源资料复核与实板资格采用不同字段。
@@ -178,7 +185,9 @@ Board 提供实际 HSE/LSE、电气条件和必要跳线事实；SoC 提供合�
 
 静态 DMA buffer 可用 linker section、alignment 和 map 检查；调用者动态传入的指针仍须在执行时验证可达域与对齐。编译检查不能替代 borrow/settlement 生命周期。内存预算区分 MSP、任务栈、OS 对象、IO buffer、组件 workspace 和可选 libc heap。
 
-Flash 布局校验使用精确料号的 erase geometry，拒绝越界、重叠与不满足擦除边界的 region。镜像 offset、VTOR、bootloader/A-B 必须同时有维护实现，不能只改变链接地址就作为支持。
+Flash 布局使用精确料号的 erase geometry，拒绝越界、重叠、重复 ID 和不满足擦除边界的 region，并且只允许一个 image。`resolved.flash` 保留完整物理几何，`resolved.layout` 选择链接镜像窗口；窗口不创建 Flash ACL 或产品写权限。所选 STM32F407VET6/ZGT6 与 GD32F470ZGT6 支持经过审查的偏移镜像、512 字节向量对齐、实际 vendor vector symbol 和配套 startup/ELF/BIN 检查；其他 SoC 仍要求复位地址镜像。准确字段和边界见[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)。
+
+偏移链接只建立软件镜像边界。外部产品仍须提供进入 Reset_Handler 的有效启动路径、初始机器状态、认证、激活及恢复政策。现有 F407 running-image handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；裸机或 FreeRTOS 链接结果不建立通用运行态交接或 FreeRTOS handoff 资格。
 
 CPU 编译选项、FPU 启用、异常上下文和 kernel port 必须一致。工具链及所有预编译输入的 ABI 记录到身份中。当前推荐源码 SDK；不默认承诺不同 compiler/version/flags 之间的 installed binary ABI。
 

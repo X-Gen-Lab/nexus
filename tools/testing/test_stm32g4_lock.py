@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import replace
 import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -17,42 +18,100 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class STM32G4LockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.seed_temporary = tempfile.TemporaryDirectory(
+            prefix="G474 device seed ")
+        cls.addClassCleanup(cls.seed_temporary.cleanup)
+        cls.seed_source = Path(cls.seed_temporary.name) / "official source"
+        cls.seed_source.mkdir()
+        cls.seed_lock = json.loads(
+            (ROOT / "dependencies/stm32g4.lock.json").read_text())
+        for name in cls.seed_lock["files"]:
+            file = cls.seed_source / name
+            file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / "vendors/st/cmsis_device_g4" / name, file)
+        cls._git(cls.seed_source, "init", "--quiet")
+        cls._git(cls.seed_source, "config", "user.name", "Device lock test")
+        cls._git(cls.seed_source, "config", "user.email",
+                 "device-test@local.invalid")
+        cls._git(cls.seed_source, "remote", "add", "origin",
+                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
+        cls._git(cls.seed_source, "add", ".")
+        cls._git(cls.seed_source, "commit", "--quiet", "-m",
+                 "actual selected device source")
+        cls.seed_lock["commit"] = cls._git(cls.seed_source, "rev-parse", "HEAD")
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="G474 device source ")
         self.addCleanup(self.temporary.cleanup)
         self.folder = Path(self.temporary.name)
         self.source = self.folder / "official source"
-        self.source.mkdir()
-        self.lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        for name in self.lock["files"]:
-            file = self.source / name
-            file.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / "vendors/st/cmsis_device_g4" / name, file)
-        self.git("init", "--quiet")
-        self.git("config", "user.name", "Device lock test")
-        self.git("config", "user.email", "device-test@local.invalid")
-        self.git("remote", "add", "origin",
-                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
-        self.git("add", ".")
-        self.git("commit", "--quiet", "-m", "actual selected device source")
-        self.lock["commit"] = self.git("rev-parse", "HEAD")
+        # Copy .git too: index, objects and config belong to this case. Never
+        # share hardlinks or cache a verifier result for mutable test inputs.
+        shutil.copytree(type(self).seed_source, self.source)
+        self.lock = copy.deepcopy(type(self).seed_lock)
         self.lock_path = self.folder / "stm32g4.lock.json"
         self.write_lock()
 
-    def git(self, *arguments):
+    @staticmethod
+    def _git(source, *arguments):
         environment = {k: v for k, v in os.environ.items()
                        if not k.startswith("GIT_")}
-        result = subprocess.run(["git", "-C", str(self.source), *arguments],
+        result = subprocess.run(["git", "-C", str(source), *arguments],
                                 capture_output=True, text=True, env=environment,
                                 timeout=20)
-        self.assertEqual(result.returncode, 0, result.stderr)
+        if result.returncode:
+            raise AssertionError(result.stderr)
         return result.stdout.strip()
+
+    def git(self, *arguments):
+        return self._git(self.source, *arguments)
 
     def write_lock(self):
         self.lock_path.write_text(json.dumps(self.lock) + "\n")
 
     def verify(self, **options):
         return stm32g4_lock.verify(self.source, self.lock_path, **options)
+
+    def test_class_seed_isolates_worktree_index_and_untracked_state(self):
+        seed = type(self).seed_source
+
+        def snapshot():
+            return {file.relative_to(seed).as_posix():
+                    hashlib.sha256(file.read_bytes()).hexdigest()
+                    for file in seed.rglob("*") if file.is_file()}
+
+        before = snapshot()
+        name = "Include/stm32g474xx.h"
+        original = (self.source / name).read_bytes()
+        (self.source / name).write_bytes(original + b"staged mutation\n")
+        self.git("add", name)
+        (self.source / name).write_bytes(original + b"unstaged mutation\n")
+        (self.source / "untracked.txt").write_text("private case\n")
+        self.git("remote", "set-url", "origin", "https://invalid.example/git")
+        with self.assertRaises(ValueError):
+            self.verify()
+
+        sibling = type(self)(
+            "test_actual_official_root_checkout_is_hash_verified")
+        sibling.setUp()
+        self.addCleanup(sibling.doCleanups)
+        self.assertEqual((sibling.source / name).read_bytes(), original)
+        self.assertEqual(sibling.git("status", "--porcelain",
+                                     "--untracked-files=all"), "")
+        self.assertEqual(sibling.git("diff", "--cached", "--name-only"), "")
+        self.assertEqual(sibling.verify()["commit"], sibling.lock["commit"])
+        (sibling.source / name).write_bytes(original + b"later mutation\n")
+        with self.assertRaises(ValueError):
+            sibling.verify()
+        self.assertEqual(self.git("diff", "--cached", "--name-only"), name)
+        for relative in before:
+            first, second = self.source / relative, sibling.source / relative
+            self.assertFalse(os.path.samefile(seed / relative, first))
+            self.assertFalse(os.path.samefile(seed / relative, second))
+            self.assertFalse(os.path.samefile(first, second))
+        self.assertEqual(snapshot(), before)
 
     def test_real_git_source_verifies_exact_part_and_does_not_change_checkout(self):
         before = self.git("status", "--porcelain")

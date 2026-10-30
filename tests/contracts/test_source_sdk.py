@@ -31,6 +31,13 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_i2c.h",
     "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
     "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
+    "Inc/stm32f4xx_hal.h", "Inc/stm32f4xx_hal_dma.h",
+    "Inc/stm32f4xx_hal_dma_ex.h", "Inc/stm32f4xx_hal_uart.h",
+    "Inc/stm32f4xx_hal_rcc.h", "Inc/stm32f4xx_hal_rcc_ex.h",
+    "Inc/stm32f4xx_hal_flash.h", "Inc/stm32f4xx_hal_flash_ex.h",
+    "Inc/stm32f4xx_hal_flash_ramfunc.h", "Inc/stm32f4xx_hal_gpio.h",
+    "Inc/stm32f4xx_hal_gpio_ex.h", "Src/stm32f4xx_hal_uart.c",
+    "Src/stm32f4xx_hal_dma.c", "Src/stm32f4xx_hal_rcc.c",
 })
 
 
@@ -310,10 +317,10 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(source_sdk.selected(name),
                                 "Required consumer omitted from SDK: " + name)
 
-    def test_official_f4_required_payload_has_the_reviewed_eleven_files(self):
+    def test_official_f4_required_payload_has_the_reviewed_transport_graph(self):
         lock_path = ROOT / "dependencies/stm32f4-hal.lock.json"
         lock = json.loads(lock_path.read_text())
-        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 11)
+        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 25)
         self.assertEqual(set(lock["files"]), OFFICIAL_F4_VERIFIED_FILES)
         for name in OFFICIAL_F4_VERIFIED_FILES:
             with self.subTest(name=name):
@@ -861,22 +868,19 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_tim.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_iwdg.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_i2c.h",
+            "soc/stm32/stm32f407/drivers/uart_hal.c",
+            "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
+            "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
+            "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
+            "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
         }
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
         self.assertIn("vendors/st/stm32f4_hal", source_sdk.REQUIRED_DEPENDENCIES)
 
-    def test_f4_sdk_redistributes_only_selected_headers_and_notice(self):
+    def test_f4_sdk_redistributes_only_selected_graph_and_notice(self):
         selected = source_sdk.dependency_entries(ROOT, "vendors/st/stm32f4_hal")
-        self.assertEqual(set(selected), {
-            "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_usart.h",
-            "LICENSE.md",
-            "Inc/stm32f4xx_ll_spi.h", "Inc/stm32f4xx_ll_adc.h",
-            "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_iwdg.h",
-            "Inc/stm32f4xx_ll_i2c.h",
-            "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_hal_def.h",
-            "Inc/Legacy/stm32_hal_legacy.h",
-        })
+        self.assertEqual(set(selected), OFFICIAL_F4_VERIFIED_FILES)
 
 
 class SourceSDKThreadXSelectionTests(unittest.TestCase):

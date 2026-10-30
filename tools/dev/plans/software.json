@@ -871,6 +871,12 @@
       "timeout_s": 7200
     },
     {
+      "name": "image-artifact-boundaries",
+      "checker": "image_artifact_tests",
+      "args": [],
+      "timeout_s": 1800
+    },
+    {
       "name": "providers-mainstream_assembly",
       "checker": "provider_assemblies",
       "args": [
