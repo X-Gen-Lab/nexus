@@ -20,6 +20,11 @@ Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
 
+The USART3 IRQ-byte path binds RDR/TDR access to locked official LL operations.
+Both accesses remain word-wide even though the public payload is a byte. The
+provider keeps its saved status, RX error/loss, TC completion and borrow/drain
+ordering; DMA modes that share its IRQ-byte companion retain the same contract.
+
 ## Optional V-only high-clock reference
 
 The additional `hsi64-pll384-cache-off` profile is a cold-start configuration

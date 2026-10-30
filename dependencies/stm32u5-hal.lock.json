@@ -33,6 +33,10 @@
       "bytes": 97434,
       "sha256": "8b7b9ad4cb5aeff1df318c042399f55726e745f129146f7ba27cec3d4623449d"
     },
+    "Inc/stm32u5xx_ll_iwdg.h": {
+      "bytes": 13653,
+      "sha256": "8552e2843e0cf8b42b505418ccaaadb1db7b4cc4ad7f730c141d90729d13df1e"
+    },
     "Inc/stm32u5xx_ll_rtc.h": {
       "bytes": 226081,
       "sha256": "e40e46698164cd4c0722460fbb59c868be643ba0f7447e0bed439a88f3a63bf2"

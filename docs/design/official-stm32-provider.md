@@ -224,9 +224,26 @@ CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged.
 
 U575 GPIO now sends four existing command sites through the actual HAL GPIO C
 unit: public write, initialization preload, stop and serial TX idle. Its private
-14-file lock admits that unit and required headers; no HAL initialization or tick
+15-file lock admits that unit and required headers; no HAL initialization or tick
 is invoked. Disjoint authorized masks remain one BSRR command, and empty public
 writes retain success without invoking HAL's nonempty-mask assertion.
+
+H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including
+the IRQ-byte companions of selected DMA modes. The provider retains saved-status
+ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog
+key, configuration and refresh commands use the locked LL IWDG header, including
+watchdog-only assemblies without a GPIO source. Irreversible ownership precedes
+activation; synchronization, exact readback, failed-update bounds and recovery
+responsibility remain in the same C provider.
+
+GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in
+isolated C11 compile-contract units. Each includes the real SDK before locally
+expanding register macros as integer addresses. Runtime providers retain their mask and
+IRQ checks and ordinary SDK register access. The contract units emit no firmware
+code or data; no compiler-specific constant folding or scanner exception is
+needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset
+contract. Source compilation, linked-image costs and physical behavior remain
+separate verification scopes.
 
 Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575
 receive/transmit to locked LL operations in the existing shared engines. They add

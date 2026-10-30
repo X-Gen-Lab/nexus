@@ -27,9 +27,10 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         continue()
     endif()
     if(kind STREQUAL "eth")
-        list(APPEND gd_sources drivers/ethernet.c)
+        list(APPEND gd_sources drivers/ethernet.c drivers/ethernet_layout.c)
     elseif(kind STREQUAL "eth_frames")
-        list(APPEND gd_sources drivers/ethernet_frames.c)
+        list(APPEND gd_sources drivers/ethernet_frames.c
+            drivers/ethernet_layout.c)
     elseif(kind STREQUAL "pwm")
         list(APPEND gd_sources drivers/timer.c)
     else()
@@ -85,7 +86,8 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         list(APPEND gd_sources usb_clock.c
             "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/usb_device_controller.c")
     elseif(kind STREQUAL "can")
-        list(APPEND gd_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/can_controller.c")
+        list(APPEND gd_sources drivers/can_layout.c
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/can_controller.c")
     elseif(kind STREQUAL "adc")
         list(APPEND gd_sdk_units adc)
         if("trigger-dma" IN_LIST modes

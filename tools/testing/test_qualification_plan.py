@@ -462,7 +462,7 @@ class QualificationPlanTests(unittest.TestCase):
                     expected |= {
                         "{root}/tools/configure/assemblies/u575-" + name + ".toml"
                         for name in ("uart-chain", "lptim-run")}
-                    self.assertEqual(len(expected), 12)
+                    self.assertEqual(len(expected), 13)
                 self.assertTrue(expected)
                 self.assertEqual(len(fixtures), len(set(fixtures)),
                                  "Duplicate fixture is not another execution")

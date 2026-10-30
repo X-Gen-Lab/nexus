@@ -120,9 +120,7 @@ if(h7_sources)
         set_property(TARGET nexus_soc_stm32h743 PROPERTY
             NEXUS_H743_FLASH_SU_FILES "${h7_flash_su_files}")
     endif()
-    if(h7_spi_modes OR h7_adc_modes OR h7_i2c_modes OR
-            "irq-fifo-bytes" IN_LIST h7_uart_modes OR
-            "irq-fifo-rtscts-bytes" IN_LIST h7_uart_modes)
+    if(h7_spi_modes OR h7_adc_modes OR h7_i2c_modes OR h7_uart_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32h743 h7)
     endif()

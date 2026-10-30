@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0fab9ce1afab85150dcee0999b5c6a792ee7033bef7256b82a9067f77d15f34c\n"
+"X-Nexus-Source-SHA256: 6b6893a6688b25528b9ab3d22d2ebc9f52e8f06db1c3061c46089c192eca9dfe\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -3070,3 +3070,13 @@ msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"
 
 msgid "`gpio-pa0`"
 msgstr "`gpio-pa0`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
+"`tests/contracts/u575_assembly/mainstream.toml`, "
+"`tests/contracts/u575_assembly/watchdog.toml`"
+msgstr ""
+"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
+"`tests/contracts/u575_assembly/mainstream.toml`, "
+"`tests/contracts/u575_assembly/watchdog.toml`"

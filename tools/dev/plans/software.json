@@ -1332,6 +1332,8 @@
         "--fixture",
         "{root}/tests/contracts/u575_assembly/pwm.toml",
         "--fixture",
+        "{root}/tests/contracts/u575_assembly/watchdog.toml",
+        "--fixture",
         "{root}/tools/configure/assemblies/u575-uart-chain.toml",
         "--fixture",
         "{root}/tools/configure/assemblies/u575-lptim-run.toml"

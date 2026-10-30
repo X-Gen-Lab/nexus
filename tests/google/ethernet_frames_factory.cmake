@@ -57,7 +57,8 @@ foreach(eth_frames_family stm32 gd32)
         nexus_stm32f4_official(${eth_frames_target})
     else()
         target_sources(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/ethernet_layout.c")
         set(eth_frames_gd
             "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         set(eth_frames_sdk "${eth_frames_target}_sdk")

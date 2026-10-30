@@ -210,7 +210,7 @@ PROFILES = {
     "u5": Profile("u5", "stm32u575", "2552682ee5a0d6f826a6435750fc9267be65868b",
         "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8", "v1.9.0",
         "d88042df24f16799957c24f00c2b234c9e306188",
-        ("adc", "spi", "i2c", "tim", "dma", "usart", "rtc"),
+        ("adc", "spi", "i2c", "tim", "dma", "usart", "rtc", "iwdg"),
         extra_files=("Inc/stm32u5xx_hal.h", "Inc/stm32u5xx_hal_def.h",
             "Inc/stm32u5xx_hal_gpio.h", "Inc/stm32u5xx_hal_gpio_ex.h",
             "Inc/Legacy/stm32_hal_legacy.h", "Src/stm32u5xx_hal_gpio.c"),

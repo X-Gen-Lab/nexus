@@ -85,6 +85,19 @@ void nx_u575_model_irq_restore(nx_arch_irq_state_t previous);
 #define NX_U575_READ(reg)         nx_u575_model_read(reg)
 #define NX_U575_WRITE(reg, value) nx_u575_model_write((reg), (value))
 #define NX_U575_UART_POLL(port)   nx_u575_model_uart_poll(port)
+#ifndef NX_U575_WATCHDOG_DEFAULT_PORT
+#define NX_U575_WATCHDOG_ENABLE(controller)                                    \
+    NX_U575_WRITE(&(controller)->KR, (0xCCCCU))
+#define NX_U575_WATCHDOG_UNLOCK(controller)                                    \
+    NX_U575_WRITE(&(controller)->KR, (0x5555U))
+#define NX_U575_WATCHDOG_LOCK(controller) NX_U575_WRITE(&(controller)->KR, (0U))
+#define NX_U575_WATCHDOG_SET_PRESCALER(controller, value)                      \
+    NX_U575_WRITE(&(controller)->PR, (value))
+#define NX_U575_WATCHDOG_SET_RELOAD(controller, value)                         \
+    NX_U575_WRITE(&(controller)->RLR, (value))
+#define NX_U575_WATCHDOG_RELOAD(controller)                                    \
+    NX_U575_WRITE(&(controller)->KR, (0xAAAAU))
+#endif
 #ifndef NX_U575_UART_DEFAULT_PORT
 #define NX_U575_UART_RECEIVE8(controller)                                      \
     ((uint8_t)NX_U575_READ(&(controller)->RDR))

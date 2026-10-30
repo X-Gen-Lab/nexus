@@ -120,7 +120,8 @@ foreach(target IN LISTS leaf_targets)
     if("${u5_leaf}/drivers/gpio.c" IN_LIST sources)
         nexus_stm32u575_gpio_hal(${target})
         nexus_use_cmsis_host_model(${target}_stm32u575_gpio_hal)
-    elseif("${u5_leaf}/drivers/uart.c" IN_LIST sources)
+    elseif("${u5_leaf}/drivers/uart.c" IN_LIST sources OR
+            "${u5_leaf}/drivers/watchdog.c" IN_LIST sources)
         nexus_stm32_official(${target} u5)
     endif()
     get_target_property(definitions ${target} COMPILE_DEFINITIONS)
@@ -153,7 +154,27 @@ foreach(target IN LISTS leaf_targets)
         endif()
     endforeach()
     if("${h7_leaf}/drivers/spi.c" IN_LIST sources OR
-            "${h7_leaf}/drivers/spi_dma.c" IN_LIST sources)
+            "${h7_leaf}/drivers/spi_dma.c" IN_LIST sources OR
+            "${h7_leaf}/drivers/uart.c" IN_LIST sources)
         nexus_stm32_official(${target} h7)
     endif()
 endforeach()
+
+# Execute the selected official word operations with production defaults.
+nexus_official_leaf_test(nexus_h743_uart_leaf_test h7 STM32H743xx
+    h743_uart_leaf_model.h
+    SOURCES h743_uart_leaf_test.cpp h743_model.cpp
+        "${NEXUS_SOURCE_DIR}/tests/contracts/h743_uart_leaf_port.c"
+        "${h7_leaf}/system.c" "${h7_leaf}/drivers/gpio.c"
+        "${h7_leaf}/drivers/uart.c"
+    INCLUDES "${h7_leaf}/private")
+nexus_official_leaf_test(nexus_u575_watchdog_leaf_test u5 STM32U575xx
+    u575_watchdog_leaf_model.h
+    SOURCES u575_watchdog_leaf_test.cpp u575_model.cpp
+        "${NEXUS_SOURCE_DIR}/tests/contracts/u575_watchdog_leaf_port.c"
+        "${u5_leaf}/system.c" "${u5_leaf}/drivers/watchdog.c"
+    INCLUDES "${u5_leaf}/private")
+set_property(SOURCE "${h7_leaf}/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/tests/contracts/h743_uart_leaf_port.c"
+    APPEND PROPERTY COMPILE_OPTIONS
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_uart_cpu_model.h")

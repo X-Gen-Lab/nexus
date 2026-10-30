@@ -41,7 +41,8 @@ foreach(eth_family stm32 gd32)
         target_compile_definitions(${eth_target} PRIVATE STM32F407xx NX_ETH_FACTORY_STM32)
     else()
         target_sources(${eth_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/ethernet_layout.c")
         set(eth_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_include_directories(${eth_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")

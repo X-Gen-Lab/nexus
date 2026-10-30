@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bc9f525466225b72c665bb0df769a57aedd6d4a1eb906df343f1395fc73948b7\n"
+"X-Nexus-Source-SHA256: 9c0514f2a0c4609824a38ed42bc21766435eaa7867cf97177b0ebebc43fff07b\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -743,11 +743,17 @@ msgstr "有界官方操作增量"
 msgid "The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1, word RDR/TDR operations carrying UART byte values, and RTC write-protection keys and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order, clock admission, timed phases and loan withdrawal remain in the same providers. H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged."
 msgstr "当前开发源码对 U575 PWM 的 PSC/ARR/CCR1 使用已锁定 LL setter，对 UART RDR/TDR 使用承载字节值的字访问，并对 RTC 写保护密钥和 Alarm A 清除命令使用已锁定 LL 操作。既有屏障、精确 readback、IRQ／错误顺序、时钟准入、定时阶段和借用撤离仍由原 provider 负责。H743 SPI 轮询及 DMA 清理使用接收 controller 的 LL byte port；屏蔽 CSTART 的 CSUSP 命令、quiet tail、Cache 所有权和 DMA／IRQ join 保持不变。"
 
-msgid "U575 GPIO now sends four existing command sites through the actual HAL GPIO C unit: public write, initialization preload, stop and serial TX idle. Its private 14-file lock admits that unit and required headers; no HAL initialization or tick is invoked. Disjoint authorized masks remain one BSRR command, and empty public writes retain success without invoking HAL's nonempty-mask assertion."
-msgstr "U575 GPIO 现将四个既有命令位置交给实际 HAL GPIO C 单元：公共 write、初始化预装载、stop 和串口 TX 空闲电平。其私有 14 文件锁准入该单元及必需头文件；不会调用 HAL 初始化或 tick。已授权且不相交的掩码仍由一条 BSRR 命令处理；公共空掩码 write 仍返回成功，并避免调用 HAL 的非空掩码断言。"
+msgid "U575 GPIO now sends four existing command sites through the actual HAL GPIO C unit: public write, initialization preload, stop and serial TX idle. Its private 15-file lock admits that unit and required headers; no HAL initialization or tick is invoked. Disjoint authorized masks remain one BSRR command, and empty public writes retain success without invoking HAL's nonempty-mask assertion."
+msgstr "U575 GPIO 现将四个既有命令位置交给实际 HAL GPIO C 单元：公共 write、初始化预装载、stop 和串口 TX 空闲电平。其私有 15 文件锁准入该单元及必需头文件；不会调用 HAL 初始化或 tick。已授权且不相交的掩码仍由一条 BSRR 命令处理；公共空掩码 write 仍返回成功，并避免调用 HAL 的非空掩码断言。"
 
 msgid "Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575 receive/transmit to locked LL operations in the existing shared engines. They add no runtime forwarder, vendor Handle, state or generated hardware algorithm. Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual old-GREEN baselines and real-default probes remain development evidence; final clean-source gates, complete SDK consumption and qualification are pending."
 msgstr "五个 SoC 私有的编译期 I2C port 在既有共享引擎中，将 F103/F407 receive 及 G474/H743/U575 receive/transmit 绑定到已锁定 LL 操作。它们不增加运行时转发层、vendor Handle、状态或生成的硬件算法。factory face、公共 ABI、生命周期和模式选择不变。实际 old-GREEN 基线及真实默认操作探针仍属于开发证据；最终 clean-source 门禁、完整 SDK 消费和资格尚待完成。"
 
 msgid "The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads: isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack. GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated translation-unit results are not whole-provider resource, stack-peak, timing or hardware qualification."
 msgstr "I2C 叶操作比较保留 V1 TX 的直接访问，因为已锁定 LL helper 会增加对 DR 的读改写；V2 完整 CR2/ICR 命令也在 vendor helper 使用读改写时保留直接访问。F103/F407 的 ADDR 清除仍使用两次有序的直接读取：独立 ARM 探针测得直接实现为 6 B，LL 为 18 B，且额外使用 8 B 栈。GD470 的高频 byte/ADDR 叶操作在窄范围 SPL 调用及被调用函数比较后保留直接访问；GD303 未选入 I2C SPL C 单元。这些独立编译单元结果不建立整个 provider 的资源、栈峰值、时序或硬件资格。"
+
+msgid "H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including the IRQ-byte companions of selected DMA modes. The provider retains saved-status ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog key, configuration and refresh commands use the locked LL IWDG header, including watchdog-only assemblies without a GPIO source. Irreversible ownership precedes activation; synchronization, exact readback, failed-update bounds and recovery responsibility remain in the same C provider."
+msgstr "H743 USART3 的 IRQ-byte RDR/TDR 访问使用锁定的 LL 字操作，也包括选定 DMA 模式的 IRQ-byte 配套路径。provider 保留已保存状态的处理顺序、RX 错误／丢失、TC 完成和完整撤回。U575 看门狗的密钥、配置和刷新命令使用锁定的 LL IWDG 头，也适用于不引入 GPIO 源文件的 watchdog-only 装配。不可撤销的所有权先于激活记录；同步、精确读回、更新失败后的边界和恢复责任仍由同一 C provider 维护。"
+
+msgid "GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in isolated C11 compile-contract units. Each includes the real SDK before locally expanding register macros as integer addresses. Runtime providers retain their mask and IRQ checks and ordinary SDK register access. The contract units emit no firmware code or data; no compiler-specific constant folding or scanner exception is needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset contract. Source compilation, linked-image costs and physical behavior remain separate verification scopes."
+msgstr "GD32F470 CAN 和 Ethernet 在独立 C11 编译合同单元中核对 20 项和 25 项已复核的 SDK 寄存器偏移。每个单元先包含真实 SDK，再仅在本文件内将寄存器宏展开为整数地址。运行时 provider 保留位掩码、IRQ 检查和普通 SDK 寄存器访问。这些合同单元不生成固件代码或数据，无需编译器特定常量折叠或扫描器例外。Raw 与 enhanced Ethernet 选择同一份 MAC/DMA/VLAN/PTP 偏移合同。源码编译、链接镜像成本和物理行为仍属于分别执行的验证范围。"

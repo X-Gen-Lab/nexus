@@ -8,6 +8,28 @@
  */
 #include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
+#include "stm32u5xx_ll_iwdg.h"
+#ifndef NX_U575_WATCHDOG_ENABLE
+#define NX_U575_WATCHDOG_ENABLE(controller) LL_IWDG_Enable(controller)
+#endif
+#ifndef NX_U575_WATCHDOG_UNLOCK
+#define NX_U575_WATCHDOG_UNLOCK(controller)                                    \
+    LL_IWDG_EnableWriteAccess(controller)
+#endif
+#ifndef NX_U575_WATCHDOG_LOCK
+#define NX_U575_WATCHDOG_LOCK(controller) LL_IWDG_DisableWriteAccess(controller)
+#endif
+#ifndef NX_U575_WATCHDOG_SET_PRESCALER
+#define NX_U575_WATCHDOG_SET_PRESCALER(controller, value)                      \
+    LL_IWDG_SetPrescaler((controller), (value))
+#endif
+#ifndef NX_U575_WATCHDOG_SET_RELOAD
+#define NX_U575_WATCHDOG_SET_RELOAD(controller, value)                         \
+    LL_IWDG_SetReloadCounter((controller), (value))
+#endif
+#ifndef NX_U575_WATCHDOG_RELOAD
+#define NX_U575_WATCHDOG_RELOAD(controller) LL_IWDG_ReloadCounter(controller)
+#endif
 
 #ifndef NX_U575_WATCHDOG_POLL
 #define NX_U575_WATCHDOG_POLL(port) ((void)(port))
@@ -173,10 +195,10 @@ static nx_result_t enable(void* context, uint32_t timeout_us, bool debug_freeze,
     p->state.debug_freeze = debug_freeze;
     timeout_bounds(&p->state, divisor, count);
     nx_arch_dmb();
-    NX_U575_WRITE(&p->registers->KR, 0xCCCCU);
-    NX_U575_WRITE(&p->registers->KR, 0x5555U);
-    NX_U575_WRITE(&p->registers->PR, prescaler);
-    NX_U575_WRITE(&p->registers->RLR, count - 1U);
+    NX_U575_WATCHDOG_ENABLE(p->registers);
+    NX_U575_WATCHDOG_UNLOCK(p->registers);
+    NX_U575_WATCHDOG_SET_PRESCALER(p->registers, prescaler);
+    NX_U575_WATCHDOG_SET_RELOAD(p->registers, count - 1U);
     remaining = p->poll_limit;
     while (NX_U575_READ(&p->registers->SR) != 0U && remaining-- != 0U)
         NX_U575_WATCHDOG_POLL(p);
@@ -192,11 +214,11 @@ static nx_result_t enable(void* context, uint32_t timeout_us, bool debug_freeze,
         p->state.maximum_timeout_us = upper.maximum_timeout_us;
         /* Relock without reload: uncertain synchronization cannot authorize
          * a refresh against an unobserved counter/window state. */
-        NX_U575_WRITE(&p->registers->KR, 0U);
+        NX_U575_WATCHDOG_LOCK(p->registers);
         *state = p->state;
         return NX_ERROR_IO;
     }
-    NX_U575_WRITE(&p->registers->KR, 0xAAAAU);
+    NX_U575_WATCHDOG_RELOAD(p->registers);
     *state = p->state;
     return NX_SUCCESS;
 }
@@ -212,7 +234,7 @@ static nx_result_t feed(void* context) {
         return NX_ERROR_STATE;
     if (NX_U575_READ(&p->registers->WINR) != IWDG_WINR_WIN)
         return NX_ERROR_UNSUPPORTED;
-    NX_U575_WRITE(&p->registers->KR, 0xAAAAU);
+    NX_U575_WATCHDOG_RELOAD(p->registers);
     return NX_SUCCESS;
 }
 

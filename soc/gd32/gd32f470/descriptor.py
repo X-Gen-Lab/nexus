@@ -12,6 +12,8 @@ DESCRIPTOR = FamilyDescriptor(
     import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
     references="references.json",
     owned_payload=(
+        "soc/gd32/gd32f470/drivers/can_layout.c",
+        "soc/gd32/gd32f470/drivers/ethernet_layout.c",
         "soc/gd32/gd32f470/private/gd32f470_can_cold.h",
         "soc/gd32/gd32f470/private/gd32f470_timer_cold.h",
         "soc/gd32/gd32f470/private/gd32f470_packet_cold.h",

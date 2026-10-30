@@ -8,6 +8,14 @@ SoC 实现使用，不导出到 `Nexus::Platform` 的公共 include 路径。
 保持原样，构建实际验证 `vendors/gigadevice/gd32f4xx/source.lock.json`；厂商
 目标的 headers 与 CPU/FPU ABI 私有使用，不带旧 HAL、OSAL 或设备 registry。
 
+CAN 和 Ethernet 的 SDK 寄存器偏移在独立 C11 translation unit 中编译核对。
+这些文件只在包含真实 SDK 头后，将本文件内的 `REG32` 展开改为整数地址，
+保留全部 20 项 CAN 偏移断言，以及 25 项 Ethernet MAC、DMA、VLAN 和 PTP
+偏移断言；不改变厂商文件或运行时
+寄存器访问。实际 provider 继续核对位掩码和 IRQ 身份。编译校验不生成固件
+代码或数据，不增加动态发现、初始化或每次 I/O 的运行成本。
+Raw 和 enhanced Ethernet 模式均编译同一份 Ethernet 偏移合同。
+
 [派生能力矩阵](../../../docs/delivery/capabilities.md) 直接核对 facts/routes、参考
 Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立新的配置权威，
 也不把芯片路线或软件夹具提升为 PCB 接线与物理资格。

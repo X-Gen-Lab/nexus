@@ -153,9 +153,15 @@ nx_arch_irq_state_t nx_h743_model_irq_save(void);
 void nx_h743_model_irq_restore(nx_arch_irq_state_t previous);
 #define nx_arch_irq_save()         nx_h743_model_irq_save()
 #define nx_arch_irq_restore(saved) nx_h743_model_irq_restore(saved)
-#define NX_H743_MODEL              1
-#define NX_H743_READ(reg)          nx_h743_model_read(reg)
-#define NX_H743_WRITE(reg, value)  nx_h743_model_write((reg), (value))
+#ifndef NX_H743_UART_DEFAULT_PORT
+#define NX_H743_UART_RECEIVE8(controller)                                      \
+    ((uint8_t)NX_H743_READ(&(controller)->RDR))
+#define NX_H743_UART_TRANSMIT8(controller, value)                              \
+    NX_H743_WRITE(&(controller)->TDR, (value))
+#endif
+#define NX_H743_MODEL             1
+#define NX_H743_READ(reg)         nx_h743_model_read(reg)
+#define NX_H743_WRITE(reg, value) nx_h743_model_write((reg), (value))
 #define NX_H743_IRQ_CONTROL(irq, enabled, priority)                            \
     nx_h743_model_irq_control((irq), (enabled), (priority))
 #define NX_H743_IRQ_AVAILABLE(irq)                                             \

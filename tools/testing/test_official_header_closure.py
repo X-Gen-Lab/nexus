@@ -42,6 +42,9 @@ ADDITIONS = {
             'bytes': 175243,
             'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'}},
     'u5': {
+        'Inc/stm32u5xx_ll_iwdg.h': {
+            'bytes': 13653,
+            'sha256': '8552e2843e0cf8b42b505418ccaaadb1db7b4cc4ad7f730c141d90729d13df1e'},
         'Inc/stm32u5xx_hal.h': {
             'bytes': 39344,
             'sha256': 'be0aa206bbdbd4be224282ab540aa1b2545b41981b61893ca9c2868c10d45e43'},
@@ -298,7 +301,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                     used.add(path.relative_to(exported).as_posix())
             self.assertEqual(used, ADDITIONS['u5'].keys() - {
                 'Inc/stm32u5xx_ll_dma.h', 'Inc/stm32u5xx_ll_usart.h',
-                'Inc/stm32u5xx_ll_rtc.h'})
+                'Inc/stm32u5xx_ll_rtc.h', 'Inc/stm32u5xx_ll_iwdg.h'})
 
     def test_u5_rtc_sdk_export_closes_actual_provider_and_cmsis_includes(self):
         import re

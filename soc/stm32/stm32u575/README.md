@@ -26,13 +26,19 @@ static typed factory objects and caller execution. Those six selections add no
 DMA engine, task, runtime registry or automatic clock adoption. The separate
 USART1 `dma-tx` and `dma-chain-tx` selections each own the same exclusive GPDMA
 channel and cannot coexist. The private, hash-locked CubeU5 v1.9.0 inputs include
-LL headers and the HAL GPIO C unit with its required headers in the 14-file lock.
+LL headers and the HAL GPIO C unit with its required headers in the 15-file lock.
 LL reuse includes encodings, readonly queries and selected data/control operations.
 Four existing GPIO-provider command sites use one combined
 `HAL_GPIO_WriteMultipleStatePin` for admitted nonempty masks; empty public writes
 still succeed. No `HAL_Init`, vendor tick, Handle or second transfer/IRQ owner is
 introduced. The exact bounded scope is in
 the [official-driver contract](../../../docs/design/official-stm32-provider.md).
+
+The watchdog selects the locked LL IWDG header for enable, configuration access,
+prescaler/reload programming and refresh. Nexus still records irreversible
+ownership before activation, observes synchronization and exact readback, and
+retains uncertain timeout bounds after failure. This also applies to a
+watchdog-only assembly; no GPIO instance or HAL GPIO source is required.
 
 The official STM32U5 CMSIS device source is pinned to
 `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8` (v1.4.3, Cube v1.9.0). The original
