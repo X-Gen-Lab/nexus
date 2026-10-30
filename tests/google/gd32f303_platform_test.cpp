@@ -30,7 +30,7 @@ class GD303Platform : public testing::Test {
         g_nx_gd32f303_system = {};
         g_nx_gd32f303_system.started = true;
         g_nx_gd32f303_system.core_hz = 8000000U;
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB;
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U);
         GPIO_CTL0(GPIOA) = GPIO_CTL1(GPIOA) = 0x44444444U;
     }
     void TearDown() override {

@@ -10,6 +10,7 @@
 #include "stm32u575_system.h"
 #include "terminal_watchdog.h"
 #include "u575_model.h"
+#include <cstring>
 #include <gtest/gtest.h>
 #include <unistd.h>
 class U575System : public testing::Test {
@@ -48,6 +49,65 @@ TEST_F(U575System, WrongSelectedRangeRejectsBeforeAnyWrite) {
     g_u575_model.rcc.ICSCR1 =
         RCC_ICSCR1_MSIRGSEL | (4U << RCC_ICSCR1_MSISRANGE_Pos);
     EXPECT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8).primary);
+}
+class U575SystemTrim : public U575System,
+                       public testing::WithParamInterface<uint32_t> {};
+TEST_P(U575SystemTrim, NonDefaultMsisTrimRejectsBeforeOwnershipOrWrites) {
+    g_u575_model.rcc.ICSCR2 = (g_u575_model.rcc.ICSCR2 &
+                               ~static_cast<uint32_t>(RCC_ICSCR2_MSITRIM1)) |
+                              (GetParam() << RCC_ICSCR2_MSITRIM1_Pos);
+    const auto clocks = g_u575_model.rcc;
+    const auto timer = g_u575_model.timer;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_system_preflight(system));
+    const auto result = nx_stm32u575_system_start(system, 8U);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, g_u575_model.writes);
+    EXPECT_FALSE(system->started);
+    EXPECT_EQ(0U, system->remaining_effects);
+    EXPECT_EQ(0U, system->core_hz);
+    EXPECT_FALSE(g_u575_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0, std::memcmp(&clocks, &g_u575_model.rcc, sizeof(clocks)));
+    EXPECT_EQ(0, std::memcmp(&timer, &g_u575_model.timer, sizeof(timer)));
+}
+INSTANTIATE_TEST_SUITE_P(AdjustedMsis, U575SystemTrim,
+                         testing::Values(0U, 15U, 17U, 31U));
+TEST_F(U575System, FactoryCalibrationAndOtherMsiTrimGroupsRemainIndependent) {
+    const uint32_t other =
+        RCC_ICSCR2_MSITRIM0 | RCC_ICSCR2_MSITRIM2 | RCC_ICSCR2_MSITRIM3;
+    for (uint32_t calibration : {0U, 0x00012345U, 0x000fffffU}) {
+        for (uint32_t trim : {0U, other, 0x00052a31U & other}) {
+            nx_u575_model_reset();
+            g_u575_model.rcc.ICSCR1 = calibration;
+            g_u575_model.rcc.ICSCR2 = RCC_ICSCR2_MSITRIM1_4 | trim;
+            const auto before = g_u575_model.rcc.ICSCR2;
+            EXPECT_EQ(NX_SUCCESS, nx_stm32u575_system_preflight(system));
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_stm32u575_system_start(system, 8U).primary);
+            EXPECT_EQ(calibration, g_u575_model.rcc.ICSCR1);
+            EXPECT_EQ(before, g_u575_model.rcc.ICSCR2);
+            ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_stop(system, 8U));
+            EXPECT_EQ(calibration, g_u575_model.rcc.ICSCR1);
+            EXPECT_EQ(before, g_u575_model.rcc.ICSCR2);
+        }
+    }
+}
+TEST_F(U575System, ChangedMsisTrimCannotRestartTheStoppedTimeDomain) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_stop(system, 8U));
+    g_u575_model.rcc.ICSCR2 ^= RCC_ICSCR2_MSITRIM1_0;
+    const auto before = g_u575_model.rcc.ICSCR2;
+    g_u575_model.writes = 0U;
+    const auto result = nx_stm32u575_system_start(system, 8U);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, g_u575_model.writes);
+    EXPECT_EQ(before, g_u575_model.rcc.ICSCR2);
+    EXPECT_FALSE(system->started);
+    EXPECT_EQ(0U, system->remaining_effects);
+    EXPECT_FALSE(g_u575_model.irq_enabled[TIM2_IRQn]);
 }
 TEST_F(U575System, ForeignTimerTriggerAndChannelStateRejectBeforeWrites) {
     for (auto* reg : {&g_u575_model.timer.SMCR, &g_u575_model.timer.CR2,

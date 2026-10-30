@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8c57517504adafed8cf948ef9e344af4e22717e319e07949b99d4d896767eea2\n"
+"X-Nexus-Source-SHA256: 0fab9ce1afab85150dcee0999b5c6a792ee7033bef7256b82a9067f77d15f34c\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -3067,3 +3067,6 @@ msgstr "UART1"
 
 msgid "`soc/stm32/stm32f407/drivers/uart_hal.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"
+
+msgid "`gpio-pa0`"
+msgstr "`gpio-pa0`"

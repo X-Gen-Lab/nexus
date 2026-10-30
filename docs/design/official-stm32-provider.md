@@ -89,6 +89,31 @@ H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
 separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
 chained, duplex or cross-domain operation.
 
+### Fixed clock admission
+
+The reviewed software-trim gates run in cold preflight. An unexpected adjustment
+in a gated profile is rejected before the startup transaction writes hardware or
+acquires resources. Factory calibration remains independent and unchanged;
+admission does not retune an oscillator. These checks add no work to the normal
+I/O call path and establish no measured clock accuracy or physical timing
+qualification.
+
+F103 HSI8 and GD303 IRC8 require adjustment 16 in `RCC_CR.HSITRIM` and
+`RCU_CTL.IRC8MADJ`, respectively. H743's exact-revision-V HSI admission requires
+`RCC_HSICFGR.HSITRIM=64`; older fixed nominal profiles retain their existing
+revision-specific boundary. U575's selected MSIS4 range requires
+`RCC_ICSCR2.MSITRIM1=16`; its separate I2C1 HSI16 gate continues to require
+`RCC_ICSCR3.HSITRIM=16`. The U575 selection follows the pinned official
+HAL/CMSIS range-to-trim mapping and reset definitions.
+
+F407 HSE8/PLL168, GD470 HXTAL25/PLL200 and G474 HSE24/PLL170 retain their
+external primary clocks. Their internal-clock admission checks are
+`RCC_CR.HSITRIM=16`, `RCU_CTL.IRC16MADJ=16` and `RCC_ICSCR.HSITRIM=64`,
+respectively. They constrain the nominal bootstrap and fallback clocks; G474
+also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows
+RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment
+stating 16 is stale.
+
 ### Production promotion gates
 
 The selected F407 `dma-tx` implementation preserves the complete mode, including

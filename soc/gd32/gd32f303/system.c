@@ -37,10 +37,15 @@ nx_result_t nx_gd32f303_system_preflight(const nx_gd32f303_system_t* s) {
         return NX_ERROR_BUSY;
     if (NX_GD303_DENSITY() != ((48U << 16U) | 256U))
         return NX_ERROR_UNSUPPORTED;
-    if ((NX_GD303_READ(&RCU_CTL) &
-         (RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | RCU_CTL_PLLEN | RCU_CTL_PLLSTB |
-          RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB | RCU_CTL_HXTALBPS |
-          RCU_CTL_CKMEN)) != (RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB) ||
+    /* UM Rev 3.4, section 5.3.1: reset ADJ is 16 (0x0000xx83).
+     * Factory CALIB is independent; do not replace or silently retune it.
+     */
+    uint32_t control = NX_GD303_READ(&RCU_CTL);
+    if ((control & RCU_CTL_IRC8MADJ) != (16U << 3U) ||
+        (control & (RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | RCU_CTL_PLLEN |
+                    RCU_CTL_PLLSTB | RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB |
+                    RCU_CTL_HXTALBPS | RCU_CTL_CKMEN)) !=
+            (RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB) ||
         (NX_GD303_READ(&RCU_CFG0) &
          (RCU_CFG0_SCS | RCU_CFG0_SCSS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC |
           RCU_CFG0_APB2PSC)) != 0U ||

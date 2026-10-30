@@ -103,7 +103,7 @@ static nx_stm32_system_t fresh(unsigned fault) {
     memset(&s_flash, 0, sizeof(s_flash));
     memset(&s_power, 0, sizeof(s_power));
     memset(&s_timer, 0, sizeof(s_timer));
-    s_rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
+    s_rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
     s_fault = fault;
     s_polls = 0U;
     s_mask = 0U;

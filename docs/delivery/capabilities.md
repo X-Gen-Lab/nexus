@@ -112,7 +112,7 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | gd32f470 | EXTI3 | exti | edge-event | `exti3-pe3` | — | `tests/contracts/gd32_assembly/exti.toml` | `soc/gd32/gd32f470/drivers/exti.c` |
 | gd32f470 | FMC | flash | poll-word | `physical-flash` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/flash.toml` | `soc/gd32/gd32f470/drivers/flash.c` |
 | gd32f470 | FWDGT | watchdog | independent | `independent-watchdog` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/watchdog.toml` | `soc/gd32/gd32f470/drivers/watchdog.c` |
-| gd32f470 | GPIOB | gpio | input | — | — | — | — |
+| gd32f470 | GPIOB | gpio | input | `gpiob0`, `gpiob1` | — | — | — |
 | gd32f470 | GPIOB | gpio | output | `gpiob0`, `gpiob1` | — | — | — |
 | gd32f470 | GPIOD | gpio | input | `gpiod7` | `gd32f470zg-liangshan` | — | — |
 | gd32f470 | GPIOD | gpio | output | `gpiod7` | `gd32f470zg-liangshan` | `tests/contracts/physical_platform_assembly/gd32-gpio.toml`, `tools/configure/assemblies/liangshan-baremetal-gpio.toml`, `tools/configure/assemblies/liangshan-baremetal.toml`, `tools/configure/assemblies/liangshan-freertos-gpio.toml`, `tools/configure/assemblies/liangshan-freertos.toml` | `soc/gd32/gd32f470/drivers/gpio.c` |
@@ -166,13 +166,13 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | stm32f407 | EXTI5 | exti | edge-event | `exti5-pa5` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
 | stm32f407 | EXTI6 | exti | edge-event | `exti6-pa6` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
 | stm32f407 | FLASH | flash | poll-word | `flash-internal` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31` | `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml` | `soc/stm32/stm32f407/drivers/flash.c` |
-| stm32f407 | GPIOA | gpio | input | — | — | — | — |
-| stm32f407 | GPIOA | gpio | output | — | — | — | — |
-| stm32f407 | GPIOB | gpio | input | — | — | — | — |
+| stm32f407 | GPIOA | gpio | input | `gpio-pa0` | — | — | — |
+| stm32f407 | GPIOA | gpio | output | `gpio-pa0` | — | — | — |
+| stm32f407 | GPIOB | gpio | input | `gpio-pb2` | `stm32f407ve-sky-qingchun` | — | — |
 | stm32f407 | GPIOB | gpio | output | `gpio-pb2` | `stm32f407ve-sky-qingchun` | `tools/configure/assemblies/sky-baremetal-gpio.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-gpio.toml`, `tools/configure/assemblies/sky-freertos.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOE | gpio | input | — | — | — | — |
+| stm32f407 | GPIOE | gpio | input | `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31` | — | — |
 | stm32f407 | GPIOE | gpio | output | `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31` | `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOG | gpio | input | — | — | — | — |
+| stm32f407 | GPIOG | gpio | input | `gpio-pg9` | `stm32f407zg-qiming-v31` | — | — |
 | stm32f407 | GPIOG | gpio | output | `gpio-pg9` | `stm32f407zg-qiming-v31` | — | — |
 | stm32f407 | I2C1 | i2c | dma-messages | `i2c1-pb6-pb7` | — | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/stm32_assembly/zg-i2c-dma.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
 | stm32f407 | I2C1 | i2c | irq-messages | `i2c1-pb6-pb7` | — | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/stm32_assembly/zg-i2c-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |

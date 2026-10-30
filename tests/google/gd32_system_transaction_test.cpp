@@ -14,6 +14,7 @@ extern "C" {
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 NVIC_Type g_gd32_model_nvic{};
 SCB_Type g_gd32_model_scb{};
@@ -48,7 +49,8 @@ class Gd32System : public testing::Test {
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(registers, reinterpret_cast<void*>(0x40000000U));
         std::memset(registers, 0, 0x80000U);
-        RCU_CTL = RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB;
+        RCU_CTL =
+            RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB | (16U << 3U) | (0x5aU << 8U);
         RCU_PLL = UINT32_C(0x24003010);
         PMU_CTL = PMU_CTL_BKPWEN;
         FMC_WS = 1U;
@@ -92,6 +94,61 @@ TEST_F(Gd32System, ReviewedProfileObservesActualCpuAndApbFrequencies) {
     EXPECT_EQ(50000000U, rcu_clock_freq_get(CK_APB1));
     EXPECT_EQ(100000000U, rcu_clock_freq_get(CK_APB2));
     EXPECT_EQ(7U, FMC_WS & FMC_WC_WSCNT);
+}
+
+class Gd32IrcAdjustment : public Gd32System,
+                          public testing::WithParamInterface<uint32_t> {};
+
+TEST_P(Gd32IrcAdjustment, UnknownAdjustmentRejectsWithoutClockOwnership) {
+    RCU_CTL = (RCU_CTL & ~static_cast<uint32_t>(RCU_CTL_IRC16MADJ)) |
+              (GetParam() << 3U);
+    std::vector<uint8_t> before(0x80000U);
+    std::memcpy(before.data(), reinterpret_cast<void*>(0x40000000U),
+                before.size());
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_clock_preflight());
+    EXPECT_NE(0, nx_gd32_clock_start());
+    EXPECT_EQ(16000000U, SystemCoreClock);
+    EXPECT_EQ(0, nx_gd32_clock_stop());
+    EXPECT_EQ(0,
+              std::memcmp(before.data(), reinterpret_cast<void*>(0x40000000U),
+                          before.size()));
+}
+
+INSTANTIATE_TEST_SUITE_P(NondefaultResetTrim, Gd32IrcAdjustment,
+                         testing::Values(0U, 15U, 17U, 31U));
+
+TEST_F(Gd32System, FactoryCalibrationVariesWithoutChangingDefaultAdjustment) {
+    for (uint32_t calibration : {0U, 1U, 0x7fU, 0xffU}) {
+        SCOPED_TRACE(calibration);
+        const uint32_t trim = (16U << 3U) | (calibration << 8U);
+        RCU_CTL = (RCU_CTL & ~static_cast<uint32_t>(RCU_CTL_IRC16MADJ |
+                                                    RCU_CTL_IRC16MCALIB)) |
+                  trim;
+        ASSERT_EQ(NX_SUCCESS, nx_gd32_clock_preflight());
+        ASSERT_EQ(0, nx_gd32_clock_start());
+        EXPECT_EQ(200000000U, SystemCoreClock);
+        EXPECT_EQ(trim, RCU_CTL & (RCU_CTL_IRC16MADJ | RCU_CTL_IRC16MCALIB));
+        ASSERT_EQ(0, nx_gd32_clock_stop());
+        EXPECT_EQ(trim, RCU_CTL & (RCU_CTL_IRC16MADJ | RCU_CTL_IRC16MCALIB));
+    }
+}
+
+TEST_F(Gd32System, ChangedAdjustmentAfterStopRejectsBeforeReacquisition) {
+    ASSERT_EQ(0, nx_gd32_clock_start());
+    ASSERT_EQ(0, nx_gd32_clock_stop());
+    RCU_CTL =
+        (RCU_CTL & ~static_cast<uint32_t>(RCU_CTL_IRC16MADJ)) | (17U << 3U);
+    std::vector<uint8_t> before(0x80000U);
+    std::memcpy(before.data(), reinterpret_cast<void*>(0x40000000U),
+                before.size());
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_clock_preflight());
+    EXPECT_NE(0, nx_gd32_clock_start());
+    EXPECT_EQ(0, nx_gd32_clock_stop());
+    EXPECT_EQ(0,
+              std::memcmp(before.data(), reinterpret_cast<void*>(0x40000000U),
+                          before.size()));
 }
 
 TEST_F(Gd32System, StopRestoresOwnedClockVoltageAndFlashFields) {

@@ -385,7 +385,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
     },
@@ -404,7 +405,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
     },

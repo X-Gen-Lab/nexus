@@ -78,6 +78,37 @@ class G474AcquisitionFactory : public testing::Test {
         EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
     }
 };
+class G474I2cForeignHsiTrim : public G474AcquisitionFactory,
+                              public testing::WithParamInterface<uint32_t> {};
+TEST_P(G474I2cForeignHsiTrim, RejectsBeforeI2cMuxOrPlatformOwnership) {
+    RCC->ICSCR =
+        (GetParam() << RCC_ICSCR_HSITRIM_Pos) | (0xa5U << RCC_ICSCR_HSICAL_Pos);
+    const RCC_TypeDef before = *RCC;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_EQ(0, std::memcmp(&before, RCC, sizeof(before)));
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(0U, g_g474_model.writes);
+}
+INSTANTIATE_TEST_SUITE_P(NonResetTrims, G474I2cForeignHsiTrim,
+                         testing::Values(0U, 16U, 63U, 65U, 127U));
+TEST_F(G474AcquisitionFactory, DefaultTrimPreservesCalibrationAndI2cHsiMux) {
+    const uint32_t internal =
+        (64U << RCC_ICSCR_HSITRIM_Pos) | (0xa5U << RCC_ICSCR_HSICAL_Pos);
+    RCC->ICSCR = internal;
+    ASSERT_NE(nullptr,
+              nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_REGISTERS));
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    EXPECT_EQ(RCC_CCIPR_I2C1SEL_1, RCC->CCIPR & RCC_CCIPR_I2C1SEL);
+    EXPECT_EQ(170000000U, g_nx_stm32g474_system.core_hz);
+    EXPECT_EQ(internal, RCC->ICSCR);
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(internal, RCC->ICSCR);
+}
 TEST_F(G474AcquisitionFactory, LookupIsPureAndFlashCapabilityMatchesGeometry) {
     const uint32_t before = g_g474_model.writes;
     const auto* sensor = nx_factory_adc(NX_ADC_ID_SENSOR);

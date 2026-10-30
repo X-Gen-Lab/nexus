@@ -118,6 +118,11 @@ host; Python tools retain stdlib unittest. Mock external dependencies and hardwa
 ports, not the implementation under test. Verify rejection, cancellation, drain,
 overflow and instance isolation where the changed contract requires them.
 
+Focused harnesses retain the maintained target's compiler, language standard,
+warning flags and defines from its actual `compile_commands.json` entry. A
+differently configured harness is narrower evidence and does not establish
+acceptance of that target.
+
 Parallel TDD has an explicit handoff barrier: the test owner records the actual
 expected RED execution and snapshots the tested source and binary before
 releasing the implementation owner to change behavior. The implementation owner

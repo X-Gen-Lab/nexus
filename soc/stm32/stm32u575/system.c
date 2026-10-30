@@ -112,9 +112,13 @@ nx_result_t nx_stm32u575_system_preflight(const nx_stm32u575_system_t* s) {
                   RCC_CSR_MSISSRANGE_Pos
             : (ranges & (uint32_t)RCC_ICSCR1_MSISRANGE) >>
                   RCC_ICSCR1_MSISRANGE_Pos;
+    /* MSIS range4 uses MSITRIM1. Admit its documented reset adjustment16
+     * without changing factory MSICAL or independent MSI trim groups. */
     if ((cr & (RCC_CR_MSISON | RCC_CR_MSISRDY)) !=
             (RCC_CR_MSISON | RCC_CR_MSISRDY) ||
         range != 4U ||
+        (NX_U575_READ(&s->rcc->ICSCR2) & RCC_ICSCR2_MSITRIM1) !=
+            RCC_ICSCR2_MSITRIM1_4 ||
         (cr & (RCC_CR_MSIPLLEN | RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_PLL1ON |
                RCC_CR_PLL2ON | RCC_CR_PLL3ON | RCC_CR_PLL1RDY | RCC_CR_PLL2RDY |
                RCC_CR_PLL3RDY)) != 0U ||

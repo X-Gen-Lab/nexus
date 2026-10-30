@@ -40,7 +40,7 @@ class LegacyDeviceFactory : public testing::Test {
         g_gd303_exti_hold_pending = g_gd303_exti_reassert_pending = false;
         g_gd303_carry_on_low_read = false;
         g_nx_gd32f303_system = {};
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB;
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U);
         GPIO_CTL0(GPIOA) = GPIO_CTL1(GPIOA) = 0x44444444U;
 #endif
     }

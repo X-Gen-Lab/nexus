@@ -175,6 +175,9 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
     if (system->started || system->remaining_effects != 0U ||
         (clock & (RCC_CR_HSION | RCC_CR_HSIRDY)) !=
             (RCC_CR_HSION | RCC_CR_HSIRDY) ||
+        /* The nominal HSI fallback requires the reset trim, not foreign tuning.
+         */
+        (clock & RCC_CR_HSITRIM) != (16U << RCC_CR_HSITRIM_Pos) ||
         (clock & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
                   RCC_CR_PLLRDY | RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY)) != 0U ||
         (system->rcc->CFGR & bus_mask) != 0U ||

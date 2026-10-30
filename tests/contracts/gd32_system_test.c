@@ -160,7 +160,8 @@ void timer_deinit(uint32_t timer) {
 static void fresh(unsigned fault) {
     memset((void*)0x40000000u, 0, 0x40000u);
     memset(&g_gd32_model_nvic, 0, sizeof(g_gd32_model_nvic));
-    RCU_CTL = RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB;
+    RCU_CTL =
+        RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB | (16U << 3U) | (0x5aU << 8U);
     s_fault = fault;
 }
 

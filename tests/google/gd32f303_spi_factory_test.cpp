@@ -30,7 +30,7 @@ class GD303SPIFactory : public testing::Test {
         g_gd303_hold_update = g_gd303_hold_irq_off = false;
         g_gd303_spi_bad_cs = g_gd303_spi_hold_rx = false;
         GPIO_CTL0(GPIOA) = GPIO_CTL1(GPIOA) = 0x44444444U;
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB;
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U);
         SPI_STAT(SPI0) = SPI_STAT_TBE;
         FMC_OBSTAT = 4U;
     }
