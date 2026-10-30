@@ -8,6 +8,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/core/status.h"
 #include "stm32u575xx.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -84,6 +85,16 @@ void nx_u575_model_irq_restore(nx_arch_irq_state_t previous);
 #define NX_U575_READ(reg)         nx_u575_model_read(reg)
 #define NX_U575_WRITE(reg, value) nx_u575_model_write((reg), (value))
 #define NX_U575_UART_POLL(port)   nx_u575_model_uart_poll(port)
+#ifndef NX_U575_UART_DEFAULT_PORT
+#define NX_U575_UART_RECEIVE8(controller)                                      \
+    ((uint8_t)NX_U575_READ(&(controller)->RDR))
+#define NX_U575_UART_TRANSMIT8(controller, value)                              \
+    NX_U575_WRITE(&(controller)->TDR, (value))
+#endif
+#ifndef NX_U575_GPIO_DEFAULT_PORT
+#define NX_U575_GPIO_WRITE(gpio, reset, set)                                   \
+    NX_U575_WRITE(&(gpio)->BSRR, (uint32_t)(set) | ((uint32_t)(reset) << 16U))
+#endif
 #define NX_U575_IRQ_CONTROL(irq, enabled, priority)                            \
     nx_u575_model_irq_control((irq), (enabled), (priority))
 #define NX_U575_IRQ_PRIORITY(irq) g_u575_model.priority[(irq)]

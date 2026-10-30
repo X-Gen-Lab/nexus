@@ -8,7 +8,15 @@
  */
 #include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
+#include "stm32u5xx_ll_usart.h"
 #include <limits.h>
+#ifndef NX_U575_UART_RECEIVE8
+#define NX_U575_UART_RECEIVE8(controller) LL_USART_ReceiveData8(controller)
+#endif
+#ifndef NX_U575_UART_TRANSMIT8
+#define NX_U575_UART_TRANSMIT8(controller, value)                              \
+    LL_USART_TransmitData8((controller), (value))
+#endif
 #ifndef NX_U575_IRQ_AVAILABLE
 #define NX_U575_IRQ_AVAILABLE(irq)                                             \
     (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
@@ -209,8 +217,8 @@ void nx_stm32u575_uart_irq(nx_stm32u575_uart_state_t* p) {
         if (p->terminal == NX_SUCCESS && (status & USART_ISR_TXE) != 0U &&
             (NX_U575_READ(&p->registers->CR1) & USART_CR1_TXEIE) != 0U &&
             p->tx_position < p->active->length) {
-            NX_U575_WRITE(&p->registers->TDR,
-                          p->active->data[p->tx_position++]);
+            NX_U575_UART_TRANSMIT8(p->registers,
+                                   p->active->data[p->tx_position++]);
             loaded = true;
             if (p->tx_position == p->active->length)
                 NX_U575_WRITE(&p->registers->CR1,
@@ -223,7 +231,7 @@ void nx_stm32u575_uart_irq(nx_stm32u575_uart_state_t* p) {
     }
     uint32_t errors = status & RX_ERRORS;
     if ((status & USART_ISR_RXNE) != 0U) {
-        uint8_t byte = (uint8_t)NX_U575_READ(&p->registers->RDR);
+        uint8_t byte = NX_U575_UART_RECEIVE8(p->registers);
         if (p->closing || errors != 0U || p->rx_count == p->rx_capacity)
             loss(p);
         else {

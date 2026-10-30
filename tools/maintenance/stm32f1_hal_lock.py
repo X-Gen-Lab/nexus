@@ -27,7 +27,8 @@ DIRECTORY = "vendors/st/stm32f1_hal"
 CMSIS_DIRECTORY = "vendors/st/cmsis_device_f1"
 LOCK_NAME = "dependencies/stm32f1-hal.lock.json"
 REVIEWED_FILES = frozenset({
-    "Inc/stm32f1xx_ll_gpio.h", "Inc/stm32f1xx_ll_usart.h", "LICENSE.md",
+    "Inc/stm32f1xx_ll_gpio.h", "Inc/stm32f1xx_ll_usart.h",
+    "Inc/stm32f1xx_ll_i2c.h", "LICENSE.md",
 })
 
 PAIRING = {
@@ -48,7 +49,7 @@ def contract(lock):
         raise ValueError("Unsupported STM32F1 official driver lock schema")
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "STM32CubeF1-v1.8.7-pinned-driver" or
-            lock["selected_api"] != "stm32f103-ll-inline" or
+            lock["selected_api"] != "stm32f103-ll-inline-i2c" or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F1 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:

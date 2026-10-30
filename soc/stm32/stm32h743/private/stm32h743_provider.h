@@ -137,12 +137,6 @@ nx_result_t nx_stm32h743_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
 #ifndef NX_H743_SPI_POLL
 #define NX_H743_SPI_POLL(port) ((void)(port))
 #endif
-#ifndef NX_H743_SPI_READ8
-#define NX_H743_SPI_READ8(reg) (*(volatile uint8_t*)(reg))
-#endif
-#ifndef NX_H743_SPI_WRITE8
-#define NX_H743_SPI_WRITE8(reg, value) (*(volatile uint8_t*)(reg) = (value))
-#endif
 /** \brief One statically selected CH1 on exclusive TIM3 or TIM4. */
 typedef struct {
     TIM_TypeDef* registers;

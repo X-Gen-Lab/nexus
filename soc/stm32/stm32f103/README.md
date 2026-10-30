@@ -18,9 +18,12 @@ limits below remain distinct from physical Board validation.
 
 ## Source and electrical boundary
 
-The private CMSIS and GPIO/USART LL headers use the exact pair pinned by official
+The private CMSIS and GPIO/USART/I2C LL headers use the exact pair pinned by
 STM32CubeF1 v1.8.7. The two dependency locks retain original notices and selected
-file identities. Vendor types do not enter public Nexus interfaces. Full HAL C
+file identities. Selected I2C receive uses a private compile-time LL port;
+command and acknowledgement exceptions follow the
+[official-driver contract](../../../docs/design/official-stm32-provider.md).
+Vendor types do not enter public Nexus interfaces. Full HAL C
 engines, mutable Handles, HAL tick and `HAL_Init` are not linked. Finite direct
 control writes preserve request ownership and avoid LL exclusive retry loops.
 F1 CRL/CRH nibbles and SR/DR acknowledgement differ from modern STM32 register

@@ -21,5 +21,7 @@ extern GPIO_TypeDef g_nx_test_mpu_gpio_registers;
 #endif
 #define NX_U575_READ(reg)         nx_test_mpu_gpio_read(reg)
 #define NX_U575_WRITE(reg, value) nx_test_mpu_gpio_write((reg), (value))
-#define NX_U575_MPU_GPIO_PORT     (&g_nx_test_mpu_gpio_registers)
+#define NX_U575_GPIO_WRITE(gpio, reset, set)                                   \
+    NX_U575_WRITE(&(gpio)->BSRR, (uint32_t)(set) | ((uint32_t)(reset) << 16U))
+#define NX_U575_MPU_GPIO_PORT (&g_nx_test_mpu_gpio_registers)
 #endif /* NEXUS_TEST_MPU_GPIO_MODEL_H */

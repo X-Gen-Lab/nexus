@@ -13,6 +13,7 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32g474/private/stm32g474_i2c_port.h",
         "soc/stm32/stm32g474/private/stm32g474_platform_cold.h",
         "soc/stm32/stm32g474/drivers/platform_cold.c",
         "soc/stm32/stm32g474/drivers/timer_capture_cold.c",

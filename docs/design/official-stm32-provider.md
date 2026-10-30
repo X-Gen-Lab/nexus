@@ -79,10 +79,12 @@ Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA,
 memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch
 coverage and the independent ThreadX subset do not expand this SoC matrix.
 
-The source review at `89485943` preserves all 217 declared identities, including
-33 without selected fixtures and 19 Native MODEL rows; absent selection remains
-unassessed. Optional components/system owners and authorized private examples
-need separate review; this view changes neither support nor qualification.
+The frozen source review at `89485943` preserves all 217 declared identities,
+including its 33 unselected identities and 19 Native MODEL rows. Separate source
+annexes now review those 33 declarations, seven components and seven system
+owners. The fresh `5e82bab6` matrix selects 29 identities in 11 ARM images and
+rejects four reserved G474 selections; it does not execute those images or change
+the original inventory. Authorized private examples still need a separate annex.
 
 F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling,
 H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
@@ -146,10 +148,11 @@ UART/SPI `uint16_t Size` parameters must match the selected public `size_t`
 contract without truncation, hidden splitting or implicit bounce storage.
 
 SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA
-addresses and counts. GPIO needs one combined set/reset command; U5
-`HAL_GPIO_WriteMultipleStatePin` supplies it outside the selected GPIO closure.
-Separate set/reset calls cannot substitute. DMA disable still needs actual
-readback and withdrawal proof before returning borrowed storage.
+addresses and counts. GPIO needs one combined set/reset command; selected U5
+GPIO commands now use private `HAL_GPIO_WriteMultipleStatePin` with the admitted
+GPIO source closure. Separate set/reset calls cannot substitute. DMA disable
+still needs actual readback and withdrawal proof before returning borrowed
+storage.
 
 Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware
 close must preserve the selected quiet interval before disabling the shifter.
@@ -202,13 +205,35 @@ Actual include closure, firmware links and installed-SDK consumption require
 current-source evidence; a common Core pin does not transfer F4 qualification to
 G4, H7, U5 or GD32.
 
-The next development overlay adds H743 `hal_driver_h7` to the family descriptor
+The earlier development overlay added H743 `hal_driver_h7` to the family descriptor
 and SoC source-lock projection, matching its existing pinned LL build input.
 Private capture, advanced-PWM and UART-FIFO templates retain specialization
 contracts; pin-state has optional implementation/default-macro scoping, while
 CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports
 now take the selected controller and directly call private LL functions, with
 no runtime forwarding. These changes do not rewrite the frozen source review.
+
+### Bounded official-operation increments
+
+The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1,
+word RDR/TDR operations carrying UART byte values, and RTC write-protection keys
+and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order,
+clock admission, timed phases and loan withdrawal remain in the same providers.
+H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked
+CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged.
+
+U575 GPIO now sends four existing command sites through the actual HAL GPIO C
+unit: public write, initialization preload, stop and serial TX idle. Its private
+14-file lock admits that unit and required headers; no HAL initialization or tick
+is invoked. Disjoint authorized masks remain one BSRR command, and empty public
+writes retain success without invoking HAL's nonempty-mask assertion.
+
+Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575
+receive/transmit to locked LL operations in the existing shared engines. They add
+no runtime forwarder, vendor Handle, state or generated hardware algorithm.
+Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual
+old-GREEN baselines and real-default probes remain development evidence;
+final clean-source gates, complete SDK consumption and qualification are pending.
 
 F407 uses official LL operations inside its existing provider state machines,
 with one selected HAL transport for UART `dma-tx`. That transport retains request
@@ -549,6 +574,15 @@ plus 2,048 B MSP and zero heap. Nonzero images consume public controller topolog
 the four-way image uses three CS banks, so its delta is not a linear endpoint
 cost. These link observations do not establish timing, HIL or new-source
 qualification.
+
+The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a
+DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers
+use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads:
+isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack.
+GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL
+call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated
+translation-unit results are not whole-provider resource, stack-peak, timing or
+hardware qualification.
 
 Retain an old implementation only while it provides a needed comparison or an
 unreplaced maintained mode. Select one normal production implementation after its

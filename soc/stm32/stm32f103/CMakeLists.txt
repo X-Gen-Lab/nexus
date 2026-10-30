@@ -23,6 +23,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${f1_device}/Source/Templates/gcc/startup_stm32f103xb.s"
     "${f1_device}/License.md" "${f1_hal}/LICENSE.md"
     "${f1_hal}/Inc/stm32f1xx_ll_gpio.h"
+    "${f1_hal}/Inc/stm32f1xx_ll_i2c.h"
     "${f1_hal}/Inc/stm32f1xx_ll_usart.h")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
 nexus_controller_modes(f1_gpio gpio)
@@ -85,6 +86,10 @@ if(f1_sources)
         "${f1_device}/Include" "${f1_hal}/Inc")
     nexus_use_cmsis_core(nexus_soc_stm32f103)
     target_compile_definitions(nexus_soc_stm32f103 PRIVATE STM32F103xB)
+    if(f1_i2c)
+        target_compile_definitions(nexus_soc_stm32f103 PRIVATE
+            "NX_I2C_V1_PORT_HEADER=\"stm32f103_i2c_port.h\"")
+    endif()
 else()
     add_library(nexus_soc_stm32f103 INTERFACE)
     target_link_libraries(nexus_soc_stm32f103 INTERFACE nexus_io)

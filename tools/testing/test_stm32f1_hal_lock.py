@@ -68,11 +68,17 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
         return official.verify(self.source, self.lock_path, self.cmsis,
                                **options)
 
+    def assert_reviewed_file_count(self, result):
+        reviewed = official.REVIEWED_FILES
+        self.assertIn("Inc/stm32f1xx_ll_i2c.h", reviewed)
+        self.assertEqual(set(self.lock["files"]), reviewed)
+        self.assertEqual(result["verified_files"], len(reviewed))
+
     def test_paired_clean_official_source_verifies_without_qualification_claim(self):
         result = self.verify()
         self.assertEqual(result["commit"], official.COMMIT)
         self.assertEqual(result["cmsis_commit"], official.CMSIS_COMMIT)
-        self.assertEqual(result["verified_files"], 3)
+        self.assert_reviewed_file_count(result)
         self.assertEqual(result["license"], "BSD-3-Clause")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
@@ -83,15 +89,16 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
         cmsis = ROOT / "vendors/st/cmsis_device_f1"
         lock = ROOT / "dependencies/stm32f1-hal.lock.json"
         result = official.verify(source, lock, cmsis)
-        self.assertEqual(result["verified_files"], 3)
+        self.assert_reviewed_file_count(result)
         executed = subprocess.run([
             sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f1_hal_lock.py"),
             "--source", str(source), "--lock", str(lock),
             "--cmsis-source", str(cmsis)], capture_output=True, text=True,
             timeout=30)
         self.assertEqual(executed.returncode, 0, executed.stderr)
-        self.assertEqual(json.loads(executed.stdout)["source_kind"],
-                         "git_checkout")
+        cli_result = json.loads(executed.stdout)
+        self.assert_reviewed_file_count(cli_result)
+        self.assertEqual(cli_result["source_kind"], "git_checkout")
 
     def test_unknown_missing_or_reauthored_pairing_and_release_reject(self):
         candidates = [{**self.lock, "fallback": True}, {}, []]

@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`8b3d1368dca6f3228ebff7e5e226c6473124b0fc3b47f23550cfc0cb20483096`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`82fe430bd5b6f3f76a574f1be937fc8e18968148bee6c334240da4c78d1dc3ab`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1220,11 +1220,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A02 |
 | `task` | 逐模式行为合同 |
-| `implementation_status` | partial_selected_165_mcu_source_contract_review |
-| `software_status` | source_review_only_33_unselected_unassessed_19_native_model |
+| `implementation_status` | partial_public_198_mcu_source_contract_review_19_native_model |
+| `software_status` | source_review_and_p3_29_positive_4_reserved_software_only |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/README.md |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/README.md;build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/remaining-source-gaps.md |
 | `exit_condition` | 逐项核对 TX/RX、格式、错误、wake、容量、长度、计数、cancel、drain 与 stop。 |
 | `owner` | codex |
 
@@ -1235,11 +1235,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A03 |
 | `task` | 官方实现决策 |
-| `implementation_status` | partial_selected_official_implementation_decisions_reviewed |
-| `software_status` | bounded_source_decisions_not_complete_migration_or_qualification |
+| `implementation_status` | partial_selected_official_decisions_and_six_bounded_increments |
+| `software_status` | source_implemented_complete_migration_and_final_qualification_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/coverage-summary.json |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/coverage-summary.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json |
 | `exit_condition` | 每个模式明确选择 HAL transport、LL/SPL 原语或有理由的专用引擎。 |
 | `owner` | codex |
 
@@ -1250,11 +1250,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A04 |
 | `task` | 必要直接访问 |
-| `implementation_status` | partial_operation_specific_direct_access_review |
-| `software_status` | vendor_source_exceptions_reviewed_remaining_leaf_and_errata_work_open |
+| `implementation_status` | partial_operation_specific_semantic_and_narrow_arm_cost_exceptions |
+| `software_status` | isolated_leaf_decisions_not_whole_provider_or_dynamic_cost |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/combined-mode-decisions.csv |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/combined-mode-decisions.csv;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-cost/decision.json |
 | `exit_condition` | 原子操作、SDK 缺口、errata、撤离证明及实测预算例外有准确理由。 |
 | `owner` | codex |
 
@@ -1265,11 +1265,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A05 |
 | `task` | 行为与成本基线 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_old_green_baselines_and_isolated_leaf_cost |
+| `software_status` | actual_source_binary_baselines_and_arm_leaf_probes_final_comparison_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/c-leaf-iteration-20261030/p4-baseline/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-old-green/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-cost/comparison.json |
 | `exit_condition` | 固定同合同的行为与资源比较范围，保留既有原始证据身份。 |
 | `owner` | codex |
 
@@ -1295,11 +1295,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B01 |
 | `task` | 官方依赖配对 |
-| `implementation_status` | partial_stm32_lock_pairing_and_gd_import_source_review |
-| `software_status` | nine_stm32_locks_67_file_identities_reviewed_not_family_qualification |
+| `implementation_status` | partial_selected_stm32_pairing_and_expanded_f1_g4_h7_u5_closures |
+| `software_status` | selected_lock_identities_reviewed_final_sdk_consumption_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
-| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/dependency-identities.md |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py;dependencies/stm32f1-hal.lock.json;dependencies/stm32g4-hal.lock.json;dependencies/stm32h7-hal.lock.json;dependencies/stm32u5-hal.lock.json |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/dependency-identities.md;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-metadata/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/closure-red/handoff.json |
 | `exit_condition` | 核对组织 fork、精确 gitlink、SDK、CMSIS Device/Core 和许可证配对。 |
 | `owner` | codex |
 
@@ -1310,11 +1310,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B02 |
 | `task` | 私有 HAL 模块构建 |
-| `implementation_status` | partial_selected_f407_uart_dma_rcc_private_sources |
-| `software_status` | selected_arm_native_factory_passed_final_gate_pending |
+| `implementation_status` | partial_selected_f407_transport_and_u575_gpio_private_hal_sources |
+| `software_status` | selected_private_build_integration_final_clean_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
-| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py;soc/stm32/stm32u575/private/hal/;soc/stm32/stm32u575/drivers/gpio.c |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/default-probes-old-green/u5-i2c-gpio-barrier.json |
 | `exit_condition` | 仅显式编译实际需要的官方 C 模块，避免整包选入。 |
 | `owner` | codex |
 
@@ -1370,11 +1370,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B06 |
 | `task` | 依赖及 SDK 闭包 |
-| `implementation_status` | partial_f4_export_and_h743_hal_identity_closure |
-| `software_status` | h743_red2_green124_and_18_configuration_comparisons_full_sdk_pending |
+| `implementation_status` | partial_selected_hal_ll_headers_five_i2c_ports_and_gpio_conf_payload |
+| `software_status` | selected_closure_red_green_final_source_sdk_consumption_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
-| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/h743-source-closure/handoff.json |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py;soc/stm32/stm32f103/private/stm32f103_i2c_port.h;soc/stm32/stm32f407/private/stm32f407_i2c_port.h;soc/stm32/stm32g474/private/stm32g474_i2c_port.h;soc/stm32/stm32h743/private/stm32h743_i2c_port.h;soc/stm32/stm32u575/private/stm32u575_i2c_port.h;soc/stm32/stm32u575/private/hal/ |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/h743-source-closure/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/sdk-conf-red/handoff.json |
 | `exit_condition` | 锁、source catalogue、descriptor、SDK 文件和许可证闭包一致，升级经过受控验证。 |
 | `owner` | codex |
 
@@ -1715,11 +1715,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F01 |
 | `task` | GPIO 与 pin 迁移 |
-| `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
+| `implementation_status` | partial_selected_f407_gd470_primitives_and_u575_four_hal_gpio_commands |
+| `software_status` | actual_default_old_green_and_selected_development_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;soc/stm32/stm32u575/drivers/gpio.c;dependencies/stm32u5-hal.lock.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/c-leaf-iteration-20261030/default-probes-old-green/u5-i2c-gpio-barrier.json |
 | `exit_condition` | 扩大 LL/SPL，保持安全电平顺序、权限与组合 set/reset 原子性。 |
 | `owner` | codex |
 
@@ -1730,11 +1730,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F02 |
 | `task` | SPI 短事务迁移 |
-| `implementation_status` | partial_f407_gd470_and_u575_spi_byte_primitives |
-| `software_status` | u575_63_cases_before_after_and_same_context_arm_link_passed_full_gate_pending |
+| `implementation_status` | partial_selected_f407_gd470_u575_and_h743_spi_byte_primitives |
+| `software_status` | actual_default_old_green_and_selected_development_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;soc/stm32/stm32h743/drivers/spi.c |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json |
 | `exit_condition` | 官方配置及收发保持完整 CS 区间、dummy/discard 和 transferred。 |
 | `owner` | codex |
 
@@ -1745,11 +1745,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F03 |
 | `task` | SPI DMA 迁移 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_h743_spi_dma_cleanup_ll_byte_leaf_transport_engine_retained |
+| `software_status` | actual_default_old_green_final_mode_and_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;soc/stm32/stm32h743/drivers/spi_dma.c |
+| `evidence_paths` | build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json |
 | `exit_condition` | 评价完整官方流程，验证 TX/RX 联合撤离、固定地址和 wire completion。 |
 | `owner` | codex |
 
@@ -1760,11 +1760,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F04 |
 | `task` | I2C 消息序列迁移 |
-| `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
+| `implementation_status` | partial_five_stm32_compile_time_i2c_ll_data_ports_direct_exceptions_retained |
+| `software_status` | actual_default_old_green_and_narrow_arm_cost_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;drivers/i2c/i2c_v1_async/i2c_v1_async.c;drivers/i2c/i2c_v2/i2c_v2.c |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-cost/decision.json |
 | `exit_condition` | 覆盖 repeated START、1/2/3 字节窗口、NACK/ARLO、STOP 和精确 errata。 |
 | `owner` | codex |
 
@@ -1790,11 +1790,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F06 |
 | `task` | PWM/capture/encoder 迁移 |
-| `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
+| `implementation_status` | partial_f407_gd470_primitives_and_u575_checked_ll_pwm_setters |
+| `software_status` | actual_default_old_green_existing_362_debug_cases_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;soc/stm32/stm32u575/drivers/pwm.c |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-old-green/handoff.json |
 | `exit_condition` | 保留共享基座、同步更新、互补输出和安全停止。 |
 | `owner` | codex |
 
@@ -1850,11 +1850,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F10 |
 | `task` | RTC/LPTIM/watchdog 迁移 |
-| `implementation_status` | partial_f407_watchdog_primitives |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
+| `implementation_status` | partial_f407_watchdog_and_u575_rtc_ll_keys_alarm_command |
+| `software_status` | actual_default_old_green_existing_362_debug_cases_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/;soc/stm32/stm32u575/drivers/rtc.c |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-old-green/handoff.json |
 | `exit_condition` | 保持时间连续性、唤醒合同和不可逆硬件影响。 |
 | `owner` | codex |
 
@@ -1865,11 +1865,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-G01 |
 | `task` | F103 精确验证 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_f103_i2c_ll_receive_and_source_review |
+| `software_status` | selected_source_and_default_old_green_full_family_exit_open |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/;soc/stm32/stm32f103/private/stm32f103_i2c_port.h |
+| `evidence_paths` | build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json |
 | `exit_condition` | 独立验证 density、低时钟、channel DMA 和 errata 限制。 |
 | `owner` | codex |
 
@@ -1940,11 +1940,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-G06 |
 | `task` | H743 域与 Cache 验证 |
-| `implementation_status` | partial_h743_official_hal_dependency_identity_corrected |
-| `software_status` | red2_green124_metadata_and_18_configurations_not_complete_h743_exit |
+| `implementation_status` | partial_h743_metadata_spi_ll_byte_and_i2c_data_ports |
+| `software_status` | selected_development_scopes_not_complete_h743_or_final_candidate_exit |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/next/h743-source-closure/handoff.json |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/;soc/stm32/stm32h743/private/stm32h743_i2c_port.h |
+| `evidence_paths` | build/vendor-first-20261030/next/h743-source-closure/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json |
 | `exit_condition` | 覆盖 Cache、域、DMA 内存、连续模式、SPI wire errata 与 RAM 执行组件。 |
 | `owner` | codex |
 
@@ -1955,11 +1955,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-G07 |
 | `task` | U575 精确子集验证 |
-| `implementation_status` | partial_u575_spi_default_byte_ports_use_official_ll |
-| `software_status` | selected_63_case_and_arm_cost_evidence_full_family_exit_open |
+| `implementation_status` | partial_u575_spi_pwm_uart_rtc_gpio_i2c_official_operations |
+| `software_status` | selected_development_scopes_final_clean_candidate_and_full_family_exit_open |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/;soc/stm32/stm32u575/drivers/pwm.c;soc/stm32/stm32u575/drivers/uart.c;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/drivers/gpio.c;soc/stm32/stm32u575/private/stm32u575_i2c_port.h |
+| `evidence_paths` | build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json |
 | `exit_condition` | 分别验证 GPDMA/chain、FIFO、保留时间、Stop2/LPDMA/LPBAM 和既有 TrustZone 窄范围。 |
 | `owner` | codex |
 
@@ -2180,11 +2180,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J03 |
 | `task` | 实际官方源码测试 |
-| `implementation_status` | partial_actual_spl_and_selected_hal_source_models |
-| `software_status` | selected_official_uart_dma_rcc_model_and_arm_compile_passed_final_gate_pending |
+| `implementation_status` | partial_actual_official_hal_transport_gpio_and_ll_default_models |
+| `software_status` | actual_selected_old_green_probes_and_metadata_red_green_final_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp |
-| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/;tests/contracts/stm32f407_uart_hal/;tests/google/stm32_uart_hal.cmake;tests/google/stm32_uart_cold_factory_test.cpp;tests/google/official_leaf_probes.cmake |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/c-leaf-iteration-20261030/default-probes-old-green/u5-i2c-gpio-barrier.json;build/vendor-first-20261030/c-leaf-iteration-20261030/closure-red/handoff.json |
 | `exit_condition` | 实际编译执行所选官方源码，验证与 adapter 的组合。 |
 | `owner` | codex |
 
@@ -2390,11 +2390,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L01 |
 | `task` | 替换后生产清理 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_official_leaf_defaults_replaced_protocol_engines_retained |
+| `software_status` | source_graph_reviewed_final_clean_gate_and_full_replacement_exit_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/;soc/stm32/stm32u575/drivers/;soc/stm32/stm32h743/drivers/;drivers/i2c/ |
+| `evidence_paths` | build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json |
 | `exit_condition` | 删除已替换实现、无用开关及重复状态，保留必要比较夹具与未替换模式。 |
 | `owner` | codex |
 

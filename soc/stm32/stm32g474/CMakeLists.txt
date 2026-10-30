@@ -108,7 +108,8 @@ if(g4_sources)
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2"
         "${NEXUS_SOURCE_DIR}/soc/stm32/common"
         "${NEXUS_SOURCE_DIR}/io/private")
-    if(g4_adc_modes OR g4_pwm_adc_modes OR g4_can_fd_modes OR g4_adc_group_modes)
+    if(g4_adc_modes OR g4_pwm_adc_modes OR g4_can_fd_modes OR
+            g4_adc_group_modes OR g4_i2c_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32g474 g4)
     endif()
@@ -116,6 +117,10 @@ if(g4_sources)
         "${g4_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32g474)
     target_compile_definitions(nexus_soc_stm32g474 PRIVATE STM32G474xx)
+    if(g4_i2c_modes)
+        target_compile_definitions(nexus_soc_stm32g474 PRIVATE
+            "NX_I2C_V2_PORT_HEADER=\"stm32g474_i2c_port.h\"")
+    endif()
     if(g4_can_fd_modes)
         target_compile_definitions(nexus_soc_stm32g474 PRIVATE
             USE_RTOS=0 USE_HAL_FDCAN_REGISTER_CALLBACKS=0)

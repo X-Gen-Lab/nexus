@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 9d9b720e457213ef31f694f003a19600f2ec75f21f55b987fce1caa3f61a9bf9\n"
+"X-Nexus-Source-SHA256: bc9f525466225b72c665bb0df769a57aedd6d4a1eb906df343f1395fc73948b7\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -711,17 +711,8 @@ msgstr "所观测最终普通 ELF 不保留 `HAL_Init`、`HAL_InitTick`、`HAL_I
 msgid "Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware close must preserve the selected quiet interval before disabling the shifter. U575 HAL also contains its Device-gated persistent-DMAT workaround. These API fits do not prove callback, deadline or loan withdrawal; review ordinary LL/SPL setters separately from justified command/snapshot exceptions."
 msgstr "逐一检查完成调用栈：F4 SPI DMA 可能等待 TXE/BSY；H7/U5 的 EOT 硬件关闭流程必须先保留所选静默间隔，再禁用移位器。U575 HAL 也已包含由 Device 条件宏控制的 persistent-DMAT workaround。这些 API 的适用点不能证明回调、deadline 或借用引用已排空；应将普通 LL/SPL setter 与有理由保留的命令／快照例外分别审查。"
 
-msgid "SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA addresses and counts. GPIO needs one combined set/reset command; U5 `HAL_GPIO_WriteMultipleStatePin` supplies it outside the selected GPIO closure. Separate set/reset calls cannot substitute. DMA disable still needs actual readback and withdrawal proof before returning borrowed storage."
-msgstr "SPI 评估须保留完整 CS 区间、dummy/discard、固定 DMA 地址和计数。GPIO 需要一次组合 set/reset 命令；U5 的 `HAL_GPIO_WriteMultipleStatePin` 已提供该操作，但不在当前所选 GPIO 闭包内。分开的 set/reset 调用不能替代它。DMA disable 仍须有实际读回与撤离证明，才能归还被借用的存储。"
-
 msgid "The [SPI cost fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/io_storage_cost/spi_endpoints/README.md) links 0/1/2/4 endpoints against the unchanged `89485943` Source SDK: development LOAD/footprint is 3,048/7,880/7,940/8,064 B, with static SRAM 72/176/208/280 B, plus 2,048 B MSP and zero heap. Nonzero images consume public controller topology; the four-way image uses three CS banks, so its delta is not a linear endpoint cost. These link observations do not establish timing, HIL or new-source qualification."
 msgstr "[SPI 成本夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/io_storage_cost/spi_endpoints/README.md)使用未改变的 `89485943` Source SDK 链接 0/1/2/4 个 endpoint：开发测量的 LOAD 与 footprint 均为 3,048/7,880/7,940/8,064 B，静态 SRAM 为 72/176/208/280 B，另有 2,048 B MSP，heap 为零。非零配置消费公共 controller 拓扑；四 endpoint 镜像使用三个 CS bank，因此其增量不能作为线性的单 endpoint 成本。这些链接观察不建立时序、HIL 或新源码资格。"
-
-msgid "The next development overlay adds H743 `hal_driver_h7` to the family descriptor and SoC source-lock projection, matching its existing pinned LL build input. Private capture, advanced-PWM and UART-FIFO templates retain specialization contracts; pin-state has optional implementation/default-macro scoping, while CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports now take the selected controller and directly call private LL functions, with no runtime forwarding. These changes do not rewrite the frozen source review."
-msgstr "后续开发 overlay 在 H743 family descriptor 与 SoC source-lock 投影中加入 `hal_driver_h7`，与既有已锁定 LL 构建输入一致。私有 capture、advanced-PWM 与 UART-FIFO 模板继续遵守各自的 specialization 合同；pin-state 提供可选 implementation 与默认宏作用域，而 CAN FD 仍是普通的、有 include guard 保护的声明。独立的 U575 SPI byte port 现在接收所选 controller 并直接调用私有 LL 函数，没有运行时转发。这些改动不重写已冻结源码审查的结论。"
-
-msgid "The source review at `89485943` preserves all 217 declared identities, including 33 without selected fixtures and 19 Native MODEL rows; absent selection remains unassessed. Optional components/system owners and authorized private examples need separate review; this view changes neither support nor qualification."
-msgstr "`89485943` 的源码审查保留全部 217 个已声明身份，其中包括 33 个未被夹具选中的身份和 19 个 Native MODEL 条目；缺少选择的条目仍为未评估。可选组件／系统责任方以及经授权的私有示例需要分别审查；此视图不改变支持范围或资格。"
 
 # Fixed-clock admission; exact source and translation independently reviewed.
 msgid "Fixed clock admission"
@@ -735,3 +726,28 @@ msgstr "F103 的 HSI8 和 GD303 的 IRC8 分别要求 `RCC_CR.HSITRIM` 与 `RCU_
 
 msgid "F407 HSE8/PLL168, GD470 HXTAL25/PLL200 and G474 HSE24/PLL170 retain their external primary clocks. Their internal-clock admission checks are `RCC_CR.HSITRIM=16`, `RCU_CTL.IRC16MADJ=16` and `RCC_ICSCR.HSITRIM=64`, respectively. They constrain the nominal bootstrap and fallback clocks; G474 also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment stating 16 is stale."
 msgstr "F407 的 HSE8/PLL168、GD470 的 HXTAL25/PLL200 和 G474 的 HSE24/PLL170 继续使用外部主时钟。三者的内部时钟准入检查分别为 `RCC_CR.HSITRIM=16`、`RCU_CTL.IRC16MADJ=16` 和 `RCC_ICSCR.HSITRIM=64`。这些检查约束名义启动与回退时钟；G474 已选的 I2C1 内核也使用 HSI16。G474 的默认值 64 依据 RM0440 Rev9 第 7.4.2 节和锁定的 HAL 定义；LL 注释中的 16 已过时。"
+
+
+msgid "The frozen source review at `89485943` preserves all 217 declared identities, including its 33 unselected identities and 19 Native MODEL rows. Separate source annexes now review those 33 declarations, seven components and seven system owners. The fresh `5e82bab6` matrix selects 29 identities in 11 ARM images and rejects four reserved G474 selections; it does not execute those images or change the original inventory. Authorized private examples still need a separate annex."
+msgstr "冻结在 `89485943` 的源码审查保留全部 217 个已声明身份，其中包括当时未选入夹具的 33 个身份和 19 个 Native MODEL 行。独立源码附录现已审查这 33 项声明、七个组件和七个 system owner。全新 `5e82bab6` 矩阵在 11 个 ARM 镜像中选入 29 个身份，并拒绝四项被保留资源约束的 G474 选择；它没有执行这些镜像，也不改变原清单。已授权的私有示例仍需独立附录。"
+
+msgid "SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA addresses and counts. GPIO needs one combined set/reset command; selected U5 GPIO commands now use private `HAL_GPIO_WriteMultipleStatePin` with the admitted GPIO source closure. Separate set/reset calls cannot substitute. DMA disable still needs actual readback and withdrawal proof before returning borrowed storage."
+msgstr "SPI 评价保留完整 CS 区间、dummy/discard、固定 DMA 地址及计数。GPIO 需要一条合并的 set/reset 命令；所选 U5 GPIO 命令现通过私有 `HAL_GPIO_WriteMultipleStatePin` 和已准入的 GPIO 源码闭包实现，不能用分开的 set/reset 调用代替。DMA disable 仍需实际 readback 和撤离证明，才能归还借用存储。"
+
+msgid "The earlier development overlay added H743 `hal_driver_h7` to the family descriptor and SoC source-lock projection, matching its existing pinned LL build input. Private capture, advanced-PWM and UART-FIFO templates retain specialization contracts; pin-state has optional implementation/default-macro scoping, while CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports now take the selected controller and directly call private LL functions, with no runtime forwarding. These changes do not rewrite the frozen source review."
+msgstr "此前的开发 overlay 已在 H743 family descriptor 与 SoC source-lock 投影中加入 `hal_driver_h7`，与既有已锁定 LL 构建输入一致。私有 capture、advanced-PWM 与 UART-FIFO 模板继续遵守各自的 specialization 合同；pin-state 提供可选 implementation 与默认宏作用域，而 CAN FD 仍是普通的、有 include guard 保护的声明。独立的 U575 SPI byte port 现在接收所选 controller 并直接调用私有 LL 函数，没有运行时转发。这些改动不重写已冻结源码审查的结论。"
+
+msgid "Bounded official-operation increments"
+msgstr "有界官方操作增量"
+
+msgid "The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1, word RDR/TDR operations carrying UART byte values, and RTC write-protection keys and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order, clock admission, timed phases and loan withdrawal remain in the same providers. H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged."
+msgstr "当前开发源码对 U575 PWM 的 PSC/ARR/CCR1 使用已锁定 LL setter，对 UART RDR/TDR 使用承载字节值的字访问，并对 RTC 写保护密钥和 Alarm A 清除命令使用已锁定 LL 操作。既有屏障、精确 readback、IRQ／错误顺序、时钟准入、定时阶段和借用撤离仍由原 provider 负责。H743 SPI 轮询及 DMA 清理使用接收 controller 的 LL byte port；屏蔽 CSTART 的 CSUSP 命令、quiet tail、Cache 所有权和 DMA／IRQ join 保持不变。"
+
+msgid "U575 GPIO now sends four existing command sites through the actual HAL GPIO C unit: public write, initialization preload, stop and serial TX idle. Its private 14-file lock admits that unit and required headers; no HAL initialization or tick is invoked. Disjoint authorized masks remain one BSRR command, and empty public writes retain success without invoking HAL's nonempty-mask assertion."
+msgstr "U575 GPIO 现将四个既有命令位置交给实际 HAL GPIO C 单元：公共 write、初始化预装载、stop 和串口 TX 空闲电平。其私有 14 文件锁准入该单元及必需头文件；不会调用 HAL 初始化或 tick。已授权且不相交的掩码仍由一条 BSRR 命令处理；公共空掩码 write 仍返回成功，并避免调用 HAL 的非空掩码断言。"
+
+msgid "Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575 receive/transmit to locked LL operations in the existing shared engines. They add no runtime forwarder, vendor Handle, state or generated hardware algorithm. Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual old-GREEN baselines and real-default probes remain development evidence; final clean-source gates, complete SDK consumption and qualification are pending."
+msgstr "五个 SoC 私有的编译期 I2C port 在既有共享引擎中，将 F103/F407 receive 及 G474/H743/U575 receive/transmit 绑定到已锁定 LL 操作。它们不增加运行时转发层、vendor Handle、状态或生成的硬件算法。factory face、公共 ABI、生命周期和模式选择不变。实际 old-GREEN 基线及真实默认操作探针仍属于开发证据；最终 clean-source 门禁、完整 SDK 消费和资格尚待完成。"
+
+msgid "The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads: isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack. GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated translation-unit results are not whole-provider resource, stack-peak, timing or hardware qualification."
+msgstr "I2C 叶操作比较保留 V1 TX 的直接访问，因为已锁定 LL helper 会增加对 DR 的读改写；V2 完整 CR2/ICR 命令也在 vendor helper 使用读改写时保留直接访问。F103/F407 的 ADDR 清除仍使用两次有序的直接读取：独立 ARM 探针测得直接实现为 6 B，LL 为 18 B，且额外使用 8 B 栈。GD470 的高频 byte/ADDR 叶操作在窄范围 SPL 调用及被调用函数比较后保留直接访问；GD303 未选入 I2C SPL C 单元。这些独立编译单元结果不建立整个 provider 的资源、栈峰值、时序或硬件资格。"

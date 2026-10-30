@@ -25,10 +25,14 @@ EXTI0/1 and physical Flash. These reference selections keep TZEN0, MSIS4MHz,
 static typed factory objects and caller execution. Those six selections add no
 DMA engine, task, runtime registry or automatic clock adoption. The separate
 USART1 `dma-tx` and `dma-chain-tx` selections each own the same exclusive GPDMA
-channel and cannot coexist. The official U5 LL
-headers are private, hash-locked CubeU5 v1.9.0 inputs; readonly configuration
-queries, encodings and selected register operations are reused without HAL
-handles, vendor IRQ callbacks, HAL ticks or a second transfer owner.
+channel and cannot coexist. The private, hash-locked CubeU5 v1.9.0 inputs include
+LL headers and the HAL GPIO C unit with its required headers in the 14-file lock.
+LL reuse includes encodings, readonly queries and selected data/control operations.
+Four existing GPIO-provider command sites use one combined
+`HAL_GPIO_WriteMultipleStatePin` for admitted nonempty masks; empty public writes
+still succeed. No `HAL_Init`, vendor tick, Handle or second transfer/IRQ owner is
+introduced. The exact bounded scope is in
+the [official-driver contract](../../../docs/design/official-stm32-provider.md).
 
 The official STM32U5 CMSIS device source is pinned to
 `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8` (v1.4.3, Cube v1.9.0). The original
@@ -262,8 +266,11 @@ Board route. Factory lookup remains a cold readonly face lookup.
 本次补齐六类选定外设：SPI1 有限轮询、I2C1 有限消息、ADC4 PC0 单次采样、
 TIM3 CH1 固定 PWM、PA0/PA1 EXTI 和完整物理 Flash。实例仍由 TOML 与不可变 IR
 静态生成，使用共享只读方法表及独立私有状态，没有隐藏任务或运行时注册表。
-官方 U5 LL 仅作为私有锁定依赖复用配置编码和只读查询，不引入 HAL 句柄、tick
-或第二个中断/传输所有者。
+私有 14 文件锁包含官方 LL 头文件、HAL GPIO C 单元及其必需头文件；LL 复用包括
+配置编码、只读查询及选定的数据和控制操作。GPIO provider 的四个既有命令位置对
+已准入非空掩码调用一条合并的 `HAL_GPIO_WriteMultipleStatePin`；公共空掩码写入
+仍成功。不引入 `HAL_Init`、vendor tick、Handle 或第二个中断/传输 owner；具体范围见
+[官方驱动合同](../../../docs/design/official-stm32-provider.md)。
 
 SPI 的 DMA 完成概念不适用于此轮询模式；本实现明确等待 EOT/TXC，复位控制器后
 才释放 CS。I2C 支持重复 START 与256字节 RELOAD，STOP 和 BUSY 均需排空。

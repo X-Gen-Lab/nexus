@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cc5d904e05edf25e1c784510c554ccc7ba37a8a4ad3e6c25a7d472d8da0c3793\n"
+"X-Nexus-Source-SHA256: 78f8975d54d9f7a383ab9bbe23907afcd8f7e27d0f1cb683517bc6654c4746c8\n"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:9
 msgid "Add a SoC, provider or reusable component"
@@ -181,16 +181,6 @@ msgid ""
 "[integration contract](../design/integration-contracts.md)"
 msgstr "按[接入合同](../design/integration-contracts.md)放入既有组件端口或外部产品"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:49
-msgid ""
-"The SoC target selects shared sources through explicit CMake entries and "
-"private includes. The driver directory does not choose routes, clock "
-"profiles or an ABI, and its presence does not add a maintained mode. Never "
-"introduce a runtime forwarder merely to match a source directory."
-msgstr ""
-"SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 "
-"ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。"
-
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:54
 msgid "Implement in a reviewable sequence"
 msgstr "按可评审的顺序实现"
@@ -201,17 +191,6 @@ msgid ""
 "Define the new behavior, supported modes, public ownership obligations and "
 "rejection boundaries before changing its production implementation."
 msgstr "准备[固定源码与递归依赖](source-checkout.md)。改变生产实现前，先定义新行为、支持模式、公共所有权义务和拒绝边界。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:59
-msgid ""
-"Add and execute a meaningful RED GoogleTest/GoogleMock contract against the "
-"current production path. Retain the actual command, nonzero execution and "
-"expected failing assertion. Test MMIO/CPU/dependency ports through mocks; "
-"Python resolver behavior uses stdlib unittest. A missing tool or compile-"
-"only error is not the expected behavioral RED result."
-msgstr ""
-"为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。通过 mock 测试 "
-"MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:64
 msgid ""
@@ -649,3 +628,10 @@ msgstr "每个 SoC 的 `configure/` 包中，`contract.py` 拥有模式能力、
 
 msgid "The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h` templates allow one specialization per translation unit. Required named exports, register, clock, IRQ and data bindings reject at compilation when missing. The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control requires its hardware flow binding. Wrapper-owned bindings, including ops names and post-include clock-readiness use, remain available after inclusion. Explicit caller read/write ports survive; cleanup removes only template-owned helper and default macros. Review each specialization's actual compilation, exported table and runtime contract; a template guard does not establish hardware timing."
 msgstr "私有 `timer_capture_impl.h`、`advanced_pwm_impl.h` 和 `uart_fifo_impl.h` 模板允许每个 translation unit 只有一个 specialization。所需的具名导出、寄存器、clock、IRQ 和数据绑定缺失时在编译期拒绝。FIFO 模板接受深度 1..16，RTS/CTS 选择为 0 或 1；选择流控时要求相应硬件 flow binding。wrapper 拥有的 binding，包括 ops 名称及 include 之后的 clock-readiness 使用，保留可用。调用方显式定义的 read/write port 保留；清理只移除模板拥有的 helper 和默认宏。逐个审查 specialization 的实际编译、导出表和运行时合同；模板 guard 不建立硬件时序资格。"
+
+
+msgid "The SoC target selects shared sources through explicit CMake entries and private includes. The driver directory does not choose routes, clock profiles or an ABI, and its presence does not add a maintained mode. Never introduce a runtime forwarder merely to match a source directory. A selected private compile-time port may bind reviewed official operations inside that shared translation unit; a macro in a separately compiled wrapper cannot change it. Preserve operation width, read side effects, command atomicity and withdrawal ordering; the [bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments) is a current example, not a blanket HAL replacement."
+msgstr "SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。选定的私有编译期 port 可以在该共享编译单元内部绑定已审查的官方操作；单独编译的 wrapper 中的宏不能改变它。保留操作宽度、读取副作用、命令原子性和撤离顺序；[有界官方操作范围](../design/official-stm32-provider.md#bounded-official-operation-increments)是当前实例，不是全面替换为 HAL 的承诺。"
+
+msgid "For new behavior or fixes, add and execute a meaningful RED GoogleTest/GoogleMock contract against the current production path. Retain the actual command, nonzero execution and expected failing assertion. Equivalent refactors retain actual old-GREEN source/binary snapshots and applicable regressions plus real-default operation probes, without fabricated RED. Test MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only error is not the expected behavioral RED result."
+msgstr "对新行为或修复，为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。等价重构保留实际 old-GREEN 源码／二进制快照、适用回归及真实默认操作探针，不伪造 RED。通过 mock 测试 MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。"

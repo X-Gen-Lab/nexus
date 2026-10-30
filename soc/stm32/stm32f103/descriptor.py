@@ -13,6 +13,7 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f103/private/stm32f103_i2c_port.h",
         "soc/stm32/stm32f103/CMakeLists.txt",
         "soc/stm32/stm32f103/system.c",
         "soc/stm32/stm32f103/drivers/gpio.c",

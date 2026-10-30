@@ -12,6 +12,7 @@ DESCRIPTOR = FamilyDescriptor(
         ("hal_driver_h7", "stm32h7_hal"),
     ),
     owned_payload=(
+        "soc/stm32/stm32h743/private/stm32h743_i2c_port.h",
         "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
         "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c",
         "tools/configure/assemblies/h743-spi-dma.toml",

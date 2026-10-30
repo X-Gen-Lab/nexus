@@ -253,6 +253,7 @@ stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
 REQUIRED_FILES += ("cmake/platform/STM32Official.cmake",)
+REQUIRED_FILES += ("soc/stm32/stm32u575/private/hal/stm32u5xx_hal_conf.h",)
 for _official in OFFICIAL_DRIVERS:
     REQUIRED_FILES += (_official.LOCK_NAME,
                        "tools/maintenance/" + _official.__name__.split(".")[-1] + ".py")

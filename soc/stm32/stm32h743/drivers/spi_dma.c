@@ -10,6 +10,10 @@
 #include "nexus/core/fault.h"
 #include "stm32h743_spi_dma.h"
 #include <limits.h>
+#ifndef NX_H743_SPI_READ8
+#include "stm32h7xx_ll_spi.h"
+#define NX_H743_SPI_READ8(port) LL_SPI_ReceiveData8(port)
+#endif
 #ifndef NX_H743_SPI_DMA1
 #define NX_H743_SPI_DMA1       DMA1
 #define NX_H743_SPI_DMA_RX     DMA1_Stream2
@@ -628,7 +632,7 @@ static void service(void* raw) {
         case DRAIN_RX:
             for (unsigned n = 0U;
                  n < 8U && (NX_H743_READ(&spi->SR) & SPI_SR_RXP) != 0U; ++n)
-                (void)NX_H743_SPI_READ8(&spi->RXDR);
+                (void)NX_H743_SPI_READ8(spi);
             if ((NX_H743_READ(&spi->SR) & NX_STM32H743_SPI_FIFO_LEVELS) == 0U)
                 ++s->stage;
             break;

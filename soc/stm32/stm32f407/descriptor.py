@@ -13,6 +13,7 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f407/private/stm32f407_i2c_port.h",
         "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
         "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h",
         "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c",

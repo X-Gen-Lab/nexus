@@ -161,8 +161,11 @@ AST. Common generation does not infer these decisions from family names. Selecte
 STM32F4 official LL operations remain inside private SoC state machines. Selected
 F407 UART `dma-tx` uses private HAL finite TX with disjoint LL IRQ RX under one
 owner; other UART modes retain their existing engines. The static shared-ops
-factory and public I/O contracts are unchanged. This mode-specific integration
-does not qualify another family or replace current-source evidence. See
+factory and public I/O contracts are unchanged. The current bounded U575
+PWM/UART/RTC/GPIO, H743 SPI and five-SoC I2C operation changes select private
+LL/HAL calls at compile time inside their existing engines, with no additional
+runtime forwarding layer. These mode-specific integrations do not qualify
+another family or replace final clean-source evidence. See
 [official driver integration](../design/official-stm32-provider.md).
 
 The legacy F103/GD303 selections share private algorithms only after exact vendor

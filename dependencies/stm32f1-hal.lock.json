@@ -5,6 +5,10 @@
       "bytes": 88034,
       "sha256": "c26c8e6cf44e838326a01baa73337938fce71a6e77d0670c0ad33fdc586629ae"
     },
+    "Inc/stm32f1xx_ll_i2c.h": {
+      "bytes": 62788,
+      "sha256": "3a82e06a2a2418f1c9ddef5f4f0c80132801d0869d0c35dba047cb40b8157502"
+    },
     "Inc/stm32f1xx_ll_usart.h": {
       "bytes": 99185,
       "sha256": "8684e487827c318256ba7ae36841bd2c7fa2438c0cc5c8aa36b555f607873e77"
@@ -29,5 +33,5 @@
   "release": "STM32CubeF1-v1.8.7-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f103-ll-inline"
+  "selected_api": "stm32f103-ll-inline-i2c"
 }

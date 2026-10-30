@@ -10,6 +10,12 @@
 #include "stm32h743_cold.h"
 #include "stm32h743_spi_wire.h"
 #include "stm32h7xx_ll_spi.h"
+#ifndef NX_H743_SPI_READ8
+#define NX_H743_SPI_READ8(port) LL_SPI_ReceiveData8(port)
+#endif
+#ifndef NX_H743_SPI_WRITE8
+#define NX_H743_SPI_WRITE8(port, value) LL_SPI_TransmitData8((port), (value))
+#endif
 /* ES0392 2.22.5: CRC-disabled finite reception still requires CRCSIZE=7. */
 #define BYTE_CONFIG NX_STM32H743_SPI_BYTE_CONFIG
 #define FIFO_LEVELS NX_STM32H743_SPI_FIFO_LEVELS
@@ -125,7 +131,7 @@ static nx_result_t drain(nx_stm32h743_spi_state_t* p, uint32_t divisor,
         if (remaining-- == 0U ||
             (NX_H743_READ(&p->registers->SR) & SPI_SR_RXP) == 0U)
             return NX_ERROR_IO;
-        const uint8_t value = NX_H743_SPI_READ8(&p->registers->RXDR);
+        const uint8_t value = NX_H743_SPI_READ8(p->registers);
         if (complete != NULL) {
             if (*complete >= submitted)
                 return NX_ERROR_IO;
@@ -269,12 +275,12 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         result = wait(p, SPI_SR_TXP, SPI_SR_TXP, deadline);
         if (result != NX_SUCCESS)
             break;
-        NX_H743_SPI_WRITE8(&p->registers->TXDR, tx == NULL ? 0xffU : tx[index]);
+        NX_H743_SPI_WRITE8(p->registers, tx == NULL ? 0xffU : tx[index]);
         ++submitted;
         result = wait(p, SPI_SR_RXP, SPI_SR_RXP, deadline);
         if (result != NX_SUCCESS)
             break;
-        uint8_t value = NX_H743_SPI_READ8(&p->registers->RXDR);
+        uint8_t value = NX_H743_SPI_READ8(p->registers);
         if (rx != NULL)
             rx[index] = value;
         ++*transferred;

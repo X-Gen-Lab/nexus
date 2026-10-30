@@ -5,6 +5,10 @@
       "bytes": 477383,
       "sha256": "0de1d50a9dd51caca179a2b761f43b24880149516ba3e884b01cbfadc77721a1"
     },
+    "Inc/stm32h7xx_ll_i2c.h": {
+      "bytes": 84613,
+      "sha256": "2703dc6fcbc59f324cc5e1c39dbf68774c9d68665649fbf1ed92cea72ee1270a"
+    },
     "Inc/stm32h7xx_ll_spi.h": {
       "bytes": 125330,
       "sha256": "637d0822e248429fd87182786f1e727860dc52645440405642e08f5df13bf565"
@@ -33,5 +37,5 @@
   "release": "STM32CubeH7-v1.13.0-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32h7xx_hal_driver.git",
   "schema_version": 1,
-  "selected_api": "stm32h743-ll-inline"
+  "selected_api": "stm32h743-ll-inline-i2c"
 }

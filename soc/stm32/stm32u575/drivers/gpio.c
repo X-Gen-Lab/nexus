@@ -11,6 +11,19 @@
 #if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
 #include "stm32u575_gpio_mpu.h"
 #endif
+#ifndef NX_U575_GPIO_WRITE
+#include "stm32u5xx_hal_gpio.h"
+#define NX_U575_GPIO_WRITE(gpio, reset, set)                                   \
+    HAL_GPIO_WriteMultipleStatePin((gpio), (reset), (set))
+#endif
+/** \brief Issue one validated nonempty command through the private GPIO port.
+ * \note Empty masks remain successful without calling HAL's nonempty leaf.
+ */
+static inline void write_command(GPIO_TypeDef* gpio, uint32_t set,
+                                 uint32_t reset) {
+    if ((set | reset) != 0U)
+        NX_U575_GPIO_WRITE(gpio, (uint16_t)reset, (uint16_t)set);
+}
 static nx_result_t write(void* context, uint32_t set, uint32_t reset) {
     nx_stm32u575_gpio_state_t* p = context;
     if (!nx_arch_is_privileged())
@@ -19,7 +32,7 @@ static nx_result_t write(void* context, uint32_t set, uint32_t reset) {
         return NX_ERROR_INVALID;
     if (((set | reset) & ~p->mask) != 0U)
         return NX_ERROR_PERMISSION;
-    NX_U575_WRITE(&p->registers->BSRR, set | (reset << 16U));
+    write_command(p->registers, set, reset);
     return NX_SUCCESS;
 }
 static nx_result_t read(const void* context, uint32_t* value) {
@@ -67,7 +80,7 @@ nx_result_t nx_stm32u575_gpio_initialize(nx_stm32u575_gpio_state_t* p,
          (NX_U575_READ(&NX_U575_PWR->SVMCR) & PWR_SVMCR_IO2SV) == 0U))
         return NX_ERROR_STATE;
     p->retained = true;
-    NX_U575_WRITE(&p->registers->BSRR, initial | ((p->mask & ~initial) << 16U));
+    write_command(p->registers, initial, p->mask & ~initial);
     nx_arch_dsb();
     if ((NX_U575_READ(&p->registers->ODR) & p->mask) != initial)
         return NX_ERROR_IO;
@@ -103,8 +116,7 @@ nx_result_t nx_stm32u575_gpio_stop(nx_stm32u575_gpio_state_t* p,
     if (!p->retained)
         return NX_SUCCESS;
     if (p->output) {
-        NX_U575_WRITE(&p->registers->BSRR,
-                      inactive | ((p->mask & ~inactive) << 16U));
+        write_command(p->registers, inactive, p->mask & ~inactive);
         nx_arch_dsb();
         if ((NX_U575_READ(&p->registers->ODR) & p->mask) != inactive)
             return NX_ERROR_IO;
@@ -152,7 +164,7 @@ static nx_result_t serial_pins_prepare(bool first) {
     const uint32_t speed = (1U << (2U * tx)) | (1U << (2U * rx));
     const uint32_t pull = 1U << (2U * rx);
     const uint32_t mode = (2U << (2U * tx)) | (2U << (2U * rx));
-    NX_U575_WRITE(&gpio->BSRR, 1U << tx);
+    write_command(gpio, 1U << tx, 0U);
     nx_arch_dsb();
     if ((NX_U575_READ(&gpio->ODR) & (1U << tx)) == 0U)
         return NX_ERROR_IO;

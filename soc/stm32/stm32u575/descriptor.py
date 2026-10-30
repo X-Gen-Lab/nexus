@@ -12,6 +12,8 @@ DESCRIPTOR = FamilyDescriptor(
         ("hal_driver_u5", "stm32u5_hal"),
     ),
     owned_payload=(
+        "soc/stm32/stm32u575/private/stm32u575_i2c_port.h",
+        "soc/stm32/stm32u575/private/hal/stm32u5xx_hal_conf.h",
         "soc/stm32/stm32u575/CMakeLists.txt",
         "soc/stm32/stm32u575/system.c",
         "soc/stm32/stm32u575/platform_cold.c",

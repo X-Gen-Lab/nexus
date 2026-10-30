@@ -49,17 +49,24 @@ Keep an unreviewed or incompatible protocol in its exact SoC implementation.
 The SoC target selects shared sources through explicit CMake entries and private
 includes. The driver directory does not choose routes, clock profiles or an ABI,
 and its presence does not add a maintained mode. Never introduce a runtime
-forwarder merely to match a source directory.
+forwarder merely to match a source directory. A selected private compile-time
+port may bind reviewed official operations inside that shared translation unit; a
+macro in a separately compiled wrapper cannot change it. Preserve operation
+width, read side effects, command atomicity and withdrawal ordering; the
+[bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments)
+is a current example, not a blanket HAL replacement.
 
 ## Implement in a reviewable sequence
 
 1. Prepare the [fixed source and recursive dependencies](source-checkout.md).
    Define the new behavior, supported modes, public ownership obligations and
    rejection boundaries before changing its production implementation.
-2. Add and execute a meaningful RED GoogleTest/GoogleMock contract against the
-   current production path. Retain the actual command, nonzero execution and
-   expected failing assertion. Test MMIO/CPU/dependency ports through mocks;
-   Python resolver behavior uses stdlib unittest. A missing tool or compile-only
+2. For new behavior or fixes, add and execute a meaningful RED
+   GoogleTest/GoogleMock contract against the current production path. Retain the
+   actual command, nonzero execution and expected failing assertion. Equivalent
+   refactors retain actual old-GREEN source/binary snapshots and applicable
+   regressions plus real-default operation probes, without fabricated RED. Test
+   MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only
    error is not the expected behavioral RED result.
 3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.

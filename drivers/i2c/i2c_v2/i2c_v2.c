@@ -9,6 +9,17 @@
 #include "i2c_v2.h"
 #include "nexus/arch/arch.h"
 #include "nexus/core/fault.h"
+#ifdef NX_I2C_V2_PORT_HEADER
+#include NX_I2C_V2_PORT_HEADER
+#endif
+#ifndef NX_I2C_V2_RECEIVE_DATA
+#define NX_I2C_V2_RECEIVE_DATA(registers)                                      \
+    ((uint8_t)NX_I2C_V2_READ(&(registers)->rxdr))
+#endif
+#ifndef NX_I2C_V2_TRANSMIT_DATA
+#define NX_I2C_V2_TRANSMIT_DATA(registers, value)                              \
+    NX_I2C_V2_WRITE(&(registers)->txdr, (value))
+#endif
 #define PE      (1U << 0)
 #define RD      (1U << 10)
 #define START   (1U << 13)
@@ -219,10 +230,10 @@ static nx_result_t transaction_bounded(void* context,
                     break;
                 if (messages[m].read)
                     messages[m].data[position] =
-                        (uint8_t)NX_I2C_V2_READ(&config->registers->rxdr);
+                        NX_I2C_V2_RECEIVE_DATA(config->registers);
                 else
-                    NX_I2C_V2_WRITE(&config->registers->txdr,
-                                    messages[m].data[position]);
+                    NX_I2C_V2_TRANSMIT_DATA(config->registers,
+                                            messages[m].data[position]);
                 ++position;
                 ++*transferred;
             }

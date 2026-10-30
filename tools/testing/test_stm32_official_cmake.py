@@ -62,6 +62,44 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("official", result.stdout + result.stderr)
 
+    def test_f103_all_locked_driver_inputs_retrigger_source_verification(self):
+        from tools.maintenance import stm32f1_hal_lock as f1
+        generated = self.root / "generated"
+        generated.mkdir()
+        (generated / "resolved.json").write_text(json.dumps({
+            "controllers": [{"kind": "i2c", "mode": "irq-messages"}],
+        }))
+        source = ROOT / "soc/stm32/stm32f103"
+        (self.root / "CMakeLists.txt").write_text(f'''\
+cmake_minimum_required(VERSION 3.31)
+project(f103_locked_inputs LANGUAGES C ASM)
+set(Python3_EXECUTABLE "{sys.executable}")
+set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
+set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
+add_library(nexus_io INTERFACE)
+add_library(nexus_arch INTERFACE)
+add_library(Nexus::Arch ALIAS nexus_arch)
+add_library(nexus_build_options INTERFACE)
+add_library(nexus_owned_warnings INTERFACE)
+add_subdirectory("{source.as_posix()}" soc)
+get_property(inputs DIRECTORY "{source.as_posix()}"
+    PROPERTY CMAKE_CONFIGURE_DEPENDS)
+list(JOIN inputs "\\n" lines)
+file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
+''')
+        result = subprocess.run([
+            shutil.which("cmake"), "-S", str(self.root), "-B",
+            str(self.root / "build"), "-G", "Ninja"],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        observed = set((self.root / "build/source-inputs.txt")
+                       .read_text().splitlines())
+        expected = {str(ROOT / f1.DIRECTORY / name)
+                    for name in f1.REVIEWED_FILES}
+        self.assertFalse(expected - observed,
+                         "Locked driver inputs do not retrigger verification: " +
+                         repr(sorted(expected - observed)))
+
     def test_explicit_uart_hal_closes_only_private_vendor_transport(self):
         result = self.configure(
             'nexus_stm32f407_uart_hal(provider)\n'

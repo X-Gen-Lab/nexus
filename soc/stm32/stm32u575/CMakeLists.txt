@@ -82,11 +82,14 @@ if(u5_sources)
         "${u5_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32u575)
     target_compile_definitions(nexus_soc_stm32u575 PRIVATE STM32U575xx)
-    if(u5_rtc_modes OR u5_spi_modes OR u5_i2c_modes OR u5_adc_modes OR u5_pwm_modes OR
-            "dma-tx" IN_LIST u5_uart_modes OR
-            "dma-chain-tx" IN_LIST u5_uart_modes OR
-            "irq-fifo-bytes" IN_LIST u5_uart_modes OR
-            "irq-fifo-rtscts-bytes" IN_LIST u5_uart_modes)
+    if(u5_i2c_modes)
+        target_compile_definitions(nexus_soc_stm32u575 PRIVATE
+            "NX_I2C_V2_PORT_HEADER=\"stm32u575_i2c_port.h\"")
+    endif()
+    if("drivers/gpio.c" IN_LIST u5_sources)
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32u575_gpio_hal(nexus_soc_stm32u575)
+    elseif(u5_rtc_modes OR u5_adc_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32u575 u5)
     endif()

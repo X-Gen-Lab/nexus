@@ -377,6 +377,45 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                                  "SDK accepts truncated firmware: " +
                                  repr(sorted(expected - required)))
 
+    def test_rehashed_omission_rejects_private_gpio_configuration_early(self):
+        configuration = "soc/stm32/stm32u575/private/hal/stm32u5xx_hal_conf.h"
+        # All other required bytes are present in a self-consistent file map.
+        # This is the real early completeness boundary, before downstream
+        # dependency provenance; no verifier or dependency check is mocked.
+        with tempfile.TemporaryDirectory(prefix="GPIO HAL SDK omission ") as value:
+            root = Path(value) / "prefix/share/nexus/src"
+            files = {}
+            for name in sdk.REQUIRED_FILES:
+                if name == configuration:
+                    continue
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"owned input\n")
+                files[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+            exports = {}
+            for name in ("lib/cmake/Nexus/NexusConfig.cmake",
+                         "lib/cmake/Nexus/NexusConfigVersion.cmake"):
+                path = root.parents[2] / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"# owned CMake export\n")
+                exports[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+            identity = {
+                "schema": 1, "kind": "nexus-installed-source-sdk",
+                "source_revision": "a" * 40, "source_tree": "b" * 40,
+                "publishable": False, "source_dirty": True,
+                "files_sha256": files, "dependencies": [],
+                "reviewed_imports": [],
+                "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"],
+                "snapshot_sha256": hashlib.sha256(json.dumps(
+                    files, sort_keys=True,
+                    separators=(",", ":")).encode()).hexdigest(),
+                "package_files_sha256": exports,
+            }
+            (root / sdk.MANIFEST).write_text(json.dumps(identity) + "\n")
+            with self.assertRaisesRegex(
+                    sdk.SDKError, "missing required sources/licenses"):
+                sdk.verify(root)
+
     def test_rehashed_omission_cannot_remove_new_provider_inputs(self):
         names = {
             "drivers/adc/legacy_adc/legacy_adc.c", "drivers/timer/legacy_pwm/legacy_pwm.c",

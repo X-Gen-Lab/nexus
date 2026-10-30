@@ -99,6 +99,12 @@ if(stm32_sources)
         "${stm32_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32f407)
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)
+    nexus_controller_modes(stm32_i2c_modes i2c)
+    if("irq-messages" IN_LIST stm32_i2c_modes OR
+            "dma-messages" IN_LIST stm32_i2c_modes)
+        target_compile_definitions(nexus_soc_stm32f407 PRIVATE
+            "NX_I2C_V1_PORT_HEADER=\"stm32f407_i2c_port.h\"")
+    endif()
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
     nexus_stm32f4_official(nexus_soc_stm32f407)
     if(stm32_uart_hal)

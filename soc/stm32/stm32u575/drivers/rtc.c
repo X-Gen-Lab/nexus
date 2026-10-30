@@ -10,6 +10,18 @@
 #include "stm32u575_rtc.h"
 #include "stm32u575_rtc_calendar.h"
 #include "stm32u5xx_ll_rtc.h"
+#ifndef NX_U575_RTC_DISABLE_WRITE_PROTECTION
+#define NX_U575_RTC_DISABLE_WRITE_PROTECTION(controller)                       \
+    LL_RTC_DisableWriteProtection(controller)
+#endif
+#ifndef NX_U575_RTC_ENABLE_WRITE_PROTECTION
+#define NX_U575_RTC_ENABLE_WRITE_PROTECTION(controller)                        \
+    LL_RTC_EnableWriteProtection(controller)
+#endif
+#ifndef NX_U575_RTC_CLEAR_FLAG_ALRA
+#define NX_U575_RTC_CLEAR_FLAG_ALRA(controller)                                \
+    LL_RTC_ClearFlag_ALRA(controller)
+#endif
 _Static_assert(RTC_IRQn == 2 && offsetof(RTC_TypeDef, ALRMAR) == 0x40U &&
                    offsetof(RTC_TypeDef, SCR) == 0x5cU &&
                    LL_RTC_ALMA_MASK_NONE == 0U,
@@ -157,13 +169,12 @@ static bool checked(nx_stm32u575_rtc_state_t* s, volatile uint32_t* reg,
     /* WPR reads always return zero. Exact admission therefore requires the
      * external owner to hand off locked WPR with no other writer; it cannot
      * silently adopt or reconstruct an unknown protection state. */
-    NX_U575_WRITE(&s->registers->WPR, 0xcaU);
-    NX_U575_WRITE(&s->registers->WPR, 0x53U);
+    NX_U575_RTC_DISABLE_WRITE_PROTECTION(s->registers);
     nx_arch_dsb();
     NX_U575_WRITE(reg, value);
     nx_arch_dsb();
     bool good = NX_U575_READ(reg) == value;
-    NX_U575_WRITE(&s->registers->WPR, 0xffU);
+    NX_U575_RTC_ENABLE_WRITE_PROTECTION(s->registers);
     nx_arch_dsb();
     return good;
 }
@@ -284,7 +295,7 @@ static nx_result_t service(void* raw) {
                                __LL_RTC_CONVERT_BIN2BCD(alarm->hour) << 16U |
                                __LL_RTC_CONVERT_BIN2BCD(alarm->minute) << 8U |
                                __LL_RTC_CONVERT_BIN2BCD(alarm->second);
-            NX_U575_WRITE(&p->SCR, RTC_SCR_CALRAF);
+            NX_U575_RTC_CLEAR_FLAG_ALRA(p);
             nx_arch_dsb();
             good = (NX_U575_READ(&p->SR) & RTC_SR_ALRAF) == 0U &&
                    checked(s, &p->ALRMAR, encoded) &&
@@ -332,7 +343,7 @@ static nx_result_t service(void* raw) {
                 s->stage = CLEAR;
             break;
         case CLEAR:
-            NX_U575_WRITE(&p->SCR, RTC_SCR_CALRAF);
+            NX_U575_RTC_CLEAR_FLAG_ALRA(p);
             nx_arch_dsb();
             if ((NX_U575_READ(&p->SR) & RTC_SR_ALRAF) != 0U)
                 return held(s);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify fixed selected private headers paired with official Cube releases.
+"""Verify selected private driver inputs paired with official Cube releases.
 
 The verifier shares source-proof behavior, not register layouts or I/O policy.
 Original inline APIs stay private; Nexus retains request, IRQ and DMA ownership.
@@ -22,7 +22,7 @@ from tools.maintenance import cmsis_device_lock  # noqa: E402
 
 @dataclass(frozen=True)
 class Profile:
-    """One reviewed exact pairing and deliberately selected inline source graph."""
+    """One reviewed pairing and deliberately selected private source graph."""
     family: str
     part: str
     commit: str
@@ -30,7 +30,7 @@ class Profile:
     cube_release: str
     cube_commit: str
     units: tuple[str, ...]
-    extra_headers: tuple[str, ...] = ()
+    extra_files: tuple[str, ...] = ()
     api_scope: str = "ll-inline"
 
     @property
@@ -72,7 +72,7 @@ class Profile:
     @property
     def selected_files(self):
         return {"LICENSE.md", *(f"Inc/stm32{self.family}xx_ll_{unit}.h"
-                                for unit in self.units), *self.extra_headers}
+                                for unit in self.units), *self.extra_files}
 
     def contract(self, lock):
         """Reject changed revisions, notices, pairing or a widened source graph."""
@@ -199,15 +199,20 @@ def canonical_directory(path):
 PROFILES = {
     "g4": Profile("g4", "stm32g474", "f5929f431f9effe45fbe18f5337e4753ced9ac92",
         "626ee412334a5ed2e5b320af5a8d77d69f03a558", "v1.6.3",
-        "d11b194a9f05d1b143d154771f3dbc282c8052a5", ("adc", "dmamux"),
-        extra_headers=("Inc/stm32g4xx_hal_fdcan.h",
+        "d11b194a9f05d1b143d154771f3dbc282c8052a5", ("adc", "dmamux", "i2c"),
+        extra_files=("Inc/stm32g4xx_hal_fdcan.h",
             "Inc/stm32g4xx_hal_def.h", "Inc/Legacy/stm32_hal_legacy.h"),
-        api_scope="ll-inline-fdcan-definitions"),
+        api_scope="ll-inline-i2c-fdcan-definitions"),
     "h7": Profile("h7", "stm32h743", "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
         "8f922cdc7cc6de2344e75ddd657889f4ff761790", "v1.13.0",
-        "5abb9764b32e11a6557b90bf39531528019b5761", ("adc", "spi", "usart")),
+        "5abb9764b32e11a6557b90bf39531528019b5761", ("adc", "spi", "usart", "i2c"),
+        api_scope="ll-inline-i2c"),
     "u5": Profile("u5", "stm32u575", "2552682ee5a0d6f826a6435750fc9267be65868b",
         "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8", "v1.9.0",
         "d88042df24f16799957c24f00c2b234c9e306188",
-        ("adc", "spi", "i2c", "tim", "dma", "usart", "rtc")),
+        ("adc", "spi", "i2c", "tim", "dma", "usart", "rtc"),
+        extra_files=("Inc/stm32u5xx_hal.h", "Inc/stm32u5xx_hal_def.h",
+            "Inc/stm32u5xx_hal_gpio.h", "Inc/stm32u5xx_hal_gpio_ex.h",
+            "Inc/Legacy/stm32_hal_legacy.h", "Src/stm32u5xx_hal_gpio.c"),
+        api_scope="ll-inline-gpio-hal-write-multiple"),
 }

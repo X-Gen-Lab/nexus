@@ -1,4 +1,4 @@
-# LL primitives and the explicit F407 HAL transport have private build scopes.
+# Reviewed LL primitives and explicit HAL selections have private build scopes.
 # Every consuming entry verifies current bytes; a previous success is no cache.
 include_guard(GLOBAL)
 
@@ -45,6 +45,42 @@ function(nexus_stm32f4_official target)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${inputs})
 endfunction()
 
+# One stateless combined GPIO command; no HAL initialization, Handle or tick.
+# The command object follows gpio.c selection and stays inside its owner.
+function(nexus_stm32u575_gpio_hal target)
+    if(NOT ARGC EQUAL 1 OR NOT TARGET "${target}")
+        message(FATAL_ERROR "STM32U575 GPIO HAL requires one owned target")
+    endif()
+    nexus_stm32_official("${target}" u5)
+    set(vendor "${target}_stm32u575_gpio_hal")
+    if(TARGET "${vendor}")
+        message(FATAL_ERROR "STM32U575 GPIO command already selected")
+    endif()
+    get_filename_component(source
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
+    set(private "${source}/soc/stm32/stm32u575/private")
+    add_library("${vendor}" OBJECT
+        "${source}/vendors/st/stm32u5_hal/Src/stm32u5xx_hal_gpio.c")
+    nexus_stm32_official("${vendor}" u5)
+    target_compile_features("${vendor}" PRIVATE c_std_11)
+    set_target_properties("${vendor}" PROPERTIES C_EXTENSIONS OFF)
+    target_compile_definitions("${vendor}" PRIVATE STM32U575xx)
+    target_include_directories("${vendor}" PRIVATE "${private}/hal")
+    target_include_directories("${vendor}" SYSTEM PRIVATE
+        "${source}/vendors/st/cmsis_device_u5/Include")
+    include("${source}/cmake/platform/CMSISCore.cmake")
+    nexus_use_cmsis_core("${vendor}")
+    foreach(policy nexus_build_options Nexus::Arch)
+        if(TARGET "${policy}")
+            target_link_libraries("${vendor}" PRIVATE "${policy}")
+        endif()
+    endforeach()
+    target_compile_options("${vendor}" PRIVATE
+        -ffunction-sections -fdata-sections)
+    target_include_directories("${target}" PRIVATE "${private}/hal")
+    target_sources("${target}" PRIVATE "$<TARGET_OBJECTS:${vendor}>")
+endfunction()
+
 # Only the selected F407 finite TX mode owns this UART/DMA runtime. Insert the
 # objects in the consumer archive, avoiding a second transport or link cycle.
 function(nexus_stm32f407_uart_hal target)
@@ -89,7 +125,7 @@ endfunction()
 # layout, transfer state or hardware ownership. No vendor C runtime is selected.
 function(nexus_stm32_official target family)
     if(NOT ARGC EQUAL 2 OR NOT TARGET "${target}" OR
-            NOT family MATCHES "^(g4|h7|u5)$")
+            NOT family MATCHES "^(f1|g4|h7|u5)$")
         message(FATAL_ERROR "Official LL requires one owned target and reviewed family")
     endif()
     get_target_property(kind "${target}" TYPE)

@@ -639,3 +639,5 @@ include(u575_lptim1_lpbam.cmake)
 include(gd32_uart_cold_factory.cmake)
 
 include(gd32_control_cold.cmake)
+
+include(official_leaf_probes.cmake)

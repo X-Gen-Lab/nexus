@@ -77,6 +77,14 @@ void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value);
 #define NX_U575_WRITE(reg, value) nx_u575_devices_write((reg), (value))
 #undef NX_U575_READ
 #define NX_U575_READ(reg) nx_u575_devices_read(reg)
+#ifndef NX_U575_PWM_DEFAULT_PORT
+#define NX_U575_PWM_SET_PRESCALER(timer, value)                                \
+    NX_U575_WRITE(&(timer)->PSC, (value))
+#define NX_U575_PWM_SET_AUTORELOAD(timer, value)                               \
+    NX_U575_WRITE(&(timer)->ARR, (value))
+#define NX_U575_PWM_SET_COMPARE_CH1(timer, value)                              \
+    NX_U575_WRITE(&(timer)->CCR1, (value))
+#endif
 #undef NX_I2C_V2_READ
 #undef NX_I2C_V2_WRITE
 #define NX_I2C_V2_READ(reg)         NX_U575_READ(reg)
@@ -84,4 +92,9 @@ void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value);
 #ifdef __cplusplus
 }
 #endif
+/* Keep external data-register effects when the SoC selects official leaves. */
+#define NX_I2C_V2_RECEIVE_DATA(registers)                                      \
+    ((uint8_t)NX_I2C_V2_READ(&(registers)->rxdr))
+#define NX_I2C_V2_TRANSMIT_DATA(registers, value)                              \
+    NX_I2C_V2_WRITE(&(registers)->txdr, (value))
 #endif

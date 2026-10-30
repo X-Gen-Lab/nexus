@@ -8,6 +8,9 @@
  */
 #include "i2c_v1_async.h"
 #include "nexus/arch/arch.h"
+#ifdef NX_I2C_V1_PORT_HEADER
+#include NX_I2C_V1_PORT_HEADER
+#endif
 #ifndef NX_I2C_V1_DMA_ACK
 #define NX_I2C_V1_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
@@ -90,7 +93,10 @@ static bool wire_idle(const nx_i2c_v1_state_t* state) {
            (state->registers[STAT1] & MASTER) == 0U;
 }
 
-/** \brief Reading STAT0 then STAT1 opens the precisely prepared ACK window. */
+/** \brief Reading STAT0 then STAT1 opens the precisely prepared ACK window.
+ * \note The reviewed F1/F4 LL helper adds a volatile stack temporary. Keep
+ * these two ordered peripheral reads without the extra stack accesses.
+ */
 static void clear_address(nx_i2c_v1_state_t* state) {
     (void)state->registers[STAT0];
     (void)state->registers[STAT1];

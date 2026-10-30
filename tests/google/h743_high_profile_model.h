@@ -62,5 +62,5 @@ uint8_t nx_h743_high_model_spi_read8(volatile uint32_t* reg);
 #undef NX_H743_WRITE
 #define NX_H743_WRITE(reg, value) nx_h743_high_model_write((reg), (value))
 #undef NX_H743_SPI_READ8
-#define NX_H743_SPI_READ8(reg) nx_h743_high_model_spi_read8(reg)
+#define NX_H743_SPI_READ8(port) nx_h743_high_model_spi_read8(&(port)->RXDR)
 #endif
