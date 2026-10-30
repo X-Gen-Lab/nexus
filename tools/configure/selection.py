@@ -2,7 +2,7 @@
 
 from tools.configure.contracts import CONTROLLER_CONTRACTS
 from tools.configure.providers.common import (
-    UINT32_MAX, cpu_abi, fail, integer, mode_traits, sequence)
+    UINT32_MAX, cpu_abi, fail, integer, mode_traits, route_dma, sequence)
 
 
 def validate_clock_profiles(soc, provider):
@@ -144,3 +144,71 @@ def validate_selection(selection, route, provider, ram_size):
         elif {"irq_priority", "calls_os"} & selection.keys():
             fail("Polling I2C has no IRQ options")
     provider.validate_selection(selection, route)
+
+
+def validate_controller_execution(selection, route, hardware, *, irq_profile,
+                                  kernel_profile, host):
+    """Check local execution options before graph resources are acquired."""
+    mode = selection["mode"]
+    for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
+                    "period_ticks", "sample_cycles", "timeout_ms"} & (
+                        selection.keys()):
+        integer(selection[numeric], 1, context=numeric)
+    if "duty_ticks" in selection:
+        integer(selection["duty_ticks"], 0, context="duty ticks")
+        if selection["duty_ticks"] > selection.get("period_ticks", 0):
+            fail("PWM duty exceeds period")
+    if "irq_priority" in selection:
+        integer(selection["irq_priority"], 0,
+                irq_profile.maximum_priority, "IRQ priority")
+    if (route["kind"] == "spi" and mode == "short-poll" and
+            ({"irq_priority", "calls_os"} & selection.keys())):
+        fail("Polling SPI has no IRQ options")
+    if (route["kind"] == "spi" and mode_traits("spi", mode).dma and
+            "irq_priority" not in selection):
+        fail("DMA SPI requires an explicit IRQ priority")
+    if "calls_os" in selection and type(selection["calls_os"]) is not bool:
+        fail("calls_os must be boolean")
+    if selection.get("calls_os", False) and (
+            kernel_profile is None or host or
+            kernel_profile.kernel_policy == "none" or
+            selection.get("irq_priority", 0) < irq_profile.syscall_priority):
+        fail("OS-calling ISR violates the selected kernel syscall ceiling")
+    if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
+        fail("Controller speed exceeds maintained limit")
+
+
+def normalize_controller(selection, route, binding, hardware, provider, *,
+                         clock, clock_plan, clock_profile, pin_states, traits):
+    """Complete category fields in a graph-local validation draft.
+
+    Typed timing decisions remain intact. This mutable draft is consumed by
+    the enclosing graph and never published as a second configuration result.
+    """
+    mode = selection["mode"]
+    resolved_timing = None
+    if route["kind"] == "i2c":
+        from tools.configure import i2c_timing_selection
+        resolved_timing = i2c_timing_selection.resolve(
+            selection, clock, provider, clock_plan=clock_plan)
+    from tools.configure import stream_profiles
+    resolved_stream = stream_profiles.resolve(
+        selection, route["kind"], provider)
+    result = {
+        **selection, "controller": route["controller"],
+        "kind": route["kind"], "route": route["id"],
+        "pins": route["pins"], "initial": binding.get("initial", 0),
+        "mask": binding.get("mask", 0),
+        **({"pin_state_resolution": pin_states}
+           if pin_states is not None else {}),
+        **({"dma": route_dma(route, mode)} if traits.dma else {}),
+        **({"timing_resolution": resolved_timing}
+           if resolved_timing is not None else {}),
+        **({"stream_resolution": resolved_stream}
+           if resolved_stream is not None else {}),
+        **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})}
+    result.update(provider.mode_fields(
+        selection, route, clock_profile=clock_profile))
+    if route["kind"] == "can_fd":
+        result["message_ram_words"] = hardware["message_ram_words"]
+    return result

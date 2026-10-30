@@ -33,9 +33,10 @@ nx_result_t nx_gd32_pwm_initialize(nx_gd32_pwm_state_t* port, uint32_t period,
     gpio_output_options_set(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,
                             GPIO_PIN_6);
     timer_deinit(TIMER2);
-    TIMER_PSC(TIMER2) = 100000000u / tick_hz - 1u;
-    TIMER_CAR(TIMER2) = period - 1u;
-    TIMER_CH0CV(TIMER2) = 0u;
+    timer_prescaler_config(TIMER2, (uint16_t)(100000000u / tick_hz - 1u),
+                           TIMER_PSC_RELOAD_UPDATE);
+    timer_autoreload_value_config(TIMER2, period - 1u);
+    timer_channel_output_pulse_value_config(TIMER2, TIMER_CH_0, 0u);
     TIMER_CHCTL0(TIMER2) = TIMER_CHCTL0_CH0COMSEN | (6u << 4);
     TIMER_CTL0(TIMER2) = TIMER_CTL0_ARSE;
     TIMER_SWEVG(TIMER2) = TIMER_SWEVG_UPG;
@@ -56,7 +57,7 @@ nx_result_t nx_gd32_pwm_set(void* context, uint32_t period, uint32_t duty) {
     if (period != port->state.period_ticks) {
         return NX_ERROR_STATE;
     }
-    TIMER_CH0CV(TIMER2) = duty;
+    timer_channel_output_pulse_value_config(TIMER2, TIMER_CH_0, duty);
     port->state.duty_ticks = duty;
     return NX_SUCCESS;
 }
@@ -72,7 +73,7 @@ nx_result_t nx_gd32_pwm_start(void* context) {
         gpio_af_set(GPIOA, GPIO_AF_2, GPIO_PIN_6);
         TIMER_CHCTL2(TIMER2) = TIMER_CHCTL2_CH0EN;
         gpio_mode_set(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_6);
-        TIMER_CTL0(TIMER2) |= TIMER_CTL0_CEN;
+        timer_enable(TIMER2);
         port->state.running = true;
     }
     return NX_SUCCESS;
@@ -87,7 +88,7 @@ nx_result_t nx_gd32_pwm_stop(void* context) {
     GPIO_BOP(GPIOA) = GPIO_PIN_6 << 16;
     gpio_mode_set(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_PIN_6);
     TIMER_CHCTL2(TIMER2) = 0u;
-    TIMER_CTL0(TIMER2) &= ~TIMER_CTL0_CEN;
+    timer_disable(TIMER2);
     nx_gd32_peripheral_barrier();
     port->state.running = false;
     return NX_SUCCESS;

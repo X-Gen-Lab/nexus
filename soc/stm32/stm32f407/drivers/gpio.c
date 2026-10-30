@@ -159,13 +159,16 @@ nx_result_t nx_stm32_uart1_pins_prepare(void) {
     if ((observed & RCC_APB2ENR_USART1EN) == 0U) {
         return NX_ERROR_IO;
     }
-    uint32_t mode_mask = (3U << 18U) | (3U << 20U);
-    GPIOA->MODER = (GPIOA->MODER & ~mode_mask) | (2U << 18U) | (2U << 20U);
-    GPIOA->OTYPER &= ~((1U << 9U) | (1U << 10U));
-    GPIOA->OSPEEDR = (GPIOA->OSPEEDR & ~mode_mask) | (2U << 18U) | (2U << 20U);
-    GPIOA->PUPDR = (GPIOA->PUPDR & ~mode_mask) | (1U << 20U);
-    GPIOA->AFR[1] = (GPIOA->AFR[1] & ~((15U << 4U) | (15U << 8U))) |
-                    (7U << 4U) | (7U << 8U);
+    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_9, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_10, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinOutputType(GPIOA, LL_GPIO_PIN_9 | LL_GPIO_PIN_10,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_9, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_10, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_9, LL_GPIO_PULL_NO);
+    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_10, LL_GPIO_PULL_UP);
+    LL_GPIO_SetAFPin_8_15(GPIOA, LL_GPIO_PIN_9, LL_GPIO_AF_7);
+    LL_GPIO_SetAFPin_8_15(GPIOA, LL_GPIO_PIN_10, LL_GPIO_AF_7);
     return NX_SUCCESS;
 }
 
@@ -234,19 +237,17 @@ void nx_stm32_pin_restore(GPIO_TypeDef* gpio, uint8_t pin, uint16_t state) {
         return;
     }
     uint32_t bit = 1U << pin;
-    uint32_t shift = (uint32_t)pin * 2U;
-    uint32_t af_shift = (uint32_t)pin % 8U * 4U;
     gpio->BSRR = (state & (1U << 11U)) != 0U ? bit : bit << 16U;
-    gpio->AFR[pin / 8U] = (gpio->AFR[pin / 8U] & ~(15U << af_shift)) |
-                          (((uint32_t)state >> 7U & 15U) << af_shift);
-    gpio->OTYPER =
-        (gpio->OTYPER & ~bit) | (((uint32_t)state >> 2U & 1U) << pin);
-    gpio->OSPEEDR = (gpio->OSPEEDR & ~(3U << shift)) |
-                    (((uint32_t)state >> 3U & 3U) << shift);
-    gpio->PUPDR = (gpio->PUPDR & ~(3U << shift)) |
-                  (((uint32_t)state >> 5U & 3U) << shift);
-    gpio->MODER =
-        (gpio->MODER & ~(3U << shift)) | (((uint32_t)state & 3U) << shift);
+    uint32_t af = (uint32_t)state >> 7U & 15U;
+    if (pin < 8U) {
+        LL_GPIO_SetAFPin_0_7(gpio, bit, af);
+    } else {
+        LL_GPIO_SetAFPin_8_15(gpio, bit, af);
+    }
+    LL_GPIO_SetPinOutputType(gpio, bit, (uint32_t)state >> 2U & 1U);
+    LL_GPIO_SetPinSpeed(gpio, bit, (uint32_t)state >> 3U & 3U);
+    LL_GPIO_SetPinPull(gpio, bit, (uint32_t)state >> 5U & 3U);
+    LL_GPIO_SetPinMode(gpio, bit, (uint32_t)state & 3U);
     nx_arch_dsb();
 }
 

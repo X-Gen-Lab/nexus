@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -21,7 +21,7 @@ source_language: zh_CN
 **原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
 也按原文保留，不能据此补造某次执行。
 
-本表包含 78 条原记录，仅表示来源行数。
+本表包含 175 条原记录，仅表示来源行数。
 
 ```{contents}
 :local:
@@ -1196,4 +1196,1459 @@ source_language: zh_CN
 | `implementation_paths` | docs/delivery;tools/release |
 | `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;https://github.com/X-Gen-Lab/nexus/tree/refactor/c-cold-lifecycle-complete-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;build/c-cold-20261028/integration/final-main-sync/final-delivery-observation.json |
 | `exit_condition` | Reviewed increments synchronize to GitHub; code software hardware and publication exits remain independently accurate |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a01)=
+## V-A01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A01 |
+| `task` | 维护配置闭包 |
+| `implementation_status` | partial_derived_navigation |
+| `software_status` | existing_authority_navigation_passed_not_acceptance |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json |
+| `exit_condition` | 汇总参考装配、provider 夹具、SDK consumer、高级组件及外部示例的完整适用配置。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a02)=
+## V-A02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A02 |
+| `task` | 逐模式行为合同 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 逐项核对 TX/RX、格式、错误、wake、容量、长度、计数、cancel、drain 与 stop。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a03)=
+## V-A03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A03 |
+| `task` | 官方实现决策 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 每个模式明确选择 HAL transport、LL/SPL 原语或有理由的专用引擎。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a04)=
+## V-A04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A04 |
+| `task` | 必要直接访问 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 原子操作、SDK 缺口、errata、撤离证明及实测预算例外有准确理由。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a05)=
+## V-A05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A05 |
+| `task` | 行为与成本基线 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 固定同合同的行为与资源比较范围，保留既有原始证据身份。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-a06)=
+## V-A06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-A06 |
+| `task` | 分离完成状态 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 实现、软件、实板与交付分别记录；试点通过不关闭整个家族任务。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b01)=
+## V-B01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B01 |
+| `task` | 官方依赖配对 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 核对组织 fork、精确 gitlink、SDK、CMSIS Device/Core 和许可证配对。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b02)=
+## V-B02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B02 |
+| `task` | 私有 HAL 模块构建 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 仅显式编译实际需要的官方 C 模块，避免整包选入。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b03)=
+## V-B03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B03 |
+| `task` | HAL 配置与符号 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 私有配置头、模块宏、callback 配置及全局符号冲突均经检查。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b04)=
+## V-B04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B04 |
+| `task` | GD32 SDK C 单元 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 使用新增 SPL 原语时同步选入对应 C 单元，特别是 DMA。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b05)=
+## V-B05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B05 |
+| `task` | 公共编译边界 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 公共 consumer 不继承 vendor/private includes；生产目标不引入测试运行时。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-b06)=
+## V-B06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-B06 |
+| `task` | 依赖及 SDK 闭包 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 锁、source catalogue、descriptor、SDK 文件和许可证闭包一致，升级经过受控验证。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c01)=
+## V-C01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C01 |
+| `task` | 最小静态 context |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 仅保留所选 Handle、配置、请求和模式扩展，不增加通用最大状态。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c02)=
+## V-C02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C02 |
+| `task` | 副作用前校验 |
+| `implementation_status` | partial_reference_payload_alias_guard |
+| `software_status` | reference_red_green_passed_not_production |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `exit_condition` | 在硬件影响前检查上下文、长度、对齐、内存域、deadline、模式和资源。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c03)=
+## V-C03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C03 |
+| `task` | 准入先于保留引用 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | admission 先于可能保留引用或同步回调的官方 API。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c04)=
+## V-C04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C04 |
+| `task` | 启动失败撤离 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 已接受操作的启动失败按实际引用撤离，不能伪装为无借用拒绝。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c05)=
+## V-C05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C05 |
+| `task` | 取消与期限映射 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | cancel/timeout 明确推进撤离、drain 和 quarantine，借用不提前释放。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c06)=
+## V-C06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C06 |
+| `task` | 冷态资源责任 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | prepare/start、部分失败和 stop 重试保留准确责任，不释放其他 owner 资源。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c07)=
+## V-C07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C07 |
+| `task` | Handle 安全复用 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 旧硬件、IRQ 和 callback 栈撤离后才能复用 Handle，迟到事件不冒充当前请求。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-c08)=
+## V-C08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-C08 |
+| `task` | 主错误与清理结果 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 主错误、清理错误、剩余责任分别保留；诊断不撤销借用。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d01)=
+## V-D01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D01 |
+| `task` | 真实 IRQ 抢占合同 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 生产 IRQ 协议明确处理抢占，不能原样使用串行夹具的跳过 handler 假设。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d02)=
+## V-D02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D02 |
+| `task` | 短临界区与 pending facts |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | HAL 嵌套、短临界区和 pending facts 明确，不以长全局关中断覆盖 vendor 等待。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d03)=
+## V-D03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D03 |
+| `task` | callback 实际上下文 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 同步、task 和 ISR callback 使用合法通知，仅记录有界事实。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d04)=
+## V-D04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D04 |
+| `task` | HAL 可达等待与时钟 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 审核 bootstrap/runtime、毫秒量化、32 位回绕及低功耗暂停的实际时间推进。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d05)=
+## V-D05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D05 |
+| `task` | OS 与时间基准隔离 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 保留既有 SysTick/OS 策略，验证 IRQ ceiling、wait/wake 和 observer join。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-d06)=
+## V-D06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-D06 |
+| `task` | Arch 屏障与状态恢复 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 恢复调用前中断状态，并区分 CPU 屏障、Cache 维护和请求发布。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e01)=
+## V-E01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E01 |
+| `task` | 完整 UART 生产候选 |
+| `implementation_status` | partial_reference_only |
+| `software_status` | serialized_finite_tx_reference_passed_not_production |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `exit_condition` | 有限 TX HAL 评估扩为明确完整模式候选，不以 TX-only 代替既有 dma-tx。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e02)=
+## V-E02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E02 |
+| `task` | UART 与 DMA 冷态接入 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 官方初始化纳入既有 resource lease、MSP、失败读回与恢复。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e03)=
+## V-E03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E03 |
+| `task` | DMA 与 UART TC |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 复用 HAL 正常 DMA 到 TC 流程，验证完成、错误及实际计数。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e04)=
+## V-E04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E04 |
+| `task` | RX 完整语义 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 保留 RX bytes/events、frame/error/loss 顺序、时间戳和存储合同。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e05)=
+## V-E05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E05 |
+| `task` | TX/RX 共同所有权 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 审查 TX abort、DMA error、共享 IRQ 对 RX 的影响，不拼接未经审查的独立 owner。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e06)=
+## V-E06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E06 |
+| `task` | UART 停止与再次提交 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 同步 callback、迟到 IRQ、wake detach、stop 和恢复后再次提交均有实际回归。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e07)=
+## V-E07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E07 |
+| `task` | 完整 UART 成本决策 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 同合同比较完整 provider 的 Flash/RAM/栈/执行成本后确定生产实现。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-e08)=
+## V-E08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-E08 |
+| `task` | UART 替换与清理 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 接受后更新装配及 SDK，删除已完整替换的生产路径，未满足合同的候选保留结论。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f01)=
+## V-F01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F01 |
+| `task` | GPIO 与 pin 迁移 |
+| `implementation_status` | partial_f407_gd470_selected_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 扩大 LL/SPL，保持安全电平顺序、权限与组合 set/reset 原子性。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f02)=
+## V-F02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F02 |
+| `task` | SPI 短事务迁移 |
+| `implementation_status` | partial_f407_gd470_selected_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 官方配置及收发保持完整 CS 区间、dummy/discard 和 transferred。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f03)=
+## V-F03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F03 |
+| `task` | SPI DMA 迁移 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 评价完整官方流程，验证 TX/RX 联合撤离、固定地址和 wire completion。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f04)=
+## V-F04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F04 |
+| `task` | I2C 消息序列迁移 |
+| `implementation_status` | partial_f407_gd470_selected_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 覆盖 repeated START、1/2/3 字节窗口、NACK/ARLO、STOP 和精确 errata。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f05)=
+## V-F05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F05 |
+| `task` | ADC 与 group 迁移 |
+| `implementation_status` | partial_f407_gd470_selected_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 保留校准、触发、数据格式、组序列及 DMA 数据借用。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f06)=
+## V-F06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F06 |
+| `task` | PWM/capture/encoder 迁移 |
+| `implementation_status` | partial_f407_gd470_selected_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 保留共享基座、同步更新、互补输出和安全停止。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f07)=
+## V-F07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F07 |
+| `task` | Flash 官方流程评价 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 核对几何、ECC、执行域、供电、pulse 结清及错误恢复。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f08)=
+## V-F08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F08 |
+| `task` | CAN/CAN FD 迁移 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 保留 mailbox/filter/message RAM、错误处理及停止责任。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f09)=
+## V-F09
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F09 |
+| `task` | USB/Ethernet 迁移 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 逐精确模式评价官方驱动，保持端点、描述符、缓冲区和 callback 所有权。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-f10)=
+## V-F10
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-F10 |
+| `task` | RTC/LPTIM/watchdog 迁移 |
+| `implementation_status` | partial_f407_watchdog_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json |
+| `exit_condition` | 保持时间连续性、唤醒合同和不可逆硬件影响。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g01)=
+## V-G01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G01 |
+| `task` | F103 精确验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 独立验证 density、低时钟、channel DMA 和 errata 限制。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g02)=
+## V-G02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G02 |
+| `task` | GD303 精确验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 独立核对 SPL、寄存器语义、启动延迟及 errata，不继承 F103 结果。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g03)=
+## V-G03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G03 |
+| `task` | F407 维护模式闭包 |
+| `implementation_status` | partial_selected_f407_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json |
+| `exit_condition` | 覆盖现有 UART/SPI/I2C/ADC/控制器模式和 stream DMA 资源。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g04)=
+## V-G04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G04 |
+| `task` | GD470 维护模式闭包 |
+| `implementation_status` | partial_selected_gd470_primitives |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json |
+| `exit_condition` | 扩大 SPL 并独立验证路由、时钟、DMA 撤离和模式差异。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g05)=
+## V-G05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G05 |
+| `task` | G474 耦合资源验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 覆盖 DMAMUX、shared/coherent PWM、PWM 到 ADC、group/injected 和 FD CAN。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g06)=
+## V-G06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G06 |
+| `task` | H743 域与 Cache 验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 覆盖 Cache、域、DMA 内存、连续模式、SPI wire errata 与 RAM 执行组件。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-g07)=
+## V-G07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-G07 |
+| `task` | U575 精确子集验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 分别验证 GPDMA/chain、FIFO、保留时间、Stop2/LPDMA/LPBAM 和既有 TrustZone 窄范围。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h01)=
+## V-H01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H01 |
+| `task` | resolver 类别局部化 |
+| `implementation_status` | partial_controller_and_endpoint_localization |
+| `software_status` | 194_focused_and_710_files_schema_equivalent |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | build/vendor-first-20261030/configure/handoff.json |
+| `exit_condition` | 类别归一化就近维护，公共入口保留共同仲裁和原子发布。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h02)=
+## V-H02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H02 |
+| `task` | family descriptor 就近维护 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 保留顶层显式映射及稳定闭包检查，避免新建平行源码图。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h03)=
+## V-H03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H03 |
+| `task` | 语义模式选择 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 用户选择语义 mode，内部明确选实现，无并行权威和隐式回退。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h04)=
+## V-H04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H04 |
+| `task` | 共享引擎归属 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 按公共机制、vendor adapter、必要专用引擎和 SoC 集成整理实际职责。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h05)=
+## V-H05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H05 |
+| `task` | 编译期模板合同 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 输入、导出符号、宏作用域及各 specialization 的验证明确。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-h06)=
+## V-H06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-H06 |
+| `task` | 偏移镜像与交接 profile |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 按既定明确范围验证向量、链接区域和入口条件，产品升级策略外置。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i01)=
+## V-I01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I01 |
+| `task` | 多实例资源成本 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 比较空/1/2/4 实例，区分 face/config/runtime/buffer/executor。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i02)=
+## V-I02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I02 |
+| `task` | 实际链接保留 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 核对 ops 引用和 ELF symbols，解释未选模式的代码及常驻 RAM。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i03)=
+## V-I03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I03 |
+| `task` | config/runtime 成本 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 逐项测量拆分收益，避免为外观统一增加指针或状态。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i04)=
+## V-I04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I04 |
+| `task` | 执行与时序成本 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 按同配置记录每块 CPU、IRQ/service、最大关中断时间及端到端期限。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i05)=
+## V-I05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I05 |
+| `task` | 连续性与背压 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 结合预算验证重挂载、消费者持有、突发、背压和总线竞争。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-i06)=
+## V-I06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-I06 |
+| `task` | 同合同完整比较 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 区分链接预算、栈预留、实测峰值和物理测量，未知值保持未知。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j01)=
+## V-J01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J01 |
+| `task` | 真实 TDD 顺序 |
+| `implementation_status` | partial_reference_alias_red_green |
+| `software_status` | reference_actual_red_then_green_passed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | build/vendor-first-20261030/hal-tests/handoff.json |
+| `exit_condition` | 新行为和修复先实际 RED，再 GREEN；并行开发遵守交接屏障。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j02)=
+## V-J02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J02 |
+| `task` | adapter 合同测试 |
+| `implementation_status` | partial_selected_adapter_boundary_regressions |
+| `software_status` | focused_development_passed_final_index_gate_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json |
+| `exit_condition` | GoogleTest/GoogleMock 检查真实 adapter，mock 仅位于明确外部边界。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j03)=
+## V-J03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J03 |
+| `task` | 实际官方源码测试 |
+| `implementation_status` | partial_actual_spl_and_hal_reference_runs |
+| `software_status` | focused_development_passed_not_full_transport |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json |
+| `exit_condition` | 实际编译执行所选官方源码，验证与 adapter 的组合。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j04)=
+## V-J04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J04 |
+| `task` | 抢占与隔离回归 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 覆盖启动后失败、同步 callback、IRQ 抢占、迟到完成和实例隔离。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j05)=
+## V-J05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J05 |
+| `task` | 故障撤离回归 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 覆盖 cancel/TC/DMA error 排列、撤离拒绝、重复 stop 和恢复再提交。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j06)=
+## V-J06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J06 |
+| `task` | 独立 ARM 上下文 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 每个独立编译上下文验证 SDK、ABI、布局、链接和资源。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j07)=
+## V-J07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J07 |
+| `task` | 测试保留审查 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 删除测试需有合同过时或独立等价覆盖依据，不靠减少数量制造通过。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-j08)=
+## V-J08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-J08 |
+| `task` | 高效完整门禁 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 开发聚焦执行，完整增量走普通 hooks，冻结源执行完整计划并预算存储。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k01)=
+## V-K01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K01 |
+| `task` | 完整 Source SDK |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 包内含生产模块、配置头、桥接代码、许可证和精确依赖闭包。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k02)=
+## V-K02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K02 |
+| `task` | 包外 C/C++ consumer |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 脱离完整 checkout 验证重定位、公共头隔离及独立构建。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k03)=
+## V-K03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K03 |
+| `task` | 三种执行示例 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 外部示例完成裸机独占、RTOS owner 和持续流规范用法。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k04)=
+## V-K04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K04 |
+| `task` | 失败与恢复示例 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 示例覆盖拒绝、取消、失败 drain、join、stop 和恢复。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k05)=
+## V-K05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K05 |
+| `task` | 完整开发入口 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 核对 create/configure/explain/diff/flash/debug/monitor 的真实用户路径。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k06)=
+## V-K06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K06 |
+| `task` | 架构与支持导航 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 架构图、模式合同、迁移说明和精确支持查询对应实际实现。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k07)=
+## V-K07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K07 |
+| `task` | 双语与代码风格 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 中英文、gettext、schema、链接及严格文档检查完整，沿用现有格式和 Doxygen。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-k08)=
+## V-K08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-K08 |
+| `task` | 公开与私有交付边界 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 新产物通过既有来源与可见性校验，私有示例不进入公开平台包。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l01)=
+## V-L01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L01 |
+| `task` | 替换后生产清理 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 删除已替换实现、无用开关及重复状态，保留必要比较夹具与未替换模式。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l02)=
+## V-L02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L02 |
+| `task` | 干净平台提交 P |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 代码和文档就绪后形成干净提交 P，冻结源码与依赖。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l03)=
+## V-L03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L03 |
+| `task` | P 的完整软件计划 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 在 P 上实际完成完整计划、四种 Native 和全部适用检查。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l04)=
+## V-L04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L04 |
+| `task` | P 的 SDK 与消费 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | P 的 SDK、资源报告和独立外部消费具有同源同产物记录。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l05)=
+## V-L05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L05 |
+| `task` | 示例提交 E |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 示例正式锁定合格 P，形成 E 并通过完整示例本地 CI。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l06)=
+## V-L06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L06 |
+| `task` | 精确交付关联 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | P/E、配置、SDK、工具和原始产物关联，保留原失败及成功记录。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l07)=
+## V-L07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L07 |
+| `task` | 受控环境与离线复现 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 分别证明受控环境与两次新鲜离线构建的实际范围，不继承旧资格。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-l08)=
+## V-L08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-L08 |
+| `task` | 提交合并与发布 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 正常提交同步并合入已验证提交，发布消费同一份已验证产物。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p01)=
+## V-P01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P01 |
+| `task` | 实板站点接入 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 确认三板 part/PCB/UID、探针、串口、电源和实际接线。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p02)=
+## V-P02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P02 |
+| `task` | 启动与 UART 实测 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 实际验证启动、时钟、GPIO、UART 收发和错误恢复。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p03)=
+## V-P03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P03 |
+| `task` | 总线与触发实测 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 仅对已审查接线执行 SPI/I2C/ADC/PWM 总线和触发测试。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p04)=
+## V-P04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P04 |
+| `task` | 负载与时序实测 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 实测 IRQ、临界区、DMA 连续性、吞吐、CPU 及栈峰值。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p05)=
+## V-P05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P05 |
+| `task` | 停机恢复实测 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 实测超时、取消、失败撤离、停机与恢复后再次运行。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-p06)=
+## V-P06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-P06 |
+| `task` | 高级范围实测 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/;boards/;docs/design/selected-mode-hil.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 在对应设备验证 Cache/域、低功耗、Flash/watchdog 和所选安全域。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-x01)=
+## V-X01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-X01 |
+| `task` | OCI 与新 daemon 验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 容量足够后实际完成 recipe 重建及 fresh daemon 验证。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-x02)=
+## V-X02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-X02 |
+| `task` | 服务端分支规则 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 具备权限后实际配置并读回 branch rules 和 required checks。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-x03)=
+## V-X03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-X03 |
+| `task` | CodeQL 访问与处置 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 取得实际 CodeQL 分析并处置问题，本地分析不替代其身份。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-v-x04)=
+## V-X04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | V-X04 |
+| `task` | Pages 与正式发布 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 实际执行 Pages/Release，记录真实执行与产物身份。 |
 | `owner` | codex |

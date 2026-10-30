@@ -143,7 +143,7 @@ nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
     if (timeout_us < 125U || timeout_us > 32768000U) {
         return NX_ERROR_INVALID;
     }
-    if ((port->registers->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) != 0U) {
+    if (LL_IWDG_IsReady(port->registers) == 0U) {
         return NX_ERROR_BUSY;
     }
     uint32_t divisor = 4U;
@@ -195,13 +195,12 @@ nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
     LL_IWDG_SetPrescaler(port->registers, prescaler);
     LL_IWDG_SetReloadCounter(port->registers, count - 1U);
     remaining = port->poll_limit;
-    while ((port->registers->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) != 0U &&
-           remaining-- != 0U) {
+    while (LL_IWDG_IsReady(port->registers) == 0U && remaining-- != 0U) {
         NX_STM32_IO_POLL(4U, port);
     }
     port->state = observed(port);
     *state = port->state;
-    if ((port->registers->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) != 0U ||
+    if (LL_IWDG_IsReady(port->registers) == 0U ||
         port->registers->PR != prescaler ||
         port->registers->RLR != count - 1U) {
         return NX_ERROR_IO;

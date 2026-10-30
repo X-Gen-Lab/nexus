@@ -29,6 +29,13 @@ They do not establish current support or qualification.
   hardware algorithms as generated C strings or introduce a runtime register
   script interpreter. Track remaining migration by complete selected paths,
   including preflight, platform resources, shared owners and resume.
+- Prefer reviewed official HAL/LL/SPL for hardware operations and complete
+  transports that satisfy the selected mode. Vendor types and Handles stay
+  private. One live controller behavior domain has one hardware transport
+  owner; Nexus bridges admission, borrowing, deadlines, callbacks and full
+  withdrawal. Keep direct access only for an explicit SDK gap, erratum,
+  atomic contract or demonstrated budget. Evaluate the complete mode before
+  replacement; a TX-only fixture does not preserve a mode with RX duties.
 - Public device APIs use Nexus types and immutable interface faces. Vendor SDKs
   and mutable provider state remain private. Instances share read-only typed
   operations tables; callbacks receive the instance context, never the table.
@@ -122,10 +129,14 @@ rewriting the earlier chronology.
 `python scripts/ci/tdd_gate.py --all --preset native-debug` builds the pinned,
 offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
 reports. Its initial `doctor --target contracts` checks the prepared locked Native
-and ARM tools before expensive suites, without installation or Docker. The commit
-hook runs this gate for behavioral changes, rejects differing
-unstaged/untracked behavior before and after execution, and requires an unchanged
-Git index tree. The hook reads the complete staged index, including deletions,
+and ARM tools before expensive suites, without installation or Docker.
+It then configures and links the Native contract target before the tool suites,
+so compile/link failures stop early. The ordinary post-suite configure/build
+still runs before fresh GoogleTest execution and matrix capture; preflight does
+not reuse a successful test report. The commit hook runs this gate for behavioral
+changes. It rejects differing unstaged/untracked behavior before and after
+execution and requires an unchanged Git index tree. The hook reads the complete
+staged index, including deletions,
 and runs once per commit without filename batching. CI executes the gate independently of
 local hooks. Do not disable cases, filters, shards or hooks to create acceptance
 evidence. Record RED/GREEN commands and the failure reason in the change review;

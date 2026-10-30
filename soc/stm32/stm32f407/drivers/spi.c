@@ -349,7 +349,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
     if (port->clock_hz / divider > endpoint->frequency_hz) {
         return NX_ERROR_UNSUPPORTED;
     }
-    if ((port->registers->SR & SPI_SR_BSY) != 0U) {
+    if (LL_SPI_IsActiveFlag_BSY(port->registers) != 0U) {
         return NX_ERROR_BUSY;
     }
     port->active = true;
@@ -424,7 +424,7 @@ nx_result_t nx_stm32_spi_recover(void* context) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if (port->active || (port->registers->SR & SPI_SR_BSY) != 0U) {
+    if (port->active || LL_SPI_IsActiveFlag_BSY(port->registers) != 0U) {
         return NX_ERROR_BUSY;
     }
     port->registers->CR2 = 0U;

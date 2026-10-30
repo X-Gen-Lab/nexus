@@ -31,12 +31,13 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         }))
         self.events = []
 
-    def execute(self, command, _environment, _log):
+    def execute(self, command, _environment, log):
         if "--report" in command:
             Path(command[command.index("--report") + 1]).write_text(
                 json.dumps({"passed": 1}))
         elif "build" in command:
-            self.events.append("build")
+            self.events.append("preflight-build" if
+                               log.name == "preflight-build.txt" else "build")
         elif "--gtest_list_tests" in command:
             self.events.append("discovery")
             return "Provider.\n  Retains\n"
@@ -81,8 +82,8 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         self.assertEqual(status, 0, output)
         before.assert_called_once()
         after.assert_called_once()
-        self.assertEqual(self.events, ["build", "capture", "discovery",
-                                       "execution", "audit"])
+        self.assertEqual(self.events, ["preflight-build", "build", "capture",
+                                       "discovery", "execution", "audit"])
         report = self.build / "tdd/io-property-report.json"
         self.assertEqual(json.loads(report.read_text())["formal_proof"], False)
 

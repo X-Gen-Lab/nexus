@@ -146,6 +146,14 @@ void gpio_output_options_set(uint32_t gpio, uint8_t type, uint32_t speed,
     (void)speed;
     GPIO_OMODE(gpio) = (GPIO_OMODE(gpio) & ~pins) | (type ? pins : 0u);
 }
+/** \brief Model one SDK input-bank read without electrical assumptions. */
+uint16_t gpio_input_port_get(uint32_t gpio) {
+    return (uint16_t)GPIO_ISTAT(gpio);
+}
+/** \brief Model one SDK output-latch read for the serialized writer. */
+uint16_t gpio_output_port_get(uint32_t gpio) {
+    return (uint16_t)GPIO_OCTL(gpio);
+}
 /** \brief           Model exact selected AF nibbles. */
 void gpio_af_set(uint32_t gpio, uint32_t af, uint32_t pins) {
     for (unsigned pin = 0u; pin < 16u; ++pin) {
@@ -168,11 +176,31 @@ void usart_deinit(uint32_t usart) {
     USART_CTL2(usart) = 0u;
     USART_STAT0(usart) = USART_STAT0_TBE | USART_STAT0_TC;
 }
+/** \brief Preserve the official nine-bit DATA field on transmit. */
+void usart_data_transmit(uint32_t usart, uint16_t data) {
+    USART_DATA(usart) = (uint32_t)data & (uint32_t)USART_DATA_DATA;
+}
+/** \brief Preserve the official nine-bit DATA field on receive. */
+uint16_t usart_data_receive(uint32_t usart) {
+    return (uint16_t)(USART_DATA(usart) & (uint32_t)USART_DATA_DATA);
+}
 /** \brief           Reset the modeled SPI shifter and data state. */
 void spi_i2s_deinit(uint32_t spi) {
     SPI_CTL0(spi) = 0u;
     SPI_CTL1(spi) = 0u;
     SPI_STAT(spi) = SPI_STAT_TBE;
+}
+/** \brief SDK disable requests do not fabricate idle shifter status. */
+void spi_disable(uint32_t spi) {
+    SPI_CTL0(spi) &= ~(uint32_t)SPI_CTL0_SPIEN;
+}
+/** \brief Model the SDK DATA store; fixtures own peripheral progress. */
+void spi_i2s_data_transmit(uint32_t spi, uint16_t data) {
+    SPI_DATA(spi) = data;
+}
+/** \brief Model the SDK DATA load without clearing modeled status. */
+uint16_t spi_i2s_data_receive(uint32_t spi) {
+    return (uint16_t)SPI_DATA(spi);
 }
 /** \brief           Reset our I2C controller without making the lines idle. */
 void i2c_deinit(uint32_t i2c) {
@@ -181,9 +209,56 @@ void i2c_deinit(uint32_t i2c) {
     I2C_STAT0(i2c) = 0u;
     I2C_STAT1(i2c) = 0u;
 }
+/** \brief Keep ACK changes independent of the receive-window model. */
+void i2c_ack_config(uint32_t i2c, uint32_t ack) {
+    I2C_CTL0(i2c) = (I2C_CTL0(i2c) & ~(uint32_t)I2C_CTL0_ACKEN) | ack;
+}
+/** \brief START requests do not manufacture address acknowledgements. */
+void i2c_start_on_bus(uint32_t i2c) {
+    I2C_CTL0(i2c) |= (uint32_t)I2C_CTL0_START;
+}
+/** \brief STOP requests still need the model's independently injected drain. */
+void i2c_stop_on_bus(uint32_t i2c) {
+    I2C_CTL0(i2c) |= (uint32_t)I2C_CTL0_STOP;
+}
+/** \brief Model the SDK's eight-bit DATA store. */
+void i2c_data_transmit(uint32_t i2c, uint8_t data) {
+    I2C_DATA(i2c) = data;
+}
+/** \brief Model the SDK's eight-bit DATA observation. */
+uint8_t i2c_data_receive(uint32_t i2c) {
+    return (uint8_t)I2C_DATA(i2c);
+}
 /** \brief           Clear model timer registers. */
 void timer_deinit(uint32_t timer) {
     memset((void*)(uintptr_t)timer, 0, 0x50u);
+}
+/** \brief The update-delayed SDK prescaler selection adds no update event. */
+void timer_prescaler_config(uint32_t timer, uint16_t prescaler,
+                            uint8_t reload) {
+    TIMER_PSC(timer) = prescaler;
+    if (reload == TIMER_PSC_RELOAD_NOW) {
+        TIMER_SWEVG(timer) |= (uint32_t)TIMER_SWEVG_UPG;
+    }
+}
+/** \brief Model the SDK's autoreload value store. */
+void timer_autoreload_value_config(uint32_t timer, uint32_t autoreload) {
+    TIMER_CAR(timer) = autoreload;
+}
+/** \brief Preserve SDK channel selection instead of aliasing every CCR. */
+void timer_channel_output_pulse_value_config(uint32_t timer, uint16_t channel,
+                                             uint32_t pulse) {
+    if (channel <= TIMER_CH_3) {
+        REG32(timer + UINT32_C(0x34) + (uint32_t)channel * 4U) = pulse;
+    }
+}
+/** \brief Counter enable does not synthesize an update or PWM output. */
+void timer_enable(uint32_t timer) {
+    TIMER_CTL0(timer) |= (uint32_t)TIMER_CTL0_CEN;
+}
+/** \brief Counter disable changes only the selected CEN bit. */
+void timer_disable(uint32_t timer) {
+    TIMER_CTL0(timer) &= ~(uint32_t)TIMER_CTL0_CEN;
 }
 /** \brief           Reset the modeled ADC without supplying conversion success.
  */
@@ -193,6 +268,10 @@ void adc_deinit(void) {
 /** \brief           Record ADC common clock selection. */
 void adc_clock_config(uint32_t divider) {
     ADC_SYNCCTL = divider;
+}
+/** \brief SDK data reads do not manufacture a completed conversion. */
+uint16_t adc_routine_data_read(uint32_t adc) {
+    return (uint16_t)ADC_RDATA(adc);
 }
 /** \brief           Unlock the modeled physical Flash controller. */
 void fmc_unlock(void) {

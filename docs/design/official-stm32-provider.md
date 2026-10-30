@@ -22,6 +22,123 @@ the private SoC implementation, not the public dependency direction. FIG-03 in
 existing build-time generation path. Neither diagram implies a new runtime
 registry, HAL manager, default worker or mandatory OS layer.
 
+## Vendor-first target and current implementation
+
+Official hardware libraries are the default input for further provider work.
+Reuse reviewed HAL transport when it satisfies the complete selected mode;
+otherwise bind suitable LL or SPL primitives to the required bounded mechanism.
+Nexus retains admission, borrowed storage, deadlines, result publication and
+resource responsibility. Direct register helpers remain justified exceptions for
+an exact SDK gap, erratum, atomic operation or demonstrated budget.
+
+This is the target for the vendor-first work, not a claim that production modes
+have already changed. The current STM32 targets select reviewed LL operations;
+the F4 Handle transport remains an explicit evaluation. GD32F470 already compiles
+selected official SPL C units. An include, primitive call or passing finite-TX
+fixture does not establish a complete vendor transport or family qualification.
+
+The [existing delivery-completion ledger](platform-delivery-completion.csv)
+appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while
+preserving the older rows and frozen results. Each new row starts with its real
+implementation, software and physical status; a plan has no execution evidence.
+The [derived ledger view](../status/ledgers/platform-delivery-completion.md)
+uses the same renderer. No second support or completion database is introduced.
+
+| Boundary | Required responsibility |
+| --- | --- |
+| Official transport | Own the selected peripheral transfer, IRQ/DMA and vendor state machine |
+| LL/SPL primitive | Encode reviewed hardware operations without claiming a complete transport |
+| Nexus adapter | Bridge admission, borrow, absolute deadline, errors, callbacks, drain and final settlement |
+| Exact SoC | Bind SDK pairing, clock/reset, IRQ/DMA route, memory/Cache and silicon restrictions |
+| Board/product | Supply reviewed wiring, electrical state, execution, storage, partitions and recovery policy |
+| Static assembly | Construct existing contexts/faces and fixed IRQ connections; select one implementation before execution |
+
+A private Handle can live in static provider storage. A public face still calls
+its selected immutable ops with that instance context. No universal HAL manager,
+name registry, default worker or extra forwarding-only layer is required. One
+live controller behavior domain has one hardware transport owner. Selecting HAL
+transport replaces the corresponding independent register transport; Handle
+readiness and Nexus request lifetime remain different contracts.
+
+### Complete maintained scope
+
+The iteration covers the existing exact selections for STM32F103, STM32F407,
+STM32G474, STM32H743, STM32U575, GD32F303 and GD32F470. The three launch Boards are
+Qiming F407ZGT6, Sky F407VET6 and Liangshan GD32F470ZGT6. Current Sky bindings
+cover LED, UART, Flash and IWDG; additional electrical routes need review before
+physical execution.
+
+The 71-entry assembly catalogue is one input, not the complete closure. Derive
+navigation from the existing capability/provider/source catalogues, provider
+fixtures, installed-SDK consumers, selected components and external examples.
+The maintained `tools/maintenance/work_packages.py` joins existing authorities;
+it does not execute tests or grant support. A mode needs its exact part/density,
+Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA,
+memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch
+coverage and the independent ThreadX subset do not expand this SoC matrix.
+
+F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling,
+H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
+separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
+chained, duplex or cross-domain operation.
+
+### Production promotion gates
+
+The first STM32 candidate evaluates the complete existing F407 UART `dma-tx`
+contract. That mode includes RX configuration and storage. The current finite-TX
+reference therefore cannot replace it unchanged. Promotion must preserve RX
+bytes/events, frame/error/loss ordering, timestamps, wake, cancellation, the
+shared UART IRQ and complete stop. If the official receiver cannot satisfy that
+contract, the selected mode may retain a reviewed LL mechanism; a narrower new
+mode needs an explicit contract and actual use case.
+
+The serialized reference's `hal_depth` IRQ guard is not an MCU preemption design.
+Production must establish allowed HAL nesting, short guards, pending-fact
+handling and real IRQ service ordering. Do not mask all interrupts around vendor
+calls that may wait. An abort callback can run synchronously in task context;
+bridges record bounded facts and use notification permitted in the actual
+context. Product callbacks and final settlement do not run arbitrarily inside
+vendor callback stacks.
+
+A Handle-only callback does not carry a request epoch. Before Handle reuse,
+prove withdrawal of the previous hardware, IRQ and callback references; stamping
+the current epoch onto a late callback is not proof of association. Establish
+admission before a vendor call can retain references, and treat a startup error
+after admission as accepted work requiring explicit withdrawal.
+
+Review every reachable vendor wait, including bootstrap/runtime progression,
+millisecond quantization, 32-bit tick wrap and low-power suspension. Initial UART
+work keeps the existing system-clock and OS startup choices. Selected HAL modules
+do not authorize default SysTick acquisition or interrupt-policy changes.
+UART/SPI `uint16_t Size` parameters must match the selected public `size_t`
+contract without truncation, hidden splitting or implicit bounce storage.
+
+SPI evaluation additionally preserves the whole CS interval, dummy/discard,
+fixed DMA address options and transferred counts. GPIO simultaneous set/reset
+retains its single atomic write where separate SDK calls would change that
+contract. DMA disable is a command; use the appropriate readback and withdrawal
+proof before returning borrowed storage.
+
+### Ordered implementation and acceptance
+
+| Phase | Ledger work | Exit |
+| --- | --- | --- |
+| G0 | V-A: exact scope and contract | Every maintained selection has a bounded migration decision and baseline |
+| G1 | V-B/V-C/V-D: dependencies and integration | Private SDK build, static contexts, resource responsibility, time and IRQ contracts are established |
+| G2 | V-E and first GD32 work | Complete F407 UART behavior and selected GD32 official primitives execute their real regressions |
+| G3 | V-F/V-G/V-H/V-I | Each applicable peripheral/family has a reviewed implementation and comparable cost; unused replaced production paths are removed |
+| G4 | V-J/V-K | Test contexts, relocated SDK consumers, external examples and both documentation languages agree |
+| G5 | V-L | Clean source P, examples E, dependencies, configuration and original artifacts are associated without inheriting old qualification |
+| G6 | V-P/V-X | Connected physical execution and actual external environment/publication exits are observed separately |
+
+Keep developer tests focused, execute the ordinary complete-index gate for each
+functional increment, and run the complete qualification plan for the frozen
+source. New behavior and fixes require actual RED then GREEN. Pure equivalent
+refactors use the applicable regressions and output checks without fabricated
+RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only.
+Preserve original attempts and compare complete providers, not only Handle sizes.
+Without connected equipment, physical rows remain `not_executed`.
+
 ## Implementation boundary
 
 The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at

@@ -7,14 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f9a71b5b691ed59ebc1cfa59cbaeb2a484fc0c41f3a6c68563654d448c84762d\n"
+"X-Nexus-Source-SHA256: 50e4845c7be21c0748f728cad3418754f2ecc5fe6f023c3ca2b7f8aaf38f1c56\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
 msgstr "Platform delivery-completion ledger"
-
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`。"
-msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `470e8cade4da32551804d327d4a83d691a78864e0235dd4dfb7eb1dc4c3df210`."
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:15
 msgid ""
@@ -38,11 +35,6 @@ msgstr ""
 "**Original exit fields** are only fields actually present in the original "
 "CSV. Tasks, qualification prerequisites and contract links also retain their"
 " original wording; they cannot be used to invent an execution."
-
-#: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:24
-msgid "本表包含 78 条原记录，仅表示来源行数。"
-msgstr ""
-"This table contains 78 original records; this is only the source row count."
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:26
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:32
@@ -1870,3 +1862,1011 @@ msgid ""
 msgstr ""
 "Reviewed increments synchronize to GitHub; code software hardware and "
 "publication exits remain independently accurate"
+
+
+# Vendor-first additions independently reviewed against the extracted source.
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`。"
+msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `18687307037a16f27744de946f5b1441a7417d639fbd63ac96219c819a0c9501`."
+
+msgid "本表包含 175 条原记录，仅表示来源行数。"
+msgstr "This table contains 175 original records; this is only the source row count."
+
+msgid "V-A01"
+msgstr "V-A01"
+
+msgid "维护配置闭包"
+msgstr "Maintained configuration closure"
+
+msgid "partial_derived_navigation"
+msgstr "partial_derived_navigation"
+
+msgid "existing_authority_navigation_passed_not_acceptance"
+msgstr "existing_authority_navigation_passed_not_acceptance"
+
+msgid "docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py"
+msgstr "docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py"
+
+msgid "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json"
+msgstr "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json"
+
+msgid "汇总参考装配、provider 夹具、SDK consumer、高级组件及外部示例的完整适用配置。"
+msgstr "Collect the complete applicable configurations from reference assemblies, provider fixtures, SDK consumers, selected components and external examples."
+
+msgid "V-A02"
+msgstr "V-A02"
+
+msgid "逐模式行为合同"
+msgstr "Per-mode behavior contract"
+
+msgid "planned"
+msgstr "planned"
+
+msgid "（原字段为空）"
+msgstr "(Original field is empty)"
+
+msgid "逐项核对 TX/RX、格式、错误、wake、容量、长度、计数、cancel、drain 与 stop。"
+msgstr "Review TX/RX, format, errors, wake, capacity, length, counts, cancel, drain and stop for every mode."
+
+msgid "V-A03"
+msgstr "V-A03"
+
+msgid "官方实现决策"
+msgstr "Official implementation decision"
+
+msgid "每个模式明确选择 HAL transport、LL/SPL 原语或有理由的专用引擎。"
+msgstr "Choose HAL transport, LL/SPL primitives or a justified dedicated engine for every mode."
+
+msgid "V-A04"
+msgstr "V-A04"
+
+msgid "必要直接访问"
+msgstr "Necessary direct access"
+
+msgid "原子操作、SDK 缺口、errata、撤离证明及实测预算例外有准确理由。"
+msgstr "Record precise reasons for atomic operations, SDK gaps, errata, withdrawal proofs and measured-budget exceptions."
+
+msgid "V-A05"
+msgstr "V-A05"
+
+msgid "行为与成本基线"
+msgstr "Behavior and cost baseline"
+
+msgid "固定同合同的行为与资源比较范围，保留既有原始证据身份。"
+msgstr "Fix equivalent behavior and resource comparison scopes while preserving existing original evidence identities."
+
+msgid "V-A06"
+msgstr "V-A06"
+
+msgid "分离完成状态"
+msgstr "Separate completion states"
+
+msgid "实现、软件、实板与交付分别记录；试点通过不关闭整个家族任务。"
+msgstr "Record implementation, software, physical and delivery states separately; a passing pilot does not close a family task."
+
+msgid "V-B01"
+msgstr "V-B01"
+
+msgid "官方依赖配对"
+msgstr "Official dependency pairing"
+
+msgid "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/"
+msgstr "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/"
+
+msgid "核对组织 fork、精确 gitlink、SDK、CMSIS Device/Core 和许可证配对。"
+msgstr "Verify organization forks, exact gitlinks, SDK, CMSIS Device/Core and license pairing."
+
+msgid "V-B02"
+msgstr "V-B02"
+
+msgid "私有 HAL 模块构建"
+msgstr "Private HAL module build"
+
+msgid "仅显式编译实际需要的官方 C 模块，避免整包选入。"
+msgstr "Compile only the explicitly selected official C modules instead of the entire package."
+
+msgid "V-B03"
+msgstr "V-B03"
+
+msgid "HAL 配置与符号"
+msgstr "HAL configuration and symbols"
+
+msgid "私有配置头、模块宏、callback 配置及全局符号冲突均经检查。"
+msgstr "Check private configuration headers, module macros, callback settings and global symbol conflicts."
+
+msgid "V-B04"
+msgstr "V-B04"
+
+msgid "GD32 SDK C 单元"
+msgstr "GD32 SDK C units"
+
+msgid "使用新增 SPL 原语时同步选入对应 C 单元，特别是 DMA。"
+msgstr "Select the corresponding C units when adding SPL primitives, especially DMA."
+
+msgid "V-B05"
+msgstr "V-B05"
+
+msgid "公共编译边界"
+msgstr "Public compile boundary"
+
+msgid "公共 consumer 不继承 vendor/private includes；生产目标不引入测试运行时。"
+msgstr "Public consumers do not inherit vendor/private includes, and production targets do not acquire test runtimes."
+
+msgid "V-B06"
+msgstr "V-B06"
+
+msgid "依赖及 SDK 闭包"
+msgstr "Dependency and SDK closure"
+
+msgid "锁、source catalogue、descriptor、SDK 文件和许可证闭包一致，升级经过受控验证。"
+msgstr "Keep locks, source catalogue, descriptors, SDK files and licenses consistent, with controlled upgrade verification."
+
+msgid "V-C01"
+msgstr "V-C01"
+
+msgid "最小静态 context"
+msgstr "Minimal static context"
+
+msgid "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/"
+msgstr "soc/stm32/stm32f407/;io/;core/;tests/contracts/stm32_hal_reference/"
+
+msgid "仅保留所选 Handle、配置、请求和模式扩展，不增加通用最大状态。"
+msgstr "Retain only selected Handles, configuration, requests and mode extensions without universal maximum state."
+
+msgid "V-C02"
+msgstr "V-C02"
+
+msgid "副作用前校验"
+msgstr "Validation before effects"
+
+msgid "partial_reference_payload_alias_guard"
+msgstr "partial_reference_payload_alias_guard"
+
+msgid "reference_red_green_passed_not_production"
+msgstr "reference_red_green_passed_not_production"
+
+msgid "build/vendor-first-20261030/hal-tests/handoff.json"
+msgstr "build/vendor-first-20261030/hal-tests/handoff.json"
+
+msgid "在硬件影响前检查上下文、长度、对齐、内存域、deadline、模式和资源。"
+msgstr "Check context, length, alignment, memory domain, deadline, mode and resources before hardware effects."
+
+msgid "V-C03"
+msgstr "V-C03"
+
+msgid "准入先于保留引用"
+msgstr "Admission before retained references"
+
+msgid "admission 先于可能保留引用或同步回调的官方 API。"
+msgstr "Establish admission before an official API can retain references or invoke callbacks synchronously."
+
+msgid "V-C04"
+msgstr "V-C04"
+
+msgid "启动失败撤离"
+msgstr "Startup failure withdrawal"
+
+msgid "已接受操作的启动失败按实际引用撤离，不能伪装为无借用拒绝。"
+msgstr "Withdraw actual retained references after accepted startup failure instead of reporting a borrow-free rejection."
+
+msgid "V-C05"
+msgstr "V-C05"
+
+msgid "取消与期限映射"
+msgstr "Cancel and deadline mapping"
+
+msgid "cancel/timeout 明确推进撤离、drain 和 quarantine，借用不提前释放。"
+msgstr "Cancel/timeout explicitly advance withdrawal, drain and quarantine without releasing borrows early."
+
+msgid "V-C06"
+msgstr "V-C06"
+
+msgid "冷态资源责任"
+msgstr "Cold resource responsibility"
+
+msgid "prepare/start、部分失败和 stop 重试保留准确责任，不释放其他 owner 资源。"
+msgstr "Prepare/start, partial failure and stop retries retain exact responsibility without releasing another owner's resources."
+
+msgid "V-C07"
+msgstr "V-C07"
+
+msgid "Handle 安全复用"
+msgstr "Safe Handle reuse"
+
+msgid "旧硬件、IRQ 和 callback 栈撤离后才能复用 Handle，迟到事件不冒充当前请求。"
+msgstr "Reuse a Handle only after old hardware, IRQ and callback stacks withdraw; late events cannot impersonate the current request."
+
+msgid "V-C08"
+msgstr "V-C08"
+
+msgid "主错误与清理结果"
+msgstr "Primary and cleanup results"
+
+msgid "主错误、清理错误、剩余责任分别保留；诊断不撤销借用。"
+msgstr "Keep primary errors, cleanup errors and remaining responsibility separate; diagnostics do not revoke borrows."
+
+msgid "V-D01"
+msgstr "V-D01"
+
+msgid "真实 IRQ 抢占合同"
+msgstr "Real IRQ preemption contract"
+
+msgid "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/"
+msgstr "soc/stm32/stm32f407/;arch/;os/;tests/contracts/stm32_hal_reference/"
+
+msgid "生产 IRQ 协议明确处理抢占，不能原样使用串行夹具的跳过 handler 假设。"
+msgstr "Production IRQ protocol handles preemption explicitly instead of copying the serialized fixture handler-skipping assumption."
+
+msgid "V-D02"
+msgstr "V-D02"
+
+msgid "短临界区与 pending facts"
+msgstr "Short guards and pending facts"
+
+msgid "HAL 嵌套、短临界区和 pending facts 明确，不以长全局关中断覆盖 vendor 等待。"
+msgstr "Specify HAL nesting, short guards and pending facts without masking all interrupts across vendor waits."
+
+msgid "V-D03"
+msgstr "V-D03"
+
+msgid "callback 实际上下文"
+msgstr "Actual callback context"
+
+msgid "同步、task 和 ISR callback 使用合法通知，仅记录有界事实。"
+msgstr "Synchronous, task and ISR callbacks use permitted notification and record bounded facts only."
+
+msgid "V-D04"
+msgstr "V-D04"
+
+msgid "HAL 可达等待与时钟"
+msgstr "Reachable HAL waits and clocks"
+
+msgid "审核 bootstrap/runtime、毫秒量化、32 位回绕及低功耗暂停的实际时间推进。"
+msgstr "Review real time progression through bootstrap/runtime, millisecond quantization, 32-bit wrap and low-power suspension."
+
+msgid "V-D05"
+msgstr "V-D05"
+
+msgid "OS 与时间基准隔离"
+msgstr "OS and timebase isolation"
+
+msgid "保留既有 SysTick/OS 策略，验证 IRQ ceiling、wait/wake 和 observer join。"
+msgstr "Preserve existing SysTick/OS policy and verify IRQ ceilings, wait/wake and observer join."
+
+msgid "V-D06"
+msgstr "V-D06"
+
+msgid "Arch 屏障与状态恢复"
+msgstr "Arch barriers and state restoration"
+
+msgid "恢复调用前中断状态，并区分 CPU 屏障、Cache 维护和请求发布。"
+msgstr "Restore incoming interrupt state and distinguish CPU barriers, Cache maintenance and request publication."
+
+msgid "V-E01"
+msgstr "V-E01"
+
+msgid "完整 UART 生产候选"
+msgstr "Complete UART production candidate"
+
+msgid "partial_reference_only"
+msgstr "partial_reference_only"
+
+msgid "serialized_finite_tx_reference_passed_not_production"
+msgstr "serialized_finite_tx_reference_passed_not_production"
+
+msgid "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/"
+msgstr "soc/stm32/stm32f407/;tests/contracts/stm32_hal_reference/;tools/configure/"
+
+msgid "有限 TX HAL 评估扩为明确完整模式候选，不以 TX-only 代替既有 dma-tx。"
+msgstr "Extend finite TX HAL evaluation into an explicit complete-mode candidate without substituting TX-only for existing dma-tx."
+
+msgid "V-E02"
+msgstr "V-E02"
+
+msgid "UART 与 DMA 冷态接入"
+msgstr "UART and DMA cold integration"
+
+msgid "官方初始化纳入既有 resource lease、MSP、失败读回与恢复。"
+msgstr "Integrate official initialization with existing resource leases, MSP, failure readback and recovery."
+
+msgid "V-E03"
+msgstr "V-E03"
+
+msgid "DMA 与 UART TC"
+msgstr "DMA and UART TC"
+
+msgid "复用 HAL 正常 DMA 到 TC 流程，验证完成、错误及实际计数。"
+msgstr "Reuse the HAL normal DMA-to-TC flow and verify completion, errors and actual counts."
+
+msgid "V-E04"
+msgstr "V-E04"
+
+msgid "RX 完整语义"
+msgstr "Complete RX semantics"
+
+msgid "保留 RX bytes/events、frame/error/loss 顺序、时间戳和存储合同。"
+msgstr "Preserve RX bytes/events, frame/error/loss ordering, timestamps and storage contracts."
+
+msgid "V-E05"
+msgstr "V-E05"
+
+msgid "TX/RX 共同所有权"
+msgstr "Joint TX/RX ownership"
+
+msgid "审查 TX abort、DMA error、共享 IRQ 对 RX 的影响，不拼接未经审查的独立 owner。"
+msgstr "Review TX abort, DMA error and shared IRQ effects on RX without combining unreviewed independent owners."
+
+msgid "V-E06"
+msgstr "V-E06"
+
+msgid "UART 停止与再次提交"
+msgstr "UART stop and resubmission"
+
+msgid "同步 callback、迟到 IRQ、wake detach、stop 和恢复后再次提交均有实际回归。"
+msgstr "Execute regressions for synchronous callbacks, late IRQs, wake detach, stop and resubmission after recovery."
+
+msgid "V-E07"
+msgstr "V-E07"
+
+msgid "完整 UART 成本决策"
+msgstr "Complete UART cost decision"
+
+msgid "同合同比较完整 provider 的 Flash/RAM/栈/执行成本后确定生产实现。"
+msgstr "Choose the production implementation after comparing complete equivalent-provider Flash, RAM, stack and execution costs."
+
+msgid "V-E08"
+msgstr "V-E08"
+
+msgid "UART 替换与清理"
+msgstr "UART replacement and cleanup"
+
+msgid "接受后更新装配及 SDK，删除已完整替换的生产路径，未满足合同的候选保留结论。"
+msgstr "After acceptance update assembly and SDK, remove fully replaced production paths and retain conclusions for candidates that do not satisfy the contract."
+
+msgid "V-F01"
+msgstr "V-F01"
+
+msgid "GPIO 与 pin 迁移"
+msgstr "GPIO and pin migration"
+
+msgid "partial_f407_gd470_selected_primitives"
+msgstr "partial_f407_gd470_selected_primitives"
+
+msgid "focused_development_passed_final_index_gate_pending"
+msgstr "focused_development_passed_final_index_gate_pending"
+
+msgid "soc/;drivers/;io/;components/;cmake/package/verification/"
+msgstr "soc/;drivers/;io/;components/;cmake/package/verification/"
+
+msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json"
+
+msgid "扩大 LL/SPL，保持安全电平顺序、权限与组合 set/reset 原子性。"
+msgstr "Expand LL/SPL while preserving safe-level ordering, permission checks and combined set/reset atomicity."
+
+msgid "V-F02"
+msgstr "V-F02"
+
+msgid "SPI 短事务迁移"
+msgstr "SPI short-transaction migration"
+
+msgid "官方配置及收发保持完整 CS 区间、dummy/discard 和 transferred。"
+msgstr "Official configuration and transfers preserve the full CS interval, dummy/discard and transferred counts."
+
+msgid "V-F03"
+msgstr "V-F03"
+
+msgid "SPI DMA 迁移"
+msgstr "SPI DMA migration"
+
+msgid "评价完整官方流程，验证 TX/RX 联合撤离、固定地址和 wire completion。"
+msgstr "Evaluate complete official flows and verify joint TX/RX withdrawal, fixed addresses and wire completion."
+
+msgid "V-F04"
+msgstr "V-F04"
+
+msgid "I2C 消息序列迁移"
+msgstr "I2C message-sequence migration"
+
+msgid "覆盖 repeated START、1/2/3 字节窗口、NACK/ARLO、STOP 和精确 errata。"
+msgstr "Cover repeated START, one/two/three-byte windows, NACK/ARLO, STOP and exact errata."
+
+msgid "V-F05"
+msgstr "V-F05"
+
+msgid "ADC 与 group 迁移"
+msgstr "ADC and group migration"
+
+msgid "保留校准、触发、数据格式、组序列及 DMA 数据借用。"
+msgstr "Preserve calibration, triggers, data format, group sequences and DMA data borrows."
+
+msgid "V-F06"
+msgstr "V-F06"
+
+msgid "PWM/capture/encoder 迁移"
+msgstr "PWM/capture/encoder migration"
+
+msgid "保留共享基座、同步更新、互补输出和安全停止。"
+msgstr "Preserve shared bases, coherent updates, complementary outputs and safe stop."
+
+msgid "V-F07"
+msgstr "V-F07"
+
+msgid "Flash 官方流程评价"
+msgstr "Official Flash flow evaluation"
+
+msgid "核对几何、ECC、执行域、供电、pulse 结清及错误恢复。"
+msgstr "Review geometry, ECC, execution domain, supply, pulse settlement and error recovery."
+
+msgid "V-F08"
+msgstr "V-F08"
+
+msgid "CAN/CAN FD 迁移"
+msgstr "CAN/CAN FD migration"
+
+msgid "保留 mailbox/filter/message RAM、错误处理及停止责任。"
+msgstr "Preserve mailbox/filter/message RAM ownership, error handling and stop responsibility."
+
+msgid "V-F09"
+msgstr "V-F09"
+
+msgid "USB/Ethernet 迁移"
+msgstr "USB/Ethernet migration"
+
+msgid "逐精确模式评价官方驱动，保持端点、描述符、缓冲区和 callback 所有权。"
+msgstr "Evaluate official drivers per exact mode while preserving endpoint, descriptor, buffer and callback ownership."
+
+msgid "V-F10"
+msgstr "V-F10"
+
+msgid "RTC/LPTIM/watchdog 迁移"
+msgstr "RTC/LPTIM/watchdog migration"
+
+msgid "partial_f407_watchdog_primitives"
+msgstr "partial_f407_watchdog_primitives"
+
+msgid "build/vendor-first-20261030/stm32/handoff.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json"
+
+msgid "保持时间连续性、唤醒合同和不可逆硬件影响。"
+msgstr "Preserve time continuity, wake contracts and irreversible hardware effects."
+
+msgid "V-G01"
+msgstr "V-G01"
+
+msgid "F103 精确验证"
+msgstr "Exact F103 verification"
+
+msgid "soc/;drivers/;tests/contracts/;cmake/package/verification/"
+msgstr "soc/;drivers/;tests/contracts/;cmake/package/verification/"
+
+msgid "独立验证 density、低时钟、channel DMA 和 errata 限制。"
+msgstr "Independently verify density, low clocks, channel DMA and errata restrictions."
+
+msgid "V-G02"
+msgstr "V-G02"
+
+msgid "GD303 精确验证"
+msgstr "Exact GD303 verification"
+
+msgid "独立核对 SPL、寄存器语义、启动延迟及 errata，不继承 F103 结果。"
+msgstr "Independently review SPL, register semantics, startup delay and errata without inheriting F103 results."
+
+msgid "V-G03"
+msgstr "V-G03"
+
+msgid "F407 维护模式闭包"
+msgstr "F407 maintained-mode closure"
+
+msgid "partial_selected_f407_primitives"
+msgstr "partial_selected_f407_primitives"
+
+msgid "覆盖现有 UART/SPI/I2C/ADC/控制器模式和 stream DMA 资源。"
+msgstr "Cover existing UART/SPI/I2C/ADC/controller modes and stream DMA resources."
+
+msgid "V-G04"
+msgstr "V-G04"
+
+msgid "GD470 维护模式闭包"
+msgstr "GD470 maintained-mode closure"
+
+msgid "partial_selected_gd470_primitives"
+msgstr "partial_selected_gd470_primitives"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json"
+
+msgid "扩大 SPL 并独立验证路由、时钟、DMA 撤离和模式差异。"
+msgstr "Expand SPL and independently verify routes, clocks, DMA withdrawal and mode differences."
+
+msgid "V-G05"
+msgstr "V-G05"
+
+msgid "G474 耦合资源验证"
+msgstr "G474 coupled-resource verification"
+
+msgid "覆盖 DMAMUX、shared/coherent PWM、PWM 到 ADC、group/injected 和 FD CAN。"
+msgstr "Cover DMAMUX, shared/coherent PWM, PWM-to-ADC, group/injected acquisition and FD CAN."
+
+msgid "V-G06"
+msgstr "V-G06"
+
+msgid "H743 域与 Cache 验证"
+msgstr "H743 domain and Cache verification"
+
+msgid "覆盖 Cache、域、DMA 内存、连续模式、SPI wire errata 与 RAM 执行组件。"
+msgstr "Cover Cache, domains, DMA memory, continuous modes, SPI wire errata and RAM-execution components."
+
+msgid "V-G07"
+msgstr "V-G07"
+
+msgid "U575 精确子集验证"
+msgstr "Exact U575 subset verification"
+
+msgid "分别验证 GPDMA/chain、FIFO、保留时间、Stop2/LPDMA/LPBAM 和既有 TrustZone 窄范围。"
+msgstr "Separately verify GPDMA/chain, FIFO, retained time, Stop2/LPDMA/LPBAM and the existing narrow TrustZone scope."
+
+msgid "V-H01"
+msgstr "V-H01"
+
+msgid "resolver 类别局部化"
+msgstr "Resolver category localization"
+
+msgid "partial_controller_and_endpoint_localization"
+msgstr "partial_controller_and_endpoint_localization"
+
+msgid "194_focused_and_710_files_schema_equivalent"
+msgstr "194_focused_and_710_files_schema_equivalent"
+
+msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/"
+msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/"
+
+msgid "build/vendor-first-20261030/configure/handoff.json"
+msgstr "build/vendor-first-20261030/configure/handoff.json"
+
+msgid "类别归一化就近维护，公共入口保留共同仲裁和原子发布。"
+msgstr "Maintain category normalization locally while common entry points retain arbitration and atomic publication."
+
+msgid "V-H02"
+msgstr "V-H02"
+
+msgid "family descriptor 就近维护"
+msgstr "Local family descriptor ownership"
+
+msgid "保留顶层显式映射及稳定闭包检查，避免新建平行源码图。"
+msgstr "Retain explicit top-level mappings and stable closure checks without a parallel source graph."
+
+msgid "V-H03"
+msgstr "V-H03"
+
+msgid "语义模式选择"
+msgstr "Semantic mode selection"
+
+msgid "用户选择语义 mode，内部明确选实现，无并行权威和隐式回退。"
+msgstr "Users select semantic modes with explicit internal implementation selection, no parallel authority or implicit fallback."
+
+msgid "V-H04"
+msgstr "V-H04"
+
+msgid "共享引擎归属"
+msgstr "Shared engine ownership"
+
+msgid "按公共机制、vendor adapter、必要专用引擎和 SoC 集成整理实际职责。"
+msgstr "Organize actual responsibilities as public mechanisms, vendor adapters, necessary dedicated engines and SoC integration."
+
+msgid "V-H05"
+msgstr "V-H05"
+
+msgid "编译期模板合同"
+msgstr "Compile-time template contract"
+
+msgid "输入、导出符号、宏作用域及各 specialization 的验证明确。"
+msgstr "Specify inputs, exported symbols, macro scope and verification of each specialization."
+
+msgid "V-H06"
+msgstr "V-H06"
+
+msgid "偏移镜像与交接 profile"
+msgstr "Offset-image and handoff profile"
+
+msgid "按既定明确范围验证向量、链接区域和入口条件，产品升级策略外置。"
+msgstr "Verify vectors, link regions and entry conditions within an explicit agreed scope while product update policy remains external."
+
+msgid "V-I01"
+msgstr "V-I01"
+
+msgid "多实例资源成本"
+msgstr "Multi-instance resource cost"
+
+msgid "tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md"
+msgstr "tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md"
+
+msgid "比较空/1/2/4 实例，区分 face/config/runtime/buffer/executor。"
+msgstr "Compare empty/one/two/four instances, separating face/config/runtime/buffer/executor costs."
+
+msgid "V-I02"
+msgstr "V-I02"
+
+msgid "实际链接保留"
+msgstr "Actual linked retention"
+
+msgid "核对 ops 引用和 ELF symbols，解释未选模式的代码及常驻 RAM。"
+msgstr "Check ops references and ELF symbols to explain code and resident RAM for unselected modes."
+
+msgid "V-I03"
+msgstr "V-I03"
+
+msgid "config/runtime 成本"
+msgstr "Config/runtime cost"
+
+msgid "逐项测量拆分收益，避免为外观统一增加指针或状态。"
+msgstr "Measure each split benefit without adding pointers or state for appearance alone."
+
+msgid "V-I04"
+msgstr "V-I04"
+
+msgid "执行与时序成本"
+msgstr "Execution and timing cost"
+
+msgid "按同配置记录每块 CPU、IRQ/service、最大关中断时间及端到端期限。"
+msgstr "Record per-block CPU, IRQ/service, maximum interrupt-mask duration and end-to-end deadline under the same configuration."
+
+msgid "V-I05"
+msgstr "V-I05"
+
+msgid "连续性与背压"
+msgstr "Continuity and backpressure"
+
+msgid "结合预算验证重挂载、消费者持有、突发、背压和总线竞争。"
+msgstr "Use budgets to verify rearm, consumer hold, bursts, backpressure and bus contention."
+
+msgid "V-I06"
+msgstr "V-I06"
+
+msgid "同合同完整比较"
+msgstr "Complete equivalent-contract comparison"
+
+msgid "区分链接预算、栈预留、实测峰值和物理测量，未知值保持未知。"
+msgstr "Distinguish linked budgets, stack reservations, observed peaks and physical measurements while retaining unknown values."
+
+msgid "V-J01"
+msgstr "V-J01"
+
+msgid "真实 TDD 顺序"
+msgstr "Actual TDD order"
+
+msgid "partial_reference_alias_red_green"
+msgstr "partial_reference_alias_red_green"
+
+msgid "reference_actual_red_then_green_passed"
+msgstr "reference_actual_red_then_green_passed"
+
+msgid "tests/;tools/testing/;scripts/ci/;tools/dev/"
+msgstr "tests/;tools/testing/;scripts/ci/;tools/dev/"
+
+msgid "新行为和修复先实际 RED，再 GREEN；并行开发遵守交接屏障。"
+msgstr "Execute actual RED before GREEN for new behavior and fixes, preserving the parallel handoff barrier."
+
+msgid "V-J02"
+msgstr "V-J02"
+
+msgid "adapter 合同测试"
+msgstr "Adapter contract tests"
+
+msgid "partial_selected_adapter_boundary_regressions"
+msgstr "partial_selected_adapter_boundary_regressions"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
+
+msgid "GoogleTest/GoogleMock 检查真实 adapter，mock 仅位于明确外部边界。"
+msgstr "GoogleTest/GoogleMock checks real adapters with mocks only at explicit external boundaries."
+
+msgid "V-J03"
+msgstr "V-J03"
+
+msgid "实际官方源码测试"
+msgstr "Actual official-source tests"
+
+msgid "partial_actual_spl_and_hal_reference_runs"
+msgstr "partial_actual_spl_and_hal_reference_runs"
+
+msgid "focused_development_passed_not_full_transport"
+msgstr "focused_development_passed_not_full_transport"
+
+msgid "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
+msgstr "build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/hal-tests/handoff.json"
+
+msgid "实际编译执行所选官方源码，验证与 adapter 的组合。"
+msgstr "Compile and execute selected official sources to verify their combination with the adapter."
+
+msgid "V-J04"
+msgstr "V-J04"
+
+msgid "抢占与隔离回归"
+msgstr "Preemption and isolation regressions"
+
+msgid "覆盖启动后失败、同步 callback、IRQ 抢占、迟到完成和实例隔离。"
+msgstr "Cover post-admission startup failure, synchronous callbacks, IRQ preemption, late completion and instance isolation."
+
+msgid "V-J05"
+msgstr "V-J05"
+
+msgid "故障撤离回归"
+msgstr "Fault withdrawal regressions"
+
+msgid "覆盖 cancel/TC/DMA error 排列、撤离拒绝、重复 stop 和恢复再提交。"
+msgstr "Cover cancel/TC/DMA-error orderings, refused withdrawal, repeated stop and resubmission after recovery."
+
+msgid "V-J06"
+msgstr "V-J06"
+
+msgid "独立 ARM 上下文"
+msgstr "Independent ARM contexts"
+
+msgid "每个独立编译上下文验证 SDK、ABI、布局、链接和资源。"
+msgstr "Verify SDK, ABI, layout, linking and resources for each independent compile context."
+
+msgid "V-J07"
+msgstr "V-J07"
+
+msgid "测试保留审查"
+msgstr "Test-retention review"
+
+msgid "删除测试需有合同过时或独立等价覆盖依据，不靠减少数量制造通过。"
+msgstr "Remove tests only with obsolete-contract or independent-equivalent-coverage evidence, never to manufacture success."
+
+msgid "V-J08"
+msgstr "V-J08"
+
+msgid "高效完整门禁"
+msgstr "Efficient complete gates"
+
+msgid "开发聚焦执行，完整增量走普通 hooks，冻结源执行完整计划并预算存储。"
+msgstr "Use focused development runs, ordinary hooks for complete increments and full plans for frozen source with bounded storage."
+
+msgid "V-K01"
+msgstr "V-K01"
+
+msgid "完整 Source SDK"
+msgstr "Complete Source SDK"
+
+msgid "cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/"
+msgstr "cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/"
+
+msgid "包内含生产模块、配置头、桥接代码、许可证和精确依赖闭包。"
+msgstr "Package production modules, configuration headers, bridge code, licenses and the exact dependency closure."
+
+msgid "V-K02"
+msgstr "V-K02"
+
+msgid "包外 C/C++ consumer"
+msgstr "Out-of-package C/C++ consumers"
+
+msgid "脱离完整 checkout 验证重定位、公共头隔离及独立构建。"
+msgstr "Verify relocation, public-header isolation and independent builds outside the complete checkout."
+
+msgid "V-K03"
+msgstr "V-K03"
+
+msgid "三种执行示例"
+msgstr "Three execution recipes"
+
+msgid "外部示例完成裸机独占、RTOS owner 和持续流规范用法。"
+msgstr "External examples complete baremetal-exclusive, RTOS-owner and continuous-stream recipes."
+
+msgid "V-K04"
+msgstr "V-K04"
+
+msgid "失败与恢复示例"
+msgstr "Failure and recovery recipes"
+
+msgid "示例覆盖拒绝、取消、失败 drain、join、stop 和恢复。"
+msgstr "Examples cover rejection, cancellation, failed drain, join, stop and recovery."
+
+msgid "V-K05"
+msgstr "V-K05"
+
+msgid "完整开发入口"
+msgstr "Complete developer workflow"
+
+msgid "核对 create/configure/explain/diff/flash/debug/monitor 的真实用户路径。"
+msgstr "Review the actual create/configure/explain/diff/flash/debug/monitor user workflows."
+
+msgid "V-K06"
+msgstr "V-K06"
+
+msgid "架构与支持导航"
+msgstr "Architecture and support navigation"
+
+msgid "架构图、模式合同、迁移说明和精确支持查询对应实际实现。"
+msgstr "Architecture diagrams, mode contracts, migration notes and exact support queries correspond to actual implementation."
+
+msgid "V-K07"
+msgstr "V-K07"
+
+msgid "双语与代码风格"
+msgstr "Bilingual content and code style"
+
+msgid "中英文、gettext、schema、链接及严格文档检查完整，沿用现有格式和 Doxygen。"
+msgstr "Complete English/Chinese content, gettext, schema, links and strict documentation checks while retaining existing format and Doxygen style."
+
+msgid "V-K08"
+msgstr "V-K08"
+
+msgid "公开与私有交付边界"
+msgstr "Public and private delivery boundary"
+
+msgid "新产物通过既有来源与可见性校验，私有示例不进入公开平台包。"
+msgstr "New artifacts pass existing origin and visibility checks, and private examples do not enter public platform packages."
+
+msgid "V-L01"
+msgstr "V-L01"
+
+msgid "替换后生产清理"
+msgstr "Post-replacement production cleanup"
+
+msgid "tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/"
+msgstr "tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/"
+
+msgid "删除已替换实现、无用开关及重复状态，保留必要比较夹具与未替换模式。"
+msgstr "Remove replaced implementations, unused switches and duplicate state while retaining necessary comparison fixtures and unreplaced modes."
+
+msgid "V-L02"
+msgstr "V-L02"
+
+msgid "干净平台提交 P"
+msgstr "Clean platform commit P"
+
+msgid "代码和文档就绪后形成干净提交 P，冻结源码与依赖。"
+msgstr "Create clean commit P after code and documentation are ready, freezing source and dependencies."
+
+msgid "V-L03"
+msgstr "V-L03"
+
+msgid "P 的完整软件计划"
+msgstr "Complete software plan for P"
+
+msgid "在 P 上实际完成完整计划、四种 Native 和全部适用检查。"
+msgstr "Actually complete the full plan, all four Native modes and all applicable checks at P."
+
+msgid "V-L04"
+msgstr "V-L04"
+
+msgid "P 的 SDK 与消费"
+msgstr "SDK and consumers for P"
+
+msgid "P 的 SDK、资源报告和独立外部消费具有同源同产物记录。"
+msgstr "SDK, resource reports and independent external consumption for P bind the same source and artifacts."
+
+msgid "V-L05"
+msgstr "V-L05"
+
+msgid "示例提交 E"
+msgstr "Examples commit E"
+
+msgid "示例正式锁定合格 P，形成 E 并通过完整示例本地 CI。"
+msgstr "Examples formally pin qualified P, create E and pass the complete examples local CI."
+
+msgid "V-L06"
+msgstr "V-L06"
+
+msgid "精确交付关联"
+msgstr "Exact delivery association"
+
+msgid "P/E、配置、SDK、工具和原始产物关联，保留原失败及成功记录。"
+msgstr "Associate P/E, configuration, SDK, tools and original artifacts while retaining original failed and successful attempts."
+
+msgid "V-L07"
+msgstr "V-L07"
+
+msgid "受控环境与离线复现"
+msgstr "Controlled environment and offline reproduction"
+
+msgid "分别证明受控环境与两次新鲜离线构建的实际范围，不继承旧资格。"
+msgstr "Separately prove the observed scope of the controlled environment and two fresh offline builds without inheriting old qualification."
+
+msgid "V-L08"
+msgstr "V-L08"
+
+msgid "提交合并与发布"
+msgstr "Commit, merge and publication"
+
+msgid "正常提交同步并合入已验证提交，发布消费同一份已验证产物。"
+msgstr "Commit and synchronize normally, merge the verified commit and publish the same verified artifacts."
+
+msgid "V-P01"
+msgstr "V-P01"
+
+msgid "实板站点接入"
+msgstr "Physical station admission"
+
+msgid "tools/hil/;boards/;docs/design/selected-mode-hil.md"
+msgstr "tools/hil/;boards/;docs/design/selected-mode-hil.md"
+
+msgid "确认三板 part/PCB/UID、探针、串口、电源和实际接线。"
+msgstr "Confirm part/PCB/UID, probe, serial, supply and actual wiring for the three Boards."
+
+msgid "V-P02"
+msgstr "V-P02"
+
+msgid "启动与 UART 实测"
+msgstr "Physical startup and UART"
+
+msgid "实际验证启动、时钟、GPIO、UART 收发和错误恢复。"
+msgstr "Physically verify startup, clocks, GPIO, UART transfers and error recovery."
+
+msgid "V-P03"
+msgstr "V-P03"
+
+msgid "总线与触发实测"
+msgstr "Physical buses and triggers"
+
+msgid "仅对已审查接线执行 SPI/I2C/ADC/PWM 总线和触发测试。"
+msgstr "Run SPI/I2C/ADC/PWM bus and trigger tests only on reviewed wiring."
+
+msgid "V-P04"
+msgstr "V-P04"
+
+msgid "负载与时序实测"
+msgstr "Physical load and timing"
+
+msgid "实测 IRQ、临界区、DMA 连续性、吞吐、CPU 及栈峰值。"
+msgstr "Measure IRQ, critical sections, DMA continuity, throughput, CPU and stack peaks on hardware."
+
+msgid "V-P05"
+msgstr "V-P05"
+
+msgid "停机恢复实测"
+msgstr "Physical stop and recovery"
+
+msgid "实测超时、取消、失败撤离、停机与恢复后再次运行。"
+msgstr "Physically test timeout, cancellation, failed withdrawal, stop and rerun after recovery."
+
+msgid "V-P06"
+msgstr "V-P06"
+
+msgid "高级范围实测"
+msgstr "Physical advanced scope"
+
+msgid "在对应设备验证 Cache/域、低功耗、Flash/watchdog 和所选安全域。"
+msgstr "Verify Cache/domains, low power, Flash/watchdog and selected security domains on the corresponding equipment."
+
+msgid "V-X01"
+msgstr "V-X01"
+
+msgid "OCI 与新 daemon 验证"
+msgstr "OCI and fresh-daemon verification"
+
+msgid "tools/evidence/;tools/release/;docs/status/software-verification.md"
+msgstr "tools/evidence/;tools/release/;docs/status/software-verification.md"
+
+msgid "容量足够后实际完成 recipe 重建及 fresh daemon 验证。"
+msgstr "Actually reconstruct the recipe and verify a fresh daemon when capacity is sufficient."
+
+msgid "V-X02"
+msgstr "V-X02"
+
+msgid "服务端分支规则"
+msgstr "Server-side branch rules"
+
+msgid "具备权限后实际配置并读回 branch rules 和 required checks。"
+msgstr "Actually configure and read back branch rules and required checks when permissions are available."
+
+msgid "V-X03"
+msgstr "V-X03"
+
+msgid "CodeQL 访问与处置"
+msgstr "CodeQL access and disposition"
+
+msgid "取得实际 CodeQL 分析并处置问题，本地分析不替代其身份。"
+msgstr "Obtain actual CodeQL analysis and address findings without substituting local analysis for its identity."
+
+msgid "V-X04"
+msgstr "V-X04"
+
+msgid "Pages 与正式发布"
+msgstr "Pages and formal publication"
+
+msgid "实际执行 Pages/Release，记录真实执行与产物身份。"
+msgstr "Actually execute Pages/Release publication and record real execution and artifact identities."

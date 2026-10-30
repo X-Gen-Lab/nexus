@@ -223,7 +223,8 @@ nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
                 break;
             }
             if ((flags & ADC_STAT_EOC) != 0u) {
-                samples[(*count)++] = (uint16_t)(ADC_RDATA(ADC0) & 0xFFFu);
+                samples[(*count)++] =
+                    (uint16_t)(adc_routine_data_read(ADC0) & 0xFFFu);
                 break;
             }
             if (polls + 1u == 1000000u) {

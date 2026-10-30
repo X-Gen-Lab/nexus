@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 66ac61d76b367793d9ba0c2559eb6965042d35118223a7ae1e1d4fda37023fba\n"
+"X-Nexus-Source-SHA256: 513cf06c7c8ac99115e84782b3b59aac1de2dc070ababdf72d7bc5166164a1af\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -481,3 +481,171 @@ msgid ""
 msgstr ""
 "Bootloader 交接、动态变频、deep STOP、更广的 H743 DMA 和通用 U575 跨域 I/O，继续保留[SoC "
 "完善台账](soc-refinement.md)中各自未实现或部分实现的退出条件。官方驱动不会自动提供这些功能需要的平台合同。"
+
+
+# Vendor-first additions independently reviewed against the extracted source.
+
+msgid "Vendor-first target and current implementation"
+msgstr "官方库优先目标与当前实现"
+
+msgid "Official hardware libraries are the default input for further provider work. Reuse reviewed HAL transport when it satisfies the complete selected mode; otherwise bind suitable LL or SPL primitives to the required bounded mechanism. Nexus retains admission, borrowed storage, deadlines, result publication and resource responsibility. Direct register helpers remain justified exceptions for an exact SDK gap, erratum, atomic operation or demonstrated budget."
+msgstr "官方硬件库是后续 provider 工作的默认输入。已审查 HAL transport 满足完整所选模式时予以复用；否则将合适的 LL 或 SPL 原语静态绑定到所需有界机制。Nexus 保留准入、借用存储、deadline、结果发布和资源责任。直接寄存器 helper 仅作为精确 SDK 缺口、erratum、原子操作或实测预算的有理由例外。"
+
+msgid "This is the target for the vendor-first work, not a claim that production modes have already changed. The current STM32 targets select reviewed LL operations; the F4 Handle transport remains an explicit evaluation. GD32F470 already compiles selected official SPL C units. An include, primitive call or passing finite-TX fixture does not establish a complete vendor transport or family qualification."
+msgstr "这是官方库优先工作的目标，不表示生产模式已经改变。当前 STM32 目标选择已审查 LL 操作；F4 Handle transport 仍属于明确的评估范围。GD32F470 已编译所选官方 SPL C 单元。包含头文件、调用原语或通过有限 TX 夹具，不代表完整 vendor transport 或整个家族取得资格。"
+
+msgid "The {download}`existing delivery-completion ledger <platform-delivery-completion.csv>` appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while preserving the older rows and frozen results. Each new row starts with its real implementation, software and physical status; a plan has no execution evidence. The [derived ledger view](../status/ledgers/platform-delivery-completion.md) uses the same renderer. No second support or completion database is introduced."
+msgstr "{download}`现有交付完善台账 <platform-delivery-completion.csv>`追加 V-A01 至 V-L08、V-P01 至 V-P06 及 V-X01 至 V-X04，保留旧记录和冻结结果。各新记录分别保留真实实现、软件和物理状态；计划没有执行证据。[派生台账视图](../status/ledgers/platform-delivery-completion.md)继续使用同一 renderer，不引入第二套支持或完成状态数据库。"
+
+msgid "Boundary"
+msgstr "边界"
+
+msgid "Required responsibility"
+msgstr "必需责任"
+
+msgid "Official transport"
+msgstr "官方 transport"
+
+msgid "Own the selected peripheral transfer, IRQ/DMA and vendor state machine"
+msgstr "拥有所选外设传输、IRQ/DMA 和 vendor 状态机"
+
+msgid "LL/SPL primitive"
+msgstr "LL/SPL 原语"
+
+msgid "Encode reviewed hardware operations without claiming a complete transport"
+msgstr "封装已审查硬件操作，不据此宣称完整 transport"
+
+msgid "Nexus adapter"
+msgstr "Nexus adapter"
+
+msgid "Bridge admission, borrow, absolute deadline, errors, callbacks, drain and final settlement"
+msgstr "桥接准入、借用、绝对 deadline、错误、callback、排空和最终结清"
+
+msgid "Exact SoC"
+msgstr "精确 SoC"
+
+msgid "Bind SDK pairing, clock/reset, IRQ/DMA route, memory/Cache and silicon restrictions"
+msgstr "绑定 SDK 配对、clock/reset、IRQ/DMA 路由、memory/Cache 和芯片限制"
+
+msgid "Board/product"
+msgstr "Board/产品"
+
+msgid "Supply reviewed wiring, electrical state, execution, storage, partitions and recovery policy"
+msgstr "提供已审查接线、电气状态、执行、存储、分区及恢复策略"
+
+msgid "Static assembly"
+msgstr "静态装配"
+
+msgid "Construct existing contexts/faces and fixed IRQ connections; select one implementation before execution"
+msgstr "构造已有 context/face 和固定 IRQ 连接；在执行前选择一个实现"
+
+msgid "A private Handle can live in static provider storage. A public face still calls its selected immutable ops with that instance context. No universal HAL manager, name registry, default worker or extra forwarding-only layer is required. One live controller behavior domain has one hardware transport owner. Selecting HAL transport replaces the corresponding independent register transport; Handle readiness and Nexus request lifetime remain different contracts."
+msgstr "私有 Handle 可以位于静态 provider 存储中。公共 face 继续使用实例 context 调用所选不可变 ops。无需通用 HAL manager、名字注册表、默认 worker 或仅转发的额外层。一个活动控制器行为域只有一个硬件 transport owner。选入 HAL transport 后替换对应的独立寄存器 transport；Handle 就绪和 Nexus 请求生命周期仍是不同合同。"
+
+msgid "Complete maintained scope"
+msgstr "完整维护范围"
+
+msgid "The iteration covers the existing exact selections for STM32F103, STM32F407, STM32G474, STM32H743, STM32U575, GD32F303 and GD32F470. The three launch Boards are Qiming F407ZGT6, Sky F407VET6 and Liangshan GD32F470ZGT6. Current Sky bindings cover LED, UART, Flash and IWDG; additional electrical routes need review before physical execution."
+msgstr "本轮覆盖 STM32F103、STM32F407、STM32G474、STM32H743、STM32U575、GD32F303 和 GD32F470 的既有精确选择。三块首发 Board 是启明 F407ZGT6、天空星 F407VET6 和梁山派 GD32F470ZGT6。天空星当前 binding 覆盖 LED、UART、Flash 和 IWDG；新增电气路由在物理执行前需要审查。"
+
+msgid "The 71-entry assembly catalogue is one input, not the complete closure. Derive navigation from the existing capability/provider/source catalogues, provider fixtures, installed-SDK consumers, selected components and external examples. The maintained `tools/maintenance/work_packages.py` joins existing authorities; it does not execute tests or grant support. A mode needs its exact part/density, Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA, memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch coverage and the independent ThreadX subset do not expand this SoC matrix."
+msgstr "含 71 项的装配 catalogue 是一个输入，不是完整闭包。导航由现有 capability/provider/source catalogue、provider 夹具、已安装 SDK consumer、所选组件及外部示例派生。维护中的 `tools/maintenance/work_packages.py` 联查既有权威，不执行测试或授予支持。一个模式需要共同审查精确料号/density、Board/revision、route、backend/kernel policy、clock、format、IRQ/DMA、memory/Cache/security/power profile 和 SDK pin。CPU-only Arch 覆盖与独立 ThreadX 子集不扩大该 SoC 矩阵。"
+
+msgid "F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling, H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain separate checks. A finite HAL UART result cannot qualify FIFO, continuous, chained, duplex or cross-domain operation."
+msgstr "F103/GD303 errata、F407/GD470 stream DMA、G474 DMAMUX 与触发耦合、H743 Cache/域/线上完成以及 U575 GPDMA/保留/TrustZone 分别验证。有限 HAL UART 结果不能授予 FIFO、连续、链式、双向或跨域操作资格。"
+
+msgid "Production promotion gates"
+msgstr "生产推广门槛"
+
+msgid "The first STM32 candidate evaluates the complete existing F407 UART `dma-tx` contract. That mode includes RX configuration and storage. The current finite-TX reference therefore cannot replace it unchanged. Promotion must preserve RX bytes/events, frame/error/loss ordering, timestamps, wake, cancellation, the shared UART IRQ and complete stop. If the official receiver cannot satisfy that contract, the selected mode may retain a reviewed LL mechanism; a narrower new mode needs an explicit contract and actual use case."
+msgstr "首个 STM32 候选评价当前 F407 UART `dma-tx` 的完整合同。该模式包含 RX 配置与存储，所以当前有限 TX 参考不能直接替换。推广必须保留 RX bytes/events、frame/error/loss 顺序、时间戳、wake、取消、共享 UART IRQ 和完整 stop。官方接收机制若不能满足合同，该模式可以保留已审查 LL 机制；更窄的新模式需要明确合同和真实用例。"
+
+msgid "The serialized reference's `hal_depth` IRQ guard is not an MCU preemption design. Production must establish allowed HAL nesting, short guards, pending-fact handling and real IRQ service ordering. Do not mask all interrupts around vendor calls that may wait. An abort callback can run synchronously in task context; bridges record bounded facts and use notification permitted in the actual context. Product callbacks and final settlement do not run arbitrarily inside vendor callback stacks."
+msgstr "串行参考的 `hal_depth` IRQ guard 不是 MCU 抢占设计。生产实现必须明确允许的 HAL 嵌套、短 guard、pending-fact 处理和真实 IRQ 服务顺序。不得在可能等待的 vendor 调用周围屏蔽全部中断。abort callback 可以在 task 上下文同步执行；桥接记录有界事实，并使用实际上下文允许的通知。产品 callback 和最终结清不能任意在 vendor callback 调用栈内执行。"
+
+msgid "A Handle-only callback does not carry a request epoch. Before Handle reuse, prove withdrawal of the previous hardware, IRQ and callback references; stamping the current epoch onto a late callback is not proof of association. Establish admission before a vendor call can retain references, and treat a startup error after admission as accepted work requiring explicit withdrawal."
+msgstr "仅携带 Handle 的 callback 没有请求 epoch。复用 Handle 前必须证明上一次硬件、IRQ 和 callback 引用已撤离；将当前 epoch 填入迟到 callback 不能证明其关联。在 vendor 调用可能保留引用前建立 admission；admission 后的启动错误属于已接受工作，需要明确撤离。"
+
+msgid "Review every reachable vendor wait, including bootstrap/runtime progression, millisecond quantization, 32-bit tick wrap and low-power suspension. Initial UART work keeps the existing system-clock and OS startup choices. Selected HAL modules do not authorize default SysTick acquisition or interrupt-policy changes. UART/SPI `uint16_t Size` parameters must match the selected public `size_t` contract without truncation, hidden splitting or implicit bounce storage."
+msgstr "审核每条可达 vendor 等待，包括 bootstrap/runtime 推进、毫秒量化、32 位 tick 回绕和低功耗暂停。首批 UART 工作保留既有系统时钟和 OS 启动选择。所选 HAL 模块不授权默认获取 SysTick 或更改中断策略。UART/SPI 的 `uint16_t Size` 参数必须匹配所选公共 `size_t` 合同，不能截断、隐藏分块或隐式提供 bounce 存储。"
+
+msgid "SPI evaluation additionally preserves the whole CS interval, dummy/discard, fixed DMA address options and transferred counts. GPIO simultaneous set/reset retains its single atomic write where separate SDK calls would change that contract. DMA disable is a command; use the appropriate readback and withdrawal proof before returning borrowed storage."
+msgstr "SPI 评价还要保留整个 CS 区间、dummy/discard、固定 DMA 地址选项和 transferred 计数。GPIO 同时 set/reset 在分开 SDK 调用会改变合同时保持单次原子写。DMA disable 是命令；归还借用存储前仍须取得适当读回和撤离证明。"
+
+msgid "Ordered implementation and acceptance"
+msgstr "实施顺序与验收"
+
+msgid "Phase"
+msgstr "阶段"
+
+msgid "Ledger work"
+msgstr "台账工作"
+
+msgid "Exit"
+msgstr "退出条件"
+
+msgid "G0"
+msgstr "G0"
+
+msgid "V-A: exact scope and contract"
+msgstr "V-A：精确范围与合同"
+
+msgid "Every maintained selection has a bounded migration decision and baseline"
+msgstr "每个维护选择具有有界迁移决策和基线"
+
+msgid "G1"
+msgstr "G1"
+
+msgid "V-B/V-C/V-D: dependencies and integration"
+msgstr "V-B/V-C/V-D：依赖与集成"
+
+msgid "Private SDK build, static contexts, resource responsibility, time and IRQ contracts are established"
+msgstr "建立私有 SDK 构建、静态 context、资源责任、时间及 IRQ 合同"
+
+msgid "G2"
+msgstr "G2"
+
+msgid "V-E and first GD32 work"
+msgstr "V-E 与首批 GD32 工作"
+
+msgid "Complete F407 UART behavior and selected GD32 official primitives execute their real regressions"
+msgstr "完整 F407 UART 行为和所选 GD32 官方原语实际执行其回归"
+
+msgid "G3"
+msgstr "G3"
+
+msgid "V-F/V-G/V-H/V-I"
+msgstr "V-F/V-G/V-H/V-I"
+
+msgid "Each applicable peripheral/family has a reviewed implementation and comparable cost; unused replaced production paths are removed"
+msgstr "每个适用外设/家族具有已审查实现和可比较成本；移除已替换且不再使用的生产路径"
+
+msgid "G4"
+msgstr "G4"
+
+msgid "V-J/V-K"
+msgstr "V-J/V-K"
+
+msgid "Test contexts, relocated SDK consumers, external examples and both documentation languages agree"
+msgstr "测试上下文、可重定位 SDK consumer、外部示例和两种文档语言一致"
+
+msgid "G5"
+msgstr "G5"
+
+msgid "V-L"
+msgstr "V-L"
+
+msgid "Clean source P, examples E, dependencies, configuration and original artifacts are associated without inheriting old qualification"
+msgstr "干净源码 P、示例 E、依赖、配置和原始产物关联，不继承旧资格"
+
+msgid "G6"
+msgstr "G6"
+
+msgid "V-P/V-X"
+msgstr "V-P/V-X"
+
+msgid "Connected physical execution and actual external environment/publication exits are observed separately"
+msgstr "分别观测已连接设备的物理执行与真实外部环境/发布退出"
+
+msgid "Keep developer tests focused, execute the ordinary complete-index gate for each functional increment, and run the complete qualification plan for the frozen source. New behavior and fixes require actual RED then GREEN. Pure equivalent refactors use the applicable regressions and output checks without fabricated RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only. Preserve original attempts and compare complete providers, not only Handle sizes. Without connected equipment, physical rows remain `not_executed`."
+msgstr "开发测试保持聚焦，每个功能增量执行普通完整 index 门禁，冻结源码执行完整资格计划。新行为与修复要求实际 RED 后 GREEN。纯等价重构使用适用回归和输出检查，不制造 RED 失败。固件保持 C11；GoogleTest/GoogleMock 仅用于 host。保留原始执行，比较完整 provider，不只比较 Handle 大小。未连接设备时，物理记录保持 `not_executed`。"

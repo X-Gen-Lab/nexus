@@ -90,3 +90,35 @@ TEST_F(Gd32OfficialGpio, RejectedMaskCannotReachVendorOrClockRegisters) {
     EXPECT_EQ(GPIO_BOP(GPIOA), UINT32_C(0x12345678));
     EXPECT_EQ(RCU_AHB1EN, 0U);
 }
+
+TEST_F(Gd32OfficialGpio, ReadsOneMaskedSnapshotAndRejectsAliasedOutput) {
+    nx_gd32_gpio_state_t state = {};
+    ASSERT_EQ(
+        nx_gd32_gpio_initialize(&state, 1U, GPIO_PIN_2 | GPIO_PIN_5, 0U, false),
+        NX_SUCCESS);
+    GPIO_ISTAT(GPIOB) = UINT32_C(0xFFFF0000) | GPIO_PIN_2 | GPIO_PIN_7;
+    uint32_t value = UINT32_MAX;
+    ASSERT_EQ(nx_gd32_gpio_read(&state, &value), NX_SUCCESS);
+    EXPECT_EQ(value, GPIO_PIN_2);
+    const nx_gd32_gpio_state_t before = state;
+    EXPECT_EQ(nx_gd32_gpio_read(&state, &state.mask), NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_gd32_gpio_read(&state, const_cast<uint32_t*>(&GPIO_ISTAT(GPIOB))),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(&state, &before, sizeof(state)), 0);
+    EXPECT_EQ(GPIO_ISTAT(GPIOB),
+              UINT32_C(0xFFFF0000) | GPIO_PIN_2 | GPIO_PIN_7);
+}
+
+TEST_F(Gd32OfficialGpio, ToggleUsesOutputSnapshotAndOneCombinedLatchWrite) {
+    nx_gd32_gpio_state_t state = {};
+    ASSERT_EQ(
+        nx_gd32_gpio_initialize(&state, 0U, GPIO_PIN_2 | GPIO_PIN_5, 0U, true),
+        NX_SUCCESS);
+    GPIO_OCTL(GPIOA) = UINT32_C(0xFFFF0000) | GPIO_PIN_2 | GPIO_PIN_7;
+    ASSERT_EQ(nx_gd32_gpio_toggle(&state, GPIO_PIN_2 | GPIO_PIN_5), NX_SUCCESS);
+    EXPECT_EQ(GPIO_BOP(GPIOA), GPIO_PIN_5 | (GPIO_PIN_2 << 16U));
+    const uint32_t before = GPIO_BOP(GPIOA);
+    EXPECT_EQ(nx_gd32_gpio_toggle(&state, GPIO_PIN_7), NX_ERROR_PERMISSION);
+    EXPECT_EQ(GPIO_BOP(GPIOA), before);
+}

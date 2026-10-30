@@ -43,6 +43,7 @@ void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef*) {
 }
 #include <cstring>
 #include <gtest/gtest.h>
+#include <new>
 #include <sys/mman.h>
 
 class OfficialHalUart : public testing::Test {
@@ -351,4 +352,99 @@ TEST_F(OfficialHalAdapter, ImpossibleRemainingCountCannotReportSuccess) {
     EXPECT_EQ(nx_request_state(&request), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.result, NX_ERROR_IO);
     EXPECT_EQ(request.transferred, 0U);
+}
+
+TEST_F(OfficialHalAdapter, RequestMetadataCannotBeBorrowedAsDmaPayload) {
+    auto* aliased = new (ram) nx_request_t{};
+    nx_request_initialize(aliased);
+    ASSERT_EQ(nx_request_prepare(aliased, 1000U), NX_SUCCESS);
+    nx_request_t before = *aliased;
+    UART_HandleTypeDef uart_before = uart;
+    DMA_HandleTypeDef dma_before = dma;
+
+    EXPECT_EQ(nx_hal_reference_submit(&owner, aliased,
+                                      reinterpret_cast<const uint8_t*>(aliased),
+                                      sizeof(*aliased), 100U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(aliased, &before, sizeof(before)), 0);
+    EXPECT_EQ(std::memcmp(&uart, &uart_before, sizeof(uart)), 0);
+    EXPECT_EQ(std::memcmp(&dma, &dma_before, sizeof(dma)), 0);
+    EXPECT_EQ(owner.active, nullptr);
+    EXPECT_EQ(DMA2_Stream7->CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(OfficialHalAdapter, PartialRequestOverlapRejectsBeforeAdmission) {
+    auto* location = static_cast<uint8_t*>(ram) + 128U;
+    auto* aliased = new (location) nx_request_t{};
+    nx_request_initialize(aliased);
+    ASSERT_EQ(nx_request_prepare(aliased, 1000U), NX_SUCCESS);
+    nx_request_t before = *aliased;
+
+    EXPECT_EQ(nx_hal_reference_submit(&owner, aliased, location - 2U, 4U, 100U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(aliased, &before, sizeof(before)), 0);
+    EXPECT_EQ(owner.active, nullptr);
+    EXPECT_EQ(uart.pTxBuffPtr, nullptr);
+    EXPECT_EQ(DMA2_Stream7->CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(OfficialHalAdapter, AdapterMetadataCannotBeBorrowedAsDmaPayload) {
+    auto* aliased = new (ram) nx_hal_reference_t{};
+    aliased->uart = &uart;
+    aliased->dma = &dma;
+    nx_hal_reference_t before = *aliased;
+
+    EXPECT_EQ(nx_hal_reference_submit(aliased, &request,
+                                      reinterpret_cast<const uint8_t*>(aliased),
+                                      sizeof(*aliased), 100U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(aliased, &before, sizeof(before)), 0);
+    EXPECT_EQ(nx_request_state(&request), NX_REQUEST_READY);
+    EXPECT_EQ(uart.pTxBuffPtr, nullptr);
+    EXPECT_EQ(DMA2_Stream7->CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(OfficialHalAdapter, UartHandleCannotBeBorrowedAsDmaPayload) {
+    auto* aliased = new (ram) UART_HandleTypeDef(uart);
+    owner.uart = aliased;
+    dma.Parent = aliased;
+    UART_HandleTypeDef before = *aliased;
+
+    EXPECT_EQ(nx_hal_reference_submit(&owner, &request,
+                                      reinterpret_cast<const uint8_t*>(aliased),
+                                      sizeof(*aliased), 100U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(aliased, &before, sizeof(before)), 0);
+    EXPECT_EQ(nx_request_state(&request), NX_REQUEST_READY);
+    EXPECT_EQ(owner.active, nullptr);
+    EXPECT_EQ(DMA2_Stream7->CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(OfficialHalAdapter, DmaHandleCannotBeBorrowedAsDmaPayload) {
+    auto* aliased = new (ram) DMA_HandleTypeDef(dma);
+    owner.dma = aliased;
+    uart.hdmatx = aliased;
+    DMA_HandleTypeDef before = *aliased;
+
+    EXPECT_EQ(nx_hal_reference_submit(&owner, &request,
+                                      reinterpret_cast<const uint8_t*>(aliased),
+                                      sizeof(*aliased), 100U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(aliased, &before, sizeof(before)), 0);
+    EXPECT_EQ(nx_request_state(&request), NX_REQUEST_READY);
+    EXPECT_EQ(owner.active, nullptr);
+    EXPECT_EQ(DMA2_Stream7->CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(OfficialHalAdapter, AdjacentPayloadRemainsIndependentOfAdapterMetadata) {
+    auto* aliased = new (ram) nx_hal_reference_t{};
+    aliased->uart = &uart;
+    aliased->dma = &dma;
+    auto* payload = static_cast<uint8_t*>(ram) + sizeof(*aliased);
+
+    EXPECT_EQ(nx_hal_reference_submit(aliased, &request, payload, 4U, 100U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(aliased->active, &request);
+    EXPECT_EQ(uart.pTxBuffPtr, payload);
 }

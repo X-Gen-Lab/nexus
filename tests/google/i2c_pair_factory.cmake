@@ -66,6 +66,26 @@ foreach(i2c_pair_family stm32 gd32)
                 "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Include")
             target_sources(${i2c_pair_target} PRIVATE
                 "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c")
+            # Execute the real SDK clock primitive while retaining the
+            # fixture's independently modeled peripheral reset effects.
+            set(i2c_pair_rcu "${i2c_pair_target}_rcu_vendor")
+            add_library(${i2c_pair_rcu} OBJECT
+                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c")
+            target_include_directories(${i2c_pair_rcu} PRIVATE
+                "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
+            target_include_directories(${i2c_pair_rcu} SYSTEM PRIVATE
+                "${i2c_pair_gd}/CMSIS/GD/GD32F4xx/Include"
+                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Include")
+            target_compile_definitions(${i2c_pair_rcu} PRIVATE
+                GD32F470 HXTAL_VALUE=25000000
+                rcu_periph_reset_enable=nx_pair_official_reset_enable
+                rcu_periph_reset_disable=nx_pair_official_reset_disable)
+            target_compile_features(${i2c_pair_rcu} PRIVATE c_std_11)
+            target_compile_options(${i2c_pair_rcu} PRIVATE
+                -Wno-int-to-pointer-cast)
+            target_sources(${i2c_pair_target} PRIVATE
+                $<TARGET_OBJECTS:${i2c_pair_rcu}>)
             target_compile_definitions(${i2c_pair_target} PRIVATE
                 GD32F470 HXTAL_VALUE=25000000)
             target_compile_options(${i2c_pair_target} PRIVATE

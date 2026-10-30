@@ -81,7 +81,8 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 #define NX_STM32_I2C_READ_DATA(port) LL_I2C_ReceiveData8((port)->registers)
 #endif
 #ifndef NX_STM32_I2C_WRITE_DATA
-#define NX_STM32_I2C_WRITE_DATA(port, value) ((port)->registers->DR = (value))
+#define NX_STM32_I2C_WRITE_DATA(port, value)                                   \
+    LL_I2C_TransmitData8((port)->registers, (uint8_t)(value))
 #endif
 #ifndef NX_STM32_I2C_ADDRESS_CLEARED
 #define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
@@ -118,11 +119,11 @@ static nx_result_t wait_flag(nx_stm32_i2c_state_t* port, uint32_t mask,
         }
         uint32_t status = port->registers->SR1;
         if ((status & I2C_SR1_AF) != 0U) {
-            port->registers->SR1 &= ~(uint32_t)I2C_SR1_AF;
+            LL_I2C_ClearFlag_AF(port->registers);
             return NX_ERROR_NACK;
         }
         if ((status & I2C_SR1_ARLO) != 0U) {
-            port->registers->SR1 &= ~(uint32_t)I2C_SR1_ARLO;
+            LL_I2C_ClearFlag_ARLO(port->registers);
             return NX_ERROR_ARBITRATION;
         }
         if ((status & (I2C_SR1_BERR | I2C_SR1_OVR)) != 0U) {
@@ -176,7 +177,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         return NX_SUCCESS;
     }
     if (remaining == 2U) {
-        regs->CR1 |= I2C_CR1_POS;
+        LL_I2C_EnableBitPOS(regs);
         nx_arch_irq_state_t mask = nx_arch_irq_save();
         clear_address(port);
         LL_I2C_AcknowledgeNextData(regs, LL_I2C_NACK);

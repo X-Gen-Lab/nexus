@@ -8,6 +8,27 @@
  */
 #include "adapter.h"
 
+/** \brief A borrowed payload cannot include mutable owner metadata. */
+static bool overlap(const void* left, size_t left_size, const void* right,
+                    size_t right_size) {
+    uintptr_t a = (uintptr_t)left;
+    uintptr_t b = (uintptr_t)right;
+    if (left_size > UINTPTR_MAX - a || right_size > UINTPTR_MAX - b) {
+        return true;
+    }
+    return a < b + right_size && b < a + left_size;
+}
+
+/** \brief Reject aliases before admission or HAL writes any retained field. */
+static bool separate_payload(const nx_hal_reference_t* adapter,
+                             const nx_request_t* request, const uint8_t* data,
+                             size_t length) {
+    return !overlap(data, length, request, sizeof(*request)) &&
+           !overlap(data, length, adapter, sizeof(*adapter)) &&
+           !overlap(data, length, adapter->uart, sizeof(*adapter->uart)) &&
+           !overlap(data, length, adapter->dma, sizeof(*adapter->dma));
+}
+
 /** \brief Reject unsupported facts before admitting or entering vendor code. */
 static bool valid(const nx_hal_reference_t* adapter, const uint8_t* data,
                   size_t length) {
@@ -28,6 +49,7 @@ nx_result_t nx_hal_reference_submit(nx_hal_reference_t* adapter,
                                     nx_request_t* request, const uint8_t* data,
                                     size_t length, nx_time_us_t now) {
     if (!valid(adapter, data, length) || request == NULL ||
+        !separate_payload(adapter, request, data, length) ||
         request->deadline == NX_DEADLINE_NEVER || now == NX_DEADLINE_NEVER) {
         return NX_ERROR_INVALID;
     }

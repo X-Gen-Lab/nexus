@@ -275,7 +275,7 @@ void nx_gd32_uart_word_irq(nx_gd32_uart_word_state_t* state) {
     uint32_t status = USART_STAT0(uart);
     if ((status & (USART_STAT0_RBNE | USART_STAT0_PERR | USART_STAT0_FERR |
                    USART_STAT0_ORERR | USART_STAT0_NERR)) != 0U) {
-        uint16_t word = (uint16_t)(USART_DATA(uart) & 0x1FFU);
+        uint16_t word = usart_data_receive(uart);
         bool reliable = (status & USART_STAT0_RBNE) != 0U &&
                         (status & (USART_STAT0_PERR | USART_STAT0_FERR |
                                    USART_STAT0_ORERR | USART_STAT0_NERR)) == 0U;
@@ -286,7 +286,7 @@ void nx_gd32_uart_word_irq(nx_gd32_uart_word_state_t* state) {
     if (request != NULL && !state->tc && state->terminal == NX_SUCCESS &&
         state->position < request->words && (status & USART_STAT0_TBE) != 0U &&
         (USART_CTL0(uart) & USART_CTL0_TBEIE) != 0U) {
-        USART_DATA(uart) = request->data[state->position++];
+        usart_data_transmit(uart, request->data[state->position++]);
         wrote = true;
         if (state->position == request->words) {
             NX_UART_REG_WRITE(&USART_CTL0(uart),
