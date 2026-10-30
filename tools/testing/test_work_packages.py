@@ -299,6 +299,35 @@ class WorkPackageCommandTests(unittest.TestCase):
 
 
 class CurrentWorkPackageTests(unittest.TestCase):
+    def test_h743_official_driver_is_in_resolved_source_identity(self):
+        from tools.configure import configure
+        from tools.maintenance import stm32h7_hal_lock
+
+        lock = json.loads((ROOT / stm32h7_hal_lock.LOCK_NAME).read_text())
+        stm32h7_hal_lock.contract(lock)
+        resolved = configure.resolve_ir(
+            ROOT / "tools/configure/assemblies/h743-spi-dma.toml", ROOT)
+        self.assertTrue(any(controller.kind == "spi" and
+                            controller.mode == "dma"
+                            for controller in resolved.controllers))
+        self.assertIn({"path": stm32h7_hal_lock.DIRECTORY,
+                       "commit": lock["commit"]},
+                      [dict(item) for item in resolved.source_dependencies])
+
+    def test_h743_official_driver_is_in_public_provider_contract(self):
+        from tools.configure.providers import descriptor
+        from tools.maintenance import source_catalogue, stm32h7_hal_lock
+
+        official = source_catalogue.dependency(stm32h7_hal_lock.DIRECTORY)
+        self.assertEqual(official.source_lock, stm32h7_hal_lock.LOCK_NAME)
+        contract = work_packages.provider_contracts()["stm32h743"]
+        self.assertEqual(contract["dependency_identity_status"],
+                         "declared_unverified")
+        self.assertIn({"role": "hal_driver_h7", "path": official.path},
+                      contract["git_dependencies"])
+        self.assertIn(("hal_driver_h7", official.path),
+                      descriptor.maintained("stm32h743").git_dependencies)
+
     def test_h743_duplex_canonical_inputs_run_in_the_existing_provider_stage(self):
         plan = json.loads((ROOT / "tools/dev/plans/software.json").read_text())
         stages = [stage for stage in plan["stages"]

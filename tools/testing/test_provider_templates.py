@@ -133,6 +133,131 @@ class ProviderTemplateTests(unittest.TestCase):
                 source_contracts(root)
 
 
+class PrivateValueHeaderCompileTests(unittest.TestCase):
+    """Check optional private value headers without inventing bindings."""
+
+    def setUp(self):
+        self.storage = tempfile.TemporaryDirectory(prefix="provider values ")
+        self.addCleanup(self.storage.cleanup)
+        self.area = Path(self.storage.name)
+
+    def compile(self, source, *, language="c", preprocess=False):
+        command = shlex.split(os.environ.get(
+            "CXX" if language == "c++" else "CC",
+            "c++" if language == "c++" else "cc"))
+        self.assertTrue(command, "Required host compiler command is empty")
+        self.assertIsNotNone(shutil.which(command[0]),
+                             "Prepared host compiler is required")
+        probe = self.area / ("probe.cpp" if language == "c++" else "probe.c")
+        probe.write_text(source)
+        output = probe.with_suffix(".o")
+        arguments = [*command, "-std=" + ("c++17" if language == "c++"
+                                         else "c11"),
+                     "-Werror"]
+        arguments += (["-E", "-dM", str(probe)] if preprocess else
+                      ["-c", str(probe), "-o", str(output)])
+        for directory in (ROOT / "io/private", ROOT / "io/include",
+                          ROOT / "core/include", ROOT / "arch/include"):
+            arguments += ["-I", str(directory)]
+        result = subprocess.run(arguments, capture_output=True, text=True,
+                                timeout=30)
+        return result, output
+
+    def pin_implementation(self, bindings="", checks=""):
+        return (bindings + "#define NX_PIN_STATE_IMPLEMENTATION\n"
+                '#include "pin_state_impl.h"\n'
+                "#ifndef NX_PIN_STATE_IMPLEMENTATION\n"
+                "#error caller implementation selector was consumed\n"
+                "#endif\n" + checks)
+
+    def test_pin_declarations_need_no_bindings_and_are_idempotent(self):
+        source = ('#include "pin_state_impl.h"\n' * 2 +
+                  "#if defined(NX_PIN_READ) || defined(NX_PIN_WRITE)\n"
+                  "#error declaration-only include introduced register ports\n"
+                  "#endif\n"
+                  "nx_pin_state_plan_t plan;\n"
+                  "nx_pin_state_control_t control;\n")
+        for language in ("c", "c++"):
+            with self.subTest(language=language):
+                result, _ = self.compile(source, language=language)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pin_default_ports_do_not_escape_the_implementation(self):
+        checks = ("#if defined(NX_PIN_READ) || defined(NX_PIN_WRITE)\n"
+                  "#error private default register ports escaped\n#endif\n")
+        result, _ = self.compile(self.pin_implementation(checks=checks))
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pin_caller_read_survives_without_leaking_default_write(self):
+        bindings = "#define NX_PIN_READ(reg) 17U\n"
+        checks = ("#ifdef NX_PIN_WRITE\n"
+                  "#error private default write port escaped\n#endif\n"
+                  "#ifndef NX_PIN_READ\n#error caller read port was consumed\n"
+                  "#endif\n"
+                  '_Static_assert(NX_PIN_READ(0) == 17U, '
+                  '"caller read changed");\n')
+        result, _ = self.compile(self.pin_implementation(bindings, checks))
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pin_caller_write_survives_without_leaking_default_read(self):
+        bindings = "#define NX_PIN_WRITE(reg, value) 29U\n"
+        checks = ("#ifdef NX_PIN_READ\n"
+                  "#error private default read port escaped\n#endif\n"
+                  "#ifndef NX_PIN_WRITE\n"
+                  "#error caller write port was consumed\n"
+                  "#endif\n"
+                  '_Static_assert(NX_PIN_WRITE(0, 0) == 29U, '
+                  '"caller write changed");\n')
+        result, _ = self.compile(self.pin_implementation(bindings, checks))
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pin_preserves_both_caller_ports_and_empty_selector(self):
+        bindings = ("#define NX_PIN_READ(reg) 17U\n"
+                    "#define NX_PIN_WRITE(reg, value) 29U\n")
+        checks = ("#if !defined(NX_PIN_READ) || !defined(NX_PIN_WRITE)\n"
+                  "#error caller register ports were consumed\n#endif\n"
+                  '_Static_assert(NX_PIN_READ(0) == 17U, '
+                  '"caller read changed");\n'
+                  '_Static_assert(NX_PIN_WRITE(0, 0) == 29U, '
+                  '"caller write changed");\n')
+        result, _ = self.compile(self.pin_implementation(bindings, checks))
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pin_private_helper_macros_do_not_escape(self):
+        result, _ = self.compile(self.pin_implementation(), preprocess=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        macros = {line.split()[1].split("(")[0]
+                  for line in result.stdout.splitlines()
+                  if line.startswith("#define NX_PIN_")}
+        self.assertEqual(macros, {"NX_PIN_STATE_IMPL_H",
+                                  "NX_PIN_STATE_IMPLEMENTATION"})
+
+    def test_can_fd_declarations_are_idempotent_without_specialization(self):
+        source = ('#include "can_fd_impl.h"\n' * 2 +
+                  "bool (*validate)(const nx_can_fd_frame_t*) = "
+                  "nx_can_fd_frame_valid;\n")
+        for language in ("c", "c++"):
+            with self.subTest(language=language):
+                result, _ = self.compile(source, language=language)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_can_fd_private_validator_keeps_c_linkage_in_cpp(self):
+        source = ('#include "can_fd_impl.h"\n'
+                  'extern "C" bool nx_can_fd_frame_valid('
+                  "const nx_can_fd_frame_t* frame) { "
+                  "return frame != nullptr; }\n")
+        result, output = self.compile(source, language="c++")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        nm = shutil.which("nm")
+        self.assertIsNotNone(nm, "Prepared host symbol tool is required")
+        symbols = subprocess.run([nm, "--defined-only", str(output)],
+                                 capture_output=True, text=True,
+                                 check=True, timeout=10)
+        self.assertTrue(any(line.split()[-2:] ==
+                            ["T", "nx_can_fd_frame_valid"]
+                            for line in symbols.stdout.splitlines()))
+
+
 class ProviderTemplateCompileTests(unittest.TestCase):
     """Compile real exact specializations; never execute their MCU MMIO."""
 

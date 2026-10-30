@@ -29,14 +29,17 @@ against the exact archived old header and the same flags, preserving both source
 identities. Rebuild consumers even when added fields happen to fit old padding;
 equal size does not establish ABI compatibility or zero cost on another ABI.
 
-`spi_endpoints/` separately links one and two endpoints on the same SPI1
-controller, using the public factory and identical polling transfer loop. Its
-Board facts preserve the external shared-SPI example's explicit software-only
-PA5/PA6/PA7 and PE4/PE3 pad contract; they do not establish first-release PCB
-connections. Both configurations use the same baremetal backend, clock, CPU,
-optimization, stack and heap. Only the second endpoint selection and consumer
-count differ. Build the CMake fixture with `NEXUS_SOURCE_ROOT`, the production
-ARM toolchain and `COST_ENDPOINTS=1` or `2`, then apply the existing resource,
-static-storage, interface and retention observers to each actual ELF. Report
-the complete image delta separately from endpoint state, face and shared table
-subsets; any consumer instruction delta remains part of the complete image.
+[`spi_endpoints/`](spi_endpoints/README.md) separately links zero, one, two and
+four endpoints, using the public factory, topology validation and one polling
+transfer loop. Nonzero configurations share SPI1. Original one/two Board facts
+retain the software-only PA5/PA6/PA7 and PE4/PE3 pad contract; a separate four-way
+software Board adds the reviewed ZGT6 PG9/PB2 routes. Its three CS banks add GPIO
+lease and activation costs, so two-to-four is not a pure linear endpoint delta.
+All configurations use the same baremetal backend, clock, CPU, optimization,
+stack and heap. The zero image selects no SPI controller or endpoint. Apply the
+existing resource, static-storage, interface and retention observers to each
+actual ELF, treating empty face retention as not applicable. Report complete
+image changes separately from endpoint state, faces, shared tables, GPIO banks
+and consumer code. The earlier endpoint-only one/two workload did not retain
+the unused controller face; keep that difference explicit when comparing it
+with the topology-validating consumer. No software Board claims PCB wiring.

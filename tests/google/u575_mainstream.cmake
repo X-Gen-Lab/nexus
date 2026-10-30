@@ -24,6 +24,25 @@ target_compile_options(nexus_u575_devices_test PRIVATE
 include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
 nexus_stm32_official(nexus_u575_devices_test u5)
 
+# Preserve real default byte accesses alongside the hooked protocol models.
+nexus_google_test(nexus_u575_spi_byte_test
+    SOURCES u575_spi_byte_test.cpp u575_model.cpp u575_devices_model.cpp
+        "${NEXUS_SOURCE_DIR}/tests/contracts/u575_spi_byte_port.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
+        "${NEXUS_SOURCE_DIR}/tests/google")
+target_include_directories(nexus_u575_spi_byte_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_u575_spi_byte_test)
+target_compile_definitions(nexus_u575_spi_byte_test PRIVATE STM32U575xx)
+target_compile_options(nexus_u575_spi_byte_test PRIVATE
+    "-include${NEXUS_SOURCE_DIR}/tests/google/u575_spi_byte_model.h")
+nexus_stm32_official(nexus_u575_spi_byte_test u5)
+
 set(u5_peripheral_bundle "${CMAKE_CURRENT_BINARY_DIR}/u575-peripherals")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"

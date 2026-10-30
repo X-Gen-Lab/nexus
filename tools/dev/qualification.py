@@ -174,9 +174,12 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
             break
         argv = command([sys.executable, "-B", str(script), *prefix, *stage["args"]],
                        {"root": str(root), "output": str(output)})
+        stage_environment = environment.copy()
+        stage_environment.setdefault("NEXUS_COMMAND_TIMEOUT",
+                                     str(stage.get("timeout_s", 1800)))
         raw = output / (stage["name"] + ".raw")
         started = time.monotonic()
-        result = run_command(argv, cwd=root, env=environment, log=raw,
+        result = run_command(argv, cwd=root, env=stage_environment, log=raw,
                              timeout=stage.get("timeout_s", 1800), stage=stage["checker"])
         # Preserve even empty actual output; the command receipt proves execution.
         with raw.open("rb") as stream:

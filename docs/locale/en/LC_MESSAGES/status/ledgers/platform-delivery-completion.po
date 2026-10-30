@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ad148a2babc9038b4093cacff4ab85a708fcf2e5422483d4ccd43e1e76bae8c0\n"
+"X-Nexus-Source-SHA256: 212d38906f1d79b048346ff1b594aa19437be1da4ae6547528638ed45a02098a\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
@@ -1872,17 +1872,8 @@ msgstr "V-A01"
 msgid "维护配置闭包"
 msgstr "Maintained configuration closure"
 
-msgid "partial_derived_navigation"
-msgstr "partial_derived_navigation"
-
-msgid "existing_authority_navigation_passed_not_acceptance"
-msgstr "existing_authority_navigation_passed_not_acceptance"
-
 msgid "docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py"
 msgstr "docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py"
-
-msgid "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json"
-msgstr "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json"
 
 msgid "汇总参考装配、provider 夹具、SDK consumer、高级组件及外部示例的完整适用配置。"
 msgstr "Collect the complete applicable configurations from reference assemblies, provider fixtures, SDK consumers, selected components and external examples."
@@ -2829,29 +2820,8 @@ msgstr "tools/configure/configure.py;tools/configure/memory.py;soc/stm32/stm32f4
 msgid "build/vendor-first-20261030/image-layout/handoff.json;build/vendor-first-20261030/image-layout/artifact-handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json"
 msgstr "build/vendor-first-20261030/image-layout/handoff.json;build/vendor-first-20261030/image-layout/artifact-handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json"
 
-msgid "partial_fail_fast_native_preflight"
-msgstr "partial_fail_fast_native_preflight"
-
-msgid "actual_red_green_and_9c0460b9_complete_index_gate_passed"
-msgstr "actual_red_green_and_9c0460b9_complete_index_gate_passed"
-
-msgid "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
-msgstr "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json"
-
-msgid "partial_first_increment_committed_and_pushed"
-msgstr "partial_first_increment_committed_and_pushed"
-
-msgid "ordinary_complete_index_passed_at_9c0460b9_merge_release_pending"
-msgstr "ordinary_complete_index_passed_at_9c0460b9_merge_release_pending"
-
 msgid "build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json"
 msgstr "build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json"
-
-msgid "partial_reviewed_f4_pin_pairing_25file_closure"
-msgstr "partial_reviewed_f4_pin_pairing_25file_closure"
-
-msgid "f4_pin_pair_license_and_export_compile_passed_other_family_review_pending"
-msgstr "f4_pin_pair_license_and_export_compile_passed_other_family_review_pending"
 
 msgid "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py"
 msgstr "cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py"
@@ -2876,12 +2846,6 @@ msgstr "partial_selected_f407_private_compile_boundary"
 
 msgid "selected_native_arm_boundary_passed_full_consumers_pending"
 msgstr "selected_native_arm_boundary_passed_full_consumers_pending"
-
-msgid "partial_f4_lock_and_export_closure"
-msgstr "partial_f4_lock_and_export_closure"
-
-msgid "actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending"
-msgstr "actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending"
 
 msgid "partial_selected_f407_static_handle_owner"
 msgstr "partial_selected_f407_static_handle_owner"
@@ -3093,10 +3057,6 @@ msgstr "selected_real_hal_arm_and_six_offset_links_passed_full_matrix_pending"
 msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
 msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/image-layout/arm-image-observation.json;build/vendor-first-20261030/image-layout/arm-freertos-image-observation.json;build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json"
 
-
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`。"
-msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`."
-
 msgid "implemented_soc_local_data_only_descriptors"
 msgstr "implemented_soc_local_data_only_descriptors"
 
@@ -3133,14 +3093,241 @@ msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/"
 msgid "docs/explanation/platform-architecture.md;docs/guides/provider-porting.md"
 msgstr "docs/explanation/platform-architecture.md;docs/guides/provider-porting.md"
 
-msgid "implemented_selected_private_template_guards_and_macro_scope"
-msgstr "implemented_selected_private_template_guards_and_macro_scope"
-
-msgid "focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending"
-msgstr "focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending"
-
 msgid "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py"
 msgstr "tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py"
 
-msgid "build/vendor-first-20261030/template-contracts/actual-root/handoff.json"
-msgstr "build/vendor-first-20261030/template-contracts/actual-root/handoff.json"
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:11
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`8b3d1368dca6f3228ebff7e5e226c6473124b0fc3b47f23550cfc0cb20483096`。"
+msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `8b3d1368dca6f3228ebff7e5e226c6473124b0fc3b47f23550cfc0cb20483096`."
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_public_217_mode_295_configuration_review"
+msgstr "partial_public_217_mode_295_configuration_review"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "public_inventory_reviewed_private_annex_and_final_acceptance_pending"
+msgstr "public_inventory_reviewed_private_annex_and_final_acceptance_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/README.md"
+msgstr "build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/README.md"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_selected_165_mcu_source_contract_review"
+msgstr "partial_selected_165_mcu_source_contract_review"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "source_review_only_33_unselected_unassessed_19_native_model"
+msgstr "source_review_only_33_unselected_unassessed_19_native_model"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/README.md"
+msgstr "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/README.md"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_selected_official_implementation_decisions_reviewed"
+msgstr "partial_selected_official_implementation_decisions_reviewed"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "bounded_source_decisions_not_complete_migration_or_qualification"
+msgstr "bounded_source_decisions_not_complete_migration_or_qualification"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/coverage-summary.json"
+msgstr "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/coverage-summary.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_operation_specific_direct_access_review"
+msgstr "partial_operation_specific_direct_access_review"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "vendor_source_exceptions_reviewed_remaining_leaf_and_errata_work_open"
+msgstr "vendor_source_exceptions_reviewed_remaining_leaf_and_errata_work_open"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/combined-mode-decisions.csv"
+msgstr "build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/combined-mode-decisions.csv"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_stm32_lock_pairing_and_gd_import_source_review"
+msgstr "partial_stm32_lock_pairing_and_gd_import_source_review"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "nine_stm32_locks_67_file_identities_reviewed_not_family_qualification"
+msgstr "nine_stm32_locks_67_file_identities_reviewed_not_family_qualification"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/dependency-identities.md"
+msgstr "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/dependency-identities.md"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_f4_export_and_h743_hal_identity_closure"
+msgstr "partial_f4_export_and_h743_hal_identity_closure"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "h743_red2_green124_and_18_configuration_comparisons_full_sdk_pending"
+msgstr "h743_red2_green124_and_18_configuration_comparisons_full_sdk_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/h743-source-closure/handoff.json"
+msgstr "build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/h743-source-closure/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_f407_gd470_and_u575_spi_byte_primitives"
+msgstr "partial_f407_gd470_and_u575_spi_byte_primitives"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "u575_63_cases_before_after_and_same_context_arm_link_passed_full_gate_pending"
+msgstr "u575_63_cases_before_after_and_same_context_arm_link_passed_full_gate_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json"
+msgstr "build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_h743_official_hal_dependency_identity_corrected"
+msgstr "partial_h743_official_hal_dependency_identity_corrected"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "red2_green124_metadata_and_18_configurations_not_complete_h743_exit"
+msgstr "red2_green124_metadata_and_18_configurations_not_complete_h743_exit"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/h743-source-closure/handoff.json"
+msgstr "build/vendor-first-20261030/next/h743-source-closure/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_u575_spi_default_byte_ports_use_official_ll"
+msgstr "partial_u575_spi_default_byte_ports_use_official_ll"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "selected_63_case_and_arm_cost_evidence_full_family_exit_open"
+msgstr "selected_63_case_and_arm_cost_evidence_full_family_exit_open"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json"
+msgstr "build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "implemented_reviewed_specialization_and_value_header_contracts"
+msgstr "implemented_reviewed_specialization_and_value_header_contracts"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pin_red4_green27_tools_50_google_and_arm_equivalence_full_gate_pending"
+msgstr "pin_red4_green27_tools_50_google_and_arm_equivalence_full_gate_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/template-contracts/actual-root/handoff.json;build/vendor-first-20261030/next/h05-value-headers/handoff.json"
+msgstr "build/vendor-first-20261030/template-contracts/actual-root/handoff.json;build/vendor-first-20261030/next/h05-value-headers/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_shared_spi_zero_one_two_four_endpoint_matrix"
+msgstr "partial_shared_spi_zero_one_two_four_endpoint_matrix"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "four_actual_arm_images_with_interface_storage_and_retention_scope"
+msgstr "four_actual_arm_images_with_interface_storage_and_retention_scope"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/spi-endpoint-cost-20261030/handoff.json"
+msgstr "build/vendor-first-20261030/next/spi-endpoint-cost-20261030/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_spi_endpoint_controller_face_and_shared_ops_retention"
+msgstr "partial_spi_endpoint_controller_face_and_shared_ops_retention"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "actual_elf_symbols_and_zero_selection_checked_other_classes_pending"
+msgstr "actual_elf_symbols_and_zero_selection_checked_other_classes_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/spi-endpoint-cost-20261030/scope-limits.json"
+msgstr "build/vendor-first-20261030/next/spi-endpoint-cost-20261030/scope-limits.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_fail_fast_and_stage_budget_propagation"
+msgstr "partial_fail_fast_and_stage_budget_propagation"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "actual_budget_red2_green158_with_explicit_caller_precedence"
+msgstr "actual_budget_red2_green158_with_explicit_caller_precedence"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/qualification-stage-budget/handoff.json"
+msgstr "build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/qualification-stage-budget/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_current_provider_source_review_and_bounded_delta_navigation"
+msgstr "partial_current_provider_source_review_and_bounded_delta_navigation"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "source_review_and_bilingual_content_checked_final_acceptance_pending"
+msgstr "source_review_and_bilingual_content_checked_final_acceptance_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json"
+msgstr "build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_existing_bilingual_content_and_new_provider_translation"
+msgstr "partial_existing_bilingual_content_and_new_provider_translation"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "fresh_gettext_132_pages_264_records_passed_clean_source_html_pending"
+msgstr "fresh_gettext_132_pages_264_records_passed_clean_source_html_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_clean_89485943_and_next_increment_integration"
+msgstr "partial_clean_89485943_and_next_increment_integration"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "prior_clean_commit_retained_new_ordinary_gate_pending"
+msgstr "prior_clean_commit_retained_new_ordinary_gate_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "build/vendor-first-20261030/next/qualification-stage-budget/handoff.json"
+msgstr "build/vendor-first-20261030/next/qualification-stage-budget/handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_formal_89485943_attempt_executed"
+msgstr "partial_formal_89485943_attempt_executed"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "13_stages_passed_asan_build_inner_timeout_124_new_source_full_run_pending"
+msgstr "13_stages_passed_asan_build_inner_timeout_124_new_source_full_run_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid ";/workspace/nexus-software-qualification-89485943-20261030/report.json"
+msgstr ";/workspace/nexus-software-qualification-89485943-20261030/report.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_two_89485943_offline_uart_pairs"
+msgstr "partial_two_89485943_offline_uart_pairs"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "h743_u575_baremetal_uart_elf_bin_identical_new_source_eight_profiles_pending"
+msgstr "h743_u575_baremetal_uart_elf_bin_identical_new_source_eight_profiles_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid ";/workspace/nexus-offline-matrix-89485943-20261030/two-pair-handoff.json"
+msgstr ";/workspace/nexus-offline-matrix-89485943-20261030/two-pair-handoff.json"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "partial_first_two_commits_pushed_pr43_draft"
+msgstr "partial_first_two_commits_pushed_pr43_draft"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "next_increment_ordinary_gate_commit_push_merge_release_pending"
+msgstr "next_increment_ordinary_gate_commit_push_merge_release_pending"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending_integration_administration_access"
+msgstr "pending_integration_administration_access"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid "actual_ruleset_post_retried_403_20261030_not_configured"
+msgstr "actual_ruleset_post_retried_403_20261030_not_configured"
+
+#: ../../../docs/status/ledgers/platform-delivery-completion.md:26
+msgid ";build/vendor-first-20261030/external-recheck-20261030/main-ruleset-create.command.json"
+msgstr ";build/vendor-first-20261030/external-recheck-20261030/main-ruleset-create.command.json"

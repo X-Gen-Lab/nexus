@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`e25eabe77ae3f1a6c0f03a3ce759c28c2c34fc47a96137ed9f969bbdd4cb44d7`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`8b3d1368dca6f3228ebff7e5e226c6473124b0fc3b47f23550cfc0cb20483096`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1205,11 +1205,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A01 |
 | `task` | 维护配置闭包 |
-| `implementation_status` | partial_derived_navigation |
-| `software_status` | existing_authority_navigation_passed_not_acceptance |
+| `implementation_status` | partial_public_217_mode_295_configuration_review |
+| `software_status` | public_inventory_reviewed_private_annex_and_final_acceptance_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json |
+| `evidence_paths` | build/vendor-first-20261030/docs/derived-mode-work-packages.json;build/vendor-first-20261030/docs/platform-navigation.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/README.md |
 | `exit_condition` | 汇总参考装配、provider 夹具、SDK consumer、高级组件及外部示例的完整适用配置。 |
 | `owner` | codex |
 
@@ -1220,11 +1220,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A02 |
 | `task` | 逐模式行为合同 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_165_mcu_source_contract_review |
+| `software_status` | source_review_only_33_unselected_unassessed_19_native_model |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/README.md |
 | `exit_condition` | 逐项核对 TX/RX、格式、错误、wake、容量、长度、计数、cancel、drain 与 stop。 |
 | `owner` | codex |
 
@@ -1235,11 +1235,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A03 |
 | `task` | 官方实现决策 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_official_implementation_decisions_reviewed |
+| `software_status` | bounded_source_decisions_not_complete_migration_or_qualification |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/coverage-summary.json |
 | `exit_condition` | 每个模式明确选择 HAL transport、LL/SPL 原语或有理由的专用引擎。 |
 | `owner` | codex |
 
@@ -1250,11 +1250,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A04 |
 | `task` | 必要直接访问 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_operation_specific_direct_access_review |
+| `software_status` | vendor_source_exceptions_reviewed_remaining_leaf_and_errata_work_open |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-mode-review-20261030/reviews/combined-mode-decisions.csv |
 | `exit_condition` | 原子操作、SDK 缺口、errata、撤离证明及实测预算例外有准确理由。 |
 | `owner` | codex |
 
@@ -1295,11 +1295,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B01 |
 | `task` | 官方依赖配对 |
-| `implementation_status` | partial_reviewed_f4_pin_pairing_25file_closure |
-| `software_status` | f4_pin_pair_license_and_export_compile_passed_other_family_review_pending |
+| `implementation_status` | partial_stm32_lock_pairing_and_gd_import_source_review |
+| `software_status` | nine_stm32_locks_67_file_identities_reviewed_not_family_qualification |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
-| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/vendor-mode-review-20261030/dependency-identities.md |
 | `exit_condition` | 核对组织 fork、精确 gitlink、SDK、CMSIS Device/Core 和许可证配对。 |
 | `owner` | codex |
 
@@ -1370,11 +1370,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-B06 |
 | `task` | 依赖及 SDK 闭包 |
-| `implementation_status` | partial_f4_lock_and_export_closure |
-| `software_status` | actual25file_verification_and_closed_export_compile_passed_sdk_consumer_pending |
+| `implementation_status` | partial_f4_export_and_h743_hal_identity_closure |
+| `software_status` | h743_red2_green124_and_18_configuration_comparisons_full_sdk_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/platform/;dependencies/;vendors/;tools/maintenance/source_catalogue.py;cmake/package/;cmake/platform/STM32Official.cmake;dependencies/stm32f4-hal.lock.json;tools/maintenance/stm32f4_hal_lock.py |
-| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/hal-maintained/debug-green-handoff.json;build/vendor-first-20261030/cost/final2-refresh.json;build/vendor-first-20261030/hal-lock-closure/handoff.json;build/vendor-first-20261030/next/h743-source-closure/handoff.json |
 | `exit_condition` | 锁、source catalogue、descriptor、SDK 文件和许可证闭包一致，升级经过受控验证。 |
 | `owner` | codex |
 
@@ -1730,11 +1730,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F02 |
 | `task` | SPI 短事务迁移 |
-| `implementation_status` | partial_f407_gd470_selected_primitives |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_scoped_only |
+| `implementation_status` | partial_f407_gd470_and_u575_spi_byte_primitives |
+| `software_status` | u575_63_cases_before_after_and_same_context_arm_link_passed_full_gate_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `evidence_paths` | build/vendor-first-20261030/stm32/handoff.json;build/vendor-first-20261030/gd32/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json |
 | `exit_condition` | 官方配置及收发保持完整 CS 区间、dummy/discard 和 transferred。 |
 | `owner` | codex |
 
@@ -1940,11 +1940,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-G06 |
 | `task` | H743 域与 Cache 验证 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_h743_official_hal_dependency_identity_corrected |
+| `software_status` | red2_green124_metadata_and_18_configurations_not_complete_h743_exit |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/h743-source-closure/handoff.json |
 | `exit_condition` | 覆盖 Cache、域、DMA 内存、连续模式、SPI wire errata 与 RAM 执行组件。 |
 | `owner` | codex |
 
@@ -1955,11 +1955,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-G07 |
 | `task` | U575 精确子集验证 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_u575_spi_default_byte_ports_use_official_ll |
+| `software_status` | selected_63_case_and_arm_cost_evidence_full_family_exit_open |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;tests/contracts/;cmake/package/verification/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/u575-spi-ll-20261030/handoff.json |
 | `exit_condition` | 分别验证 GPDMA/chain、FIFO、保留时间、Stop2/LPDMA/LPBAM 和既有 TrustZone 窄范围。 |
 | `owner` | codex |
 
@@ -2030,11 +2030,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-H05 |
 | `task` | 编译期模板合同 |
-| `implementation_status` | implemented_selected_private_template_guards_and_macro_scope |
-| `software_status` | focused19methods_9runtime359cases_and_9identical_arm_objects_passed_final_gate_pending |
+| `implementation_status` | implemented_reviewed_specialization_and_value_header_contracts |
+| `software_status` | pin_red4_green27_tools_50_google_and_arm_equivalence_full_gate_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py |
-| `evidence_paths` | build/vendor-first-20261030/template-contracts/actual-root/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/template-contracts/actual-root/handoff.json;build/vendor-first-20261030/next/h05-value-headers/handoff.json |
 | `exit_condition` | 输入、导出符号、宏作用域及各 specialization 的验证明确。 |
 | `owner` | codex |
 
@@ -2060,11 +2060,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-I01 |
 | `task` | 多实例资源成本 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_shared_spi_zero_one_two_four_endpoint_matrix |
+| `software_status` | four_actual_arm_images_with_interface_storage_and_retention_scope |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/spi-endpoint-cost-20261030/handoff.json |
 | `exit_condition` | 比较空/1/2/4 实例，区分 face/config/runtime/buffer/executor。 |
 | `owner` | codex |
 
@@ -2075,11 +2075,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-I02 |
 | `task` | 实际链接保留 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_spi_endpoint_controller_face_and_shared_ops_retention |
+| `software_status` | actual_elf_symbols_and_zero_selection_checked_other_classes_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/measurement/;tools/hil/;tests/contracts/io_storage_cost/;docs/design/soc-execution-budgets.md |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/spi-endpoint-cost-20261030/scope-limits.json |
 | `exit_condition` | 核对 ops 引用和 ELF symbols，解释未选模式的代码及常驻 RAM。 |
 | `owner` | codex |
 
@@ -2255,11 +2255,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-J08 |
 | `task` | 高效完整门禁 |
-| `implementation_status` | partial_fail_fast_native_preflight |
-| `software_status` | actual_red_green_and_9c0460b9_complete_index_gate_passed |
+| `implementation_status` | partial_fail_fast_and_stage_budget_propagation |
+| `software_status` | actual_budget_red2_green158_with_explicit_caller_precedence |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tests/;tools/testing/;scripts/ci/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json |
+| `evidence_paths` | build/vendor-first-20261030/native-preflight/handoff.json;build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/next/qualification-stage-budget/handoff.json |
 | `exit_condition` | 开发聚焦执行，完整增量走普通 hooks，冻结源执行完整计划并预算存储。 |
 | `owner` | codex |
 
@@ -2345,11 +2345,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-K06 |
 | `task` | 架构与支持导航 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_current_provider_source_review_and_bounded_delta_navigation |
+| `software_status` | source_review_and_bilingual_content_checked_final_acceptance_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json |
 | `exit_condition` | 架构图、模式合同、迁移说明和精确支持查询对应实际实现。 |
 | `owner` | codex |
 
@@ -2360,11 +2360,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-K07 |
 | `task` | 双语与代码风格 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_existing_bilingual_content_and_new_provider_translation |
+| `software_status` | fresh_gettext_132_pages_264_records_passed_clean_source_html_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json |
 | `exit_condition` | 中英文、gettext、schema、链接及严格文档检查完整，沿用现有格式和 Doxygen。 |
 | `owner` | codex |
 
@@ -2405,11 +2405,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L02 |
 | `task` | 干净平台提交 P |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_clean_89485943_and_next_increment_integration |
+| `software_status` | prior_clean_commit_retained_new_ordinary_gate_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | build/vendor-first-20261030/next/qualification-stage-budget/handoff.json |
 | `exit_condition` | 代码和文档就绪后形成干净提交 P，冻结源码与依赖。 |
 | `owner` | codex |
 
@@ -2420,11 +2420,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L03 |
 | `task` | P 的完整软件计划 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_formal_89485943_attempt_executed |
+| `software_status` | 13_stages_passed_asan_build_inner_timeout_124_new_source_full_run_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | ;/workspace/nexus-software-qualification-89485943-20261030/report.json |
 | `exit_condition` | 在 P 上实际完成完整计划、四种 Native 和全部适用检查。 |
 | `owner` | codex |
 
@@ -2480,11 +2480,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L07 |
 | `task` | 受控环境与离线复现 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_two_89485943_offline_uart_pairs |
+| `software_status` | h743_u575_baremetal_uart_elf_bin_identical_new_source_eight_profiles_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | ;/workspace/nexus-offline-matrix-89485943-20261030/two-pair-handoff.json |
 | `exit_condition` | 分别证明受控环境与两次新鲜离线构建的实际范围，不继承旧资格。 |
 | `owner` | codex |
 
@@ -2495,8 +2495,8 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L08 |
 | `task` | 提交合并与发布 |
-| `implementation_status` | partial_first_increment_committed_and_pushed |
-| `software_status` | ordinary_complete_index_passed_at_9c0460b9_merge_release_pending |
+| `implementation_status` | partial_first_two_commits_pushed_pr43_draft |
+| `software_status` | next_increment_ordinary_gate_commit_push_merge_release_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
 | `evidence_paths` | build/vendor-first-20261030/commits/02-commit.command.json;build/vendor-first-20261030/commits/02-push.command.json |
@@ -2615,11 +2615,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-X02 |
 | `task` | 服务端分支规则 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | pending_integration_administration_access |
+| `software_status` | actual_ruleset_post_retried_403_20261030_not_configured |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | ;build/vendor-first-20261030/external-recheck-20261030/main-ruleset-create.command.json |
 | `exit_condition` | 具备权限后实际配置并读回 branch rules 和 required checks。 |
 | `owner` | codex |
 

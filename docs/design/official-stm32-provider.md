@@ -79,6 +79,11 @@ Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA,
 memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch
 coverage and the independent ThreadX subset do not expand this SoC matrix.
 
+The source review at `89485943` preserves all 217 declared identities, including
+33 without selected fixtures and 19 Native MODEL rows; absent selection remains
+unassessed. Optional components/system owners and authorized private examples
+need separate review; this view changes neither support nor qualification.
+
 F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling,
 H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
 separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
@@ -115,11 +120,17 @@ do not authorize default SysTick acquisition or interrupt-policy changes.
 UART/SPI `uint16_t Size` parameters must match the selected public `size_t`
 contract without truncation, hidden splitting or implicit bounce storage.
 
-SPI evaluation additionally preserves the whole CS interval, dummy/discard,
-fixed DMA address options and transferred counts. GPIO simultaneous set/reset
-retains its single atomic write where separate SDK calls would change that
-contract. DMA disable is a command; use the appropriate readback and withdrawal
-proof before returning borrowed storage.
+SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA
+addresses and counts. GPIO needs one combined set/reset command; U5
+`HAL_GPIO_WriteMultipleStatePin` supplies it outside the selected GPIO closure.
+Separate set/reset calls cannot substitute. DMA disable still needs actual
+readback and withdrawal proof before returning borrowed storage.
+
+Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware
+close must preserve the selected quiet interval before disabling the shifter.
+U575 HAL also contains its Device-gated persistent-DMAT workaround. These API
+fits do not prove callback, deadline or loan withdrawal; review ordinary LL/SPL
+setters separately from justified command/snapshot exceptions.
 
 ### Ordered implementation and acceptance
 
@@ -165,6 +176,14 @@ release, Core version macros, literal pack metadata and license identities.
 Actual include closure, firmware links and installed-SDK consumption require
 current-source evidence; a common Core pin does not transfer F4 qualification to
 G4, H7, U5 or GD32.
+
+The next development overlay adds H743 `hal_driver_h7` to the family descriptor
+and SoC source-lock projection, matching its existing pinned LL build input.
+Private capture, advanced-PWM and UART-FIFO templates retain specialization
+contracts; pin-state has optional implementation/default-macro scoping, while
+CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports
+now take the selected controller and directly call private LL functions, with
+no runtime forwarding. These changes do not rewrite the frozen source review.
 
 F407 uses official LL operations inside its existing provider state machines,
 with one selected HAL transport for UART `dma-tx`. That transport retains request
@@ -497,6 +516,14 @@ route, mode, capacity, OS, compiler, optimization and workload. Record Flash LOA
 and footprint separately, per-domain static RAM, caller-owned storage, stack
 reservation versus measured peak, IRQ/service behavior and cleanup failures.
 Operation counts and host timings are not physical cycles, latency or WCET.
+
+The [SPI cost fixture](../../tests/contracts/io_storage_cost/spi_endpoints/README.md)
+links 0/1/2/4 endpoints against the unchanged `89485943` Source SDK: development
+LOAD/footprint is 3,048/7,880/7,940/8,064 B, with static SRAM 72/176/208/280 B,
+plus 2,048 B MSP and zero heap. Nonzero images consume public controller topology;
+the four-way image uses three CS banks, so its delta is not a linear endpoint
+cost. These link observations do not establish timing, HIL or new-source
+qualification.
 
 Retain an old implementation only while it provides a needed comparison or an
 unreplaced maintained mode. Select one normal production implementation after its

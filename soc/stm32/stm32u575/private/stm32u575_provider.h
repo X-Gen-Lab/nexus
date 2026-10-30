@@ -172,12 +172,6 @@ nx_result_t nx_stm32u575_spi_initialize(nx_stm32u575_spi_state_t* port);
 #ifndef NX_U575_SPI_POLL
 #define NX_U575_SPI_POLL(port) ((void)(port))
 #endif
-#ifndef NX_U575_SPI_READ8
-#define NX_U575_SPI_READ8(reg) (*(volatile uint8_t*)(reg))
-#endif
-#ifndef NX_U575_SPI_WRITE8
-#define NX_U575_SPI_WRITE8(reg, value) (*(volatile uint8_t*)(reg) = (value))
-#endif
 /** \brief Exact PA0/PA1 IRQ rings; U5 owns its EXTI mux and two pending banks.
  */
 typedef struct {

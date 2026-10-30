@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 project(nexus_spi_endpoint_cost LANGUAGES C ASM)
-if(NOT NEXUS_SOURCE_ROOT OR NOT COST_ENDPOINTS MATCHES "^[12]$")
-    message(FATAL_ERROR "Select an explicit source tree and one/two endpoints")
+if(NOT NEXUS_SOURCE_ROOT OR NOT COST_ENDPOINTS MATCHES "^[0124]$")
+    message(FATAL_ERROR "Select an explicit source tree and 0, 1, 2 or 4 endpoints")
 endif()
 set(NEXUS_ASSEMBLY_FILE
     "${CMAKE_CURRENT_SOURCE_DIR}/endpoints-${COST_ENDPOINTS}.toml"

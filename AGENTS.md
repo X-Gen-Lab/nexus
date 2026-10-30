@@ -170,6 +170,11 @@ explain invariants and hardware ordering. Do not duplicate declaration parameter
 lists in source definitions. New or changed files pass whole-file checks. Frozen
 historical debt may only shrink; never rebaseline new defects.
 
+Before a parallel handoff, run `python scripts/ci/style_gate.py <changed-files>`
+as well as the focused behavior checks. Clang-format alone does not check the
+repository's comment contracts. Record the actual commands and results before
+claiming that formatting and comments passed.
+
 Run the maintained host/model and tool boundary suites. Changes to interrupt,
 lifecycle, persistence or concurrency need meaningful failure-path regressions.
 Compile common components for both MCU families. Native models establish software

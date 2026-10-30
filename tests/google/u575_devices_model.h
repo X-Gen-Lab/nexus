@@ -68,8 +68,9 @@ void nx_u575_adc_poll(void* port);
 #define ADC4_COMMON (&g_u575_adc_common_registers)
 void nx_u575_spi_write8(volatile uint32_t* reg, uint8_t value);
 uint8_t nx_u575_spi_read8(volatile uint32_t* reg);
-#define NX_U575_SPI_WRITE8(reg, value) nx_u575_spi_write8((reg), (value))
-#define NX_U575_SPI_READ8(reg)         nx_u575_spi_read8(reg)
+#define NX_U575_SPI_WRITE8(port, value)                                        \
+    nx_u575_spi_write8(&(port)->TXDR, (value))
+#define NX_U575_SPI_READ8(port) nx_u575_spi_read8(&(port)->RXDR)
 uint32_t nx_u575_devices_read(volatile uint32_t* reg);
 void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value);
 #undef NX_U575_WRITE

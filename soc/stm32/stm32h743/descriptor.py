@@ -9,6 +9,7 @@ DESCRIPTOR = FamilyDescriptor(
     git_modules=(
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_h7", "stm32h7_cmsis"),
+        ("hal_driver_h7", "stm32h7_hal"),
     ),
     owned_payload=(
         "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
