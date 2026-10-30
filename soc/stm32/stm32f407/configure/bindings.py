@@ -5,7 +5,7 @@ from tools.configure.memory import dma_regions, flash_geometry
 from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
-from tools.configure import usb_device, ethernet, timer_advanced, secondary_controllers
+from tools.configure import timer_advanced, secondary_controllers
 from .contract import (ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
 

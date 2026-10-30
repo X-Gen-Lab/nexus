@@ -5,7 +5,7 @@ from tools.configure.memory import dma_regions
 from tools.configure import enhanced_endpoints
 from tools.configure.providers.common import Construction, mode_traits
 from tools.configure.providers import hardware
-from tools.configure import usb_device, ethernet, timer_advanced, secondary_controllers
+from tools.configure import timer_advanced, secondary_controllers
 from . import uart, control
 from . import can as can_cold, timer as timer_cold, packet
 

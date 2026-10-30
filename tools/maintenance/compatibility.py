@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     POLICY, identity, load_policy, parse_json, policy_contract,
-    read_json, regular, snapshot,
+    regular, snapshot,
 )
 
 
