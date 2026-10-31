@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/os-execution.csv)。
-源文件：`docs/design/os-execution.csv`；SHA-256：`1a01b0795609b31d1b0f41ccdaf2d83e0dc14c0671f3f7889e5964a5d54d76ec`。
+源文件：`docs/design/os-execution.csv`；SHA-256：`c8fbbdb7d609f42bb838acdf6f5e808eaed943c13c307abf2455ca2f3e3f209c`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -579,7 +579,7 @@ source_language: zh_CN
 | `task_id` | OS37 |
 | `priority` | P2 |
 | `task` | Current OS contracts and support boundaries |
-| `implementation_paths` | docs/design/os-contracts.md;docs/delivery/os.md;os/README.md;docs/sphinx/os.rst |
+| `implementation_paths` | docs/design/os-contracts.md;docs/delivery/os.md;os/README.md;docs/guides/os-shutdown.md |
 | `evidence_paths` | docs/design/os-execution.csv |
 | `implementation_status` | implemented |
 | `software_status` | development_passed |

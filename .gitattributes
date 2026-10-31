@@ -5,6 +5,8 @@ vendors/gigadevice/gd32f30x/Firmware/** -text -whitespace
 # Execution logs and compiled-source snapshots retain their exact original bytes.
 tools/testing/evidence/** -text -whitespace
 tests/evidence/** -text -whitespace
+# Portable historical payloads retain their original compressed bytes.
+docs/archive/evidence/**/*.tar.gz -text -whitespace
 # Review bytes are exact; unified patch context prefixes can precede tabs.
 dependencies/reviews/freertos/upstream.gitmodules -text
 dependencies/reviews/freertos/transport.patch -text whitespace=-space-before-tab
