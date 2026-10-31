@@ -332,17 +332,21 @@ class WorkflowContracts(unittest.TestCase):
     def test_tooling_runs_google_report_and_hil_preparation_boundaries(self):
         tools = workflow('enterprise-tools.yml')['jobs']['tooling']
         commands = '\n'.join(step.get('run', '') for step in tools['steps'])
-        self.assertIn('tools/testing/run_tool_tests.py --suite testing', commands)
-        self.assertIn('tools-testing.json', commands)
-        self.assertEqual(commands.count('--suite configure'), 1)
+        self.assertEqual(commands.count(
+            'scripts/ci/tdd_gate.py --all --preset native-debug'), 1)
+        for suite in ('configure', 'ci', 'workflows', 'testing'):
+            self.assertIn(
+                f'cp build/native-debug/tdd/tools-{suite}.json '
+                f'build/quality/tools-{suite}.json', commands)
         self.assertIn('tools.hil.prepare', commands)
 
     def test_mode_independent_suites_have_one_reported_tool_owner(self):
         tools = workflow('enterprise-tools.yml')['jobs']['tooling']
         commands = '\n'.join(step.get('run', '') for step in tools['steps'])
         selected = re.findall(r'--suite\s+(\w+)', commands)
-        self.assertCountEqual(selected, [
-            'testing', 'configure', 'ci', 'workflows', 'contracts', 'freertos'])
+        self.assertCountEqual(selected, ['contracts', 'freertos'])
+        self.assertEqual(commands.count(
+            'scripts/ci/tdd_gate.py --all --preset native-debug'), 1)
         self.assertNotIn('unittest discover -s tests/contracts', commands)
         seal = next(step for step in tools['steps']
                     if step.get('uses') == './.github/actions/record-identity')

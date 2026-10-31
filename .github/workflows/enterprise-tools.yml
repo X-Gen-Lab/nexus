@@ -30,10 +30,16 @@ jobs:
         run: .venv/bin/python -I -m pre_commit install-hooks
       - name: Use the installed CLI tools for real consumer builds
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
-      - name: Execute configuration rejection and atomic generation
+      - name: Execute the ordinary complete TDD gate
         run: >-
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure
-          --report build/quality/tools-configure.json
+          .venv/bin/python -B scripts/ci/tdd_gate.py --all --preset native-debug
+      - name: Collect reports from that same tool-domain execution
+        run: |
+          mkdir -p build/quality
+          cp build/native-debug/tdd/tools-configure.json build/quality/tools-configure.json
+          cp build/native-debug/tdd/tools-ci.json build/quality/tools-ci.json
+          cp build/native-debug/tdd/tools-workflows.json build/quality/tools-workflows.json
+          cp build/native-debug/tdd/tools-testing.json build/quality/tools-testing.json
       - name: Check derived capability text and report review assignment gaps
         run: |
           .venv/bin/python tools/maintenance/capabilities.py --check
@@ -46,14 +52,8 @@ jobs:
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite freertos --report build/quality/tools-freertos.json
         env:
           NEXUS_ARM_GCC: arm-none-eabi-gcc
-      - name: Execute commit and analyzer orchestration boundaries
-        run: |
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite ci --report build/quality/tools-ci.json
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite workflows --report build/quality/tools-workflows.json
-      - name: Execute Google report admission and station preparation boundaries
-        run: |
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
-          .venv/bin/python -B -m tools.hil.prepare --help
+      - name: Check station preparation CLI availability
+        run: .venv/bin/python -B -m tools.hil.prepare --help
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -71,6 +71,9 @@ jobs:
             build/quality/tools-testing.json
             build/quality/tools-ci.json
             build/quality/tools-workflows.json
+            build/native-debug/tdd/
+            build/native-debug/compile_commands.json
+            build/native-debug/generated/
           tools: |
             python=python3
             cmake=cmake
@@ -88,6 +91,9 @@ jobs:
             build/quality/tools-testing.json
             build/quality/tools-ci.json
             build/quality/tools-workflows.json
+            build/native-debug/tdd/
+            build/native-debug/compile_commands.json
+            build/native-debug/generated/
             build/job-identities/tooling/
           retention-days: 30
           include-hidden-files: true

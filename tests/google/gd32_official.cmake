@@ -55,5 +55,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c"
         "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c"
         "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c"
+        "${gd_official_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c"
         PROPERTIES COMPILE_OPTIONS "-Wno-conversion;-Wno-sign-conversion")
 endif()

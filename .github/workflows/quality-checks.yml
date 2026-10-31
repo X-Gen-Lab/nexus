@@ -30,6 +30,12 @@ jobs:
         run: .venv/bin/python -m pip install -r dependencies/workflow-tools.txt
       - name: Prepare commit-hook environments before offline tests
         run: .venv/bin/python -I -m pre_commit install-hooks
+      - name: Check the actual source commit message with the same hook
+        run: |
+          git log -1 --format=%B > "$RUNNER_TEMP/nexus-commit-message"
+          .venv/bin/python -m pre_commit run nexus-commit-message \
+            --hook-stage commit-msg \
+            --commit-msg-filename "$RUNNER_TEMP/nexus-commit-message"
       - name: Check the complete staged workflow DSL offline
         run: .venv/bin/python scripts/ci/lint_workflows.py --staged
       - name: Test commit automation boundaries
