@@ -26,6 +26,38 @@ jobs:
         with:
           preset: native-debug
           arm: 'true'
+      - name: Select and verify the locked Native compiler
+        run: |
+          .venv/bin/python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import shutil
+          import subprocess
+
+          lock = json.loads(
+              Path("dependencies/environment.lock.json").read_text())
+          expected = lock["native_compiler"]["version"]
+          major = expected.split(".", 1)[0]
+          directory = Path(os.environ["RUNNER_TEMP"]) / "nexus-native-toolchain"
+          directory.mkdir()
+          for name in ("gcc", "g++"):
+              compiler = shutil.which(f"{name}-{major}")
+              if compiler is None:
+                  raise SystemExit(f"Missing locked Native compiler {name}-{major}")
+              observed = subprocess.check_output(
+                  [compiler, "-dumpfullversion"], text=True).strip()
+              if observed != expected:
+                  raise SystemExit(
+                      f"{name} differs from locked {expected}: {observed}")
+              (directory / name).symlink_to(compiler)
+              print(f"{name}: {observed} ({compiler})")
+          with open(os.environ["GITHUB_PATH"], "a") as output:
+              output.write(str(directory) + "\n")
+          with open(os.environ["GITHUB_ENV"], "a") as output:
+              output.write(f"CC={directory / 'gcc'}\n")
+              output.write(f"CXX={directory / 'g++'}\n")
+          PY
       - name: Prepare commit-hook environments before offline tests
         run: .venv/bin/python -I -m pre_commit install-hooks
       - name: Use the installed CLI tools for real consumer builds
