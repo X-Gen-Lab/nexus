@@ -164,9 +164,14 @@ def _revisions(root: Path, item, expected: str, actual: str, *, migrating: bool)
         _git(checkout, "fetch", "--no-tags", "--no-write-fetch-head",
              "--recurse-submodules=no", item.fetch_url, expected)
     try:
-        return freertos_transport.migration_revisions(root, expected)
+        revisions = freertos_transport.migration_revisions(root, expected)
     except ValueError as error:
         raise EvidenceError("FreeRTOS transport migration proof failed") from error
+    if migrating:
+        # Keep reviewed objects reachable for Git's normal submodule checkout.
+        _git(checkout, "update-ref", "--no-deref",
+             "refs/nexus/reviewed/" + expected, expected)
+    return revisions
 
 
 def _inspect_sources(root: Path, selected, *, migrating: bool):
