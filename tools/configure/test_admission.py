@@ -6,7 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch
 from tools.configure import configure
 
 
@@ -94,7 +94,7 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         missing = ModuleNotFoundError(
             "No module named 'soc.native.configure'",
             name='soc.native.configure')
-        with mock.patch('tools.configure.providers.import_module',
+        with patch('tools.configure.providers.import_module',
                         side_effect=missing):
             status, out, err = self.command(
                 'provider-check', '--assembly', str(self.assembly),
@@ -112,7 +112,7 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         for error in (ModuleNotFoundError(
                 "No module named 'internal_dependency'",
                 name='internal_dependency'), ImportError('invalid symbol')):
-            with self.subTest(error=error), mock.patch(
+            with self.subTest(error=error), patch(
                     'tools.configure.providers.import_module',
                     side_effect=error):
                 with self.assertRaises(type(error)):

@@ -28,12 +28,14 @@ clock does not exist yet. Dynamic reclocking is unsupported.
 The official ST device package and Arm CMSIS submodules provide register
 layout, masks and the complete GCC vector/startup. The official STM32F4 HAL
 Driver package supplies selected LL operations inside private provider state
-machines. Its reviewed version, exact Git identity, CMSIS pairing, selected
-header digests and license are recorded in
+machines and HAL finite TX for the selected UART `dma-tx` mode. Its reviewed
+version, exact Git identity, CMSIS pairing, selected file digests and license
+are recorded in
 [`stm32f4-hal.lock.json`](../../../dependencies/stm32f4-hal.lock.json). Vendor
 headers remain private to the implementation and generated static binding.
-This does not select the complete HAL Handle/callback transport state machine
-or establish support for every official module. See
+Only `dma-tx` selects the private UART/DMA Handle transport and official UART,
+DMA and RCC C units. Other UART modes retain their existing providers; no
+global HAL startup, HAL SysTick or all-module support is introduced. See
 [official driver integration](../../../docs/design/official-stm32-provider.md)
 for ownership, time, cancellation, comparison and delivery requirements.
 
@@ -62,10 +64,27 @@ they do not establish Board wiring, external pull-ups, device fitting or
 physical support. Consumers must supply reviewed external Board bindings to
 select those routes. Selected capture, advanced PWM and continuous double-buffer RX/ADC modes are
 maintained as listed below. Explicit I2C GPIO bus-clear is a separate common
-component. Internal ADC channels, bootloader relocation and undeclared modes
-remain rejected or absent from the selectable schema. The
+component. Internal ADC channels and undeclared modes remain rejected or absent from the
+selectable schema. Selected erase-aligned offset images have explicit startup,
+vector/linker and ELF/BIN checks; boot authentication, activation and running-image
+handoff qualification remain outside that software mechanism. The
 [derived matrix](../../../docs/delivery/capabilities.md) records exact selectable
 mode names, reference Board bindings and resolver-selected production source.
+
+The selected `dma-tx` owner combines official HAL finite TX with a disjoint LL
+IRQ-byte/event receiver. Its private callback ABI is 1 for all selected units;
+one shared readonly ops table serves separate static instance contexts. RX is
+not passed to HAL, and TX abort does not transfer RX ownership. Short CPU guards
+defer a preempting selected vector without a global interrupt mask around HAL
+calls. Every HAL DMA handler entry requires EN clear; HT-only progress uses
+bounded official acknowledgment, while refused error withdrawal masks that
+vector and defers HAL handling to task progress, avoiding the pinned IRQ poll. Failed
+drain/deinit keeps requests, pads, gates and cleanup ownership. The private
+bounded atomic and nearest-BRR compile profile requires the reviewed single-CPU
+owner; it leaves the vendor source unchanged. `HAL_GetTick` uses the existing
+TIM2 epoch, and `SystemCoreClock` tracks confirmed HCLK through failure cleanup;
+neither HAL initialization nor SysTick is started. Exact current-source model,
+factory, ARM/SDK and resource evidence remain separate; HIL is not executed.
 
 UART/SPI finite DMA uses caller-owned buffers in reviewed DMA-accessible domains;
 CCM is excluded. DMA TC alone does not release a borrow: UART TC or SPI idle,

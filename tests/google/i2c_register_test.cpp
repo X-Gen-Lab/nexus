@@ -239,6 +239,27 @@ extern "C" void i2c_deinit(uint32_t registers) {
     std::memset(reinterpret_cast<void*>(static_cast<uintptr_t>(registers)), 0,
                 0x28);
 }
+/** \brief SDK ACK changes retain all independently modeled status facts. */
+extern "C" void i2c_ack_config(uint32_t registers, uint32_t ack) {
+    I2C_CTL0(registers) =
+        (I2C_CTL0(registers) & ~static_cast<uint32_t>(I2C_CTL0_ACKEN)) | ack;
+}
+/** \brief The bus model, not the SDK START request, supplies progress. */
+extern "C" void i2c_start_on_bus(uint32_t registers) {
+    I2C_CTL0(registers) |= static_cast<uint32_t>(I2C_CTL0_START);
+}
+/** \brief STOP remains independently observable until modeled withdrawal. */
+extern "C" void i2c_stop_on_bus(uint32_t registers) {
+    I2C_CTL0(registers) |= static_cast<uint32_t>(I2C_CTL0_STOP);
+}
+/** \brief Unselected GPIO reads retain their exact SDK-width boundary. */
+extern "C" uint16_t gpio_input_port_get(uint32_t registers) {
+    return static_cast<uint16_t>(GPIO_ISTAT(registers));
+}
+/** \brief Unselected GPIO latch reads do not toggle or drive a pin. */
+extern "C" uint16_t gpio_output_port_get(uint32_t registers) {
+    return static_cast<uint16_t>(GPIO_OCTL(registers));
+}
 /** \brief Unselected fixture pin setup is outside this transaction model. */
 extern "C" void gpio_af_set(uint32_t, uint32_t, uint32_t) {
 }

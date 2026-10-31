@@ -10,6 +10,7 @@
 #include "nexus/core/fault.h"
 #include "stm32g474_system.h"
 #include "terminal_watchdog.h"
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
@@ -39,6 +40,52 @@ class G474System : public testing::Test {
         fault_port = nullptr;
     }
 };
+class G474ForeignHsiTrim : public G474System,
+                           public testing::WithParamInterface<uint32_t> {};
+TEST_P(G474ForeignHsiTrim, RejectsBeforeClockWritesOrOwnership) {
+    g_g474_model.rcc.ICSCR =
+        (GetParam() << RCC_ICSCR_HSITRIM_Pos) | (0x5aU << RCC_ICSCR_HSICAL_Pos);
+    const RCC_TypeDef before = g_g474_model.rcc;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32g474_system_preflight(&g_nx_stm32g474_system));
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, g_nx_stm32g474_system.remaining_effects);
+    EXPECT_EQ(0U, g_nx_stm32g474_system.core_hz);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_EQ(0, std::memcmp(&before, &g_g474_model.rcc, sizeof(before)));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8U));
+    EXPECT_EQ(0U, g_g474_model.writes);
+}
+INSTANTIATE_TEST_SUITE_P(NonResetTrims, G474ForeignHsiTrim,
+                         testing::Values(0U, 16U, 63U, 65U, 127U));
+TEST_F(G474System, DefaultTrimAdmitsVariableFactoryCalibrationUnchanged) {
+    EXPECT_EQ(64U, (g_g474_model.rcc.ICSCR & RCC_ICSCR_HSITRIM) >>
+                       RCC_ICSCR_HSITRIM_Pos);
+    for (uint32_t calibration : {0U, 1U, 0x7fU, 0xffU}) {
+        SCOPED_TRACE(calibration);
+        nx_g474_model_reset();
+        const uint32_t internal = (64U << RCC_ICSCR_HSITRIM_Pos) |
+                                  (calibration << RCC_ICSCR_HSICAL_Pos);
+        g_g474_model.rcc.ICSCR = internal;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32g474_system_preflight(&g_nx_stm32g474_system));
+        EXPECT_EQ(0U, g_g474_model.writes);
+        ASSERT_EQ(
+            NX_SUCCESS,
+            nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary);
+        EXPECT_EQ(170000000U, g_nx_stm32g474_system.core_hz);
+        EXPECT_EQ(169U, g_g474_model.timer.PSC);
+        EXPECT_EQ(internal, g_g474_model.rcc.ICSCR);
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8U));
+        EXPECT_EQ(16000000U, g_nx_stm32g474_system.core_hz);
+        EXPECT_EQ(internal, g_g474_model.rcc.ICSCR);
+    }
+}
 TEST_F(G474System, Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch) {
     auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
     ASSERT_EQ(NX_SUCCESS, result.primary);

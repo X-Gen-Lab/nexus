@@ -59,4 +59,16 @@ void nx_u575_rtc_model_write(volatile uint32_t* reg, uint32_t value);
 #undef NX_U575_WRITE
 #define NX_U575_READ(p)     nx_u575_rtc_model_read(p)
 #define NX_U575_WRITE(p, v) nx_u575_rtc_model_write((p), (v))
+#ifndef NX_U575_RTC_DEFAULT_PORT
+static inline void nx_u575_rtc_model_unlock(RTC_TypeDef* controller) {
+    nx_u575_rtc_model_write(&controller->WPR, 0xCAU);
+    nx_u575_rtc_model_write(&controller->WPR, 0x53U);
+}
+#define NX_U575_RTC_DISABLE_WRITE_PROTECTION(controller)                       \
+    nx_u575_rtc_model_unlock(controller)
+#define NX_U575_RTC_ENABLE_WRITE_PROTECTION(controller)                        \
+    NX_U575_WRITE(&(controller)->WPR, 0xFFU)
+#define NX_U575_RTC_CLEAR_FLAG_ALRA(controller)                                \
+    NX_U575_WRITE(&(controller)->SCR, RTC_SCR_CALRAF)
+#endif
 #endif

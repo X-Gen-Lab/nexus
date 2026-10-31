@@ -111,13 +111,16 @@ if(h7_sources)
         "${h7_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32h743)
     target_compile_definitions(nexus_soc_stm32h743 PRIVATE STM32H743xx)
+    if(h7_i2c_modes)
+        target_compile_definitions(nexus_soc_stm32h743 PRIVATE
+            "NX_I2C_V2_PORT_HEADER=\"stm32h743_i2c_port.h\"")
+    endif()
     if(h7_flash_modes)
         add_dependencies(nexus_soc_stm32h743 nexus_h743_flash_stack_outputs)
         set_property(TARGET nexus_soc_stm32h743 PROPERTY
             NEXUS_H743_FLASH_SU_FILES "${h7_flash_su_files}")
     endif()
-    if(h7_spi_modes OR h7_adc_modes OR "irq-fifo-bytes" IN_LIST h7_uart_modes OR
-            "irq-fifo-rtscts-bytes" IN_LIST h7_uart_modes)
+    if(h7_spi_modes OR h7_adc_modes OR h7_i2c_modes OR h7_uart_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32h743 h7)
     endif()

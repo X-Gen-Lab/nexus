@@ -124,6 +124,7 @@ def _kill_group(process: subprocess.Popen) -> None:
     try:
         os.killpg(process.pid, signal.SIGKILL)
     except ProcessLookupError:
+        # The group already exited; wait below still reaps the owned child.
         pass
     process.wait(timeout=5)
 

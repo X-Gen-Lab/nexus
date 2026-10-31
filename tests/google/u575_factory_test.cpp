@@ -60,6 +60,28 @@ TEST_F(U575Factory, TypedLookupIsPureAndIdentitySurvivesStartStop) {
     Start();
     EXPECT_EQ(before, nx_factory_uart(NX_UART_ID_CONSOLE));
 }
+class U575FactoryTrim : public U575Factory,
+                        public testing::WithParamInterface<uint32_t> {};
+TEST_P(U575FactoryTrim, NonDefaultMsisTrimCannotAcquireColdPinsOrTimer) {
+    g_u575_model.rcc.ICSCR2 = (g_u575_model.rcc.ICSCR2 &
+                               ~static_cast<uint32_t>(RCC_ICSCR2_MSITRIM1)) |
+                              (GetParam() << RCC_ICSCR2_MSITRIM1_Pos);
+    const auto clocks = g_u575_model.rcc;
+    const auto timer = g_u575_model.timer;
+    const auto started = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, started.primary);
+    EXPECT_EQ(NX_SUCCESS, started.cleanup);
+    EXPECT_EQ(0U, started.remaining_effects);
+    EXPECT_EQ(0U, g_u575_model.writes);
+    EXPECT_EQ(0U, g_u575_model.gpio_writes);
+    EXPECT_FALSE(g_nx_stm32u575_system.started);
+    EXPECT_EQ(0U, g_nx_stm32u575_system.remaining_effects);
+    EXPECT_FALSE(g_u575_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0, std::memcmp(&clocks, &g_u575_model.rcc, sizeof(clocks)));
+    EXPECT_EQ(0, std::memcmp(&timer, &g_u575_model.timer, sizeof(timer)));
+}
+INSTANTIATE_TEST_SUITE_P(AdjustedMsis, U575FactoryTrim,
+                         testing::Values(0U, 15U, 17U, 31U));
 TEST_F(U575Factory, ExactPinsAfWordClockAndReservedVectorsAreBound) {
     Start();
     EXPECT_EQ(4000000U, g_nx_stm32u575_system.core_hz);

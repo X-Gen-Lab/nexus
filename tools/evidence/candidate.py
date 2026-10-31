@@ -18,7 +18,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
 from tools.evidence.common import SOFTWARE_QUALIFICATION_SCOPES as REQUIRED_SCOPES
 from tools.evidence.identity import resolved_identity, verify_source
 from tools.evidence.container import verify as verify_environment
-from tools.measurement.elf import Elf32, binary_from_elf
+from tools.measurement.elf import Elf32, binary_from_elf, image_window
 from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
 from tools.evidence.proof import validate_scope_proof, verify_sdk_file
 
@@ -138,9 +138,9 @@ def validate_manifest(manifest: dict, *, sdk_packages_out=None) -> tuple[dict, l
     elf = Elf32(Path(manifest["artifacts"]["elf"]["path"]).read_bytes(),
                 float_abi=resolved_float_abi(resolved))
     validate_elf_configuration(elf, resolved)
-    flash = resolved["flash"]
+    image = image_window(resolved)
     if Path(manifest["artifacts"]["bin"]["path"]).read_bytes() != binary_from_elf(
-            elf, flash["origin"], flash["origin"] + flash["size"]):
+            elf, image["origin"], image["origin"] + image["size"]):
         raise EvidenceError("candidate BIN differs from linked ELF load bytes")
     reports = []
     scopes = set()
@@ -268,9 +268,9 @@ def verify(candidate_path: Path) -> dict:
     elf = Elf32(packed(manifest["artifacts"]["elf"]).read_bytes(),
                 float_abi=resolved_float_abi(resolved))
     validate_elf_configuration(elf, resolved)
-    flash = resolved["flash"]
+    image = image_window(resolved)
     if packed(manifest["artifacts"]["bin"]).read_bytes() != binary_from_elf(
-            elf, flash["origin"], flash["origin"] + flash["size"]):
+            elf, image["origin"], image["origin"] + image["size"]):
         raise EvidenceError("sealed BIN differs from linked ELF")
     scopes = set()
     for identity in manifest["qualifications"]:

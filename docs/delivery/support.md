@@ -79,6 +79,14 @@ GPIO 参考单独维护；不从芯片型号或通用接口推断其他外设、
 | Classic CAN | 11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发 |
 | USB FS device | internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk IN/OUT MPS8/16/32/64 B、interrupt IN MPS1–64 B、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；独立可选 activation face 显式管理非零方向 active／mask，冷态仅 EP0；reset 实际排空后软件屏蔽并撤销非零 active，再以当前 epoch 显式启用；Chapter 9 配置事务／回滚由外部负责；没有 Host/HS/DMA/ISO/class stack |
 
+F407 的 `dma-tx` 显式选入官方 HAL 有限 TX 与分离的 LL IRQ byte/event RX，
+由同一个私有静态 provider 管理。公共 face、共享 readonly ops、取消、drain
+与借用合同保留，其他 UART 模式仍使用各自既有引擎。仅 UART/DMA/RCC C 单元
+和已审查头文件进入私有构建，不调用 `HAL_Init`，也不启动 HAL SysTick，不授予其他 HAL 模块支持。
+精确 callback ABI、IRQ 延后、held EN/TE、时钟和完整退出合同见
+[官方驱动接入](../design/official-stm32-provider.md#selected-f407-hal-uart-transport)。
+模型、factory、ARM/SDK、同合同资源比较和物理 HIL 分别验收；不能从复用推断成本下降。
+
 F407 名义周期使用 `(RLR + 1) × divisor / 32000`，GD470 使用
 `(RLD × divisor + 1) / 32000`，不能套用同一公式。F407 数据手册的 17..47 kHz
 是 VDD=3 V、TA=-40..105 °C 的表征条件，当前没有声明满足条件的 operating profile；

@@ -10,6 +10,12 @@
 #include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include "stm32u5xx_ll_spi.h"
+#ifndef NX_U575_SPI_READ8
+#define NX_U575_SPI_READ8(port) LL_SPI_ReceiveData8(port)
+#endif
+#ifndef NX_U575_SPI_WRITE8
+#define NX_U575_SPI_WRITE8(port, value) LL_SPI_TransmitData8((port), (value))
+#endif
 #define BYTE_CONFIG (LL_SPI_DATAWIDTH_8BIT | (7U << SPI_CFG1_CRCSIZE_Pos))
 #define FIFO_LEVELS ((uint32_t)(SPI_SR_RXPLVL | SPI_SR_RXWNE | SPI_SR_RXP))
 static bool task_context(void) {
@@ -224,11 +230,11 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         result = wait(p, SPI_SR_TXP, SPI_SR_TXP, deadline);
         if (result != NX_SUCCESS)
             break;
-        NX_U575_SPI_WRITE8(&p->registers->TXDR, tx == NULL ? 0xffU : tx[index]);
+        NX_U575_SPI_WRITE8(p->registers, tx == NULL ? 0xffU : tx[index]);
         result = wait(p, SPI_SR_RXP, SPI_SR_RXP, deadline);
         if (result != NX_SUCCESS)
             break;
-        uint8_t value = NX_U575_SPI_READ8(&p->registers->RXDR);
+        uint8_t value = NX_U575_SPI_READ8(p->registers);
         if (rx != NULL)
             rx[index] = value;
         ++*transferred;

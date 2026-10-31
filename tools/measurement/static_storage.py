@@ -9,6 +9,9 @@ import re
 
 from tools.evidence.common import EvidenceError
 from tools.measurement.elf import interval_bytes
+from tools.measurement.retention import linked_object, object_words
+
+CS_FACE = re.compile(r"s_nx_cs_face_[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")
 
 CLASSES = (
     ("provider_state", re.compile(
@@ -30,11 +33,19 @@ def inspect_storage(elf, metrics):
                for section in elf.sections):
         raise EvidenceError("unstripped ELF symbol table required for storage costs")
     objects, intervals, names = [], [], set()
+    read_only_faces = []
     classes = {name: [] for name, _ in CLASSES} | {"other_static": []}
     for symbol in elf.defined_symbols:
+        name = symbol["name"]
+        if CS_FACE.fullmatch(name):
+            face, section = linked_object(elf, name, "chip-select interface")
+            if len(object_words(elf, face, section)) != 2:
+                raise EvidenceError("ARM chip-select interface must contain two pointers")
+            read_only_faces.append({"name": name, "bytes": face["size"],
+                                    "section": section["name"]})
+            continue
         if symbol["type"] != 1 or symbol["size"] == 0:
             continue
-        name = symbol["name"]
         selected = next((label for label, pattern in CLASSES
                          if pattern.fullmatch(name)), "other_static")
         index = symbol["section"]
@@ -79,9 +90,12 @@ def inspect_storage(elf, metrics):
         "msp_reserved_bytes": msp, "heap_reserved_bytes": heap,
         "unattributed_reserved_bytes": total - attributed - msp - heap,
         "objects": sorted(objects, key=lambda row: (row["start"], row["name"])),
+        "read_only_chip_select_faces": sorted(read_only_faces,
+                                              key=lambda row: row["name"]),
         "accounting": "Disjoint object interval subsets; exact same-class aliases "
             "count once. MSP/heap reservations and padding are never added twice.",
         "classification_scope": "Maintained generated provider/buffer symbols and "
-            "FreeRTOS idle/timer static storage; arbitrary caller storage is other_static.",
+            "FreeRTOS idle/timer static storage; arbitrary caller storage is other_static. "
+            "Generated chip-select interfaces are validated read-only and excluded from RAM.",
         "dynamic_stack_high_water": "not_measured",
         "cycles_latency": "not_measured"}

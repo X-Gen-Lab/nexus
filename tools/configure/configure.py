@@ -24,7 +24,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.configure import cpu as cpu_profiles
-from tools.configure import bundle, dependencies, sdk, i2s2
+from tools.configure import bundle, dependencies, sdk, i2s2, enhanced_endpoints
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -35,9 +35,9 @@ from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS)
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
-from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
-                        validate_interrupt_profile,
-                        validate_selection)
+from tools.configure.selection import (
+    validate_clock_profiles, validate_interrupt_profile,
+    validate_selection, validate_controller_execution, normalize_controller)
 from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                mode_traits, route_dma,
                                sequence)
@@ -702,8 +702,9 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
                              freeze(selected_memory), gpio_user)
 
 
-def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read):
-    """Select one reset-address image on reviewed physical erase boundaries."""
+def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
+                          *, offset_alignment=None):
+    """Select one image window without changing physical Flash geometry."""
     from tools.configure.ir import freeze
     layout = physical_flash.copy()
     layout_path = None
@@ -733,8 +734,16 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read)
                 fail("Unknown Flash region kind")
             if region["kind"] == "image":
                 images.append(region)
-        if len(images) != 1 or images[0]["origin"] != physical_flash["origin"]:
-            fail("Only one reset-address image is maintained; offsets/bootloaders are unsupported")
+        if len(images) != 1:
+            fail("Flash layout requires exactly one image region")
+        image = images[0]
+        if image["origin"] != physical_flash["origin"]:
+            if offset_alignment is None:
+                fail("Image offset requires an explicitly reviewed SoC startup")
+            integer(offset_alignment, 128, context="image vector alignment")
+            if (offset_alignment & (offset_alignment - 1) or
+                    image["origin"] % offset_alignment):
+                fail("Image vector base differs from the reviewed alignment")
         unique(region_ids, "Flash region IDs")
         layout = {**physical_flash, **images[0]}
     return _FlashLayoutResolution(freeze(layout), layout_path)
@@ -935,29 +944,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             provider.validate_mode_context(
                 selection, route, backend=backend,
                 clock_profile=assembly.clock_profile)
-            for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
-                            "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
-                integer(selection[numeric], 1, context=numeric)
-            if "duty_ticks" in selection:
-                integer(selection["duty_ticks"], 0, context="duty ticks")
-                if selection["duty_ticks"] > selection.get("period_ticks", 0):
-                    fail("PWM duty exceeds period")
-            if "irq_priority" in selection:
-                integer(selection["irq_priority"], 0,
-                        irq_profile.maximum_priority, "IRQ priority")
-            if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
-                fail("Polling SPI has no IRQ options")
-            if route["kind"] == "spi" and mode_traits("spi", mode).dma and "irq_priority" not in selection:
-                fail("DMA SPI requires an explicit IRQ priority")
-            if "calls_os" in selection and type(selection["calls_os"]) is not bool:
-                fail("calls_os must be boolean")
-            if selection.get("calls_os", False) and (
-                    kernel_profile is None or host or
-                    kernel_profile.kernel_policy == "none" or
-                    selection.get("irq_priority", 0) < irq_profile.syscall_priority):
-                fail("OS-calling ISR violates the selected kernel syscall ceiling")
-            if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
-                fail("Controller speed exceeds maintained limit")
+            validate_controller_execution(
+                selection, route, hardware, irq_profile=irq_profile,
+                kernel_profile=kernel_profile, host=host)
             traits = mode_traits(route["kind"], mode)
             if traits.dma and not route_dma(route, mode):
                 fail("DMA mode has no reviewed DMA route")
@@ -999,30 +988,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
                     claim(provider.dma_irq(dma), name, mode, route["id"])
-            resolved_timing = None
-            if route["kind"] == "i2c":
-                from tools.configure import i2c_timing_selection
-                resolved_timing = i2c_timing_selection.resolve(
-                    selection, clock, provider, clock_plan=clock_plan)
-            from tools.configure import stream_profiles
-            resolved_stream = stream_profiles.resolve(
-                selection, route["kind"], provider)
-            selected.append({**selection, "controller": route["controller"],
-                             "kind": route["kind"], "route": route["id"],
-                             "pins": route["pins"], "initial": binding.get("initial", 0),
-                             "mask": binding.get("mask", 0),
-                             **({"pin_state_resolution": resolved_pin_states}
-                                if resolved_pin_states is not None else {}),
-                             **({"dma": route_dma(route, mode)} if traits.dma else {}),
-                             **({"timing_resolution": resolved_timing}
-                                if resolved_timing is not None else {}),
-                             **({"stream_resolution": resolved_stream}
-                                if resolved_stream is not None else {}),
-                             **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
-            selected[-1].update(provider.mode_fields(
-                selection, route, clock_profile=assembly.clock_profile))
-            if route["kind"] == "can_fd":
-                selected[-1]["message_ram_words"] = hardware["message_ram_words"]
+            selected.append(normalize_controller(
+                selection, route, binding, hardware, provider, clock=clock,
+                clock_plan=clock_plan, clock_profile=assembly.clock_profile,
+                pin_states=resolved_pin_states, traits=traits))
             if route["kind"] == "adc_group":
                 if provider.ADC_GROUP is None:
                     fail("ADC group has no maintained provider")
@@ -1094,30 +1063,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                     "I2C device")
                 if provider.MODEL and "model_bytes" not in device:
                     fail("Native I2C device requires explicit model_bytes")
-            if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280",
-                                        "spi-transaction", "i2c-long-endpoint",
-                                        "spi-dma-transaction"}:
-                fail(f"Unknown maintained device driver: {device['driver']}")
-            provider.ENDPOINT_POLICY.validate(device, controller)
-            if device["driver"] == "bmp280" and controller["kind"] != "spi":
-                fail("BMP280 currently requires its maintained SPI transport")
-            if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
-                fail("SPI endpoint driver is not an I2C transport")
-            if device["driver"] == "i2c-endpoint" and controller["kind"] != "i2c":
-                fail("I2C endpoint driver is not a SPI transport")
-            if "mode" in device:
-                integer(device["mode"], 0, 3, "SPI endpoint mode")
-            if "max_hz" in device:
-                integer(device["max_hz"], 1, context="device speed")
-                if device["max_hz"] > controller.get("max_hz", 1000000):
-                    fail("Device speed exceeds its selected controller budget")
+            builtin_cs = enhanced_endpoints.validate_transport(
+                device, controller, provider, soc=soc, clock_plan=clock_plan)
             if controller["kind"] == "spi":
-                speed = device.get("max_hz", controller.get("max_hz", 1000000))
-                limit = soc["controllers"][controller["controller"]].get("max_hz")
-                provider.validate_endpoint_clock(speed, clock_plan=clock_plan)
-                if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
-                    fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
-                builtin_cs = provider.builtin_cs(controller)
                 if "cs_binding" not in device and not builtin_cs:
                     fail("SPI child requires a CS binding")
                 if "cs_binding" in device:
@@ -1149,18 +1097,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     usb_device.complete_plan(selected, endpoint_selections, claim)
     for controller in selected:
         children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
-        if (provider.ENDPOINT_POLICY.model_async_echo and
-                controller["kind"] == "spi" and
-                controller["mode"] == "async-model" and not children):
-            fail("Native async SPI requires at least one explicit enhanced endpoint")
-        if any(item["driver"] == "spi-dma-transaction" for item in children):
-            if any(item["driver"] != "spi-dma-transaction" for item in children):
-                fail("SPI DMA sequence requires all endpoints; mixed faces forbidden")
-            controller["interface_kind"] = "spi_dma_transaction"
-        if controller["kind"] == "i2c" and not children:
-            fail("I2C requires at least one explicit address endpoint")
-        if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
-            fail("SPI requires at least one reviewed CS endpoint")
+        enhanced_endpoints.complete_controller(controller, children, provider)
     if gpio_user and (len(selected) != 1 or
             selected[0]["kind"] != "gpio" or
             selected[0]["controller"] != "GPIOC" or
@@ -1264,7 +1201,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     inputs = [assembly_path, *facts.inputs, policy_path]
     inputs.extend(device_graph.inputs)
     selected_layout = _resolve_flash_layout(
-        assembly.layout, assembly_path.parent, variant["flash"], read)
+        assembly.layout, assembly_path.parent, variant["flash"], read,
+        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None))
     if selected_layout.input_path is not None:
         inputs.append(selected_layout.input_path)
     selected_sources = _resolve_source_dependencies(

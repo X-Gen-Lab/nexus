@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -57,7 +57,7 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                 reads.append(path)
             return original_open(path, *args, **kwargs)
 
-        with mock.patch.object(Path, "open", autospec=True,
+        with mock_patch.object(Path, "open", autospec=True,
                                side_effect=observe_open):
             with self.assertRaisesRegex(self.sdk.SDKError,
                                         "missing required sources/licenses"):

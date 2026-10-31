@@ -1,5 +1,6 @@
-"""Official inline LL headers stay private and never select HAL runtime."""
+"""Official STM32 scopes stay private and reject implicit HAL selection."""
 from __future__ import annotations
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -60,6 +61,105 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 result = self.configure(statement)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("official", result.stdout + result.stderr)
+
+    def test_f103_all_locked_driver_inputs_retrigger_source_verification(self):
+        from tools.maintenance import stm32f1_hal_lock as f1
+        generated = self.root / "generated"
+        generated.mkdir()
+        (generated / "resolved.json").write_text(json.dumps({
+            "controllers": [{"kind": "i2c", "mode": "irq-messages"}],
+        }))
+        source = ROOT / "soc/stm32/stm32f103"
+        (self.root / "CMakeLists.txt").write_text(f'''\
+cmake_minimum_required(VERSION 3.31)
+project(f103_locked_inputs LANGUAGES C ASM)
+set(Python3_EXECUTABLE "{sys.executable}")
+set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
+set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
+add_library(nexus_io INTERFACE)
+add_library(nexus_arch INTERFACE)
+add_library(Nexus::Arch ALIAS nexus_arch)
+add_library(nexus_build_options INTERFACE)
+add_library(nexus_owned_warnings INTERFACE)
+add_subdirectory("{source.as_posix()}" soc)
+get_property(inputs DIRECTORY "{source.as_posix()}"
+    PROPERTY CMAKE_CONFIGURE_DEPENDS)
+list(JOIN inputs "\\n" lines)
+file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
+''')
+        result = subprocess.run([
+            shutil.which("cmake"), "-S", str(self.root), "-B",
+            str(self.root / "build"), "-G", "Ninja"],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        observed = set((self.root / "build/source-inputs.txt")
+                       .read_text().splitlines())
+        expected = {str(ROOT / f1.DIRECTORY / name)
+                    for name in f1.REVIEWED_FILES}
+        self.assertFalse(expected - observed,
+                         "Locked driver inputs do not retrigger verification: " +
+                         repr(sorted(expected - observed)))
+
+    def test_explicit_uart_hal_closes_only_private_vendor_transport(self):
+        result = self.configure(
+            'nexus_stm32f407_uart_hal(provider)\n'
+            'get_target_property(private provider INCLUDE_DIRECTORIES)\n'
+            'get_target_property(public provider INTERFACE_INCLUDE_DIRECTORIES)\n'
+            'get_target_property(sources provider SOURCES)\n'
+            'get_target_property(vendor provider_stm32f407_hal SOURCES)\n'
+            'get_target_property(options provider_stm32f407_hal COMPILE_OPTIONS)\n'
+            'get_target_property(kind provider_stm32f407_hal TYPE)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/hal-properties" '
+            '"${private}\\n${public}\\n${sources}\\n${vendor}\\n${options}\\n${kind}\\n")\n')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        lines = (self.root / "build/hal-properties").read_text().splitlines()
+        self.assertIn(str(ROOT / "soc/stm32/stm32f407/private/hal"),
+                      lines[0].split(";"))
+        self.assertEqual(lines[1], "public-NOTFOUND")
+        self.assertEqual(lines[3].split(";"), [
+            str(ROOT / "vendors/st/stm32f4_hal/Src" / name)
+            for name in ("stm32f4xx_hal_uart.c", "stm32f4xx_hal_dma.c",
+                         "stm32f4xx_hal_rcc.c")])
+        self.assertIn("$<TARGET_OBJECTS:provider_stm32f407_hal>", lines[2])
+        self.assertIn("-include" + str(
+            ROOT / "soc/stm32/stm32f407/private/stm32f407_hal_profile.h"),
+            lines[4].split(";"))
+        self.assertEqual(lines[5], "OBJECT_LIBRARY")
+
+    def test_real_f407_assembly_selects_one_hal_transport_only_for_dma_tx(self):
+        self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"),
+                             "Prepared ARM compiler required")
+        fixture = ROOT / "tests/contracts/uart_rx_compact_assembly"
+        for mode in ("dma-tx", "irq"):
+            with self.subTest(mode=mode):
+                build = self.root / mode
+                result = subprocess.run([
+                    shutil.which("cmake"), "-S", str(ROOT), "-B", str(build),
+                    "-G", "Ninja",
+                    "-DCMAKE_TOOLCHAIN_FILE=" + str(
+                        ROOT / "cmake/toolchains/arm-gcc.cmake"),
+                    "-DNEXUS_ASSEMBLY_FILE=" + str(
+                        fixture / ("f407-" + mode + ".toml")),
+                    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                    "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF"],
+                    capture_output=True, text=True, timeout=90)
+                self.assertEqual(result.returncode, 0,
+                                 result.stdout + result.stderr)
+                commands = json.loads((build / "compile_commands.json")
+                                      .read_text())
+                vendor = [entry for entry in commands
+                          if "/vendors/st/stm32f4_hal/Src/" in entry["file"]]
+                self.assertEqual(
+                    {Path(entry["file"]).name for entry in vendor},
+                    {"stm32f4xx_hal_uart.c", "stm32f4xx_hal_dma.c",
+                     "stm32f4xx_hal_rcc.c"} if mode == "dma-tx" else set())
+                drivers = {Path(entry["file"]).name for entry in commands
+                           if "/soc/stm32/stm32f407/drivers/" in entry["file"]}
+                self.assertEqual("uart_hal.c" in drivers, mode == "dma-tx")
+                self.assertNotIn("uart_dma.c", drivers)
+                for entry in vendor:
+                    self.assertIn("stm32f407_hal_profile.h", entry["command"])
+                    self.assertIn("/private/hal", entry["command"])
 
     def test_repeated_entry_rechecks_current_bytes_without_cached_success(self):
         fixture = self.root / "source"

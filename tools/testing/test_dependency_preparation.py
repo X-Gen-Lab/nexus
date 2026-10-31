@@ -239,7 +239,7 @@ class DependencyPreparationTests(unittest.TestCase):
                  "https://github.com/personal/googletest.git")
         self.reject_before_mutation()
 
-    def freertos_transition(self):
+    def freertos_transition(self, *, changed_kernel=False):
         from tools.maintenance import freertos_transport
         kernel = self.area / "kernel-remote"
         kernel.mkdir()
@@ -276,6 +276,9 @@ class DependencyPreparationTests(unittest.TestCase):
         self.addCleanup(policy.stop)
         updated = self.modules("ext/freertos").encode()
         (kernel / ".gitmodules").write_bytes(updated)
+        if changed_kernel:
+            (kernel / "tasks.c").write_text("/* Unreviewed kernel edit. */\n")
+            self.git(kernel, "add", "tasks.c")
         self.git(kernel, "add", ".gitmodules")
         self.commit(kernel)
         target = self.git(kernel, "rev-parse", "HEAD")
@@ -308,7 +311,7 @@ class DependencyPreparationTests(unittest.TestCase):
         self.addCleanup(selection.stop)
         return kernel, checkout, base, target
 
-    def freertos_network(self, kernel, target, calls):
+    def freertos_network(self, kernel, target, calls, *, before_sync=None):
         run = subprocess.run
 
         def observe(argv, **kwargs):
@@ -321,24 +324,109 @@ class DependencyPreparationTests(unittest.TestCase):
                 calls.append(argv)
                 argv = list(argv)
                 argv[-2] = str(kernel)
+            if (before_sync is not None and "submodule" in argv and
+                    "sync" in argv and "--recursive" not in argv):
+                before_sync()
             return run(argv, **kwargs)
 
         return patch.object(dependencies.subprocess, "run", side_effect=observe)
 
+    def freertos_state(self, checkout):
+        return {"head": self.git(checkout, "rev-parse", "HEAD"),
+                "index": self.git(checkout, "write-tree"),
+                "origin": self.git(checkout, "remote", "get-url", "origin"),
+                "parent_index": self.git(self.root, "write-tree")}
+
+    def forbid_remote_transport(self, checkout):
+        # Only explicit fixture fetches are redirected to the local supplier.
+        # An accidental fetch inside submodule update must fail without network.
+        for owner in (self.root, checkout):
+            self.git(owner, "config", "protocol.https.allow", "never")
+
     def test_old_freertos_checkout_fetches_reviewed_object_before_switch(self):
         kernel, checkout, base, target = self.freertos_transition()
+        self.forbid_remote_transport(checkout)
         missing = subprocess.run(["git", "-C", str(checkout), "cat-file", "-e",
                                   target + "^{commit}"], capture_output=True)
         self.assertNotEqual(missing.returncode, 0)
         self.assertEqual(self.git(checkout, "rev-parse", "HEAD"), base)
+        initial = self.freertos_state(checkout)
+        admitted = []
+
+        def before_sync():
+            admitted.append((self.freertos_state(checkout),
+                self.git(checkout, "for-each-ref", "--format=%(objectname)",
+                         "refs/nexus/reviewed/" + target)))
+
         calls = []
-        with self.freertos_network(kernel, target, calls):
+        with self.freertos_network(kernel, target, calls,
+                                   before_sync=before_sync):
             receipt = self.prepare(network=True)
         self.assertEqual(receipt["status"], "verified")
+        self.assertEqual(admitted, [(initial, target)])
         self.assertEqual(self.git(checkout, "rev-parse", "HEAD"), target)
         self.assertEqual(len(calls), 1)
         self.assertIn("--no-write-fetch-head", calls[0])
         self.assertEqual(len(receipt["recursive_submodules"]), 3)
+
+    def test_present_dangling_freertos_target_needs_no_remote_fetch(self):
+        kernel, checkout, _, target = self.freertos_transition()
+        self.forbid_remote_transport(checkout)
+        self.git(checkout, "fetch", "--no-tags", "--no-write-fetch-head",
+                 "--recurse-submodules=no", str(kernel), target)
+        self.assertEqual(self.git(checkout, "rev-list", target,
+                                  "--not", "--all"), target)
+        initial = self.freertos_state(checkout)
+        admitted = []
+        calls = []
+        with self.freertos_network(kernel, target, calls,
+                before_sync=lambda: admitted.append(
+                    self.freertos_state(checkout))):
+            receipt = self.prepare(network=True)
+        self.assertEqual(receipt["status"], "verified")
+        self.assertEqual(calls, [])
+        self.assertEqual(admitted, [initial])
+        self.assertEqual(self.git(checkout, "rev-parse", "HEAD"), target)
+        self.assertEqual(self.git(checkout, "rev-list", target,
+                                  "--not", "--all"), "")
+
+    def test_unreviewed_freertos_tree_never_gets_a_retained_reference(self):
+        kernel, checkout, _, target = self.freertos_transition(
+            changed_kernel=True)
+        self.forbid_remote_transport(checkout)
+        initial = self.freertos_state(checkout)
+        references = self.git(checkout, "for-each-ref",
+                              "--format=%(refname) %(objectname)")
+        calls = []
+        with self.freertos_network(kernel, target, calls):
+            with self.assertRaisesRegex(EvidenceError,
+                                        "migration proof failed"):
+                self.prepare(network=True)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(self.freertos_state(checkout), initial)
+        self.assertEqual(self.git(checkout, "for-each-ref",
+            "--format=%(refname) %(objectname)"), references)
+        self.assertEqual(self.git(checkout, "for-each-ref",
+            "--format=%(refname)", "refs/nexus/reviewed"), "")
+
+    def test_owned_freertos_pin_cannot_move_a_symbolic_reference_target(self):
+        kernel, checkout, base, target = self.freertos_transition()
+        self.forbid_remote_transport(checkout)
+        self.git(checkout, "fetch", "--no-tags", "--no-write-fetch-head",
+                 "--recurse-submodules=no", str(kernel), target)
+        guard = "refs/heads/guard"
+        reference = "refs/nexus/reviewed/" + target
+        self.git(checkout, "update-ref", guard, base)
+        self.git(checkout, "symbolic-ref", reference, guard)
+        calls = []
+        with self.freertos_network(kernel, target, calls):
+            self.assertEqual(self.prepare(network=True)["status"], "verified")
+        self.assertEqual(calls, [])
+        self.assertEqual(self.git(checkout, "rev-parse", guard), base)
+        self.assertEqual(self.git(checkout, "rev-parse", reference), target)
+        symbolic = subprocess.run(["git", "-C", str(checkout),
+            "symbolic-ref", "-q", reference], capture_output=True)
+        self.assertNotEqual(symbolic.returncode, 0)
 
     def test_unknown_freertos_head_rejected_before_object_fetch(self):
         kernel, checkout, _, target = self.freertos_transition()
@@ -353,6 +441,7 @@ class DependencyPreparationTests(unittest.TestCase):
 
     def test_freertos_preparation_uses_the_inspected_repository_index(self):
         kernel, checkout, _, target = self.freertos_transition()
+        self.forbid_remote_transport(checkout)
         environment = {"GIT_INDEX_FILE": str(self.seed / ".git/index")}
         with self.freertos_network(kernel, target, []):
             with patch.dict(os.environ, environment):

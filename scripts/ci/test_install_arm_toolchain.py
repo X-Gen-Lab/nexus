@@ -6,8 +6,7 @@ import json
 from pathlib import Path
 import tarfile
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 import urllib.error
 
 try:
@@ -66,10 +65,10 @@ class ArmToolchainTests(unittest.TestCase):
         entry = self.compiler_package()
         destination = self.work / 'installed'
         with self.archive.open('rb') as source:
-            with mock.patch.object(installer.urllib.request, 'urlopen',
+            with unittest.mock.patch.object(installer.urllib.request, 'urlopen',
                                    side_effect=[urllib.error.URLError('temporary'),
                                                 source]) as download:
-                with mock.patch('time.sleep'):
+                with unittest.mock.patch('time.sleep'):
                     installer.install(destination, entry,
                                       cache_dir=self.work / 'cache')
         self.assertEqual(download.call_count, 2)
@@ -90,9 +89,9 @@ class ArmToolchainTests(unittest.TestCase):
         def interrupted(*args, **kwargs):
             return InterruptedDownload(self.archive.read_bytes())
 
-        with mock.patch.object(installer.urllib.request, 'urlopen',
+        with unittest.mock.patch.object(installer.urllib.request, 'urlopen',
                                side_effect=interrupted) as download:
-            with mock.patch('time.sleep'):
+            with unittest.mock.patch('time.sleep'):
                 with self.assertRaisesRegex(OSError, 'interrupted'):
                     installer.install(destination, entry,
                                       cache_dir=self.work / 'cache')
@@ -105,7 +104,7 @@ class ArmToolchainTests(unittest.TestCase):
         entry = self.compiler_package()
         destination = self.work / 'installed'
         cache = self.work / 'cache'
-        with mock.patch.object(installer.urllib.request, 'urlopen',
+        with unittest.mock.patch.object(installer.urllib.request, 'urlopen',
                                side_effect=KeyboardInterrupt) as download:
             with self.assertRaises(KeyboardInterrupt):
                 installer.install(destination, entry, cache_dir=cache)
@@ -118,7 +117,7 @@ class ArmToolchainTests(unittest.TestCase):
         entry = self.compiler_package()
         cache = self.work / 'cache'
         installer.install(self.work / 'first', entry, cache_dir=cache)
-        with mock.patch.object(installer.urllib.request, 'urlopen',
+        with unittest.mock.patch.object(installer.urllib.request, 'urlopen',
                                side_effect=AssertionError('must use cache')):
             installer.install(self.work / 'second', entry, cache_dir=cache)
         self.assertEqual((self.work / 'second/bin/arm-none-eabi-gcc').read_bytes(),
@@ -138,9 +137,9 @@ class ArmToolchainTests(unittest.TestCase):
         cache = self.work / 'cache'
         installer.install(self.work / 'first', entry, cache_dir=cache)
         self.cached_archive(entry).write_bytes(b'modified after first install')
-        with mock.patch.object(installer.urllib.request, 'urlopen',
+        with unittest.mock.patch.object(installer.urllib.request, 'urlopen',
                                side_effect=urllib.error.URLError('offline')):
-            with mock.patch('time.sleep'):
+            with unittest.mock.patch('time.sleep'):
                 with self.assertRaises(urllib.error.URLError):
                     installer.install(self.work / 'second', entry,
                                       cache_dir=cache)
@@ -150,7 +149,7 @@ class ArmToolchainTests(unittest.TestCase):
     def test_wrong_download_digest_never_publishes_cache_or_destination(self):
         entry = self.compiler_package()
         entry['sha256'] = '0' * 64
-        with mock.patch('time.sleep'):
+        with unittest.mock.patch('time.sleep'):
             with self.assertRaisesRegex(ValueError, 'SHA-256'):
                 installer.install(self.work / 'installed', entry,
                                   cache_dir=self.work / 'cache')

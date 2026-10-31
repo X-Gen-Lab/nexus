@@ -282,9 +282,9 @@ def collect(root=ROOT):
 
 def render(rows):
     """Render the sole derived block deterministically without qualification."""
-    lines = ["| SoC | Controller | Kind | Mode | Reviewed SoC routes | "
-             "Declared reference Boards | Resolver fixtures | "
-             "Selected production source |",
+    lines = [("| SoC | Controller | Kind | Mode | Reviewed SoC routes | "
+              "Declared reference Boards | Resolver fixtures | "
+              "Selected production source |"),
              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for row in rows:
         cells = [row[key] for key in ("family", "controller", "kind", "mode")]

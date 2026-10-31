@@ -183,6 +183,8 @@ class _Trace:
                 "serial raw stream exceeded capture bound")
 
     def close(self):
+        # Defer even KeyboardInterrupt/SystemExit until every owned stream has
+        # been attempted, then preserve the first failure instead of a later one.
         failure = None
         for stream in self.streams.values():
             if not stream.closed:

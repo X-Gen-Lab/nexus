@@ -571,6 +571,7 @@ include(soc_system.cmake)
 include(gd32_exti.cmake)
 include(stm32_exti.cmake)
 include(stm32_official.cmake)
+include(stm32_uart_hal.cmake)
 include(h743.cmake)
 include(h743_spi_wire.cmake)
 include(h743_dma.cmake)
@@ -638,3 +639,5 @@ include(u575_lptim1_lpbam.cmake)
 include(gd32_uart_cold_factory.cmake)
 
 include(gd32_control_cold.cmake)
+
+include(official_leaf_probes.cmake)

@@ -40,6 +40,8 @@ void nx_u575_model_reset(void) {
     std::memset(&g_nx_stm32u575_system, 0, sizeof(g_nx_stm32u575_system));
     g_u575_model.privileged = true;
     g_u575_model.rcc.CR = RCC_CR_MSISON | RCC_CR_MSISRDY;
+    g_u575_model.rcc.ICSCR1 = 17U << RCC_ICSCR1_MSICAL1_Pos;
+    g_u575_model.rcc.ICSCR2 = 0x00084210U;
     g_u575_model.rcc.CSR = 4U << RCC_CSR_MSISSRANGE_Pos;
     g_u575_model.flash_kib = 2048;
     g_nx_stm32u575_system.rcc = &g_u575_model.rcc;

@@ -102,7 +102,7 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
         LL_ADC_REG_StartConversionSWStart(port->registers);
         for (;;) {
             NX_STM32_IO_POLL(5U, port);
-            if ((port->registers->SR & ADC_SR_OVR) != 0U) {
+            if (LL_ADC_IsActiveFlag_OVR(port->registers) != 0U) {
                 result = NX_ERROR_IO;
                 break;
             }
@@ -110,7 +110,7 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
                 result = NX_ERROR_TIMEOUT;
                 break;
             }
-            if ((port->registers->SR & ADC_SR_EOC) != 0U) {
+            if (LL_ADC_IsActiveFlag_EOCS(port->registers) != 0U) {
                 samples[(*count)++] =
                     (uint16_t)(LL_ADC_REG_ReadConversionData12(
                                    port->registers) &

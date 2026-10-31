@@ -7,7 +7,7 @@ import sys
 import tempfile
 import unittest
 
-from tools.configure import configure as gate, emission
+from tools.configure import configure as gate, memory
 
 
 class U575Sram4ConfigurationTests(unittest.TestCase):
@@ -60,7 +60,7 @@ class U575Sram4ConfigurationTests(unittest.TestCase):
                       (output / "nexus_config.h").read_text())
         self.assertIn("set(NEXUS_MEMORY_SRAM4 1)",
                       (output / "selection.cmake").read_text())
-        declarations, count = emission.dma_regions("copy", gate.resolve_ir(self.root / "assembly.toml"),
+        declarations, count = memory.dma_regions("copy", gate.resolve_ir(self.root / "assembly.toml"),
                                                     engine="LPDMA1")
         self.assertEqual(count, 1)
         self.assertIn("0x28000000u, 16384u", "\n".join(declarations))

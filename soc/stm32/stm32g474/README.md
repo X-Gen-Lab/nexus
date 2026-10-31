@@ -271,10 +271,12 @@ HIL remains `not_executed`.
 
 The official CMSIS Device G4 source is pinned to
 `626ee412334a5ed2e5b320af5a8d77d69f03a558`, with its original Apache-2.0 LICENSE.md
-and ST source notices preserved. ADC/DMAMUX inline primitives use the private
+and ST source notices preserved. ADC/DMAMUX/I2C inline primitives use the private
 STM32CubeG4 v1.6.3 paired driver `f5929f431f9effe45fbe18f5337e4753ced9ac92`
-with its unchanged BSD-3-Clause notice and exact selected-file lock. Public
-product interfaces do not expose SDK
+with its unchanged BSD-3-Clause notice and exact selected-file lock. Selected
+I2C receive/transmit use a private compile-time port inside the existing engine;
+see the [official-driver contract](../../../docs/design/official-stm32-provider.md)
+for retained command exceptions. Public product interfaces do not expose SDK
 register types. The SDK is private to selected implementation targets.
 
 Developer model logs, strict C11 ARM commands, actual official startup ELF
@@ -297,6 +299,8 @@ TIM6 触发的有限普通 DMA block、I2C1 PB8/PB9 polling 及完整物理 Flas
 的 C prepare/close 函数负责。Python 仅生成不可变资源配置、精确静态存储和固定的
 类型化调用，不生成硬件算法。每个选中焊盘只保留一份原始状态；清理失败保留原始
 快照及未归还时钟，等待显式重试。空装配不链接外设冷态实现或保留引脚状态。
+选定 I2C 通过私有编译期 port 复用官方 LL 收发叶操作，不增加运行时转发层或 owner；
+命令访问例外与资格边界见[官方驱动合同](../../../docs/design/official-stm32-provider.md)。
 
 FDCAN1 新增精确 STM32G474RET6 的 ISO-FD 正常/内部环回软件装配，
 500 kbit/s / 2 Mbit/s、固定 212 word 物理消息 RAM 与 3 个硬件优先级发送槽。

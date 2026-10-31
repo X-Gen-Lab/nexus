@@ -43,7 +43,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                     and row["mode"] == "dma-tx"]
         self.assertEqual(len(uart_dma), 1)
         self.assertEqual(uart_dma[0]["exports"],
-                         ["soc/stm32/stm32f407/drivers/uart_dma.c"])
+                         ["soc/stm32/stm32f407/drivers/uart_hal.c"])
         self.assertTrue(uart_dma[0]["fixtures"])
         spi = next(row for row in rows if row["family"] == "stm32f407"
                    and row["controller"] == "SPI1" and row["mode"] == "dma")

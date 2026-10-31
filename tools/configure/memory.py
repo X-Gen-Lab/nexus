@@ -281,6 +281,21 @@ def linker(result):
                         "linker_fragments", None)
     (flash_image_record, flash_ram_phdr, flash_ram_section,
      flash_workspace_bss) = (fragments(result) if fragments else ("", "", "", ""))
+    vector_assertions = ""
+    if flash["origin"] != result.flash["origin"]:
+        profile = maintained(result.soc_family)
+        alignment = profile.OFFSET_IMAGE_ALIGNMENT
+        symbol = profile.OFFSET_IMAGE_VECTOR_SYMBOL
+        vector_assertions = (
+            '    ASSERT(ADDR(.isr_vector) == ORIGIN(FLASH), '
+            '"image vectors must begin at the image origin")\n'
+            f'    ASSERT((ADDR(.isr_vector) & {alignment - 1}) == 0, '
+            '"image vectors require reviewed alignment")\n'
+            f'    ASSERT({symbol} == ADDR(.isr_vector), '
+            '"startup vectors must begin the image vector section")\n'
+            '    ASSERT(SIZEOF(.isr_vector) > 0 && '
+            f'SIZEOF(.isr_vector) <= {alignment}, '
+            '"image vector table exceeds the reviewed reservation")\n')
     return f'''/* Exact resolved physical layout; no product reservation. */
 ENTRY(Reset_Handler)
 PHDRS {{
@@ -315,7 +330,7 @@ __nx_resolved_sha256_6 = 0x{result.configuration_sha256[48:56]};
 __nx_resolved_sha256_7 = 0x{result.configuration_sha256[56:64]};
 SECTIONS {{
     .isr_vector : {{ KEEP(*(.isr_vector)) KEEP(*(.vectors)) }} > FLASH :flash
-    .text : {{ *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > FLASH :flash
+{vector_assertions}    .text : {{ *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > FLASH :flash
     .ARM.extab : {{ *(.ARM.extab*) }} > FLASH :flash
     .ARM.exidx : {{ __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; }} > FLASH :flash
     .preinit_array : {{ PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); }} > FLASH :flash

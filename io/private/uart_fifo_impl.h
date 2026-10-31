@@ -8,14 +8,41 @@
  */
 #include <limits.h>
 
+/* One specialization per translation unit. The wrapper owns all required
+ * NX bindings, including exports and post-include cold helpers. This template
+ * removes only its own helper/default macros; caller-supplied ports survive. */
 #if !defined(NX_UART_FIFO_OPS) || !defined(NX_UART_FIFO_INITIALIZE) ||         \
     !defined(NX_UART_FIFO_IRQ) || !defined(NX_UART_FIFO_STATE) ||              \
-    !defined(NX_UART_FIFO_BASE) || !defined(NX_UART_FIFO_DEPTH)
+    !defined(NX_UART_FIFO_BASE) || !defined(NX_UART_FIFO_DEPTH) ||             \
+    !defined(NX_UART_FIFO_CLOCK) || !defined(NX_UART_FIFO_REGISTERS) ||        \
+    !defined(NX_UART_FIFO_VECTOR) || !defined(NX_UART_FIFO_READ) ||            \
+    !defined(NX_UART_FIFO_WRITE) || !defined(NX_UART_FIFO_POLL) ||             \
+    !defined(NX_UART_FIFO_ENABLE) || !defined(NX_UART_FIFO_RX_THRESHOLD) ||    \
+    !defined(NX_UART_FIFO_TX_THRESHOLD) || !defined(NX_UART_FIFO_RECEIVE) ||   \
+    !defined(NX_UART_FIFO_TRANSMIT) || !defined(NX_UART_FIFO_IRQ_ENABLED) ||   \
+    !defined(NX_UART_FIFO_IRQ_PENDING) || !defined(NX_UART_FIFO_IRQ_ACTIVE) || \
+    !defined(NX_UART_FIFO_IRQ_CONTROL) ||                                      \
+    !defined(NX_UART_FIFO_IRQ_PRIORITY) || !defined(NX_UART_FIFO_IRQ_GROUP) || \
+    !defined(NX_UART_FIFO_ACCESS_READY) ||                                     \
+    !defined(NX_UART_FIFO_CLOCK_READY) ||                                      \
+    !defined(NX_UART_FIFO_CONTROL_OVERLAP) ||                                  \
+    !defined(NX_UART_FIFO_RX_READY) || !defined(NX_UART_FIFO_TX_READY)
 #error "FIFO implementation requires one complete concrete specialization"
 #endif
 
 #ifndef NX_UART_FIFO_RTSCTS
-#define NX_UART_FIFO_RTSCTS 0
+#define NX_UART_FIFO_DEFAULT_UART_FIFO_RTSCTS 1
+#define NX_UART_FIFO_RTSCTS                   0
+#endif
+
+#if NX_UART_FIFO_DEPTH < 1U || NX_UART_FIFO_DEPTH > 16U
+#error "Unsupported FIFO depth"
+#endif
+#if NX_UART_FIFO_RTSCTS != 0 && NX_UART_FIFO_RTSCTS != 1
+#error "Unsupported FIFO flow selector"
+#endif
+#if NX_UART_FIFO_RTSCTS && !defined(NX_UART_FIFO_HW_FLOW)
+#error "RTS/CTS FIFO implementation requires hardware flow control"
 #endif
 
 #define FIFO_TX_CR1 ((uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE))
@@ -679,3 +706,14 @@ nx_result_t NX_UART_FIFO_INITIALIZE(NX_UART_FIFO_STATE* s, uint32_t clock,
 const nx_uart_ops_t NX_UART_FIFO_OPS = {
     fifo_submit,     fifo_start_admitted, fifo_cancel,      fifo_service, NULL,
     fifo_read_bytes, fifo_stop,           fifo_attach_wake, NULL,         NULL};
+
+/* The specialization bindings remain owned by the concrete wrapper. */
+#undef FIFO_TX_CR1
+#undef FIFO_RX_ERRORS
+#undef FIFO_ENTRY_ERRORS
+#undef FIFO_CR1_SOURCES
+#undef FIFO_CR3_SOURCES
+#ifdef NX_UART_FIFO_DEFAULT_UART_FIFO_RTSCTS
+#undef NX_UART_FIFO_RTSCTS
+#undef NX_UART_FIFO_DEFAULT_UART_FIFO_RTSCTS
+#endif

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fcb2244e8408c5ae4fa37a25a1ff1a548be3f6c265317b6105d36ed0d7b1aaa8\n"
+"X-Nexus-Source-SHA256: 62db66a7eb40cf5e3f87154f438c60f0499960f4032f9ebd12c019c0176cc599\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
@@ -210,3 +210,34 @@ msgstr ""
 "策略，不生成 SoC/Board/startup/factory。不得据此声明完整设备平台。[构建合同](../../design/build-"
 "system.md)、[接入合同](../../design/integration-contracts.md)和生产字段模型／schema "
 "拥有详细合法字段；编辑器补全不建立硬件能力。"
+
+
+msgid "`layout`"
+msgstr "`layout`"
+
+msgid "Optional schema-1 Flash-region JSON path relative to the assembly; exactly one image"
+msgstr "相对装配文件的可选 schema-1 Flash region JSON 路径；只允许一个镜像"
+
+msgid "Physical Flash and the selected image"
+msgstr "物理 Flash 与所选镜像"
+
+msgid "`flash` in the resolved output describes the complete physical device, including its exact erase and programming geometry. `layout` selects the linked image window. Without an authored `layout`, that image uses the full physical Flash. A smaller image does not redefine the physical Flash API or create a Flash access control policy. Products still own erase-aligned writable regions and recovery."
+msgstr "解析输出中的 `flash` 描述完整物理器件及其精确擦除、编程几何。`layout` 选择链接镜像窗口。没有显式 `layout` 时，镜像使用完整物理 Flash。较小的镜像不会重新定义物理 Flash API，也不会创建 Flash 访问控制政策。产品仍负责擦除对齐的可写区域和恢复策略。"
+
+msgid "A `layout` JSON file has `schema_version = 1` and `regions`. Each region has an `id`, integer `origin`, positive `size` and `kind` (`image` or `data`). Exactly one region is an image. IDs must be unique; all regions must be nonoverlapping, within physical Flash, and start/end on its exact erase boundaries. This is an auxiliary layout input; schema-1 JSON assemblies remain rejected."
+msgstr "`layout` JSON 文件包含 `schema_version = 1` 和 `regions`。各 region 具有 `id`、整数 `origin`、正数 `size` 和 `kind`（`image` 或 `data`）。只能有一个 image region。ID 必须唯一；全部 region 必须互不重叠、位于物理 Flash 内，并从其精确擦除边界开始、结束。这是辅助 layout 输入；schema-1 JSON 装配仍然拒绝。"
+
+msgid "The reviewed offset-image profiles are STM32F407VET6, STM32F407ZGT6 and GD32F470ZGT6. Other SoCs still require a reset-address image. An admitted offset must additionally satisfy the source-owned 512-byte vector alignment. The selected profile owns that alignment and the actual vendor vector symbol; authored or artifact JSON cannot grant another chip offset support."
+msgstr "已审查的偏移镜像 profile 是 STM32F407VET6、STM32F407ZGT6 和 GD32F470ZGT6。其他 SoC 仍要求复位地址镜像。被接受的偏移还必须满足由源码定义的 512 字节向量对齐。所选 profile 拥有该对齐和实际 vendor vector symbol；用户或产物 JSON 不能授予其他芯片偏移支持。"
+
+msgid "For example, this complete layout file selects the final 384 KiB of Sky STM32F407VET6 Flash. Select it with the assembly's `layout` path. The decimal origin is `0x08020000`; the omitted first 128 KiB is not another selected image and is not protected from writes by this layout."
+msgstr "例如，这个完整 layout 文件选择天空星 STM32F407VET6 Flash 的最后 384 KiB。通过装配的 `layout` 路径选择它。十进制 origin 对应 `0x08020000`；省略的前 128 KiB 不是另一个所选镜像，也不会因本 layout 而获得写保护。"
+
+msgid "For an offset image, generated linker checks require `.isr_vector` at the image origin, correct alignment, a nonempty table no larger than 512 bytes, and the actual vendor symbol at the section base: `g_pfnVectors` for F407 or `__gVectors` for GD470. The selected startup sets VTOR from that linked symbol with the required barriers. Default reset-address linker output keeps its existing path."
+msgstr "偏移镜像的生成 linker 检查要求 `.isr_vector` 位于镜像起点并正确对齐，向量表非空且不大于 512 字节，实际 vendor symbol 位于该 section 基址：F407 使用 `g_pfnVectors`，GD470 使用 `__gVectors`。所选 startup 从链接后的符号设置 VTOR，并执行必要屏障。默认复位地址 linker 输出保留既有路径。"
+
+msgid "ELF LOAD bounds, Flash capacity and footprint use the selected image window. ELF-to-BIN checks reconstruct bytes from that image origin rather than prefixing the binary to physical Flash base. Physical erase/program facts and RAM budgets remain unchanged; use `flash`, not `layout.origin`, to interpret erase geometry."
+msgstr "ELF LOAD 边界、Flash 容量和 footprint 使用所选镜像窗口。ELF-to-BIN 检查从该镜像起点重建字节，不补入物理 Flash 基址到镜像起点之间的前缀字节。物理擦除/编程事实和 RAM 预算保持不变；解释擦除几何时使用 `flash`，不能以 `layout.origin` 为基准。"
+
+msgid "An offset executable still needs a product-owned boot path that reaches its vendor reset entry with valid initial machine state. Linking, vector checks and BIN identity do not execute that path. This mechanism does not provide image authentication, activation, A/B rollback, Flash permissions or a general running image handoff. Baremetal or FreeRTOS links prove their build scope only. In particular, the existing F407 handoff retains PRIMASK=1 and startup does not unmask it; no FreeRTOS handoff qualification follows from an offset link."
+msgstr "偏移可执行文件仍需要产品拥有的启动路径，在有效初始机器状态下进入其 vendor reset entry。链接、向量检查和 BIN 身份不会执行这条路径。该机制不提供镜像认证、激活、A/B 回滚、Flash 权限或通用运行态镜像交接。裸机或 FreeRTOS 链接只证明各自构建范围。尤其是现有 F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移链接不能建立 FreeRTOS handoff 资格。"

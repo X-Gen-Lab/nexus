@@ -1,5 +1,11 @@
 # Historical execution evidence
 
+The eight compressed payloads are kept in the fixed
+[4433a753 Git snapshot](https://github.com/X-Gen-Lab/nexus/tree/4433a753389abd7afd014330e7e6824ea3da037a/docs/archive/evidence),
+not in the current source checkout. Package metadata and original evidence
+identities remain here. Recover the fixed snapshot before using the existing
+explicit `--archive` commands below; this relocation creates no new qualification.
+
 The [2026-10-23 index](20261023/index.json) preserves the complete historical
 `tests/evidence/` and `tools/testing/evidence/` trees from Nexus commit
 `e820b24791d3b4a006d0fc3b3a759819e0278413`. It binds the source tree, each
@@ -26,6 +32,19 @@ New test inputs belong in maintained fixtures, not in these historical trees.
 
 ## Verify or restore
 
+Use Bash, Git and tar for this extraction step. The fixed historical commit and
+its blobs must be available locally; prepare them before an offline restore.
+Choose a new task-owned extraction directory. A failed command must stop the
+procedure and its partial output must not be accepted.
+
+```bash
+set -o pipefail
+nexus_history_archives=/tmp/nexus-history-archives-4433a753
+mkdir "$nexus_history_archives" || exit 1
+git archive 4433a753389abd7afd014330e7e6824ea3da037a \
+  docs/archive/evidence | tar -xf - -C "$nexus_history_archives" || exit 1
+```
+
 Run from a Nexus checkout using Python 3.11 or later. Choose a new output
 directory. The explicit `--archive` path permits relocation without changing the
 expected package identities. Archived scripts are historical data; do not execute
@@ -34,24 +53,24 @@ them as a current build or qualification command.
 ```sh
 python tools/evidence/store.py verify \
   --package docs/archive/evidence/20261023/tests-evidence.json \
-  --archive docs/archive/evidence/20261023/tests-evidence.tar.gz \
-  --report /tmp/nexus-history-tests-verification.json
+  --archive "$nexus_history_archives/docs/archive/evidence/20261023/tests-evidence.tar.gz" \
+  --report /tmp/nexus-history-tests-verification.json || exit 1
 ```
 
 Restore all original paths under a fresh, task-owned directory:
 
 ```sh
 nexus_history_root=/tmp/nexus-history-e820b247
-mkdir "$nexus_history_root"
+mkdir "$nexus_history_root" || exit 1
 python tools/evidence/store.py restore \
   --package docs/archive/evidence/20261023/tests-evidence.json \
-  --archive docs/archive/evidence/20261023/tests-evidence.tar.gz \
+  --archive "$nexus_history_archives/docs/archive/evidence/20261023/tests-evidence.tar.gz" \
   --destination "$nexus_history_root/tests/evidence" \
-  --report "$nexus_history_root/tests-restored.json"
+  --report "$nexus_history_root/tests-restored.json" || exit 1
 for part in 01 02 03 04 05; do
   python tools/evidence/store.py restore \
     --package "docs/archive/evidence/20261023/tools-testing-evidence-part-$part.json" \
-    --archive "docs/archive/evidence/20261023/tools-testing-evidence-part-$part.tar.gz" \
+    --archive "$nexus_history_archives/docs/archive/evidence/20261023/tools-testing-evidence-part-$part.tar.gz" \
     --destination "$nexus_history_root/tools-part-$part" \
     --report "$nexus_history_root/tools-part-$part-restored.json" || exit 1
 done
@@ -77,6 +96,13 @@ without copying file data or overwriting another scope. If a command fails,
 preserve its report and use a new output directory for a later restore.
 
 # 历史执行证据
+
+八份压缩包保存在固定的
+[4433a753 Git 快照](https://github.com/X-Gen-Lab/nexus/tree/4433a753389abd7afd014330e7e6824ea3da037a/docs/archive/evidence)
+中，已从当前源码检出移出；本目录继续保留 package 元数据和原始证据身份。
+先按上述 Bash 命令将固定历史版本提取到全新专用目录，再使用既有 `--archive`
+参数验证或恢复。离线操作前须确保该提交及其 blob 已在本地；任一命令失败即停止，
+不接受部分提取结果。此次位置调整不建立新的软件、实板或发布资格。
 
 [2026-10-23 索引](20261023/index.json)保存 Nexus 源码
 `e820b24791d3b4a006d0fc3b3a759819e0278413` 中完整的 `tests/evidence/`

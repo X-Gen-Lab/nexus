@@ -9,8 +9,7 @@ import os
 import signal
 import sys
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 from scripts.ci import provider_assemblies as gate
 from tools.evidence.common import EvidenceError
@@ -161,7 +160,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
             self.assertFalse((root / "source").exists())
 
     def test_cli_repeated_project_rejects_before_running_the_matrix(self):
-        with mock.patch.object(gate, "run") as run, \
+        with unittest.mock.patch.object(gate, "run") as run, \
                 contextlib.redirect_stderr(io.StringIO()), \
                 self.assertRaises(SystemExit) as failure:
             gate.main(["--fixture", str(self.assembly), "--output", "unused",
@@ -171,23 +170,23 @@ class ExplicitProjectAdmission(unittest.TestCase):
         run.assert_not_called()
 
     def test_cli_default_inherits_outer_build_jobs(self):
-        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
+        with unittest.mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
                                          "CMAKE_BUILD_PARALLEL_LEVEL": "9"}), \
-                mock.patch.object(gate, "run", return_value=0) as run:
+                unittest.mock.patch.object(gate, "run", return_value=0) as run:
             result = gate.main(["--fixture", str(USB), "--output", "unused"])
         self.assertEqual(result, 0)
         self.assertEqual(run.call_args.kwargs["parallel"], 1)
 
     def test_explicit_cli_allocation_overrides_outer_default(self):
-        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1"}), \
-                mock.patch.object(gate, "run", return_value=0) as run:
+        with unittest.mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1"}), \
+                unittest.mock.patch.object(gate, "run", return_value=0) as run:
             result = gate.main(["--fixture", str(USB), "--output", "unused",
                                 "--parallel", "3"])
         self.assertEqual(result, 0)
         self.assertEqual(run.call_args.kwargs["parallel"], 3)
 
     def test_cli_passes_the_explicit_project_without_family_inference(self):
-        with mock.patch.object(gate, "run", return_value=0) as run:
+        with unittest.mock.patch.object(gate, "run", return_value=0) as run:
             self.assertEqual(gate.main([
                 "--fixture", str(self.assembly), "--output", "unused",
                 "--project", str(self.project)]), 0)
@@ -302,7 +301,7 @@ class ActualCommandRecording(unittest.TestCase):
 
     def test_command_environment_does_not_inherit_test_filters(self):
         with tempfile.TemporaryDirectory() as directory:
-            with mock.patch.dict(os.environ, {"GTEST_FILTER": "nothing", "CTEST_PARALLEL_LEVEL": "9"}):
+            with unittest.mock.patch.dict(os.environ, {"GTEST_FILTER": "nothing", "CTEST_PARALLEL_LEVEL": "9"}):
                 recorder = gate.Recorder(Path(directory), ROOT)
             output = recorder.execute([sys.executable, "-c",
                 "import os; print(int(any(k.startswith(('GTEST_', 'CTEST_')) for k in os.environ)))"],
@@ -323,6 +322,8 @@ class ActualCommandRecording(unittest.TestCase):
                     try:
                         os.kill(int(log.read_text().strip()), signal.SIGKILL)
                     except ProcessLookupError:
+                        # The recorder may already have withdrawn this child.
+                        # Other cleanup errors must still fail the test.
                         pass
 
 
@@ -438,9 +439,9 @@ class OutputAdmission(unittest.TestCase):
             gate.dependency_paths("a.o: #deps 1, deps mtime 1 (STALE)\n    file.h\n", ROOT)
 
     def test_empty_retention_rejects_retained_concrete_provider(self):
-        elf = mock.Mock()
+        elf = unittest.mock.Mock()
         elf.defined_symbols = [{"name": "nx_any_uart_ops"}]
-        with mock.patch.object(gate.retention, "source_contracts", return_value=(
+        with unittest.mock.patch.object(gate.retention, "source_contracts", return_value=(
                 {}, {}, {"nx_any_uart_ops": {}}, [])):
             with self.assertRaisesRegex(EvidenceError, "unselected"):
                 gate.empty_retention(elf, "", {"controllers": [], "devices": []})

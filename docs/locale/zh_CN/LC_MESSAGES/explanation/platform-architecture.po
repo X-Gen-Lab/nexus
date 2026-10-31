@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cc2dbaacad22d336b4f13e8f0c92273db8ca9259d63efc7d4fb6352f6b8da571\n"
+"X-Nexus-Source-SHA256: 505ffd19d23cacb3e71ca7641583c2a9a0b56fa52b2112acd91063d15462d30f\n"
 
 #: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:9
 msgid "How the platform is assembled and executed"
@@ -369,30 +369,6 @@ msgstr ""
 "Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ "
 "分发固定到提供者实例，不为每个字节重复执行工厂查找。"
 
-#: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:142
-msgid ""
-"The constructor contract names private state, definitions, read-only "
-"admission, initialization, stop actions and failed-init responsibility "
-"explicitly. Admission, initializer and stop lists use immutable `DirectCall`"
-" values with explicit static references or constants; no free-form C "
-"expression or function-pointer/member-call expression can enter those "
-"fields. Definitions remain generated static C source and fixed connections; "
-"hardware algorithms are maintained in C. The C compiler establishes actual "
-"symbol and parameter types. Model tests and linked-image checks remain "
-"necessary: this narrow representation is not a complete typed C AST. Common "
-"generation does not infer these decisions from family names. Selected "
-"STM32F4 official LL operations remain inside private SoC state machines; "
-"factory and public I/O contracts are unchanged. Full HAL Handle/callback "
-"transport requires separate mode-specific evaluation. See [official driver "
-"integration](../design/official-stm32-provider.md)."
-msgstr ""
-"构造合同明确列出私有状态、定义、只读准入、初始化、停止动作和启动失败责任。准入、初始化与停止列表使用不可变 `DirectCall` "
-"值及显式静态引用或常量；这些字段不接受自由形式的 C 表达式或函数指针／成员调用表达式。定义仍是生成的静态 C 源码和固定连接；硬件算法直接维护在 C "
-"中。C 编译器确定实际符号和参数类型。模型测试与链接镜像检查仍然必要：这种窄表达不是完整的类型化 C AST。公共生成器不从家族名称推断这些决策。选定的"
-" STM32F4 官方 LL 操作仍位于私有 SoC 状态机内；factory 和公共 I/O 合同保持不变。完整 HAL "
-"Handle／callback 传输需要按模式单独评估。参见{doc}`官方驱动集成 <../design/official-"
-"stm32-provider>`。"
-
 #: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:156
 msgid ""
 "The legacy F103/GD303 selections share private algorithms only after exact "
@@ -513,3 +489,11 @@ msgstr ""
 "阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
 "contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
 "HIL 分别建立各自执行范围。"
+
+
+msgid "Each of the eight maintained providers owns data-only `descriptor.py` metadata at its SoC package root, outside `configure/`. The central frozen `FamilyDescriptor` and explicit family-to-module map remain in `tools/configure/providers/descriptor.py`; the provider loader delegates that lookup without a second eager registry. A single `descriptor.maintained()` lookup loads only selected metadata, without configuration behavior; `providers.maintained()` uses that record to import the selected configure package. Explicit enumeration, source snapshots and SDK inventory may read all metadata. No descriptor becomes a second software source graph."
+msgstr "八个维护中的 provider 各自在 SoC package 根目录拥有纯数据 `descriptor.py` 元数据，位于 `configure/` 之外。通用冻结 `FamilyDescriptor` 和显式 family-to-module map 仍在 `tools/configure/providers/descriptor.py`；provider loader 委托该查找，不另建 eager registry。单次 `descriptor.maintained()` 查找只加载所选元数据，不加载配置行为；`providers.maintained()` 使用该记录导入所选 configure package。显式枚举、源码快照和 SDK 清单可以读取全部元数据。descriptor 不成为第二份软件源码图。"
+
+
+msgid "The constructor contract names private state, definitions, read-only admission, initialization, stop actions and failed-init responsibility explicitly. Admission, initializer and stop lists use immutable `DirectCall` values with explicit static references or constants; no free-form C expression or function-pointer/member-call expression can enter those fields. Definitions remain generated static C source and fixed connections; hardware algorithms are maintained in C. The C compiler establishes actual symbol and parameter types. Model tests and linked-image checks remain necessary: this narrow representation is not a complete typed C AST. Common generation does not infer these decisions from family names. Selected STM32F4 official LL operations remain inside private SoC state machines. Selected F407 UART `dma-tx` uses private HAL finite TX with disjoint LL IRQ RX under one owner; other UART modes retain their existing engines. The static shared-ops factory and public I/O contracts are unchanged. The current bounded U575 PWM/UART/RTC/GPIO, H743 SPI and five-SoC I2C operation changes select private LL/HAL calls at compile time inside their existing engines, with no additional runtime forwarding layer. These mode-specific integrations do not qualify another family or replace final clean-source evidence. See [official driver integration](../design/official-stm32-provider.md)."
+msgstr "构造器合同显式命名私有 state、definition、只读 admission、initialization、stop action 和失败初始化责任。admission、initializer 和 stop 列表使用带显式静态引用或常量的不可变 `DirectCall`；这些字段不能包含自由 C 表达式或 function-pointer/member-call 表达式。definition 仍是生成的静态 C 源码和固定连接；硬件算法直接维护在 C 中。C 编译器建立实际 symbol 和参数类型。模型测试和链接镜像检查仍然必要：这个窄表示不是完整 typed C AST。公共生成器不会从 family 名推断这些决策。所选 STM32F4 官方 LL 操作仍在私有 SoC 状态机内。所选 F407 UART `dma-tx` 在一个 owner 内使用私有 HAL 有限 TX 和分离的 LL IRQ RX；其他 UART 模式保留既有引擎。静态共享 ops factory 和公共 I/O 合同不变。当前有界的 U575 PWM/UART/RTC/GPIO、H743 SPI 和五个 SoC 的 I2C 操作改动，在既有引擎内部通过编译期选择私有 LL/HAL 调用，没有额外的运行时转发层。这些逐模式集成不会授予其他 family 资格，也不能替代最终 clean-source 证据。见[官方驱动集成](../design/official-stm32-provider.md)。"

@@ -432,6 +432,7 @@ def main(arguments=None, *, root=ROOT):
             try:
                 server.serve_forever()
             except KeyboardInterrupt:
+                # Ctrl-C ends preview normally; finally closes the socket.
                 pass
             finally:
                 server.server_close()

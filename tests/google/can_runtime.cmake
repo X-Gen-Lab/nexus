@@ -24,7 +24,8 @@ foreach(can_family stm32 gd32)
             NX_CAN_SOC_STM32 NEXUS_STM32_MODEL STM32F407xx)
     else()
         target_sources(${can_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can_layout.c")
         target_include_directories(${can_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")

@@ -9,7 +9,7 @@ import tempfile
 import textwrap
 import unittest
 
-from tools.configure import configure as gate, emission, memory
+from tools.configure import configure as gate, memory
 
 
 class MemoryRegionConfigurationTests(unittest.TestCase):
@@ -177,7 +177,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
                 domains = {item["id"]: item for item in ir.memory}
                 self.assertTrue(domains["ccm"]["linker"])
                 self.assertFalse(domains["ccm"]["dma"])
-                declarations, count = emission.dma_regions("selected", ir,
+                declarations, count = memory.dma_regions("selected", ir,
                                                          include_flash=True)
                 self.assertEqual(count, 2)
                 self.assertNotIn("0x10000000", "\n".join(declarations))

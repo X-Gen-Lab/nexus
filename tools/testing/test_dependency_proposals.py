@@ -6,12 +6,10 @@ from pathlib import Path
 import tempfile
 import unittest
 import subprocess
-import sys
 from tools.maintenance import dependency_proposals as proposals
 from tools.maintenance import (cmsis_device_lock, source_catalogue,
                                stm32f1_hal_lock, stm32f4_hal_lock)
 from tools.maintenance.stm32_ll_lock import PROFILES
-import shutil
 import os
 
 ROOT = Path(__file__).resolve().parents[2]

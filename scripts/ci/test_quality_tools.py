@@ -8,7 +8,6 @@ import sys
 import tempfile
 import unittest
 import quality_tools
-from quality_tools import commands, compiler_query, run
 
 
 @unittest.skipUnless(os.name == "posix", "analyzer process fixtures require POSIX; CI analysis runs on Linux")
@@ -37,7 +36,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         return str(path)
 
     def test_success_requires_nonempty_scope(self):
-        self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 0)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, self.tool(0), self.report), 0)
         self.assertIn("Exit code: 0", self.report.read_text())
 
     def test_equivalent_output_entries_have_one_analysis_context(self):
@@ -57,7 +56,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
             f"with open({str(count)!r}, 'a') as stream: stream.write(json.dumps(sys.argv) + '\\n')\n")
         tool.chmod(0o700)
-        self.assertEqual(run("tidy", self.root, self.build, str(tool), self.report), 0)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, str(tool), self.report), 0)
         self.assertEqual(len(count.read_text().splitlines()), 1)
         self.assertIn('Unique analysis contexts: 1', self.report.read_text())
         self.assertIn('"compilation_indexes": [0, 1]', self.report.read_text())
@@ -147,30 +146,30 @@ class RequiredAnalysisTests(unittest.TestCase):
                 '-c', str(self.source), '-o', 'discard.o']
         entry = {'file': str(self.source), 'directory': str(self.root),
                  'arguments': argv}
-        _, query = compiler_query(entry)
+        _, query = quality_tools.compiler_query(entry)
         self.assertEqual(query, ['cc', *argv[1:9], '-x', 'c', '-E', '-dM', '-'])
 
     def test_query_uses_language_at_translation_unit_not_trailing_language(self):
         entry = {'file': str(self.source), 'directory': str(self.root),
                  'arguments': ['cc', '-x', 'c++', '-c', str(self.source), '-x', 'c']}
-        _, query = compiler_query(entry)
+        _, query = quality_tools.compiler_query(entry)
         self.assertEqual(query, ['cc', '-x', 'c++', '-E', '-dM', '-'])
 
     def test_query_language_none_restores_translation_unit_extension(self):
         entry = {'file': str(self.source), 'directory': str(self.root),
                  'arguments': ['cc', '-x', 'c++', '-x', 'none', '-c', str(self.source)]}
-        _, query = compiler_query(entry)
+        _, query = quality_tools.compiler_query(entry)
         self.assertEqual(query, ['cc', '-x', 'c', '-E', '-dM', '-'])
 
     def test_invalid_execution_budgets_fail_before_analyzer_launch(self):
         tool = self.tool(0)
         for budget in (0, -1, '2.0'):
             with self.subTest(parallel=budget):
-                self.assertEqual(run('tidy', self.root, self.build, tool,
+                self.assertEqual(quality_tools.run('tidy', self.root, self.build, tool,
                                      self.report, parallel=budget), 1)
         for budget in (0, -1, float('inf'), float('nan')):
             with self.subTest(timeout=budget):
-                self.assertEqual(run('tidy', self.root, self.build, tool,
+                self.assertEqual(quality_tools.run('tidy', self.root, self.build, tool,
                                      self.report, timeout=budget), 1)
 
     def test_parallel_execution_is_bounded_and_reports_are_deterministic(self):
@@ -193,7 +192,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             "print(sys.argv[1])\n"
             f"with open({str(activity)!r}, 'a') as stream: stream.write(json.dumps(['end', time.monotonic()])+'\\n')\n")
         tool.chmod(0o700)
-        self.assertEqual(run('tidy', self.root, self.build, str(tool), self.report,
+        self.assertEqual(quality_tools.run('tidy', self.root, self.build, str(tool), self.report,
                              parallel=2), 0, self.report.read_text())
         active = maximum = 0
         for event, _ in sorted((json.loads(line) for line in activity.read_text().splitlines()), key=lambda item: item[1]):
@@ -218,7 +217,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             f"if sys.argv[1] == {str(self.source)!r}: time.sleep(30)\n"
             "print('other-context-result')\n")
         tool.chmod(0o700)
-        self.assertEqual(run('tidy', self.root, self.build, str(tool), self.report,
+        self.assertEqual(quality_tools.run('tidy', self.root, self.build, str(tool), self.report,
                              parallel=2, timeout=0.2), 1)
         report = self.report.read_text()
         self.assertIn('Exit code: 124', report)
@@ -278,17 +277,17 @@ class RequiredAnalysisTests(unittest.TestCase):
                         os.kill(identity['pid'], signal.SIGKILL)
 
     def test_diagnostic_exit_fails(self):
-        self.assertEqual(run("cppcheck", self.root, self.build, self.tool(2), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.tool(2), self.report), 1)
         self.assertIn("Exit code: 2", self.report.read_text())
 
     def test_crashed_tool_fails(self):
-        self.assertEqual(run("tidy", self.root, self.build, self.tool(70), self.report), 1)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, self.tool(70), self.report), 1)
 
     def test_tool_version_failure_cannot_pass(self):
-        self.assertEqual(run("tidy", self.root, self.build, self.tool(0, 1), self.report), 1)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, self.tool(0, 1), self.report), 1)
 
     def test_missing_tool_fails_and_retains_reason(self):
-        self.assertEqual(run("tidy", self.root, self.build, str(self.root / "missing"), self.report), 1)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, str(self.root / "missing"), self.report), 1)
         self.assertIn("Analysis execution failed", self.report.read_text())
 
     def test_zero_owned_scope_fails(self):
@@ -296,12 +295,12 @@ class RequiredAnalysisTests(unittest.TestCase):
         external.parent.mkdir()
         external.write_text("int vendor;\n")
         self.database([external])
-        self.assertEqual(run("cppcheck", self.root, self.build, self.tool(0), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.tool(0), self.report), 1)
         self.assertIn("zero owned translation units", self.report.read_text())
 
     def test_external_vendor_commands_excluded(self):
         self.database([self.source, Path("/tmp/foreign.c"), self.root / "vendors" / "sdk.c"])
-        self.assertEqual(len(commands(self.root, self.build)), 1)
+        self.assertEqual(len(quality_tools.commands(self.root, self.build)), 1)
 
     def test_core_is_owned_and_external_product_is_not(self):
         runtime = self.root / "core" / "bootstrap.c"
@@ -311,7 +310,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         product.parent.mkdir()
         product.write_text("int product_private;\n")
         self.database([self.source, runtime, product])
-        self.assertEqual([entry['file'] for entry in commands(self.root, self.build)],
+        self.assertEqual([entry['file'] for entry in quality_tools.commands(self.root, self.build)],
                          [str(self.source), str(runtime)])
 
     def test_shared_driver_in_actual_cmake_database_is_owned(self):
@@ -337,7 +336,7 @@ class RequiredAnalysisTests(unittest.TestCase):
                          configured.stdout + configured.stderr)
         raw = json.loads((self.build / "compile_commands.json").read_text())
         actual = next(entry for entry in raw if entry["file"] == str(source))
-        selected = commands(self.root, self.build)
+        selected = quality_tools.commands(self.root, self.build)
         self.assertEqual({entry["file"] for entry in selected},
                          {str(self.source), str(source)})
         driver = next(entry for entry in selected
@@ -351,7 +350,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         header = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.h"
         header.parent.mkdir(parents=True)
         header.write_text("extern int shared_driver;\n")
-        self.assertEqual(run("tidy", self.root, self.build,
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build,
                              self.tool(0), self.report), 0)
         argv = json.loads(next(line.removeprefix("Invocation: ")
                                for line in self.report.read_text().splitlines()
@@ -370,7 +369,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         support.parent.mkdir(parents=True)
         support.write_text("int event_support;\n")
         self.database([support])
-        selected = commands(self.root, self.build)
+        selected = quality_tools.commands(self.root, self.build)
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
         self.assertEqual(selected[0]["nexus_production_source"],
@@ -381,7 +380,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         support.parent.mkdir(parents=True)
         support.write_text("int idle_support;\n")
         self.database([support])
-        selected = commands(self.root, self.build)
+        selected = quality_tools.commands(self.root, self.build)
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
         self.assertEqual(selected[0]["nexus_production_source"],
@@ -403,7 +402,7 @@ class RequiredAnalysisTests(unittest.TestCase):
              "arguments": ["cc", "-c", str(model)]},
         ]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        selected = commands(self.root, self.build)
+        selected = quality_tools.commands(self.root, self.build)
         self.assertEqual(len(selected), 2)
         self.assertEqual(selected[0]["arguments"][1], "-DNX_REGISTER_MODEL=1")
         self.assertEqual(selected[1]["arguments"][1], "-DGD32F470=1")
@@ -411,11 +410,11 @@ class RequiredAnalysisTests(unittest.TestCase):
 
     def test_malformed_database_fails(self):
         (self.build / "compile_commands.json").write_text("{}")
-        self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 1)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, self.tool(0), self.report), 1)
 
     def test_missing_owned_source_fails(self):
         self.source.unlink()
-        self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 1)
+        self.assertEqual(quality_tools.run("tidy", self.root, self.build, self.tool(0), self.report), 1)
 
     def compiler(self, name="fixture-gcc", identity="17", failure=0, empty=False):
         path = self.root / name
@@ -461,7 +460,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             {"directory": str(self.root), "file": str(self.source), "arguments": [second, "--target=x86-fixture", "-std=c11", "-c", str(self.source)]},
         ]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
         analyzed = [json.loads(line) for line in self.analyzer_log.read_text().splitlines()]
         self.assertEqual(len(analyzed), 2)
         self.assertIn("--check-level=exhaustive", analyzed[0])
@@ -491,7 +490,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         entries = [{"directory": str(self.root), "file": str(self.source),
                     "arguments": [driver, "-c", str(self.source)]}]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
         self.assertFalse(self.analyzer_log.exists())
         self.assertIn("compiler stdint pointer limit scope is incomplete", self.report.read_text())
 
@@ -502,7 +501,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         entries = [{"directory": str(self.root), "file": str(self.source),
                     "arguments": [driver, "-c", str(self.source)]}]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
         self.assertFalse(self.analyzer_log.exists())
         self.assertIn("unobserved dependency", self.report.read_text())
 
@@ -514,7 +513,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         argv = [driver, "--target=arm-fixture", "-DOPAQUE=a;touch " + str(marker), "-c", str(spaced)]
         (self.build / "compile_commands.json").write_text(json.dumps([
             {"directory": str(self.root), "file": str(spaced), "command": shlex.join(argv)}]))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
         self.assertFalse(marker.exists())
         self.assertIn(argv[2], json.loads(log.read_text().splitlines()[-1]))
 
@@ -564,7 +563,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         for kind in ('tidy', 'cppcheck'):
             with self.subTest(kind=kind):
                 log.unlink(missing_ok=True)
-                self.assertEqual(run(kind, self.root, self.build, str(tool), self.report), 0,
+                self.assertEqual(quality_tools.run(kind, self.root, self.build, str(tool), self.report), 0,
                                  self.report.read_text())
                 consumed = [json.loads(line) for line in log.read_text().splitlines()]
                 self.assertEqual(len(consumed), 2)
@@ -579,7 +578,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         entries[0]["arguments"][0] = driver
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
         tool = self.recording_analyzer()
-        self.assertEqual(run("cppcheck", self.root, self.build, tool, self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, tool, self.report), 1)
         self.assertFalse(self.analyzer_log.exists())
         self.assertIn("Compiler query exit code: 71", self.report.read_text())
 
@@ -587,19 +586,19 @@ class RequiredAnalysisTests(unittest.TestCase):
         driver, _ = self.compiler(empty=True)
         entries = [{"directory": str(self.root), "file": str(self.source), "arguments": [driver, "-c", str(self.source)]}]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
         self.assertIn("query failed or empty", self.report.read_text())
 
     def test_missing_compiler_never_passes(self):
         entries = [{"directory": str(self.root), "file": str(self.source), "arguments": [str(self.root / "missing-gcc"), "-c", str(self.source)]}]
         (self.build / "compile_commands.json").write_text(json.dumps(entries))
-        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertEqual(quality_tools.run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
         self.assertFalse(self.analyzer_log.exists())
 
     def test_language_and_target_flags_preserved_without_compile_outputs(self):
         entry = {"directory": str(self.root), "file": str(self.source),
                  "arguments": ["arm-none-eabi-gcc", "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", "-x", "c++", "-DREAL=1", "-UOTHER", "-Iinclude", "-MMD", "-MF", "deps.d", "-MT", "target", "-oresult.o", "-c", str(self.source)]}
-        version, query = compiler_query(entry)
+        version, query = quality_tools.compiler_query(entry)
         self.assertEqual(version, ["arm-none-eabi-gcc", "--version"])
         for flag in ("-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", "-DREAL=1", "-UOTHER", "-Iinclude", "c++"):
             self.assertIn(flag, query)
@@ -609,7 +608,7 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_unsupported_response_file_fails_closed(self):
         entry = {"directory": str(self.root), "file": str(self.source), "arguments": ["cc", "@unexpanded.rsp", "-c", str(self.source)]}
         with self.assertRaises(ValueError):
-            compiler_query(entry)
+            quality_tools.compiler_query(entry)
 
     def cppcheck_importer_fixture(self):
         """Model the observed 2.13 importer boundary, use the real compiler."""
@@ -665,7 +664,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             entries.append({'directory': str(directory),
                             'file': str(self.source), 'arguments': argv})
         (self.build / 'compile_commands.json').write_text(json.dumps(entries))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
         self.assertEqual(json.loads((self.build / 'compile_commands.json').read_text()), entries)
@@ -688,7 +687,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         (self.build / 'compile_commands.json').write_text(json.dumps([
             {'directory': str(self.root), 'file': str(self.source),
              'command': shlex.join(argv)}]))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
 
@@ -703,7 +702,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             {'directory': str(self.root), 'file': str(self.source),
              'arguments': ['cc', '-include' + str(header),
                            '-c', str(self.source)]}]))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 1)
         self.assertIn('owned diagnostic retained', self.report.read_text())
 
@@ -720,7 +719,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             {'directory': str(self.root), 'file': str(self.source),
              'arguments': ['cc', '-Irelative headers', '-includeentry.h',
                            '-c', str(self.source)]}]))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
 
@@ -762,7 +761,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         (self.build / 'compile_commands.json').write_text(json.dumps([
             {'directory': str(self.root), 'file': str(self.source),
              'arguments': argv}]))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
 
@@ -814,7 +813,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             entries.append({'directory': str(self.root), 'file': str(self.source),
                             'arguments': argv})
         (self.build / 'compile_commands.json').write_text(json.dumps(entries))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
         consumed = [json.loads(line) for line in self.analyzer_log.read_text().splitlines()]
@@ -845,7 +844,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         (self.build / 'compile_commands.json').write_text(json.dumps([
             {'directory': str(self.root), 'file': str(self.source),
              'command': shlex.join(argv)}]))
-        self.assertEqual(run('cppcheck', self.root, self.build,
+        self.assertEqual(quality_tools.run('cppcheck', self.root, self.build,
                              self.cppcheck_importer_fixture(), self.report), 0,
                          self.report.read_text())
 
@@ -896,7 +895,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             f"print('<location file=\"{diagnostic}\" line=\"2\"/></error></errors></results>')\n"
             'sys.exit(2)\n')
         tool.chmod(0o700)
-        return run('cppcheck', self.root, self.build, str(tool), self.report)
+        return quality_tools.run('cppcheck', self.root, self.build, str(tool), self.report)
 
     def test_exact_declared_external_system_header_is_outside_owned_checks(self):
         header = self.root / 'vendors/fixture/include/header.h'

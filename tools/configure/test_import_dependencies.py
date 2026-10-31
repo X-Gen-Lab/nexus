@@ -1,7 +1,7 @@
 """Imported SDK headers retain their separately pinned compiler dependencies."""
 from pathlib import Path
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from tools.configure import configure
 
@@ -19,7 +19,7 @@ class ImportedDependencyContracts(unittest.TestCase):
                          "vendor-source-import")
 
     def test_auxiliary_git_identity_failure_cannot_be_ignored(self):
-        with mock.patch.object(configure, "dependency_identity",
+        with patch.object(configure, "dependency_identity",
                                side_effect=configure.ConfigurationError(
                                    "auxiliary CMSIS identity changed")):
             with self.assertRaisesRegex(configure.ConfigurationError,

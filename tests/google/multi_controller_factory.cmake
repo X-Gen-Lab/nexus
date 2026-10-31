@@ -5,9 +5,13 @@ foreach(multi_family stm32 gd32)
         set(multi_official STM32F4_LL)
         set(multi_label stm32-zg)
         set(multi_soc stm32f407)
+        set(multi_uart_tx uart_hal)
+        set(multi_model multi_controller_hal_model.h)
     else()
         set(multi_label gd32)
         set(multi_soc gd32f470)
+        set(multi_uart_tx uart_dma)
+        set(multi_model multi_controller_factory_model.h)
     endif()
     set(multi_input "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${multi_label}.toml")
     set(multi_bundle "${CMAKE_CURRENT_BINARY_DIR}/multi-controller-factory-${multi_family}")
@@ -25,7 +29,7 @@ foreach(multi_family stm32 gd32)
         SOURCES multi_controller_factory_test.cpp
         "${multi_bundle}/bindings.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart_dma.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/${multi_uart_tx}.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi_dma.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_async.c"
@@ -39,7 +43,7 @@ foreach(multi_family stm32 gd32)
     target_sources(${multi_target} PRIVATE
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_cold.c")
     target_compile_options(${multi_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/${multi_model}"
         "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
     target_compile_definitions(${multi_target} PRIVATE
         _init=nx_multi_fixture_init _fini=nx_multi_fixture_fini)
@@ -73,6 +77,14 @@ foreach(multi_family stm32 gd32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_cold.c")
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32f4_official(${multi_gpio})
+        nexus_stm32f407_uart_hal(${multi_target})
+        target_link_options(${multi_target} PRIVATE "-Wl,--gc-sections")
+        set(multi_hal "${multi_target}_stm32f407_hal")
+        target_compile_definitions(${multi_hal} PRIVATE NX_MULTI_FACTORY_STM32)
+        target_compile_options(${multi_hal} BEFORE PRIVATE
+            "-include${CMAKE_CURRENT_SOURCE_DIR}/${multi_model}")
+        # CMSIS declarations precede the model, which precedes the profile.
+        nexus_use_cmsis_host_model(${multi_hal})
         target_include_directories(${multi_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         target_compile_definitions(${multi_target} PRIVATE

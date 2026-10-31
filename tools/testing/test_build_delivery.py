@@ -329,7 +329,9 @@ class BuildDeliveryTests(unittest.TestCase):
         self.assertIn("vendors/st/cmsis_device_u5", selected)
         self.assertIn("ext/freertos", selected)
         selected = dependencies.required_submodules("arm", "stm32h743", "baremetal")
-        self.assertEqual(selected, ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_h7"))
+        self.assertEqual(selected, ("vendors/arm/CMSIS_6",
+                                    "vendors/st/cmsis_device_h7",
+                                    "vendors/st/stm32h7_hal"))
         with self.assertRaises(EvidenceError):
             dependencies.required_submodules("arm", "unknown", "baremetal")
 

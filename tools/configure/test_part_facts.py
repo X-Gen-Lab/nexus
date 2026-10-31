@@ -20,7 +20,7 @@ class PartFactsTests(unittest.TestCase):
                 result = replace(result, physical_part=replace(
                     result.physical_part, memory=regions))
                 source = bindings.emit(result)[1]
-                self.assertTrue("{ 0x20000000u, 65536u," in source)
+                self.assertIn("{ 0x20000000u, 65536u,", source)
                 regions = tuple(freeze({**region, "dma": False})
                                 if region["id"] == "sram" else region
                                 for region in result.physical_part.memory)

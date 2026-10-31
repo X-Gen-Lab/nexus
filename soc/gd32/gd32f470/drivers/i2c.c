@@ -16,11 +16,11 @@
 #endif
 #ifndef NX_GD32_I2C_READ_DATA
 #define NX_GD32_I2C_READ_DATA(port)                                            \
-    ((uint8_t)I2C_DATA((port)->controller->registers))
+    i2c_data_receive((port)->controller->registers)
 #endif
 #ifndef NX_GD32_I2C_WRITE_DATA
 #define NX_GD32_I2C_WRITE_DATA(port, value)                                    \
-    (I2C_DATA((port)->controller->registers) = (value))
+    i2c_data_transmit((port)->controller->registers, (uint8_t)(value))
 #endif
 #ifndef NX_GD32_I2C_ADDRESS_CLEARED
 #define NX_GD32_I2C_ADDRESS_CLEARED(port) ((void)(port))
@@ -183,8 +183,11 @@ static void clear_address(nx_gd32_i2c_state_t* port) {
 
 /** \brief Request STOP or repeated START before consuming the final pair. */
 static void end_receive(nx_gd32_i2c_state_t* port, bool last) {
-    I2C_CTL0(port->controller->registers) |=
-        last ? I2C_CTL0_STOP : I2C_CTL0_START;
+    if (last) {
+        i2c_stop_on_bus(port->controller->registers);
+    } else {
+        i2c_start_on_bus(port->controller->registers);
+    }
 }
 
 /** \brief Consume a bounded receive with exact 1/2/final-three-byte timing. */
@@ -197,7 +200,7 @@ static nx_result_t receive(nx_gd32_i2c_state_t* port, nx_i2c_message_t* message,
     nx_result_t status;
     if (remaining == 1u) {
         uint32_t saved = nx_gd32_critical_enter();
-        I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+        i2c_ack_config(registers, I2C_ACK_DISABLE);
         clear_address(port);
         end_receive(port, last);
         nx_gd32_critical_leave(saved);
@@ -213,7 +216,7 @@ static nx_result_t receive(nx_gd32_i2c_state_t* port, nx_i2c_message_t* message,
         I2C_CTL0(registers) |= I2C_CTL0_POAP;
         uint32_t saved = nx_gd32_critical_enter();
         clear_address(port);
-        I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+        i2c_ack_config(registers, I2C_ACK_DISABLE);
         nx_gd32_critical_leave(saved);
         status = wait_status(port, I2C_STAT0_BTC, deadline);
         if (status != NX_SUCCESS) {
@@ -243,7 +246,7 @@ static nx_result_t receive(nx_gd32_i2c_state_t* port, nx_i2c_message_t* message,
     }
     /* ACK withdrawal and N-2 consumption must share one protected window. */
     uint32_t saved = nx_gd32_critical_enter();
-    I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+    i2c_ack_config(registers, I2C_ACK_DISABLE);
     message->data[index++] = NX_GD32_I2C_READ_DATA(port);
     nx_gd32_critical_leave(saved);
     ++*transferred;
@@ -304,7 +307,7 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
     bool start_requested = false;
     for (size_t i = 0u; i < count && status == NX_SUCCESS; ++i) {
         if (!start_requested) {
-            I2C_CTL0(port->controller->registers) |= I2C_CTL0_START;
+            i2c_start_on_bus(port->controller->registers);
         }
         status = wait_status(port, I2C_STAT0_SBSEND, deadline);
         if (status != NX_SUCCESS) {
@@ -347,12 +350,12 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
             status = wait_status(port, I2C_STAT0_BTC, deadline);
         }
         if (i + 1u == count && status == NX_SUCCESS) {
-            I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
+            i2c_stop_on_bus(port->controller->registers);
         }
     }
     if (status != NX_SUCCESS && status != NX_ERROR_ARBITRATION &&
         (I2C_STAT1(port->controller->registers) & I2C_STAT1_MASTER) != 0u) {
-        I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
+        i2c_stop_on_bus(port->controller->registers);
     }
     for (uint32_t polls = 0u; polls < 1000000u; ++polls) {
         NX_GD32_I2C_POLL(port);

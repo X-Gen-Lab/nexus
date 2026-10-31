@@ -1,4 +1,4 @@
-"""Missing locked build tools stop the existing gate before complete suites."""
+"""Tool and Native link failures stop the gate before complete suites."""
 
 from contextlib import redirect_stderr, redirect_stdout
 import io
@@ -35,12 +35,60 @@ class TDDToolPreflightTests(unittest.TestCase):
 
         status, output, _, _ = self.fixture.run_gate(execute=execute)
         self.assertEqual(status, 0, output)
-        self.assertEqual(commands[0], self.command("contracts"))
-        self.assertEqual(logs[0].name, "preflight-contracts.txt")
+        configure = [sys.executable, "tools/dev/dev.py", "configure",
+                     "--preset", "native-debug"]
+        build = [sys.executable, "tools/dev/dev.py", "build", "--preset",
+                 "native-debug", "--target", "nexus_google_contracts"]
+        self.assertEqual(commands[:3], [self.command("contracts"),
+                                       configure, build])
+        self.assertEqual([log.name for log in logs[:3]],
+                         ["preflight-contracts.txt", "preflight-configure.txt",
+                          "preflight-build.txt"])
+        first_suite = next(index for index, command in enumerate(commands)
+                           if "--suite" in command)
+        last_suite = max(index for index, command in enumerate(commands)
+                         if "--suite" in command)
+        self.assertLess(commands.index(build), first_suite)
+        self.assertEqual(commands.count(configure), 2)
+        self.assertEqual(commands.count(build), 2)
+        self.assertEqual(commands[last_suite + 1:last_suite + 3],
+                         [configure, build])
+        self.assertEqual([log.name for log in logs[last_suite + 1:
+                                                 last_suite + 3]],
+                         ["configure.txt", "build.txt"])
         self.assertEqual([command[command.index("--suite") + 1]
                           for command in commands if "--suite" in command],
                          ["testing", "configure", "ci", "workflows"])
         self.assertFalse(any("candidate" in command for command in commands))
+
+    def assert_failed_compile_preflight(self, action):
+        commands = []
+        directory = self.fixture.build / "tdd"
+        directory.mkdir()
+        summary = directory / "execution.json"
+        summary.write_text('{"previous": "unrelated execution"}\n')
+
+        def execute(command, environment, log):
+            commands.append(command)
+            if command[:3] == [sys.executable, "tools/dev/dev.py", action]:
+                raise ValueError("Native " + action + " preflight failed")
+            return self.fixture.execute(command, environment, log)
+
+        status, output, before, after = self.fixture.run_gate(execute=execute)
+        self.assertEqual(status, 1, output)
+        self.assertEqual(commands[0], self.command("contracts"))
+        self.assertIn("Native " + action + " preflight failed", output)
+        self.assertFalse(any("--suite" in command for command in commands),
+                         "Compile/link failures must precede tool suites")
+        before.assert_not_called()
+        after.assert_not_called()
+        self.assertFalse(summary.exists())
+
+    def test_native_configure_failure_stops_before_any_complete_suite(self):
+        self.assert_failed_compile_preflight("configure")
+
+    def test_native_link_failure_stops_before_any_complete_suite(self):
+        self.assert_failed_compile_preflight("build")
 
     def assert_failed_preflight(self, target):
         commands = []

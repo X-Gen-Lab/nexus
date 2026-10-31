@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import importlib.util
 from pathlib import Path
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -27,13 +27,13 @@ class SourceSDKImportSetTests(unittest.TestCase):
         ]}
 
     def test_import_set_comes_from_maintained_descriptors(self):
-        with mock.patch.object(sdk.provider_descriptors, "families",
+        with mock_patch.object(sdk.provider_descriptors, "families",
                                return_value=self.families()):
             self.assertEqual(sdk.reviewed_import_directories(), (
                 "vendors/gigadevice/gd32f30x", "vendors/gigadevice/gd32f4xx"))
 
     def test_all_reviewed_imports_are_packaged_without_adjacent_vendor_trees(self):
-        with mock.patch.object(sdk.provider_descriptors, "families",
+        with mock_patch.object(sdk.provider_descriptors, "families",
                                return_value=self.families()):
             for directory in sdk.reviewed_import_directories():
                 self.assertTrue(sdk.selected(directory + "/source.lock.json"))
@@ -42,14 +42,14 @@ class SourceSDKImportSetTests(unittest.TestCase):
             self.assertFalse(sdk.selected("vendors/gigadevice/other/driver.h"))
 
     def test_complete_unordered_records_bind_the_same_owner_tree(self):
-        with mock.patch.object(sdk.provider_descriptors, "families",
+        with mock_patch.object(sdk.provider_descriptors, "families",
                                return_value=self.families()):
             identity = self.identity()
             self.assertEqual(sdk.validate_import_records(identity),
                              identity["reviewed_imports"])
 
     def test_missing_duplicate_foreign_and_changed_owner_records_reject(self):
-        with mock.patch.object(sdk.provider_descriptors, "families",
+        with mock_patch.object(sdk.provider_descriptors, "families",
                                return_value=self.families()):
             records = self.identity()["reviewed_imports"]
             invalid = [None, {}, [], records[:1], [records[0], records[0]],

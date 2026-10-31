@@ -9,6 +9,18 @@
 #include "stm32u575_cold.h"
 #include "stm32u575_provider.h"
 #include "stm32u5xx_ll_tim.h"
+#ifndef NX_U575_PWM_SET_PRESCALER
+#define NX_U575_PWM_SET_PRESCALER(timer, value)                                \
+    LL_TIM_SetPrescaler((timer), (value))
+#endif
+#ifndef NX_U575_PWM_SET_AUTORELOAD
+#define NX_U575_PWM_SET_AUTORELOAD(timer, value)                               \
+    LL_TIM_SetAutoReload((timer), (value))
+#endif
+#ifndef NX_U575_PWM_SET_COMPARE_CH1
+#define NX_U575_PWM_SET_COMPARE_CH1(timer, value)                              \
+    LL_TIM_OC_SetCompareCH1((timer), (value))
+#endif
 #define PWM_MODE                                                               \
     ((uint32_t)(TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1PE))
 static bool task_context(void) {
@@ -38,6 +50,22 @@ static bool write_checked(volatile uint32_t* reg, uint32_t value) {
     NX_U575_WRITE(reg, value);
     nx_arch_dsb();
     return NX_U575_READ(reg) == value;
+}
+/** \brief Keep the official timer store inside the exact readback protocol. */
+static bool prescaler_checked(TIM_TypeDef* timer, uint32_t value) {
+    NX_U575_PWM_SET_PRESCALER(timer, value);
+    nx_arch_dsb();
+    return NX_U575_READ(&timer->PSC) == value;
+}
+static bool autoreload_checked(TIM_TypeDef* timer, uint32_t value) {
+    NX_U575_PWM_SET_AUTORELOAD(timer, value);
+    nx_arch_dsb();
+    return NX_U575_READ(&timer->ARR) == value;
+}
+static bool compare_checked(TIM_TypeDef* timer, uint32_t value) {
+    NX_U575_PWM_SET_COMPARE_CH1(timer, value);
+    nx_arch_dsb();
+    return NX_U575_READ(&timer->CCR1) == value;
 }
 static bool cold(const nx_stm32u575_pwm_state_t* p) {
     TIM_TypeDef* r = p->registers;
@@ -105,10 +133,10 @@ nx_result_t nx_stm32u575_pwm_initialize(nx_stm32u575_pwm_state_t* p) {
         return result;
     TIM_TypeDef* r = p->registers;
     if (!write_checked(&r->CR1, TIM_CR1_ARPE) ||
-        !write_checked(&r->PSC, 4000000U / p->tick_hz - 1U) ||
-        !write_checked(&r->ARR, p->period_ticks - 1U) ||
+        !prescaler_checked(r, 4000000U / p->tick_hz - 1U) ||
+        !autoreload_checked(r, p->period_ticks - 1U) ||
         !write_checked(&r->CCMR1, PWM_MODE) ||
-        !write_checked(&r->CCR1, p->duty_ticks))
+        !compare_checked(r, p->duty_ticks))
         return NX_ERROR_IO;
     result = epoch(p);
     if (result == NX_SUCCESS)
@@ -134,7 +162,7 @@ static nx_result_t set(void* context, uint32_t period, uint32_t duty) {
         return NX_ERROR_STATE;
     /* PWM1 with CCR=0 is constant low. CCR=period exceeds ARR and is high.
      * Both fit16bits, so endpoint transitions preserve normal CCR preload. */
-    if (!write_checked(&p->registers->CCR1, duty))
+    if (!compare_checked(p->registers, duty))
         return NX_ERROR_IO;
     p->duty_ticks = duty;
     return NX_SUCCESS;

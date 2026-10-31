@@ -7,7 +7,6 @@ this tool cannot turn a JSON passed marker into qualification or merge authority
 """
 from __future__ import annotations
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path

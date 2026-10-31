@@ -10,34 +10,8 @@
 #include "gd32f4xx_can.h"
 #include "gd32f4xx_rcu.h"
 
-/* The SDK defines lvalue register macros. GCC/Clang constant folding makes
- * their addresses testable without weakening pedantic C11 diagnostics. */
-#define GD_CAN_OFFSET(reg, offset)                                             \
-    _Static_assert(__builtin_constant_p((uintptr_t) & (reg))                   \
-                       ? (uintptr_t) & (reg) == CAN0 + (offset)                \
-                       : 0,                                                    \
-                   "Actual GD32 CAN SDK register offset")
-GD_CAN_OFFSET(CAN_CTL(CAN0), 0x00U);
-GD_CAN_OFFSET(CAN_STAT(CAN0), 0x04U);
-GD_CAN_OFFSET(CAN_TSTAT(CAN0), 0x08U);
-GD_CAN_OFFSET(CAN_RFIFO0(CAN0), 0x0CU);
-GD_CAN_OFFSET(CAN_RFIFO1(CAN0), 0x10U);
-GD_CAN_OFFSET(CAN_INTEN(CAN0), 0x14U);
-GD_CAN_OFFSET(CAN_ERR(CAN0), 0x18U);
-GD_CAN_OFFSET(CAN_BT(CAN0), 0x1CU);
-GD_CAN_OFFSET(CAN_TMI(CAN0, 0U), 0x180U);
-GD_CAN_OFFSET(CAN_TMP(CAN0, 2U), 0x1A4U);
-GD_CAN_OFFSET(CAN_TMDATA1(CAN0, 2U), 0x1ACU);
-GD_CAN_OFFSET(CAN_RFIFOMI(CAN0, 0U), 0x1B0U);
-GD_CAN_OFFSET(CAN_RFIFOMDATA1(CAN0, 1U), 0x1CCU);
-GD_CAN_OFFSET(CAN_FCTL(CAN0), 0x200U);
-GD_CAN_OFFSET(CAN_FMCFG(CAN0), 0x204U);
-GD_CAN_OFFSET(CAN_FSCFG(CAN0), 0x20CU);
-GD_CAN_OFFSET(CAN_FAFIFO(CAN0), 0x214U);
-GD_CAN_OFFSET(CAN_FW(CAN0), 0x21CU);
-GD_CAN_OFFSET(CAN_FDATA0(CAN0, 0U), 0x240U);
-GD_CAN_OFFSET(CAN_FDATA1(CAN0, 27U), 0x31CU);
-#undef GD_CAN_OFFSET
+/* can_layout.c checks SDK addresses; masks and vectors stay with this binding.
+ */
 _Static_assert(CAN_CTL_IWMOD == 1U && CAN_STAT_IWS == 1U &&
                    CAN_CTL_ARD == 16U && CAN_CTL_RFOD == 8U &&
                    CAN_CTL_TFO == 4U && CAN_TSTAT_MTF0 == 1U &&

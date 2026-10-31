@@ -4,7 +4,7 @@ from dataclasses import replace
 from tools.configure import selected_contracts
 from tools.configure.calls import Address, DirectCall
 from tools.configure.providers import maintained
-from tools.configure.providers.common import fail
+from tools.configure.providers.common import fail, integer
 
 DRIVERS = selected_contracts.ENDPOINT_DRIVERS
 
@@ -178,3 +178,51 @@ def emit_owner_factory(result):
                    f'            return &s_nx_spi_owner_{name};']
     return header, source + ['        default:', '            return NULL;',
                              '    }', '}']
+
+
+def validate_transport(device, controller, provider, *, soc, clock_plan):
+    """Admit endpoint transport and clocks before graph pin/address claims."""
+    if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280",
+                                "spi-transaction", "i2c-long-endpoint",
+                                "spi-dma-transaction"}:
+        fail(f"Unknown maintained device driver: {device['driver']}")
+    provider.ENDPOINT_POLICY.validate(device, controller)
+    if device["driver"] == "bmp280" and controller["kind"] != "spi":
+        fail("BMP280 currently requires its maintained SPI transport")
+    if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
+        fail("SPI endpoint driver is not an I2C transport")
+    if device["driver"] == "i2c-endpoint" and controller["kind"] != "i2c":
+        fail("I2C endpoint driver is not a SPI transport")
+    if "mode" in device:
+        integer(device["mode"], 0, 3, "SPI endpoint mode")
+    if "max_hz" in device:
+        integer(device["max_hz"], 1, context="device speed")
+        if device["max_hz"] > controller.get("max_hz", 1000000):
+            fail("Device speed exceeds its selected controller budget")
+    if controller["kind"] == "spi":
+        speed = device.get("max_hz", controller.get("max_hz", 1000000))
+        limit = soc["controllers"][controller["controller"]].get("max_hz")
+        provider.validate_endpoint_clock(speed, clock_plan=clock_plan)
+        if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
+            fail("SPI endpoint speed cannot be realized by the reviewed "
+                 "clock divider")
+        return provider.builtin_cs(controller)
+    return False
+
+
+def complete_controller(controller, children, provider):
+    """Finalize endpoint-dependent faces before the typed graph is frozen."""
+    if (provider.ENDPOINT_POLICY.model_async_echo and
+            controller["kind"] == "spi" and
+            controller["mode"] == "async-model" and not children):
+        fail("Native async SPI requires at least one explicit enhanced "
+             "endpoint")
+    if any(item["driver"] == "spi-dma-transaction" for item in children):
+        if any(item["driver"] != "spi-dma-transaction" for item in children):
+            fail("SPI DMA sequence requires all endpoints; mixed faces forbidden")
+        controller["interface_kind"] = "spi_dma_transaction"
+    if controller["kind"] == "i2c" and not children:
+        fail("I2C requires at least one explicit address endpoint")
+    if (controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and
+            not children):
+        fail("SPI requires at least one reviewed CS endpoint")

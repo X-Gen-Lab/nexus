@@ -26,6 +26,15 @@ current detailed limits; this page explains how to select them.
 | U575 separate dual-domain reference | TZEN=1, no OS; synchronous scalar gateway and copied cooperative jobs of at most eight PC7 commands in Secure storage; no retained NS pointer or generic asynchronous cross-domain transport |
 | CPU-only Runtime | M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch and selected baremetal/FreeRTOS software profiles; no generated SoC/Board/factory |
 
+F407 `dma-tx` selects official HAL finite TX and a disjoint LL IRQ-byte/event
+receiver under one private static owner. It keeps the existing public mode,
+shared ops, cancellation and drain contracts; other F407 UART modes retain their
+existing engines. Private UART/DMA/RCC source selection does not start HAL
+SysTick or establish whole-library support. Read the
+[exact transport contract](../../design/official-stm32-provider.md#selected-f407-hal-uart-transport)
+and current-source evidence before selecting it. Exact linked cost, final-source evidence and physical HIL
+remain separate exits.
+
 The [F103 source boundary](../../../soc/stm32/stm32f103/README.md) separates the
 CPU-readable 128 KiB Flash-density check from its declared orderable part.
 ES096 section2.2.2 prevents normal firmware from observing the debug-only

@@ -17,6 +17,92 @@ from tools.evidence.common import EvidenceError, load_json
 ROOT = Path(__file__).resolve().parents[2]
 
 
+class QualificationStageBudgetTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.environment = {key: value for key, value in os.environ.items()
+                            if key != "NEXUS_COMMAND_TIMEOUT"}
+        script = self.root / CHECKERS["configure"][0]
+        script.parent.mkdir(parents=True)
+        script.write_text(
+            "import json, os, sys\n"
+            "from pathlib import Path\n"
+            f"sys.path.insert(0, {str(ROOT)!r})\n"
+            "from tools.dev.process import run\n"
+            "log = Path(sys.argv[-1])\n"
+            "result = run([sys.executable, '-B', '-c', "
+            "\"print('actual nested budget probe')\"], "
+            "cwd=Path.cwd(), env=os.environ.copy(), log=log)\n"
+            "log.with_suffix('.env.json').write_text(json.dumps({"
+            "'budget': os.environ.get('NEXUS_COMMAND_TIMEOUT')}))\n"
+            "raise SystemExit(result.returncode)\n")
+        (self.root / ".gitignore").write_text("/runs/\n")
+        environment = self.environment | {
+            "GIT_AUTHOR_NAME": "Qualification fixture",
+            "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+            "GIT_COMMITTER_NAME": "Qualification fixture",
+            "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+        }
+        for arguments in (("init", "--quiet"), ("add", "."),
+                          ("commit", "--quiet", "-m", "initial fixture")):
+            subprocess.run(["git", "-c", "maintenance.auto=false", "-c",
+                            "gc.auto=0", "-C", str(self.root), *arguments],
+                           env=environment, check=True, capture_output=True,
+                           text=True, timeout=30)
+
+    def execute(self, budgets, *, explicit=None, name="result"):
+        stages = []
+        for index, budget in enumerate(budgets):
+            stage = {"name": "probe-" + str(index), "checker": "configure",
+                     "args": ["{output}/probe-" + str(index) + ".nested.log"]}
+            if budget is not None:
+                stage["timeout_s"] = budget
+            stages.append(stage)
+        plan = {"schema_version": 1, "formal": True, "stages": stages}
+        environment = dict(self.environment)
+        if explicit is not None:
+            environment["NEXUS_COMMAND_TIMEOUT"] = explicit
+        output = self.root / "runs" / name
+        with patch.dict(os.environ, environment, clear=True):
+            report = qualification.execute(plan, self.root, output)
+            self.assertEqual(dict(os.environ), environment)
+        self.assertEqual(report["status"], "executed_passed")
+        self.assertFalse(report["source_before"]["dirty"])
+        self.assertEqual(report["source_before"], report["source_after"])
+        observed = []
+        for index, budget in enumerate(budgets):
+            name = "probe-" + str(index)
+            nested = load_json(output / (name + ".nested.command.json"))
+            outer = load_json(output / (name + ".command.json"))
+            self.assertEqual(nested["exit_code"], 0)
+            self.assertEqual(nested["outcome"], "completed")
+            self.assertEqual(outer["timeout_seconds"],
+                             1800 if budget is None else budget)
+            observed.append(nested["timeout_seconds"])
+            if explicit is not None:
+                received = load_json(output / (name + ".nested.env.json"))
+                self.assertEqual(received["budget"], explicit)
+        return observed
+
+    def test_declared_stage_budget_reaches_the_real_nested_command(self):
+        self.assertEqual(self.execute([7200.25]), [7200.25])
+
+    def test_omitted_stage_budget_keeps_the_nested_default(self):
+        self.assertEqual(self.execute([None]), [1800])
+
+    def test_different_stage_budgets_do_not_leak_to_later_stages(self):
+        self.assertEqual(self.execute([7.25, 13, None]), [7.25, 13, 1800])
+
+    def test_explicit_lower_or_higher_caller_budget_keeps_precedence(self):
+        for explicit in ("2.50", "14400"):
+            with self.subTest(explicit=explicit):
+                self.assertEqual(self.execute([30], explicit=explicit,
+                                              name="explicit-" + explicit),
+                                 [float(explicit)])
+
+
 class QualityToolPreflightTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -297,6 +383,51 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertEqual(selected[0]["args"], [])
         validate_plan(self.plan)
 
+    def test_selected_image_artifacts_have_one_fixed_complete_runner(self):
+        self.assertEqual(CHECKERS.get("image_artifact_tests"),
+                         ("tests/contracts/test_image_artifacts.py",))
+        selected = [stage for stage in self.stages
+                    if stage["checker"] == "image_artifact_tests"]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["name"], "image-artifact-boundaries")
+        self.assertEqual(selected[0]["args"], [])
+        validate_plan(self.plan)
+
+    def test_selected_image_boundaries_follow_existing_artifact_recovery(self):
+        names = [stage["name"] for stage in self.stages]
+        self.assertIn("image-artifact-boundaries", names)
+        previous = names.index("build-artifact-boundaries")
+        self.assertEqual(names[previous:previous + 3],
+                         ["build-artifact-boundaries",
+                          "image-artifact-boundaries",
+                          "providers-mainstream_assembly"])
+
+    def test_image_artifact_script_bootstraps_without_import_environment(self):
+        script = ROOT / "tests/contracts/test_image_artifacts.py"
+        case = ("ImageArtifactTests."
+                "test_default_full_reset_image_retains_existing_accounting")
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-I", "-B", str(script), case],
+                cwd=directory, capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Ran 1 test", result.stderr)
+
+    def test_missing_arm_tool_cannot_be_a_skipped_image_artifact_pass(self):
+        script = ROOT / "tests/contracts/test_image_artifacts.py"
+        case = ("ImageArtifactTests."
+                "test_default_full_reset_image_retains_existing_accounting")
+        environment = os.environ.copy()
+        environment["PATH"] = ""
+        environment.pop("NEXUS_ARM_GCC", None)
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-I", "-B", str(script), case],
+                cwd=directory, env=environment, capture_output=True,
+                text=True, timeout=30)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Prepared ARM compiler required", result.stderr)
+
     def test_each_expanded_provider_fixture_is_explicitly_qualified_once(self):
         for directory in ("legacy_transport_assembly", "mainstream_assembly",
                           "g474_assembly", "h743_assembly", "u575_assembly"):
@@ -331,7 +462,7 @@ class QualificationPlanTests(unittest.TestCase):
                     expected |= {
                         "{root}/tools/configure/assemblies/u575-" + name + ".toml"
                         for name in ("uart-chain", "lptim-run")}
-                    self.assertEqual(len(expected), 12)
+                    self.assertEqual(len(expected), 13)
                 self.assertTrue(expected)
                 self.assertEqual(len(fixtures), len(set(fixtures)),
                                  "Duplicate fixture is not another execution")

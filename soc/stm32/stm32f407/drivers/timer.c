@@ -7,10 +7,13 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_gpio.h"
 #include "stm32f4xx_ll_tim.h"
 
 /** \brief Locate the selected fixed channel compare register. */
 static volatile uint32_t* compare(nx_stm32_pwm_state_t* port) {
+    /* One dynamic-channel store avoids an out-of-line per-channel setter
+     * switch in the maintained size-optimized hot path. */
     switch (port->channel) {
         case 1U:
             return &port->registers->CCR1;
@@ -89,11 +92,13 @@ nx_result_t nx_stm32_pwm_start(void* context) {
     GPIO_TypeDef* gpio = port->inactive_gpio->registers;
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->inactive_mask & (1U << pin)) != 0U) {
-            unsigned shift = (pin % 8U) * 4U;
-            gpio->AFR[pin / 8U] =
-                (gpio->AFR[pin / 8U] & ~(15U << shift)) | (2U << shift);
-            gpio->MODER =
-                (gpio->MODER & ~(3U << (pin * 2U))) | (2U << (pin * 2U));
+            uint32_t selected = 1U << pin;
+            if (pin < 8U) {
+                LL_GPIO_SetAFPin_0_7(gpio, selected, LL_GPIO_AF_2);
+            } else {
+                LL_GPIO_SetAFPin_8_15(gpio, selected, LL_GPIO_AF_2);
+            }
+            LL_GPIO_SetPinMode(gpio, selected, LL_GPIO_MODE_ALTERNATE);
         }
     }
     if ((port->registers->CR1 & TIM_CR1_CEN) == 0U) {
@@ -121,8 +126,7 @@ nx_result_t nx_stm32_pwm_stop(void* context) {
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->inactive_mask & (1U << pin)) != 0U) {
             GPIO_TypeDef* gpio = port->inactive_gpio->registers;
-            gpio->MODER =
-                (gpio->MODER & ~(3U << (pin * 2U))) | (1U << (pin * 2U));
+            LL_GPIO_SetPinMode(gpio, 1U << pin, LL_GPIO_MODE_OUTPUT);
         }
     }
     if ((port->registers->CCER & 0x1111U) == 0U) {

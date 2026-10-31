@@ -124,7 +124,8 @@ class MemoryBootFixture : public testing::Test {
         for (uint32_t index = 0U; index < 4U; ++index) {
             source[index] = 11U + index;
         }
-        RCU_CTL = RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB;
+        RCU_CTL =
+            RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB | (16U << 3U) | (0x5aU << 8U);
         RCU_AHB1EN = RCU_AHB1EN_PAEN;
         g_gd32_model_scb = {};
     }
@@ -201,5 +202,16 @@ TEST_F(MemoryBootFixture, IncomingTcmClockIsNeverDisabledByReset) {
     SystemInit();
     EXPECT_NE(RCU_AHB1EN & RCU_AHB1EN_TCMSRAMEN, 0U);
     EXPECT_EQ(RCU_AHB1EN & RCU_AHB1EN_PAEN, RCU_AHB1EN_PAEN);
+}
+
+TEST_F(MemoryBootFixture,
+       IncomingAdjustmentAndFactoryCalibrationAreNotRetuned) {
+    for (uint32_t adjustment : {0U, 15U, 16U, 17U, 31U}) {
+        SCOPED_TRACE(adjustment);
+        const uint32_t trim = (adjustment << 3U) | (0x7fU << 8U);
+        RCU_CTL = RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB | trim;
+        SystemInit();
+        EXPECT_EQ(trim, RCU_CTL & (RCU_CTL_IRC16MADJ | RCU_CTL_IRC16MCALIB));
+    }
 }
 } /* namespace */

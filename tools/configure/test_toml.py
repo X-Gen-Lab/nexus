@@ -240,9 +240,9 @@ model_bytes=128
         output = self.root / "bundle"
         gate.configure(self.assembly, output, gate.ROOT)
         generated = (output / "bindings.c").read_text()
-        self.assertIn("nx_stm32_uart_dma_state_t", generated)
-        self.assertIn("&nx_stm32_uart_dma_ops", generated)
-        self.assertIn("nx_stm32_uart_dma_cold_prepare", generated)
+        self.assertIn("nx_stm32_uart_hal_state_t", generated)
+        self.assertIn("&nx_stm32_uart_hal_ops", generated)
+        self.assertIn("nx_stm32_uart_hal_cold_prepare", generated)
         self.assertIn("DMA2_Stream7_IRQHandler", generated)
         self.assertIn("static const nx_stm32_uart_dma_cold_config_t", generated)
         self.assertIn(".registers = USART1", generated)
@@ -317,7 +317,7 @@ model_bytes=128
                      "nx_spi_port_stop(nx_binding_spi0)"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
-        self.assertTrue({"dma:DMA2:stream3", "dma:DMA2:stream0"} <= claims)
+        self.assertLessEqual({"dma:DMA2:stream3", "dma:DMA2:stream0"}, claims)
 
     def test_gd32_uart_dma_uses_vendor_channel_vector_and_shared_clock(self):
         source = gate.ROOT / "tests/contracts/gd32_assembly/multi.toml"
@@ -353,7 +353,8 @@ model_bytes=128
                      "nx_gd32_spi_dma_close", "nx_spi_port_stop(nx_binding_bus_spi_a)"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
-        self.assertTrue({"dma:DMA1:stream3", "dma:DMA1:stream4", "dma:DMA1:stream7"} <= claims)
+        self.assertLessEqual(
+            {"dma:DMA1:stream3", "dma:DMA1:stream4", "dma:DMA1:stream7"}, claims)
 
     def test_uart_blocks_have_caller_storage_and_mode_specific_ops(self):
         source = gate.ROOT / "tests/contracts/stm32_assembly/zg-dma.toml"
@@ -397,7 +398,7 @@ model_bytes=128
                      "nx_stm32_adc_stream_close"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
-        self.assertTrue({"controller:TIM3", "dma:DMA2:stream4"} <= claims)
+        self.assertLessEqual({"controller:TIM3", "dma:DMA2:stream4"}, claims)
         self.assembly.write_text(self.assembly.read_text() +
             '\n[pwm.pwm0]\nbinding="pwm0"\nmode="fixed-pwm"\nperiod_ticks=1000\nduty_ticks=100\ntick_hz=1000000\n')
         with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:TIM3"):
@@ -419,7 +420,7 @@ model_bytes=128
                      "nx_gd32_adc_stream_stop(&s_nx_port_adc0)"):
             self.assertIn(text, generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly).claims}
-        self.assertTrue({"controller:TIMER2", "dma:DMA1:stream0"} <= claims)
+        self.assertLessEqual({"controller:TIMER2", "dma:DMA1:stream0"}, claims)
         self.assembly.write_text(contents.replace('sample_times=[1]', 'sample_times=[7]'))
         with self.assertRaisesRegex(gate.ConfigurationError, "fifteen cycles"):
             gate.resolve_ir(self.assembly)

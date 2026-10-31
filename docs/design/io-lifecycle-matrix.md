@@ -1,11 +1,19 @@
 # 有界 I/O 生命周期属性矩阵
 
-`tools/testing/io_lifecycle_matrix.json` 维护 203 条经过审查的有限属性，覆盖
+`tools/testing/io_lifecycle_matrix.json` 维护 233 条经过审查的有限属性，覆盖
 STM32F407/GD32F470 UART、SPI、I2C、ADC、CAN、USB、raw Ethernet、capture/
 advanced timer，选定的 STM32G474 软件参考 provider/factory，以及 Native
 descriptor 序列和 RS485 方向适配。每条属性明确实例模式、生产 TU、寄存器模型、
 真实 Google case、该 case 内的断言和生产调用、所证明的不变量与限制。
 名称和测试数量不能单独建立属性成立的证据。
+
+原 203 项属性和 `unproven` 定义保持不变，另追加 30 项 F407 HAL `dma-tx`
+属性。既有 LL/provider 行保留各自列明的源码和模式，不按相似名称重绑到 HAL。
+新增行单独绑定实际 `uart_hal.c`、共享 RX／冷态／Core、锁定的官方 UART/DMA
+源码及既有 runtime、cold、generated factory case，覆盖 IRQ RX 事件／错误／loss 和 source mask、取消、
+EN=0 IRQ 门禁及迟到 TE 竞态、wake、复用、冷态 lease 和双控制器隔离。
+233 是导航条目数量；元数据检查或 capture 成功不表示本轮执行了全部 case，
+也不表示硬件通过。实际执行仍须绑定下述完整链路。
 
 ## 唯一执行链路
 
@@ -15,8 +23,9 @@ descriptor 序列和 RS485 方向适配。每条属性明确实例模式、生�
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-门禁先执行工具测试并构建实际 CMake `nexus_google_contracts`。随后 capture
-绑定当前 catalogue、CMake executable plan、compile database、已编译对象、
+门禁先执行 doctor 和 Native configure/compile/link preflight；失败时不进入
+工具测试。工具测试后再次 configure/build 当前 CMake `nexus_google_contracts`，
+随后 capture 绑定当前 catalogue、CMake executable plan、compile database、已编译对象、
 各目标 binary，以及明确列出的生产/测试/模型/公共合同源码 SHA256。每个
 provider 与测试 TU 必须属于指定 Google target 的真实编译上下文；共享
 Core/I/O TU 保留实际库对象与命令。缺少对象或目标不能退化为源码名匹配。
@@ -72,5 +81,5 @@ assertion 使用 fixture 的窄 `Initialize` 或已声明 provider 宏，审查�
 
 新增模式或修正 provider 后，应复审不变量、真实断言、模型和 limitations，
 再由新的构建和执行绑定当前源码；历史测试计数和哈希不能继承为新源的资格。
-原 80 项开发矩阵和原始日志保持历史字节不变；203 项必须由当前源码重新
+原 80 项开发矩阵和原始日志保持历史字节不变；233 项必须由当前源码重新
 capture/build/execute/audit，不能把旧报告的成功状态扩展到新增属性。

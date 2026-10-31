@@ -128,6 +128,10 @@ nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* s) {
     if ((cr & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
                RCC_CR_PLLRDY)) != 0U ||
         (cr & RCC_CR_HSIRDY) == 0U ||
+        /* RM0440 Rev9 7.4.2: reset trim64, factory HSICAL remains variable.
+         * HSI16 also supplies rollback and the selected I2C1 kernel. */
+        (NX_G474_READ(&s->rcc->ICSCR) & RCC_ICSCR_HSITRIM) !=
+            (64U << RCC_ICSCR_HSITRIM_Pos) ||
         (cfgr & (RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PPRE1 |
                  RCC_CFGR_PPRE2)) != (RCC_CFGR_SW_HSI | RCC_CFGR_SWS_HSI) ||
         (NX_G474_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U ||

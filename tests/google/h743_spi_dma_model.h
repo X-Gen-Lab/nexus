@@ -106,7 +106,7 @@ nx_arch_result_t nx_h743_spi_dma_model_invalidate(uintptr_t address,
 #undef NX_H743_SPI_READ8
 #define NX_H743_READ(reg)           nx_h743_spi_dma_model_read(reg)
 #define NX_H743_WRITE(reg, value)   nx_h743_spi_dma_model_write((reg), (value))
-#define NX_H743_SPI_READ8(reg)      nx_h743_spi_dma_model_read8(reg)
+#define NX_H743_SPI_READ8(port)     nx_h743_spi_dma_model_read8(&(port)->RXDR)
 #define NX_H743_SPI_DMA1            (&g_h743_spi_dma_model.dma)
 #define NX_H743_SPI_DMA_RX          (&g_h743_spi_dma_model.streams[2])
 #define NX_H743_SPI_DMA_TX          (&g_h743_spi_dma_model.streams[3])

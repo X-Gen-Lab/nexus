@@ -20,6 +20,11 @@ Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
 
+The USART3 IRQ-byte path binds RDR/TDR access to locked official LL operations.
+Both accesses remain word-wide even though the public payload is a byte. The
+provider keeps its saved status, RX error/loss, TC completion and borrow/drain
+ordering; DMA modes that share its IRQ-byte companion retain the same contract.
+
 ## Optional V-only high-clock reference
 
 The additional `hsi64-pll384-cache-off` profile is a cold-start configuration
@@ -546,12 +551,19 @@ recovery and product boot/update policy remain separate scopes. The reference's
 measured. Source integration and a successful link do not establish completed
 IO-24, software-candidate or physical qualification.
 
-The selected private LL SPI/ADC headers and original BSD-3-Clause notice are
-paired with STM32CubeH7v1.13.0 by the reviewed source lock. Public faces retain
-Nexus types. Official LL field encodings and pure TSIZE access are reused while
-Nexus remains the single transfer, time, IRQ and shutdown owner.
+The selected private LL SPI/ADC/USART/I2C headers and original BSD-3-Clause
+notice are paired with STM32CubeH7v1.13.0 by the reviewed source lock. Reuse
+includes field encodings, TSIZE queries, selected USART operations, SPI polling
+and DMA-cleanup byte ports, and I2C receive/transmit through a private compile-time
+port. Public faces retain Nexus types; existing transfer, time, IRQ and shutdown
+owners are unchanged. Retained command and lifecycle exceptions follow the
+[official-driver contract](../../../docs/design/official-stm32-provider.md).
 
 ## 中文范围说明
+
+私有官方 LL 依赖现涵盖 SPI/ADC/USART/I2C。SPI 轮询与 DMA 清理的字节访问、
+I2C 收发叶操作使用选定实例；既有传输、时间、IRQ 和停止 owner 不变。
+具体操作例外及资格边界见[官方驱动合同](../../../docs/design/official-stm32-provider.md)。
 
 新增显式 `dma-duplex-continuous`，使用
 `h743-uart-duplex-continuous.toml` 和 `h743-uart-duplex-continuous-cache-on.toml`。

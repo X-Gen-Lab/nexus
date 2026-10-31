@@ -97,6 +97,11 @@ extern "C" void adc_clock_config(uint32_t prescaler) {
         (ADC_SYNCCTL & ~static_cast<uint32_t>(ADC_SYNCCTL_ADCCK)) | prescaler;
 }
 
+/** \brief The unselected sample path retains the real SDK read boundary. */
+extern "C" uint16_t adc_routine_data_read(uint32_t peripheral) {
+    return static_cast<uint16_t>(ADC_RDATA(peripheral));
+}
+
 /** \brief Independently inject each cold-start wait, without a success stub. */
 extern "C" nx_time_us_t nx_time_now_us(void) {
     if ((ADC_CTL1(ADC0) & ADC_CTL1_ADCON) != 0U) {

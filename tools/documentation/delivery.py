@@ -203,6 +203,45 @@ def _alias_rows(payload, catalog=None, *, require_pages=True):
     return rows
 
 
+def _validate_alias_originals(source_root, rows):
+    """Validate live originals or pinned historical regular blobs."""
+    missing = {}
+    for row in rows:
+        original = _no_symlink(source_root / row["old_source"])
+        if original.exists():
+            if not original.is_file():
+                raise ValueError(
+                    "Documentation alias original source is not a file")
+        else:
+            missing.setdefault(row["source_revision"], set()).add(
+                row["old_source"])
+    for revision, paths in missing.items():
+        try:
+            result = subprocess.run(
+                ["git", "--literal-pathspecs", "-C", str(source_root),
+                 "ls-tree", "-r", "-z", revision, "--", *sorted(paths)],
+                capture_output=True, check=False, timeout=30)
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise ValueError(
+                "Documentation alias historical source lookup failed") from error
+        if result.returncode:
+            raise ValueError(
+                "Documentation alias historical source revision is unavailable")
+        proven = set()
+        for entry in result.stdout.split(b"\0"):
+            if not entry:
+                continue
+            metadata, name = entry.split(b"\t", 1)
+            mode, kind, _ = metadata.split()
+            path = name.decode("utf-8")
+            if (path in paths and mode in (b"100644", b"100755")
+                    and kind == b"blob"):
+                proven.add(path)
+        if proven != paths:
+            raise ValueError(
+                "Documentation alias original source is missing or unverifiable")
+
+
 def install_alias_catalog(build_dir, source_root):
     """Derive portable aliases only from the maintained CSV; never guess redirects."""
     build_dir, source_root = _no_symlink(build_dir), _no_symlink(source_root)
@@ -219,13 +258,11 @@ def install_alias_catalog(build_dir, source_root):
                "aliases": list(reader), "canonical_collisions": []}
     payload = _payload(build_dir)
     rows = _alias_rows(payload, catalog, require_pages=False)
+    _validate_alias_originals(source_root, rows)
     catalog_destination = _no_symlink(build_dir / ALIASES)
     if catalog_destination.exists():
         raise ValueError("Documentation alias output collides with existing payload")
     for row in rows:
-        original = _no_symlink(source_root / row["old_source"])
-        if not original.is_file():
-            raise ValueError("Documentation alias original source is missing")
         destination = _no_symlink(build_dir / row["old_url"])
         if destination.exists():
             if not destination.is_file():

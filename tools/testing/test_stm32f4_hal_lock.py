@@ -1,4 +1,4 @@
-"""Official LL source is closed, paired and privately consumed without HAL tick."""
+"""Selected official sources stay closed, paired and private without a tick."""
 from __future__ import annotations
 import copy
 import json
@@ -8,7 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tools.maintenance import stm32f4_hal_lock as official
 from tools.maintenance import source_catalogue
@@ -44,7 +44,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
                          "origin": source_catalogue.dependency(
                              official.CMSIS_DIRECTORY).fetch_url, "status": ""},
         }
-        self.git_patch = mock.patch.object(official.cmsis_device_lock, "git",
+        self.git_patch = mock_patch.object(official.cmsis_device_lock, "git",
                                           side_effect=self.git)
         self.git_patch.start()
         self.addCleanup(self.git_patch.stop)
@@ -72,7 +72,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result["commit"], official.COMMIT)
         self.assertEqual(result["cmsis_commit"], official.CMSIS_COMMIT)
-        self.assertEqual(result["verified_files"], 11)
+        self.assertEqual(result["verified_files"], 25)
         self.assertEqual(result["license"], "BSD-3-Clause")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
@@ -83,7 +83,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         cmsis = ROOT / "vendors/st/cmsis_device_f4"
         lock = ROOT / "dependencies/stm32f4-hal.lock.json"
         result = official.verify(source, lock, cmsis)
-        self.assertEqual(result["verified_files"], 11)
+        self.assertEqual(result["verified_files"], 25)
         executed = subprocess.run([
             sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f4_hal_lock.py"),
             "--source", str(source), "--lock", str(lock),
@@ -171,7 +171,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
                 file.write_bytes(file.read_bytes())
             return result
 
-        with mock.patch.object(official.cmsis_device_lock, "stable_snapshot",
+        with mock_patch.object(official.cmsis_device_lock, "stable_snapshot",
                                side_effect=rewrite), self.assertRaises(ValueError):
             self.verify()
 

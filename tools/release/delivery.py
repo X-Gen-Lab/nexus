@@ -794,6 +794,7 @@ def _github_http_failure(method, url, error, token):
         if parsed.scheme == "https" and parsed.hostname in ("api.github.com", "uploads.github.com"):
             endpoint = safe_text(parsed.hostname + (parsed.path or "/"), 512)
     except ValueError:
+        # Malformed untrusted URLs retain the redacted fallback endpoint.
         pass
     details = {"method": method if re.fullmatch(r"[A-Z]{1,12}", method) else "UNKNOWN",
                "endpoint": endpoint, "status": error.code}
@@ -805,12 +806,14 @@ def _github_http_failure(method, url, error, token):
         try:
             error.close()
         except (OSError, ValueError):
+            # Cleanup failure must not replace the bounded HTTP diagnostic.
             pass
     body = None
     if isinstance(contents, bytes) and len(contents) <= 16384:
         try:
             body = json.loads(contents)
         except (ValueError, RecursionError):
+            # Invalid or deeply nested JSON has no safe response-body fallback.
             pass
     if isinstance(body, dict):
         if message := safe_text(body.get("message"), 512):

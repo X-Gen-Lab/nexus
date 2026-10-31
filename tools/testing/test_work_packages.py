@@ -299,6 +299,35 @@ class WorkPackageCommandTests(unittest.TestCase):
 
 
 class CurrentWorkPackageTests(unittest.TestCase):
+    def test_h743_official_driver_is_in_resolved_source_identity(self):
+        from tools.configure import configure
+        from tools.maintenance import stm32h7_hal_lock
+
+        lock = json.loads((ROOT / stm32h7_hal_lock.LOCK_NAME).read_text())
+        stm32h7_hal_lock.contract(lock)
+        resolved = configure.resolve_ir(
+            ROOT / "tools/configure/assemblies/h743-spi-dma.toml", ROOT)
+        self.assertTrue(any(controller.kind == "spi" and
+                            controller.mode == "dma"
+                            for controller in resolved.controllers))
+        self.assertIn({"path": stm32h7_hal_lock.DIRECTORY,
+                       "commit": lock["commit"]},
+                      [dict(item) for item in resolved.source_dependencies])
+
+    def test_h743_official_driver_is_in_public_provider_contract(self):
+        from tools.configure.providers import descriptor
+        from tools.maintenance import source_catalogue, stm32h7_hal_lock
+
+        official = source_catalogue.dependency(stm32h7_hal_lock.DIRECTORY)
+        self.assertEqual(official.source_lock, stm32h7_hal_lock.LOCK_NAME)
+        contract = work_packages.provider_contracts()["stm32h743"]
+        self.assertEqual(contract["dependency_identity_status"],
+                         "declared_unverified")
+        self.assertIn({"role": "hal_driver_h7", "path": official.path},
+                      contract["git_dependencies"])
+        self.assertIn(("hal_driver_h7", official.path),
+                      descriptor.maintained("stm32h743").git_dependencies)
+
     def test_h743_duplex_canonical_inputs_run_in_the_existing_provider_stage(self):
         plan = json.loads((ROOT / "tools/dev/plans/software.json").read_text())
         stages = [stage for stage in plan["stages"]
@@ -332,8 +361,8 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertGreater(len(report["work_packages"]), 0)
         selected = next(row for row in report["work_packages"]
                         if row["identity"] == "stm32f407.USART1.dma-tx")
-        self.assertEqual(selected["provider_implementation"], "uart_dma")
-        self.assertIn("soc/stm32/stm32f407/drivers/uart_dma.c", selected["sdk_required_sources"])
+        self.assertEqual(selected["provider_implementation"], "uart_hal")
+        self.assertIn("soc/stm32/stm32f407/drivers/uart_hal.c", selected["sdk_required_sources"])
         self.assertTrue(selected["reviewed_properties"])
         self.assertTrue(report["authority_inputs"])
         inputs = {row["path"] for row in report["authority_inputs"]}
@@ -343,7 +372,8 @@ class CurrentWorkPackageTests(unittest.TestCase):
         for fixture in report["fixture_configurations"]:
             self.assertEqual(len(fixture["configuration_sha256"]), 64)
             self.assertTrue(fixture["inputs"])
-            self.assertTrue({item["path"] for item in fixture["inputs"]} <= inputs)
+            self.assertLessEqual({item["path"] for item in fixture["inputs"]},
+                                 inputs)
         for row in report["work_packages"]:
             self.assertEqual(row["software_status"], "not_executed")
             self.assertEqual(row["hardware_status"], "not_executed")
@@ -477,11 +507,11 @@ class CurrentWorkPackageTests(unittest.TestCase):
                 self.assertIn(fixture, values[0]["resolver_fixtures"])
                 self.assertIn(values[0]["provider_implementation"], {"rtc", "lptim"})
         inputs = {row["path"] for row in report["authority_inputs"]}
-        self.assertTrue({"soc/native/soc.json", "soc/native/routes.json",
-                         "soc/native/configure/__init__.py",
-                         "soc/native/configure/bindings.py",
-                         "soc/native/configure/emission.py",
-                         "soc/native/drivers/rtc_lptim.c", fixture} <= inputs)
+        self.assertLessEqual({"soc/native/soc.json", "soc/native/routes.json",
+                              "soc/native/configure/__init__.py",
+                              "soc/native/configure/bindings.py",
+                              "soc/native/configure/emission.py",
+                              "soc/native/drivers/rtc_lptim.c", fixture}, inputs)
         empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
         self.assertFalse(any(empty in row["resolver_fixtures"] for row in models))
         self.assertFalse(report["software_qualification"])

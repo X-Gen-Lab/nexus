@@ -262,6 +262,7 @@ def builtin_cs(controller):
 
 # Explicit static imports; importing this package performs no filesystem I/O.
 # Explicit software capabilities do not authorize an unreviewed route.
+# Public provider reexports consumed by configure/__init__.py and the resolver.
 from . import adc_group as ADC_GROUP, pwm_shared as PWM_SHARED
 
 ENDPOINT_POLICY = common.EndpointPolicy(i2c_long=True)

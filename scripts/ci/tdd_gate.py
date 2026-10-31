@@ -166,6 +166,13 @@ def main(arguments=None):
         # their existing locked prerequisites before executing those suites.
         execute([python, "tools/dev/dev.py", "doctor", "--target", "contracts"],
                 env, output / "preflight-contracts.txt")
+        # Reject current Native compile/link failures before expensive tool
+        # suites. The later build still captures their current output context.
+        execute([python, "tools/dev/dev.py", "configure", "--preset",
+                 args.preset], env, output / "preflight-configure.txt")
+        execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
+                 "--target", "nexus_google_contracts"], env,
+                output / "preflight-build.txt")
         tool_results = []
         for suite in TOOL_SUITES:
             tool_report = output / f"tools-{suite}.json"

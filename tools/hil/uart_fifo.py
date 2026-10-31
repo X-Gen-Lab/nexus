@@ -225,19 +225,19 @@ def collect(*, context_path, device_path, irq_path, rx_wire_path, tx_wire_path,
             },
             "acquisition_failed": device["first_error"] != 0 or
                 device["overflow_events"] != 0 or device["mismatch_count"] != 0,
-            "limits": ["Parser consistency is not station admission or "
+            "limits": ["Parser consistency is not station admission or " +
                        "physical truth.",
-                       "IRQ conversion rate/window are retained caller "
+                       "IRQ conversion rate/window are retained caller " +
                        "declarations, not calibrated facts.",
-                       "Candidate intervals are arithmetic microseconds, "
+                       "Candidate intervals are arithmetic microseconds, " +
                        "not measured IRQ latency.",
-                       "Actual assertion source, dispatch association and "
+                       "Actual assertion source, dispatch association and " +
                        "complete capture remain unverified.",
-                       "Target timestamps use nominal monotonic units; "
+                       "Target timestamps use nominal monotonic units; " +
                        "external SI calibration is unestablished.",
                        "Dispatcher entry is not Cortex exception entry.",
                        "Raw modulo/DWT pairs are not IRQ arrival latency.",
-                       "SOC-55 still needs all existing metric/observation "
+                       "SOC-55 still needs all existing metric/observation " +
                        "inputs."]}
 
 

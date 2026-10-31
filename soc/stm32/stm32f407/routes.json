@@ -2,6 +2,27 @@
   "schema_version": 1,
   "routes": [
     {
+      "id": "gpio-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO input/output modes; silicon pad only, no PCB wiring claim"
+    },
+    {
       "id": "gpio-pe3",
       "variants": [
         "STM32F407VET6",
@@ -17,7 +38,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
     },
@@ -37,7 +59,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
     },
@@ -56,7 +79,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
     },
@@ -76,7 +100,8 @@
         }
       ],
       "modes": [
-        "output"
+        "output",
+        "input"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
     },

@@ -253,6 +253,7 @@ stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
 REQUIRED_FILES += ("cmake/platform/STM32Official.cmake",)
+REQUIRED_FILES += ("soc/stm32/stm32u575/private/hal/stm32u5xx_hal_conf.h",)
 for _official in OFFICIAL_DRIVERS:
     REQUIRED_FILES += (_official.LOCK_NAME,
                        "tools/maintenance/" + _official.__name__.split(".")[-1] + ".py")
@@ -331,6 +332,11 @@ REQUIRED_FILES += ("soc/common/uart_control.h",)
 REQUIRED_FILES += (
     "soc/stm32/stm32f407/private/stm32f407_system.h",
     "soc/stm32/stm32f407/private/stm32f407_stream.h",
+    "soc/stm32/stm32f407/drivers/uart_hal.c",
+    "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
+    "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
+    "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
     "soc/gd32/gd32f470/timebase.c", "soc/gd32/gd32f470/private/system.h",
     "soc/gd32/gd32f470/private/gd32f470_adc_stream.h",
     "soc/gd32/gd32f470/private/gd32f470_spi_dma.h",

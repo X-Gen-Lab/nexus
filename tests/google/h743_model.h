@@ -153,29 +153,36 @@ nx_arch_irq_state_t nx_h743_model_irq_save(void);
 void nx_h743_model_irq_restore(nx_arch_irq_state_t previous);
 #define nx_arch_irq_save()         nx_h743_model_irq_save()
 #define nx_arch_irq_restore(saved) nx_h743_model_irq_restore(saved)
-#define NX_H743_MODEL              1
-#define NX_H743_READ(reg)          nx_h743_model_read(reg)
-#define NX_H743_WRITE(reg, value)  nx_h743_model_write((reg), (value))
+#ifndef NX_H743_UART_DEFAULT_PORT
+#define NX_H743_UART_RECEIVE8(controller)                                      \
+    ((uint8_t)NX_H743_READ(&(controller)->RDR))
+#define NX_H743_UART_TRANSMIT8(controller, value)                              \
+    NX_H743_WRITE(&(controller)->TDR, (value))
+#endif
+#define NX_H743_MODEL             1
+#define NX_H743_READ(reg)         nx_h743_model_read(reg)
+#define NX_H743_WRITE(reg, value) nx_h743_model_write((reg), (value))
 #define NX_H743_IRQ_CONTROL(irq, enabled, priority)                            \
     nx_h743_model_irq_control((irq), (enabled), (priority))
 #define NX_H743_IRQ_AVAILABLE(irq)                                             \
     (!g_h743_model.irq_enabled[(irq)] && !g_h743_model.irq_pending[(irq)] &&   \
      !g_h743_model.irq_active[(irq)])
-#define NX_H743_IRQ_PRIORITY(irq)      g_h743_model.priority[(irq)]
-#define NX_H743_IRQ_GROUP()            g_h743_model.group
-#define NX_H743_FLASH_KIB()            g_h743_model.flash_kib
-#define NX_H743_DEVICE_ID()            g_h743_model.device_id
-#define NX_H743_SILICON_ID()           g_h743_model.silicon_id
-#define NX_H743_GPIOB                  (&g_h743_model.gpio_b)
-#define NX_H743_GPIOD                  (&g_h743_model.gpio_d)
-#define NX_H743_GPIOE                  (&g_h743_model.gpio_e)
-#define NX_H743_UART_POLL(port)        nx_h743_model_uart_poll(port)
-#define NX_H743_WATCHDOG_POLL(port)    nx_h743_model_watchdog_poll(port)
-#define NX_H743_SPI_WRITE8(reg, value) nx_h743_model_spi_write8((reg), (value))
-#define NX_H743_SPI_READ8(reg)         nx_h743_model_spi_read8(reg)
-#define NX_H743_SPI_POLL(port)         nx_h743_model_spi_poll(port)
-#define NX_H743_ADC_POLL(port)         nx_h743_model_adc_poll(port)
-#define NX_H743_FLASH_POLL(port)       nx_h743_model_flash_poll(port)
+#define NX_H743_IRQ_PRIORITY(irq)   g_h743_model.priority[(irq)]
+#define NX_H743_IRQ_GROUP()         g_h743_model.group
+#define NX_H743_FLASH_KIB()         g_h743_model.flash_kib
+#define NX_H743_DEVICE_ID()         g_h743_model.device_id
+#define NX_H743_SILICON_ID()        g_h743_model.silicon_id
+#define NX_H743_GPIOB               (&g_h743_model.gpio_b)
+#define NX_H743_GPIOD               (&g_h743_model.gpio_d)
+#define NX_H743_GPIOE               (&g_h743_model.gpio_e)
+#define NX_H743_UART_POLL(port)     nx_h743_model_uart_poll(port)
+#define NX_H743_WATCHDOG_POLL(port) nx_h743_model_watchdog_poll(port)
+#define NX_H743_SPI_WRITE8(port, value)                                        \
+    nx_h743_model_spi_write8(&(port)->TXDR, (value))
+#define NX_H743_SPI_READ8(port)  nx_h743_model_spi_read8(&(port)->RXDR)
+#define NX_H743_SPI_POLL(port)   nx_h743_model_spi_poll(port)
+#define NX_H743_ADC_POLL(port)   nx_h743_model_adc_poll(port)
+#define NX_H743_FLASH_POLL(port) nx_h743_model_flash_poll(port)
 #define NX_H743_FLASH_WRITE32(address, value)                                  \
     nx_h743_model_flash_write32((address), (value))
 #define NX_H743_SYSTEM_POLL(system) nx_h743_model_system_poll(system)

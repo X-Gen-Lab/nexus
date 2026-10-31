@@ -181,6 +181,23 @@ class DocumentationCommandTests(unittest.TestCase):
         self.assertNotEqual(result, 0)
         server.assert_not_called()
 
+    def test_preview_interrupt_closes_server_and_returns_success(self):
+        output = self.root / "build/documentation"
+        output.mkdir(parents=True)
+        (output / "documentation-build.json").write_text('{"status":"passed"}')
+        closed = []
+
+        def interrupt():
+            raise KeyboardInterrupt()
+
+        server = SimpleNamespace(server_port=8080, serve_forever=interrupt,
+                                 server_close=lambda: closed.append(True))
+        with patch.object(cli, "ThreadingHTTPServer", return_value=server), \
+                redirect_stdout(io.StringIO()):
+            result = cli.main(["preview", "--build", str(output)], root=self.root)
+        self.assertEqual(result, 0)
+        self.assertEqual(closed, [True])
+
     def test_staged_check_compares_svg_input_bytes(self):
         import subprocess
         image = self.root / "docs/assets/diagram.svg"

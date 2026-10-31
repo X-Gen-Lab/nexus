@@ -34,6 +34,9 @@ FLASH_GEOMETRY = ("g_nx_gd32f470_flash_geometry",
                   "0u")
 FLASH_PROGRAM_UNIT = 2
 FLASH_INPUT_ALIGNMENT = 1
+# The reviewed official startup table fits a 512-byte vector reservation.
+OFFSET_IMAGE_ALIGNMENT = 512
+OFFSET_IMAGE_VECTOR_SYMBOL = '__gVectors'
 FACT_REFERENCES = descriptor.maintained("gd32f470").references
 SOURCE_IMPORT_LOCK = descriptor.maintained("gd32f470").import_lock
 ETH_CONTROLLER = 'ENET'

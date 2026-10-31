@@ -114,7 +114,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 if label == "gd32":
                     self.assertIn("nx_gd32_uart_dma_cold_prepare", source)
                 else:
-                    self.assertIn("nx_stm32_uart_dma_cold_prepare", source)
+                    self.assertIn("nx_stm32_uart_hal_cold_prepare", source)
                     self.assertIn(
                         ".transmit = { DMA1_Stream6, DMA1_Stream6_IRQn, 6u, 4u }",
                         source)

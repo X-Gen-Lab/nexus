@@ -9,7 +9,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tools.evidence.common import EvidenceError
 from tools.measurement.elf import Elf32
@@ -361,11 +361,11 @@ _sidata = LOADADDR(.data);
                     source["commit"] = "3" * 40
                 return raw
 
-            with (mock.patch.object(producer, "run", side_effect=build_matrix),
-                  mock.patch.object(producer, "validate_fixtures",
+            with (mock_patch.object(producer, "run", side_effect=build_matrix),
+                  mock_patch.object(producer, "validate_fixtures",
                                     return_value=fixtures),
-                  mock.patch.object(producer.Recorder, "execute", new=inspect),
-                  mock.patch.object(self.gate, "git_source", create=True,
+                  mock_patch.object(producer.Recorder, "execute", new=inspect),
+                  mock_patch.object(self.gate, "git_source", create=True,
                                     side_effect=lambda _: copy.deepcopy(source))):
                 output = directory / "output"
                 compiler = (os.environ.get("NEXUS_ARM_GCC") or

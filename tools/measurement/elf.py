@@ -135,6 +135,92 @@ def interval_bytes(spans: list[tuple[int, int]]) -> int:
     return sum(end - start for start, end in intervals_union(spans))
 
 
+def _image_span(value: dict, name: str) -> tuple[int, int]:
+    """Check a nonempty uint32 address window without wrapped arithmetic."""
+    if not isinstance(value, dict):
+        raise EvidenceError("invalid " + name + " window")
+    origin, size = value.get("origin"), value.get("size")
+    if (type(origin) is not int or not 0 <= origin < 2**32 or
+            type(size) is not int or not 0 < size < 2**32 or
+            origin + size > 2**32):
+        raise EvidenceError("invalid " + name + " window")
+    return origin, origin + size
+
+
+def _same_image_fact(left, right) -> bool:
+    """Keep metadata types as well as values in a physical fact projection."""
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            _same_image_fact(value, right[key]) for key, value in left.items())
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            _same_image_fact(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def image_window(resolved: dict) -> dict:
+    """Validate the selected image without redefining physical Flash facts.
+
+    Complete reset-address historical fixtures retain their original scope.
+    A changed window must follow the exact physical erase geometry. Offsets
+    additionally require an explicitly reviewed source-owned startup profile;
+    arbitrary artifact metadata cannot grant a new family that capability.
+    """
+    if not isinstance(resolved, dict):
+        raise EvidenceError("invalid resolved image contract")
+    physical = resolved.get("flash")
+    selected = resolved.get("layout", physical)
+    physical_start, physical_end = _image_span(physical, "physical Flash")
+    start, end = _image_span(selected, "selected Flash image")
+    if not physical_start <= start < end <= physical_end:
+        raise EvidenceError("selected Flash image leaves physical Flash")
+    if "kind" in selected and selected["kind"] != "image":
+        raise EvidenceError("selected Flash layout is not an image")
+    blocks = physical.get("erase_blocks")
+    boundaries = {physical_start}
+    if blocks is not None:
+        if (not isinstance(blocks, list) or not blocks or
+                any(type(size) is not int or size <= 0 for size in blocks)):
+            raise EvidenceError("invalid physical Flash erase geometry")
+        cursor = physical_start
+        for size in blocks:
+            cursor += size
+            if cursor > physical_end:
+                raise EvidenceError("physical Flash erase geometry overflows")
+            boundaries.add(cursor)
+        if cursor != physical_end:
+            raise EvidenceError("physical Flash erase geometry is incomplete")
+    for key, value in physical.items():
+        if (key not in {"origin", "size", "id", "kind"} and
+                key in selected and not _same_image_fact(value, selected[key])):
+            raise EvidenceError("image cannot redefine physical Flash geometry")
+    if (start, end) != (physical_start, physical_end):
+        if blocks is None or start not in boundaries or end not in boundaries:
+            raise EvidenceError("selected image requires physical erase boundaries")
+    result = {"origin": start, "size": end - start}
+    if start != physical_start:
+        from tools.configure.providers import maintained
+        try:
+            profile = maintained(resolved.get("soc_family"))
+        except (KeyError, TypeError, ValueError) as error:
+            raise EvidenceError("image offset has no reviewed startup") from error
+        alignment = getattr(profile, "OFFSET_IMAGE_ALIGNMENT", None)
+        symbol = getattr(profile, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
+        part = resolved.get("part")
+        if (type(alignment) is not int or alignment < 128 or
+                alignment & (alignment - 1) or
+                not isinstance(symbol, str) or not symbol or
+                not isinstance(part, str) or
+                part not in getattr(profile, "PARTS", ())):
+            raise EvidenceError("image offset has no reviewed startup")
+        if start % alignment or end - start < 8:
+            raise EvidenceError("image offset violates reviewed vector bounds")
+        result.update(vector_alignment=alignment, vector_symbol=symbol)
+    return result
+
+
 def binary_from_elf(elf: Elf32, origin: int, limit: int) -> bytes:
     """Reconstruct objcopy's allocated file-backed section image, including data."""
     spans = []

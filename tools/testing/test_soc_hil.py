@@ -141,7 +141,6 @@ if operation == 'serial':
         context_id = payload["context"]
         observations = payload["observations"]
         traces = payload["traces"]
-        now = datetime.now(timezone.utc)
         return {"schema_version": 1, "kind": "physical_soc_hil",
                 "case_id": "SOC-37", "started_utc": capture["started_utc"],
                 "finished_utc": capture["finished_utc"],

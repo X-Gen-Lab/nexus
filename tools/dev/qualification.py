@@ -44,6 +44,7 @@ CHECKERS = {
     "sdk_consumers": ("cmake/package/verify_consumers.py",),
     "sdk_boundary_tests": ("tests/contracts/test_source_sdk.py",),
     "build_artifact_tests": ("tests/contracts/test_build_artifacts.py",),
+    "image_artifact_tests": ("tests/contracts/test_image_artifacts.py",),
     "resource_budget": ("tools/measurement/resources.py",),
     "retention": ("tools/measurement/retention.py",),
     "compatibility": ("tools/maintenance/compatibility.py",),
@@ -173,9 +174,12 @@ def execute(plan: dict, root: Path, output: Path, *, require_candidate: bool = F
             break
         argv = command([sys.executable, "-B", str(script), *prefix, *stage["args"]],
                        {"root": str(root), "output": str(output)})
+        stage_environment = environment.copy()
+        stage_environment.setdefault("NEXUS_COMMAND_TIMEOUT",
+                                     str(stage.get("timeout_s", 1800)))
         raw = output / (stage["name"] + ".raw")
         started = time.monotonic()
-        result = run_command(argv, cwd=root, env=environment, log=raw,
+        result = run_command(argv, cwd=root, env=stage_environment, log=raw,
                              timeout=stage.get("timeout_s", 1800), stage=stage["checker"])
         # Preserve even empty actual output; the command receipt proves execution.
         with raw.open("rb") as stream:

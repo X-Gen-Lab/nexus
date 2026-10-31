@@ -150,12 +150,14 @@ class EthernetFramesFactory : public testing::Test {
         Reg(UINT32_C(0x40023800)) = 3U;
         Reg(UINT32_C(0x40023804)) = UINT32_C(0x24003010);
 #ifdef NX_ETH_FRAMES_FACTORY_STM32
+        RCC->CR |= 16U << RCC_CR_HSITRIM_Pos;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         g_nx_stm32_system.flash = FLASH;
         g_nx_stm32_system.power = PWR;
         g_nx_stm32_system.timer = TIM2;
 #else
+        RCU_CTL |= 16U << 3U;
         SystemCoreClock = 16000000U;
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;

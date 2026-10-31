@@ -13,6 +13,8 @@ if(NEXUS_TRUSTZONE_STAGE STREQUAL "secure")
         "${nexus_source}/soc/stm32/stm32u575/drivers/gpio.c")
     target_link_libraries(u575_secure PRIVATE Nexus::Runtime
         Nexus::UserIoBroker nexus_owned_warnings)
+    include("${nexus_source}/cmake/platform/STM32Official.cmake")
+    nexus_stm32u575_gpio_hal(u575_secure)
     target_include_directories(u575_secure PRIVATE
         "${nexus_source}/soc/stm32/stm32u575/private"
         "${nexus_source}/components/user_io_broker/private")

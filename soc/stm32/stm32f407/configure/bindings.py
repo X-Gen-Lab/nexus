@@ -5,8 +5,9 @@ from tools.configure.memory import dma_regions, flash_geometry
 from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
-from tools.configure import can, usb_device, ethernet, timer_advanced, secondary_controllers
-from .contract import ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS, PARTS
+from tools.configure import timer_advanced, secondary_controllers
+from .contract import (ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS,
+                       PARTS, mode_implementation)
 
 
 def _symbol(value):
@@ -392,11 +393,7 @@ def _uart_constructor(item, result):
     tx_dma, rx_dma = traits.tx_dma, traits.rx_dma
     blocks = traits.block_stream
     words = item.mode == "irq-words"
-    implementation = ("uart_word" if words else
-                      "uart_duplex" if rx_dma and tx_dma else
-                      "uart_receive" if rx_dma else
-                      "uart_dma" if tx_dma else
-                      "uart_stream" if blocks else "uart")
+    implementation = mode_implementation(item.kind, item.mode)
     cold_kind = "byte" if implementation == "uart" else implementation[5:]
     saved = f"s_nx_uart_pin_state_{name}"
     config = f"s_nx_uart_config_{name}"
@@ -471,7 +468,8 @@ def _uart_constructor(item, result):
             vector = hardware.dma_vector("stm32f407", tx)
             definitions += [f"    .transmit = {{ {vector}, {vector}_IRQn, {tx[1]}u, {tx[2]}u }}"]
     definitions += ["};"]
-    irq_implementation = ("uart_word" if words else
+    irq_implementation = ("uart_hal" if implementation == "uart_hal" else
+                          "uart_word" if words else
                           "uart_format" if uart_formats.changed(item) else
                           "uart_duplex" if rx_dma and tx_dma else
                           "uart_receive" if rx_dma else
@@ -490,7 +488,8 @@ def _uart_constructor(item, result):
                         f"void {vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&{state}); }}"]
     if tx:
         vector = hardware.dma_vector("stm32f407", tx)
-        method = "duplex_dma" if rx_dma else "dma"
+        method = ("hal_dma" if implementation == "uart_hal" else
+                  "duplex_dma" if rx_dma else "dma")
         definitions += [f"void {vector}_IRQHandler(void);",
                         r"/** \brief Fixed selected TX-DMA publisher. */",
                         f"void {vector}_IRQHandler(void) {{ nx_stm32_uart_{method}_irq(&s_nx_port_{name}); }}"]

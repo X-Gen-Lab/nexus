@@ -50,6 +50,7 @@ void nx_g474_model_reset(void) {
     memset(&g_nx_stm32g474_system, 0, sizeof(g_nx_stm32g474_system));
     g_g474_model.privileged = true;
     g_g474_model.rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
+    g_g474_model.rcc.ICSCR = 64U << RCC_ICSCR_HSITRIM_Pos;
     g_g474_model.rcc.CFGR = RCC_CFGR_SW_HSI | RCC_CFGR_SWS_HSI;
     g_g474_model.power.CR1 = PWR_CR1_VOS_0;
     g_g474_model.power.CR5 = PWR_CR5_R1MODE;

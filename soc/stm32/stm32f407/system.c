@@ -24,6 +24,14 @@ nx_stm32_system_t g_nx_stm32_system = {
 
 extern nx_stm32_system_t g_nx_stm32_system;
 
+/* CMSIS/HAL readers share the last confirmed fixed HCLK observation. Startup
+ * initializes DATA after SystemInit, so this reset value needs no early RAM. */
+uint32_t SystemCoreClock = 16000000U;
+/* Official RCC frequency getters use these CMSIS prescaler exponents. */
+const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
+                                   1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
+
 #ifndef NX_STM32_TIMEBASE_ACK
 #define NX_STM32_TIMEBASE_ACK(system, value) ((system)->timer->SR = (value))
 #endif
@@ -31,6 +39,11 @@ extern nx_stm32_system_t g_nx_stm32_system;
 /** \brief Read the unique fixed provider clock without an OS dependency. */
 nx_time_us_t nx_time_now_us(void) {
     return nx_stm32_system_now(&g_nx_stm32_system);
+}
+
+/** \brief Bridge HAL milliseconds to the existing live monotonic epoch. */
+uint32_t HAL_GetTick(void) {
+    return (uint32_t)(nx_time_now_us() / 1000U);
 }
 
 /** \brief Forward the explicitly reserved timer vector to the static context.
@@ -162,6 +175,9 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
     if (system->started || system->remaining_effects != 0U ||
         (clock & (RCC_CR_HSION | RCC_CR_HSIRDY)) !=
             (RCC_CR_HSION | RCC_CR_HSIRDY) ||
+        /* The nominal HSI fallback requires the reset trim, not foreign tuning.
+         */
+        (clock & RCC_CR_HSITRIM) != (16U << RCC_CR_HSITRIM_Pos) ||
         (clock & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
                   RCC_CR_PLLRDY | RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY)) != 0U ||
         (system->rcc->CFGR & bus_mask) != 0U ||
@@ -216,6 +232,10 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
     if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS, 0U, limit)) {
         return -1;
     }
+    /* HPRE is one throughout the reviewed profile. Publish the confirmed HSI
+     * switch even if a later PLL, prescaler or resource cleanup is refused. */
+    system->core_hz = 16000000U;
+    SystemCoreClock = system->core_hz;
     NX_STM32_WRITE(&system->rcc->CR,
                    system->rcc->CR & ~(uint32_t)(RCC_CR_PLLON | RCC_CR_HSEON));
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY | RCC_CR_HSERDY, 0U,
@@ -229,7 +249,6 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
             RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) {
         return -1;
     }
-    system->core_hz = 16000000U;
     if (!write_checked(&system->rcc->PLLCFGR, system->saved_pll, UINT32_MAX) ||
         !write_checked(&system->flash->ACR, system->saved_flash, UINT32_MAX)) {
         return -1;
@@ -262,7 +281,10 @@ void SystemInit(void) {
     RCC->CR &= ~(uint32_t)(RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_PLLON);
     RCC->PLLCFGR = 0x24003010U;
     RCC->CIR = 0U;
-    SCB->VTOR = FLASH_BASE;
+    extern const uint32_t g_pfnVectors[];
+    SCB->VTOR = (uint32_t)(uintptr_t)g_pfnVectors;
+    __DSB();
+    __ISB();
     NVIC_SetPriorityGrouping(3U);
 #endif
 #if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
@@ -289,6 +311,8 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         return result;
     }
     system->timer_error = NX_SUCCESS;
+    system->core_hz = 16000000U;
+    SystemCoreClock = system->core_hz;
     system->reset_cause = system->rcc->CSR;
     system->saved_pll = system->rcc->PLLCFGR;
     system->saved_flash = system->flash->ACR;
@@ -341,6 +365,10 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -5;
         goto rollback;
     }
+    /* Consumers start only after the timebase, but failed timer preparation
+     * can leave the PLL live. Metadata follows hardware, not API success. */
+    system->core_hz = 168000000U;
+    SystemCoreClock = system->core_hz;
     system->remaining_effects |= NX_STM32_EFFECT_TIMER_GATE;
     if (!write_checked(&system->rcc->APB1ENR,
                        system->rcc->APB1ENR | RCC_APB1ENR_TIM2EN,
@@ -419,7 +447,6 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         goto rollback;
     }
 #endif
-    system->core_hz = 168000000U;
     system->started = true;
     return result;
 rollback:

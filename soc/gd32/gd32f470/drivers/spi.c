@@ -358,12 +358,14 @@ nx_result_t nx_gd32_spi_endpoint_transfer(void* context, const uint8_t* tx,
         if (status != NX_SUCCESS) {
             break;
         }
-        SPI_DATA(port->controller->registers) = tx ? tx[i] : UINT8_MAX;
+        spi_i2s_data_transmit(port->controller->registers,
+                              tx ? tx[i] : UINT8_MAX);
         status = wait_status(port, SPI_STAT_RBNE, true, deadline);
         if (status != NX_SUCCESS) {
             break;
         }
-        uint8_t byte = (uint8_t)SPI_DATA(port->controller->registers);
+        uint8_t byte =
+            (uint8_t)spi_i2s_data_receive(port->controller->registers);
         if (rx) {
             rx[i] = byte;
         }
@@ -377,7 +379,7 @@ nx_result_t nx_gd32_spi_endpoint_transfer(void* context, const uint8_t* tx,
          */
         spi_i2s_deinit(port->controller->registers);
     }
-    SPI_CTL0(port->controller->registers) &= ~SPI_CTL0_SPIEN;
+    spi_disable(port->controller->registers);
     nx_gd32_peripheral_barrier();
     GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask;
     port->active = false;
@@ -460,7 +462,7 @@ const nx_spi_ops_t nx_gd32_spi_ops = {
 #define NX_GD32_SPI_TRANSACTION_WRITE(port, value, bits)                       \
     do {                                                                       \
         (void)(bits);                                                          \
-        SPI_DATA((port)->controller->registers) = (value);                     \
+        spi_i2s_data_transmit((port)->controller->registers, (value));         \
     } while (0)
 #endif
 
@@ -499,7 +501,7 @@ static nx_result_t transaction_transfer(void* context,
     }
     port->active = true;
     /* FF16 changes only while SPI is disabled, never between phases. */
-    SPI_CTL0(port->controller->registers) &= ~SPI_CTL0_SPIEN;
+    spi_disable(port->controller->registers);
     SPI_CTL0(port->controller->registers) =
         (endpoint->control & ~(SPI_CTL0_SPIEN | SPI_CTL0_FF16)) |
         (word_bits == 16U ? SPI_CTL0_FF16 : 0U) | SPI_CTL0_SPIEN;
@@ -523,7 +525,8 @@ static nx_result_t transaction_transfer(void* context,
             if (result != NX_SUCCESS) {
                 break;
             }
-            uint16_t received = (uint16_t)SPI_DATA(port->controller->registers);
+            uint16_t received =
+                spi_i2s_data_receive(port->controller->registers);
             if (segment->rx != NULL) {
                 if (word_bits == 8U) {
                     ((uint8_t*)segment->rx)[word] = (uint8_t)received;
@@ -540,7 +543,7 @@ static nx_result_t transaction_transfer(void* context,
     if (result != NX_SUCCESS) {
         spi_i2s_deinit(port->controller->registers);
     }
-    SPI_CTL0(port->controller->registers) &= ~SPI_CTL0_SPIEN;
+    spi_disable(port->controller->registers);
     nx_gd32_peripheral_barrier();
     GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask;
     NX_GD32_SPI_TRANSACTION_CS(false);

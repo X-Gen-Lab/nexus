@@ -12,10 +12,17 @@ extern "C" {
 #include "nexus_factory.h"
 #include "stm32f407_provider.h"
 #include "stm32f407_uart_cold.h"
+#ifdef NX_COLD_HAL
+#include "stm32f407_uart_hal.h"
+#endif
 nx_stm32_system_t g_nx_stm32_system;
+#ifdef NX_COLD_HAL
+alignas(16) uint8_t g_nx_stm32_scs_model[0x2000U] = {};
+#else
 NVIC_Type g_gd32_model_nvic;
 SCB_Type g_gd32_model_scb;
 SysTick_Type g_gd32_model_systick;
+#endif
 uint32_t g_gd32_model_mask;
 bool g_gd32_model_isr;
 }
@@ -64,6 +71,11 @@ using ColdState = nx_stm32_uart_receive_state_t;
 using ColdConfig = nx_stm32_uart_dma_cold_config_t;
 #define COLD_PREPARE nx_stm32_uart_receive_cold_prepare
 #define COLD_CLOSE   nx_stm32_uart_receive_cold_close
+#elif defined(NX_COLD_HAL)
+using ColdState = nx_stm32_uart_hal_state_t;
+using ColdConfig = nx_stm32_uart_dma_cold_config_t;
+#define COLD_PREPARE nx_stm32_uart_hal_cold_prepare
+#define COLD_CLOSE   nx_stm32_uart_hal_cold_close
 #elif NX_COLD_TX
 using ColdState = nx_stm32_uart_dma_state_t;
 using ColdConfig = nx_stm32_uart_dma_cold_config_t;
@@ -96,9 +108,15 @@ class UartColdFactory : public testing::Test {
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mmio, reinterpret_cast<void*>(UINT32_C(0x40000000)));
+#ifdef NX_COLD_HAL
+        std::memset(g_nx_stm32_scs_model, 0, sizeof(g_nx_stm32_scs_model));
+        SystemCoreClock = 168000000U;
+        RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
+#else
         g_gd32_model_nvic = {};
         g_gd32_model_scb = {};
         g_gd32_model_systick = {};
+#endif
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;
         g_nx_stm32_system = {};
@@ -285,6 +303,23 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return ++now;
 }
+#ifdef NX_COLD_HAL
+extern "C" {
+uint32_t SystemCoreClock = 168000000U;
+const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
+                                   1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
+/* This factory isolates the Platform time port; the runtime suite executes
+ * the production System/HAL time bridge with an explicit timer model. */
+uint32_t HAL_GetTick(void) {
+    return static_cast<uint32_t>(nx_time_now_us() / 1000U);
+}
+/* The SDK's DMA disable macro writes one 32-bit silicon register. */
+void nx_uart_cold_hal_dma_disable(DMA_HandleTypeDef* handle) {
+    handle->Instance->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+}
+}
+#endif
 extern "C" void nx_platform_cold_model_write(volatile uint32_t* reg,
                                              uint32_t value) {
     ++writes;

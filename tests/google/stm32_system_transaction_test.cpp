@@ -9,6 +9,9 @@
 extern "C" {
 #include "nexus/core/fault.h"
 #include "stm32f407_system.h"
+/* A missing CMSIS producer is an observable RED, not a fake clock provider. */
+extern uint32_t SystemCoreClock __attribute__((weak));
+uint32_t HAL_GetTick(void) __attribute__((weak));
 }
 #include "terminal_watchdog.h"
 #include <gmock/gmock.h>
@@ -56,7 +59,7 @@ class Stm32System : public testing::Test {
         g_nx_stm32_system.flash = &flash;
         g_nx_stm32_system.power = &power;
         g_nx_stm32_system.timer = &timer;
-        rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
+        rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
         rcc.PLLCFGR = UINT32_C(0x24003010);
         flash.ACR = FLASH_ACR_ICEN;
         power.CR = PWR_CR_DBP;
@@ -120,6 +123,89 @@ TEST_F(Stm32System, ExactClockAndIndependentTimerHaveOneLiveEpoch) {
     EXPECT_EQ(5U, nx_stm32_system_now(&g_nx_stm32_system));
     ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, CmsisClockTracksConfirmedStartAndHsiReturn) {
+    ASSERT_NE(nullptr, &SystemCoreClock);
+    EXPECT_EQ(16000000U, SystemCoreClock);
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_EQ(168000000U, SystemCoreClock);
+    EXPECT_EQ(g_nx_stm32_system.core_hz, SystemCoreClock);
+    ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(16000000U, SystemCoreClock);
+    EXPECT_EQ(g_nx_stm32_system.core_hz, SystemCoreClock);
+}
+
+TEST_F(Stm32System, CmsisClockKeepsPllAfterTimerFailureAndRefusedHsiReturn) {
+    ASSERT_NE(nullptr, &SystemCoreClock);
+    EXPECT_CALL(hardware_mock, Write(&timer.PSC, 83U))
+        .WillOnce([](volatile uint32_t*, uint32_t) { hold_hsi = true; });
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_NE(0, result.cleanup);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_EQ(RCC_CFGR_SWS_PLL, rcc.CFGR & RCC_CFGR_SWS);
+    EXPECT_EQ(168000000U, SystemCoreClock);
+    EXPECT_EQ(g_nx_stm32_system.core_hz, SystemCoreClock);
+}
+
+TEST_F(Stm32System, CmsisClockDoesNotClaimPllAfterEarlySourceFailure) {
+    ASSERT_NE(nullptr, &SystemCoreClock);
+    hold_hse = true;
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_EQ(16000000U, SystemCoreClock);
+    EXPECT_EQ(g_nx_stm32_system.core_hz, SystemCoreClock);
+}
+
+TEST_F(Stm32System, ConfirmedHsiMetadataSurvivesLaterFlashRestoreRefusal) {
+    ASSERT_NE(nullptr, &SystemCoreClock);
+    const uint32_t saved_flash = flash.ACR;
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_CALL(hardware_mock, Write(&flash.ACR, saved_flash))
+        .WillOnce([](volatile uint32_t*, uint32_t) {})
+        .RetiresOnSaturation();
+    EXPECT_NE(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, rcc.CFGR & (RCC_CFGR_SWS | RCC_CFGR_HPRE));
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects);
+    EXPECT_EQ(16000000U, SystemCoreClock);
+    EXPECT_EQ(16000000U, g_nx_stm32_system.core_hz);
+}
+
+TEST_F(Stm32System, ForeignClockRefusalPreservesObservedClockMetadata) {
+    ASSERT_NE(nullptr, &SystemCoreClock);
+    const uint32_t previous_clock = SystemCoreClock;
+    SystemCoreClock = 84000000U;
+    g_nx_stm32_system.core_hz = 84000000U;
+    rcc.CR |= RCC_CR_PLLON | RCC_CR_PLLRDY;
+    rcc.CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL;
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_NE(0, Start().primary);
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
+    EXPECT_EQ(RCC_CFGR_SWS_PLL, rcc.CFGR & RCC_CFGR_SWS);
+    EXPECT_EQ(84000000U, SystemCoreClock);
+    EXPECT_EQ(84000000U, g_nx_stm32_system.core_hz);
+    SystemCoreClock = previous_clock;
+}
+
+TEST_F(Stm32System, HalMillisecondsUseTheOwnedEpochAndModuloWrap) {
+    auto* volatile get_tick = &HAL_GetTick;
+    ASSERT_NE(nullptr, get_tick);
+    EXPECT_EQ(0U, HAL_GetTick());
+    ASSERT_EQ(0, Start().primary);
+    timer.CNT = 1999U;
+    EXPECT_EQ(1U, HAL_GetTick());
+    timer.CNT = 2000U;
+    EXPECT_EQ(2U, HAL_GetTick());
+    g_nx_stm32_system.overflow_us =
+        (static_cast<uint64_t>(UINT32_MAX) + 1U) * 1000U;
+    timer.CNT = 1234U;
+    EXPECT_EQ(1U, HAL_GetTick());
+    ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, HAL_GetTick());
 }
 
 TEST_F(Stm32System, PendingAtSourceWithdrawalIsClearedBeforeOwnerRelease) {
@@ -269,6 +355,54 @@ TEST_F(Stm32System, HseFailureRestoresSavedFieldsWithoutPublishingTime) {
     EXPECT_EQ(old_power, power.CR);
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
 }
+
+class Stm32AdjustedHsiTrim : public Stm32System,
+                             public testing::WithParamInterface<uint32_t> {};
+
+TEST_P(Stm32AdjustedHsiTrim, RejectsBeforeAnyWriteOrOwnership) {
+    rcc.CR = (rcc.CR & ~(uint32_t)RCC_CR_HSITRIM) |
+             (GetParam() << RCC_CR_HSITRIM_Pos) | (0xA5U << RCC_CR_HSICAL_Pos);
+    const uint32_t saved_clock = rcc.CR;
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_system_preflight(&g_nx_stm32_system));
+    const auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
+    EXPECT_EQ(0U, g_nx_stm32_system.core_hz);
+    EXPECT_FALSE(g_nx_stm32_system.owned_power_clock);
+    EXPECT_FALSE(g_nx_stm32_system.power_snapshotted);
+    EXPECT_EQ(saved_clock, rcc.CR);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_FALSE(irq_pending);
+    EXPECT_EQ(0U, mask);
+    testing::Mock::VerifyAndClearExpectations(&hardware_mock);
+}
+
+INSTANTIATE_TEST_SUITE_P(Adjusted, Stm32AdjustedHsiTrim,
+                         testing::Values(0U, 15U, 17U, 31U));
+
+class Stm32FactoryHsiCalibration
+    : public Stm32System,
+      public testing::WithParamInterface<uint32_t> {};
+
+TEST_P(Stm32FactoryHsiCalibration, DefaultTrimPreservesFactoryCalibration) {
+    rcc.CR |= GetParam() << RCC_CR_HSICAL_Pos;
+    const uint32_t calibration = rcc.CR & (RCC_CR_HSITRIM | RCC_CR_HSICAL);
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_system_preflight(&g_nx_stm32_system));
+    testing::Mock::VerifyAndClearExpectations(&hardware_mock);
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_EQ(168000000U, g_nx_stm32_system.core_hz);
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(16000000U, g_nx_stm32_system.core_hz);
+    EXPECT_EQ(calibration, rcc.CR & (RCC_CR_HSITRIM | RCC_CR_HSICAL));
+}
+
+INSTANTIATE_TEST_SUITE_P(Factory, Stm32FactoryHsiCalibration,
+                         testing::Values(0U, 0x55U, 0xAAU, 0xFFU));
 
 TEST_F(Stm32System, ForeignClockIsRejectedBeforeAnyOwnedWrite) {
     rcc.CR |= RCC_CR_PLLON;

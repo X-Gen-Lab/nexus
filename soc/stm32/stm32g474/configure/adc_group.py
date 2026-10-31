@@ -15,7 +15,10 @@ SAMPLE_HALFCYCLES = (5, 13, 25, 49, 95, 185, 495, 1281)
 
 
 def trigger_resources(selection):
-    """The reviewed trigger consumes the family's exact physical timer."""
+    """Return a variable-length resource tuple: zero or one exact timer.
+
+    Callers iterate these homogeneous resource identities, not fixed fields.
+    """
     return ("controller:TIM6",) if selection["trigger"] == "tim6-trgo" else ()
 
 

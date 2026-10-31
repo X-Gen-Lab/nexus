@@ -153,6 +153,8 @@ def _linux_signal(known, signum):
             else:
                 os.kill(pid, signum)
         except ProcessLookupError:
+            # A target can disappear after observation. Freeze and withdrawal
+            # checks still reobserve the captured process identities.
             pass
 
 
@@ -239,11 +241,13 @@ def _terminate(process):
         try:
             process.wait(timeout=0.2)
         except subprocess.TimeoutExpired:
+            # Expiry still requires the whole-group withdrawal below.
             pass
         # The parent may exit before its children. Kill the group regardless.
         try:
             os.killpg(process.pid, signal.SIGKILL)
         except ProcessLookupError:
+            # The group may already be gone; still join the parent below.
             pass
     else:
         # CREATE_NEW_PROCESS_GROUP alone does not kill descendant processes.

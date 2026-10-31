@@ -9,7 +9,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tools.evidence import store, u575_pair
 from tools.evidence.common import EvidenceError
@@ -651,7 +651,7 @@ class RetainedCopyAndOutputBoundary(unittest.TestCase):
             if path == self.source and args and args[0] == "rb":
                 return reader
             return original_open(path, *args, **kwargs)
-        with mock.patch.object(Path, "open", external_open):
+        with mock_patch.object(Path, "open", external_open):
             with self.assertRaisesRegex(EvidenceError, "changed"):
                 u575_pair._copy_retained(
                     self.source, self.target, self.row(b"x"))

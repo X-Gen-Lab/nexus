@@ -12,6 +12,7 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources)
+set(stm32_uart_hal OFF)
 foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames
         timer_capture advanced_pwm)
     nexus_controller_modes(modes "${kind}")
@@ -36,7 +37,11 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         if("irq-words" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_word.c)
         endif()
-        if("dma-tx" IN_LIST modes OR "dma-duplex" IN_LIST modes
+        if("dma-tx" IN_LIST modes)
+            set(stm32_uart_hal ON)
+            list(APPEND stm32_sources drivers/uart_hal.c)
+        endif()
+        if("dma-duplex" IN_LIST modes
             OR "dma-duplex-continuous" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_dma.c)
         endif()
@@ -94,8 +99,17 @@ if(stm32_sources)
         "${stm32_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32f407)
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)
+    nexus_controller_modes(stm32_i2c_modes i2c)
+    if("irq-messages" IN_LIST stm32_i2c_modes OR
+            "dma-messages" IN_LIST stm32_i2c_modes)
+        target_compile_definitions(nexus_soc_stm32f407 PRIVATE
+            "NX_I2C_V1_PORT_HEADER=\"stm32f407_i2c_port.h\"")
+    endif()
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
     nexus_stm32f4_official(nexus_soc_stm32f407)
+    if(stm32_uart_hal)
+        nexus_stm32f407_uart_hal(nexus_soc_stm32f407)
+    endif()
 else()
     # Startup/system belong to the firmware; an empty assembly needs no driver.
     add_library(nexus_soc_stm32f407 INTERFACE)
@@ -103,9 +117,15 @@ else()
 endif()
 set(NEXUS_STARTUP_SOURCE
     "${stm32_device}/Source/Templates/gcc/startup_stm32f407xx.s" PARENT_SCOPE)
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES
+set(stm32_system_includes
     "${CMAKE_CURRENT_SOURCE_DIR}/private" "${stm32_device}/Include"
-    "${stm32_cmsis}" PARENT_SCOPE)
+    "${stm32_cmsis}")
+if(stm32_uart_hal)
+    list(APPEND stm32_system_includes
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/hal"
+        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc")
+endif()
+set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${stm32_system_includes} PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32F407xx PARENT_SCOPE)
 set(stm32_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
 if(NEXUS_MEMORY_CCM)

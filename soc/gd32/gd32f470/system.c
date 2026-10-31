@@ -130,6 +130,8 @@ void SystemInit(void) {
         ~(uint32_t)(RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC);
     extern const uint32_t __gVectors[];
     SCB->VTOR = (uint32_t)(uintptr_t)__gVectors;
+    __DSB();
+    __ISB();
     SystemCoreClock = 16000000u;
 #if defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1
     /* TCM is only on DBUS. Keep unrelated AHB1 enables and establish access
@@ -171,9 +173,14 @@ nx_result_t nx_gd32_clock_preflight(void) {
     const uint32_t bus =
         (uint32_t)(RCU_CFG0_SCS | RCU_CFG0_SCSS | RCU_CFG0_AHBPSC |
                    RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC);
+    /* UM Rev 3.3, section 4.3.1: reset MADJ is 16; CALIB is factory-set.
+     * Adopt only that reset-like IRC16M bootstrap/fallback without retuning.
+     * The selected 200 MHz main PLL remains derived from the 25 MHz HXTAL.
+     */
     if (s_clock.captured ||
         (RCU_CTL & (RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB)) !=
             (RCU_CTL_IRC16MEN | RCU_CTL_IRC16MSTB) ||
+        (RCU_CTL & RCU_CTL_IRC16MADJ) != (16U << 3U) ||
         (RCU_CTL & sources) != 0U || (RCU_CFG0 & bus) != RCU_SCSS_IRC16M ||
         (RCU_PLLSSCTL & RCU_PLLSSCTL_SSCGON) != 0U ||
         (RCU_CFG1 & RCU_CFG1_TIMERSEL) != 0U ||

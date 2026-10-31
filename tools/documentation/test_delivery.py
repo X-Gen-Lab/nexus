@@ -536,7 +536,7 @@ class DeliveryTests(unittest.TestCase):
                                  result["manifest_sha256"],
                                  expected_archive_sha256=result["archive_sha256"])
 
-    def alias_inputs(self):
+    def alias_inputs(self, *, retire=False):
         rows = [
             {"old_url": "en/user_guide/uart.html",
              "target_url": "en/reference/history.html",
@@ -569,6 +569,19 @@ class DeliveryTests(unittest.TestCase):
         self.git("add", ".")
         self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
                  "commit", "-qm", "Declare fixture aliases")
+        if retire:
+            revision = self.git("rev-parse", "HEAD").decode("ascii").strip()
+            for row in rows:
+                row["source_revision"] = revision
+            with csv_path.open("w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            for relative in {row["old_source"] for row in rows}:
+                (self.source / relative).unlink()
+            self.git("add", ".")
+            self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                     "commit", "-qm", "Retire migrated original documents")
         metadata_path = self.build / "documentation-build.json"
         metadata = json.loads(metadata_path.read_bytes())
         metadata["source"] = delivery.observe_git_source(self.source)
@@ -587,6 +600,94 @@ class DeliveryTests(unittest.TestCase):
         page = Path(result["directory"]) / "en/getting_started.html"
         self.assertIn("same current platform contract", page.read_text())
         self.assertNotIn("different API contract", page.read_text())
+
+    def test_retired_originals_keep_versioned_aliases_and_package(self):
+        rows = self.alias_inputs(retire=True)
+        targets = {row["target_url"]:
+                   (self.build / row["target_url"]).read_bytes()
+                   for row in rows}
+        with patch.object(delivery.subprocess, "run",
+                          wraps=subprocess.run) as lookup:
+            result = delivery.install_alias_catalog(self.build, self.source)
+        self.assertEqual(lookup.call_count, 1)
+        self.assertEqual(result["aliases"], len(rows))
+        packaged = self.package()
+        directory = Path(packaged["directory"])
+        delivery.verify(directory)
+        self.assertIn("historical API contract",
+                      (directory / rows[0]["old_url"]).read_text())
+        self.assertIn("历史 API 合同",
+                      (directory / rows[1]["old_url"]).read_text())
+        self.assertIn("same current platform contract",
+                      (directory / rows[2]["old_url"]).read_text())
+        for relative, contents in targets.items():
+            self.assertEqual((directory / relative).read_bytes(), contents)
+        for relative in {row["old_source"] for row in rows}:
+            self.assertFalse((self.source / relative).exists())
+
+    def test_retired_unproven_originals_reject_before_first_write(self):
+        rows = self.alias_inputs(retire=True)
+        for field, value in (("source_revision", "0" * 40),
+                             ("old_source", "docs/sphinx/not-recorded.rst")):
+            with self.subTest(field=field):
+                invalid = [dict(row) for row in rows]
+                invalid[-1][field] = value
+                csv_path = self.source / "docs/reference/redirects.csv"
+                with csv_path.open("w", newline="") as file:
+                    writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+                    writer.writeheader()
+                    writer.writerows(invalid)
+                with self.assertRaisesRegex(
+                        ValueError, "original source|historical source"):
+                    delivery.install_alias_catalog(self.build, self.source)
+                self.assertFalse((self.build / delivery.ALIASES).exists())
+                for row in rows:
+                    self.assertFalse((self.build / row["old_url"]).exists())
+
+    def test_retired_original_live_directory_and_symlink_reject(self):
+        rows = self.alias_inputs(retire=True)
+        original = self.source / rows[0]["old_source"]
+        for kind in ("directory", "symlink"):
+            with self.subTest(kind=kind):
+                if kind == "directory":
+                    original.mkdir()
+                else:
+                    original.symlink_to(self.base / "missing-outside.rst")
+                try:
+                    with self.assertRaisesRegex(
+                            ValueError, "original source|symlink"):
+                        delivery.install_alias_catalog(self.build, self.source)
+                    self.assertFalse((self.build / delivery.ALIASES).exists())
+                    for row in rows:
+                        self.assertFalse((self.build / row["old_url"]).exists())
+                finally:
+                    if kind == "directory":
+                        original.rmdir()
+                    else:
+                        original.unlink()
+
+    def test_retired_historical_symlink_is_not_a_regular_blob(self):
+        rows = self.alias_inputs()
+        original = self.source / rows[0]["old_source"]
+        original.unlink()
+        original.symlink_to(self.base / "missing-outside.rst")
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Record historical nonregular original")
+        revision = self.git("rev-parse", "HEAD").decode("ascii").strip()
+        original.unlink()
+        for row in rows:
+            row["source_revision"] = revision
+        csv_path = self.source / "docs/reference/redirects.csv"
+        with csv_path.open("w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+        with self.assertRaisesRegex(ValueError, "original source"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertFalse((self.build / delivery.ALIASES).exists())
+        for row in rows:
+            self.assertFalse((self.build / row["old_url"]).exists())
 
     def test_publish_restores_root_bookmarks_and_api_boundary(self):
         result = self.alias_package()

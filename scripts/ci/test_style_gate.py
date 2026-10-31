@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -61,6 +62,81 @@ class TextHygieneTests(unittest.TestCase):
         self.assertEqual(gate.check_text(self.path, "notes.txt"), [
             "notes.txt: use LF line endings",
         ])
+
+
+class OrdinaryHookOrderingTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
+        self.configuration = (ROOT / ".pre-commit-config.yaml").read_bytes()
+        (self.root / ".pre-commit-config.yaml").write_bytes(self.configuration)
+        (self.root / ".gitignore").write_text("/build/\n")
+        (self.root / "src").mkdir()
+        (self.root / "src/input.c").write_text("valid style\n")
+        self.expected = ["nexus-style", "nexus-docs", "nexus-workflow-lint",
+                         "nexus-tdd-gate"]
+        hooks = [hook for repo in yaml.safe_load(self.configuration)["repos"]
+                 for hook in repo["hooks"]]
+        self.assertEqual([hook["id"] for hook in hooks
+                          if "pre-commit" in hook["stages"]], self.expected)
+        for hook in hooks:
+            entry = shlex.split(hook["entry"])
+            self.assertEqual(entry[0], "python")
+            script = self.root / entry[1]
+            script.parent.mkdir(parents=True, exist_ok=True)
+            script.write_text(
+                "from pathlib import Path\n"
+                f"identity = {hook['id']!r}\n"
+                "area = Path('build')\narea.mkdir(exist_ok=True)\n"
+                "with (area / 'hook-order.txt').open('a') as trace:\n"
+                "    trace.write(identity + '\\n')\n"
+                "(area / (identity + '.started')).write_text('started')\n"
+                "bad = Path('src/input.c').read_text() == 'invalid style\\n'\n"
+                "raise SystemExit(1 if identity == 'nexus-style' and bad else 0)\n")
+        self.environment = os.environ | {
+            "PIP_NO_INDEX": "1", "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "GIT_AUTHOR_NAME": "Hook fixture",
+            "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+            "GIT_COMMITTER_NAME": "Hook fixture",
+            "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+        }
+        self.assertFalse(self.environment.get("SKIP"))
+        for arguments in (("init", "--quiet"), ("add", "."),
+                          ("commit", "--quiet", "-m", "initial fixture")):
+            subprocess.run(["git", "-c", "maintenance.auto=false", "-c",
+                            "gc.auto=0", "-C", str(self.root), *arguments],
+                           env=self.environment, check=True,
+                           capture_output=True, text=True, timeout=10)
+
+    def run_hooks(self):
+        result = subprocess.run(
+            [sys.executable, "-B", "-m", "pre_commit", "run", "--all-files",
+             "--hook-stage", "pre-commit"], cwd=self.root,
+            env=self.environment, capture_output=True, text=True, timeout=10)
+        self.assertNotIn("Installing environment", result.stdout + result.stderr)
+        self.assertNotIn("Initializing environment", result.stdout + result.stderr)
+        self.assertEqual((self.root / ".pre-commit-config.yaml").read_bytes(),
+                         self.configuration)
+        return result
+
+    def test_invalid_style_never_starts_the_later_tdd_hook(self):
+        (self.root / "src/input.c").write_text("invalid style\n")
+        subprocess.run(["git", "add", "src/input.c"], cwd=self.root,
+                       env=self.environment, check=True,
+                       capture_output=True, text=True, timeout=10)
+        result = self.run_hooks()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertFalse((self.root / "build/nexus-tdd-gate.started").exists())
+        self.assertEqual((self.root / "build/hook-order.txt").read_text(),
+                         "nexus-style\n")
+
+    def test_valid_style_runs_every_ordinary_hook_once_in_order(self):
+        result = self.run_hooks()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.root / "build/hook-order.txt").read_text().splitlines(),
+                         self.expected)
 
 
 class StyleGateTests(unittest.TestCase):

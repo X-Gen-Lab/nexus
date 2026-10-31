@@ -49,13 +49,61 @@ class GD303System : public testing::Test {
         g_gd303_hold_update = g_gd303_hold_irq_off = false;
         g_gd303_pend_on_timer_withdraw = false;
         g_gd303_hold_late_irq_off = false;
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB;
+        RCU_CTL =
+            RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U) | (0xa5U << 8U);
     }
     void TearDown() override {
         if (mapping != MAP_FAILED)
             munmap(mapping, 0x30000U);
     }
 };
+class GD303AdjustedClock : public GD303System,
+                           public testing::WithParamInterface<uint32_t> {};
+TEST_P(GD303AdjustedClock, RejectsBeforeAnyClockTimerOrIrqOwnership) {
+    RCU_CTL = (RCU_CTL & ~static_cast<uint32_t>(RCU_CTL_IRC8MADJ)) |
+              (GetParam() << 3U);
+    const uint32_t clock = RCU_CTL;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32f303_system_preflight(&system));
+    const auto start = nx_gd32f303_system_start(&system, 4U);
+    EXPECT_EQ(NX_ERROR_BUSY, start.primary);
+    EXPECT_EQ(NX_SUCCESS, start.cleanup);
+    EXPECT_EQ(0U, start.remaining_effects);
+    EXPECT_EQ(0U, g_gd303_writes);
+    EXPECT_EQ(clock, RCU_CTL);
+    EXPECT_EQ(0U, RCU_APB1EN);
+    EXPECT_EQ(0U, system.remaining_effects);
+    EXPECT_EQ(0U, system.core_hz);
+    EXPECT_FALSE(system.started);
+    EXPECT_FALSE(g_gd303_irq[TIMER1_IRQn]);
+    EXPECT_FALSE(g_gd303_irq[TIMER4_IRQn]);
+}
+INSTANTIATE_TEST_SUITE_P(NonResetAdjustment, GD303AdjustedClock,
+                         testing::Values(0U, 15U, 17U, 31U));
+TEST_F(GD303System, ResetAdjustmentPreservesEveryFactoryCalibrationValue) {
+    for (uint32_t calibration : {0U, 0x5aU, 0xffU}) {
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U) |
+                  (calibration << 8U);
+        const uint32_t clock = RCU_CTL;
+        ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_preflight(&system));
+        ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+        EXPECT_EQ(clock, RCU_CTL);
+        ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_stop(&system));
+        EXPECT_EQ(clock, RCU_CTL);
+    }
+}
+TEST_F(GD303System, RestartCannotAdoptAChangedInternalClockAdjustment) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_stop(&system));
+    RCU_CTL &= ~static_cast<uint32_t>(RCU_CTL_IRC8MADJ);
+    const uint32_t clock = RCU_CTL;
+    g_gd303_writes = 0U;
+    const auto start = nx_gd32f303_system_start(&system, 4U);
+    EXPECT_EQ(NX_ERROR_BUSY, start.primary);
+    EXPECT_EQ(0U, g_gd303_writes);
+    EXPECT_EQ(clock, RCU_CTL);
+    EXPECT_FALSE(system.started);
+    EXPECT_EQ(0U, system.remaining_effects);
+}
 TEST_F(GD303System, RejectForeignClockWithoutWrites) {
     RCU_CTL |= RCU_CTL_PLLEN;
     EXPECT_EQ(NX_ERROR_BUSY, nx_gd32f303_system_start(&system, 4).primary);
@@ -220,7 +268,7 @@ TEST_F(GD303System, RetainedMasterOrChannelStateRejectsWithoutUpdateEvent) {
 
 TEST_F(GD303System, ForeignCrystalBypassOrMonitorRejectsWithoutWrites) {
     for (uint32_t flag : {RCU_CTL_HXTALBPS, RCU_CTL_CKMEN}) {
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | flag;
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U) | flag;
         EXPECT_EQ(NX_ERROR_BUSY, nx_gd32f303_system_start(&system, 4).primary);
         EXPECT_EQ(0U, g_gd303_writes);
         EXPECT_NE(0U, RCU_CTL & flag);

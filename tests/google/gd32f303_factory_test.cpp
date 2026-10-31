@@ -30,7 +30,7 @@ class GD303Factory : public testing::Test {
         g_gd303_density = (48U << 16U) | 256U;
         g_gd303_hold_update = g_gd303_hold_irq_off = false;
         GPIO_CTL0(GPIOA) = GPIO_CTL1(GPIOA) = 0x44444444U;
-        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB;
+        RCU_CTL = RCU_CTL_IRC8MEN | RCU_CTL_IRC8MSTB | (16U << 3U);
         USART_STAT0(USART0) = USART_STAT0_TC | USART_STAT0_TBE;
     }
     void TearDown() override {

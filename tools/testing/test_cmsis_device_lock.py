@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 from tools.maintenance import cmsis_device_lock, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -42,7 +42,7 @@ class DeviceLockContracts:
         self.git_state = {"HEAD": self.lock["commit"],
                           "origin": source_catalogue.upstream_dependency(
                               self.lock["repository"]).fetch_url, "status": ""}
-        self.git_patch = mock.patch.object(cmsis_device_lock, "git",
+        self.git_patch = mock_patch.object(cmsis_device_lock, "git",
                                           side_effect=self.git)
         self.git_patch.start()
         self.addCleanup(self.git_patch.stop)
@@ -103,7 +103,7 @@ class DeviceLockContracts:
         entries = tuple(controlled if record == item else record
                         for record in source_catalogue.ALL_DEPENDENCIES)
         self.git_state["origin"] = controlled.fetch_url
-        with mock.patch.object(source_catalogue, "ALL_DEPENDENCIES", entries):
+        with mock_patch.object(source_catalogue, "ALL_DEPENDENCIES", entries):
             self.assertEqual(self.verify()["commit"], self.lock["commit"])
             self.git_state["origin"] = self.lock["repository"]
             with self.assertRaises(ValueError):
@@ -253,7 +253,7 @@ class DeviceLockContracts:
 
     def test_dirty_checkout_rejects_before_selected_files_are_read(self):
         self.git_state["status"] = " M unrelated_header.h"
-        with mock.patch.object(cmsis_device_lock, "snapshot",
+        with mock_patch.object(cmsis_device_lock, "snapshot",
                                wraps=cmsis_device_lock.snapshot) as snapshots:
             with self.assertRaises(ValueError):
                 self.verify()
@@ -272,7 +272,7 @@ class DeviceLockContracts:
                     return "c" * 40
             return self.git(source, *arguments)
 
-        with mock.patch.object(cmsis_device_lock, "git", side_effect=changed):
+        with mock_patch.object(cmsis_device_lock, "git", side_effect=changed):
             with self.assertRaises(ValueError):
                 self.verify()
 
@@ -290,7 +290,7 @@ class DeviceLockContracts:
                         replacement.replace(file)
                 return self.git(source, *arguments)
 
-            with self.subTest(file=file.name), mock.patch.object(
+            with self.subTest(file=file.name), mock_patch.object(
                     cmsis_device_lock, "git", side_effect=rewritten):
                 with self.assertRaises(ValueError):
                     self.verify()
@@ -308,7 +308,7 @@ class DeviceLockContracts:
                 target.write_bytes(result[0])
             return result
 
-        with mock.patch.object(cmsis_device_lock, "snapshot",
+        with mock_patch.object(cmsis_device_lock, "snapshot",
                                side_effect=rewritten):
             with self.assertRaises(ValueError):
                 self.verify()
@@ -339,10 +339,10 @@ class DeviceLockContracts:
         sdk = self.relocate_to_sdk()
         (sdk / ".nexus-source-sdk.json").write_text("{}\n")
         failure = ValueError("full SDK failed")
-        with mock.patch.object(cmsis_device_lock, "verify_sdk",
+        with mock_patch.object(cmsis_device_lock, "verify_sdk",
                                side_effect=failure) as sdk_check:
-            with mock.patch.object(cmsis_device_lock, "verify") as component:
-                with mock.patch("sys.stderr",
+            with mock_patch.object(cmsis_device_lock, "verify") as component:
+                with mock_patch("sys.stderr",
                                 new_callable=io.StringIO) as errors:
                     self.assertEqual(self.cli(), 1)
         sdk_check.assert_called_once_with(sdk)
@@ -356,9 +356,9 @@ class DeviceLockContracts:
         record = {"path": "vendors/st/cmsis_device_" + self.family,
                   "commit": self.lock["commit"], "tree": "e" * 40}
         manifest = {"dependencies": [record]}
-        with mock.patch.object(cmsis_device_lock, "verify_sdk",
+        with mock_patch.object(cmsis_device_lock, "verify_sdk",
                                return_value=manifest) as checked:
-            with mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            with mock_patch("sys.stdout", new_callable=io.StringIO) as output:
                 self.assertEqual(self.cli(), 0)
         checked.assert_called_once_with(sdk)
         self.assertEqual(json.loads(output.getvalue())["source_kind"],
@@ -366,25 +366,25 @@ class DeviceLockContracts:
         for records in ([], [record, record], [{**record, "commit": "f" * 40}],
                         [{**record, "path": "vendors/st/other_device"}]):
             manifest = {"dependencies": records}
-            with self.subTest(records=records), mock.patch.object(
+            with self.subTest(records=records), mock_patch.object(
                     cmsis_device_lock, "verify_sdk", return_value=manifest):
-                with mock.patch("sys.stderr", new_callable=io.StringIO):
+                with mock_patch("sys.stderr", new_callable=io.StringIO):
                     self.assertEqual(self.cli(), 1)
 
     def test_cli_sdk_path_mismatch_and_dangling_marker_reject(self):
         sdk = self.relocate_to_sdk()
         marker = sdk / ".nexus-source-sdk.json"
         marker.symlink_to(sdk / "missing.json")
-        with mock.patch.object(cmsis_device_lock, "verify_sdk") as checked:
-            with mock.patch("sys.stderr", new_callable=io.StringIO):
+        with mock_patch.object(cmsis_device_lock, "verify_sdk") as checked:
+            with mock_patch("sys.stderr", new_callable=io.StringIO):
                 self.assertEqual(self.cli(), 1)
         checked.assert_not_called()
         marker.unlink()
         marker.write_text("{}\n")
         self.lock_path.rename(self.folder / "outside.lock.json")
         self.lock_path = self.folder / "outside.lock.json"
-        with mock.patch.object(cmsis_device_lock, "verify_sdk") as checked:
-            with mock.patch("sys.stderr", new_callable=io.StringIO):
+        with mock_patch.object(cmsis_device_lock, "verify_sdk") as checked:
+            with mock_patch("sys.stderr", new_callable=io.StringIO):
                 self.assertEqual(self.cli(), 1)
         checked.assert_not_called()
 
@@ -404,10 +404,10 @@ class DeviceLockContracts:
                                        "commit": self.lock["commit"],
                                        "tree": "e" * 40}]}
 
-        with mock.patch.object(cmsis_device_lock, "verify_sdk",
+        with mock_patch.object(cmsis_device_lock, "verify_sdk",
                                side_effect=rewritten):
-            with mock.patch("sys.stderr", new_callable=io.StringIO):
-                with mock.patch("sys.stdout", new_callable=io.StringIO):
+            with mock_patch("sys.stderr", new_callable=io.StringIO):
+                with mock_patch("sys.stdout", new_callable=io.StringIO):
                     self.assertEqual(self.cli(), 1)
 
     def test_real_cli_rejects_non_git_and_invalid_full_sdk_manifest(self):

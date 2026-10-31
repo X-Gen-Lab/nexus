@@ -2,9 +2,9 @@
 
 Use the [source checkout guide](../guides/source-checkout.md) to obtain the exact
 documentation revision and initialize its pinned dependencies. The canonical
-prose source root is `docs/`; this directory contains only Sphinx configuration
-and retained compatibility wrappers. Building `docs/sphinx` directly produces a
-different, incomplete page set.
+prose source root is `docs/`; this directory contains Sphinx configuration,
+templates and the shared coding-standard source. Building `docs/sphinx` directly
+produces a different, incomplete page set.
 
 Prepare the hash-locked Linux x86_64 documentation tuple from the repository
 root, with CPython 3.12 available:
@@ -36,7 +36,8 @@ requirements. [Documentation maintenance](../development/documentation.md)
 owns content and review practice. A successful documentation build establishes
 neither firmware qualification nor physical board acceptance.
 
-Legacy HAL/OSAL/Kconfig tutorials and translation tools are retained under
-`docs/archive/sphinx-before-next-generation`. Their examples describe
-historical revisions. Existing format and Doxygen rules are preserved in the
+Legacy HAL/OSAL/Kconfig tutorials and translation tools remain available through
+[fixed historical Git revisions](../reference/history.md). They are outside the
+current source tree and do not describe current support. Existing format and
+Doxygen rules are preserved in the
 [coding standard](development/coding_standards.rst).

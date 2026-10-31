@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tests.contracts.test_evidence_support import link_fixture
 from tools.evidence.common import EvidenceError, atomic_json, digest
@@ -94,7 +94,7 @@ class ResolvedAbiTests(unittest.TestCase):
     def resources_cli(self, *extra):
         arguments = ["resources", "--elf", str(self.elf), "--resolved", str(self.resolved),
                      "--budget", str(self.budget), "--report", str(self.report), *extra]
-        with mock.patch.object(sys, "argv", arguments), contextlib.redirect_stdout(io.StringIO()):
+        with mock_patch.object(sys, "argv", arguments), contextlib.redirect_stdout(io.StringIO()):
             return resources.main()
 
     def retention_cli(self, *, resolved=True):

@@ -22,15 +22,177 @@ the private SoC implementation, not the public dependency direction. FIG-03 in
 existing build-time generation path. Neither diagram implies a new runtime
 registry, HAL manager, default worker or mandatory OS layer.
 
+## Vendor-first target and current implementation
+
+Official hardware libraries are the default input for further provider work.
+Reuse reviewed HAL transport when it satisfies the complete selected mode;
+otherwise bind suitable LL or SPL primitives to the required bounded mechanism.
+Nexus retains admission, borrowed storage, deadlines, result publication and
+resource responsibility. Direct register helpers remain justified exceptions for
+an exact SDK gap, erratum, atomic operation or demonstrated budget.
+
+The selected F407 UART `dma-tx` provider uses official HAL finite TX with a
+disjoint LL IRQ receiver under one private owner. Other F407 UART modes retain
+their existing engines; G4, H7 and U5 retain their reviewed LL integrations.
+GD32F470 compiles selected official SPL C units. Source selection, model tests,
+ARM links and physical execution remain separate evidence. An include, primitive
+call or finite-TX fixture alone does not establish a complete transport or family
+qualification.
+
+The [existing delivery-completion ledger](platform-delivery-completion.csv)
+appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while
+preserving the older rows and frozen results. Each new row starts with its real
+implementation, software and physical status; a plan has no execution evidence.
+The [derived ledger view](../status/ledgers/platform-delivery-completion.md)
+uses the same renderer. No second support or completion database is introduced.
+
+| Boundary | Required responsibility |
+| --- | --- |
+| Official transport | Own the selected peripheral transfer, IRQ/DMA and vendor state machine |
+| LL/SPL primitive | Encode reviewed hardware operations without claiming a complete transport |
+| Nexus adapter | Bridge admission, borrow, absolute deadline, errors, callbacks, drain and final settlement |
+| Exact SoC | Bind SDK pairing, clock/reset, IRQ/DMA route, memory/Cache and silicon restrictions |
+| Board/product | Supply reviewed wiring, electrical state, execution, storage, partitions and recovery policy |
+| Static assembly | Construct existing contexts/faces and fixed IRQ connections; select one implementation before execution |
+
+A private Handle can live in static provider storage. A public face still calls
+its selected immutable ops with that instance context. No universal HAL manager,
+name registry, default worker or extra forwarding-only layer is required. One
+live controller behavior domain has one hardware transport owner. Selecting HAL
+transport replaces the corresponding independent register transport; Handle
+readiness and Nexus request lifetime remain different contracts.
+
+### Complete maintained scope
+
+The iteration covers the existing exact selections for STM32F103, STM32F407,
+STM32G474, STM32H743, STM32U575, GD32F303 and GD32F470. The three launch Boards are
+Qiming F407ZGT6, Sky F407VET6 and Liangshan GD32F470ZGT6. Current Sky bindings
+cover LED, UART, Flash and IWDG; additional electrical routes need review before
+physical execution.
+
+The 71-entry assembly catalogue is one input, not the complete closure. Derive
+navigation from the existing capability/provider/source catalogues, provider
+fixtures, installed-SDK consumers, selected components and external examples.
+The maintained `tools/maintenance/work_packages.py` joins existing authorities;
+it does not execute tests or grant support. A mode needs its exact part/density,
+Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA,
+memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch
+coverage and the independent ThreadX subset do not expand this SoC matrix.
+
+The frozen source review at `89485943` preserves all 217 declared identities,
+including its 33 unselected identities and 19 Native MODEL rows. Separate source
+annexes now review those 33 declarations, seven components and seven system
+owners. The fresh `5e82bab6` matrix selects 29 identities in 11 ARM images and
+rejects four reserved G474 selections; it does not execute those images or change
+the original inventory. Authorized private examples still need a separate annex.
+
+F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling,
+H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
+separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
+chained, duplex or cross-domain operation.
+
+### Fixed clock admission
+
+The reviewed software-trim gates run in cold preflight. An unexpected adjustment
+in a gated profile is rejected before the startup transaction writes hardware or
+acquires resources. Factory calibration remains independent and unchanged;
+admission does not retune an oscillator. These checks add no work to the normal
+I/O call path and establish no measured clock accuracy or physical timing
+qualification.
+
+F103 HSI8 and GD303 IRC8 require adjustment 16 in `RCC_CR.HSITRIM` and
+`RCU_CTL.IRC8MADJ`, respectively. H743's exact-revision-V HSI admission requires
+`RCC_HSICFGR.HSITRIM=64`; older fixed nominal profiles retain their existing
+revision-specific boundary. U575's selected MSIS4 range requires
+`RCC_ICSCR2.MSITRIM1=16`; its separate I2C1 HSI16 gate continues to require
+`RCC_ICSCR3.HSITRIM=16`. The U575 selection follows the pinned official
+HAL/CMSIS range-to-trim mapping and reset definitions.
+
+F407 HSE8/PLL168, GD470 HXTAL25/PLL200 and G474 HSE24/PLL170 retain their
+external primary clocks. Their internal-clock admission checks are
+`RCC_CR.HSITRIM=16`, `RCU_CTL.IRC16MADJ=16` and `RCC_ICSCR.HSITRIM=64`,
+respectively. They constrain the nominal bootstrap and fallback clocks; G474
+also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows
+RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment
+stating 16 is stale.
+
+### Production promotion gates
+
+The selected F407 `dma-tx` implementation preserves the complete mode, including
+IRQ RX bytes/events, frame/error/loss ordering, timestamps, wake and storage.
+HAL owns finite TX DMA, the UART TC completion sequence and transmit abort;
+the private provider owns their integration with the disjoint LL receiver and
+Nexus lifetime. The older serialized finite-TX reference remains evaluation
+evidence for its narrower contract, not the production mode's qualification.
+Other modes require their own complete evaluation before replacement.
+
+The serialized reference's `hal_depth` IRQ guard is not an MCU preemption design.
+Production must establish allowed HAL nesting, short guards, pending-fact
+handling and real IRQ service ordering. Do not mask all interrupts around vendor
+calls that may wait. An abort callback can run synchronously in task context;
+bridges record bounded facts and use notification permitted in the actual
+context. Product callbacks and final settlement do not run arbitrarily inside
+vendor callback stacks.
+
+A Handle-only callback does not carry a request epoch. Before Handle reuse,
+prove withdrawal of the previous hardware, IRQ and callback references; stamping
+the current epoch onto a late callback is not proof of association. Establish
+admission before a vendor call can retain references, and treat a startup error
+after admission as accepted work requiring explicit withdrawal.
+
+Review every reachable vendor wait, including bootstrap/runtime progression,
+millisecond quantization, 32-bit tick wrap and low-power suspension. Initial UART
+work keeps the existing system-clock and OS startup choices. Selected HAL modules
+do not authorize default SysTick acquisition or interrupt-policy changes.
+UART/SPI `uint16_t Size` parameters must match the selected public `size_t`
+contract without truncation, hidden splitting or implicit bounce storage.
+
+SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA
+addresses and counts. GPIO needs one combined set/reset command; selected U5
+GPIO commands now use private `HAL_GPIO_WriteMultipleStatePin` with the admitted
+GPIO source closure. Separate set/reset calls cannot substitute. DMA disable
+still needs actual readback and withdrawal proof before returning borrowed
+storage.
+
+Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware
+close must preserve the selected quiet interval before disabling the shifter.
+U575 HAL also contains its Device-gated persistent-DMAT workaround. These API
+fits do not prove callback, deadline or loan withdrawal; review ordinary LL/SPL
+setters separately from justified command/snapshot exceptions.
+
+### Ordered implementation and acceptance
+
+| Phase | Ledger work | Exit |
+| --- | --- | --- |
+| G0 | V-A: exact scope and contract | Every maintained selection has a bounded migration decision and baseline |
+| G1 | V-B/V-C/V-D: dependencies and integration | Private SDK build, static contexts, resource responsibility, time and IRQ contracts are established |
+| G2 | V-E and first GD32 work | Complete F407 UART behavior and selected GD32 official primitives execute their real regressions |
+| G3 | V-F/V-G/V-H/V-I | Each applicable peripheral/family has a reviewed implementation and comparable cost; unused replaced production paths are removed |
+| G4 | V-J/V-K | Test contexts, relocated SDK consumers, external examples and both documentation languages agree |
+| G5 | V-L | Clean source P, examples E, dependencies, configuration and original artifacts are associated without inheriting old qualification |
+| G6 | V-P/V-X | Connected physical execution and actual external environment/publication exits are observed separately |
+
+Keep developer tests focused, execute the ordinary complete-index gate for each
+functional increment, and run the complete qualification plan for the frozen
+source. New behavior and fixes require actual RED then GREEN. Pure equivalent
+refactors use the applicable regressions and output checks without fabricated
+RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only.
+Preserve original attempts and compare complete providers, not only Handle sizes.
+Without connected equipment, physical rows remain `not_executed`.
+
 ## Implementation boundary
 
 The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at
 `b6f0ed3829f3829eb358a2e7417d80bba1a42db7`. Its CMSIS Device pairing comes from
 STM32CubeF4 v1.28.3. The machine authority is
 [the official-driver lock](../../dependencies/stm32f4-hal.lock.json), checked
-against the selected Git dependency and imported SDK bytes. The lock records the
-reviewed LL headers and license; it is not a declaration that all HAL modules are
-compiled, supported or validated.
+against the selected Git dependency and imported SDK bytes. The selected API is
+`stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`. Its 25-file closure retains
+the earlier LL/ETH definitions and license, and adds the reviewed HAL headers
+plus UART, DMA and RCC C units. GPIO/Flash declarations are required by RCC
+compilation; their C implementations, PWR and global `stm32f4xx_hal.c` are not
+selected. This lock is not a declaration that all HAL modules are supported or
+validated.
 
 CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The
 Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family
@@ -43,12 +205,59 @@ Actual include closure, firmware links and installed-SDK consumption require
 current-source evidence; a common Core pin does not transfer F4 qualification to
 G4, H7, U5 or GD32.
 
-The selected production approach uses official LL operations inside existing F407
-provider state machines. It retains request admission, absolute deadlines, wire
-completion, cancellation, drain and quarantine. A full HAL Handle/callback
-transport is a separate evaluation and must not be described as an implemented
-platform-wide HAL migration. G4, H7 and U5 do not inherit F4 support or dependency
-qualification. GD32 remains a separate provider.
+The earlier development overlay added H743 `hal_driver_h7` to the family descriptor
+and SoC source-lock projection, matching its existing pinned LL build input.
+Private capture, advanced-PWM and UART-FIFO templates retain specialization
+contracts; pin-state has optional implementation/default-macro scoping, while
+CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports
+now take the selected controller and directly call private LL functions, with
+no runtime forwarding. These changes do not rewrite the frozen source review.
+
+### Bounded official-operation increments
+
+The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1,
+word RDR/TDR operations carrying UART byte values, and RTC write-protection keys
+and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order,
+clock admission, timed phases and loan withdrawal remain in the same providers.
+H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked
+CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged.
+
+U575 GPIO now sends four existing command sites through the actual HAL GPIO C
+unit: public write, initialization preload, stop and serial TX idle. Its private
+15-file lock admits that unit and required headers; no HAL initialization or tick
+is invoked. Disjoint authorized masks remain one BSRR command, and empty public
+writes retain success without invoking HAL's nonempty-mask assertion.
+
+H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including
+the IRQ-byte companions of selected DMA modes. The provider retains saved-status
+ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog
+key, configuration and refresh commands use the locked LL IWDG header, including
+watchdog-only assemblies without a GPIO source. Irreversible ownership precedes
+activation; synchronization, exact readback, failed-update bounds and recovery
+responsibility remain in the same C provider.
+
+GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in
+isolated C11 compile-contract units. Each includes the real SDK before locally
+expanding register macros as integer addresses. Runtime providers retain their mask and
+IRQ checks and ordinary SDK register access. The contract units emit no firmware
+code or data; no compiler-specific constant folding or scanner exception is
+needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset
+contract. Source compilation, linked-image costs and physical behavior remain
+separate verification scopes.
+
+Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575
+receive/transmit to locked LL operations in the existing shared engines. They add
+no runtime forwarder, vendor Handle, state or generated hardware algorithm.
+Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual
+old-GREEN baselines and real-default probes remain development evidence;
+final clean-source gates, complete SDK consumption and qualification are pending.
+
+F407 uses official LL operations inside its existing provider state machines,
+with one selected HAL transport for UART `dma-tx`. That transport retains request
+admission, absolute deadlines, wire completion, cancellation, drain and quarantine.
+It does not replace F407 IRQ-word, IRQ-block, RX-DMA or duplex providers. G4, H7
+and U5 do not inherit F4 support or dependency qualification. GD32 remains a
+separate provider.
 
 | Owner | Responsibility |
 | --- | --- |
@@ -64,6 +273,103 @@ interrupt flags or DMA channel. Mixed LL/register operations require explicit
 ordering and ownership. Vendor types, mutable handles and headers stay out of
 public interfaces. Factory lookup returns an existing face without initializing
 hardware or allocating storage.
+
+## Selected F407 HAL UART transport
+
+The same authored `dma-tx` mode selects a static private owner, immutable cold
+configuration, one `UART_HandleTypeDef`, one `DMA_HandleTypeDef` and a shared
+readonly Nexus ops table. The factory still returns the existing Nexus face;
+neither vendor types nor callback registration become a public interface. The
+private callback ABI sets `USE_HAL_UART_REGISTER_CALLBACKS=1` consistently for
+the adapter and selected official C units. TX completion/error/transmit-abort/MSP
+and TX half-transfer callbacks are explicitly bound per Handle, without a global
+product callback override or runtime controller registry.
+
+One provider owns both UART behavior domains. The LL receiver consumes RX
+status/data once, then temporarily masks RXNE/parity/error enables while
+`HAL_UART_IRQHandler` observes TX facts. HAL receive state remains idle, RX
+buffer/size/count and `hdmarx` remain empty, and DMAR stays clear. This prevents
+HAL error/abort paths from claiming the IRQ receiver. An unexpected receive
+domain or Handle/route identity change closes admission and retains quarantine;
+it does not adopt or abort a foreign DMA owner.
+
+Admission establishes the request and payload borrow before a HAL call can
+retain them or invoke a synchronous callback. Callbacks latch bounded facts;
+task service alone withdraws transfer pointers and publishes final settlement.
+DMA completion still differs from UART TC and from full reference withdrawal.
+Cancel, timeout and deinitialization failures retain the request or cold lease
+until the same owner proves actual drain. Stop checks peripheral enables,
+DMA addresses/counts and pending/active IRQ references before releasing pins
+or clocks. A Handle is reused only after this withdrawal; official `HAL_DMA_Init` restores
+the reusable idle state where required, without assigning READY by hand.
+
+The production IRQ gate saves the incoming CPU mask for short state changes.
+If a relevant UART/DMA IRQ preempts a task HAL call, it disables only that
+selected vector, leaves its hardware fact pending and restores the vector when
+the retained HAL stack exits. It does not spin or let a level IRQ tail-chain
+indefinitely inside that task call. Every `HAL_DMA_IRQHandler` entry requires EN readback clear, including an IRQ
+with only HT or no observed error: an error can arrive after a flag snapshot.
+While EN remains set, an HT-only event is acknowledged and HTIE disabled with
+official primitives; its registered private no-op callback is not invoked and
+no transfer state advances. Observed errors or inconsistent terminal facts
+withdraw DMAT and request disable once. Refused disable masks that DMA vector
+and quarantines the borrow; task service retries and dispatches HAL only after
+EN is clear. This excludes the pinned handler's `SystemCoreClock/9600` wait
+(17,500 iterations at 168 MHz) from the selected IRQ path.
+This is a bounded-path design, not measured interrupt latency or WCET.
+
+The target-private compile profile replaces CMSIS exclusive-retry RMW macros
+with one saved-mask word update. This profile requires a single CPU owner of
+the aligned UART control words and no NMI, fault/panic logger or other writer.
+It preserves the incoming mask and leaves vendor source unchanged. The same
+profile uses nearest OVER16 BRR rounding with overflow-safe quotient/remainder;
+cold validation rejects zero baud or an out-of-field divisor before UART enable.
+It does not grant dynamic clock or arbitrary format support.
+
+Only the selected HAL UART/DMA/RCC source units enter the provider's private
+build. `HAL_Init`, `HAL_InitTick` and a HAL SysTick handler are not selected.
+`HAL_GetTick` reads `uint32_t` milliseconds modulo `2^32` from the existing live TIM2 epoch;
+bootstrap retains its separate finite polling limits. `SystemCoreClock` follows
+the last confirmed 16 MHz HSI or 168 MHz PLL observation, including partial
+startup and cleanup failures. Official RCC frequency getters use the selected
+prescaler tables rather than a fabricated constant clock.
+
+The actual adapter/official-source model and clock tests establish their
+recorded software scope. Generated factory execution, selected ARM/SDK links,
+stack/cycle comparisons and the complete current-source gate remain separate
+exits. Physical IRQ latency, wire timing and long-load HIL are not executed
+without connected equipment. Do not infer a resource improvement from vendor
+reuse or a passing model.
+
+A paired development ARM firmware measurement uses the same F407ZG baremetal
+`uart_rx_compact_assembly/f407-dma-tx.toml`, UART workload and `NX_UART_ID_UART1`,
+GCC 14.3 M4F hard-float, `-Os`, no LTO and compiler cache off. Both builds add
+measurement-only `-ffile-prefix-map=<each-source-root>=.` so different absolute
+source-root spellings in retained `__FILE__` diagnostics do not bias Flash cost.
+Their resolved configuration bytes are identical. The normalized pair is:
+
+| Measurement (bytes) | Old LL (`9c0460b9`) | Selected HAL | Change |
+| --- | --- | --- | --- |
+| Flash LOAD / footprint | 12,592 | 18,188 | +5,596 |
+| Static RAM | 248 | 456 | +208 |
+| MSP reservation | 2,048 | 2,048 | 0 |
+| Libc heap reservation | 0 | 0 | 0 |
+
+The ordinary new build without that measurement-only option loads 18,200 Flash
+bytes and uses 456 static RAM bytes. Both the ordinary build and normalized pair
+fit this fixture's 64 KiB Flash and 32 KiB static RAM budgets; MSP remains a
+separate 2,048-byte reservation and heap remains zero. This compares the complete
+increment, including clock metadata and shared RX changes, not isolated HAL
+overhead. The engineering decision favors reviewed official finite-TX reuse for
+this F407 mode at the explicit cost; it is not a memory/performance win or a
+mandate to use HAL for every family.
+
+The observed final ordinary ELF retains no `HAL_Init`, `HAL_InitTick`,
+`HAL_IncTick`, `HAL_RCC_ClockConfig` or `HAL_RCC_OscConfig`, and contains no
+exclusive instructions. These are observations of this image, not all possible
+callers. Stack high-water, execution cycles and physical behavior remain
+unmeasured. Final-source or other-configuration costs require their own
+ELF/map/resources.
 
 ## Build-time provider contract
 
@@ -278,6 +584,23 @@ and footprint separately, per-domain static RAM, caller-owned storage, stack
 reservation versus measured peak, IRQ/service behavior and cleanup failures.
 Operation counts and host timings are not physical cycles, latency or WCET.
 
+The [SPI cost fixture](../../tests/contracts/io_storage_cost/spi_endpoints/README.md)
+links 0/1/2/4 endpoints against the unchanged `89485943` Source SDK: development
+LOAD/footprint is 3,048/7,880/7,940/8,064 B, with static SRAM 72/176/208/280 B,
+plus 2,048 B MSP and zero heap. Nonzero images consume public controller topology;
+the four-way image uses three CS banks, so its delta is not a linear endpoint
+cost. These link observations do not establish timing, HIL or new-source
+qualification.
+
+The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a
+DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers
+use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads:
+isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack.
+GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL
+call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated
+translation-unit results are not whole-provider resource, stack-peak, timing or
+hardware qualification.
+
 Retain an old implementation only while it provides a needed comparison or an
 unreplaced maintained mode. Select one normal production implementation after its
 contract and costs are accepted; remove unused switches and duplicate state.
@@ -299,6 +622,14 @@ the same artifacts. No iteration checklist or derived work-package report grants
 that status. Existing release tags/assets and original evidence remain immutable.
 Without connected boards, HIL stays `not_executed`; do not call a software-only
 iteration a product release or safety qualification.
+
+Selected F407VE/ZG and GD470 offset images now have reviewed configuration,
+startup, vector/linker and ELF-to-BIN boundaries; the
+[assembly reference](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)
+distinguishes their image window from complete physical Flash. This is not boot
+authentication, Flash access control or running-image handoff qualification.
+The F407 handoff retains PRIMASK=1 and startup does not unmask it; an offset
+FreeRTOS link cannot establish a valid FreeRTOS handoff.
 
 Bootloader handoff, dynamic reclocking, deep STOP, broader H743 DMA and generic
 U575 cross-domain I/O retain their separate unimplemented or partial exits in the

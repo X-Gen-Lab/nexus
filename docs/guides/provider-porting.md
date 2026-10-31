@@ -49,17 +49,24 @@ Keep an unreviewed or incompatible protocol in its exact SoC implementation.
 The SoC target selects shared sources through explicit CMake entries and private
 includes. The driver directory does not choose routes, clock profiles or an ABI,
 and its presence does not add a maintained mode. Never introduce a runtime
-forwarder merely to match a source directory.
+forwarder merely to match a source directory. A selected private compile-time
+port may bind reviewed official operations inside that shared translation unit; a
+macro in a separately compiled wrapper cannot change it. Preserve operation
+width, read side effects, command atomicity and withdrawal ordering; the
+[bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments)
+is a current example, not a blanket HAL replacement.
 
 ## Implement in a reviewable sequence
 
 1. Prepare the [fixed source and recursive dependencies](source-checkout.md).
    Define the new behavior, supported modes, public ownership obligations and
    rejection boundaries before changing its production implementation.
-2. Add and execute a meaningful RED GoogleTest/GoogleMock contract against the
-   current production path. Retain the actual command, nonzero execution and
-   expected failing assertion. Test MMIO/CPU/dependency ports through mocks;
-   Python resolver behavior uses stdlib unittest. A missing tool or compile-only
+2. For new behavior or fixes, add and execute a meaningful RED
+   GoogleTest/GoogleMock contract against the current production path. Retain the
+   actual command, nonzero execution and expected failing assertion. Equivalent
+   refactors retain actual old-GREEN source/binary snapshots and applicable
+   regressions plus real-default operation probes, without fabricated RED. Test
+   MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only
    error is not the expected behavioral RED result.
 3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
@@ -70,7 +77,10 @@ forwarder merely to match a source directory.
    cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after
    checking each participating silicon contract. Cross-vendor SoC collaboration
    stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`.
-4. Add the family to the explicit maintained provider map in `tools/configure/`.
+4. Add a data-only `descriptor.py` at the SoC package root (Native uses
+   `soc/native/descriptor.py`), outside its `configure/` package. Add its exact
+   module to the central explicit map in `tools/configure/providers/descriptor.py`;
+   reuse the frozen `FamilyDescriptor`, without an eager parallel registry.
    Place its production configuration package in
    `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and
    its configuration tests in `tools/configure/tests/providers/<family>/`.
@@ -108,8 +118,23 @@ The leaf `providers/common.py` owns validation helpers and immutable
 resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
 policy, `ir.py` owns named immutable decisions and their one-way JSON projection,
 and `matrix.py` orchestrates support catalogues.
-The descriptor explicitly lists `configuration_modules`, including `contract.py`,
-so edits trigger reconfiguration and remain in the Source SDK closure.
+The descriptor's `configuration_modules` property combines the fixed package,
+`contract.py`, `bindings.py` and `emission.py` paths with explicitly declared
+`configuration_helpers` and the selected local descriptor file. These sources
+belong to reconfiguration inputs and the Source SDK source closure. Keep family records, order and public selections
+stable when relocating metadata. A single `descriptor.maintained()` lookup must not import
+another family or configure behavior; explicit enumeration and snapshot/SDK
+inventory may intentionally load all data-only descriptors.
+
+The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h`
+templates allow one specialization per translation unit. Required named exports,
+register, clock, IRQ and data bindings reject at compilation when missing.
+The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control
+requires its hardware flow binding. Wrapper-owned bindings, including ops names
+and post-include clock-readiness use, remain available after inclusion. Explicit
+caller read/write ports survive; cleanup removes only template-owned helper and
+default macros. Review each specialization's actual compilation, exported table
+and runtime contract; a template guard does not establish hardware timing.
 
 `tools/configure/contracts.py` owns immutable controller-category fields, factory
 kind order and public header mappings. Authoring, selection and factory consume

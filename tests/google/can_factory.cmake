@@ -33,7 +33,9 @@ foreach(can_family stm32 gd32)
         target_sources(${can_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
         set(can_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
-        target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
+        target_sources(${can_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can_layout.c")
         target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
             "${can_gd}/CMSIS/GD/GD32F4xx/Include"

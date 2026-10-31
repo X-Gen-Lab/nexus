@@ -8,7 +8,22 @@
  */
 #include "nexus/arch/arch.h"
 #include "timer_advanced_controller.h"
+/* One specialization per translation unit. The wrapper owns all required
+ * NX bindings, including exports and post-include cold helpers. This template
+ * removes only its own helper/default macros; caller-supplied ports survive. */
+#if !defined(NX_ADV_CR1) || !defined(NX_ADV_CR2) || !defined(NX_ADV_SMCR) ||   \
+    !defined(NX_ADV_RCR) || !defined(NX_ADV_PSC) || !defined(NX_ADV_ARR) ||    \
+    !defined(NX_ADV_CCR) || !defined(NX_ADV_CCMR) || !defined(NX_ADV_CCER) ||  \
+    !defined(NX_ADV_DIER) || !defined(NX_ADV_EGR) || !defined(NX_ADV_SR) ||    \
+    !defined(NX_ADV_BDTR) || !defined(NX_ADV_INITIALIZE) ||                    \
+    !defined(NX_ADV_IRQ) || !defined(NX_ADV_RELEASE) ||                        \
+    !defined(NX_ADV_OPS) || !defined(NX_ADV_HZ) ||                             \
+    !defined(NX_ADV_CLOCK_READY) || !defined(NX_ADV_INPUT_VALID)
+#error                                                                         \
+    "Advanced PWM implementation requires one complete concrete specialization"
+#endif
 #ifndef NX_TIMER_WRITE
+#define NX_ADV_DEFAULT_TIMER_WRITE 1
 #define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
 /** \brief Task controls never borrow CPU privilege from an interface lookup. */
@@ -327,3 +342,9 @@ const nx_advanced_pwm_ops_t NX_ADV_OPS = {.set_duty = advanced_duty,
                                           .stop = advanced_stop,
                                           .state = advanced_state,
                                           .clear_fault = advanced_clear};
+
+/* The specialization bindings remain owned by the concrete wrapper. */
+#ifdef NX_ADV_DEFAULT_TIMER_WRITE
+#undef NX_TIMER_WRITE
+#undef NX_ADV_DEFAULT_TIMER_WRITE
+#endif

@@ -31,11 +31,14 @@ typedef struct {
 
 #ifdef NX_PIN_STATE_IMPLEMENTATION
 #include "nexus/arch/arch.h"
+/* Only fallback MMIO ports belong to this header; caller ports survive. */
 #ifndef NX_PIN_READ
-#define NX_PIN_READ(reg) (*(reg))
+#define NX_PIN_STATE_DEFAULT_PIN_READ 1
+#define NX_PIN_READ(reg)              (*(reg))
 #endif
 #ifndef NX_PIN_WRITE
-#define NX_PIN_WRITE(reg, value) (*(reg) = (value))
+#define NX_PIN_STATE_DEFAULT_PIN_WRITE 1
+#define NX_PIN_WRITE(reg, value)       (*(reg) = (value))
 #endif
 /** \brief Stack-only typed-bank view; no register operations table or owner. */
 typedef struct {
@@ -200,5 +203,14 @@ static nx_result_t nx_pin_apply(const nx_pin_state_bank_t* bank,
     control->dirty = false;
     return NX_SUCCESS;
 }
+/* Remove only ports introduced by this implementation inclusion. */
+#ifdef NX_PIN_STATE_DEFAULT_PIN_READ
+#undef NX_PIN_READ
+#undef NX_PIN_STATE_DEFAULT_PIN_READ
+#endif
+#ifdef NX_PIN_STATE_DEFAULT_PIN_WRITE
+#undef NX_PIN_WRITE
+#undef NX_PIN_STATE_DEFAULT_PIN_WRITE
+#endif
 #endif
 #endif

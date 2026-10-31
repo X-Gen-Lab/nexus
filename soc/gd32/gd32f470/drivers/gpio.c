@@ -27,7 +27,7 @@ nx_result_t nx_gd32_gpio_initialize(nx_gd32_gpio_state_t* port, unsigned index,
         return NX_ERROR_CONTEXT;
     }
     uint32_t registers = GPIOA + 0x400u * index;
-    RCU_AHB1EN |= UINT32_C(1) << index;
+    rcu_periph_clock_enable((rcu_periph_enum)((uint32_t)RCU_GPIOA + index));
     (void)RCU_AHB1EN;
     GPIO_BOP(registers) = initial | ((mask & ~initial) << 16);
     gpio_mode_set(registers, output ? GPIO_MODE_OUTPUT : GPIO_MODE_INPUT,
@@ -71,7 +71,7 @@ nx_result_t nx_gd32_gpio_read(const void* context, uint32_t* value) {
         (output < bank + 0x30U && bank < output + sizeof(*value))) {
         return NX_ERROR_INVALID;
     }
-    *value = GPIO_ISTAT(port->registers) & port->mask;
+    *value = (uint32_t)gpio_input_port_get(port->registers) & port->mask;
     return NX_SUCCESS;
 }
 
@@ -84,7 +84,7 @@ nx_result_t nx_gd32_gpio_toggle(void* context, uint32_t mask) {
     if ((mask & ~port->mask) != 0u) {
         return NX_ERROR_PERMISSION;
     }
-    uint32_t previous = GPIO_OCTL(port->registers);
+    uint32_t previous = gpio_output_port_get(port->registers);
     GPIO_BOP(port->registers) = (mask & ~previous) | ((mask & previous) << 16);
     return NX_SUCCESS;
 }

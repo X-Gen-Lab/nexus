@@ -183,14 +183,15 @@ def derive(rows, properties, providers, sdk_required):
             "software_executed": 0, "hardware_executed": 0,
         },
         "limitations": [
-            "Matching properties retain their original controller-independent "
-            "bounded scope; they do not prove every selected fixture or route.",
-            "Unmapped properties include Native/common and different aggregate "
-            "mode scopes; aliases and nearby hardware are never inferred.",
-            "not_catalogued means no exact lifecycle catalogue association; "
-            "other tests may exist and are not assessed here.",
-            "Software and hardware remain not_executed in this plan regardless "
-            "of historical reports; use existing qualification and HIL admission.",
+            ("Matching properties retain their original controller-independent "
+             "bounded scope; they do not prove every selected fixture or route."),
+            ("Unmapped properties include Native/common and different aggregate "
+             "mode scopes; aliases and nearby hardware are never inferred."),
+            ("not_catalogued means no exact lifecycle catalogue association; "
+             "other tests may exist and are not assessed here."),
+            ("Software and hardware remain not_executed in this plan "
+             "regardless of historical reports; use existing qualification "
+             "and HIL admission."),
         ],
     }
 

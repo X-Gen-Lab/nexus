@@ -21,6 +21,10 @@
       "bytes": 94605,
       "sha256": "ae7fa0016736254d0bef8527893ac93bbe5ff6a740aae7438431ac65dc6a0d0c"
     },
+    "Inc/stm32g4xx_ll_i2c.h": {
+      "bytes": 84586,
+      "sha256": "2aa8e23ca87d7a2b6773d4f092565d62b85a14254be45cd86640882594a8f534"
+    },
     "LICENSE.md": {
       "bytes": 1484,
       "sha256": "1a0c3a2cf55d2d808048d452c6598d441f89890d62d0890147459ec6db61037a"
@@ -49,5 +53,5 @@
   "release": "STM32CubeG4-v1.6.3-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git",
   "schema_version": 1,
-  "selected_api": "stm32g474-ll-inline-fdcan-definitions"
+  "selected_api": "stm32g474-ll-inline-i2c-fdcan-definitions"
 }

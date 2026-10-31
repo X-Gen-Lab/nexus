@@ -15,8 +15,9 @@ class KernelProfileGateTests(unittest.TestCase):
         self.assertEqual(len(matrix), 14)
         self.assertEqual(len({item["name"] for item in matrix}), 14)
         self.assertEqual(sum(item["expected_rejection"] for item in matrix), 2)
-        self.assertTrue({"cortex-m0", "cortex-m23", "cortex-m55", "cortex-m85"}
-                        <= {item["facts"]["cpu"]["arch"] for item in matrix})
+        self.assertLessEqual(
+            {"cortex-m0", "cortex-m23", "cortex-m55", "cortex-m85"},
+            {item["facts"]["cpu"]["arch"] for item in matrix})
         self.assertEqual({item["choices"]["profile"] for item in matrix},
                          {"standard", "minimal", "diagnostic", "lowpower"})
 

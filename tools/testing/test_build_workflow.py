@@ -254,7 +254,7 @@ class ProcessExecutionTests(unittest.TestCase):
             self.assertEqual(Path(record["stdout"]["path"]).read_bytes(), supplied)
 
     def test_shared_cancellation_withdraws_thread_owned_descendants(self):
-        import concurrent.futures
+        from concurrent.futures import ThreadPoolExecutor
         import threading
         from tools.dev.process import run
         with tempfile.TemporaryDirectory() as directory:
@@ -266,7 +266,7 @@ class ProcessExecutionTests(unittest.TestCase):
                     f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
                     f"pathlib.Path({str(ready)!r}).write_text('ready'); "
                     "time.sleep(30)")
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            with ThreadPoolExecutor(max_workers=1) as pool:
                 future = pool.submit(run, [sys.executable, "-c", code],
                                      cwd=root, env={}, log=root / "cancel.txt",
                                      timeout=20, cancel_event=event)
@@ -315,8 +315,8 @@ class ProcessExecutionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
             result = run([sys.executable, "-c",
-                          "import os; print(os.environ['NEXUS_BUILD_JOBS']); "
-                          "print(os.environ['CMAKE_BUILD_PARALLEL_LEVEL'])"],
+                          ("import os; print(os.environ['NEXUS_BUILD_JOBS']); "
+                           "print(os.environ['CMAKE_BUILD_PARALLEL_LEVEL'])")],
                          cwd=root, env=environment, log=root / "budget.txt",
                          timeout=10)
             self.assertEqual(result.returncode, 0)
@@ -474,7 +474,8 @@ class ProcessExecutionTests(unittest.TestCase):
                 self.assertTrue(record["withdrawal_complete"])
                 if linux:
                     withdrawn = {item["pid"] for item in record["withdrawn_processes"]}
-                    self.assertTrue({item["pid"] for item in identities} <= withdrawn)
+                    self.assertLessEqual({item["pid"] for item in identities},
+                                         withdrawn)
                     for identity in identities:
                         current = _linux_process(identity["pid"])
                         self.assertTrue(current is None or
@@ -494,6 +495,7 @@ class ProcessExecutionTests(unittest.TestCase):
                         try:
                             os.killpg(pid, signal.SIGKILL)
                         except ProcessLookupError:
+                            # The fixture group may already have exited.
                             pass
                 process.communicate(timeout=5)
 
@@ -544,6 +546,7 @@ class ProcessExecutionTests(unittest.TestCase):
                     try:
                         os.killpg(int(pid_file.read_text()), signal.SIGKILL)
                     except ProcessLookupError:
+                        # The fixture group may already have exited.
                         pass
                 self.assertEqual(process.returncode,
                                  124 if mode == "timeout" else 130, out + err)
@@ -580,6 +583,7 @@ class ProcessExecutionTests(unittest.TestCase):
                 try:
                     os.killpg(escaped["pid"], signal.SIGKILL)
                 except ProcessLookupError:
+                    # The fixture group may already have exited.
                     pass
             self.assertEqual(result.returncode, 124)
             self.assertFalse(handler.exists(), "Cleanup executed a forking signal handler")

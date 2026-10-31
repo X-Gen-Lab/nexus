@@ -19,7 +19,7 @@ import threading
 import time
 import tomllib
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -661,9 +661,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
         return subprocess.CompletedProcess(command, code, stdout, "")
 
     def execute(self, extra=()):
-        with mock.patch.object(subprocess, "run",
+        with mock_patch.object(subprocess, "run",
                                side_effect=self.external_process), \
-                mock.patch.object(maintained_process, "run",
+                mock_patch.object(maintained_process, "run",
                                   side_effect=self.external_run):
             status = self.consumer.main([
                 "--prefix", str(self.prefix), "--output", str(self.output),
@@ -937,7 +937,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertEqual(report["commands"][-1]["exit_code"], exit_code)
 
     def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
-        with mock.patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
+        with mock_patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
             status, report = self.execute(("--parallel", "1"))
         self.assertEqual(status, 0)
         self.assertEqual(report["status"], "passed")
@@ -948,7 +948,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          ["1"] * (13 + len(self.SELECTED_INPUTS)))
 
     def test_default_uses_two_consumers_with_one_job_per_build(self):
-        with mock.patch.dict(os.environ):
+        with mock_patch.dict(os.environ):
             os.environ.pop("NEXUS_BUILD_JOBS", None)
             os.environ.pop("CMAKE_BUILD_PARALLEL_LEVEL", None)
             status, report = self.execute()
@@ -963,7 +963,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["consumer_workers"], 2)
 
     def test_default_inherits_outer_job_allocation_without_reducing_matrix(self):
-        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
+        with mock_patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1",
                                          "CMAKE_BUILD_PARALLEL_LEVEL": "9"}):
             status, report = self.execute()
         self.assertEqual(status, 0)
@@ -975,8 +975,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           for command in self.builds()}, {"1"})
 
     def test_default_rejects_invalid_outer_job_allocation_before_launch(self):
-        with mock.patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "0"}), \
-                mock.patch.object(maintained_process, "run") as command, \
+        with mock_patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "0"}), \
+                mock_patch.object(maintained_process, "run") as command, \
                 contextlib.redirect_stderr(io.StringIO()):
             with self.assertRaises(SystemExit) as failure:
                 self.consumer.main(["--prefix", str(self.prefix),
@@ -1357,7 +1357,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     finally:
                         actual_shutdown(executor, *arguments, **options)
                 try:
-                    with mock.patch.object(ThreadPoolExecutor, "shutdown",
+                    with mock_patch.object(ThreadPoolExecutor, "shutdown",
                                            shutdown):
                         try:
                             status, report = self.execute(("--parallel", "2"))
@@ -1377,9 +1377,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
 
     def test_invalid_budget_rejects_before_any_output_or_external_command(self):
         for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):
-            with self.subTest(value=value), mock.patch.object(
+            with self.subTest(value=value), mock_patch.object(
                     subprocess, "run") as command, \
-                    mock.patch.object(maintained_process, "run") as maintained:
+                    mock_patch.object(maintained_process, "run") as maintained:
                 errors = io.StringIO()
                 with contextlib.redirect_stderr(errors), self.assertRaises(
                         SystemExit) as failure:
@@ -1545,11 +1545,11 @@ finally:
             if mode == 'two-failures' and result.returncode in (42, 43):
                 completed_failures.wait(timeout=5)
             return result
-        with mock.patch.object(subprocess, 'run',
+        with mock_patch.object(subprocess, 'run',
                                side_effect=external), \
-                mock.patch.object(maintained_process, 'run',
+                mock_patch.object(maintained_process, 'run',
                                   side_effect=external), \
-                mock.patch.dict(os.environ, {'NEXUS_BUILD_JOBS': '99',
+                mock_patch.dict(os.environ, {'NEXUS_BUILD_JOBS': '99',
                     'CMAKE_BUILD_PARALLEL_LEVEL': '99'}), \
                 contextlib.redirect_stderr(io.StringIO()):
             status = self.fixture.consumer.main([

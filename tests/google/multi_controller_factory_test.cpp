@@ -13,7 +13,8 @@ extern "C" {
 #include "nexus_factory.h"
 #ifdef NX_MULTI_FACTORY_STM32
 #include "stm32f407_dma.h"
-#define UART_STATE             nx_stm32_uart_dma_state_t
+#include "stm32f407_uart_hal.h"
+#define UART_STATE             nx_stm32_uart_hal_state_t
 #define SPI_STATE              nx_stm32_spi_dma_state_t
 #define DEVICE_STATE           nx_stm32_spi_dma_endpoint_state_t
 #define GPIO_GATE              RCC->AHB1ENR
@@ -27,6 +28,8 @@ extern "C" {
 #define SECONDARY_I2C_TX_IRQ   DMA1_Stream7_IRQn
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
+void DMA2_Stream7_IRQHandler(void);
+void DMA1_Stream6_IRQHandler(void);
 void DMA2_Stream0_IRQHandler(void);
 void DMA2_Stream3_IRQHandler(void);
 void DMA1_Stream3_IRQHandler(void);
@@ -234,6 +237,31 @@ extern "C" uint64_t nx_gd32_now_us(void) {
 #ifdef NX_MULTI_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
+/* The hardware model supplies the same fixed HCLK observed by real RCC C. */
+uint32_t SystemCoreClock = 168000000U;
+const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
+                                   1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
+}
+
+/** \brief Preserve the selected EN readback through actual HAL disable. */
+extern "C" void nx_multi_factory_hal_dma_disable(DMA_HandleTypeDef* handle) {
+    nx_multi_factory_dma_disable(&handle->Instance->CR, DMA_SxCR_EN);
+}
+/** \brief Observe the UART enable write without replacing HAL initialization.
+ */
+extern "C" void nx_multi_factory_hal_uart_enable(UART_HandleTypeDef* handle) {
+    SET_BIT(handle->Instance->CR1, USART_CR1_UE);
+}
+/** \brief Hardware clear-on-zero flags do not set unrelated status bits. */
+extern "C" void nx_multi_factory_hal_uart_clear(UART_HandleTypeDef* handle,
+                                                uint32_t flags) {
+    handle->Instance->SR &= ~flags;
+}
+/** \brief HAL uses the same modeled monotonic epoch; no separate tick exists.
+ */
+extern "C" uint32_t HAL_GetTick(void) {
+    return static_cast<uint32_t>(nx_time_now_us() / 1000U);
 }
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
@@ -410,6 +438,23 @@ class MultipleFactory : public testing::Test {
             (index == 0U ? USART0_IRQHandler : USART1_IRQHandler)();
 #endif
     }
+#ifdef NX_MULTI_FACTORY_STM32
+    /** \brief Complete the modeled DMA stream before delivering its vector.
+     * \note The HAL abort owner also joins this hardware terminal observation;
+     *       UART TC alone cannot stand in for a disabled DMA's completion IRQ.
+     */
+    void uart_memory_complete(unsigned index) {
+        DMA_Stream_TypeDef* stream = index == 0U ? DMA2_Stream7 : DMA1_Stream6;
+        DMA_TypeDef* engine = index == 0U ? DMA2 : DMA1;
+        stream->NDTR = 0U;
+        stream->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+        const uint32_t complete = index == 0U ? DMA_HISR_TCIF7 : DMA_HISR_TCIF6;
+        const_cast<uint32_t&>(engine->HISR) |= complete;
+        (index == 0U ? DMA2_Stream7_IRQHandler : DMA1_Stream6_IRQHandler)();
+        /* Apply the actual HAL handler's write-only flag-clear command. */
+        nx_multi_factory_dma_ack(&engine->HIFCR, engine->HIFCR);
+    }
+#endif
     volatile uint32_t* uart_engine(unsigned index) {
 #ifdef NX_MULTI_FACTORY_STM32
         return index == 0U ? &DMA2_Stream7->CR : &DMA1_Stream6->CR;
@@ -1014,6 +1059,10 @@ TEST_F(MultipleFactory, TwoDmaUartRequestsUseSeparateReviewedEngines) {
     EXPECT_NE(nx_request_state(&uart_requests[1].base), NX_REQUEST_SETTLED);
     s_held_engine = nullptr;
     *uart_engine(1U) &= ~1U;
+#ifdef NX_MULTI_FACTORY_STM32
+    uart_memory_complete(0U);
+    uart_memory_complete(1U);
+#endif
     uart_wire_idle(0U);
     uart_wire_idle(1U);
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);

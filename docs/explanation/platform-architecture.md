@@ -139,6 +139,16 @@ existing face. After explicit successful platform start, ordinary operations cal
 its shared ops table with its instance context. IRQ dispatch is fixed to provider
 instances and does not repeat factory lookup for every byte.
 
+Each of the eight maintained providers owns data-only `descriptor.py` metadata
+at its SoC package root, outside `configure/`. The central frozen
+`FamilyDescriptor` and explicit family-to-module map remain in
+`tools/configure/providers/descriptor.py`; the provider loader delegates that
+lookup without a second eager registry. A single `descriptor.maintained()` lookup
+loads only selected metadata, without configuration behavior; `providers.maintained()`
+uses that record to import the selected configure package. Explicit enumeration,
+source snapshots and SDK inventory may read all metadata. No descriptor becomes
+a second software source graph.
+
 The constructor contract names private state, definitions, read-only admission,
 initialization, stop actions and failed-init responsibility explicitly. Admission,
 initializer and stop lists use immutable `DirectCall` values with explicit static
@@ -148,9 +158,14 @@ and fixed connections; hardware algorithms are maintained in C. The C compiler
 establishes actual symbol and parameter types. Model tests and linked-image
 checks remain necessary: this narrow representation is not a complete typed C
 AST. Common generation does not infer these decisions from family names. Selected
-STM32F4 official LL operations remain inside private SoC state machines; factory
-and public I/O contracts are unchanged. Full HAL Handle/callback transport
-requires separate mode-specific evaluation. See
+STM32F4 official LL operations remain inside private SoC state machines. Selected
+F407 UART `dma-tx` uses private HAL finite TX with disjoint LL IRQ RX under one
+owner; other UART modes retain their existing engines. The static shared-ops
+factory and public I/O contracts are unchanged. The current bounded U575
+PWM/UART/RTC/GPIO, H743 SPI and five-SoC I2C operation changes select private
+LL/HAL calls at compile time inside their existing engines, with no additional
+runtime forwarding layer. These mode-specific integrations do not qualify
+another family or replace final clean-source evidence. See
 [official driver integration](../design/official-stm32-provider.md).
 
 The legacy F103/GD303 selections share private algorithms only after exact vendor

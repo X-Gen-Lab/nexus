@@ -1093,7 +1093,7 @@ class ConsumerTransportTests(unittest.TestCase):
             self.assertEqual(receipt["builder_commit"], "b" * 40)
             self.assertEqual(receipt["builder_workflow_ref"], workflow_ref)
             self.assertEqual(receipt["release_run_id"], 321)
-            self.assertFalse("original_failed_run_id" in receipt)
+            self.assertNotIn("original_failed_run_id", receipt)
             evidence = output / "source-sdk-identity.json"
             self.assertEqual(evidence.read_bytes(), b"original C identity")
             extended = json.loads((output / "release-manifest.json").read_text())

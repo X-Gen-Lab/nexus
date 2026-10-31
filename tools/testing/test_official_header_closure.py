@@ -1,10 +1,14 @@
 """Exact official header closures preserve pins, notices and SDK inputs."""
 
 import copy
+import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shlex
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -13,13 +17,52 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(ROOT))
 from tools.maintenance.stm32_ll_lock import PROFILES
+from tools.dev.process import run
+
+F4_HAL_HEADERS = {
+    'Inc/Legacy/stm32_hal_legacy.h', 'Inc/stm32f4xx_hal_def.h',
+    *(f'Inc/stm32f4xx_hal_{unit}.h' for unit in (
+        'dma', 'dma_ex', 'flash', 'flash_ex', 'flash_ramfunc', 'gpio',
+        'gpio_ex', 'rcc', 'rcc_ex', 'uart')),
+    'Inc/stm32f4xx_hal.h'}
+F4_HAL_SOURCES = {f'Src/stm32f4xx_hal_{unit}.c'
+                  for unit in ('uart', 'dma', 'rcc')}
+F4_REQUIRED_FILES = {
+    'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
+    *F4_HAL_SOURCES, *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
+                      ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c'))}
+F4_SELECTED_API = 'stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx'
 
 ADDITIONS = {
     'h7': {
+        'Inc/stm32h7xx_ll_i2c.h': {
+            'bytes': 84613,
+            'sha256': '2703dc6fcbc59f324cc5e1c39dbf68774c9d68665649fbf1ed92cea72ee1270a'},
         'Inc/stm32h7xx_ll_usart.h': {
             'bytes': 175243,
             'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'}},
     'u5': {
+        'Inc/stm32u5xx_ll_iwdg.h': {
+            'bytes': 13653,
+            'sha256': '8552e2843e0cf8b42b505418ccaaadb1db7b4cc4ad7f730c141d90729d13df1e'},
+        'Inc/stm32u5xx_hal.h': {
+            'bytes': 39344,
+            'sha256': 'be0aa206bbdbd4be224282ab540aa1b2545b41981b61893ca9c2868c10d45e43'},
+        'Inc/stm32u5xx_hal_def.h': {
+            'bytes': 7638,
+            'sha256': '73a911c835b4c7f75b7d4c7e47847f9776c5b55dc265bb59c17dfbbc6488e2b9'},
+        'Inc/stm32u5xx_hal_gpio.h': {
+            'bytes': 16246,
+            'sha256': '6d9e6c1abe6303f3e72f488c21fe2a1272a033a8309e6b8da4a3f2f62c3ced23'},
+        'Inc/stm32u5xx_hal_gpio_ex.h': {
+            'bytes': 16959,
+            'sha256': '40848fe334a9252b50e7a941537312443ba0830ef0a3f2a2c283151f0f4fa23c'},
+        'Inc/Legacy/stm32_hal_legacy.h': {
+            'bytes': 242146,
+            'sha256': 'ae2c716ae3097e6b34ac92eeb0feeaa01c992628da1a2d3adf12710352004288'},
+        'Src/stm32u5xx_hal_gpio.c': {
+            'bytes': 33435,
+            'sha256': '2d7b5f252bf1bf2ad0fff46ac4fa7050bf437b23802f212051a0a595a283fffd'},
         'Inc/stm32u5xx_ll_rtc.h': {
             'bytes': 226081,
             'sha256': 'e40e46698164cd4c0722460fbb59c868be643ba0f7447e0bed439a88f3a63bf2'},
@@ -30,6 +73,9 @@ ADDITIONS = {
             'bytes': 177899,
             'sha256': '50a203a04e4b9688b95db3c806cb5af1a4c436b1608ea44e04d72205f354127b'}},
     'g4': {
+        'Inc/stm32g4xx_ll_i2c.h': {
+            'bytes': 84586,
+            'sha256': '2aa8e23ca87d7a2b6773d4f092565d62b85a14254be45cd86640882594a8f534'},
         'Inc/stm32g4xx_hal_fdcan.h': {
             'bytes': 79977,
             'sha256': '085076ee896219babd0801c0f8c3a97b65e5ae2cb88c78f6b43124925deb1c56'},
@@ -50,19 +96,43 @@ BASE_FILES = {
 def proposed_lock(family):
     selected = json.loads((ROOT / PROFILES[family].lock_name).read_text())
     selected['files'].update(copy.deepcopy(ADDITIONS[family]))
-    if family == 'g4':
-        selected['selected_api'] = 'stm32g474-ll-inline-fdcan-definitions'
+    selected['selected_api'] = {
+        'g4': 'stm32g474-ll-inline-i2c-fdcan-definitions',
+        'h7': 'stm32h743-ll-inline-i2c',
+        'u5': 'stm32u575-ll-inline-gpio-hal-write-multiple'}[family]
     return selected
 
 
 class OfficialHeaderClosureTests(unittest.TestCase):
-    def test_h7_exact_closed_graph_adds_only_usart_inline_header(self):
+    def test_h7_exact_closed_graph_closes_usart_and_i2c_inline_headers(self):
         profile = PROFILES['h7']
         expected = BASE_FILES['h7'] | ADDITIONS['h7'].keys()
         self.assertEqual(profile.selected_files, expected)
         self.assertEqual(profile.contract(proposed_lock('h7')), expected)
 
-    def test_f4_eth_definitions_close_exact_transitive_headers_without_vendor_c(self):
+    def test_f1_i2c_inline_header_closes_exact_reviewed_graph(self):
+        from tools.maintenance import stm32f1_hal_lock as f1
+        selected = json.loads((ROOT / f1.LOCK_NAME).read_text())
+        name = 'Inc/stm32f1xx_ll_i2c.h'
+        raw = (ROOT / f1.DIRECTORY / name).read_bytes()
+        selected['files'][name] = {
+            'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+        selected['selected_api'] = 'stm32f103-ll-inline-i2c'
+        expected = {'LICENSE.md', 'Inc/stm32f1xx_ll_gpio.h',
+                    'Inc/stm32f1xx_ll_usart.h', name}
+        self.assertEqual(f1.REVIEWED_FILES, expected)
+        self.assertEqual(f1.contract(selected), expected)
+        for missing in expected:
+            reduced = copy.deepcopy(selected)
+            del reduced['files'][missing]
+            with self.subTest(missing=missing), self.assertRaises(ValueError):
+                f1.contract(reduced)
+        selected['files']['Src/stm32f1xx_ll_i2c.c'] = {
+            'bytes': 1, 'sha256': '0' * 64}
+        with self.assertRaises(ValueError):
+            f1.contract(selected)
+
+    def test_f4_selected_transport_closes_exact_headers_and_only_three_sources(self):
         from tools.maintenance import stm32f4_hal_lock as f4
         additions = {
             'Inc/stm32f4xx_hal_eth.h': {
@@ -77,14 +147,18 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         original = json.loads((ROOT / f4.LOCK_NAME).read_text())
         candidate = copy.deepcopy(original)
         candidate['files'].update(additions)
-        candidate['selected_api'] = 'stm32f407-ll-inline-eth-definitions'
-        expected = {'LICENSE.md', *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
-                    ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c')),
-                    *additions}
+        candidate['selected_api'] = F4_SELECTED_API
+        for name in F4_REQUIRED_FILES:
+            data = subprocess.run(
+                ['git', '-C', str(ROOT / f4.DIRECTORY), 'cat-file', 'blob',
+                 f'{f4.COMMIT}:{name}'], capture_output=True, check=True).stdout
+            candidate['files'][name] = {
+                'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+        expected = F4_REQUIRED_FILES
         self.assertEqual(f4.REVIEWED_FILES, expected)
         self.assertEqual(f4.contract(candidate), expected)
-        for name, identity in additions.items():
-            self.assertEqual(original['files'][name], identity)
+        for name in expected:
+            self.assertEqual(original['files'][name], candidate['files'][name])
             reduced = copy.deepcopy(candidate)
             del reduced['files'][name]
             with self.subTest(missing=name), self.assertRaises(ValueError):
@@ -99,14 +173,135 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             lock.write_text(json.dumps(candidate))
             result = f4.verify(ROOT / f4.DIRECTORY, lock,
                                ROOT / f4.CMSIS_DIRECTORY)
-            self.assertEqual(result['verified_files'], 11)
+            self.assertEqual(result['verified_files'], len(expected))
             self.assertFalse(result['software_qualified'])
 
-    def test_u5_exact_closed_graph_adds_only_dma_usart_and_rtc(self):
+    def test_f4_exported_headers_compile_real_uart_dma_and_rcc_sources(self):
+        from tools.maintenance import stm32f4_hal_lock as f4
+        compiler = (os.environ.get('NEXUS_ARM_GCC') or
+                    shutil.which('arm-none-eabi-gcc'))
+        self.assertIsNotNone(compiler, 'Prepared ARM compiler required')
+        spec = importlib.util.spec_from_file_location(
+            'nexus_package_for_f4_hal_source_closure',
+            ROOT / 'cmake/package/package_source_sdk.py')
+        module = importlib.util.module_from_spec(spec)
+        sys.path.insert(0, str(ROOT / 'cmake/package'))
+        spec.loader.exec_module(module)
+        selected = module.dependency_entries(ROOT, f4.DIRECTORY)
+        with tempfile.TemporaryDirectory(
+                prefix='nexus-f4-hal-closure-') as temporary:
+            retained = os.environ.get('NEXUS_HAL_CLOSURE_TEST_ROOT')
+            root = (Path(retained) / self._testMethodName if retained
+                    else Path(temporary))
+            root.mkdir(parents=True, exist_ok=True)
+            exported = root / 'exported'
+            for name in selected:
+                path = exported / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / f4.DIRECTORY / name, path)
+            private = root / 'private'
+            private.mkdir()
+            (private / 'stm32f4xx_hal_conf.h').write_text('''
+#define HAL_MODULE_ENABLED
+#define HAL_DMA_MODULE_ENABLED
+#define HAL_UART_MODULE_ENABLED
+#define HAL_RCC_MODULE_ENABLED
+#define HSE_VALUE 8000000U
+#define HSI_VALUE 16000000U
+#define LSE_VALUE 32768U
+#define EXTERNAL_CLOCK_VALUE 12288000U
+#define HSE_STARTUP_TIMEOUT 100U
+#define LSE_STARTUP_TIMEOUT 5000U
+#define USE_HAL_UART_REGISTER_CALLBACKS 1U
+#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_flash.h"
+#include "stm32f4xx_hal_dma.h"
+#include "stm32f4xx_hal_rcc.h"
+#include "stm32f4xx_hal_uart.h"
+#define assert_param(expr) ((void)0U)
+''')
+            flags = ['-std=c11', '-mcpu=cortex-m4', '-mthumb',
+                     '-mfpu=fpv4-sp-d16', '-mfloat-abi=hard', '-Os',
+                     '-DSTM32F407xx', '-DUSE_HAL_DRIVER', '-ffunction-sections',
+                     '-fdata-sections', '-Werror=implicit-function-declaration']
+            includes = [private, exported / 'Inc',
+                        ROOT / f4.CMSIS_DIRECTORY / 'Include',
+                        ROOT / 'vendors/arm/CMSIS_6/CMSIS/Core/Include']
+            used = set()
+            # Compile committed vendor sources against only exported HAL
+            # headers, never the complete checkout's incidental include tree.
+            for unit in ('uart', 'dma', 'rcc'):
+                source = ROOT / f4.DIRECTORY / f'Src/stm32f4xx_hal_{unit}.c'
+                dependencies = root / (unit + '.d')
+                result = run([
+                    compiler, *flags,
+                    *[arg for path in includes for arg in ('-I', str(path))],
+                    '-MMD', '-MF', str(dependencies), '-c', str(source),
+                    '-o', str(root / (unit + '.o'))], cwd=root,
+                    env=os.environ.copy(), log=root / (unit + '.log'),
+                    timeout=60, stage='f4-exported-hal-source-closure')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                dependency_text = dependencies.read_text().replace('\\\n', ' ')
+                for token in shlex.split(dependency_text):
+                    path = Path(token)
+                    if path.is_relative_to(exported):
+                        used.add(path.relative_to(exported).as_posix())
+            self.assertEqual(used, F4_HAL_HEADERS)
+
+    def test_u5_exact_closed_graph_closes_inline_and_gpio_hal_commands(self):
         profile = PROFILES['u5']
         expected = BASE_FILES['u5'] | ADDITIONS['u5'].keys()
         self.assertEqual(profile.selected_files, expected)
         self.assertEqual(profile.contract(proposed_lock('u5')), expected)
+
+    def test_u5_exported_gpio_hal_source_closes_only_reviewed_headers(self):
+        compiler = os.environ.get('NEXUS_ARM_GCC') or shutil.which(
+            'arm-none-eabi-gcc')
+        self.assertIsNotNone(compiler, 'Prepared ARM compiler required')
+        specification = importlib.util.spec_from_file_location(
+            'sdk_u5_gpio_source_closure',
+            ROOT / 'cmake/package/package_source_sdk.py')
+        module = importlib.util.module_from_spec(specification)
+        sys.path.insert(0, str(ROOT / 'cmake/package'))
+        specification.loader.exec_module(module)
+        profile = PROFILES['u5']
+        selected = module.dependency_entries(ROOT, profile.directory)
+        with tempfile.TemporaryDirectory(prefix='u5 GPIO HAL closure ') as value:
+            retained = os.environ.get('NEXUS_HAL_CLOSURE_TEST_ROOT')
+            root = (Path(retained) / self._testMethodName if retained
+                    else Path(value))
+            root.mkdir(parents=True, exist_ok=True)
+            exported = root / 'exported'
+            for name in selected:
+                path = exported / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / profile.directory / name, path)
+            private = ROOT / 'soc/stm32/stm32u575/private/hal'
+            dependencies = root / 'gpio.d'
+            includes = [private, exported / 'Inc',
+                        ROOT / profile.cmsis_directory / 'Include',
+                        ROOT / 'vendors/arm/CMSIS_6/CMSIS/Core/Include']
+            result = run([
+                compiler, '-std=c11', '-mcpu=cortex-m33', '-mthumb',
+                '-mfloat-abi=soft', '-Os', '-DSTM32U575xx',
+                '-ffunction-sections', '-fdata-sections',
+                '-Werror=implicit-function-declaration',
+                *[arg for path in includes for arg in ('-I', str(path))],
+                '-MMD', '-MF', str(dependencies), '-c',
+                str(exported / 'Src/stm32u5xx_hal_gpio.c'),
+                '-o', str(root / 'gpio.o')], cwd=root, env=os.environ.copy(),
+                log=root / 'gpio.log', timeout=60,
+                stage='u5-exported-gpio-hal-source-closure')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            used = set()
+            for token in shlex.split(dependencies.read_text().replace(
+                    '\\\n', ' ')):
+                path = Path(token)
+                if path.is_relative_to(exported):
+                    used.add(path.relative_to(exported).as_posix())
+            self.assertEqual(used, ADDITIONS['u5'].keys() - {
+                'Inc/stm32u5xx_ll_dma.h', 'Inc/stm32u5xx_ll_usart.h',
+                'Inc/stm32u5xx_ll_rtc.h', 'Inc/stm32u5xx_ll_iwdg.h'})
 
     def test_u5_rtc_sdk_export_closes_actual_provider_and_cmsis_includes(self):
         import re
@@ -131,16 +326,16 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         core = module.dependency_entries(ROOT, 'vendors/arm/CMSIS_6')
         self.assertIn('CMSIS/Core/Include/core_cm33.h', core)
 
-    def test_g4_exact_closed_graph_adds_transitive_hal_definitions_only(self):
+    def test_g4_exact_closed_graph_closes_i2c_and_fdcan_definitions(self):
         profile = PROFILES['g4']
         expected = BASE_FILES['g4'] | ADDITIONS['g4'].keys()
         self.assertEqual(profile.selected_files, expected)
         self.assertEqual(profile.contract(proposed_lock('g4')), expected)
 
     def test_scope_is_exact_and_does_not_widen_other_families(self):
-        for family, scope in (('g4', 'stm32g474-ll-inline-fdcan-definitions'),
-                              ('u5', 'stm32u575-ll-inline'),
-                              ('h7', 'stm32h743-ll-inline')):
+        for family, scope in (('g4', 'stm32g474-ll-inline-i2c-fdcan-definitions'),
+                              ('u5', 'stm32u575-ll-inline-gpio-hal-write-multiple'),
+                              ('h7', 'stm32h743-ll-inline-i2c')):
             with self.subTest(family=family):
                 profile = PROFILES[family]
                 lock = proposed_lock(family) if family in ADDITIONS else json.loads(

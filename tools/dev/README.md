@@ -265,7 +265,12 @@ uses the validated plan's total stage budgets plus 60 seconds, with an
 1800-second floor. An explicit caller value always takes precedence. Other
 commands retain the ordinary 1800-second default. Each plan stage retains its
 `timeout_s`, with a default of 1800 seconds when that field is absent. The
-maintained software plan uses effective stage budgets of 1800 or 7200 seconds.
+qualifier also supplies that stage budget as the default for nested checker
+commands when `NEXUS_COMMAND_TIMEOUT` is unset, including direct API/CLI use.
+Each stage receives its own environment, so one stage's default cannot leak
+into another. An explicit caller value remains authoritative for nested commands;
+it does not replace the stage's explicit outer timeout. The maintained software
+plan uses effective stage budgets of 1800 or 7200 seconds.
 Its SDK stage writes
 `<output>/sdk`, and packaging rejects a prefix inside its input checkout or with
 path aliases. Choose a new canonical directory for each attempt and retain failed

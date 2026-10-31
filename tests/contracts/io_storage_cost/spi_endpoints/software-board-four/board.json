@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-four-spi-endpoints-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "software-only-three-cs-bank-pad-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "primary-spi",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "secondary-cs",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "initial": 8
+    },
+    {
+      "id": "primary-cs",
+      "controller": "GPIOE",
+      "route": "gpio-pe4",
+      "initial": 16
+    },
+    {
+      "id": "tertiary-cs",
+      "controller": "GPIOG",
+      "route": "gpio-pg9",
+      "initial": 512
+    },
+    {
+      "id": "quaternary-cs",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "initial": 4
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only silicon pad and active-low CS contract; no PCB devices or connections are claimed.",
+    "PE4/PE3, PG9 and PB2 deliberately span three CS banks; a four-endpoint image includes their GPIO lease and clock activation costs.",
+    "No physical UART/SPI/I2C timing, pulls, voltage or external-device qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "STM32F407ZGT6 silicon pads only: existing DS8626/RM0090-reviewed SPI1 and GPIOE/GPIOG/GPIOB routes. No board revision, attached device, or electrical qualification is claimed."
+    }
+  ]
+}

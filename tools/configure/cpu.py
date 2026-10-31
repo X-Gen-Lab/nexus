@@ -24,7 +24,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.configure import kernel, metadata, factory, sdk
-from tools.configure.ir import CpuProfileIR, freeze, thaw
+from tools.configure.ir import CpuProfileIR, thaw
 from tools.configure.providers.common import fail, integer
 
 

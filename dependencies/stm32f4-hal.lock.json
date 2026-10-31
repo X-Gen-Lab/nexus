@@ -5,13 +5,57 @@
       "bytes": 240833,
       "sha256": "8c2d2feb90e8ed88fe5756f3f1616a2b67aa1cd0858da8b130ed69607688c8c0"
     },
+    "Inc/stm32f4xx_hal.h": {
+      "bytes": 12683,
+      "sha256": "6942f40453fee331e026179cfac4c0f24ffe6313fedcb68af9c3382f702dbaf5"
+    },
     "Inc/stm32f4xx_hal_def.h": {
       "bytes": 7563,
       "sha256": "c8eb3f7b393f8c5a0c32e16ccfa101c83ddb59e96bd42239b8a5c5d4da83e97f"
     },
+    "Inc/stm32f4xx_hal_dma.h": {
+      "bytes": 37869,
+      "sha256": "71c38dfd65c5415b388375147e5317c7ac018b39893d6fd0ac1c897f4313329c"
+    },
+    "Inc/stm32f4xx_hal_dma_ex.h": {
+      "bytes": 2651,
+      "sha256": "3ee15423d73ac394de39e7b65821775966389b13749ff0849894548ab6968676"
+    },
     "Inc/stm32f4xx_hal_eth.h": {
       "bytes": 89154,
       "sha256": "596e6eb83351a5cb3cad97750f2c7536069c278bb58fc52ccce74a0bfc34beb5"
+    },
+    "Inc/stm32f4xx_hal_flash.h": {
+      "bytes": 14303,
+      "sha256": "10be06c6e06fcf4eb11e236641948aed861898fea235c606ae221fa72bc46638"
+    },
+    "Inc/stm32f4xx_hal_flash_ex.h": {
+      "bytes": 64011,
+      "sha256": "7c206f5dbed3c147a6f090ab808933132a1b06b8339623ad7174fd0a222e981c"
+    },
+    "Inc/stm32f4xx_hal_flash_ramfunc.h": {
+      "bytes": 2206,
+      "sha256": "f18a6eabc99f56483566f9231ca33c780afa98bc93929e60bb419b5e544eee2a"
+    },
+    "Inc/stm32f4xx_hal_gpio.h": {
+      "bytes": 13687,
+      "sha256": "0b40fc83363b64d3c7396a202be7a914ceaa7735ab0fa81d566ed320102b23fb"
+    },
+    "Inc/stm32f4xx_hal_gpio_ex.h": {
+      "bytes": 81141,
+      "sha256": "4091beefc5bf8b250f376d400f43ca028ef7378e1c7ba5c9eb5de64ec74231c0"
+    },
+    "Inc/stm32f4xx_hal_rcc.h": {
+      "bytes": 73468,
+      "sha256": "eb6911d964b1cf8a83993b19c8feb9845e8793d7c0e5d643390b53207c8b078e"
+    },
+    "Inc/stm32f4xx_hal_rcc_ex.h": {
+      "bytes": 436806,
+      "sha256": "49f0c8068524e1de248738530cff3bbe630dc4784b6e8b5568fbc7e1a154f772"
+    },
+    "Inc/stm32f4xx_hal_uart.h": {
+      "bytes": 45527,
+      "sha256": "42528bc9caa6e2fe96b7e6d7b3fcdf35d8d85ae38d33195a233e18a072f157a1"
     },
     "Inc/stm32f4xx_ll_adc.h": {
       "bytes": 284748,
@@ -44,6 +88,18 @@
     "LICENSE.md": {
       "bytes": 1485,
       "sha256": "376c82bcef0be563bf59b93d05cfdd4b6295e4660b55b31dd8a883bf1d6637f7"
+    },
+    "Src/stm32f4xx_hal_dma.c": {
+      "bytes": 39525,
+      "sha256": "a345a1b1fe0221c827d5ad21d5a0f5387296bc2c075e06e5b8539c23da5678e4"
+    },
+    "Src/stm32f4xx_hal_rcc.c": {
+      "bytes": 42493,
+      "sha256": "f3ac468e2f415adb74281107c0dec1448008950b64a7bb11c14cbe3ee1a936de"
+    },
+    "Src/stm32f4xx_hal_uart.c": {
+      "bytes": 136921,
+      "sha256": "a74ed3a9a13a4fcbaada9e6f88f7d4fcabe2a75852a6ce4c09f8d4314a2e851a"
     }
   },
   "kind": "nexus-reviewed-official-driver",
@@ -61,5 +117,5 @@
   "release": "v1.8.5",
   "repository": "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f407-ll-inline-eth-definitions"
+  "selected_api": "stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx"
 }

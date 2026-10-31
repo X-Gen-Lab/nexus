@@ -262,6 +262,8 @@ def missing_idle(root: Path, recorder, tools: dict, variant: dict) -> dict:
         recorder.execute([cmake, '--build', str(build), '--parallel', '2',
                           '--target', 'nexus_os_mpu'], 'missing-idle-link')
     except ValueError:
+        # Link failure is expected; the exact result and raw diagnostic below
+        # must still prove the missing caller-owned idle storage.
         pass
     record = recorder.commands[-1]
     diagnostic = '\n'.join(Path(record[item]['path']).read_text()

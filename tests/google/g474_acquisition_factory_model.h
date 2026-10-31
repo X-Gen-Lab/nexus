@@ -59,4 +59,9 @@ void nx_g474_acquisition_factory_poll(nx_stm32g474_adc_state_t* port);
 #define NX_G474_ADC_POLL(port)      nx_g474_acquisition_factory_poll(port)
 #define NX_G474_DMAMUX_SELECT(mux)  NX_G474_WRITE(&(mux)->CCR, 5U)
 #define NX_I2C_V2_WRITE(reg, value) NX_G474_WRITE(reg, value)
+/* Keep external data-register effects when the SoC selects official leaves. */
+#define NX_I2C_V2_RECEIVE_DATA(registers)                                      \
+    ((uint8_t)NX_I2C_V2_READ(&(registers)->rxdr))
+#define NX_I2C_V2_TRANSMIT_DATA(registers, value)                              \
+    NX_I2C_V2_WRITE(&(registers)->txdr, (value))
 #endif

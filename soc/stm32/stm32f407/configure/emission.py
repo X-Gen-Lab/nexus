@@ -41,6 +41,8 @@ def includes(result):
         source.append('#include "stm32f407_i2c_cold.h"')
     if any(item.kind == "uart" for item in selections):
         source.append('#include "stm32f407_uart_cold.h"')
+    if any(implementation(item) == "uart_hal" for item in selections):
+        source.append('#include "stm32f407_uart_hal.h"')
     if any(item.mode == "irq-words" for item in selections):
         source.append('#include "stm32f407_uart_word.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in selections):

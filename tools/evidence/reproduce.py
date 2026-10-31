@@ -26,7 +26,7 @@ from tools.evidence.container import docker_prefix, verify as verify_environment
 from tools.evidence.identity import (git_source, verify_source, verify_sdk_package,
                                      resolved_identity)
 from tools.evidence.inputs import tree_identity
-from tools.measurement.elf import Elf32, binary_from_elf
+from tools.measurement.elf import Elf32, binary_from_elf, image_window
 from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
 
 
@@ -221,12 +221,12 @@ def validate_build_artifacts(build: Path, artifacts: dict,
     """Recheck the actual linked ELF/BIN against this build's resolved input."""
     resolved, _ = resolved_identity(build / consumer.relative_path(
         resolved_path, "resolved configuration"))
-    flash = resolved["flash"]
+    image = image_window(resolved)
     elf = Elf32(Path(artifacts["elf"]["path"]).read_bytes(),
                 float_abi=resolved_float_abi(resolved))
     validate_elf_configuration(elf, resolved)
     if Path(artifacts["bin"]["path"]).read_bytes() != binary_from_elf(
-            elf, flash["origin"], flash["origin"] + flash["size"]):
+            elf, image["origin"], image["origin"] + image["size"]):
         raise EvidenceError("offline BIN bytes differ from linked ELF")
 
 

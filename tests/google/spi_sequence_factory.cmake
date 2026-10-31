@@ -18,6 +18,8 @@ foreach(sequence_family stm32 gd32)
     nexus_google_configuration_inputs("${sequence_bundle}")
 
     set(sequence_reference "nexus_${sequence_family}_multi_controller_factory_test")
+    # The STM32 clone shares the parent HAL objects only with this exact
+    # family/model/profile context. Each executable supplies its own ports.
     get_property(sequence_sources TARGET ${sequence_reference} PROPERTY SOURCES)
     get_property(sequence_libraries TARGET ${sequence_reference} PROPERTY LINK_LIBRARIES)
     get_property(sequence_includes TARGET ${sequence_reference} PROPERTY INCLUDE_DIRECTORIES)
@@ -54,4 +56,28 @@ foreach(sequence_family stm32 gd32)
         ${sequence_system} ${sequence_vendor_includes})
     target_compile_definitions(${sequence_target} PRIVATE ${sequence_definitions})
     target_compile_options(${sequence_target} PRIVATE ${sequence_options})
+    if(sequence_family STREQUAL "stm32")
+        target_link_options(${sequence_target} PRIVATE "-Wl,--gc-sections")
+    endif()
+    if(sequence_family STREQUAL "gd32")
+        # The retained polling participant now uses actual SPL primitives.
+        # Only its unrelated reset remains the fixture's external hardware
+        # model; rename that unused SDK entry in this private object alone.
+        set(sequence_i2c_vendor "${sequence_target}_i2c_vendor")
+        add_library(${sequence_i2c_vendor} OBJECT
+            "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c")
+        target_include_directories(${sequence_i2c_vendor} PRIVATE
+            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
+        target_include_directories(${sequence_i2c_vendor} SYSTEM PRIVATE
+            ${sequence_system} ${sequence_vendor_includes})
+        target_compile_definitions(${sequence_i2c_vendor} PRIVATE
+            GD32F470 HXTAL_VALUE=25000000
+            i2c_deinit=nx_sequence_official_i2c_deinit)
+        target_compile_features(${sequence_i2c_vendor} PRIVATE c_std_11)
+        target_compile_options(${sequence_i2c_vendor} PRIVATE
+            -Wno-int-to-pointer-cast)
+        target_sources(${sequence_target} PRIVATE
+            $<TARGET_OBJECTS:${sequence_i2c_vendor}>)
+    endif()
 endforeach()

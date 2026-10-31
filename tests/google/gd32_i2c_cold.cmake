@@ -9,6 +9,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             "${gd_i2c_cold_root}/drivers/i2c.c"
             "${gd_i2c_cold_root}/drivers/i2c_cold.c"
             "${gd_i2c_cold_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c"
+            "${gd_i2c_cold_sdk}/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c"
         LIBRARIES Nexus::IO
         INCLUDES "${gd_i2c_cold_root}" "${gd_i2c_cold_root}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"

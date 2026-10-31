@@ -1,6 +1,26 @@
 {
   "commit": "2552682ee5a0d6f826a6435750fc9267be65868b",
   "files": {
+    "Inc/Legacy/stm32_hal_legacy.h": {
+      "bytes": 242146,
+      "sha256": "ae2c716ae3097e6b34ac92eeb0feeaa01c992628da1a2d3adf12710352004288"
+    },
+    "Inc/stm32u5xx_hal.h": {
+      "bytes": 39344,
+      "sha256": "be0aa206bbdbd4be224282ab540aa1b2545b41981b61893ca9c2868c10d45e43"
+    },
+    "Inc/stm32u5xx_hal_def.h": {
+      "bytes": 7638,
+      "sha256": "73a911c835b4c7f75b7d4c7e47847f9776c5b55dc265bb59c17dfbbc6488e2b9"
+    },
+    "Inc/stm32u5xx_hal_gpio.h": {
+      "bytes": 16246,
+      "sha256": "6d9e6c1abe6303f3e72f488c21fe2a1272a033a8309e6b8da4a3f2f62c3ced23"
+    },
+    "Inc/stm32u5xx_hal_gpio_ex.h": {
+      "bytes": 16959,
+      "sha256": "40848fe334a9252b50e7a941537312443ba0830ef0a3f2a2c283151f0f4fa23c"
+    },
     "Inc/stm32u5xx_ll_adc.h": {
       "bytes": 533860,
       "sha256": "13e9cfc1df70a4dd34234bbad84def36e71bd8032f4ddbb6f29ac5d9e872c071"
@@ -12,6 +32,10 @@
     "Inc/stm32u5xx_ll_i2c.h": {
       "bytes": 97434,
       "sha256": "8b7b9ad4cb5aeff1df318c042399f55726e745f129146f7ba27cec3d4623449d"
+    },
+    "Inc/stm32u5xx_ll_iwdg.h": {
+      "bytes": 13653,
+      "sha256": "8552e2843e0cf8b42b505418ccaaadb1db7b4cc4ad7f730c141d90729d13df1e"
     },
     "Inc/stm32u5xx_ll_rtc.h": {
       "bytes": 226081,
@@ -32,6 +56,10 @@
     "LICENSE.md": {
       "bytes": 1484,
       "sha256": "3ef135517604c828e7e2ac60daa5d34ce90a258dd0dfbec140651ac173b45ced"
+    },
+    "Src/stm32u5xx_hal_gpio.c": {
+      "bytes": 33435,
+      "sha256": "2d7b5f252bf1bf2ad0fff46ac4fa7050bf437b23802f212051a0a595a283fffd"
     }
   },
   "kind": "nexus-reviewed-official-driver",
@@ -49,5 +77,5 @@
   "release": "STM32CubeU5-v1.9.0-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git",
   "schema_version": 1,
-  "selected_api": "stm32u575-ll-inline"
+  "selected_api": "stm32u575-ll-inline-gpio-hal-write-multiple"
 }

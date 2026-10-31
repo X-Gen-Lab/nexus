@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch as mock_patch
 
 from tests.contracts.test_evidence_support import link_fixture
 from tools.evidence.common import EvidenceError, atomic_json
@@ -338,7 +338,7 @@ class SocCostsTests(unittest.TestCase):
                 self.commands.write_bytes(original + b"\n")
             return output
         try:
-            with mock.patch.object(soc_costs, "run_adapter",
+            with mock_patch.object(soc_costs, "run_adapter",
                                    side_effect=adapter):
                 self.bad_observe()
         finally:

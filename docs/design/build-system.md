@@ -18,7 +18,13 @@ or generator-source identity.
 
 CMake owns source lists and target dependencies. The resolver emits selected
 facts and its configuration-code dependencies, never a parallel software build
-graph. ABI, optimization, diagnostics and firmware link policy have explicit
+graph. The selected SoC-local `descriptor.py` is an explicit configuration-code
+input and Source SDK source dependency. Moving that immutable metadata preserves
+all firmware payloads; `selection.cmake` gains the selected file dependency.
+Descriptor enumeration does not select C source units. Private compile templates
+validate required specialization bindings and preserve wrapper-owned macro scope;
+CMake still selects and checks each actual translation unit.
+ABI, optimization, diagnostics and firmware link policy have explicit
 target boundaries. The firmware target guarantees its declared delivery outputs
 and resource check. External application warnings are a consumer policy.
 
