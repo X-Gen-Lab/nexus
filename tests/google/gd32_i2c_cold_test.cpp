@@ -107,10 +107,17 @@ extern "C" void nx_arch_dsb(void) {
 extern "C" void nx_arch_isb(void) {
 }
 
-/** \brief Model the SDK reset line, leaving the C driver under test intact. */
-extern "C" void i2c_deinit(uint32_t registers) {
-    std::memset(reinterpret_cast<void*>(static_cast<uintptr_t>(registers)), 0,
-                0x28U);
+/** \brief Model the selected reset line below the real SDK I2C reset. */
+extern "C" void rcu_periph_reset_enable(rcu_periph_reset_enum reset) {
+    RCU_REG_VAL(reset) |= BIT(RCU_BIT_POS(reset));
+    if (reset == RCU_I2C0RST) {
+        std::memset(reinterpret_cast<void*>(static_cast<uintptr_t>(I2C0)), 0,
+                    0x28U);
+    }
+}
+/** \brief Release the modeled SDK reset pulse without changing other bits. */
+extern "C" void rcu_periph_reset_disable(rcu_periph_reset_enum reset) {
+    RCU_REG_VAL(reset) &= ~BIT(RCU_BIT_POS(reset));
 }
 /** \brief Model the SDK gate release at the external MMIO boundary. */
 extern "C" void rcu_periph_clock_disable(rcu_periph_enum clock) {

@@ -60,6 +60,8 @@ static volatile uint32_t& SelectRegister() {
 
 class F407AtomicContract : public testing::Test {
   protected:
+    USART_TypeDef observed_uart = {};
+
     void SetUp() override {
         s_mask = 0U;
         s_saves = 0U;
@@ -71,17 +73,20 @@ class F407AtomicContract : public testing::Test {
         s_registers[0] = 0xF0U;
         s_registers[1] = 0xAAU;
     }
+
+    void TearDown() override {
+        s_observed = nullptr;
+    }
 };
 
 TEST_F(F407AtomicContract, VendorLlSetGuardsBeforeEffectAndRestoresAfterward) {
-    USART_TypeDef uart = {};
-    s_observed = &uart.CR3;
-    nx_atomic_vendor_enable_tx(&uart);
+    s_observed = &observed_uart.CR3;
+    nx_atomic_vendor_enable_tx(&observed_uart);
     EXPECT_GE(s_saves, 1U);
     EXPECT_EQ(s_restores, s_saves);
     EXPECT_EQ(s_before_guard, 0U);
     EXPECT_EQ(s_before_restore, USART_CR3_DMAT);
-    EXPECT_EQ(uart.CR3, USART_CR3_DMAT);
+    EXPECT_EQ(observed_uart.CR3, USART_CR3_DMAT);
     EXPECT_EQ(s_mask, 0U);
 }
 

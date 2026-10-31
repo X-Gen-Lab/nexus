@@ -146,6 +146,8 @@ class F407HalContract : public testing::Test {
     uint8_t* payload = nullptr;
     nx_uart_rx_event_t* events = nullptr;
     nx_stm32_uart_hal_state_t state = {};
+    /* Config borrows optional format overrides for the fixture lifetime. */
+    nx_uart_format_t format = {};
     nx_stm32_uart_dma_cold_config_t config = {};
     nx_dma_memory_region_t region = {};
     IRQn_Type vectors[2] = {USART1_IRQn, DMA2_Stream7_IRQn};
@@ -551,8 +553,7 @@ TEST_F(F407HalContract, LateIrqsCannotModifyReleasedRequest) {
 TEST_F(F407HalContract, SevenBitParityReceptionPreservesPayloadAndError) {
     ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
     state = {};
-    const nx_uart_format_t format = {7U, NX_UART_PARITY_EVEN, NX_UART_STOP_1,
-                                     NX_UART_FLOW_NONE};
+    format = {7U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE};
     config.uart.format = &format;
     ASSERT_EQ(nx_stm32_uart_hal_initialize(&state, &config), NX_SUCCESS);
     Receive(USART_SR_RXNE | USART_SR_PE, 0xFFU);
@@ -743,8 +744,7 @@ TEST_F(F407HalContract, NearestBaudDivisorIsReadyBeforeFirstUeOnApb1) {
 TEST_F(F407HalContract, CompleteFrameIsReadyBeforeFirstUe) {
     ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
     state = {};
-    const nx_uart_format_t format = {8U, NX_UART_PARITY_ODD, NX_UART_STOP_2,
-                                     NX_UART_FLOW_NONE};
+    format = {8U, NX_UART_PARITY_ODD, NX_UART_STOP_2, NX_UART_FLOW_NONE};
     config.uart.format = &format;
     s_uart_enables = 0U;
     ASSERT_EQ(nx_stm32_uart_hal_initialize(&state, &config), NX_SUCCESS);
@@ -970,8 +970,7 @@ TEST_F(F407HalCold, LowBaudRejectsBeforeAnyResourceAcquisition) {
 }
 
 TEST_F(F407HalCold, UnsupportedFrameRejectsBeforeAnyPinOrClockWrite) {
-    const nx_uart_format_t format = {9U, NX_UART_PARITY_NONE, NX_UART_STOP_1,
-                                     NX_UART_FLOW_NONE};
+    format = {9U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE};
     config.uart.format = &format;
     EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state, &config, &receipt),
               NX_ERROR_UNSUPPORTED);

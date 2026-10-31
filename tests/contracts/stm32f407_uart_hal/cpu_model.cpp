@@ -59,8 +59,14 @@ extern "C" bool nx_arch_in_isr(void) {
 extern "C" bool nx_arch_is_privileged(void) {
     return true;
 }
+/**
+ * \brief           Order synchronous model observations and reentrant IRQ hooks
+ * \details         IRQs are explicit calls on one host thread. Compiler
+ * ordering is sufficient here; Native architecture tests retain their real
+ * host-thread synchronization and barrier coverage.
+ */
 extern "C" void nx_arch_dmb(void) {
-    std::atomic_thread_fence(std::memory_order_seq_cst);
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 extern "C" void nx_arch_dsb(void) {
     nx_arch_dmb();

@@ -28,6 +28,8 @@ jobs:
         run: python scripts/setup/install_dev_tools.py --skip-hooks
       - name: Prepare the existing workflow YAML dependency
         run: .venv/bin/python -m pip install -r dependencies/workflow-tools.txt
+      - name: Prepare commit-hook environments before offline tests
+        run: .venv/bin/python -I -m pre_commit install-hooks
       - name: Check the complete staged workflow DSL offline
         run: .venv/bin/python scripts/ci/lint_workflows.py --staged
       - name: Test commit automation boundaries

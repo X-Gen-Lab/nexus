@@ -26,6 +26,8 @@ jobs:
         with:
           preset: native-debug
           arm: 'true'
+      - name: Prepare commit-hook environments before offline tests
+        run: .venv/bin/python -I -m pre_commit install-hooks
       - name: Use the installed CLI tools for real consumer builds
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
       - name: Execute configuration rejection and atomic generation
