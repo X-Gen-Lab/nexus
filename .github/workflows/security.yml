@@ -81,7 +81,7 @@ jobs:
         if: matrix.language == 'cpp'
         run: |
           .venv/bin/python tools/dev/dev.py configure --preset native-debug
-          .venv/bin/python tools/dev/dev.py build --preset native-debug --parallel 2
+          NEXUS_COMMAND_TIMEOUT=3600 .venv/bin/python tools/dev/dev.py build --preset native-debug --parallel 2
           test -s build/native-debug/compile_commands.json
       - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:

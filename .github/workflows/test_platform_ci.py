@@ -77,6 +77,64 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(document['on']['schedule'], [{'cron': '0 2 * * *'}])
         self.assertEqual(document['jobs']['status-check']['if'], 'always()')
 
+    def test_codeql_trace_keeps_complete_build_with_explicit_finite_budget(self):
+        document = workflow('security.yml')
+        job = document['jobs']['codeql']
+        step = next(item for item in job['steps'] if item.get('name') ==
+                    'Trace the actual native build')
+        # Exercise the authored shell and real budget parser. Only the external
+        # configure/build CLI is a port; no compiler or CodeQL extraction runs.
+        spy = ('#!' + sys.executable + '\n'
+            'import json,os,sys\nfrom pathlib import Path\n'
+            'sys.dont_write_bytecode=True\n'
+            'sys.path.insert(0,os.environ["TRACE_PROCESS_ROOT"])\n'
+            'from tools.dev.process import command_timeout\n'
+            'args=sys.argv[1:]\n'
+            'if args[0]!="tools/dev/dev.py" or args[1] not in '
+            '("configure","build"):raise SystemExit(97)\n'
+            'with open(os.environ["TRACE_CALLS"],"a") as stream:\n'
+            '    stream.write(json.dumps({"argv":args,"timeout":'
+            'command_timeout(os.environ)})+"\\n")\n'
+            'if args[1]=="build":\n'
+            '    mode=os.environ["TRACE_OUTPUT"]\n'
+            '    if mode!="missing-database":\n'
+            '        database=Path("build/native-debug/compile_commands.json")\n'
+            '        database.parent.mkdir(parents=True)\n'
+            '        database.write_text("" if mode=="empty-database" '
+            'else "[{}]\\n")\n'
+            '    if mode=="build-failure":raise SystemExit(37)\n')
+        for mode, expected in (('complete', 0), ('missing-database', 1),
+                               ('empty-database', 1), ('build-failure', 37)):
+            with self.subTest(output=mode), tempfile.TemporaryDirectory() as name:
+                root = Path(name) / 'repository with spaces'
+                executable = root / '.venv/bin/python'
+                executable.parent.mkdir(parents=True)
+                executable.write_text(spy)
+                executable.chmod(0o700)
+                calls = root / 'trace-calls.jsonl'
+                environment = {key: value for key, value in os.environ.items()
+                               if key != 'NEXUS_COMMAND_TIMEOUT'}
+                for scope in (document, job, step):
+                    environment.update(scope.get('env', {}))
+                environment.update(TRACE_PROCESS_ROOT=str(ROOT),
+                                   TRACE_CALLS=str(calls), TRACE_OUTPUT=mode)
+                result = subprocess.run(
+                    ['bash', '-euo', 'pipefail', '-c', step['run']],
+                    cwd=root, env=environment, capture_output=True, text=True,
+                    timeout=10)
+                self.assertEqual(result.returncode, expected,
+                                 result.stdout + result.stderr)
+                records = [json.loads(line)
+                           for line in calls.read_text().splitlines()]
+                self.assertEqual([item['argv'] for item in records], [
+                    ['tools/dev/dev.py', 'configure', '--preset', 'native-debug'],
+                    ['tools/dev/dev.py', 'build', '--preset', 'native-debug',
+                     '--parallel', '2']])
+                if mode == 'complete':
+                    self.assertEqual(records[0]['timeout'], 1800)
+                    self.assertEqual(records[1]['timeout'], 3600,
+                                     'Traced builds need their own finite budget')
+
     def test_dependency_review_is_weekly_read_only_and_source_bound(self):
         document = workflow('dependency-maintenance.yml')
         self.assertEqual(document['on']['schedule'][0]['cron'], '0 3 * * 1')
