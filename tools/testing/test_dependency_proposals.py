@@ -7,8 +7,8 @@ import tempfile
 import unittest
 import subprocess
 from tools.maintenance import dependency_proposals as proposals
-from tools.maintenance import (cmsis_device_lock, lwip_lock, source_catalogue,
-                               stm32f1_hal_lock, stm32f4_hal_lock)
+from tools.maintenance import (cmsis_device_lock, lwip_lock, mbedtls_lock, coremqtt_lock,
+                               source_catalogue, stm32f1_hal_lock, stm32f4_hal_lock)
 from tools.maintenance.stm32_ll_lock import PROFILES
 import os
 
@@ -303,6 +303,11 @@ class DependencyInventoryGitTests(unittest.TestCase):
                     (ROOT / item.source_lock).read_text())["commit"]}
             if item.identifier == "lwip":
                 review = {"commit": lwip_lock.COMMIT}
+            if item.identifier == "coremqtt":
+                review = {"commit": coremqtt_lock.COMMIT}
+            if item.source_lock == mbedtls_lock.LOCK_NAME:
+                review = {"commit": mbedtls_lock.record(
+                    mbedtls_lock.load_lock(), item.path)["commit"]}
             if item.identifier == "freertos" or item.parent is not None:
                 review = {"commit": self.git(ROOT / item.path,
                                               "rev-parse", "HEAD")}

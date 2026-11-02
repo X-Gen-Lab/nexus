@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "name": "coremqtt",
+  "version": "2.3.1",
+  "commit": "f4445aa70cb211504bca2c9e4177cd74609f5fba",
+  "tree": "8e3605e081b031d617fa0501697cc5e4f7b0b828",
+  "upstream_commit": "2beef04725328923e05e576b884212d53ec97af7",
+  "upstream_url": "https://github.com/FreeRTOS/coreMQTT.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/coreMQTT.git",
+  "path": "ext/coremqtt",
+  "license": "MIT",
+  "admission": "organization_gitlink",
+  "files": {
+    "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+    "NEXUS-SOURCE-CURATION.md": "09d44eeb5fabdd7aaafaa77380a2679f29bbeaaca4f567269b13932b725f50f0",
+    "source/core_mqtt.c": "98cfdd1651acd725296164e9a865c51d0cd137b531a54e2e0c937846c202de0c",
+    "source/core_mqtt_serializer.c": "1e4bf5a2b307f37f3cbc83a898e9c6b89b873daf93968fddb81eac06bb113c0b",
+    "source/core_mqtt_state.c": "af5c215f11692c7ced8a90b9d6f9c9c23d2476538ff77a38952945f642fbc8cf",
+    "source/include/core_mqtt.h": "2c49f123cf30d07607c0d7589fcc466906dbdc7d19662b5c834869b8763c40f9",
+    "source/include/core_mqtt_config_defaults.h": "e56ff8c4e440be37d4ca413315f10c503fe47d558922b78830aef18878f9f9cd",
+    "source/include/core_mqtt_serializer.h": "7d14754eda1efc43b8f7e85ccb0b03bcbae363444a6f22c11b6850e5d094aa23",
+    "source/include/core_mqtt_state.h": "97a82665b7a363c4dfce018066cff913d03ac04848058b5e458d694f6e2f2ae7",
+    "source/interface/transport_interface.h": "2118819dd0f7d2e64c312f071c0d4ab688d2fa36a659b91aeab557d888ac1c73"
+  }
+}

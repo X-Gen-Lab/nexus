@@ -30,7 +30,8 @@ CMSIS_DIRECTORY = "vendors/st/cmsis_device_f4"
 LOCK_NAME = "dependencies/stm32f4-hal.lock.json"
 REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_usart.h",
-    "Inc/stm32f4xx_ll_spi.h",
+    "Inc/stm32f4xx_ll_spi.h", "Inc/stm32f4xx_ll_bus.h",
+    "Inc/stm32f4xx_ll_rcc.h", "Inc/stm32f4xx_ll_rng.h",
     "Inc/stm32f4xx_ll_adc.h", "Inc/stm32f4xx_ll_tim.h",
     "Inc/stm32f4xx_ll_iwdg.h", "LICENSE.md",
     "Inc/stm32f4xx_ll_i2c.h",

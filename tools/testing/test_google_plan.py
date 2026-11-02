@@ -23,6 +23,7 @@ class GooglePlanTests(unittest.TestCase):
             'project(google_plan C)\n'
             'add_custom_target(nexus_google_contracts)\n'
             'add_executable(early case.c)\n'
+            'set_property(TARGET early PROPERTY NEXUS_GOOGLE_CONTRACT TRUE)\n'
             'add_dependencies(nexus_google_contracts early)\n'
             'set_property(GLOBAL APPEND PROPERTY NEXUS_GOOGLE_EXECUTABLES '
             '"$<TARGET_FILE:early>")\n'
@@ -37,6 +38,7 @@ class GooglePlanTests(unittest.TestCase):
     def test_late_executable_in_aggregate_is_in_execution_plan(self):
         result, build = self.configure(
             'add_executable(late case.c)\n'
+            'set_property(TARGET late PROPERTY NEXUS_GOOGLE_CONTRACT TRUE)\n'
             'add_dependencies(nexus_google_contracts late)\n'
             'set_property(GLOBAL APPEND PROPERTY NEXUS_GOOGLE_EXECUTABLES '
             '"$<TARGET_FILE:late>")\n'
@@ -55,6 +57,32 @@ class GooglePlanTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("GoogleTest aggregate requires executable targets",
                       result.stdout + result.stderr)
+
+    def test_aggregate_rejects_unregistered_helper_executable(self):
+        result, _build = self.configure(
+            'add_executable(helper case.c)\n'
+            'add_dependencies(nexus_google_contracts helper)\n'
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("GoogleTest aggregate requires registered contracts",
+                      result.stdout + result.stderr)
+
+    def test_compile_helper_is_a_nested_build_dependency_only(self):
+        result, build = self.configure(
+            'add_executable(helper case.c)\n'
+            'add_dependencies(early helper)\n'
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        manifest = json.loads((build / "google-contracts.json").read_text())
+        self.assertEqual([Path(name).stem for name in manifest["executables"]],
+                         ["early"])
+        built = subprocess.run(
+            [shutil.which("cmake") or "cmake", "--build", str(build),
+             "--target", "nexus_google_contracts", "--parallel", "1"],
+            capture_output=True, text=True, timeout=30)
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+        self.assertTrue(any(path.is_file() for name in ("helper", "helper.exe")
+                            for path in build.rglob(name)))
 
 
 if __name__ == "__main__":

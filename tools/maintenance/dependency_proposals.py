@@ -23,12 +23,14 @@ from tools.configure.metadata import (  # noqa: E402
     fields, identity, parse_json, read_json, regular, snapshot,
 )
 from tools.maintenance.source_catalogue import (  # noqa: E402
-    ALL_DEPENDENCIES, declared_modules, relative_path,
+    ALL_DEPENDENCIES, declared_modules, relative_path, verify_alias_identities,
+    verify_gitlinks,
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
     stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-    stm32g4_lock, threadx_lock, googletest_lock, lwip_lock,
+    stm32g4_lock, threadx_lock, googletest_lock, lwip_lock, mbedtls_lock,
+    coremqtt_lock,
 )
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
@@ -85,9 +87,32 @@ def inventory(root=ROOT):
     module_bytes, module_identity = snapshot(root / ".gitmodules")
     declared_modules(module_bytes)
     records = []
+    owner_graphs, alias_identities = set(), []
+    tls_verified = False
+
+    def audit_owner(owner, parent):
+        if owner not in owner_graphs:
+            declaration = owner / ".gitmodules"
+            declared_modules(snapshot(declaration)[0] if declaration.exists()
+                             or declaration.is_symlink() else b"", parent)
+            links = {}
+            for row in git(owner, "ls-tree", "-r", "HEAD").splitlines():
+                metadata, relative = row.split("\t", 1)
+                mode, kind, pin = metadata.split()
+                if mode == "160000":
+                    if kind != "commit":
+                        raise ValueError("Invalid committed source Gitlink")
+                    links[relative] = pin
+            try:
+                verify_gitlinks(links, parent)
+            except ValueError as error:
+                raise ValueError("Missing committed source Gitlink or unreviewed graph") from error
+            owner_graphs.add(owner)
+
     for dependency in ALL_DEPENDENCIES:
         name, path, notice = dependency.identifier, dependency.path, dependency.notice
         owner = root if dependency.parent is None else root / dependency.parent
+        audit_owner(owner, dependency.parent)
         entry = git(owner, "ls-tree", "HEAD", "--",
                     relative_path(dependency)).split()
         if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
@@ -100,6 +125,9 @@ def inventory(root=ROOT):
                 dependency.fetch_url or
                 git(checkout, "status", "--porcelain", "--untracked-files=all")):
             raise ValueError("Source checkout differs from locked clean Gitlink: " + path)
+        # Audit every selected leaf too: an unexpected nested declaration or
+        # Gitlink is not permission to acquire another source dependency.
+        audit_owner(checkout, path)
         references = [module_identity, identity(checkout / notice)]
         upstream_revision = entry[2]
         if dependency.parent is not None:
@@ -121,6 +149,15 @@ def inventory(root=ROOT):
                 googletest_lock.verify(checkout, lock_path)
             elif name == "lwip":
                 lwip_lock.verify(checkout, lock_path)
+            elif name == "coremqtt":
+                coremqtt_lock.verify(checkout, lock_path)
+                upstream_revision = locked["upstream_commit"]
+            elif dependency.source_lock == mbedtls_lock.LOCK_NAME:
+                if not tls_verified:
+                    mbedtls_lock.verify(root / "ext/mbedtls", lock_path)
+                    tls_verified = True
+                locked = mbedtls_lock.record(locked, path)
+                upstream_revision = locked["upstream_commit"]
             elif name == "threadx":
                 threadx_lock.verify(checkout, lock_path, "linux")
             elif name in OFFICIAL_DRIVERS:
@@ -146,6 +183,9 @@ def inventory(root=ROOT):
                         "upstream_revision": upstream_revision,
                         "identities": references,
                         "license_review": "current_notices_observed"})
+        alias_identities.append({"path": path, "commit": entry[2],
+            "tree": git(checkout, "rev-parse", "HEAD^{tree}")})
+    verify_alias_identities(alias_identities)
     vendor_path = root / "vendors/gigadevice/gd32f4xx/source.lock.json"
     vendor_bytes, vendor_identity = snapshot(vendor_path)
     vendor = parse_json(vendor_bytes)

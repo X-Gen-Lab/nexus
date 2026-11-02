@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import shlex
 import stat
 import sys
 
@@ -67,22 +68,56 @@ def _image(target, provenance_path, elf):
     if (len(header) != 20 or header[:6] != b"\x7fELF\x01\x01"
             or int.from_bytes(header[18:20], "little") != 40):
         raise ValueError("Probe action requires a little-endian ARM ELF")
-    return candidates[0]
+    # Execution changes cwd to the owned run directory; preserve the path of
+    # the bytes just verified rather than reinterpreting a relative identity.
+    return {**candidates[0], "path": str(image)}
+
+
+def _gdb_command(server, client, image):
+    """Use GDB's official pipe transport with one safely quoted shell exec.
+
+    GDB explicitly parses the pipe tail through /bin/sh. Quote every OpenOCD
+    argument, keep Tcl words independently quoted, and reject line controls
+    before that tail becomes one GDB command. No ELF path enters this string.
+    """
+    fields(client, {"tool"}, {"commands"})
+    tool = verify_file_identity(client["tool"])
+    if not os.access(tool, os.X_OK):
+        raise ValueError("Reviewed GDB client must be executable")
+    if any(any(ord(char) < 32 or ord(char) == 127 for char in argument)
+           for argument in server):
+        raise ValueError("GDB pipe requires one-line arguments without controls")
+    command = [str(tool), "--nx", "--batch", "--quiet",
+               "--init-eval-command=set auto-load off",
+               "--se=" + image["path"],
+               "--eval-command=target extended-remote | exec "
+               + shlex.join(server)]
+    if "commands" in client:
+        command.append("--command=" + str(verify_file_identity(
+            client["commands"])))
+    else:
+        command.append("--eval-command=info threads")
+    return command + ["--eval-command=detach"]
 
 
 def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
-         port=3333):
+         port=3333, client=False):
     """Inspect only action inputs without opening a probe or serial device."""
     if action not in ("flash", "debug", "monitor"):
         raise ValueError("Unsupported developer equipment action")
+    if type(client) is not bool or (client and action != "debug"):
+        raise ValueError("GDB client is an explicit debug-only selection")
     if type(timeout) is not int or not 1 <= timeout <= 3600:
         raise ValueError("Equipment timeout must be 1..3600 seconds")
-    if type(port) is not int or not 1024 <= port <= 65535:
+    if client and port not in (3333, None):
+        raise ValueError("Pipe GDB client does not use a TCP port")
+    if not client and (type(port) is not int or not 1024 <= port <= 65535):
         raise ValueError("Debug port must be 1024..65535")
     target = load_json(target_path)
     required = {"schema", "kind", "board", "station_lock"}
     required |= {"serial"} if action == "monitor" else {"part", "probe"}
-    fields(target, required, optional={"part", "probe", "serial"} - required)
+    fields(target, required, optional={"part", "probe", "serial",
+                                       "gdb_client"} - required)
     if (type(target["schema"]) is not int or target["schema"] != 1
             or target["kind"] != "nexus_development_target"):
         raise ValueError("Explicit developer target required")
@@ -133,10 +168,20 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
             command += ["-c", "gdb_port disabled", "-c",
                         "program " + _tcl_word(image["path"])
                         + " verify reset exit"]
+        elif client:
+            if not sys.platform.startswith("linux"):
+                raise ValueError("Reviewed pipe GDB workflow requires Linux")
+            if "gdb_client" not in target:
+                raise ValueError("Explicit reviewed GDB client required")
+            command += ["-c", "gdb_port pipe", "-c",
+                        "log_output openocd.log", "-c", "init", "-c",
+                        "reset halt"]
+            command = _gdb_command(command, target["gdb_client"], image)
+            port = None
         else:
             command += ["-c", "gdb_port " + str(port), "-c", "init",
                         "-c", "reset halt"]
-    return {
+    prepared = {
         "schema": 1, "kind": "nexus_development_operation", "action": action,
         "target": file_identity(target_path),
         "provenance": (file_identity(provenance_path)
@@ -152,6 +197,9 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
         "scope": ("development host command only; "
                   "no physical qualification or MCU timing"),
     }
+    if client:
+        prepared["gdb_client"] = target["gdb_client"]
+    return prepared
 
 
 def _monitor_snapshot(serial):
@@ -296,7 +344,8 @@ def execute(prepared, output):
     current = plan(prepared["action"], target, provenance,
                    elf=image,
                    timeout=prepared["timeout_seconds"],
-                   port=prepared["debug_port"])
+                   port=prepared["debug_port"],
+                   client="gdb_client" in prepared)
     if current != prepared:
         raise ValueError("Developer plan inputs changed")
     if output.exists():
@@ -317,7 +366,8 @@ def execute(prepared, output):
         if plan(prepared["action"], target, provenance,
                 elf=image,
                 timeout=prepared["timeout_seconds"],
-                port=prepared["debug_port"]) != prepared:
+                port=prepared["debug_port"],
+                client="gdb_client" in prepared) != prepared:
             raise ValueError("Developer inputs changed before execution")
         if lock.read_text() != token:
             raise ValueError("Station lock ownership changed")
@@ -361,7 +411,8 @@ def execute(prepared, output):
             if plan(prepared["action"], target, provenance,
                     elf=image,
                     timeout=prepared["timeout_seconds"],
-                    port=prepared["debug_port"]) != prepared:
+                    port=prepared["debug_port"],
+                    client="gdb_client" in prepared) != prepared:
                 raise ValueError("Developer input identity changed")
         except (OSError, ValueError) as error:
             validation_error = "Post-command identity validation: " + str(error)
@@ -439,13 +490,18 @@ def main(action, argv=None):
     parser.add_argument("--provenance", type=Path)
     parser.add_argument("--elf", type=Path)
     parser.add_argument("--timeout", type=int, default=300)
-    parser.add_argument("--port", type=int, default=3333)
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--client", action="store_true",
+                        help="Attach bounded batch GDB through OpenOCD pipe")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--output", type=Path)
     arguments = parser.parse_args(argv)
+    if arguments.client and arguments.port is not None:
+        raise ValueError("Pipe GDB client does not use --port")
     prepared = plan(action, arguments.target, arguments.provenance,
                     elf=arguments.elf, timeout=arguments.timeout,
-                    port=arguments.port)
+                    port=arguments.port if arguments.port is not None else 3333,
+                    client=arguments.client)
     if not arguments.execute:
         print(json.dumps(prepared, indent=2))
         return 0
@@ -455,8 +511,8 @@ def main(action, argv=None):
                  else "probe " + prepared["probe_serial"])
     print("Executing " + action + " on " + prepared["board"] + " using "
           + selection, flush=True)
-    if action == "debug":
-        print("GDB: target extended-remote 127.0.0.1:" + str(arguments.port),
+    if action == "debug" and not arguments.client:
+        print("GDB: target extended-remote 127.0.0.1:" + str(prepared["debug_port"]),
               flush=True)
     return execute(prepared, arguments.output)["exit_code"]
 

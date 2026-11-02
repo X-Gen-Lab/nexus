@@ -13,6 +13,12 @@ function(nexus_write_google_plan)
             message(FATAL_ERROR
                 "GoogleTest aggregate requires executable targets: ${google_target}")
         endif()
+        get_target_property(google_registered "${google_target}"
+            NEXUS_GOOGLE_CONTRACT)
+        if(NOT google_registered)
+            message(FATAL_ERROR
+                "GoogleTest aggregate requires registered contracts: ${google_target}")
+        endif()
         list(APPEND google_executables "$<TARGET_FILE:${google_target}>")
     endforeach()
     list(JOIN google_executables "\",\n    \"" google_executables)

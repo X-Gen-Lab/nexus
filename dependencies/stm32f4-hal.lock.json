@@ -61,6 +61,10 @@
       "bytes": 284748,
       "sha256": "fabfc9706709a9997e96d87aee25356b3ca84021668a915ad816ba42e1babadc"
     },
+    "Inc/stm32f4xx_ll_bus.h": {
+      "bytes": 99874,
+      "sha256": "95a518139f74d14a4477519b5172675347990e9fa637bd3948c69bd475bd7c88"
+    },
     "Inc/stm32f4xx_ll_gpio.h": {
       "bytes": 37445,
       "sha256": "e46857f5f9a5f5a2d13ca2d6925dc9e66dfa7fc56a2cc72e54b891bdb88e2f16"
@@ -72,6 +76,14 @@
     "Inc/stm32f4xx_ll_iwdg.h": {
       "bytes": 9098,
       "sha256": "755bdf0e666bc8023fb154734726a681fae718edeb346c60b63534223c57e1ad"
+    },
+    "Inc/stm32f4xx_ll_rcc.h": {
+      "bytes": 341256,
+      "sha256": "605960f2e8e57a702b912475f9c154bb58711b58c8f2ff27dd4e75b5d767dc4e"
+    },
+    "Inc/stm32f4xx_ll_rng.h": {
+      "bytes": 8777,
+      "sha256": "253b5a2da69655cad8c98045f9a13e7331a1c3792b8e4bc9e7e81b891b655cfe"
     },
     "Inc/stm32f4xx_ll_spi.h": {
       "bytes": 66631,

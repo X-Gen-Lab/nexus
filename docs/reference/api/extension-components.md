@@ -9,6 +9,39 @@ source_language: en
 
 These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract.
 
+(stm32f407-entropy-construction)=
+
+## Explicit F407 entropy construction
+
+For an F407 assembly, explicitly call `nexus_add_stm32f407_entropy(target)` and
+link that target at the product's composition site. It owns the unique static
+RNG source and refuses a second constructor. The getter
+`nx_stm32f407_entropy_instance()` returns an existing readonly face; it performs
+no startup, register access or factory registration.
+
+After successful Platform startup, call
+`nx_stm32f407_entropy_instance_start()` with exact validated Board/profile
+`hse_hz` and `hclk_hz` facts. The implementation checks the live PLL48/HCLK
+relationship and acquires only its RNG clock gate; it neither configures the
+shared PLL nor starts Platform. The reviewed source choices are 8 MHz HSE or
+16 MHz HSI. The product must preserve those clock dependencies through stop.
+
+Run start/stop from one privileged, unmasked, serialized task context. Join every
+entropy consumer before `nx_stm32f407_entropy_instance_stop()`, and require that
+stop to succeed before withdrawing Platform clocks. Failed withdrawal retains
+the same owner and cleanup responsibility; retry stop without resetting or
+rebinding its state. A stopped face remains valid and rejects data calls with
+STATE. This explicit constructor is separate from TOML typed-factory selection;
+neither it nor software RNG health checks qualify physical min-entropy or HIL.
+
+(stm32f407__entropy_8h)=
+
+### stm32f407_entropy.h
+
+```{doxygenfile} soc/stm32/stm32f407/include/nexus/soc/stm32f407_entropy.h
+:project: nexus
+```
+
 (frame__stream_8h)=
 
 ## frame_stream.h

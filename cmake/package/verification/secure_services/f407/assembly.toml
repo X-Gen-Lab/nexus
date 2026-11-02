@@ -1,0 +1,11 @@
+schema = 2
+board = "stm32f407_qiming_v31"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 8192
+flash_load_limit_bytes = 524288
+static_ram_limit_bytes = 114688
+libc_heap_bytes = 0

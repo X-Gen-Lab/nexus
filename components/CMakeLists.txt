@@ -72,3 +72,5 @@ add_subdirectory(soc)
 
 add_subdirectory(i3c_controller)
 add_subdirectory(network)
+add_subdirectory(tls)
+add_subdirectory(mqtt)

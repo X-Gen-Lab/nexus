@@ -4,11 +4,16 @@ Use Python 3.11+, CMake 3.31.6, Ninja 1.13.2 and a C11 compiler. Install the
 repository tools and both local Git hooks for each clone:
 
 ```sh
+python tools/dev/dev.py prepare --scope native --allow-network
 python scripts/setup/install_dev_tools.py
 .venv/bin/python -m pip install -r requirements.txt
-git submodule update --init --recursive
 python tools/dev/dev.py doctor
 ```
+
+Preparation audits the exact source-owned graph and initializes its selected
+paths in parent-first layers. Omit `--allow-network` to verify sources already
+present offline. Unknown declarations, missing dependencies and changed pins
+fail admission. Firmware configuration never fetches a missing dependency.
 
 The committed graph includes the shared `vendors/arm/CMSIS_6` Core source and
 the selected ST/GigaDevice Device and driver dependencies. CMSIS-Core is pinned

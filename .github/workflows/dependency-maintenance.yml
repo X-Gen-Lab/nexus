@@ -20,8 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
+      - name: Prepare the reviewed selected source closure
+        run: |
+          python3 -B tools/dev/dependencies.py prepare --scope native \
+            --allow-network --report build/dependency-maintenance/preparation.json
       - name: Retain actual compatibility and upstream observations
         run: |
           mkdir -p build/dependency-maintenance

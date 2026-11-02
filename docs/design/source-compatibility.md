@@ -134,18 +134,11 @@ python tools/dev/dev.py prepare --scope native --allow-network
 python tools/dev/dev.py prepare --preset stm32-nucleo-h743-baremetal-uart --allow-network
 ```
 
-完整递归迁移按以下顺序执行；选择性准备使用同样的顺序，只处理所选模块。
-这是准备工具的顺序说明，手动调用不能替代前述工作区和来源检查：
-
-```sh
-git submodule sync
-git -c submodule.recurse=false submodule update --init --checkout --jobs 2
-git submodule sync --recursive
-git submodule update --init --recursive --checkout --jobs 2
-```
-
+准备工具先审查源码拥有的完整声明和 Gitlink，再同步、初始化明确选中的顶层路径。
+每个父模块更新后，重新审查其实际声明和所属 Git 树，再逐层处理明确选中的子路径。
+这些步骤不使用无范围的递归下载；组织维护分支只声明已选择并审查的依赖。
 先更新顶层 FreeRTOS，再同步它的嵌套声明，避免旧 `.gitmodules` 把官方地址写回。
-成功后逐项核对递归路径、Gitlink、实际 HEAD、origin 和干净状态。缺失对象、下载
+成功后逐项核对路径、Gitlink、实际 HEAD、origin 和干净状态。缺失对象、下载
 失败或来源不符必须失败，保留实际执行记录，不改用 `--remote` 或隐式备用地址。
 配置、构建和提交门禁均不自动联网准备依赖。
 

@@ -9,11 +9,14 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 
 from tools.configure import configure, experience, onboarding, selected_contracts
 
 
 ROOT = configure.ROOT
+LIFECYCLE_REFERENCE = (ROOT /
+    "tests/contracts/external_provider_lifecycle")
 
 
 class ExternalPackageTests(unittest.TestCase):
@@ -224,50 +227,45 @@ class ExternalPackageTests(unittest.TestCase):
             configure.resolve_ir(assembly)
 
     def test_external_source_target_configures_links_and_runs(self):
-        package, assembly = self.package()
-        cmake = package / "soc/CMakeLists.txt"
-        cmake.write_text(
-            'add_library(nexus_soc_partner_model STATIC\n'
-            '  "${NEXUS_SOURCE_DIR}/soc/native/drivers/gpio.c"\n'
-            '  "${NEXUS_SOURCE_DIR}/soc/native/drivers/time.c")\n'
-            'target_include_directories(nexus_soc_partner_model PRIVATE\n'
-            '  "${NEXUS_SOURCE_DIR}/io/private")\n'
-            'target_link_libraries(nexus_soc_partner_model PUBLIC Nexus::IO\n'
-            '  Nexus::Arch PRIVATE nexus_build_options nexus_owned_warnings)\n'
-            'set(NEXUS_SYSTEM_PRIVATE_INCLUDES\n'
-            '  "${NEXUS_SOURCE_DIR}/soc/native/drivers" PARENT_SCOPE)\n')
-        self.reseal(package)
-        assembly.write_text(assembly.read_text() +
-                            "\n[factory]\ncapabilities = true\n")
+        """Execute a package-owned C adapter, not a generated-source snapshot."""
         consumer = self.root / "consumer"
-        consumer.mkdir()
-        (consumer / "CMakeLists.txt").write_text(
-            'cmake_minimum_required(VERSION 3.31)\n'
-            'project(external_package_consumer C ASM)\n'
-            f'set(NEXUS_ASSEMBLY_FILE "{assembly}")\n'
-            'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)\n'
-            'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)\n'
-            f'add_subdirectory("{ROOT}" nexus-owned)\n'
-            'nexus_add_firmware(external_consumer SOURCES main.c)\n')
-        (consumer / "main.c").write_text(
-            '#include "nexus_bindings.h"\n'
-            '#include "nexus_factory.h"\n'
-            'int main(void) {\n'
-            '  nx_platform_start_result_t r = nx_platform_start();\n'
-            '  if (r.primary != NX_SUCCESS) { return 1; }\n'
-            '  if (nx_factory_gpio(NX_GPIO_ID_INDICATOR) == 0) { return 2; }\n'
-            '  return nx_platform_stop() == NX_SUCCESS ? 0 : 3;\n}\n')
+        shutil.copytree(LIFECYCLE_REFERENCE, consumer)
         build = self.root / "build"
-        commands = (["cmake", "-S", str(consumer), "-B", str(build),
-                     "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Debug"],
-                    ["cmake", "--build", str(build), "--target",
-                     "external_consumer", "--parallel", "2"],
-                    [str(build / "bin/external_consumer")])
+        report = build / "external-lifecycle-google.xml"
+        commands = (
+            ["cmake", "-S", str(consumer), "-B", str(build), "-G", "Ninja",
+             "-DCMAKE_BUILD_TYPE=Debug",
+             "-DNEXUS_REFERENCE_PLATFORM_SOURCE=" + str(ROOT),
+             "-DEXTERNAL_LIFECYCLE_HOST_TESTS=ON",
+             "-DNEXUS_REFERENCE_GOOGLETEST_SOURCE=" + str(ROOT / "ext/googletest")],
+            ["cmake", "--build", str(build), "--target",
+             "external_lifecycle_consumer", "external_lifecycle_contract_test",
+             "--parallel", "1"],
+            [str(build / "external_lifecycle_contract_test"),
+             "--gtest_output=xml:" + str(report)],
+            [str(build / "bin/external_lifecycle_consumer")])
+        environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        for name in ("GTEST_FILTER", "GTEST_TOTAL_SHARDS", "GTEST_SHARD_INDEX",
+                     "GTEST_SHARD_STATUS_FILE", "GTEST_ALSO_RUN_DISABLED_TESTS"):
+            environment.pop(name, None)
         for command in commands:
             execution = subprocess.run(command, capture_output=True, text=True,
-                                       timeout=180)
+                                       timeout=180, env=environment)
             self.assertEqual(execution.returncode, 0,
                              execution.stdout + execution.stderr)
+        results = ET.parse(report).getroot()
+        self.assertEqual(int(results.attrib["tests"]), 4)
+        self.assertEqual(int(results.attrib["failures"]), 0)
+        self.assertEqual(int(results.attrib["errors"]), 0)
+        self.assertEqual(int(results.attrib["disabled"]), 0)
+        self.assertFalse(results.findall(".//skipped"))
+        entries = json.loads((build / "compile_commands.json").read_text())
+        adapter = consumer / "provider/soc/lifecycle_adapter.c"
+        self.assertEqual(sum(Path(row["file"]).resolve() == adapter
+                             for row in entries), 1)
+        manifest = json.loads((consumer / "provider/nexus-soc.json").read_text())
+        self.assertEqual(manifest["inputs"]["soc/lifecycle_adapter.c"],
+                         hashlib.sha256(adapter.read_bytes()).hexdigest())
 
     def test_package_parent_with_cmake_metacharacters_rejects(self):
         for character in ('$', ';', '"'):

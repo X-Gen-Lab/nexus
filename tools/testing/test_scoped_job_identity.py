@@ -46,20 +46,7 @@ class SelectedIdentityTests(unittest.TestCase):
         self.git(self.module, 'add', '.')
         self.git(self.module, 'commit', '-qm', 'fixture module')
         self.module_sha = self.git(self.module, 'rev-parse', 'HEAD')
-        self.freertos = self.area / 'freertos'
-        self.freertos.mkdir()
-        self.git(self.freertos, 'init', '-q')
-        nested = children('ext/freertos')
-        (self.freertos / '.gitmodules').write_text(''.join(
-            '[submodule "' + module_name(item) + '"]\n path = '
-            + relative_path(item) + '\n url = ' + item.fetch_url + '\n'
-            for item in nested))
-        self.git(self.freertos, 'add', '.')
-        for item in nested:
-            self.git(self.freertos, 'update-index', '--add', '--cacheinfo',
-                     '160000', self.module_sha, relative_path(item))
-        self.git(self.freertos, 'commit', '-qm', 'fixture recursive module')
-        self.freertos_sha = self.git(self.freertos, 'rev-parse', 'HEAD')
+        self.module_sources = {}
         self.git(self.root, 'init', '-q')
         (self.root / '.gitignore').write_text('build/\n')
         (self.root / 'dependencies').mkdir()
@@ -83,7 +70,7 @@ class SelectedIdentityTests(unittest.TestCase):
                                    '${sourceDir}/assembly.toml'}}]}))
         self.git(self.root, 'add', '.')
         for item in ALL_SOURCE_DEPENDENCIES:
-            sha = self.freertos_sha if item.path == 'ext/freertos' else self.module_sha
+            sha = self.git(self.module_source(item.path), 'rev-parse', 'HEAD')
             self.git(self.root, 'update-index', '--add', '--cacheinfo',
                      '160000', sha, item.path)
         self.commit_source()
@@ -108,9 +95,31 @@ class SelectedIdentityTests(unittest.TestCase):
         self.git(self.root, 'commit', '-qm', 'fixture platform')
         self.commit = self.git(self.root, 'rev-parse', 'HEAD')
 
+    def module_source(self, module):
+        nested = children(module)
+        if not nested:
+            return self.module
+        if module in self.module_sources:
+            return self.module_sources[module]
+        source = self.area / ('module-' + dependency(module).identifier)
+        source.mkdir()
+        self.git(source, 'init', '-q')
+        (source / '.gitmodules').write_text(''.join(
+            '[submodule "' + module_name(item) + '"]\n path = '
+            + relative_path(item) + '\n url = ' + item.fetch_url + '\n'
+            for item in nested))
+        self.git(source, 'add', '.')
+        for item in nested:
+            sha = self.git(self.module_source(item.path), 'rev-parse', 'HEAD')
+            self.git(source, 'update-index', '--add', '--cacheinfo',
+                     '160000', sha, relative_path(item))
+        self.git(source, 'commit', '-qm', 'fixture recursive module')
+        self.module_sources[module] = source
+        return source
+
     def initialize(self, *modules):
         for module in modules:
-            source = self.freertos if module == 'ext/freertos' else self.module
+            source = self.module_source(module)
             self.git(self.root, 'config', 'submodule.' + module + '.url', str(source))
             self.git(self.root, '-c', 'protocol.file.allow=always', 'submodule',
                      'update', '--init', '--', module)
@@ -119,14 +128,20 @@ class SelectedIdentityTests(unittest.TestCase):
             self.git(checkout, 'remote', 'set-url', 'origin', item.fetch_url)
             self.git(self.root, 'config', 'submodule.' + module + '.url',
                      item.fetch_url)
-            for child in children(module):
-                key = 'submodule.' + module_name(child) + '.url'
-                self.git(checkout, 'config', key, str(self.module))
-                self.git(checkout, '-c', 'protocol.file.allow=always', 'submodule',
-                         'update', '--init', '--', relative_path(child))
-                self.git(self.root / child.path, 'remote', 'set-url', 'origin',
-                         child.fetch_url)
-                self.git(checkout, 'config', key, child.fetch_url)
+            self.initialize_children(module)
+
+    def initialize_children(self, module):
+        checkout = self.root / module
+        for child in children(module):
+            key = 'submodule.' + module_name(child) + '.url'
+            self.git(checkout, 'config', key,
+                     str(self.module_source(child.path)))
+            self.git(checkout, '-c', 'protocol.file.allow=always', 'submodule',
+                     'update', '--init', '--', relative_path(child))
+            self.git(self.root / child.path, 'remote', 'set-url', 'origin',
+                     child.fetch_url)
+            self.git(checkout, 'config', key, child.fetch_url)
+            self.initialize_children(child.path)
 
     def refresh_receipt(self):
         self.receipt = prepare_preset(self.root, 'fixture')

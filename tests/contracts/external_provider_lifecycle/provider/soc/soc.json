@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "external_lifecycle_model",
+  "variants": {
+    "NATIVE_MODEL": {
+      "package": "host-model",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_blocks": [
+          1048576
+        ]
+      },
+      "memory": [
+        {
+          "id": "model-ram",
+          "origin": 536870912,
+          "size": 1048576,
+          "dma": false,
+          "linker": true
+        }
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "native",
+    "fpu": "none",
+    "float_abi": "native",
+    "dsp": false,
+    "dwt_cyccnt": false,
+    "mpu_version": 0,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "clock_profiles": {
+    "model": {
+      "hse_hz": 1000000,
+      "core_hz": 1000000
+    }
+  },
+  "controllers": {
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA3"
+      ]
+    }
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 0
+  }
+}

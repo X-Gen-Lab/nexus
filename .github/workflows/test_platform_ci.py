@@ -161,7 +161,7 @@ class WorkflowContracts(unittest.TestCase):
         steps = document['jobs']['build']['steps']
         checkout = next(step for step in steps if step.get('uses', '').startswith(
             'actions/checkout@'))
-        self.assertEqual(checkout['with']['submodules'], 'recursive')
+        self.assertEqual(checkout['with']['submodules'], 'false')
         commands = '\n'.join(step.get('run', '') for step in steps)
         self.assertIn('tools/documentation/install.py', commands)
         self.assertIn('tools/dev/dev.py docs test', commands)
@@ -173,6 +173,40 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('shutil.copytree(source, staging)', commands)
         self.assertIn('delivery.verify', commands)
         self.assertNotIn('sudo apt-get', commands)
+
+    def test_source_jobs_prepare_only_the_reviewed_selected_closure(self):
+        for name, job, consumer in (
+                ('docs-build.yml', 'build', 'tools/documentation/install.py'),
+                ('dependency-maintenance.yml', 'observe',
+                 'tools/maintenance/dependency_proposals.py')):
+            with self.subTest(workflow=name):
+                steps = workflow(name)['jobs'][job]['steps']
+                checkout = next(i for i, step in enumerate(steps) if step.get(
+                    'uses', '').startswith('actions/checkout@'))
+                self.assertEqual(steps[checkout]['with']['submodules'], 'false')
+                preparation = [(i, step['run']) for i, step in enumerate(steps)
+                               if 'tools/dev/dependencies.py prepare'
+                               in step.get('run', '')]
+                self.assertEqual(len(preparation), 1)
+                position, command = preparation[0]
+                arguments = shlex.split(command.replace('\\\n', ' '))
+                self.assertEqual(arguments[:4], [
+                    'python3', '-B', 'tools/dev/dependencies.py', 'prepare'])
+                self.assertEqual(arguments[arguments.index('--scope') + 1],
+                                 'native')
+                self.assertIn('--allow-network', arguments)
+                report = arguments[arguments.index('--report') + 1]
+                self.assertTrue(report.startswith('build/'))
+                self.assertLess(checkout, position)
+                self.assertLess(position, next(i for i, step in enumerate(steps)
+                                if consumer in step.get('run', '')))
+                self.assertFalse(any('--recursive' in step.get('run', '')
+                                     for step in steps))
+                upload = next(step['with']['path'] for step in steps if step.get(
+                    'uses', '').startswith('actions/upload-artifact@'))
+                paths = upload.splitlines()
+                self.assertTrue(any(report == path or report.startswith(
+                    path.rstrip('/') + '/') for path in paths))
 
     def test_docs_tests_reuse_the_prepared_nondefault_tool_prefix(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
@@ -201,6 +235,7 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(seal.get('uses'), './.github/actions/record-identity')
         self.assertEqual(seal['if'], 'success()')
         self.assertEqual(seal['with']['artifacts'].splitlines(), [
+            'build/dependencies/docs-build-preparation.json',
             'build/documentation/', 'build/documentation-package/',
             'build/documentation-check.json', 'build/documentation-tests.json'])
         self.assertEqual(seal['with']['output'], 'build/docs-job-identity')

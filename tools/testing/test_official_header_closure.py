@@ -30,7 +30,8 @@ F4_HAL_SOURCES = {f'Src/stm32f4xx_hal_{unit}.c'
 F4_REQUIRED_FILES = {
     'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
     *F4_HAL_SOURCES, *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
-                      ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c'))}
+                      ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c',
+                       'bus', 'rcc', 'rng'))}
 F4_SELECTED_API = 'stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx'
 
 ADDITIONS = {

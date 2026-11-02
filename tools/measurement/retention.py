@@ -619,6 +619,99 @@ COMPONENT_OWNER_SMOKES = frozenset((
     "u575-retained-time", "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam"))
 
 
+SECURE_COMPONENT_OWNER = "f407-secure-services"
+SECURE_ARM_HEAP_SYMBOLS = frozenset({
+    "malloc", "calloc", "realloc", "free", "_malloc_r", "_calloc_r",
+    "_realloc_r", "_free_r", "_sbrk", "_sbrk_r", "sbrk", "_memalign_r",
+})
+
+
+def secure_forbidden_symbols(names):
+    """Exact libc names preserve the bounded arena and lwIP pool functions."""
+    return {"libc_heap": sorted(SECURE_ARM_HEAP_SYMBOLS.intersection(names)),
+            "cpp_runtime": sorted(name for name in names
+                if name.startswith(("__cxa_", "__gxx_", "_Z")))}
+
+
+def secure_service_symbols(arm):
+    """Require real linked API/backend bodies, with no forced archive members."""
+    common = frozenset({
+        "nx_entropy_fill", "nx_tls_runtime_start", "nx_tls_runtime_stop",
+        "nx_tls_initialize", "nx_tls_handshake_step", "nx_tls_abort",
+        "nx_mqtt_init", "nx_mqtt_deinit", "MQTT_Init", "psa_crypto_init",
+        "mbedtls_ssl_handshake_step", "nx_platform_start", "nx_platform_stop",
+        "lwip_init", "nx_lwip_adapter_start", "nx_lwip_adapter_service",
+        "nx_lwip_adapter_stop",
+    })
+    return common | (frozenset({
+        "nx_stm32f407_entropy_instance", "nx_stm32f407_entropy_instance_start",
+        "nx_stm32f407_entropy_instance_stop", "nx_mqtt_connect",
+        "nx_mqtt_publish", "nx_mqtt_process", "nx_mqtt_disconnect",
+    }) if arm else frozenset())
+
+
+def secure_owner_inputs(root, consumer):
+    """Protect and compare exact canonical C/header/assembly inputs."""
+    from tools.release.transport import SERVICE_CONSUMERS
+    choices = [item for item in SERVICE_CONSUMERS
+               if item.scenario == "secure_services" and item.domain == "arm-secure"]
+    if len(choices) != 1 or consumer is None or Path(consumer).name != "application.c":
+        raise EvidenceError("secure component requires its exact caller")
+    canonical = root / "cmake/package/verification" / choices[0].scenario
+    selected = canonical / Path(choices[0].assembly).parent
+    sources = {path.name: path for path in selected.iterdir()
+               if path.suffix in {".c", ".h", ".toml"}}
+    sources["public_ca.h"] = canonical / "public_ca.h"
+    return [(path, Path(consumer).parent / name) for name, path in sources.items()]
+
+
+def inspect_secure_owner(elf, bindings, resolved, consumer, root):
+    """The explicit empty-F407 contract proves components, never factory faces."""
+    if (resolved is None or resolved.get("soc_family") != "stm32f407" or
+            resolved.get("part") != "STM32F407ZGT6" or
+            resolved.get("backend") != "baremetal" or
+            resolved.get("clock_profile") != "hse8-pll168" or
+            resolved.get("controllers") != [] or resolved.get("devices") != [] or
+            FACE_DECLARATION.search(bindings)):
+        raise EvidenceError("secure component differs from canonical empty F407 domain")
+    inputs = []
+    for canonical, copied in secure_owner_inputs(root, consumer):
+        expected, actual = file_identity(canonical), file_identity(copied)
+        if expected["sha256"] != actual["sha256"]:
+            raise EvidenceError("secure component differs from canonical source")
+        inputs.append(actual)
+    forbidden = secure_forbidden_symbols({item["name"] for item in elf.defined_symbols})
+    if any(forbidden.values()):
+        raise EvidenceError("secure component retains libc heap or C++ runtime")
+    entrypoints = []
+    for name in sorted(secure_service_symbols(True)):
+        symbol = unique_symbol(elf, name)
+        method = concrete_method(elf, symbol["value"])
+        if name not in method["symbols"]:
+            raise EvidenceError("secure entrypoint does not name its actual code")
+        entrypoints.append({"name": name, **method})
+    storage = {}
+    for name, extent in (("tls_arena", 65536), ("tls_stage", 512),
+                         ("mqtt_network", 1024), ("ram_heap", None),
+                         ("memp_memory_PBUF_POOL_base", None),
+                         ("memp_memory_TCP_PCB_base", None),
+                         ("memp_memory_TCP_SEG_base", None)):
+        obj = component_owner_object(elf, name)
+        if (extent is not None and obj["size"] != extent) or (
+                name == "tls_arena" and obj["value"] % 8):
+            raise EvidenceError("secure component static storage extent/alignment differs")
+        storage[name] = {"address": obj["value"], "size": obj["size"]}
+    return {"schema_version": 1, "kind": "linked_component_owner_retention",
+            "status": "passed", "owner_profile": SECURE_COMPONENT_OWNER,
+            "face_count": 0, "operations_table_count": 0,
+            "method_count": len(entrypoints), "faces": [], "tables": [],
+            "entrypoints": entrypoints, "storage": storage,
+            "consumer": file_identity(Path(consumer)), "consumer_inputs": inputs,
+            "forbidden_symbols": forbidden, "physical_status": "not_executed",
+            "limitations": ["Linked component code and static storage only; no "
+                            "factory faces, execution, TLS authentication or HIL."]}
+
+
 def component_storage_size(root, stem, macro):
     """Read the public ARM32 owner extent, rather than guess it from names."""
     path = root / f"components/soc/stm32/{stem}/include/nexus/components/{stem}.h"
@@ -815,6 +908,8 @@ def inspect_component_owner(elf, bindings, resolved, smoke, consumer, root):
 def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
                                component_owner=None, consumer_path=None):
     """Trace selected faces through exact tables and all non-NULL methods."""
+    if component_owner == SECURE_COMPONENT_OWNER:
+        return inspect_secure_owner(elf, bindings, resolved, consumer_path, root)
     if component_owner is not None:
         return inspect_component_owner(elf, bindings, resolved, component_owner,
                                        consumer_path, root)
@@ -1245,7 +1340,7 @@ def main(arguments=None):
     parser.add_argument("--resolved", type=Path,
                         help="bind current CPU ABI, linked configuration and declared inputs")
     parser.add_argument("--component-owner",
-                        choices=sorted(COMPONENT_OWNER_SMOKES))
+                        choices=sorted(COMPONENT_OWNER_SMOKES | {SECURE_COMPONENT_OWNER}))
     parser.add_argument("--consumer", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
@@ -1258,6 +1353,10 @@ def main(arguments=None):
         if args.consumer is not None:
             protected.add(args.consumer.resolve())
             protected.update(component_owner_input_paths(ROOT))
+            if args.component_owner == SECURE_COMPONENT_OWNER:
+                protected.update(path.resolve() for pair in
+                                 secure_owner_inputs(ROOT, args.consumer)
+                                 for path in pair)
         if args.resolved is not None:
             protected.update(input_protection_paths(args.resolved))
         if args.output.resolve() in protected:

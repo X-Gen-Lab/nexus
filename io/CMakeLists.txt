@@ -6,6 +6,7 @@ add_library(nexus_io STATIC
     src/api/can.c
     src/api/can_fd.c
     src/api/encoder.c
+    src/api/entropy.c
     src/api/ethernet.c
     src/api/ethernet_frames.c
     src/api/exti.c

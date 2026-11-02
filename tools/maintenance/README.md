@@ -191,7 +191,51 @@ for scope, commands and the complete upgrade process.
 `source_catalogue.py` separates official `upstream_url`, approved `fetch_url`
 and the selected Gitlink. Upstream observations follow the official URL even
 when retrieval uses a reviewed fork. The catalogue explicitly includes nested
-FreeRTOS modules; host-only GoogleTest remains outside the production SDK.
+FreeRTOS modules and the TLS/crypto/framework mounts; host-only GoogleTest
+remains outside the production SDK.
 Hosting activation and the reviewed FreeRTOS transport commit are separate
 from upgrading the official base. The linked contract also defines checkout
 migration order, rejection of local changes and offline SDK trust boundaries.
+
+`mbedtls_lock.py` verifies the exact curated Mbed TLS 4.1.1 and TF-PSA-Crypto
+1.1.1 sources through one [lock](../../dependencies/mbedtls.lock.json). The
+catalogue owns four selected mounts: Mbed TLS, its crypto child and two distinct
+mounts of the same framework commit/tree. Each mount must independently match
+its parent Gitlink, clean checkout, approved organization origin and locked
+bytes. The framework alias shares one canonical file map without substituting
+one checkout for the other. Every declared child is selected; this source graph
+has no ML-DSA Gitlink. Historical excluded pins remain in the curated vendor
+notice, and unexpected driver material cannot enter the closed SDK payload.
+
+```sh
+python tools/maintenance/mbedtls_lock.py --source ext/mbedtls
+```
+
+The static payload includes the locked C/CMake inputs, public/private headers,
+eleven official release-generated files, generated-source provenance notices
+and complete license texts. Consumers must set `GEN_FILES=OFF`; source
+generators, upstream tests and programs are outside this SDK closure. Keep the
+configuration identical for library and caller, and compile the selected vendor
+targets as C11. The three canonical repositories use
+`Apache-2.0 OR GPL-2.0-or-later`; individual source notices, including the Everest
+Apache-2.0 notices, remain intact.
+
+`--development` permits an explicit location for the same exact curated source
+and labels it unqualified. `--source-sdk` first invokes the owning installed SDK
+verifier and then checks all four dependency records and complete per-mount
+file sets; it never invents Git state for redistributed source. Source checks
+do not establish that a cipher profile was built, TLS handshakes succeeded,
+physical entropy is trustworthy, or a Board passed HIL. Those results require
+their separate source-bound build and execution evidence.
+
+`coremqtt_lock.py --source ext/coremqtt` applies the same source boundary to
+the optional coreMQTT 2.3.1 client. Its organization commit removes the upstream
+CMock test submodule while preserving the production algorithms and MIT
+license. The [single lock](../../dependencies/coremqtt.lock.json) contains three
+C sources, five headers, `LICENSE` and the curation notice: ten exact files.
+The catalogue requires a selected leaf, not an unselected dependency exception.
+The SDK excludes CMock, upstream tests and unrelated files; rehashing an extra
+test dependency or an omitted algorithm does not authorize another closure.
+Inventory records the curated selection separately from its official upstream
+parent. Development and installed-SDK scopes remain explicit and do not
+establish broker behavior, credentials policy, TLS authentication or HIL.

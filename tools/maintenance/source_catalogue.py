@@ -23,6 +23,7 @@ class SourceDependency:
     source_lock: str | None = None
     parent: str | None = None
     submodule_name: str | None = None
+    alias_of: str | None = None
 
 
 ALL_DEPENDENCIES = (
@@ -86,6 +87,31 @@ ALL_DEPENDENCIES = (
         "https://github.com/lwip-tcpip/lwip.git",
         "https://github.com/X-Gen-Lab/lwip.git",
         "runtime", "COPYING", "dependencies/lwip.lock.json"),
+    SourceDependency("mbedtls", "ext/mbedtls",
+        "https://github.com/Mbed-TLS/mbedtls.git",
+        "https://github.com/X-Gen-Lab/mbedtls.git",
+        "runtime", "LICENSE", "dependencies/mbedtls.lock.json"),
+    SourceDependency("coremqtt", "ext/coremqtt",
+        "https://github.com/FreeRTOS/coreMQTT.git",
+        "https://github.com/X-Gen-Lab/coreMQTT.git",
+        "runtime", "LICENSE", "dependencies/coremqtt.lock.json"),
+    SourceDependency("tf_psa_crypto", "ext/mbedtls/tf-psa-crypto",
+        "https://github.com/Mbed-TLS/TF-PSA-Crypto.git",
+        "https://github.com/X-Gen-Lab/TF-PSA-Crypto.git",
+        "runtime", "LICENSE", "dependencies/mbedtls.lock.json",
+        parent="ext/mbedtls", submodule_name="tf-psa-crypto"),
+    SourceDependency("mbedtls_framework", "ext/mbedtls/framework",
+        "https://github.com/Mbed-TLS/mbedtls-framework.git",
+        "https://github.com/X-Gen-Lab/mbedtls-framework.git",
+        "runtime", "LICENSE", "dependencies/mbedtls.lock.json",
+        parent="ext/mbedtls", submodule_name="framework"),
+    SourceDependency("tf_psa_crypto_framework",
+        "ext/mbedtls/tf-psa-crypto/framework",
+        "https://github.com/Mbed-TLS/mbedtls-framework.git",
+        "https://github.com/X-Gen-Lab/mbedtls-framework.git",
+        "runtime", "LICENSE", "dependencies/mbedtls.lock.json",
+        parent="ext/mbedtls/tf-psa-crypto", submodule_name="framework",
+        alias_of="mbedtls_framework"),
     SourceDependency("freertos_partner_ports",
         "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
         "https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports",
@@ -126,20 +152,25 @@ def module_name(item):
     return item.submodule_name or relative_path(item)
 
 
+def _url(value):
+    if (not isinstance(value, str) or not re.fullmatch(
+            r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", value)):
+        raise ValueError("Source transport requires exact public GitHub URL")
+
+
 def validate_catalogue(entries):
     """Reject ambiguous records, unsafe transports and invalid parent graphs."""
     entries = tuple(entries)
-    identifiers, paths, origins = set(), {}, set()
+    identifiers, paths, origins = {}, {}, {}
     for item in entries:
         if not isinstance(item, SourceDependency):
             raise ValueError("Source catalogue requires immutable records")
         if (not re.fullmatch(r"[a-z][a-z0-9_]*", item.identifier) or
-                item.identifier in identifiers or item.path in paths or
-                item.upstream_url in origins):
+                item.identifier in identifiers or item.path in paths):
             raise ValueError("Duplicate or invalid source dependency identity")
-        identifiers.add(item.identifier)
+        identifiers[item.identifier] = item
         paths[item.path] = item
-        origins.add(item.upstream_url)
+        origins.setdefault(item.upstream_url, []).append(item)
         _relative(item.path)
         _relative(item.notice)
         if item.source_lock is not None:
@@ -149,9 +180,22 @@ def validate_catalogue(entries):
         if item.scope not in {"runtime", "host-test"}:
             raise ValueError("Unsupported source dependency scope")
         for url in (item.upstream_url, item.fetch_url):
-            if (not isinstance(url, str) or not re.fullmatch(
-                    r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url)):
-                raise ValueError("Source transport requires exact public GitHub URL")
+            _url(url)
+    for item in entries:
+        if item.alias_of is not None:
+            canonical = identifiers.get(item.alias_of)
+            if (canonical is None or canonical == item or
+                    canonical.alias_of is not None or
+                    any(getattr(item, name) != getattr(canonical, name)
+                        for name in ("upstream_url", "fetch_url", "scope",
+                                     "notice", "source_lock"))):
+                raise ValueError("Source alias requires one exact canonical source")
+    for mounts in origins.values():
+        canonical = [item for item in mounts if item.alias_of is None]
+        if len(canonical) != 1 or any(
+                item.alias_of != canonical[0].identifier
+                for item in mounts if item.alias_of is not None):
+            raise ValueError("Duplicate source requires an explicit canonical alias")
     names = set()
     for item in entries:
         if item.parent is not None:
@@ -183,7 +227,8 @@ def dependency(identifier_or_path):
 
 
 def upstream_dependency(url):
-    selected = [item for item in ALL_DEPENDENCIES if item.upstream_url == url]
+    selected = [item for item in ALL_DEPENDENCIES
+                if item.upstream_url == url and item.alias_of is None]
     if len(selected) != 1:
         raise ValueError("Unknown or ambiguous upstream source dependency")
     return selected[0]
@@ -210,7 +255,9 @@ def declared_modules(data, parent=None, *, upstream=False):
     Explicit upstream mode is for reviewing an official baseline declaration;
     ordinary source preparation and SDK admission always use approved fetch URLs.
     """
-    expected = {module_name(item): item for item in children(parent)}
+    validate_catalogue(ALL_DEPENDENCIES)
+    selected = children(parent)
+    expected = {module_name(item): item for item in selected}
     parser = configparser.ConfigParser(interpolation=None)
     try:
         parser.read_string(data.decode("utf-8"))
@@ -235,4 +282,48 @@ def declared_modules(data, parent=None, *, upstream=False):
                  else item.fetch_url
                  for item in expected.values()}:
         raise ValueError("Missing source dependency requires catalogue review")
-    return paths
+    return {relative_path(item): paths[relative_path(item)] for item in selected}
+
+
+def verify_gitlinks(links, parent=None):
+    """Audit all owning-tree links; return only the exact selected closure."""
+    validate_catalogue(ALL_DEPENDENCIES)
+    selected = children(parent)
+    expected = {relative_path(item) for item in selected}
+    if (not isinstance(links, dict) or set(links) != expected or
+            any(not isinstance(pin, str) or
+                not re.fullmatch(r"[0-9a-f]{40}", pin) for pin in links.values())):
+        raise ValueError("Source Gitlinks differ from the reviewed declared graph")
+    return {relative_path(item): links[relative_path(item)] for item in selected}
+
+
+def verify_alias_identities(records):
+    """Compare independently observed selected pins and source trees per mount.
+
+    Callers obtain each pin from its own parent Git tree and verify it against
+    that mount's actual checkout. A different parent commit is expected; alias
+    equality concerns the framework/source mount itself. Partial observations
+    cannot qualify either member of an alias pair.
+    """
+    validate_catalogue(ALL_DEPENDENCIES)
+    observed = {}
+    for record in records:
+        if (not isinstance(record, dict) or
+                not {"path", "commit", "tree"}.issubset(record) or
+                record["path"] in observed or
+                any(not isinstance(record[name], str) or
+                    not re.fullmatch(r"[0-9a-f]{40}", record[name])
+                    for name in ("commit", "tree"))):
+            raise ValueError("Source alias requires exact unique mount identities")
+        if dependency(record["path"]).path != record["path"]:
+            raise ValueError("Source alias identity requires an exact mount path")
+        observed[record["path"]] = (record["commit"], record["tree"])
+    for item in ALL_DEPENDENCIES:
+        if item.alias_of is None:
+            continue
+        canonical = dependency(item.alias_of)
+        if item.path not in observed and canonical.path not in observed:
+            continue
+        if (item.path not in observed or canonical.path not in observed or
+                observed[item.path] != observed[canonical.path]):
+            raise ValueError("Source alias pin/tree differs from its canonical mount")

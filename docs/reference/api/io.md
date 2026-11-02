@@ -106,6 +106,22 @@ finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
 :project: nexus
 ```
 
+(entropy_8h)=
+
+## entropy.h
+
+The entropy face supplies bounded, health-admitted source words. `nx_entropy_fill`
+uses a finite absolute deadline and erases the complete admitted output on a
+read failure. It does not allocate, create a worker or establish entropy quality;
+it is not a DRBG. A source's existence does not authorize full entropy credit
+for a cryptographic library. See the explicit
+{ref}`F407 constructor <stm32f407-entropy-construction>` for its
+clock and shutdown prerequisites. GD32 entropy is not implemented.
+
+```{doxygenfile} io/include/nexus/io/entropy.h
+:project: nexus
+```
+
 (ethernet_8h)=
 
 ## ethernet.h

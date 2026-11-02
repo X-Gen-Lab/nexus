@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "Host virtual model; no physical wiring"
+    },
+    {
+      "id": "gpio-pa3",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "Host independent virtual GPIO view; no physical wiring"
+    }
+  ]
+}

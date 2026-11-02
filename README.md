@@ -71,7 +71,7 @@ Run from the repository root with host Python, Git, C/C++ tools and the maintain
 CMake/Ninja versions available:
 
 ```sh
-git submodule update --init --recursive
+python tools/dev/dev.py prepare --scope native --allow-network
 python scripts/setup/install_dev_tools.py
 .venv/bin/python -m pip install -r dependencies/environment-tools.txt
 python tools/dev/dev.py doctor

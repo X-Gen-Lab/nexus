@@ -129,7 +129,7 @@ class DependencyPreparationTests(unittest.TestCase):
                  self.origin)
         self.reject_before_mutation()
 
-    def test_network_preparation_updates_parent_before_recursive_sync(self):
+    def test_network_preparation_updates_only_explicit_selected_paths(self):
         run = subprocess.run
         operations = []
 
@@ -146,11 +146,10 @@ class DependencyPreparationTests(unittest.TestCase):
         with patch.object(dependencies.subprocess, "run", side_effect=observe):
             self.assertEqual(self.prepare(network=True)["status"], "verified")
         self.assertEqual([operation[0] for operation in operations],
-                         ["sync", "update", "sync", "update"])
-        self.assertNotIn("--recursive", operations[1])
-        self.assertIn("--recursive", operations[2])
-        self.assertIn("--recursive", operations[3])
-        for operation in (operations[1], operations[3]):
+                         ["sync", "update"])
+        self.assertTrue(all("--recursive" not in operation
+                            for operation in operations))
+        for operation in (operations[1],):
             self.assertIn("--checkout", operation)
             self.assertIn("--jobs", operation)
             self.assertNotIn("--force", operation)
@@ -325,7 +324,8 @@ class DependencyPreparationTests(unittest.TestCase):
                 argv = list(argv)
                 argv[-2] = str(kernel)
             if (before_sync is not None and "submodule" in argv and
-                    "sync" in argv and "--recursive" not in argv):
+                    "sync" in argv and
+                    argv[argv.index("-C") + 1] == str(self.root)):
                 before_sync()
             return run(argv, **kwargs)
 

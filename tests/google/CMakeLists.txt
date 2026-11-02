@@ -36,6 +36,7 @@ function(nexus_google_test name)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32f4_official(${name})
     endif()
+    set_property(TARGET ${name} PROPERTY NEXUS_GOOGLE_CONTRACT TRUE)
     add_dependencies(nexus_google_contracts ${name})
     add_test(NAME ${name} COMMAND ${name})
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
@@ -657,4 +658,36 @@ if(TARGET Nexus::LwIP AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
         SOURCES network_tcp_pair_test.cpp
         LIBRARIES Nexus::LwIP)
     set_tests_properties(nexus_network_tcp_pair_test PROPERTIES TIMEOUT 30)
+endif()
+
+# The explicit entropy instance uses the real reviewed LL over a register model.
+nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES entropy_test.cpp
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/entropy.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/entropy_instance.c"
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/include")
+target_include_directories(nexus_entropy_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+nexus_use_cmsis_core(nexus_entropy_test)
+target_compile_definitions(nexus_entropy_test PRIVATE STM32F407xx
+    NEXUS_STM32_MODEL)
+target_compile_options(nexus_entropy_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/entropy_model.h")
+
+include(tls_client.cmake)
+
+nexus_add_coremqtt()
+nexus_google_test(nexus_mqtt_client_test
+    SOURCES mqtt_client_test.cpp LIBRARIES Nexus::CoreMQTTStorage)
+
+# Compile the opt-in broker client without running Docker in ordinary hooks.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(nexus_mqtt_tls_interop_client EXCLUDE_FROM_ALL
+        "${NEXUS_SOURCE_DIR}/tests/contracts/mqtt_tls_interop/client.c")
+    nexus_apply_target_policy(nexus_mqtt_tls_interop_client)
+    target_link_libraries(nexus_mqtt_tls_interop_client PRIVATE
+        Nexus::TLSStorage Nexus::CoreMQTTStorage
+        nexus_build_options nexus_owned_warnings)
+    add_dependencies(nexus_tls_client_test nexus_mqtt_tls_interop_client)
 endif()

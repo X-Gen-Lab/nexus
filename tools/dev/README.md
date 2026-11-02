@@ -100,6 +100,10 @@ python tools/dev/dev.py flash --target /station/development-target.json \
 python tools/dev/dev.py debug --target /station/development-target.json \
   --provenance build/board/quality/build-provenance.json \
   --timeout 600 --port 3333 --execute --output /station/runs/debug-001
+# Optional bounded batch attach; does not open an interactive terminal.
+python tools/dev/dev.py debug --target /station/development-target.json \
+  --provenance build/board/quality/build-provenance.json \
+  --client --timeout 60 --execute --output /station/runs/attach-001
 python tools/dev/dev.py monitor --target /station/development-target.json \
   --timeout 30 --execute --output /station/runs/monitor-001
 ```
@@ -143,7 +147,34 @@ Software identifiers cannot prove the physical PCB identity.
 
 Execution defaults to 300 seconds and accepts 1..3600. Debug starts a server on
 `127.0.0.1`, disables Telnet/Tcl ports and prints the GDB connection command;
-connect GDB from another terminal. Monitor is Linux-only, read-only 8N1, bounded
+connect GDB from another terminal. The optional Linux-only `--client` mode uses
+the official GDB/OpenOCD pipe transport in one owned process chain instead of a
+TCP listener. It rejects `--port`, so a foreign listening port cannot become its
+target. It starts GDB with `--nx`, disables automatic script loading before
+loading the exact provenance-bound ELF, attaches through the selected OpenOCD
+arguments, runs `info threads`, and detaches. `--timeout` bounds the entire
+batch, including the server. A timeout or cancellation withdraws the owned
+process tree before returning; failures retain raw receipts and station
+quarantine. GDB's pipe transport uses `/bin/sh`; Nexus quotes each server
+argument with `shlex.join`, uses shell `exec` and rejects line control characters.
+It does not interpolate arbitrary unquoted commands or start a separate proxy.
+
+To opt in, add `gdb_client` to the local equipment JSON. Its required `tool` is
+the reviewed GDB executable identity with `path`, `size` and `sha256`, using the
+same schema as `probe.tool`. Its optional `commands` is a reviewed GDB command
+file identity with those same fields. This file replaces `info threads`; Nexus
+still attaches first and detaches last. GDB command files are executable trusted
+operator input, and may themselves change target state; review their contents.
+The tool, command file, OpenOCD inputs, station lock and ELF are revalidated
+before and after execution. OpenOCD must support `gdb_port pipe`; its log is
+directed to the new operation directory's `openocd.log` to keep protocol stdout
+separate. No GDB executable is auto-discovered or downloaded. The default server
+workflow ignores an unselected `gdb_client` entry and retains its TCP behavior.
+Official pipe documentation and host software fixtures establish this workflow;
+they do not establish probe compatibility, physical connection or hardware
+qualification at a particular station.
+
+Monitor is Linux-only, read-only 8N1, bounded
 to 16 MiB, and uses a `/dev/serial/by-id/` name. Its equipment file supplies an
 explicit positive integer `baudrate`, such as 9600, 57600 or 115200. The selected
 rate must have a native host `termios.B<rate>` constant. Unknown or unavailable

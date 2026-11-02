@@ -10,7 +10,7 @@ source_language: en
 
 Use this guide before running repository commands in a tutorial, configuration
 reference or maintenance workflow. You will obtain a detached, exact Nexus source
-revision and its recursive dependencies. This requires Git, Python 3.11+ and
+revision and its reviewed dependency closure. This requires Git, Python 3.11+ and
 network access for the initial clone and dependency retrieval. It does not build,
 flash or establish software or hardware qualification.
 
@@ -53,8 +53,7 @@ cd nexus
 git remote add origin https://github.com/X-Gen-Lab/nexus.git
 git fetch --no-tags origin "$nexus_source_revision"
 git checkout --detach "$nexus_source_revision"
-git submodule sync --recursive
-git submodule update --init --recursive
+python tools/dev/dev.py prepare --scope native --allow-network
 git rev-parse HEAD
 git submodule status --recursive
 git status --short
@@ -65,6 +64,11 @@ full commit. Recursive submodule lines must have neither a leading `-` (missing)
 `+` (different revision) nor `U` (conflict), and `git status --short` must be empty
 before starting a clean-source workflow. Stop on an unavailable commit or failed
 dependency retrieval; never substitute `main`, `HEAD` or a latest dependency.
+The preparation command audits the source-owned catalogue and each parent
+Gitlink before initializing its explicitly selected paths. Firmware configuration
+does not retrieve dependencies. For historical revisions predating this command,
+use the matching immutable documentation rather than applying current commands
+to an older source tree.
 For a preview without a package manifest, record the full commit from its source
 banner or `documentation-build.json` and use that validated commit explicitly.
 

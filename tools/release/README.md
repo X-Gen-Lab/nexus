@@ -108,12 +108,12 @@ administrator changing it during an upload.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-requires 54 independent consumer roots and 57 executable images under
-policy-v12. This is a required plan; actual installed-consumer execution must be
+requires 56 independent consumer roots and 59 executable images under
+policy-v13. This is a required plan; actual installed-consumer execution must be
 assessed from its source-bound producer report and matching transport manifest.
 Plan counts do not establish software qualification or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v12`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v13`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -328,3 +328,21 @@ Physical HIL remains `not_executed` until equipment executes the relevant
 tests. Host tests, linked images and source provenance do not establish
 production qualification, safety certification, signed firmware or an LTS
 promise.
+
+Policy-v13 preserves all fifty-four v12 identities, appending two secure API
+profiles from the installed
+[secure scenarios](../../cmake/package/verification/secure_services/README.md).
+The Native Linux profile executes real host entropy acquisition, PSA/runtime
+initialization, one bounded TLS handshake WANT, MQTT initialization/deinit and
+bounded lwIP-pool lifecycle. It uses a public synthetic CA and a controlled
+fixture UTC; no client private key or identity is exported. The independent
+F407 profile links the explicit RNG, TLS, MQTT and bounded lwIP pool against the
+reviewed Qiming assembly with 512 KiB Flash, 112 KiB static RAM, 8 KiB main stack
+and zero libc heap budgets. It is not executed on hardware. Every C translation
+unit is checked for C11 and selected CPU/enum ABI; public-only API callers do not
+inherit supplier storage headers. Both profiles bind canonical source bytes,
+configuration, actual linked backend symbols and the unchanged installed prefix.
+These are required plan contracts, not an assertion that this checkout has
+passed them. Actual installed executions retain separate source-bound results.
+Authenticated TLS/mTLS and broker exchange remain the separate N09 host fixture;
+neither a bounded WANT nor an ARM ELF establishes those outcomes or physical HIL.

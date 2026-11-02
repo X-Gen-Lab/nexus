@@ -25,12 +25,14 @@ sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import (
         ALL_DEPENDENCIES, SOURCE_DEPENDENCIES, children, declared_modules,
-        dependency, relative_path,
+        dependency, relative_path, verify_alias_identities,
+        verify_gitlinks,
     )
     from tools.maintenance import (
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
         stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-        stm32g4_lock, threadx_lock, freertos_transport, lwip_lock,
+        stm32g4_lock, threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
+        coremqtt_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -59,6 +61,36 @@ CMSIS_CORE_REQUIRED_HEADERS = (
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
+    'cmake/package/verification/secure_services/f407/application.c',
+    'cmake/package/verification/secure_services/f407/application.h',
+    'cmake/package/verification/secure_services/f407/assembly.toml',
+    'cmake/package/verification/secure_services/f407/composition.c',
+    'cmake/package/verification/secure_services/native/application.c',
+    'cmake/package/verification/secure_services/native/application.h',
+    'cmake/package/verification/secure_services/native/assembly.toml',
+    'cmake/package/verification/secure_services/native/composition.c',
+    'cmake/package/verification/secure_services/public_ca.h',
+    'components/network/include/nexus/network/byte_stream.h',
+    'components/tls/CMakeLists.txt',
+    'components/tls/README.md',
+    'components/tls/include/nexus/tls/tls.h',
+    'components/tls/include/nexus/tls/storage.h',
+    'components/tls/src/tls.c',
+    'components/tls/profile/tls-user.h',
+    'components/tls/profile/crypto-user.h',
+    'components/mqtt/CMakeLists.txt',
+    'components/mqtt/README.md',
+    'components/mqtt/include/nexus/mqtt/client.h',
+    'components/mqtt/include/nexus/mqtt/core_mqtt_storage.h',
+    'components/mqtt/port/core_mqtt_config.h',
+    'components/mqtt/src/client.c',
+    'io/include/nexus/io/entropy.h',
+    'io/src/api/entropy.c',
+    'soc/stm32/stm32f407/Entropy.cmake',
+    'soc/stm32/stm32f407/entropy_instance.c',
+    'soc/stm32/stm32f407/drivers/entropy.c',
+    'soc/stm32/stm32f407/include/nexus/soc/stm32f407_entropy.h',
+    'soc/stm32/stm32f407/private/stm32f407_entropy.h',
     'cmake/package/verification/common_services/native.toml',
     'cmake/package/verification/common_services/f407.toml',
     'cmake/package/verification/common_services/gd470.toml',
@@ -272,6 +304,18 @@ _threadx_lock = parse_json((SOURCE_ROOT / "dependencies/threadx.lock.json").read
 threadx_lock.contract(_threadx_lock)
 REQUIRED_FILES += tuple("ext/threadx/" + name for name in _threadx_lock["files"])
 REQUIRED_FILES += ("ext/threadx/" + _threadx_lock["license"]["path"],)
+_tls_lock = mbedtls_lock.load_lock(SOURCE_ROOT / mbedtls_lock.LOCK_NAME)
+REQUIRED_FILES += (mbedtls_lock.LOCK_NAME,
+                   "tools/maintenance/mbedtls_lock.py")
+REQUIRED_FILES += tuple(item.path + "/" + name
+                        for item in mbedtls_lock.mounts()
+                        for name in mbedtls_lock.record(
+                            _tls_lock, item.identifier)["files"])
+_mqtt_lock = parse_json((SOURCE_ROOT / "dependencies/coremqtt.lock.json").read_bytes())
+coremqtt_lock.contract(_mqtt_lock)
+REQUIRED_FILES += ("dependencies/coremqtt.lock.json",
+                   "tools/maintenance/coremqtt_lock.py")
+REQUIRED_FILES += tuple("ext/coremqtt/" + name for name in _mqtt_lock["files"])
 REQUIRED_FILES += ("dependencies/stm32g4.lock.json",
                    )
 _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_bytes())
@@ -608,6 +652,18 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("lwIP committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
+    elif dependency == "ext/coremqtt":
+        raw, _ = snapshot(root / "dependencies/coremqtt.lock.json")
+        names = set(coremqtt_lock.contract(parse_json(raw))["files"])
+        if not names.issubset(entries):
+            raise SDKError("coreMQTT committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
+    elif dependency in {item.path for item in mbedtls_lock.mounts()}:
+        lock = mbedtls_lock.load_lock(root / mbedtls_lock.LOCK_NAME)
+        names = set(mbedtls_lock.record(lock, dependency)["files"])
+        if not names.issubset(entries):
+            raise SDKError("TLS committed static source closure is incomplete")
+        entries = {name: entries[name] for name in names}
     elif dependency == "vendors/st/cmsis_device_g4":
         raw, _ = snapshot(root / "dependencies/stm32g4.lock.json")
         names = stm32g4_lock.contract(parse_json(raw))
@@ -703,14 +759,21 @@ def dependency_declarations(root, item, entries=None):
             raise SDKError("Invalid recursive dependency declaration: " +
                            item.path) from error
     if entries is not None:
-        links = {name for name, row in entries.items()
+        links = {name: row[2] for name, row in entries.items()
                  if row[1] == "commit"}
-        if links != {relative_path(child) for child in descendants}:
-            raise SDKError("Unregistered or missing recursive dependency Gitlink")
+        try:
+            verify_gitlinks(links, item.path)
+        except ValueError as error:
+            raise SDKError("Unregistered or changed recursive dependency Gitlink") from error
 
 
 def dependency_records(root, entries):
     declared_modules(regular(root, ".gitmodules").read_bytes())
+    try:
+        verify_gitlinks({name: row[2] for name, row in entries.items()
+                         if row[1] == "commit"}, None)
+    except ValueError as error:
+        raise SDKError("Unregistered or missing top-level dependency Gitlink") from error
     closure = runtime_dependency_closure()
     records = []
     parent_entries = {None: entries}
@@ -741,6 +804,10 @@ def dependency_records(root, entries):
         records.append({"path": path, "commit": actual,
                         "tree": git(checkout, "rev-parse", "HEAD^{tree}")
                         .decode().strip()})
+    try:
+        verify_alias_identities(records)
+    except ValueError as error:
+        raise SDKError("Dependency alias pin/tree differs from canonical mount") from error
     return records
 
 
@@ -828,6 +895,10 @@ def prepare(source, output, development_fixture=False):
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     lwip_lock.verify(source / "ext/lwip",
                      source / "dependencies/lwip.lock.json")
+    mbedtls_lock.verify(source / "ext/mbedtls",
+                        source / mbedtls_lock.LOCK_NAME)
+    coremqtt_lock.verify(source / "ext/coremqtt",
+                          source / "dependencies/coremqtt.lock.json")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
     for official in OFFICIAL_DRIVERS:
@@ -975,6 +1046,10 @@ def verify(root):
     closure = runtime_dependency_closure()
     if paths != set(closure):
         raise SDKError("Source SDK dependency set differs from the reviewed catalogue")
+    try:
+        verify_alias_identities(records)
+    except ValueError as error:
+        raise SDKError("Dependency alias pin/tree differs from canonical mount") from error
     declared_modules(regular(root, ".gitmodules").read_bytes())
     for item in closure.values():
         dependency_declarations(root, item)
@@ -993,6 +1068,13 @@ def verify(root):
         raise SDKError("Source SDK lwIP Git identity differs from reviewed source")
     lwip_lock.verify(root / "ext/lwip", root / "dependencies/lwip.lock.json",
                      source_sdk=True)
+    mbedtls_lock.verify(root / "ext/mbedtls", root / mbedtls_lock.LOCK_NAME,
+                        source_sdk=True, dependency_records=records)
+    mqtt = next(record for record in records if record["path"] == "ext/coremqtt")
+    if mqtt["commit"] != coremqtt_lock.COMMIT or mqtt["tree"] != coremqtt_lock.TREE:
+        raise SDKError("Source SDK coreMQTT identity differs from reviewed source")
+    coremqtt_lock.verify(root / "ext/coremqtt",
+                          root / "dependencies/coremqtt.lock.json", source_sdk=True)
     g4 = next(record for record in records
               if record["path"] == "vendors/st/cmsis_device_g4")
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",

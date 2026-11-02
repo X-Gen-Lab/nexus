@@ -55,6 +55,6 @@ _external_types = (
     'TX_THREAD TX_SEMAPHORE UINT nx_clock_domain nx_user_io_broker nx_user_io_call '
     'nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint '
     'nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port '
-    'nx_watchdog_port'
+    'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory'
 ).split()
 nitpick_ignore = [('c:identifier', name) for name in _external_types]

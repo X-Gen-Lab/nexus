@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 3c361aa346146d0167f0ff8b42434be395b20e5ff93e94e57e5bf10b0f04d537\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 8523b2776873bb3965319c4b02ec99bbc6faa31559f7205000f87132e95e4964\nX-Nexus-Reviewed: true\n"
 
 msgid "Optional common components"
 msgstr "可选通用组件"
@@ -1421,3 +1421,521 @@ msgstr "调用者拥有的 Settings 元数据与有界暂存镜像。"
 
 msgid "Task-only; serialize all operations and the underlying storage. No heap, workers or global key registry. Keys are product-assigned uint32 identifiers; values are byte strings, including empty strings. The format is little-endian, not authenticated. Products own defaults, schema migration, authorization, durability frequency and Flash reservations. Only commit writes storage; close discards staged changes."
 msgstr "仅任务上下文；全部操作及底层存储须串行化。无 heap、worker 或全局 key 注册表。Key 为产品分配的 uint32 标识，值为字节串，允许空串。格式为 little-endian，不提供认证。产品拥有默认值、schema 迁移、授权、持久化频率和 Flash 预留。只有 commit 写存储；close 丢弃暂存变更。"
+
+msgid "Byte transport, TLS and MQTT composition"
+msgstr "字节传输、TLS 与 MQTT 装配"
+
+msgid ""
+"`byte_stream.h` defines immediate partial reads and copied writes with "
+"finite absolute deadlines. SUCCESS reports local byte acceptance, not "
+"peer delivery; BUSY with zero bytes requires explicit owner progress. No "
+"caller buffer remains borrowed after a stream operation returns. The "
+"product supplies the transport, executor and its shutdown policy; these "
+"declarations do not imply a maintained TCP stream adapter."
+msgstr ""
+"`byte_stream.h` 定义使用有限绝对截止时间的即时部分读取与复制写入。SUCCESS 表示本地接受字节，不表示对端收到；零字节 "
+"BUSY 要求所有者显式推进。流操作返回后不再借用调用方缓冲区。产品提供传输层、执行器和关闭策略；这些声明不表示已有维护的 TCP 流适配器。"
+
+msgid ""
+"Ordinary consumers include `tls.h` or `client.h` and link `Nexus::TLS` or"
+" `Nexus::CoreMQTT`. Their public session types are opaque and expose no "
+"supplier headers or profile macros. Only the static composition "
+"translation unit selects `Nexus::TLSStorage` with `nexus/tls/storage.h`, "
+"or `Nexus::CoreMQTTStorage` with `nexus/mqtt/core_mqtt_storage.h`, to "
+"allocate the exact pinned backend layout. Keep these explicit storage "
+"targets local to composition; they are not binary ABI promises. Products "
+"explicitly call `nexus_add_tls()` or `nexus_add_coremqtt()` to create the"
+" selected targets."
+msgstr ""
+"普通使用方包含 `tls.h` 或 `client.h`，链接 `Nexus::TLS` 或 "
+"`Nexus::CoreMQTT`。公共会话类型不透明，不暴露厂商头文件或配置宏。仅静态装配翻译单元选择 `Nexus::TLSStorage` "
+"并包含 `nexus/tls/storage.h`，或选择 `Nexus::CoreMQTTStorage` 并包含 "
+"`nexus/mqtt/core_mqtt_storage.h`，以分配准确锁定的后端布局。这些显式存储目标应仅用于装配，不承诺二进制 "
+"ABI。产品显式调用 `nexus_add_tls()` 或 `nexus_add_coremqtt()` 创建所选目标。"
+
+msgid ""
+"The TLS profile is one serialized TLS 1.2 client/PSA domain using ECDHE-"
+"ECDSA P-256 and AES-128-GCM/SHA-256. It requires explicit DER trust, "
+"trusted UTC and a reviewed entropy-quality assertion. Its 64 KiB caller "
+"arena and 512 B TX stage exclude session metadata, transport memory and "
+"stack. Join facade users, abort the session, then stop the runtime; "
+"failed or BUSY cleanup retains its resources. The MQTT 3.1.1 profile "
+"provides clean sessions and QoS0/1; callbacks borrow incoming views only "
+"until return. Explicit DISCONNECT and TLS close report local progress and"
+" do not replace lower-layer drain or peer acknowledgement. The component "
+"contracts detail [TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/tls/README.md) and "
+"[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/mqtt/README.md) ownership and fixed profile limits."
+msgstr ""
+"TLS 配置限定为一个串行化 TLS 1.2 客户端/PSA 域，使用 ECDHE-ECDSA P-256 与 "
+"AES-128-GCM/SHA-256。它要求显式 DER 信任材料、可信 UTC 以及经过审查的熵质量声明。调用方的 64 KiB arena "
+"和 512 B TX 暂存区不包含会话元数据、传输内存和栈。先等待接口使用方退出，再中止会话，最后停止运行时；失败或 BUSY "
+"的清理仍保留资源。MQTT 3.1.1 配置提供 clean session 与 QoS0/1；回调对接收视图的借用仅持续到返回。显式 "
+"DISCONNECT 和 TLS close 报告本地进度，不能替代下层排空或对端确认。所有权及固定配置限制详见 "
+"[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/tls/README.md) 与 [MQTT](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mqtt/README.md) "
+"组件合同。"
+
+msgid ""
+"Real TLS/MQTT broker interoperability in this increment uses host POSIX "
+"sockets. It does not establish MCU networking, physical entropy quality "
+"or HIL execution."
+msgstr "本增量的真实 TLS/MQTT broker 联测使用主机 POSIX socket。它不证明 MCU 联网、物理熵质量或 HIL 已执行。"
+
+msgid "byte_stream.h"
+msgstr "byte_stream.h"
+
+msgid "Immediate partial byte transport without retained buffers."
+msgstr "不保留缓冲区的即时部分字节传输。"
+
+msgid "Immutable methods for a serialized nonblocking byte stream."
+msgstr "用于串行化非阻塞字节流的只读方法。"
+
+msgid ""
+"Every call has a finite absolute monotonic deadline in the transport's "
+"explicit clock domain. Calls do not wait, create workers or retain "
+"input/output buffers after return. An accepted write copies bytes into "
+"the transport's own bounded storage; it does not promise peer delivery. "
+"SUCCESS writes 1..requested bytes for a nonempty write, or reads "
+"1..requested bytes. SUCCESS with read count zero means orderly EOF. BUSY "
+"has count zero and means retry after explicit owner progress. Other "
+"results are errors, never alternate encodings of would-block. Zero-byte "
+"calls return SUCCESS/count zero without underlying I/O. Output count is "
+"disjoint from all buffers and live transport storage. Transport, table "
+"and context outlive every consumer and its shutdown."
+msgstr ""
+"每次调用均使用传输层明确时间域内的有限绝对单调截止时间。调用不等待、不创建工作线程，也不在返回后保留输入/输出缓冲区。已接受的写入将字节复制到传输层自己的有界存储中；不承诺对端收到。非空写入"
+" SUCCESS 时接受 1..requested 字节；读取 SUCCESS 时取得 1..requested 字节。读取计数为零的 "
+"SUCCESS 表示正常 EOF。BUSY 的计数为零，表示所有者显式推进后重试。其他结果均为错误，不能用来变相表示 would-"
+"block。零字节调用返回 SUCCESS/计数零，不执行下层 "
+"I/O。输出计数与全部缓冲区及有效传输存储互不重叠。传输层、方法表和上下文必须存活至全部使用方及其关闭操作结束。"
+
+msgid "Stable readonly face; no factory lookup, allocation or start."
+msgstr "稳定只读接口；不查 factory、不分配或启动。"
+
+msgid "tls.h"
+msgstr "tls.h"
+
+msgid "Explicit bounded TLS 1.2 client and crypto-domain lifecycle."
+msgstr "显式有界 TLS 1.2 客户端与密码域生命周期。"
+
+msgid "Source-quality declaration, never inferred from a health check."
+msgstr "源质量声明，绝不从健康检查推断。"
+
+msgid "Initialize one explicit PSA/arena domain, never once per connection."
+msgstr "初始化一个显式 PSA/arena 域，而非每次连接都初始化。"
+
+msgid ""
+"No worker/heap/lock. A second live domain is BUSY. Every library entropy "
+"callback is guarded by the shorter operation/entropy deadline."
+msgstr "无工作线程、堆或锁。第二个有效域返回 BUSY。每次库熵回调均受操作截止时间与熵截止时间中较早者约束。"
+
+msgid "[inout] Zeroed static backend storage."
+msgstr "[inout] 已清零的静态后端存储。"
+
+msgid "[in] Configuration copied; referenced resources stay borrowed."
+msgstr "[in] 复制配置；被引用资源继续借用。"
+
+msgid "[in] Finite absolute initialization deadline."
+msgstr "[in] 有限绝对初始化截止时间。"
+
+msgid "Success, permission for undeclared quality, or actual bounded error."
+msgstr "成功；未声明质量时返回权限错误；或实际有界操作错误。"
+
+msgid "Stop PSA only after all sessions and outside consumers have joined."
+msgstr "仅在全部会话和外部使用方退出后停止 PSA。"
+
+msgid ""
+"No session cleanup calls this operation implicitly. Product code must not"
+" use PSA outside this explicit domain or reset its global allocator."
+msgstr "会话清理不会隐式调用此操作。产品代码不得在此显式域外使用 PSA 或重置其全局分配器。"
+
+msgid "[inout] Exclusive live domain owner."
+msgstr "[inout] 有效域的独占所有者。"
+
+msgid "BUSY with a session; success frees PSA then wipes the whole arena."
+msgstr "仍有会话时返回 BUSY；成功时先释放 PSA，再擦除整个 arena。"
+
+msgid "Prepare one client using public Mbed TLS APIs and required peer auth."
+msgstr "使用公共 Mbed TLS API 和强制对端认证准备一个客户端。"
+
+msgid ""
+"No raw credential input is retained after return. Port and staging stay "
+"borrowed until abort; failures clean partial backend state."
+msgstr "返回后不保留原始凭据输入。端口和暂存区继续借用到 abort；失败时清理部分后端状态。"
+
+msgid "[in] Explicit trust, hostname, optional client identity/port."
+msgstr "[in] 显式信任、主机名和可选客户端身份/端口。"
+
+msgid "[in] Finite initialization deadline, including key import."
+msgstr "[in] 包括密钥导入的有限初始化截止时间。"
+
+msgid "Success, BUSY for the occupied domain, or no-admission failure."
+msgstr "成功；域已占用时为 BUSY；或未准入的失败。"
+
+msgid "Perform one public handshake step under the first locked deadline."
+msgstr "在首次锁定的截止时间内执行一次公共握手步骤。"
+
+msgid ""
+"First step publicly reseeds PSA with a finite guard. Trusted UTC is "
+"sampled coherently; loss during a library date check is latched and "
+"overrides a successful library result. Renegotiation is disabled."
+msgstr ""
+"首个步骤通过公共 API 在有限约束下重新播种 PSA。对可信 UTC "
+"取一致快照；库日期检查期间失去可信时间会被锁存，并覆盖库的成功结果。禁用重新协商。"
+
+msgid "[inout] Initialized exclusive client."
+msgstr "[inout] 已初始化的独占客户端。"
+
+msgid "[in] Finite deadline; later calls cannot extend the first."
+msgstr "[in] 有限截止时间；后续调用不能延长首次截止时间。"
+
+msgid "Success only after verified auth; BUSY for progress/WANT; fatal error."
+msgstr "仅认证验证成功后返回成功；推进/WANT 时返回 BUSY；或致命错误。"
+
+msgid "Progress the one accepted plaintext staging block without waiting."
+msgstr "推进唯一已接受的明文暂存块，不等待。"
+
+msgid ""
+"WANT retries keep the backend's exact original pointer/length. An expired"
+" queued write fails the session; only abort releases its stage."
+msgstr "WANT 重试保留后端原始指针和长度。排队写入过期会使会话失败；仅 abort 释放其暂存区。"
+
+msgid "[inout] Live serialized owner."
+msgstr "[inout] 有效的串行化所有者。"
+
+msgid "Success when no pending bytes; BUSY for WANT; sticky fatal error."
+msgstr "无待发字节时成功；WANT 时 BUSY；或锁存的致命错误。"
+
+msgid "Copy an immediate partial write into the explicit bounded stage."
+msgstr "将即时部分写入复制到显式有界暂存区。"
+
+msgid ""
+"Original input may be reused immediately. Pending stage is never "
+"overwritten, replayed or discarded on timeout. Late failures are sticky. "
+"An invalid aliased count is rejected before writing that count."
+msgstr "原始输入可立即复用。待发暂存区不会被覆盖、重放或在超时后丢弃。后续失败会锁存。无效别名计数在写该计数之前被拒绝。"
+
+msgid "[inout] Established serialized client."
+msgstr "[inout] 已建立连接的串行化客户端。"
+
+msgid "[in] Immutable input, not retained after return."
+msgstr "[in] 只读输入，返回后不保留。"
+
+msgid "[in] Requested bytes; zero performs no I/O."
+msgstr "[in] 请求字节数；零不执行 I/O。"
+
+msgid "[out] Disjoint copied count; zero on BUSY/error."
+msgstr "[out] 互不重叠的复制计数；BUSY/错误时为零。"
+
+msgid "[in] Finite absolute deadline retained for accepted bytes."
+msgstr "[in] 为已接受字节保留的有限绝对截止时间。"
+
+msgid "Success means copied admission, not peer delivery; BUSY or error."
+msgstr "成功表示复制准入，不表示对端收到；或 BUSY/错误。"
+
+msgid "Try to copy authenticated plaintext without retaining caller output."
+msgstr "尝试复制已认证明文，不保留调用方输出。"
+
+msgid ""
+"Raw transport EOF without close-notify is a sticky truncation error. An "
+"expired preflight retains session state and creates no new borrow. An "
+"invalid aliased count is rejected before writing that count. A pending "
+"stage with a later effective deadline returns BUSY without automatic I/O;"
+" the owner explicitly services that earlier acceptance."
+msgstr ""
+"未收到 close-notify 的底层传输 EOF "
+"是锁存的截断错误。准入前已过期时保留会话状态，不建立新借用。无效别名计数在写该计数之前被拒绝。待发暂存区的有效截止时间较晚时返回 "
+"BUSY，不自动执行 I/O；所有者显式推进先前已接受的写入。"
+
+msgid "[out] Unretained output disjoint from all live session storage."
+msgstr "[out] 不保留的输出，与全部有效会话存储互不重叠。"
+
+msgid "[in] Writable capacity; zero performs no I/O."
+msgstr "[in] 可写容量；零不执行 I/O。"
+
+msgid "[out] Disjoint count; zero on BUSY/error or auth EOF."
+msgstr "[out] 互不重叠的计数；BUSY/错误或认证 EOF 时为零。"
+
+msgid "[in] Finite absolute deadline for this nonblocking attempt."
+msgstr "[in] 本次非阻塞尝试的有限绝对截止时间。"
+
+msgid "Success/bytes, BUSY, authenticated close-notify EOF, or error."
+msgstr "成功/字节数、BUSY、已认证 close-notify EOF 或错误。"
+
+msgid "Send close-notify with an explicit first locked deadline."
+msgstr "使用首次显式锁定的截止时间发送 close-notify。"
+
+msgid ""
+"Pending app bytes must first drain. This never closes the underlying "
+"transport or proves the peer consumed data. Abort still frees storage."
+msgstr "必须先排空待发应用字节。此操作不关闭下层传输，也不证明对端已消费数据。仍需 abort 释放存储。"
+
+msgid "[inout] Exclusive live client after producers have joined."
+msgstr "[inout] 生产者全部退出后的独占有效客户端。"
+
+msgid "[in] Finite absolute deadline; no implicit extension."
+msgstr "[in] 有限绝对截止时间；不隐式延长。"
+
+msgid "Success means local alert accepted, BUSY for WANT, or sticky error."
+msgstr "成功表示本地警报已接受；WANT 时为 BUSY；或锁存错误。"
+
+msgid "Free synchronous session state and wipe its stage after final access."
+msgstr "最终访问结束后释放同步会话状态并擦除其暂存区。"
+
+msgid ""
+"BUSY retains all storage; the outer owner retries after callback join. No"
+" network I/O or replay. Underlying transport closure remains external. "
+"The pinned builtin synchronous crypto profile retains no callback after "
+"return. PSA domain/arena stays live for the next explicit session."
+msgstr ""
+"BUSY 保留全部存储；外层所有者在回调退出后重试。不执行网络 I/O "
+"或重放。下层传输关闭仍由外部负责。锁定的内置同步密码配置不在返回后保留回调。PSA 域/arena 保持有效，供下一个显式会话使用。"
+
+msgid "[inout] Exclusive owner, all external facade users joined."
+msgstr "[inout] 独占所有者，全部外部接口使用方已退出。"
+
+msgid "Success after cleanup (also cold), BUSY if crypto/BIO is executing."
+msgstr "清理完成后成功（冷态也成功）；密码/BIO 正在执行时为 BUSY。"
+
+msgid "Return an existing no-borrow byte face; no start or allocation."
+msgstr "返回已有、不建立借用的字节接口；不启动或分配。"
+
+msgid "Copy current owner diagnosis to unretained disjoint output."
+msgstr "将当前所有者诊断复制到不保留、互不重叠的输出。"
+
+msgid "Explicit trusted UTC, separate from monotonic operation deadlines."
+msgstr "显式可信 UTC，与单调操作截止时间分离。"
+
+msgid ""
+"SUCCESS means trusted Unix seconds. Unknown/untrusted/unavailable time "
+"returns an error. Calendar years are 1970..9999 within the selected "
+"time_t representation. The product owns authentication and clock policy."
+msgstr ""
+"SUCCESS 表示可信 Unix 秒数。未知、不可信或不可用时间返回错误。日历年份必须处于所选 time_t 表示范围内的 "
+"1970..9999。产品负责认证和时钟策略。"
+
+msgid "One serialized crypto owner, caller arena and finite entropy source."
+msgstr "一个串行化密码所有者、调用方 arena 与有限熵源。"
+
+msgid ""
+"Arena is max_align_t-aligned and exactly NX_TLS_ARENA_BYTES. All faces "
+"and opaque contexts outlive every session. FULL_SOURCE explicitly "
+"declares 8 bits/byte to the selected PSA entropy-driver API; software "
+"health checks and this enum do not establish physical qualification. The "
+"profile disables operating-system entropy and seed fallbacks. Clock "
+"advances in one unchanged monotonic domain throughout callbacks."
+msgstr ""
+"arena 按 max_align_t 对齐，大小恰为 "
+"NX_TLS_ARENA_BYTES。全部接口和不透明上下文必须存活至每个会话结束。FULL_SOURCE 向选定的 PSA 熵驱动 API "
+"显式声明 8 bits/byte；软件健康检查和此枚举不能建立物理资格。配置禁用操作系统熵与种子回退。时钟必须在回调期间持续推进并保持单一时间域。"
+
+msgid "Client credentials copied by the backend during initialization."
+msgstr "初始化期间由后端复制的客户端凭据。"
+
+msgid ""
+"DER only, no implicit files, key discovery or default trust. hostname has"
+" hostname_length non-NUL bytes followed by NUL, length 1..253. Mutual-"
+"authentication certificate and key are both supplied or absent. TX "
+"staging is exactly 512 caller-owned bytes, disjoint from runtime, "
+"session, arena and transport state. It stays borrowed until abort. The "
+"single serialized executor owns all session and PSA calls."
+msgstr ""
+"仅 DER；不隐式加载文件、发现密钥或提供默认信任。hostname 包含 hostname_length 个非 NUL 字节，后接 "
+"NUL，长度为 1..253。双向认证证书和密钥必须同时提供或同时缺省。TX 暂存区恰为调用方的 512 字节，与运行时、会话、arena "
+"和传输状态互不重叠。它继续借用到 abort。单一串行化执行器负责全部会话和 PSA 调用。"
+
+msgid "Read-only diagnosis; no snapshot grants permission to operate."
+msgstr "只读诊断；快照不授予操作许可。"
+
+msgid "client.h"
+msgstr "client.h"
+
+msgid "Bounded synchronous MQTT 3.1.1 client over explicit streams."
+msgstr "基于显式流的有界同步 MQTT 3.1.1 客户端。"
+
+msgid "Product clock shared by all clients and their transports."
+msgstr "全部客户端及其传输层共用的产品时钟。"
+
+msgid ""
+"Required context-free hook matches upstream's timer API. Never silently "
+"change epoch/domain. UINT64_MAX is invalid. No active-instance global "
+"registry is used by this adapter."
+msgstr "必需的无上下文钩子与上游计时器 API 一致。绝不得静默更换纪元或时间域。UINT64_MAX 无效。此适配器不使用活动实例全局注册表。"
+
+msgid "Absolute monotonic microseconds in one stable boot/domain"
+msgstr "同一稳定启动纪元/时间域内的绝对单调微秒数"
+
+msgid "Nonreturning product invariant-failure hook."
+msgstr "不返回的产品不变量失败钩子。"
+
+msgid "Must not reclaim DMA or transport storage on an assertion."
+msgstr "不得因断言而回收 DMA 或传输存储。"
+
+msgid "[in] Static source location"
+msgstr "[in] 静态源码位置"
+
+msgid "[in] Source line"
+msgstr "[in] 源码行号"
+
+msgid "Initialize exact caller storage without opening transport."
+msgstr "初始化调用方的准确存储，不打开传输。"
+
+msgid ""
+"Task-only, no I/O/heap. All storage and port contexts remain valid and "
+"exclusively owned through successful deinit."
+msgstr "仅限任务上下文，无 I/O 或堆。全部存储与端口上下文必须保持有效、独占，直到 deinit 成功。"
+
+msgid "[inout] Zero-initialized or deinited metadata"
+msgstr "[inout] 已清零或已 deinit 的元数据"
+
+msgid "[in] Valid stable ports; values copied, contexts borrowed"
+msgstr "[in] 有效稳定端口；复制数值，借用上下文"
+
+msgid "[inout] Disjoint network, QoS and control storage"
+msgstr "[inout] 互不重叠的网络、QoS 与控制存储"
+
+msgid "SUCCESS, INVALID, STATE, OVERFLOW or EXHAUSTED"
+msgstr "SUCCESS、INVALID、STATE、OVERFLOW 或 EXHAUSTED"
+
+msgid "Send clean-session CONNECT and await CONNACK synchronously."
+msgstr "同步发送 clean-session CONNECT 并等待 CONNACK。"
+
+msgid ""
+"Does not connect TCP/TLS. The product provides transport and "
+"authentication policy. Failed CONNECT is not replayed."
+msgstr "不连接 TCP/TLS。产品提供传输与认证策略。失败 CONNECT 不会被重放。"
+
+msgid "[inout] Initialized inactive client on a fresh open stream"
+msgstr "[inout] 使用全新已打开流、已初始化但未活动的客户端"
+
+msgid "[in] Legal MQTT UTF-8 fields, borrowed for this call"
+msgstr "[in] 合法 MQTT UTF-8 字段，仅本次调用借用"
+
+msgid "[in] Finite absolute deadline and nonzero I/O budget"
+msgstr "[in] 有限绝对截止时间及非零 I/O 预算"
+
+msgid "SUCCESS, admission error or sticky session/transport failure"
+msgstr "SUCCESS、准入错误或锁存的会话/传输失败"
+
+msgid "Publish QoS0/1 with call-scoped topic and payload loans."
+msgstr "使用调用期主题与负载借用发布 QoS0/1。"
+
+msgid ""
+"QoS1 records remain borrowed through deinit. PUBACK signals confirmation;"
+" the application owns message retry/data retention. No persistent-session"
+" replay or QoS2 is provided."
+msgstr "QoS1 记录继续借用到 deinit。PUBACK 表示确认；应用负责消息重试和数据保留。不提供持久会话重放或 QoS2。"
+
+msgid "[inout] Connected serialized client"
+msgstr "[inout] 已连接的串行化客户端"
+
+msgid "[in] Valid UTF-8 topic and byte payload; no aliases"
+msgstr "[in] 合法 UTF-8 主题与字节负载；不得别名重叠"
+
+msgid "[out] Written on success only; zero for QoS0"
+msgstr "[out] 仅成功时写入；QoS0 为零"
+
+msgid "[in] Finite deadline and nonzero I/O budget"
+msgstr "[in] 有限截止时间及非零 I/O 预算"
+
+msgid "SUCCESS for local stream admission, never broker delivery"
+msgstr "本地流准入返回 SUCCESS，绝不代表 broker 已收到"
+
+msgid "Send one bounded subscription request."
+msgstr "发送一个有界订阅请求。"
+
+msgid "[inout] Connected client with a free caller control slot"
+msgstr "[inout] 已连接且有空闲调用方控制槽的客户端"
+
+msgid "[in] Call-scoped valid MQTT UTF-8 filter"
+msgstr "[in] 调用期合法 MQTT UTF-8 过滤器"
+
+msgid "[in] Nonzero bytes, at most UINT16_MAX"
+msgstr "[in] 非零字节数，至多 UINT16_MAX"
+
+msgid "[in] Requested maximum zero or one"
+msgstr "[in] 请求的最大 QoS 为零或一"
+
+msgid "[out] Written on successful send only"
+msgstr "[out] 仅发送成功时写入"
+
+msgid "[in] Explicit deadline and I/O budget"
+msgstr "[in] 显式截止时间与 I/O 预算"
+
+msgid "SUCCESS means sent; SUBACK event reports grant/refusal"
+msgstr "SUCCESS 表示已发送；SUBACK 事件报告授权或拒绝"
+
+msgid "Send one bounded unsubscribe request."
+msgstr "发送一个有界取消订阅请求。"
+
+msgid "SUCCESS means sent; UNSUBACK is observed during process"
+msgstr "SUCCESS 表示已发送；在 process 期间观察 UNSUBACK"
+
+msgid "Caller-driven receive, acknowledgments and keepalive step."
+msgstr "调用方推进的接收、确认与保活步骤。"
+
+msgid ""
+"Callback views expire on return; copy needed data there. No implicit "
+"timer/task registration or automatic replay."
+msgstr "回调视图在返回时失效；需要的数据须在回调内复制。无隐式计时器/任务注册或自动重放。"
+
+msgid "SUCCESS, BUSY for incomplete data, or sticky failure"
+msgstr "SUCCESS、数据不完整时的 BUSY 或锁存失败"
+
+msgid "Send MQTT DISCONNECT without closing the transport."
+msgstr "发送 MQTT DISCONNECT，不关闭传输。"
+
+msgid "SUCCESS means local admission, not TCP/TLS drain"
+msgstr "SUCCESS 表示本地准入，不表示 TCP/TLS 已排空"
+
+msgid "End local borrows after all synchronous calls return."
+msgstr "全部同步调用返回后结束本地借用。"
+
+msgid ""
+"No I/O. The product separately drains/closes TCP/TLS before another MQTT "
+"session; deinit cannot retract accepted bytes."
+msgstr "无 I/O。产品在下一 MQTT 会话之前另行排空/关闭 TCP/TLS；deinit 不能撤回已接受的字节。"
+
+msgid "[inout] Inactive initialized client, including failed client"
+msgstr "[inout] 未活动的已初始化客户端，包括失败客户端"
+
+msgid "SUCCESS, BUSY for reentry or INVALID"
+msgstr "SUCCESS、重入时的 BUSY 或 INVALID"
+
+msgid "Inspect sticky failure in the same serialized task context."
+msgstr "在同一串行任务上下文检查锁存失败。"
+
+msgid "[in] Initialized instance"
+msgstr "[in] 已初始化实例"
+
+msgid "First failure, SUCCESS, or STATE for an inactive instance"
+msgstr "首次失败、SUCCESS 或未活动实例的 STATE"
+
+msgid "Callback-scoped facts; all pointers expire with callback return."
+msgstr "回调期事实；全部指针随回调返回失效。"
+
+msgid "Explicit finite operation deadline and transport-call allocation."
+msgstr "显式有限操作截止时间及传输调用预算。"
+
+msgid "Caller-owned ports retained until deinit."
+msgstr "借用至 deinit 的调用方端口。"
+
+msgid ""
+"All calls/callbacks use one serialized task context. Event and optional "
+"idle callbacks must be bounded and may not reenter this client. Idle may "
+"service/wait on lower layers; no worker, lock, scheduler or implicit "
+"reconnect is created. Idle SUCCESS/BUSY permit retry; other results fail "
+"the session. Event views are not NUL-terminated strings."
+msgstr ""
+"全部调用和回调使用单一串行任务上下文。事件回调与可选 idle 回调必须有界，不得重入此客户端。idle "
+"可在下层推进或等待；不创建工作线程、锁、调度器或隐式重连。idle 返回 SUCCESS/BUSY 允许重试；其他结果使会话失败。事件视图不是 "
+"NUL 结尾字符串。"
+
+msgid "Transient CONNECT parameters; this profile always uses clean session."
+msgstr "临时 CONNECT 参数；此配置始终使用 clean session。"
+
+msgid "Transient publish; QoS1 confirmation is a later PUBACK event."
+msgstr "临时发布；QoS1 确认由后续 PUBACK 事件报告。"

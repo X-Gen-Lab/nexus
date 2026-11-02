@@ -114,9 +114,10 @@ def _gitlinks(path: Path, parent: str | None, *, upstream: bool = False):
                 if kind != "commit":
                     raise EvidenceError("dependency Gitlink has an invalid kind")
                 links[relative] = commit
-    if set(links) != {source_catalogue.relative_path(item) for item in expected}:
-        raise EvidenceError("dependency Gitlinks differ from declared graph")
-    return links
+    try:
+        return source_catalogue.verify_gitlinks(links, parent)
+    except ValueError as error:
+        raise EvidenceError("dependency Gitlinks differ from declared graph") from error
 
 
 def _source_origin(path: Path, item, *, migrating: bool):
@@ -179,6 +180,7 @@ def _inspect_sources(root: Path, selected, *, migrating: bool):
     _clean_repository(root)
     top = _gitlinks(root, None)
     records = []
+    identities = []
 
     def visit(item, expected):
         path = root / item.path
@@ -201,6 +203,8 @@ def _inspect_sources(root: Path, selected, *, migrating: bool):
             raise EvidenceError("dependency revision is not approved: " + item.path)
         links = _gitlinks(path, item.path, upstream=actual != expected)
         records.append({"path": item.path, "commit": expected})
+        identities.append({"path": item.path, "commit": expected,
+            "tree": _git(path, "rev-parse", "HEAD^{tree}").stdout.strip()})
         for child in source_catalogue.children(item.path):
             visit(child, links[source_catalogue.relative_path(child)])
 
@@ -209,6 +213,11 @@ def _inspect_sources(root: Path, selected, *, migrating: bool):
         if item.parent is not None:
             raise EvidenceError("dependency selection must use top-level modules")
         visit(item, top[item.path])
+    if not migrating:
+        try:
+            source_catalogue.verify_alias_identities(identities)
+        except ValueError as error:
+            raise EvidenceError("dependency alias pin/tree differs from canonical mount") from error
     return records
 
 
@@ -251,14 +260,27 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
         _git(root, "submodule", "sync", "--", *selected)
         _git(root, "-c", "submodule.recurse=false", "submodule", "update",
              "--init", "--checkout", "--jobs", "2", "--", *selected)
-        # The parent's new .gitmodules must be present before recursive sync;
-        # otherwise its old URLs would overwrite the reviewed child transport.
-        closure = _inspect_sources(root, selected, migrating=True)
-        _available_sources(root, [record for record in closure
-                                  if record["path"] not in advertised])
-        _git(root, "submodule", "sync", "--recursive", "--", *selected)
-        _git(root, "submodule", "update", "--init", "--recursive",
-             "--checkout", "--jobs", "2", "--", *selected)
+        # Inspect each materialized parent before synchronizing its exact
+        # selected children. Never let Git discover or retrieve a dependency
+        # that has not passed the catalogue and owning-tree audit.
+        parents = [source_catalogue.dependency(path) for path in selected]
+        while parents:
+            closure = _inspect_sources(root, selected, migrating=True)
+            _available_sources(root, [record for record in closure
+                                      if record["path"] not in advertised])
+            advertised.update(record["path"] for record in closure)
+            descendants = []
+            for parent in parents:
+                children = source_catalogue.children(parent.path)
+                if not children:
+                    continue
+                owner = root / parent.path
+                paths = [source_catalogue.relative_path(item) for item in children]
+                _git(owner, "submodule", "sync", "--", *paths)
+                _git(owner, "-c", "submodule.recurse=false", "submodule",
+                     "update", "--init", "--checkout", "--jobs", "2", "--", *paths)
+                descendants.extend(children)
+            parents = descendants
         closure = _inspect_sources(root, selected, migrating=False)
     if "ext/freertos" in selected:
         from tools.maintenance import freertos_transport

@@ -54,3 +54,9 @@
 [submodule "ext/lwip"]
 	path = ext/lwip
 	url = https://github.com/X-Gen-Lab/lwip.git
+[submodule "ext/mbedtls"]
+	path = ext/mbedtls
+	url = https://github.com/X-Gen-Lab/mbedtls.git
+[submodule "ext/coremqtt"]
+	path = ext/coremqtt
+	url = https://github.com/X-Gen-Lab/coreMQTT.git

@@ -263,6 +263,20 @@ them. A successful daily operation does not qualify HIL. Until real equipment is
 connected, record physical execution as `not_executed`. The
 [performance and HIL guide](performance-hil.md) owns capture and qualification.
 
+For one bounded Linux batch, add `--client` to `debug`. This uses the official
+GDB/OpenOCD pipe transport and rejects `--port`; the default debug server keeps
+its loopback TCP workflow. The target JSON must explicitly identify the GDB
+executable in `gdb_client.tool` with `path`, `size` and `sha256`. Optional
+`gdb_client.commands` uses the same file identity fields and replaces the default
+`info threads` command. Review that file as executable operator input. GDB starts
+with automatic scripts disabled, loads the exact provenance-bound ELF, attaches,
+runs the selected commands and detaches. Tool/configuration/ELF identities are
+checked before and after execution. The finite timeout covers the owned process
+chain; failure or cancellation withdraws it and retains station quarantine.
+No executable or target is auto-discovered. See the
+[development tool contract](../../tools/dev/README.md) for the equipment schema
+and command example. Host pipe fixtures do not establish physical probe support.
+
 Development monitor remains Linux/POSIX. The session-bound terminal phases are
 `acquiring`, `owned`, `releasing` and `released`. After confirmed helper
 withdrawal, the parent may restore its originally held descriptor only when

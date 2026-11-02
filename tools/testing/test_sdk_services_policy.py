@@ -52,18 +52,18 @@ class SDKServicesPolicyTests(unittest.TestCase):
                          execution.stdout + execution.stderr)
         return execution
 
-    def test_v12_retains_the_complete_legacy_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v12")
+    def test_current_retains_the_complete_legacy_layout_prefix(self):
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v13")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:50], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(),
                          LEGACY_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 54)
-        self.assertEqual(len(transport.IMAGES), 57)
-        self.assertEqual(len(transport.FIXTURES), 54)
+        self.assertEqual(len(layout), 56)
+        self.assertEqual(len(transport.IMAGES), 59)
+        self.assertEqual(len(transport.FIXTURES), 56)
 
     def test_service_profiles_are_exact_frozen_plan_entries(self):
-        profiles = transport.SERVICE_CONSUMERS
+        profiles = transport.SERVICE_CONSUMERS[:4]
         self.assertEqual([item.name for item in profiles], [
             "native services", "external services", "f407 services",
             "gd470 services"])
@@ -75,7 +75,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             profiles[0].name = "changed"
         plan = transport.consumer_plan()
-        self.assertEqual(plan[-4:], tuple(("services", item)
+        self.assertEqual(plan[-6:-2], tuple(("services", item)
                                           for item in profiles))
         changed = replace(profiles[0], domain="arm-services")
         with self.assertRaisesRegex(ValueError, "canonical|reviewed"):

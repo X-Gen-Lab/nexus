@@ -26,7 +26,11 @@ function(nexus_apply_target_policy target)
     if("${launcher}" MATCHES "-NOTFOUND$")
         set(launcher "")
     endif()
+    # Helpers can create targets in a consuming parent directory. A child
+    # CMAKE_C_STANDARD does not reach that scope, so each owned C target must
+    # carry the exact language contract. C++ test standards remain independent.
     set_target_properties("${target}" PROPERTIES
+        C_STANDARD 11 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF
         C_COMPILER_LAUNCHER "${launcher}" CXX_COMPILER_LAUNCHER "${launcher}")
 endfunction()
 
