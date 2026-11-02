@@ -13,7 +13,7 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 
 | 项目 | 当前值 | 合同 |
 |---|---|---|
-| 平台 semantic version | `0.2.0` | 唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致 |
+| 平台 semantic version | `0.2.1` | 唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致 |
 | `factory_abi_epoch` | `1` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
 | source SDK | `source_only` / `exact` | CMake package 只接受相同完整版本，拒绝 ranges |
 | authored assembly | `2` | 简化的 TOML 选择面；不改变 Board/SoC 事实 |
@@ -33,10 +33,10 @@ factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 
 `source_epoch` 是 Python 类级合同，不写入 JSON，也不增加 MCU 状态或改变公共
 C factory 接口。维护工具直接观察实际 IR 类的两项声明，并核对唯一版本策略。
 
-当前 `0.2.0` 用于开发与软件候选准备，不表示已公开发行或已通过候选验收。
-本次 semantic version 变化保留 epoch `1`、exact 匹配和 authored schema `2`；
-版本值不把旧 SDK／候选的资格转移到新源码。新候选仍须独立绑定实际 clean source、
-配置、依赖、工具与执行证据。
+当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。
+既有 `v0.2.0` 标签保留原始预览源码身份。本次 semantic version 变化保留 epoch `1`、
+exact 匹配和 authored schema `2`；版本值不把旧 SDK／候选的资格转移到新源码。
+新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。
 
 `0.1.0` 是 2026-10-15（Asia/Shanghai）首个公开源码 SDK 开发者预览版。
 之前源码快照中的 `1.0.0` 是公开发行前的版本值；2026-01-12 第一阶段的旧

@@ -10,6 +10,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Future changes are tracked here.
 
+## [0.2.1] - 2026-11-02 (Asia/Shanghai)
+
+Integrated Source SDK software preview. The existing `v0.2.0` tag retains its
+original source; this version identifies the subsequent mainline integration.
+
+### Changed
+
+- Select exact Source SDK version `0.2.1` through the single compatibility
+  policy. Factory epoch `1`, authored schema `2` and typed IR epoch `2` remain.
+- Integrate reviewed official STM32 HAL/LL and GD32 SPL dependencies inside
+  private providers while retaining static factories and public C11 interfaces.
+- Fetch reviewed Git dependencies from organization-hosted repositories with
+  exact gitlinks, source locks and original upstream/license identities.
+- Remove obsolete tools and duplicated historical documentation/evidence;
+  retain recoverable history and independently managed documentation assets.
+
+### Fixed
+
+- Link the real GD32F470 I2C SPL implementation and the U575 Secure GPIO HAL
+  dependencies; preserve the existing vendor-only host warning policy.
+- Correct host IRQ model ordering and test-fixture borrowed-storage lifetimes.
+- Prepare offline commit-hook environments explicitly and select the locked
+  Native compiler for the complete CI contract gate.
+- Validate historical documentation aliases at their original Git revision,
+  preserve compressed evidence bytes and refresh bilingual OS ledger references.
+
+### Verification and limitations
+
+Release assets record their exact source, fresh CI, SDK consumers and provenance.
+This software preview does not establish an offline-reproduced software
+candidate or product qualification. Physical MCU HIL remains `not_executed`;
+existing feature and hardware boundaries remain in force.
+
 ## [0.2.0] - 2026-10-22 (Asia/Shanghai)
 
 Source SDK preview preparation. Published previews and their immutable source

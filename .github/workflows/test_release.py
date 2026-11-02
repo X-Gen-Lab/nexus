@@ -1743,6 +1743,7 @@ class ReleaseRecoveryTests(unittest.TestCase):
         source = base / "checkout"
         source.mkdir()
         policy = (ROOT / "dependencies/platform-compatibility.json").read_bytes()
+        tag = "v" + load_policy(ROOT)["semantic_version"]
         for name in ("dependencies", "tools/release", "tools/configure"):
             (source / name).mkdir(parents=True, exist_ok=True)
         (source / "dependencies/platform-compatibility.json").write_bytes(
@@ -1762,7 +1763,7 @@ class ReleaseRecoveryTests(unittest.TestCase):
         git("add", ".")
         git("commit", "--quiet", "-m", "Tagged SDK source")
         tagged = git("rev-parse", "HEAD")
-        git("tag", "-a", "v0.2.0", "-m", "Immutable source")
+        git("tag", "-a", tag, "-m", "Immutable source")
         (source / "dependencies/platform-compatibility.json").write_bytes(policy)
         for name in ("tools/release/delivery.py", "tools/configure/metadata.py"):
             shutil.copyfile(ROOT / name, source / name)
@@ -1771,7 +1772,7 @@ class ReleaseRecoveryTests(unittest.TestCase):
         git("commit", "--quiet", "-m", "Trusted recovery builder")
         builder = git("rev-parse", "HEAD")
         routes = {"/git/ref/heads/main": {"object": {"type": "commit", "sha": builder}},
-                  "/git/ref/tags/v0.2.0": {"object": {"type": "tag", "sha": "c" * 40}},
+                  "/git/ref/tags/" + tag: {"object": {"type": "tag", "sha": "c" * 40}},
                   "/git/tags/" + "c" * 40: {"object": {"type": "commit", "sha": tagged}}}
         return base, source, tagged, builder, routes
 
@@ -1787,7 +1788,7 @@ class ReleaseRecoveryTests(unittest.TestCase):
                     path = "/git/ref/heads/main" if mutation == "main" else "/git/tags/" + "c" * 40
                     routes[path]["object"]["sha"] = "b" * 40
                 if mutation == "missing-tag":
-                    del routes["/git/ref/tags/v0.2.0"]
+                    del routes["/git/ref/tags/v" + load_policy(source)["semantic_version"]]
                 if mutation == "dirty":
                     (source / "builder.txt").write_text("uncommitted builder\n")
                 api = base / "api.json"
@@ -1986,12 +1987,14 @@ class ReleaseRecoveryTests(unittest.TestCase):
                 root, api = self.recovery_publisher()
                 original = api.get.side_effect
                 calls = {}
+                tag_ref = "/git/ref/tags/" + json.loads(
+                    (root / "release-manifest.json").read_text())["tag"]
 
                 def get(path):
                     calls[path] = calls.get(path, 0) + 1
                     response = original(path)
                     if mutation.startswith(("main-", "tag-")):
-                        ref = "/git/ref/heads/main" if mutation.startswith("main-") else "/git/ref/tags/v0.2.0"
+                        ref = "/git/ref/heads/main" if mutation.startswith("main-") else tag_ref
                         if path == ref and calls[path] == (2 if mutation.endswith("after") else 1):
                             return {"object": {"type": "commit", "sha": "c" * 40}}
                     run = 456 if mutation.startswith("builder-ci-") else 123
