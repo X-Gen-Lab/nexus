@@ -1,7 +1,7 @@
 # Relocatable Nexus source SDK
 
-Nexus 0.2.0 is the current development Source SDK version, not a published
-release or a qualification result. The consumer owns its assembly,
+Nexus 0.2.1 is the current Source SDK version. A version value does not establish
+publication or software or hardware qualification. The consumer owns its assembly,
 application sources, compiler, ABI, workers and resource budgets. Vendor headers
 and concrete provider storage stay private. No precompiled MCU binary ABI or
 application generator is exported.
@@ -33,7 +33,7 @@ Move the complete prefix, then consume it from an independent project:
 cmake_minimum_required(VERSION 3.31)
 project(my_device LANGUAGES C ASM)
 set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
-find_package(Nexus 0.2.0 EXACT CONFIG REQUIRED)
+find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)
 nexus_add_firmware(my_device SOURCES main.c)
 ```
 

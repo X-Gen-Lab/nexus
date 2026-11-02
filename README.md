@@ -6,7 +6,8 @@ Applications, workers, product roles, private PCB data, Flash reservations and
 recovery policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 or private product repositories. [中文入口](README_CN.md).
 
-**This checkout uses Nexus 0.2.0 for development and Source SDK previews.**
+**This checkout uses Nexus 0.2.1 for development and Source SDK previews.**
+The existing `v0.2.0` tag retains its original preview source identity.
 Published previews and their immutable source identities are recorded in
 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases). A version value
 does not establish software or hardware qualification. Consumers recompile source
@@ -86,7 +87,7 @@ GoogleTest/GoogleMock is pinned and host-only; firmware remains C11.
 
 The release SDK requires the complete pinned dependency and license closure.
 Its manifest records the exact clean source commit/tree, recursive dependencies
-and every packaged file. Use `find_package(Nexus 0.2.0 EXACT CONFIG REQUIRED)`;
+and every packaged file. Use `find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)`;
 the source interface epoch remains `1` and authored assembly schema remains `2`.
 The compatibility JSON is the sole authored version authority. The release
 receipts identify the tools actually executed; declared minimum versions and
