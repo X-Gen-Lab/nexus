@@ -1,0 +1,51 @@
+// FIG-02 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph BuildTargets {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用"];
+    firmware [label="外部 firmware\nnexus_add_firmware()", fillcolor="#f8fafc"];
+    startup [label="firmware_nexus_startup\nOBJECT：官方启动 + 自有 system"];
+    platform [label="Nexus::Platform\ngenerated bindings.c"];
+    soc [label="nexus_soc_stm32h743\n所选 GPIO / UART 驱动"];
+    io [label="Nexus::IO"];
+    arch [label="Nexus::Arch"];
+    core [label="Nexus::Core"];
+    bare [label="Nexus::OSBaremetal"];
+    wait [label="Nexus::OSWait"];
+    abi [label="nexus_abi_options\n由冻结 CPU profile 决定"];
+    config [label="Nexus::Config\n生成 include / ABI / 构建策略"];
+    sdk [label="厂商 CMSIS headers\nSYSTEM PRIVATE include", fillcolor="#fefce8"];
+    firmware -> platform [label="PRIVATE 链接"];
+    firmware -> arch [label="PRIVATE 链接"];
+    firmware -> bare [label="PRIVATE：选定后端"];
+    firmware -> config [label="PRIVATE 链接"];
+    firmware -> startup [label="OBJECT 注入", style=dashed];
+    platform -> soc [label="PUBLIC 链接"];
+    platform -> arch [label="PRIVATE 链接"];
+    platform -> sdk [label="PRIVATE 包含", style=dashed];
+    soc -> io [label="PUBLIC 链接"];
+    soc -> arch [label="PRIVATE 链接"];
+    soc -> sdk [label="PRIVATE 包含", style=dashed];
+    startup -> sdk [label="PRIVATE 包含", style=dashed];
+    startup -> io [label="PRIVATE 链接"];
+    startup -> arch [label="PRIVATE 链接"];
+    io -> core [label="PUBLIC 链接"];
+    io -> arch [label="PRIVATE 链接"];
+    bare -> wait [label="PUBLIC 链接"];
+    bare -> arch [label="PRIVATE 链接"];
+    wait -> core [label="PUBLIC 链接"];
+    core -> abi [label="PUBLIC 链接"];
+    arch -> abi [label="PUBLIC 链接"];
+    config -> abi [label="INTERFACE 链接"];
+    { rank=same; platform; bare; startup; config; }
+    { rank=same; core; arch; }
+}

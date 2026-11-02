@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_io_evolution_next_wave_validation_index",
+  "status": "draft_focused_model_scopes_source_not_frozen",
+  "source": {
+    "repository": "https://github.com/X-Gen-Lab/nexus",
+    "canonical_code_commit": null,
+    "code_tree": null,
+    "clean_before_after": false,
+    "source_binding": "Final source freeze and full execution binding pending; do not inherit prior HEAD qualification."
+  },
+  "software_results": {
+    "generated_factory_scopes": [
+      {
+        "scope": "h743_high_factory",
+        "cases": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "command": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/h743-evolution/high-factory-first-runtime-10.command.json",
+          "bytes": 1394,
+          "sha256": "193b99f52dcf0850db8d599de5e2a84782ef1a0be8192ee1113088f8f23c2be2"
+        },
+        "raw": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/h743-evolution/high-factory-first-runtime-10.raw",
+          "bytes": 1936,
+          "sha256": "670a5f5d0585bf29d0bcc9059a4a1e627250ac5272e93b9c572d3836e1c1a7ea"
+        },
+        "xml": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/h743-evolution/high-factory-first-runtime-10.xml",
+          "bytes": 3085,
+          "sha256": "56f3a24f89787851cdce1143672fbdac6ef1d6e1fd27c13818cd8e8d29f594d8"
+        },
+        "qualification": "host_model_generated_factory_only"
+      },
+      {
+        "scope": "g474_fdcan_factory",
+        "cases": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "command": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/loopback-factory-current-green-5.command.json",
+          "bytes": 1428,
+          "sha256": "97f39d857b7bdf55b48fa75eb5c5a9441f2812f853f4ed91ca04cd09e4803e1d"
+        },
+        "raw": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/loopback-factory-current-green-5.raw",
+          "bytes": 1182,
+          "sha256": "a379783c803f6a95f31f556f8a916dea3ec727fba3e574b0f5d29bc72b93afa6"
+        },
+        "xml": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/loopback-factory-current-green-5.xml",
+          "bytes": 1730,
+          "sha256": "8068097407e84dcfeebb6e2ac4d544663f5dcb7f8a46ab648a49c52a05a6f3a8"
+        },
+        "qualification": "host_model_generated_factory_only"
+      },
+      {
+        "scope": "u575_uart_gpdma_factory",
+        "cases": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "command": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/u575-finite-tx-plan/factory-first-runtime-8.command.json",
+          "bytes": 1397,
+          "sha256": "fed88c69bd8ef0c4dd410247a37bed488db347935df7e77aea670c12f9bfc6a7"
+        },
+        "raw": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/u575-finite-tx-plan/factory-first-runtime-8.raw",
+          "bytes": 1717,
+          "sha256": "93200030f3b790855faabdb8d61326238f14f920cb03d15b43dd48885b1409d0"
+        },
+        "xml": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/u575-finite-tx-plan/factory-first-runtime-8.xml",
+          "bytes": 2627,
+          "sha256": "6a6380f10c13a3a9884c51745cf935469a734efefe692facdc8e240db70e1103"
+        },
+        "qualification": "host_model_generated_factory_only"
+      },
+      {
+        "scope": "g474_pwm_adc_factory",
+        "cases": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "command": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/adc-control/io29-factory-first-runtime-11.command.json",
+          "bytes": 1386,
+          "sha256": "05515ed445ee4353d99acf7eea51c151a81e7357ecc172064ef84edfc635af85"
+        },
+        "raw": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/adc-control/io29-factory-first-runtime-11.raw",
+          "bytes": 2191,
+          "sha256": "fd0c915ea3d56214781313aa68e00cb3dda55aa231d3dea0d826742aa73e8aa0"
+        },
+        "xml": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/adc-control/io29-factory-first-runtime-11.xml",
+          "bytes": 3441,
+          "sha256": "711a9c396d90bb5901eed262a55526f5e05e071f04472bb9d93693f35a7f31f9"
+        },
+        "qualification": "host_model_generated_factory_only"
+      },
+      {
+        "scope": "g474_fdcan_normal_factory",
+        "cases": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "command": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/normal-factory-current-green-5.command.json",
+          "bytes": 1427,
+          "sha256": "10a2edd92aa56f8f9f4669e31612caf6dfe25b8f8c2f9c512ca6075fcef29a2d"
+        },
+        "raw": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/normal-factory-current-green-5.raw",
+          "bytes": 1182,
+          "sha256": "a379783c803f6a95f31f556f8a916dea3ec727fba3e574b0f5d29bc72b93afa6"
+        },
+        "xml": {
+          "path": "/dev/shm/nexus-io-evolution-20261017/io33-fdcan-readonly/normal-factory-current-green-5.xml",
+          "bytes": 1730,
+          "sha256": "53aca6da089fac3166c7dd54b2b646ba55594e825c1f09da634ff0cfbf03a683"
+        },
+        "qualification": "host_model_generated_factory_only"
+      }
+    ],
+    "counting_rule": "Counts are scope-specific and not a complete-project total. Subsequent source changes need matching reruns.",
+    "arm_development_scopes": [
+      {
+        "preset": "fixture-io-evolution-h743-high-empty",
+        "image": "nexus_firmware",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-empty-configure.command.json",
+            "bytes": 1289,
+            "sha256": "32be25a2493826e8f864d88704ede61c94553830970aa289ed0e4d01ddaf377d"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-empty-build.command.json",
+            "bytes": 1320,
+            "sha256": "214eb336663cd300ae554b019705f18adfeb5d9577f06f8aa1d76e80b72cdb47"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-empty/bin/nexus_firmware.resources.json",
+          "bytes": 4622,
+          "sha256": "ef43ede16978c1ba27fabccf48e828268b009b91973f9344cb7668d71cf0d0a1"
+        },
+        "provider_retention": {
+          "status": "not_generated_for_empty_standard_firmware_target",
+          "scope": "No selected provider retention result is claimed. Earlier io_evolution_fixture strong-retention failure remains historical and is not substituted."
+        },
+        "flash_load_bytes": 5403,
+        "flash_footprint_bytes": 5404,
+        "reserved_ram_bytes": 2104,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-empty/bin/nexus_firmware.elf",
+            "bytes": 22344,
+            "sha256": "463b44c3804b8c4d0e8b2b26b5411861de1bfb19e1688fa34adf3f3cf58e59d9"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-empty/bin/nexus_firmware.bin",
+            "bytes": 5404,
+            "sha256": "b5b651d22d8790ad7dff774432d70a8627f71034e237f0c754f192a341a6795d"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-empty/bin/nexus_firmware.map",
+            "bytes": 38414,
+            "sha256": "38dca0ca74a69fed4e5e4311f156aa2b9a6211a2ae921f4c49d37fd6d9fcebe0"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      },
+      {
+        "preset": "fixture-io-evolution-h743-high-uart",
+        "image": "io_evolution_fixture",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-uart-configure.command.json",
+            "bytes": 1285,
+            "sha256": "5882c3329367177ff723e6c3a836f52dfe21a5d83b7548323f84708169e64b2d"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-uart-build.command.json",
+            "bytes": 1317,
+            "sha256": "98170d79c5afec10f2645d6d9d0fae5d84642defb3b296b89725bbb359c353de"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-uart/bin/io_evolution_fixture.resources.json",
+          "bytes": 4559,
+          "sha256": "81c1fff93965b6eb5799097db69cf0953984a7f7c2f9f2d7512e83b3e21b6b0b"
+        },
+        "provider_retention": {
+          "status": "passed",
+          "report": {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-uart/bin/provider-retention.json",
+            "bytes": 12922,
+            "sha256": "f2060ce60d91a424663a386f9fc3429e4bb449742efb74336c13de0dff67a2aa"
+          }
+        },
+        "flash_load_bytes": 12016,
+        "flash_footprint_bytes": 12016,
+        "reserved_ram_bytes": 2336,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-uart/bin/io_evolution_fixture.elf",
+            "bytes": 30084,
+            "sha256": "cbd1b212b7d607658e05ffefbadf7ab26312dcc9988a4a92b74b445b7f6f942f"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-uart/bin/io_evolution_fixture.bin",
+            "bytes": 12016,
+            "sha256": "e2652cd9545d14f025e51a4384ed288fa12a1d8b688d817387e2191fab2b2567"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-uart/bin/io_evolution_fixture.map",
+            "bytes": 56771,
+            "sha256": "2320fe8051898c02d0e4fcdef7f8c247929248b6d314a502b12142c8211e1725"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      },
+      {
+        "preset": "fixture-io-evolution-h743-high-peripherals",
+        "image": "io_evolution_fixture",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-peripherals-configure.command.json",
+            "bytes": 1313,
+            "sha256": "43c2bc32aed1ad58119e81718bf4d110d8cc0bfdb38c92c138b235690e51b708"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-h743-high-peripherals-build.command.json",
+            "bytes": 1344,
+            "sha256": "ed89415748ac2f0dc5204aee48f2e8be52e8a7f1117ad87dc3d6e9f18ed89e28"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-peripherals/bin/io_evolution_fixture.resources.json",
+          "bytes": 4684,
+          "sha256": "94151903dca4953cea1d269ec6fd4894b6f0ef6553fdcb14ebf6f29fa8e21e2e"
+        },
+        "provider_retention": {
+          "status": "passed",
+          "report": {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-peripherals/bin/provider-retention.json",
+            "bytes": 23699,
+            "sha256": "cb7ea41e845adcba0fffd9db4d1605ddf9c1672f4ab424f0f949ccbecbf611e7"
+          }
+        },
+        "flash_load_bytes": 23660,
+        "flash_footprint_bytes": 23660,
+        "reserved_ram_bytes": 2628,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-peripherals/bin/io_evolution_fixture.elf",
+            "bytes": 48016,
+            "sha256": "fe19f47d1c1f0da93b906ebae31f6f927d61109348b55df977b0ff702e6d4f1c"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-peripherals/bin/io_evolution_fixture.bin",
+            "bytes": 23660,
+            "sha256": "f950cc5ca1793c9c3a21b5eecd95b3c884b1daa7e8921f1e720ecac16df62dc8"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-h743-high-peripherals/bin/io_evolution_fixture.map",
+            "bytes": 80579,
+            "sha256": "93b9e8cb0922b1535a49fddd9b3ac8c5a61fc4336bfe36f6248b59ca267d6c40"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      },
+      {
+        "preset": "fixture-io-evolution-u575-uart-gpdma",
+        "image": "io_evolution_fixture",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-u575-uart-gpdma-configure.command.json",
+            "bytes": 1289,
+            "sha256": "d452a1458563a92e5ae916ba54770354062d244629614c4bdf2421c0fd000d8a"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-u575-uart-gpdma-build.command.json",
+            "bytes": 1321,
+            "sha256": "b4d60c5c50467df539c764e694cfd0fd1bfa86814eec3baa757036a86cfa1afa"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-u575-uart-gpdma/bin/io_evolution_fixture.resources.json",
+          "bytes": 3554,
+          "sha256": "1fe88eefc6f0145c9313e1c9daa16d06c50cb626ca29b49a36963cdff723f97b"
+        },
+        "provider_retention": {
+          "status": "passed",
+          "report": {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-u575-uart-gpdma/bin/provider-retention.json",
+            "bytes": 11364,
+            "sha256": "e9e6b0c5ff8165f4a443411a2a1c8329b93ee086a8c7904f0cb64a07fb9e6dc2"
+          }
+        },
+        "flash_load_bytes": 8964,
+        "flash_footprint_bytes": 8964,
+        "reserved_ram_bytes": 2312,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-u575-uart-gpdma/bin/io_evolution_fixture.elf",
+            "bytes": 28104,
+            "sha256": "e5bd67204f83c720e68bd7891e8cd86f3ee0f04a82617ab194341911323b530b"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-u575-uart-gpdma/bin/io_evolution_fixture.bin",
+            "bytes": 8964,
+            "sha256": "d4949ce9d44dbfcd45f49b43e71d590d8ebd17592e5478da4fa46363ab655104"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-u575-uart-gpdma/bin/io_evolution_fixture.map",
+            "bytes": 50758,
+            "sha256": "be6a2455793d2ab3fba584f7288730f1d6286ed055c447d7dea0a6d3dccee011"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      },
+      {
+        "preset": "fixture-io-evolution-g474-can-fd",
+        "image": "io_evolution_fixture",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-g474-can-fd-configure.command.json",
+            "bytes": 1273,
+            "sha256": "c279b57bfba9f9f61a7f08d5967d4ceb1d54211f2b955473c5a2624ad7386fc5"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-arm-r1-g474-can-fd-build.command.json",
+            "bytes": 1304,
+            "sha256": "ac65ce0ef104ed5da40a0f1c17b1cc7a15f11249207c32e97b4056dee01cd50e"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-can-fd/bin/io_evolution_fixture.resources.json",
+          "bytes": 4114,
+          "sha256": "4b125f95ff23c647184c7ee08e5916b80378c814ea4f6cd22d52b288ed94251d"
+        },
+        "provider_retention": {
+          "status": "passed",
+          "report": {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-can-fd/bin/provider-retention.json",
+            "bytes": 11596,
+            "sha256": "62b87a380da64590899a6fa20c6d27165ca1544ea5c8e510f65f1a3dfc8a6bb9"
+          }
+        },
+        "flash_load_bytes": 10184,
+        "flash_footprint_bytes": 10184,
+        "reserved_ram_bytes": 2788,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-can-fd/bin/io_evolution_fixture.elf",
+            "bytes": 27956,
+            "sha256": "e6653a41470de30ba7a10e80bb7dd8a5281b2ba1402332a6c4a36af304af7036"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-can-fd/bin/io_evolution_fixture.bin",
+            "bytes": 10184,
+            "sha256": "4adbeb3030507566ea747fbdfdd9161c6d35f846bada094104c76e9536664b1f"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-can-fd/bin/io_evolution_fixture.map",
+            "bytes": 53639,
+            "sha256": "2eff7a1f5159eb1800227a7a7b06c45ccbb9d100fd72429637e098b2767d694b"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      },
+      {
+        "preset": "fixture-io-evolution-g474-pwm-adc",
+        "image": "io_evolution_fixture",
+        "configure_exit": 0,
+        "build_exit": 0,
+        "receipts": [
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/adc-control/io29-arm-selected-config-green-r1.command.json",
+            "bytes": 1295,
+            "sha256": "556e624e68ec7030a0a932f452f64fd44feb07406c35491d95de5cdc6eb6d199"
+          },
+          {
+            "path": "/dev/shm/nexus-io-evolution-20261017/adc-control/io29-arm-selected-build-r1.command.json",
+            "bytes": 1318,
+            "sha256": "64d85051f242e1595ae6d1f6462d539121f42da6c0650e7753eb4fb454749bb7"
+          }
+        ],
+        "resources": {
+          "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-pwm-adc/bin/io_evolution_fixture.resources.json",
+          "bytes": 4055,
+          "sha256": "7fbb3cb7f40f90d74fa1b4a9dc6d1214f6b5bc7b39acb85d8638546852ad63cb"
+        },
+        "provider_retention": {
+          "status": "passed",
+          "report": {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-pwm-adc/bin/provider-retention.json",
+            "bytes": 10533,
+            "sha256": "7a205ec04151bfaf6dfd7758ada9369526439c953c2549f6af2756c393105168"
+          }
+        },
+        "flash_load_bytes": 13620,
+        "flash_footprint_bytes": 13620,
+        "reserved_ram_bytes": 2264,
+        "artifacts": [
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-pwm-adc/bin/io_evolution_fixture.elf",
+            "bytes": 32952,
+            "sha256": "27198c7780bdc039036726fe04ded197e2ebb499f112cd83cac9a1f4beeb41be"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-pwm-adc/bin/io_evolution_fixture.bin",
+            "bytes": 13620,
+            "sha256": "e922d7807de906124ff46887ac1763b4acc24282bd50f04028b966addf7d3524"
+          },
+          {
+            "path": "/tmp/nexus-io-evolution-source-20261017/build/fixture-io-evolution-g474-pwm-adc/bin/io_evolution_fixture.map",
+            "bytes": 54999,
+            "sha256": "6e96b8de09f54399a1cd32e732769b3422a3a539ab14f9dc0a0bb60f1b75e8cd"
+          }
+        ],
+        "scope": "Recorded development build; final frozen source and unchanged rerun binding remain pending. Not reproduction or HIL."
+      }
+    ]
+  },
+  "historical_github_ci": {
+    "head": "2963c34aa399c43bea05022eb8846ad2370f0f76",
+    "run_id": 39028022087,
+    "job_counts": {
+      "success": 30,
+      "failure": 0,
+      "skipped": 0
+    },
+    "observation": {
+      "path": "/dev/shm/nexus-io-evolution-20261017/remote-ci-monitor/2963-final-jobs-scalars.json",
+      "bytes": 5182,
+      "sha256": "070a782fa4e4f710dbaa1626c1ff7d8d48f3cb422f111a28b1ff17fd2ffb4fdc"
+    },
+    "scope": "Previous clean commit only; not current extensions. Documentation job steps/package not inspected by this observation."
+  },
+  "pending_qualification": [
+    "Final clean source/tree and normal commit hooks",
+    "Matching final focused model and complete regression execution",
+    "Final frozen-source ARM ELF/BIN/map resource and provider-retention reruns",
+    "Fresh publishable source SDK verification and actual independent consumers",
+    "Current public API and complete English/Chinese documentation",
+    "Independent offline reproduction and software candidate if claimed"
+  ],
+  "physical_hil": "not_executed",
+  "ledger_status": "No IO-01–42 status changed by this result draft.",
+  "preserved_first_arm_observations": {
+    "manifest": {
+      "path": "/dev/shm/nexus-io-evolution-20261017/next-wave-first-arm-observations-preserved/manifest.json",
+      "bytes": 13141,
+      "sha256": "ddc143fe2a8a20a319c3882dc0d8bc6650e88838a1db939b255f25268150bcdf"
+    },
+    "retained_file_count": 33,
+    "retained_bytes": 765576,
+    "exact_files_referenced_by_the_six_recorded_scopes": 29,
+    "retained_payload_sha256_verified": true,
+    "purpose": "Resolve historical build-path references after later ARM rebuilds. Match original path, bytes and SHA256 against this preservation manifest; do not substitute later build outputs. The four extra io_evolution_fixture empty-target files are preserved historical leftovers and establish no selected empty-target retention qualification."
+  }
+}

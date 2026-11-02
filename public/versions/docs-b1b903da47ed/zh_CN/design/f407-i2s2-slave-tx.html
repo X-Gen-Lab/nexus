@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>STM32F407 上的有限 I2S2 从机发送 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="故障观测与保留责任" href="fault-observation.html" />
+    <link rel="prev" title="以太网帧借用与 MAC 硬件时钟" href="ethernet-frames.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/f407-i2s2-slave-tx.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/design/f407-i2s2-slave-tx.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="finite-i2s2-slave-tx-on-stm32f407">
+<span id="f407-i2s2-slave-tx"></span><h1>STM32F407 上的有限 I2S2 从机发送<a class="headerlink" href="#finite-i2s2-slave-tx-on-stm32f407" title="Link to this heading">¶</a></h1>
+<p>在独立控制的外部 I2S 主机提供时钟时，这个精确裸机角色可让 STM32F407VET6 或 STM32F407ZGT6 发送一个由调用方拥有的 stereo16 帧块。单一任务拥有发送器、外部时钟握手及失败排空。实现提供有限普通模式 DMA 和显式最终访问边界；产品负责采样值、速率、编解码器、主机及恢复政策。物理 HIL 为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。IO-41 仍为 <code class="docutils literal notranslate"><span class="pre">in_progress</span></code>；连续音频、SAI 和 PDM 仍开放。</p>
+<section id="select-one-physical-role">
+<h2>选择一个物理角色<a class="headerlink" href="#select-one-physical-role" title="Link to this heading">¶</a></h2>
+<p>在 <code class="docutils literal notranslate"><span class="pre">[i2s2]</span></code> 中以 <code class="docutils literal notranslate"><span class="pre">profile</span> <span class="pre">=</span> <span class="pre">&quot;slave-tx-stereo16-pb12-pb13-pb15&quot;</span></code> 声明这个角色。它与其他控制器通过同一套已验证硬件 IR 和资源计划解析。所选 SPI2 模式、引脚、DMA stream 或向量发生冲突时，在生成前拒绝。省略角色就保持未选中，不创建音频所有者或目标。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>资源或格式</p></th>
+<th class="head"><p>精确选定项</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>芯片与时钟</p></td>
+<td><p>STM32F407VET6 或 STM32F407ZGT6；baremetal；<code class="docutils literal notranslate"><span class="pre">hse8-pll168</span></code>；有效运行的 1 MHz TIM2</p></td>
+</tr>
+<tr class="row-odd"><td><p>线上协议</p></td>
+<td><p>Philips I2S；两个 16 位声道、16 位时隙；采样以 MSB 优先的顺序输出</p></td>
+</tr>
+<tr class="row-even"><td><p>引脚</p></td>
+<td><p>PB12 WS 输入、PB13 CK 输入、PB15 SD 输出；AF5</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA 引擎</p></td>
+<td><p>DMA1 Stream4 channel0；普通模式、直接模式、内存地址递增的 16 位传输</p></td>
+</tr>
+<tr class="row-even"><td><p>独占中断向量</p></td>
+<td><p>DMA1 Stream4 和 SPI2；中断源始终保持禁用，不安装 IRQ 服务</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据负载</p></td>
+<td><p>一个平面，偏移为零，各非空行连续排列，满足 <code class="docutils literal notranslate"><span class="pre">stride</span> <span class="pre">==</span> <span class="pre">row_bytes</span></code> 且无填充；按先左后右顺序存放 16 位小端采样</p></td>
+</tr>
+<tr class="row-even"><td><p>块大小</p></td>
+<td><p>4..131068 B，且为四的倍数；2..65534 个 DMA 半字</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA 可访问内存</p></td>
+<td><p>整个对齐的源数据范围必须位于主 SRAM <code class="docutils literal notranslate"><span class="pre">[0x20000000,</span> <span class="pre">0x20020000)</span></code> 内；不允许使用 CCM</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>对于这种 stereo16 I2S 格式，<code class="docutils literal notranslate"><span class="pre">nx_frame_layout_audio</span></code> 将连续音频帧描述为行。保留这种规范布局：多帧块可以由多个连续行组成。provider 检查行非空、<code class="docutils literal notranslate"><span class="pre">stride</span> <span class="pre">==</span> <span class="pre">row_bytes</span></code>，并以有界计算核验 <code class="docutils literal notranslate"><span class="pre">rows</span> <span class="pre">*</span> <span class="pre">row_bytes</span> <span class="pre">==</span> <span class="pre">layout.bytes</span></code>，再以实际行布局取得视图。DMA 计数和结清均覆盖完整块，不存在逐行借用或逐行完成。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_frame_layout_t</span></code> 记录存储几何布局，不配置线上格式，也不验证音频格式元数据。调用方仍须提供所声明的小端 stereo16 采样。音频布局 helper 的其他格式不会因此成为发送器支持的格式。</p>
+<p>下面是维护的 VE 输入。<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/configure/assemblies/qiming-i2s2-slave-tx.toml">ZG 输入</a> 以相同角色选择对应的精确 Board 包。</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"stm32f407ve_sky_qingchun"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hse8-pll168"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="c1"># Chip pin capability only; no audio PCB or external master is qualified.</span>
+<span class="k">[i2s2]</span>
+<span class="n">profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"slave-tx-stereo16-pb12-pb13-pb15"</span>
+</pre></div>
+</div>
+<p>组件目标为 <code class="docutils literal notranslate"><span class="pre">Nexus::F407I2S2SlaveTx</span></code>，仅在选中已验证角色时由<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt">其 CMake 文件</a> 定义。消费者显式链接目标，并以共享操作表和独立清零的所有者存储构造一个稳定的只读 face。Factory 查找不创建或启动音频所有者。固件所有者存储为 88 B，不包括调用方拥有的请求、流、帧和载荷存储。不创建任务、分配、队列或重放 worker。</p>
+<p>该角色使用外部 CK/WS，不启用 PLLI2S，也不生成音频时钟。芯片 AF 能力不证明 PCB 布线。装配提供精确料号／封装身份：器件组和 Flash 容量读取不能认证 F407 或区分其物理封装。调用方必须满足 DS8626 的电压、I/O、负载及 CK/WS/SD 时序要求，并提供足够的 DMA 补充裕量。本软件不定义实测外部时钟速率，也不额外给出经过特性测定的 PCLK 与 CK 比率。</p>
+</section>
+<section id="keep-platform-and-transmitter-ownership-separate">
+<h2>分别维护 Platform 与发送器所有权<a class="headerlink" href="#keep-platform-and-transmitter-ownership-separate" title="Link to this heading">¶</a></h2>
+<p>所选正常 Platform 启动以冷复位为前提，没有其他已在运行的外设或总线主设备。它建立固定时钟和 TIM2 时间域，并在 Platform 生命周期内持有 GPIOB/DMA1 门控。时钟门控状态不能证明保留的 DMA 引擎已经复位；不支持附着到未知门控状态或正在运行的 HAL 状态。</p>
+<p>发送器初始化要求两个共享门控已经开启。它拥有 SPI2 门控、SPI2/I2S2 模式、所选引脚字段及两个向量，直至发送器成功停止。它从不打开或撤回 GPIOB/DMA1 门控，不复位整个 DMA 控制器，也不改变相邻 stream／引脚状态。Platform 在写入前记录所尝试添加的门控，保留预先存在的门控，并在回滚失败时继续承担清理责任。</p>
+<p>一个未设置中断屏蔽的特权任务串行执行初始化和每个方法。排除并发 Platform stop、复位／重新配置时钟／调试器写入者，以及竞争 DMA、向量或引脚的所有者。调用失败不授权复用存储。在 Platform stop 撤回其添加的门控或结束 TIM2 时间域前，先停止并 join 发送器及所有其他共享域用户，包括外部 HAL 用户。旧的绝对截止时间不能跨越 Platform stop/restart。</p>
+</section>
+<section id="accept-the-frame-before-arming-the-master">
+<h2>先接受帧，再允许主机开始<a class="headerlink" href="#accept-the-frame-before-arming-the-master" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/f407-i2s2-slave-tx.svg" title="打开 SVG 大图"><img alt="FIG-30：精确有限 I2S2 的所有权、使能握手及最终访问证明" src="../_images/f407-i2s2-slave-tx.svg" /></a></p>
+<p><strong>FIG-30 是这个精确角色的参考生命周期。</strong> 实线表示必需顺序或已标明的分支；虚线表示保留责任及有界重试。其依据是下方链接的公共头文件、provider 和所选 System 实现。它不证明物理时钟持续静止或硬件资格。</p>
+<ol class="arabic simple">
+<li><p>在初始化和提交之前开始，持续保持 CK 为 LOW、WS 为 HIGH，直到以 acquire 语义观察到 ACTIVE。寄存器中的引脚读数只反映采样瞬间；连续的静止间隔必须由调用方协调外部主机来保证。每次正常重新启动都从左声道开始。</p></li>
+<li><p>先成功启动 Platform，再使用地址稳定的接口对象和正值 <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code> 初始化全新的发送器存储。初始化返回 IO 时可能仍保留清理责任；必须保持其存储有效，并调用 stop。</p></li>
+<li><p>使用常规 stream/frame 辅助函数构建完整、连续的帧，并取得其原始 <code class="docutils literal notranslate"><span class="pre">nx_frame_dma_loan_t</span></code>。在当前有效 TIM2 时间纪元内，使用绝对截止时间初始化并准备请求，再将该借用赋给请求的 <code class="docutils literal notranslate"><span class="pre">source</span></code>。控制对象必须正确对齐、始终有效，且与池中每个槽位的完整容量范围互不重叠，包括未使用的负载尾部。</p></li>
+<li><p>通过接口对象提交请求。拒绝接纳时，不保留任何请求或帧引用，也不会产生提交所导致的硬件效果。<code class="docutils literal notranslate"><span class="pre">NX_SUCCESS</span></code> 表示 ACCEPTED：该确切的完整帧借用及请求均已被借用。提供方会先发布 QUEUED，再进行请求路径中的首次读清除型 SR 观察或允许任何可能的 DMA 预取。初始化则在读取 SR 之前，单独取得相应的清理责任。</p></li>
+<li><p>提交过程同步执行有界的就绪准备。它先写入完整的半字计数，再依次启用 DMA、TXDMAEN 和 I2SE。发布 ACTIVE 前，必须观察到 I2SE 已启用、DR 已预填充一个半字（<code class="docutils literal notranslate"><span class="pre">NDTR</span> <span class="pre">=</span> <span class="pre">N</span> <span class="pre">-</span> <span class="pre">1</span></code>、<code class="docutils literal notranslate"><span class="pre">TXE</span> <span class="pre">=</span> <span class="pre">0</span></code>），并在启用读回后观察到至少三个实际的 1 MHz TIM2 计数推进。<code class="docutils literal notranslate"><span class="pre">BSY</span> <span class="pre">=</span> <span class="pre">0</span></code> 不是就绪准备的前提条件。CPU 轮询次数不表示经过的时间。返回时请求可能已经处于 ACTIVE 或 DRAINING；仅有 QUEUED 或 ACCEPTED 绝不允许开始提供 CK。</p></li>
+<li><p>只有以 acquire 语义观察到 ACTIVE，才允许主机为所声明的完整立体声帧提供时钟。主机必须在需要下一个尚未提供的数据字之前停止。由同一个任务调用 <code class="docutils literal notranslate"><span class="pre">service</span></code>，观察完成状态、错误和截止时间到期，并推进排空。提供方不通过 IRQ 推进请求。</p></li>
+</ol>
+<p>SR 读取会清除 UDR/FRE，因此每次请求路径中的观察都发生在接受之后，并将任何故障保留为本操作的首个错误。后续干净的读取或迟到的 DMA 完成都不能将错误变成成功。绝对截止时间覆盖整个操作，包括线上排空及最终地址／向量撤回。使能观察预算耗尽也可能产生 TIMEOUT；这不证明已经经过某个特定时长。<code class="docutils literal notranslate"><span class="pre">poll_limit</span></code> 限定每个观察循环，从不保证外部主机取得进展。</p>
+</section>
+<section id="prove-final-access-before-releasing-storage">
+<h2>归还存储前证明最终访问<a class="headerlink" href="#prove-final-access-before-releasing-storage" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>观察结果或阶段</p></th>
+<th class="head"><p>所需操作与仍须承担的责任</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>正常的 <code class="docutils literal notranslate"><span class="pre">TCIF</span></code> 与 <code class="docutils literal notranslate"><span class="pre">NDTR</span> <span class="pre">=</span> <span class="pre">0</span></code></p></td>
+<td><p>这只能证明内存计数完成。继续保留对请求和帧的借用。软件禁用 DMA 也可能在计数非零时置位 TCIF。</p></td>
+</tr>
+<tr class="row-odd"><td><p>取消、超时或失败</p></td>
+<td><p>保留首个错误并进入 DRAINING；任何错误或取消均报告零传输字节。</p></td>
+</tr>
+<tr class="row-even"><td><p>DMA 引擎撤回</p></td>
+<td><p>清除 TXDMAEN 和 DMA EN 并完成读回确认，然后才能依据串行发送器的排空状态继续。清除失败时仍保留借用。</p></td>
+</tr>
+<tr class="row-odd"><td><p>任何 I2SE 启用尝试</p></td>
+<td><p>先观察到 <code class="docutils literal notranslate"><span class="pre">TXE</span> <span class="pre">=</span> <span class="pre">1</span></code>，再通过另一次新的读取观察到 <code class="docutils literal notranslate"><span class="pre">BSY</span> <span class="pre">=</span> <span class="pre">0</span></code>，之后才能清除 I2SE 并读回确认。即使启用写入被忽略，也仍属于一次启用尝试。</p></td>
+</tr>
+<tr class="row-even"><td><p>未尝试启用 I2SE</p></td>
+<td><p>对于已被接受、但在早期设置阶段失败的请求，可以在不等待串行发送器标志的情况下证明 DMA 引擎和引用已撤回。</p></td>
+</tr>
+<tr class="row-odd"><td><p>已证明串行发送器空闲</p></td>
+<td><p>在之后的清理重试中保留该证明；不要再次要求已禁用的 I2S 给出 TXE。</p></td>
+</tr>
+<tr class="row-even"><td><p>引用撤回</p></td>
+<td><p>清除 DMA 流配置、地址、计数和标志；撤回中断向量，并证明它们已禁用、无挂起且不处于活动状态。</p></td>
+</tr>
+<tr class="row-odd"><td><p>所有证明均已汇合</p></td>
+<td><p>解除提供方持有的引用，归还原始完整帧借用，然后以 release 语义发布 SETTLED，作为对请求的最终访问。</p></td>
+</tr>
+<tr class="row-even"><td><p>证明不足</p></td>
+<td><p>保留处于 QUARANTINED 的存储。排空循环达到次数上限时可以返回 BUSY；超时、TC 或 DMA 计数为零都不能替代最终访问证明。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>先以 acquire 观察 SETTLED，再读取终结结果或复用请求及帧存储。成功完成报告全部提交字节数。错误和取消报告零；DMA 计数不能证明串行音频字节数。复用外部观察者自身存储前，先 join 这些观察者。只要 stop 尚未关闭准入，请求成功结清后，已初始化的发送器就可接受另行准备的下一块；结清不归还其物理角色。</p>
+<p>预填充后 CK 保持静止时，DR 无法清空。因此，取消仍保留借用，直至产品协调足够的排空时钟，实际证明 TXE 及新鲜 BSY 条件。这种错误排空可能欠载或产生部分／无效音频，不保证完整 stereo 帧。保留首个失败，之后重启只能从左声道开始。只要硬件／时间历史仍已知，就可通过同一所有者继续调用 <code class="docutils literal notranslate"><span class="pre">service</span></code> 或 <code class="docutils literal notranslate"><span class="pre">stop</span></code>，重试时钟停滞后的清理。</p>
+<p>借用期间观察到复位、共享门控／时钟配置丢失或无效时间历史，会使本实例及其借用永久隔离。将寄存器恢复为看似复位的状态，不能证明此前的最终访问。不存在撤销该借用的复位或恢复 API。产品负责应对无法恢复的控制器／主机故障。</p>
+<p><code class="docutils literal notranslate"><span class="pre">stop</span></code> 关闭准入并请求取消。在 service 确认剩余清理已完成后，再次调用 stop。只有发送器成功停止才归还所选引脚／SPI2 模式及 SPI2 门控；共享 GPIOB/DMA1 门控仍留给 Platform 用户。失败的 stop 保留每个未结束的借用及已拥有的效果。</p>
+</section>
+<section id="assess-the-current-evidence">
+<h2>判断当前证据<a class="headerlink" href="#assess-the-current-evidence" title="Link to this heading">¶</a></h2>
+<p>选入 I2S2 的 VE、ZG 配置以及未选入 I2S2 的默认配置均已通过普通 ARM 构建。限定范围内的 Native 与选择测试、SDK／交付工具检查、retention 检查，以及修正后的两项调用者接口审计也均已通过。一个经移动路径的不可发布开发版 Source SDK 已通过导出、更名、验证、公共 C11 consumer 链接、所选镜像审计及再次验证；该 SDK 检查仅覆盖一个 VE 镜像。<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/testing/evidence/f407-i2s2-20261020/README.md">源码绑定证据</a>记录完整镜像资源，不代表独立驱动成本。这些是部分开发证据，不能据此认定完整 v10 矩阵、clean main、正式／OCI 交付或物理 HIL 已取得资格。API 与全站构建收据，以及最终提交门禁，必须分别评估。原有严格 Wshadow 与测试夹具准备失败记录继续保留，并与功能 TDD 分列。</p>
+<p>正常公共消费者源码为 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c">f407-i2s2-slave-tx.c</a>。它链接公共构造和完整帧所有权路径；链接不会执行这些调用。它不是外部时钟源，也不是已完成的硬件教程。不宣称已执行物理运行或获得有效音频结果。连续 DBM、无间隙重放、SAI/PDM、其他格式／引脚／料号／后端及物理 HIL 在 IO-41 下仍开放。</p>
+<p>硬件顺序遵循 RM0090 Rev22 第 28.4.6–28.4.8 节及第 10.3.13–10.3.14 节，同时以 DS8626 的电气要求及锁定的 ES0182 适用范围为约束。不以仅适用于 SPI 的 BSY 勘误规避方法替代 I2S 停止顺序。来源身份维护于 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/references.json">F407 参考清单</a>。</p>
+<p>参见<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h">公共合同</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/drivers/i2s2_slave_tx.c">真实 provider</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/private/stm32f407_system.h">所选 System 生命周期</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/frame_stream.h">帧所有权合同</a>及<a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">资格边界</span></a>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

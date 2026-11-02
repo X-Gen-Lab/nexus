@@ -39,8 +39,13 @@ REQUIRED = ("index.html", "en/index.html", "zh_CN/index.html",
             "api/index.html", "licenses/LICENSE.txt", BUILD_METADATA)
 MAX_FILES = 100000
 MAX_BYTES = 1024 * 1024 * 1024
+REFERENCE_VERIFICATION = {
+    "at_packaging": "original_candidate_closure",
+    "offline": "reference_metadata_only",
+    "original_evidence_included": False,
+}
 CODE_PATHS = ("CMakeLists.txt", "arch", "boards", "cmake", "components",
-              "core", "dependencies", "io", "os", "soc")
+              "core", "dependencies", "drivers", "io", "os", "soc")
 
 
 def _json_bytes(value):
@@ -198,6 +203,45 @@ def _alias_rows(payload, catalog=None, *, require_pages=True):
     return rows
 
 
+def _validate_alias_originals(source_root, rows):
+    """Validate live originals or pinned historical regular blobs."""
+    missing = {}
+    for row in rows:
+        original = _no_symlink(source_root / row["old_source"])
+        if original.exists():
+            if not original.is_file():
+                raise ValueError(
+                    "Documentation alias original source is not a file")
+        else:
+            missing.setdefault(row["source_revision"], set()).add(
+                row["old_source"])
+    for revision, paths in missing.items():
+        try:
+            result = subprocess.run(
+                ["git", "--literal-pathspecs", "-C", str(source_root),
+                 "ls-tree", "-r", "-z", revision, "--", *sorted(paths)],
+                capture_output=True, check=False, timeout=30)
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise ValueError(
+                "Documentation alias historical source lookup failed") from error
+        if result.returncode:
+            raise ValueError(
+                "Documentation alias historical source revision is unavailable")
+        proven = set()
+        for entry in result.stdout.split(b"\0"):
+            if not entry:
+                continue
+            metadata, name = entry.split(b"\t", 1)
+            mode, kind, _ = metadata.split()
+            path = name.decode("utf-8")
+            if (path in paths and mode in (b"100644", b"100755")
+                    and kind == b"blob"):
+                proven.add(path)
+        if proven != paths:
+            raise ValueError(
+                "Documentation alias original source is missing or unverifiable")
+
+
 def install_alias_catalog(build_dir, source_root):
     """Derive portable aliases only from the maintained CSV; never guess redirects."""
     build_dir, source_root = _no_symlink(build_dir), _no_symlink(source_root)
@@ -214,13 +258,11 @@ def install_alias_catalog(build_dir, source_root):
                "aliases": list(reader), "canonical_collisions": []}
     payload = _payload(build_dir)
     rows = _alias_rows(payload, catalog, require_pages=False)
+    _validate_alias_originals(source_root, rows)
     catalog_destination = _no_symlink(build_dir / ALIASES)
     if catalog_destination.exists():
         raise ValueError("Documentation alias output collides with existing payload")
     for row in rows:
-        original = _no_symlink(source_root / row["old_source"])
-        if not original.is_file():
-            raise ValueError("Documentation alias original source is missing")
         destination = _no_symlink(build_dir / row["old_url"])
         if destination.exists():
             if not destination.is_file():
@@ -507,7 +549,7 @@ def _manifest(payload, expected_manifest_sha256=None):
         raise ValueError("Documentation manifest digest mismatch")
     manifest = _json(raw, "manifest")
     if (type(manifest.get("schema_version")) is not int or
-            manifest.get("schema_version") != 1 or
+            manifest.get("schema_version") not in (1, 2) or
             manifest.get("kind") != "nexus_documentation_package"):
         raise ValueError("Unsupported documentation manifest schema")
     _release_id(manifest.get("release_id"))
@@ -594,6 +636,18 @@ def _manifest_identity(manifest):
     if (_identity(manifest["code_source"]) !=
             _identity(manifest["documentation_source"])):
         raise ValueError("Documentation code and source snapshots differ")
+    if manifest["schema_version"] == 2:
+        if "qualified_code" in manifest:
+            raise ValueError("Legacy qualification cannot enter schema-2 delivery")
+        _qualification_references(manifest.get("qualification_references"))
+    else:
+        _legacy_qualification_reference(manifest)
+
+
+def _legacy_qualification_reference(manifest):
+    """Read frozen schema-1 references without producing new legacy packages."""
+    if "qualification_references" in manifest:
+        raise ValueError("Schema-1 delivery cannot carry new qualification references")
     qualified = manifest.get("qualified_code")
     if not isinstance(qualified, dict):
         raise ValueError("Documentation qualified code reference missing")
@@ -603,6 +657,84 @@ def _manifest_identity(manifest):
     if (qualified.get("index") != "docs/delivery/build-system-results.json" or
             not re.fullmatch(r"[0-9a-f]{64}", str(qualified.get("index_sha256", "")))):
         raise ValueError("Documentation qualified code evidence identity missing")
+
+
+def _qualification_references(references):
+    """Check sealed navigation metadata, not original firmware execution bytes."""
+    from tools.evidence.common import SOFTWARE_QUALIFICATION_SCOPES, identifier
+
+    if not isinstance(references, list) or len(references) > 256:
+        raise ValueError("Documentation qualification references must be bounded")
+    seen = set()
+    fields = {"candidate", "candidate_id", "source", "configuration_sha256",
+              "artifacts", "qualified_scopes", "physical_status",
+              "product_promotion", "signature_status", "verification"}
+    for reference in references:
+        if not isinstance(reference, dict) or set(reference) != fields:
+            raise ValueError("Documentation qualification reference fields differ")
+        identifier(reference["candidate_id"], "candidate id")
+        source = reference["source"]
+        if (not isinstance(source, dict) or source.get("dirty") is not False or
+                any(not re.fullmatch(r"[0-9a-f]{40}", str(source.get(key, "")))
+                    for key in ("commit", "tree"))):
+            raise ValueError("Documentation qualification source identity invalid")
+        modules = source.get("submodules")
+        if (not isinstance(modules, list) or
+                any(not isinstance(item, str) or item.startswith(("-", "+", "U"))
+                    for item in modules)):
+            raise ValueError("Documentation qualification dependency identity invalid")
+        if (not re.fullmatch(r"[0-9a-f]{64}",
+                             str(reference["configuration_sha256"])) or
+                reference["qualified_scopes"] != sorted(SOFTWARE_QUALIFICATION_SCOPES) or
+                reference["physical_status"] != "not_executed" or
+                reference["product_promotion"] != "not_performed" or
+                reference["signature_status"] != "unsigned" or
+                reference["verification"] != REFERENCE_VERIFICATION):
+            raise ValueError("Documentation qualification scope/boundary invalid")
+        candidate = reference["candidate"]
+        if (not isinstance(candidate, dict) or
+                set(candidate) != {"path", "sha256", "size"} or
+                not isinstance(candidate["path"], str) or
+                not candidate["path"].strip() or
+                any(ord(character) < 32 for character in candidate["path"])):
+            raise ValueError("Documentation candidate locator identity invalid")
+        artifacts = reference["artifacts"]
+        if not isinstance(artifacts, dict) or set(artifacts) != {"elf", "bin", "map"}:
+            raise ValueError("Documentation qualification artifacts incomplete")
+        for identity in [candidate, *artifacts.values()]:
+            if (not isinstance(identity, dict) or
+                    type(identity.get("size")) is not int or identity["size"] <= 0 or
+                    not re.fullmatch(r"[0-9a-f]{64}",
+                                     str(identity.get("sha256", "")))):
+                raise ValueError("Documentation qualification digest/bytes invalid")
+        if any(set(identity) != {"sha256", "size"}
+               for identity in artifacts.values()):
+            raise ValueError("Documentation artifact reference fields differ")
+        if candidate["sha256"] in seen:
+            raise ValueError("Documentation duplicate qualification reference")
+        seen.add(candidate["sha256"])
+
+
+def _verified_qualification_references(paths):
+    """Verify explicitly selected original candidates before retaining references."""
+    if not paths:
+        return []
+    from tools.evidence.candidate import verified_projection
+
+    references = []
+    for path in paths:
+        projection = verified_projection(_no_symlink(path))
+        reference = {key: projection[key] for key in
+                     ("candidate", "candidate_id", "source",
+                      "configuration_sha256", "qualified_scopes",
+                      "physical_status", "product_promotion", "signature_status")}
+        reference["artifacts"] = {
+            role: {key: identity[key] for key in ("sha256", "size")}
+            for role, identity in projection["artifacts"].items()}
+        reference["verification"] = dict(REFERENCE_VERIFICATION)
+        references.append(reference)
+    _qualification_references(references)
+    return references
 
 
 def _checksums(payload):
@@ -657,7 +789,8 @@ def _identity(source):
     return {key: source[key] for key in ("commit", "tree", "dirty", "submodules")}
 
 
-def package(build_dir, output_dir, *, source_root, release_id, toolchain=None):
+def package(build_dir, output_dir, *, source_root, release_id, toolchain=None,
+            qualification_references=()):
     """Bind a clean, unchanged source and complete built payload to one release ID."""
     release_id = _release_id(release_id)
     build_dir = _no_symlink(build_dir)
@@ -695,26 +828,17 @@ def package(build_dir, output_dir, *, source_root, release_id, toolchain=None):
     source_interface = dict(policy)
     source_interface["policy_sha256"] = _digest(
         (source_root / "dependencies/platform-compatibility.json").read_bytes())
-    qualification_path = source_root / "docs/delivery/build-system-results.json"
-    qualification_bytes = qualification_path.read_bytes()
-    qualification = _json(qualification_bytes, "qualification index")
-    qualified = qualification.get("source", {})
-    if any(not re.fullmatch(r"[0-9a-f]{40}", str(qualified.get(key, "")))
-           for key in ("canonical_code_commit", "code_tree")):
-        raise ValueError("Missing exact qualified code source")
+    references = _verified_qualification_references(qualification_references)
     documentation = _identity(source)
     documentation.update(_git_tree(source_root, ("docs", "tools/documentation")))
     code = _identity(source)
     code.update(_git_tree(source_root, CODE_PATHS))
     manifest = {
-        "schema_version": 1, "kind": "nexus_documentation_package",
+        "schema_version": 2, "kind": "nexus_documentation_package",
         "release_id": release_id, "version": policy["semantic_version"],
         "source_interface": source_interface,
         "documentation_source": documentation, "code_source": code,
-        "qualified_code": {"commit": qualified["canonical_code_commit"],
-                           "tree": qualified["code_tree"],
-                           "index": "docs/delivery/build-system-results.json",
-                           "index_sha256": _digest(qualification_bytes)},
+        "qualification_references": references,
         "physical_status": "not_executed", "languages": ["en", "zh_CN"],
         "tool_versions": metadata["tools"],
         "qualification_boundary": "Documentation delivery grants no new firmware or HIL qualification.",

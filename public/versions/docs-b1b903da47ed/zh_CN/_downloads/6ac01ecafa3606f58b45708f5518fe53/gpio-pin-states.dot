@@ -1,0 +1,46 @@
+// FIG-22 current exact G474 named GPIO software lifecycle.
+// Dashed edges: generation / pure identity. Solid: lifecycle or selection.
+// No request states, automatic clock repair, wake or physical safety are implied.
+digraph gpioPinStates {
+    graph [label="FIG-22 G474 named GPIO states\nCurrent software; no low-power or HIL qualification", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=14, bgcolor="white", pad=0.2, nodesep=0.3, ranksep=0.4];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, margin="0.1,0.08"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.7];
+    authored [label="Board + TOML"];
+    assembled [label="Static face, plans and private state"];
+    factory [label="Factory lookup"];
+    cold [label="Platform: cold snapshot + pad/gate lease"];
+    select [label="Serialized privileged select"];
+    apply [label="Withdraw group; latch / fields; target readback"];
+    active [label="Proved DEFAULT / SLEEP image"];
+    retained [label="Runtime failure: initialized lease retained", fillcolor="#fff7ed"];
+    cleanup [label="Cleanup failure: keep remaining responsibility", fillcolor="#fff7ed"];
+    shutdown [label="Platform stop: resume unfinished stages"];
+    gate [label="Platform: prove gate cleanup"];
+    stop [label="Provider stop: prove drivers withdrawn"];
+    restore [label="Platform: restore cold snapshot"];
+    released [label="Proved cleanup; release lease", fillcolor="#f0fdf4"];
+    authored -> assembled [label="build-time generation", style=dashed];
+    factory -> assembled [label="return existing face only", style=dashed];
+    assembled -> cold [label="Platform start"];
+    cold -> active [label="initialize and prove DEFAULT"];
+    cold -> cleanup [label="partial startup effects"];
+    active -> select [label="explicit target; writers quiescent"];
+    select -> apply [label="dirty or changed target; admission proved"];
+    apply -> active [label="checked target committed"];
+    select -> active [label="same target; image verified; no write"];
+    select -> retained [label="refusal preserves existing lease"];
+    apply -> retained [label="incomplete transition proof"];
+    retained -> select [label="initialized and not stopped; target retry"];
+    active -> shutdown [label="explicit Platform stop"];
+    retained -> shutdown [label="checked cleanup retry"];
+    cleanup -> shutdown [label="retry remaining cleanup"];
+    shutdown -> stop [label="provider responsibility remains"];
+    shutdown -> restore [label="provider already withdrawn"];
+    shutdown -> gate [label="only gate responsibility remains"];
+    stop -> restore [label="provider proof only"];
+    stop -> cleanup [label="missing withdrawal proof"];
+    restore -> gate [label="cold snapshot restored"];
+    restore -> cleanup [label="snapshot restore incomplete"];
+    gate -> released [label="gate cleanup proved"];
+    gate -> cleanup [label="gate cleanup incomplete"];
+}

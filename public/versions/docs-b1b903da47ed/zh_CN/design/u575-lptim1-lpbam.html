@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>U575 跨 Stop2 的 LPTIM1 单组 LPBAM &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="U575 MPU-v2 scalar GPIO WRITE authority" href="u575-mpu-gpio.html" />
+    <link rel="prev" title="可选 timer 捕获与互补 PWM" href="timer-advanced.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/u575-lptim1-lpbam.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/design/u575-lptim1-lpbam.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="u575-single-tuple-lptim1-lpbam-across-stop2">
+<h1>U575 跨 Stop2 的 LPTIM1 单组 LPBAM<a class="headerlink" href="#u575-single-tuple-lptim1-lpbam-across-stop2" title="Link to this heading">¶</a></h1>
+<p>本参考适用于 STM32U575ZIT6Q TZEN0 baremetal：一组固定 SRAM4 tuple 通过 LPDMA1 channel0 更新 LPTIM1 CCR1、RCR 和 ARR，同一 concrete Stop2 owner 负责睡眠与最终归还。通用 LPBAM 以及原 <a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">IO-32</span></code></a>、<a class="reference download internal" download="" href="../_downloads/99f801eac159da083b9107f1c02855a6/soc-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">SOC-35</span></code></a> 退出仍开放。Board 输出路线未知；物理 HIL 为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+<p>ES0499 第 2.17.3 节指出，修改 DIER 中的中断位会清除对应状态标志。因此成功必须在撤源改写 DIER 之前锁存新鲜的内核写入确认。软件模型保守地允许任意 DIER 写入清除全部三个 write-OK 标志；这是防御性测试边界，不是硅片测量结果。</p>
+<p>链接 <code class="docutils literal notranslate"><span class="pre">Nexus::U575Stop2Lptim1</span></code>，它引入 <code class="docutils literal notranslate"><span class="pre">Nexus::U575LpdmaLptim1</span></code> 和保留时间组件。WUT-only、SRAM4-copy 与 LPTIM1 是同一静态 Stop2 owner 和 RUN ClockDomain 的互斥编译期模式。默认镜像不选入任何新目标。该参考不引入堆、worker、队列、动态 MMIO 计划、运行时注册表或新 factory；vendor types 保持私有。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/u575-lptim1-lpbam.svg" title="打开 SVG 大图"><img alt="FIG-28：选定的 LPTIM1 单组参考；成功证明先于撤源和复合归还；物理退出仍开放" src="../_images/u575-lptim1-lpbam.svg" /></a></p>
+<p>FIG-28 区分调用、硬件请求和最终访问证明。<a class="reference internal" href="../assets/diagrams/README.html#fig-28-u575-lptim1-lpbam"><span class="std std-ref">图示合同</span></a> 与 WUT-only FIG-24、内存复制 FIG-27 分开；任何箭头都不建立引脚路线或物理 Stop2 驻留。</p>
+<section id="prepare-the-exact-owners">
+<h2>准备精确 owner<a class="headerlink" href="#prepare-the-exact-owners" title="Link to this heading">¶</a></h2>
+<p>选用维护的 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml">assembly</a>。仍须满足其选定 SRAM4/LPDMA1 reset startup 和外部准备的 LSE RTC 来源合同。在每次 join 完成前，必须保持 <code class="docutils literal notranslate"><span class="pre">0x28000000..0x28003fff</span></code> 的 16 KiB nonsecure SRAM4 供电与保留，并保持 SRAM4EN、LPDMA1EN 有效。运行时恢复不得通过修改掉电字段来补救已丢失的 SRAM4。</p>
+<p>既有 <a class="reference internal" href="u575-retained-time.html"><span class="std std-doc">保留时钟与 Stop2 profile</span></a> 要求 TZEN0、未交换 Flash、有效 MSIS4/MSIK4、各总线频率相同、真实 Range4 和 caches off。所有 LPDMA channel/vector 初始必须静默，其他 channel 不得运行。整个 LPTIM1 控制器必须独占且初始处于 reset/cold 状态，访问门控关闭、kernel mux 为 reset 值。外部 timer writer、IRQ user 或 reset 不得共享它。RUN LPTIM2 必须已禁用并 join。</p>
+<p>以 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h">receiver API</a> 和 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h">Stop2 API</a> 为声明权威。由一个 privileged Thread 串行调用；复制的 face 保留相同物理身份。ISR 或并发 writer 不得控制这些对象。所有 owner、clock 和 face 都须保持有效，直至 stop 与 join 完成。</p>
+</section>
+<section id="storage-and-the-single-tuple-bound">
+<h2>存储与单组限制<a class="headerlink" href="#storage-and-the-single-tuple-bound" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>选定对象</p></th>
+<th class="head"><p>精确成本或约束</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>不可变 SRAM4 tuple</p></td>
+<td><p>12 B，4 字节对齐；<code class="docutils literal notranslate"><span class="pre">CCR1&lt;ARR</span></code>、<code class="docutils literal notranslate"><span class="pre">RCR=0</span></code>、<code class="docutils literal notranslate"><span class="pre">1023&lt;=ARR&lt;=65535</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>生成的 continuation workspace</p></td>
+<td><p>独立 48 B，4 字节对齐；恰好两个 LLI</p></td>
+</tr>
+<tr class="row-even"><td><p>调用者拥有的 ARM32 receiver</p></td>
+<td><p>104 B，包含新增的 16 B start-effects 账本</p></td>
+</tr>
+<tr class="row-odd"><td><p>既有 SRAM4-copy receiver</p></td>
+<td><p>ARM32 保持 88 B 不变；该模式不增加新账本</p></td>
+</tr>
+<tr class="row-even"><td><p>共享 LPTIM1 ops 表</p></td>
+<td><p>ARM32 下为 16 B 只读；不为每个实例复制</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>完整 tuple 和 workspace 范围必须是互不重叠的 SRAM4 区段，并与 request、owner、face、clock、snapshot 及其他控制存储分开。调用者不提供目的地址、原始 DMA 指令或 tuple 数量。第二组 tuple 需要证明每个前序异步寄存器写入均在复用前被接受；较大的 ARR 不能约束任意 bridge 延迟。重复更新不属于本 API。Host64 receiver storage 为 136 B；旧 copy 保持 120 B。</p>
+</section>
+<section id="start-borrow-and-execute">
+<h2>启动、借用与执行<a class="headerlink" href="#start-borrow-and-execute" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>使用普通保留时间初始化器，设置 <code class="docutils literal notranslate"><span class="pre">wake_owner=nx_stm32u575_stop2_identity()</span></code>，再初始化 Stop2 和 receiver。不使用 AlarmA-copy 初始化器。Receiver 初始化无副作用；显式公开 <code class="docutils literal notranslate"><span class="pre">start</span></code> 在未屏蔽的 privileged Thread 中准备访问。</p></li>
+<li><p>Start 获取 LPTIM1EN、LPTIM1SEL=LSE 和仅在需要时新增的 LSESYSEN，并观察 LSESYSRDY，保持 oscillator/calendar 来源不变。它不写 timer register。部分失败保留账本和物理预留；必须保持存储有效，并调用公开 <code class="docutils literal notranslate"><span class="pre">stop</span></code>，直到恢复成功。产品无需私有 RCC 准备写入。</p></li>
+<li><p>初始化 request base，取得一次成功的 retained sample，然后以 tuple、workspace 和保留时间域中的绝对 deadline 或 NEVER 准备元数据。Prepare 不借用或访问 tuple/workspace；须保持 tuple 内容不变。值准入检查发生在 ACCEPTED 之前。拒绝不改变 request 的任何字节，也不保留新引用；旧 TIM2 deadline 从不转换。</p></li>
+<li><p>关闭并排空精确 RUN barrier，禁用/join LPTIM2 并停止 Platform。以 privileged MSP Thread、CONTROL0、PRIMASK1 和 BASEPRI/FAULTMASK0 进入；恢复期间保持掩码及 RUN 准入关闭。使用 4096..65536 个 RTC/16 escape ticks，以及正数的每阶段 <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code>。即使后续设置失败，ACCEPTED 仍借用 request、tuple 和完整 workspace，直至 acquire 观察到 SETTLED 且外部 observer join 完成。</p></li>
+</ol>
+<p>观察到 CR.ENABLE 后，新的成功 retained sample 作为有界等待的起点；至少再等待两个 256 Hz RTC tick，并检查 request deadline。即使第一个 tick 间隔任意短，仍包含一个完整的 128 LSE cycle 间隔，超过两个 counter cycle。轮询次数本身不能证明经过时间。PRELOAD1、一次 CC1E 设置以及初始 CCR1=0/RCR=0/ARR=1023 写入要求新的 CMP1OK/REPOK/ARROK；这些初始标志随后必须被清除并确认清除，才能启动 DMA。</p>
+<p>首个 32 位 CCR1 写入等待 request13 <code class="docutils literal notranslate"><span class="pre">lptim1_ue_dma</span></code>，使用 BREQ1、SWREQ0 和保留位 DREQ0。两个生成的软件请求 LLI 依次写 RCR，最后写 ARR，目的地址固定且不连续，也不递增。ARR 的 APB 写入应答清除 UE；末链为零，完成发生在最后一个 LLI。WUT 独立提供逃逸唤醒；不配置 AlarmA register 或 GPIO。成功表示寄存器写入已同步，不代表播放完整 PWM 周期。</p>
+</section>
+<section id="prove-success-isolate-and-join">
+<h2>证明成功、隔离与 join<a class="headerlink" href="#prove-success-isolate-and-join" title="Link to this heading">¶</a></h2>
+<p>成功须在 UEDE0 或任何 DIER 撤源写入可能清除标志之前，锁存有限 DMA 完成与新鲜 CMP1OK/REPOK/ARROK。DIER 写入后标志安静不是该证明。每次准入及完成的自有隔离都会在既有 16 B 账本内清除保存的证明。错误或部分取消无需为未发出的写入取得 write-OK；master 隔离和自有 reset 可以错误终止此类请求。</p>
+<p>若尚无 DMA 终态或既有失败，公开 <code class="docutils literal notranslate"><span class="pre">service</span></code> 返回 BUSY 并保持 UEDE 启用，使待发生的硬件请求仍可推进。pending IRQ 只是提示。若具体 Stop2 清理不能证明完成，会保留借用并记录错误，供显式恢复使用。</p>
+<p>有限 DMA 完成后，有界的新鲜 write-OK 证明若不完整，会锁存 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_IO</span></code> 并返回 BUSY，本次调用仍保留生产源和借用。下一次公开 <code class="docutils literal notranslate"><span class="pre">service</span></code> 或具体 <code class="docutils literal notranslate"><span class="pre">recover</span></code> 即使始终没有这些标志，也会沿错误排空路径推进。这表示未能证明内核接收，不是从轮询次数推断 deadline 已到。</p>
+<p>WUT、deadline、cancel 和恢复错误须在撤源前进入首次失败账本。该决定与 DIER 写入之间到达的 TC 可以增加已观察的传输前缀，但不能将终态错误升级为成功。公开 <code class="docutils literal notranslate"><span class="pre">service</span></code> 从不发布 SETTLED；同一具体 Stop2 owner 必须完成最终引用撤除。</p>
+<p>在有效访问配置下，先撤回 UEDE 并观察新鲜 DIEROK，再进行下一次 DIER 写入；对于仍启用的 DMA 通道须取得 suspend/SUSPF/idle，对已完成通道须观察 idle。证明 full-word RESET 与完整 CCR 为零。在通过 RCC reset 独占的 LPTIM1 前，清除通道地址、链接、标志和 IRQ 引用。绝不清 CR.ENABLE：ES0499 第 2.17.1 节要求使用 reset 关闭。保留无关门控、mux 字段及 RTC/LSE 来源；自有 reset 不得擦除任何外部控制器状态。</p>
+<p>访问 profile 未知时，不允许 RTC/LPTIM/DMA MMIO，并保留效果与存储。Concrete Stop2 recovery 重试时不执行 WFI。只有 DMA 最终访问已被证明之后，自有 reset 失败才可重试；活动借用期间观察到外部 DMA 或 LPTIM reset，会将借用永久隔离，直至实际外部系统 reset。撤销 reset 或静默 reset 默认值不能归还该借用。</p>
+<p>Cancel/deadline 从不撤销存储借用。只有 peripheral、DMA、IRQ、借用 gate、RTC/WUT、power 和 clock 都恢复后，Stop2 才移除引用，并以 release 发布 SETTLED，作为其最后一次 request 访问。公开 start 的 claim 保留到 joined public <code class="docutils literal notranslate"><span class="pre">stop</span></code> 归还它们，即使 stop 是在借用期间请求的。所有效果排空后才可重新开放 RUN 并重启 Platform；旧 Core TIM2 deadline 仍然无效。</p>
+</section>
+<section id="sources-and-verification-boundary">
+<h2>来源与验证边界<a class="headerlink" href="#sources-and-verification-boundary" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32u575/drivers/lpdma_copy.c">生产 receiver</a> 与<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32u575/stop2.c">具体 Stop2</a> 通过 typed compile-time profile 共享不变量；两个公共 request/ops 类型保持独立。<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c">维护的公共 C11 consumer</a> 是源码集成参考。完整安装版 SDK consumer plan 由<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/release/transport.py">维护的 transport policy</a> 定义；历史 v7/v8 结果不授予新增选择资格。完整集成 gate、搬移 SDK、离线复现与候选验收均须有各自证据。</p>
+<p>有针对性的真实生产 C GoogleTest 模型在 debug 和 Os 下各通过 24 项，覆盖保守 DIER 清旗、早期 service、确认缺失、部分取消、晚到 TC 和证明复用。既有 memory-copy receiver31 与 coupled17 项保持通过。选择性严格 C11 Cortex-M33 开发重链接重新编译 receiver 和 Stop2 单元，复用固定的 startup、公共 consumer 与未变依赖库。这些检查不建立完整 SDK 或候选资格。</p>
+<p>RM0456 Rev7 来源为第 18.3.3 节/Table148（request13）、18.3.4 节/Table149（BREQ）、18.8.11 节（保留位 DREQ）、58.4.11/13 节（write-OK/enable 延迟）、58.4.20–21 节（CCR1→RCR→ARR/UEDE）、58.5 节（Stop2 前禁用 LPTIM2）、58.7.8 节（DIEROK）和 11.8.48–49 节（LSE mux/system gate）。ES0499 Rev12 第 2.17.1–3 节规定 reset、repeat/APB 约束和 DIER flag；RCR0 与 LSE≤PCLK 排除奇数 repeat profile。物理波形、保留、驻留、精度、唤醒与功耗检查仍为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>；不提升任何原 IO-32/SOC-35 退出状态。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,41 @@
+// FIG-23 current bounded software mechanisms, independently selected.
+// Source contracts: docs/design/io-extension-boundaries.md and linked headers.
+// Every arrow names calls, supplied storage or required external proof.
+digraph ioExtensionOwnership {
+    graph [label="FIG-23 当前软件所有权\n独立选定机制；不建立硬件资格",
+           rankdir=LR, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    app [label="外部 owner\n串行执行／service／停机／join", fillcolor="#f8fafc"];
+    mapped [label="MappedStorage\n精确 slot + epoch 借用\n唯一 backend writer"];
+    amp [label="AMPIPC\nlane + boot epoch + sequence\noffer／ACK cache line"];
+    handoff [label="STM32F407Handoff\n既有 ClockDomain barrier\n屏蔽中断 Flash 向量尾跳"];
+    rtc [label="U575 保留 RTC\n单个 AlarmA 请求\nRUN 轮询／预先准备 LSE"];
+    frame [label="FrameStream + H743 V DMA2D\n完整源帧借用\nRGB565 复制／固定 ARGB8888 → RGB565 PFC\nAXI SRAM／D-Cache off\n无 CLUT 或 blending"];
+    storage [label="调用方存储\nrequest／payload／slot／共享记录", fillcolor="#f8fafc"];
+    proof [label="外部证明\nconsumer 已 join／旧 epoch 无法再访问\n时钟用户已排空／有效 backup domain", fillcolor="#fff7ed"];
+    ports [label="显式 AMP 端口\n唯一角色 claim／持久 boot 历史\n一致性 control 顺序／cache 操作", fillcolor="#f8fafc"];
+    held [label="撤源失败\n保留精确借用与状态\nQUARANTINED 请求仍被借用", fillcolor="#fff7ed"];
+    app -> mapped [label="调用 acquire／release／service"];
+    app -> amp [label="调用 send／receive／finish／join"];
+    app -> handoff [label="登记／关闭／证明 barrier／调用"];
+    app -> rtc [label="调用 factory face／service／stop"];
+    app -> frame [label="发布帧／提交／service"];
+    storage -> mapped [label="提供 slot + writer 输入"];
+    storage -> amp [label="提供共享记录 + payload"];
+    storage -> rtc [label="提供 request"];
+    storage -> frame [label="提供池 + request + 目标"];
+    proof -> mapped [label="release 前 join 映射读者", style=dashed];
+    proof -> amp [label="仅授权 reset_join", style=dashed];
+    ports -> amp [label="提供目标特定顺序 + 身份", style=dashed];
+    proof -> handoff [label="全部已登记及未登记 owner 静止", style=dashed];
+    proof -> rtc [label="boot owner 保留精确 LSE 日历", style=dashed];
+    mapped -> held [label="unmap／writer 排空失败"];
+    amp -> held [label="ACK／epoch 证明失败"];
+    rtc -> held [label="alarm 撤回／恢复失败"];
+    frame -> held [label="DMA2D 排空证明失败"];
+}

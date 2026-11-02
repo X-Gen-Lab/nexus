@@ -1,0 +1,39 @@
+// FIG-27 current exact finite SRAM4 copy; selected ARM/SDK development checks passed; full qualification/HIL open.
+// Source: public copy/Stop2/retained-clock APIs and private compound release.
+digraph u575Stop2Copy {
+ graph [label="FIG-27：选定 SRAM4 复制／同一 Stop2 owner\n软件模型与源码审查完成\n选定 ARM／安装版 SDK 开发检查已通过\n完整资格／物理退出仍开放", rankdir=TB,
+        labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+ node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+ edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+ boot [label="选定的仅复位启动／外部 owner\nSRAM4 供电与 DATA/BSS；持续 SRAM4EN／LPDMA1EN\nMSIS4／MSIK4 配置稳定；其他通道与 master 安静", fillcolor="#fff7ed"];
+ run [label="调用方：精确关闭的 RUN 屏障\n停止 Platform；退出实际 consumer\n结束旧 TIM2 deadline；保留全部复制存储"];
+ clock [label="独立保留 RTC 时钟\n显式选择 AlarmA-copy\n同一 Stop2 身份／有效代次"];
+ owner [label="同一具体 Stop2 owner／Copy 变体\ncopy_enter：先 receiver 后 producer\nAlarmA＋独立 WUT 逃逸／屏蔽中断的 WFI"];
+ copy [label="精确 LPDMA1 通道 0 receiver\n私有 validate_ready → arm → validate_sleep\n公共 service／cancel／stop 不能单独结清"];
+ buffers [label="精确 16 KiB 非安全 SRAM4\n源／目标／生成的 24 B LLI 互不重叠\n首块 floor(n/2) 字节；次块为余下字节"];
+ first [label="有限硬件链\nAlarmA 上升沿 trigger 14 → 首块\n次 LLI 无触发门控／末 LLI 完成／最终链接为零"];
+ guard [label="唤醒／设置失败：先核对 RUN 配置\n配置未知：只撤回 CPU 状态\n不访问 RTC／DMA MMIO；保留外设效果与借用", fillcolor="#fff7ed"];
+ drain [label="复合清理\n撤回 AlarmA／WUT → 观察复位后完整 CCR=0 与 idle\n清零链接／IRQ 安静 → 恢复所占门控与时钟"];
+ held [label="证明失败：保留整个借用与 copy marker\n即使硬件效果为零\nRUN 继续关闭；recover 重试且不再 WFI", fillcolor="#fff7ed"];
+ quarantine [label="活动借用期间观察到外部 LPDMA1 reset\n永久 QUARANTINE：安静 reset 值不证明先前最终访问\n只有实际外部系统 reset 终止该责任", fillcolor="#fee2e2"];
+ release [label="最终 release 门：全部效果为零／Stop2 引用已分离\n私有 release 成功 → 最终 SETTLED 发布\nacquire 观察及外部退出后才可复用", fillcolor="#ecfdf5"];
+ open [label="开放退出\n外设 LPBAM／物理复制／Stop2 驻留\n保留／电流／精度／唤醒延迟／完整 IO-32 与 SOC-35", style="rounded,dashed,filled", fillcolor="#f8fafc"];
+ boot -> buffers [label="准备存储并保持运行门控稳定", style=dashed];
+ boot -> owner [label="提供配置与外部排除条件证明", style=dashed];
+ run -> owner [label="copy_enter 传入精确屏障／face／request"];
+ clock -> owner [label="核对同一 owner 与代次"];
+ owner -> copy [label="私有准入与 receiver arm"];
+ copy -> buffers [label="ACCEPTED：借用 request／buffer／workspace"];
+ owner -> first [label="随后启用 AlarmA"];
+ buffers -> first [label="DMA 读写精确借用范围"];
+ first -> guard [label="IRQ114 或 WUT IRQ2 pending 唤醒屏蔽状态 WFI"];
+ owner -> guard [label="设置失败也进入清理"];
+ guard -> drain [label="RTC／DMA 访问前已核对配置"];
+ guard -> held [label="配置未知：不撤回外设"];
+ drain -> held [label="任一撤回／恢复证明失败"];
+ held -> guard [label="recover：保持屏蔽；不再 WFI"];
+ copy -> quarantine [label="借用期间观察到外部 engine reset"];
+ drain -> release [label="全部 RTC／DMA／IRQ／供电／门控／时钟证明"];
+ release -> held [label="release 失败：恢复 Stop2 引用／保留 marker"];
+ release -> open [label="软件最终访问不建立物理结果", style=dashed];
+}

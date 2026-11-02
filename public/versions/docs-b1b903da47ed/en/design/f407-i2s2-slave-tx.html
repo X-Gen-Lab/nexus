@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Finite I2S2 slave TX on STM32F407 &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fault observation and retained responsibility" href="fault-observation.html" />
+    <link rel="prev" title="Ethernet frame loans and the MAC hardware clock" href="ethernet-frames.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/f407-i2s2-slave-tx.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/design/f407-i2s2-slave-tx.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="finite-i2s2-slave-tx-on-stm32f407">
+<span id="f407-i2s2-slave-tx"></span><h1>Finite I2S2 slave TX on STM32F407<a class="headerlink" href="#finite-i2s2-slave-tx-on-stm32f407" title="Link to this heading">¶</a></h1>
+<p>Use this exact baremetal role to transmit one caller-owned stereo16 frame block
+from an STM32F407VET6 or STM32F407ZGT6 under an independently controlled external
+I2S master. One task owns the transmitter, the external-clock handshake and
+failure drain. The implementation supplies finite normal DMA and explicit final
+access; the product supplies samples, rate, codec, master and recovery policy.
+Physical HIL is <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>. IO-41 remains <code class="docutils literal notranslate"><span class="pre">in_progress</span></code>; continuous audio,
+SAI and PDM remain open.</p>
+<section id="select-one-physical-role">
+<h2>Select one physical role<a class="headerlink" href="#select-one-physical-role" title="Link to this heading">¶</a></h2>
+<p>The authored role is <code class="docutils literal notranslate"><span class="pre">[i2s2]</span></code> with
+<code class="docutils literal notranslate"><span class="pre">profile</span> <span class="pre">=</span> <span class="pre">&quot;slave-tx-stereo16-pb12-pb13-pb15&quot;</span></code>. It resolves through the same
+validated hardware IR and resource plan as other controllers. A selected SPI2
+personality, pin, DMA stream or vector conflict is rejected before generation.
+Omitting the role leaves it unselected; it creates no audio owner or target.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource or format</p></th>
+<th class="head"><p>Exact selection</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Chip and clock</p></td>
+<td><p>STM32F407VET6 or STM32F407ZGT6; baremetal; <code class="docutils literal notranslate"><span class="pre">hse8-pll168</span></code>; live 1 MHz TIM2</p></td>
+</tr>
+<tr class="row-odd"><td><p>Wire</p></td>
+<td><p>Philips I2S; two 16-bit channels and 16-bit slots; samples leave MSB first</p></td>
+</tr>
+<tr class="row-even"><td><p>Pads</p></td>
+<td><p>PB12 WS input, PB13 CK input, PB15 SD output; AF5</p></td>
+</tr>
+<tr class="row-odd"><td><p>Engine</p></td>
+<td><p>DMA1 Stream4 channel0; normal, direct, memory-incrementing 16-bit transfers</p></td>
+</tr>
+<tr class="row-even"><td><p>Exclusive vectors</p></td>
+<td><p>DMA1 Stream4 and SPI2; sources remain disabled and no IRQ service is installed</p></td>
+</tr>
+<tr class="row-odd"><td><p>Payload</p></td>
+<td><p>One plane, zero offset, contiguous nonempty rows with <code class="docutils literal notranslate"><span class="pre">stride</span> <span class="pre">==</span> <span class="pre">row_bytes</span></code> and no padding; left then right 16-bit little-endian samples</p></td>
+</tr>
+<tr class="row-even"><td><p>Block size</p></td>
+<td><p>4..131068 B, divisible by four; 2..65534 DMA halfwords</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA memory</p></td>
+<td><p>Entire aligned source span in main SRAM <code class="docutils literal notranslate"><span class="pre">[0x20000000,</span> <span class="pre">0x20020000)</span></code>; CCM is excluded</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>For this stereo16 I2S format, <code class="docutils literal notranslate"><span class="pre">nx_frame_layout_audio</span></code> describes successive
+audio frames as rows. Keep that canonical layout: a multi-frame block may
+have multiple contiguous rows. The provider checks nonempty rows,
+<code class="docutils literal notranslate"><span class="pre">stride</span> <span class="pre">==</span> <span class="pre">row_bytes</span></code> and a bounded <code class="docutils literal notranslate"><span class="pre">rows</span> <span class="pre">*</span> <span class="pre">row_bytes</span> <span class="pre">==</span> <span class="pre">layout.bytes</span></code>, then
+takes a view covering the actual row geometry. The DMA count and settlement
+cover the complete block; there is no per-row loan or completion.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_frame_layout_t</span></code> records storage geometry; it does not configure the wire
+or validate audio format metadata. The caller still supplies the declared
+little-endian stereo16 samples. Other audio-layout helper formats do not
+become supported transmitter formats.</p>
+<p>The maintained VE input is below. The
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/configure/assemblies/qiming-i2s2-slave-tx.toml">ZG input</a> selects
+the corresponding exact Board package with the same role.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"stm32f407ve_sky_qingchun"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hse8-pll168"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="c1"># Chip pin capability only; no audio PCB or external master is qualified.</span>
+<span class="k">[i2s2]</span>
+<span class="n">profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"slave-tx-stereo16-pb12-pb13-pb15"</span>
+</pre></div>
+</div>
+<p>The component target is <code class="docutils literal notranslate"><span class="pre">Nexus::F407I2S2SlaveTx</span></code>, defined by
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt">its CMake file</a> only for
+the validated selection. A consumer explicitly links it and constructs one
+stable readonly face with shared operations and separate zero-initialized owner
+storage. Factory lookup does not create or start an audio owner. The firmware
+owner storage is 88 B, excluding caller-owned request, stream, frame and payload
+storage. No task, allocation, queue or replay worker is created.</p>
+<p>The role uses external CK/WS; it does not enable PLLI2S or generate an audio
+clock. Chip AF capability does not establish a PCB route. The assembly supplies
+the exact part/package identity: device-group and Flash-density reads cannot
+authenticate an F407 or distinguish its physical package. The caller must meet
+DS8626 voltage, I/O, load and CK/WS/SD timing requirements and provide adequate
+DMA refill margin. This software defines no measured external-clock rate or
+additional characterized PCLK-to-CK ratio.</p>
+</section>
+<section id="keep-platform-and-transmitter-ownership-separate">
+<h2>Keep Platform and transmitter ownership separate<a class="headerlink" href="#keep-platform-and-transmitter-ownership-separate" title="Link to this heading">¶</a></h2>
+<p>The selected normal Platform startup assumes cold reset with no foreign running
+peripheral or bus master. It establishes the fixed clock and TIM2 epoch and
+holds GPIOB/DMA1 gates for the Platform lifetime. Clock-gating does not prove
+that a retained DMA engine is reset; attachment to unknown gated or running
+HAL state is unsupported.</p>
+<p>Transmitter initialization requires both shared gates already on. It owns the
+SPI2 gate, the SPI2/I2S2 personality, its selected pad fields and both vectors
+until successful transmitter stop. It never opens or withdraws GPIOB/DMA1
+gates, resets the whole DMA controller or changes neighboring stream/pin state.
+Platform tracks its attempted gate additions before writes, preserves
+preexisting gates and retains cleanup responsibility if rollback fails.</p>
+<p>One privileged unmasked task serializes initialization and every method.
+Concurrent Platform stop, reset/reclock/debugger writers and competing DMA,
+vector or pin owners are excluded. Failed calls do not authorize storage reuse.
+Stop and join the transmitter and every other shared-domain user, including
+external HAL users, before Platform stop withdraws its added gates or ends the
+TIM2 epoch. Old deadlines cannot cross Platform stop/restart.</p>
+</section>
+<section id="accept-the-frame-before-arming-the-master">
+<h2>Accept the frame before arming the master<a class="headerlink" href="#accept-the-frame-before-arming-the-master" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/f407-i2s2-slave-tx.svg" title="Open SVG at full size"><img alt="FIG-30: exact finite I2S2 ownership, arm handshake and final-access proof" src="../_images/f407-i2s2-slave-tx.svg" /></a></p>
+<p><strong>FIG-30 is a reference lifecycle for this exact role.</strong> Solid arrows show
+required order or a named branch; dashed arrows show retained responsibility
+and bounded retry. It is based on the public header, provider and selected
+System implementation linked below. It establishes neither physical clock
+silence nor hardware qualification.</p>
+<ol class="arabic simple">
+<li><p>Hold CK continuously LOW and WS HIGH before initialization and submission,
+and keep them there until acquire-observed ACTIVE. Register pin reads sample
+instants; the caller’s master coordination establishes the continuous quiet
+interval. Each normal restart begins with the left channel.</p></li>
+<li><p>Start Platform successfully, then initialize fresh transmitter storage with
+the stable face and a positive <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code>. Initialization can retain
+cleanup responsibility on IO; keep its storage live and call stop.</p></li>
+<li><p>Build the complete contiguous frame with the ordinary stream/frame helpers
+and acquire its original <code class="docutils literal notranslate"><span class="pre">nx_frame_dma_loan_t</span></code>. Initialize and prepare the
+request with an absolute deadline in the current live TIM2 epoch, and assign
+that loan to its <code class="docutils literal notranslate"><span class="pre">source</span></code>. Controls must be correctly aligned, live and
+disjoint from every full-capacity pool slot, including unused payload tails.</p></li>
+<li><p>Submit through the face. Rejection retains no request or frame reference and
+introduces no submission hardware effect. <code class="docutils literal notranslate"><span class="pre">NX_SUCCESS</span></code> means ACCEPTED: the
+exact whole-frame loan and request are borrowed. The provider publishes
+QUEUED before the first read-clear SR observation or possible DMA prefetch.
+Initialization separately owns cleanup before its SR reads.</p></li>
+<li><p>Submission runs bounded arming synchronously. It programs the full halfword
+count, enables DMA, then TXDMAEN, then I2SE. ACTIVE requires observed I2SE
+enable, one prefetched DR halfword (<code class="docutils literal notranslate"><span class="pre">NDTR</span> <span class="pre">=</span> <span class="pre">N</span> <span class="pre">-</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">TXE</span> <span class="pre">=</span> <span class="pre">0</span></code>) and at least
+three actual 1 MHz TIM2 ticks after enable readback. <code class="docutils literal notranslate"><span class="pre">BSY</span> <span class="pre">=</span> <span class="pre">0</span></code> is not an arm
+prerequisite. A CPU polling count is not elapsed time. The return state may
+already be ACTIVE or DRAINING; QUEUED and ACCEPTED alone never authorize CK.</p></li>
+<li><p>Only acquire-observed ACTIVE authorizes the master to clock the declared
+complete stereo frames. The master must stop before requesting a missing
+next word. The same task calls <code class="docutils literal notranslate"><span class="pre">service</span></code> to observe completion, errors and
+deadline expiry and to progress drain. No provider IRQ advances the request.</p></li>
+</ol>
+<p>An SR read clears UDR/FRE, so each request-path observation occurs after
+acceptance and preserves any fault as the first operation error. A later clean
+read or late DMA completion cannot turn that error into success. The absolute
+deadline covers the whole operation, including wire and final address/vector
+withdrawal. Arming observation-budget exhaustion can also produce TIMEOUT; it
+does not prove that a particular duration elapsed. <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code> bounds each
+observation loop and never guarantees progress by an external master.</p>
+</section>
+<section id="prove-final-access-before-releasing-storage">
+<h2>Prove final access before releasing storage<a class="headerlink" href="#prove-final-access-before-releasing-storage" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation or stage</p></th>
+<th class="head"><p>Required action and remaining responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Normal <code class="docutils literal notranslate"><span class="pre">TCIF</span></code> and <code class="docutils literal notranslate"><span class="pre">NDTR</span> <span class="pre">=</span> <span class="pre">0</span></code></p></td>
+<td><p>Memory-count completion only. Keep the request and frame borrowed. Software DMA disable can also set TCIF with a nonzero count.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cancel, timeout or failure</p></td>
+<td><p>Preserve the first error and enter DRAINING; every error/cancellation reports zero transferred bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p>Engine withdrawal</p></td>
+<td><p>Clear TXDMAEN and DMA EN with readback before relying on serializer drain. A failed clear retains the borrow.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Any I2SE enable attempt</p></td>
+<td><p>Observe <code class="docutils literal notranslate"><span class="pre">TXE</span> <span class="pre">=</span> <span class="pre">1</span></code>, then a separate fresh <code class="docutils literal notranslate"><span class="pre">BSY</span> <span class="pre">=</span> <span class="pre">0</span></code>, before clearing I2SE with readback. An ignored enable write is still an attempted enable.</p></td>
+</tr>
+<tr class="row-even"><td><p>No I2SE attempt</p></td>
+<td><p>An accepted early setup failure may prove engine and reference withdrawal without waiting for serializer flags.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Serializer already proved quiet</p></td>
+<td><p>Preserve that proof across later cleanup retries; do not demand TXE again from disabled I2S.</p></td>
+</tr>
+<tr class="row-even"><td><p>Reference withdrawal</p></td>
+<td><p>Clear stream configuration, addresses/count and flags; withdraw and prove disabled, not pending and inactive vectors.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Every proof joined</p></td>
+<td><p>Detach provider references, release the original whole-frame loan, then release-publish SETTLED as the final request access.</p></td>
+</tr>
+<tr class="row-even"><td><p>Missing proof</p></td>
+<td><p>Retain QUARANTINED storage. A drain-loop bound can return BUSY; timeout, TC or a zero DMA count never substitutes for final access.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Acquire-observe SETTLED before reading the terminal result or reusing the
+request and frame storage. Successful completion reports the full submitted
+byte count. Error and cancellation report zero; a DMA count cannot establish
+serialized audio bytes. Join external observers before their own storage is
+reused. While stop has not closed admission, successful request settlement
+keeps the initialized transmitter ready for another separately prepared block;
+it does not release its physical role.</p>
+<p>With CK idle after prefill, DR cannot empty. Cancellation therefore retains the
+loan until the product coordinates enough drain clocks for the actual TXE and
+fresh BSY proof. This error drain may underrun or produce partial/invalid audio;
+it does not promise a complete stereo frame. Keep the first failure and restart
+later only at the left channel. Continuing <code class="docutils literal notranslate"><span class="pre">service</span></code> or <code class="docutils literal notranslate"><span class="pre">stop</span></code> through the same
+owner can retry a stalled-clock cleanup while its hardware/time history remains
+known.</p>
+<p>Observed reset, shared-gate/clock-profile loss or invalid time history while
+borrowed permanently quarantines this instance and its loan. Restoring
+reset-looking registers cannot establish prior final access. There is no reset
+or recovery API that revokes that borrow. A product owns the response to an
+unrecoverable controller/master failure.</p>
+<p><code class="docutils literal notranslate"><span class="pre">stop</span></code> closes admission and requests cancellation. Repeat it after service has
+proved any outstanding cleanup. Only successful transmitter stop returns the
+selected pads/SPI2 personality and SPI2 gate; shared GPIOB/DMA1 gates remain for
+Platform users. Failed stop retains every unfinished borrow and owned effect.</p>
+</section>
+<section id="assess-the-current-evidence">
+<h2>Assess the current evidence<a class="headerlink" href="#assess-the-current-evidence" title="Link to this heading">¶</a></h2>
+<p>Normal ARM builds passed for the selected VE and ZG I2S2 configurations and the
+omitted default. Scoped Native and selection tests, SDK/release checks,
+retention checks and both corrected caller-face audits also passed. One
+relocated, nonpublishable development Source SDK passed export, rename,
+verification, a public C11 consumer link, the selected-image audit and
+reverification; this covered one VE image. The
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/testing/evidence/f407-i2s2-20261020/README.md">source-bound evidence</a> records
+full-image resources rather than isolated driver cost. This is partial
+development evidence: it does not qualify the full v10 matrix, clean main,
+formal/OCI delivery or physical HIL. The API and full-site build receipts and the final commit gate must be
+assessed separately. Original strict Wshadow and harness-setup failures
+are retained separately from functional TDD.</p>
+<p>The normal public-consumer source is
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c">f407-i2s2-slave-tx.c</a>.
+It links public construction and whole-frame ownership paths; linking does not
+execute those calls. It is not an external clock source or a completed hardware
+tutorial. No physical execution or valid audio result is claimed. Continuous
+DBM, gapless replay, SAI/PDM, other formats/pads/parts/backends and physical HIL
+remain open under IO-41.</p>
+<p>The hardware sequence follows RM0090 Rev22 sections 28.4.6–28.4.8 and
+10.3.13–10.3.14, with DS8626 electrical requirements and the pinned ES0182
+scope. The SPI-only BSY erratum workaround is not substituted for the I2S
+shutdown sequence. Source identities are maintained in
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/references.json">the F407 reference manifest</a>.</p>
+<p>See the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h">public contract</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/drivers/i2s2_slave_tx.c">real provider</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32f407/private/stm32f407_system.h">selected System lifecycle</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/frame_stream.h">frame ownership contract</a> and
+<a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">qualification boundaries</span></a>.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -13,6 +13,11 @@ import tempfile
 import time
 from typing import Any
 
+SOFTWARE_QUALIFICATION_SCOPES = frozenset({
+    "host_contracts", "arm_link", "resource_budget", "source_sdk",
+    "reproducibility", "hil_tooling",
+})
+
 
 class EvidenceError(ValueError):
     """A required delivery invariant could not be established."""

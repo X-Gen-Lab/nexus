@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>构建独立的 Source SDK 消费工程 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="观察拒绝、借用、取消与排空" href="async-io.html" />
+    <link rel="prev" title="入门教程" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/tutorials/source-sdk.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/tutorials/source-sdk.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="build-an-independent-source-sdk-consumer">
+<span id="docs-tutorials-source-sdk"></span><h1>构建独立的 Source SDK 消费工程<a class="headerlink" href="#build-an-independent-source-sdk-consumer" title="Link to this heading">¶</a></h1>
+<p>从经过复核的模板创建真实外部 C11 应用，再构建并运行 Native 模型。此路径需要 Linux、Python 3.11+、CMake 3.31+、Ninja、C 编译器与 Git。产品拥有装配和应用源码；Nexus 拥有可复用机制。本教程不烧录 MCU。</p>
+<section id="create-and-run-an-application">
+<h2>创建并运行应用<a class="headerlink" href="#create-and-run-an-application" title="Link to this heading">¶</a></h2>
+<p>取得经过验证的 Source SDK 和外部 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus-examples">nexus-examples</a> checkout。该仓库是私有仓库，需要单独的 GitHub 访问权限；公开 Nexus 或 SDK 的权限不包含模板权限。下方独立 SDK 验证不需要该私有仓库。将 <code class="docutils literal notranslate"><span class="pre">NEXUS_SDK_PREFIX</span></code> 设置为已安装 SDK prefix，将 <code class="docutils literal notranslate"><span class="pre">NEXUS_EXAMPLES_DIR</span></code> 设置为该 checkout，将 <code class="docutils literal notranslate"><span class="pre">NEXUS_EXAMPLES_REVISION</span></code> 设置为所选平台交付关联的精确 40 位示例 commit。这些是独立身份：模板预期的平台 revision 不证明实际用了哪个 SDK。从 <code class="docutils literal notranslate"><span class="pre">$NEXUS_SDK_PREFIX/share/nexus/src</span></code> 执行以下命令，在两个输入 checkout 外选择新的产品目录：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>create<span class="w"> </span>--templates<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_EXAMPLES_DIR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--revision<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_EXAMPLES_REVISION</span><span class="s2">"</span><span class="w"> </span>--template<span class="w"> </span>native<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>/tmp/my-nexus-product
+cmake<span class="w"> </span>-S<span class="w"> </span>/tmp/my-nexus-product<span class="w"> </span>-B<span class="w"> </span>/tmp/my-nexus-product-build<span class="w"> </span>-G<span class="w"> </span>Ninja<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DNexus_DIR<span class="o">=</span><span class="s2">"</span><span class="nv">$NEXUS_SDK_PREFIX</span><span class="s2">/lib/cmake/Nexus"</span>
+cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/my-nexus-product-build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">2</span>
+ctest<span class="w"> </span>--test-dir<span class="w"> </span>/tmp/my-nexus-product-build<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output-on-failure<span class="w"> </span>--no-tests<span class="o">=</span>error
+</pre></div>
+</div>
+<p>创建过程读取已提交的模板 blob 与其 SHA-256 manifest，不访问网络。不同 Git HEAD、变化的模板字节、symlink 或已有目标目录都会被拒绝。成功前先解析复制后的装配；失败只删除其新创建的目标。检查 <code class="docutils literal notranslate"><span class="pre">.nexus-template.json</span></code>：<code class="docutils literal notranslate"><span class="pre">expected_platform</span></code> 是模板源码锁中的预期；<code class="docutils literal notranslate"><span class="pre">validation</span></code> 记录实际检查的解析器与输入字节。</p>
+<p>生成的产品包含 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>、<code class="docutils literal notranslate"><span class="pre">assembly.toml</span></code>、<code class="docutils literal notranslate"><span class="pre">main.c</span></code> 与 <code class="docutils literal notranslate"><span class="pre">README.md</span></code>。Native 测试成功会输出 <code class="docutils literal notranslate"><span class="pre">Nexus</span> <span class="pre">starter:</span> <span class="pre">transfer</span> <span class="pre">settled;</span> <span class="pre">platform</span> <span class="pre">stopped</span></code> 并以零退出。Native UART 是软件模型，不是 host 串口。示例使用 strong factory 引用，提供请求存储，观察结清并停止平台。timeout 是错误，不能授权释放未结清存储。</p>
+<p>使用开发检出而非已安装 SDK 时，将 <code class="docutils literal notranslate"><span class="pre">Nexus_DIR</span></code> 替换为 <code class="docutils literal notranslate"><span class="pre">-DNEXUS_SOURCE=/absolute/path/to/nexus</span></code>。这仅验证该检出，不建立 SDK 资格。已维护的 MCU 模板选择 <code class="docutils literal notranslate"><span class="pre">qiming</span></code>、<code class="docutils literal notranslate"><span class="pre">sky</span></code> 或 <code class="docutils literal notranslate"><span class="pre">liangshan</span></code>。SDK 消费方增加 <code class="docutils literal notranslate"><span class="pre">-DCMAKE_TOOLCHAIN_FILE=&quot;$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake&quot;</span></code>；源码检出消费方则选择 <code class="docutils literal notranslate"><span class="pre">-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-gcc.cmake</span></code>。使用锁定的 ARM 编译器。MCU 链接属于软件证据；板卡启动和电气验证仍单独进行。</p>
+<p>创建因配置被拒绝时，阅读报告中的文件、key 与约束。先检查所选 SDK／接口和固定模板版本。模板修正需要新的已复核提交，不能修改固定模板字节。成功创建后，编辑产品 authored 装配并重新配置；通过<a class="reference internal" href="../guides/developer-workflow.html"><span class="std std-doc">配置与所有权指南</span></a>检查已复核 binding。不要修补生成文件或压制拒绝。保留产品源码；保存必要日志后只删除自有构建输出。</p>
+</section>
+<section id="maintainer-verify-the-complete-sdk-consumer">
+<h2>维护者：验证完整 SDK 消费<a class="headerlink" href="#maintainer-verify-the-complete-sdk-consumer" title="Link to this heading">¶</a></h2>
+<p>验证示例仓库本身时，使用固定示例版本中的维护入口 <code class="docutils literal notranslate"><span class="pre">scripts/local_ci.py</span></code> 和双语 <code class="docutils literal notranslate"><span class="pre">docs/local-ci.md</span></code>。默认 scope 从新输出目录执行完整映射的本地工作流；<code class="docutils literal notranslate"><span class="pre">--scope</span> <span class="pre">native</span></code>、<code class="docutils literal notranslate"><span class="pre">--scope</span> <span class="pre">arm</span></code> 和 preset 选择仍是局部范围。显式 <code class="docutils literal notranslate"><span class="pre">--nexus-source</span></code> 必须匹配示例锁定版本；可选 <code class="docutils literal notranslate"><span class="pre">--installed-sdk</span></code> 也必须匹配同一版本。该工作流不会把受阻的托管 CI 改为通过，也不建立物理 HIL 资格。</p>
+<p>以下各节是平台维护任务。先取得<a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">固定源码与递归依赖</span></a>。从该检出执行，不使用任意默认分支。以下已维护合同检查独立 C／C++ 消费、搬移与包身份。</p>
+<p>从仓库根目录执行，先初始化锁定的递归依赖。输出置于源码 checkout 外。下面这个确切测试调用生产打包器和维护中的消费者模板，将前缀搬移到含空格的路径，配置独立工程，构建两种语言并运行 Native 可执行文件：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tests/contracts/test_source_sdk.py<span class="w">     </span>SourceSDKTests.test_relocated_c_and_cpp_consumer_build_and_run_without_original_source
+</pre></div>
+</div>
+<p>成功要求非空 unittest 执行以 <code class="docutils literal notranslate"><span class="pre">OK</span></code> 结束，退出码为零。测试自动清理临时目录。失败保留实际命令诊断；编译器缺失不能记作消费者通过。夹具明确打包开发快照并显式允许消费；这验证消费流程，不建立可发布软件候选。</p>
+<p>完整消费者由生产验证器维护，本页不复制实现。以下真实输入就是该测试执行的模板：</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">维护中的 Native/F407/F470 消费者准备；模板代码不是 shell 命令。</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">prepare_consumer</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">run_checked</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fixture</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">arm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">chip</span><span class="o">=</span><span class="s2">"stm32"</span><span class="p">,</span> <span class="n">expected_revision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contracts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One public consumer template shared by qualification and boundary tests."""</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="n">sdk</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">/</span> <span class="s2">"share/nexus/src"</span>
+    <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">load_policy</span><span class="p">(</span><span class="n">sdk</span><span class="p">)[</span><span class="s2">"semantic_version"</span><span class="p">]</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">" source"</span><span class="p">)</span>
+    <span class="n">build</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">" build"</span><span class="p">)</span>
+    <span class="n">source</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="c1"># A parent Git identity must never become the SDK source identity.</span>
+    <span class="n">run_checked</span><span class="p">([</span><span class="s2">"git"</span><span class="p">,</span> <span class="s2">"init"</span><span class="p">,</span> <span class="s2">"--quiet"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">)])</span>
+    <span class="p">(</span><span class="n">source</span> <span class="o">/</span> <span class="s2">"CMakeLists.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="s1">'cmake_minimum_required(VERSION 3.31)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'project(installed_source_consumer LANGUAGES C CXX ASM)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="sa">f</span><span class="s1">'find_package(Nexus </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1"> EXACT CONFIG REQUIRED)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'find_package(Nexus CONFIG REQUIRED)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'add_executable(parent_plain parent.c)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'nexus_add_firmware(installed_c SOURCES main.c)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '</span>
+        <span class="s1">'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker'</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s1">' Nexus::STM32F407Handoff'</span> <span class="k">if</span> <span class="n">arm</span> <span class="ow">and</span> <span class="n">chip</span> <span class="o">==</span> <span class="s2">"stm32"</span> <span class="k">else</span> <span class="s1">''</span><span class="p">)</span> <span class="o">+</span> <span class="s1">')</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'target_compile_options(installed_cpp PRIVATE "$&lt;$&lt;COMPILE_LANGUAGE:CXX&gt;:-fno-exceptions;-fno-rtti&gt;")</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'file(WRITE "$</span><span class="si">{CMAKE_BINARY_DIR}</span><span class="s1">/resolved-sdk.txt" "$</span><span class="si">{sdk_root}</span><span class="s1">")</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">source</span> <span class="o">/</span> <span class="s2">"parent.c"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="s1">'#ifdef NEXUS_EFFECTIVE_CONFIG</span><span class="se">\n</span><span class="s1">#error SDK leaked into unrelated parent target</span><span class="se">\n</span><span class="s1">#endif</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'int main(void) { return 0; }</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'#include "nexus_bindings.h"</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#include "nexus_factory.h"</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#include "nexus_config.h"</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#ifndef NEXUS_PLATFORM_VERSION</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#error "Missing source interface version"</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#endif</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#if NEXUS_FACTORY_ABI_EPOCH != 1U</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#error "Unsupported factory interface epoch"</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#endif</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#if __has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#error Vendor SDK leaked into product source</span><span class="se">\n</span><span class="s1">#endif</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#if __has_include("stm32f407_provider.h") || __has_include("gd32f470_provider.h")</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'#error Concrete provider leaked into product source</span><span class="se">\n</span><span class="s1">#endif</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">'int main(void) {</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_factory_gpio(NX_GPIO_ID_COUNT) != 0) return 7;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' nx_platform_start_result_t result = nx_platform_start();</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (result.primary != NX_SUCCESS) return 1;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;</span><span class="se">\n</span><span class="s1">}</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">source</span> <span class="o">/</span> <span class="s2">"main.c"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+    <span class="n">handoff</span> <span class="o">=</span> <span class="n">arm</span> <span class="ow">and</span> <span class="n">chip</span> <span class="o">==</span> <span class="s2">"stm32"</span>
+    <span class="p">(</span><span class="n">source</span> <span class="o">/</span> <span class="s2">"main.cpp"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="s1">'#include "nexus/components/log.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/bmp280.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/storage.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/mapped_storage.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/mapped_storage_owner.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/amp_ipc_storage.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/i3c_controller_storage.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="s1">'#include "nexus/components/user_io_async_storage.h"</span><span class="se">\n</span><span class="s1">'</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s1">'#include "nexus/components/stm32f407_handoff.h"</span><span class="se">\n</span><span class="s1">'</span> <span class="k">if</span> <span class="n">handoff</span> <span class="k">else</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s1">'#include &lt;cstring&gt;</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span> <span class="n">code</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">' nx_platform_start_result_t result'</span><span class="p">,</span>
+            <span class="s1">' nx_log_sink_port_t sink;</span><span class="se">\n</span><span class="s1"> std::memset(&amp;sink, 0, sizeof(sink));</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_log_init(nullptr, sink, NX_LOG_INFO) != NX_ERROR_INVALID) return 3;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_bmp280_compensate(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 4;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_mapped_storage_stop(nullptr) != NX_ERROR_INVALID) return 5;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 6;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_i3c_controller_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 9;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="s1">' if (nx_user_io_async_construct(nullptr, nullptr, 0U, nullptr) '</span>
+            <span class="s1">'!= NX_ERROR_INVALID) return 10;</span><span class="se">\n</span><span class="s1">'</span>
+            <span class="o">+</span> <span class="p">(</span><span class="s1">' if (nx_stm32f407_handoff_initialize(0) != NX_ERROR_INVALID) return 8;</span><span class="se">\n</span><span class="s1">'</span>
+               <span class="k">if</span> <span class="n">handoff</span> <span class="k">else</span> <span class="s1">''</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' nx_platform_start_result_t result'</span><span class="p">))</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"cmake"</span><span class="p">,</span> <span class="s2">"-S"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="s2">"-B"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">build</span><span class="p">),</span> <span class="s2">"-G"</span><span class="p">,</span> <span class="s2">"Ninja"</span><span class="p">,</span>
+                 <span class="s2">"-DCMAKE_BUILD_TYPE=Release"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"-DNexus_DIR=</span><span class="si">{</span><span class="n">prefix</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'lib/cmake/Nexus'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                 <span class="s2">"-DNEXUS_BUILD_TESTS=OFF"</span><span class="p">,</span> <span class="s2">"-DNEXUS_BUILD_WORKLOAD=OFF"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">fixture</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">contracts</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"-DNEXUS_BUILD_WORKLOAD=ON"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">expected_revision</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"-DNEXUS_EXPECTED_SOURCE_REVISION="</span> <span class="o">+</span> <span class="n">expected_revision</span><span class="p">)</span>
+    <span class="n">arm_assembly</span> <span class="o">=</span> <span class="s2">"liangshan-baremetal.toml"</span> <span class="k">if</span> <span class="n">chip</span> <span class="o">==</span> <span class="s2">"gd32"</span> <span class="k">else</span> <span class="s2">"sky-baremetal.toml"</span>
+    <span class="n">assembly</span> <span class="o">=</span> <span class="n">sdk</span> <span class="o">/</span> <span class="s2">"tools/configure/assemblies"</span> <span class="o">/</span> <span class="p">(</span><span class="n">arm_assembly</span> <span class="k">if</span> <span class="n">arm</span> <span class="k">else</span> <span class="s2">"native.toml"</span><span class="p">)</span>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"-DNEXUS_ASSEMBLY_FILE=</span><span class="si">{</span><span class="n">assembly</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arm</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"-DCMAKE_TOOLCHAIN_FILE=</span><span class="si">{</span><span class="n">sdk</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'cmake/toolchains/arm-gcc.cmake'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">source</span><span class="p">,</span> <span class="n">build</span><span class="p">,</span> <span class="n">arguments</span>
+
+
+</pre></div>
+</div>
+</div>
+</section>
+<section id="maintainer-prepare-a-publishable-prefix">
+<h2>维护者：准备可发布前缀<a class="headerlink" href="#maintainer-prepare-a-publishable-prefix" title="Link to this heading">¶</a></h2>
+<p>从已初始化、干净且已提交的 checkout 开始，选择自己拥有的新输出路径：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>cmake/package/package_source_sdk.py<span class="w"> </span>--source<span class="w"> </span>.<span class="w"> </span>--output<span class="w"> </span>/tmp/nexus-source-sdk
+python<span class="w"> </span>cmake/package/package_source_sdk.py<span class="w">     </span>--verify<span class="w"> </span>/tmp/nexus-source-sdk/share/nexus/src
+</pre></div>
+</div>
+<p>消费前搬移整个前缀，包括身份和许可。<a class="reference internal" href="../design/source-compatibility.html"><span class="std std-doc">Source SDK 合同</span></a>定义版本与接口 epoch 检查。内容文件缺失、额外、修改或符号链接文件会拒绝配置。使用 <code class="docutils literal notranslate"><span class="pre">--development-fixture</span></code> 生成的包保持不可发布，消费者必须显式设置 <code class="docutils literal notranslate"><span class="pre">NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON</span></code>。不得用该选项绕过发布资格。</p>
+<p>SDK 保留锁定的官方 v6.4.0 来源中完整递归 CMSIS-Core <code class="docutils literal notranslate"><span class="pre">Include</span></code> 树及其 Apache-2.0 <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code>。它不包含整个 CMSIS 仓库，也不自动启用 CMSIS-RTOS、CMSIS-Driver、DSP 或 NN。这些私有实现头与公共 <code class="docutils literal notranslate"><span class="pre">Nexus::Core</span></code> 中性机制不同。Device/startup 和 HAL/LL 仍分别锁定；GigaDevice 原包中的旧 Core 文件保留原始字节及通知，但不作为选中的共享 Core 来源。应验证移位后的完整 prefix，而不是手动复制的头文件子集。这项依赖更新不扩大芯片支持，也不替代当前源码的编译器与 consumer 执行证据。</p>
+<p>正式安装前缀验证器除主机工具外，还要求锁定的 ARM 编译器位于 <code class="docutils literal notranslate"><span class="pre">PATH</span></code>。它构建 Native C/C++ 和维护中的 MCU 消费者：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>cmake/package/verify_consumers.py<span class="w">     </span>--prefix<span class="w"> </span>/tmp/nexus-source-sdk<span class="w"> </span>--output<span class="w"> </span>/tmp/nexus-source-sdk-verification
+</pre></div>
+</div>
+<p>检查 <code class="docutils literal notranslate"><span class="pre">verification.json</span></code>、每个记录的退出码、Native 运行结果、MCU ELF/BIN/map 与资源报告。MCU 链接不执行硬件。验证器输出为专有目录；不相关的已有目录会拒绝替换。SDK 前缀与输出必须是没有符号链接别名的规范路径，且两者均不得包含另一方。路径被拒绝时，SDK 字节和既有报告保持不变；失败诊断写入 stderr。通过准入的专有输出会在下一次尝试前清空。仅在保留所需证据后删除自己创建的输出。</p>
+</section>
+<section id="choose-a-product-assembly">
+<h2>选择产品装配<a class="headerlink" href="#choose-a-product-assembly" title="Link to this heading">¶</a></h2>
+<p>产品在外部仓库维护 <code class="docutils literal notranslate"><span class="pre">assembly.toml</span></code>、<code class="docutils literal notranslate"><span class="pre">main</span></code>、执行任务和私有 Board 数据。通过 <code class="docutils literal notranslate"><span class="pre">nexus_add_firmware()</span></code> 消费 <code class="docutils literal notranslate"><span class="pre">Nexus::Platform</span></code>；该辅助函数不生成应用或启动调度器。使用<a class="reference internal" href="../reference/configuration/assembly.html"><span class="std std-doc">装配参考</span></a>选择复核绑定，通过<a class="reference internal" href="../explanation/factory.html"><span class="std std-doc">factory 说明</span></a>取得接口面。公开产品示例位于 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus-examples">nexus-examples</a>。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/source-sdk-consumer.svg" title="打开 SVG 大图"><img alt="Source SDK 准备、搬移与独立消费者验证" src="../_images/source-sdk-consumer.svg" /></a></p>
+<p>FIG-10 表示当前软件消费流程。Runtime 与 MCU 链接证据和<a class="reference internal" href="../reference/platforms/qualification.html"><span class="std std-doc">物理资格</span></a>分别记录。</p>
+</section>
+<section id="maintainer-recover-delivery-without-moving-an-existing-tag">
+<h2>维护者：恢复交付且不移动已有 tag<a class="headerlink" href="#maintainer-recover-delivery-without-moving-an-existing-tag" title="Link to this heading">¶</a></h2>
+<p>发布维护者通常对 SDK 源码和交付工作流使用同一提交。源码建立标签后，若仅需修复交付工具，必须保持该标签不变。<code class="docutils literal notranslate"><span class="pre">recover_tagged_source</span></code> 输入默认为 <code class="docutils literal notranslate"><span class="pre">false</span></code>；只有显式选择恢复并设置 <code class="docutils literal notranslate"><span class="pre">publish=true</span></code>，才允许已标签源码与当前 <code class="docutils literal notranslate"><span class="pre">main</span></code> 工作流构建器使用不同提交。同源运行无需 <code class="docutils literal notranslate"><span class="pre">builder_ci_run_id</span></code>。</p>
+<p>恢复前，打开该仓库的 <strong>Settings → Secrets and variables → Actions → New repository secret</strong>，创建 <code class="docutils literal notranslate"><span class="pre">NEXUS_RELEASE_TOKEN</span></code>。使用经批准且仅限本仓库的凭据，授予 Actions 读、Contents 写和 Workflows 写权限。凭据类型、有效期和批准要求见<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/release/README.md#publishing-credentials">发布合同</a>。仅在 GitHub 的 secret 输入框填写凭据值；不得通过聊天发送。将 GitHub 连接到助手并不会创建该 Actions secret。</p>
+<p>恢复流程在 SDK 工作前拒绝缺少 secret 的运行。此检查仅证明 secret 已配置，不能证明其权限、批准状态或有效期符合要求。仅恢复流程的最终发布步骤使用该凭据；SDK 准备、下载与证明继续使用内置工作流凭据。源码与构建器使用同一提交的普通发布始终使用内置 token。</p>
+<p>从仓库根目录操作，使用已认证且具备 Actions 写权限的 GitHub CLI。将 <code class="docutils literal notranslate"><span class="pre">NEXUS_RELEASE_SOURCE</span></code> 设为已标签的 40 字符源码提交，将 <code class="docutils literal notranslate"><span class="pre">NEXUS_CI_RUN_ID</span></code> 设为在 <code class="docutils literal notranslate"><span class="pre">main</span></code> 上针对该源码成功执行的完整 CI 运行编号，将 <code class="docutils literal notranslate"><span class="pre">NEXUS_BUILDER_CI_RUN_ID</span></code> 设为当前 <code class="docutils literal notranslate"><span class="pre">main</span></code> 构建器成功执行的完整 CI 运行编号。两次运行均须在过去 24 小时内创建；源码 CI 不能为不同的构建器建立资格。每次修复交付工具后，选择新构建器的 CI 运行，保持源码提交与标签不变。然后触发工作流：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>gh<span class="w"> </span>workflow<span class="w"> </span>run<span class="w"> </span>release.yml<span class="w"> </span>--ref<span class="w"> </span>main<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-f<span class="w"> </span><span class="nv">expected_commit</span><span class="o">=</span><span class="s2">"</span><span class="nv">$NEXUS_RELEASE_SOURCE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-f<span class="w"> </span><span class="nv">ci_run_id</span><span class="o">=</span><span class="s2">"</span><span class="nv">$NEXUS_CI_RUN_ID</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-f<span class="w"> </span><span class="nv">builder_ci_run_id</span><span class="o">=</span><span class="s2">"</span><span class="nv">$NEXUS_BUILDER_CI_RUN_ID</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-f<span class="w"> </span><span class="nv">publish</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>-f<span class="w"> </span><span class="nv">recover_tagged_source</span><span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>工作流根据实际 <code class="docutils literal notranslate"><span class="pre">main</span></code> 工作流与 checkout 确定构建器。恢复要求源码与构建器的版本策略字节完全相同、既有标签指向该源码、实时 <code class="docutils literal notranslate"><span class="pre">main</span></code> 引用指向该构建器。SDK、文档和源码 CI 保持已标签源码的身份，交付记录另行标明构建器。策略不一致时拒绝准入；资产上传前后均复核这两个引用。</p>
+<p>修复打包限制时保留全部原始证据文件。不得为了获得成功而移动标签、删去证据或换用不同源码的 CI 运行。仅触发工作流不能证明已发布：必须检查完成的工作流、发布清单与资产，再独立下载并验证 SDK。恢复不建立物理 HIL 或生产资格。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">入门教程</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">构建独立的 Source SDK 消费工程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async-io.html">观察拒绝、借用、取消与排空</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

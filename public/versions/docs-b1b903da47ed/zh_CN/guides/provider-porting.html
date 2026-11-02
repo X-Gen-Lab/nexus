@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>接入 SoC、提供者或通用组件 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="正确等待并停止显式 owner" href="os-shutdown.html" />
+    <link rel="prev" title="接入复核的 Board 包" href="board-porting.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/guides/provider-porting.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/guides/provider-porting.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="add-a-soc-provider-or-reusable-component">
+<span id="docs-guides-provider-porting"></span><h1>接入 SoC、提供者或通用组件<a class="headerlink" href="#add-a-soc-provider-or-reusable-component" title="Link to this heading">¶</a></h1>
+<p>使用本指南增加具有明确资源和可测成本的维护实现。新芯片家族或模式需要同时完成行为、配置和构建集成。STM32／GD32 的外设名称相似，不能证明寄存器兼容。</p>
+<section id="keep-the-layer-boundary-narrow">
+<h2>保持清晰而窄的分层边界<a class="headerlink" href="#keep-the-layer-boundary-narrow" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>所有者</p></th>
+<th class="head"><p>必需责任</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Arch</p></td>
+<td><p>精确 CPU 原语、特性事实和 ABI；不拥有 PCB 或设备注册表</p></td>
+</tr>
+<tr class="row-odd"><td><p>SoC</p></td>
+<td><p>完整型号、内存、时钟、IRQ／DMA 路由、复位／启动和私有提供者</p></td>
+</tr>
+<tr class="row-even"><td><p>Board</p></td>
+<td><p>经来源审查的接线、晶振、安全电平，以及真实未知项</p></td>
+</tr>
+<tr class="row-odd"><td><p>I/O 提供者</p></td>
+<td><p>公共操作合同、私有状态、准入判定和最终排空</p></td>
+</tr>
+<tr class="row-even"><td><p>组件</p></td>
+<td><p>调用者拥有的存储、有界算法和显式窄端口</p></td>
+</tr>
+<tr class="row-odd"><td><p>外部产品</p></td>
+<td><p>角色、任务、队列深度、恢复、Flash 预留和发行</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>阅读<a class="reference internal" href="../explanation/platform-architecture.html"><span class="std std-doc">架构说明</span></a>、<a class="reference internal" href="../design/integration-contracts.html"><span class="std std-doc">接入合同</span></a>和<a class="reference internal" href="../design/provider-assemblies.html"><span class="std std-doc">提供者装配合同</span></a>。</p>
+</section>
+<section id="choose-the-source-owner">
+<h2>确定源码归属<a class="headerlink" href="#choose-the-source-owner" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/driver-source-ownership.svg" title="打开 SVG 大图"><img alt="共享寄存器算法与精确 SoC 集成的当前判定" src="../_images/driver-source-ownership.svg" /></a></p>
+<p>FIG-31 对私有控制器工作作归属判定。箭头表示维护决策，不是运行时调用。共享需要每个选入芯片的寄存器布局、位含义、访问顺序及复位兼容性证据，并显式处理其勘误。名称相似或编译成功不能建立这些证据。尚未复核或不兼容的协议保留在精确 SoC 实现中。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>变更</p></th>
+<th class="head"><p>源码归属与必需检查</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>公共 I/O 合同或可移植 I/O 规则</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">io/</span></code>；保持公共所有权与失败合同</p></td>
+</tr>
+<tr class="row-odd"><td><p>可复用寄存器协议算法</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">drivers/&lt;kind&gt;/&lt;ip&gt;/</span></code>；每个 SoC wrapper 确认实际硅片合同</p></td>
+</tr>
+<tr class="row-even"><td><p>料号、内存、时钟、复位、引脚、IRQ 或 DMA 集成</p></td>
+<td><p>精确 <code class="docutils literal notranslate"><span class="pre">soc/&lt;vendor&gt;/&lt;family&gt;/</span></code>；事实、配置策略与私有 C 保持各自职责</p></td>
+</tr>
+<tr class="row-odd"><td><p>私有 SoC 协作辅助代码</p></td>
+<td><p>最窄的已复核 SoC 范围；<code class="docutils literal notranslate"><span class="pre">soc/common/uart_control.h</span></code> 跨厂家共享，STM32 identity 访问则属于厂家特定范围</p></td>
+</tr>
+<tr class="row-even"><td><p>外部器件、协议或产品策略</p></td>
+<td><p>按<a class="reference internal" href="../design/integration-contracts.html"><span class="std std-doc">接入合同</span></a>放入既有组件端口或外部产品</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。选定的私有编译期 port 可以在该共享编译单元内部绑定已审查的官方操作；单独编译的 wrapper 中的宏不能改变它。保留操作宽度、读取副作用、命令原子性和撤离顺序；<a class="reference internal" href="../design/official-stm32-provider.html#bounded-official-operation-increments"><span class="std std-ref">有界官方操作范围</span></a>是当前实例，不是全面替换为 HAL 的承诺。</p>
+</section>
+<section id="implement-in-a-reviewable-sequence">
+<h2>按可评审的顺序实现<a class="headerlink" href="#implement-in-a-reviewable-sequence" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>准备<a class="reference internal" href="source-checkout.html"><span class="std std-doc">固定源码与递归依赖</span></a>。改变生产实现前，先定义新行为、支持模式、公共所有权义务和拒绝边界。</p></li>
+<li><p>对新行为或修复，为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。等价重构保留实际 old-GREEN 源码／二进制快照、适用回归及真实默认操作探针，不伪造 RED。通过 mock 测试 MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。</p></li>
+<li><p>添加精确的 <code class="docutils literal notranslate"><span class="pre">soc.json</span></code>／<code class="docutils literal notranslate"><span class="pre">routes.json</span></code> 事实并记录来源。使用共享 CPU resolver，不重复 CPU flags，也不推断可选功能。将 MCU 实现放在 <code class="docutils literal notranslate"><span class="pre">soc/&lt;vendor&gt;/&lt;family&gt;/</span></code>，并在维护中的家族 descriptor 声明该规范 <code class="docutils literal notranslate"><span class="pre">source_directory</span></code>。公共家族标识独立于目录。CPU 实现按 ISA 放置，例如 <code class="docutils literal notranslate"><span class="pre">arch/arm/cortex_m/</span></code>；经复核的跨厂家寄存器算法只有在核对各参与芯片合同后才能放入 <code class="docutils literal notranslate"><span class="pre">drivers/&lt;kind&gt;/&lt;ip&gt;/</span></code>。跨厂家 SoC 协作保留在 <code class="docutils literal notranslate"><span class="pre">soc/common/</span></code>；STM32 identity helper 保留在 <code class="docutils literal notranslate"><span class="pre">soc/stm32/common/</span></code>。</p></li>
+<li><p>在 SoC package 根目录添加纯数据 <code class="docutils literal notranslate"><span class="pre">descriptor.py</span></code>（Native 使用 <code class="docutils literal notranslate"><span class="pre">soc/native/descriptor.py</span></code>），放在其 <code class="docutils literal notranslate"><span class="pre">configure/</span></code> package 之外。在 <code class="docutils literal notranslate"><span class="pre">tools/configure/providers/descriptor.py</span></code> 的中央显式映射中加入其精确模块；复用冻结的 <code class="docutils literal notranslate"><span class="pre">FamilyDescriptor</span></code>，不建立 eager 平行 registry。生产配置包放在 <code class="docutils literal notranslate"><span class="pre">soc/&lt;vendor&gt;/&lt;family&gt;/configure/</span></code>（Native 使用 <code class="docutils literal notranslate"><span class="pre">soc/native/configure/</span></code>），配置测试放在 <code class="docutils literal notranslate"><span class="pre">tools/configure/tests/providers/&lt;family&gt;/</span></code>。定义支持模式、数值限制、构造器、回滚与 IRQ 接线。返回显式冻结的 <code class="docutils literal notranslate"><span class="pre">Construction</span></code> 记录，包含私有状态类型及初始化失败后的清理责任。Initialize 和 stop 动作使用<a class="reference internal" href="../design/official-stm32-provider.html#build-time-provider-contract"><span class="std std-ref">构造合同</span></a>中的 <code class="docutils literal notranslate"><span class="pre">DirectCall</span></code> 值；这些字段不接受原始 C 表达式。公共生成器不依赖系列名称推断。不支持的模式应拒绝；不引入运行时注册或插件发现。</p></li>
+<li><p>增加显式 CMake 目标与私有 SDK 依赖。更新解析器声明的重新配置输入，以及 Source SDK 的必需文件闭包。</p></li>
+<li><p>实施最小正确生产变更。定义不可变公共 face，共享只读 ops，并使用独立 context。复用 Nexus 公共类型，厂商结构与具体存储保持私有。复制厂商状态机前，先审查官方 HAL/LL 复用。时间、回调、取消、私有依赖与逐模式比较遵守<a class="reference internal" href="../design/official-stm32-provider.html"><span class="std std-doc">官方驱动边界</span></a>。</p></li>
+<li><p>对真实提供者执行 GREEN。按模式需要验证无残留效果的拒绝、接受后的借用、取消／截止时间、排空失败、隔离保留、停止／重启和实例隔离。</p></li>
+<li><p>保持合同通过再重构。链接精确 ARM 夹具，验证实际资源、处理函数保留、向量表字节和未选择驱动裁剪。验证独立搬移后的 SDK 消费工程，并将实板工作记录为未执行。</p></li>
+</ol>
+<p>组件通过显式总线、GPIO、时间和可选 OS 端口工作。不得创建执行任务、探测设备、虚构应用角色或提供最大对象池。Flash 驱动暴露物理几何；持久化和升级策略仍在外部。</p>
+<p>每个 SoC 的 <code class="docutils literal notranslate"><span class="pre">configure/</span></code> 包中，<code class="docutils literal notranslate"><span class="pre">contract.py</span></code> 拥有模式能力、ABI／限制与系列准入策略。相邻模块直接导入该合同；<code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> 将其与构造器、emitter 显式导出。叶模块 <code class="docutils literal notranslate"><span class="pre">providers/common.py</span></code> 拥有校验辅助函数与不可变 <code class="docutils literal notranslate"><span class="pre">Construction</span></code>；叶合同及公共辅助模块不导入顶层 resolver 或 emitter。<code class="docutils literal notranslate"><span class="pre">selection.py</span></code> 检查跨域选项、时钟和 IRQ 策略；<code class="docutils literal notranslate"><span class="pre">ir.py</span></code> 拥有具名不可变决策及其单向 JSON 投影；<code class="docutils literal notranslate"><span class="pre">matrix.py</span></code> 编排支持目录。descriptor 的 <code class="docutils literal notranslate"><span class="pre">configuration_modules</span></code> 属性将固定 package、<code class="docutils literal notranslate"><span class="pre">contract.py</span></code>、<code class="docutils literal notranslate"><span class="pre">bindings.py</span></code>、<code class="docutils literal notranslate"><span class="pre">emission.py</span></code> 路径与显式声明的 <code class="docutils literal notranslate"><span class="pre">configuration_helpers</span></code> 及所选本地 descriptor 文件合并。这些源码属于重新配置输入和 Source SDK 源码闭包。迁移元数据时保留 family record、顺序和公共选择。单次 <code class="docutils literal notranslate"><span class="pre">descriptor.maintained()</span></code> 查找不得导入另一 family 或 configure 行为；显式枚举及 snapshot/SDK 清单可以按要求加载全部纯数据 descriptor。</p>
+<p>私有 <code class="docutils literal notranslate"><span class="pre">timer_capture_impl.h</span></code>、<code class="docutils literal notranslate"><span class="pre">advanced_pwm_impl.h</span></code> 和 <code class="docutils literal notranslate"><span class="pre">uart_fifo_impl.h</span></code> 模板允许每个 translation unit 只有一个 specialization。所需的具名导出、寄存器、clock、IRQ 和数据绑定缺失时在编译期拒绝。FIFO 模板接受深度 1..16，RTS/CTS 选择为 0 或 1；选择流控时要求相应硬件 flow binding。wrapper 拥有的 binding，包括 ops 名称及 include 之后的 clock-readiness 使用，保留可用。调用方显式定义的 read/write port 保留；清理只移除模板拥有的 helper 和默认宏。逐个审查 specialization 的实际编译、导出表和运行时合同；模板 guard 不建立硬件时序资格。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tools/configure/contracts.py</span></code> 负责不可变的控制器类别字段、factory 类别顺序和公共头文件映射。编写、选择与 factory 消费同一份元数据；精确 SoC 能力仍归家族合同负责。已审查的事实选择、内存预算、Flash 布局和源码依赖具有冻结的具名阶段结果。一个冻结的设备图结果在最终装配之前完成控制器、端点、USB FIFO、SPI face、ADC trigger、资源和 DMA 决策。它的局部校验构建过程仍可使用字典；这个阶段边界不代表每个 normalizer 都已拆成独立的类型化阶段。</p>
+<p><code class="docutils literal notranslate"><span class="pre">_FactResolution</span></code> 按 Board 的完整料号引用该 SoC 中选定的只读 variant 视图；不另存一份料号或 variant 决策。公共字段校验器直接接收 <code class="docutils literal notranslate"><span class="pre">Mapping</span></code> 和明确的 <code class="docutils literal notranslate"><span class="pre">list</span></code>／<code class="docutils literal notranslate"><span class="pre">tuple</span></code> 容器；JSON 输入保持相同的严格字段、类型及取值域检查。Provider 直接消费这些不可变容器。</p>
+</section>
+<section id="keep-facts-and-admission-policy-distinct">
+<h2>区分事实与准入策略<a class="headerlink" href="#keep-facts-and-admission-policy-distinct" title="Link to this heading">¶</a></h2>
+<p>精确 <code class="docutils literal notranslate"><span class="pre">soc.json</span></code> variant 提供物理 Flash 起始地址、大小、擦除块和 RAM 域。每个家族的 <code class="docutils literal notranslate"><span class="pre">contract.PARTS</span></code> 通过冻结的 <code class="docutils literal notranslate"><span class="pre">PartPolicy</span></code> 显式准入完整料号：封装与可选内存域 allowlist 是软件策略，不是重复的容量表。未知料号、不同封装或与物理事实不一致的可选域均拒绝。</p>
+<p>校验覆盖事实包中的每个维护变体，包括当前装配未选中的料号。每个变体采用相同的封装、Flash 几何、内存重叠、DMA 可达性和 <code class="docutils literal notranslate"><span class="pre">PartPolicy</span></code> 检查。选择过程返回已有的所选事实；不会修复错误的未选料号，也不会复制另一料号的几何。</p>
+<p>添加构造器前，沿以下维护中的输入核对新增料号或模式：</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>输入或投影</p></th>
+<th class="head"><p>维护者检查</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">soc.json</span></code> variant 与 <code class="docutils literal notranslate"><span class="pre">routes.json</span></code></p></td>
+<td><p>精确物理几何、引出 pad、路由来源和有限模式 allowlist</p></td>
+</tr>
+<tr class="row-odd"><td><p>家族 <code class="docutils literal notranslate"><span class="pre">PARTS</span></code> 与 <code class="docutils literal notranslate"><span class="pre">PartPolicy</span></code></p></td>
+<td><p>显式完整料号、已复核封装与可选放置域</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">normalize_clock</span></code> 与 <code class="docutils literal notranslate"><span class="pre">clock_plan</span></code></p></td>
+<td><p>精确家族实现所选 profile 及经复核的时钟域关系</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">i2c_timing_clock</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">I2cTimingClock</span></code> 携带所选内核与外设时钟边界，以及是否要求显式 timing；电气假设仍由装配编写者提供</p></td>
+</tr>
+<tr class="row-even"><td><p>所选限制、格式和硅片策略</p></td>
+<td><p>元数据属于精确选定 owner；缺失复核保持明确，不因此准入模式</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PhysicalPartIR</span></code></p></td>
+<td><p>查看同一组冻结的料号、封装、Flash 与内存事实；不增加 JSON 或配置身份字段</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ControllerIntegrationIR</span></code></p></td>
+<td><p>复用规范资源 claim、DMA lane、IRQ 选项／profile、时钟、引脚及精确 SoC 硬件绑定</p></td>
+</tr>
+<tr class="row-odd"><td><p>家族 <code class="docutils literal notranslate"><span class="pre">UART_FORMATS</span></code>、<code class="docutils literal notranslate"><span class="pre">STREAM_GEOMETRY</span></code> 与 <code class="docutils literal notranslate"><span class="pre">ENDPOINT_POLICY</span></code></p></td>
+<td><p>显式经复核的格式、stream geometry 与 endpoint 能力；厂家别名或名称前缀不选择策略</p></td>
+</tr>
+<tr class="row-even"><td><p>生成的静态 C 与私有 provider</p></td>
+<td><p>消费已校验数值，并保留独立 SDK／寄存器断言与运行时失败检查</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>F407 Flash 生成展示了该边界：所选 sector 数组与只读 geometry 来自已校验的 <code class="docutils literal notranslate"><span class="pre">result.flash.erase_blocks</span></code>、起始地址和大小。C SDK 断言仍核对物理基址，独立寄存器模型测试保留参考几何。删除重复生产表不会让配置取代硬件校验。</p>
+<p>维护中的七个 MCU 家族都通过 <code class="docutils literal notranslate"><span class="pre">memory.flash_geometry</span></code>，从已校验事实生成只读 Flash geometry。六个家族保留既有全局 geometry symbol；F407 生成所选静态 geometry。Native 仍是主机模型。精确源码与独立维护的测试 oracle 仍须执行适用的 provider 和最终链接映像检查。</p>
+<p><code class="docutils literal notranslate"><span class="pre">ConfigurationIR.physical_part</span></code> 引用已有的冻结 Flash 和内存对象。<code class="docutils literal notranslate"><span class="pre">ControllerIR.integration</span></code> 组合权威 <code class="docutils literal notranslate"><span class="pre">ResourcePlanIR</span></code> 资源申领记录、<code class="docutils literal notranslate"><span class="pre">DmaTopologyIR</span></code> 通道、IRQ 选项／配置、时钟计划／输入和选定引脚。家族声明了 <code class="docutils literal notranslate"><span class="pre">ControllerBinding</span></code> 时，它会引用该记录。它的 <code class="docutils literal notranslate"><span class="pre">clock_hz</span></code> 仅表示配对的标称 APB 输入；缺失值不会猜测，已审查的频率边界来自 <code class="docutils literal notranslate"><span class="pre">clock_plan</span></code>。固定且经过审查的 SDK 地址、掩码与 Native 模型事实仍是显式叶子数据；它们不独立选择路由、owner 或时钟。维护中构造器的消费审计检查这些选定记录与能力投影；它不引入新的路由 resolver，也不建立最终集成资格。</p>
+<p>家族策略 hook 仍是声明的配置输入。H743 经复核的时钟域关系与所选 Flash linker fragment 位于其 <code class="docutils literal notranslate"><span class="pre">configure/</span></code> 包；通用工具仍拥有解析、typed IR、资源仲裁与原子发布。hook 不得创建第二份源码图，也不得静默选择不同料号、路由或 profile。</p>
+<p>成对 F407／GD470 控制器的 binding、DMA vector map 与具体 secondary controller hook 位于各自 SoC。公共代码消费所选 typed integration，并保留资源 lease、固定 IRQ wiring 和 drain 顺序。耦合 personality 与命名引脚状态同样要求显式 provider 策略。跨 Board／backend 资格仍属于既有 OS 合同；搬移家族机制不会扩大已准入组合。</p>
+<p>只读<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/maintenance/README.md">工作包视图</a>将精确维护模式关联到 resolver 夹具、所选 ops 源码与已审生命周期性质。视图条目用于导航，不是已执行测试或新增支持声明。实际适用门禁需要另行运行。</p>
+</section>
+<section id="keep-hardware-behavior-in-c">
+<h2>硬件行为使用 C 实现<a class="headerlink" href="#keep-hardware-behavior-in-c" title="Link to this heading">¶</a></h2>
+<p>固件机制使用 C11，启动和 CPU 上下文等位置保留必要的汇编。Python 在开发主机上运行：校验手写输入、解析资源，生成静态 C/H 声明、实例、typed factory getter、固定 IRQ 入口连接及明确的类型化调用。MCU 执行编译后的固件，不包含 Python 解释器。</p>
+<p>寄存器读写、硬件准入、等待、pin/clock/IRQ/DMA 取得、回滚、停止和恢复应直接维护在具体 C adapter 中。生成的定义可以保留常量寄存器地址和不可变资源数据；固定 IRQ 薄入口可以直接调用所选 handler。不得将这些算法搬进运行时动作解释器，也不得增加 registry、隐藏 worker 或强制锁。通过硬件端口使用 GoogleTest/GoogleMock 测试生产 C 算法；Python unittest 验证配置和静态连接。</p>
+<p>已审查的 Native 和七个 MCU 家族增量包含维护范围内的冷态路径。共享增强 SPI 准入在取得资源或设置启动失败标记之前执行只读 C 检查；H743 恢复在重新开放运行时域并取得租约之前检查准入。无用的硬件生成器和未使用的默认 MMIO 宏已删除。审查完整的启动／失败／停止／恢复路径，包括共享 owner 和可选保留组件。某个构造器中的一次 <code class="docutils literal notranslate"><span class="pre">DirectCall</span></code> 不能证明整个家族或全源码已经完成。精确实现与执行范围继续记录在<a class="reference download internal" download="" href="../_downloads/bba9cb694d1ab887c8df01b42b4ebe4b/platform-delivery-completion.csv"><code class="xref download docutils literal notranslate"><span class="pre">交付完善台账</span></code></a>中。</p>
+<p>编写按模式区分的只读配置和精确大小的可变存储。C prepare 函数在产生效果前校验上下文与外部所有权；C close 函数在接触已有 provider 前验证自身收据。空收据必须保持未取得的状态不变。部分准备后，close 必须保留每个尚未完成的引脚、时钟、IRQ 或 DMA 权利，直到读回证明已经归还。既要测试外来空收据，也要测试真实的部分取得收据；还要测试调用者已停止公开外设后的清理。避免重复的持久引脚快照或容纳所有模式最大状态的联合体。</p>
+<p>将 schema 字段和数值策略留在主机校验中。将运行态 MMIO 读取、时钟检查、发布者汇合、等待与恢复留在 C 中。在既有家族 descriptor 和显式 CMake target 中声明每个新增配置辅助模块及私有 C／头文件输入。主机模型成功不能替代实际 ARM 链接、迁址 SDK 消费者或物理工位执行。</p>
+<p>H743 fixed-run power 通过 <code class="docutils literal notranslate"><span class="pre">power.controllers</span></code> 引用选中的逻辑控制器 ID，ID 无须命名为 <code class="docutils literal notranslate"><span class="pre">bus4</span></code>。修改控制器名称时须同步修改端点和 power 引用。这仍严格限定为单个 SPI4 finite-DMA、baremetal、HSI64/cache-off；改变逻辑名称不会准入另一物理控制器、时钟配置或后端。</p>
+</section>
+<section id="review-performance-and-ownership">
+<h2>审查性能与所有权<a class="headerlink" href="#review-performance-and-ownership" title="Link to this heading">¶</a></h2>
+<p>测量所选空镜像和同一夹具启用新模式后的镜像。分别报告 Flash LOAD、Flash 占用范围、各 RAM 域和预留任务／I/O 存储。高频 IRQ 应直接访问固定提供者；接口查找属于冷路径。在合同要求时，准入判定和流元数据操作保持有界，并且不随队列长度增长。</p>
+<p>通过的主机寄存器模型只证明其建模的软件范围。新增 CPU、缓存、FPU／MVE、安全或低功耗行为必须建立自己的实际执行边界；<a class="reference internal" href="../reference/platforms/support.html"><span class="std std-doc">平台支持</span></a>不能仅凭名称推导它们。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">操作指南</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html">取得精确源码与锁定依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-workflow.html">配置产品并推进 I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">接入复核的 Board 包</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">接入 SoC、提供者或通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">测量资源并准备硬件验收</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

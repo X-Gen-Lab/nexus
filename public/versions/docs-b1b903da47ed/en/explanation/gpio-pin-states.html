@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GPIO pin states: explicit images under one retained lease &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Source-adjacent contracts" href="source-map.html" />
+    <link rel="prev" title="RTC and LPTIM: separate time domains and retained requests" href="rtc-lptim.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/explanation/gpio-pin-states.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/explanation/gpio-pin-states.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="gpio-pin-states-explicit-images-under-one-retained-lease">
+<span id="explanation-gpio-pin-states"></span><h1>GPIO pin states: explicit images under one retained lease<a class="headerlink" href="#gpio-pin-states-explicit-images-under-one-retained-lease" title="Link to this heading">¶</a></h1>
+<p>Use this explanation to select an explicitly authored <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> or <code class="docutils literal notranslate"><span class="pre">SLEEP</span></code> GPIO
+image without transferring pad ownership. The current named-state assembly is
+limited to STM32G474RET6, GPIOA, baremetal and <code class="docutils literal notranslate"><span class="pre">hse24-pll170</span></code>. Its PA5 software
+Board fixture does not establish PCB wiring, electrical safety or hardware
+low-power behavior. Other providers do not acquire this mode from the public
+header alone.</p>
+<p>The public <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/pin_state.h">pin-state declarations</a> own
+the API contract. The <a class="reference internal" href="../design/io-evolution.html"><span class="std std-doc">I/O evolution design</span></a> and its
+execution ledger keep this mechanism separate from the remaining wake,
+retention and power-mode work. This page explains integration and responsibility;
+it does not replace those declarations or mark IO-31 complete.</p>
+<section id="one-authored-plan-three-distinct-identities">
+<h2>One authored plan, three distinct identities<a class="headerlink" href="#one-authored-plan-three-distinct-identities" title="Link to this heading">¶</a></h2>
+<p>Board facts explicitly supply both GPIO images. The ordinary TOML selects a
+GPIO binding with <code class="docutils literal notranslate"><span class="pre">mode</span> <span class="pre">=</span> <span class="pre">&quot;named-states&quot;</span></code>; strict resolution produces immutable
+register plans and existing static provider storage. No runtime strings, heap,
+worker, dynamic registry or second pin-configuration authority is introduced.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_id_t</span></code> identifies one generated factory instance.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_port_t</span></code> is its immutable public face: shared readonly operations
+and that instance’s private context.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_selection_t</span></code> selects <code class="docutils literal notranslate"><span class="pre">NX_PIN_STATE_DEFAULT</span></code> or
+<code class="docutils literal notranslate"><span class="pre">NX_PIN_STATE_SLEEP</span></code>; it is not a factory instance ID.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">nx_factory_pin_state()</span></code> returns the existing face without touching hardware.
+Ordinary GPIO lookup does not return a named-state instance. Lifecycle work
+belongs to explicit Platform start/stop, and runtime selection enters the
+provider directly through <code class="docutils literal notranslate"><span class="pre">nx_pin_state_select()</span></code>.</p>
+<p>The selected configuration is maintained here:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../cmake/package/verification/io_evolution/boards/g474-pin-states"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hse24-pll170"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16384</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+
+<span class="k">[gpio.status]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"state-a5"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"named-states"</span>
+</pre></div>
+</div>
+<p>The software Board explicitly declares PA5 output push-pull, low speed, no pull
+and level zero for <code class="docutils literal notranslate"><span class="pre">default</span></code>, and analog/no-pull for <code class="docutils literal notranslate"><span class="pre">sleep</span></code>. These are fixture
+values, not inferred board-safe levels. Products must provide reviewed electrical
+facts and their own policy instead of copying the names as safety guarantees.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/gpio-pin-states.svg" title="Open SVG at full size"><img alt="Current G474 named GPIO ownership: cold lease, checked selection and separate Platform cleanup" src="../_images/gpio-pin-states.svg" /></a></p>
+<p>FIG-22 describes the current selected software lifecycle. Arrows distinguish
+build-time generation, pure lookup, state selection and cleanup. Every failure
+retains the responsibility it has not proved released; rendering does not
+establish a physical transition or HIL result.</p>
+</section>
+<section id="cold-startup-acquires-responsibility-before-driving">
+<h2>Cold startup acquires responsibility before driving<a class="headerlink" href="#cold-startup-acquires-responsibility-before-driving" title="Link to this heading">¶</a></h2>
+<p>The generated Platform owns the exact selected pads, bank gate and original cold
+snapshot. Its cold admission checks the selected resources before accepting
+hardware effects. Named-state initialization requires selected pads to be input
+or analog, unlocked and in a powered, non-reset bank. Existing output or AF
+ownership is not permission to take over that pad.</p>
+<p>Initialization proves the authored <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> image before opening the instance.
+A failed startup can leave partial effects and cleanup responsibility. The
+Platform’s rollback must use checked provider stop and original-snapshot
+restoration; it cannot discard the lease because the constructor returned an
+error. Keep the owner, immutable plans and their complete storage live until
+that cleanup actually succeeds.</p>
+</section>
+<section id="selection-is-serialized-privileged-work">
+<h2>Selection is serialized privileged work<a class="headerlink" href="#selection-is-serialized-privileged-work" title="Link to this heading">¶</a></h2>
+<p>The caller provides one serialized, non-reentrant, privileged same-CPU Thread
+executor. Incoming interrupt masks must be clear. No ISR/NMI, competing pad or
+RCC writer, clock transition or register takeover may run concurrently. These
+are integration preconditions, not permissions established by matching register
+bits or by the factory pointer.</p>
+<p>The provider uses a bounded masked section and restores the saved interrupt
+state. Bank gate/reset checks precede GPIO register access; selected lock bits are
+then checked without taking over a locked pad. An unavailable bank is rejected
+without silently enabling its clock or clearing reset. A clean
+committed image is checked even when selecting the same state; external drift
+can return <code class="docutils literal notranslate"><span class="pre">STATE</span></code> and retain dirty responsibility instead of silently accepting
+the altered image.</p>
+<p>For a transition, the provider first proves that the entire selected group has
+withdrawn its drivers. It then programs the required output latch and electrical
+fields, applies the target mode and checks the actual target image. Only that
+proof commits the new selection. Masks preserve unrelated pads. This ordering
+is software behavior; it does not prove glitch-free pad voltage, external bias
+or an electrical settling interval.</p>
+<p>A partial failure may leave neither the previous image nor the target image.
+The lease stays retained, and the caller must not reuse its storage or hand the
+pads to a different writer. An initialized instance that has not stopped can
+retry an explicit supported target; otherwise resume checked Platform cleanup.
+A failed initialization or an already withdrawn provider cannot be reopened by
+selection. There is no hidden background repair, automatic
+clock recovery or deadline-based ownership release.</p>
+</section>
+<section id="stop-has-two-separate-completion-boundaries">
+<h2>Stop has two separate completion boundaries<a class="headerlink" href="#stop-has-two-separate-completion-boundaries" title="Link to this heading">¶</a></h2>
+<p>Private provider stop proves selected drivers withdrawn. Its success is that
+provider’s final access, but it does not by itself restore the Platform’s cold
+snapshot or release the bank lease. Those remain separate generated Platform
+cleanup steps.</p>
+<p>The Platform restores the saved selected-pad image and proves that restoration
+before releasing its GPIO gate responsibility. If restoration fails after provider stop succeeded, its pending snapshot and
+lease remain live. If restoration is already proved and only gate cleanup fails,
+only the remaining gate responsibility stays pending. Keep the complete storage
+until the whole Platform stop succeeds, and retry only unfinished cleanup.
+Do not repeat construction, zero
+storage or interpret a first error as proof that every resource is still fully
+running or fully released.</p>
+</section>
+<section id="use-the-public-selected-face">
+<h2>Use the public selected face<a class="headerlink" href="#use-the-public-selected-face" title="Link to this heading">¶</a></h2>
+<p>After a successful Platform start, an external product uses only public and
+generated headers. The fragment below is the named-state branch of the
+maintained link fixture; the surrounding fixture handles startup and stop. It
+is not a standalone application or a physical execution result.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_pin_state_port_t</span><span class="o">*</span><span class="w"> </span><span class="n">pins</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">nx_factory_pin_state</span><span class="p">(</span><span class="n">NX_PIN_STATE_ID_STATUS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_result_t</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_pin_state_select</span><span class="p">(</span><span class="n">pins</span><span class="p">,</span><span class="w"> </span><span class="n">NX_PIN_STATE_SLEEP</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">selected</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">selected</span><span class="p">;</span>
+<span class="w">    </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_pin_state_select</span><span class="p">(</span><span class="n">pins</span><span class="p">,</span><span class="w"> </span><span class="n">NX_PIN_STATE_DEFAULT</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">selected</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">selected</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Factory lookup, synchronous selection and final Platform cleanup allocate no
+request or transfer buffer. The operation performs bounded work over at most
+16 selected pad bits; readonly plans, mutable provider state and the Platform’s
+saved snapshots remain distinct costs. No measured MCU latency, total RAM or
+worst-case interrupt bound is implied by that structural statement.</p>
+</section>
+<section id="current-scope-and-verification-boundary">
+<h2>Current scope and verification boundary<a class="headerlink" href="#current-scope-and-verification-boundary" title="Link to this heading">¶</a></h2>
+<p>Current source implements named GPIO images, cold ownership and explicit
+selection for the exact G474 reference tuple. The derived <a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">capability
+matrix</span></a> records selected modes and source definitions;
+it does not qualify a board or execute a firmware image.</p>
+<p>Native register/factory tests establish the exercised software and failure
+paths. Actual ARM linking, installed SDK consumption and HIL require their own
+same-source evidence. The public interface and figure do not establish AF
+switching, wake routing, retention, deep Sleep/STOP entry, monotonic continuity,
+PCB safety or real pad timing. Those remain separate contracts and work packages.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architecture explanations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">How the platform is assembled and executed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">Typed factory, static instances and polymorphic faces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">Borrow, completion and observer lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rtc-lptim.html">RTC and LPTIM: separate time domains and retained requests</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GPIO pin states: explicit images under one retained lease</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">Source-adjacent contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU-local primitives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o-contracts-and-shared-mechanisms">Typed I/O contracts and shared mechanisms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">Optional OS adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">Optional common components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#soc-packages-and-private-providers">SoC packages and private providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">Reusable IP implementations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#reviewed-board-facts">Reviewed Board facts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

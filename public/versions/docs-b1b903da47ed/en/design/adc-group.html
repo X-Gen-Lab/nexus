@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Finite ADC sequences with explicit integer frames &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CPU, atomics and runtime assembly contracts" href="arch-contracts.html" />
+    <link rel="prev" title="Current design and execution ledgers" href="README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/adc-group.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/design/adc-group.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="finite-adc-sequences-with-explicit-integer-frames">
+<span id="adc-group"></span><h1>Finite ADC sequences with explicit integer frames<a class="headerlink" href="#finite-adc-sequences-with-explicit-integer-frames" title="Link to this heading">¶</a></h1>
+<p>Use <code class="docutils literal notranslate"><span class="pre">nx_adc_group_port_t</span></code> to acquire complete ordered ADC frames through one
+physical owner. The current reference selects STM32G474RET6, HSE24/PLL170 and
+baremetal, with regular normal DMA or one injected frame. It keeps integer
+layout, trigger provenance, silicon expectations and storage ownership explicit.
+Control algorithms, calibrated engineering units and product sampling policy
+remain external. Physical HIL is <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<section id="select-one-static-owner">
+<h2>Select one static owner<a class="headerlink" href="#select-one-static-owner" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="Open SVG at full size"><img alt="FIG-16: current assembly, static factory lookup and direct provider calls for one selected ADC sequence owner" src="../_images/io-evolution.svg" /></a></p>
+<p><strong>FIG-16 describes shared assembly and ownership mechanisms, not an ADC timing
+measurement.</strong> Here the generated face is <code class="docutils literal notranslate"><span class="pre">nx_adc_group_port_t</span></code>; its private
+context owns the selected ADC1 sequence and optional DMA/TIM6 resources. The
+application owns the request and complete raw frame array. Generation, lookup
+and runtime call arrows retain their distinct meanings. Factory lookup performs
+no conversion, calibration, resource acquisition or task scheduling.</p>
+<p>The four complete maintained inputs select
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml">regular software</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml">regular TIM6</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml">injected software</a>
+or <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml">injected TIM6</a>.
+Their software-only Board supplies PA0/PA1 analog route and voltage assumptions;
+it does not establish a fitted analog circuit, source impedance or connector
+access. The resolver rejects conflicting ADC/common, DMA, timer, vector and pad
+claims before publishing one atomic bundle.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Owner</p></th>
+<th class="head"><p>Responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Authored assembly and typed IR</p></td>
+<td><p>Select logical rank order, sample codes, named silicon layout, trigger and exact resource claims</p></td>
+</tr>
+<tr class="row-odd"><td><p>Platform Construction</p></td>
+<td><p>Admit actual silicon before effects; acquire and restore pins, kernel mux, gates and system time</p></td>
+</tr>
+<tr class="row-even"><td><p>Private provider</p></td>
+<td><p>Independently recheck cold silicon; program actual SQR/JSQR/SMPR, own source/ADC/DMA/vector drain and retain partial effects</p></td>
+</tr>
+<tr class="row-odd"><td><p>Application executor</p></td>
+<td><p>Serialize privileged, unmasked task calls, preserve monotonic deadlines and explicitly advance service</p></td>
+</tr>
+<tr class="row-even"><td><p>Application storage</p></td>
+<td><p>Keep accepted metadata immutable and exclude all other access to the complete raw array until acquired SETTLED</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The factory returns the existing <code class="docutils literal notranslate"><span class="pre">NX_ADC_GROUP_ID_SAMPLES</span></code> face through
+<code class="docutils literal notranslate"><span class="pre">nx_factory_adc_group</span></code>. The two-pointer face shares one const five-operation
+table. On a 32-bit target these structural costs are 8 B per face and 20 B per
+shared table; private state, request and caller arrays are separate. Ordinary
+single ADC, continuous-block ADC and PWM/ADC state and tables do not grow.
+There is no allocator, maximum pool, hidden worker or runtime registry.</p>
+</section>
+<section id="exact-hardware-profiles-and-layout">
+<h2>Exact hardware profiles and layout<a class="headerlink" href="#exact-hardware-profiles-and-layout" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Selection</p></th>
+<th class="head"><p>Actual execution and finite boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Regular, software</p></td>
+<td><p>Real ADC <code class="docutils literal notranslate"><span class="pre">CONT1</span></code> scan sequence with finite normal DMA; software service does not emulate each conversion or frame</p></td>
+</tr>
+<tr class="row-odd"><td><p>Regular, TIM6</p></td>
+<td><p>Rising TIM6 TRGO drives each complete regular scan; finite normal DMA ends on a whole physical-rank boundary</p></td>
+</tr>
+<tr class="row-even"><td><p>Injected, software</p></td>
+<td><p>One software JADSTART with JQDIS1 and fresh JEOS; the task copies the whole group only after source/vector drain</p></td>
+</tr>
+<tr class="row-odd"><td><p>Injected, TIM6</p></td>
+<td><p>One owned TIM6 OPM update drives one injected group; no second context or trigger is admitted before complete withdrawal</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>All selections use ADC12 SYSCLK/8 = 21.25 MHz and HCLK 170 MHz, single-ended
+unsigned12 normal sampling. Regular has at most 16 physical ranks; injected has
+at most four. Regular owns DMA1 channel1, DMAMUX1 channel0/request5 and vectors 11
+and 18. Injected owns vector 18 and performs no DMA-channel admission or access.
+Software selections do not lease TIM6. TIM6 selections additionally own the
+whole timer at a 1 MHz counter tick. All vectors use logical priority 5 and no
+kernel calls.</p>
+<p>The maintained inputs select channels <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">1]</span></code>, sample codes <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code> and nominal
+3300 mV. Channel 1 is PA0 and channel 2 is PA1. The provider also admits the reviewed
+internal channels 16/17/18 for temperature, VBAT and VREF respectively. One
+physical channel has one SMPR field, so repeated logical occurrences cannot
+select different sample codes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_adc_group_info</span></code> reports the actual immutable channel order, sampling-code
+lookup, physical rank count and integer format. Storage is little-endian,
+two-byte unsigned12 with zero LSB offset. A normal layout has sample stride 2;
+the Z layout has stride 4 because each logical rank occupies two physical slots.
+The scan stride is logical channel count multiplied by sample stride. Consumers
+use <code class="docutils literal notranslate"><span class="pre">nx_adc_format_decode</span></code> after SETTLED and ignore discarded padding. The raw
+array is not a floating-point voltage array.</p>
+<p>Regular requests contain 1 through <code class="docutils literal notranslate"><span class="pre">floor(65535</span> <span class="pre">/</span> <span class="pre">physical_ranks)</span></code> whole frames,
+further bounded by their actual DMA-visible memory span. Injected requests
+contain exactly one frame. The four reference bundles select writable SRAM1/2
+domains; this selection does not authorize CCM aliases. The exact byte length
+must equal <code class="docutils literal notranslate"><span class="pre">frame_count</span> <span class="pre">*</span> <span class="pre">scan_stride</span></code>, including all padding, with halfword
+alignment. A partial rank, EOC, JEOC or DMA prefix never establishes a valid
+frame result.</p>
+<p>The trigger identity is zero for software and a nonzero assembly provenance for
+TIM6. It is not a counter, aperture timestamp, physical wire identity or measured
+phase relationship. <code class="docutils literal notranslate"><span class="pre">period_us</span></code> describes the selected timer period; it does
+not describe an instantaneous ADC aperture.</p>
+</section>
+<section id="observe-silicon-and-execute-its-actual-algorithm">
+<h2>Observe silicon and execute its actual algorithm<a class="headerlink" href="#observe-silicon-and-execute-its-actual-algorithm" title="Link to this heading">¶</a></h2>
+<p>The named <code class="docutils literal notranslate"><span class="pre">g474-adc-group-x</span></code>, <code class="docutils literal notranslate"><span class="pre">g474-adc-group-y</span></code> and <code class="docutils literal notranslate"><span class="pre">g474-adc-group-z</span></code> profiles
+expect revisions 0x2003, 0x2002 and 0x2001 respectively. A profile is an immutable
+expectation, not observed hardware. Platform admission and the independent
+private constructor use the existing <code class="docutils literal notranslate"><span class="pre">nx_stm32_identity_read</span></code> source and shared
+core silicon policy against actual IDCODE and Flash-size registers. Wrong
+group/density, unavailable density, unknown cuts and mismatched expected cuts
+reject. An ordinary restart observes again rather than caching admission.
+All four canonical inputs select the X layout. Y/Z selections require their
+matching observed cut and separate qualification receipts; an X factory run
+does not qualify those configurations.</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32g474/reviews/adc-group.json">The reviewed mode record</a> is the
+single source of cut rules and required workaround masks. The provider does not
+maintain another revision allowlist or reader. The group and density values
+cannot identify an exact package or orderable part by themselves; the selected
+SoC and Board must still authorize their exact routes.</p>
+<p>The Z profile repeats every physical channel rank twice and keeps the first
+slot of each pair. It therefore permits at most eight logical regular ranks or
+two logical injected ranks. The explicit raw stride preserves the extra slots;
+there is no hidden packing buffer. Every profile discards a real priming scan
+and disables/re-enables ADC around each valid acquisition. These are actual
+register algorithms, not evidence inferred from workaround metadata.</p>
+<p>The fixed ratio HCLK/ADC = 8 avoids ES0430 section 2.7.5’s condition above 10.
+JQDIS1, one ADC group, no dual conversion, no automatic injected conversion and
+no preemption exclude additional dynamic-context cases. These mode constraints
+do not qualify unselected continuous injected queues or different clock ratios.</p>
+</section>
+<section id="sampling-time-and-real-priming">
+<h2>Sampling time and real priming<a class="headerlink" href="#sampling-time-and-real-priming" title="Link to this heading">¶</a></h2>
+<p>The eight sample codes represent 2.5, 6.5, 12.5, 24.5, 47.5, 92.5, 247.5 and
+640.5 ADC cycles. Conversion adds 12.5 cycles per physical rank. The reported
+halfcycle lookup and expanded scan budget include discarded ranks. Internal
+sources require at least code 5 for VREF, code 6 for temperature and code 7 for
+VBAT at the selected ADC clock. Cold initialization enables only the selected
+internal sources, waits 122 us if temperature is selected or 22 us otherwise,
+performs calibration and waits at least four ADC cycles afterwards. These
+unmasked waits do not establish analog accuracy or calibrated voltage.</p>
+<p>Calibration has no independent fresh-completion flag. A short guard saves and
+restores the incoming interrupt mask around the ADCAL command, barrier and
+immediate busy observation; the completion wait runs unmasked. Initialization
+requires observed ADCAL1 followed by hardware ADCAL0. An initial zero is
+ambiguous: the command may have been refused, or calibration may already have
+finished before the read. It conservatively reports IO and retains partial
+effects for joined cleanup and a cold retry. An unchanged CALFACT or the nominal
+116-cycle duration cannot prove fresh completion; no factor sentinel is written.</p>
+<p>Before valid samples of each accepted acquisition, the provider executes one
+complete discarded software scan. Regular priming uses the accepted raw output
+span as temporary DMA storage; injected priming uses the JDR bank. The caller cannot read either
+as valid samples. Watchdog and periodic trigger sources are disabled during
+priming. Idle leaves ADC disabled, and a late task must really prime again;
+updating a timestamp cannot substitute for a conversion.</p>
+<p>For a hardware trigger, the complete expanded scan and asynchronous-trigger
+margin must fit the exact period. The necessary cold freshness budget is
+<code class="docutils literal notranslate"><span class="pre">period_us</span> <span class="pre">+</span> <span class="pre">ceil(scan_halfcycles</span> <span class="pre">*</span> <span class="pre">4</span> <span class="pre">/</span> <span class="pre">170)</span> <span class="pre">&lt;</span> <span class="pre">1000</span></code>; slow sample codes therefore
+reduce the admitted maximum period. Configuration and the private constructor
+use the same physical units and reject impossible budgets without rounding.
+Runtime freshness checks still cover actual task/arm delays. A stale arm retains
+the loan, legally withdraws the in-progress hardware and converts another
+discarded scan before publishing valid frames.</p>
+<p>The optional analog watchdog applies raw lower/upper thresholds to the selected
+group. It is disabled during discarded priming and latches a terminal IO fault
+in the valid window. It does not supply a product trip policy, comparator break
+route, safe output or guaranteed reaction time.</p>
+</section>
+<section id="admit-advance-and-consume">
+<h2>Admit, advance and consume<a class="headerlink" href="#admit-advance-and-consume" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Retrieve the static typed face and explicitly start Platform. Startup
+calibrates the cold owner but starts no acquisition and no hidden task.</p></li>
+<li><p>Initialize the request, obtain the current immutable info and prepare a
+separate complete raw array with a finite absolute monotonic deadline.
+Preparation borrows nothing, touches no sample bytes and validates no chip
+or DMA domain on its own.</p></li>
+<li><p>Submit through the unique privileged, unmasked task executor. Rejection
+retains no pointers or new effects. <code class="docutils literal notranslate"><span class="pre">NX_SUCCESS</span></code> means ACCEPTED, including
+an arm failure that may already have settled through actual withdrawal.</p></li>
+<li><p>Preserve the descriptor and array. IRQs record bounded owned facts; the
+same task explicitly advances service through priming, acquisition and drain.
+No worker supplies progress when the application stops calling service.</p></li>
+<li><p>Acquire-observe <code class="docutils literal notranslate"><span class="pre">NX_REQUEST_SETTLED</span></code>, inspect result and decode valid frames.
+Join any external observers separately before preparing the same storage
+for another request. An ordinary success never automatically rearms itself.</p></li>
+</ol>
+<p>The provider rejects wrapping, overlapping, control-aliasing and incomplete
+spans before admission; known control descriptors reject before their fields
+are read. Without a trusted completion timestamp, completion first observed at
+or after the deadline reports TIMEOUT. Completion already observed in time may
+finish required withdrawal later. This observation rule is not a physical
+execution-time or service-latency guarantee.</p>
+</section>
+<section id="withdraw-before-releasing-the-loan">
+<h2>Withdraw before releasing the loan<a class="headerlink" href="#withdraw-before-releasing-the-loan" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-06: current request lifecycle; cancellation and quarantine retain ADC frame storage until actual source and reference withdrawal" src="../_images/request-lifecycle.svg" /></a></p>
+<p><strong>FIG-06 supplies the shared request-state contract.</strong> ACCEPTED and REJECTED
+are admission outcomes, not extra request states. In this provider, SETTLED
+requires the following physical and reference proofs.</p>
+<ol class="arabic simple">
+<li><p>For TIM6, prove CEN0 before selecting the quiet enable-based MMS route.
+Cold/rearm UG occurs behind that quiet route with fresh UIF/acknowledgement;
+stop does not issue UG or create another update trigger.</p></li>
+<li><p>Request only the matching regular or injected stop, observe its START/STOP
+withdrawal, then legally disable ADC and observe ADEN/ADDIS0. JEXTEN changes
+follow JADSTART0; ADDIS never substitutes for group drain.</p></li>
+<li><p>For regular DMA, prove EN0, detach addresses and remaining count, and detach
+DMAMUX. TC and CNDTR0 alone do not stop a CONT1 scan or a hardware trigger.</p></li>
+<li><p>Preserve captured TE/OVR/watchdog faults before W1C, acknowledge only owned
+observed flags and recheck during drain and final publication.</p></li>
+<li><p>Disable/join selected vectors and active publishers. The final metadata
+guard detaches the request and release-publishes SETTLED as the final provider
+access. Injected JDR values are copied only after whole fresh JEOS and drain.</p></li>
+</ol>
+<p>Success reports exactly the requested frame count. Errors, cancellation and
+timeout report zero guaranteed valid frames, even if raw storage contains a
+partial or complete-looking prefix. The first terminal cause remains latched.
+A refused counter, ADC, DMA or vector withdrawal retains QUARANTINED storage
+and recovery responsibility; service can retry the same real drain. A retired
+predecessor’s repeated stop cannot withdraw a successor’s controller.</p>
+<p>Public stop closes new admission and drains the accepted request. Its success
+does not release pins, internal-source enables or clock leases. Final Platform
+close restores logical priorities and common configuration only after complete
+request/source/vector withdrawal, then releases outer resources. Failed close
+retains unfinished leases for retry. Fault recovery is an explicit joined cold
+close and restart, never an automatic replay.</p>
+</section>
+<section id="sources-and-software-evidence">
+<h2>Sources and software evidence<a class="headerlink" href="#sources-and-software-evidence" title="Link to this heading">¶</a></h2>
+<p>The authoritative API is <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/adc_group.h">the public group contract</a>.
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32g474/drivers/adc_group.c">The private provider</a> implements the
+actual sequencer, timer, watchdog and DMA transitions. The selected official
+ADC/DMAMUX definitions remain private and locked by
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/dependencies/stm32g4-hal.lock.json">the STM32G4 dependency record</a>.
+RM0440 Rev9, DS12288 Rev6 and ES0430 Rev9 establish the reviewed hardware facts;
+the mode record binds their source identities and algorithm scope.</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tests/google/adc_group_test.cpp">Public GoogleTest/GoogleMock contracts</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tests/google/g474_adc_group_test.cpp">external register/event tests</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tests/google/g474_adc_group_factory_test.cpp">normal generated-factory tests</a>
+exercise real common/provider code. They cover whole-rank boundaries, integer
+decoding, discarded priming, actual continuous regular scans, OPM, aliases,
+deadline/late faults, refused withdrawal, instance handoff and retained cleanup.
+Independent admission cases use actual IDCODE/Flash-size storage and the same
+generated policy, without replacing the reader or comparison function.</p>
+<p>Current development validation passed eight public API cases, 55 real-provider
+cases and four normal generated-factory programs with 16 cases each: 127 cases
+with no failures or skips. All four canonical X configurations also passed
+normal ARM configure/build, resource budgets and retention checks for one face,
+one table and its five method slots. These are model and firmware-link results,
+not executed analog measurements, Y/Z normal-configuration qualification or a
+clean reproducible software candidate.</p>
+<p>Actual model results and ARM ELF/resource checks belong to their exact source,
+configuration and execution receipts. Linking does not execute ADC or prove
+analog waveforms. A clean reproducible software candidate, installed-SDK
+composition and physical station acceptance have separate evidence. No model,
+diagram or policy mask establishes PCB connectivity, measured accuracy,
+aperture timing, physical HIL or a safety-qualified control system.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['kernel_0',['kernel',['../structnx__irq__policy__t.html#ac41744d48b88fd0186222ea1bddbc895',1,'nx_irq_policy_t']]],
+  ['kind_1',['kind',['../structnx__can__frame__t.html#a4b612e19e734a87b4d09d89c16a64995',1,'nx_can_frame_t::kind'],['../structnx__can__event__t.html#ab15a5d26366409c254fd957a92b0b52e',1,'nx_can_event_t::kind'],['../structnx__can__fd__frame__t.html#aee6cf07a677abb3b158644315b61c4b6',1,'nx_can_fd_frame_t::kind'],['../structnx__can__fd__event__t.html#a1b86d48dd5aeb0dfae8c140ab32ee301',1,'nx_can_fd_event_t::kind'],['../structnx__frame__audio__format__t.html#ac95049d193509636f7ad8521bfb52504',1,'nx_frame_audio_format_t::kind'],['../structnx__usb__event__t.html#a3f2727356a15e025fa4a0f027c567e67',1,'nx_usb_event_t::kind'],['../structnx__usb__control__request__t.html#a669ad6a37b389fb24e3b0cb5dd12c889',1,'nx_usb_control_request_t::kind'],['../structnx__i3c__request__t.html#aa3914c4931d2ff8901b6057948a3e281',1,'nx_i3c_request_t::kind'],['../structnx__i3c__event__t.html#ad81a667e6b3bf9c7051f3c0389a8265e',1,'nx_i3c_event_t::kind'],['../structnx__i3c__command__t.html#a1a7a72e47aa732f860ca25743a7722af',1,'nx_i3c_command_t::kind']]],
+  ['known_2',['known',['../structnx__io__diagnostic__facts__t.html#a912840a845499d4f56400e798316683d',1,'nx_io_diagnostic_facts_t']]]
+];

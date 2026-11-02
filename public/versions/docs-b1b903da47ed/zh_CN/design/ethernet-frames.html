@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>以太网帧借用与 MAC 硬件时钟 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="STM32F407 上的有限 I2S2 从机发送" href="f407-i2s2-slave-tx.html" />
+    <link rel="prev" title="Raw Ethernet MAC、MDIO 与 DP83848" href="ethernet.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/ethernet-frames.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/design/ethernet-frames.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="ethernet-frame-loans-and-the-mac-hardware-clock">
+<h1>以太网帧借用与 MAC 硬件时钟<a class="headerlink" href="#ethernet-frame-loans-and-the-mac-hardware-clock" title="Link to this heading">¶</a></h1>
+<p>可选的 <code class="docutils literal notranslate"><span class="pre">eth_frames</span></code> 接口提供完整的分散聚集帧、一个带内 VLAN C-tag 和 MAC硬件事件时间戳。它选择独立的 provider 状态、八字描述符和调用方存储。现有 <code class="docutils literal notranslate"><span class="pre">eth</span></code> 接口保留连续无标签帧契约、四字描述符及原有操作表。选择其中一个接口不会扩大另一个接口的能力。</p>
+<p>首批面向硬件的实现是采用已维护 168 MHz、200 MHz HCLK 配置的精确STM32F407、GD32F470 RMII provider。Native 提供显式的 C 硬件模型。已执行的主机验证覆盖公共契约、共享引擎、精确系列 provider、Native 和普通装配／工厂组合。两个规范 ARM 固件配置也已编译和链接通过。这些属于软件检查；物理 RMII、PHY 行为、外部总线时序、时间戳准确度和工位 HIL 仍为<code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="打开 SVG 大图"><img alt="FIG-16：构建期装配选择一个不可变接口和一个私有物理所有者；普通帧调用直接派发给该所有者" src="../_images/io-evolution.svg" /></a></p>
+<section id="assembly-and-hardware-ownership">
+<h2>装配与硬件所有权<a class="headerlink" href="#assembly-and-hardware-ownership" title="Link to this heading">¶</a></h2>
+<p>已维护的普通装配契约使用 authored <code class="docutils literal notranslate"><span class="pre">eth_frames.mac</span></code> 控制器选择<code class="docutils literal notranslate"><span class="pre">rmii-vlan-sg-ptp</span></code>、已审核 RMII 路由、MAC 地址、精确 TX／RX 环大小、RX缓冲大小、IRQ 策略以及有限初始化／排空预算。工厂契约通过<code class="docutils literal notranslate"><span class="pre">nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC)</span></code> 返回已有的静态<code class="docutils literal notranslate"><span class="pre">nx_eth_frames_port_t</span></code>。查找不得访问硬件、分配或初始化。配对的 MDIO 接口通过独立公共类型访问同一物理所有者。位于<code class="docutils literal notranslate"><span class="pre">cmake/package/verification/io_evolution/</span></code> 的两个规范示例配置<code class="docutils literal notranslate"><span class="pre">f407zg-eth-frames.toml</span></code> 和 <code class="docutils literal notranslate"><span class="pre">gd470-eth-frames.toml</span></code> 验证了这一完整组合。</p>
+<p>Platform 拥有 System 时钟租约、引脚、RMII 选择及 MAC／TX／RX／PTP 时钟门。provider 在该租约内管理 MAC、DMA、PTP 计数器和 IRQ。旧 raw Ethernet 与增强帧不能同时拥有同一 MAC。产品在本仓库之外提供 PHY 复位、地址、电源、自协商／链路观测、网络栈、报文分类和关闭策略。</p>
+<p>启动先建立实际 HSE8／PLL168 或 HXTAL25／PLL200，再访问 MAC。系列 provider检查最新的振荡器／PLL 就绪、实际时钟源状态、PLL 参数、AHB／APB 分频、RMII选择及独立 PTP 时钟门。仅请求切换到 PLL 或声明配置频率，不能授权 16 MHz回退或其他实际分频。两份手册都要求 Ethernet AHB 至少 25 MHz。外部 50 MHzRMII REF_CLK 不能证明 HCLK 或 PTP 输入时钟。</p>
+<p>provider 在复位前拒绝外部／活动描述符表。描述符和报文存储必须处于精确的主SRAM DMA 域；排除 F407 CCM 和 GD470 TCM。软件元数据可使用其他 CPU 可访问存储。硬件描述符步长为 32 字节；ST HAL 描述符类型还含软件备份字，不能以其大小作为硬件步长。官方头文件提供经过审核的布局／掩码定义；不选择厂商 C运行时、描述符池、可变全局游标或 HAL tick 初始化。</p>
+</section>
+<section id="complete-frames-and-vlan-handling">
+<h2>完整帧与 VLAN 处理<a class="headerlink" href="#complete-frames-and-vlan-handling" title="Link to this heading">¶</a></h2>
+<p>TX 请求包含不可变 <code class="docutils literal notranslate"><span class="pre">nx_eth_fragment_t</span></code> 视图。准备阶段在改变请求存储前检查全部长度、指针溢出及跨片段的完整 L2 首部，拒绝空片段。允许一个 EtherType0x8100 C-tag；TCI 保留在载荷中。拒绝嵌套标签、0x88A8 和采用长度字段的802.3 帧。无标签帧包含 14..1514 个调用方字节；带标签帧包含 18..1518 个，均不含前导码、硬件填充和硬件 FCS。</p>
+<p>所选模式不插入或剥离标签。PCP／DEI／VID、access／trunk 端口策略及 VLAN成员关系属于产品。保持硬件填充／FCS 开启，校验和卸载关闭。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>事实</p></th>
+<th class="head"><p>TX</p></th>
+<th class="head"><p>RX</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>单位</p></td>
+<td><p>一个完整 L2 帧</p></td>
+<td><p>一个完整 L2 帧</p></td>
+</tr>
+<tr class="row-odd"><td><p>硬件存储</p></td>
+<td><p>每个提供的片段使用一个描述符</p></td>
+<td><p>按接收帧所需使用环缓冲</p></td>
+</tr>
+<tr class="row-even"><td><p>首尾事实</p></td>
+<td><p>软件元数据在发布前选择 FS 与 LS</p></td>
+<td><p>实际 FS／LS 回写划定帧边界</p></td>
+</tr>
+<tr class="row-odd"><td><p>FCS</p></td>
+<td><p>硬件插入</p></td>
+<td><p>视图排除 FCS，包括跨两个缓冲的四字节 FCS</p></td>
+</tr>
+<tr class="row-even"><td><p>缓冲可用性</p></td>
+<td><p>在发布任何首 OWN 前准入完整链</p></td>
+<td><p>永不重新交付或覆盖被持有的描述符</p></td>
+</tr>
+<tr class="row-odd"><td><p>结果</p></td>
+<td><p>证明 MAC 成功后 <code class="docutils literal notranslate"><span class="pre">transferred</span></code> 为完整调用方长度，否则为零</p></td>
+<td><p>视图容量全部成功或全部拒绝，不公开半帧</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>准入先检查全部片段、DMA 范围及空闲描述符。拒绝时请求与 OWN 状态不变。接受后，provider 记录 PREPARING 预留，在不屏蔽 IRQ 的情况下准备可变数量的描述符，待后续所有描述符就绪后才发布首个 OWN。IRQ 不能把 CPU 所有的PREPARING 描述符解释为已完成流量。每次 IRQ 最多推进一个 TX 和一个 RX描述符。中间 TX 回写不能证明整帧线上完成；实际末描述符提供最终状态及可选捕获。</p>
+<p>RX 获取产生一个 <code class="docutils literal notranslate"><span class="pre">nx_eth_frames_rx_loan_t</span></code> 和调用方提供的片段视图。视图不足返回 <code class="docutils literal notranslate"><span class="pre">OVERFLOW</span></code>，不将帧出队或改变输出。即使 FCS 占据整个尾描述符，视图仍排除 FCS。令牌持有全部硬件描述符，直到精确释放。复制令牌不增加借用。过期、外部、语义字段被改变或重复的释放均拒绝。结构体填充字节不属于令牌身份。</p>
+</section>
+<section id="borrow-cancellation-and-recovery">
+<h2>借用、取消与恢复<a class="headerlink" href="#borrow-cancellation-and-recovery" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="打开 SVG 大图"><img alt="FIG-06：准入建立借用；取消与隔离继续保留存储，直到实际撤离完成后才能发布 SETTLED" src="../_images/request-lifecycle.svg" /></a></p>
+<p>接受 TX 后，完整请求、片段数组及全部载荷一直被借用，直到以 acquire 语义观测到 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>。单个描述符归还 OWN 不会独立释放片段。完整帧借用被持有时，RX 字节保持不可变。视图数组本身只是未保留的输出，可在获取后复用。provider 的输出存储必须与其状态、环、控制对象及全部活动请求／载荷借用分离。</p>
+<p>MAC 仅提供控制器范围的 TX 撤离。取消一个待处理请求会关闭 TX 准入并排空其他待处理 TX，不虚构逐帧中止能力。实际完成的发送可以优先于取消。超时、取消和排空失败都不会撤销借用。无法证明引擎／MAC／FIFO 静止时，请求保留为<code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>，载荷地址继续保留。</p>
+<p>STM32 ES0182 控制写规避措施依据租用的 HCLK，执行有限次 volatile Device读取。该间隔超过最慢所支持 10 Mbit/s 下的四个内部 TX／RX 时钟周期，包含RMII 内部 REF_CLK／20 分频。四次 HCLK 回读或最快情况下的 80 ns 下界都不足。该间隔用于受影响的控制写，不用于报文 poll／W1C 写。GD32 共享机制采用同样的保守顺序，但不将 ST 的硅勘误归于 GD32。发出 FTF 前必须观测 FIFO 已空；刷新非空 FIFO 不能制造取消完成的证明。</p>
+<p>Stop 关闭新准入／获取，在释放存储前证明 MAC／DMA／IRQ 引用撤离。被持有的RX 或已捕获的 wake 发布者返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>。可选 wake 接收器一直被借用到发布者退出；通知只是提示，不是完成谓词。调用方在回收各自存储前，还须分别停止并join 外部生产者、消费者、等待者与观测者。</p>
+<p>显式恢复属于 MAC 的排他所有者。它在发出复位前拒绝被持有的 RX 或活动发布者。只有复位被实际确认后，才能撤离未完成 TX 并以已锁定失败原因结算。复位超时继续保留所有权，不自动复位、重试或重放。成功复位记录 RX 缺口并递增 MAC时钟 epoch。Stop／start 保留 RX 令牌代次和时钟 epoch 计数，防止旧身份再次有效。</p>
+</section>
+<section id="timestamp-meaning">
+<h2>时间戳含义<a class="headerlink" href="#timestamp-meaning" title="Link to this heading">¶</a></h2>
+<p>所有时间事实都使用已有 <code class="docutils literal notranslate"><span class="pre">nx_io_timestamp_t</span></code>。装配契约从实际计数器的统一命名空间分配一个非零 32 位 domain；应用不能通过赋予相同本地设备 ID，就使互不相关的计数器具备可比较性。</p>
+<p>所选时钟使用数字纳秒回卷、20 ns 子秒增量和精细更新。累加器输入为 HCLK，168 MHz 时 addend 为 1278264076，200 MHz 时为 1073741824。上述数值和声明单位不代表量测的振荡器准确度。该计数器不是 UTC、TAI 或已同步网络时钟。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>观测</p></th>
+<th class="head"><p>来源</p></th>
+<th class="head"><p>数值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>有效 TX 末描述符或 RX 末描述符捕获</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HARDWARE_EVENT</span></code></p></td>
+<td><p>MAC 扩展纳秒 tick</p></td>
+</tr>
+<tr class="row-odd"><td><p>一致读取当前 MAC 计数器</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SERVICE_OBSERVATION</span></code></p></td>
+<td><p>相同 domain、epoch 和每秒 1e9 tick</p></td>
+</tr>
+<tr class="row-even"><td><p>消费者取得 RX 借用</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ACQUIRE_OBSERVATION</span></code></p></td>
+<td><p>独立的核心单调域 <code class="docutils literal notranslate"><span class="pre">acquired_us</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>缺失／损坏捕获</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code></p></td>
+<td><p>不具备可用事件量测</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>捕获有效性来自实际 TTSS／TSV 回写。有效的零捕获是真实零事件。缺失有效位不会复用描述符的前次捕获。全一或格式错误的原始捕获记录独立损坏标志及UNKNOWN 时间戳，不用获取时间替代。不确定度未知保持显式，不能虚构零不确定度。</p>
+<p>一致读取会在秒回卷时重试。自然 32 位秒回卷被扩展而不改变 epoch；复位／重启改变 epoch。所有者拒绝同一 epoch 内计数器回退、有歧义的观测／捕获间隔及64 位 tick 溢出，不假定经历了几次回卷。时间戳比较要求相同 domain、epoch和频率。产品显式建立事件配对及跨时钟映射。</p>
+</section>
+<section id="validation-and-remaining-physical-work">
+<h2>验证与剩余物理工作<a class="headerlink" href="#validation-and-remaining-physical-work" title="Link to this heading">¶</a></h2>
+<p>已维护的外部 MMIO 模型区分可见寄存器回读与内部锁存，分别建模 W1C 和只读DMA 进程状态，并在故障控制要求时拒绝引擎撤离／复位。Native 收发是显式的完整帧事件，不会自动 service 或结算 provider。各模型实例具有独立计数器与 DMA 身份。</p>
+<p>Native 源在与 provider 结算相同的排他域中验证活动借用。确定性的最终访问回归让真实 provider 结算已接受请求，随后让消费者合法保护已回收页；旧的未受保护读取会触发故障。这仅证明该软件边界，不代替物理 DMA 或完整并发系统资格。</p>
+<p>已执行的主机验证包含 108 个公共／共享引擎／系列／Native 用例，加上每个规范装配各六个工厂用例，全部无失败、无跳过。工厂用例针对同一共享时钟／定时器oracle 和实际 DMA 可达地址，执行真实 System／GPIO／provider 代码。两个规范ARM 配置均使用所选源码编译和链接通过。工位证据保持独立：在实板验证 PHY 时钟／复位、路由与电平、两种链路速率、负载下DMA 流量、控制写间隔、VLAN 保留、错误／排空／复位、PTP 捕获行为及量测的时钟准确度。</p>
+<p>已知 GD32 ENET 帧间隔限制仍是物理资格约束；本软件模式不能凭主机模型声明IEEE 时序符合性。协议栈、PHY／PCB 策略、时间同步及应用产品仍是外部平台消费者。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

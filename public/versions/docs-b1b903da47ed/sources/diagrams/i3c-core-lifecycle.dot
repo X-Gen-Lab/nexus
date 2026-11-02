@@ -1,0 +1,39 @@
+// FIG-26 current common I3C mechanism, no physical controller provider.
+// Basis: public i3c_controller headers and i3c_controller.c.
+digraph i3cCore {
+    graph [label="FIG-26 Current bounded I3C core\nH563 declarations compile only; physical provider / HIL / full IO-38 exit open",
+           rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    caller [label="External serialized executor + storage\nAuthored PID/address policy; request + payload\nExplicit service / events / reset / stop", fillcolor="#f8fafc"];
+    core [label="Optional Nexus::I3CController\nOne active finite request; no transfer queue\nDISCOVER / PRIVATE / whitelisted CCC"];
+    port [label="Required synchronous hardware port\nUnique claim + baseline address invalidation\n1..8 B aggregate FIFO batch; no retained spans", fillcolor="#f8fafc"];
+    records [label="Caller-owned target records\nTentative epoch/address BEFORE assignment\nConfirmed only after hardware ACK\nFailure retains all known addresses"];
+    events [label="Caller-sized copied event ring\nIBI: confirmed epoch, at most 4 B\nHot join requests explicit discovery\nDrop new on overflow; saturating counters"];
+    draining [label="DRAINING: borrow remains\nCompletion / cancel / deadline / error\nNever reclaim from FIFO/frame completion"];
+    quarantine [label="QUARANTINED: borrow remains\nFailed wire / FIFO / IRQ / observer proof\nContinue explicit recovery/service", fillcolor="#fff7ed"];
+    settled [label="SETTLED: final request access\nDetach active request + stable slot\nRelease publication; caller acquires"];
+    reset [label="Closed explicit whole-bus RESET\nQuiescence AND every target address invalidated\nController reset or FIFO flush is insufficient"];
+    stop [label="Final explicit STOP\nNo work/events/fault/assigned or tentative address\nProven final quiescence -> release claim\nController stays a permanent identity/tombstone"];
+    { rank=same; core; port; }
+    caller -> core [label="prepare; accepted submit borrows\nexact request + payload"];
+    core -> port [label="begin / assign / bounded pump"];
+    port -> core [label="copied aggregate observations;\nno application callback"];
+    core -> records [label="explicit DAA; nonwrapping target epochs"];
+    core -> events [label="copy bounded IBI/HJ;\nnever schedule discovery"];
+    core -> draining [label="finite completion or withdrawal"];
+    draining -> settled [label="quiescent SUCCESS: all final access detached", style=dashed];
+    draining -> quarantine [label="proof BUSY / IO / UNSUPPORTED"];
+    quarantine -> settled [label="later actual quiescence proof succeeds", style=dashed];
+    caller -> reset [label="close; request external reset proof"];
+    reset -> records [label="proof SUCCESS: invalidate addresses; preserve epochs", style=dashed];
+    reset -> settled [label="proof SUCCESS also detaches outstanding request", style=dashed];
+    records -> reset [label="live/tentative addresses or fault forbid final stop"];
+    caller -> stop [label="consume events; retry explicit stop", constraint=false];
+    settled -> stop [label="request gone; remaining stop predicates still required"];
+    port -> stop [label="final quiescent proof before release", style=dashed, constraint=false];
+}

@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>开发体验与 provider 迭代 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Nexus 文档系统完整优化清单" href="documentation-improvements.html" />
+    <link rel="prev" title="显式时钟借用与浅睡眠" href="clock-domain-sleep.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/developer-experience.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/design/developer-experience.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="developer-experience-and-provider-iteration">
+<span id="design-developer-experience"></span><h1>开发体验与 provider 迭代<a class="headerlink" href="#developer-experience-and-provider-iteration" title="Link to this heading">¶</a></h1>
+<p>本轮保留静态 factory 和共享多态接口，减少产品开发与维护中不必要的工作。<a class="reference download internal" download="" href="../_downloads/cfdda25fd761043fd28174108da682d9/developer-experience-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">75</span> <span class="pre">项执行台账</span></code></a> 是任务状态权威；其<a class="reference internal" href="../status/ledgers/developer-experience.html"><span class="std std-doc">可读视图</span></a>保留相同字段：W1–W9 包含63 项软件工作，I-01–I-06 跟踪集成交付，H1–H6 需要连接实物设备。实现、软件执行与实板执行分别记录；软件机制不能关闭物理退出条件。</p>
+<p>后续的 <a class="reference download internal" download="" href="../_downloads/bba9cb694d1ab887c8df01b42b4ebe4b/platform-delivery-completion.csv"><code class="xref download docutils literal notranslate"><span class="pre">交付完善台账</span></code></a>及其<a class="reference internal" href="../status/ledgers/platform-delivery-completion.html"><span class="std std-doc">可读视图</span></a>继续作为同一后续任务权威。它保留 N01–N14，并追加已接受的 A01–J04 工作分解，包括 X01–X05：全部维护模式的冷态生命周期、配置合同、公共消费、执行效率、交付、HIL 和环境恢复。这些任务保留原 75 项台账及其固定 P/E 证据。每行保留完整退出条件；迁移一个外设或准备好仪器，不能关闭整个家族或物理任务。硬件执行与正式软件候选各有独立退出条件，都不继承此前迭代状态。</p>
+<p>实施顺序为覆盖清单与基线、C 生命周期与配置合同、家族及跨控制器迁移、公共使用配方，最后冻结集成。工具效率、交付报告与环境恢复可并行推进。物理执行须在真实站点准入后开展。当前架构图仍然适用：这些任务完善既有机制，不增加运行时层。实际状态仍记录在同一 CSV 中；工作分解不建立另一份支持矩阵，也不用于计算全项目完成百分比。</p>
+<p><a class="reference download internal" download="" href="../_downloads/59e40665ed54d5b2c9fdcdebf3598f8b/platform-delivery-completion-results.json"><code class="xref download docutils literal notranslate"><span class="pre">后续开发索引</span></code></a>保留原始开发观察，不重标旧 P/E 结果。其后的<a class="reference internal" href="../status/software-verification.html#sealed-cold-lifecycle-baseline"><span class="std std-ref">冷态生命周期封存基线</span></a>记录最终源码、完整门禁、固定示例消费、离线复现及合并后的关联。解释较早 pending 字段前，应先读取后续绑定源码的观察；仅有准备计划或成功配置查询不能关闭退出。</p>
+<section id="boundaries-that-stay-explicit">
+<h2>保持明确的边界<a class="headerlink" href="#boundaries-that-stay-explicit" title="Link to this heading">¶</a></h2>
+<p>当前<a class="reference internal" href="../explanation/platform-architecture.html"><span class="std std-doc">架构图</span></a>仍然适用。一份产品 TOML 生成不可变 typed IR 和精确静态实例；CMake 选择源码。factory getter 返回已有只读 face。产品在本仓库之外拥有执行、存储、私有 PCB 与恢复策略。更易用的命令不建立第二份配置或构建权威。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>工作包</p></th>
+<th class="head"><p>交付机制与事实来源</p></th>
+<th class="head"><p>退出证据</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>W1：应用入口</p></td>
+<td><p>外部版本化模板与 <code class="docutils literal notranslate"><span class="pre">dev.py</span> <span class="pre">create</span></code>；SDK 维护独立</p></td>
+<td><p>创建后的应用实际完成解析、构建与运行；模板与实际 SDK 身份分别记录</p></td>
+</tr>
+<tr class="row-odd"><td><p>W2：配置</p></td>
+<td><p>从 Board 查询绑定、经验证的 profile、人读解释、有效差异和编辑器 schema</p></td>
+<td><p>正常拒绝与不可变解析结果仍是权威</p></td>
+</tr>
+<tr class="row-even"><td><p>W3：provider 边界</p></td>
+<td><p>系列解析与 typed Construction；公共资源仲裁和原子发布</p></td>
+<td><p>等价配置保持生成字节一致；迁移后的源码仍由 CMake 与 SDK 选择</p></td>
+</tr>
+<tr class="row-odd"><td><p>W4：支持选择</p></td>
+<td><p>现有 Board／SoC 事实、provider 模式、派生矩阵与明确未知项</p></td>
+<td><p>精确路由、后端、模式、内存与证据相符；不建立第二份支持状态数据库</p></td>
+</tr>
+<tr class="row-even"><td><p>W5：生命周期使用</p></td>
+<td><p>外部主循环、独占任务与共享 owner 配方；可选的复制事实诊断</p></td>
+<td><p>借用、背压、取消、排空与 observer join 行为实际执行</p></td>
+</tr>
+<tr class="row-odd"><td><p>W6：资源成本</p></td>
+<td><p>实际链接变体、现有镜像报告与选定物理测量计划</p></td>
+<td><p>等价成本规则区分已测差量和未执行的时序测量</p></td>
+</tr>
+<tr class="row-even"><td><p>W7：官方复用</p></td>
+<td><p>锁定的厂家源码与一项有界的真实 HAL／SPL 评估</p></td>
+<td><p>语义、链接成本与维护范围支撑唯一生产实现的选择</p></td>
+</tr>
+<tr class="row-odd"><td><p>W8：执行效率</p></td>
+<td><p>现有进程 receipt、定向开发与完整最终门禁</p></td>
+<td><p>耗时记录保留未知项和失败；删除测试必须保留独立覆盖</p></td>
+</tr>
+<tr class="row-even"><td><p>W9：外部集成</p></td>
+<td><p>真实示例应用、源码锁与公共 SDK 消费</p></td>
+<td><p>平台 P 与示例 E 在最终交付关联中固定</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="source-ownership-and-migration">
+<h2>源码归属与迁移<a class="headerlink" href="#source-ownership-and-migration" title="Link to this heading">¶</a></h2>
+<p>H743 DMA2D 组件位于 <code class="docutils literal notranslate"><span class="pre">components/soc/stm32/stm32h743_frame_dma2d</span></code>。公共头文件 <code class="docutils literal notranslate"><span class="pre">nexus/components/frame_dma2d.h</span></code> 与 CMake 目标保持稳定。这是私有源码归属修正，不增加多媒体或硬件支持。历史记录保留其对应版本中的路径。</p>
+<p><code class="docutils literal notranslate"><span class="pre">explain</span></code> 现在默认输出人读摘要；自动化必须使用 <code class="docutils literal notranslate"><span class="pre">--json</span></code>。可选 owner 观察增加准入事实并改变公共 sidecar 布局，源码消费方需要重新编译。新辅助函数不会向每个 provider 添加必需状态、分配全局注册表或释放借用存储。<a class="reference internal" href="../guides/developer-workflow.html"><span class="std std-doc">产品工作流</span></a>说明这些变化。</p>
+<p>官方库按精确操作评估复用。仅凭库名称不能确定时序或所有权。F4 HAL 参考范围为 USART1 有限 TX 与 DMA2 Stream7；它不是生产后端，也不是全部模式迁移。HAL v1.8.5 的 DMA 传输错误 IRQ 清理使用有界的 <code class="docutils literal notranslate"><span class="pre">SystemCoreClock</span> <span class="pre">/</span> <span class="pre">9600</span></code> 使能位轮询；tick 等待位于独立的 DMA Init、Abort 和 PollForTransfer 路径。不能把所有正常有限 TX 或中断式 abort 描述为 <code class="docutils literal notranslate"><span class="pre">HAL_GetTick</span></code> 等待。<a class="reference internal" href="official-stm32-provider.html"><span class="std std-doc">官方 provider 合同</span></a>继续约束 callback、deadline、唯一 owner 和完整排空。</p>
+<p>当前决策保留唯一生产 LL／provider 状态机及 GD32 SPL 操作复用。真实 HAL 软件行为、当前生产 ELF 成本与不等价的 ARM handle 布局分别记录。参考实现尚未实现完整 NVIC 抢占／向量撤回、IRQ 唤醒、并发 RX、冷启动回滚或完整平台停止。升级为生产实现及比较等价完整镜像属于后续工作；本轮不提供 HAL 与 LL 的资源排名，也不声称替换生产实现。</p>
+</section>
+<section id="close-work-with-observations">
+<h2>以实际观察关闭任务<a class="headerlink" href="#close-work-with-observations" title="Link to this heading">¶</a></h2>
+<section id="compare-complete-execution-costs">
+<h3>比较完整执行成本<a class="headerlink" href="#compare-complete-execution-costs" title="Link to this heading">¶</a></h3>
+<p>普通行为变更的 TDD 门禁首先运行维护的 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">tools/dev/dev.py</span> <span class="pre">doctor</span> <span class="pre">--target</span> <span class="pre">contracts</span></code> profile。在昂贵的 Python 和 Native suite 之前，检查已准备且锁定的 Native/ARM 工具，不安装工具，也不要求 Docker。仅文档的暂存变更沿用现有快速路径。此预检不代替测试，也不建立软件资格。</p>
+<p>只有在相同维护的正式计划、clean 源码和固定依赖上完成两次独立的完整执行后，才使用 <code class="docutils literal notranslate"><span class="pre">dev.py</span> <span class="pre">timings</span> <span class="pre">--compare</span></code>。每次执行必须通过可选的 <code class="docutils literal notranslate"><span class="pre">qualify</span> <span class="pre">--environment</span></code> 输入，绑定相同且已验证的 OCI environment-report 字节。该绑定记录已观察的输入身份，不证明 checker 在隔离容器中运行。缺少这种原始绑定的历史报告仍保留其原执行范围的有效性，但不能事后补入本比较。</p>
+<p>从 clean 平台根目录执行：将 <code class="docutils literal notranslate"><span class="pre">NEXUS_MEASUREMENT_ROOT</span></code> 设置为容量充足的新输出父目录，将 <code class="docutils literal notranslate"><span class="pre">NEXUS_ENVIRONMENT</span></code> 设置为封存 OCI layout 的 <code class="docutils literal notranslate"><span class="pre">environment.json</span></code>，并将 <code class="docutils literal notranslate"><span class="pre">NEXUS_COLD_CACHE_STATE</span></code>/<code class="docutils literal notranslate"><span class="pre">NEXUS_WARM_CACHE_STATE</span></code> 设置为实际缓存准备说明。在每次执行前显式准备相应 cold 或 warm 条件。以下命令运行完整计划，不复用已有的成功测试报告：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>qualify<span class="w"> </span>--plan<span class="w"> </span>tools/dev/plans/software.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_MEASUREMENT_ROOT</span><span class="s2">/cold"</span><span class="w"> </span>--environment<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_ENVIRONMENT</span><span class="s2">"</span>
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>qualify<span class="w"> </span>--plan<span class="w"> </span>tools/dev/plans/software.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_MEASUREMENT_ROOT</span><span class="s2">/warm"</span><span class="w"> </span>--environment<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_ENVIRONMENT</span><span class="s2">"</span>
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>timings<span class="w"> </span>--compare<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--plan<span class="w"> </span>tools/dev/plans/software.json<span class="w"> </span>--root<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cold-report<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_MEASUREMENT_ROOT</span><span class="s2">/cold/report.json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--warm-report<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_MEASUREMENT_ROOT</span><span class="s2">/warm/report.json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cold-environment<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_ENVIRONMENT</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--warm-environment<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_ENVIRONMENT</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cold-cache-state<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_COLD_CACHE_STATE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--warm-cache-state<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_WARM_CACHE_STATE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--json<span class="w"> </span><span class="s2">"</span><span class="nv">$NEXUS_MEASUREMENT_ROOT</span><span class="s2">/comparison.json"</span>
+</pre></div>
+</div>
+<p>两次执行都必须实际完整成功，且计划、阶段顺序、命令、原始输出流和独立 receipt 精确匹配。正式计划禁用编译器缓存；声明 warm 准备不会启用它。比较报告使用原始阶段命令墙钟区间的并集，排除空闲间隔并避免嵌套墙钟时长相加。Native producer 检查还验证当前共享构建输出，不证明每次 cold/warm 执行分别保留独立历史内部 Native XML/产物。缓存状态是声明，不是测得的 cache hit；汇总 CPU、进程树峰值 RSS 及相应差值仍为未知。成本比较不是资格，不能赋予变更后源码资格。命令存在本身不表示完整 cold/warm 测量已执行。</p>
+</section>
+<section id="hand-off-an-unsigned-local-software-preview">
+<h3>交接无签名的本地软件预览<a class="headerlink" href="#hand-off-an-unsigned-local-software-preview" title="Link to this heading">¶</a></h3>
+<p>托管 Actions 不可用时，<code class="docutils literal notranslate"><span class="pre">tools/release/delivery.py</span></code> 中显式的 <code class="docutils literal notranslate"><span class="pre">prepare-local</span></code> 命令（别名 <code class="docutils literal notranslate"><span class="pre">bundle-local</span></code>）从原始完整软件执行、SDK/consumer 包、文档与封存候选装配本地预览。<code class="docutils literal notranslate"><span class="pre">verify-local</span></code> 独立检查准备后的输出。使用<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/release/README.md#explicit-local-software-preview">本地预览合同与精确命令</a>，选用新输出目录和预期 clean 源码提交。输入源码、固定依赖、原始已结束 receipt、SDK 身份与 candidate/document 范围必须一致；成功报告不复用为其他源码的资格。</p>
+<p>该路径保留原始字节，恢复包时不重建或重新封存。其 trust 为 <code class="docutils literal notranslate"><span class="pre">local_observation_no_oidc</span></code>，签名状态为 unsigned，且 <code class="docutils literal notranslate"><span class="pre">publication_authorized=false</span></code>。它不伪造 Actions run、OIDC 或正式 release，不削弱现有发布门禁。实际远程发布仍是独立退出。</p>
+<p>台账记录实际实现与证据路径，包括范围有限的开发测试。<a class="reference download internal" download="" href="../_downloads/251a8e7ef605592559fa967a3de6de70/developer-experience-results.json"><code class="xref download docutils literal notranslate"><span class="pre">开发结果索引</span></code></a> 保留已维护测试入口和观察范围；最终 PR／CI 关联在源码提交产生后记录。最终源码门禁、独立 SDK 消费与双语文档各有集成退出条件。预期的 CI 运行、模板 manifest 或旧版本结果都不能冒充当前源码的通过结果。</p>
+<p>先创建平台提交 P，再将示例源码锁和 gitlink 更新为 P。随后在交付关联中记录示例提交 E 与 P。教程使用该记录提供的显式示例版本变量；两个仓库都不嵌入对方尚未产生的提交。正常评审与发布控制继续生效。</p>
+<p>本轮未连接物理测试站。H1–H6 保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>：首发板启动与工具；串口／SPI／I2C 与恢复；IRQ／临界区延迟；连续 DMA／Cache；Flash／看门狗／停机；最终物理支持范围封存。准备的计划为以后真实执行保留未知 PCB 事实、测试站身份与数值验收限值。</p>
+</section>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

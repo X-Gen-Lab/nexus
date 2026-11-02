@@ -1,0 +1,593 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_developer_experience_development_index",
+  "date": "2026-10-24",
+  "time_zone": "Etc/UTC",
+  "scope": "Observed ordinary software gate, publishable P Source SDK and independent E application execution. This documentation update records P/E; it is not a separately SDK-tested firmware revision or formal candidate.",
+  "platform_baseline": "f52cb3e614bf599dd741b743c25e9411f56e76df",
+  "examples_baseline": "e96bf7bf41d3887b7e91cb3f5b71838555ffeb5a",
+  "final_platform_commit": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+  "final_examples_commit": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+  "pr_ci_association": "Examples PR: https://github.com/X-Gen-Lab/nexus-examples/pull/11. The final platform PR records this documentation commit separately from P. Remote CI and strict bilingual HTML status come from its actual live checks, not from a predeclared result in this file.",
+  "publishable_candidate": false,
+  "physical_hil": "not_executed",
+  "task_authority": "docs/design/developer-experience-execution.csv",
+  "maintained_execution_entries": {
+    "configuration": "tools/configure/test_experience.py",
+    "development_tools": [
+      "tools/testing/test_dev_projects.py",
+      "tools/testing/test_dev_device.py",
+      "tools/testing/test_dev_timings.py",
+      "tools/testing/test_dev_efficiency.py"
+    ],
+    "provider_vendor": [
+      "tests/contracts/stm32_hal_reference/reference_test.cpp",
+      "tests/google/gd32_official_gpio_test.cpp",
+      "tests/google/i2c_multi_controller_test.cpp"
+    ],
+    "io": [
+      "tests/google/io_diagnostic_test.cpp",
+      "tests/google/dma_test.cpp",
+      "tests/google/io_observer_test.cpp"
+    ],
+    "examples": [
+      "X-Gen-Lab/nexus-examples/scripts/test_starter_templates.py",
+      "X-Gen-Lab/nexus-examples/tests/developer_recipes_test.cpp"
+    ]
+  },
+  "observations": {
+    "configuration": {
+      "new_behavior_cases": 20,
+      "identical_ir_projections": 71,
+      "identical_generated_files": 710
+    },
+    "development_tools": {
+      "focused_cases": 53,
+      "preset_selection_median_before_ms": 1.734,
+      "preset_selection_median_after_ms": 0.948,
+      "speed_scope": "Preset metadata only; not whole build or gate",
+      "test_retention": "No independent duplicate or obsolete obligation justified deletion"
+    },
+    "provider_vendor": {
+      "hal_reference_cases": 15,
+      "real_gd32_gpio_cases": 3,
+      "shared_i2c_cases_each_family": 14,
+      "production_decision": "Retain current single LL/provider and SPL operation reuse; no HAL production migration or equivalent image cost ranking"
+    },
+    "examples": {
+      "templates": 4,
+      "native_recipe_ctest_cases": 4,
+      "google_application_contract_cases": 2,
+      "arm_consumer_links": 5
+    },
+    "documentation": {
+      "source_check": "passed",
+      "ledger_views": "all nine registered views checked against their original CSV; existing 21 renderer tests passed",
+      "fresh_doxygen_xml": "passed with restored and fully byte-verified locked tool files",
+      "fresh_gettext": "passed with strict warnings after explicit diagnostic header-path and anchor disambiguation",
+      "translation_review": "passed: independently reviewed prose, 150 task fields and 25 public API/time facts; exact fresh gettext message sets admitted for both languages",
+      "strict_en_zh_html": "not_executed_locally; actual final platform PR checks are authoritative",
+      "current_pages": 130,
+      "language_records": 260
+    },
+    "io": {
+      "focused_google_cases": 55,
+      "changed_python_contracts": 22,
+      "linked_images": 9,
+      "allocation_model_images": 4,
+      "tuple": {
+        "cpu": "Cortex-M4",
+        "float_abi": "hard; fpv4-sp-d16",
+        "enum_abi": "short-enums",
+        "optimization": "Os",
+        "compiler": {
+          "path": "/tmp/nexus-quality-arm/bin/arm-none-eabi-gcc",
+          "bytes": 2421736,
+          "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385"
+        }
+      },
+      "rows": [
+        {
+          "profile": "qiming-empty",
+          "flash_load_bytes": 2827,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2112
+          },
+          "readonly_interface_bytes": 0,
+          "readonly_operations_bytes": 0,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "qiming-gpio",
+          "flash_load_bytes": 4452,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2136
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 12,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "qiming-uart",
+          "flash_load_bytes": 8020,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2736
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-empty",
+          "flash_load_bytes": 4291,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2088,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 0,
+          "readonly_operations_bytes": 0,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-gpio",
+          "flash_load_bytes": 5872,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2112,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 12,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-uart",
+          "flash_load_bytes": 9818,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2708,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-spi",
+          "flash_load_bytes": 8088,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2136,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        },
+        {
+          "profile": "endpoints-1",
+          "flash_load_bytes": 6856,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2184
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        },
+        {
+          "profile": "endpoints-2",
+          "flash_load_bytes": 7208,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2216
+          },
+          "readonly_interface_bytes": 16,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        }
+      ],
+      "one_to_two_spi1_endpoint": {
+        "flash_loaded_bytes": 352,
+        "interface_flash_bytes": 8,
+        "operations_flash_bytes": 0,
+        "ram": {
+          "ccm": 0,
+          "sram": 32
+        },
+        "static_objects": {
+          "buffers": 0,
+          "other_static": 2,
+          "provider_state": 32,
+          "rtos_control": 0,
+          "rtos_stack": 0
+        }
+      },
+      "allocation": {
+        "slot_bytes": 48,
+        "request_bytes": 32,
+        "payload_bytes": 32,
+        "slots_1_to_4_ram_delta_bytes": 336,
+        "optional_observer_sidecar_bytes": 96,
+        "selected_abi_observation_before_after_bytes": [
+          72,
+          72
+        ]
+      },
+      "limits": [
+        "No hardware supplied; physical acceptance remains not_executed.",
+        "No cycle, dynamic stack, WCET or throughput measurements claimed.",
+        "M4 short-enum observation72/sidecar96 size equality is limited to selected ABI; consumers still rebuild.",
+        "Cost matrices are developmental observations, not candidates or reproducibility attestations.",
+        "SPI-only consumers collect unused controller factory face; full-factory retention does not apply to those images."
+      ]
+    },
+    "sdk_closure": {
+      "new_required_omissions_red": 6,
+      "complete_focused_tests_green": 31,
+      "scope": "Missing-module SDK regressions; not final installed SDK qualification"
+    },
+    "final_integration": {
+      "platform": {
+        "commit": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+        "ordinary_gate": "passed",
+        "source_scope": "complete staged tree, committed unchanged",
+        "tool_cases": 3090,
+        "google_programs": 352,
+        "google_cases": 6350,
+        "bounded_io_properties": 203,
+        "property_count_is_same_execution": true
+      },
+      "examples": {
+        "commit": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+        "tree": "663c6474ed9589cdefd81f46cf760864eddf9dea",
+        "platform_lock": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "platform_gitlink_verified": true,
+        "gate_consumption": "verified explicit P source checkout; independent SDK onboarding recorded separately",
+        "source_override": true,
+        "python_cases": 64,
+        "ctest": 15,
+        "google": {
+          "tests": 69,
+          "passed": 69,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "programs": 6
+        },
+        "ctest_composition": {
+          "applications": 7,
+          "google_wrappers": 6,
+          "actual_freertos_tests": 2
+        },
+        "counts_overlap_and_must_not_be_added": true,
+        "pull_request": "https://github.com/X-Gen-Lab/nexus-examples/pull/11",
+        "upgrade_from": {
+          "examples_commit": "7b7fea3e0bb0465a8a4e93ab8132a458c0373f31",
+          "platform_lock_commit": "d0b8637453330070a052ededbd39bb1f597c76a9",
+          "platform_lock_tree": "f3a54d3847d104ca5504b455fb70c51bcc695982",
+          "scope": "Actual parent of E and its committed source lock; initial e96bf7bf/6f09ea78 development observation remains recorded separately"
+        }
+      },
+      "source_sdk": {
+        "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "source_tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+        "publishable_package": true,
+        "payload_files": 6021,
+        "relocated_prefix": true,
+        "consumers": 50,
+        "commands": 202,
+        "all_commands_passed": true,
+        "is_formal_platform_candidate": false,
+        "total_consumer_images": 53,
+        "selected_fixture_images": 37,
+        "archived_raw_files": 9047
+      },
+      "onboarding": {
+        "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "examples_revision": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+        "create_build_run": "passed",
+        "authored_error_and_recovery": "passed",
+        "public_include_audit": "passed",
+        "development_fixture": false,
+        "checkout_fallback": false
+      },
+      "remote_ci": {
+        "examples": {
+          "run_id": 40058250985,
+          "url": "https://github.com/X-Gen-Lab/nexus-examples/actions/runs/40058250985",
+          "status": "blocked_billing",
+          "runner_id": 0,
+          "executed_steps": 0,
+          "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        },
+        "platform": {
+          "status": "not_yet_observed",
+          "authority": "Actual checks on the final platform PR; no earlier CI success is inherited"
+        }
+      },
+      "physical_status": "not_executed",
+      "offline_dual_build": "not_executed",
+      "examples_arm": {
+        "status": "passed",
+        "scope": "Actual existing build.py and standalone CMake configure/build/resource validation on final clean P/E; warm incremental builds allowed. Local software evidence does not establish hosted CI success or physical hardware qualification.",
+        "preset_count": 16,
+        "main_firmware_elf_count": 32,
+        "existing_fifo_elf_count": 2,
+        "new_recipe_and_starter_elf_count": 5,
+        "elf_budget_count": 39,
+        "commands_passed": 83,
+        "prepared_unbound_hil_plans": 12,
+        "physical_status": "not_executed",
+        "native_rerun": false,
+        "elapsed_seconds": 90.464
+      }
+    }
+  },
+  "evidence_members": {
+    "configuration": [
+      {
+        "member": "configuration/handoff.json",
+        "sha256": "b59298d349176b4016f0524a8a61a37a2fc9573c883ee7383ed796ae10d5097e"
+      },
+      {
+        "member": "configuration/emission-equivalence.json",
+        "sha256": "899db41915d4b9df97eaf142cdab90ecf8c267bfa0f603b248d27cca2f7c2e5d"
+      }
+    ],
+    "development_tools": [
+      {
+        "member": "devtools/focused-integration-green-03.log",
+        "sha256": "f3652bb5d6dc583381bef14386a63e0b58a47cf72eabb3132f0790450357c99f"
+      },
+      {
+        "member": "devtools/feedback-cost-comparison.json",
+        "sha256": "45023459e1a6b881393c8a5803018db228a301570f91be82d4b656a121eb2a38"
+      },
+      {
+        "member": "devtools/observed-costs-01.json",
+        "sha256": "ac9ee893f099c1e9859ea8365e3ec123d357b9e24303e2f3b68541c5e191d7b4"
+      },
+      {
+        "member": "devtools/test-retention-review.md",
+        "sha256": "c33b1efc1b0d5674fbaccac8cfdfcd19931297de164c9bf2d7a7a48456d3b078"
+      }
+    ],
+    "provider_vendor": [
+      {
+        "member": "provider-vendor/handoff.json",
+        "sha256": "04a1b9592503d1999b31a639524cdb0b4071f63f85c17e13e9b7f06d4d16a903"
+      },
+      {
+        "member": "provider-vendor/official-reuse-audit.json",
+        "sha256": "6173aac1eb264db88a5bbcd96c01d7fa1b04123206bdc1cd8f9716ebf71fe798"
+      },
+      {
+        "member": "provider-vendor/dma2d-relocation.json",
+        "sha256": "f9a8f45b16f91dc9593bb69f2beb0b5dfc45e7836e5ac7e61b71da850bfacfaa"
+      }
+    ],
+    "external_examples": [
+      {
+        "member": "examples/development-summary.json",
+        "sha256": "0201c9808b311bed4d5477facfbe5111c1a306c4b415e6f1a4788ae372c4c522"
+      }
+    ],
+    "documentation": [
+      {
+        "member": "docs/semantic-review.json",
+        "sha256": "b32dbfe63866e11afb4a4f13dfcebd433031671cfa0a1a3dbdd2d2169d18d729"
+      },
+      {
+        "member": "docs/final-documentation-checks.json",
+        "sha256": "169e9a2f7315389fb1d848ae436c7629eb7d3715725b0ebf7df04b579eb0d757"
+      },
+      {
+        "member": "docs/fresh-gettext-final-02.log",
+        "sha256": "cb19ec1d6b5139386f79704190e5b08ff9885816650f254f8215025e0a9d42bf"
+      },
+      {
+        "member": "docs/ledger-tests.log",
+        "sha256": "5dff172626b13aa6f13aab34a42d1d5a75db8d8d18ceb4a35b55a26f45cf57af"
+      }
+    ],
+    "io_cost": [
+      {
+        "member": "io-cost/handoff.json",
+        "sha256": "126f42f62b2919ed4e5920a1b0e1926170a2bf8c521de6456d2823b54f30a2d6"
+      },
+      {
+        "member": "io-cost/observations/summary.json",
+        "sha256": "56013fce5f09a99799dcab1c64e08cfebe084bff06d29fdfb8b3c4742b640dcc"
+      },
+      {
+        "member": "io-cost/storage-probes/report.json",
+        "sha256": "d02e2504016ed24d4b55b2d8e7f27ff27cfb35232ae7ea0a40b40e4dfc559e19"
+      }
+    ],
+    "examples_arm": [
+      {
+        "member": "examples/arm-consumer-execution.json",
+        "sha256": "391f4a87b7d4913f354d262a6d5b3229662ef5c23cdfa206080703452d914c56"
+      },
+      {
+        "member": "examples/endpoint-cost-execution.json",
+        "sha256": "51a8cad68f4ed78d16d416d09bf204072bd4f0bf621ef53ecde812312277d53b"
+      }
+    ],
+    "sdk_closure": [
+      {
+        "member": "sdk-closure-red.log",
+        "sha256": "08dd59911ec1ced722836406fa18cfbd6f3ef77be69ce888856c7150d67c26e0"
+      },
+      {
+        "member": "sdk-closure-green.log",
+        "sha256": "c92054734f7882df9ffcf9cadf69790a4d0fa768e0fd6fb443f5008c44a9f20e"
+      }
+    ],
+    "final_integration": [
+      {
+        "path": "/tmp/nexus-iteration-20261024/platform-gate.json",
+        "bytes": 1157,
+        "sha256": "75851d99284b85bb17c97f71ada1f198237d661835254e9bc1606893b4663d20"
+      },
+      {
+        "path": "/dev/shm/nexus-examples-iteration-20261024/build/native-debug/tdd/execution.json",
+        "bytes": 25773,
+        "sha256": "9a122061e7ad5bc770c44ea6c198db10ff0e1102073138b160de1c4252d28124"
+      },
+      {
+        "path": "/dev/shm/nexus-iteration24-sdk-consumers-c8df1c49-attempt01/verification.json",
+        "bytes": 355860,
+        "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab"
+      },
+      {
+        "path": "/tmp/nexus-iteration-20261024/sdk/onboarding-summary.json",
+        "bytes": 3824,
+        "sha256": "b745f6f3d6f6e6e522e0fb26963b5e35dd3130d4e794eddde5a13e44c4985924"
+      }
+    ],
+    "sdk_transport": [
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/.nexus-sdk-consumer-transport",
+        "sha256": "e5b57c43099018458471cb10f89740ceaa95bd00f088d9070ed3297d4be41486",
+        "bytes": 29
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw-manifest.json",
+        "sha256": "4a19fda7188ed536e0f36edf5cd09d2ab0030f7d563bf361475993853830575c",
+        "bytes": 2777048
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw.tar.gz",
+        "sha256": "f782abfea437c9c98734685660e4f53b58a719e91776e0fb2a46f6140a84cb59",
+        "bytes": 12315248
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/verification.json",
+        "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab",
+        "bytes": 355860
+      }
+    ],
+    "iteration_records": [
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/README.md",
+        "sha256": "9ba3ce7f2982b264cb5335b116042ddf3892df77e4f055249014b9de0378e23b",
+        "bytes": 1840
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+        "sha256": "547769bb37912ba65244ee4b5c6fc735b0e7ae1df52b1bb139f615b3b43ca92c",
+        "bytes": 503
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+        "sha256": "da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816",
+        "bytes": 3539302
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/verification.json",
+        "sha256": "1ff81cfdd373b402643a9540287c47f1f1ba024e340cff08dae7a69a8f623328",
+        "bytes": 153
+      }
+    ]
+  },
+  "evidence_archive_locator": {
+    "sdk_consumers": {
+      "directory": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49",
+      "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+      "source_tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+      "files": [
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/.nexus-sdk-consumer-transport",
+          "sha256": "e5b57c43099018458471cb10f89740ceaa95bd00f088d9070ed3297d4be41486",
+          "bytes": 29
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw-manifest.json",
+          "sha256": "4a19fda7188ed536e0f36edf5cd09d2ab0030f7d563bf361475993853830575c",
+          "bytes": 2777048
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw.tar.gz",
+          "sha256": "f782abfea437c9c98734685660e4f53b58a719e91776e0fb2a46f6140a84cb59",
+          "bytes": 12315248
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/verification.json",
+          "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab",
+          "bytes": 355860
+        }
+      ],
+      "status": "original_transport_verified_before_copy_and_all_four_copy_digests_match"
+    },
+    "iteration_records": {
+      "directory": "docs/archive/evidence/20261024/iteration-records",
+      "files": [
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/README.md",
+          "sha256": "9ba3ce7f2982b264cb5335b116042ddf3892df77e4f055249014b9de0378e23b",
+          "bytes": 1840
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+          "sha256": "547769bb37912ba65244ee4b5c6fc735b0e7ae1df52b1bb139f615b3b43ca92c",
+          "bytes": 503
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+          "sha256": "da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816",
+          "bytes": 3539302
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/verification.json",
+          "sha256": "1ff81cfdd373b402643a9540287c47f1f1ba024e340cff08dae7a69a8f623328",
+          "bytes": 153
+        }
+      ],
+      "original_members": 4457,
+      "original_bytes": 30862622,
+      "record_index_member": "record-index.json",
+      "scope": "Original development, local complete gates, final P/E ARM observations, documentation failure/correction and billing annotations; not a software candidate or physical qualification",
+      "status": "original_store_package_verified_before_copy_and_all_four_copy_digests_match",
+      "verify_command": [
+        "python",
+        "tools/evidence/store.py",
+        "verify",
+        "--package",
+        "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+        "--archive",
+        "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+        "--report",
+        "/tmp/nexus-20261024-records-verification.json"
+      ],
+      "working_directory": "repository root",
+      "sdk_raw_not_duplicated": true,
+      "documentation_D_checks_not_included_to_avoid_hash_cycle": true
+    }
+  },
+  "limitations": [
+    "The ordinary platform gate and independent SDK/application execution bind P/E only. The recording documentation commit is checked separately; remote CI and strict HTML remain actual live PR evidence.",
+    "Original SDK consumer bytes are included at the recorded repository-relative transport paths. The separate iteration record package retains its own source and execution scopes.",
+    "Physical H1-H6 remain not_executed.",
+    "HAL reference handle layout objects are not equivalent complete linked images."
+  ],
+  "branches": {
+    "platform": "feat/developer-platform-iteration-20261024",
+    "examples": "feat/developer-platform-iteration-20261024",
+    "previous_open_pr": 31,
+    "previous_pr_merged": false,
+    "examples_previous_platform_lock": "6f09ea78e99e341d8da9f99e52d6c0d7111ddd6c"
+  }
+}

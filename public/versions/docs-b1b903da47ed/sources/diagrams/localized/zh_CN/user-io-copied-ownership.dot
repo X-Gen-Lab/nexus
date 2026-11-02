@@ -1,0 +1,38 @@
+// FIG-25 current optional copied-UART mechanism, not an installed gateway.
+// Basis: user_io_async.h/.c, existing BusOwner/UARTOwner and Core request.
+// Every visible edge names copying, a borrow, execution or required proof.
+digraph copiedUserIo {
+    graph [label="FIG-25 UART TX 复制代理：当前软件所有权\n实际 kernel 入口／NS RTOS／HIL 及完整 IO-39/SOC-36 退出仍开放",
+           rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    user [label="不可信调用方\nscalar device／session／slot／epoch\n瞬态 TX 字节与 reply 区间", fillcolor="#f8fafc"];
+    gateway [label="Kernel 调用的 dispatch\n复制前取得可信 principal\n容错快照；不保留 user 地址"];
+    cells [label="精确特权复制 cell\nrequest + 复制 TX 字节\n没有第二个 FIFO 或 worker"];
+    execution [label="唯一既有 BusOwner FIFO\nUARTOwner + 所选 UART port\n外部 executor 推进真实硬件"];
+    settled [label="必需的最后访问谓词\nAcquire Core SETTLED + owner idle\n实际 UART／IRQ 与 publisher 撤回"];
+    retire [label="退出复制结果 cell\nCONSUME：reply 复制成功\n或 closed REAP：可信 drained 证明\n随后 detach + wipe；保留 epoch"];
+    joined [label="最终 JOIN\nClosed + 全部 cell 退出 + owner idle\nAuthority release SUCCESS 才能回收"];
+    authority [label="可信 kernel／session authority\n唯一实际 owner role + 持久历史\nidentity／claim／drained／release", fillcolor="#f8fafc"];
+    manager [label="可信串行 kernel owner\n显式 service／cancel／close／reap／join\n不隐式启动调度或停止 provider", fillcolor="#f8fafc"];
+    retained [label="失败保留责任\nQUARANTINED 保留复制借用\n证明／release 失败保留 role 与存储", fillcolor="#fff7ed"];
+    user -> gateway [label="复制 scalar 协议 + 瞬态字节"];
+    authority -> gateway [label="每次入口：identity\n仅构造：独占 session claim", style=dashed];
+    gateway -> cells [label="SUBMIT：接纳前复制"];
+    cells -> execution [label="借用 request + 特权 payload"];
+    manager -> execution [label="调用既有 service／cancel"];
+    execution -> settled [label="真实排空；最终发布；publisher 退出"];
+    settled -> retire [label="仅 terminal 状态不释放 cell"];
+    authority -> retire [label="仅 REAP：旧 gateway observer 已 join\nfuture entry 已阻止；role 仍保留", style=dashed];
+    manager -> retire [label="Closed 的可信 REAP；没有 user action"];
+    retire -> joined [label="仅在全部复制 cell 退出后"];
+    authority -> joined [label="仅 JOIN：外部 observer join + role release", style=dashed];
+    execution -> retained [label="实际排空失败／QUARANTINED"];
+    retire -> retained [label="复制／证明失败：不 wipe"];
+    joined -> retained [label="release 失败：不回收"];
+    retained -> execution [label="外部恢复 + 继续 service\n仅在硬件仍拥有 request 时", constraint=false];
+}

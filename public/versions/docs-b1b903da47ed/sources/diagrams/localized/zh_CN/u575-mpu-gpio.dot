@@ -1,0 +1,44 @@
+digraph u575MpuGpio {
+  graph [label="FIG-29 实施参考：单个 U575 MPU-v2 task／PC7 WRITE grant\nSTM32U575ZIT6Q／TZEN0／MSIS4／CM33 NTZ／八个 MPU region\nhost 模型＋normal M33 reset 链接；安装版 SDK 单独记录\n未执行 runtime MPU／GPIO 电气／HIL", rankdir=TB, labelloc=t,
+    fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25,
+    nodesep=0.32, ranksep=0.48, splines=polyline, compound=true];
+  node [shape=box, style="rounded,filled", color="#475569", fontcolor="#0f172a",
+    fontname="Noto Sans CJK SC", fontsize=12, margin="0.13,0.09"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+  layout [label="显式 normal memory generator／真实 reset 启动\nprivileged Flash＋syscall Flash＋user Flash\nprivileged RAM＋user RAM；未分配尾部不映射给 user\n全部边界核验后才复制 user DATA／清零 BSS", fillcolor="#eff6ff", group="main"];
+  user [label="一个受保护的 user task\n不映射外设 MMIO；三个 scalar 参数\nnx_freertos_user_gpio_write(device, set, reset)", fillcolor="#eff6ff", group="main"];
+  svc [label="选定真实 veneer／SVC70／71 项表\n锁定的 CM33 NTZ 来源＋protected stack 核验\n既有 delay6／ticks13 保持独立", fillcolor="#eff6ff", group="main"];
+  binding [label="一个强符号、不可变的 privileged-Flash binding\n固定 grant → 只读 nx_binding_led slot → 实际 face／ops\n嵌套解引用前核对完整范围\n完整实际 GPIO context 在互不重叠的 privileged RAM 中", fillcolor="#f0fdf4"];
+  current [label="实际 kernel current TCB\n同一 static TCB／有效 task epoch\n无 user 选择的身份、registry 或 worker", fillcolor="#f0fdf4", group="main"];
+  guard [label="保存掩码后的最终核验贯穿实际效果\nopen＋有效代次＋device\nset/reset 不重叠；合并 mask 非零\n仅 PC7 位；不调用 kernel／等待／产品 callback", fillcolor="#dcfce7", group="main"];
+  effect [label="真实 typed GPIO helper → 精确 U575 provider\n一次有界 BSRR 写入\n所有 helper／provider 指令必须在 privileged Flash", fillcolor="#dcfce7", group="main"];
+  result [label="R0 返回 scalar nx_result_t\n已接受 SVC：真实 protected exit\n被拒 veneer：CONTEXT fallback\n没有 payload 借用或异步 request", fillcolor="#eff6ff", group="main"];
+  rejected [label="GPIO 效果前 fail closed\n错误 task／device 或 grant 之外位：PERMISSION\n非法 trusted binding：INVALID\n两者均为零或 set/reset 重叠：INVALID\nclosed／陈旧：STATE；错误上下文：CONTEXT", fillcolor="#fef2f2"];
+  owner [label="单个 privileged lifecycle owner\nstatic task start → open 阻止删除\n所有绑定的 control／grant／provider 存储持续有效", fillcolor="#fff7ed", group="life"];
+  close [label="close 撤回准入；保留 pin\njoin 排除全部 scalar 效果并移除 pin\n二者均不删除 task 或复位 task epoch", fillcolor="#fff7ed", group="life"];
+  deleted [label="有 pin 时 delete → BUSY；拒绝自删\njoin 后：closing marker → 实际 kernel delete → 清除 handle\n保留 task epoch；溢出即拒绝", fillcolor="#fff7ed", group="life"];
+  pending [label="维护的 selected 静态 ELF 证明\n三个 user 入口／实际 veneer／完整 privileged 指令范围\n源码绑定 selected/default 成本：证据 README\nM7 保持负面；无 runtime 隔离／电气／HIL 结果", fillcolor="#fef2f2", group="main"];
+  layout -> user [label="显式 user execute／XN data region"];
+  layout -> binding [label="受保护代码／只读 authority／私有 state", constraint=false, tailport=w, headport=n];
+  owner -> binding [label="可信装配；无 user pointer", style=dashed];
+  owner -> current [label="open 快照实际有效代次", style=dashed, constraint=false];
+  user -> svc [label="公共 scalar 调用"];
+  svc -> current [label="真实 dispatcher 在 guard 前取得 current TCB"];
+  binding -> guard [label="已核验的固定 capability"];
+  current -> guard [label="保存掩码后再次核验"];
+  guard -> effect [label="仅已准入的 WRITE"];
+  effect -> result [label="恢复 incoming masks／返回结果"];
+  guard -> rejected [label="任一最终核验失败", constraint=false, tailport=e, headport=w];
+  svc -> rejected [label="protected entry 非法", constraint=false, tailport=e, headport=n];
+  rejected -> result [label="不写 BSRR", constraint=false, tailport=e, headport=e];
+  owner -> close [label="显式 close 后 join", style=dashed];
+  close -> guard [label="同一单核排除边界", style=dashed, constraint=false, tailport=e, headport=w];
+  close -> deleted [label="删除前先成功 join", style=dashed];
+  deleted -> owner [label="新的 task 代次；绝不重置 epoch", style=dashed, constraint=false, tailport=w, headport=w];
+  result -> pending [label="软件链接不构成物理资格", style=dashed];
+  {rank=same; owner; svc;}
+  {rank=same; binding; current;}
+  {rank=same; guard; rejected;}
+  {rank=same; effect; close;}
+  {rank=same; result; deleted;}
+}

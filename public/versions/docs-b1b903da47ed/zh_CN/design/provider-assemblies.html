@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>选定提供者装配门禁 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="由同一硬件 owner 管理的有限 PWM 与 ADC 窗口" href="pwm-adc.html" />
+    <link rel="prev" title="OS 执行与生命周期合同" href="os-contracts.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/provider-assemblies.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/design/provider-assemblies.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="selected-provider-assembly-gate">
+<h1>选定提供者装配门禁<a class="headerlink" href="#selected-provider-assembly-gate" title="Link to this heading">¶</a></h1>
+<p>维护中的门禁通过既有 CMake 工程链接显式编写的软件夹具。TOML 与唯一配置解析器选择精确料号、Board 包、后端、路由、模式及预算。门禁不改写后端、不建立提供者注册表、不选择源码目标，也不推断物理 Board 接线。</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/provider_assemblies.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fixture<span class="w"> </span>tests/contracts/usb_assembly/stm32-zg.toml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--family<span class="w"> </span>stm32f407<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--compiler<span class="w"> </span>arm-none-eabi-gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>build/provider-assemblies/usb-stm32
+</pre></div>
+</div>
+<p>对经审查的 TOML 列表重复传入 <code class="docutils literal notranslate"><span class="pre">--fixture</span></code>。未指定 <code class="docutils literal notranslate"><span class="pre">--project</span></code> 时，每份 TOML 仍须位于 <code class="docutils literal notranslate"><span class="pre">tests/contracts</span></code>，并具有维护中的同目录 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>。显式 <code class="docutils literal notranslate"><span class="pre">--project</span></code> 将整次调用绑定到当前 checkout 的 <code class="docutils literal notranslate"><span class="pre">tests/contracts</span></code> 下一个既有 CMake 工程；TOML 可以是该仓库的合同夹具，或直接位于 <code class="docutils literal notranslate"><span class="pre">tools/configure/assemblies</span></code> 的规范 schema-2 装配。每个选择都必须解析为 MCU 配置。门禁不根据系列自动发现工程，也不静默切换模式。</p>
+<p>对于三个公开的 H743 SPI4 DMA 装配，在仓库根目录执行既有 H743 工程，并确保维护中的 ARM 编译器位于 <code class="docutils literal notranslate"><span class="pre">PATH</span></code>：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/provider_assemblies.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--project<span class="w"> </span>tests/contracts/h743_assembly<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fixture<span class="w"> </span>tools/configure/assemblies/h743-spi-dma.toml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fixture<span class="w"> </span>tools/configure/assemblies/h743-spi-dma-uart-tx.toml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fixture<span class="w"> </span>tools/configure/assemblies/h743-spi-dma-uart-rx.toml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--family<span class="w"> </span>stm32h743<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--compiler<span class="w"> </span>arm-none-eabi-gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>build/provider-assemblies/h743-spi-dma
+</pre></div>
+</div>
+<p>输出路径必须全新；每个选定固件构建、资源报告和保留的 provider 方法均须通过。命令链接 ARM 软件并保存报告及原始输出，不执行 MCU。完整 H743 provider 阶段通过同一工程选择既有 26 份合同装配和这三份规范装配。仅运行三份夹具不等于完成全部 29 份夹具的阶段。</p>
+<p>可选的系列断言对照实际解析结果。不同后端必须具有分别维护的 TOML；不存在独立 OS 覆盖项。CMake 使用 <code class="docutils literal notranslate"><span class="pre">NEXUS_SOURCE_ROOT</span></code> 和 <code class="docutils literal notranslate"><span class="pre">NEXUS_ASSEMBLY_FILE</span></code> 构建所选工程的默认目标图。Native 选择、仓库外工程、符号链接工程、重复夹具和重复指定工程均被拒绝。选定源码根目录必须拥有实际执行的门禁及其导入工具；其他 checkout 的工具被拒绝。</p>
+<p>输出目录必须不存在。既有证据、符号链接目标和源码目录均拒绝。每条真实命令记录 argv、工作目录、时间戳、返回码和原始 stdout/stderr 字节。缺失工具、非零退出、超时或后台产物写入者使矩阵失败并保留失败报告。空矩阵或重复矩阵不能算成功工作。</p>
+<p>每次真实构建后，门禁要求恰好一个固件 ELF 与一个完整生成包。它比较已构建的规范配置摘要与原始作者输入解析结果，复核全部声明输入，并使用既有 ELF 资源工具重新计算内存分配。原始链接后报告须与重算相符。Flash LOAD 字节、Flash 占用、各物理 RAM 域、MSP 和 heap 保持既有预算语义。</p>
+<p>选定 I/O 的既有保留检查工具独立追踪实际接口面指针、具体方法表及 ELF LOAD 中每个非 NULL 方法。链接后报告须与重算相符。刻意为空的夹具则证明零作者控制器／器件、零生成接口声明，且真实 ELF 不含具体 I/O 提供者表与接口面。这是实际执行的空选择 GC 检查，不是跳过保留检查，也不声称所有无关运行时代码都不存在。</p>
+<p>实际编译数据库和 Ninja 依赖日志将编译源码、生成头、选定厂商头及编译器提供的头绑定到文件身份。维护中的图／配置源码及选定的锁定 SDK 输入字节在执行前建立快照，并在执行后复核。显式工程、它的 CMake 输入和所选装配均属于该快照。工程源码或任何声明装配发生变化都会使证据失效。矩阵拒绝源码、Git 版本、工具或产物变化。dirty checkout 可以提供身份明确的开发证据，但仅此门禁不能赋予 clean 发布候选资格。</p>
+<p><code class="docutils literal notranslate"><span class="pre">report.json</span></code> 记录 <code class="docutils literal notranslate"><span class="pre">selected_provider_assembly_matrix</span></code>、真实夹具／命令数量、源码身份、工具身份、各夹具配置摘要、ELF/BIN/map/bundle/report 身份、RAM 域和保留方法。全部成功夹具均须通过，没有跳过即通过的结果。CI 持有显式夹具列表，并与报告一同上传原始命令及产物。</p>
+<p>本门禁建立软件图、编译／链接、预算及所选提供者保留证据，不执行 MCU 启动、中断、DMA、USB 枚举、Ethernet 流量、timer 波形或电气控制。物理状态保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>，周期和延迟保持 <code class="docutils literal notranslate"><span class="pre">not_measured</span></code>。模型测试与后续 HIL 资格范围独立。</p>
+<p>工具回归测试命令：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>scripts.ci.test_provider_assemblies<span class="w"> </span>-v
+</pre></div>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

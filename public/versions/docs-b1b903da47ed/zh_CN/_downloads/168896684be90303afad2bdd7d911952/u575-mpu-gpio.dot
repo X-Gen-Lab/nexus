@@ -1,0 +1,44 @@
+digraph u575MpuGpio {
+  graph [label="FIG-29 implementation reference: one U575 MPU-v2 task / PC7 WRITE grant\nSTM32U575ZIT6Q / TZEN0 / MSIS4 / CM33 NTZ / eight MPU regions\nHost models + normal M33 reset link; installed SDK recorded separately\nRuntime MPU / GPIO electrical / HIL not executed", rankdir=TB, labelloc=t,
+    fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25,
+    nodesep=0.32, ranksep=0.48, splines=polyline, compound=true];
+  node [shape=box, style="rounded,filled", color="#475569", fontcolor="#0f172a",
+    fontname="Noto Sans CJK SC", fontsize=12, margin="0.13,0.09"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+  layout [label="Explicit normal memory generator / real reset startup\nPrivileged Flash + syscall Flash + user Flash\nPrivileged RAM + user RAM; unassigned tails not mapped to user\nUser DATA copied / BSS zeroed only after all bounds pass", fillcolor="#eff6ff", group="main"];
+  user [label="One protected user task\nNo peripheral MMIO mapping; three scalar arguments\nnx_freertos_user_gpio_write(device, set, reset)", fillcolor="#eff6ff", group="main"];
+  svc [label="Selected real veneer / SVC70 / 71-entry table\nPinned CM33 NTZ origin + protected stack checks\nExisting delay6 / ticks13 remain separate", fillcolor="#eff6ff", group="main"];
+  binding [label="One strong immutable privileged-Flash binding\nFixed grant -> readonly nx_binding_led slot -> actual face / ops\nFull extents checked before nested dereference\nComplete actual GPIO context in disjoint privileged RAM", fillcolor="#f0fdf4"];
+  current [label="Actual kernel current TCB\nSame static TCB / live task epoch\nNo user-selected identity, registry or worker", fillcolor="#f0fdf4", group="main"];
+  guard [label="Saved-mask final check through effect\nOpen + live incarnation + device\nDisjoint set/reset; combined mask nonzero\nOnly PC7 bits; no kernel call / wait / product callback", fillcolor="#dcfce7", group="main"];
+  effect [label="Real typed GPIO helper -> exact U575 provider\nOne bounded BSRR write\nAll helper / provider instructions must be privileged Flash", fillcolor="#dcfce7", group="main"];
+  result [label="Scalar nx_result_t in R0\nAccepted SVC: real protected exit\nRefused veneer: CONTEXT fallback\nNo payload borrow or asynchronous request", fillcolor="#eff6ff", group="main"];
+  rejected [label="Fail closed before GPIO effect\nWrong task / device or bits outside grant: PERMISSION\nMalformed trusted binding: INVALID\nBoth masks zero or overlapping: INVALID\nClosed / stale: STATE; bad context: CONTEXT", fillcolor="#fef2f2"];
+  owner [label="One privileged lifecycle owner\nStatic task start -> open pins deletion\nAll linked control / grant / provider storage stays live", fillcolor="#fff7ed", group="life"];
+  close [label="close revokes admission; pin remains\njoin excludes every scalar effect and removes pin\nNeither operation deletes task or resets task epoch", fillcolor="#fff7ed", group="life"];
+  deleted [label="Pinned delete -> BUSY; self-delete rejected\nAfter join: closing marker -> real kernel delete -> clear handle\nPreserve task epoch; wrap rejects", fillcolor="#fff7ed", group="life"];
+  pending [label="Maintained selected static ELF proof\nThree user entries / real veneers / complete privileged extents\nSource-bound selected/default costs: evidence README\nM7 stays negative; no runtime isolation / electrical / HIL result", fillcolor="#fef2f2", group="main"];
+  layout -> user [label="explicit user execute / XN data regions"];
+  layout -> binding [label="protected code / readonly authority / private state", constraint=false, tailport=w, headport=n];
+  owner -> binding [label="trusted assembly; no user pointer", style=dashed];
+  owner -> current [label="open snapshots actual live incarnation", style=dashed, constraint=false];
+  user -> svc [label="public scalar call"];
+  svc -> current [label="real dispatcher obtains current TCB before guard"];
+  binding -> guard [label="validated fixed capability"];
+  current -> guard [label="check again under saved mask"];
+  guard -> effect [label="only admitted WRITE"];
+  effect -> result [label="restore incoming masks / return result"];
+  guard -> rejected [label="any failed final check", constraint=false, tailport=e, headport=w];
+  svc -> rejected [label="invalid protected entry", constraint=false, tailport=e, headport=n];
+  rejected -> result [label="no BSRR write", constraint=false, tailport=e, headport=e];
+  owner -> close [label="explicit close then join", style=dashed];
+  close -> guard [label="same single-core exclusion boundary", style=dashed, constraint=false, tailport=e, headport=w];
+  close -> deleted [label="successful join before deletion", style=dashed];
+  deleted -> owner [label="new task incarnation; never reset epoch", style=dashed, constraint=false, tailport=w, headport=w];
+  result -> pending [label="software links are not physical qualification", style=dashed];
+  {rank=same; owner; svc;}
+  {rank=same; binding; current;}
+  {rank=same; guard; rejected;}
+  {rank=same; effect; close;}
+  {rank=same; result; deleted;}
+}

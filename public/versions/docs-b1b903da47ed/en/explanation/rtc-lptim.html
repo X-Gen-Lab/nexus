@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RTC and LPTIM: separate time domains and retained requests &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GPIO pin states: explicit images under one retained lease" href="gpio-pin-states.html" />
+    <link rel="prev" title="Borrow, completion and observer lifetime" href="ownership.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/explanation/rtc-lptim.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/explanation/rtc-lptim.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="rtc-and-lptim-separate-time-domains-and-retained-requests">
+<span id="explanation-rtc-lptim"></span><h1>RTC and LPTIM: separate time domains and retained requests<a class="headerlink" href="#rtc-and-lptim-separate-time-domains-and-retained-requests" title="Link to this heading">¶</a></h1>
+<p>Use this explanation to integrate the Native raw-calendar RTC and finite-counter LPTIM through static typed factory lookup and explicit Platform lifecycle. One ordinary TOML assembly selects independent instances; public calls enter the matching provider directly. This Native host-model scope does not provide an MCU RTC/LPTIM driver, a product clock service or hardware low-power continuity.</p>
+<p>The public declarations in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/rtc.h">rtc.h</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/lptim.h">lptim.h</a> and the host-only <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/native/rtc_lptim_model.h">model controls</a> remain authoritative. This page explains ownership and use boundaries; it does not duplicate their complete return-value reference.</p>
+<section id="current-implementation-and-planned-integration">
+<h2>Current implementation and planned integration<a class="headerlink" href="#current-implementation-and-planned-integration" title="Link to this heading">¶</a></h2>
+<p>The current implementation has common C wrappers and a Native provider. The wrappers validate a face and dispatch through its immutable operations table to its context. Native instances share two readonly operations tables, one per device class, and retain independent state. There is no heap, registry, hidden worker, request queue or mandatory OS adapter.</p>
+<p>Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without invoking its time reader, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set.</p>
+<p>Explicit private reopen and ordinary typed configuration assembly are implemented for the selected Native host models. Private reopen changes the owner incarnation after actual withdrawal and external joins instead of reconstructing storage. H743 and U575 RTC/LPTIM adaptation remains a future target with separate hardware contracts and evidence.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/rtc-lptim-lifecycle.svg" title="Open SVG at full size"><img alt="Current Native RTC/LPTIM assembly, ownership and final publication; dashed hardware branch is a future target" src="../_images/rtc-lptim-lifecycle.svg" /></a></p>
+<p>FIG-21 distinguishes current Native build-time assembly from runtime calls and source progression. Edge labels state which relationship applies. The dashed hardware branch is a target; it does not establish a physical driver, IRQ, STOP/VBAT continuity or HIL result. A factory returns an existing face; it never performs lifecycle work.</p>
+</section>
+<section id="three-domains-three-meanings">
+<h2>Three domains, three meanings<a class="headerlink" href="#three-domains-three-meanings" title="Link to this heading">¶</a></h2>
+<p>Core deadlines are absolute monotonic microseconds read through the copied <code class="docutils literal notranslate"><span class="pre">nx_clock_t</span></code> face. The original face descriptor may be copied, but its context remains borrowed: assembly must preserve the entire context lifetime, disjoint storage, finite monotonic readings and non-reentrant access. A finite deadline expires when the observed Core time is greater than or equal to it. <code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> avoids a deadline read; it does not make the calendar or counter advance.</p>
+<p>RTC uses raw year <code class="docutils literal notranslate"><span class="pre">00..99</span></code>, month/day and 24-hour time without UTC, a century, timezone or leap seconds. Leap years satisfy raw year modulo 4 equals zero. Weekday is an independent <code class="docutils literal notranslate"><span class="pre">1..7</span></code> field. Natural <code class="docutils literal notranslate"><span class="pre">99</span> <span class="pre">-&gt;</span> <span class="pre">00</span></code> rollover advances the calendar without creating a new setting domain; an explicit successful set advances the nonwrapping generation.</p>
+<p>An RTC alarm matches one future day-of-month/hour/minute/second pattern. It has no month/year field or wildcard mask. A pattern already matching the current second is rejected with <code class="docutils literal notranslate"><span class="pre">STATE</span></code>; the provider does not silently interpret it as a later recurrence. The product owns UTC conversion, date selection, synchronization, recurrence and authorization policy.</p>
+<p>LPTIM accepts one finite shot of <code class="docutils literal notranslate"><span class="pre">1..65536</span></code> ticks. Its positive <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code> is a fixed declared unit rate, not measured oscillator accuracy. The 16-bit sample is modulo 65536: a complete 65536-tick shot can sample as zero. Counter zero alone proves neither completion nor low-power continuity. Open idle returns zero and <code class="docutils literal notranslate"><span class="pre">running=false</span></code>; closed public read/sample returns <code class="docutils literal notranslate"><span class="pre">STATE</span></code> without changing output.</p>
+<p>RTC and LPTIM domains contain the owner address and a checked <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> generation. They are separate types and are not Core deadline tokens. RTC set, private reopen and completed LPTIM withdrawal invalidate older domains. Tokens compare identity without dereferencing it; they establish neither authorization nor cross-boot identity. Retire every token and external observer before ending or reusing owner storage.</p>
+<p>Generation never wraps silently. A Native RTC set at <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code> returns <code class="docutils literal notranslate"><span class="pre">EXHAUSTED</span></code>; a Native LPTIM submission at that limit refuses before acceptance so a previously accepted shot can always perform its reserved final generation increment. Exhaustion is not permission to reset a stopped owner or abandon a loan.</p>
+</section>
+<section id="who-owns-storage-and-execution">
+<h2>Who owns storage and execution<a class="headerlink" href="#who-owns-storage-and-execution" title="Link to this heading">¶</a></h2>
+<p>One serialized, non-reentrant task executor owns all calls on an instance, including reads, model controls and lifecycle. The face, operations table, private owner and borrowed clock context outlive every accepted request and any separate observer/control joins. No implicit cross-task lock or ISR entry contract is provided. Products that need cross-task cancellation must add explicit stable-slot/epoch control and joining outside this provider.</p>
+<p>The caller owns the complete request. Initialize its Core base before preparing it; prepare only unborrowed <code class="docutils literal notranslate"><span class="pre">READY</span></code> or consumed <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> storage after all joins. Preparation copies metadata and takes no loan. The request and input/output spans must be aligned, nonwrapping and disjoint from known protected objects. These checks are not a universal invalid-pointer or memory-access oracle; assembly remains responsible for opaque context extents and live mapped storage.</p>
+<p>Each instance accepts at most one request. Submission validates lifecycle, idle state, the current domain and the class-specific range before reading a finite deadline. <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> means ACCEPTED; rejection retains no request or source effects. A rejected request stays caller-owned. A missing optional operations-table method returns <code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span></code>; malformed public inputs may return <code class="docutils literal notranslate"><span class="pre">INVALID</span></code> before provider dispatch.</p>
+<p>After ACCEPTED the caller keeps every request byte live and immutable until acquire-observed <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>, then consumes the result and joins any separate controls or observers before reuse. Cancellation, expiry, stop, a failed withdrawal or a sampled completion flag never revoke this loan.</p>
+</section>
+<section id="source-progression-terminal-cause-and-final-access">
+<h2>Source progression, terminal cause and final access<a class="headerlink" href="#source-progression-terminal-cause-and-final-access" title="Link to this heading">¶</a></h2>
+<p>Host model advancement changes source state only. RTC advancement is bounded to <code class="docutils literal notranslate"><span class="pre">0..86400</span></code> seconds per call with at most one date carry; an initialized calendar may advance while admission is closed. LPTIM advancement is bounded to <code class="docutils literal notranslate"><span class="pre">0..65536</span></code> ticks and saturates at the shot limit; an unarmed source accumulates nothing. These hooks neither read Core time nor touch or settle requests. Setting or clearing the withdrawal hold also does not settle a request.</p>
+<p>Explicit public service observes the predicate and advances withdrawal. Cancel and stop can call withdrawal directly, so they may settle immediately when no hold remains; service is not the only final publisher. On first service observation an expired finite deadline wins over a pending event. An earlier cancel or stop may instead latch <code class="docutils literal notranslate"><span class="pre">CANCELLED</span></code>. Once latched, the first terminal cause stays fixed while withdrawal waits.</p>
+<p>If withdrawal is held, the request remains borrowed and <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>. Cancel can return <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> because cancellation was accepted while service/stop returns <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>. Removing a model hold only makes a later real withdrawal possible; the executor must still call an appropriate public service/cancel/stop operation. Keep the owner and request alive while that work remains.</p>
+<p>Successful withdrawal first disables the source, clears pending state and detaches the owner reference. LPTIM also records final tick progress and advances its generation before publication. Only then does the provider release-publish <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> as its last request access. RTC <code class="docutils literal notranslate"><span class="pre">transferred</span></code> is 1 for success and 0 otherwise. LPTIM <code class="docutils literal notranslate"><span class="pre">transferred</span></code> is the final observed tick count, including ticks accrued while withdrawal was held; it is not frozen when cancel/timeout first latches.</p>
+<p>Stop closes admission immediately, even when withdrawal returns <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>. Closed reads and submissions remain rejected, while service/cancel can still drain the retained loan. A repeated clean stop is idempotent. Successful stop does not end owner storage lifetime or waive external joins. Reopening is a separate explicit private lifecycle operation, not a side effect of lookup, model advancement or a repeated constructor.</p>
+</section>
+<section id="explicit-private-reopen-preserves-identity-and-responsibility">
+<h2>Explicit private reopen preserves identity and responsibility<a class="headerlink" href="#explicit-private-reopen-preserves-identity-and-responsibility" title="Link to this heading">¶</a></h2>
+<p>A constructor is valid once per owner storage lifetime. The internal <code class="docutils literal notranslate"><span class="pre">nx_native_rtc_start</span></code> and <code class="docutils literal notranslate"><span class="pre">nx_native_lptim_start</span></code> operations reopen that same stable owner; they are not public application SDK APIs. They require a valid constructed, closed owner with no active request, armed source, pending event or terminal responsibility. The caller must also prove that external controls and observers have joined; inspecting owner fields cannot establish those external joins.</p>
+<p>After full-span validation, retained request/source responsibility takes <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> priority over unconstructed/already-open <code class="docutils literal notranslate"><span class="pre">STATE</span></code>. A closed joined owner at <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code> returns <code class="docutils literal notranslate"><span class="pre">NX_ERROR_EXHAUSTED</span></code>. Every rejection preserves all owner bytes, source facts, fault state, clock and generation. Start is not idempotent: a clean already-open owner returns <code class="docutils literal notranslate"><span class="pre">STATE</span></code>. A held closed loan remains borrowed and <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>; neither start nor repeated construction can revoke it.</p>
+<p>On success private start checks generation capacity, increments the generation, then opens admission. It reads no Core time, advances no source, reconstructs nothing and adds no state field or owner pool. It preserves the RTC set/unset state and calendar, LPTIM fixed <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code>, copied clock binding and external withdrawal hold. A hold flag on an otherwise idle joined owner is an external fault, not an active loan; reopening preserves it rather than silently clearing it.</p>
+<p>The final permitted reopen can move <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span> <span class="pre">-</span> <span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code>; after a later clean stop another reopen is exhausted. Old externally held <code class="docutils literal notranslate"><span class="pre">READY</span></code> domains remain stale and reject submission unchanged. No wrap, reset-to-one or implicit fresh construction repairs exhaustion. Model source progression and result consumption remain separate from this lifecycle transition.</p>
+</section>
+<section id="typed-assembly-uses-the-existing-configuration-path">
+<h2>Typed assembly uses the existing configuration path<a class="headerlink" href="#typed-assembly-uses-the-existing-configuration-path" title="Link to this heading">¶</a></h2>
+<p>The maintained pair fixture below is a complete Native assembly. Ordinary <code class="docutils literal notranslate"><span class="pre">[rtc.name]</span></code> and <code class="docutils literal notranslate"><span class="pre">[lptim.name]</span></code> sections resolve through the existing immutable <code class="docutils literal notranslate"><span class="pre">ControllerIR</span> <span class="pre">-&gt;</span> <span class="pre">provider</span> <span class="pre">-&gt;</span> <span class="pre">factory</span></code> path. <code class="docutils literal notranslate"><span class="pre">calendar-alarm</span></code> has no date or timezone option; <code class="docutils literal notranslate"><span class="pre">counter16-oneshot</span></code> requires an explicit positive <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code> <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code>. Unknown policy/IRQ fields and duplicate controller claims are rejected rather than repaired.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native_reference"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"model"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[rtc.calendar_a]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"rtc0"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"calendar-alarm"</span>
+
+<span class="k">[rtc.calendar_b]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"rtc1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"calendar-alarm"</span>
+
+<span class="k">[lptim.counter_a]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lptim0"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"counter16-oneshot"</span>
+<span class="n">tick_hz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+
+<span class="k">[lptim.counter_b]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lptim1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"counter16-oneshot"</span>
+<span class="n">tick_hz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span>
+</pre></div>
+</div>
+<p>Native host-model facts expose RTC0/RTC1 and LPTIM0/LPTIM1 without pins or IRQ routes. Two software RTC instances exercise isolation; they do not assert two physical RTC peripherals. The generator emits only selected static state, readonly faces and pure typed lookup. The selected shared deadline adapter reads <code class="docutils literal notranslate"><span class="pre">nx_time_now_us()</span></code> without advancing any RTC/LPTIM source. An empty assembly emits no selected RTC/LPTIM state or that adapter.</p>
+</section>
+<section id="public-and-generated-entry-points">
+<h2>Public and generated entry points<a class="headerlink" href="#public-and-generated-entry-points" title="Link to this heading">¶</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">nexus_factory.h</span></code> to obtain <code class="docutils literal notranslate"><span class="pre">nx_factory_rtc(id)</span></code> or <code class="docutils literal notranslate"><span class="pre">nx_factory_lptim(id)</span></code>. IDs belong to the selected assembly and class; invalid/unselected IDs return NULL. Faces and shared operations tables exist before startup, but RTC read and LPTIM sample reject closed/unconstructed use. Lookup neither constructs an owner nor reads a clock.</p>
+<p>The external lifecycle owner calls <code class="docutils literal notranslate"><span class="pre">nx_platform_start()</span></code> and checks <code class="docutils literal notranslate"><span class="pre">primary</span></code>, <code class="docutils literal notranslate"><span class="pre">cleanup</span></code> and <code class="docutils literal notranslate"><span class="pre">remaining_effects</span></code>. It then explicitly sets the RTC if needed, copies a current domain, prepares caller-owned requests and submits through public ports. It drives the required model source and public service separately. Startup creates no scheduler, and Core-time advancement does not advance a calendar or finite shot.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">nx_platform_stop()</span></code> returns <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>, retain every borrowed request and its owner, drive real withdrawal, consume final results and join external users before retrying stop. Complete Platform shutdown before another start; it does not silently reconstruct or reopen an unfinished stop. The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/consumers/native-time-pair.c">pair consumer</a> and <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/cmake/package/verification/io_evolution/consumers/native-time-empty.c">empty consumer</a> are maintained public/generated host verification programs, not hardware application examples.</p>
+</section>
+<section id="costs-and-verification-boundary">
+<h2>Costs and verification boundary<a class="headerlink" href="#costs-and-verification-boundary" title="Link to this heading">¶</a></h2>
+<p>The public face contains two pointers; per-instance state contains the copied clock face, domain and class-specific calendar/counter state. One request is retained at a time. RTC model work is bounded without a per-second loop; LPTIM uses bounded saturating arithmetic. This structure avoids dynamic allocation and queue capacity costs, but it does not establish a byte budget, stack bound, WCET, oscillator accuracy or MCU power result. Measure those against the actual selected build and hardware.</p>
+<p>The Native behavior and explicit private reopen described here build on separately recorded manual evidence. The phase3 manifest does not record a rerun of those manual programs.</p>
+<p>Phase3 development evidence binds the frozen dirty-source tuple identified by source-and-execution manifest SHA-256 <code class="docutils literal notranslate"><span class="pre">85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f</span></code>. It records configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results.</p>
+<p>No H743/U575 RTC or LPTIM provider, ARM RTC/LPTIM execution, backup-domain reset/ownership, oscillator selection/calibration, STOP-mode wake, VBAT persistence, hardware retention or physical HIL result is established here. Future adaptation must prove its exact SoC/Board/clock/IRQ/security and retained-storage contracts; a chip datasheet capability or this public API alone does not provide that proof.</p>
+<p>Related mechanisms: <a class="reference internal" href="ownership.html"><span class="std std-doc">request ownership</span></a>, <a class="reference internal" href="factory.html"><span class="std std-doc">typed factory</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/native/drivers/rtc_lptim.c">Native provider source</a> and the <a class="reference internal" href="../design/io-evolution.html"><span class="std std-doc">I/O evolution contract</span></a>. Product schedules, protocol state, persistence policy and private board wiring stay in external repositories.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architecture explanations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">How the platform is assembled and executed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">Typed factory, static instances and polymorphic faces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">Borrow, completion and observer lifetime</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RTC and LPTIM: separate time domains and retained requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gpio-pin-states.html">GPIO pin states: explicit images under one retained lease</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">Source-adjacent contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU-local primitives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o-contracts-and-shared-mechanisms">Typed I/O contracts and shared mechanisms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">Optional OS adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">Optional common components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#soc-packages-and-private-providers">SoC packages and private providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">Reusable IP implementations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#reviewed-board-facts">Reviewed Board facts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_soc_refinement_validation_index",
+  "status": "software_scopes_validated",
+  "source": {
+    "canonical_code_commit": "3728b334b02eb2eb70bcf5d4caafbb9746837dd3",
+    "code_tree": "48ba820e5c2d4c372bf7eb6e909c49850cc1fe76",
+    "clean_before_after": true,
+    "unchanged_during_execution": true,
+    "recorded_execution_scope": "Normal staged gates, complete ARM matrices, independent linked-startup capture and installed source SDK; each report binds the exact code source"
+  },
+  "normal_commit_gates": {
+    "status": "passed",
+    "google_test_executables": 165,
+    "google_test_cases": 3040,
+    "tool_tests": 585,
+    "configuration_tests": 428,
+    "bound_io_properties": 203,
+    "formal_or_exhaustive_proof": false,
+    "unproven_scope_categories": 8,
+    "failures": 0,
+    "skipped": 0,
+    "report": {
+      "archive_relative_path": "batch-09-hook-passed/result.json",
+      "sha256": "592222bd70742f77bde84d397f52fbd0fef23876e5459ce2e8d68444721ea342",
+      "bytes": 848
+    },
+    "execution_report": {
+      "archive_relative_path": "batch-09-hook-passed/tdd/execution.json",
+      "sha256": "1a9e07dd2f5f19b00f470f1fcea5c0c46814bf8d589eaf2ff7669f8e4343c420",
+      "bytes": 539159
+    },
+    "bound_property_report": {
+      "archive_relative_path": "batch-09-hook-passed/tdd/io-property-report.json",
+      "sha256": "17b111cf2b4b8fd54cb3a99b3040b45955b1cd40c4c270f235df363e4f9337aa",
+      "bytes": 6632304
+    }
+  },
+  "arm_matrices": {
+    "stm32f407_memory": {
+      "status": "passed",
+      "scope": "VE/ZG default and CCM placement; actual ELF linking, budgets and retention",
+      "executed_images": 4,
+      "report": {
+        "archive_relative_path": "final-arm-3728b334/stm32_memory/report.json",
+        "sha256": "78958446ae7c697a72448b0767ffe30966e304a1b817526f76c3c6e677a8e8f4",
+        "bytes": 110220
+      }
+    },
+    "gd32f470_memory": {
+      "status": "passed",
+      "scope": "Main SRAM, ADDSRAM, TCM and combined placement; actual ELF linking, budgets and retention",
+      "executed_images": 4,
+      "report": {
+        "archive_relative_path": "final-arm-3728b334/gd32_memory/report.json",
+        "sha256": "4308f2a189d601be7ca8acb14dca8a101aa36c27b2ca52cdaf5671db2fffcfc1",
+        "bytes": 113601
+      }
+    },
+    "stm32h743_reference": {
+      "status": "passed",
+      "scope": "Empty/selected GPIO and IRQ UART, baremetal/FreeRTOS; HSI64, Cache off, TIM2, actual power-entry closure, vectors, budgets and retention",
+      "executed_images": 4,
+      "report": {
+        "archive_relative_path": "final-arm-3728b334/stm32h743/report.json",
+        "sha256": "0a27e12518124ab86803f8ead9b110482b22281982327513e79bcc79cccd70ba",
+        "bytes": 68854
+      }
+    },
+    "stm32u575_reference": {
+      "status": "passed",
+      "scope": "Empty/selected GPIO and IRQ UART, baremetal/FreeRTOS; MSIS4 MHz, TZEN=0, SWAP_BANK=0, Cache off, TIM2, vectors, budgets and retention",
+      "executed_images": 4,
+      "report": {
+        "archive_relative_path": "final-arm-3728b334/stm32u575/report.json",
+        "sha256": "a65f456e4e7958f45bf51f7df6385efb7500ba65faa368646d641774468c7657",
+        "bytes": 62848
+      },
+      "independent_linked_startup_review": {
+        "archive_relative_path": "independent-startup-3728b334/report.json",
+        "sha256": "0a0d96d1bf3f3e55a9849920adf0c5ffd3c9801d1c446731b23dc45d5201343c",
+        "bytes": 37840
+      }
+    },
+    "selected_provider_assemblies": {
+      "status": "passed",
+      "scope": "Every maintained authored provider fixture through the actual CMake graph, with linked ELF resources, selected retention and compile-input closure",
+      "executed_images": 87,
+      "report": {
+        "archive_relative_path": "final-arm-3728b334/provider_assemblies/report.json",
+        "sha256": "d7bf7e5c6a58710dd72eb3c513ad5adead0dc143d8c0628b02f79e2a83a980f2",
+        "bytes": 5381980
+      }
+    }
+  },
+  "source_sdk": {
+    "status": "passed",
+    "scope": "Clean-source installed SDK, locked dependencies, actual relocated public consumers and private-include boundaries",
+    "executed_tests": 58,
+    "consumer_scopes": [
+      "Native public consumers",
+      "Selected STM32F407/GD32F470 platform firmware",
+      "STM32G474/H743/U575 baremetal and FreeRTOS public platform consumers",
+      "ThreadX Native execution and selected F407/F470 ARM consumers"
+    ],
+    "report": {
+      "archive_relative_path": "final-sdk-3728b334/report.json",
+      "sha256": "40d22d38bea6da8cd6b5f29b4d0761a183f7060769bb3184b593191f3a98cb99",
+      "bytes": 220344
+    },
+    "discovered_tests": 58,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "executed_commands": 236,
+    "nonzero_command_returns": 128,
+    "nonzero_returns_scope": "Expected negative-path commands checked by the passing test suite; commands are not all expected to return zero",
+    "source_clean_before_after": true
+  },
+  "cost_observations": {
+    "status": "observed_selected_profiles",
+    "scope": "Eleven explicitly selected linked-ELF profiles: eight H743/U575 references plus F407 EXTI, GD32 EXTI and G474 LPUART; representative static baselines, not every mode or measured cycles",
+    "observed_profiles": [
+      {
+        "family": "stm32h743",
+        "fixture": "empty",
+        "backend": "baremetal",
+        "configuration_sha256": "f3308abfc857ce2767ea27adf5cc6b7955d80ff3dd685ec1f6268ef4950e90bb",
+        "flash_loaded_bytes": 2437,
+        "flash_footprint_bytes": 2440,
+        "ram_reserved_bytes": 2104,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32h743",
+        "fixture": "io",
+        "backend": "baremetal",
+        "configuration_sha256": "1daa11c0993de8900894789cb7cbb63717febe4786a4ea8580d2780aff6c6571",
+        "flash_loaded_bytes": 8908,
+        "flash_footprint_bytes": 8908,
+        "ram_reserved_bytes": 2364,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32h743",
+        "fixture": "empty-freertos",
+        "backend": "freertos",
+        "configuration_sha256": "ae683d69fcdd1e38ba263bc90c13bf4c04e3a69339acda6bf63dcb46e0eb4fbe",
+        "flash_loaded_bytes": 7564,
+        "flash_footprint_bytes": 7564,
+        "ram_reserved_bytes": 3716,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32h743",
+        "fixture": "io-freertos",
+        "backend": "freertos",
+        "configuration_sha256": "c212368c2fd9c7bef01bf68480eba9b125265c328726fc86222a0a3bb85e9325",
+        "flash_loaded_bytes": 14108,
+        "flash_footprint_bytes": 14108,
+        "ram_reserved_bytes": 3976,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32u575",
+        "fixture": "empty",
+        "backend": "baremetal",
+        "configuration_sha256": "19b2f24d5ef605e84009fdf7df7cd80fb43ee94b569c2db75deb996ada199f4b",
+        "flash_loaded_bytes": 2225,
+        "flash_footprint_bytes": 2228,
+        "ram_reserved_bytes": 2112,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32u575",
+        "fixture": "io",
+        "backend": "baremetal",
+        "configuration_sha256": "db4a9649fbc570e103a0f32886c9b5c2988815118701d940420b4900c02c8c00",
+        "flash_loaded_bytes": 8712,
+        "flash_footprint_bytes": 8712,
+        "ram_reserved_bytes": 2372,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32u575",
+        "fixture": "empty-freertos",
+        "backend": "freertos",
+        "configuration_sha256": "911ed3a691c48f55fa9e423d31d2e72c96553f1b1406fe261a6f5332ae0f982d",
+        "flash_loaded_bytes": 7300,
+        "flash_footprint_bytes": 7300,
+        "ram_reserved_bytes": 3724,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32u575",
+        "fixture": "io-freertos",
+        "backend": "freertos",
+        "configuration_sha256": "7df421200ebd70cc7c79691fe1dbdcf4ed79b4bad9a439afe9e2deda708dfcfb",
+        "flash_loaded_bytes": 13868,
+        "flash_footprint_bytes": 13868,
+        "ram_reserved_bytes": 3984,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0
+      },
+      {
+        "family": "stm32f407",
+        "fixture": "ve-exti",
+        "backend": "baremetal",
+        "configuration_sha256": "3c455a09c4aea465a95e17cbedac23b20f9a8d03a69e268bfb7c5492b2914a41",
+        "flash_loaded_bytes": 6152,
+        "flash_footprint_bytes": 6152,
+        "ram_reserved_bytes": 2344,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0,
+        "selected_exti_line_count": 2
+      },
+      {
+        "family": "gd32f470",
+        "fixture": "exti",
+        "backend": "baremetal",
+        "configuration_sha256": "342d1653d8a98cb34a47812e823a986af7b8cd241233e3902a5066d70a9202cb",
+        "flash_loaded_bytes": 6956,
+        "flash_footprint_bytes": 6956,
+        "ram_reserved_bytes": 2260,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0,
+        "selected_exti_line_count": 1
+      },
+      {
+        "family": "stm32g474",
+        "fixture": "io",
+        "backend": "baremetal",
+        "configuration_sha256": "69641c639a9a2b86060c699cbec8827c603b2de9c5a2902fcc2b54026bf26f3d",
+        "flash_loaded_bytes": 9012,
+        "flash_footprint_bytes": 9012,
+        "ram_reserved_bytes": 2316,
+        "msp_reserved_bytes": 2048,
+        "heap_reserved_bytes": 0,
+        "selected_exti_line_count": 0
+      }
+    ],
+    "report": {
+      "archive_relative_path": "final-costs-3728b334/report.json",
+      "sha256": "514b58a3c99a60855cd9cd0103b410758c3db2c2fe1f15dc167112d242bc1be7",
+      "bytes": 77945
+    },
+    "measured_cycles_or_wcet": false,
+    "comparison": "Selection costs only; not equivalent-profile improvement percentages or measured cycles",
+    "supplemental_report": {
+      "archive_relative_path": "final-irq-costs-3728b334/report.json",
+      "sha256": "6912941bc7e9690d2e1a4ad12e1485aa9cb4faba619c9de9eb4bd6016c6a654d",
+      "bytes": 35984
+    },
+    "observed_profile_count": 11
+  },
+  "capability_projection": {
+    "status": "passed",
+    "rows": 87,
+    "report": {
+      "archive_relative_path": "final-capabilities-3728b334/report.json",
+      "sha256": "2b7893b2a2846f179127b8fd168e7f0e2d66ef35be71c35136526bae81d83d20",
+      "bytes": 702
+    }
+  },
+  "physical": {
+    "status": "not_executed",
+    "soc_acceptance_cases": "SOC-37..SOC-55",
+    "executed_cases": 0,
+    "reason": "Physical boards, probes and instruments are not connected"
+  },
+  "conditional_extensions": {
+    "SOC-28_SOC-30_SOC-31": "Only exact H743/U575 startup, fixed-clock timebase, GPIO and IRQ-byte UART references",
+    "SOC-29": "Additional G474 peripheral modes are not implemented",
+    "SOC-32": "Per-engine reachability facts only; H7/U5 DMA, cache ownership and security transfers are not implemented",
+    "SOC-33_SOC-34_SOC-35_SOC-36": "Running-state handoff, dynamic frequency, deep STOP continuity and userspace MPU/TrustZone transport are not implemented"
+  },
+  "offline_reproducibility_and_candidate": "not_established_by_this_index",
+  "report_reference_format": {
+    "archive_relative_path": "Path within the separately preserved validation archive",
+    "sha256": "SHA256 of the exact report bytes",
+    "bytes": "Exact report byte count"
+  },
+  "raw_evidence_policy": "Original commands, logs, XML and ELF/BIN/map artifacts remain in the external validation archive; this index neither replaces execution nor qualifies a changed source",
+  "independent_linked_startup_review": {
+    "status": "passed",
+    "reviewed_images": 8,
+    "verified_inputs_before_after": 2297,
+    "source_clean_before_after": true,
+    "scope": "Actual H743/U575 Reset, pre-RAM call closure, DATA/BSS initialization, entry/vector/MSP and four-byte DATA LMA alignment; no physical execution",
+    "report": {
+      "archive_relative_path": "independent-startup-3728b334/report.json",
+      "sha256": "0a0d96d1bf3f3e55a9849920adf0c5ffd3c9801d1c446731b23dc45d5201343c",
+      "bytes": 37840
+    }
+  },
+  "external_examples": {
+    "status": "passed",
+    "repository": "https://github.com/X-Gen-Lab/nexus-examples",
+    "code_commit": "f02b91867bb64abfa31e3c1d4b6004bd1a38b091",
+    "code_tree": "731e54ace34d9b9f5a3fb473b184306158d15fb8",
+    "platform_code_commit": "3728b334b02eb2eb70bcf5d4caafbb9746837dd3",
+    "ctest_programs": 8,
+    "google_test_executables": 3,
+    "google_test_cases": 43,
+    "actual_arm_images": 20,
+    "commands": 46,
+    "hil_preparations": 10,
+    "hil_status": "prepared_unbound",
+    "physical_status": "not_executed",
+    "source_clean_and_stable": true,
+    "report": {
+      "archive_relative_path": "examples-reference/formal-f02b9186-v2/report.json",
+      "sha256": "46c305cefefc108e4e98bf6df26bea25b5a53edeef0e58e56be5f0b4f0f3d779",
+      "bytes": 173336
+    },
+    "source_record": {
+      "archive_relative_path": "examples-reference/formal-f02b9186-v2/source-before.json",
+      "sha256": "0bf4f0a19c9e79d218f5a7b43ac4c17b389f0500b362e214c83b56449f555cc9",
+      "bytes": 93230
+    }
+  },
+  "arm_execution": {
+    "status": "passed",
+    "maintained_gates": 5,
+    "memory_and_reference_images": 16,
+    "selected_provider_images": 87,
+    "total_executed_images": 103,
+    "report": {
+      "archive_relative_path": "final-arm-3728b334/report.json",
+      "sha256": "0847b6eaecc3de3783946c63b006bc72f846e49313e33b9f139c87b574d52eb2",
+      "bytes": 16560
+    }
+  }
+}

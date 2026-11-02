@@ -1,0 +1,20 @@
+minimum_pre_commit_version: '4.3.0'
+fail_fast: true
+default_install_hook_types: [pre-commit, commit-msg]
+repos:
+  - repo: local
+    hooks:
+      - id: nexus-publication
+        name: Verify prepared documentation publication
+        entry: python3 -B verifier/verify_documentation.py public publication.json
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+      - id: nexus-commit-message
+        name: Nexus conventional commit message
+        entry: python3 -B scripts/ci/check_commit_message.py
+        language: system
+        stages: [commit-msg]
+        always_run: true

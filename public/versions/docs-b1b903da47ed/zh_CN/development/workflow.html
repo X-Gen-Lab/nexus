@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>使用 TDD 与正常提交门禁开发 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="维护清晰且可验证的文档" href="documentation.html" />
+    <link rel="prev" title="维护 Nexus" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/development/workflow.md">b1b903da47ed</a>; 代码引用: b1b903da47ed. <a href="../../en/development/workflow.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="develop-with-tdd-and-normal-commit-gates">
+<span id="docs-development-workflow"></span><h1>使用 TDD 与正常提交门禁开发<a class="headerlink" href="#develop-with-tdd-and-normal-commit-gates" title="Link to this heading">¶</a></h1>
+<p>本工作流保留当前 C11 架构、格式与显式证据。Codex 负责平台维护；独立 agent 审查高风险变更。虚构人员或本地文件都不能建立 GitHub 分支保护。</p>
+<section id="install-and-check-tools">
+<h2>安装并检查工具<a class="headerlink" href="#install-and-check-tools" title="Link to this heading">¶</a></h2>
+<p>先完成<a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">固定源码与递归依赖指南</span></a>。然后从该仓库根目录安装维护工具：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/setup/install_dev_tools.py
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>dependencies/environment-tools.txt
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>Windows 使用 <code class="docutils literal notranslate"><span class="pre">.venv/Scripts/python.exe</span></code>。安装建立 pre-commit 和 commit-msg 钩子。钩子检查暂存输入，不替用户暂存，也不静默修复文件。保留未暂存工作和真实失败诊断；不得绕过钩子。</p>
+</section>
+<section id="prepare-the-pinned-host-test-framework">
+<h2>准备锁定的主机测试框架<a class="headerlink" href="#prepare-the-pinned-host-test-framework" title="Link to this heading">¶</a></h2>
+<p>GoogleTest 与 GoogleMock 通过 Git 子模块 <code class="docutils literal notranslate"><span class="pre">ext/googletest</span></code> 引入，锁定版本 1.16.0 和 commit <code class="docutils literal notranslate"><span class="pre">6910c9d9165801d8827d628cb72eb7ea9dd538c5</span></code>。上面的递归检出已包含它。已有检出应在运行测试前显式准备 Native 依赖范围：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>prepare<span class="w"> </span>--scope<span class="w"> </span>native<span class="w"> </span>--allow-network
+</pre></div>
+</div>
+<p>如果只需初始化此子模块，可改用 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">submodule</span> <span class="pre">update</span> <span class="pre">--init</span> <span class="pre">--recursive</span> <span class="pre">ext/googletest</span></code>。准备阶段可以使用网络；CMake 配置只使用已准备的本地源码，缺失、版本与锁定值不符或存在本地修改均失败。配置过程不获取依赖，也不使用系统安装替代。框架只进入主机测试目标图；ARM 构建和固件 SDK 消费者不需要它。</p>
+</section>
+<section id="execute-red-green-and-review">
+<h2>执行 RED、GREEN 与评审<a class="headerlink" href="#execute-red-green-and-review" title="Link to this heading">¶</a></h2>
+<p>新增 C 行为或修复缺陷时，先添加有意义的 GoogleTest／GoogleMock 回归。执行并保留预期失败原因与原命令。实现最小正确生产变更，执行 GREEN，再重构。Mock 外部端口／MMIO，而不是被测实现。覆盖相关拒绝、取消、排空、溢出、隔离保留和实例隔离。Python 生产工具使用标准库 unittest，遵循相同实际 RED／GREEN 规则。</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/tdd_gate.py<span class="w"> </span>--all<span class="w"> </span>--preset<span class="w"> </span>native-debug
+</pre></div>
+</div>
+<p>完整门禁构建锁定的离线框架，以新报告执行发现的全部用例，不使用 filter／shard。空、跳过、部分、陈旧或变化输入均失败。钩子核对暂存树保持不变；CI 独立执行门禁。框架仅用于主机 C++17；固件保持 C11。自动化证明执行，保留的开发日志记录历史 RED／GREEN 顺序。纯正文或图源修改需要对应文档检查和语义审查，不需要镜像实现测试。</p>
+</section>
+<section id="associate-a-complete-local-software-plan-with-a-pull-request">
+<h2>将完整本地软件计划关联到 Pull Request<a class="headerlink" href="#associate-a-complete-local-software-plan-with-a-pull-request" title="Link to this heading">¶</a></h2>
+<p>GitHub Actions 不可用时，<code class="docutils literal notranslate"><span class="pre">tools/maintenance/local_ci.py</span></code> 校验维护中的 <code class="docutils literal notranslate"><span class="pre">tools/dev/plans/software.json</span></code> 的既有执行。默认只读：报告精确源码与范围前，检查实际完整阶段、命令收条、干净源码、输入以及同一计划。它不运行计划，也不把中断或部分报告改成成功。</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/maintenance/local_ci.py<span class="w"> </span>--report<span class="w"> </span>/path/to/software/report.json
+</pre></div>
+</div>
+<p>显式 <code class="docutils literal notranslate"><span class="pre">--publish</span></code> 使用已配置且获授权的 GitHub 凭据和既有开放 PR。它两次核对 PR head/base，只向已验证 head SHA 发布 <code class="docutils literal notranslate"><span class="pre">nexus/local-software-plan</span></code>；后来的 head 不能继承该状态。保留的收条区分 pending、confirmed 和 unconfirmed 发布。两次观察不构成原子的 GitHub 合并事务。</p>
+<p>此状态只证明维护中的本地计划范围。它不是 GitHub Actions job、封存软件候选、已配置分支规则或产品发布。服务器规则需单独实际回读；独立 agent 审查不虚构 CODEOWNERS 账号或人工批准。现有 release workflow 仍要求其声明的最终 main CI jobs 和可信发布检查；本地状态不能悄悄替代这些要求。</p>
+</section>
+<section id="keep-feedback-fast-and-evidence-complete">
+<h2>快速反馈与完整证据<a class="headerlink" href="#keep-feedback-fast-and-evidence-complete" title="Link to this heading">¶</a></h2>
+<p>先对修改的行为执行定向开发测试，再对最终源码执行正常完整验收门禁。发现已维护的测试名称，不增加重复测试程序。保留原始 RED 失败、GREEN 结果和实际命令。过滤执行或缓存结果不能使完整候选通过验收。</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">tools/dev/dev.py</span> <span class="pre">timings</span> <span class="pre">/path/to/receipts</span></code> 汇总已有进程 receipt，不重新运行工作。分别观察准备、配置、编译、测试、文档和 SDK 消费。保留失败／取消的尝试以及未观测的 CPU 或 RSS；重叠的墙钟时间不能相加作为总耗时。比较等价源码、工具与配置范围后再归因提速。</p>
+<p>在 Linux 上，正常回收的进程（包括非零退出）可带有由 <code class="docutils literal notranslate"><span class="pre">wait4</span></code> 观测的 <code class="docutils literal notranslate"><span class="pre">resource_usage</span></code>：用户态／内核态 CPU 秒数和 <code class="docutils literal notranslate"><span class="pre">maximum_process_rss_bytes</span></code>。范围是被等待的进程及其已经回收的后代。RSS 值是观测到的最大单进程峰值，不是整个进程树的同时占用。超时、取消、启动失败、旧收据和其他平台保留未知值，不从墙钟耗时估算。</p>
+<p>耗时汇总公开 <code class="docutils literal notranslate"><span class="pre">measured_resource_attempts</span></code> 和 <code class="docutils literal notranslate"><span class="pre">maximum_observed_process_rss_bytes</span></code>，同时保留每份原始收据。汇总的 <code class="docutils literal notranslate"><span class="pre">cpu_seconds</span></code>、<code class="docutils literal notranslate"><span class="pre">peak_rss_bytes</span></code> 和 <code class="docutils literal notranslate"><span class="pre">cache_hits</span></code> 仍为未知，因为嵌套收据可能重复计算工作，这些观测也不能建立全局内存峰值或缓存行为。分别比较同一工具链、源码和 profile 下的 cold 与 warm 尝试；小型工具回归的测量不能量化全项目构建收益。</p>
+<p>根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU 数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。</p>
+<p>运行较长的资格计划前，应显式选择有限的外层命令预算，并选择平台输入 checkout 之外、无符号链接或父路径别名的新规范化绝对输出路径。<code class="docutils literal notranslate"><span class="pre">NEXUS_COMMAND_TIMEOUT</span></code> 为没有显式 timeout 的 process 调用提供默认预算，不替代计划各阶段的期限。维护中的软件计划在输出目录下打包 SDK，因此既有 SDK 边界会拒绝位于平台 checkout 内或带路径别名的输出。</p>
+<p>先检查本次调用的环境：维护中的 provider 和 TrustZone 验收拒绝所有 <code class="docutils literal notranslate"><span class="pre">GIT_</span></code> 变量，包括仅控制显示的 <code class="docutils literal notranslate"><span class="pre">GIT_PAGER</span></code>。若启动器注入了 <code class="docutils literal notranslate"><span class="pre">GIT_PAGER</span></code>，只在本次启动的进程环境中省略它；若仍有其他 <code class="docutils literal notranslate"><span class="pre">GIT_</span></code> 变量名，则停止启动。维护中的调用方式见<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/tools/dev/README.md">开发命令参考</a>。应保留失败和中断的尝试；更长的重试预算和前面阶段通过，都不等于完整计划已经完成或候选已经封存。</p>
+<p>删除测试前，指出其行为责任和仍存在的独立覆盖。仅删除过时行为或已经证明重复覆盖同一合同的测试。保留检查拒绝所有权、借用保留、实例隔离、取消、IRQ 顺序、真实厂家行为或外部 SDK 消费的测试。照着实现编写的通过断言本身不能作为独立替代。审查未找到可安全删除的测试时应保留；减少测试数量不是优化目标。</p>
+</section>
+<section id="preserve-style-and-scope">
+<h2>保留风格与范围<a class="headerlink" href="#preserve-style-and-scope" title="Link to this heading">¶</a></h2>
+<p>使用未改变的 <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> 和 <code class="docutils literal notranslate"><span class="pre">.editorconfig</span></code>：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen 注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。</p>
+<p>每次使用 Conventional Commits 提交一个可评审变更。将接口／配置变化与图示、示例、翻译和执行范围一起评审。产品、执行任务、私有 PCB 和恢复策略保留在 Nexus 外。记录实际源码／配置／工具／ELF 身份与物理待执行项；成功 commit 或 CI 不将结果升级为产品发行。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护 Nexus</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">使用 TDD 与正常提交门禁开发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">维护清晰且可验证的文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">定位实现权威</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">代码规范</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kernel-invoked user I/O admission &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Recorded delivery evidence" href="../delivery/index.html" />
+    <link rel="prev" title="USB FS device packet ownership and integration boundaries" href="usb-device.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/user-io-broker.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/design/user-io-broker.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="kernel-invoked-user-i-o-admission">
+<h1>Kernel-invoked user I/O admission<a class="headerlink" href="#kernel-invoked-user-i-o-admission" title="Link to this heading">¶</a></h1>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">Nexus::UserIoBroker</span></code> separates untrusted messages from trusted
+kernel policy. The scalar GPIO path pins user memory for one bounded typed read
+or set/reset write. A separate copied UART TX path retains only privileged
+request/payload cells and uses the existing BusOwner/UARTOwner. Neither path
+accepts a user-supplied principal, port, MMIO address, callback or private slot
+pointer. Actual kernel entry, permissions and hardware attribution remain
+integration responsibilities.</p>
+<section id="scalar-gpio-and-pinned-user-memory">
+<h2>Scalar GPIO and pinned user memory<a class="headerlink" href="#scalar-gpio-and-pinned-user-memory" title="Link to this heading">¶</a></h2>
+<p>The 32-byte input and 8-byte output contain explicit <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code> fields. The
+trusted gateway calls the public API from privileged Thread mode with incoming
+interrupt masks clear. A kernel identity callback authenticates the current
+principal; the public message cannot choose it. Construction retains immutable
+nonoverlapping nominal user RAM windows, exact device/mask grants, a positive
+loan capacity and the kernel memory port. All known broker, policy, port-table
+and private context spans stay outside those user windows.</p>
+<p>Admission validates full-span arithmetic, alignment, access and one-window
+containment before pinning. <code class="docutils literal notranslate"><span class="pre">pin</span></code> must establish the specified CPU access and
+retain address-space/process/mapping lifetime until successful <code class="docutils literal notranslate"><span class="pre">unpin</span></code>. A failed
+pin must leave no mapping references or residual effects. The whitelist alone
+does not establish actual mapped RAM, DMA reachability, MMIO exclusion or MPU
+isolation; the trusted kernel and SoC memory layout establish those facts.</p>
+<p>The input is pinned and copied once into kernel storage. Policy checks use that
+snapshot. The reply span is pinned before any GPIO operation. A final saved-mask
+guard serializes revocation with the bounded scalar provider operation. Close
+before this guard prohibits the effect; close after dispatch cannot undo it.
+Every dispatched result copies a fully initialized reply, including provider
+errors. A cancelled admission leaves the reply untouched. Pins remain held
+through all copies.</p>
+<p><code class="docutils literal notranslate"><span class="pre">result</span></code> reports admission/device execution and <code class="docutils literal notranslate"><span class="pre">cleanup_result</span></code> reports the
+most recent release attempt. <code class="docutils literal notranslate"><span class="pre">accepted</span></code> becomes true at the first successful
+pin. <code class="docutils literal notranslate"><span class="pre">device_effect_possible</span></code> is set before calling the WRITE provider, even if
+that provider returns an error. <code class="docutils literal notranslate"><span class="pre">retained</span></code> requires the exact kernel call slot,
+user memory and address-space identity to stay alive. Cleanup tries output then
+input release, records errors and preserves every failed pin independently.
+<code class="docutils literal notranslate"><span class="pre">gpio_finish</span></code> retries only retained cleanup; it never rereads users, writes a
+reply or repeats a device operation. Neither an operation error nor successful
+cleanup authorizes replay of an earlier write.</p>
+<p>The private generic loan mechanism retains one exact slot pointer with a
+monotonic 64-bit epoch. Copied tokens and stale epochs cannot release it; epoch
+exhaustion rejects reuse. Read-only spans may share bytes; any writable overlap
+with a peer loan rejects. Known policy, provider, other loan and drain-control
+aliases reject before mutation. Only the two exact internal GPIO child slots
+may share their own call proof. A trusted drain callback must prove actual
+peripheral/DMA/IRQ/deferred/copy final access and observer join. User input cannot
+claim this proof. A failed proof or unpin keeps the exact pin and token retained.</p>
+<p>One privileged serialized kernel owner controls a broker and its slots. All
+memory/proof callbacks are bounded and run outside Arch guards; they may mark
+close, but cannot recursively admit, release, execute or retain the cookie
+output. Close inhibits admission and preserves every live loan. Quiescence is
+valid only after close, with zero loans/list entries and no executor. It does
+not implicitly stop providers or establish an application shutdown barrier.
+There is no reopen or hidden identity registry. NMI/fault/SMP publishers and
+unserialized privileged memory writers are outside this contract.</p>
+<p>This is a component callable by an integrating privileged kernel, not an
+implemented userspace transport. FreeRTOS SVC/MPU wrappers, task principal
+authentication, real memory pins, fault-safe copy mechanisms and TrustZone
+veneers are not connected in this slice. Generic loans provide ownership
+mechanics. They do not provide asynchronous borrowed-user UART/SPI/CAN messages.
+The copied UART path below is a separate contract and accepts no user-supplied
+drain proof.</p>
+</section>
+<section id="copied-asynchronous-uart-tx">
+<h2>Copied asynchronous UART TX<a class="headerlink" href="#copied-asynchronous-uart-tx" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/user_io_broker/include/nexus/components/user_io_async.h">public protocol</a>
+and <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/user_io_broker/include/nexus/components/user_io_async_storage.h">trusted construction</a>
+provide <code class="docutils literal notranslate"><span class="pre">construct</span></code>, <code class="docutils literal notranslate"><span class="pre">dispatch</span></code>, <code class="docutils literal notranslate"><span class="pre">close</span></code>, <code class="docutils literal notranslate"><span class="pre">reap</span></code> and <code class="docutils literal notranslate"><span class="pre">join</span></code>. The optional target
+does not create a factory, kernel task, queue, registry or lock. The caller
+supplies exact privileged cells and payload capacities, immutable policy/user
+windows, complete private-context extents and an already constructed exclusive
+BusOwner/UARTOwner/UART binding. The existing BusOwner remains the only FIFO.</p>
+<p id="fig-25-user-io-copied-ownership"><a class="nexus-diagram-link reference internal" href="../_images/user-io-copied-ownership.svg" title="Open SVG at full size"><img alt="FIG-25: current copied-UART TX ownership; labeled arrows distinguish user copies, existing owner execution and required trusted lifecycle proofs" src="../_images/user-io-copied-ownership.svg" /></a></p>
+<p>FIG-25 describes the current software mechanism, not an installed kernel gateway
+or physical isolation result. The trusted kernel supplies principal identity,
+fault-contained copies and an exclusive session/role authority. The external
+executor advances the existing owner; no gateway call services UART implicitly.
+The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/user_io_broker/src/user_io_async.c">implementation</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/bus_owner/include/nexus/components/bus_owner.h">BusOwner</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/components/bus_owner/include/nexus/components/uart_owner.h">UARTOwner</a>
+define the figure’s source and final-access boundaries.</p>
+<p>Construction checks all complete span arithmetic and known aliases before any
+external callback or claim. Cells, payloads, configuration, region/operation
+tables, owner slots, UART executor/provider and every declared context stay
+outside nominal user windows and disjoint as required. A temporary construction
+reservation blocks callback reentry. The final trusted claim establishes one
+exclusive role for the actual controller/owner, then initialization has no
+fallible step. Another wrapper of that controller is not another role.</p>
+<p>The authority must retain nonwrapping session history across fresh server
+storage, process/device reset and reconstruction. It rejects reused or
+non-increasing nonzero sessions and any second live role, including a larger
+session, and fails closed when history is exhausted. The component supplies no
+persistence policy or authority implementation.
+Initialize-once alone is insufficient: after successful join, fresh objects need
+a larger claimed session so old commands cannot become valid in new storage.</p>
+<p>Every admitted gateway transaction authenticates the current principal before
+copying users. A 48 B scalar header names device, session, slot, epoch, length and
+an absolute deadline in the existing owner’s clock domain. A 40 B initialized
+reply contains no privileged pointer. These are local C gateway records; the
+integrating kernel owns any transport serialization. The copied header is
+checked once; full
+read/write containment and disjoint user spans precede payload/reply copies.
+The trusted copy port must establish real permission, fault containment and
+mapping/process lifetime for each callback; nominal ranges alone establish none
+of these properties. No user address survives return.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Ownership and result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUBMIT</span></code></p></td>
+<td><p>Propose the exact next nonzero slot epoch in the claimed session; copy a positive bounded payload before owner admission. Copy failure wipes the copied payload without burning the epoch. Acceptance reserves the copied cell, including a retained terminal error if BusOwner rejects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POLL</span></code></p></td>
+<td><p>Use the exact accepted session/slot/epoch. Only acquire-observed <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> exposes final result/count; earlier replies report <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> and zero count.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CANCEL</span></code></p></td>
+<td><p>Request the real owner’s withdrawal. Cancellation, timeout and quarantine retain cells; late cancellation cannot replace the provider’s observed terminal result.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CONSUME</span></code></p></td>
+<td><p>Require acquire-observed <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> and real BusOwner idle/publication join. Copy the reply first; only success releases the exact identity and wipes copied bytes.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>A reply-copy error can follow accepted <code class="docutils literal notranslate"><span class="pre">SUBMIT</span></code>. The user already knows its
+proposed session/slot/epoch and must recover with <code class="docutils literal notranslate"><span class="pre">POLL</span></code>; duplicate <code class="docutils literal notranslate"><span class="pre">SUBMIT</span></code>
+cannot replay or replace the operation. A failed <code class="docutils literal notranslate"><span class="pre">CONSUME</span></code> reply copy retains
+the terminal cell. Accepted TX may already have irreversible effects; no error
+authorizes automatic replay. Per-slot epochs never wrap and survive consumption.</p>
+</section>
+<section id="close-trusted-reap-and-role-join">
+<h2>Close, trusted reap and role join<a class="headerlink" href="#close-trusted-reap-and-role-join" title="Link to this heading">¶</a></h2>
+<p>One privileged unmasked Thread serializes gateway and management calls. Identity
+and copy callbacks may synchronously request close; recursive dispatch and
+in-flight management reentry reject. Close reserves its control publication,
+permanently rejects new <code class="docutils literal notranslate"><span class="pre">SUBMIT</span></code> and cancels live work without wiping it or
+stopping the underlying owner. The external executor must keep servicing actual
+UART drain. <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code> never grants permission to consume or reap.</p>
+<p>If a user mapping disappears permanently, authenticated reply copy may never
+recover. Trusted management can call <code class="docutils literal notranslate"><span class="pre">reap</span></code>; there is no user wire action for it.
+It requires permanent close, every retained exact request acquire-observed
+<code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> and real owner idle. Before any wipe, a trusted <code class="docutils literal notranslate"><span class="pre">drained</span></code> callback must
+prove outer gateway/transport observers joined and future entries blocked while
+retaining the exclusive role. Failure or pending/quarantined work preserves all
+cells and role. Success retires all cells without resetting epochs, wipes copied
+payloads and latches a local fence against further dispatch. Reap abandons results;
+it does not cancel an in-flight operation or undo transmitted bytes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">join</span></code> requires permanent close, every cell consumed or reaped and real owner
+idle, then the authority’s successful release proves outer observers joined and
+detaches role references. Failed release retains the role and all bound storage.
+Keep configuration, cells, payloads, owner/provider and every context alive until
+successful join. Only then may storage be reclaimed or fresh objects claim a
+larger session. No local epoch or software predicate replaces the external
+gateway proof or the provider’s real final-access proof.</p>
+<p>Cold validation performs pairwise checks over explicit cells/controls; copies
+and wiping use the caller’s exact byte budgets, and close/reap/join inspect the
+explicit cell count. These are bounded software costs, not measured MCU latency
+or power. SVC/CMSE entry, an actual kernel principal/copy/session authority,
+MPU/TrustZone enforcement, NS RTOS, borrowed-user asynchronous SPI/CAN transports
+and physical HIL remain outside this increment. The original
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">IO-39</span></code></a> and <a class="reference download internal" download="" href="../_downloads/99f801eac159da083b9107f1c02855a6/soc-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">SOC-36</span></code></a>
+exits remain open; this common mechanism does not complete them.</p>
+</section>
+<section id="software-validation-boundary">
+<h2>Software validation boundary<a class="headerlink" href="#software-validation-boundary" title="Link to this heading">¶</a></h2>
+<p>Google tests run the actual broker, typed GPIO wrapper, Native GPIO provider,
+Core request state and Native saved-mask implementation. They model only the
+external kernel identity/pin/unpin/proof boundary and privileged context.
+Behavioral RED/GREEN logs, sanitizer runs, public-header probes and strict ARM
+compilation are recorded in
+<code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/user-io-broker-iteration/manifest.json</span></code>. These establish
+software behavior and compilation, not physical isolation, HIL timing or a
+qualified product release. The optional archive defines no mutable globals;
+default factory/source/ELF omission is verified separately by the integrating
+build graph.</p>
+<p>Copied-UART regressions exercise the real mediation, Core requests and existing
+BusOwner/UARTOwner with external identity/copy/role and UART hardware ports
+modeled. They include stale commands across fresh storage/session lifetimes,
+copy failures, real drain/publication joins, management callback reentry and
+closed reap. Execution evidence belongs to the exact source records, not to
+this page or its diagram; it establishes no physical isolation or HIL result.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

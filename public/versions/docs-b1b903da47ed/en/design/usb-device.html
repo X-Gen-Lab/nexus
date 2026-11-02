@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>USB FS device packet ownership and integration boundaries &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Kernel-invoked user I/O admission" href="user-io-broker.html" />
+    <link rel="prev" title="Bounded UART hardware FIFO bytes" href="uart-fifo.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/usb-device.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/design/usb-device.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="usb-fs-device">
+<h1>USB FS device packet ownership and integration boundaries<a class="headerlink" href="#usb-fs-device" title="Link to this heading">¶</a></h1>
+<p>The public interface is <code class="docutils literal notranslate"><span class="pre">nexus/io/usb_device.h</span></code>. The current slice provides internal-PHY full-speed device PIO mechanisms for Native, STM32F407 and GD32F470, with actual SDK bindings. Its maintained scope covers EP0 control, explicitly selected EP1–EP3 bulk IN/OUT and interrupt IN, SETUP/reset/suspend/resume facts, STALL, SET_ADDRESS, cancellation and exit. One DCD request remains one packet no larger than MPS. A separate optional activation face explicitly controls nonzero endpoint active state and interrupt masks. The external Chapter 9 owner supplies SET_CONFIGURATION, configured readiness and rollback; packet mechanisms alone do not prove complete enumeration or physical reset recovery. Optional <code class="docutils literal notranslate"><span class="pre">Nexus::USBControl</span></code> composes EP0 multipacket DATA, necessary ZLP and STATUS; the separate <code class="docutils literal notranslate"><span class="pre">Nexus::USBDescriptors</span></code> validates external descriptor structure. Neither creates tasks or allocates memory. External projects supply class dispatch, descriptor bytes and lookup, VID/PID, strings, configuration and recovery policy. Optional <code class="docutils literal notranslate"><span class="pre">Nexus::USBACM</span></code> composes only the CDC ACM control subset below; it provides no data pump or complete CDC/HID class stack, nor Host, HS, DMA, ISO or remote wake support.</p>
+<section id="id1">
+<h2>Objects, resources and clocks<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Controller and endpoint retain separate identities; public faces contain only read-only ops and context. Assembly owns one controller, exact endpoint array, exact event ring and an explicit 48 MHz clock owner. Instances share read-only tables without global mutable registries, maximum endpoint pools, hidden workers or mandatory OS. Unselected instances create no state, and MCU hot paths use direct volatile MMIO. Model builds replace only external MMIO/NVIC leaves; MCUs carry no model-function tables or runtime-simulation branches.</p>
+<p>Both SoCs use USBFS base <code class="docutils literal notranslate"><span class="pre">0x50000000</span></code>, four IN / four OUT directions, a 320-word FIFO and IRQ 67. Bindings validate actual offsets, strides, capacity and W1C/read-only bits against locked SDKs. EP0 MPS is fixed at 64 bytes; bulk MPS may only be 8/16/32/64. Interrupt mode selects only EP1–EP3 IN with MPS 1–64 B, including non-power-of-two lengths such as 10 B; interrupt OUT and ISO are not integrated. RX FIFO requires at least 64 words and each selected IN FIFO at least 16 words. Partition validation rejects overlap or totals exceeding 320 words. Invalid direction, type, MPS, FIFO or duplicate-identity plans are rejected before clock validate/retain or MMIO.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>Actual 48 MHz source</p></th>
+<th class="head"><p>Integration behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>HSE 8 MHz / M8 × N336 / Q7</p></td>
+<td><p>Validate existing PLL/ready; manage only the USBFS gate</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>HXTAL 25 MHz / M25 × PLLSAI N192 / P4</p></td>
+<td><p>Bounded startup after exclusively owning idle PLLSAI and CK48 mux</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>GD32’s original 200 MHz main-PLL Q9 output is not 48 MHz and cannot directly clock USB. Its clock owner rejects newly active USBHS/TRNG/SDIO/TLI consumers, preserves neighboring fields and never changes SYSCLK. IDLE/CLEANUP/READY and exact consumer counts track responsibility; failed rollback without readback proof retains CLEANUP. DCD validates/retains first, releases consumers after completed exit, and external owners stop clocks last. External resource owners must authorize and quiesce pins/electrical/VBUS and hidden clock-gated consumers; zero gates alone do not prove system-wide exclusivity.</p>
+<p>An existing actual ARM GCC 14.3 sizeof probe reports: controller 144 B, each endpoint 40 B, each event 40 B, request 56 B, and STM/GD clock state 8/16 B respectively. The production-unit ARM objects have no global <code class="docutils literal notranslate"><span class="pre">.data</span></code>/<code class="docutils literal notranslate"><span class="pre">.bss</span></code>; garbage collection of unselected code and resource changes in a complete ELF must be established separately by an actual assembly build. These existing DCD sizes exclude the optional ROM profile, EP0 adapter and caller-provided outer request; the added components’ Flash/RAM costs require separate confirmation using an ARM ELF built from the same source and the actual ABI. Private endpoints replace the former single-byte <code class="docutils literal notranslate"><span class="pre">bulk</span></code> with <code class="docutils literal notranslate"><span class="pre">uint8_t</span> <span class="pre">transfer</span></code>, adding no interval, scheduling or queue fields. The selector remains one byte; host sizeof or historical probes do not substitute for ARM cost measurements of the new image.</p>
+</section>
+<section id="rom-profile">
+<h2>Selected ROM profile and descriptors<a class="headerlink" href="#rom-profile" title="Link to this heading">¶</a></h2>
+<p>The read-only profile in <code class="docutils literal notranslate"><span class="pre">nexus/io/usb_profile.h</span></code> binds existing controller/endpoint faces and the selected direction, type, MPS, FIFO, 48 MHz, internal PHY, FS device and PIO facts. The generator emits the profile, exact endpoint array and <code class="docutils literal notranslate"><span class="pre">nx_factory_usb_profile</span></code> getter only when USB is selected and <code class="docutils literal notranslate"><span class="pre">factory.capabilities</span> <span class="pre">=</span> <span class="pre">true</span></code>. With <code class="docutils literal notranslate"><span class="pre">false</span></code>, it emits none of these objects or the getter; ordinary USB faces, method tables, provider contexts and existing generic capability types do not grow as a result. The getter neither initializes hardware nor discovers new endpoints. Assembly adds the value <code class="docutils literal notranslate"><span class="pre">&quot;interrupt&quot;</span></code> to the existing <code class="docutils literal notranslate"><span class="pre">transfer</span></code> field; immutable IR and public profile fields remain unchanged. Public <code class="docutils literal notranslate"><span class="pre">NX_USB_PROFILE_INTERRUPT</span></code> has enum value 2, whereas USB wire/register EPTYP is 3. The provider explicitly maps the types rather than casting between them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_usb_profile_validate</span></code> checks selected facts read-only; it cannot prove actual clocks, PCB, VBUS or enumeration. External descriptors reach <code class="docutils literal notranslate"><span class="pre">nx_usb_descriptor_validate</span></code> through <code class="docutils literal notranslate"><span class="pre">nx_usb_descriptor_view_t</span></code>: device, configuration and string views must be complete. Validation checks lengths/totals, EP0 MPS, unique interfaces, alternate zero, and the correspondence of bulk/interrupt IN endpoint direction, number, type and MPS with the selected profile. An interrupt descriptor’s <code class="docutils literal notranslate"><span class="pre">bInterval</span></code> must be a linear count of 1–255 full-speed 1 ms frames; zero is invalid. External descriptor bytes alone own it: it is not copied into TOML, IR, profiles or provider state. DCD neither schedules host polls nor promises actual intervals; existing bulk interval handling remains unchanged. A selected-type mismatch, a described endpoint absent from the selected profile or an MPS mismatch returns INVALID. Interrupt OUT, ISO, nonzero control and alternate settings remain UNSUPPORTED; invalid reserved fields remain INVALID. Class-specific subordinate records are bounds-checked without decoding class semantics.</p>
+<p>Descriptor validation scans the full supplied length without reading hardware, copying descriptors or retaining them; passing establishes structural validity only. Descriptor selection, request handling and class content remain external policy. Once sent, descriptor/reply bytes must remain valid and unchanged until the outer request’s SETTLED is observed with acquire semantics.</p>
+<p>The profile, endpoint array, face/ops, adapter, request and view/snapshot metadata must have the natural alignment of their C types, and address ranges must not wrap; invalid alignment is rejected before typed access. Descriptor bytes require only byte alignment. Numeric checks do not establish accessibility of arbitrary addresses or opaque private contexts; callers must still supply valid readable/writable storage and keep it valid.</p>
+</section>
+<section id="epoch">
+<h2>Packet completion and control epochs<a class="headerlink" href="#epoch" title="Link to this heading">¶</a></h2>
+<p>Prepare never accesses payloads; rejected admission retains no new references. ACCEPTED borrows requests and payloads until acquire-observed SETTLED. Requests, payloads, outputs, counts, immutable clock ops and wake targets are checked against controller/endpoint/ring/clock state and existing loans for overlap. Rejected state/read_events output aliases preserve outputs.</p>
+<p>Each finite IN data/ZLP writes <code class="docutils literal notranslate"><span class="pre">(1U</span> <span class="pre">&lt;&lt;</span> <span class="pre">19)</span> <span class="pre">|</span> <span class="pre">length</span></code> to the length register (PKTCNT=1), keeping MCNT/reserved high bits zero; interrupt mode adds no odd/even-frame commands. Every selected IN direction uses a dedicated Tx FIFO. The entire packet of at most 64 B is loaded synchronously, leaving no software refill work; the TX-empty mask stays zero and no TXFE refill worker is created. Writing IN FIFO is not completion. SUCCESS requires XFRC, cleared EP enable, restored FIFO free capacity and successful observed-W1C-completion clear readback. OUT requires both packet data and XFRC; short packets complete normally. Oversized packets consume every FIFO word, copy at most caller capacity, then report OVERFLOW and drain, never writing outside caller buffers.</p>
+<p>IN TXFE is read-only and contributes neither W1C clearing nor zero-value completion proof. ITTXFE means a retryable host IN token arrived while FIFO was empty; OUT STUP is normal SETUP phase. Neither incorrectly terminates packets. IN control timeout and OUT FIFO overrun use real direction-specific event bits. SETUP/core owns EP0 DATA PID: bits 29:28/16 are reserved on EP0, so software uses DATA0 commands only on nonzero bulk/interrupt endpoints. Reset/clear-halt must check DATA0 readback; failure retains the reset admission barrier or halt instead of admitting a new packet loan early.</p>
+<p>SETUP strictly decodes eight little-endian bytes and generates monotonically increasing epochs. New SETUP/reset makes old control loans drain; changing an epoch cannot revoke a borrow. Reset and queued SETUP in one snapshot have no proven order, so previously queued SETUP is discarded. After old loans drain and FIFOs are flushed, reset must also explicitly mask and clear active state on the selected nonzero directions of both families. Only successful readback clears <code class="docutils literal notranslate"><span class="pre">reset_pending</span></code>. Failure retains the reset barrier and clock; service or full stop continues recovery. New admission still requires the endpoint to be active in hardware. SET_ADDRESS validates every field of the current standard SETUP, stages the address and writes DCFG only after actual XFRC of the corresponding status-IN. Address readback failure closes the controller.</p>
+<p>STM32F407 bus reset clears USBAEP on nonzero endpoints; the model preserves this hardware fact. Automatic EPACT clearing on GD has not been verified. After loans drain, the common production path clears nonzero active state and masks those directions on both families. This is a uniform platform postcondition, not an assertion of automatic GD hardware behavior. The GD regression must leave hardware active and prove that common code actually clears it. Completed reset still requires explicit enable with the new current epoch; reset, clear-halt and submit never activate endpoints automatically. Submitting to an inactive nonzero endpoint returns STATE, leaves the prepared request READY and creates no new request/buffer borrow or FIFO write. EP0 control retains its existing contract; DATA0 recovery, a reset event or a controller that is not closing does not prove an external configuration has been committed.</p>
+<p>The event ring retains value facts without overwriting old events when full; exact software-loss markers follow existing queue contents. Latest SETUP/epoch/closing state does not depend on ring space. Timestamps are IRQ acquisition times, not USB bus sampling times; unordered old SETUP in reset batches is not counted as newly received control.</p>
+</section>
+<section id="endpoint-activation">
+<h2>Explicit nonzero endpoint activation<a class="headerlink" href="#endpoint-activation" title="Link to this heading">¶</a></h2>
+<p>The separate <code class="docutils literal notranslate"><span class="pre">nexus/io/usb_activation.h</span></code> provides <code class="docutils literal notranslate"><span class="pre">nx_usb_activation_port_t</span></code>: a two-pointer face containing shared read-only ops and the existing controller context, with one synchronous <code class="docutils literal notranslate"><span class="pre">nx_usb_activation_set(port,</span> <span class="pre">epoch,</span> <span class="pre">endpoint_address,</span> <span class="pre">active)</span></code> operation. Generated <code class="docutils literal notranslate"><span class="pre">nx_factory_usb_activation(nx_usb_device_id_t)</span></code> returns a static borrowed face for the selected controller, or NULL for an invalid or unsupported identity. Lookup neither initializes hardware nor retains the clock. Generation is independent of <code class="docutils literal notranslate"><span class="pre">factory.capabilities</span></code>, needs no ROM profile and changes no existing USB ops, profile or face layout, or factory ABI epoch 1. The mechanism adds no mutable controller/endpoint state, queue, worker, instance pool, dynamic allocation, TOML field or IR type. The two-pointer layout describes the face shape; retained read-only cost, unreferenced GC and complete-image cost require separate evidence from the corresponding ARM ELF.</p>
+<p>The operation addresses one already selected EP1–EP3 direction. Both EP0 addresses and reserved or unselected addresses are rejected; OUT still supports only existing bulk mode. The caller must be the same serialized privileged Task with incoming IRQ masks clear. The controller must be started, retain its clock and have no closing/reset barrier. The <code class="docutils literal notranslate"><span class="pre">epoch</span></code> argument must equal the latest authoritative software control/reset epoch; cold epoch 0 is valid. Invalid identities and already-known stale software epochs reject before MMIO. After software checks pass, an observed raw USBRST also returns STATE before writes. A physical SETUP/reset not yet acquired may still arrive later; the IRQ guard is not a wire-atomic transaction. External callers must discard cached epochs after stop/restart.</p>
+<p>The target direction must have no request loan, disable work, EPENA, unacknowledged defined event or unfinished SETUP cleanup. IN also requires its dedicated FIFO fully free and no flush; OUT requires the shared RX status FIFO empty. Otherwise the operation returns BUSY without implicitly cancelling requests, consuming another direction’s RX or releasing its storage. INVALID/CONTEXT/STATE/BUSY preflight rejection performs no hardware writes and creates no new loan. Activation itself never borrows a request or payload and cannot replace an existing packet’s cancel/drain/acquire SETTLED.</p>
+<p>Cold start activates and unmasks only the two EP0 directions. Other selected directions retain immutable geometry but remain inactive/SNAK. Enabling an inactive direction first applies its selected MPS and wire type, and the FIFO selector for IN only, establishes DATA0, clears STALL and sets active/SNAK. It leaves EPENA clear and writes neither TSIZ nor the payload FIFO. It proves stable control fields, DATA0 and NAK, then handles only new target IN NAK-effective/token-empty hints (0x50) arising after the command and proves their W1C clear. Any other new event fails the operation with partial IO/closing. Defined events already present on entry still return BUSY and are not cleared during preflight rejection. It then unmasks the target EP_MASK bit and reads back the complete expected mask. OUT never writes reserved TxFIFO fields. Active state, transfer enable and IRQ masking are independent conditions; a mask or active bit alone does not mean a packet was admitted.</p>
+<p>Before deactivation, the external owner must actually cancel/drain and acquire SETTLED for the target packet. The operation first masks the target direction and proves other mask bits unchanged, then sets SNAK, clears active and reads back the result. Each call changes only its direction, preserving other endpoints and both EP0 bits; physical vector/priority routing stays fixed. It neither flushes shared RX, resets the controller, stops the clock nor starts a transfer. Explicit Task operations wait for control/W1C readback within the existing finite poll budget, issuing each command once. The added reset-progress deactivation step makes one observation and relies on later service to continue; it does not introduce this Task wait loop into IRQ execution.</p>
+<p>Idempotent calls require the same no-loan/no-pending preflight. Enable on an already active direction first validates immutable geometry, does not replay control-register configuration and only repairs the target mask if needed. Repeated enable must not reset DATA1 to DATA0, clear a real HALT or send a packet. Disable on an already inactive direction does not reprogram geometry; it only proves the target mask is off and events are clear. Only explicit disable followed by enable establishes fresh DATA0 and clears halt after successful readback; disable preserves PID. Corrupt immutable geometry on an active direction returns IO/closing without concealing the fault by rewriting control registers.</p>
+<p>Failed readback after a control or mask write returns IO and retains the existing <code class="docutils literal notranslate"><span class="pre">closing</span></code> barrier. IO may already have partial hardware effects; it is not a no-operation rejection. Best-effort mask/inactive rollback affects only the target. If EPENA is unexpectedly observed set, writing zero cannot pretend disable has completed. Retrying activation cannot clear closing. The external owner must continue progressing other loans and perform explicit full stop. Stop may still return BUSY, retaining the clock and caller storage until existing disable/flush/IRQ-join proofs complete.</p>
+<p>The external Chapter 9/configuration owner chooses directions for the configuration or alternate setting, cancels/drains/disables old directions, stages new directions and then submits STATUS IN for that request. This matches the before-status sequence in the ST manual and reference Zephyr; it does not impose activation only after ACK. The external owner publishes configured readiness only after actual corresponding STATUS completion and while the current transaction conditions still hold, and must gate ordinary nonzero packet admission beforehand. Several setter calls are not a configuration transaction. On a later failure, superseding SETUP or failed status, the owner must undo successful staging or explicitly stop. Platform rollback cannot revoke an ACK already observed by the host. Deconfiguration also requires actual drain/deactivation before the external deadline/rejection policy decides whether to accept; the DCD does not decode configuration values.</p>
+<p>Activation adds an explicit control call to existing FIG-16 without a new lifecycle owner or execution thread. It supplies no Chapter 9/class stack, CDC notification, multiple-configuration/alternate policy, continuous transfer, DMA, ISO, interrupt OUT, HS/Host/OTG or electrical integration. Software mechanisms do not prove physical enumeration/reset timing, full IO-35 exit, a clean candidate or HIL.</p>
+</section>
+<section id="ep0-packetizer">
+<h2>Optional EP0 packetizer and outer borrow<a class="headerlink" href="#ep0-packetizer" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nexus/components/usb_control.h</span></code> uses a caller-provided, zero-initialized <code class="docutils literal notranslate"><span class="pre">nx_usb_control_t</span></code> containing only two fixed packet request slots; callers also provide the outer <code class="docutils literal notranslate"><span class="pre">nx_usb_control_request_t</span></code> and payload. The profile/faces must remain valid for the entire lifetime of the bound adapter. The application has exclusive use of EP0 packets; external owners still manage event-ring consumption, class dispatch and controller recovery/stop. The face→provider edge in the existing <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">FIG-16 I/O assembly and execution diagram</span></a> represents packet-layer calls; the application executor explicitly advances the EP0 component, which adds no lifecycle owner.</p>
+<p>prepare is also restricted to Task context; all other adapter APIs additionally require execution by the same serialized privileged Task with incoming IRQ masks clear. A second Task, ISR or callback must not reenter. initialize does not start hardware; prepare does not borrow the payload. <code class="docutils literal notranslate"><span class="pre">nx_usb_control_begin</span></code> admits against the current authoritative SETUP epoch, establishes the outer borrow only on success, and does not itself submit a packet. IN sends min(length, wLength); OUT capacity must cover wLength. Requests, control storage and payload must meet the alignment and nonoverlap contracts in the public header. Each <code class="docutils literal notranslate"><span class="pre">nx_usb_control_step</span></code> makes at most one DCD service call, reads authoritative state at most once, and performs at most one packet submission/cancellation or STALL action. It checks only the two fixed packet slots, does not loop through a multipacket transaction within one step, and creates no worker; callers remain responsible for advancing it during suspend, cancel or shutdown.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Fact</p></th>
+<th class="head"><p>Permitted conclusion and subsequent responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SETTLED observed with acquire semantics for one inner packet</p></td>
+<td><p>Only that packet’s provider has finished accessing it; DATA ACK neither completes the entire control transaction nor returns the outer payload</p></td>
+</tr>
+<tr class="row-odd"><td><p>All DATA has finished</p></td>
+<td><p>IN is split into MPS-sized packets and sends the required DATA ZLP when it is shorter than wLength and ends exactly on an MPS boundary; OUT enters DATA_READY without sending STATUS IN yet</p></td>
+</tr>
+<tr class="row-even"><td><p>Actual ACK of the corresponding STATUS packet</p></td>
+<td><p>The on-wire result of that outer transaction may complete; a STATUS ACK already observed with acquire semantics takes precedence over a subsequently observed new epoch, closing state or timeout decision</p></td>
+</tr>
+<tr class="row-odd"><td><p>Successful SET_ADDRESS staging</p></td>
+<td><p>Only the address is staged; actual STATUS IN ACK and the DCFG address write/readback are established separately. On-wire success does not guarantee that the address or external configuration has been committed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p><code class="docutils literal notranslate"><span class="pre">nx_usb_control_out_view</span></code> provides a const inspection view only in DATA_READY for the same epoch with no provider packet references. The outer borrow continues; the view expires at the next adapter call by the same owner and must not be modified, freed or passed across Tasks. External policy inspects the contents and then calls <code class="docutils literal notranslate"><span class="pre">nx_usb_control_approve</span></code>: true permits STATUS IN at the next step, while false requests STALL for the old transaction. Approval must occur within the original absolute monotonic deadline; a rejection decision for an old transaction is not accepted once software has observed a new epoch.</p>
+<p>The rejection path uses the selected ROM profile’s <code class="docutils literal notranslate"><span class="pre">setup_decision</span></code>, a by-value <code class="docutils literal notranslate"><span class="pre">nx_usb_setup_decision_port_t</span></code> two-pointer face formed from shared read-only ops and the existing instance context. Within one IRQ critical section, <code class="docutils literal notranslate"><span class="pre">nx_usb_setup_reject</span></code> checks the expected published software SETUP epoch, pending/closing state, and the absence of active provider packets in both EP0 directions; it then issues the STALL command and verifies readback. No fields are added to the existing generic USB method table or provider context. A decision for an old epoch cannot STALL a newly observed software transaction. This is a serialization contract for observed software epochs, not a physical atomic transaction on the USB bus. SETUP packets not yet collected by the IRQ, host retries and actual wire timing still require hardware verification; rejection, epoch changes or leaving the critical section do not revoke the outer request’s borrow.</p>
+<p>Address policy explicitly calls <code class="docutils literal notranslate"><span class="pre">nx_usb_device_address</span></code> and checks authoritative device state after step refreshes it. <code class="docutils literal notranslate"><span class="pre">nx_usb_control_snapshot</span></code> only copies the most recently acquired state; it neither replaces a refresh nor returns the borrow. Device address, closing and external configuration readiness cannot be inferred from outer SUCCESS.</p>
+<p>A new SETUP/reset epoch, cancel, timeout or device stop never revokes an old borrow. The adapter first acquires/folds completed packets and then observes a new epoch; old packets must actually drain before it can finally publish outer SETTLED. Descriptor bytes, the outer request, adapter context, profile and its endpoint faces must remain valid throughout this interval; completion of one outer request does not join independent observers on the caller’s behalf.</p>
+<p>If an OUT0 packet enters QUARANTINED, the adapter exposes <code class="docutils literal notranslate"><span class="pre">NEEDS_DEVICE_STOP</span></code> and retains the outer borrow. Only the external controller owner can authorize <code class="docutils literal notranslate"><span class="pre">nx_usb_device_stop</span></code>; the adapter does not automatically stop a shared controller or substitute reset or reinitialization for drain. After the owner performs an actual full stop, it must continue stepping to acquire the packet’s terminal state and finish the old outer request; storage remains retained without the required proof.</p>
+</section>
+<section id="cdc-acm">
+<h2>Optional CDC ACM control subset<a class="headerlink" href="#cdc-acm" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nexus/components/usb_acm.h</span></code> uses caller-zero-initialized, naturally aligned <code class="docutils literal notranslate"><span class="pre">nx_usb_acm_t</span></code> storage containing one existing EP0 packetizer, one outer request and seven wire bytes. The caller explicitly supplies the communication interface number, initial line coding and control intent; no instance pool, task, data pump, UART binding or new controller/endpoint face is created. Providers still share readonly ops; without a reference to <code class="docutils literal notranslate"><span class="pre">Nexus::USBACM</span></code>, no class instance or archive code is retained. The external dispatcher exclusively schedules EP0 use and handles standard requests and other interfaces/classes first. Class-specific descriptors, capability declarations, configuration readiness and application authorization remain external responsibilities; the generic descriptor helper does not validate ACM class semantics. An external project advertising a class capability must provide all its required request/notification contracts; this control subset alone does not establish complete CDC compliance.</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">SET_LINE_CODING</span></code>, <code class="docutils literal notranslate"><span class="pre">GET_LINE_CODING</span></code>, <code class="docutils literal notranslate"><span class="pre">SET_CONTROL_LINE_STATE</span></code> and <code class="docutils literal notranslate"><span class="pre">SEND_BREAK</span></code> are supported. <code class="docutils literal notranslate"><span class="pre">bmRequestType</span></code> must be OUT <code class="docutils literal notranslate"><span class="pre">0x21</span></code>, or IN <code class="docutils literal notranslate"><span class="pre">0xa1</span></code> for GET. The complete <code class="docutils literal notranslate"><span class="pre">wIndex</span></code> must equal the selected interface number. Line coding requires zero <code class="docutils literal notranslate"><span class="pre">wValue</span></code> and <code class="docutils literal notranslate"><span class="pre">wLength</span></code> of exactly <code class="docutils literal notranslate"><span class="pre">7</span></code>; control-line and break requests require zero <code class="docutils literal notranslate"><span class="pre">wLength</span></code>, and control-line permits only the two DTR/RTS bits. Unknown requests or malformed fields are explicitly stalled through the existing software-epoch guarded rejection. If guarded rejection returns an error such as BUSY/STATE/IO, rejection cannot be reported as completed. External dispatch must not misroute other valid class requests to this narrow subset.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SET_LINE_CODING</span></code> first receives seven staged bytes into DATA_READY; <code class="docutils literal notranslate"><span class="pre">nx_usb_acm_pending</span></code> copies values only for external inspection. Shared line-coding format checks accept only nonzero rate, stop bits <code class="docutils literal notranslate"><span class="pre">0..2</span></code>, parity <code class="docutils literal notranslate"><span class="pre">0..4</span></code> and data bits <code class="docutils literal notranslate"><span class="pre">5/6/7/8/16</span></code>; actual UART capabilities and product policy may be narrower. Short DATA or malformed fields cannot be approved, but may still be explicitly rejected. Control-line/break requests do not admit STATUS before approval. Every mutation requires explicit <code class="docutils literal notranslate"><span class="pre">nx_usb_acm_approve</span></code> from the same serialized privileged Task. True permits subsequent STATUS only; it neither changes committed state nor applies physical lines early. Approval remains within the original absolute monotonic deadline.</p>
+<p>Only after the matching outer acquire SUCCESS, meaning a real STATUS ACK, does the component commit approved software intent and update <code class="docutils literal notranslate"><span class="pre">committed_epoch</span></code>. New SETUP/reset/cancel drains under the existing packetizer rules without revoking borrows; a terminal outcome without outer SUCCESS does not commit. Successful cancellation only requests drain: if the matching STATUS still receives a real ACK before endpoint withdrawal, outer acquire SUCCESS still commits the approved original epoch intent. An already acquired STATUS ACK is not revoked by later SETUP/reset, closing or a failed state read; an immediately following GET returns the newly committed line coding. Whether reset restores initial class state is separate external owner policy. Each <code class="docutils literal notranslate"><span class="pre">nx_usb_acm_step</span></code> advances the existing packetizer at most once, preserving the per-step bounds of one service, one state read and one packet action. The external executor must continue progress and retain all storage during cancellation, timeout, suspend and shutdown. OUT0 quarantine still requires the external controller owner to authorize real complete stop; the component does not stop it automatically.</p>
+<p>After each step and before dispatching the next request, the external owner reads the snapshot and uses a new <code class="docutils literal notranslate"><span class="pre">committed_epoch</span></code> to apply UART parameters, DTR/RTS or break, with separate responsibility for application failures and recovery. The snapshot is not an event queue, and software commit does not prove peripheral application. <code class="docutils literal notranslate"><span class="pre">SEND_BREAK</span></code> records only <code class="docutils literal notranslate"><span class="pre">0</span></code> (stop), <code class="docutils literal notranslate"><span class="pre">0xffff</span></code> (indefinite) or a finite millisecond intent; it creates no timer, performs no automatic clearing and does not prove physical break. The control subset provides no bulk data movement, serial-state notification, complete CDC enumeration, other classes or physical qualification.</p>
+</section>
+<section id="id2">
+<h2>Cancellation, failure and complete stop<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Task entries require one serialized privileged executor outside Handler mode with clear incoming IRQ masks. IRQs save/restore masks, consume at most eight RX status items, 128 payload words and eight selected directions per call. Cold/hot paths are separate: cold reset/flush has finite poll budgets; IRQ flush issues one command and readback, never cold polling in IRQ. Timeout uses independent monotonic deadlines; USB suspend/unplug still needs external executor service, not SOF or hidden timers.</p>
+<p>IN drain requests SNAK, observes actual NAK, then requests disable. EN clear, EPDISD, FIFO flush and W1C clear must all hold. Nonzero OUT first confirms global OUT NAK, then disables and drains RX. Drain timeout retains QUARANTINED and never revokes buffer loans.</p>
+<p>Control OUT0 EPD is permanently zero and SETUP may bypass NAK. Cancellation cannot be completed by modeling a nonexistent disable acknowledgement. Without actual completion proof, individual OUT0 cancellation remains DRAINING then QUARANTINED; users may select full device stop. Full stop reads back soft disconnect, global OUT NAK and DMAEN=0, consumes RX FIFO, disables global/endpoint/NVIC sources and joins all notification publishers, flushes FIFO, then rechecks disconnect/NAK/FIFO/IRQ state before releasing OUT0 PIO loans and finally publishing SETTLED. OUT0 EP enable may still be one because hardware owns only internal FIFO and withdrawn PIO executors no longer own caller buffers; next cold core reset reestablishes hardware state. Missing proof at any step returns BUSY with caller storage and clock consumer retained.</p>
+<p>After wake-target capture, publisher counts still retain that borrow; stop/detach returns BUSY until notify returns. Wake must support both service/cancel task context and true IRQ context. Binding reads actual priority/grouping to validate syscall ceilings without changing global grouping.</p>
+</section>
+<section id="id3">
+<h2>Evidence and qualification not yet established<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>Existing DCD development evidence in <code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/usb-device-iteration/manifest.json</span></code> binds the original Native 43, STM32 7 and GD32 7 Google cases, plus execution of the same 57 cases under ASan/UBSan with zero skips; six production ARM units using the two vendors’ actual SDKs passed strict C11 compilation. The corresponding clock owner’s 27 independent cases remain in <code class="docutils literal notranslate"><span class="pre">usb-clock-iteration</span></code> and are not counted again in DCD 57. Historical incorrect TXFE/EP0/PID assumptions and failure logs are retained; current source identities are kept separate from old reports. These historical counts do not cover the added profile, descriptor helper, EP0 packetizer or interrupt IN. Development evidence for the additions separately records actual regressions for ROM profile, descriptor, control and software epochs, alignment counterexamples RED→corrected focused GREEN, and compilation and linking of exact ARM assemblies. Each result describes only its associated source and command; case details and failed attempts are in that batch’s raw receipts. focused GREEN and ARM linking do not establish clean SDK or full Native candidate qualification; SDK consumers, resources, bilingual documentation and the ordinary complete-index commit gates must still be verified separately.</p>
+<p>Sources are the FS register facts in the locked ST CMSIS header and GD32F4xx User Manual Rev3.3 §28.7.3 (DIEPxCTL printed pp988–990, DIEPxINTF pp994–995 and DIEPxLEN p998), plus PLLSAI/CK48 in §4.3.24/26. In Rev3.3, chapter 28 is USBFS and chapter 29 is USBHS. Only current citations are corrected here; historical evidence keeps its original bytes. The GD manual SHA256 is <code class="docutils literal notranslate"><span class="pre">c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13</span></code>. Complete source identities are bound in the manifest.</p>
+<p>The full IO-35 exit remains open. Finite interrupt IN and explicit activation supply no notification policy, complete Chapter 9/class stack, external configuration transaction or physical reset-recovery qualification. They establish neither a clean software candidate, product release nor physical qualification. USB role, VBUS sensing/power/backfeed, pull-up/ESD, electrical jumpers, pin leases and shared-pin conflicts for the three PCBs still require independently reviewed Board assemblies; this batch configures none of those pins. Enumeration, host retries, reset/unplug, transfer errors, PHY three-cycle flush timing and actual ISR/WCET/HIL have not been executed; old example tests confer no qualification.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

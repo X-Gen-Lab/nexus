@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Finite USART1 GPDMA TX on STM32U575 &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="UART receive DMA, duplex DMA and electrical adaptation" href="uart-dma-rs485.html" />
+    <link rel="prev" title="U575 dual-world GPIO reference contract" href="u575-trustzone-contract.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/docs/design/u575-uart-gpdma.md">b1b903da47ed</a>; code reference: b1b903da47ed. <a href="../../zh_CN/design/u575-uart-gpdma.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="finite-usart1-gpdma-tx-on-stm32u575">
+<span id="u575-uart-gpdma"></span><h1>Finite USART1 GPDMA TX on STM32U575<a class="headerlink" href="#finite-usart1-gpdma-tx-on-stm32u575" title="Link to this heading">¶</a></h1>
+<p>Select this mode when an exact STM32U575ZIT6Q TZEN0 assembly needs finite byte
+transmission through USART1 while retaining independent IRQ-byte reception.
+The implementation uses one static UART owner, caller-owned requests and TX
+buffers, and the pinned official LL register operations. Product tasks, wait
+policy, protocol framing and recovery policy remain external. Physical HIL is
+<code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<section id="select-the-exact-assembly">
+<h2>Select the exact assembly<a class="headerlink" href="#select-the-exact-assembly" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="Open SVG at full size"><img alt="FIG-16: current generated faces, private providers and caller-owned requests; this selection has one UART owner" src="../_images/io-evolution.svg" /></a></p>
+<p><strong>FIG-16 shows current shared construction and runtime ownership. It is not a
+U575 DMA timing diagram or hardware qualification.</strong> For this selection, the
+generated face is <code class="docutils literal notranslate"><span class="pre">nx_uart_port_t</span></code>, its shared table is
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_uart_gpdma_ops</span></code>, and its private owner embeds one UART prefix plus
+selected GPDMA metadata. The arrows retain their generation, lookup and call
+meanings. No second UART face or hidden DMA worker owns the same controller.
+Ordinary IRQ-byte UART state and operations gain no fields.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Fact</p></th>
+<th class="head"><p>Maintained selection</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Chip and execution</p></td>
+<td><p>STM32U575ZIT6Q, TZEN0 baremetal reference, existing MSIS/PCLK4MHz profile</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART</p></td>
+<td><p>USART1, PA9/PA10 AF7,8N1, FIFO disabled, baud62..250000</p></td>
+</tr>
+<tr class="row-even"><td><p>TX engine</p></td>
+<td><p>GPDMA1 channel0, request25, IRQ29</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX and UART IRQ</p></td>
+<td><p>Independent caller-selected byte ring, USART1 IRQ61</p></td>
+</tr>
+<tr class="row-even"><td><p>IRQ policy</p></td>
+<td><p>Both vectors priority5; validate each selected kernel policy</p></td>
+</tr>
+<tr class="row-odd"><td><p>TX count</p></td>
+<td><p>1..65535bytes, matching the16bit BNDT field</p></td>
+</tr>
+<tr class="row-even"><td><p>TX source</p></td>
+<td><p>Entire nonwrapping span in nonsecure SRAM1 <code class="docutils literal notranslate"><span class="pre">[0x20000000,0x20030000)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Current Board input</p></td>
+<td><p>Source-reviewed NUCLEO-U575ZI-Q reference; physical wiring remains unqualified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The normal fixture supplies the existing Board package and UART mode. Physical
+engine, channel, request and vector facts come from the exact SoC descriptor;
+there is no competing authored DMA register configuration.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exact finite byte-TX software fixture; physical HIL remains not executed.</span>
+<span class="c1"># Resolve DMA engine/channel/request/vector from exact SoC facts, not a new</span>
+<span class="c1"># authored option or alternate build authority. Physical HIL remains pending.</span>
+<span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../../boards/stm32u575_nucleo_zi_q"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"msis4"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16384</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+
+<span class="k">[uart.console]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"dma-tx"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.console.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+
+<span class="k">[uart.console.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">calls_os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</pre></div>
+</div>
+<p>The last SRAM1 byte is valid for a one-byte transfer. SRAM2/3/4, Secure aliases
+and LPDMA-only memory are outside this selected source domain. The provider
+rejects wrapping, oversized or unreachable payloads and overlap with its known
+state, immutable route facts, RX ring and controlled MMIO before admission.
+RX read outputs and count storage cannot overwrite those controls or an active
+request/payload. These checks do not replace the caller’s obligation to supply
+live, correctly typed storage.</p>
+</section>
+<section id="execute-through-the-existing-uart-face">
+<h2>Execute through the existing UART face<a class="headerlink" href="#execute-through-the-existing-uart-face" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Call platform start from the privileged task owner. Check its primary error,
+cleanup error and remaining effects. A failed partial constructor can retain
+ownership; keep its storage and cold leases live while retrying stop.</p></li>
+<li><p>Obtain the static face through
+<code class="docutils literal notranslate"><span class="pre">nx_factory_uart(NX_UART_ID_CONSOLE)</span></code>. Lookup is pure identity and may happen
+before startup; hardware operations require successful platform startup.</p></li>
+<li><p>Initialize a fresh request once with <code class="docutils literal notranslate"><span class="pre">nx_request_initialize</span></code>, then prepare
+it with <code class="docutils literal notranslate"><span class="pre">nx_uart_tx_prepare</span></code>. The deadline is absolute in the live
+<code class="docutils literal notranslate"><span class="pre">nx_time_now_us</span></code> domain. Keep the entire payload immutable while borrowed.</p></li>
+<li><p>Submit through <code class="docutils literal notranslate"><span class="pre">nx_uart_port_submit</span></code>. Rejection retains no request, payload
+or new hardware effects. <code class="docutils literal notranslate"><span class="pre">NX_SUCCESS</span></code> means ACCEPTED, including a subsequent
+hardware start failure that the same owner must drain. An explicit adapter
+may instead pass its existing QUEUED loan through
+<code class="docutils literal notranslate"><span class="pre">nx_uart_port_start_admitted</span></code>.</p></li>
+<li><p>The same task calls <code class="docutils literal notranslate"><span class="pre">nx_uart_port_service</span></code> to advance deadline observation
+and drain. IRQs only latch bounded physical facts and issue an optional wake
+hint. A wait adapter is optional; it must validate both IRQ policies before
+using kernel notifications. A wake hint never replaces the request level.</p></li>
+<li><p>Acquire-observe <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> before reading the result or reusing the request
+and payload. Adapter observers must also join before their storage is
+reused. Ordinary RX reads remain available during DMA TX.</p></li>
+</ol>
+<p>No scheduler, worker, allocation or runtime name registry is created by lookup,
+startup, submission or IRQ dispatch. One privileged task serializes controls;
+cross-task cancellation uses the established external slot/epoch adapter rather
+than sharing a mutable request pointer.</p>
+</section>
+<section id="separate-dma-wire-and-reference-completion">
+<h2>Separate DMA, wire and reference completion<a class="headerlink" href="#separate-dma-wire-and-reference-completion" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-06: current request states retain the borrow through drain and quarantine until final release-publication" src="../_images/request-lifecycle.svg" /></a></p>
+<p><strong>FIG-06 describes the current shared request contract, not a promise that a
+timeout can stop hardware.</strong> Its optional QUEUED path belongs to an explicit
+adapter. In this provider, cancellation and deadline observation retain the
+same request and source until hardware and reference withdrawal is proved.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation</p></th>
+<th class="head"><p>Provider action and release condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DMA <code class="docutils literal notranslate"><span class="pre">TCF</span></code></p></td>
+<td><p>Latch block completion; still retain the request and source. Prove disabled/idle engine with no FIFO data before relying on USART wire state.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cancellation, deadline or DMA error</p></td>
+<td><p>Retain the first terminal cause, begin bounded drain and preserve the earliest existing drain bound. No buffer revocation follows from a timeout.</p></td>
+</tr>
+<tr class="row-even"><td><p>Active channel withdrawal</p></td>
+<td><p>Request <code class="docutils literal notranslate"><span class="pre">SUSP</span></code>; observe fresh hardware <code class="docutils literal notranslate"><span class="pre">SUSPF</span></code> and <code class="docutils literal notranslate"><span class="pre">IDLEF</span></code>; issue legal <code class="docutils literal notranslate"><span class="pre">RESET</span></code> and read back disabled/idle state. Writing zero to <code class="docutils literal notranslate"><span class="pre">EN</span></code> does not disable GPDMA.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Suspension IRQ</p></td>
+<td><p>Withdraw <code class="docutils literal notranslate"><span class="pre">SUSPIE</span></code> with readback and preserve the actual <code class="docutils literal notranslate"><span class="pre">SUSPF</span></code> needed by the later reset proof. Cached flags cannot authorize reset.</p></td>
+</tr>
+<tr class="row-even"><td><p>Independent USART <code class="docutils literal notranslate"><span class="pre">TC</span></code></p></td>
+<td><p>The final stop bit is complete; source/IRQ/publisher withdrawal is still required before settlement.</p></td>
+</tr>
+<tr class="row-odd"><td><p>All required proof joined</p></td>
+<td><p>Clear the active reference, then release-publish <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> as the final provider request access.</p></td>
+</tr>
+<tr class="row-even"><td><p>Proof still missing when the drain bound expires</p></td>
+<td><p>Keep <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code> storage borrowed and expose continued owner recovery responsibility.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Normal block completion does not require a reset on every request when the
+engine is already proved disabled, idle and empty. Cancellation of an active
+channel requires the suspension/reset sequence above. Old completion and
+suspension flags are drained before a new <code class="docutils literal notranslate"><span class="pre">EN</span></code>; errors remain latched and an
+old <code class="docutils literal notranslate"><span class="pre">TCF</span></code> cannot start the next request’s wire-drain budget. DMA errors arriving
+while flags are acknowledged cannot turn a failed request into success.</p>
+<p>Task service withdraws DMA/USART TX interrupt sources and checks their
+readback, disabled/not-pending/inactive DMA vector state, active UART IRQ and
+captured wake publishers. Only after DMA cannot load another TDR byte does it
+independently observe USART <code class="docutils literal notranslate"><span class="pre">TC</span></code>. IRQ-byte RX remains independent of TX DMA.
+An error or aborted request reports zero guaranteed transferred bytes; a
+successful request reports its full submitted byte count.</p>
+</section>
+<section id="preserve-the-usart-request-gate-through-recovery">
+<h2>Preserve the USART request gate through recovery<a class="headerlink" href="#preserve-the-usart-request-gate-through-recovery" title="Link to this heading">¶</a></h2>
+<p>ES0499 Rev12 section2.21.2 describes lost subsequent DMA requests when <code class="docutils literal notranslate"><span class="pre">DMAT</span></code>
+is cleared and set again. This mode uses the documented persistent-gate
+workaround: install <code class="docutils literal notranslate"><span class="pre">DMAT=1</span></code> before the first <code class="docutils literal notranslate"><span class="pre">UE</span></code> enable and retain it through
+success, cancellation, errors, channel reset and rearm. Per-request recovery
+does not cycle the receiver’s <code class="docutils literal notranslate"><span class="pre">UE</span></code>.</p>
+<p>Whole stop closes admission and retains <code class="docutils literal notranslate"><span class="pre">DMAT</span></code> until the outstanding request,
+interrupt sources, both vectors and wake publishers have joined and
+<code class="docutils literal notranslate"><span class="pre">UE=0</span></code>, <code class="docutils literal notranslate"><span class="pre">TEACK=0</span></code> and <code class="docutils literal notranslate"><span class="pre">REACK=0</span></code> are observed. Only then may it clear <code class="docutils literal notranslate"><span class="pre">DMAT</span></code> and
+withdraw its added GPDMA clock. Partial initialization records effects before
+their first write and retains unproved cleanup. Repeated stop on a cold or
+successfully stopped owner performs no hardware access, including after a
+successor starts on the same controller.</p>
+<p>If service or stop cannot prove withdrawal, keep the request, payload, ring,
+wake target and selected cold owner live. Continue bounded service/stop through
+that same owner. A product decides how to handle a permanently unresponsive
+peripheral; this platform does not invent a successful release or automatically
+restart protocol traffic.</p>
+</section>
+<section id="build-and-assess-the-evidence">
+<h2>Build and assess the evidence<a class="headerlink" href="#build-and-assess-the-evidence" title="Link to this heading">¶</a></h2>
+<p>From the repository root with the pinned tools and dependencies prepared, run:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-u575-uart-gpdma
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-u575-uart-gpdma
+</pre></div>
+</div>
+<p>The maintained input is the TOML above. Successful commands produce
+<code class="docutils literal notranslate"><span class="pre">io_evolution_fixture.elf</span></code>, <code class="docutils literal notranslate"><span class="pre">.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">.map</span></code>, <code class="docutils literal notranslate"><span class="pre">.resources.json</span></code> and
+<code class="docutils literal notranslate"><span class="pre">provider-retention.json</span></code> under the preset’s <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory. Check successful
+resource validation and retention of one selected UART face with the real
+GPDMA operations table. These commands build software and do not flash a board
+or execute physical HIL. Application TX execution requires the explicit task
+flow above; the linked smoke fixture only establishes its declared link scope.</p>
+<p>Current development evidence includes 40 real-provider GoogleTest/GoogleMock
+cases, 8 normal-TOML/generated-factory cases, and the normal ARM configure/build
+with linked resource and provider-retention checks. All recorded model cases
+passed with no skips. Model execution establishes the tested software behavior;
+ARM artifacts establish linking/resources. Neither establishes clean-source
+full-gate candidate status, measured cycles, oscillator accuracy, electrical
+behavior or physical erratum qualification. Physical HIL is <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>The source uses the already pinned official LL DMA and USART headers for the
+selected register operations. It adds no vendor HAL handle, HAL tick, vendor
+IRQ callback, linked-list descriptor or second transfer owner. USART2 DMA, RX
+DMA, continuous streams, autonomous/low-power DMA and a TrustZone broker remain
+outside this implementation. The general Cortex-M33 architecture and other
+chip DMA capabilities do not extend this exact provider scope.</p>
+<p>See the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32u575/README.md">U575 source map</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h">private provider contract</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/soc/stm32/stm32u575/drivers/uart_dma.c">real provider</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/b1b903da47eda722a6be3e98edced5cfa36221b1/io/include/nexus/io/uart.h">public UART ownership contract</a> and
+<a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">current qualification boundaries</span></a>.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

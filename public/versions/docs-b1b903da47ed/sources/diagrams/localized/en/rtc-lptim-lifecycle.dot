@@ -1,0 +1,74 @@
+// FIG-21. Current: selected Native typed assembly and explicit lifecycle.
+// Dashed cluster/edge: future physical RTC/LPTIM adaptation only.
+// Private start is explicit; no public start, IRQ, hardware driver or scheduler is invented.
+digraph rtcLptimLifecycle {
+    graph [label="FIG-21 Native RTC/LPTIM: assembly and final access\nSolid: current Native; dashed: future hardware target", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.55];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    subgraph clusterCurrent {
+        label="CURRENT runtime: one serialized Native owner per instance"; color="#64748b";
+    executor [label="External serialized task executor"];
+    face [label="Public RTC / LPTIM face\nimmutable ops + instance context"];
+    owner [label="Independent private Native state\nshared readonly ops; one active request"];
+    clock [label="Copied Core clock face\nborrowed context stays live and disjoint"];
+    model [label="Explicit host model advancement\nsource only; no request publication"];
+    source [label="Calendar / finite counter source\narmed and pending facts"];
+    stop [label="Stop closes admission immediately\nA retained loan can still need drain", shape=note, fillcolor="#f8fafc"];
+    closed [label="Closed; no active / armed / pending / terminal\nCaller still proves external joins", fillcolor="#f8fafc"];
+    reopen [label="Explicit PRIVATE start\ncheck full owner; retained BUSY first\nthen constructed + closed + generation room"];
+    refused [label="Rejected start leaves all owner bytes unchanged\nINVALID / BUSY / STATE / EXHAUSTED", shape=note, fillcolor="#fff7ed"];
+    executor -> face [label="public task calls; no implicit worker"];
+    face -> owner [label="dispatch ops(context, ...)"];
+    owner -> clock [label="reads finite deadlines only when required"];
+    executor -> model [label="serialized host-only control"];
+    model -> source [label="bounded advancement; no Core time change"];
+    owner -> stop [label="lifecycle rule", arrowhead=none];
+    stop -> closed [label="clean stop or actual retained-source withdrawal"];
+    closed -> reopen [label="explicit private call after external joins"];
+    reopen -> owner [label="SUCCESS: generation++ before opened=true\npreserve calendar/rate/clock/fault"];
+    reopen -> refused [label="checks fail; no clock read/source progress"];
+    }
+    subgraph clusterRequest {
+        label="CURRENT: protocol actions; ACTIVE / QUARANTINED / SETTLED are request states"; color="#64748b";
+    ready [label="READY: caller storage\ninitialized and unborrowed", fillcolor="#f8fafc"];
+    active [label="ACTIVE: provider borrows\nthe complete immutable request"];
+    terminal [label="Latch first terminal cause\nservice / cancel / stop can withdraw"];
+    held [label="QUARANTINED: hold prevents withdrawal\nrequest and owner remain live", fillcolor="#fff7ed"];
+    detached [label="Withdrawal proved\nsource off; pending clear; active detached\nLPTIM: final ticks copied; generation advanced"];
+    settled [label="SETTLED: release publication\nprovider final request access", fillcolor="#f0fdf4"];
+    ready -> ready [label="REJECTED: no loan or source effects", constraint=false];
+    ready -> active [label="submit SUCCESS = ACCEPTED"];
+    active -> terminal [label="explicit service observation / cancel / stop"];
+    terminal -> held [label="armed source + hold"];
+    held -> terminal [label="real public retry; cause unchanged", constraint=false];
+    terminal -> detached [label="withdrawal permitted"];
+    detached -> settled [label="only after every required reference detaches"];
+    settled -> ready [label="consume result + external joins, then prepare", constraint=false];
+    }
+    owner -> active [label="retains exact request identity"];
+    held -> refused [label="private start returns BUSY; never revoke the loan", constraint=false];
+    settled -> closed [label="only when a prior stop closed admission", constraint=false];
+    clock -> terminal [label="Core deadline observation only;\nno source advancement"];
+    source -> terminal [label="service observes pending event\nexpiry wins only if no earlier cause is latched"];
+    source -> held [label="source can keep progressing during hold\nLPTIM result uses final withdrawal ticks", constraint=false];
+    subgraph clusterTarget {
+        label="CURRENT build: ordinary typed configuration and static assembly"; style=rounded; color="#64748b";
+    toml [label="Ordinary [rtc.name] / [lptim.name]\nNative RTC0/1 and LPTIM0/1, no pins/IRQ", fillcolor="#f8fafc"];
+    ir [label="Existing ControllerIR -> provider path\nno second configuration authority", fillcolor="#f8fafc"];
+    platform [label="Generated nx_platform_start/stop\nexplicit external lifecycle, no scheduler"];
+    generated [label="Emit selected static state/faces\nand pure typed factory lookup", fillcolor="#f8fafc"];
+    toml -> ir [label="build: strict validation and resource claims"];
+    ir -> generated [label="build: static emission through existing providers"];
+    }
+    generated -> face [label="runtime lookup returns an existing face\nlookup performs no initialization", constraint=false];
+    generated -> platform [label="build: emits existing lifecycle entry points"];
+    executor -> platform [label="explicit start/stop; inspect outcomes"];
+    platform -> owner [label="first preparation: construct once", constraint=false];
+    platform -> reopen [label="later preparation: private start of constructed owner", constraint=false];
+    platform -> stop [label="public port stop; retain failed cleanup", constraint=false];
+    subgraph clusterHardwareTarget {
+        label="TARGET: physical adaptation, not implemented or executed"; style=dashed; color="#64748b";
+    hardware [label="H743 / U575 RTC + LPTIM\nclock / backup reset / IRQ / STOP / VBAT\nNo hardware or HIL qualification", fillcolor="#f8fafc"];
+    }
+    hardware -> face [label="future provider must meet the public contract", style=dashed, constraint=false];
+}
