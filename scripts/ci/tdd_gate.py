@@ -193,7 +193,8 @@ def main(arguments=None):
         # The catalogue consumes this runner's evidence, not another execution.
         from scripts.ci import io_lifecycle_matrix
         catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
-        io_lifecycle_matrix.capture(ROOT, build, catalogue, matrix_snapshot)
+        io_lifecycle_matrix.capture_complete(
+            ROOT, build, catalogue, matrix_snapshot, execute, env)
         results = []
         for index, name in enumerate(manifest["executables"]):
             binary = checked_binary(name, build)

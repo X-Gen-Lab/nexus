@@ -69,7 +69,7 @@ class StagedExecutionTests(unittest.TestCase):
         output = io.StringIO()
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "execute", side_effect=execute), \
-                patch.object(io_lifecycle_matrix, "capture"), \
+                patch.object(io_lifecycle_matrix, "capture_complete"), \
                 patch.object(io_lifecycle_matrix, "audit", return_value={}), \
                 patch.dict("os.environ", {}, clear=True), \
                 redirect_stdout(output), redirect_stderr(output):
@@ -81,7 +81,14 @@ class StagedExecutionTests(unittest.TestCase):
         summary = self.build / "tdd" / "execution.json"
         summary.parent.mkdir(parents=True, exist_ok=True)
         summary.write_text('{"previous": "unrelated execution"}\n')
-        result, output = self.pipeline(mutation)
+        reached = []
+
+        def observed_mutation():
+            reached.append(True)
+            mutation()
+
+        result, output = self.pipeline(observed_mutation)
+        self.assertTrue(reached, "Fixture failed before the late mutation: " + output)
         self.assertEqual(result, 1, output)
         self.assertFalse(summary.exists(), output)
 

@@ -16,7 +16,7 @@ def resolved(protected=True):
         user_flash_bytes=2097152 - 131072 - 256,
         privileged_ram_bytes=163840, user_ram_bytes=32768) if protected else None
     return replace(result,
-        layout=freeze({"origin": 0x08000000, "size": 2097152}),
+        layout=replace(result.layout, origin=0x08000000, size=2097152),
         physical_part=replace(result.physical_part, memory=freeze([
             {"id": "sram1", "origin": 0x20000000,
              "size": 196608, "linker": True},

@@ -1,0 +1,43 @@
+{
+  "ti": {
+    "url": "https://www.ti.com/lit/ds/symlink/tmp117.pdf",
+    "document": "SNOSD82D",
+    "title": "TMP117 High-Accuracy, Low-Power, Digital Temperature Sensor With SMBus and I2C-Compatible Interface",
+    "publication": "June 2018",
+    "revision": "September 2022",
+    "bytes": 1717888,
+    "sha256": "78212e91e478035a91165397a8de8a90bfc776759dc445243c033537f0c4b789",
+    "sections": [
+      "6.5 electrical characteristics",
+      "7.3.1 power up",
+      "7.3.3 temperature result",
+      "7.4.2 shutdown",
+      "7.4.3 one-shot",
+      "7.5.3 I2C",
+      "7.6.2 temperature",
+      "7.6.3 configuration",
+      "7.6.9 temperature offset",
+      "7.6.11 device ID"
+    ]
+  },
+  "zephyr": {
+    "repository": "zephyrproject-rtos/zephyr",
+    "release": "v4.2.0",
+    "tag_object": "8e4cf33cb92ba0f8768fac90a5fbfcab4cb8130c",
+    "commit": "413b789deb391d3a37d06b463288a5fe765ee57e",
+    "driver": "drivers/sensor/ti/tmp11x/tmp11x.c",
+    "driver_blob_sha1": "20dee440068a28d93c650ca3ff9e5bbb738bdeff",
+    "private_header": "drivers/sensor/ti/tmp11x/tmp11x.h",
+    "private_header_blob_sha1": "c1e075955f2da2c382c9fa28bfbb6c1ddf7f3c79",
+    "binding": "dts/bindings/sensor/ti,tmp11x.yaml",
+    "binding_blob_sha1": "a6207360db76d744265cdb37668044c4342ecd51",
+    "license": "Apache-2.0 (SPDX in referenced files)",
+    "use": "Read-only design comparison; no source copied into Nexus and no Git dependency added."
+  },
+  "reviewed_scope": {
+    "identity": "0x0117 complete word",
+    "mode": "one-shot, averaging disabled (one conversion)",
+    "offset": "verify existing signed 1/128 Celsius register; never program or add twice",
+    "physical_status": "not_executed"
+  }
+}

@@ -108,12 +108,12 @@ administrator changing it during an upload.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-requires 56 independent consumer roots and 59 executable images under
-policy-v13. This is a required plan; actual installed-consumer execution must be
+requires 59 independent consumer roots and 62 executable images under
+policy-v14. This is a required plan; actual installed-consumer execution must be
 assessed from its source-bound producer report and matching transport manifest.
 Plan counts do not establish software qualification or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v13`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v14`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest

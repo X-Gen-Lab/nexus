@@ -29,7 +29,7 @@ from tools.configure import integration_package
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
-    EndpointIR, FactoryOptions, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
+    EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology
 from tools.configure.contracts import (
@@ -641,7 +641,7 @@ class _MemoryResolution:
 @dataclass(frozen=True)
 class _FlashLayoutResolution:
     """One selected image and its optional authored input identity."""
-    layout: Mapping
+    layout: "FlashRegionIR"
     input_path: Path | None
 
 
@@ -657,12 +657,15 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
     from tools.configure.ir import (MemoryRegionBudgetIR,
                                     MpuMemoryReservationsIR, freeze, thaw)
     budgets = obj(thaw(assembly.memory_budgets), {"main_stack_bytes"},
-                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes",
+                   "image_prefix_bytes", "image_suffix_bytes", "regions", "mpu"},
                   "memory budgets")
     for name, value in budgets.items():
         if name in {"regions", "mpu"}:
             continue
-        integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
+        integer(value, 0 if name in {"libc_heap_bytes", "image_prefix_bytes",
+                                     "image_suffix_bytes"} else 1,
+                UINT32_MAX, context=name)
     if budgets["main_stack_bytes"] % 8:
         fail("Main stack must have 8-byte alignment")
     ram = next(region for region in variant["memory"] if region["linker"])
@@ -707,15 +710,16 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
         budgets.get("static_ram_bytes"), budgets.get("flash_load_bytes"),
         tuple(MemoryRegionBudgetIR(name, item["limit_bytes"])
               for name, item in sorted(budgets.get("regions", {}).items())),
-        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None)
+        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None,
+        budgets.get("image_prefix_bytes", 0), budgets.get("image_suffix_bytes", 0))
     return _MemoryResolution(memory_budget, freeze(ram),
                              freeze(selected_memory), gpio_user)
 
 
 def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
-                          *, offset_alignment=None):
-    """Select one image window without changing physical Flash geometry."""
-    from tools.configure.ir import freeze
+                          *, offset_alignment=None, vector_symbol=None,
+                          memory_budget=None):
+    """Select a physical owner and admit its derived executable window."""
     layout = physical_flash.copy()
     layout_path = None
     if layout_name is not None:
@@ -746,17 +750,30 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
                 images.append(region)
         if len(images) != 1:
             fail("Flash layout requires exactly one image region")
-        image = images[0]
-        if image["origin"] != physical_flash["origin"]:
-            if offset_alignment is None:
-                fail("Image offset requires an explicitly reviewed SoC startup")
-            integer(offset_alignment, 128, context="image vector alignment")
-            if (offset_alignment & (offset_alignment - 1) or
-                    image["origin"] % offset_alignment):
-                fail("Image vector base differs from the reviewed alignment")
         unique(region_ids, "Flash region IDs")
         layout = {**physical_flash, **images[0]}
-    return _FlashLayoutResolution(freeze(layout), layout_path)
+    owner = FlashRegionIR(layout["origin"], layout["size"],
+                          layout.get("id"), layout.get("kind"))
+    prefix = memory_budget.image_prefix_bytes if memory_budget else 0
+    suffix = memory_budget.image_suffix_bytes if memory_budget else 0
+    if prefix + suffix >= owner.size:
+        fail("Image reservations exhaust the selected physical Flash owner")
+    if (prefix or suffix) and (not isinstance(vector_symbol, str) or
+                               not vector_symbol):
+        fail("Image reservation requires an explicitly reviewed SoC startup")
+    if owner.origin != physical_flash["origin"] or prefix or suffix:
+        if offset_alignment is None:
+            fail("Image offset or reservation requires an explicitly reviewed SoC startup")
+        integer(offset_alignment, 128, context="image vector alignment")
+        if (offset_alignment & (offset_alignment - 1) or
+                (owner.origin + prefix) % offset_alignment):
+            fail("Image vector base differs from the reviewed alignment")
+        if owner.size - prefix - suffix < 8:
+            fail("Image reservations leave no complete reset vector")
+    if (memory_budget and memory_budget.flash_load_limit_bytes is not None and
+            memory_budget.flash_load_limit_bytes > owner.size - prefix - suffix):
+        fail("Flash budget exceeds the selected executable image window")
+    return _FlashLayoutResolution(owner, layout_path)
 
 
 def _resolve_source_dependencies(soc, provider, family, root, backend, read,
@@ -1224,7 +1241,10 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     inputs.extend(device_graph.inputs)
     selected_layout = _resolve_flash_layout(
         assembly.layout, assembly_path.parent, variant["flash"], read,
-        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None))
+        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None),
+        vector_symbol=(getattr(provider, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
+                       if not facts.provider_context.external else None),
+        memory_budget=selected_memory.budget)
     if selected_layout.input_path is not None:
         inputs.append(selected_layout.input_path)
     selected_sources = _resolve_source_dependencies(

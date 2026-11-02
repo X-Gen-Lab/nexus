@@ -97,6 +97,11 @@ nexus_google_test(nexus_io_observation_contract_test
 nexus_google_test(nexus_io_diagnostic_test
     SOURCES io_diagnostic_test.cpp
     LIBRARIES Nexus::IO)
+nexus_google_test(nexus_io_owner_diagnostic_pipeline_test
+    SOURCES io_owner_diagnostic_pipeline_test.cpp
+    LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
+        Nexus::SPIAsyncOwner Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers")
 include("${CMAKE_CURRENT_SOURCE_DIR}/gd32_official.cmake")
 nexus_google_test(nexus_silicon_admission_test
     SOURCES silicon_admission_test.cpp
@@ -132,6 +137,8 @@ nexus_google_test(nexus_spi_dma_owner_wait_test
         "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
     LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
+nexus_google_test(nexus_tmp117_test SOURCES tmp117_test.cpp
+    LIBRARIES Nexus::TMP117I2C Nexus::BusOwner Nexus::Arch)
 nexus_google_test(nexus_settings_test SOURCES settings_test.cpp
     LIBRARIES Nexus::Settings)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
@@ -649,15 +656,21 @@ include(official_leaf_probes.cmake)
 
 if(TARGET Nexus::LwIP)
     nexus_google_test(nexus_network_lwip_test
-        SOURCES network_lwip_test.cpp LIBRARIES Nexus::LwIP)
+        SOURCES network_lwip_test.cpp LIBRARIES Nexus::LwIPStorage)
 endif()
 
 # Actual raw TCP peers own separate lwIP global states on the maintained host.
 if(TARGET Nexus::LwIP AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_pair_test
         SOURCES network_tcp_pair_test.cpp
-        LIBRARIES Nexus::LwIP)
+        LIBRARIES Nexus::LwIPStorage)
     set_tests_properties(nexus_network_tcp_pair_test PROPERTIES TIMEOUT 30)
+endif()
+if(TARGET Nexus::LwIPTCPStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    nexus_google_test(nexus_network_tcp_stream_test
+        SOURCES network_tcp_stream_test.cpp
+        LIBRARIES Nexus::LwIPTCPStorage)
+    set_tests_properties(nexus_network_tcp_stream_test PROPERTIES TIMEOUT 30)
 endif()
 
 # The explicit entropy instance uses the real reviewed LL over a register model.
@@ -690,4 +703,22 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         Nexus::TLSStorage Nexus::CoreMQTTStorage
         nexus_build_options nexus_owned_warnings)
     add_dependencies(nexus_tls_client_test nexus_mqtt_tls_interop_client)
+endif()
+
+# Compile the real client stack chain as a nested Google dependency. Broker
+# execution stays explicit; ordinary hooks never start Docker or use a PHY.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
+   TARGET nexus_network_tcp_stream_test AND TARGET Nexus::TLSStorage AND
+   TARGET Nexus::CoreMQTTStorage)
+    add_executable(nexus_lwip_mqtt_interop_client EXCLUDE_FROM_ALL
+        "${NEXUS_SOURCE_DIR}/tests/contracts/lwip_mqtt_interop/client.c"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/lwip_mqtt_interop/transport.cpp")
+    nexus_apply_target_policy(nexus_lwip_mqtt_interop_client)
+    target_include_directories(nexus_lwip_mqtt_interop_client PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_link_libraries(nexus_lwip_mqtt_interop_client PRIVATE
+        Nexus::LwIPTCPStorage Nexus::TLSStorage Nexus::CoreMQTTStorage
+        GTest::gtest nexus_build_options nexus_owned_warnings)
+    add_dependencies(nexus_network_tcp_stream_test
+        nexus_lwip_mqtt_interop_client)
 endif()

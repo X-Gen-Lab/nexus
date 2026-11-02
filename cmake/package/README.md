@@ -121,3 +121,47 @@ payload.
 Configuring a firmware consumer never downloads a test dependency. A consumer
 that needs platform development tests uses the complete repository checkout;
 the installed source SDK explicitly excludes those contract targets.
+
+
+## Device and executable-window consumers
+
+Consumer policy `nexus-sdk-consumers-v14` retains the complete v13 plan and adds
+three independent C11 consumers: Native TMP117, F407 TMP117 and the F407 image
+window. The full plan contains 59 source/build roots and 62 linked images. A plan
+entry records required execution; these counts alone do not establish a pass.
+
+The TMP117 compositions explicitly link `Nexus::TMP117I2C`, own a settled software
+I2C endpoint and use all six public component functions. Native executes one
+bounded, positive sample/cleanup path. F407 links that same model with actual
+startup, generated bindings, resources and provider-retention checks; it never
+runs on an MCU. Neither scenario establishes physical TMP117, PCB or bus support.
+The component's two headers, two C sources and CMake target are mandatory SDK
+payload. Unselected device code remains eligible for link-time removal.
+
+The image reference copies one assembly and its physical layout from the SDK.
+The existing linker/resource gate checks the derived executable window, vectors,
+ELF LOADs and bounds. Its 512-byte prefix and 1,024-byte suffix reserve bytes;
+this consumer supplies no metadata encoding, bootloader, signature or activation.
+It selects no I/O faces, so provider-retention observation is not applicable.
+Its report still binds source, layout, configuration, ELF and checked resources.
+All three profiles audit actual C11/CPU/enum flags and public include boundaries;
+ARM images reject linked libc heap and C++ runtime. Native heap use is unassessed.
+
+### 中文
+
+消费策略 `nexus-sdk-consumers-v14` 完整保留 v13 原有计划，再增加三个独立 C11
+工程：Native TMP117、F407 TMP117 和 F407 执行镜像窗口。全量计划为 59 个源码／
+构建根目录、62 个链接镜像；这些数量定义必须执行的范围，本身不代表验收通过。
+
+TMP117 组合显式链接 `Nexus::TMP117I2C`，调用者持有完全结清的软件 I2C endpoint，
+并使用六个公共组件函数。Native 实际执行有界的正向采样与清理；F407 使用同一软件
+模型并实际链接启动代码、生成绑定，再执行资源与 provider 保留检查，不在 MCU
+运行。两者均不证明真实传感器、PCB 或总线支持。两个公共头文件、两个 C 源文件和
+CMake 目标列为 SDK 必需内容；未选择的器件代码仍可由链接器移除。
+
+镜像参考从 SDK 复制唯一装配与物理布局，复用既有链接／资源门禁验证派生执行窗口、
+向量、ELF LOAD 和边界。512 字节前缀与 1,024 字节尾部只保留空间，不提供元数据
+格式、引导器、签名或镜像切换。该配置不选择 I/O face，因此 provider 保留观察
+不适用；报告仍绑定源码、布局、配置、ELF 和已检查资源。三个工程均检查实际
+C11／CPU／枚举 ABI 编译参数与公共头文件边界；ARM 拒绝链接 libc heap 和 C++
+运行时。Native 的 heap 使用保持未评估，不借用 ARM 的结论。

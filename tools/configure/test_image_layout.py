@@ -57,10 +57,10 @@ class ImageLayoutTests(unittest.TestCase):
         self.assertEqual(result.physical_part.flash,
                          original.physical_part.flash)
         self.assertEqual(result.controllers, original.controllers)
-        self.assertEqual(result.layout["origin"], image["origin"])
-        self.assertEqual(result.layout["size"], image["size"])
-        self.assertEqual(result.layout["erase_blocks"],
-                         original.flash["erase_blocks"])
+        self.assertEqual(result.layout.origin, image["origin"])
+        self.assertEqual(result.layout.size, image["size"])
+        self.assertEqual(result.to_dict()["layout"]["erase_blocks"],
+                         list(original.flash["erase_blocks"]))
         linker = memory.linker(result)
         self.assertIn("ORIGIN = 0x%08x, LENGTH = %d" % (
             image["origin"], image["size"]), linker)
@@ -105,7 +105,7 @@ class ImageLayoutTests(unittest.TestCase):
         except configure.ConfigurationError as error:
             self.fail("Reviewed data/image layout must resolve: " + str(error))
         self.assertEqual(result.flash, original.flash)
-        self.assertEqual(result.layout["origin"], image["origin"])
+        self.assertEqual(result.layout.origin, image["origin"])
 
     def test_unreviewed_startups_continue_to_reject_offset_images(self):
         cases = ("tools/configure/assemblies/stm32-f103-baremetal.toml",

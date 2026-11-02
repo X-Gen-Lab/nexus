@@ -17,6 +17,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from scripts.ci.tdd_gate import checked_binary, validate_google_report
 
+MAX_CONTEXTS = 50000
+MAX_METADATA_BYTES = 32 * 1024 * 1024
+
 
 def digest(path):
     """Hash existing regular bytes; do not traverse an evidence symlink."""
@@ -121,9 +124,17 @@ def catalogue_inputs(root, catalogue):
     return data, sources, compiled
 
 
-def build_inputs(root, build, catalogue):
+def build_inputs(root, build, catalogue, *, complete=False):
     """Observe actual compiled contexts, objects and executable identities."""
     data, sources, compiled = catalogue_inputs(root, catalogue)
+    identities = {}
+
+    def observe_digest(path):
+        name = str(Path(path).absolute())
+        if name not in identities:
+            identities[name] = digest(path)
+        return identities[name]
+
     plan_path = build / "google-contracts.json"
     plan = read_json(plan_path)
     names = plan.get("executables", [])
@@ -136,13 +147,18 @@ def build_inputs(root, build, catalogue):
     if not targets.issubset(binaries):
         raise ValueError("Catalogue target is not in the actual CMake graph")
     binary_ids = {}
-    for name in targets:
+    for name in sorted(binaries):
         path = checked_binary(binaries[name], build)
-        binary_ids[name] = {"path": str(path), "sha256": digest(path)}
+        binary_ids[name] = {"path": str(path), "sha256": observe_digest(path)}
     database_path = build / "compile_commands.json"
     entries = read_json(database_path)
+    if not isinstance(entries, list) or len(entries) > MAX_CONTEXTS:
+        raise ValueError("Compiler context input exceeds its bound")
     contexts = {name: [] for name in compiled}
     target_contexts = {name: [] for name in sorted(targets)}
+    all_sources = {}
+    all_objects = {}
+    complete_contexts = {name: [] for name in sorted(binaries)}
     for entry in entries:
         directory = Path(entry["directory"])
         source = Path(entry["file"])
@@ -154,6 +170,31 @@ def build_inputs(root, build, catalogue):
             continue
         output = Path(command[command.index("-o") + 1])
         output = output if output.is_absolute() else directory / output
+        if output.is_file():
+            canonical_source, canonical_output = source.resolve(), output.resolve()
+            if (not canonical_output.is_relative_to(build.resolve()) or
+                    not (canonical_source.is_relative_to(root.resolve()) or
+                         canonical_source.is_relative_to(build.resolve()))):
+                raise ValueError("Materialized compiled context escapes checkout/build")
+            if command.count("-c") != 1 or command.index("-c") + 1 >= len(command):
+                raise ValueError("Materialized context lacks one compile source")
+            selected = Path(command[command.index("-c") + 1])
+            selected = selected if selected.is_absolute() else directory / selected
+            if selected.resolve() != canonical_source:
+                raise ValueError("Compiled source and compile command disagree")
+            source_name, object_name = str(source), str(output)
+            all_sources[source_name] = observe_digest(source)
+            context = {"source": source_name, "directory": str(directory),
+                       "command": command, "sha256": observe_digest(output)}
+            if object_name in all_objects:
+                raise ValueError("Duplicate materialized object context")
+            all_objects[object_name] = context
+            owners = [name for name in complete_contexts if
+                      "/CMakeFiles/" + name + ".dir/" in output.as_posix()]
+            if len(owners) > 1:
+                raise ValueError("Ambiguous complete target context")
+            if owners:
+                complete_contexts[owners[0]].append(object_name)
         local = [name for name in target_contexts if
                  "/CMakeFiles/" + name + ".dir/" in output.as_posix()]
         if local:
@@ -169,9 +210,9 @@ def build_inputs(root, build, catalogue):
                     marker not in canonical_output.as_posix()):
                 raise ValueError("Target-local object escapes its build/target")
             target_contexts[target].append({
-                "source": str(source), "source_sha256": digest(source),
+                "source": str(source), "source_sha256": observe_digest(source),
                 "directory": str(directory), "command": command,
-                "object": str(output), "object_sha256": digest(output),
+                "object": str(output), "object_sha256": observe_digest(output),
             })
         if not source.is_relative_to(root):
             continue
@@ -183,9 +224,11 @@ def build_inputs(root, build, catalogue):
         if output.is_file():
             contexts[name].append({"directory": str(directory),
                                    "command": command, "object": str(output),
-                                   "object_sha256": digest(output)})
+                                   "object_sha256": observe_digest(output)})
     if any(not values for values in contexts.values()):
         raise ValueError("A reviewed production/test TU has no compiled object")
+    if any(not values for values in complete_contexts.values()):
+        raise ValueError("A planned Google target has no materialized context")
     for row in data["properties"]:
         for source in [row["test_source"], *row["production_sources"]]:
             source_name = (root / source).resolve().relative_to(
@@ -200,18 +243,197 @@ def build_inputs(root, build, catalogue):
                 if not any(marker in Path(item["object"]).resolve().as_posix()
                            for item in contexts[source]):
                     raise ValueError("Reviewed test/provider compiled only for another target")
-    return {"catalogue_sha256": digest(catalogue),
-            "plan_sha256": digest(plan_path),
-            "compile_commands_sha256": digest(database_path),
-            "sources": {name: digest(root / name) for name in sorted(sources)},
-            "compiled": contexts, "target_compiled": target_contexts,
-            "binaries": binary_ids}
+    result = {"catalogue_sha256": observe_digest(catalogue),
+              "plan_sha256": observe_digest(plan_path),
+              "compile_commands_sha256": observe_digest(database_path),
+              "sources": {name: observe_digest(root / name)
+                          for name in sorted(sources)},
+              "compiled": contexts, "target_compiled": target_contexts,
+              "complete_sources": all_sources, "objects": all_objects,
+              "target_contexts": complete_contexts,
+              "binaries": binary_ids}
+    if complete:
+        result["compiler_inputs"] = compiler_inputs(root, build, all_objects)
+    if any(digest(name) != value for name, value in identities.items()):
+        raise ValueError("Compiled inputs changed during observation")
+    return result
 
 
-def capture(root, build, catalogue, output):
+def ninja_tool(build):
+    """Use the selected build's tool, never guess a host Ninja executable."""
+    cache = build / "CMakeCache.txt"
+    digest(cache)
+    text = cache.read_text()
+    generator = re.findall(r"^CMAKE_GENERATOR:INTERNAL=(.+)$", text, re.M)
+    programs = re.findall(r"^CMAKE_MAKE_PROGRAM:FILEPATH=(.+)$", text, re.M)
+    if generator != ["Ninja"] or len(programs) != 1:
+        raise ValueError("Complete observation requires the Native Ninja build")
+    tool = Path(programs[0]).resolve()
+    digest(tool)
+    return str(tool)
+
+
+def metadata_commands(build):
+    """Query the existing aggregate once; no per-binary link graph is built."""
+    prefix = [ninja_tool(build), "-C", str(build), "-t"]
+    return {
+        "input-graph": prefix + ["graph", "nexus_google_contracts"],
+        "input-dependencies": prefix + ["deps"],
+    }
+
+
+def compiler_inputs(root, build, objects):
+    """Deduplicate actual graph/dependency facts into the existing snapshot.
+
+    This conservatively binds materialized compiler contexts and shared files;
+    it is not another target/link resolver or a compilation execution proof.
+    """
+    from tools.dev.qualification import completed_command_inputs
+
+    files = {}
+    archives = set()
+    headers = set()
+
+    def observe(path):
+        path = Path(path).resolve()
+        name = str(path)
+        if name in files:
+            return path
+        identity = {"sha256": digest(path), "size": path.stat().st_size}
+        files[name] = identity
+        if len(files) > MAX_CONTEXTS:
+            raise ValueError("Compiler file observation exceeds its bound")
+        return path
+
+    for name in ("CMakeCache.txt", "build.ninja", "CMakeFiles/rules.ninja",
+                 ".ninja_deps"):
+        observe(build / name)
+    observe(Path(ninja_tool(build)))
+    logs = {}
+    for stem, argv in metadata_commands(build).items():
+        log = build / "tdd" / (stem + ".txt")
+        if log.stat().st_size > MAX_METADATA_BYTES:
+            raise ValueError("Compiler metadata output exceeds its bound")
+        selected = completed_command_inputs(log, expected_argv=argv)
+        receipt = read_json(log.with_suffix(".command.json"))
+        if receipt.get("cwd") != str(root):
+            raise ValueError("Compiler observation used a different source")
+        for path in selected:
+            observe(path)
+        raw = log.read_bytes()
+        if (len(raw) > MAX_METADATA_BYTES or
+                hashlib.sha256(raw).hexdigest() !=
+                files[str(log.resolve())]["sha256"]):
+            raise ValueError("Compiler metadata bytes changed during reading")
+        logs[stem] = raw.decode("utf-8")
+        if completed_command_inputs(log, expected_argv=argv) != selected:
+            raise ValueError("Compiler metadata original closure changed")
+
+    graph = logs["input-graph"].strip()
+    if not graph.startswith("digraph ninja {\n") or not graph.endswith("}"):
+        raise ValueError("Ninja graph observation is missing or malformed")
+    node = re.compile(r'^"[^"\n]+" \[label=("(?:\\.|[^"\\])*")')
+    nodes = 0
+    for line in graph.splitlines():
+        match = node.match(line)
+        if match is None:
+            continue
+        nodes += 1
+        if nodes > MAX_CONTEXTS:
+            raise ValueError("Ninja graph observation exceeds its bound")
+        name = json.loads(match[1])
+        path = Path(name)
+        path = path if path.is_absolute() else build / path
+        if path.is_file():
+            if (path.suffix in {".a", ".lib", ".o", ".obj"} and
+                    any(part.is_symlink() for part in (path, *path.parents))):
+                raise ValueError("Ninja linked input must be materialized, "
+                                 "not a cached symlink")
+            observed = observe(path)
+            if path.suffix in {".a", ".lib", ".so"}:
+                archives.add(str(observed))
+        elif path.suffix in {".a", ".lib", ".o", ".obj"}:
+            raise ValueError("Ninja linked input is not materialized")
+    if not nodes:
+        raise ValueError("Ninja graph contains no observed nodes")
+
+    expected = {str(Path(name).resolve()) for name in objects}
+    dependencies = {}
+    current = None
+    declared = 0
+    lines = logs["input-dependencies"].splitlines()
+    pattern = re.compile(
+        r"(.+): #deps ([0-9]+), deps mtime ([0-9]+) \((VALID|STALE)\)")
+
+    def finish():
+        if current is not None and len(dependencies[current]) != declared:
+            raise ValueError("Compiler dependency count differs from output")
+
+    for line in lines:
+        if not line.strip():
+            continue
+        if not line.startswith("    "):
+            finish()
+            match = pattern.fullmatch(line)
+            if match is None:
+                raise ValueError("Compiler dependencies are malformed")
+            path = Path(match[1])
+            path = path if path.is_absolute() else build / path
+            name = str(path.resolve())
+            current = name if name in expected else None
+            if current is not None:
+                if (match[4] != "VALID" or current in dependencies or
+                        int(match[3]) != path.stat().st_mtime_ns):
+                    raise ValueError("Compiler dependencies are stale")
+                declared = int(match[2])
+                dependencies[current] = []
+                observe(path)
+        elif current is not None:
+            path = Path(line.strip())
+            path = path if path.is_absolute() else build / path
+            observed = observe(path)
+            dependencies[current].append(str(observed))
+            headers.add(str(observed))
+    finish()
+    if set(dependencies) != expected or any(not row for row in dependencies.values()):
+        raise ValueError("A materialized object lacks compiler dependencies")
+    for name, identity in files.items():
+        if (digest(name) != identity["sha256"] or
+                Path(name).stat().st_size != identity["size"]):
+            raise ValueError("Compiler inputs changed during observation")
+    return {"scope": "current_ninja_materialized_context_superset",
+            "files": files, "archives": sorted(archives),
+            "headers": sorted(headers)}
+
+
+def capture_complete(root, build, catalogue, output, execute, environment):
+    """Observe one actual Ninja build before the existing producer lists cases."""
+    root, build = Path(root).absolute(), Path(build).absolute()
+    for stem, argv in metadata_commands(build).items():
+        text = execute(argv, environment, build / "tdd" / (stem + ".txt"))
+        if len(text.encode()) > MAX_METADATA_BYTES:
+            raise ValueError("Compiler metadata output exceeds its bound")
+    return capture(root, build, catalogue, output, complete=True)
+
+
+def verify_snapshot(root, build, catalogue, snapshot):
+    """Recheck current bytes without running a compiler, Ninja or test process."""
+    before = read_json(snapshot)
+    if (before.get("schema") != 1 or
+            before.get("kind") != "io-property-preexecution-inputs"):
+        raise ValueError("Missing preexecution compiled/source identity")
+    current = build_inputs(
+        Path(root).absolute(), Path(build).absolute(), catalogue,
+        complete="compiler_inputs" in before)
+    if any(before.get(key) != value for key, value in current.items()):
+        raise ValueError("Source, binary or compiled inputs changed")
+    return before
+
+
+def capture(root, build, catalogue, output, *, complete=False):
     """Capture after real build and before executing the existing test gate."""
     root, build = Path(root).absolute(), Path(build).absolute()
-    binding = build_inputs(root, build, catalogue)
+    binding = build_inputs(root, build, catalogue, complete=complete)
     report_directory = build / "tdd"
     report_directory.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=report_directory, prefix=".io-matrix-") as anchor:
@@ -245,12 +467,8 @@ def discovery_names(text):
 def audit(root, build, catalogue, snapshot, execution, *, allow_subset=False):
     """Consume existing gate outputs; never execute tests or infer HIL results."""
     root, build, execution = map(lambda p: Path(p).absolute(), (root, build, execution))
-    before = read_json(snapshot)
-    if before.get("schema") != 1 or before.get("kind") != "io-property-preexecution-inputs":
-        raise ValueError("Missing preexecution compiled/source identity")
-    current = build_inputs(root, build, catalogue)
-    if any(before.get(k) != v for k, v in current.items()):
-        raise ValueError("Reviewed source, binary or compiled inputs changed during execution")
+    before = verify_snapshot(root, build, catalogue, snapshot)
+    current = before
     summary = read_json(execution / "execution.json")
     if summary.get("schema") != 1 or summary.get("kind") != "development-contract-execution" or not summary.get("suites"):
         raise ValueError("Missing actual existing Google execution summary")
@@ -259,7 +477,8 @@ def audit(root, build, catalogue, snapshot, execution, *, allow_subset=False):
     full_names = [Path(p).name for p in plan["executables"]]
     if len(names) != len(set(names)) or (not allow_subset and names != full_names):
         raise ValueError("Execution differs from the actual complete Google plan")
-    if not set(current["binaries"]).issubset(names):
+    reviewed_targets = {row["target"] for row in read_json(catalogue)["properties"]}
+    if not reviewed_targets.issubset(names):
         raise ValueError("A reviewed target was not executed")
     passed = {}
     for index, suite in enumerate(summary["suites"]):

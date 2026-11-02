@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import shutil
 import sys
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -101,37 +102,63 @@ def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", required=True, choices=(
         "native-debug", "native-release", "native-asan", "native-tsan"))
+    parser.add_argument("--observe-only", action="store_true", help=(
+        "Execute unfiltered case-list processes only; do not run test cases "
+        "or produce execution qualification"))
     args = parser.parse_args(arguments)
     try:
         build = selected_build(args.preset)
         output = build / "tdd"
         output.mkdir(parents=True, exist_ok=True)
         summary = output / "execution.json"
-        summary.unlink(missing_ok=True)
+        if args.observe_only and summary.exists():
+            summary.rename(output / (
+                "execution.before-observe-" + uuid.uuid4().hex + ".json"))
+        else:
+            summary.unlink(missing_ok=True)
         google = output / "google"
         if google.is_symlink():
             raise ValueError("GoogleTest output directory must not "
                              "be a symlink")
-        if google.exists():
-            shutil.rmtree(google)
-        google.mkdir()
+        if not args.observe_only:
+            if google.exists():
+                shutil.rmtree(google)
+            google.mkdir()
         report = build / "ctest-results.xml"
-        report.unlink(missing_ok=True)
+        if not args.observe_only:
+            report.unlink(missing_ok=True)
         env = environment()
-        ctest = shutil.which("ctest", path=env["PATH"])
-        if not ctest:
-            raise ValueError("Missing maintained CTest executable")
         binaries = google_binaries(build)
-        plan = json.loads(execute(
-            [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
-            output / "ctest-plan.txt"))
-        planned = ctest_names(plan, binaries, build)
+        from scripts.ci import io_lifecycle_matrix as matrix
+        catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
+        snapshot = output / "io-property-inputs.json"
+        if args.observe_only:
+            for path in (snapshot, output / "io-property-report.json"):
+                if path.exists():
+                    path.rename(path.with_name(
+                        path.stem + ".before-observe-" +
+                        uuid.uuid4().hex + path.suffix))
+        matrix.capture_complete(ROOT, build, catalogue, snapshot, execute, env)
+        if not args.observe_only:
+            ctest = shutil.which("ctest", path=env["PATH"])
+            if not ctest:
+                raise ValueError("Missing maintained CTest executable")
+            plan = json.loads(execute(
+                [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
+                output / "ctest-plan.txt"))
+            planned = ctest_names(plan, binaries, build)
         discovered = {}
         for index, binary in enumerate(binaries):
             listing = execute([str(binary), "--gtest_filter=*",
                                "--gtest_list_tests"], env,
                               output / f"discovery-{index}.txt")
             discovered[binary] = discovered_cases(listing)
+        matrix.verify_snapshot(ROOT, build, catalogue, snapshot)
+        if args.observe_only:
+            print(f"Observed {sum(map(len, discovered.values()))} case names "
+                  f"using case-list processes; no test cases executed; "
+                  f"qualification=false; snapshot: {snapshot}")
+            return 0
         # CTest runs the complete runtime plan, including non-Google contracts.
         # GoogleTest's directory output names each report after its executable.
         env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
@@ -160,6 +187,7 @@ def main(arguments=None):
                 raise ValueError("GoogleTest execution differs from discovered "
                                  "case identities: " + binary.name)
             results.append({"binary": binary.name, **evidence})
+        matrix.verify_snapshot(ROOT, build, catalogue, snapshot)
         summary.write_text(json.dumps({
             "schema": 1, "kind": "development-contract-execution",
             "preset": args.preset, "passed": sum(r["passed"] for r in results),

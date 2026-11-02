@@ -70,7 +70,7 @@ def resource_budget(result):
     budget = result.memory_budget
     flash_limit = (budget.flash_load_limit_bytes
                    if budget.flash_load_limit_bytes is not None
-                   else result.layout["size"])
+                   else result.image_size)
     return _resource_budget(flash_limit, budget_limits(result),
                             budget.main_stack_bytes, budget.libc_heap_bytes)
 
@@ -85,7 +85,9 @@ def resource_budget_projection(resolved):
     limits = _budget_limits(resolved["memory"], budget.get("static_ram_bytes"),
         {name: item["limit_bytes"] for name, item in budget.get("regions", {}).items()})
     return _resource_budget(
-        budget.get("flash_load_bytes", resolved["layout"]["size"]), limits,
+        budget.get("flash_load_bytes", resolved["layout"]["size"] -
+                   budget.get("image_prefix_bytes", 0) -
+                   budget.get("image_suffix_bytes", 0)), limits,
         budget["main_stack_bytes"], budget.get("libc_heap_bytes", 0))
 
 
@@ -157,7 +159,7 @@ def _mpu_linker(result):
     reservations = budgets.mpu
     flash = result.layout
     ram = next(region for region in result.memory if region["linker"])
-    flash_origin = flash["origin"]
+    flash_origin = flash.origin
     svc_origin = flash_origin + reservations.privileged_flash_bytes
     user_flash_origin = svc_origin + reservations.syscall_flash_bytes
     ram_origin = ram["origin"]
@@ -219,7 +221,7 @@ MEMORY {{
 {bounds}
 {aliases}
 __nx_flash_start = 0x{flash_origin:08x};
-__nx_flash_end = 0x{flash_origin + flash["size"]:08x};
+__nx_flash_end = 0x{flash_origin + flash.size:08x};
 __nx_flash_live_start = __nx_flash_start;
 __nx_flash_image_load_start = __nx_flash_start;
 _estack = ORIGIN(PRIV_RAM) + LENGTH(PRIV_RAM);
@@ -264,7 +266,8 @@ def linker(result):
     if result.memory_budget.mpu is not None:
         return _mpu_linker(result)
     ram = next(region for region in result.memory if region["linker"])
-    flash = result.layout
+    flash_origin = result.image_origin
+    flash_size = result.image_size
     stack = result.memory_budget.main_stack_bytes
     heap = result.memory_budget.libc_heap_bytes
     extras = [region for region in result.memory if region["id"] != ram["id"]]
@@ -282,7 +285,9 @@ def linker(result):
     (flash_image_record, flash_ram_phdr, flash_ram_section,
      flash_workspace_bss) = (fragments(result) if fragments else ("", "", "", ""))
     vector_assertions = ""
-    if flash["origin"] != result.flash["origin"]:
+    if (flash_origin != result.flash["origin"] or
+            result.memory_budget.image_prefix_bytes or
+            result.memory_budget.image_suffix_bytes):
         profile = for_selection(result)
         alignment = profile.OFFSET_IMAGE_ALIGNMENT
         symbol = profile.OFFSET_IMAGE_VECTOR_SYMBOL
@@ -296,7 +301,7 @@ def linker(result):
             '    ASSERT(SIZEOF(.isr_vector) > 0 && '
             f'SIZEOF(.isr_vector) <= {alignment}, '
             '"image vector table exceeds the reviewed reservation")\n')
-    return f'''/* Exact resolved physical layout; no product reservation. */
+    return f'''/* Resolved executable window inside its physical erase owner. */
 ENTRY(Reset_Handler)
 PHDRS {{
     flash PT_LOAD FLAGS(5);
@@ -306,7 +311,7 @@ PHDRS {{
 {flash_ram_phdr}{extra_phdrs}
 }}
 MEMORY {{
-    FLASH (rx) : ORIGIN = 0x{flash["origin"]:08x}, LENGTH = {flash["size"]}
+    FLASH (rx) : ORIGIN = 0x{flash_origin:08x}, LENGTH = {flash_size}
     RAM (rwx) : ORIGIN = 0x{ram["origin"]:08x}, LENGTH = {ram["size"]}
 {extra_memory}
 }}

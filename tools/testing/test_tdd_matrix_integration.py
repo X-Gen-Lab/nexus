@@ -71,7 +71,7 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "environment", return_value={}), \
                 patch.object(tdd_gate, "execute", side_effect=execute or self.execute), \
-                patch.object(matrix, "capture", side_effect=capture or self.capture) as before, \
+                patch.object(matrix, "capture_complete", side_effect=capture or self.capture) as before, \
                 patch.object(matrix, "audit", side_effect=audit or self.audit) as after, \
                 redirect_stdout(output), redirect_stderr(output):
             status = tdd_gate.main(["--all"])

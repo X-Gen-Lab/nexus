@@ -405,6 +405,9 @@ def service_sources(sdk, specification):
                 "application.h": selected / "application.h",
                 "composition.c": selected / "composition.c",
                 "public_ca.h": verification / "public_ca.h"}
+    if specification.scenario == "image_window":
+        return {"main.c": verification / "main.c",
+                "layout.json": verification / "layout.json"}
     return {"main.c": verification / "services.c"}
 
 
@@ -445,6 +448,11 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
            '#error Supplier headers leaked into public secure APIs\n#endif\n'
            if secure else '')
         + '_Static_assert(1, "Public service include isolation");\n')
+    libraries = {
+        "common_services": "Nexus::Settings Nexus::OSWait Nexus::LwIPStorage",
+        "device_tmp117": "Nexus::TMP117I2C",
+        "image_window": "",
+    }
     version = load_policy(sdk)["semantic_version"]
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
@@ -464,10 +472,11 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
               if specification.arm else '')
            + 'nexus_add_firmware(installed_services SOURCES composition.c\n'
            '  LIBRARIES installed_public Nexus::TLSStorage Nexus::CoreMQTTStorage\n'
-           '  Nexus::LwIP' + (' installed_entropy' if specification.arm else '')
+           '  Nexus::LwIPStorage' + (' installed_entropy' if specification.arm else '')
            + ')\n' if secure else
            'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
-           '  LIBRARIES Nexus::Settings Nexus::OSWait Nexus::LwIP)\n')
+           + ('  LIBRARIES ' + libraries[specification.scenario]
+              if libraries[specification.scenario] else '') + ')\n')
         + 'nexus_target_warnings(installed_services STRICT)\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
@@ -776,36 +785,66 @@ def secure_service_symbols(specification):
     return required(specification.arm)
 
 
-def check_secure_compiles(commands, public, sdk, resolved, specification):
+def service_symbols(specification):
+    """Required linked methods come from the exact immutable scenario entry."""
+    service_profile(specification)
+    if specification.scenario == "secure_services":
+        return secure_service_symbols(specification)
+    if specification.scenario == "device_tmp117":
+        return frozenset({"nx_tmp117_init", "nx_tmp117_begin", "nx_tmp117_poll",
+                          "nx_tmp117_cancel", "nx_tmp117_stop",
+                          "nx_tmp117_i2c_transport", "nx_platform_start",
+                          "nx_platform_stop", "nx_factory_gpio"})
+    if specification.scenario == "image_window":
+        return frozenset({"nx_platform_start", "nx_platform_stop", "image_data"})
+    return SERVICE_SYMBOLS
+
+
+def service_scope(specification):
+    """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "image_window":
+        return ("Executable window only; no bootloader, signing, activation "
+                "or physical execution. No measured stack or timing.")
+    if specification.scenario == "device_tmp117":
+        return ("Software I2C endpoint model only; Native runtime or ARM link. "
+                "No physical sensor, bus, measured stack or timing.")
+    return (("Public CA only; no client identity, authenticated connection "
+             "or broker exchange. "
+             if specification.scenario == "secure_services" else "")
+            + "Canonical SDK scenario and linked implementation only; "
+            "no measured stack, timing, physical network or Flash.")
+
+
+def check_service_compiles(commands, public, sdk, resolved, specification):
     """Audit actual C11/CPU/ABI argv and the narrow public-only API boundary."""
     for entry in public:
         argv = entry.get("arguments") or shlex.split(entry["command"])
         # Public-only callers may not opt into either supplier's storage layout.
         if any(str(sdk / "ext") in argument for argument in argv):
-            raise ValueError("Secure service private inputs leaked into product")
+            raise ValueError("Service private inputs leaked into product")
     expected = {"-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
                 "-mfloat-abi=hard", "-fshort-enums"} if specification.arm else set()
     if (resolved.get("enum_abi") != ("short-enums" if specification.arm
                                     else "native-int")):
-        raise ValueError("Secure service enum ABI differs from its profile")
+        raise ValueError("Service enum ABI differs from its profile")
     if specification.arm and (resolved.get("soc_family") != "stm32f407" or
             resolved.get("cpu", {}).get("arch") != "cortex-m4" or
             resolved["cpu"].get("float_abi") != "hard" or
             resolved["cpu"].get("fpu") != "fpv4-sp-d16"):
-        raise ValueError("Secure service CPU ABI differs from its profile")
+        raise ValueError("Service CPU ABI differs from its profile")
     for entry in commands:
         if Path(entry["file"]).suffix in {".cpp", ".cc", ".cxx", ".C"}:
-            raise ValueError("Secure service firmware must remain C11")
+            raise ValueError("Service firmware must remain C11")
         if Path(entry["file"]).suffix != ".c":
             continue
         argv = entry.get("arguments") or shlex.split(entry["command"])
         if [item for item in argv if item.startswith("-std=")] != ["-std=c11"]:
-            raise ValueError("Secure service requires actual C11 translation units")
+            raise ValueError("Service requires actual C11 translation units")
         options = {item for item in argv if item.startswith((
             "-mcpu=", "-mfpu=", "-mfloat-abi=")) or item in {
                 "-mthumb", "-marm", "-fshort-enums", "-fno-short-enums"}}
         if options != expected:
-            raise ValueError("Secure service compiled CPU/enum ABI differs")
+            raise ValueError("Service compiled CPU/enum ABI differs")
 
 
 def check_service_image(sdk, source, build, specification, run_checked):
@@ -825,7 +864,7 @@ def check_service_image(sdk, source, build, specification, run_checked):
               "private_probe": source / "private_headers.c",
               "sdk_manifest": sdk / ".nexus-source-sdk.json",
               "compile_commands": build / "compile_commands.json"}
-    if secure:
+    if specification.scenario != "common_services":
         inputs.update({"consumer/" + name: source / name
                        for name in canonical_sources})
     else:
@@ -866,7 +905,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
         if sum(Path(entry["file"]).resolve() == source / "composition.c"
                for entry in commands) != 1:
             raise ValueError("Secure service composition has no unique compile row")
-        check_secure_compiles(commands, public, sdk, resolved, specification)
+    if specification.scenario != "common_services":
+        check_service_compiles(commands, public, sdk, resolved, specification)
     for entry in commands:
         file = Path(entry["file"]).resolve()
         if (not file.is_relative_to(sdk) and file not in owned
@@ -913,9 +953,11 @@ def check_service_image(sdk, source, build, specification, run_checked):
         if secure:
             retention_command += ["--component-owner", "f407-secure-services",
                                   "--consumer", str(source / "application.c")]
-        run_checked(retention_command)
-        retained = json.loads(retention_path.read_text())
-        if (retained["status"] != "passed" or
+        if specification.scenario != "image_window":
+            run_checked(retention_command)
+        retained = (json.loads(retention_path.read_text())
+                    if specification.scenario != "image_window" else None)
+        if retained is not None and (retained["status"] != "passed" or
                 retained["elf"] != before["elf"]):
             raise ValueError("Service provider retention failed")
         if secure and (
@@ -923,7 +965,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
                 retained.get("owner_profile") != "f407-secure-services" or
                 retained.get("consumer") != before["consumer/application.c"]):
             raise ValueError("Secure service component retention identity differs")
-        retention_identity = file_identity(retention_path)
+        retention_identity = (file_identity(retention_path)
+                              if retained is not None else None)
     else:
         runtime = run_checked([str(executable)])
         if runtime.returncode:
@@ -933,14 +976,14 @@ def check_service_image(sdk, source, build, specification, run_checked):
                             str(executable)])
     if observed.returncode or len(observed.stdout) > 4 * 1024 * 1024:
         raise ValueError("Service symbol observation failed or exceeded its bound")
-    required_symbols = secure_service_symbols(specification) if secure else SERVICE_SYMBOLS
+    required_symbols = service_symbols(specification)
     forbidden = {"libc_heap": [], "cpp_runtime": []}
-    if secure and specification.arm:
+    if specification.scenario != "common_services" and specification.arm:
         from tools.measurement.retention import secure_forbidden_symbols
         forbidden = secure_forbidden_symbols({line.split()[0] for line in
             observed.stdout.splitlines() if line.split()})
         if any(forbidden.values()):
-            raise ValueError("Secure service retained libc heap or C++ runtime")
+            raise ValueError("Service retained libc heap or C++ runtime")
     symbols = {}
     for line in observed.stdout.splitlines():
         fields = line.split()
@@ -962,11 +1005,10 @@ def check_service_image(sdk, source, build, specification, run_checked):
             "physical_status": "not_executed", "inputs": before,
             "runtime_executed": runtime is not None, "symbols": symbols,
             "resources": resources_identity, "retention": retention_identity,
-            **({"forbidden_symbols": forbidden} if secure else {}),
-            "scope": ("Public CA only; no client identity, authenticated connection "
-                      "or broker exchange. " if secure else "")
-                     + "Canonical SDK scenario and linked implementation only; "
-                     "no measured stack, timing, physical network or Flash."}
+            **({"forbidden_symbols": forbidden}
+               if specification.scenario != "common_services"
+               and specification.arm else {}),
+            "scope": service_scope(specification)}
 
 
 def positive_parallel(value):

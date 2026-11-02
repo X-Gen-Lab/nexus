@@ -25,6 +25,7 @@ INPUT                  += soc/stm32/stm32f407/include/nexus
 INPUT                  += components/network/include/nexus
 INPUT                  += components/tls/include/nexus
 INPUT                  += components/mqtt/include/nexus
+INPUT                  += components/tmp117/include/nexus
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.h
 RECURSIVE              = YES

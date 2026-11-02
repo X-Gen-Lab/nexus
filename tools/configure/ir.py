@@ -859,6 +859,23 @@ class MpuMemoryReservationsIR:
 
 
 @dataclass(frozen=True)
+class FlashRegionIR(Record):
+    """Selected physical erase owner; image reservations do not change it."""
+    origin: int
+    size: int
+    id: str | None = None
+    kind: str | None = None
+
+    def projection(self):
+        result = {"origin": self.origin, "size": self.size}
+        if self.id is not None:
+            result["id"] = self.id
+        if self.kind is not None:
+            result["kind"] = self.kind
+        return result
+
+
+@dataclass(frozen=True)
 class MemoryBudgetIR:
     main_stack_bytes: int
     libc_heap_bytes: int
@@ -866,6 +883,8 @@ class MemoryBudgetIR:
     flash_load_limit_bytes: int | None
     regions: tuple[MemoryRegionBudgetIR, ...] = ()
     mpu: MpuMemoryReservationsIR | None = None
+    image_prefix_bytes: int = 0
+    image_suffix_bytes: int = 0
 
     def projection(self):
         result = {"main_stack_bytes": self.main_stack_bytes,
@@ -879,6 +898,9 @@ class MemoryBudgetIR:
                                  for item in self.regions}
         if self.mpu is not None:
             result["mpu"] = thaw(self.mpu)
+        for name in ("image_prefix_bytes", "image_suffix_bytes"):
+            if getattr(self, name):
+                result[name] = getattr(self, name)
         return result
 
 
@@ -972,7 +994,7 @@ class ConfigurationIR(Record):
     physical_part: PhysicalPartIR
     clock: Mapping
     clock_profile: str
-    layout: Mapping
+    layout: FlashRegionIR
     board_bindings: Mapping
     routes: Mapping
     platform_metadata: Mapping
@@ -1025,6 +1047,15 @@ class ConfigurationIR(Record):
         return self.physical_part.memory
 
     @property
+    def image_origin(self):
+        return self.layout.origin + self.memory_budget.image_prefix_bytes
+
+    @property
+    def image_size(self):
+        return (self.layout.size - self.memory_budget.image_prefix_bytes -
+                self.memory_budget.image_suffix_bytes)
+
+    @property
     def claims(self):
         return self.resource_plan.claims
 
@@ -1037,6 +1068,7 @@ class ConfigurationIR(Record):
         result.update(backend=self.backend, enum_abi=self.enum_abi,
                       irq=thaw(self.irq), cpu=self.cpu, part=self.part,
                       package=self.package, flash=self.flash, memory=self.memory,
+                      layout={**self.flash, **self.layout.projection()},
                       kernel_profile=self.kernel,
                       memory_budgets=self.memory_budget.projection(),
                       claims=tuple({name: getattr(claim, name) for name in

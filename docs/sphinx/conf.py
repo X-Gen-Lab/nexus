@@ -45,8 +45,8 @@ breathe_default_project = 'nexus'
 breathe_domain_by_extension = {'h': 'c'}
 nitpicky = True
 
-# These deliberately opaque provider tags and actual external kernel/C types
-# are not defined by the public-only Doxygen input. Other references stay strict.
+# These public-page tags intentionally remain opaque, and the kernel/C types
+# are external. Exact ignored identifiers do not relax other references.
 _external_types = (
     'size_t uint8_t uint16_t uint32_t uint64_t int16_t int32_t int64_t uintptr_t '
     'pthread_t pthread_mutex_t pthread_cond_t '
@@ -55,6 +55,7 @@ _external_types = (
     'TX_THREAD TX_SEMAPHORE UINT nx_clock_domain nx_user_io_broker nx_user_io_call '
     'nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint '
     'nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port '
-    'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory'
+    'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory '
+    'nx_lwip_adapter tcp_pcb pbuf'
 ).split()
 nitpick_ignore = [('c:identifier', name) for name in _external_types]

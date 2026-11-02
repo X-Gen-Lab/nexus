@@ -1,7 +1,8 @@
 # Optional common components
 
 Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner,
-BMP280 core and SPI transport, instance-level Log, two-bank commit-last Storage,
+BMP280 core and SPI transport, [TMP117 one-shot I2C](tmp117/README.md),
+instance-level Log, two-bank commit-last Storage,
 physical Flash region and Native file adapters, bounded Settings/KV staging,
 and pure Modbus RTU parsing.
 Unreferenced component code does not enter a firmware image.

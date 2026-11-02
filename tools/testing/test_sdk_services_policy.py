@@ -53,14 +53,14 @@ class SDKServicesPolicyTests(unittest.TestCase):
         return execution
 
     def test_current_retains_the_complete_legacy_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v13")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:50], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(),
                          LEGACY_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 56)
-        self.assertEqual(len(transport.IMAGES), 59)
-        self.assertEqual(len(transport.FIXTURES), 56)
+        self.assertEqual(len(layout), 59)
+        self.assertEqual(len(transport.IMAGES), 62)
+        self.assertEqual(len(transport.FIXTURES), 59)
 
     def test_service_profiles_are_exact_frozen_plan_entries(self):
         profiles = transport.SERVICE_CONSUMERS[:4]
@@ -75,7 +75,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             profiles[0].name = "changed"
         plan = transport.consumer_plan()
-        self.assertEqual(plan[-6:-2], tuple(("services", item)
+        self.assertEqual(plan[50:54], tuple(("services", item)
                                           for item in profiles))
         changed = replace(profiles[0], domain="arm-services")
         with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
@@ -104,7 +104,8 @@ class SDKServicesPolicyTests(unittest.TestCase):
         self.assertEqual(build.name, "native services build")
         self.assertIn("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON", command)
         cmake = (source / "CMakeLists.txt").read_text()
-        for target in ("Nexus::Settings", "Nexus::OSWait", "Nexus::LwIP"):
+        for target in ("Nexus::Settings", "Nexus::OSWait",
+                       "Nexus::LwIPStorage"):
             self.assertIn(target, cmake)
         self.assertIn("LANGUAGES C ASM", cmake)
         smoke = (source / "main.c").read_text()

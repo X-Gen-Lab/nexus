@@ -49,13 +49,59 @@ default plan is `tools/dev/plans/software.json`; the default future directory is
 `build/quality/planned-execution`. A preview covers the complete selected plan;
 `--preset` filtering is rejected.
 
-This operation never launches a checker, CTest, GoogleTest, equipment or a network
-request, and never prepares tools. Case discovery remains `not_executed` and case
-counts remain unknown. The `hil_prepare` stage is explicitly station preparation
-without equipment execution; other physical requirements remain unassessed.
-Checker argument validation and tool availability still belong to the actual
-checker. A formal input plan does not make its preview a qualification result:
-all stage statuses remain `not_executed` and `qualification` remains false.
+Preview never launches a checker, CTest, GoogleTest, equipment or a network
+request. Without an observation it remains lightweight: discovery is
+`not_executed` and case counts are unknown. Known host-only stages report
+`not_required`; unknown hardware needs stay `unknown`. HIL preparation can list
+an existing fixture's required tests and pending measurements. Until its exact
+resolved configuration exists it reports `configuration_pending`, without
+inventing controller routes or station observations.
+
+To show previously observed case names, first build one maintained Native
+preset, then explicitly run its existing producer in case-list mode:
+
+```sh
+python scripts/ci/native_contracts.py --preset native-debug --observe-only
+python tools/dev/dev.py plan --output-root /new/future-execution \
+  --observation native-debug=build/native-debug/tdd/io-property-inputs.json \
+  --json /existing/observed-preview.json
+```
+
+`--observe-only` executes every manifest binary with the unfiltered GoogleTest
+case-list arguments. It does not run case bodies or CTest and does not create
+an execution-success summary. Existing summaries, input snapshots and property
+reports are retained under unique `before-observe` names. Without that flag,
+the Native producer still executes the complete CTest plan and all discovered
+Google cases once, including disabled cases.
+
+Both producers extend the same `io-property-inputs.json` snapshot. Complete
+observations bind every Google manifest binary and target-local object context,
+plus a deduplicated conservative superset of current materialized compile
+contexts, sources, compiler-reported dependencies and linked files. Two bounded
+Ninja metadata queries use the existing raw command receipts; preview reads those
+receipts and never starts Ninja. The scope is
+`current_ninja_materialized_context_superset`, not an independent link resolver
+or proof that each observed input was consumed by a fresh compilation. The
+maintained Native builds use Ninja; unknown generators or incomplete dependency
+records reject. Each metadata stream and reader snapshot is bounded to 32 MiB,
+with at most 50,000 compiler contexts/files and 100,000 projected cases.
+
+The explicit snapshot must belong to the selected preset's actual build path.
+Its successful original discovery receipts must postdate the snapshot, match
+unfiltered arguments, and retain unchanged raw output. Sources, objects, headers,
+archives, binaries and retained receipts are rechecked before and after reading;
+stale, failed, partial or changed observations reject. Legacy snapshots with no
+complete compiler binding cannot establish all-Google case discovery. Moving a
+checkout or SDK requires a new observation in its actual build directory.
+
+Preview preserves parameterized and disabled names using the existing Native
+parser. Cases matching the reviewed lifecycle catalogue show the existing
+invariant and limitations; other cases are explicitly `unknown`. Selection comes
+from the authored plan stage and complete existing executable manifest. This is
+“previously observed, current inputs match”, with case execution `not_assessed`.
+No pass, coverage percentage, physical result or qualification is inferred.
+Every preview stage remains `not_executed` and `qualification` remains false.
+Checker argument validation and tool availability belong to actual execution.
 
 Application creation uses versioned templates from the separate
 `X-Gen-Lab/nexus-examples` checkout. It does not copy a platform tree or download

@@ -41,6 +41,27 @@ observer、owner、slots 和 guard/executor/clock 必须保持同一绑定及生
 继续使用原 owner guard；执行者不会因接入诊断增加一层设备热路径 vtable。detach 后
 owner 继续拥有所有未排空工作。诊断输出也不得覆盖已接受的 operation 或 payload。
 
+## 只读消费者与正常进度分离
+
+`IT-R01` 组合既有机制，不增加公共状态 API。唯一执行者在正常进度位点调用
+`nx_owner_observer_service`，其输出是 `nx_owner_observation_t` 值副本。监控端只接收
+该副本及可选的 `nx_request_observation_t` 副本，再调用纯函数 `nx_io_diagnose`；读取
+同一副本不会再次 service、读取设备寄存器、推进传输、获取时钟或归还借用。副本描述
+其观察时刻，不保证读取时仍是最新状态，也不授予 cancel、恢复或存储复用权限。
+
+只有 `diagnostic_result` 成功时，消费者才将 owner admission/queue/slot 字段标为
+已知。未提供的 request、stream、生命周期、服务预算和 observer join 事实保持 unknown。
+owner 已关闭且 idle，仍不证明 UART/SPI 硬件已停止、IRQ 发布者已退出或外部读者已 join；
+这些步骤仍由真实生命周期拥有者分别完成。跨任务发布副本需要调用方提供同步与存储
+生命周期；不能把普通 C 结构体的并发读写当成原子快照。
+
+本组合不修改默认 request、slot、owner 或 provider 的字段，不增加默认队列、计数器、
+worker、vtable 或设备热路径调用；未选择观察时没有新增常驻成本。选择观察时，调用方
+承担已有 sidecar 与值副本存储，ABI 相关尺寸见本页存储表。组合回归位于
+`tests/google/io_owner_diagnostic_pipeline_test.cpp`：真实 Native UART/SPI 与既有 C
+executor 验证 active、quarantine、关闭/idle、unknown、同类实例隔离及排空后副本生存期。
+这些是四项 Google case，内部传输分支不是额外 case；模型执行不证明实板停机或时序。
+
 ## Stream 快照与容量预算
 
 `nx_stream_observe` 在一次短 IRQ guard 中复制 maintained aggregates，工作量与 block

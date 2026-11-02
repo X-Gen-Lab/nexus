@@ -111,6 +111,25 @@ class DeveloperPlanPreviewTests(unittest.TestCase):
                          "station_preparation_only")
         self.assertFalse(station["hardware"]["requires_equipment"])
 
+    def test_hil_fixture_requirements_remain_pending_without_resolved_routes(self):
+        original = Path(__file__).resolve().parents[2]
+        fixture = original / "tools/hil/fixtures/stm32f407_qiming_v31.json"
+        (self.root / "fixture.json").write_bytes(fixture.read_bytes())
+        self.stages[-1]["args"] = ["--fixture", "{root}/fixture.json",
+                                    "--resolved", "{output}/resolved.json",
+                                    "--report", "{output}/hil.json"]
+        self.write_plan()
+        result = self.preview()
+        requirement = result["stages"][-1]["hardware"]["requirements"]
+        self.assertEqual(requirement["status"], "configuration_pending")
+        self.assertIn("uart_echo", requirement["required_tests"])
+        self.assertIsNone(requirement["station_prerequisites"])
+        self.assertTrue(all(row["status"] == "not_executed" for row in
+                            requirement["pending_qualification"]))
+        self.assertEqual(result["stages"][1]["hardware"]["assessment"],
+                         "unknown")
+        self.assertFalse(self.output.exists())
+
     def test_unknown_placeholder_checker_and_duplicate_stage_reject(self):
         originals = json.loads(self.plan.read_text())
         cases = [
@@ -188,6 +207,136 @@ class DeveloperPlanPreviewTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "changed"):
                 self.preview()
         self.assertFalse(self.output.exists())
+
+    def test_transient_authored_plan_cannot_replace_retained_stage_meaning(self):
+        original = self.plan.read_bytes()
+        replacement = json.loads(original)
+        replacement["stages"][0]["timeout_s"] = 17
+        read = Path.read_bytes
+
+        def during_read(path):
+            if Path(path) == self.plan:
+                self.plan.write_text(json.dumps(replacement))
+                try:
+                    return read(path)
+                finally:
+                    self.plan.write_bytes(original)
+            return read(path)
+
+        with patch.object(Path, "read_bytes", new=during_read):
+            try:
+                result = self.preview()
+            except ValueError:
+                result = None
+        if result is not None:
+            self.assertEqual(result["stages"][0]["timeout_s"], 1800)
+            self.assertEqual(result["plan"]["sha256"],
+                             hashlib.sha256(original).hexdigest())
+        self.assertEqual(self.plan.read_bytes(), original)
+
+    def hil_inputs(self):
+        from tools.evidence.identity import canonical_digest
+
+        source = Path(__file__).resolve().parents[2]
+        fixture = self.root / "fixture.json"
+        fixture.write_bytes((source /
+            "tools/hil/fixtures/stm32f407_qiming_v31.json").read_bytes())
+        authored = json.loads(fixture.read_text())
+        resolved = self.root / "resolved.json"
+        configuration = {
+            "schema_version": 1, "board": authored["board"],
+            "part": authored["part"], "backend": "baremetal",
+            "controllers": [{"id": "uart1", "kind": "uart",
+                "controller": "USART1", "mode": "poll", "baud": 115200,
+                "pins": [{"function": "tx", "pin": "PA9"},
+                         {"function": "rx", "pin": "PA10"}]}]}
+        configuration["configuration_sha256"] = canonical_digest(configuration)
+        resolved.write_text(json.dumps(configuration))
+        self.write_plan(stages=[{"name": "station", "checker": "hil_prepare",
+            "args": ["--fixture", str(fixture), "--resolved", str(resolved),
+                     "--report", "{output}/station.json"]}])
+        return fixture, resolved
+
+    def test_transient_hil_fixture_cannot_replace_retained_pending_budget(self):
+        fixture, _resolved = self.hil_inputs()
+        original = fixture.read_bytes()
+        replacement = json.loads(original)
+        replacement["pending_qualification"][0]["budget"] = 17
+        read = Path.read_bytes
+
+        def during_read(path):
+            if Path(path) == fixture:
+                fixture.write_text(json.dumps(replacement))
+                try:
+                    return read(path)
+                finally:
+                    fixture.write_bytes(original)
+            return read(path)
+
+        with patch.object(Path, "read_bytes", new=during_read):
+            try:
+                result = self.preview()
+            except ValueError:
+                result = None
+        if result is not None:
+            pending = result["stages"][0]["hardware"]["requirements"][
+                "pending_qualification"]
+            self.assertIsNone(pending[0]["budget"])
+        self.assertEqual(fixture.read_bytes(), original)
+
+    def test_transient_hil_resolved_cannot_replace_retained_configuration(self):
+        from tools.evidence import identity
+
+        _fixture, resolved = self.hil_inputs()
+        original = resolved.read_bytes()
+        replacement = json.loads(original)
+        replacement["backend"] = "freertos"
+        replacement.pop("configuration_sha256")
+        replacement["configuration_sha256"] = identity.canonical_digest(
+            replacement)
+        validate = identity.resolved_identity
+
+        def during_validation(path):
+            resolved.write_text(json.dumps(replacement))
+            try:
+                return validate(path)
+            finally:
+                resolved.write_bytes(original)
+
+        with patch.object(identity, "resolved_identity",
+                          side_effect=during_validation):
+            with self.assertRaises(ValueError):
+                self.preview()
+        self.assertEqual(resolved.read_bytes(), original)
+
+    def test_transient_preset_cannot_replace_retained_build_selection(self):
+        module = self.module()
+        original = self.presets.read_bytes()
+        replacement = json.loads(original)
+        replacement["configurePresets"][0]["binaryDir"] = "transient-build"
+        load_presets, read = module.Presets, Path.read_bytes
+
+        def during_presets(root, environment):
+            self.presets.write_text(json.dumps(replacement))
+            try:
+                return load_presets(root, environment)
+            finally:
+                self.presets.write_bytes(original)
+
+        def during_read(path):
+            if Path(path) == self.presets:
+                self.presets.write_text(json.dumps(replacement))
+                try:
+                    return read(path)
+                finally:
+                    self.presets.write_bytes(original)
+            return read(path)
+
+        with patch.object(module, "Presets", side_effect=during_presets), \
+                patch.object(Path, "read_bytes", new=during_read):
+            with self.assertRaises(ValueError):
+                self.preview()
+        self.assertEqual(self.presets.read_bytes(), original)
 
     def test_json_is_exclusive_and_future_execution_stays_absent(self):
         destination = self.root / "preview.json"

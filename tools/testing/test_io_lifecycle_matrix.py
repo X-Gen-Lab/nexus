@@ -288,19 +288,31 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         with self.assertRaises((ValueError, OSError)): self.run_audit()
 
     def test_complete_gate_rejects_an_omitted_non_catalogue_target(self):
-        path = self.build / "google-contracts.json"
-        plan = json.loads(path.read_text())
-        plan["executables"].append(str(self.build / "bin/nexus_other_test"))
-        path.write_text(json.dumps(plan))
+        self.materialize_other_target()
         matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
         self.write_execution()
         with self.assertRaises(ValueError): self.run_audit()
 
-    def test_explicit_development_subset_is_never_complete_gate_evidence(self):
+    def materialize_other_target(self):
+        """Represent a real unreviewed target before testing subset admission."""
+        binary = self.build / "bin/nexus_other_test"
+        binary.write_bytes(b"unreviewed binary fixture")
+        output = self.build / "CMakeFiles/nexus_other_test.dir/other.cpp.o"
+        output.parent.mkdir(parents=True)
+        output.write_bytes(b"unreviewed compiled object fixture")
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        entries.append({"directory": str(self.build), "file": str(self.source),
+                        "arguments": ["cc", "-c", str(self.source),
+                                      "-o", str(output)]})
+        database.write_text(json.dumps(entries))
         path = self.build / "google-contracts.json"
         plan = json.loads(path.read_text())
-        plan["executables"].append(str(self.build / "bin/nexus_other_test"))
+        plan["executables"].append(str(binary))
         path.write_text(json.dumps(plan))
+
+    def test_explicit_development_subset_is_never_complete_gate_evidence(self):
+        self.materialize_other_target()
         matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
         self.write_execution()
         result = matrix.audit(self.root, self.build, self.catalogue, self.snapshot,

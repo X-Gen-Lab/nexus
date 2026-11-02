@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "regions": [
+    {
+      "id": "external_reserved",
+      "kind": "data",
+      "origin": 134217728,
+      "size": 131072
+    },
+    {
+      "id": "application",
+      "kind": "image",
+      "origin": 134348800,
+      "size": 131072
+    }
+  ]
+}

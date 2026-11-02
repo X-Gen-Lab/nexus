@@ -35,10 +35,64 @@ log_type all
 """
 
 
+def case_names(transport):
+    if transport == "posix":
+        return ("clean", "fault", "missing-client")
+    if transport == "lwip-test-relay":
+        return ("clean", "backpressure", "fault", "deadline", "missing-client")
+    raise ValueError("Unknown broker integration transport")
+
+
+def chain_report(mode, stdout):
+    """Admit explicit host-chain counters, never a process exit alone."""
+    if mode not in case_names("lwip-test-relay"):
+        raise ValueError("Unknown full-chain case")
+    metrics = {}
+    fields = {"result", "client_loans_clear", "loans_clear", "relay_joined",
+              "two_tcp_connections", "phy_qualified", "data_frames", "rx_frames",
+              "provider_service_calls", "relay_sent", "relay_received",
+              "relay_rx_frames", "relay_data_frames", "mqtt_events", "byte_budget",
+              "replay_provider_calls", "deadline", "memory_busy", "max_chain",
+              "paused_rounds"}
+    for key, value in re.findall(r"\b([a-z][a-z0-9_]*)=([0-9]+)\b", stdout):
+        if key not in fields:
+            continue
+        if key in metrics:
+            raise ValueError(f"Duplicate chain metric: {key}")
+        metrics[key] = int(value)
+    required = {"result": 0, "client_loans_clear": 1, "loans_clear": 1,
+                "relay_joined": 1, "two_tcp_connections": 1, "phy_qualified": 0}
+    if any(metrics.get(key) != value for key, value in required.items()):
+        raise ValueError("Incomplete full-chain withdrawal or scope")
+    for key in ("data_frames", "rx_frames", "provider_service_calls",
+                "relay_sent", "relay_received", "relay_rx_frames",
+                "relay_data_frames"):
+        if metrics.get(key, 0) <= 0:
+            raise ValueError(f"No actual stack progress: {key}")
+    if mode == "missing-client":
+        if "missing_client_peer_fatal_alert=" not in stdout:
+            raise ValueError("Missing actual broker authentication refusal")
+    elif "authenticated_tls=TLSv1.2 " not in stdout:
+        raise ValueError("Missing authenticated TLS session")
+    if mode in ("clean", "backpressure"):
+        if metrics.get("mqtt_events") != 15 or "mqtt_clean_close=locally_accepted" not in stdout:
+            raise ValueError("Incomplete MQTT QoS1/ACK/close flow")
+    if mode == "backpressure" and (
+        metrics.get("byte_budget") != 17 or metrics.get("paused_rounds", 0) <= 0
+    ):
+        raise ValueError("Missing bounded partial relay mode")
+    if mode in ("fault", "deadline"):
+        if metrics.get("replay_provider_calls") != 0 or metrics.get("deadline") != int(mode == "deadline"):
+            raise ValueError("Missing sticky failure/no-replay result")
+    return metrics
+
+
 def arguments():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--client", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--transport", choices=("posix", "lwip-test-relay"),
+                        default="posix")
     args = parser.parse_args()
     args.client = args.client.resolve(strict=True)
     args.output_root = args.output_root.absolute()
@@ -69,7 +123,11 @@ def main():
     record = {
         "owner": owner, "container_name": name, "image_selector": IMAGE,
         "physical_status": "not_executed", "qualification": False,
-        "scope": "Native POSIX socket only; no lwIP/MCU path",
+        "scope": ("Native full client lwIP/TCP/TLS/MQTT; two TCP hops via test-only "
+                  "ciphertext relay, no TAP/PHY/MCU qualification"
+                  if args.transport == "lwip-test-relay" else
+                  "Native POSIX socket only; no lwIP/MCU path"),
+        "transport": args.transport,
         "receipts": [], "cases": [], "cleanup": [],
         "client_binary_sha256": hashlib.sha256(args.client.read_bytes()).hexdigest(),
     }
@@ -208,13 +266,15 @@ def main():
             "exec", cid, "sha256sum", "/usr/sbin/mosquitto",
         ])
         record["broker_binary_sha256"] = binary.stdout.strip()
-        for mode in ("clean", "fault", "missing-client"):
+        for mode in case_names(args.transport):
             case = run(mode, [str(args.client), mapping[0]["HostPort"], mode,
                               str(credentials)], required=False, timeout=20)
             record["cases"].append({
                 "name": mode, "exit_code": case.returncode,
                 "receipt": str(case.receipt_path), "stdout": case.stdout,
             })
+            if case.returncode == 0 and args.transport == "lwip-test-relay":
+                record["cases"][-1]["metrics"] = chain_report(mode, case.stdout)
             print(mode, case.returncode, case.stdout, flush=True)
             if case.returncode:
                 raise RuntimeError(f"{mode} integration case failed")

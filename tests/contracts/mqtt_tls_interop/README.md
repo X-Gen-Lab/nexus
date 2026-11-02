@@ -65,3 +65,9 @@ it contributes no broker, TLS or hardware qualification. Run them with:
 ```sh
 python -B -m unittest tools.testing.test_mqtt_tls_interop
 ```
+
+The separate [complete client-chain fixture](../lwip_mqtt_interop/README.md) uses
+`--transport lwip-test-relay` and its own helper to exercise the actual
+lwIP/TCP/TLS/MQTT client chain through a test-only ciphertext relay. That mode
+has five cases and distinct scope; it does not change these default three POSIX
+cases or turn their evidence into lwIP or hardware qualification.

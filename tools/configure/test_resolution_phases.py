@@ -47,9 +47,11 @@ class ResolutionPhaseTests(unittest.TestCase):
         selected = gate._resolve_flash_layout(
             None, gate.ROOT, self.variant['flash'], gate.load)
         self.assertIsNone(selected.input_path)
-        self.assertEqual(selected.layout, freeze(self.variant['flash']))
-        with self.assertRaises(TypeError):
-            selected.layout['size'] = 0
+        self.assertEqual(selected.layout.origin, self.variant['flash']['origin'])
+        self.assertEqual(selected.layout.size, self.variant['flash']['size'])
+        self.assertFalse(hasattr(selected.layout, 'erase_blocks'))
+        with self.assertRaises(FrozenInstanceError):
+            selected.layout.size = 0
 
     def test_layout_phase_keeps_exact_input_and_rejects_overlap(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -63,7 +65,7 @@ class ResolutionPhaseTests(unittest.TestCase):
             selected = gate._resolve_flash_layout(
                 'layout.json', root, physical, gate.load)
             self.assertEqual(selected.input_path, path.resolve())
-            self.assertEqual(selected.layout['size'], image['size'])
+            self.assertEqual(selected.layout.size, image['size'])
             path.write_text(json.dumps({'schema_version': 1,
                 'regions': [image, dict(image, id='data', kind='data')]}))
             with self.assertRaisesRegex(ValueError, 'overlap'):

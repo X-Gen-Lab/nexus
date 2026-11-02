@@ -61,6 +61,28 @@ target_link_libraries(nexus_lwip_vendor PUBLIC nexus_abi_options
 add_library(nexus_lwip STATIC EXCLUDE_FROM_ALL src/lwip_adapter.c)
 target_include_directories(nexus_lwip PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_lwip PUBLIC nexus_io nexus_lwip_vendor
-    PRIVATE nexus_build_options nexus_owned_warnings)
+target_link_libraries(nexus_lwip PUBLIC Nexus::IO
+    PRIVATE nexus_lwip_vendor nexus_build_options nexus_owned_warnings)
 add_library(Nexus::LwIP ALIAS nexus_lwip)
+
+# Only static composition opts into the exact supplier netif layout/profile.
+add_library(nexus_lwip_storage INTERFACE)
+target_link_libraries(nexus_lwip_storage INTERFACE
+    Nexus::LwIP nexus_lwip_vendor)
+add_library(Nexus::LwIPStorage ALIAS nexus_lwip_storage)
+
+# Optional byte client over the same explicitly owned NO_SYS stack.
+add_library(nexus_lwip_tcp STATIC EXCLUDE_FROM_ALL src/lwip_tcp.c)
+nexus_apply_target_policy(nexus_lwip_tcp)
+target_include_directories(nexus_lwip_tcp PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(nexus_lwip_tcp PUBLIC Nexus::IO
+    PRIVATE nexus_lwip nexus_lwip_vendor
+        nexus_build_options nexus_owned_warnings)
+add_library(Nexus::LwIPTCP ALIAS nexus_lwip_tcp)
+
+# Only static composition opts into the exact PCB/pbuf storage layout.
+add_library(nexus_lwip_tcp_storage INTERFACE)
+target_link_libraries(nexus_lwip_tcp_storage INTERFACE
+    Nexus::LwIPTCP nexus_lwip_vendor)
+add_library(Nexus::LwIPTCPStorage ALIAS nexus_lwip_tcp_storage)

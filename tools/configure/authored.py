@@ -43,7 +43,8 @@ INSTANCE_FIELDS = MappingProxyType(
      for kind, contract in CONTROLLER_CONTRACTS.items()})
 KINDS = frozenset(CONTROLLER_KINDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
-                 "flash_load_limit_bytes", "regions", "mpu"}
+                 "flash_load_limit_bytes", "image_prefix_bytes",
+                 "image_suffix_bytes", "regions", "mpu"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
@@ -172,9 +173,11 @@ def editor_schema():
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
                    "filter", "filter_a", "filter_b", "deadtime_ticks",
                    "trigger_ticks", "data_bitrate", "period_us", "lower",
-                   "upper"}
+                   "upper", "image_prefix_bytes", "image_suffix_bytes"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
+        for name in fields & {"image_prefix_bytes", "image_suffix_bytes"}:
+            properties[name]["maximum"] = 2**32 - 1
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
@@ -345,6 +348,10 @@ def explain_schema(schema):
                                    "checked against linked output."),
         "flash_load_limit_bytes": ("Declared Flash LOAD limit in bytes; "
                                    "not the ELF file size."),
+        "image_prefix_bytes": ("Reserved bytes before the executable vectors "
+                               "inside the selected physical Flash owner."),
+        "image_suffix_bytes": ("Reserved bytes after the executable load window; "
+                               "no header or trailer bytes are generated."),
         "max_units_per_second": "Producer-rate bound in payload units per second.",
         "units_per_block": "Payload units in each equally sized stream block.",
         "blocks": "Explicit caller-owned stream block count.",

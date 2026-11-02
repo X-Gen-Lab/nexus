@@ -916,7 +916,14 @@
     "语法 / 字段非法\\ninvalid syntax / fields": "invalid syntax / fields",
     "单向 JSON / 配置 / 内存投影\\none-way JSON / config / memory projection": "one-way JSON /\nconfig / memory projection",
     "严格 TOML 字段检查 → 冻结用户意图\\nstrict TOML fields -> frozen AuthoredAssembly": "strict TOML fields -> frozen AuthoredAssembly",
-    "不可变具名 IR：每个决策只存一次\\nimmutable named IR: each decision stored once": "immutable named IR: each decision stored once"
+    "不可变具名 IR：每个决策只存一次\\nimmutable named IR: each decision stored once": "immutable named IR: each decision stored once",
+    "FIG-32 Reference software-host interoperability": "FIG-32 Reference software-host interoperability",
+    "Nexus client process\\nMQTT / TLS client\\nreadonly byte face / TCP / lwIP\\none serialized stack owner": "Nexus client process\nMQTT / TLS client\nreadonly byte face / TCP / lwIP\none serialized stack owner",
+    "Test-only peer process\\nlwIP raw TCP peer\\ntransparent ciphertext relay\\nPOSIX socket / separate stack owner": "Test-only peer process\nlwIP raw TCP peer\ntransparent ciphertext relay\nPOSIX socket / separate stack owner",
+    "Local Mosquitto\\nTLS and MQTT endpoint": "Local Mosquitto\nTLS and MQTT endpoint",
+    "TCP A\\nsoftware Ethernet frame ports": "TCP A\nsoftware Ethernet frame ports",
+    "TCP B\\nhost socket bytes": "TCP B\nhost socket bytes",
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "One end-to-end TLS session\nrelay does not terminate TLS"
   },
   "zh_CN": {
     "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用": "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用",
@@ -1834,6 +1841,13 @@
     "语法 / 字段非法\\ninvalid syntax / fields": "语法 / 字段非法",
     "单向 JSON / 配置 / 内存投影\\none-way JSON / config / memory projection": "单向 JSON / 配置 / 内存投影",
     "严格 TOML 字段检查 → 冻结用户意图\\nstrict TOML fields -> frozen AuthoredAssembly": "严格 TOML 字段检查 → 冻结用户意图",
-    "不可变具名 IR：每个决策只存一次\\nimmutable named IR: each decision stored once": "不可变具名 IR：每个决策只存一次"
+    "不可变具名 IR：每个决策只存一次\\nimmutable named IR: each decision stored once": "不可变具名 IR：每个决策只存一次",
+    "FIG-32 Reference software-host interoperability": "FIG-32 软件主机互通参考",
+    "Nexus client process\\nMQTT / TLS client\\nreadonly byte face / TCP / lwIP\\none serialized stack owner": "Nexus 客户端进程\nMQTT／TLS 客户端\n只读字节接口／TCP／lwIP\n单一串行协议栈所有者",
+    "Test-only peer process\\nlwIP raw TCP peer\\ntransparent ciphertext relay\\nPOSIX socket / separate stack owner": "仅测试的对端进程\nlwIP 原始 TCP 对端\n透明密文中继\nPOSIX socket／独立协议栈所有者",
+    "Local Mosquitto\\nTLS and MQTT endpoint": "本地 Mosquitto\nTLS 与 MQTT 端点",
+    "TCP A\\nsoftware Ethernet frame ports": "TCP A\n软件以太网帧接口",
+    "TCP B\\nhost socket bytes": "TCP B\n主机 socket 字节",
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "一条端到端 TLS 会话\n中继不终止 TLS"
   }
 }

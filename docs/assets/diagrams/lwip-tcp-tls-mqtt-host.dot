@@ -1,0 +1,20 @@
+// FIG-32 reference: software-host data flow, not a firmware/HIL result.
+// Source: public byte/TCP/adapter contracts and the maintained host relay fixture.
+digraph LwipTcpTlsMqttHost {
+    graph [label="FIG-32 Reference software-host interoperability",
+           rankdir=LR, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.7,
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.18,0.14"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    client [label="Nexus client process\nMQTT / TLS client\nreadonly byte face / TCP / lwIP\none serialized stack owner"];
+    relay [label="Test-only peer process\nlwIP raw TCP peer\ntransparent ciphertext relay\nPOSIX socket / separate stack owner",
+           fillcolor="#f8fafc"];
+    broker [label="Local Mosquitto\nTLS and MQTT endpoint", fillcolor="#f0fdf4"];
+    client -> relay [dir=both, label="TCP A\nsoftware Ethernet frame ports"];
+    relay -> broker [dir=both, label="TCP B\nhost socket bytes"];
+    client -> broker [dir=both, style=dashed, constraint=false,
+                      label="One end-to-end TLS session\nrelay does not terminate TLS"];
+}

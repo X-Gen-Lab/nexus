@@ -30,15 +30,15 @@ that same nonreentrant execution context. No worker, scheduler startup, OS lock,
 socket API or Netconn API is created by the component.
 
 The fixed reference profile provides Ethernet II, ARP, IPv4, ICMP, UDP and TCP.
-DHCP, DNS, IPv6, VLAN delivery, IP fragmentation/reassembly, TLS and MQTT are
-not enabled. Address, mask, gateway, MAC identity, PHY observation and reconnect
+DHCP, DNS, IPv6, VLAN delivery and IP fragmentation/reassembly are not enabled.
+Optional Nexus TLS and MQTT components use the byte interface above this profile;
+the lwIP built-in TLS/socket integrations are not selected. Address, mask, gateway, MAC identity, PHY observation and reconnect
 policy are supplied by the external composition. The adapter does not discover
 a PHY, negotiate a link or establish Board electrical facts.
 
 The reference stack has a 16 KiB internal arena, 24 fixed 512-byte pool
 payloads, four UDP PCBs, four TCP PCBs, two listening TCP PCBs, 32 TCP segments,
-eight ARP
-entries and eight timer entries. lwIP additionally uses fixed protocol metadata;
+eight ARP entries and eight timer entries. lwIP additionally uses fixed protocol metadata;
 these numbers are not the complete `.bss` size. There is no libc allocation or
 unbounded storage growth. The arena is a bounded optional stack allocator, not
 an allocation-free guarantee for lwIP internals. Pool/arena exhaustion remains
@@ -46,8 +46,10 @@ observable and must be handled by the product. The complete chosen ELF, not a
 sum of nominal pool payloads, establishes its resource cost. Arena alignment
 is eight bytes on Native64 and four bytes on the maintained 32-bit MCU ABI.
 
-The public adapter API uses Nexus types. Only the composition site explicitly
-includes `lwip_storage.h` to allocate the exact `netif` and adapter layout.
+The public adapter API uses Nexus types. Generic users link `Nexus::LwIP` and
+inherit neither vendor include paths nor the stack configuration macros. Only
+the composition site explicitly links `Nexus::LwIPStorage` and includes
+`lwip_storage.h` to allocate the exact `netif` and adapter layout.
 This backend storage header depends on the pinned lwIP profile. It avoids a
 maximum-size opaque object and does not enter the generic I/O interface.
 
@@ -130,7 +132,109 @@ the source lock, changed bytes, wrong commit/origin, dirty source, unsafe paths
 fixed closure enforcement, changes during observation, production origin and
 gitlink rejection, source-SDK scope and symbolic CMake selector rejection.
 
-These are development results. A TCP handshake/data/close matrix, full software
-plan, installed SDK consumption, physical PHY/DMA behavior, network performance,
-TLS and MQTT qualification remain separate work. Model MAC frames do not prove
-Board wiring or physical connectivity.
+TCP client model tests additionally cover copied queue admission, receive
+backpressure, peer FIN, close/abort, bounded progress, deadline and shared-pool
+reclamation. The separate
+[complete host network fixture](../../tests/contracts/lwip_mqtt_interop/README.md)
+connects the actual lwIP/TCP/TLS/MQTT client to real Mosquitto through a test-only
+transparent ciphertext relay. One TCP connection crosses software Ethernet frame
+ports between two independent lwIP processes; the second crosses a nonblocking
+host socket from the relay to the broker. TLS/mTLS and MQTT acknowledgements
+terminate at the Nexus client and broker. The relay does not decrypt TLS or
+provide a production socket adapter.
+
+That host fixture retains separate normal and sanitizer execution identities.
+Its local TCP close only detaches the client context; FIN/TIME_WAIT and global
+clock retirement are separate. It aborts remaining owned PCBs, releases accepted
+pbufs, settles MAC loans and stops its adapter before ending service. Network and
+clock storage remain live until process exit, which retires the isolated test
+stack domain. An MCU cannot infer permission to destroy its global clock or
+reinitialize lwIP merely from adapter stop.
+
+These are development results. Full software-plan and installed-SDK acceptance,
+physical PHY/DMA, network performance and MCU trusted-time/entropy qualification
+retain their own source-bound evidence. Model frames and a real host broker do
+not prove Board wiring, physical connectivity or HIL.
+
+
+## Optional copied TCP byte client
+
+`Nexus::LwIPTCP` provides the existing readonly `nx_byte_stream_t` contract over
+one official raw TCP connection. Ordinary consumers include
+`nexus/network/lwip_tcp.h` and receive Nexus types. A static composition unit
+explicitly links `Nexus::LwIPTCPStorage` to allocate the exact reviewed PCB/pbuf
+adapter layout. The component adds no socket registry, worker or maximum opaque
+object pool. Unselected firmware does not link this target.
+
+```mermaid
+flowchart LR
+    Product[External serialized executor] --> MQTT[Optional MQTT client]
+    MQTT --> TLS[Optional TLS client]
+    TLS --> Byte[Readonly immediate-copy byte face]
+    Byte --> TCP[Nexus raw TCP client]
+    TCP --> Stack[Reviewed lwIP TCP and bounded pools]
+    TCP --> Network[Explicit budgeted network adapter progress]
+    Stack --> Network
+    Network --> Frames[Nexus Ethernet frame loans]
+```
+
+The caller supplies zeroed client storage, a live network adapter, one positive
+receive-frame budget and an IPv4 address/port. Configuration and address are
+copied. `start` success accepts CONNECTING; it does not prove ESTABLISHED.
+The first finite connect deadline is retained. Connection failure is sticky;
+there is no implicit retry, fallback, DNS or reconnection.
+
+One serialized NO_SYS executor owns the stack, adapters and all clients. Call
+facade data/control outside raw callbacks. A shared in-call guard prevents nested
+mutation across facade instances; it holds no instance registry or active-client
+pointer. The network adapter, its storage, clock epoch and global stack timers
+outlive every connection, including detached FIN/TIME_WAIT state. Millisecond
+stack timers and microsecond API deadlines use the same unchanged time domain.
+
+Each nonzero byte attempt may perform one explicitly budgeted network service
+pass so a synchronous caller such as coreMQTT can receive packets without a
+hidden thread. Held RX is consumed first, avoiding an allocation dependency while
+its pbuf pool is exhausted. Timer callback cost remains subject to the selected
+stack profile and its raw users; a frame count is not a hard wall-clock bound.
+
+Writes use official `tcp_write(..., TCP_WRITE_FLAG_COPY)`. Positive partial
+acceptance copies bytes into lwIP's existing bounded storage; the source may be
+reused immediately. It promises queue admission, not delivery. The caller bounds
+delivery using its protocol acknowledgement policy. A fatal output observed
+after copied admission cannot undo acceptance; diagnostics and subsequent calls
+remain failed until explicit abort. Would-block/capacity produces BUSY/count zero.
+
+RX holds at most one accepted pbuf chain and a partial-read offset. Returning
+ERR_MEM for another chain retains lwIP ownership of that refused chain. Only
+bytes copied to the caller receive `tcp_recved` credit. The accepted chain is
+released exactly once after complete consumption or explicit abort; the error
+callback has already freed its PCB and never frees it twice. Buffered data
+precedes orderly TCP FIN, and a peer half-close still permits writes. TLS makes
+its separate close-notify authentication decision.
+
+After producers join, `close` shuts write admission and waits for held/refused RX
+and queued/unacknowledged TX. Its first finite deadline cannot be extended.
+Timeout or BUSY retains the context. Callback references detach before official
+`tcp_close`; only an error permits touching the PCB again. Success may represent
+upstream deferred FIN allocation and still-running FIN/TIME_WAIT timers, so it
+proves this context's final stack access rather than global/PHY drain. Explicit
+`abort` discards data, detaches callbacks and frees any still-owned PCB/pbuf;
+MAC frame loans remain the network adapter's independent withdrawal duty.
+Products stop all known clients before draining/removing the adapter.
+
+The fixed stack currently budgets four shared TCP PCBs, 24 shared 512-byte pool
+blocks and the explicitly configured stack arena. One held chain can consume a
+receive window; refused/out-of-order data also consumes shared stack resources.
+Applications must schedule timely reads and progress. Capacity refusal and
+connection state do not provide a physical network or performance qualification.
+
+PCB allocation deliberately retains the pinned official reclamation policy.
+`tcp_new_ip_type` uses normal priority. If its first pool allocation fails,
+`tcp_alloc` first progresses pending closes, then attempts to reclaim TIME_WAIT,
+LAST_ACK, CLOSING and lower-priority active connections. Other connections can
+therefore receive error callbacks while a new client starts; even a subsequently
+rejected start does not promise a globally unchanged stack. Local rejection
+means this context retains no new PCB, pbuf or configuration reference. Products
+budget the shared pool and handle every connection's error; this adapter adds no
+second allocator or hidden reservation pool. The four-CLOSED-PCB rejection test
+has no reclaimable victim and does not establish a universal no-reclaim rule.

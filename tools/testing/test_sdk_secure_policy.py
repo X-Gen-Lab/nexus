@@ -27,17 +27,17 @@ class SDKSecurePolicyTests(unittest.TestCase):
         cls.consumers = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(cls.consumers)
 
-    def test_v13_preserves_the_complete_v12_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v13")
+    def test_current_policy_preserves_the_complete_v12_layout_prefix(self):
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:54], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(), V12_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 56)
-        self.assertEqual(len(transport.IMAGES), 59)
-        self.assertEqual(len(transport.FIXTURES), 56)
+        self.assertEqual(len(layout), 59)
+        self.assertEqual(len(transport.IMAGES), 62)
+        self.assertEqual(len(transport.FIXTURES), 59)
 
     def test_secure_profiles_have_explicit_reviewed_execution_domains(self):
-        profiles = transport.SERVICE_CONSUMERS[-2:]
+        profiles = transport.SERVICE_CONSUMERS[4:6]
         self.assertEqual([item.name for item in profiles],
                          ["native secure services", "f407 secure services"])
         self.assertEqual([item.domain for item in profiles],
@@ -45,14 +45,14 @@ class SDKSecurePolicyTests(unittest.TestCase):
         self.assertEqual([item.arm for item in profiles], [False, True])
         self.assertEqual([item.scenario for item in profiles],
                          ["secure_services", "secure_services"])
-        self.assertEqual(transport.consumer_plan()[-2:],
+        self.assertEqual(transport.consumer_plan()[54:56],
                          tuple(("services", item) for item in profiles))
         for profile in profiles:
             changed = replace(profile, scenario="unreviewed")
             with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
                 self.consumers.service_profile(changed)
 
-    def test_missing_secure_image_is_not_a_complete_v13_transport(self):
+    def test_missing_secure_image_is_not_a_complete_current_transport(self):
         rows = transport.consumer_layout()
         files = {image: {"size": 1} for _, _, images in rows for image in images}
         directories = [name for source, build, _ in rows
@@ -85,7 +85,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
         return result
 
     def test_preparation_preserves_public_and_composition_boundaries(self):
-        for profile in transport.SERVICE_CONSUMERS[-2:]:
+        for profile in transport.SERVICE_CONSUMERS[4:6]:
             with self.subTest(profile=profile.name), tempfile.TemporaryDirectory() as tmp:
                 base = Path(tmp)
                 prefix, _ = self.prefix(base)
@@ -117,7 +117,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
                                      524288)
 
     def image_fixture(self, base, arm=False):
-        profile = transport.SERVICE_CONSUMERS[-1 if arm else -2]
+        profile = transport.SERVICE_CONSUMERS[5 if arm else 4]
         prefix, sdk = self.prefix(base)
         source, build, _ = self.consumers.prepare_service_consumer(
             prefix, base, profile, self.execute,
@@ -186,6 +186,11 @@ class SDKSecurePolicyTests(unittest.TestCase):
                     self.assertEqual(owners[0][owners[0].index("--consumer") + 1],
                                      str(source / "application.c"))
                 self.assertEqual(any(len(call) == 1 for call in calls), not arm)
+                if arm:
+                    self.assertEqual(report["forbidden_symbols"],
+                                     {"libc_heap": [], "cpp_runtime": []})
+                else:
+                    self.assertNotIn("forbidden_symbols", report)
 
     def test_secure_checker_rejects_c99_or_conflicting_mcu_abi(self):
         for fault in ("-std=c99", "-mfloat-abi=soft", "-fno-short-enums"):

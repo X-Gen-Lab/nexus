@@ -164,9 +164,9 @@ def image_window(resolved: dict) -> dict:
     """Validate the selected image without redefining physical Flash facts.
 
     Complete reset-address historical fixtures retain their original scope.
-    A changed window must follow the exact physical erase geometry. Offsets
-    additionally require an explicitly reviewed source-owned startup profile;
-    arbitrary artifact metadata cannot grant a new family that capability.
+    The physical owner follows exact erase geometry; byte reservations shrink
+    only its executable window. Offsets and nonzero reservations require a
+    reviewed source-owned startup profile. Metadata grants no new capability.
     """
     if not isinstance(resolved, dict):
         raise EvidenceError("invalid resolved image contract")
@@ -199,8 +199,23 @@ def image_window(resolved: dict) -> dict:
     if (start, end) != (physical_start, physical_end):
         if blocks is None or start not in boundaries or end not in boundaries:
             raise EvidenceError("selected image requires physical erase boundaries")
+    budget = resolved.get("memory_budgets", {})
+    if not isinstance(budget, dict):
+        raise EvidenceError("invalid image reservation contract")
+    prefix = budget.get("image_prefix_bytes", 0)
+    suffix = budget.get("image_suffix_bytes", 0)
+    if (any(type(value) is not int or not 0 <= value < 2**32
+            for value in (prefix, suffix)) or prefix + suffix >= end - start):
+        raise EvidenceError("image reservations leave the physical owner")
+    if (prefix or suffix) and blocks is None:
+        raise EvidenceError("image reservations require complete physical Flash erase geometry")
+    start += prefix
+    end -= suffix
+    limit = budget.get("flash_load_bytes", end - start)
+    if type(limit) is not int or not 0 < limit <= end - start:
+        raise EvidenceError("Flash budget exceeds the executable image window")
     result = {"origin": start, "size": end - start}
-    if start != physical_start:
+    if start != physical_start or prefix or suffix:
         from tools.configure.providers import maintained
         try:
             profile = maintained(resolved.get("soc_family"))

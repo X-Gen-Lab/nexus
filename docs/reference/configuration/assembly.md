@@ -39,8 +39,8 @@ Before running the resolver, prepare the
 | `backend` | Explicit `native`, `baremetal`, `freertos` or supported `threadx` subset |
 | `clock` | Maintained exact profile matching Board and SoC facts |
 | `optimization` | Maintained optimization/debug/LTO profile; no arbitrary compiler override |
-| `[memory]` | Byte budgets for stack, libc heap, static RAM and Flash LOAD |
-| `layout` | Optional schema-1 Flash-region JSON path relative to the assembly; exactly one image |
+| `[memory]` | Byte budgets plus optional executable-image prefix/suffix reservations |
+| `layout` | Optional schema-1 physical Flash-owner JSON path relative to the assembly; exactly one image |
 | `[factory]` | Explicit optional strong IDs and capability metadata |
 | Kind instance table | Stable authored name, reviewed binding, mode and bounded options |
 | SPI/I2C device table | Separate endpoint identity tied to an existing controller |
@@ -58,10 +58,10 @@ for Board-first queries, validated profiles, human summaries and effective diffs
 ## Physical Flash and the selected image
 
 `flash` in the resolved output describes the complete physical device, including
-its exact erase and programming geometry. `layout` selects the linked image
-window. Without an authored `layout`, that image uses the full physical Flash.
-A smaller image does not redefine the physical Flash API or create a Flash access
-control policy. Products still own erase-aligned writable regions and recovery.
+its exact erase and programming geometry. `layout` selects the physical erase
+owner that contains the executable image. Without an authored `layout`, that
+owner is the complete physical Flash. Products still own writable regions and
+recovery; this selection grants no Flash access control or protection.
 
 A `layout` JSON file has `schema_version = 1` and `regions`. Each region has an
 `id`, integer `origin`, positive `size` and `kind` (`image` or `data`). Exactly one
@@ -69,11 +69,48 @@ region is an image. IDs must be unique; all regions must be nonoverlapping,
 within physical Flash, and start/end on its exact erase boundaries. This is an
 auxiliary layout input; schema-1 JSON assemblies remain rejected.
 
-The reviewed offset-image profiles are STM32F407VET6, STM32F407ZGT6 and
-GD32F470ZGT6. Other SoCs still require a reset-address image. An admitted offset
-must additionally satisfy the source-owned 512-byte vector alignment. The
-selected profile owns that alignment and the actual vendor vector symbol;
-authored or artifact JSON cannot grant another chip offset support.
+### Executable prefix and suffix
+
+The optional `[memory]` fields reserve bytes inside the selected physical owner.
+Both fields are unsigned 32-bit byte counts with a default of zero. Booleans,
+floats, negative values and values above `4294967295` reject. Zero-valued fields
+are omitted from the resolved projection. They preserve the existing default
+layout, linked addresses and budgets; source changes still change source and
+configuration identities.
+
+| Field | Meaning |
+| --- | --- |
+| `image_prefix_bytes` | Reserved bytes before the executable vector table |
+| `image_suffix_bytes` | Reserved bytes after the executable load window |
+
+`ConfigurationIR` derives the executable origin and size from its immutable
+`FlashRegionIR` owner and `MemoryBudgetIR` reservations. `PhysicalPartIR` remains
+the sole physical geometry authority; the JSON `layout` projection retains that
+geometry for audit. No independent executable address or CMake address override
+is authored.
+
+```text
+owner       = [layout.origin, layout.origin + layout.size)
+image_start = layout.origin + image_prefix_bytes
+image_end   = layout.origin + layout.size - image_suffix_bytes
+image_size  = image_end - image_start
+```
+
+The physical owner remains erase-aligned and nonoverlapping. Its executable
+window need not start on an erase boundary. The prefix plus suffix must be less
+than the owner size and leave a complete reset vector. The derived window must
+stay inside that owner without address overflow. An explicit
+`flash_load_limit_bytes` cannot exceed the executable size; the default Flash
+budget uses that size. Reserved prefix/suffix bytes do not count as actual ELF
+LOAD bytes and do not change the physical Flash API.
+
+The reviewed offset and nonzero-reservation profiles are STM32F407VET6,
+STM32F407ZGT6 and GD32F470ZGT6. They require complete physical erase geometry and
+a 512-byte-aligned executable vector base, including when the physical owner
+starts at the reset address. Other SoCs and external provider packages gain no
+prefix/suffix support from these fields. The maintained profile owns that exact
+alignment and its actual vendor vector symbol; authored or artifact metadata
+cannot grant another startup that capability.
 
 For example, this complete layout file selects the final 384 KiB of Sky
 STM32F407VET6 Flash. Select it with the assembly's `layout` path. The decimal
@@ -94,16 +131,36 @@ and is not protected from writes by this layout.
 }
 ```
 
-For an offset image, generated linker checks require `.isr_vector` at the image
-origin, correct alignment, a nonempty table no larger than 512 bytes, and the
-actual vendor symbol at the section base: `g_pfnVectors` for F407 or `__gVectors`
-for GD470. The selected startup sets VTOR from that linked symbol with the
-required barriers. Default reset-address linker output keeps its existing path.
+For an offset image or nonzero reservations, generated linker checks require
+`.isr_vector` at the derived executable origin, correct alignment, a nonempty
+table no larger than 512 bytes, and the actual vendor symbol at the section
+base: `g_pfnVectors` for F407 or `__gVectors` for GD470. The reviewed startup sets
+VTOR from that linked symbol with the required barriers. Default zero-reservation
+reset-address linking keeps its existing semantics.
 
-ELF LOAD bounds, Flash capacity and footprint use the selected image window.
-ELF-to-BIN checks reconstruct bytes from that image origin rather than prefixing
-the binary to physical Flash base. Physical erase/program facts and RAM budgets
-remain unchanged; use `flash`, not `layout.origin`, to interpret erase geometry.
+ELF LOAD bounds, Flash capacity and footprint use the derived executable window.
+The resource checker independently validates the physical owner, reservations,
+vector words, reset entry and all actual Flash LOAD ranges against that window.
+ELF-to-BIN checks reconstruct bytes from the executable origin. They add no
+prefix or suffix bytes. Physical erase/program facts and RAM budgets remain
+unchanged; use `flash`, not `layout.origin`, to interpret erase geometry.
+
+The complete [public image-window reference](../../../cmake/package/verification/image_window/README.md)
+selects a 128 KiB F407 sector owner at `[0x08020000, 0x08040000)`. Its 512-byte
+prefix and 1,024-byte suffix derive `[0x08020200, 0x0803fc00)`, or 129,536 bytes,
+for vectors and executable LOADs. The reference links the actual reviewed
+startup through the installed SDK; its declared 2,048-byte MSP is not a measured
+stack peak.
+
+```{literalinclude} ../../../cmake/package/verification/image_window/assembly.toml
+:language: toml
+:caption: Complete F407 assembly with explicit byte reservations; layout.json is part of the linked public reference.
+```
+
+A prefix reservation does not create an image header. A suffix reservation does
+not create a trailer, activation marker or rollback record. Products supply any
+metadata format, keys, Flash permissions and recovery policy. The platform does
+not build a bootloader or authenticate, install, activate or boot this image.
 
 An offset executable still needs a product-owned boot path that reaches its
 vendor reset entry with valid initial machine state. Linking, vector checks and

@@ -1249,6 +1249,18 @@
           "minimum": 0,
           "type": "integer"
         },
+        "image_prefix_bytes": {
+          "description": "Reserved bytes before the executable vectors inside the selected physical Flash owner.",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "image_suffix_bytes": {
+          "description": "Reserved bytes after the executable load window; no header or trailer bytes are generated.",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
         "libc_heap_bytes": {
           "description": "Explicit libc heap reservation in bytes; zero disables it.",
           "minimum": 0,

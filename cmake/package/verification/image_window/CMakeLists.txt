@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.31)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+project(NexusImageWindowReference C ASM)
+find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)
+nexus_add_firmware(image_window SOURCES main.c)
