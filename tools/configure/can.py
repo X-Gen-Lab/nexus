@@ -6,7 +6,7 @@ forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
 from dataclasses import dataclass
 
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, integer, sequence
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
@@ -26,7 +26,7 @@ class CanPolicy:
 
 
 def _integration(result, prefix):
-    provider = maintained(result.soc_family)
+    provider = for_selection(result)
     policy = getattr(provider, "CAN_INTEGRATION", None)
     if policy is None or provider.PREFIX != prefix:
         fail("CAN binding differs from its exact selected provider")

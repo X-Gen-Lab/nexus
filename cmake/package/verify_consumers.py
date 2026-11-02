@@ -19,7 +19,9 @@ from tools.measurement.retention import COMPONENT_OWNER_SMOKES  # noqa: E402
 from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
-                                     SELECTED_CONSUMERS)  # noqa: E402
+                                     SELECTED_CONSUMERS, SERVICE_CONSUMERS,
+                                     ServiceConsumer, consumer_plan,
+                                     selected_domain)  # noqa: E402
 
 
 
@@ -386,6 +388,73 @@ def component_owner_selection(specification):
     return specification[2]
 
 
+def service_profile(specification):
+    """Accept exactly one immutable entry from the reviewed transport plan."""
+    if (not isinstance(specification, ServiceConsumer)
+            or specification not in SERVICE_CONSUMERS):
+        raise ValueError("Service consumer differs from the canonical plan")
+    return specification
+
+
+def prepare_service_consumer(prefix, directory, specification, run_checked, *,
+                             expected_revision, fixture=False):
+    """Copy an installed public scenario; external packages stay consumer-owned."""
+    specification = service_profile(specification)
+    sdk = Path(prefix) / "share/nexus/src"
+    verification = sdk / "cmake/package/verification/common_services"
+    assembly = regular_file(verification / specification.assembly)
+    smoke = regular_file(verification / "services.c")
+    source = directory / (specification.name + " source")
+    build = directory / (specification.name + " build")
+    source.mkdir()
+    run_checked(["git", "init", "--quiet", str(source)])
+    if specification.domain == "external-package":
+        for path in sorted(assembly.parent.rglob("*")):
+            if path.is_dir():
+                continue
+            regular_file(path)
+            target = source / path.relative_to(assembly.parent)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, target)
+    else:
+        shutil.copyfile(assembly, source / "assembly.toml")
+    shutil.copyfile(smoke, source / "main.c")
+    (source / "private_headers.c").write_text(
+        '#if __has_include("stm32f4xx.h") || '
+        '__has_include("gd32f4xx.h") || __has_include("provider.h")\n'
+        '#error Private hardware state leaked into the public consumer\n'
+        '#endif\n'
+        '_Static_assert(1, "Public service include isolation");\n')
+    version = load_policy(sdk)["semantic_version"]
+    (source / "CMakeLists.txt").write_text(
+        'cmake_minimum_required(VERSION 3.31)\n'
+        'project(installed_service_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_C_STANDARD 11)\n'
+        'set(CMAKE_C_STANDARD_REQUIRED ON)\n'
+        'set(CMAKE_C_EXTENSIONS OFF)\n'
+        'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+        f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
+        '  LIBRARIES Nexus::Settings Nexus::OSWait Nexus::LwIP)\n'
+        'nexus_target_warnings(installed_services STRICT)\n'
+        'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+        'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
+    command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
+               "-DCMAKE_BUILD_TYPE=Release",
+               f"-DNexus_DIR={Path(prefix) / 'lib/cmake/Nexus'}",
+               "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
+               f"-DNEXUS_ASSEMBLY_FILE={source / 'assembly.toml'}",
+               "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
+    if fixture:
+        command.append("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
+    if specification.arm:
+        command.append("-DCMAKE_TOOLCHAIN_FILE=" +
+                       str(sdk / "cmake/toolchains/arm-gcc.cmake"))
+    return source, build, command
+
+
 def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name,
                               run_checked, *, expected_revision):
     """Reuse installed canonical inputs through a separate public C project."""
@@ -612,6 +681,11 @@ def check_selected_image(sdk, source, build, run_checked, *,
         raise ValueError("Selected consumer private inputs leaked into product")
     config = Path((build / "resolved-config.txt").read_text())
     resolved = json.loads((config / "resolved.json").read_text())
+    if owner_specification is not None:
+        domain = selected_domain(owner_specification)
+        if ((domain == "native-time") !=
+                (resolved.get("cpu", {}).get("arch") == "native")):
+            raise ValueError("Selected consumer differs from its reviewed domain")
     if resolved.get("backend") == "native":
         return check_native_time_image(sdk, source, build, config, commands, run_checked)
     artifacts = {suffix: file_identity(build / "bin" /
@@ -651,6 +725,145 @@ def check_selected_image(sdk, source, build, run_checked, *,
     return {"artifacts": artifacts, "resources": file_identity(resources_path),
             "resolved": file_identity(config / "resolved.json"),
             "retention": file_identity(retention_path)}
+
+
+SERVICE_SYMBOLS = frozenset({
+    "nx_settings_open", "nx_settings_get", "nx_settings_set",
+    "nx_settings_commit", "nx_settings_close", "nx_wait_select",
+    "nx_lwip_adapter_start", "nx_lwip_adapter_apply_link",
+    "nx_lwip_adapter_service", "nx_lwip_adapter_stop", "lwip_init",
+    "tcp_new", "udp_new", "nx_platform_start", "nx_platform_stop",
+    "nx_factory_gpio",
+})
+
+
+def check_service_image(sdk, source, build, specification, run_checked):
+    """Check one exact scenario, real runtime or ARM resources, and retention."""
+    specification = service_profile(specification)
+    if (build / "resolved-sdk.txt").read_text() != str(sdk):
+        raise ValueError("Service consumer resolved another source SDK")
+    verification = sdk / "cmake/package/verification/common_services"
+    canonical = verification / specification.assembly
+    if ((source / "assembly.toml").read_bytes() != canonical.read_bytes()
+            or (source / "main.c").read_bytes() !=
+            (verification / "services.c").read_bytes()):
+        raise ValueError("Service consumer differs from the canonical scenario")
+    inputs = {"assembly": source / "assembly.toml",
+              "public_source": source / "main.c",
+              "private_probe": source / "private_headers.c",
+              "sdk_manifest": sdk / ".nexus-source-sdk.json",
+              "compile_commands": build / "compile_commands.json"}
+    if specification.domain == "external-package":
+        for path in sorted(canonical.parent.rglob("*")):
+            if path.is_dir():
+                continue
+            regular_file(path)
+            copied = source / path.relative_to(canonical.parent)
+            if copied.read_bytes() != path.read_bytes():
+                raise ValueError("External service package differs from SDK")
+            inputs["external/" + path.relative_to(canonical.parent).as_posix()] = copied
+    config = Path((build / "resolved-config.txt").read_text())
+    if config != build / "nexus-sdk/generated":
+        raise ValueError("Service configuration directory is not canonical")
+    inputs.update(resolved=config / "resolved.json", bindings=config / "bindings.c")
+    resolved = json.loads((config / "resolved.json").read_text())
+    native = resolved.get("cpu", {}).get("arch") == "native"
+    if (native == specification.arm or
+            resolved.get("backend") != ("baremetal" if specification.arm
+                                         else "native")):
+        raise ValueError("Service consumer differs from its reviewed domain")
+    if (specification.domain == "external-package" and
+            resolved.get("soc_family") != "sdk_services_model"):
+        raise ValueError("External service consumer did not select its package")
+    commands = json.loads((build / "compile_commands.json").read_text())
+    products = {source / "main.c", source / "private_headers.c"}
+    public = [entry for entry in commands
+              if Path(entry["file"]).resolve() in products]
+    if (len(public) != 2 or
+            {Path(entry["file"]).resolve() for entry in public} != products or
+            any(private_compile_inputs(entry, sdk) for entry in public)):
+        raise ValueError("Service consumer private inputs leaked into product")
+    for entry in commands:
+        file = Path(entry["file"]).resolve()
+        if (not file.is_relative_to(sdk) and file not in products
+                and file != config / "bindings.c"):
+            raise ValueError("Service compilation consumed an unreviewed source")
+        if file in products or file == config / "bindings.c":
+            argv = entry.get("arguments") or shlex.split(entry["command"])
+            if argv.count("-c") != 1:
+                raise ValueError("Service compile row has no unique -c source")
+            selected = Path(argv[argv.index("-c") + 1])
+            if not selected.is_absolute():
+                selected = Path(entry["directory"]) / selected
+            if selected.resolve() != file:
+                raise ValueError("Service compile row source and -c disagree")
+    if sum(Path(entry["file"]).resolve() == config / "bindings.c"
+           for entry in commands) != 1:
+        raise ValueError("Service generated bindings have no unique compile row")
+    suffix = ".elf" if specification.arm else ""
+    executable = build / "bin" / ("installed_services" + suffix)
+    with regular_file(executable).open("rb") as stream:
+        header = stream.read(20)
+    expected = (b"\x7fELF\x01\x01", b"\x28\x00") if specification.arm else (
+        b"\x7fELF\x02\x01", b"\x3e\x00")
+    if len(header) != 20 or header[:6] != expected[0] or header[18:20] != expected[1]:
+        raise ValueError("Service image differs from its reviewed ELF domain")
+    inputs["elf"] = executable
+    before = {name: file_identity(path) for name, path in inputs.items()}
+    runtime = None
+    resources_identity = retention_identity = None
+    if specification.arm:
+        resources_path = build / "bin/installed_services.resources.json"
+        resources = json.loads(resources_path.read_text())
+        if (resources["status"] != "passed" or resources["violations"] or
+                resources["elf"] != before["elf"] or
+                resources["resolved"] != before["resolved"]):
+            raise ValueError("Service resource/configuration binding failed")
+        resources_identity = file_identity(resources_path)
+        retention_path = build / "provider-retention.json"
+        run_checked([sys.executable, "-B",
+                     str(sdk / "tools/measurement/retention.py"),
+                     "--elf", str(executable), "--bindings",
+                     str(config / "bindings.c"), "--resolved",
+                     str(config / "resolved.json"), "--output",
+                     str(retention_path)])
+        retained = json.loads(retention_path.read_text())
+        if (retained["status"] != "passed" or
+                retained["elf"] != before["elf"]):
+            raise ValueError("Service provider retention failed")
+        retention_identity = file_identity(retention_path)
+    else:
+        runtime = run_checked([str(executable)])
+        if runtime.returncode:
+            raise ValueError("Service canonical runtime failed")
+    observed = run_checked(["arm-none-eabi-nm" if specification.arm else "nm",
+                            "-S", "--defined-only", "--format=posix",
+                            str(executable)])
+    if observed.returncode or len(observed.stdout) > 4 * 1024 * 1024:
+        raise ValueError("Service symbol observation failed or exceeded its bound")
+    symbols = {}
+    for line in observed.stdout.splitlines():
+        fields = line.split()
+        if not fields or fields[0] not in SERVICE_SYMBOLS:
+            continue
+        if (len(fields) != 4 or fields[0] in symbols or
+                re.fullmatch(r"[0-9a-fA-F]+", fields[2]) is None or
+                re.fullmatch(r"[0-9a-fA-F]+", fields[3]) is None):
+            raise ValueError("Service symbol identity is ambiguous")
+        symbols[fields[0]] = {"type": fields[1], "address": int(fields[2], 16),
+                              "size": int(fields[3], 16)}
+    if set(symbols) != SERVICE_SYMBOLS or any(not value["size"]
+                                            for value in symbols.values()):
+        raise ValueError("Service implementation retention is incomplete")
+    if before != {name: file_identity(path) for name, path in inputs.items()}:
+        raise ValueError("Service observation inputs changed during execution")
+    return {"kind": "source-sdk-service-observation", "status": "passed",
+            "name": specification.name, "domain": specification.domain,
+            "physical_status": "not_executed", "inputs": before,
+            "runtime_executed": runtime is not None, "symbols": symbols,
+            "resources": resources_identity, "retention": retention_identity,
+            "scope": "Canonical SDK scenario and linked implementation only; "
+                     "no measured stack, timing, physical network or Flash."}
 
 
 def positive_parallel(value):
@@ -716,7 +929,15 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
             "--output", str(retention_path)])
         if json.loads(retention_path.read_text())["status"] != "passed":
             raise ValueError("Modern consumer provider retention failed")
-    else:
+    elif kind == "services":
+        source, build, command = prepare_service_consumer(
+            prefix, output, specification, run_checked,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_services"])
+        return check_service_image(sdk, source, build, specification, run_checked)
+    elif kind == "selected":
         name, assembly, smoke = specification
         source, build, command = prepare_selected_consumer(
             prefix, output, name, assembly, smoke, run_checked,
@@ -728,6 +949,8 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
                                      owner_specification=specification)
         image.update({"name": name, "assembly": str(sdk / assembly)})
         return image
+    else:
+        raise ValueError("Unknown consumer plan domain")
     return None
 
 
@@ -765,7 +988,8 @@ def main(argv=None):
     report = {"schema_version": 1, "kind": "source_sdk_consumer_verification",
               "prefix": str(prefix), "status": "failed",
               "physical_status": "not_executed", "commands": records,
-              "selected_images": [], "parallel_jobs": args.parallel}
+              "selected_images": [], "service_images": [],
+              "parallel_jobs": args.parallel}
     output_prepared = False
     cancel = threading.Event()
     failure_lock = threading.Lock()
@@ -842,9 +1066,7 @@ def main(argv=None):
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
         # The maintained transport tuples remain the sole plan authority.
-        plan = ([("base", specification) for specification in BASE_CONSUMERS] +
-                [("modern", specification) for specification in MODERN_CONSUMERS] +
-                [("selected", specification) for specification in SELECTED_CONSUMERS])
+        plan = consumer_plan()
         results = [None] * len(plan)
         local_records = [[] for _ in plan]
         workers = min(args.parallel, len(plan))
@@ -852,7 +1074,8 @@ def main(argv=None):
 
         def work(position):
             kind, specification = plan[position]
-            name = (specification[0] + " " + specification[1]
+            name = (specification.name if kind == "services" else
+                    specification[0] + " " + specification[1]
                     if kind == "modern" else
                     ("selected " if kind == "selected" else "") + specification[0])
             outcome = {"consumer_index": position + 1, "name": name,
@@ -865,7 +1088,8 @@ def main(argv=None):
                                             position + 1, local_records[position]))
                 outcome["status"] = "passed"
                 if image is not None:
-                    outcome["selected_image"] = image
+                    outcome["service_image" if kind == "services" else
+                            "selected_image"] = image
             except ConsumerCancelled as error:
                 outcome["error"] = str(error)
             except Exception as error:
@@ -933,6 +1157,8 @@ def main(argv=None):
                 for index, item in enumerate(results)]
             report["selected_images"] = [item["selected_image"] for item in results
                 if item is not None and "selected_image" in item]
+            report["service_images"] = [item["service_image"] for item in results
+                if item is not None and "service_image" in item]
         if interrupted:
             error = ValueError("Consumer verification interrupted")
             error.exit_code = 130

@@ -70,7 +70,7 @@ def selection(assembly, root=ROOT, *, candidate_path=None):
                                 "software_candidate", "physical_hil"),
                                "not_assessed")
     validation["configuration"] = "validated"
-    if typed.soc_family == "native":
+    if typed.cpu_profile.arch == "native":
         validation["physical_hil"] = "not_applicable"
     result = {"schema_version": 1, "kind": "selected_support",
             "selection": {key: data[key] for key in

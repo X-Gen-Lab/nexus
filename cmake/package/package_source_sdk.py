@@ -30,7 +30,7 @@ try:
     from tools.maintenance import (
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
         stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-        stm32g4_lock, threadx_lock, freertos_transport,
+        stm32g4_lock, threadx_lock, freertos_transport, lwip_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -59,6 +59,30 @@ CMSIS_CORE_REQUIRED_HEADERS = (
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
+    'cmake/package/verification/common_services/native.toml',
+    'cmake/package/verification/common_services/f407.toml',
+    'cmake/package/verification/common_services/gd470.toml',
+    'cmake/package/verification/common_services/services.c',
+    'cmake/package/verification/common_services/external/assembly.toml',
+    'cmake/package/verification/common_services/external/board/board.json',
+    'cmake/package/verification/common_services/external/provider/nexus-soc.json',
+    'cmake/package/verification/common_services/external/provider/soc/soc.json',
+    'cmake/package/verification/common_services/external/provider/soc/routes.json',
+    'cmake/package/verification/common_services/external/provider/soc/CMakeLists.txt',
+    'cmake/package/verification/common_services/external/provider/configure/__init__.py',
+    'cmake/package/verification/common_services/external/provider/configure/contract.py',
+    'cmake/package/verification/common_services/external/provider/configure/bindings.py',
+    'cmake/package/verification/common_services/external/provider/configure/emission.py',
+    'tools/maintenance/lwip_lock.py',
+    'dependencies/lwip.lock.json',
+    'components/network/CMakeLists.txt',
+    'components/network/include/nexus/network/lwip_adapter.h',
+    'components/network/include/nexus/network/lwip_storage.h',
+    'components/network/port/lwipopts.h',
+    'components/network/port/arch/cc.h',
+    'components/network/src/lwip_adapter.c',
+    'components/settings/include/nexus/components/settings.h',
+    'components/settings/src/settings.c',
     'io/include/nexus/io/usb_profile.h',
     'io/include/nexus/io/usb_activation.h',
     'io/src/mechanisms/usb_profile.c',
@@ -110,6 +134,8 @@ REQUIRED_FILES = (
     "tools/dev/projects.py", "tools/dev/device.py", "tools/dev/timings.py",
     "tools/dev/cache.py", "tools/dev/dependencies.py",
     "tools/dev/qualification.py", "tools/dev/provenance.py",
+    "tools/dev/plan.py", "tools/dev/artifacts.py",
+    "tools/configure/integration_package.py",
     "tools/evidence/store.py",
     "tools/evidence/environment.py", "tools/evidence/recipe.py",
     "tools/maintenance/stm32_ll_lock.py", "cmake/platform/Workload.cmake",
@@ -576,6 +602,12 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("ThreadX committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
+    elif dependency == "ext/lwip":
+        raw, _ = snapshot(root / "dependencies/lwip.lock.json")
+        names = set(lwip_lock.contract(parse_json(raw))["files"])
+        if not names.issubset(entries):
+            raise SDKError("lwIP committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
     elif dependency == "vendors/st/cmsis_device_g4":
         raw, _ = snapshot(root / "dependencies/stm32g4.lock.json")
         names = stm32g4_lock.contract(parse_json(raw))
@@ -794,6 +826,8 @@ def prepare(source, output, development_fixture=False):
     dependency_graph, index = dependency_snapshot(source, development_fixture)
     dependencies = dependency_records(source, dependency_graph)
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
+    lwip_lock.verify(source / "ext/lwip",
+                     source / "dependencies/lwip.lock.json")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
     for official in OFFICIAL_DRIVERS:
@@ -954,6 +988,11 @@ def verify(root):
     threadx = next(record for record in records if record["path"] == "ext/threadx")
     threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
                         "linux", packaged_commit=threadx["commit"])
+    lwip = next(record for record in records if record["path"] == "ext/lwip")
+    if lwip["commit"] != lwip_lock.COMMIT or lwip["tree"] != lwip_lock.TREE:
+        raise SDKError("Source SDK lwIP Git identity differs from reviewed source")
+    lwip_lock.verify(root / "ext/lwip", root / "dependencies/lwip.lock.json",
+                     source_sdk=True)
     g4 = next(record for record in records
               if record["path"] == "vendors/st/cmsis_device_g4")
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",

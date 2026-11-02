@@ -23,9 +23,13 @@ def project(result):
     return result.to_dict() if hasattr(result, "to_dict") else result
 
 
-def physical_scope(data):
+def physical_scope(data, context=None):
     """Configuration never substitutes for a station's physical evidence."""
-    return ("not_applicable" if data["soc_family"] == "native" else
+    model = (context is not None and
+             context.descriptor.family == data["soc_family"] and
+             context.provider.MODEL is True and
+             data.get("cpu", {}).get("arch") == "native")
+    return ("not_applicable" if model or data["soc_family"] == "native" else
             "not_established_by_configuration")
 
 
@@ -47,7 +51,8 @@ def describe(result):
              f"Clock: {data['clock_profile']} ({clock['core_hz']} Hz core)",
              f"Optimization: {data['optimization']}",
              f"Configuration: {data['configuration_sha256']}",
-             "Physical verification: " + physical_scope(data),
+             "Physical verification: " + physical_scope(
+                 data, getattr(result, "provider_context", None)),
              "Consult exact-board station records for physical evidence.",
              "", "Controllers:"]
     for item in data["controllers"]:
@@ -283,24 +288,33 @@ def board_catalogue(gate, root, *, board=None, board_package=None):
 def binding_facts(gate, result, root):
     """Read the exact SoC bytes bound by IR without changing its identity."""
     data = project(result)
-    relative = (gate.descriptor.maintained(data["soc_family"]).source_directory
+    context = getattr(result, "provider_context", None)
+    relative = ("soc-package/" + context.identity["id"] + "/" +
+                context.descriptor.source_directory + "/soc.json"
+                if context is not None and context.external else
+                gate.descriptor.maintained(data["soc_family"]).source_directory
                 + "/soc.json")
     expected = next((item["sha256"] for item in data["inputs"]
                      if item["path"] == relative), None)
-    path = gate.contained_file(root.resolve(), relative)
+    path = (context.source_directory / "soc.json" if context is not None and
+            context.external else gate.contained_file(root.resolve(), relative))
     snapshot = {}
     facts = gate.load(path, snapshot)
     actual = hashlib.sha256(snapshot[path]).hexdigest()
     if expected is None or actual != expected:
         gate.fail("Binding query SoC facts differ from the resolved input: "
                   + str(path))
-    return {**data, "controller_facts": facts["controllers"]}
+    return {**data, "controller_facts": facts["controllers"],
+            "_provider_context": context}
 
 
 def bindings_view(result, *, kind=None):
     """Show routing candidates and current ownership, not mode admission."""
     data = project(result)
-    provider = maintained(data["soc_family"])
+    context = getattr(result, "provider_context", None)
+    if context is None:
+        context = data.get("_provider_context")
+    provider = context.provider if context is not None else maintained(data["soc_family"])
     rows = []
     for name, binding in sorted(data["board_bindings"].items()):
         route = data["routes"][binding["route"]]
@@ -353,7 +367,7 @@ def bindings_view(result, *, kind=None):
                      "mode_contracts": modes,
                      "admission": "configuration-required"})
     return {"schema_version": 1, "board": data["board"], "part": data["part"],
-            "physical_verification": physical_scope(data), "bindings": rows,
+            "physical_verification": physical_scope(data, context), "bindings": rows,
             "selection": {"family": data["soc_family"],
                           "backend": data.get("backend"),
                           "clock_profile": data.get("clock_profile"),

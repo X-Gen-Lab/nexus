@@ -131,6 +131,8 @@ nexus_google_test(nexus_spi_dma_owner_wait_test
         "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
     LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
+nexus_google_test(nexus_settings_test SOURCES settings_test.cpp
+    LIBRARIES Nexus::Settings)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers")
@@ -504,6 +506,8 @@ include(arch_native_mechanism.cmake)
 include(freertos_context.cmake)
 include(freertos_prestart.cmake)
 include(os_wait.cmake)
+nexus_google_test(nexus_wait_select_test SOURCES wait_select_test.cpp
+    LIBRARIES Nexus::OSWait)
 include(os_optional.cmake)
 include(os_secure.cmake)
 include(freertos_mpu.cmake)
@@ -641,3 +645,16 @@ include(gd32_uart_cold_factory.cmake)
 include(gd32_control_cold.cmake)
 
 include(official_leaf_probes.cmake)
+
+if(TARGET Nexus::LwIP)
+    nexus_google_test(nexus_network_lwip_test
+        SOURCES network_lwip_test.cpp LIBRARIES Nexus::LwIP)
+endif()
+
+# Actual raw TCP peers own separate lwIP global states on the maintained host.
+if(TARGET Nexus::LwIP AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    nexus_google_test(nexus_network_tcp_pair_test
+        SOURCES network_tcp_pair_test.cpp
+        LIBRARIES Nexus::LwIP)
+    set_tests_properties(nexus_network_tcp_pair_test PROPERTIES TIMEOUT 30)
+endif()

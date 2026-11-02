@@ -89,6 +89,14 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(settings_8h)=
+
+## settings.h
+
+```{doxygenfile} settings.h
+:project: nexus
+```
+
 (spi__async__owner_8h)=
 
 ## spi_async_owner.h

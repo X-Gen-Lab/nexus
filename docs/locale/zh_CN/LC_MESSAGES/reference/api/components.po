@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a97e3a298401fd2ab331bd1e4224fde9fe137159d52e502cab3c09a25bee6108\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 3c361aa346146d0167f0ff8b42434be395b20e5ff93e94e57e5bf10b0f04d537\nX-Nexus-Reviewed: true\n"
 
 msgid "Optional common components"
 msgstr "可选通用组件"
@@ -1319,3 +1319,105 @@ msgstr "accepted 表示至少成功固定了一个内存区间。retained=true �
 
 msgid "Configuration views require alternate zero, endpoint plans matching selected bulk or interrupt IN ports, consistent totals and unique interface numbers. Interrupt bInterval is a nonzero linear count of full-speed 1 ms frames in external descriptor bytes. Bulk bInterval is not interpreted; no polling is scheduled. Class-specific subordinate bytes are bounds-checked but not decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor lookup remain external. Success is structural validation, not enumeration or physical qualification. To send bytes, preserve their lifetime through the control adapter's acquire-observed outer SETTLED. The view struct requires natural C alignment; rejection is not an arbitrary address probe. Descriptor bytes need only byte alignment and remain externally readable."
 msgstr "configuration 视图要求 alternate zero、与选定 bulk 或 interrupt IN 端口匹配的 endpoint 计划、一致的总长度及唯一的 interface 编号。interrupt bInterval 是外部 descriptor 字节中 full-speed 1 ms frame 的非零线性计数。bulk bInterval 不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"
+
+msgid "settings.h"
+msgstr "settings.h"
+
+msgid "Bounded key/value staging over durable whole-blob storage."
+msgstr "在持久化整块存储上提供有界 key/value 暂存。"
+
+msgid "Load one exact schema or stage an empty, uncommitted image."
+msgstr "加载精确 schema，或暂存空的未提交镜像。"
+
+msgid "Synchronous task-only scan. Missing blob stages an empty image, without reading defaults or writing Flash. Different schema/format is UNSUPPORTED and never rewritten. Truncated, duplicate or unordered keys are CORRUPT. A failed load never becomes an empty writable store; the instance stays closed."
+msgstr "仅任务上下文同步扫描。缺少 blob 时暂存空镜像，不读取默认值或写 Flash。不同 schema/format 返回 UNSUPPORTED，绝不重写。截断、重复或无序 key 返回 CORRUPT。加载失败不能变成空的可写存储；实例保持关闭。"
+
+msgid "[out] Unused or closed instance, exclusively owned"
+msgstr "[out] 未使用或已关闭的独占实例"
+
+msgid "[inout] Open durable store; no other mutating client while this settings instance is open"
+msgstr "[inout] 已打开的持久化存储；Settings 打开期间不得有其他变更性客户端"
+
+msgid "[in] Product-defined schema identity, including zero"
+msgstr "[in] 产品定义的 schema 身份，允许零"
+
+msgid "[inout] Caller buffer, disjoint from both instances and the storage workspace; borrowed until close or a failed commit"
+msgstr "[inout] 调用者 buffer，与两个实例及 storage workspace 独立；借用至 close 或失败的 commit"
+
+msgid "[in] At least HEADER_SIZE and at most UINT32_MAX"
+msgstr "[in] 至少 HEADER_SIZE，至多 UINT32_MAX"
+
+msgid "[in] Nonzero upper bound on staged entries"
+msgstr "[in] 暂存条目数量的非零上限"
+
+msgid "OK, INVALID, NO_SPACE, CORRUPT, UNSUPPORTED or port error"
+msgstr "OK、INVALID、NO_SPACE、CORRUPT、UNSUPPORTED 或 port 错误"
+
+msgid "Copy a staged value without exposing internal storage."
+msgstr "复制暂存值，不暴露内部存储。"
+
+msgid "Task-only synchronous copy; no pointer is retained. Missing key reports size zero. NO_SPACE leaves output untouched and reports required bytes. No underlying Flash operation occurs."
+msgstr "仅任务上下文同步复制，不保留指针。缺 key 时报告长度零。NO_SPACE 保持输出不变并报告所需字节数。不执行底层 Flash 操作。"
+
+msgid "[in] Open instance, serialized with all mutation"
+msgstr "[in] 已打开实例，与全部变更操作串行化"
+
+msgid "[in] Exact product-assigned identifier"
+msgstr "[in] 精确的产品分配标识"
+
+msgid "[out] Disjoint destination, or NULL to query size only"
+msgstr "[out] 独立目标，或以 NULL 只查询长度"
+
+msgid "[inout] Capacity on input, required/value bytes on output; disjoint from metadata, staging image and output"
+msgstr "[inout] 输入为容量，输出为所需或实际值字节数；与元数据、暂存镜像及 output 独立"
+
+msgid "OK, NOT_FOUND, NO_SPACE or INVALID"
+msgstr "OK、NOT_FOUND、NO_SPACE 或 INVALID"
+
+msgid "Insert or replace one copied value in bounded RAM staging."
+msgstr "在有界 RAM 暂存中插入或替换复制的值。"
+
+msgid "Task-only, bounded by image capacity and entry limit. Failed admission changes neither entries nor dirty state. A changed value marks staging dirty without touching Flash; an identical value preserves both image and the previous dirty state."
+msgstr "仅任务上下文，由镜像容量和条目上限约束。准入失败不改变条目或 dirty 状态。值变化使暂存变脏，不写 Flash；值相同时保留镜像和原 dirty 状态。"
+
+msgid "[in] Input disjoint from instance and staging image; NULL only for an empty value, borrowed during this call"
+msgstr "[in] 输入与实例及暂存镜像独立；仅空值允许 NULL，调用期间借用"
+
+msgid "[in] Value byte count, at most UINT32_MAX"
+msgstr "[in] 值字节数，至多 UINT32_MAX"
+
+msgid "OK, NO_SPACE or INVALID"
+msgstr "OK、NO_SPACE 或 INVALID"
+
+msgid "Remove a staged key without writing Flash."
+msgstr "移除暂存 key，不写 Flash。"
+
+msgid "Task-only synchronous operation. Missing keys have no effects. Success compacts staging and marks it dirty."
+msgstr "仅任务上下文同步操作。缺 key 时无影响。成功时压紧暂存并标记 dirty。"
+
+msgid "OK, NOT_FOUND or INVALID"
+msgstr "OK、NOT_FOUND 或 INVALID"
+
+msgid "Commit the complete staged snapshot through durable Storage."
+msgstr "通过持久化 Storage 提交完整暂存快照。"
+
+msgid "Task-only settled call; underlying Flash may stall execution. Clean staging does not write. Successful save clears dirty. A mutating I/O failure closes the instance and preserves the dirty flag for diagnosis, but retains no staging borrow. Reopen Storage, then Settings to determine the surviving commit; failure may occur after a new marker became durable. Retrying a failed commit without recovery is rejected."
+msgstr "仅任务上下文同步完成调用；底层 Flash 可能暂停执行。干净暂存不写入，保存成功清除 dirty。变更性 I/O 失败会关闭实例并保留 dirty 供诊断，不再借用暂存。先重新打开 Storage，再打开 Settings 以确定保留的提交；失败可能发生在新 marker 已持久化之后。不恢复就重试失败 commit 会被拒绝。"
+
+msgid "OK or underlying storage error"
+msgstr "OK 或底层 storage 错误"
+
+msgid "Release settings metadata without committing staged values."
+msgstr "释放 Settings 元数据，不提交暂存值。"
+
+msgid "Task-only, serialized after all calls. No I/O or retained references remain. Underlying Storage stays open; its scratch lifetime remains governed by the Storage contract."
+msgstr "仅任务上下文，在全部调用之后串行化。不执行 I/O，也无保留引用。底层 Storage 保持打开；其 scratch 生命周期仍由 Storage 合同决定。"
+
+msgid "[inout] Quiesced instance, or NULL"
+msgstr "[inout] 已静默的实例，或 NULL"
+
+msgid "Caller-owned settings metadata and bounded staging image."
+msgstr "调用者拥有的 Settings 元数据与有界暂存镜像。"
+
+msgid "Task-only; serialize all operations and the underlying storage. No heap, workers or global key registry. Keys are product-assigned uint32 identifiers; values are byte strings, including empty strings. The format is little-endian, not authenticated. Products own defaults, schema migration, authorization, durability frequency and Flash reservations. Only commit writes storage; close discards staged changes."
+msgstr "仅任务上下文；全部操作及底层存储须串行化。无 heap、worker 或全局 key 注册表。Key 为产品分配的 uint32 标识，值为字节串，允许空串。格式为 little-endian，不提供认证。产品拥有默认值、schema 迁移、授权、持久化频率和 Flash 预留。只有 commit 写存储；close 丢弃暂存变更。"

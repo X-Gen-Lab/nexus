@@ -60,10 +60,12 @@ add_subdirectory(components EXCLUDE_FROM_ALL)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Components.cmake")
 nexus_resolve_components(nexus_component_targets ${NEXUS_SELECTED_COMPONENTS})
 if(NEXUS_SOC_FAMILY STREQUAL "native")
-    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}")
+    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
+        "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
     set(nexus_provider nexus_io_native)
 else()
-    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}")
+    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
+        "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
     set(nexus_provider "nexus_soc_${NEXUS_SOC_FAMILY}")
 endif()
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
@@ -89,7 +91,7 @@ if(NEXUS_SYSTEM_VENDOR_INCLUDES)
     target_include_directories(nexus_platform SYSTEM PRIVATE
         ${NEXUS_SYSTEM_VENDOR_INCLUDES})
 endif()
-if(NOT NEXUS_SOC_FAMILY STREQUAL "native")
+if(NOT NEXUS_CPU_ARCH STREQUAL "native")
     nexus_use_cmsis_core(nexus_platform)
 endif()
 if(NEXUS_SYSTEM_COMPILE_DEFINITIONS)
@@ -100,6 +102,7 @@ set_target_properties(nexus_platform PROPERTIES
     NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"
     NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
     NEXUS_SOC_FAMILY "${NEXUS_SOC_FAMILY}"
+    NEXUS_CPU_ARCH "${NEXUS_CPU_ARCH}"
     NEXUS_BACKEND "${NEXUS_BACKEND}"
     NEXUS_COMPONENT_TARGETS "${nexus_component_targets}"
     NEXUS_STARTUP_SOURCE "${NEXUS_STARTUP_SOURCE}"

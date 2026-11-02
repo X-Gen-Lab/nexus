@@ -108,12 +108,12 @@ administrator changing it during an upload.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-requires 50 independent consumer roots and 53 executable images under
-policy-v11. This is a required plan; actual installed-consumer execution must be
+requires 54 independent consumer roots and 57 executable images under
+policy-v12. This is a required plan; actual installed-consumer execution must be
 assessed from its source-bound producer report and matching transport manifest.
 Plan counts do not establish software qualification or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v11`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v12`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -146,12 +146,30 @@ with `Nexus::F407I2S2SlaveTx`, bringing the plan to 50 roots and 53 images.
 These additions specify public software consumers; they do not establish
 physical MPU isolation, external audio execution or HIL qualification.
 
-Policy-v11 retains 50 roots and 53 images, but changes the existing `h743 high`
-consumer to the canonical
+Historical policy-v11 retained 50 roots and 53 images, but changed the existing
+`h743 high` consumer to the canonical
 [assembly](../configure/assemblies/h743-high-peripherals.toml). Its consumer name
 and `h743-high` smoke remain unchanged. The previous verification-directory
 copy is not a fallback. A complete policy-v10 transport with the same root and
-image counts still cannot satisfy the current exact plan or policy identity.
+image counts could not satisfy the v11 exact plan or policy identity.
+
+Policy-v12 preserves those fifty consumer identities and appends four exact
+profiles: `native services`, `external services`, `f407 services` and
+`gd470 services`. The canonical public
+[C11 scenario](../../cmake/package/verification/common_services/services.c)
+exercises Settings commit/reopen/read, wait-select arm/wait/recheck and a live
+lwIP netif with an ARP receive/reply model. The external Native model copies its
+relative Board and SoC packages into the consumer-owned source directory; its
+project locates Nexus through `Nexus_DIR`. F407 and GD470 build and link the same
+services with independently authored 128 KiB Flash, 64 KiB static RAM and 2 KiB
+MSP budgets. These budgets leave the existing consumers' defaults unchanged.
+Execution domain and image suffix come from explicit reviewed profiles, rather
+than display-name prefixes. The plan derives 54 roots, 57 images and 222 command
+invocations, including initial SDK verification. Those counts are requirements,
+not proof that all commands executed. Native software-model success does not
+establish physical Flash durability or Ethernet behavior; the ARM profiles
+establish linked implementation and resource results only when their actual
+source-bound checks pass. Physical HIL remains a separate acceptance scope.
 
 Archives retain all original raw bytes, file modes and empty directories, verify
 the complete inventory and consume the gzip stream through its CRC/size trailer
@@ -163,7 +181,7 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 50-root/53-image selection. Earlier policy-v3
+a fallback or rewrite it as the 54-root/57-image selection. Earlier policy-v3
 34-root/37-image and 36-root/39-image plans also retain their exact historical
 source identities; neither is the current plan or a fallback. Historical policy-v4
 has 28 selected features, 41 roots and 44 images: H743 SPI DMA Cache on, U575 finite

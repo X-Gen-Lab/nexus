@@ -61,6 +61,11 @@ python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/q
 以各记录中的不可变源码为准。配置、软件和物理阶段是不同证据，并非会自动晋级的
 单个“支持等级”。
 
+运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用
+{ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有
+capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。
+它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。
+
 ## 显式关联已封存候选
 
 需要核对已有执行证据时，在同一查询追加原候选路径：

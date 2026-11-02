@@ -113,6 +113,50 @@ TEST_F(NativeFactory, SelectedCapabilitiesRemainReadonlyAndModelScoped) {
     EXPECT_EQ(adc->buffer_alignment, 2U);
 }
 
+TEST_F(NativeFactory, DiagnosticMetadataUsesOrdinalsAndExistingCapabilities) {
+    const size_t ordinal = NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A;
+    EXPECT_NE(ordinal, static_cast<size_t>(NX_UART_ID_LINK_A));
+    const nx_time_us_t before = nx_time_now_us();
+    const auto* capability = nx_factory_uart_capability(NX_UART_ID_LINK_A);
+    ASSERT_NE(capability, nullptr);
+    EXPECT_EQ(nx_factory_controller_capability(ordinal), capability);
+    EXPECT_STREQ(nx_factory_controller_label(ordinal, NX_FACTORY_CONTROLLER_ID),
+                 "link_a");
+    EXPECT_STREQ(
+        nx_factory_controller_label(ordinal, NX_FACTORY_CONTROLLER_KIND),
+        "uart");
+    EXPECT_STREQ(
+        nx_factory_controller_label(ordinal, NX_FACTORY_CONTROLLER_HARDWARE),
+        "UART0");
+    EXPECT_STREQ(
+        nx_factory_controller_label(ordinal, NX_FACTORY_CONTROLLER_MODE),
+        "irq-byte-event");
+    EXPECT_EQ(nx_time_now_us(), before);
+    EXPECT_EQ(nx_native_uart_model_receive(nx_factory_uart(NX_UART_ID_LINK_A),
+                                           1U, 0U),
+              NX_ERROR_STATE);
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_EQ(nx_factory_controller_capability(ordinal), capability);
+    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_EQ(nx_factory_controller_capability(ordinal), capability);
+}
+
+TEST_F(NativeFactory, DiagnosticMetadataRejectsInvalidOrdinalsAndFields) {
+    EXPECT_EQ(
+        nx_factory_controller_capability(NX_PLATFORM_CONTROLLER_INDEX_COUNT),
+        nullptr);
+    EXPECT_EQ(nx_factory_controller_capability(SIZE_MAX), nullptr);
+    EXPECT_EQ(nx_factory_controller_label(SIZE_MAX, NX_FACTORY_CONTROLLER_ID),
+              nullptr);
+    EXPECT_EQ(nx_factory_controller_label(NX_PLATFORM_CONTROLLER_INDEX_COUNT,
+                                          NX_FACTORY_CONTROLLER_MODE),
+              nullptr);
+    EXPECT_EQ(
+        nx_factory_controller_label(NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A,
+                                    NX_FACTORY_CONTROLLER_FIELD_COUNT),
+        nullptr);
+}
+
 TEST_F(NativeFactory, LookupBeforeStartupHasNoEffectsAndChecksEveryClass) {
     const nx_gpio_port_t* first = nx_factory_gpio(NX_GPIO_ID_LED_A);
     const nx_gpio_port_t* second = nx_factory_gpio(NX_GPIO_ID_LED_B);
@@ -513,9 +557,16 @@ TEST_F(NativeFactory, DiagnosedFailureKeepsPrimaryAndCleanupIdentity) {
     EXPECT_EQ(result.cleanup, NX_ERROR_BUSY);
     EXPECT_NE(result.remaining_effects, 0U);
     EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_CONTROLLER);
-    EXPECT_EQ(diagnostic.controller_index, 8U);
+    EXPECT_EQ(diagnostic.controller_index,
+              static_cast<size_t>(NX_PLATFORM_CONTROLLER_INDEX_SPI_BUS_SPI_A));
     EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_CONTROLLER);
-    EXPECT_EQ(diagnostic.cleanup_controller_index, 8U);
+    EXPECT_EQ(diagnostic.cleanup_controller_index,
+              static_cast<size_t>(NX_PLATFORM_CONTROLLER_INDEX_SPI_BUS_SPI_A));
+    EXPECT_EQ(nx_factory_controller_capability(diagnostic.controller_index),
+              nx_factory_spi_capability(NX_SPI_ID_BUS_SPI_A));
+    EXPECT_STREQ(nx_factory_controller_label(diagnostic.controller_index,
+                                             NX_FACTORY_CONTROLLER_ID),
+                 "bus_spi_a");
     EXPECT_TRUE(state->active);
     state->active = false;
     EXPECT_EQ(nx_platform_stop_diagnosed(&diagnostic), NX_SUCCESS);
@@ -535,7 +586,11 @@ TEST_F(NativeFactory, DiagnosedStopPreservesQuarantinedRequestBorrow) {
     nx_platform_diagnostic_t diagnostic = {};
     EXPECT_EQ(nx_platform_stop_diagnosed(&diagnostic), NX_ERROR_BUSY);
     EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_CONTROLLER);
-    EXPECT_EQ(diagnostic.controller_index, 10U);
+    EXPECT_EQ(diagnostic.controller_index,
+              static_cast<size_t>(NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A));
+    EXPECT_STREQ(nx_factory_controller_label(diagnostic.controller_index,
+                                             NX_FACTORY_CONTROLLER_MODE),
+                 "irq-byte-event");
     EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
     EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);

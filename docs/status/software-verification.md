@@ -12,6 +12,46 @@ source_language: zh_CN
 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map 字节，不能只看 passed。
 资格规则由 [资格合同](../delivery/qualification.md)维护。
 
+(sdk-preview-v021)=
+## 0.2.1 软件预览：b1b903da
+
+公开 [v0.2.1 Release](https://github.com/X-Gen-Lab/nexus/releases/tag/v0.2.1)
+固定平台源码 `b1b903da47eda722a6be3e98edced5cfa36221b1`，tree
+`56fc077ca7048d4758bdc050a98046de77824d08`。它是软件预览，不是新的正式软件
+候选、生产资格或物理 HIL 结论。发布后源码继续迭代时，不继承本节的实际执行。
+
+| 范围 | 取得入口与实际界限 |
+| --- | --- |
+| 精确源码 CI | [平台 CI](https://github.com/X-Gen-Lab/nexus/actions/runs/41397178941) 的 31 个 job 与 [Security](https://github.com/X-Gen-Lab/nexus/actions/runs/41397178889) 的 4 个 job 实际成功；不替代完整候选计划或物理测量 |
+| Source SDK | [维护的 manifest](https://github.com/X-Gen-Lab/nexus/releases/download/v0.2.1/source-sdk-manifest.json) 与 [SDK 归档](https://github.com/X-Gen-Lab/nexus/releases/download/v0.2.1/nexus-source-sdk-0.2.1.tar.gz)；policy-v11 的 50 个 consumer root、53 个镜像和 202 条命令实际通过，不扩大成其他组合资格 |
+| Release | [实际发布流程](https://github.com/X-Gen-Lab/nexus/actions/runs/41402947612) 上传 13 个资产；[发布清单](https://github.com/X-Gen-Lab/nexus/releases/download/v0.2.1/release-manifest.json) 绑定其字节，`v0.2.0` 旧标签保持原身份 |
+| 中英文文档 | [实际 Pages 部署](https://github.com/X-Gen-Lab/nexus/actions/runs/41403026859) 与 [文档 manifest](https://github.com/X-Gen-Lab/nexus/releases/download/v0.2.1/documentation-manifest.json) 描述同一 `b1b903da` 源码；站点后续更新以实际 manifest 为准 |
+| 正式候选与物理 | 本预览没有建立新的软件候选；实板状态仍为 `not_executed`。历史候选见下方原封存基线，OCI recipe 与服务端规则分别按实际结果判断 |
+
+新一轮 [71 项规划入口](../delivery/next-iterations.md)映射至同一原交付台账。
+新增功能、配置或依赖必须取得自己的实际回归、SDK 和候选记录；导航整理本身
+不关闭软件、物理或服务端规则退出。
+
+## 当前开发源码的 SDK v12 计划要求
+
+维护源码的 `nexus-sdk-consumers-v12` 保留 v11 的五十个精确 consumer 身份，并
+追加下面四个 profile。它要求 54 个独立 root、57 个镜像和 222 条命令，含初始
+SDK 校验。这些是[同一计划权威](../../tools/release/transport.py)的要求，不是
+执行结果；已发布 `v0.2.1` 的 v11 记录和归档保持原身份。
+
+| 新增 profile | 计划消费范围与界限 |
+| --- | --- |
+| `native services` | 在 Native 软件模型执行 Settings 提交/重开、wait-select 和 lwIP ARP 收发；不建立真实 Flash 或 Ethernet 结论 |
+| `external services` | 相对 Board/SoC 包复制到 consumer 自有目录，仅通过 `Nexus_DIR` 消费安装版平台并运行同一服务场景 |
+| `f407 services` | 独立 ARM 编译、链接及资源检查，显式 128 KiB Flash、64 KiB 静态 RAM 和 2 KiB MSP；不执行实板服务 |
+| `gd470 services` | 独立 GD32 ARM 上下文检查相同场景和预算，不继承 F407 软件或物理结果 |
+
+公共[服务场景](../../cmake/package/verification/common_services/services.c)和
+[计划回归](../../tools/testing/test_sdk_services_policy.py)说明选择和检查方法，
+不能替代实际 producer report。SDK04 的四条新增消费链、完整 v12 执行和当前主
+CI 仍需各自实际记录，本节不将它们标为通过。未上传的主机日志不是公开下载地址；
+实现、定向开发检查、完整门禁、候选和 HIL 分别判断。
+
 ## 三种身份分别解释
 
 下面字段用于成功打包的正式站点与离线包。构建预览先查看

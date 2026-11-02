@@ -14,6 +14,7 @@ function(_nexus_component_bindings output)
         "bmp280-spi=Nexus::BMP280SPI"
         "log=Nexus::Log"
         "storage=Nexus::Storage"
+        "settings=Nexus::Settings"
         "flash-storage=Nexus::FlashStorage"
         "modbus-rtu=Nexus::ModbusRTU"
         PARENT_SCOPE)

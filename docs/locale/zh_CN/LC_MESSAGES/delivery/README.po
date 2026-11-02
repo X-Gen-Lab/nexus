@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: dde1a194723eccd3023f6bf3f27cac49bf5a8a1146f6f99eed83464fbd1403b0\n"
+"X-Nexus-Source-SHA256: 032ef3381c8a5798e74041f3cb0a1f5b532efa4e578387fee7296b490d1dc72f\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:1
 msgid "当前平台交付"
@@ -22,9 +22,6 @@ msgstr ""
 "默认实现统一为 **Core / Arch / SoC / Board / 静态 factory / 多态 I/O / 可选 OS / "
 "可选组件**。一份 TOML 经严格校验和不可变 IR 生成精确实例；factory 返回稳定的 只读接口对象，共享只读操作表，独立状态留在 "
 "provider 内部。获取接口不启动硬件。 应用、产品任务、私有 PCB、Flash 分区、恢复与安全策略由外部工程维护。"
-
-msgid "最新封存基线是 `7590b2d4`。完整软件计划、SDK、八个精确配置候选和远程恢复 结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 该入口区分公开平台证据、需授权的私有示例证据及仍开放的物理、环境和发布退出； 下列旧索引保留其原始源码和历史状态，不覆盖后续封存观察。"
-msgstr "最新封存基线是 `7590b2d4`。完整软件计划、SDK、八个精确配置候选和远程恢复 结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 该入口区分公开平台证据、需授权的私有示例证据及仍开放的物理、环境和发布退出； 下列旧索引保留其原始源码和历史状态，不覆盖后续封存观察。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:8
 msgid ""
@@ -309,3 +306,9 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:84
 msgid "[SoC refinement and physical acceptance](../design/soc-refinement.md)"
 msgstr "[SoC 完善与物理验收](../design/soc-refinement.md)"
+
+msgid "当前公开版本为 `v0.2.1` 软件预览，固定平台源码 `b1b903da`。其 Source SDK、 实际 CI、Release 和文档发布见{ref}`0.2.1 预览交付 <sdk-preview-v021>`。 预览没有建立新的正式软件候选或物理资格。"
+msgstr "当前公开版本为 `v0.2.1` 软件预览，固定平台源码 `b1b903da`。其 Source SDK、 实际 CI、Release 和文档发布见{ref}`0.2.1 预览交付 <sdk-preview-v021>`。 预览没有建立新的正式软件候选或物理资格。"
+
+msgid "最新封存的软件候选基线仍是 `7590b2d4`，完整软件计划、八个精确配置候选和恢复 结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 两种交付保留各自源码、配置和范围；旧结果不因新版本发布而转移资格。 下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在原交付台账。"
+msgstr "最新封存的软件候选基线仍是 `7590b2d4`，完整软件计划、八个精确配置候选和恢复 结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。 两种交付保留各自源码、配置和范围；旧结果不因新版本发布而转移资格。 下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在原交付台账。"

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 04e21c8fae6d61e215051cda41c72ac9c2405705f08dfe87984aae77956f01b5\n"
+"X-Nexus-Source-SHA256: 00a1cd0e2b2ae30539b501acd68a501a8fd1e20fdfa4dd5a68051cb63c6ce388\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:9
 msgid "Configure a product and make I/O progress"
@@ -336,24 +336,41 @@ msgid ""
 "actual successful build. Monitor may run without build association:"
 msgstr "对于 flash／debug，使用已识别的设备文件和实际成功构建的 provenance。Monitor 可以不关联构建："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:175
-msgid ""
-"The default prints a plan. Actual execution requires `--execute --output` "
-"with a new owned directory. Flash/debug require matching board/part, image, "
-"probe serial and pinned tool/configuration bytes; they do not require a "
-"serial console. Monitor requires the board, stable serial by-id and station "
-"lock, but may omit build provenance: that result states `image_linkage = "
-"unassociated`, not an image-qualified observation. Monitor uses 115200 8N1 "
-"and finite duration; EOF or disconnection fails. Debug binds loopback. "
-"Failed or cancelled device operations retain their locks for explicit "
-"inspection; normal completion releases them. A successful daily operation "
-"does not qualify HIL. Until real equipment is connected, record physical "
-"execution as `not_executed`. The [performance and HIL guide](performance-"
-"hil.md) owns capture and qualification."
-msgstr ""
-"默认只打印计划。实际执行需要 `--execute --output` 与新的自有目录。Flash／debug "
-"要求相符的板卡／料号、镜像、探针序列号及固定工具／配置字节，不要求串口控制台。Monitor 需要板卡、稳定的 serial by-id "
-"和测试站锁，可以省略构建 provenance；此时结果标为 `image_linkage = "
-"unassociated`，不构成关联镜像的观察。Monitor 使用115200 8N1 和有限时长；EOF 或断连失败。Debug 仅绑定 "
-"loopback。失败或取消的设备操作保留锁供显式检查；正常完成释放锁。日常操作成功不构成 HIL 资格。真实设备未连接前，物理执行记录为 "
-"`not_executed`。[性能与 HIL 指南](performance-hil.md)负责采集和资格合同。"
+msgid "Preview the maintained software plan"
+msgstr "预览维护的软件计划"
+
+msgid "The plan/artifact commands, Settings, wait selection and serial extensions in this iteration require a development checkout containing those changes. They do not modify the published `v0.2.1` archive; installed-SDK support follows actual verification of the corresponding new SDK."
+msgstr "本轮 plan/artifact 命令、Settings、wait selection 与串口扩展要求使用包含这些改动的开发 checkout。它们不改变已发布的 `v0.2.1` 归档；安装版 SDK 支持以对应新 SDK 的实际验证为准。"
+
+msgid "From the fixed development checkout, inspect the existing complete software plan before starting expensive validation:"
+msgstr "在固定开发 checkout 的源码根目录，先检查既有完整软件计划，再启动昂贵的验证："
+
+msgid "Choose a new JSON path in an existing parent directory; the future run directory is not created. The preview derives ordered commands, deadlines, checker and preset metadata, and input identities from the maintained plan. It does not execute tests, install tools, discover test cases, use equipment or access the network. Case counts remain unknown, HIL preparation is not acquisition, and qualification remains false. `--preset` filtering is rejected; use the existing focused test command for development. Remove only your own preview JSON when no longer needed. See the [development tool contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/dev/README.md)."
+msgstr "在已有父目录中选择新的 JSON 路径；不会创建未来的执行目录。预览从维护计划派生命令顺序、deadline、checker/preset 元数据和输入身份。它不执行测试、安装工具、发现用例、使用设备或访问网络。用例数保持未知，HIL 准备不是采集，qualification 保持 false。拒绝 `--preset` 过滤；开发时使用现有定向测试命令。不再需要时只删除自己生成的预览 JSON。参见[开发工具合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/dev/README.md)。"
+
+msgid "After a successful build, inspect its captured outputs without guessing which ELF belongs to the selected configuration. Replace the path below with that build's actual `quality/build-provenance.json`:"
+msgstr "构建成功后，查询实际捕获的输出，避免猜测哪个 ELF 属于选定配置。将下面路径替换为该次构建实际的 `quality/build-provenance.json`："
+
+msgid "The command verifies the provenance and resolved identity before listing source, configuration, artifact roles and the original command receipt. Missing, changed, stale or mismatched inputs reject rather than becoming a successful artifact view. The optional JSON path must be new. Inspection neither builds nor accesses equipment, and does not grant the current checkout, software or hardware a new qualification."
+msgstr "命令先校验 provenance 与解析身份，再列出源码、配置、产物角色和原始命令 receipt。缺失、变化、陈旧或不匹配的输入必须拒绝，不能生成成功产物视图。可选 JSON 路径必须是新文件。查询不构建或访问设备，也不为当前 checkout、软件或硬件建立新资格。"
+
+msgid "Use optional Settings and networking mechanisms"
+msgstr "使用可选 Settings 与联网机制"
+
+msgid "Select `settings` in the assembly's component list to link `Nexus::Settings`. The caller first opens Storage, then supplies Settings metadata, a disjoint staging buffer, entry capacity and a product-defined schema. Integer keys and copied byte values stay bounded. Get/set/remove operate on staging; only explicit commit writes Storage, and close discards uncommitted changes. Unknown schemas or corrupt loads are errors, not empty writable stores. After a mutating commit failure, reopen Storage and Settings to observe the surviving commit before retrying. Defaults, migration, authorization and Flash regions remain product policy. Read {ref}`settings.h <settings_8h>` and the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) for detailed ownership."
+msgstr "在装配的组件列表选择 `settings`，链接 `Nexus::Settings`。调用者先打开 Storage，再提供 Settings 元数据、独立暂存 buffer、条目容量和产品定义的 schema。整数 key 和复制的字节值保持有界。Get/set/remove 操作暂存；只有显式 commit 写 Storage，close 丢弃未提交变更。未知 schema 或损坏加载是错误，不是空的可写存储。发生变更性 commit 失败后，先重新打开 Storage 和 Settings，观察实际保留的提交，再决定重试。默认值、迁移、授权和 Flash region 由产品决定。详细所有权见 {ref}`settings.h <settings_8h>` 与[组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md)。"
+
+msgid "The optional `Nexus::LwIP` target admits the organization-hosted `X-Gen-Lab/lwip` 2.2.1 gitlink `77dcd25a` and its fixed source closure. It is excluded from the default build until explicitly selected. It uses `NO_SYS=1`: a product loop or task advances one serialized owner, without an implicit RTOS stack port. It reuses Ethernet frame loans and bounded memory. The reviewed slice covers static IPv4/ARP/ICMP/UDP and limited TCP integration; complete TCP connection lifecycles, DHCP, DNS, IPv6, VLAN, TLS and MQTT remain separate exits. Read the [network integration contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) for source, SDK, clock, memory and stop prerequisites. Source admission and development SDK consumption do not establish a software candidate, full network-platform, ARM or physical acceptance."
+msgstr "可选 `Nexus::LwIP` 目标准入组织托管的 `X-Gen-Lab/lwip` 2.2.1 gitlink `77dcd25a` 与固定源码闭包。显式选择前不参与默认构建。它采用 `NO_SYS=1`，由产品循环或任务推进单一串行 owner，不隐式创建 RTOS 网络栈移植层。它复用 Ethernet frame 借用和有界内存。已审查切片包括静态 IPv4/ARP/ICMP/UDP 和有限 TCP 集成；完整 TCP 连接生命周期、DHCP、DNS、IPv6、VLAN、TLS 和 MQTT 仍是独立退出。源码、SDK、clock、内存和停止前提见[联网集成合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)。源码准入和开发 SDK 消费不建立软件候选、完整联网平台、ARM 或物理资格。"
+
+msgid "For several authoritative predicates sharing one wait port, `nx_wait_select` checks a caller-owned source array from an explicit cyclic start index. It returns an observed-ready index without acquiring or consuming that source. The caller chooses fairness by advancing the next start index, wires every publisher to the same port, and owns service/timer progress. Stop and join publishers and waiters before reclaiming their state. There is no implicit subscription, dispatch, worker or resource transfer; the public {ref}`wait contract <wait_8h>` still governs arm/recheck and the absolute deadline."
+msgstr "多个权威谓词共享一个 wait port 时，`nx_wait_select` 从显式循环起始索引检查调用者 source 数组。它返回观察到 ready 的索引，不取得或消费对应 source。调用者推进下一次起始索引以选择公平性，把每个 publisher 接到同一 port，并负责 service/timer 进度。回收状态前须停止并 join publisher 和 waiter。没有隐式订阅、派发、worker 或资源转移；公共 {ref}`wait 合同 <wait_8h>` 仍约束 arm/recheck 与绝对 deadline。"
+
+msgid "The default prints a plan. Actual execution requires `--execute --output` with a new owned directory. Flash/debug require matching board/part, image, probe serial and pinned tool/configuration bytes; they do not require a serial console. Monitor requires the board, stable serial by-id and station lock, but may omit build provenance: that result states `image_linkage = unassociated`, not an image-qualified observation. Monitor uses the explicitly selected host-supported standard baud rate with 8N1 and finite duration; 115200 remains the default. Unknown rates or a TTY configuration mismatch fail rather than selecting a different speed. Host acceptance does not prove the physical device baud rate. EOF or disconnection fails. Debug binds loopback. Failed or cancelled device operations retain their locks for explicit inspection; normal completion releases them. A successful daily operation does not qualify HIL. Until real equipment is connected, record physical execution as `not_executed`. The [performance and HIL guide](performance-hil.md) owns capture and qualification."
+msgstr "默认打印计划。实际执行要求 `--execute --output` 与新建的自有目录。Flash/debug 要求 board/part、镜像、探针序列号及锁定工具/配置字节匹配，不要求串口控制台。Monitor 要求 board、稳定的 serial by-id 和 station lock，但可省略 build provenance；此时记录 `image_linkage = unassociated`，不表示镜像已关联。Monitor 使用显式选定且主机支持的标准波特率、8N1 和有限时长；默认仍为 115200。未知速率或 TTY 配置不匹配必须失败，不能改用其他速度。主机接受配置不证明物理设备波特率。EOF 或断开视为失败。Debug 绑定 loopback。设备操作失败或取消后保留锁等待明确检查，正常完成释放锁。日常操作成功不建立 HIL 资格。设备未接入前，物理执行记录为 `not_executed`。[性能与 HIL 指南](performance-hil.md)负责采集和资格规则。"
+
+msgid "Development monitor remains Linux/POSIX. The session-bound terminal phases are `acquiring`, `owned`, `releasing` and `released`. After confirmed helper withdrawal, the parent may restore its originally held descriptor only when `owned` proves this session's exclusive ownership. An already `released` helper does not authorize another restore or exclusive-release operation: another process may now own the terminal. Unknown, corrupt or intermediate phases, unconfirmed withdrawal and identity failures retain quarantine without touching another owner's terminal. The parent never opens a replacement by-id device."
+msgstr "开发 monitor 仍限于 Linux/POSIX。会话绑定的终端 phase 为 `acquiring`、`owned`、`releasing` 和 `released`。确认 helper 已撤回后，只有 `owned` 证明本会话持有独占所有权时，父进程才可通过原先持有的 descriptor 恢复。Helper 已为 `released` 时，不授权再次恢复或清除独占：另一个进程可能已经取得终端。未知、损坏或中间 phase、未确认撤回及身份错误均保留隔离，不修改其他 owner 的终端。父进程不打开 by-id 指向的替换设备。"
+
+msgid "Primary I/O failure and cleanup failure remain separately visible, including their exception cause/context chains; a cleanup exception must not hide an earlier EOF or read failure. Independent cleanup errors remain in the operation record. External SIGKILL of the parent cannot guarantee restoration. The baud-rate extension does not expand formal HIL console admission or establish Windows/macOS support. See the [serial ownership regressions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_dev_serial_ownership.py) and [rate/cancellation regressions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_dev_serial_rates.py)."
+msgstr "主 I/O 错误与清理错误分别可见，包括各自 exception cause/context 链；清理异常不能隐藏更早的 EOF 或读取失败。独立清理错误保留在操作记录中。父进程遭外部 SIGKILL 时不能保证恢复。波特率扩展不扩大正式 HIL console 准入，也不建立 Windows/macOS 支持。参见[串口所有权回归](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_dev_serial_ownership.py)及[速率/取消回归](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_dev_serial_rates.py)。"

@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`82fe430bd5b6f3f76a574f1be937fc8e18968148bee6c334240da4c78d1dc3ab`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`7258acf6d69723c4055021783da9e18e2d2f0bc90dd1f5a0b2d52cc928b41cae`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -21,7 +21,7 @@ source_language: zh_CN
 **原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
 也按原文保留，不能据此补造某次执行。
 
-本表包含 175 条原记录，仅表示来源行数。
+本表包含 210 条原记录，仅表示来源行数。
 
 ```{contents}
 :local:
@@ -2651,4 +2651,529 @@ source_language: zh_CN
 | `implementation_paths` | tools/evidence/;tools/release/;docs/status/software-verification.md |
 | `evidence_paths` | （原字段为空） |
 | `exit_condition` | 实际执行 Pages/Release，记录真实执行与产物身份。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p01)=
+## IT-P01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P01 |
+| `task` | 外置 SoC/provider 包契约 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/integration_package.py;docs/guides/provider-porting.md |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | 明确包身份、接口版本、facts/routes、配置入口、CMake 入口和依赖；清单只记录输入身份，不建立第二套源码目标图。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p02)=
+## IT-P02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P02 |
+| `task` | 不可变 package context |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/integration_package.py;tools/configure/ir.py;tools/configure/configure.py |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | 一次显式解析包选择，resolver、能力查询、bindings、factory 和构建消费同一不可变结果；不同包不串用全局状态或缓存。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p03)=
+## IT-P03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P03 |
+| `task` | 外置包身份与路径准入 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/integration_package.py |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | 拒绝重复身份、越界输入、未允许的符号链接、缺文件和版本不符；失败不保留半套生成结果，实际拒绝回归通过。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p04)=
+## IT-P04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P04 |
+| `task` | 外置配置解析接入 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/providers/descriptor.py;tools/configure/selected_contracts.py;tools/configure/configure.py |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | 新增外置 family 不需编辑中央白名单；内置与外置包复用维护解析流程，同进程多包结果保持隔离。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p05)=
+## IT-P05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P05 |
+| `task` | 外置 CMake 集成 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/platform/Firmware.cmake;tools/configure/dependencies.py |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | 选定外置包私有连接 SDK、startup、system 和 linker；普通构建作用域保留单个 Nexus::Config，未选包不进入目标。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p06)=
+## IT-P06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P06 |
+| `task` | 安装版 SDK 消费外置包 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;cmake/package/verification/common_services/external/assembly.toml |
+| `evidence_paths` | tools/testing/test_sdk_services_policy.py;tools/configure/test_external_package.py |
+| `exit_condition` | 包外工程只用安装前缀和显式包路径完成配置、编译和链接；移动路径、断网、缺包和版本错误均验证，无源码 checkout 回退。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p07)=
+## IT-P07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P07 |
+| `task` | 外置包输入与证据闭包 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/dependencies.py;tools/maintenance/capabilities.py;tools/configure/integration_package.py |
+| `evidence_paths` | tools/configure/test_external_package.py |
+| `exit_condition` | facts、配置代码和选定构建输入进入同一身份；包变化拒绝旧证据，能力查询不混用内置来源或扩大物理资格。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-p08)=
+## IT-P08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-P08 |
+| `task` | 独立接入验收夹具 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | cmake/package/verification/common_services/external/assembly.toml;tools/configure/test_external_package.py |
+| `evidence_paths` | tools/configure/test_external_package.py;tools/testing/test_sdk_services_policy.py |
+| `exit_condition` | 不修改 Nexus 即可交付一个包外集成，实际验证静态 factory、多实例、启动失败及回滚；夹具结果不代表新芯片实板通过。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-r01)=
+## IT-R01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-R01 |
+| `task` | 只读运行状态观察 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | io/;components/;tests/google/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 先以 UART/SPI 复用真实 owner/provider 事实提供可选观察；不创建第二状态机，快照不授予操作权限，关闭观察不增加热路径常驻成本。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-r02)=
+## IT-R02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-R02 |
+| `task` | 多源 wait-set 与显式 executor |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | os/wait.c;os/include/nexus/os/wait.h |
+| `evidence_paths` | tests/google/wait_select_test.cpp |
+| `exit_condition` | 实际第二消费者固定合同后，以调用者存储组合完成、timer 和关闭提示；验证 arm/recheck、deadline、注销、join 与公平性，不创建隐藏线程。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-r04)=
+## IT-R04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-R04 |
+| `task` | 精确 runtime PM 路径 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;soc/;tools/hil/;tests/google/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 固定控制器、电源/clock、pin 与唤醒依赖并验证 suspend/resume 回滚；软件结果和真实功耗、保留范围、唤醒时序分别验收。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-r05)=
+## IT-R05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-R05 |
+| `task` | 第二传感器与采样合同 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;tests/google/;tools/hil/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 用第二个实际器件检验单位、有效性、时间来源、校准、overflow 与 sample lifetime；复用 bus owner，覆盖坏值、过期、总线失败、取消与多实例。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n01)=
+## IT-N01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N01 |
+| `task` | 首发联网范围与预算 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/;dependencies/;docs/delivery/next-iterations.md |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 固定一个精确 SoC/Board/PHY/backend 和 IPv4 纵切片，声明 MTU、连接、帧、任务、存储及排除项；裸机与 RTOS 组合分别准入。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n02)=
+## IT-N02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N02 |
+| `task` | 成熟 C 网络栈接入 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | dependencies/lwip.lock.json;components/network/CMakeLists.txt;tools/maintenance/lwip_lock.py |
+| `evidence_paths` | tools/testing/test_lwip_lock.py;tools/testing/test_lwip_sdk.py |
+| `exit_condition` | 评估并锁定网络栈精确来源、许可和构建选项，采用组织托管依赖；离线 SDK 可显式构建，未链接时无驻留组件。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n03)=
+## IT-N03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N03 |
+| `task` | Ethernet frames 网络栈适配 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_adapter.h |
+| `evidence_paths` | tests/google/network_lwip_test.cpp |
+| `exit_condition` | 复用现有 TX/RX loan，验证多 fragment、旧 token、链路变化、持有 RX 时停止及恢复失败；复制和零复制分别证明预算与生命周期。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n04)=
+## IT-N04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N04 |
+| `task` | 网络执行与有界内存 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/network/port/lwipopts.h;components/network/src/lwip_adapter.c |
+| `evidence_paths` | tests/google/network_lwip_test.cpp |
+| `exit_condition` | 明确栈执行上下文、timer 进度、池/arena、packet 和连接容量；无隐式任务或可扩张全局堆，耗尽、过载和真实关闭排空可验证。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n05)=
+## IT-N05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N05 |
+| `task` | 基础 IPv4 联网 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/network/src/lwip_adapter.c;components/network/README.md |
+| `evidence_paths` | tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp |
+| `exit_condition` | 实现选定 ARP/ICMP/UDP/TCP 与明确 DHCP/DNS 范围，实际验证地址变化、链路反复、半关闭、超时、重连和容量耗尽；物理链路另验收。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n06)=
+## IT-N06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N06 |
+| `task` | 熵接口与首个 provider |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | io/;soc/;components/;tests/google/;tools/hil/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 明确来源、健康失败、可用量、上下文、deadline 和关闭合同；不足或硬件错误明确失败，不使用时间戳或固定种子替代真实熵。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n07)=
+## IT-N07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N07 |
+| `task` | TLS 资源与信任端口 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/;dependencies/;tests/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 锁定成熟 TLS 库，分开单调 deadline 与证书日历时间，产品提供 trust/credential；坏证书、未知可信时间、熵失败、耗尽、取消和停止均有回归。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n08)=
+## IT-N08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N08 |
+| `task` | 可选 MQTT 适配 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/;dependencies/;tests/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 固定协议版本、QoS、payload 和会话范围，在所选 TCP/TLS 上验证断网、重复报文、满队列和停止；topic、授权、重试与离线队列策略外置。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-n09)=
+## IT-N09
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-N09 |
+| `task` | 联网端到端故障与资源验证 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/network/src/lwip_adapter.c;cmake/package/verification/common_services/services.c |
+| `evidence_paths` | tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp;tools/testing/test_sdk_services_policy.py |
+| `exit_condition` | 实际执行 host 协议交互、抓包、失效场景和 ARM 链接预算；结果绑定精确配置和产物，PHY/DMA 吞吐与长负载仍由实板证明。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s01)=
+## IT-S01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S01 |
+| `task` | 有界 Settings/KV |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/settings/src/settings.c;components/settings/include/nexus/components/settings.h |
+| `evidence_paths` | tests/google/settings_test.cpp;tools/testing/test_settings_component.py |
+| `exit_condition` | 在现有双 bank Storage 上实现有界 key/value、schema、容量和提交边界；不重造物理 Flash 或持久化底层，默认值与迁移策略外置。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s02)=
+## IT-S02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S02 |
+| `task` | Settings 故障回归 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/settings/src/settings.c |
+| `evidence_paths` | tests/google/settings_test.cpp |
+| `exit_condition` | 实际验证中断提交、损坏、满容量、未知 schema 和失败后 reopen；commit-last 保留旧版本或真实新版本，host 文件不代表 Flash 掉电通过。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s03)=
+## IT-S03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S03 |
+| `task` | 镜像维护窄端口 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | components/;io/;tests/google/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 使用显式 Flash region 检查 image bounds、对齐、擦写、同步、busy 与状态读回；不自动预留分区，不把 CRC 当签名认证。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s04)=
+## IT-S04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S04 |
+| `task` | 成熟 bootloader 外部集成 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;cmake/;dependencies/;docs/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 评估 MCUboot 等成熟方案，分别构建 bootloader 与应用并验证资源可行性；产品拥有分区、信任根、签名、确认、回滚和反降级策略。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s05)=
+## IT-S05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S05 |
+| `task` | 镜像故障与资源验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tests/;tools/testing/;tools/hil/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 验证越界、部分写、无效镜像、版本及状态异常和 ARM image/link 布局；物理掉电、真实启动、确认和回滚按实板记录独立验收。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-s06)=
+## IT-S06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-S06 |
+| `task` | 文件系统准入与适配 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;dependencies/;tests/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 由真实文件需求固定介质后选择一个文件系统，明确块几何、sync、错误、互斥和挂载寿命；无需求时记录选型结论，不引入无用依赖。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-x02)=
+## IT-X02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-X02 |
+| `task` | 可选 GDB 客户端流程 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/dev/;tools/testing/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 保留 localhost GDB server，客户端绑定原构建 ELF 和工具身份，遵守超时、取消、输出与 station lock；退出实际回收所属进程。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-x03)=
+## IT-X03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-X03 |
+| `task` | 串口主机与波特率扩展 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/dev/device.py;tools/hil/serial_echo.py |
+| `evidence_paths` | tools/testing/test_dev_serial_rates.py;tools/testing/test_dev_serial_ownership.py |
+| `exit_condition` | 按实际需要扩展波特率和主机，保留明确设备身份；终端恢复、断开、输出上限、锁冲突与取消有回归，不自动选择首个串口。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-x04)=
+## IT-X04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-X04 |
+| `task` | 统一设备 runner 扩展 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/dev/;tools/testing/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | OpenOCD 现有路径不退化，新增实际需要的探针工具复用设备身份、ELF/provenance、超时、输出、锁和失败隔离合同。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-x06)=
+## IT-X06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-X06 |
+| `task` | 固件产物查询 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/dev/artifacts.py;tools/dev/dev.py |
+| `evidence_paths` | tools/testing/test_dev_artifacts.py |
+| `exit_condition` | 展示本次真实 ELF/BIN/map、链接资源与生成配置；过期、不匹配或未完成产物明确标识，不以文件或目录存在声明构建通过。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-t01)=
+## IT-T01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-T01 |
+| `task` | 测试计划只读预览 |
+| `implementation_status` | in_progress |
+| `software_status` | development_checks_reported_full_gate_and_sdk_pending |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/dev/plan.py;tools/dev/dev.py |
+| `evidence_paths` | tools/testing/test_dev_plan_preview.py |
+| `exit_condition` | 从已有 plan/preset/测试发现和生命周期目录派生执行命令、覆盖域、选择原因、硬件需求与未知项；预览不执行测试或产生成功资格。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-t06)=
+## IT-T06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-T06 |
+| `task` | 高风险输入与并发补充验证 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/;tools/testing/ |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 对网络、Settings、镜像和关闭路径使用适用 sanitizer/fuzz/故障注入，保留真实最小失败输入；不以伪硬件模型扩大物理结论。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-e01)=
+## IT-E01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-E01 |
+| `task` | 工业控制外部参考系统 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;docs/;X-Gen-Lab/nexus-examples |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 组合现有采集、Modbus、owner、Storage 和 watchdog，实际展示启动、运行、维护、停止、失败与恢复；任务、寄存器表和产品策略保持外部。 |
+| `owner` | codex |
+
+(status-platform-delivery-completion-it-e02)=
+## IT-E02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | IT-E02 |
+| `task` | 联网网关外部参考系统 |
+| `implementation_status` | planned |
+| `software_status` | not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/;docs/;X-Gen-Lab/nexus-examples |
+| `evidence_paths` | （原字段为空） |
+| `exit_condition` | 用精确外部组合完成 Ethernet→TCP/TLS→MQTT，展示断网、耗尽、重连和关闭；凭据、授权和业务策略外置，私有源及证据不进入公共包。 |
 | `owner` | codex |

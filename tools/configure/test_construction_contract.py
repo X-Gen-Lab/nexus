@@ -100,7 +100,7 @@ class ConstructionContractTests(unittest.TestCase):
             start_system=provider.start_system,
             start_resources=provider.start_resources,
             constructor=lambda *args: construction)
-        with patch.object(bindings, "maintained", return_value=explicit):
+        with patch.object(bindings, "for_selection", return_value=explicit):
             source = bindings.emit(result)[1]
         self.assertIn("static nx_alternate_gpio_state_t s_nx_port_led0;",
                       source)

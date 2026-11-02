@@ -211,8 +211,13 @@ class DeveloperDeviceTests(unittest.TestCase):
         self.addCleanup(os.close, descriptor)
 
         @contextmanager
-        def disconnected_device(name):
+        def disconnected_device(name, *, baudrate=115200, read_only=False,
+                                expected_device=None, phase_control=None):
             del name
+            self.assertEqual(baudrate, 115200)
+            self.assertTrue(read_only)
+            self.assertIsNone(expected_device)
+            self.assertIsNone(phase_control)
             yield descriptor, {}
 
         with patch("tools.hil.serial_echo._device", disconnected_device):

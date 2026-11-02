@@ -59,9 +59,10 @@ def validate_binding(binding, kind, mask):
     return normalized
 
 
-def select(binding, *, family, part, controller, backend, clock):
+def select(binding, *, family, part, controller, backend, clock, provider=None):
     """Require the exact SoC review before projecting normalized Board intent."""
-    validate = getattr(maintained(family), "validate_pin_states_selection", None)
+    provider = maintained(family) if provider is None else provider
+    validate = getattr(provider, "validate_pin_states_selection", None)
     if validate is None:
         fail("Named states require an explicitly reviewed SoC selection")
     validate(part=part, controller=controller, backend=backend, clock=clock)

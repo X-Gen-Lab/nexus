@@ -7,7 +7,7 @@ lease survives failed cleanup and is released after all device publishers drain.
 import re
 from collections.abc import Mapping
 
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, owned_claims
 
 
@@ -21,7 +21,7 @@ def selected_pins(result):
 
 
 def applies(result):
-    return (getattr(maintained(result.soc_family), "GPIO_PHASE", None) is not None
+    return (getattr(for_selection(result), "GPIO_PHASE", None) is not None
             and bool(selected_pins(result)))
 
 
@@ -58,7 +58,7 @@ def add_snapshots(result, item, offered, snapshots):
 def declarations(result, existing_snapshots=None):
     if not applies(result):
         return []
-    policy = maintained(result.soc_family).GPIO_PHASE
+    policy = for_selection(result).GPIO_PHASE
     pins, banks = selected_pins(result), _banks(result)
     slots = dict(existing_snapshots or {})
     if set(slots) - set(pins):
@@ -72,7 +72,7 @@ def declarations(result, existing_snapshots=None):
 
 
 def _cold_call(result, operation):
-    return maintained(result.soc_family).GPIO_PHASE.cold_call(operation)
+    return for_selection(result).GPIO_PHASE.cold_call(operation)
 
 
 def preflight(result):

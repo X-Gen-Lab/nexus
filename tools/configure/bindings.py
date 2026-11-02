@@ -1,7 +1,8 @@
 """Static faces and common lifecycle order; SoC modules emit hardware wiring."""
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
-from tools.configure.factory import interface_type, public_header, controller_class
+from tools.configure.factory import (interface_type, public_header,
+                                     controller_class, controller_ordinals)
 from tools.configure import gpio_phase, runtime_power
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats
@@ -41,7 +42,7 @@ def diagnostic_helpers():
 def emit(result):
     if not isinstance(result, ConfigurationIR):
         raise TypeError("Bindings emission requires ConfigurationIR")
-    provider = maintained(result.soc_family)
+    provider = for_selection(result)
     runtime = result.runtime_power is not None
     selections = result.controllers
     context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
@@ -88,6 +89,8 @@ def emit(result):
                '/** \\brief Caller-owned output, accessed only during this call.',
                ' * Controller indices are zero-based resolved.json controllers',
                ' * positions, not typed factory IDs. SIZE_MAX means no controller.',
+               ' * NX_PLATFORM_CONTROLLER_INDEX_* names those ordinals. Optional',
+               ' * factory capabilities provide immutable labels and bounds.',
                ' * Success clears all fields; failure identifies the failing stage.',
                ' */', 'typedef struct {',
                '    nx_platform_phase_t phase;',
@@ -107,6 +110,12 @@ def emit(result):
                ' * Context and ownership rules match nx_platform_stop.',
                ' */',
                'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);']
+    header += [
+        '/** \\brief Resolved controller ordinals; not factory IDs or a wire ABI. */',
+        'enum {']
+    header.extend(f'    {name} = {index},'
+                  for index, _, name in controller_ordinals(result))
+    header += [f'    NX_PLATFORM_CONTROLLER_INDEX_COUNT = {len(selections)}', '};']
     if runtime:
         header.extend(runtime_power.header())
     source = ['/**', ' * \\file            bindings.c',

@@ -6,7 +6,7 @@ from types import MappingProxyType
 COMPONENTS = frozenset({
     "owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "spi-dma-owner",
     "uart-owner", "bmp280", "bmp280-spi", "log", "storage",
-    "flash-storage", "modbus-rtu",
+    "flash-storage", "modbus-rtu", "settings",
 })
 
 

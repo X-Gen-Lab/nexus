@@ -22,3 +22,17 @@ def maintained(family):
              f"({directory}/__init__.py)", code="provider_module_missing",
              family=family, module=module,
              source=directory + "/__init__.py", missing_module=error.name)
+
+
+def for_selection(selection):
+    """Consume the explicit resolved owner; synthetic internal fixtures are local."""
+    context = getattr(selection, "provider_context", None)
+    if context is not None:
+        family = getattr(selection, "soc_family", None)
+        if family is None:
+            family = selection.provider
+        if context.descriptor.family != family:
+            fail("Selected provider context differs from its resolved family")
+        return context.provider
+    family = getattr(selection, "soc_family", None)
+    return maintained(selection.provider if family is None else family)

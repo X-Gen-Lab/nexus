@@ -10,7 +10,7 @@ COMMON = (
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
-    "selected_contracts",
+    "selected_contracts", "integration_package",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
 )
 PLATFORM = (
@@ -72,15 +72,24 @@ def snapshot(*, mode, family=None, sdk=False):
     return paths, _identity(mode, records)
 
 
-def selected(paths, identity, *, family):
+def selected(paths, identity, *, family, context=None):
     """Retain the pre-resolution bytes of the selected family, never rehash."""
-    names = source_names("platform", family,
+    names = source_names("platform", None if context is not None and
+                        context.external else family,
                    sdk="cmake/package/package_source_sdk.py" in paths)
     records = {record["path"]: record for record in identity["files"]}
     if not set(names).issubset(records):
         raise ValueError("Configuration code dependency closure changed during resolution")
-    return ({name: paths[name] for name in names},
-            _identity("platform", [records[name] for name in names]))
+    selected_paths = {name: paths[name] for name in names}
+    selected_records = [records[name] for name in names]
+    if context is not None and context.external:
+        for path in context.inputs:
+            if path.suffix == ".py":
+                name = "soc-package/" + path.relative_to(context.directory).as_posix()
+                selected_paths[name] = str(path)
+                selected_records.append({"path": name,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return selected_paths, _identity("platform", selected_records)
 
 
 def emit(output, paths, identity):

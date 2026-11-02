@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 78f8975d54d9f7a383ab9bbe23907afcd8f7e27d0f1cb683517bc6654c4746c8\n"
+"X-Nexus-Source-SHA256: 4e1836232a549cf8cbca5e28f0a89ba33f82325dd827519b01c80599f1935849\n"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:9
 msgid "Add a SoC, provider or reusable component"
@@ -191,26 +191,6 @@ msgid ""
 "Define the new behavior, supported modes, public ownership obligations and "
 "rejection boundaries before changing its production implementation."
 msgstr "准备[固定源码与递归依赖](source-checkout.md)。改变生产实现前，先定义新行为、支持模式、公共所有权义务和拒绝边界。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:64
-msgid ""
-"Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the"
-" shared CPU resolver; do not duplicate CPU flags or infer optional features."
-" Place MCU implementations under `soc/<vendor>/<family>/` and declare that "
-"canonical `source_directory` in the maintained family descriptor. Public "
-"family identifiers stay independent of the directory. CPU implementation "
-"sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed "
-"cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after"
-" checking each participating silicon contract. Cross-vendor SoC "
-"collaboration stays in `soc/common/`; STM32 identity helpers stay in "
-"`soc/stm32/common/`."
-msgstr ""
-"添加精确的 `soc.json`／`routes.json` 事实并记录来源。使用共享 CPU resolver，不重复 CPU "
-"flags，也不推断可选功能。将 MCU 实现放在 `soc/<vendor>/<family>/`，并在维护中的家族 descriptor 声明该规范"
-" `source_directory`。公共家族标识独立于目录。CPU 实现按 ISA 放置，例如 "
-"`arch/arm/cortex_m/`；经复核的跨厂家寄存器算法只有在核对各参与芯片合同后才能放入 "
-"`drivers/<kind>/<ip>/`。跨厂家 SoC 协作保留在 `soc/common/`；STM32 identity helper 保留在"
-" `soc/stm32/common/`。"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:84
 msgid ""
@@ -619,19 +599,74 @@ msgstr ""
 "通过的主机寄存器模型只证明其建模的软件范围。新增 "
 "CPU、缓存、FPU／MVE、安全或低功耗行为必须建立自己的实际执行边界；[平台支持](../reference/platforms/support.md)不能仅凭名称推导它们。"
 
-
-msgid "Add a data-only `descriptor.py` at the SoC package root (Native uses `soc/native/descriptor.py`), outside its `configure/` package. Add its exact module to the central explicit map in `tools/configure/providers/descriptor.py`; reuse the frozen `FamilyDescriptor`, without an eager parallel registry. Place its production configuration package in `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and its configuration tests in `tools/configure/tests/providers/<family>/`. Define supported modes, numerical limits, constructors, rollback and IRQ wiring. Return an explicit frozen `Construction` record, including the private state type and failed-init cleanup responsibility. Initialize and stop actions use `DirectCall` values under the [constructor contract](../design/official-stm32-provider.md#build-time-provider-contract); raw C expressions are not accepted in those fields. Do not require family-name inference in common generation. Unsupported modes reject; there is no runtime registration or plugin discovery."
-msgstr "在 SoC package 根目录添加纯数据 `descriptor.py`（Native 使用 `soc/native/descriptor.py`），放在其 `configure/` package 之外。在 `tools/configure/providers/descriptor.py` 的中央显式映射中加入其精确模块；复用冻结的 `FamilyDescriptor`，不建立 eager 平行 registry。生产配置包放在 `soc/<vendor>/<family>/configure/`（Native 使用 `soc/native/configure/`），配置测试放在 `tools/configure/tests/providers/<family>/`。定义支持模式、数值限制、构造器、回滚与 IRQ 接线。返回显式冻结的 `Construction` 记录，包含私有状态类型及初始化失败后的清理责任。Initialize 和 stop 动作使用[构造合同](../design/official-stm32-provider.md#build-time-provider-contract)中的 `DirectCall` 值；这些字段不接受原始 C 表达式。公共生成器不依赖系列名称推断。不支持的模式应拒绝；不引入运行时注册或插件发现。"
-
 msgid "Within each SoC's `configure/` package, `contract.py` owns mode capabilities, ABI/limits and family admission policy. Sibling modules import that contract directly; `__init__.py` explicitly exports it with constructors and emitters. The leaf `providers/common.py` owns validation helpers and immutable `Construction`; leaf contracts and common helpers do not import the top-level resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ policy, `ir.py` owns named immutable decisions and their one-way JSON projection, and `matrix.py` orchestrates support catalogues. The descriptor's `configuration_modules` property combines the fixed package, `contract.py`, `bindings.py` and `emission.py` paths with explicitly declared `configuration_helpers` and the selected local descriptor file. These sources belong to reconfiguration inputs and the Source SDK source closure. Keep family records, order and public selections stable when relocating metadata. A single `descriptor.maintained()` lookup must not import another family or configure behavior; explicit enumeration and snapshot/SDK inventory may intentionally load all data-only descriptors."
 msgstr "每个 SoC 的 `configure/` 包中，`contract.py` 拥有模式能力、ABI／限制与系列准入策略。相邻模块直接导入该合同；`__init__.py` 将其与构造器、emitter 显式导出。叶模块 `providers/common.py` 拥有校验辅助函数与不可变 `Construction`；叶合同及公共辅助模块不导入顶层 resolver 或 emitter。`selection.py` 检查跨域选项、时钟和 IRQ 策略；`ir.py` 拥有具名不可变决策及其单向 JSON 投影；`matrix.py` 编排支持目录。descriptor 的 `configuration_modules` 属性将固定 package、`contract.py`、`bindings.py`、`emission.py` 路径与显式声明的 `configuration_helpers` 及所选本地 descriptor 文件合并。这些源码属于重新配置输入和 Source SDK 源码闭包。迁移元数据时保留 family record、顺序和公共选择。单次 `descriptor.maintained()` 查找不得导入另一 family 或 configure 行为；显式枚举及 snapshot/SDK 清单可以按要求加载全部纯数据 descriptor。"
 
 msgid "The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h` templates allow one specialization per translation unit. Required named exports, register, clock, IRQ and data bindings reject at compilation when missing. The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control requires its hardware flow binding. Wrapper-owned bindings, including ops names and post-include clock-readiness use, remain available after inclusion. Explicit caller read/write ports survive; cleanup removes only template-owned helper and default macros. Review each specialization's actual compilation, exported table and runtime contract; a template guard does not establish hardware timing."
 msgstr "私有 `timer_capture_impl.h`、`advanced_pwm_impl.h` 和 `uart_fifo_impl.h` 模板允许每个 translation unit 只有一个 specialization。所需的具名导出、寄存器、clock、IRQ 和数据绑定缺失时在编译期拒绝。FIFO 模板接受深度 1..16，RTS/CTS 选择为 0 或 1；选择流控时要求相应硬件 flow binding。wrapper 拥有的 binding，包括 ops 名称及 include 之后的 clock-readiness 使用，保留可用。调用方显式定义的 read/write port 保留；清理只移除模板拥有的 helper 和默认宏。逐个审查 specialization 的实际编译、导出表和运行时合同；模板 guard 不建立硬件时序资格。"
 
-
 msgid "The SoC target selects shared sources through explicit CMake entries and private includes. The driver directory does not choose routes, clock profiles or an ABI, and its presence does not add a maintained mode. Never introduce a runtime forwarder merely to match a source directory. A selected private compile-time port may bind reviewed official operations inside that shared translation unit; a macro in a separately compiled wrapper cannot change it. Preserve operation width, read side effects, command atomicity and withdrawal ordering; the [bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments) is a current example, not a blanket HAL replacement."
 msgstr "SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。选定的私有编译期 port 可以在该共享编译单元内部绑定已审查的官方操作；单独编译的 wrapper 中的宏不能改变它。保留操作宽度、读取副作用、命令原子性和撤离顺序；[有界官方操作范围](../design/official-stm32-provider.md#bounded-official-operation-increments)是当前实例，不是全面替换为 HAL 的承诺。"
 
 msgid "For new behavior or fixes, add and execute a meaningful RED GoogleTest/GoogleMock contract against the current production path. Retain the actual command, nonzero execution and expected failing assertion. Equivalent refactors retain actual old-GREEN source/binary snapshots and applicable regressions plus real-default operation probes, without fabricated RED. Test MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only error is not the expected behavioral RED result."
 msgstr "对新行为或修复，为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。等价重构保留实际 old-GREEN 源码／二进制快照、适用回归及真实默认操作探针，不伪造 RED。通过 mock 测试 MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。"
+
+msgid "Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the shared CPU resolver; do not duplicate CPU flags or infer optional features. For an in-tree family, place MCU implementations under `soc/<vendor>/<family>/` and declare that canonical `source_directory` in the maintained family descriptor. Public family identifiers stay independent of the directory. CPU implementation sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after checking each participating silicon contract. Cross-vendor SoC collaboration stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`."
+msgstr "添加精确 `soc.json`/`routes.json` facts 与来源说明。使用共享 CPU resolver，不重复 CPU flags 或推断可选特性。对于仓库内 family，MCU 实现放在 `soc/<vendor>/<family>/`，并在维护的 family descriptor 声明规范 `source_directory`。公共 family 标识独立于目录。CPU 实现源码归属对应 ISA，例如 `arch/arm/cortex_m/`；只有核对每个参与芯片合同后，经审查的跨厂商寄存器算法才放到 `drivers/<kind>/<ip>/`。跨厂商 SoC 协作留在 `soc/common/`；STM32 身份辅助留在 `soc/stm32/common/`。"
+
+msgid "For an in-tree family, add a data-only `descriptor.py` at the SoC package root (Native uses `soc/native/descriptor.py`), outside its `configure/` package. Add its exact module to the central explicit map in `tools/configure/providers/descriptor.py`; reuse the frozen `FamilyDescriptor`, without an eager parallel registry. Place its production configuration package in `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and its configuration tests in `tools/configure/tests/providers/<family>/`. Define supported modes, numerical limits, constructors, rollback and IRQ wiring. Return an explicit frozen `Construction` record, including the private state type and failed-init cleanup responsibility. Initialize and stop actions use `DirectCall` values under the [constructor contract](../design/official-stm32-provider.md#build-time-provider-contract); raw C expressions are not accepted in those fields. Do not require family-name inference in common generation. Unsupported modes reject; there is no runtime registration or plugin discovery."
+msgstr "对于仓库内 family，在 SoC 包根目录添加仅含数据的 `descriptor.py`（Native 使用 `soc/native/descriptor.py`），放在 `configure/` 包之外。在 `tools/configure/providers/descriptor.py` 的中央显式映射加入精确模块，复用冻结的 `FamilyDescriptor`，不建立急切加载的并行注册表。生产配置包放在 `soc/<vendor>/<family>/configure/`（Native 使用 `soc/native/configure/`），配置测试放在 `tools/configure/tests/providers/<family>/`。定义支持模式、数值限制、构造、回滚和 IRQ 连接。返回显式冻结的 `Construction` 记录，包含私有状态类型和初始化失败后的清理责任。初始化和停止动作使用[构造合同](../design/official-stm32-provider.md#build-time-provider-contract)中的 `DirectCall`，这些字段不接受原始 C 表达式。公共生成器不应推断 family 名称。不支持的模式拒绝，不提供运行时注册或插件发现。"
+
+msgid "External SoC/provider package contract"
+msgstr "外置 SoC/provider 包契约"
+
+msgid "This section documents the explicit package contract introduced by IT-P01–IT-P08 in the [current iteration](../delivery/next-iterations.md). Consult the [original task records](../status/ledgers/platform-delivery-completion.md) for implementation and executed acceptance. The contract itself does not establish an available chip, Board route, installed-SDK result or physical qualification. This addition does not change the published `v0.2.1` archive; use the development source containing the package implementation until a corresponding SDK is verified."
+msgstr "本节说明[当前迭代](../delivery/next-iterations.md)中 IT-P01–IT-P08 引入的显式包契约。实现与实际验收见[原任务记录](../status/ledgers/platform-delivery-completion.md)。契约本身不建立可用芯片、Board 路由、安装版 SDK 结果或物理资格。新增内容不改变已发布的 `v0.2.1` 归档；对应 SDK 取得实际验证前，使用包含包实现的开发源码。"
+
+msgid "The assembly explicitly selects `soc_package` relative to its own TOML file. The existing `board_package` selects Board facts separately. No package scan, automatic download or mutable global registry chooses an implementation. An external family cannot replace an existing in-tree family identity."
+msgstr "装配通过相对其 TOML 文件的 `soc_package` 显式选择包。既有 `board_package` 独立选择 Board facts。不通过包扫描、自动下载或可变全局注册表选择实现。外置 family 不得替换已有仓库内 family 身份。"
+
+msgid "Package input"
+msgstr "包输入"
+
+msgid "Contract"
+msgstr "合同"
+
+msgid "`nexus-soc.json`"
+msgstr "`nexus-soc.json`"
+
+msgid "Strict manifest with `schema_version`, `interface_version`, `id`, `version`, `family` and `vendor`"
+msgstr "严格清单，包含 `schema_version`、`interface_version`、`id`、`version`、`family` 和 `vendor`"
+
+msgid "`source_directory`"
+msgstr "`source_directory`"
+
+msgid "Package-relative SoC source directory containing `soc.json`, `routes.json` and `CMakeLists.txt`"
+msgstr "相对包根目录的 SoC 源码目录，包含 `soc.json`、`routes.json` 和 `CMakeLists.txt`"
+
+msgid "`configuration_directory`"
+msgstr "`configuration_directory`"
+
+msgid "Package-relative explicit configuration entry containing `__init__.py` and the selected provider modules"
+msgstr "相对包根目录的显式配置入口，包含 `__init__.py` 和选定 provider 模块"
+
+msgid "`inputs`"
+msgstr "`inputs`"
+
+msgid "Relative regular-file paths mapped to SHA-256; cover the selected facts, configuration code and build inputs, including required entry files"
+msgstr "相对普通文件路径到 SHA-256 的映射，覆盖选定 facts、配置代码和构建输入，包括必需入口文件"
+
+msgid "Manifest schema and interface version 1 define this first contract. Paths and hashes are admission inputs; they do not define targets or replace CMake's source dependency graph. Reject unknown fields, duplicate identities, escaped paths, disallowed links, missing files, unsupported interface versions and changed bytes rather than falling back to an in-tree family. Configuration rejection must leave no partial usable bundle."
+msgstr "第一版契约的 manifest schema 和 interface version 均为 1。路径和摘要用于准入，不定义目标，也不替代 CMake 源依赖图。未知字段、重复身份、路径越界、不允许的链接、缺文件、不支持的接口版本或字节变化必须拒绝，不回退到仓库内 family。配置拒绝后不得留下部分可用 bundle。"
+
+msgid "`interface_version` is the compatibility gate. `version` is the package's audit identity, not an expected-semver constraint requested by the consumer. Declare package-owned vendor source and locks in `inputs`; the existing `soc.source_lock` refers to Nexus-managed dependencies and does not automatically validate arbitrary external Git repositories."
+msgstr "`interface_version` 是兼容准入门槛。`version` 是包的审计身份，不是 consumer 请求的 expected-semver 约束。包自有的 vendor 源码和锁须声明到 `inputs`；现有 `soc.source_lock` 指向 Nexus 管理的依赖，不自动验证任意外部 Git 仓库。"
+
+msgid "Package configuration and CMake are explicitly selected trusted host code, not data executed by the firmware. Resolve their identity once into the immutable package context, then carry it through facts, selected contracts, resource validation, static generation, capabilities and build selection. Queries must not resolve one package while firmware compilation selects another."
+msgstr "包的配置代码和 CMake 是显式选择的受信任主机代码，不是固件执行的数据。将其身份一次解析为不可变 package context，贯穿 facts、selected contracts、资源校验、静态生成、能力查询和构建选择。查询不得解析一个包，而固件编译选择另一个包。"
+
+msgid "Declared Python modules within `configuration_directory` are loaded eagerly from their hash-checked source. Later relative imports reuse those declared loaded modules; undeclared filesystem fallback and bytecode caches are not package inputs. Absolute package paths may contain spaces; CMake-special characters are rejected explicitly rather than passed into generated build syntax."
+msgstr "`configuration_directory` 内声明的 Python 模块经摘要校验后，从源码急切加载。后续相对 import 复用已声明且已加载的模块；不把未声明的文件系统回退或 bytecode cache 作为包输入。绝对包路径可含空格；CMake 特殊字符会明确拒绝，不会传入生成的构建语法。"
+
+msgid "The selected SoC target privately connects its SDK, startup, system and linker inputs. Public I/O retains Nexus types and static faces. Ordinary builds retain one `Nexus::Config`; an installed Source SDK consumer supplies its external package explicitly and must not fall back to a development checkout. Relocation, offline consumption, interface-version rejection and independent package fixtures are software exits; actual PCB, DMA, clocks and electrical behavior need HIL."
+msgstr "选定 SoC 目标私有连接 SDK、startup、system 和 linker 输入。公共 I/O 保留 Nexus 类型和静态 face。普通构建保留一个 `Nexus::Config`；安装版 Source SDK consumer 显式提供外置包，不得回落开发 checkout。路径搬移、断网消费、接口版本拒绝和独立包夹具属于软件退出；真实 PCB、DMA、clock 和电气行为需要 HIL。"

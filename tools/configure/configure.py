@@ -25,6 +25,7 @@ if __package__ in (None, ""):
 
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2, enhanced_endpoints
+from tools.configure import integration_package
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -294,7 +295,7 @@ def _validate_physical_variant(value, provider, policy):
     return variant
 
 
-def validate_soc(soc, part):
+def validate_soc(soc, part, provider=None):
     obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
               "controllers"}, {"provenance", "source_lock", "reserved_resources",
                                "can_domain", "references", "adc_group_review"},
@@ -303,7 +304,7 @@ def validate_soc(soc, part):
     identity(soc["id"], "SoC id")
     if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
         fail(f"Unmaintained exact part: {part}")
-    provider = maintained(soc["id"])
+    provider = maintained(soc["id"]) if provider is None else provider
     from tools.configure.providers.common import exact_part
     exact_part(provider.PARTS, part)
     reference = getattr(provider, "FACT_REFERENCES", None)
@@ -526,14 +527,23 @@ def resolve_bindings(board, routes, part):
     return bindings
 
 
-def bind_input_identities(inputs, root, snapshots, input_paths):
+def bind_input_identities(inputs, root, snapshots, input_paths, context=None):
     """Seal authored/fact input bytes and their navigation atomically."""
     records = []
     for path in sorted(set(inputs), key=lambda value: value.as_posix()):
-        label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
-                 else "external/" + path.name)
+        external = context is not None and context.external
+        if external and path in context.inputs:
+            label = ("soc-package/" + context.identity["id"] + "/" +
+                     path.relative_to(context.directory).as_posix())
+        else:
+            label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
+                     else "external/" + path.name)
         contents = snapshots.get(path, path.read_bytes())
         expected = hashlib.sha256(contents).hexdigest()
+        if external:
+            declared = dict(context.input_digests).get(path)
+            if declared is not None and declared != expected:
+                fail("SoC package input changed during resolution: " + label)
         if file_digest(path) != expected:
             fail(f"Input changed during resolution: {label}")
         records.append({"path": label, "sha256": expected})
@@ -541,7 +551,7 @@ def bind_input_identities(inputs, root, snapshots, input_paths):
             input_paths[label] = str(path)
     if len({record["path"] for record in records}) != len(records):
         fail("Declared input identity labels collide")
-    return records
+    return sorted(records, key=lambda record: record["path"])
 
 
 def resolve_components(assembly):
@@ -797,6 +807,7 @@ class _FactResolution:
     provider: ModuleType
     references: Mapping | None
     inputs: tuple[Path, ...]
+    provider_context: integration_package.ProviderContext
 
     @property
     def family(self):
@@ -828,14 +839,21 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
     integer(board["schema_version"], 1, 1, "Board schema")
     identity(board["id"], "Board id")
     family = identity(board["soc_family"], "SoC family")
-    provider = maintained(family)
+    context = integration_package.select(
+        assembly.soc_package, family=family, root=root,
+        assembly_directory=assembly_directory)
+    provider = context.provider
     part = identity(board["soc"], "exact part")
-    soc_dir = root / descriptor.maintained(family).source_directory
-    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
+    soc_dir = context.source_directory
+    if (not context.external and (soc_dir.is_symlink() or
+            not soc_dir.resolve().is_relative_to(root / "soc"))):
         fail("SoC package escapes owned source")
     soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
     soc, routes_doc = read(soc_path), read(routes_path)
-    validate_soc(soc, part)
+    if context.external and "source_lock" in soc:
+        fail("External SDK sources must be bound by package inputs; "
+             "Nexus source_lock belongs to internal integrations")
+    validate_soc(soc, part, provider)
     reference_path = None
     references = None
     if "references" in soc:
@@ -849,7 +867,7 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
     routes = resolve_routes(routes_doc, soc, part, provider)
     validate_board_context(board)
     bindings = resolve_bindings(board, routes, part)
-    inputs = [board_path, soc_path, routes_path]
+    inputs = [board_path, soc_path, routes_path, *context.inputs]
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -857,7 +875,8 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
     return _FactResolution(
         board=freeze(board), soc=freeze(soc), routes=freeze(routes),
         bindings=freeze(bindings), provider=provider,
-        references=freeze(references), inputs=tuple(inputs))
+        references=freeze(references), inputs=tuple(inputs),
+        provider_context=context)
 
 
 @dataclass(frozen=True)
@@ -940,7 +959,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 resolved_pin_states = pin_states.select(
                     binding, family=family, part=part,
                     controller=route["controller"], backend=backend,
-                    clock=assembly.clock_profile)
+                    clock=assembly.clock_profile, provider=provider)
             provider.validate_mode_context(
                 selection, route, backend=backend,
                 clock_profile=assembly.clock_profile)
@@ -1024,6 +1043,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
         claim_list.extend(physical_claims)
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
+    unique([factory.controller_ordinal_identifier(item["kind"], item["id"])
+            for item in selected], "generated controller ordinal identifiers")
     can_domain = can.resolve_domain(thaw(assembly.can_domain), selected,
                                     soc, provider, claim, claims)
     device_ids = []
@@ -1175,7 +1196,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     clocks.match_board(clock, board["clocks"])
     i2s2_role = i2s2.resolve(thaw(assembly.i2s2), family=family,
                             part=part, backend=backend,
-                            clock_profile=assembly.clock_profile)
+                            clock_profile=assembly.clock_profile,
+                            provider=provider)
     if assembly.os is not None and not isinstance(assembly.os, Mapping):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(thaw(assembly.os), cpu_profile,
@@ -1208,7 +1230,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     selected_sources = _resolve_source_dependencies(
         soc, provider, family, root, backend, read, source_dependency)
     inputs.extend(selected_sources.inputs)
-    records = bind_input_identities(inputs, root, snapshots, input_paths)
+    records = bind_input_identities(inputs, root, snapshots, input_paths,
+                                    facts.provider_context)
     components = resolve_components(assembly)
     resolved = ConfigurationIR(
         board=board["id"], soc_family=family,
@@ -1236,7 +1259,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         physical_qualified=False,
         fact_references=freeze(references),
         pwm_shared_owners=device_graph.pwm_shared_owners,
-        i2s2=i2s2_role)
+        i2s2=i2s2_role, provider_context=facts.provider_context)
     resolved = resolved.with_integrations()
     if assembly.power is not None:
         from tools.configure import runtime_power
@@ -1288,6 +1311,9 @@ def protected_inputs(assembly, root):
     if not isinstance(raw, dict):
         return paths
     package = raw.get("board_package")
+    soc_package = raw.get("soc_package")
+    if isinstance(soc_package, str):
+        paths.append(assembly.parent / soc_package)
     if isinstance(raw.get("board"), str):
         package = str(root / "boards" / raw["board"])
     if isinstance(package, str):
@@ -1323,7 +1349,8 @@ def configure(assembly, output, root=ROOT):
         result = resolve_ir(assembly, root, input_paths=input_paths)
         dependencies.verify(initial_code_paths, initial_code_identity)
         code_paths, code_identity = dependencies.selected(
-            initial_code_paths, initial_code_identity, family=result.soc_family)
+            initial_code_paths, initial_code_identity, family=result.soc_family,
+            context=result.provider_context)
         generate(result, temporary)
         (temporary / "input_paths.json").write_text(
             json.dumps(input_paths, indent=2, sort_keys=True) + "\n", encoding="utf-8")

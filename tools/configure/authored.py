@@ -27,6 +27,7 @@ class AuthoredAssembly(Record):
     can_domain: Mapping | None = None
     power: Mapping | None = None
     i2s2: Mapping | None = None
+    soc_package: str | None = None
 
     @classmethod
     def create(cls, values):
@@ -48,7 +49,7 @@ ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
                        "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
+TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
 
 
 
@@ -134,7 +135,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("abi", "optimization", "components", "os", "factory", "can_domain", "power"):
+    for field in ("soc_package", "abi", "optimization", "components", "os", "factory", "can_domain", "power"):
         if field in data:
             result[field] = data[field]
     if "i2s2" in data:

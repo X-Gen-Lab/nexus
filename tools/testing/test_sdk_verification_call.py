@@ -441,6 +441,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             for relative in (stem + ".toml", "consumers/" + stem + ".c"):
                 shutil.copyfile(ROOT / "cmake/package/verification/io_evolution" /
                                 relative, verification / relative)
+        shutil.copytree(ROOT / "cmake/package/verification/common_services",
+                        self.sdk / "cmake/package/verification/common_services")
         specification = importlib.util.spec_from_file_location(
             "nexus_consumer_parallel_contract",
             ROOT / "cmake/package/verify_consumers.py")
@@ -476,8 +478,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     row["arguments"].insert(1, "-I" + str(public))
                     row["command"] = shlex.join(row["arguments"])
             (build / "compile_commands.json").write_text(json.dumps(rows))
-            config = build / "configuration"
-            config.mkdir()
+            service = next((profile for profile in self.consumer.SERVICE_CONSUMERS
+                            if source.name == profile.name + " source"), None)
+            config = build / ("nexus-sdk/generated" if service is not None else
+                              "configuration")
+            config.mkdir(parents=True)
             (config / "bindings.c").write_text("/* external CMake fixture */")
             (config / "resolved.json").write_text("{}")
             (build / "resolved-config.txt").write_text(str(config))
@@ -523,7 +528,6 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 for name in ("installed_selected.elf", "installed_selected.resources.json"):
                     (binary / name).unlink()
             elif source.name.startswith("selected "):
-                import hashlib
                 def identity(path):
                     return {"path": str(path), "size": path.stat().st_size,
                             "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
@@ -553,6 +557,38 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "directory": str(build),
                          "command": "cc -c " + shlex.quote(
                              str(source / "private_headers.c"))}]))
+            if service is not None:
+                family = {"native-services": "native",
+                          "external-package": "sdk_services_model"}.get(
+                              service.domain, "stm32f407" if
+                              service.name == "f407 services" else "gd32f470")
+                (config / "resolved.json").write_text(json.dumps({
+                    "backend": "baremetal" if service.arm else "native",
+                    "soc_family": family,
+                    "cpu": {"arch": "cortex-m4" if service.arm else "native"},
+                    "controllers": []}))
+                rows.append({"file": str(config / "bindings.c"),
+                             "directory": str(build),
+                             "arguments": ["cc", "-c", str(config / "bindings.c")]})
+                (build / "compile_commands.json").write_text(json.dumps(rows))
+                header = bytearray(64)
+                header[:6] = (b"\x7fELF\x01\x01" if service.arm else
+                              b"\x7fELF\x02\x01")
+                header[18:20] = (40 if service.arm else 62).to_bytes(2, "little")
+                image = binary / ("installed_services" +
+                                  (".elf" if service.arm else ""))
+                image.write_bytes(header)
+                if service.arm:
+                    def identity(path):
+                        return {"path": str(path), "size": path.stat().st_size,
+                                "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                    for suffix in ("bin", "map"):
+                        (binary / ("installed_services." + suffix)).write_text(
+                            "external service artifact " + suffix)
+                    (binary / "installed_services.resources.json").write_text(
+                        json.dumps({"status": "passed", "violations": [],
+                                    "elf": identity(image),
+                                    "resolved": identity(config / "resolved.json")}))
         elif command[0] == "cmake" and "--build" in command:
             code = 42 if self.failed_build else 0
             if (Path(command[2]).name.startswith("selected ") and
@@ -574,8 +610,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
             if (Path(command[2]).name == "selected g474 shared pwm build"
                     and self.selected_fault == "shared_pwm_build"):
                 code = 48
-        elif command[0] == "nm":
+        elif command[0] in ("nm", "arm-none-eabi-nm"):
             build = Path(command[-1]).parents[1]
+            if any(build.name == item.name + " build"
+                   for item in self.consumer.SERVICE_CONSUMERS):
+                stdout = "".join(name + " T 1000 10\n"
+                                 for name in sorted(self.consumer.SERVICE_SYMBOLS))
+                return subprocess.CompletedProcess(command, code, stdout, "")
             profile = "empty" if "native time empty" in build.name else "pair"
             if profile == "pair":
                 stdout = ("nx_native_rtc_ops D 2000 30\n"
@@ -625,8 +666,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 "selected g474 shared pwm build" and
                 self.selected_fault == "shared_pwm_retention")
             report = {"status": "failed" if failed else "passed"}
-            if "selected " in command[command.index("--elf") + 1]:
-                import hashlib
+            if ("selected " in command[command.index("--elf") + 1] or
+                    Path(command[command.index("--elf") + 1]).name ==
+                    "installed_services.elf"):
                 path = Path(command[command.index("--elf") + 1])
                 report["elf"] = {"path": str(path), "size": path.stat().st_size,
                                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
@@ -709,36 +751,40 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         for backend in ("baremetal", "freertos"))
         expected.update("selected " + name
                         for name, _, _ in self.SELECTED_INPUTS)
+        expected.update(item.name for item in self.consumer.SERVICE_CONSUMERS)
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 13 + len(self.SELECTED_INPUTS))
+        self.assertEqual(len(builds), 17 + len(self.SELECTED_INPUTS))
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 16 + len(self.SELECTED_INPUTS))
+                             for command in builds), 20 + len(self.SELECTED_INPUTS))
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 13 + len(self.SELECTED_INPUTS))
+        self.assertEqual(len(configurations), 17 + len(self.SELECTED_INPUTS))
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
         retention = [command for command in self.commands
                      if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 8 + len(self.SELECTED_INPUTS))
+        self.assertEqual(len(retention), 10 + len(self.SELECTED_INPUTS))
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
-                         {"installed_c", "installed_cpp", "installed_selected"})
-        self.assertEqual(len(native), 4)
+                         {"installed_c", "installed_cpp", "installed_selected",
+                          "installed_services"})
+        self.assertEqual(len(native), 6)
         self.assertEqual({Path(command[0]).parents[1].name for command in native
                           if Path(command[0]).name == "installed_selected"},
                          {"selected native time pair build", "selected native time empty build"})
         nm = [command for command in self.commands if command[0] == "nm"]
-        self.assertEqual(len(nm), 2)
+        self.assertEqual(len(nm), 4)
         self.assertEqual({Path(command[-1]).parents[1].name for command in nm},
-                         {"selected native time pair build", "selected native time empty build"})
+                         {"selected native time pair build", "selected native time empty build",
+                          "native services build", "external services build"})
         self.assertIn("--verify", self.commands[0])
 
     def test_producer_uses_the_standalone_transport_plan_without_a_copy(self):
         from tools.release import transport
-        for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS"):
+        for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS",
+                     "SERVICE_CONSUMERS"):
             self.assertIs(getattr(self.consumer, name), getattr(transport, name))
         expected = {
             (name, ("tools/configure/assemblies/" if stem in
@@ -945,7 +991,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (13 + len(self.SELECTED_INPUTS)))
+                         ["1"] * (17 + len(self.SELECTED_INPUTS)))
 
     def test_default_uses_two_consumers_with_one_job_per_build(self):
         with mock_patch.dict(os.environ):
@@ -958,7 +1004,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (13 + len(self.SELECTED_INPUTS)))
+                         ["1"] * (17 + len(self.SELECTED_INPUTS)))
         self.assertEqual(report["parallel_jobs"], 2)
         self.assertEqual(report["consumer_workers"], 2)
 
@@ -991,7 +1037,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (13 + len(self.SELECTED_INPUTS)))
+                         ["1"] * (17 + len(self.SELECTED_INPUTS)))
         self.assertEqual(report["parallel_jobs"], 3)
         self.assertEqual(report["consumer_workers"], 3)
 
@@ -1496,6 +1542,10 @@ try:
     fixture.failed_build = False
     fixture.failed_sdk = False
     fixture.selected_fault = payload.get('fault')
+    consumer_specification = importlib.util.spec_from_file_location(
+        'external_sdk_consumer', root / 'cmake/package/verify_consumers.py')
+    fixture.consumer = importlib.util.module_from_spec(consumer_specification)
+    consumer_specification.loader.exec_module(fixture.consumer)
     result = fixture.external_process(command)
     if mode == 'validation' and (workspace / 'validation-ready').exists():
         if any(item.endswith('retention.py') for item in command):
@@ -1581,7 +1631,7 @@ finally:
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
         self.assertEqual(len(report['consumers']),
-                         13 + len(self.fixture.SELECTED_INPUTS))
+                         17 + len(self.fixture.SELECTED_INPUTS))
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],

@@ -2552,3 +2552,36 @@ msgstr ""
 "blocking before reporting a hint. A nonblocking backend may return BUSY "
 "while unexpired. Only one owner may arm/wait; a second concurrent wait is "
 "outside the port contract even when a backend rejects it."
+
+msgid "Wait for any source in caller-selected cyclic priority order."
+msgstr "Wait for any source in caller-selected cyclic priority order."
+
+msgid "Task-only; follows nx_wait_until's arm/recheck and deadline contract. Each scan visits at most count predicates, wrapping from start, with no allocation or retained registration. A ready source does not grant ownership or consume its event; the caller must acquire/try the real operation. Advance the next call's start explicitly to choose fairness. The caller connects source notifications to this port, maintains the authoritative predicates, and stops/joins publishers and waiters before reclaiming their state. No worker, dispatch, subscription, automatic unregister or service is implicit. Errors preserve selected unless caller callbacks change it."
+msgstr "Task-only; follows nx_wait_until's arm/recheck and deadline contract. Each scan visits at most count predicates, wrapping from start, with no allocation or retained registration. A ready source does not grant ownership or consume its event; the caller must acquire/try the real operation. Advance the next call's start explicitly to choose fairness. The caller connects source notifications to this port, maintains the authoritative predicates, and stops/joins publishers and waiters before reclaiming their state. No worker, dispatch, subscription, automatic unregister or service is implicit. Errors preserve selected unless caller callbacks change it."
+
+msgid "[in] Same live single-waiter port used by source publishers"
+msgstr "[in] Same live single-waiter port used by source publishers"
+
+msgid "[in] Stable array; every ready callback is non-NULL"
+msgstr "[in] Stable array; every ready callback is non-NULL"
+
+msgid "[in] Nonzero number of readable source entries"
+msgstr "[in] Nonzero number of readable source entries"
+
+msgid "[in] First index to inspect, strictly less than count"
+msgstr "[in] First index to inspect, strictly less than count"
+
+msgid "[in] Absolute monotonic deadline in port's domain, or NX_DEADLINE_NEVER"
+msgstr "[in] Absolute monotonic deadline in port's domain, or NX_DEADLINE_NEVER"
+
+msgid "[out] Index written on success only; disjoint from port, sources, their live contexts and other borrowed metadata"
+msgstr "[out] Index written on success only; disjoint from port, sources, their live contexts and other borrowed metadata"
+
+msgid "NX_SUCCESS for observed readiness, including final readiness after a backend error; INVALID for invalid/overlapping arguments, OVERFLOW for unrepresentable spans, or port error"
+msgstr "NX_SUCCESS for observed readiness, including final readiness after a backend error; INVALID for invalid/overlapping arguments, OVERFLOW for unrepresentable spans, or port error"
+
+msgid "One caller-owned authoritative readiness source."
+msgstr "One caller-owned authoritative readiness source."
+
+msgid "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."
+msgstr "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."

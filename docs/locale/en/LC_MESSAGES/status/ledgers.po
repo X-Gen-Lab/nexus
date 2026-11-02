@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4eb439a35bed3580ebe31d64a11c69283fcd4e8f137e5e26be313debeb4b4ab6\n"
+"X-Nexus-Source-SHA256: e517d29944ac0636137bf3f15c53c9474b5590687cd6aa577aaff18a8ea26372\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers.md:9
 msgid "原台账、退出条件与派生视图"
@@ -154,3 +154,6 @@ msgstr ""
 "documentation matches original fields; it executes no firmware and acquires "
 "no hardware observations. Actual test evidence is in the original results "
 "indexes."
+
+msgid "`v0.2.1` 之后的 [71 项迭代入口](../delivery/next-iterations.md)复用同一台账： 36 项映射原任务，35 项新增退出使用 `IT-` 编号。规划映射不维护第二套状态； 新增行从 `planned`／`not_executed` 开始，原 175 行保留原编号、顺序和证据。 原有通过记录仍只适用于原受测源码，不能关闭本轮新增范围。"
+msgstr "The [71 iteration entries](../delivery/next-iterations.md) after `v0.2.1` reuse this ledger: 36 items map to original tasks and 35 new exits use `IT-` IDs. The planning map maintains no second status; new rows begin as `planned`/`not_executed`, while the original 175 rows retain IDs, order and evidence. Existing passes still apply only to their original tested sources and cannot close new iteration scope."

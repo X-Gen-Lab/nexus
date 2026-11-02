@@ -28,7 +28,7 @@ from tools.maintenance.source_catalogue import (  # noqa: E402
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
     stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-    stm32g4_lock, threadx_lock, googletest_lock,
+    stm32g4_lock, threadx_lock, googletest_lock, lwip_lock,
 )
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
@@ -119,6 +119,8 @@ def inventory(root=ROOT):
             locked = parse_json(lock_bytes)
             if name == "googletest":
                 googletest_lock.verify(checkout, lock_path)
+            elif name == "lwip":
+                lwip_lock.verify(checkout, lock_path)
             elif name == "threadx":
                 threadx_lock.verify(checkout, lock_path, "linux")
             elif name in OFFICIAL_DRIVERS:

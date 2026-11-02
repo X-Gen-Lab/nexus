@@ -5,7 +5,7 @@ their existing provider layout and readonly operations tables. It emits no
 runtime registry, allocator, worker or dispatch layer.
 """
 from tools.configure.providers.common import fail, mode_traits
-from tools.configure.providers import hardware, maintained
+from tools.configure.providers import hardware, for_selection
 
 
 def validate_soc(soc, provider):
@@ -20,7 +20,7 @@ def validate_soc(soc, provider):
 
 
 def applies(item, result, prefix):
-    provider = maintained(result.soc_family)
+    provider = for_selection(result)
     if provider.PREFIX != prefix:
         fail("Paired constructor differs from the selected provider")
     pair = getattr(provider, "CONTROLLER_PAIRS", {}).get(item.kind)

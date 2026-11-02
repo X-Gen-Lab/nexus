@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
-        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 16)
-        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 14)
-        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 13)
+        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 17)
+        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 15)
+        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 14)
         self.assertEqual(len(catalogue.HOST_TEST_DEPENDENCIES), 1)
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")
         self.assertTrue(all(item.parent is None
@@ -50,7 +50,7 @@ class SourceCatalogueTests(unittest.TestCase):
 
     def test_real_root_and_nested_declarations_match_exact_catalogue(self):
         root = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
-        self.assertEqual(len(root), 14)
+        self.assertEqual(len(root), 15)
         nested = catalogue.declared_modules(
             (ROOT / "ext/freertos/.gitmodules").read_bytes(), "ext/freertos")
         self.assertEqual(set(nested), {
@@ -60,6 +60,19 @@ class SourceCatalogueTests(unittest.TestCase):
             self.assertNotEqual(catalogue.module_name(item),
                                 catalogue.relative_path(item))
             self.assertEqual(nested[catalogue.relative_path(item)], item.fetch_url)
+
+    def test_lwip_is_an_organization_hosted_optional_runtime_source(self):
+        item = catalogue.dependency("lwip")
+        self.assertEqual(item.path, "ext/lwip")
+        self.assertEqual(item.scope, "runtime")
+        self.assertEqual(item.upstream_url,
+                         "https://github.com/lwip-tcpip/lwip.git")
+        self.assertEqual(item.fetch_url,
+                         "https://github.com/X-Gen-Lab/lwip.git")
+        self.assertEqual(item.notice, "COPYING")
+        self.assertEqual(item.source_lock, "dependencies/lwip.lock.json")
+        modules = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
+        self.assertEqual(modules[item.path], item.fetch_url)
 
     def test_nested_name_path_and_fetch_url_are_not_interchangeable(self):
         data = (ROOT / "ext/freertos/.gitmodules").read_bytes()

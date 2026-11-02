@@ -47,6 +47,11 @@ N01–N14，并追加 A01–J04 与 X01–X05 的完整工作分解。它不改�
 整个家族任务。N11 与 H 组物理任务需要真实设备；N13 与 J 组软件封存需要当前
 clean source 的完整计划和离线复现，不能由旧候选或开发测试代替。
 
+`v0.2.1` 之后的 [71 项迭代入口](../delivery/next-iterations.md)复用同一台账：
+36 项映射原任务，35 项新增退出使用 `IT-` 编号。规划映射不维护第二套状态；
+新增行从 `planned`／`not_executed` 开始，原 175 行保留原编号、顺序和证据。
+原有通过记录仍只适用于原受测源码，不能关闭本轮新增范围。
+
 本轮 C 冷态与工程交付观察继续写入
 [同一结果索引](../delivery/platform-delivery-completion-results.json)的
 `current_iteration_20261028`。`implemented` 家族行表示维护路径的 C 责任已经落地，

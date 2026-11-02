@@ -70,14 +70,14 @@ is a current example, not a blanket HAL replacement.
    error is not the expected behavioral RED result.
 3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
-   Place MCU implementations under `soc/<vendor>/<family>/` and declare that
+   For an in-tree family, place MCU implementations under `soc/<vendor>/<family>/` and declare that
    canonical `source_directory` in the maintained family descriptor. Public
    family identifiers stay independent of the directory. CPU implementation
    sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed
    cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after
    checking each participating silicon contract. Cross-vendor SoC collaboration
    stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`.
-4. Add a data-only `descriptor.py` at the SoC package root (Native uses
+4. For an in-tree family, add a data-only `descriptor.py` at the SoC package root (Native uses
    `soc/native/descriptor.py`), outside its `configure/` package. Add its exact
    module to the central explicit map in `tools/configure/providers/descriptor.py`;
    reuse the frozen `FamilyDescriptor`, without an eager parallel registry.
@@ -144,6 +144,62 @@ named stage results. One frozen device-graph result completes controller,
 endpoint, USB FIFO, SPI face, ADC trigger, resource and DMA decisions before final
 assembly. Its local validation builders may still use dictionaries; the stage
 boundary does not claim that every normalizer is a separate typed stage.
+
+## External SoC/provider package contract
+
+This section documents the explicit package contract introduced by IT-P01–IT-P08
+in the
+[current iteration](../delivery/next-iterations.md). Consult the
+[original task records](../status/ledgers/platform-delivery-completion.md) for
+implementation and executed acceptance. The contract itself does not establish
+an available chip, Board route, installed-SDK result or physical qualification.
+This addition does not change the published `v0.2.1` archive; use the development
+source containing the package implementation until a corresponding SDK is verified.
+
+The assembly explicitly selects `soc_package` relative to its own TOML file.
+The existing `board_package` selects Board facts separately. No package scan,
+automatic download or mutable global registry chooses an implementation.
+An external family cannot replace an existing in-tree family identity.
+
+| Package input | Contract |
+| --- | --- |
+| `nexus-soc.json` | Strict manifest with `schema_version`, `interface_version`, `id`, `version`, `family` and `vendor` |
+| `source_directory` | Package-relative SoC source directory containing `soc.json`, `routes.json` and `CMakeLists.txt` |
+| `configuration_directory` | Package-relative explicit configuration entry containing `__init__.py` and the selected provider modules |
+| `inputs` | Relative regular-file paths mapped to SHA-256; cover the selected facts, configuration code and build inputs, including required entry files |
+
+Manifest schema and interface version 1 define this first contract. Paths and
+hashes are admission inputs; they do not define targets or replace CMake's source
+dependency graph. Reject unknown fields, duplicate identities, escaped paths,
+disallowed links, missing files, unsupported interface versions and changed bytes
+rather than falling back to
+an in-tree family. Configuration rejection must leave no partial usable bundle.
+
+`interface_version` is the compatibility gate. `version` is the package's audit
+identity, not an expected-semver constraint requested by the consumer. Declare
+package-owned vendor source and locks in `inputs`; the existing `soc.source_lock`
+refers to Nexus-managed dependencies and does not automatically validate arbitrary
+external Git repositories.
+
+Package configuration and CMake are explicitly selected trusted host code, not
+data executed by the firmware. Resolve their identity once into the immutable
+package context, then carry it through facts, selected contracts, resource
+validation, static generation, capabilities and build selection. Queries must
+not resolve one package while firmware compilation selects another.
+
+Declared Python modules within `configuration_directory` are loaded eagerly from
+their hash-checked source. Later relative imports reuse those declared loaded
+modules; undeclared filesystem fallback and bytecode caches are not package
+inputs. Absolute package paths may contain spaces; CMake-special characters are
+rejected explicitly rather than passed into generated build syntax.
+
+The selected SoC target privately connects its SDK, startup, system and linker
+inputs. Public I/O retains Nexus types and static faces. Ordinary builds retain
+one `Nexus::Config`; an installed Source SDK consumer supplies its external
+package explicitly and must not fall back to a development checkout. Relocation,
+offline consumption, interface-version rejection and independent package fixtures
+are
+software exits; actual PCB, DMA, clocks and electrical behavior need HIL.
 
 `_FactResolution` views the selected readonly SoC variant for the exact Board part;
 it does not store a second part or variant decision. Common field validators consume

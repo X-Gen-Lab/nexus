@@ -51,3 +51,6 @@
 [submodule "ext/googletest"]
 	path = ext/googletest
 	url = https://github.com/X-Gen-Lab/googletest.git
+[submodule "ext/lwip"]
+	path = ext/lwip
+	url = https://github.com/X-Gen-Lab/lwip.git

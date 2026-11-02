@@ -14,12 +14,13 @@ class I2s2RoleIR:
     claims: tuple[str, ...]
 
 
-def resolve(choice, *, family, part, backend, clock_profile):
+def resolve(choice, *, family, part, backend, clock_profile, provider=None):
     """Dispatch a selected chip role only to its exact maintained owner."""
     if choice is None:
         return None
     from tools.configure.providers import maintained
-    resolver = getattr(maintained(family), "resolve_i2s2", None)
+    provider = maintained(family) if provider is None else provider
+    resolver = getattr(provider, "resolve_i2s2", None)
     if resolver is None:
         raise ValueError("I2S2 requires exact F407VE/ZG baremetal HSE8/PLL168")
     return resolver(choice, part=part, backend=backend,

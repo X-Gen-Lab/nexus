@@ -34,7 +34,7 @@ function(nexus_add_firmware target)
         message(FATAL_ERROR "Firmware target ${target} already exists")
     endif()
     nexus_require_build_generator()
-    foreach(property NEXUS_SOURCE_DIR NEXUS_CONFIG_DIR NEXUS_SOC_FAMILY
+    foreach(property NEXUS_SOURCE_DIR NEXUS_CONFIG_DIR NEXUS_SOC_FAMILY NEXUS_CPU_ARCH
                      NEXUS_BACKEND NEXUS_COMPONENT_TARGETS NEXUS_STARTUP_SOURCE NEXUS_SYSTEM_SOURCE
                      NEXUS_SYSTEM_PRIVATE_INCLUDES NEXUS_SYSTEM_VENDOR_INCLUDES
                      NEXUS_SYSTEM_COMPILE_DEFINITIONS)
@@ -43,7 +43,7 @@ function(nexus_add_firmware target)
             set(${property} "")
         endif()
     endforeach()
-    foreach(property NEXUS_SOURCE_DIR NEXUS_CONFIG_DIR NEXUS_SOC_FAMILY
+    foreach(property NEXUS_SOURCE_DIR NEXUS_CONFIG_DIR NEXUS_SOC_FAMILY NEXUS_CPU_ARCH
                      NEXUS_BACKEND)
         if(NOT ${property})
             message(FATAL_ERROR "Nexus::Platform is missing ${property}")
@@ -57,7 +57,7 @@ function(nexus_add_firmware target)
     target_link_libraries(${target} PRIVATE Nexus::Platform nexus_build_options
         Nexus::Arch "nexus_os_${NEXUS_BACKEND}"
         ${NEXUS_COMPONENT_TARGETS} ${ARG_LIBRARIES})
-    if(NOT NEXUS_SOC_FAMILY STREQUAL "native")
+    if(NOT NEXUS_CPU_ARCH STREQUAL "native")
         # Compile startup/system in their own private include/definition scope.
         # Product source files see only typed public Nexus interfaces.
         set(startup_target "${target}_nexus_startup")

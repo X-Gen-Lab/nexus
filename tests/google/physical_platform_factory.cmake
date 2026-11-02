@@ -38,12 +38,12 @@ foreach(physical_family stm32 gd32)
                 nx_platform_stop=nx_empty_platform_stop
                 nx_platform_start_diagnosed=nx_empty_platform_start_diagnosed
                 nx_platform_stop_diagnosed=nx_empty_platform_stop_diagnosed)
-            # Generated exports start with a const Nexus return type and the
-            # factory name followed by '('. Arguments may continue on a new
-            # line. Reject any other export spelling instead of missing it.
+            # Generated exports return a const Nexus pointer or immutable label
+            # text, followed by the factory name and '('. Arguments may continue
+            # on a new line. Reject any other export spelling instead of missing it.
             file(READ "${physical_bundle}/nexus_factory.h" physical_factory_header)
             set(physical_factory_pattern
-                "const nx_[a-z0-9_]+_t[*] (nx_factory_[a-z0-9_]+)[(]")
+                "const (nx_[a-z0-9_]+_t|char)[*] (nx_factory_[a-z0-9_]+)[(]")
             string(REGEX MATCHALL "${physical_factory_pattern}"
                 physical_factory_declarations "${physical_factory_header}")
             string(REGEX MATCHALL "nx_factory_[A-Za-z0-9_]+[ \t\r\n]*[(]"
@@ -58,7 +58,7 @@ foreach(physical_family stm32 gd32)
             foreach(declaration IN LISTS physical_factory_declarations)
                 string(REGEX MATCH "${physical_factory_pattern}"
                     physical_factory_match "${declaration}")
-                list(APPEND physical_factory_symbols "${CMAKE_MATCH_1}")
+                list(APPEND physical_factory_symbols "${CMAKE_MATCH_2}")
             endforeach()
             list(REMOVE_DUPLICATES physical_factory_symbols)
             foreach(symbol IN LISTS physical_factory_symbols)

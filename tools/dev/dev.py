@@ -223,10 +223,23 @@ def main(argv=None):
                                           "check", "doctor", "prepare",
                                           "qualify", "candidate", "cache", "docs",
                                           "create", "flash", "debug", "monitor",
-                                          "timings"))
-    parser.add_argument("--preset", default="native-debug")
+                                          "timings", "plan", "artifacts"))
+    parser.add_argument("--preset")
     args, native = parser.parse_known_args(argv)
     try:
+        if args.action == "artifacts":
+            if args.preset is not None:
+                raise ValueError("artifacts requires actual --provenance; "
+                                 "--preset does not identify a build")
+            from tools.dev import artifacts
+            return artifacts.main(native)
+        if args.action == "plan":
+            if args.preset is not None:
+                raise ValueError("plan previews the complete selected plan; "
+                                 "--preset filtering is not supported")
+            from tools.dev import plan
+            return plan.main(native, root=ROOT)
+        args.preset = args.preset or "native-debug"
         environment = process.execution_environment(os.environ)
         # Prefer the pinned local tools without requiring shell activation.
         local_bin = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")

@@ -4,8 +4,8 @@ from tools.configure.providers.common import fail
 
 def resolve(value, result):
     """Optional lifecycle policy belongs to the selected concrete SoC."""
-    from tools.configure.providers import maintained
-    resolve_selected = getattr(maintained(result.soc_family),
+    from tools.configure.providers import for_selection
+    resolve_selected = getattr(for_selection(result),
                                "resolve_runtime_power", None)
     if resolve_selected is None:
         fail("power has no maintained lifecycle for the selected SoC")
@@ -43,6 +43,6 @@ def state():
 
 def runtime_functions(result, context_guard, initialize, admission):
     """Use the selected SoC's existing cold start and cleanup helpers."""
-    from tools.configure.providers import maintained
-    return maintained(result.soc_family).runtime_power_functions(
+    from tools.configure.providers import for_selection
+    return for_selection(result).runtime_power_functions(
         result, context_guard, initialize, admission)

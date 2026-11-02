@@ -14,6 +14,7 @@ from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
 from tools.configure.i2s2 import I2s2RoleIR
 if TYPE_CHECKING:
     from tools.configure.providers.hardware import ControllerBinding
+    from tools.configure.integration_package import ProviderContext
 
 
 def freeze(value):
@@ -704,6 +705,7 @@ class ControllerIR(Record):
     stream_fields: tuple[str, ...] = ()
     interface_kind: str | None = None
     integration: "ControllerIntegrationIR | None" = None
+    provider_context: "ProviderContext | None" = None
 
     @property
     def mask(self):
@@ -988,6 +990,7 @@ class ConfigurationIR(Record):
     i2s2: I2s2RoleIR | None = None
     configuration_sha256: str = ""
     schema_version: int = 1
+    provider_context: "ProviderContext | None" = None
 
     @property
     def backend(self):
@@ -1029,7 +1032,8 @@ class ConfigurationIR(Record):
         result = {item.name: getattr(self, item.name) for item in fields(self)
                   if item.name not in {
                       "kernel", "memory_budget", "physical_part", "fact_references",
-                      "pwm_shared_owners", "runtime_power", "i2s2", "clock_plan"}}
+                      "pwm_shared_owners", "runtime_power", "i2s2", "clock_plan",
+                      "provider_context"}}
         result.update(backend=self.backend, enum_abi=self.enum_abi,
                       irq=thaw(self.irq), cpu=self.cpu, part=self.part,
                       package=self.package, flash=self.flash, memory=self.memory,
@@ -1042,12 +1046,14 @@ class ConfigurationIR(Record):
                 result[name] = getattr(self, name)
         if self.pwm_shared_owners:
             result["pwm_shared_owners"] = self.pwm_shared_owners
+        if self.provider_context is not None and self.provider_context.external:
+            result["soc_package"] = self.provider_context.identity
         return result
 
     def with_integrations(self):
         """Reference canonical selected plans without copying or re-resolving."""
-        from tools.configure.providers import maintained
-        provider = maintained(self.soc_family)
+        from tools.configure.providers import for_selection
+        provider = for_selection(self)
         integrated = []
         for item in self.controllers:
             hardware = next((binding for binding in
@@ -1064,7 +1070,8 @@ class ConfigurationIR(Record):
                 self.clock,
                 (self.clock[f"apb{hardware.apb}_hz"]
                  if hardware is not None else None), item.pins, hardware)
-            integrated.append(replace(item, integration=integration))
+            integrated.append(replace(item, integration=integration,
+                                      provider_context=self.provider_context))
         return replace(self, controllers=tuple(integrated))
 
 

@@ -49,6 +49,43 @@ classes and preserves forward declarations for unselected getters. Include a
 specific public I/O header explicitly when code needs that API or its complete
 face layout; an empty getter still returns NULL.
 
+(factory-controller-diagnostics)=
+## Map lifecycle diagnostics to the assembly
+
+Generated `nexus_bindings.h` names every resolved controller position with
+`NX_PLATFORM_CONTROLLER_INDEX_<kind>_<assemblyID>` and provides
+`NX_PLATFORM_CONTROLLER_INDEX_COUNT`. Names use generated C symbols, for example
+`NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A`. These are the zero-based controller
+ordinals reported by diagnosed start/stop, not typed factory IDs, persistent
+numbers or a wire ABI. `SIZE_MAX` still means no controller in a diagnostic.
+
+When `factory.capabilities` is enabled, `nx_factory_controller_capability()`
+uses that `size_t` ordinal to return the controller's existing immutable
+capability object. It does not allocate a copy or introduce another metadata
+table. `nx_factory_controller_label()` uses the same ordinal and an exact field:
+
+| Field | Returned immutable fact |
+| --- | --- |
+| `NX_FACTORY_CONTROLLER_ID` | Authored assembly instance ID |
+| `NX_FACTORY_CONTROLLER_KIND` | Selected controller kind |
+| `NX_FACTORY_CONTROLLER_HARDWARE` | Selected concrete hardware controller |
+| `NX_FACTORY_CONTROLLER_MODE` | Selected semantic mode |
+
+An invalid ordinal, including COUNT, returns NULL. Label lookup also returns
+NULL for an invalid field or `NX_FACTORY_CONTROLLER_FIELD_COUNT`. Text is static
+and belongs to this assembly. Neither lookup accesses hardware, clocks, locks or
+mutable lifecycle state; both may inspect immutable facts before start and after
+stop without granting readiness, resource ownership or execution permission.
+
+The default-disabled option emits no diagnostic text or runtime lookup objects.
+Named ordinal constants alone occupy no runtime storage. See the actual
+[factory emitter](../../tools/configure/factory.py),
+[binding emitter](../../tools/configure/bindings.py),
+[configuration regressions](../../tools/configure/test_factory_diagnostics.py)
+and [generated Native factory tests](../../tests/google/native_factory_test.cpp).
+These source/test locations are review entry points, not downloadable execution
+receipts or new-source software qualification.
+
 ## What a call does
 
 | Action | Work performed |

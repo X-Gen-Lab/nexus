@@ -2354,3 +2354,36 @@ msgstr ""
 "必须原子地观察序列变化或已锁存唤醒，包括调用者再次检查与睡眠之间发生的唤醒。序列变化不能绕过有限截止时间：wait "
 "在每次调用以及每次从阻塞返回后，都先检查到期，再报告提示。未到期时，非阻塞后端可以返回 BUSY。仅一个所有者可以执行 "
 "arm/wait；即使后端会拒绝第二个并发等待，其行为仍位于端口合同之外。"
+
+msgid "Wait for any source in caller-selected cyclic priority order."
+msgstr "按调用者选定的循环优先顺序等待任一 source。"
+
+msgid "Task-only; follows nx_wait_until's arm/recheck and deadline contract. Each scan visits at most count predicates, wrapping from start, with no allocation or retained registration. A ready source does not grant ownership or consume its event; the caller must acquire/try the real operation. Advance the next call's start explicitly to choose fairness. The caller connects source notifications to this port, maintains the authoritative predicates, and stops/joins publishers and waiters before reclaiming their state. No worker, dispatch, subscription, automatic unregister or service is implicit. Errors preserve selected unless caller callbacks change it."
+msgstr "仅任务上下文，遵守 nx_wait_until 的 arm/recheck 和 deadline 合同。每轮扫描从 start 回绕，至多访问 count 个谓词，不分配或保留注册。Source ready 不授予所有权，也不消费事件；调用者必须获取或尝试真实操作。显式推进下次 start 以选择公平性。调用者连接 source 通知到同一 port，维护权威谓词，并在回收状态前停止和 join publisher/waiter。没有隐式 worker、派发、订阅、自动注销或 service。除非调用者 callback 改变 selected，错误会保留它。"
+
+msgid "[in] Same live single-waiter port used by source publishers"
+msgstr "[in] Source publisher 使用的同一有效单 waiter port"
+
+msgid "[in] Stable array; every ready callback is non-NULL"
+msgstr "[in] 稳定数组，每个 ready callback 非 NULL"
+
+msgid "[in] Nonzero number of readable source entries"
+msgstr "[in] 可读 source 条目数量，非零"
+
+msgid "[in] First index to inspect, strictly less than count"
+msgstr "[in] 首个检查索引，严格小于 count"
+
+msgid "[in] Absolute monotonic deadline in port's domain, or NX_DEADLINE_NEVER"
+msgstr "[in] Port 时间域内的绝对单调 deadline，或 NX_DEADLINE_NEVER"
+
+msgid "[out] Index written on success only; disjoint from port, sources, their live contexts and other borrowed metadata"
+msgstr "[out] 仅成功时写索引；与 port、sources、其有效 context 及其他借用元数据独立"
+
+msgid "NX_SUCCESS for observed readiness, including final readiness after a backend error; INVALID for invalid/overlapping arguments, OVERFLOW for unrepresentable spans, or port error"
+msgstr "观察到 ready 时返回 NX_SUCCESS，包括后端错误后的最终 ready；参数无效或重叠返回 INVALID，跨度不可表示返回 OVERFLOW，或返回 port 错误"
+
+msgid "One caller-owned authoritative readiness source."
+msgstr "一个调用者拥有的权威 ready source。"
+
+msgid "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."
+msgstr "ready 在等待调用者的上下文执行，必须有界。按状态要求的同步规则观察真实状态，不 service 控制器或修改 source 数组。若谓词允许，context 可为 NULL。整个选择期间，source 配置和 context 必须保持有效。"

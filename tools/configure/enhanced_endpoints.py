@@ -3,7 +3,7 @@ from dataclasses import replace
 
 from tools.configure import selected_contracts
 from tools.configure.calls import Address, DirectCall
-from tools.configure.providers import maintained
+from tools.configure.providers import maintained, for_selection
 from tools.configure.providers.common import fail, integer
 
 DRIVERS = selected_contracts.ENDPOINT_DRIVERS
@@ -21,7 +21,7 @@ def face_type(device):
 
 
 def _spi_provider(family, *, dma):
-    provider = maintained(family)
+    provider = maintained(family) if isinstance(family, str) else for_selection(family)
     policy = provider.ENDPOINT_POLICY
     if not (policy.spi_dma is not None if dma else policy.spi_transaction):
         fail("SPI transaction provider lacks an explicit table")
@@ -62,7 +62,7 @@ def dma_construction(item, construction, prefix):
     """
     if item.interface_kind != "spi_dma_transaction":
         return construction
-    provider = _spi_provider(item.provider, dma=True)
+    provider = _spi_provider(item, dma=True)
     if prefix != provider.PREFIX:
         fail("SPI sequence binding differs from its exact selected provider")
     selected_contracts.describe(item)
@@ -162,7 +162,7 @@ def emit_owner_factory(result):
     source = []
     for item in selected:
         name = item.id.replace("-", "_")
-        provider = _spi_provider(item.provider, dma=True)
+        provider = _spi_provider(item, dma=True)
         selected_contracts.describe(item)
         prefix = provider.PREFIX
         source += [f'static const nx_spi_dma_owner_binding_t s_nx_spi_owner_{name} = {{',

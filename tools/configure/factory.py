@@ -1,8 +1,11 @@
 """Generate pure, typed static lookup without registration or construction."""
 
+import json
+
 from tools.configure.ir import ConfigurationIR
 from tools.configure.contracts import CONTROLLER_CONTRACTS, CONTROLLER_KINDS
 from tools.configure import io_traits, selected_contracts
+from tools.configure.providers import for_selection
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats, usb_profiles
 
@@ -13,6 +16,19 @@ KINDS = CONTROLLER_KINDS
 
 def symbol(name):
     return name.replace("-", "_")
+
+
+def controller_ordinal_identifier(kind, identifier):
+    """Name a diagnostic ordinal, never a typed factory or wire identity."""
+    return ("NX_PLATFORM_CONTROLLER_INDEX_" + symbol(kind).upper() + "_" +
+            symbol(identifier).upper())
+
+
+def controller_ordinals(result):
+    """Project the single resolved controller order without a second registry."""
+    return tuple((index, item,
+                  controller_ordinal_identifier(item.kind, item.id))
+                 for index, item in enumerate(_typed(result).controllers))
 
 
 def interface_type(class_name, shape):
@@ -233,7 +249,7 @@ def emit_capabilities(result):
                          if port.id == instance.controller)
                     if shape == "endpoint" else instance)
             flags, units, size, alignment, messages = _capability(
-                item, result.soc_family == "native",
+                item, for_selection(result).MODEL,
                 instance if shape == "endpoint" else None,
                 public_class=class_name)
             # Public C constants are the bounds authority; never recopy values.
@@ -256,4 +272,65 @@ def emit_capabilities(result):
             source += [f"        case NX_{class_name.upper()}_ID_{name.upper()}:",
                        f"            return &s_nx_capability_{class_name}_{name};"]
         source += ["        default:", "            return NULL;", "    }", "}"]
+    diagnostic_header, diagnostic_source = emit_controller_metadata(result)
+    header.extend(diagnostic_header)
+    source.extend(diagnostic_source)
+    return header, source
+
+
+def emit_controller_metadata(result):
+    """Opt-in cold labels and aliases of the existing capability objects."""
+    ordinals = controller_ordinals(result)
+    header = [
+        '/** \\brief Immutable selected facts, never operational readiness. */',
+        'typedef enum {',
+        '    NX_FACTORY_CONTROLLER_ID, NX_FACTORY_CONTROLLER_KIND,',
+        '    NX_FACTORY_CONTROLLER_HARDWARE, NX_FACTORY_CONTROLLER_MODE,',
+        '    NX_FACTORY_CONTROLLER_FIELD_COUNT',
+        '} nx_factory_controller_field_t;',
+        '/**',
+        ' * \\brief Reuse the selected controller\'s existing capability object.',
+        ' * \\param[in] controller_index Resolved controller ordinal from a',
+        ' * diagnostic or NX_PLATFORM_CONTROLLER_INDEX_*; not a typed factory ID.',
+        ' * \\return Existing immutable capability, or NULL for an invalid ordinal.',
+        ' * \\note Task/ISR safe before startup and after stop. No allocation,',
+        ' * locks, hardware, clock or mutable-state access. No readiness implied.',
+        ' */',
+        'const nx_factory_io_capability_t* nx_factory_controller_capability(',
+        '    size_t controller_index);',
+        '/**',
+        ' * \\brief Locate immutable assembly, kind, hardware or mode text.',
+        ' * \\param[in] controller_index Same diagnostic ordinal as above.',
+        ' * \\param[in] field Exact requested fact, not an execution-state query.',
+        ' * \\return Static borrowed text, or NULL for an invalid ordinal/field.',
+        ' * \\note Task/ISR safe; no hardware or lifecycle effects. Text and',
+        ' * ordinals belong to this assembly, not a persistent or wire ABI.',
+        ' */',
+        'const char* nx_factory_controller_label(',
+        '    size_t controller_index, nx_factory_controller_field_t field);']
+    source = [
+        '/** \\brief Alias existing capabilities without another metadata table. */',
+        'const nx_factory_io_capability_t* nx_factory_controller_capability(',
+        '    size_t controller_index) {',
+        '    switch (controller_index) {']
+    for index, item, _ in ordinals:
+        source += [f'        case {index}U:',
+                   '            return &s_nx_capability_' +
+                   controller_class(item) + '_' + symbol(item.id) + ';']
+    source += ['        default:', '            return NULL;', '    }', '}',
+               '/** \\brief Pure cold lookup; diagnostic storage is never retained. */',
+               'const char* nx_factory_controller_label(',
+               '    size_t controller_index, nx_factory_controller_field_t field) {']
+    if not ordinals:
+        source.append('    (void)field;')
+    source.append('    switch (controller_index) {')
+    for index, item, _ in ordinals:
+        source += [f'        case {index}U:', '            switch (field) {']
+        for name, value in (("ID", item.id), ("KIND", item.kind),
+                            ("HARDWARE", item.controller), ("MODE", item.mode)):
+            source += [f'                case NX_FACTORY_CONTROLLER_{name}:',
+                       '                    return ' + json.dumps(value) + ';']
+        source += ['                default:', '                    return NULL;',
+                   '            }']
+    source += ['        default:', '            return NULL;', '    }', '}']
     return header, source

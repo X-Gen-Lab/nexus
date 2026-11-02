@@ -2,8 +2,15 @@
 
 Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner,
 BMP280 core and SPI transport, instance-level Log, two-bank commit-last Storage,
-physical Flash region and Native file adapters, and pure Modbus RTU parsing.
+physical Flash region and Native file adapters, bounded Settings/KV staging,
+and pure Modbus RTU parsing.
 Unreferenced component code does not enter a firmware image.
+
+`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned
+integer keys and an explicit schema/capacity. Only commit writes persistent
+storage; schema migration, defaults, authorization and Flash regions remain
+external. See the [component contract](settings/README.md) and the
+[development workflow](../docs/guides/developer-workflow.md).
 
 General mechanisms remain in their named component directories. Exact STM32
 extensions live under `components/soc/stm32/`, including selected F407 handoff/I2S2

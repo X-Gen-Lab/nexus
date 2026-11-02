@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import stat
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,7 +17,8 @@ if str(ROOT) not in sys.path:
 from tools.dev import process
 from tools.dev.qualification import verify_provenance
 from tools.evidence.common import (
-    fields, file_identity, identifier, load_json, verify_file_identity,
+    fields, file_identity, identifier, load_json, parse_json,
+    verify_file_identity,
 )
 from tools.evidence.identity import resolved_identity
 
@@ -97,18 +99,20 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
              if provenance_path is not None else None)
     serial, probe_serial = None, None
     if action == "monitor":
+        if not sys.platform.startswith("linux"):
+            raise ValueError("Developer serial monitoring requires Linux")
+        from tools.hil.serial_echo import _baud_constant
         serial = target["serial"]
         fields(serial, {"path", "baudrate"})
         name = serial["path"]
         if (not isinstance(name, str) or "\0" in name or
                 Path(name).parent != Path("/dev/serial/by-id") or
-                str(Path(name)) != name or
-                type(serial["baudrate"]) is not int or
-                serial["baudrate"] != 115200):
-            raise ValueError("Explicit by-id serial and 115200 8N1 required")
+                str(Path(name)) != name):
+            raise ValueError("Explicit by-id serial identity required")
+        _baud_constant(serial["baudrate"])
         command = [str(Path(sys.executable).resolve()), "-B",
                    str(Path(__file__).resolve()),
-                   "_monitor", name, str(timeout)]
+                   "_monitor", name, str(timeout), str(serial["baudrate"])]
     else:
         probe = target["probe"]
         fields(probe, {"serial", "transport", "tool", "interface_config",
@@ -150,6 +154,138 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
     }
 
 
+def _monitor_snapshot(serial):
+    """Hold the original terminal without configuring or consuming its input."""
+    import termios
+    from tools.hil.serial_echo import _alias_target
+
+    target = _alias_target(serial["path"])
+    expected = target.stat()
+    if not stat.S_ISCHR(expected.st_mode):
+        raise ValueError("Monitor guard requires a character device")
+    descriptor = os.open(target, os.O_RDONLY | os.O_NOCTTY | os.O_NONBLOCK |
+                         os.O_CLOEXEC | os.O_NOFOLLOW)
+    try:
+        actual = os.fstat(descriptor)
+        identity = (actual.st_dev, actual.st_ino, actual.st_rdev)
+        if (not stat.S_ISCHR(actual.st_mode)
+                or identity != (expected.st_dev, expected.st_ino,
+                                expected.st_rdev)
+                or _alias_target(serial["path"]) != target):
+            raise ValueError("Monitor identity changed during guard open")
+        return {"descriptor": descriptor, "identity": identity,
+                "attributes": termios.tcgetattr(descriptor),
+                "alias": serial["path"], "target": target}
+    except BaseException as primary:
+        try:
+            os.close(descriptor)
+        except BaseException as cleanup:
+            raise ValueError("Monitor guard failed: " + str(primary)
+                             + "; descriptor close failed: "
+                             + str(cleanup)) from primary
+        raise
+
+
+def _monitor_withdrawn(result):
+    """Require completed owned-child withdrawal before terminal writes."""
+    if result is None or result.receipt_path is None:
+        return False
+    try:
+        receipt = load_json(result.receipt_path)
+        return (receipt.get("withdrawal_complete") is True
+                and receipt.get("withdrawal_stable") is True
+                and receipt.get("outcome") in (
+                    "completed", "cancelled", "timed_out", "launch_failed")
+                and type(receipt.get("exit_code")) is int
+                and receipt["exit_code"] == result.returncode)
+    except (OSError, ValueError, TypeError):
+        return False
+
+
+def _restore_monitor(snapshot, *, withdrawal_confirmed, phase_control):
+    """Restore only our retained descriptor, after the child is withdrawn.
+
+    Each cleanup failure remains visible to the operation report. Continue
+    through independent cleanup steps even after a driver error or signal.
+    Never open a possibly replaced by-id device to perform restoration.
+    """
+    import fcntl
+    import termios
+    from tools.hil.serial_echo import (
+        _advance_monitor_phase, _alias_target, _read_monitor_phase,
+    )
+
+    descriptor = snapshot["descriptor"]
+    try:
+        current = os.fstat(descriptor)
+        if (not stat.S_ISCHR(current.st_mode)
+                or (current.st_dev, current.st_ino, current.st_rdev)
+                != snapshot["identity"]):
+            raise ValueError("monitor guard descriptor identity changed")
+    except BaseException as error:
+        # A recycled descriptor is no longer ours to configure or close.
+        return ["descriptor identity: " + str(error)]
+    def close_only(error):
+        errors = [error]
+        try:
+            os.close(descriptor)
+        except BaseException as failure:
+            errors.append("close guard: " + str(failure))
+        return errors
+
+    if not withdrawal_confirmed:
+        # The child may still own this terminal. Closing our read-only guard
+        # neither reconfigures it nor clears its exclusive access.
+        return close_only("child withdrawal not confirmed; terminal unchanged")
+    binding = {"path": str(snapshot["target"]),
+               **dict(zip(("st_dev", "st_ino", "st_rdev"),
+                          snapshot["identity"]))}
+    try:
+        phase = _read_monitor_phase(phase_control, binding)["phase"]
+        if phase == "owned":
+            _advance_monitor_phase(phase_control, binding, "owned", "releasing")
+        elif phase != "released":
+            return close_only("terminal ownership is not confirmed: " + phase)
+    except BaseException as error:
+        return close_only("terminal ownership record rejected: " + str(error))
+
+    def readback():
+        if termios.tcgetattr(descriptor) != snapshot["attributes"]:
+            raise ValueError("saved terminal attributes were not restored")
+
+    def alias_identity():
+        if _alias_target(snapshot["alias"]) != snapshot["target"]:
+            raise ValueError("monitor by-id identity changed during execution")
+
+    actions = (
+        ("restore attributes", lambda: termios.tcsetattr(
+            descriptor, termios.TCSANOW, snapshot["attributes"])),
+        ("restore readback", readback),
+        ("release exclusive access", lambda: fcntl.ioctl(
+            descriptor, termios.TIOCNXCL)),
+        ("alias identity", alias_identity),
+        ("close guard", lambda: os.close(descriptor)),
+    )
+    if phase == "released":
+        # The child already relinquished ownership. Another process may now
+        # own the terminal, so only inspect the alias and close our guard.
+        actions = actions[-2:]
+    errors = []
+    for name, action in actions:
+        try:
+            action()
+        except BaseException as error:
+            errors.append(name + ": " + type(error).__name__ + ": "
+                          + str(error))
+    if not errors and phase == "owned":
+        try:
+            _advance_monitor_phase(phase_control, binding,
+                                   "releasing", "released")
+        except BaseException as error:
+            errors.append("publish released phase: " + str(error))
+    return errors
+
+
 def execute(prepared, output):
     """Execute reviewed bytes with failure records and exclusive ownership."""
     output = _path(output)
@@ -185,13 +321,39 @@ def execute(prepared, output):
             raise ValueError("Developer inputs changed before execution")
         if lock.read_text() != token:
             raise ValueError("Station lock ownership changed")
-        started = True
-        result = process.run(
-            prepared["command"], cwd=output, env=os.environ,
-            log=output / "command.log",
-            timeout=prepared["timeout_seconds"] + (
-                5 if prepared["action"] == "monitor" else 0),
-            stage="development-" + prepared["action"])
+        execution_command = list(prepared["command"])
+        binding = None
+        phase_control = None
+        snapshot = None
+        terminal_errors = []
+        result = None
+        try:
+            snapshot = (_monitor_snapshot(prepared["serial"])
+                        if prepared["action"] == "monitor" else None)
+            if snapshot is not None:
+                from tools.hil.serial_echo import _begin_monitor_phase
+                binding = {"path": str(snapshot["target"]),
+                           **dict(zip(("st_dev", "st_ino", "st_rdev"),
+                                      snapshot["identity"]))}
+                phase_control = {
+                    "path": str(output / "monitor-terminal-phase.json"),
+                    "nonce": secrets.token_hex(16)}
+                _begin_monitor_phase(phase_control, binding)
+                execution_command.append(json.dumps({
+                    "device": binding, "phase": phase_control},
+                    sort_keys=True, separators=(",", ":")))
+            started = True
+            result = process.run(
+                execution_command, cwd=output, env=os.environ,
+                log=output / "command.log",
+                timeout=prepared["timeout_seconds"] + (
+                    5 if prepared["action"] == "monitor" else 0),
+                stage="development-" + prepared["action"])
+        finally:
+            if snapshot is not None:
+                terminal_errors = _restore_monitor(
+                    snapshot, withdrawal_confirmed=_monitor_withdrawn(result),
+                    phase_control=phase_control)
         validation_error = None
         try:
             if _path(lock).read_text() != token:
@@ -203,13 +365,26 @@ def execute(prepared, output):
                 raise ValueError("Developer input identity changed")
         except (OSError, ValueError) as error:
             validation_error = "Post-command identity validation: " + str(error)
+        if terminal_errors:
+            restoration = "Terminal restoration failed: " + "; ".join(
+                terminal_errors)
+            validation_error = (validation_error + "; " + restoration
+                                if validation_error else restoration)
         success = result.returncode == 0 and validation_error is None
         report = {**prepared,
+                  "planned_command": prepared["command"],
+                  "command": execution_command,
+                  "monitor_device_binding": binding,
+                  "monitor_phase_control": phase_control,
                   "exit_code": result.returncode or (
                       2 if validation_error else 0),
                   "child_exit_code": result.returncode,
                   "validation_error": validation_error,
                   "receipt": str(result.receipt_path),
+                  "terminal_restore": ({
+                      "status": "failed" if terminal_errors else "restored",
+                      "errors": terminal_errors,
+                  } if snapshot is not None else None),
                   "physical_status": "executed_unqualified",
                   "station_quarantined": not success}
         (output / "operation.json").write_text(
@@ -224,7 +399,8 @@ def execute(prepared, output):
                 lock.unlink()
 
 
-def _monitor(name, duration):
+def _monitor(name, duration, baudrate=115200, *, expected_device=None,
+             phase_control=None):
     """Reuse the existing stable-identity/exclusive/restore serial primitive."""
     import select
     import time
@@ -234,7 +410,9 @@ def _monitor(name, duration):
     maximum = 16 * 1024 * 1024
     total = 0
     deadline = time.monotonic() + duration
-    with _device(name) as (descriptor, _identity):
+    with _device(name, baudrate=baudrate, read_only=True,
+                 expected_device=expected_device,
+                 phase_control=phase_control) as (descriptor, _identity):
         while time.monotonic() < deadline:
             ready, _, _ = select.select(
                 [descriptor], [], [],
@@ -285,9 +463,31 @@ def main(action, argv=None):
 
 if __name__ == "__main__":
     try:
-        if len(sys.argv) != 4 or sys.argv[1] != "_monitor":
+        if len(sys.argv) != 6 or sys.argv[1] != "_monitor":
             raise ValueError("Use the dev.py flash/debug/monitor entry points")
-        raise SystemExit(_monitor(sys.argv[2], int(sys.argv[3])))
+        if len(sys.argv[5]) > 4096:
+            raise ValueError("Monitor device binding exceeds input limit")
+        control = parse_json(sys.argv[5])
+        fields(control, {"device", "phase"})
+        raise SystemExit(_monitor(sys.argv[2], int(sys.argv[3]),
+                                  int(sys.argv[4]),
+                                  expected_device=control["device"],
+                                  phase_control=control["phase"]))
     except (OSError, ValueError) as error:
-        print("Developer monitor failed: " + str(error), file=sys.stderr)
+        import traceback
+        print("Developer monitor failed:", file=sys.stderr)
+        # A cleanup library may use `raise ... from None`. Retain its hidden
+        # context too, so a prior EOF or I/O failure remains in the raw receipt.
+        pending, failures, seen = [error], [], set()
+        while pending:
+            failure = pending.pop()
+            if id(failure) in seen:
+                continue
+            seen.add(id(failure))
+            failures.append(failure)
+            pending.extend(item for item in
+                           (failure.__context__, failure.__cause__)
+                           if item is not None)
+        for failure in reversed(failures):
+            traceback.print_exception(failure, chain=False, file=sys.stderr)
         raise SystemExit(2) from error

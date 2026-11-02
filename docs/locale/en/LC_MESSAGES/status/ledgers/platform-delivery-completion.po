@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 642c6a9298b8436e0afc63f95abde9dd1ad7d4b92323647d23e2397213ca2a32\n"
+"X-Nexus-Source-SHA256: 03f528da884d9f1015de4a8b669871e8a1140d578824dc04a6a9bef3dd6951f4\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
@@ -1863,9 +1863,6 @@ msgstr ""
 "Reviewed increments synchronize to GitHub; code software hardware and "
 "publication exits remain independently accurate"
 
-msgid "本表包含 175 条原记录，仅表示来源行数。"
-msgstr "This table contains 175 original records; this is only the source row count."
-
 msgid "V-A01"
 msgstr "V-A01"
 
@@ -3214,10 +3211,6 @@ msgstr "actual_ruleset_post_retried_403_20261030_not_configured"
 msgid ";build/vendor-first-20261030/external-recheck-20261030/main-ruleset-create.command.json"
 msgstr ";build/vendor-first-20261030/external-recheck-20261030/main-ruleset-create.command.json"
 
-
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`82fe430bd5b6f3f76a574f1be937fc8e18968148bee6c334240da4c78d1dc3ab`。"
-msgstr "This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source: `docs/design/platform-delivery-completion.csv`; SHA-256: `82fe430bd5b6f3f76a574f1be937fc8e18968148bee6c334240da4c78d1dc3ab`."
-
 msgid "partial_public_198_mcu_source_contract_review_19_native_model"
 msgstr "partial_public_198_mcu_source_contract_review_19_native_model"
 
@@ -3415,3 +3408,462 @@ msgstr "tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/
 
 msgid "build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json"
 msgstr "build/vendor-first-20261030/c-leaf-iteration-20261030/u5-leaf-implementation/handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/h7-implementation/h7-implementation-handoff.json;build/vendor-first-20261030/c-leaf-iteration-20261030/i2c-final/handoff.json"
+
+msgid "本表包含 210 条原记录，仅表示来源行数。"
+msgstr "This table contains 210 original records; this is only the source row count."
+
+msgid "IT-P01"
+msgstr "IT-P01"
+
+msgid "外置 SoC/provider 包契约"
+msgstr "External SoC/provider package contract"
+
+msgid "明确包身份、接口版本、facts/routes、配置入口、CMake 入口和依赖；清单只记录输入身份，不建立第二套源码目标图。"
+msgstr "Define package identity, interface version, facts/routes, configuration and CMake entry points, and dependencies; the manifest records input identity without defining a second source-target graph."
+
+msgid "IT-P02"
+msgstr "IT-P02"
+
+msgid "不可变 package context"
+msgstr "Immutable package context"
+
+msgid "一次显式解析包选择，resolver、能力查询、bindings、factory 和构建消费同一不可变结果；不同包不串用全局状态或缓存。"
+msgstr "Resolve package selection explicitly once; resolver, capability queries, bindings, factory and build consume the same immutable result, without shared mutable state or cache contamination across packages."
+
+msgid "IT-P03"
+msgstr "IT-P03"
+
+msgid "外置包身份与路径准入"
+msgstr "External-package identity and path admission"
+
+msgid "拒绝重复身份、越界输入、未允许的符号链接、缺文件和版本不符；失败不保留半套生成结果，实际拒绝回归通过。"
+msgstr "Reject duplicate identities, escaped inputs, disallowed symlinks, missing files and version mismatches; failure leaves no partial generated bundle, with actual rejection regressions."
+
+msgid "IT-P04"
+msgstr "IT-P04"
+
+msgid "外置配置解析接入"
+msgstr "External configuration resolution"
+
+msgid "新增外置 family 不需编辑中央白名单；内置与外置包复用维护解析流程，同进程多包结果保持隔离。"
+msgstr "A new external family needs no central allowlist edit; built-in and external packages share the maintained resolution flow, with isolated results for multiple packages in one process."
+
+msgid "IT-P05"
+msgstr "IT-P05"
+
+msgid "外置 CMake 集成"
+msgstr "External CMake integration"
+
+msgid "选定外置包私有连接 SDK、startup、system 和 linker；普通构建作用域保留单个 Nexus::Config，未选包不进入目标。"
+msgstr "The selected external package privately connects SDK, startup, system and linker inputs; an ordinary build scope retains one Nexus::Config and excludes unselected packages."
+
+msgid "IT-P06"
+msgstr "IT-P06"
+
+msgid "安装版 SDK 消费外置包"
+msgstr "Installed-SDK consumption of external packages"
+
+msgid "包外工程只用安装前缀和显式包路径完成配置、编译和链接；移动路径、断网、缺包和版本错误均验证，无源码 checkout 回退。"
+msgstr "An external project configures, compiles and links using only the installed prefix and explicit package path; verify relocation, offline use, missing packages and version errors without checkout fallback."
+
+msgid "IT-P07"
+msgstr "IT-P07"
+
+msgid "外置包输入与证据闭包"
+msgstr "External-package input and evidence closure"
+
+msgid "facts、配置代码和选定构建输入进入同一身份；包变化拒绝旧证据，能力查询不混用内置来源或扩大物理资格。"
+msgstr "Facts, configuration code and selected build inputs enter one identity; package changes reject stale evidence, and capability queries neither mix built-in sources nor broaden physical qualification."
+
+msgid "IT-P08"
+msgstr "IT-P08"
+
+msgid "独立接入验收夹具"
+msgstr "Independent integration acceptance fixture"
+
+msgid "不修改 Nexus 即可交付一个包外集成，实际验证静态 factory、多实例、启动失败及回滚；夹具结果不代表新芯片实板通过。"
+msgstr "Deliver an external integration without changing Nexus, exercising static factory, multiple instances, startup failure and rollback; fixture results do not establish physical support for a new chip."
+
+msgid "IT-R01"
+msgstr "IT-R01"
+
+msgid "只读运行状态观察"
+msgstr "Read-only runtime-state observation"
+
+msgid "io/;components/;tests/google/"
+msgstr "io/;components/;tests/google/"
+
+msgid "先以 UART/SPI 复用真实 owner/provider 事实提供可选观察；不创建第二状态机，快照不授予操作权限，关闭观察不增加热路径常驻成本。"
+msgstr "Start with optional UART/SPI observations derived from real owner/provider facts; add no second state machine, grant no operation authority from snapshots, and impose no resident hot-path cost when disabled."
+
+msgid "IT-R02"
+msgstr "IT-R02"
+
+msgid "多源 wait-set 与显式 executor"
+msgstr "Multi-source wait-set and explicit executor"
+
+msgid "实际第二消费者固定合同后，以调用者存储组合完成、timer 和关闭提示；验证 arm/recheck、deadline、注销、join 与公平性，不创建隐藏线程。"
+msgstr "After a real second consumer fixes the contract, combine completion, timer and close hints with caller storage; verify arm/recheck, deadlines, unregister, join and fairness without hidden threads."
+
+msgid "IT-R04"
+msgstr "IT-R04"
+
+msgid "精确 runtime PM 路径"
+msgstr "Exact runtime-PM path"
+
+msgid "components/;soc/;tools/hil/;tests/google/"
+msgstr "components/;soc/;tools/hil/;tests/google/"
+
+msgid "固定控制器、电源/clock、pin 与唤醒依赖并验证 suspend/resume 回滚；软件结果和真实功耗、保留范围、唤醒时序分别验收。"
+msgstr "Fix controller, power/clock, pin and wake dependencies and verify suspend/resume rollback; accept software results separately from actual power, retention and wake timing."
+
+msgid "IT-R05"
+msgstr "IT-R05"
+
+msgid "第二传感器与采样合同"
+msgstr "Second sensor and sampling contract"
+
+msgid "components/;tests/google/;tools/hil/"
+msgstr "components/;tests/google/;tools/hil/"
+
+msgid "用第二个实际器件检验单位、有效性、时间来源、校准、overflow 与 sample lifetime；复用 bus owner，覆盖坏值、过期、总线失败、取消与多实例。"
+msgstr "Use a second actual device to test units, validity, time provenance, calibration, overflow and sample lifetime; reuse bus owners and cover invalid or stale values, bus failures, cancellation and multiple instances."
+
+msgid "IT-N01"
+msgstr "IT-N01"
+
+msgid "首发联网范围与预算"
+msgstr "Initial networking scope and budgets"
+
+msgid "components/;dependencies/;docs/delivery/next-iterations.md"
+msgstr "components/;dependencies/;docs/delivery/next-iterations.md"
+
+msgid "固定一个精确 SoC/Board/PHY/backend 和 IPv4 纵切片，声明 MTU、连接、帧、任务、存储及排除项；裸机与 RTOS 组合分别准入。"
+msgstr "Fix one exact SoC/Board/PHY/backend and IPv4 slice, declaring MTU, connections, frames, tasks, storage and exclusions; admit bare-metal and RTOS combinations separately."
+
+msgid "IT-N02"
+msgstr "IT-N02"
+
+msgid "成熟 C 网络栈接入"
+msgstr "Mature C network-stack integration"
+
+msgid "评估并锁定网络栈精确来源、许可和构建选项，采用组织托管依赖；离线 SDK 可显式构建，未链接时无驻留组件。"
+msgstr "Evaluate and lock the network stack source, license and build options using organization-hosted dependencies; support explicit offline SDK builds with no resident component when unlinked."
+
+msgid "IT-N03"
+msgstr "IT-N03"
+
+msgid "Ethernet frames 网络栈适配"
+msgstr "Ethernet-frames network-stack adapter"
+
+msgid "复用现有 TX/RX loan，验证多 fragment、旧 token、链路变化、持有 RX 时停止及恢复失败；复制和零复制分别证明预算与生命周期。"
+msgstr "Reuse existing TX/RX loans and verify multiple fragments, stale tokens, link changes, stop with held RX and recovery failure; prove budgets and lifetimes separately for copied and zero-copy paths."
+
+msgid "IT-N04"
+msgstr "IT-N04"
+
+msgid "网络执行与有界内存"
+msgstr "Network execution and bounded memory"
+
+msgid "明确栈执行上下文、timer 进度、池/arena、packet 和连接容量；无隐式任务或可扩张全局堆，耗尽、过载和真实关闭排空可验证。"
+msgstr "Specify stack context, timer progress, pools/arenas, packets and connection capacity; use no implicit tasks or expanding global heap, and verify exhaustion, overload and actual close/drain."
+
+msgid "IT-N05"
+msgstr "IT-N05"
+
+msgid "基础 IPv4 联网"
+msgstr "Basic IPv4 networking"
+
+msgid "实现选定 ARP/ICMP/UDP/TCP 与明确 DHCP/DNS 范围，实际验证地址变化、链路反复、半关闭、超时、重连和容量耗尽；物理链路另验收。"
+msgstr "Implement selected ARP/ICMP/UDP/TCP and explicit DHCP/DNS scope, exercising address changes, link flaps, half-close, timeout, reconnect and exhaustion; accept physical links separately."
+
+msgid "IT-N06"
+msgstr "IT-N06"
+
+msgid "熵接口与首个 provider"
+msgstr "Entropy interface and first provider"
+
+msgid "io/;soc/;components/;tests/google/;tools/hil/"
+msgstr "io/;soc/;components/;tests/google/;tools/hil/"
+
+msgid "明确来源、健康失败、可用量、上下文、deadline 和关闭合同；不足或硬件错误明确失败，不使用时间戳或固定种子替代真实熵。"
+msgstr "Specify source, health failure, available quantity, context, deadline and shutdown contracts; fail explicitly on shortage or hardware error rather than substituting timestamps or fixed seeds for entropy."
+
+msgid "IT-N07"
+msgstr "IT-N07"
+
+msgid "TLS 资源与信任端口"
+msgstr "TLS resource and trust ports"
+
+msgid "components/;dependencies/;tests/"
+msgstr "components/;dependencies/;tests/"
+
+msgid "锁定成熟 TLS 库，分开单调 deadline 与证书日历时间，产品提供 trust/credential；坏证书、未知可信时间、熵失败、耗尽、取消和停止均有回归。"
+msgstr "Lock a mature TLS library, separate monotonic deadlines from certificate calendar time, and accept product-provided trust/credentials; regress bad certificates, unknown trusted time, entropy failure, exhaustion, cancellation and shutdown."
+
+msgid "IT-N08"
+msgstr "IT-N08"
+
+msgid "可选 MQTT 适配"
+msgstr "Optional MQTT adapter"
+
+msgid "固定协议版本、QoS、payload 和会话范围，在所选 TCP/TLS 上验证断网、重复报文、满队列和停止；topic、授权、重试与离线队列策略外置。"
+msgstr "Fix protocol version, QoS, payload and session scope, testing disconnection, duplicate messages, full queues and shutdown over selected TCP/TLS; keep topic, authorization, retry and offline-queue policy external."
+
+msgid "IT-N09"
+msgstr "IT-N09"
+
+msgid "联网端到端故障与资源验证"
+msgstr "End-to-end networking fault and resource validation"
+
+msgid "实际执行 host 协议交互、抓包、失效场景和 ARM 链接预算；结果绑定精确配置和产物，PHY/DMA 吞吐与长负载仍由实板证明。"
+msgstr "Execute host protocol interactions, packet capture, fault scenarios and ARM linked budgets; bind results to exact configuration and artifacts, leaving PHY/DMA throughput and endurance to physical execution."
+
+msgid "IT-S01"
+msgstr "IT-S01"
+
+msgid "有界 Settings/KV"
+msgstr "Bounded Settings/KV"
+
+msgid "在现有双 bank Storage 上实现有界 key/value、schema、容量和提交边界；不重造物理 Flash 或持久化底层，默认值与迁移策略外置。"
+msgstr "Build bounded key/value, schema, capacity and commit boundaries on existing two-bank Storage without replacing physical Flash or persistence foundations; keep defaults and migration policy external."
+
+msgid "IT-S02"
+msgstr "IT-S02"
+
+msgid "Settings 故障回归"
+msgstr "Settings failure regressions"
+
+msgid "实际验证中断提交、损坏、满容量、未知 schema 和失败后 reopen；commit-last 保留旧版本或真实新版本，host 文件不代表 Flash 掉电通过。"
+msgstr "Exercise interrupted commit, corruption, full capacity, unknown schema and reopen after failure; commit-last retains the old or actual new version, while host files do not establish Flash power-cut acceptance."
+
+msgid "IT-S03"
+msgstr "IT-S03"
+
+msgid "镜像维护窄端口"
+msgstr "Narrow image-maintenance ports"
+
+msgid "components/;io/;tests/google/"
+msgstr "components/;io/;tests/google/"
+
+msgid "使用显式 Flash region 检查 image bounds、对齐、擦写、同步、busy 与状态读回；不自动预留分区，不把 CRC 当签名认证。"
+msgstr "Check image bounds, alignment, erase/program, sync, busy and state readback within explicit Flash regions; reserve no partitions automatically and do not treat CRC as signature authentication."
+
+msgid "IT-S04"
+msgstr "IT-S04"
+
+msgid "成熟 bootloader 外部集成"
+msgstr "External integration of a mature bootloader"
+
+msgid "components/;cmake/;dependencies/;docs/"
+msgstr "components/;cmake/;dependencies/;docs/"
+
+msgid "评估 MCUboot 等成熟方案，分别构建 bootloader 与应用并验证资源可行性；产品拥有分区、信任根、签名、确认、回滚和反降级策略。"
+msgstr "Evaluate mature choices such as MCUboot, build bootloader and application independently and verify resource feasibility; products own partitions, trust roots, signing, confirmation, rollback and anti-downgrade policy."
+
+msgid "IT-S05"
+msgstr "IT-S05"
+
+msgid "镜像故障与资源验证"
+msgstr "Image fault and resource validation"
+
+msgid "tests/;tools/testing/;tools/hil/"
+msgstr "tests/;tools/testing/;tools/hil/"
+
+msgid "验证越界、部分写、无效镜像、版本及状态异常和 ARM image/link 布局；物理掉电、真实启动、确认和回滚按实板记录独立验收。"
+msgstr "Verify out-of-bounds access, partial writes, invalid images, version/state faults and ARM image/link layouts; accept physical power cuts, boot, confirmation and rollback through separate station records."
+
+msgid "IT-S06"
+msgstr "IT-S06"
+
+msgid "文件系统准入与适配"
+msgstr "Filesystem admission and adaptation"
+
+msgid "由真实文件需求固定介质后选择一个文件系统，明确块几何、sync、错误、互斥和挂载寿命；无需求时记录选型结论，不引入无用依赖。"
+msgstr "After a real file requirement fixes the medium, select one filesystem and specify block geometry, sync, errors, exclusion and mount lifetime; without that requirement, record the selection decision without adding unused dependencies."
+
+msgid "IT-X02"
+msgstr "IT-X02"
+
+msgid "可选 GDB 客户端流程"
+msgstr "Optional GDB client workflow"
+
+msgid "tools/dev/;tools/testing/"
+msgstr "tools/dev/;tools/testing/"
+
+msgid "保留 localhost GDB server，客户端绑定原构建 ELF 和工具身份，遵守超时、取消、输出与 station lock；退出实际回收所属进程。"
+msgstr "Retain the localhost GDB server; bind an optional client to the original build ELF and tool identity, honoring timeout, cancellation, output and station locks, with actual owned-process cleanup."
+
+msgid "IT-X03"
+msgstr "IT-X03"
+
+msgid "串口主机与波特率扩展"
+msgstr "Serial host and baud-rate extensions"
+
+msgid "按实际需要扩展波特率和主机，保留明确设备身份；终端恢复、断开、输出上限、锁冲突与取消有回归，不自动选择首个串口。"
+msgstr "Extend baud rates and hosts according to actual needs while retaining explicit device identity; regress terminal restoration, disconnect, output bounds, lock conflicts and cancellation without first-port fallback."
+
+msgid "IT-X04"
+msgstr "IT-X04"
+
+msgid "统一设备 runner 扩展"
+msgstr "Unified device-runner extension"
+
+msgid "OpenOCD 现有路径不退化，新增实际需要的探针工具复用设备身份、ELF/provenance、超时、输出、锁和失败隔离合同。"
+msgstr "Preserve the existing OpenOCD path; additional required probe tools reuse device identity, ELF/provenance, timeout, output, lock and failure-isolation contracts."
+
+msgid "IT-X06"
+msgstr "IT-X06"
+
+msgid "固件产物查询"
+msgstr "Firmware-artifact queries"
+
+msgid "展示本次真实 ELF/BIN/map、链接资源与生成配置；过期、不匹配或未完成产物明确标识，不以文件或目录存在声明构建通过。"
+msgstr "Show actual invocation ELF/BIN/map, linked resources and generated configuration; explicitly label stale, mismatched or incomplete artifacts rather than inferring build success from file or directory existence."
+
+msgid "IT-T01"
+msgstr "IT-T01"
+
+msgid "测试计划只读预览"
+msgstr "Read-only test-plan preview"
+
+msgid "从已有 plan/preset/测试发现和生命周期目录派生执行命令、覆盖域、选择原因、硬件需求与未知项；预览不执行测试或产生成功资格。"
+msgstr "Derive commands, domains, selection reasons, hardware requirements and unknowns from existing plans, presets, test discovery and lifecycle catalogues; previews neither execute tests nor create passing qualification."
+
+msgid "IT-T06"
+msgstr "IT-T06"
+
+msgid "高风险输入与并发补充验证"
+msgstr "Additional high-risk input and concurrency validation"
+
+msgid "tests/;tools/testing/"
+msgstr "tests/;tools/testing/"
+
+msgid "对网络、Settings、镜像和关闭路径使用适用 sanitizer/fuzz/故障注入，保留真实最小失败输入；不以伪硬件模型扩大物理结论。"
+msgstr "Apply suitable sanitizers, fuzzing and fault injection to networking, Settings, image and shutdown paths, retaining actual minimal failing inputs without broadening physical conclusions from models."
+
+msgid "IT-E01"
+msgstr "IT-E01"
+
+msgid "工业控制外部参考系统"
+msgstr "External industrial-control reference system"
+
+msgid "components/;docs/;X-Gen-Lab/nexus-examples"
+msgstr "components/;docs/;X-Gen-Lab/nexus-examples"
+
+msgid "组合现有采集、Modbus、owner、Storage 和 watchdog，实际展示启动、运行、维护、停止、失败与恢复；任务、寄存器表和产品策略保持外部。"
+msgstr "Compose existing acquisition, Modbus, owners, Storage and watchdog to exercise startup, operation, maintenance, shutdown, failure and recovery; keep tasks, register maps and product policy external."
+
+msgid "IT-E02"
+msgstr "IT-E02"
+
+msgid "联网网关外部参考系统"
+msgstr "External network-gateway reference system"
+
+msgid "用精确外部组合完成 Ethernet→TCP/TLS→MQTT，展示断网、耗尽、重连和关闭；凭据、授权和业务策略外置，私有源及证据不进入公共包。"
+msgstr "Complete Ethernet→TCP/TLS→MQTT in an exact external composition, exercising disconnection, exhaustion, reconnect and shutdown; keep credentials, authorization and business policy external and private source/evidence out of public packages."
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`7258acf6d69723c4055021783da9e18e2d2f0bc90dd1f5a0b2d52cc928b41cae`。"
+msgstr "This page is derived from the original CSV, not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source file: `docs/design/platform-delivery-completion.csv`; SHA-256: `7258acf6d69723c4055021783da9e18e2d2f0bc90dd1f5a0b2d52cc928b41cae`."
+
+msgid "in_progress"
+msgstr "in_progress"
+
+msgid "development_checks_reported_full_gate_and_sdk_pending"
+msgstr "development_checks_reported_full_gate_and_sdk_pending"
+
+msgid "tools/configure/integration_package.py;docs/guides/provider-porting.md"
+msgstr "tools/configure/integration_package.py;docs/guides/provider-porting.md"
+
+msgid "tools/configure/test_external_package.py"
+msgstr "tools/configure/test_external_package.py"
+
+msgid "tools/configure/integration_package.py;tools/configure/ir.py;tools/configure/configure.py"
+msgstr "tools/configure/integration_package.py;tools/configure/ir.py;tools/configure/configure.py"
+
+msgid "tools/configure/integration_package.py"
+msgstr "tools/configure/integration_package.py"
+
+msgid "tools/configure/providers/descriptor.py;tools/configure/selected_contracts.py;tools/configure/configure.py"
+msgstr "tools/configure/providers/descriptor.py;tools/configure/selected_contracts.py;tools/configure/configure.py"
+
+msgid "cmake/platform/Firmware.cmake;tools/configure/dependencies.py"
+msgstr "cmake/platform/Firmware.cmake;tools/configure/dependencies.py"
+
+msgid "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;cmake/package/verification/common_services/external/assembly.toml"
+msgstr "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;cmake/package/verification/common_services/external/assembly.toml"
+
+msgid "tools/testing/test_sdk_services_policy.py;tools/configure/test_external_package.py"
+msgstr "tools/testing/test_sdk_services_policy.py;tools/configure/test_external_package.py"
+
+msgid "tools/configure/dependencies.py;tools/maintenance/capabilities.py;tools/configure/integration_package.py"
+msgstr "tools/configure/dependencies.py;tools/maintenance/capabilities.py;tools/configure/integration_package.py"
+
+msgid "cmake/package/verification/common_services/external/assembly.toml;tools/configure/test_external_package.py"
+msgstr "cmake/package/verification/common_services/external/assembly.toml;tools/configure/test_external_package.py"
+
+msgid "tools/configure/test_external_package.py;tools/testing/test_sdk_services_policy.py"
+msgstr "tools/configure/test_external_package.py;tools/testing/test_sdk_services_policy.py"
+
+msgid "os/wait.c;os/include/nexus/os/wait.h"
+msgstr "os/wait.c;os/include/nexus/os/wait.h"
+
+msgid "tests/google/wait_select_test.cpp"
+msgstr "tests/google/wait_select_test.cpp"
+
+msgid "dependencies/lwip.lock.json;components/network/CMakeLists.txt;tools/maintenance/lwip_lock.py"
+msgstr "dependencies/lwip.lock.json;components/network/CMakeLists.txt;tools/maintenance/lwip_lock.py"
+
+msgid "tools/testing/test_lwip_lock.py;tools/testing/test_lwip_sdk.py"
+msgstr "tools/testing/test_lwip_lock.py;tools/testing/test_lwip_sdk.py"
+
+msgid "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_adapter.h"
+msgstr "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_adapter.h"
+
+msgid "tests/google/network_lwip_test.cpp"
+msgstr "tests/google/network_lwip_test.cpp"
+
+msgid "components/network/port/lwipopts.h;components/network/src/lwip_adapter.c"
+msgstr "components/network/port/lwipopts.h;components/network/src/lwip_adapter.c"
+
+msgid "components/network/src/lwip_adapter.c;components/network/README.md"
+msgstr "components/network/src/lwip_adapter.c;components/network/README.md"
+
+msgid "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp"
+msgstr "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp"
+
+msgid "components/network/src/lwip_adapter.c;cmake/package/verification/common_services/services.c"
+msgstr "components/network/src/lwip_adapter.c;cmake/package/verification/common_services/services.c"
+
+msgid "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp;tools/testing/test_sdk_services_policy.py"
+msgstr "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp;tools/testing/test_sdk_services_policy.py"
+
+msgid "components/settings/src/settings.c;components/settings/include/nexus/components/settings.h"
+msgstr "components/settings/src/settings.c;components/settings/include/nexus/components/settings.h"
+
+msgid "tests/google/settings_test.cpp;tools/testing/test_settings_component.py"
+msgstr "tests/google/settings_test.cpp;tools/testing/test_settings_component.py"
+
+msgid "components/settings/src/settings.c"
+msgstr "components/settings/src/settings.c"
+
+msgid "tests/google/settings_test.cpp"
+msgstr "tests/google/settings_test.cpp"
+
+msgid "tools/dev/device.py;tools/hil/serial_echo.py"
+msgstr "tools/dev/device.py;tools/hil/serial_echo.py"
+
+msgid "tools/testing/test_dev_serial_rates.py;tools/testing/test_dev_serial_ownership.py"
+msgstr "tools/testing/test_dev_serial_rates.py;tools/testing/test_dev_serial_ownership.py"
+
+msgid "tools/dev/artifacts.py;tools/dev/dev.py"
+msgstr "tools/dev/artifacts.py;tools/dev/dev.py"
+
+msgid "tools/testing/test_dev_artifacts.py"
+msgstr "tools/testing/test_dev_artifacts.py"
+
+msgid "tools/dev/plan.py;tools/dev/dev.py"
+msgstr "tools/dev/plan.py;tools/dev/dev.py"
+
+msgid "tools/testing/test_dev_plan_preview.py"
+msgstr "tools/testing/test_dev_plan_preview.py"

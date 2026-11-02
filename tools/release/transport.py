@@ -3,6 +3,7 @@
 
 import argparse
 import configparser
+from dataclasses import dataclass
 import gzip
 import hashlib
 import json
@@ -21,7 +22,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v11"
+CONSUMER_POLICY = "nexus-sdk-consumers-v12"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -141,6 +142,43 @@ SELECTED_CONSUMERS = (
      "f407-i2s2-slave-tx"),
 )
 
+
+@dataclass(frozen=True)
+class ServiceConsumer:
+    """An exact additional consumer, with explicit execution/image domains."""
+
+    name: str
+    assembly: str
+    domain: str
+    arm: bool
+
+
+SERVICE_CONSUMERS = (
+    ServiceConsumer("native services", "native.toml", "native-services", False),
+    ServiceConsumer("external services", "external/assembly.toml",
+                    "external-package", False),
+    ServiceConsumer("f407 services", "f407.toml", "arm-services", True),
+    ServiceConsumer("gd470 services", "gd470.toml", "arm-services", True),
+)
+NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
+
+
+def selected_domain(specification):
+    """Classify only a reviewed legacy smoke, never a display-name prefix."""
+    if tuple(specification) not in SELECTED_CONSUMERS:
+        raise ValueError("Selected consumer differs from the reviewed plan")
+    return ("native-time" if specification[2] in NATIVE_TIME_SMOKES
+            else "arm-provider")
+
+
+def consumer_plan():
+    """The producer and transport consume this one ordered policy."""
+    return (tuple(("base", item) for item in BASE_CONSUMERS)
+            + tuple(("modern", item) for item in MODERN_CONSUMERS)
+            + tuple(("selected", item) for item in SELECTED_CONSUMERS)
+            + tuple(("services", item) for item in SERVICE_CONSUMERS))
+
+
 def consumer_layout():
     """Return exact source/build roots and executable paths, without IO."""
     rows = [(name, ("installed_c", "installed_cpp"), arm)
@@ -148,8 +186,11 @@ def consumer_layout():
     rows += [(family + " " + backend, ("installed_modern",), True)
              for family, backend in MODERN_CONSUMERS]
     rows += [("selected " + name, ("installed_selected",),
-              not name.startswith("native time "))
-             for name, _, _ in SELECTED_CONSUMERS]
+              selected_domain(specification) == "arm-provider")
+             for specification in SELECTED_CONSUMERS
+             for name in (specification[0],)]
+    rows += [(item.name, ("installed_services",), item.arm)
+             for item in SERVICE_CONSUMERS]
     return tuple((name + " source", name + " build",
                   tuple(name + " build/bin/" + target + (".elf" if arm else "")
                         for target in targets))

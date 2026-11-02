@@ -10,7 +10,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, mode_traits
 
 
@@ -201,7 +201,7 @@ def describe(item, endpoint=None, *, public_class=None):
     A synthetic ControllerIR can exercise individual projections in tests; it
     does not establish a reviewed physical route or replace full resolution.
     """
-    provider = maintained(item.provider)
+    provider = for_selection(item)
     provider.mode_implementation(item.kind, item.mode)
     shape = mode_traits(item.kind, item.mode)
     selected = (endpoint_class(endpoint) if endpoint is not None else
@@ -338,7 +338,7 @@ def _silicon_policy(result, item=None):
             fail("Selected silicon profile belongs to no ADC group owner")
         if item.kind == "adc_group":
             return item.options.admission
-    provider = maintained(result.soc_family)
+    provider = for_selection(result)
     selected_policy = getattr(provider, "silicon_policy", None)
     policy = (selected_policy(result, item)
               if selected_policy is not None else None)

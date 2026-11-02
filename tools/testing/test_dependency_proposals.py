@@ -7,7 +7,7 @@ import tempfile
 import unittest
 import subprocess
 from tools.maintenance import dependency_proposals as proposals
-from tools.maintenance import (cmsis_device_lock, source_catalogue,
+from tools.maintenance import (cmsis_device_lock, lwip_lock, source_catalogue,
                                stm32f1_hal_lock, stm32f4_hal_lock)
 from tools.maintenance.stm32_ll_lock import PROFILES
 import os
@@ -301,6 +301,8 @@ class DependencyInventoryGitTests(unittest.TestCase):
             if item.identifier == "googletest":
                 review = {"commit": json.loads(
                     (ROOT / item.source_lock).read_text())["commit"]}
+            if item.identifier == "lwip":
+                review = {"commit": lwip_lock.COMMIT}
             if item.identifier == "freertos" or item.parent is not None:
                 review = {"commit": self.git(ROOT / item.path,
                                               "rev-parse", "HEAD")}
@@ -390,6 +392,56 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.assertGreaterEqual(len(record["identities"]), 217)
         self.assertFalse(result["source_dirty"])
         self.assertFalse(result["software_qualified"])
+
+    def test_lwip_inventory_records_real_pin_closure_and_license(self):
+        result = proposals.inventory(self.root)
+        record = next(item for item in result["dependencies"]
+                      if item["id"] == "lwip")
+        self.assertEqual(record["revision"], lwip_lock.COMMIT)
+        self.assertEqual(record["upstream_revision"], lwip_lock.COMMIT)
+        self.assertEqual(record["upstream_url"], lwip_lock.UPSTREAM)
+        self.assertEqual(record["fetch_url"], lwip_lock.FETCH)
+        lock = json.loads((self.root / "dependencies/lwip.lock.json").read_text())
+        self.assertEqual(len(lock["files"]), 310)
+        observed = {Path(item["path"]).relative_to(self.root).as_posix()
+                    for item in record["identities"]}
+        expected = {".gitmodules", "dependencies/lwip.lock.json"}
+        expected.update("ext/lwip/" + name for name in lock["files"])
+        self.assertEqual(observed, expected)
+        self.assertIn("ext/lwip/COPYING", observed)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["locks_changed"])
+        self.assertFalse(result["software_qualified"])
+
+    def test_lwip_inventory_rejects_rehashed_omission_and_foreign_transport(self):
+        lock = self.root / "dependencies/lwip.lock.json"
+        original = lock.read_bytes()
+        changed = json.loads(original)
+        del changed["files"]["src/core/tcp.c"]
+        lock.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(ValueError, "lwIP reviewed source closure"):
+            proposals.inventory(self.root)
+        lock.write_bytes(original)
+        checkout = self.root / "ext/lwip"
+        self.git(checkout, "remote", "set-url", "origin", lwip_lock.UPSTREAM)
+        with self.assertRaisesRegex(ValueError, "Source checkout differs.*ext/lwip"):
+            proposals.inventory(self.root)
+        self.git(checkout, "remote", "set-url", "origin", lwip_lock.FETCH)
+        self.assertFalse(proposals.inventory(self.root)["source_dirty"])
+
+    def test_lwip_inventory_rechecks_source_hidden_from_git_status(self):
+        checkout = self.root / "ext/lwip"
+        relative = "src/core/tcp.c"
+        source = checkout / relative
+        original = source.read_bytes()
+        self.git(checkout, "update-index", "--assume-unchanged", relative)
+        source.write_bytes(original + b"\n/* changed source observation */\n")
+        self.assertEqual(self.git(checkout, "status", "--porcelain"), "")
+        with self.assertRaisesRegex(ValueError, "lwIP source bytes differ"):
+            proposals.inventory(self.root)
+        source.write_bytes(original)
+        self.git(checkout, "update-index", "--no-assume-unchanged", relative)
+        self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
     def test_five_committed_gitlinks_observe_actual_g4_origin_license_and_sources(self):
         result = proposals.inventory(self.root)

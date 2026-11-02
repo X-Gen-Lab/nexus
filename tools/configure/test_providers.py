@@ -139,7 +139,7 @@ class ProviderContractTests(unittest.TestCase):
         result = gate.resolve_ir(gate.ROOT /
                               "tools/configure/assemblies/native-empty.toml")
         result = replace(result, soc_family="unmaintained")
-        with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
+        with self.assertRaisesRegex(ValueError, "Selected provider context differs"):
             bindings.emit(result)
 
     def test_family_contract_has_explicit_abi_and_irq_identity(self):

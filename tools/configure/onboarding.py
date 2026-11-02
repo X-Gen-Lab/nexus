@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 
 from tools.configure import emission, selected_contracts
-from tools.configure.providers import descriptor, maintained
+from tools.configure.providers import descriptor, for_selection
 from tools.configure.providers.common import fail
 
 
@@ -23,8 +23,8 @@ def check(result, *, expected_family=None, expected_part=None):
         fail("Provider check part differs from the resolved exact part",
              code="provider_identity_mismatch", expected=expected_part,
              actual=result.part)
-    provider = maintained(result.soc_family)
-    family = descriptor.maintained(result.soc_family)
+    provider = for_selection(result)
+    family = descriptor.for_selection(result)
     # Use the production emitter once. It exercises provider constructors,
     # nominal factory faces, cold start/stop and compiler/linker projections.
     with tempfile.TemporaryDirectory(prefix="nexus-provider-check-") as work:
@@ -49,7 +49,11 @@ def check(result, *, expected_family=None, expected_part=None):
         "board": result.board, "backend": result.backend,
         "configuration_sha256": result.configuration_sha256,
         "controllers": controllers,
-        "configuration_modules": list(family.configuration_modules),
+        "configuration_modules": (
+            [path.relative_to(result.provider_context.directory).as_posix()
+             for path in result.provider_context.inputs if path.suffix == ".py"]
+            if result.provider_context is not None and
+            result.provider_context.external else list(family.configuration_modules)),
         "fact_inputs": [dict(item) for item in result.inputs],
         "generated_files": generated,
         "physical_verification": ("not_applicable" if provider.MODEL else

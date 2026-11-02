@@ -203,6 +203,9 @@ location to caller-owned cold-path storage. They retain no diagnostic pointer
 and do not replace the primary/cleanup results or remaining-effect obligations.
 See [the diagnostic contract](../design/official-stm32-provider.md) for index
 meaning and failure responsibilities.
+The {ref}`factory diagnostic mapping <factory-controller-diagnostics>` adds named
+assembly-local ordinals and optional immutable labels; it does not create a
+device-ready state machine or a second capability object.
 
 ## Costs and tradeoffs
 

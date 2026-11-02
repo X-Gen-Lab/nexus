@@ -93,6 +93,73 @@ resource and competing claims, including owner, mode and source. These records
 locate authored inputs without silently correcting them.
 CLI argument syntax errors retain argparse diagnostics and exit code 2.
 
+## Preview the maintained software plan
+
+The plan/artifact commands, Settings, wait selection and serial extensions in
+this iteration require a development checkout containing those changes. They do
+not modify the published `v0.2.1` archive; installed-SDK support follows actual
+verification of the corresponding new SDK.
+
+From the fixed development checkout, inspect the existing complete software plan
+before starting expensive validation:
+
+```sh
+python tools/dev/dev.py plan \
+    --output-root /tmp/nexus-planned-run-001 \
+    --json /tmp/nexus-plan-001.json
+```
+
+Choose a new JSON path in an existing parent directory; the future run directory
+is not created. The preview derives ordered commands, deadlines, checker and
+preset metadata, and input identities from the maintained plan. It does not
+execute tests, install tools, discover test cases, use equipment or access the
+network. Case counts remain unknown, HIL preparation is not acquisition, and
+qualification remains false. `--preset` filtering is rejected; use the existing
+focused test command for development. Remove only your own preview JSON when no
+longer needed. See the [development tool contract](../../tools/dev/README.md).
+
+After a successful build, inspect its captured outputs without guessing which
+ELF belongs to the selected configuration. Replace the path below with that
+build's actual `quality/build-provenance.json`:
+
+```sh
+python tools/dev/dev.py artifacts \
+    --provenance build/my-board/quality/build-provenance.json \
+    --json /tmp/nexus-artifacts-001.json
+```
+
+The command verifies the provenance and resolved identity before listing source,
+configuration, artifact roles and the original command receipt. Missing, changed,
+stale or mismatched inputs reject rather than becoming a successful artifact
+view. The optional JSON path must be new. Inspection neither builds nor accesses
+equipment, and does not grant the current checkout, software or hardware a new
+qualification.
+
+## Use optional Settings and networking mechanisms
+
+Select `settings` in the assembly's component list to link `Nexus::Settings`.
+The caller first opens Storage, then supplies Settings metadata, a disjoint
+staging buffer, entry capacity and a product-defined schema. Integer keys and
+copied byte values stay bounded. Get/set/remove operate on staging; only explicit
+commit writes Storage, and close discards uncommitted changes. Unknown schemas
+or corrupt loads are errors, not empty writable stores. After a mutating commit
+failure, reopen Storage and Settings to observe the surviving commit before
+retrying. Defaults, migration, authorization and Flash regions remain product
+policy. Read {ref}`settings.h <settings_8h>` and the
+[component contract](../../components/settings/README.md) for detailed ownership.
+
+The optional `Nexus::LwIP` target admits the organization-hosted `X-Gen-Lab/lwip`
+2.2.1 gitlink `77dcd25a` and its fixed source closure. It is excluded from the
+default build until explicitly selected. It uses `NO_SYS=1`: a product loop or
+task advances one serialized owner, without an implicit RTOS stack port. It
+reuses Ethernet frame loans and bounded memory. The reviewed slice covers static
+IPv4/ARP/ICMP/UDP and limited TCP integration; complete TCP connection lifecycles,
+DHCP, DNS, IPv6, VLAN, TLS and MQTT remain separate exits. Read the
+[network integration contract](../../components/network/README.md) for source,
+SDK, clock, memory and stop prerequisites. Source admission and development SDK
+consumption do not establish a software candidate, full network-platform,
+ARM or physical acceptance.
+
 ## Assign one executor and retain borrowed storage
 
 The factory returns an existing typed face. Platform start, request admission,
@@ -121,6 +188,15 @@ QUARANTINED preserves storage and cleanup obligations. SETTLED does not imply a
 successful transfer or that callbacks and observers have already joined. Read
 [ownership](../explanation/ownership.md) before placing asynchronous storage on a
 stack or stopping a worker.
+
+For several authoritative predicates sharing one wait port, `nx_wait_select`
+checks a caller-owned source array from an explicit cyclic start index. It
+returns an observed-ready index without acquiring or consuming that source.
+The caller chooses fairness by advancing the next start index, wires every
+publisher to the same port, and owns service/timer progress. Stop and join
+publishers and waiters before reclaiming their state. There is no implicit
+subscription, dispatch, worker or resource transfer; the public {ref}`wait contract <wait_8h>`
+still governs arm/recheck and the absolute deadline.
 
 For streams, a consumer releases each acquired block explicitly. Slow consumers
 can cause loss or stop on backpressure according to the selected mode; providers
@@ -177,9 +253,29 @@ new owned directory. Flash/debug require matching board/part, image, probe seria
 and pinned tool/configuration bytes; they do not require a serial console.
 Monitor requires the board, stable serial by-id and station lock, but may omit
 build provenance: that result states `image_linkage = unassociated`, not an
-image-qualified observation. Monitor uses 115200 8N1 and finite duration; EOF
-or disconnection fails. Debug binds loopback. Failed or cancelled device
+image-qualified observation. Monitor uses the explicitly selected host-supported
+standard baud rate with 8N1 and finite duration; 115200 remains the default.
+Unknown rates or a TTY configuration mismatch fail rather than selecting a
+different speed. Host acceptance does not prove the physical device baud rate.
+EOF or disconnection fails. Debug binds loopback. Failed or cancelled device
 operations retain their locks for explicit inspection; normal completion releases
 them. A successful daily operation does not qualify HIL. Until real equipment is
 connected, record physical execution as `not_executed`. The
 [performance and HIL guide](performance-hil.md) owns capture and qualification.
+
+Development monitor remains Linux/POSIX. The session-bound terminal phases are
+`acquiring`, `owned`, `releasing` and `released`. After confirmed helper
+withdrawal, the parent may restore its originally held descriptor only when
+`owned` proves this session's exclusive ownership. An already `released` helper
+does not authorize another restore or exclusive-release operation: another
+process may now own the terminal. Unknown, corrupt or intermediate phases,
+unconfirmed withdrawal and identity failures retain quarantine without touching
+another owner's terminal. The parent never opens a replacement by-id device.
+
+Primary I/O failure and cleanup failure remain separately visible, including
+their exception cause/context chains; a cleanup exception must not hide an
+earlier EOF or read failure. Independent cleanup errors remain in the operation
+record. External SIGKILL of the parent cannot guarantee restoration. The
+baud-rate extension does not expand formal HIL console admission or establish
+Windows/macOS support. See the [serial ownership regressions](../../tools/testing/test_dev_serial_ownership.py)
+and [rate/cancellation regressions](../../tools/testing/test_dev_serial_rates.py).

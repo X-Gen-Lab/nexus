@@ -89,3 +89,13 @@ def families():
 def source_directory(family):
     """Return the canonical layout only after exact descriptor admission."""
     return maintained(family).source_directory
+
+
+def for_selection(selection):
+    """Use the resolved descriptor instead of selecting an external name again."""
+    context = getattr(selection, "provider_context", None)
+    if context is not None:
+        if context.descriptor.family != selection.soc_family:
+            fail("Selected descriptor context differs from its resolved family")
+        return context.descriptor
+    return maintained(selection.soc_family)

@@ -11,7 +11,7 @@ def emit_bundle(result, output):
     from tools.configure import cpu as cpu_profiles
     from tools.configure import kernel, memory as memory_regions, metadata, i2s2
     from tools.configure.ir import thaw
-    from tools.configure.providers import descriptor, maintained
+    from tools.configure.providers import descriptor, for_selection
     from tools.configure.ir import ConfigurationIR
     if not isinstance(result, ConfigurationIR):
         raise TypeError("Bundle emission requires ConfigurationIR")
@@ -41,13 +41,21 @@ def emit_bundle(result, output):
                    "#define NX_IO_CYCLE_PROBES 1", "#endif"]
     if result.clock["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result.clock["input_hz"]}u')
-    header.extend(maintained(result.soc_family).configuration_header(result))
+    header.extend(for_selection(result).configuration_header(result))
+    context = result.provider_context
+    selected = (context.descriptor if context is not None else
+                descriptor.maintained(result.soc_family))
+    source = (context.source_directory.as_posix() if context is not None and
+              context.external else selected.source_directory)
+    modules = (tuple(path.as_posix() for path in context.inputs
+                     if path.suffix == ".py") if context is not None and
+               context.external else selected.configuration_modules)
     cmake = [f'set(NEXUS_SOC_FAMILY "{result.soc_family}")',
              'set(NEXUS_SOC_SOURCE_DIRECTORY "' +
-             descriptor.maintained(result.soc_family).source_directory + '")',
+             source + '")',
              f'set(NEXUS_EXACT_PART "{result.part}")',
              'set(NEXUS_PROVIDER_CONFIG_MODULES "' + ';'.join(
-                 descriptor.maintained(result.soc_family).configuration_modules)
+                 modules)
              + '")',
              *cpu_profiles.selection_lines(profile),
              *kernel.selection_lines(policy),

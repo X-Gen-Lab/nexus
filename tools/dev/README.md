@@ -1,5 +1,18 @@
 # Development commands and execution boundaries
 
+Inspect actual build outputs without rebuilding or opening equipment:
+
+```sh
+python tools/dev/dev.py artifacts \
+  --provenance build/board/quality/build-provenance.json
+```
+
+The view verifies the existing complete provenance closure, then lists the
+recorded source, resolved configuration, ELF/BIN/map and linked-resource report
+paths. `--json` writes only a new file. Changed outputs or raw command logs fail
+the query. This is navigation over recorded bytes, not a comparison with the
+current checkout, a fresh resource measurement or software/hardware qualification.
+
 `dev.py` forwards configure/build/test to CMake and CTest. CMake targets remain
 the only software dependency graph. Native arguments and actual failures pass
 through. The default build parallelism is two; set `NEXUS_BUILD_JOBS` or pass
@@ -18,6 +31,31 @@ standalone analyzer execution defaults to one job.
 This is a per-invocation budget. Concurrent independent invocations still need
 an orchestrator to divide runner CPU and memory capacity; no machine-wide CPU
 semaphore or automatic discovery is implied.
+
+Inspect an existing qualification plan before preparing or executing it:
+
+```sh
+python tools/dev/dev.py plan --plan tools/dev/plans/software.json \
+  --output-root /new/future-execution --json /existing/preview.json
+```
+
+The preview reuses the plan validator, fixed checker registry and preset reader.
+It retains authored stage order, exact future command arguments, deadlines,
+checker-source identities, selected tool suites and observed preset metadata.
+The future execution directory must be new and is never created. Optional JSON
+uses exclusive creation in an existing parent directory and cannot replace
+observed inputs or create files inside the future execution directory. The
+default plan is `tools/dev/plans/software.json`; the default future directory is
+`build/quality/planned-execution`. A preview covers the complete selected plan;
+`--preset` filtering is rejected.
+
+This operation never launches a checker, CTest, GoogleTest, equipment or a network
+request, and never prepares tools. Case discovery remains `not_executed` and case
+counts remain unknown. The `hil_prepare` stage is explicitly station preparation
+without equipment execution; other physical requirements remain unassessed.
+Checker argument validation and tool availability still belong to the actual
+checker. A formal input plan does not make its preview a qualification result:
+all stage statuses remain `not_executed` and `qualification` remains false.
 
 Application creation uses versioned templates from the separate
 `X-Gen-Lab/nexus-examples` checkout. It does not copy a platform tree or download
@@ -103,10 +141,35 @@ serial selector. Without provenance, monitor explicitly records
 `image_linkage = unassociated`; a Board label never proves the running firmware.
 Software identifiers cannot prove the physical PCB identity.
 
-Execution defaults to 300 seconds and accepts 1..3600. Debug binds only
+Execution defaults to 300 seconds and accepts 1..3600. Debug starts a server on
 `127.0.0.1`, disables Telnet/Tcl ports and prints the GDB connection command;
-connect GDB from another terminal. Monitor is Linux/POSIX, read-only 115200 8N1,
-bounded to 16 MiB, and uses a `/dev/serial/by-id/` name. Every actual operation
+connect GDB from another terminal. Monitor is Linux-only, read-only 8N1, bounded
+to 16 MiB, and uses a `/dev/serial/by-id/` name. Its equipment file supplies an
+explicit positive integer `baudrate`, such as 9600, 57600 or 115200. The selected
+rate must have a native host `termios.B<rate>` constant. Unknown or unavailable
+rates reject before opening a device; driver rejection or different speed
+readback fails without selecting another rate. A host constant and terminal
+readback do not establish that the physical adapter or MCU supports that speed.
+The monitor parent holds an unchanged, read-only descriptor and saved terminal
+attributes before starting the child. It binds the canonical device path and
+device/inode/rdev identity into the actual helper command. The read-only child
+checks that binding before open and again against its opened descriptor before
+exclusive access or terminal configuration; an alias replacement fails closed.
+The operation retains the planned and actual command arguments and binding.
+The session also records acquiring, owned, releasing and released phases bound
+to its nonce and device identity. The child publishes owned only after acquiring
+exclusive access, and releasing before restoring or clearing that access.
+After confirmed child withdrawal, the parent restores only an explicitly owned
+session, publishes releasing before cleanup, and checks restoration on its
+original descriptor. A released session needs no repeated terminal cleanup:
+another process may already own it. Busy acquisition, unknown or corrupt phase
+records, interrupted release and unconfirmed withdrawal never authorize terminal
+changes or clearing exclusive access; they retain station quarantine.
+It never reopens a replaced by-id device for restoration. Any restore, identity
+or close error is recorded as operation failure and station quarantine.
+An external kill of the parent cannot guarantee restoration.
+The formal HIL echo console keeps its separate fixed 115200 8N1 admission.
+Every actual operation
 requires a new output directory and acquires the shared station lock. Successful
 commands, including monitor reaching its requested duration, release their owned
 lock. Monitor treats EOF as a disconnect failure. Failure, cancellation or changed

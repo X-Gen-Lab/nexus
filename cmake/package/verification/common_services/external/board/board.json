@@ -1,0 +1,57 @@
+{
+  "bindings": [
+    {
+      "controller": "GPIOA",
+      "id": "led0",
+      "initial": 0,
+      "mask": 1,
+      "route": "gpio-pa0"
+    },
+    {
+      "controller": "UART0",
+      "id": "uart0",
+      "route": "uart0"
+    },
+    {
+      "controller": "SPI0",
+      "id": "spi0",
+      "route": "spi0"
+    },
+    {
+      "controller": "RTC0",
+      "id": "rtc0",
+      "route": "rtc0"
+    },
+    {
+      "controller": "RTC1",
+      "id": "rtc1",
+      "route": "rtc1"
+    },
+    {
+      "controller": "LPTIM0",
+      "id": "lptim0",
+      "route": "lptim0"
+    },
+    {
+      "controller": "LPTIM1",
+      "id": "lptim1",
+      "route": "lptim1"
+    }
+  ],
+  "clocks": {
+    "hse_hz": 1000000
+  },
+  "id": "sdk_external_services_reference",
+  "physical_pcb_revision": null,
+  "provenance": [
+    "Maintained host model"
+  ],
+  "reserved_resources": [],
+  "schema_version": 1,
+  "soc": "NATIVE_MODEL",
+  "soc_family": "sdk_services_model",
+  "source_revision": "native-model-v1",
+  "unknowns": [
+    "Host model does not qualify physical clock, memory or electrical behavior"
+  ]
+}

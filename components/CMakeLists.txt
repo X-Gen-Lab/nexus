@@ -28,6 +28,10 @@ target_link_libraries(nexus_log PUBLIC nexus_core
 add_library(nexus_storage STATIC storage/src/storage.c)
 target_include_directories(nexus_storage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/storage/include")
 target_link_libraries(nexus_storage PUBLIC nexus_abi_options PRIVATE nexus_owned_warnings nexus_build_options)
+add_library(nexus_settings STATIC settings/src/settings.c)
+target_include_directories(nexus_settings PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/settings/include")
+target_link_libraries(nexus_settings PUBLIC nexus_storage
+    PRIVATE nexus_owned_warnings nexus_build_options)
 add_library(nexus_modbus STATIC modbus/src/modbus_rtu.c)
 target_include_directories(nexus_modbus PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/modbus/include")
 target_link_libraries(nexus_modbus PUBLIC nexus_abi_options PRIVATE nexus_owned_warnings nexus_build_options)
@@ -47,6 +51,7 @@ add_library(Nexus::BMP280 ALIAS nexus_bmp280)
 add_library(Nexus::BMP280SPI ALIAS nexus_bmp280_spi)
 add_library(Nexus::Log ALIAS nexus_log)
 add_library(Nexus::Storage ALIAS nexus_storage)
+add_library(Nexus::Settings ALIAS nexus_settings)
 add_library(Nexus::FlashStorage ALIAS nexus_flash_storage)
 add_library(Nexus::ModbusRTU ALIAS nexus_modbus)
 if(TARGET nexus_file_flash)
@@ -66,3 +71,4 @@ add_subdirectory(soc)
 
 
 add_subdirectory(i3c_controller)
+add_subdirectory(network)

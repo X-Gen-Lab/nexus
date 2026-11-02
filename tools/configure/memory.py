@@ -276,14 +276,14 @@ def linker(result):
                              for region in selected)
     extra_sections = _extra_sections(extras)
     # Optional exact SoC sections remain independent from generic placement.
-    from tools.configure.providers import maintained
-    fragments = getattr(maintained(result.soc_family),
+    from tools.configure.providers import for_selection
+    fragments = getattr(for_selection(result),
                         "linker_fragments", None)
     (flash_image_record, flash_ram_phdr, flash_ram_section,
      flash_workspace_bss) = (fragments(result) if fragments else ("", "", "", ""))
     vector_assertions = ""
     if flash["origin"] != result.flash["origin"]:
-        profile = maintained(result.soc_family)
+        profile = for_selection(result)
         alignment = profile.OFFSET_IMAGE_ALIGNMENT
         symbol = profile.OFFSET_IMAGE_VECTOR_SYMBOL
         vector_assertions = (

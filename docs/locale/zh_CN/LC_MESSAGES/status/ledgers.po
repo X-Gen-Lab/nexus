@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4eb439a35bed3580ebe31d64a11c69283fcd4e8f137e5e26be313debeb4b4ab6\n"
+"X-Nexus-Source-SHA256: e517d29944ac0636137bf3f15c53c9474b5590687cd6aa577aaff18a8ea26372\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers.md:9
 msgid "原台账、退出条件与派生视图"
@@ -118,3 +118,6 @@ msgid ""
 msgstr ""
 "第一条仅由同一原 CSV 重新生成视图；第二条检查 missing／stale，失败时返回非零， 不写文件。更改原台账后应重新生成，commit／CI "
 "检查同一派生关系。生成、检查成功 只证明文档与原字段一致，不运行固件或采集硬件。实际测试证据见原结果索引。"
+
+msgid "`v0.2.1` 之后的 [71 项迭代入口](../delivery/next-iterations.md)复用同一台账： 36 项映射原任务，35 项新增退出使用 `IT-` 编号。规划映射不维护第二套状态； 新增行从 `planned`／`not_executed` 开始，原 175 行保留原编号、顺序和证据。 原有通过记录仍只适用于原受测源码，不能关闭本轮新增范围。"
+msgstr "`v0.2.1` 之后的 [71 项迭代入口](../delivery/next-iterations.md)复用同一台账： 36 项映射原任务，35 项新增退出使用 `IT-` 编号。规划映射不维护第二套状态； 新增行从 `planned`／`not_executed` 开始，原 175 行保留原编号、顺序和证据。 原有通过记录仍只适用于原受测源码，不能关闭本轮新增范围。"
