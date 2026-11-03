@@ -183,3 +183,14 @@ CONTROLLER_KINDS = tuple(CONTROLLER_CONTRACTS)
 # The graph checks the record envelope before its exact kind/mode contract.
 CONTROLLER_SELECTION_FIELDS = frozenset().union(
     *(contract.selected_fields for contract in CONTROLLER_CONTRACTS.values()))
+
+
+ENDPOINT_FIELDS = MappingProxyType({
+    "spi": frozenset(("controller", "driver", "cs_binding", "mode", "max_hz",
+                      "model_bytes")),
+    "i2c": frozenset(("controller", "driver", "address", "model_bytes")),
+})
+USB_ENDPOINT_FIELDS = frozenset(("controller", "number", "direction",
+                                 "transfer", "max_packet", "fifo_words"))
+ENDPOINT_SELECTION_FIELDS = frozenset().union(
+    *ENDPOINT_FIELDS.values(), USB_ENDPOINT_FIELDS) | {"authored_kind"}

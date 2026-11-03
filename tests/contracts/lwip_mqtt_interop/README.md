@@ -100,3 +100,68 @@ ASan/UBSan are separate fresh executions. Any first successful run is integratio
 validation of existing components, not invented TDD evidence. Tool contract
 changes retain genuine RED/GREEN regressions. This suite grants no Source SDK,
 release, PHY, board, timing, power or hardware-entropy qualification.
+
+
+## Bounded raw Ethernet captures
+
+Each full-chain case owns a new mode-0700 directory at
+`evidence/cases/<case>/`. `client.pcap` and `relay.pcap` contain the exact complete
+Ethernet bytes accepted by each successful AF_UNIX datagram send. The test hook
+copies them before TX publishes SETTLED and retains no request or payload span.
+Offered, EAGAIN, failed and deliberately discarded sends are not captured. These
+files cover the lwIP-to-lwIP IPC hop; they do not capture the relay-to-broker
+loopback TCP connection or physical PHY/DMA traffic.
+
+Files use ordinary little-endian PCAP 2.4, Ethernet link type 1, no FCS and a
+1,514-byte snapshot limit. Record timestamps are elapsed host CLOCK_MONOTONIC
+microseconds from the case's shared pre-fork origin, not UTC or hardware packet
+timestamps. A reader may display their zero epoch as January 1970. Each file is
+bounded to 1,024 frames and 1 MiB including headers. Exclusive file creation and
+no-follow directory traversal reject aliases and overwrites. Exhaustion, partial
+writes, invalid clocks or failed final sync/close latch a failed case; a truncated
+prefix never becomes complete evidence. This host-only fixture adds no firmware
+trace API, worker, registry, source configuration or selected MCU state.
+
+The existing runner binds each capture's retained parsed bytes, SHA256, size,
+direction and exact frame count to the completed case command receipt, raw stdout
+identity and actual client executable hash. It retains observations of the test
+source files before/after execution; actual compiler/source closure belongs to
+the separate build evidence and is not inferred from a live source hash.
+
+The bounded reader checks complete PCAP EOF, Ethernet/IPv4/TCP structure, the
+reviewed single IPC connection, consistent retransmitted bytes and TLS record
+framing. Clean and backpressure cases require complete application records in
+both directions. Failed protocol cases may explicitly report a partial trailing
+TLS record while every captured Ethernet record must remain complete. Known
+fixture MQTT topic/payload bytes must not appear in application-record bodies.
+This check does not decrypt TLS or prove cryptographic secrecy; authentication
+and MQTT outcomes remain the real broker/client observations. No TLS key log is
+created. Captures contain host test traffic and establish no board, throughput,
+wire timing, power or long-load qualification.
+
+### 中文
+
+每个完整链路用例独占 `evidence/cases/<case>/` 下新建的 0700 目录。
+`client.pcap` 与 `relay.pcap` 保存两个方向实际成功送入 AF_UNIX 数据报通道的
+完整以太网字节。测试 hook 在 TX 发布 SETTLED 前立即复制，不保留请求或缓冲区；
+尚未发送、EAGAIN、失败和故意丢弃的发送不记入抓包。抓包仅覆盖两个 lwIP 之间的
+IPC 跳，不包含 relay 到 broker 的 loopback TCP，也不代表真实 PHY／DMA 流量。
+
+格式为小端 PCAP 2.4、Ethernet link type 1、不含 FCS，单帧上限 1,514 字节。
+时间戳来自 fork 前共享起点后的主机 CLOCK_MONOTONIC 微秒，不是 UTC 或硬件
+收发时刻；查看器可能把零点显示为 1970 年 1 月。每个文件最多 1,024 帧、含头部
+1 MiB。独占创建和逐级禁止符号链接的目录访问会拒绝别名与覆盖。超限、短写、时钟
+无效或最终同步／关闭失败均使本用例失败，不会把截断前缀标为完整证据。本工装只在
+主机测试代码中存在，不增加固件 trace API、worker、注册表或 MCU 实例状态。
+
+既有 runner 将真正解析的文件字节、SHA256、大小、方向和精确帧数绑定到本用例的
+完成收据、原始 stdout 与实际执行文件身份。测试源码在执行前后观察并核对；二进制
+对应的编译／源码闭包由独立构建证据建立，不能仅凭现有源码的散列推断。
+
+有界读取器检查 PCAP 完整 EOF、Ethernet／IPv4／TCP 结构、唯一 IPC 连接、重复
+发送字节一致性和 TLS record 边界。clean 与 backpressure 要求两个方向都有完整
+application record；协议失败用例允许明确报告最后一个 TLS record 未完成，但
+每个以太网抓包记录仍必须完整。application record 内不得出现已知测试 MQTT
+主题或载荷明文。该检查不解密 TLS，也不证明密码保密性；认证和 MQTT 结果仍来自
+真实客户端与 broker。不生成 TLS key log。抓包不建立实板、吞吐、线上时序、功耗
+或长负载资格。

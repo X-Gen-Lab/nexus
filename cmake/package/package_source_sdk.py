@@ -19,7 +19,8 @@ class SDKError(ValueError):
     pass
 
 
-sys.dont_write_bytecode = True
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
 SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
@@ -32,7 +33,7 @@ try:
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
         stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
         stm32g4_lock, threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
-        coremqtt_lock,
+        coremqtt_lock, mcuboot_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -61,6 +62,37 @@ CMSIS_CORE_REQUIRED_HEADERS = (
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
+    'cmake/package/verification/loaned_rx/application.c',
+    'cmake/package/verification/loaned_rx/application.h',
+    'cmake/package/verification/loaned_rx/composition.c',
+    'cmake/package/verification/loaned_rx/f407.toml',
+    'cmake/package/verification/loaned_rx/gd470.toml',
+    'cmake/package/verification/mcuboot_boot/assembly.toml',
+    'cmake/package/verification/mcuboot_boot/layout.json',
+    'cmake/package/verification/mcuboot_boot/main.c',
+    'cmake/package/verification/mcuboot_boot/public_key.c',
+    'cmake/package/verification/mcuboot_control/application.c',
+    'cmake/package/verification/mcuboot_control/application.h',
+    'cmake/package/verification/mcuboot_control/f407.c',
+    'cmake/package/verification/mcuboot_control/f407.toml',
+    'cmake/package/verification/mcuboot_control/native.c',
+    'cmake/package/verification/mcuboot_control/native.toml',
+    'components/mcuboot/CMakeLists.txt',
+    'components/mcuboot/README.md',
+    'components/mcuboot/include/nexus/components/mcuboot_control.h',
+    'components/mcuboot/port/flash_map_backend/flash_map_backend.h',
+    'components/mcuboot/private/upstream_profile.cmake',
+    'components/mcuboot/profile/mcuboot_config/mcuboot_assert.h',
+    'components/mcuboot/profile/mcuboot_config/mcuboot_config.h',
+    'components/mcuboot/profile/mcuboot_config/mcuboot_logging.h',
+    'components/mcuboot/profile/os/os_malloc.h',
+    'components/mcuboot/profile/sysflash/sysflash.h',
+    'components/mcuboot/src/flash_map_backend.c',
+    'components/mcuboot/src/mcuboot_control.c',
+
+    'components/network/Profiles.cmake',
+    'components/network/include/nexus/network/lwip_loaned_rx.h',
+    'components/network/include/nexus/network/lwip_loaned_rx_storage.h',
     'components/tmp117/CMakeLists.txt',
     'components/tmp117/include/nexus/components/tmp117.h',
     'components/tmp117/include/nexus/components/tmp117_i2c.h',
@@ -118,6 +150,7 @@ REQUIRED_FILES = (
     'cmake/package/verification/common_services/external/provider/configure/emission.py',
     'tools/maintenance/lwip_lock.py',
     'dependencies/lwip.lock.json',
+    'ext/lwip/NEXUS_CURATED_SOURCE.md',
     'components/network/CMakeLists.txt',
     'components/network/include/nexus/network/lwip_adapter.h',
     'components/network/include/nexus/network/lwip_storage.h',
@@ -325,11 +358,20 @@ REQUIRED_FILES += tuple(item.path + "/" + name
                         for item in mbedtls_lock.mounts()
                         for name in mbedtls_lock.record(
                             _tls_lock, item.identifier)["files"])
+_lwip_lock = parse_json((SOURCE_ROOT / "dependencies/lwip.lock.json").read_bytes())
+lwip_lock.contract(_lwip_lock)
+REQUIRED_FILES += tuple("ext/lwip/" + name for name in _lwip_lock["files"])
 _mqtt_lock = parse_json((SOURCE_ROOT / "dependencies/coremqtt.lock.json").read_bytes())
 coremqtt_lock.contract(_mqtt_lock)
 REQUIRED_FILES += ("dependencies/coremqtt.lock.json",
                    "tools/maintenance/coremqtt_lock.py")
 REQUIRED_FILES += tuple("ext/coremqtt/" + name for name in _mqtt_lock["files"])
+_mcuboot_lock = parse_json((SOURCE_ROOT / "dependencies/mcuboot.lock.json").read_bytes())
+mcuboot_lock.contract(_mcuboot_lock)
+REQUIRED_FILES += ("dependencies/mcuboot.lock.json",
+                   "tools/maintenance/mcuboot_lock.py")
+REQUIRED_FILES += tuple("ext/mcuboot/" + name for name in _mcuboot_lock["files"])
+
 REQUIRED_FILES += ("dependencies/stm32g4.lock.json",
                    )
 _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_bytes())
@@ -666,6 +708,12 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("lwIP committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
+    elif dependency == "ext/mcuboot":
+        raw, _ = snapshot(root / "dependencies/mcuboot.lock.json")
+        names = set(mcuboot_lock.contract(parse_json(raw))["files"])
+        if not names.issubset(entries):
+            raise SDKError("MCUboot committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
     elif dependency == "ext/coremqtt":
         raw, _ = snapshot(root / "dependencies/coremqtt.lock.json")
         names = set(coremqtt_lock.contract(parse_json(raw))["files"])
@@ -913,6 +961,8 @@ def prepare(source, output, development_fixture=False):
                         source / mbedtls_lock.LOCK_NAME)
     coremqtt_lock.verify(source / "ext/coremqtt",
                           source / "dependencies/coremqtt.lock.json")
+    mcuboot_lock.verify(source / "ext/mcuboot",
+                         source / "dependencies/mcuboot.lock.json")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
     for official in OFFICIAL_DRIVERS:
@@ -1089,6 +1139,12 @@ def verify(root):
         raise SDKError("Source SDK coreMQTT identity differs from reviewed source")
     coremqtt_lock.verify(root / "ext/coremqtt",
                           root / "dependencies/coremqtt.lock.json", source_sdk=True)
+    mcuboot = next(record for record in records if record["path"] == "ext/mcuboot")
+    if (mcuboot["commit"] != mcuboot_lock.COMMIT or
+            mcuboot["tree"] != mcuboot_lock.TREE):
+        raise SDKError("Source SDK MCUboot identity differs from reviewed source")
+    mcuboot_lock.verify(root / "ext/mcuboot",
+                         root / "dependencies/mcuboot.lock.json", source_sdk=True)
     g4 = next(record for record in records
               if record["path"] == "vendors/st/cmsis_device_g4")
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",

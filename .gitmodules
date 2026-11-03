@@ -60,3 +60,6 @@
 [submodule "ext/coremqtt"]
 	path = ext/coremqtt
 	url = https://github.com/X-Gen-Lab/coreMQTT.git
+[submodule "ext/mcuboot"]
+	path = ext/mcuboot
+	url = https://github.com/X-Gen-Lab/mcuboot.git

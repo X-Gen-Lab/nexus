@@ -2,6 +2,7 @@
 from dataclasses import replace
 
 from tools.configure import selected_contracts
+from tools.configure.contracts import ENDPOINT_FIELDS
 from tools.configure.calls import Address, DirectCall
 from tools.configure.providers import maintained, for_selection
 from tools.configure.providers.common import fail, integer
@@ -226,3 +227,57 @@ def complete_controller(controller, children, provider):
     if (controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and
             not children):
         fail("SPI requires at least one reviewed CS endpoint")
+
+
+def resolve_device(device, controller, provider, *, soc, clock_plan,
+                   bindings, routes, addresses, chip_selects, claim, obj):
+    """Validate one SPI/I2C child against the current graph resource ledger.
+
+    The enclosing graph owns addresses, chip selects and publication. This leaf
+    checks their category rules without publishing a second device result.
+    """
+    model_fields = {"model_bytes"} if provider.MODEL else set()
+    if "model_bytes" in device:
+        if not provider.MODEL:
+            fail("model_bytes is only valid for an explicit Native "
+                 "device model")
+        integer(device["model_bytes"], 1, 256, "Native device model_bytes")
+    if controller["kind"] == "spi":
+        obj(device, {"id", "controller", "driver"},
+            (ENDPOINT_FIELDS["spi"] - {"controller", "driver", "model_bytes"})
+            | model_fields, "SPI device")
+    else:
+        obj(device, {"id", "controller", "driver", "address"}, model_fields,
+            "I2C device")
+        if provider.MODEL and "model_bytes" not in device:
+            fail("Native I2C device requires explicit model_bytes")
+    builtin_cs = validate_transport(
+        device, controller, provider, soc=soc, clock_plan=clock_plan)
+    if controller["kind"] == "spi":
+        if "cs_binding" not in device and not builtin_cs:
+            fail("SPI child requires a CS binding")
+        if "cs_binding" in device:
+            binding = bindings.get(device["cs_binding"])
+            if not binding or routes[binding["route"]]["kind"] != "gpio":
+                fail("SPI child CS lacks reviewed GPIO wiring")
+            cs_pins = routes[binding["route"]]["pins"]
+            if (len(cs_pins) != 1 or binding.get("initial") !=
+                    1 << int(cs_pins[0]["pin"][2:])):
+                fail("Active-low SPI CS must be one reviewed pin initially high")
+            for pin in cs_pins:
+                if pin["pin"] in chip_selects:
+                    fail("Duplicate SPI chip select")
+                chip_selects.add(pin["pin"])
+                claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
+        elif not provider.MODEL:
+            for pin in controller["pins"]:
+                if pin["function"] == "cs":
+                    if pin["pin"] in chip_selects:
+                        fail("Duplicate SPI chip select")
+                    chip_selects.add(pin["pin"])
+    else:
+        integer(device["address"], 8, 119, "7-bit I2C address")
+        key = (controller["id"], device["address"])
+        if key in addresses:
+            fail("Duplicate I2C address on one bus")
+        addresses.add(key)

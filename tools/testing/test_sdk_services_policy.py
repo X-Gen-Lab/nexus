@@ -53,14 +53,14 @@ class SDKServicesPolicyTests(unittest.TestCase):
         return execution
 
     def test_current_retains_the_complete_legacy_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:50], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(),
                          LEGACY_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 59)
-        self.assertEqual(len(transport.IMAGES), 62)
-        self.assertEqual(len(transport.FIXTURES), 59)
+        self.assertEqual(len(layout), 64)
+        self.assertEqual(len(transport.IMAGES), 67)
+        self.assertEqual(len(transport.FIXTURES), 64)
 
     def test_service_profiles_are_exact_frozen_plan_entries(self):
         profiles = transport.SERVICE_CONSUMERS[:4]

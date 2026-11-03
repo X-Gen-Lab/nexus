@@ -8,6 +8,9 @@
 
 #include "lwip/netif.h"
 #include "nexus/network/lwip_adapter.h"
+#if defined(NEXUS_LWIP_LOANED_RX)
+#include "nexus/network/lwip_loaned_rx.h"
+#endif
 
 /**
  * \brief Caller-owned backend storage; include only at the composition site.
@@ -21,10 +24,20 @@ struct nx_lwip_adapter {
     nx_lwip_config_t config;
     nx_eth_frames_tx_request_t transmit;
     nx_eth_fragment_t transmit_fragment;
+#if !defined(NEXUS_LWIP_LOANED_RX)
     nx_eth_frames_rx_loan_t receive;
+#endif
     bool attached;
     bool closing;
+#if !defined(NEXUS_LWIP_LOANED_RX)
     bool receive_held;
+#else
+    nx_lwip_rx_slot_t* slots;
+    size_t slot_count;
+    nx_lwip_rx_piece_t* pieces;
+    size_t piece_count;
+    bool in_call;
+#endif
 };
 
 #endif

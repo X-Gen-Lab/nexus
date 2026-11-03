@@ -35,10 +35,15 @@
 #else
 #define MEM_ALIGNMENT 4
 #endif
-#define MEM_LIBC_MALLOC         0
-#define MEMP_MEM_MALLOC         0
-#define MEM_SIZE                16384
-#define PBUF_POOL_SIZE          24
+#define MEM_LIBC_MALLOC 0
+#define MEMP_MEM_MALLOC 0
+#define MEM_SIZE        16384
+#if defined(NEXUS_LWIP_LOANED_RX)
+#define NEXUS_LWIP_RX_CUSTOM_PBUFS 1
+#define PBUF_POOL_SIZE             2
+#else
+#define PBUF_POOL_SIZE 24
+#endif
 #define PBUF_POOL_BUFSIZE       512
 #define MEMP_NUM_PBUF           16
 #define MEMP_NUM_RAW_PCB        2

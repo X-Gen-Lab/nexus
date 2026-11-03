@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4a1fa0b28f0098c67cc1ca234809b2b685a3bfe27cd9f41a65016dfdbe8a9bec\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 44e1f0d74d7291b13dee552861b35e0c97225d747ddaf5dd1fd6a42cc7aae1fe\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "Extension and lifecycle APIs"
@@ -1520,3 +1520,54 @@ msgstr ""
 "These values come from validated assembly facts, not guessed hardware. "
 "Start checks exact PLL48 and HCLK; caller maintains the source/PLLQ/HCLK "
 "dependency until stop."
+
+msgid "MCUboot control and explicit Flash composition"
+msgstr "MCUboot control and explicit Flash composition"
+
+msgid "`Nexus::MCUBootControl` exposes the stateless public control API below. It uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked boot image. These targets are outside the default platform assembly."
+msgstr "`Nexus::MCUBootControl` exposes the stateless public control API below. It uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked boot image. These targets are outside the default platform assembly."
+
+msgid "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
+msgstr "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
+
+msgid "mcuboot_control.h"
+msgstr "mcuboot_control.h"
+
+msgid "Stateless control of a fixed MCUboot overwrite-only image."
+msgstr "Stateless control of a fixed MCUboot overwrite-only image."
+
+msgid "The selected single-image profile supports permanent requests only. This API neither downloads nor verifies an image, resets hardware, confirms a trial image, or provides rollback. Applications own authorization, valid candidate bytes, maintenance scheduling, platform lifetime and reset policy. Author  Nexus Team"
+msgstr "The selected single-image profile supports permanent requests only. This API neither downloads nor verifies an image, resets hardware, confirms a trial image, or provides rollback. Applications own authorization, valid candidate bytes, maintenance scheduling, platform lifetime and reset policy. Author  Nexus Team"
+
+msgid "Requested upgrade behavior; TEST is explicitly unsupported."
+msgstr "Requested upgrade behavior; TEST is explicitly unsupported."
+
+msgid "Upstream observed action, not a physical or image-health verdict."
+msgstr "Upstream observed action, not a physical or image-health verdict."
+
+msgid "TEST and REVERT can be observed in foreign trailer metadata; their presence does not add support for those modes to overwrite-only firmware."
+msgstr "TEST and REVERT can be observed in foreign trailer metadata; their presence does not add support for those modes to overwrite-only firmware."
+
+msgid "Query upstream's planned action for image zero."
+msgstr "Query upstream's planned action for image zero."
+
+msgid "Task/boot context only. Caller serializes access and supplies the immutable Flash operation hook and its finite deadline for the whole call. All referenced areas, regions, clock and provider remain alive through return. The pinned upstream API treats an unreadable secondary trailer as empty; NONE therefore does not establish secondary availability or image validity."
+msgstr "Task/boot context only. Caller serializes access and supplies the immutable Flash operation hook and its finite deadline for the whole call. All referenced areas, regions, clock and provider remain alive through return. The pinned upstream API treats an unreadable secondary trailer as empty; NONE therefore does not establish secondary availability or image validity."
+
+msgid "Receives a value on success only; never retained."
+msgstr "Receives a value on success only; never retained."
+
+msgid "NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for upstream PANIC, an unknown value or a reported read error."
+msgstr "NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for upstream PANIC, an unknown value or a reported read error."
+
+msgid "Request a permanent upgrade using the upstream public trailer API."
+msgstr "Request a permanent upgrade using the upstream public trailer API."
+
+msgid "Same serialized finite operation/lifetime contract as query. Return settles current Flash access; a timeout is not a physical pulse abort. This does not prove candidate authenticity, promise old-image recovery, renew the deadline, stop infrastructure or reset the MCU."
+msgstr "Same serialized finite operation/lifetime contract as query. Return settles current Flash access; a timeout is not a physical pulse abort. This does not prove candidate authenticity, promise old-image recovery, renew the deadline, stop infrastructure or reset the MCU."
+
+msgid "PERMANENT requests an update; TEST rejects without access."
+msgstr "PERMANENT requests an update; TEST rejects without access."
+
+msgid "NX_SUCCESS after upstream completes and reports PERMANENT on readback, NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an upstream error. An error can follow partial persistent trailer modification, including a pending TEST that cannot be silently promoted."
+msgstr "NX_SUCCESS after upstream completes and reports PERMANENT on readback, NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an upstream error. An error can follow partial persistent trailer modification, including a pending TEST that cannot be silently promoted."

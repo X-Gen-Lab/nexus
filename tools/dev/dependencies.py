@@ -53,7 +53,8 @@ def required_submodules(scope: str, family: str | None = None,
     return tuple(dict.fromkeys(selected))
 
 
-def _git(root: Path, *arguments: str, check: bool = True):
+def _git(root: Path, *arguments: str, check: bool = True,
+         parent_index: bool = False):
     """Keep untrusted Git diagnostics and credential-bearing remotes private."""
     environment = {key: value for key, value in os.environ.items()
                    if not key.startswith("GIT_")}
@@ -61,6 +62,8 @@ def _git(root: Path, *arguments: str, check: bool = True):
                         "GIT_CONFIG_GLOBAL": os.devnull,
                         "GIT_OPTIONAL_LOCKS": "0",
                         "GIT_NO_REPLACE_OBJECTS": "1"})
+    if parent_index and "GIT_INDEX_FILE" in os.environ:
+        environment["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
     try:
         result = subprocess.run(["git", "-c", "core.fsmonitor=false", "-C",
                                  str(root), *arguments], env=environment,
@@ -129,6 +132,63 @@ def _source_origin(path: Path, item, *, migrating: bool):
     if result.returncode or len(urls) != 1 or urls[0] not in accepted:
         raise EvidenceError("dependency origin is not approved: " + item.path)
     _exact_transport(path, item)
+
+
+def verify_selected_checkout(root: Path, source: Path, identifier: str,
+                             commit: str, tree: str, *,
+                             parent_index: bool = False,
+                             development: bool = False) -> dict:
+    """Read one catalogue-owned checkout and its explicit parent index link.
+
+    Child observations always use the child's own Git context. Only the two
+    owning-index reads may inherit a hook's GIT_INDEX_FILE when requested.
+    Development permits an external location/official origin, never a changed
+    selected revision, dirty source or unreviewed child dependency graph.
+    """
+    from tools.configure.metadata import snapshot
+    root, source = Path(root).absolute(), Path(source).absolute()
+    _safe_directory(root)
+    _safe_directory(source)
+    try:
+        item = source_catalogue.dependency(identifier)
+    except ValueError as error:
+        raise EvidenceError("selected source requires a catalogue identity") from error
+    if item.parent is not None:
+        raise EvidenceError("selected checkout must be a top-level source")
+    if any(not isinstance(value, str) or
+           re.fullmatch(r"[0-9a-f]{40}", value) is None
+           for value in (commit, tree)):
+        raise EvidenceError("selected source requires exact commit/tree identities")
+    if not development and source != root / item.path:
+        raise EvidenceError("selected source requires canonical placement")
+    _clean_repository(source)
+    _source_origin(source, item, migrating=development)
+    if (_git(source, "rev-parse", "HEAD").stdout.strip() != commit or
+            _git(source, "rev-parse", "HEAD^{tree}").stdout.strip() != tree):
+        raise EvidenceError("selected source commit/tree differs: " + item.path)
+    _gitlinks(source, item.path)
+    if not development:
+        if _git(root, "rev-parse", "--show-toplevel").stdout.strip() != str(root):
+            raise EvidenceError("selected source requires its owning checkout")
+        declaration, observed = snapshot(root / ".gitmodules")
+        indexed = _git(root, "show", ":.gitmodules",
+                       parent_index=parent_index).stdout.encode()
+        if declaration != indexed:
+            raise EvidenceError("source declaration differs from owning index")
+        try:
+            source_catalogue.declared_modules(declaration)
+        except ValueError as error:
+            raise EvidenceError("source declaration differs from catalogue") from error
+        _configured_source(root, item, migrating=False)
+        selected = _git(root, "ls-files", "--stage", "--", item.path,
+                        parent_index=parent_index).stdout.strip()
+        if selected != "160000 " + commit + " 0\t" + item.path:
+            raise EvidenceError("selected source owning Gitlink differs")
+        if snapshot(root / ".gitmodules")[1] != observed:
+            raise EvidenceError("source declaration changed during observation")
+    return {"path": item.path, "commit": commit, "tree": tree,
+            "scope": ("explicit_development_only" if development else
+                      "organization_gitlink")}
 
 
 def _configured_source(owner: Path, item, *, migrating: bool):

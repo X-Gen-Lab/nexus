@@ -151,3 +151,13 @@ def state_declarations(result, prefix):
               f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",
               f"    .filter_count = {len(filters)}u, .split = {domain.split}u", "};"]
     return lines
+
+
+def fd_editor_schema(schema, record):
+    """Complete this category through the sole authored schema composer."""
+    filter_fields = {"id", "mask", "format", "fifo"}
+    filters = record(filter_fields, filter_fields)
+    filters["properties"]["format"] = {"enum": ["standard", "extended"]}
+    filters["properties"]["fifo"] = {"enum": [0, 1]}
+    schema["properties"]["filters"] = {
+        "type": "array", "items": filters, "maxItems": 36}

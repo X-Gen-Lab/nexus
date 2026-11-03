@@ -83,7 +83,7 @@ class LwIPSourceLockTests(unittest.TestCase):
     def test_org_gitlink_admission_is_not_software_qualification(self):
         result = self.verify()
         self.assertEqual(lwip_lock.COMMIT, result["commit"])
-        self.assertEqual(310, result["verified_files"])
+        self.assertEqual(311, result["verified_files"])
         self.assertTrue(result["production_admitted"])
         self.assertFalse(result["software_qualified"])
 
@@ -112,7 +112,7 @@ class LwIPSourceLockTests(unittest.TestCase):
                 setattr(self, attribute, previous)
 
     def test_changed_license_and_selected_source_reject(self):
-        for name in ("COPYING", "src/core/init.c"):
+        for name in ("COPYING", "NEXUS_CURATED_SOURCE.md", "src/core/init.c"):
             with self.subTest(name=name):
                 identity = self.identities[self.source / name]
                 before = identity["sha256"]
@@ -148,6 +148,7 @@ class LwIPSourceLockTests(unittest.TestCase):
     def test_truncated_added_or_reauthored_source_closure_rejects(self):
         mutations = (
             lambda files: files.pop("src/core/init.c"),
+            lambda files: files.pop("NEXUS_CURATED_SOURCE.md"),
             lambda files: files.update({"src/additional.c": "0" * 64}),
             lambda files: files.update({"src/core/init.c": "0" * 64}),
         )

@@ -859,21 +859,25 @@
       "timeout_s": 7200
     },
     {
-      "name": "source-sdk-boundaries",
-      "checker": "sdk_boundary_tests",
-      "args": [],
-      "timeout_s": 7200
+      "name": "contract-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "contracts",
+        "--report",
+        "{output}/contract-tests.json"
+      ],
+      "timeout_s": 16200
     },
     {
-      "name": "build-artifact-boundaries",
-      "checker": "build_artifact_tests",
-      "args": [],
-      "timeout_s": 7200
-    },
-    {
-      "name": "image-artifact-boundaries",
-      "checker": "image_artifact_tests",
-      "args": [],
+      "name": "freertos-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "freertos",
+        "--report",
+        "{output}/freertos-tests.json"
+      ],
       "timeout_s": 1800
     },
     {

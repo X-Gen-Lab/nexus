@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "regions": [
+    {"id": "boot", "kind": "image", "origin": 134217728, "size": 131072},
+    {"id": "primary", "kind": "data", "origin": 134348800, "size": 131072},
+    {"id": "secondary", "kind": "data", "origin": 134479872, "size": 131072},
+    {"id": "unassigned", "kind": "data", "origin": 134610944, "size": 131072}
+  ]
+}

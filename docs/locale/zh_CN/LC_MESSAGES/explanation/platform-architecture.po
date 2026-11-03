@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 72c1b9ba49ded7ab3aad7b32a9d7e343036622be8737af8359d4b189fc2b10c0\n"
+"X-Nexus-Source-SHA256: c0af357b4c7cc4e5f02d73e523fe1e3402dd6b710bd1331461879d691c72df90\n"
 
 #: ../../../../workspace/nexus/docs/explanation/platform-architecture.md:9
 msgid "How the platform is assembled and executed"
@@ -486,3 +486,12 @@ msgstr "构造器合同显式命名私有 state、definition、只读 admission�
 
 msgid "Optional generated diagnosed start/stop entries write phase and controller location to caller-owned cold-path storage. They retain no diagnostic pointer and do not replace the primary/cleanup results or remaining-effect obligations. See [the diagnostic contract](../design/official-stm32-provider.md) for index meaning and failure responsibilities. The {ref}`factory diagnostic mapping <factory-controller-diagnostics>` adds named assembly-local ordinals and optional immutable labels; it does not create a device-ready state machine or a second capability object."
 msgstr "可选生成的 diagnosed start/stop 入口把 phase 与 controller 位置写入调用者拥有的冷态存储。不保留 diagnostic 指针，也不替代 primary/cleanup 结果或剩余影响责任。索引含义和失败责任见[诊断合同](../design/official-stm32-provider.md)。{ref}`Factory 诊断映射 <factory-controller-diagnostics>`增加装配局部具名序号和可选不可变标签，不建立 device-ready 状态机或第二个 capability 对象。"
+
+msgid "Optional network data and boot boundaries"
+msgstr "可选网络数据与 boot 边界"
+
+msgid "Optional network targets keep copied RX and payload-loaned RX as distinct, explicit stack profiles; one image selects one profile. The copied TCP byte face copies accepted writes into bounded stack storage. A payload-loaned RX frame instead has a copied writable prefix and immutable MAC-backed tails. Final pbuf free marks release readiness; the serialized owner performs the actual MAC release later. Outstanding references or failed release retain storage and withdrawal responsibility. The {ref}`network composition contract <lwip-loaned-rx-contract>` owns the exact public/Storage targets, capacities and failure rules. These optional components fit FIG-01's component boundary without adding a worker or runtime registry."
+msgstr "可选网络 target 将复制 RX 与负载借用 RX 保持为独立、显式选择的协议栈配置；每个镜像选择一种配置。复制 TCP 字节接口面将已接纳的写入复制到有界协议栈存储。负载借用 RX 帧则有复制的可写前缀和不可变的 MAC 原始负载尾段。最后一次 pbuf free 标记已可归还；串行 owner 随后实际归还 MAC 借用。尚存引用或归还失败时，存储与退出责任继续保留。{ref}`网络装配合同 <lwip-loaned-rx-contract>`负责定义精确的公共／Storage target、容量和失败规则。这些可选组件符合 FIG-01 的组件边界，不增加 worker 或运行时注册表。"
+
+msgid "MCUboot exposes distinct control and full-boot targets. The reference links the application and bootloader as separate images. The generic C11 control target requests or queries trailer state; an explicit concrete Flash port uses caller-owned regions, a valid clock and one finite deadline for each operation. Only the separate boot image selects verification and overwrite-copy code. The [canonical MCUboot contract and ownership diagram](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) own those dependencies and product reset/recovery duties. The selected profile provides permanent overwrite only; partial trailer writes leave product recovery responsibility and imply no rollback. The {ref}`control API <mcuboot-control-contract>` neither authenticates candidate bytes nor starts hardware. Source documentation, software models and linked budgets do not establish new firmware-candidate or physical HIL qualification."
+msgstr "MCUboot 提供独立的控制与完整 boot target；参考配置将应用与 bootloader 链接为两个独立镜像。通用 C11 控制 target 请求或查询 trailer 状态；显式具体 Flash port 为每次 operation 使用调用方持有的 region、有效时钟和一个有限 deadline。只有独立 boot 镜像选择校验与覆盖复制代码。[MCUboot 权威合同及所有权图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)负责定义这些依赖，以及产品复位／恢复责任。所选配置仅提供永久覆盖；部分 trailer 写入仍留下产品恢复责任，不代表有回滚。{ref}`控制 API <mcuboot-control-contract>`不鉴别候选字节，也不启动硬件。源码文档、软件模型和链接预算不建立新的固件候选或物理 HIL 资格。"

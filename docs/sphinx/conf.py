@@ -56,6 +56,6 @@ _external_types = (
     'nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint '
     'nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port '
     'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory '
-    'nx_lwip_adapter tcp_pcb pbuf'
+    'nx_lwip_adapter nx_lwip_rx_slot nx_lwip_rx_piece tcp_pcb pbuf pbuf_custom'
 ).split()
 nitpick_ignore = [('c:identifier', name) for name in _external_types]

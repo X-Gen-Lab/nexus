@@ -30,7 +30,7 @@ from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
     stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
     stm32g4_lock, threadx_lock, googletest_lock, lwip_lock, mbedtls_lock,
-    coremqtt_lock,
+    coremqtt_lock, mcuboot_lock,
 )
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
@@ -151,6 +151,9 @@ def inventory(root=ROOT):
                 lwip_lock.verify(checkout, lock_path)
             elif name == "coremqtt":
                 coremqtt_lock.verify(checkout, lock_path)
+                upstream_revision = locked["upstream_commit"]
+            elif name == "mcuboot":
+                mcuboot_lock.verify(checkout, lock_path)
                 upstream_revision = locked["upstream_commit"]
             elif dependency.source_lock == mbedtls_lock.LOCK_NAME:
                 if not tls_verified:

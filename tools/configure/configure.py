@@ -25,7 +25,7 @@ if __package__ in (None, ""):
 
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2, enhanced_endpoints
-from tools.configure import integration_package
+from tools.configure import integration_package, adc
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -33,7 +33,8 @@ from tools.configure.ir import (
     RuntimePowerIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology
 from tools.configure.contracts import (
-    COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS)
+    COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
+    ENDPOINT_SELECTION_FIELDS)
 from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (
@@ -1016,9 +1017,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                              *route.get("mode_resources", {}).get(mode, ())):
                 claim(resource, name, mode, route["id"])
             if route["kind"] == "adc_group":
-                if provider.ADC_GROUP is None:
-                    fail("ADC group has no maintained provider")
-                for resource in provider.ADC_GROUP.trigger_resources(selection):
+                for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
             if traits.dma:
                 for dma in route_dma(route, mode):
@@ -1029,21 +1028,12 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 clock_plan=clock_plan, clock_profile=assembly.clock_profile,
                 pin_states=resolved_pin_states, traits=traits))
             if route["kind"] == "adc_group":
-                if provider.ADC_GROUP is None:
-                    fail("ADC group has no maintained provider")
-                if adc_group_contract is None:
-                    adc_group_path = contained_file(
-                        root, soc.get("adc_group_review", ""))
-                    review = read(adc_group_path)
-                    adc_group_contract = (
-                        review, hashlib.sha256(
-                            snapshots[adc_group_path]).hexdigest(),
-                        adc_group_path)
-                adc_group_review, adc_group_digest, _ = adc_group_contract
-                selected[-1]["adc_group_resolution"] = (
-                    provider.ADC_GROUP.resolve(
-                        selection, adc_group_review, adc_group_digest,
-                        part=part, clock=clock))
+                resolution, adc_group_contract = adc.resolve_group(
+                    selection, provider, adc_group_contract,
+                    review_path=lambda: contained_file(
+                        root, soc.get("adc_group_review", "")),
+                    read=read, snapshots=snapshots, part=part, clock=clock)
+                selected[-1]["adc_group_resolution"] = resolution
     provider.validate_controller_set(
         selected, clock_profile=assembly.clock_profile)
     ethernet.resolve_counter_domains(selected)
@@ -1072,9 +1062,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                     else "<invalid>")
         context = f"endpoint {location}"
         with error_context(context):
-            obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
-                "mode", "max_hz", "authored_kind", "model_bytes", "number",
-                "direction", "transfer", "max_packet", "fifo_words"}, "device")
+            obj(device, {"id", "controller", "driver"},
+                ENDPOINT_SELECTION_FIELDS - {"controller", "driver"}, "device")
             device_ids.append(identity(device["id"], "device ID"))
             c_identity(device["id"])
             controller = next((item for item in selected if item["id"] == device["controller"]), None)
@@ -1088,48 +1077,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 device.clear()
                 device.update(validated)
                 continue
-            model_fields = {"model_bytes"} if provider.MODEL else set()
-            if "model_bytes" in device:
-                if not provider.MODEL:
-                    fail("model_bytes is only valid for an explicit Native device model")
-                integer(device["model_bytes"], 1, 256, "Native device model_bytes")
-            if controller["kind"] == "spi":
-                obj(device, {"id", "controller", "driver"},
-                    {"cs_binding", "mode", "max_hz"} | model_fields, "SPI device")
-            else:
-                obj(device, {"id", "controller", "driver", "address"}, model_fields,
-                    "I2C device")
-                if provider.MODEL and "model_bytes" not in device:
-                    fail("Native I2C device requires explicit model_bytes")
-            builtin_cs = enhanced_endpoints.validate_transport(
-                device, controller, provider, soc=soc, clock_plan=clock_plan)
-            if controller["kind"] == "spi":
-                if "cs_binding" not in device and not builtin_cs:
-                    fail("SPI child requires a CS binding")
-                if "cs_binding" in device:
-                    binding = bindings.get(device["cs_binding"])
-                    if not binding or routes[binding["route"]]["kind"] != "gpio":
-                        fail("SPI child CS lacks reviewed GPIO wiring")
-                    cs_pins = routes[binding["route"]]["pins"]
-                    if len(cs_pins) != 1 or binding.get("initial") != 1 << int(cs_pins[0]["pin"][2:]):
-                        fail("Active-low SPI CS must be one reviewed pin initially high")
-                    for pin in cs_pins:
-                        if pin["pin"] in chip_selects:
-                            fail("Duplicate SPI chip select")
-                        chip_selects.add(pin["pin"])
-                        claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
-                elif not provider.MODEL:
-                    for pin in controller["pins"]:
-                        if pin["function"] == "cs":
-                            if pin["pin"] in chip_selects:
-                                fail("Duplicate SPI chip select")
-                            chip_selects.add(pin["pin"])
-            else:
-                integer(device["address"], 8, 119, "7-bit I2C address")
-                key = (controller["id"], device["address"])
-                if key in addresses:
-                    fail("Duplicate I2C address on one bus")
-                addresses.add(key)
+            enhanced_endpoints.resolve_device(
+                device, controller, provider, soc=soc, clock_plan=clock_plan,
+                bindings=bindings, routes=routes, addresses=addresses,
+                chip_selects=chip_selects, claim=claim, obj=obj)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
     usb_device.complete_plan(selected, endpoint_selections, claim)
@@ -1144,11 +1095,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
         fail("GPIO user I/O requires the single exact PC7 output binding")
     resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
     triggers = trigger_graph.resolve_fixed(selected, routes)
-    for item in selected:
-        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
-            item["adc_group_resolution"]["trigger_identity"] = next(
-                index + 1 for index, edge in enumerate(triggers.edges)
-                if edge.target == item["id"] + ":adc")
+    adc.complete_triggers(selected, triggers)
     dma_plan = dma_topology.resolve_selected(selected, provider)
     controllers = tuple(ControllerIR.create(item, family) for item in selected)
     devices = tuple(EndpointIR.create(item, controllers)

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d46a85ccb625ff29f226b86d8c048d10f8d9c33f1e54c630a393969f846a84e8\n"
+"X-Nexus-Source-SHA256: b8dd7cd8dd316a579f9d8e498a875cbe9e623b869e9df79fc8d6789283f1bf91\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
@@ -998,3 +998,12 @@ msgstr "显式 CMake 目标组合窄端口：有界 BusOwner、SPI/UART owner、
 
 msgid "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
 msgstr "`Nexus::Settings` 在 Storage 上使用调用者暂存、产品分配的整数 key 和显式 schema/容量。只有 commit 写持久化存储；schema 迁移、默认值、授权与 Flash region 保持外置。参见[组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md)和[开发流程](/guides/developer-workflow.md)。"
+
+msgid "Selected network and boot contracts"
+msgstr "选定网络与 boot 合同"
+
+msgid "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
+msgstr "[网络组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)负责定义 adapter 执行、复制 TCP 字节、TX 结果观察和停机。{ref}`选定 RX 负载借用合同 <lwip-loaned-rx-contract>`负责定义可选复制／借用协议栈配置，以及独立的公共／Storage target 边界。最后一次 pbuf free 标记借用已可归还；串行 owner 随后精确归还 MAC 借用。仍有引用或归还失败时，stop 保留存储。这些选择不建立 PHY 布线、DMA／cache 或 HIL 资格。"
+
+msgid "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
+msgstr "[MCUboot 组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)负责定义选定覆盖配置、显式 Flash 装配、boot／应用所有权图和产品恢复责任。{ref}`公共控制 API <mcuboot-control-contract>`仅呈现通用 C11 头文件。具体 Flash port 类型与私有 boot／profile 头文件不属于该 API 表面。模型与已链接镜像证据不建立掉电恢复或物理 Flash 资格。"

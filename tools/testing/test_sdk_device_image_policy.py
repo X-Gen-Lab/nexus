@@ -97,13 +97,13 @@ class SDKDeviceImagePolicyTests(unittest.TestCase):
                 "".join(name + " T 1000 10\n" for name in sorted(symbols)), "")
         return sdk, source, build, config, profile, calls, execute
 
-    def test_v14_extends_exact_v13_plan_without_reclassifying_old_images(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+    def test_current_extends_exact_v13_plan_without_reclassifying_old_images(self):
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:56], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(), V13_LAYOUT_SHA256)
-        self.assertEqual((len(layout), len(transport.IMAGES)), (59, 62))
-        self.assertEqual([item.name for item in transport.SERVICE_CONSUMERS[-3:]],
+        self.assertEqual((len(layout), len(transport.IMAGES)), (64, 67))
+        self.assertEqual([item.name for item in transport.SERVICE_CONSUMERS[6:9]],
                          ["native tmp117", "f407 tmp117", "f407 image window"])
 
     def test_device_payload_is_required_before_sdk_payload_reads(self):

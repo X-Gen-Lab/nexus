@@ -339,13 +339,14 @@ class QualificationPlanTests(unittest.TestCase):
                 positions = [self.stages.index(stage) for stage in selected]
                 self.assertEqual(positions, sorted(positions))
 
-    def test_source_sdk_illegal_input_boundaries_have_a_fixed_full_runner(self):
-        self.assertEqual(CHECKERS.get("sdk_boundary_tests"),
-                         ("tests/contracts/test_source_sdk.py",))
-        selected = [stage for stage in self.stages
-                    if stage["checker"] == "sdk_boundary_tests"]
-        self.assertEqual(len(selected), 1)
-        self.assertEqual(selected[0]["args"], [])
+    def test_legacy_boundary_checkers_keep_their_standalone_entrypoints(self):
+        for checker, module in (
+                ("sdk_boundary_tests", "test_source_sdk"),
+                ("build_artifact_tests", "test_build_artifacts"),
+                ("image_artifact_tests", "test_image_artifacts")):
+            with self.subTest(checker=checker):
+                self.assertEqual(CHECKERS.get(checker),
+                                 ("tests/contracts/" + module + ".py",))
         self.assertTrue(any(stage["checker"] == "sdk_consumers"
                             for stage in self.stages))
 
@@ -360,13 +361,14 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Ran 1 test", result.stderr)
 
-    def test_all_four_tool_domains_share_the_fixed_complete_runner(self):
+    def test_all_six_tool_domains_share_the_fixed_complete_runner(self):
         selected = [stage for stage in self.stages
                     if stage["checker"] == "tool_tests"]
         self.assertEqual(CHECKERS["tool_tests"],
                          ("tools/testing/run_tool_tests.py",))
         self.assertEqual([stage["args"][1] for stage in selected],
-                         ["testing", "configure", "ci", "workflows"])
+                         ["testing", "configure", "ci", "workflows",
+                          "contracts", "freertos"])
         for stage in selected:
             self.assertEqual(stage["args"][0], "--suite")
             self.assertEqual(stage["args"][2], "--report")
@@ -374,32 +376,44 @@ class QualificationPlanTests(unittest.TestCase):
             self.assertTrue(stage["args"][3].startswith("{output}/"))
         validate_plan(self.plan)
 
-    def test_actual_arm_artifact_recovery_boundaries_have_a_fixed_full_runner(self):
-        self.assertEqual(CHECKERS.get("build_artifact_tests"),
-                         ("tests/contracts/test_build_artifacts.py",))
-        selected = [stage for stage in self.stages
-                    if stage["checker"] == "build_artifact_tests"]
-        self.assertEqual(len(selected), 1)
-        self.assertEqual(selected[0]["args"], [])
+    def test_complete_contract_domain_replaces_duplicate_module_stages(self):
+        selected = [stage["name"] for stage in self.stages
+                    if stage["checker"] in {
+                        "sdk_boundary_tests", "build_artifact_tests",
+                        "image_artifact_tests"}]
+        self.assertEqual(selected, [],
+                         "Complete contracts already executes these modules")
         validate_plan(self.plan)
 
-    def test_selected_image_artifacts_have_one_fixed_complete_runner(self):
-        self.assertEqual(CHECKERS.get("image_artifact_tests"),
-                         ("tests/contracts/test_image_artifacts.py",))
-        selected = [stage for stage in self.stages
-                    if stage["checker"] == "image_artifact_tests"]
-        self.assertEqual(len(selected), 1)
-        self.assertEqual(selected[0]["name"], "image-artifact-boundaries")
-        self.assertEqual(selected[0]["args"], [])
-        validate_plan(self.plan)
+    def test_complete_contract_discovery_preserves_original_boundary_cases(self):
+        def case_names(suite):
+            for case in suite:
+                if isinstance(case, unittest.TestSuite):
+                    yield from case_names(case)
+                else:
+                    module, name, method = case.id().rsplit(".", 2)
+                    yield module.rsplit(".", 1)[-1], (name, method)
 
-    def test_selected_image_boundaries_follow_existing_artifact_recovery(self):
+        complete = unittest.TestLoader().discover(
+            str(ROOT / "tests/contracts"), pattern="test_*.py")
+        observed = {}
+        for module, case in case_names(complete):
+            observed.setdefault(module, set()).add(case)
+        for name in ("test_source_sdk", "test_build_artifacts",
+                     "test_image_artifacts"):
+            with self.subTest(module=name):
+                module = __import__("tests.contracts." + name,
+                                    fromlist=["unused"])
+                original = unittest.TestLoader().loadTestsFromModule(module)
+                expected = {case for _, case in case_names(original)}
+                self.assertTrue(expected)
+                self.assertEqual(observed[name], expected)
+
+    def test_complete_boundary_domains_follow_installed_sdk_consumers(self):
         names = [stage["name"] for stage in self.stages]
-        self.assertIn("image-artifact-boundaries", names)
-        previous = names.index("build-artifact-boundaries")
-        self.assertEqual(names[previous:previous + 3],
-                         ["build-artifact-boundaries",
-                          "image-artifact-boundaries",
+        previous = names.index("sdk-consumers")
+        self.assertEqual(names[previous:previous + 4],
+                         ["sdk-consumers", "contract-tools", "freertos-tools",
                           "providers-mainstream_assembly"])
 
     def test_image_artifact_script_bootstraps_without_import_environment(self):

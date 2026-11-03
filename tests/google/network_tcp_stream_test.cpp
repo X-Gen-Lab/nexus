@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  * \note            Host Ethernet IPC fixture; no MCU, PHY or timing proof.
  */
+#include "../contracts/lwip_mqtt_interop/pcap.h"
 #include "nexus/network/lwip_tcp_storage.h"
 #include "support/lwip_frame_pair.h"
 extern "C" {
@@ -15,7 +16,12 @@ extern "C" {
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <iterator>
+#include <sys/stat.h>
+#include <vector>
 
 namespace {
 using namespace nexus::test::lwip_pair;
@@ -549,7 +555,12 @@ class Pair : public ProcessPair<Worker, Command, Snapshot> {
     void Step(uint32_t milliseconds = 10U) {
         now += milliseconds;
         for (size_t role = 0U; role < 2U; ++role) {
-            if (Call(role, Action::Tick, 0U, now).result != NX_SUCCESS) {
+            const auto result = Call(role, Action::Tick, 0U, now).result;
+            if (result != NX_SUCCESS
+#if defined(NEXUS_LWIP_LOANED_RX)
+                && result != NX_ERROR_BUSY && result != NX_ERROR_EXHAUSTED
+#endif
+            ) {
                 throw std::runtime_error("network service failed");
             }
         }
@@ -841,6 +852,258 @@ TEST(NxLwipTcpPair, ASecondInstanceCannotReenterTheSameInFlightStackDomain) {
     EXPECT_EQ(0U, pair.states[0].corrupt[0]);
     EXPECT_EQ(0U, pair.states[0].corrupt[1]);
 }
+
+/** \brief Unique private directory; symlinks themselves are removed on exit. */
+struct CaptureDirectory {
+    std::string path;
+    CaptureDirectory() {
+        char name[] = "/tmp/nexus-pcap-contract-XXXXXX";
+        const char* created = mkdtemp(name);
+        if (created == nullptr) {
+            throw std::runtime_error("Cannot create capture test directory");
+        }
+        path = created;
+    }
+    ~CaptureDirectory() {
+        std::filesystem::remove_all(path);
+    }
+};
+struct CaptureWire {
+    int sockets[2]{-1, -1};
+    CaptureWire() {
+        if (socketpair(AF_UNIX, SOCK_DGRAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0,
+                       sockets) != 0) {
+            throw std::runtime_error("Cannot create capture Ethernet wire");
+        }
+    }
+    ~CaptureWire() {
+        close(sockets[0]);
+        close(sockets[1]);
+    }
+};
+static uint64_t capture_time = 0U;
+static uint64_t CaptureClock(void*) {
+    return capture_time;
+}
+static std::vector<uint8_t> CaptureBytes(const std::string& path) {
+    std::ifstream input(path, std::ios::binary);
+    return {std::istreambuf_iterator<char>(input),
+            std::istreambuf_iterator<char>()};
+}
+static uint32_t CaptureWord(const std::vector<uint8_t>& bytes, size_t at) {
+    return static_cast<uint32_t>(bytes.at(at)) |
+           static_cast<uint32_t>(bytes.at(at + 1U)) << 8U |
+           static_cast<uint32_t>(bytes.at(at + 2U)) << 16U |
+           static_cast<uint32_t>(bytes.at(at + 3U)) << 24U;
+}
+static std::array<uint8_t, 64> CaptureFrame() {
+    std::array<uint8_t, 64> frame{};
+    for (size_t i = 0U; i < frame.size(); ++i) {
+        frame[i] = static_cast<uint8_t>(i);
+    }
+    frame[12] = 0x08U;
+    frame[13] = 0x06U;
+    return frame;
+}
+TEST(NxLwipPcap,
+     CapturesSuccessfulRawSendBeforeSettlementAndCopiesImmediately) {
+    CaptureDirectory directory;
+    CaptureWire wire;
+    nexus::test::PcapCapture capture;
+    capture_time = 0U;
+    ASSERT_TRUE(
+        capture.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+    FrameEndpoint endpoint(0U, wire.sockets[0]);
+    auto frame = CaptureFrame();
+    const auto expected = frame;
+    const nx_eth_fragment_t fragment{frame.data(), frame.size()};
+    nx_eth_frames_tx_request_t request{};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(nx_eth_frames_tx_prepare(&request, &fragment, 1U, false,
+                                       UINT64_C(1000000)),
+              NX_SUCCESS);
+    struct Hook {
+        nexus::test::PcapCapture* capture;
+        FrameEndpoint* endpoint;
+        nx_eth_frames_tx_request_t* request;
+        unsigned calls;
+    } hook{&capture, &endpoint, &request, 0U};
+    endpoint.on_transmit_context = &hook;
+    endpoint.on_transmit = [](void* context, const uint8_t* bytes,
+                              size_t count) {
+        auto& state = *static_cast<Hook*>(context);
+        ++state.calls;
+        EXPECT_EQ(state.endpoint->pending, state.request);
+        EXPECT_EQ(nx_request_state(&state.request->base), NX_REQUEST_ACTIVE);
+        nexus::test::PcapCapture::Record(state.capture, bytes, count);
+    };
+    ASSERT_EQ(FrameEndpoint::Submit(&endpoint, &request), NX_SUCCESS);
+    capture_time = UINT64_C(1500001);
+    ASSERT_EQ(FrameEndpoint::Service(&endpoint), NX_SUCCESS);
+    EXPECT_EQ(hook.calls, 1U);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    frame.fill(0xa5U);
+    ASSERT_TRUE(capture.Finish());
+    EXPECT_EQ(capture.Frames(), 1U);
+    EXPECT_EQ(capture.Bytes(), 24U + 16U + expected.size());
+    std::array<uint8_t, 64> received{};
+    ASSERT_EQ(recv(wire.sockets[1], received.data(), received.size(), 0),
+              static_cast<ssize_t>(received.size()));
+    EXPECT_EQ(received, expected);
+    const auto bytes = CaptureBytes(directory.path + "/client.pcap");
+    ASSERT_EQ(bytes.size(), capture.Bytes());
+    EXPECT_EQ(CaptureWord(bytes, 0U), UINT32_C(0xa1b2c3d4));
+    EXPECT_EQ(CaptureWord(bytes, 16U), 1514U);
+    EXPECT_EQ(CaptureWord(bytes, 20U), 1U);
+    EXPECT_EQ(CaptureWord(bytes, 24U), 1U);
+    EXPECT_EQ(CaptureWord(bytes, 28U), 500001U);
+    EXPECT_EQ(CaptureWord(bytes, 32U), expected.size());
+    EXPECT_EQ(CaptureWord(bytes, 36U), expected.size());
+    EXPECT_TRUE(
+        std::equal(expected.begin(), expected.end(), bytes.begin() + 40));
+}
+TEST(NxLwipPcap, RetryAndDeliberateDiscardDoNotBecomeSuccessfulCaptureRecords) {
+    CaptureDirectory directory;
+    CaptureWire wire;
+    const int capacity = 1024;
+    ASSERT_EQ(setsockopt(wire.sockets[0], SOL_SOCKET, SO_SNDBUF, &capacity,
+                         sizeof(capacity)),
+              0);
+    auto frame = CaptureFrame();
+    bool busy = false;
+    for (unsigned i = 0U; i < 1024U; ++i) {
+        if (send(wire.sockets[0], frame.data(), frame.size(), MSG_DONTWAIT) <
+            0) {
+            busy = errno == EAGAIN || errno == EWOULDBLOCK;
+            break;
+        }
+    }
+    ASSERT_TRUE(busy);
+    nexus::test::PcapCapture capture;
+    capture_time = 0U;
+    ASSERT_TRUE(
+        capture.Open(directory.path.c_str(), "relay.pcap", CaptureClock));
+    SetNowMs(0U);
+    FrameEndpoint endpoint(1U, wire.sockets[0]);
+    endpoint.on_transmit = nexus::test::PcapCapture::Record;
+    endpoint.on_transmit_context = &capture;
+    nx_eth_frames_tx_request_t request{};
+    nx_request_initialize(&request.base);
+    const nx_eth_fragment_t fragment{frame.data(), frame.size()};
+    ASSERT_EQ(nx_eth_frames_tx_prepare(&request, &fragment, 1U, false,
+                                       UINT64_C(1000000)),
+              NX_SUCCESS);
+    ASSERT_EQ(FrameEndpoint::Submit(&endpoint, &request), NX_SUCCESS);
+    ASSERT_EQ(FrameEndpoint::Service(&endpoint), NX_SUCCESS);
+    EXPECT_EQ(endpoint.pending, &request);
+    EXPECT_EQ(capture.Frames(), 0U);
+    std::array<uint8_t, 64> drained{};
+    for (unsigned i = 0U; i < 1024U; ++i) {
+        if (recv(wire.sockets[1], drained.data(), drained.size(),
+                 MSG_DONTWAIT) < 0) {
+            break;
+        }
+    }
+    ASSERT_EQ(FrameEndpoint::Service(&endpoint), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(capture.Frames(), 1U);
+    frame[13] = 0U;
+    frame[14] = 0x45U;
+    frame[23] = 6U;
+    frame[46] = 0x50U;
+    endpoint.drop_tcp = true;
+    ASSERT_EQ(nx_eth_frames_tx_prepare(&request, &fragment, 1U, false,
+                                       UINT64_C(1000000)),
+              NX_SUCCESS);
+    ASSERT_EQ(FrameEndpoint::Submit(&endpoint, &request), NX_SUCCESS);
+    ASSERT_EQ(FrameEndpoint::Service(&endpoint), NX_SUCCESS);
+    EXPECT_EQ(endpoint.dropped, 1U);
+    EXPECT_EQ(capture.Frames(), 1U);
+    ASSERT_TRUE(capture.Finish());
+    EXPECT_EQ(capture.Bytes(), 24U + 16U + frame.size());
+}
+TEST(NxLwipPcap, FrameAndFileLimitsLatchFailureWithoutACompleteClaim) {
+    CaptureDirectory directory;
+    capture_time = 0U;
+    std::array<uint8_t, 1514> frame{};
+    nexus::test::PcapCapture frames;
+    ASSERT_TRUE(
+        frames.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+    for (unsigned i = 0U; i < 1024U; ++i) {
+        nexus::test::PcapCapture::Record(&frames, frame.data(), 14U);
+    }
+    ASSERT_EQ(frames.Frames(), 1024U);
+    const size_t completed = frames.Bytes();
+    nexus::test::PcapCapture::Record(&frames, frame.data(), 14U);
+    EXPECT_FALSE(frames.Finish());
+    EXPECT_EQ(frames.Frames(), 1024U);
+    EXPECT_EQ(frames.Bytes(), completed);
+    nexus::test::PcapCapture bytes;
+    ASSERT_TRUE(bytes.Open(directory.path.c_str(), "relay.pcap", CaptureClock));
+    for (unsigned i = 0U; i < 1024U; ++i) {
+        nexus::test::PcapCapture::Record(&bytes, frame.data(), frame.size());
+    }
+    EXPECT_FALSE(bytes.Finish());
+    EXPECT_EQ(bytes.Frames(), (1048576U - 24U) / (1514U + 16U));
+    EXPECT_LE(bytes.Bytes(), 1048576U);
+}
+TEST(NxLwipPcap, CapturePathsRejectOverwriteAliasesAndNonprivateDirectories) {
+    CaptureDirectory directory;
+    capture_time = 0U;
+    nexus::test::PcapCapture original;
+    ASSERT_TRUE(
+        original.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+    ASSERT_TRUE(original.Finish());
+    const auto preserved = CaptureBytes(directory.path + "/client.pcap");
+    nexus::test::PcapCapture repeated;
+    EXPECT_FALSE(
+        repeated.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+    EXPECT_EQ(CaptureBytes(directory.path + "/client.pcap"), preserved);
+    ASSERT_EQ(
+        symlink(directory.path.c_str(), (directory.path + "/alias").c_str()),
+        0);
+    nexus::test::PcapCapture alias;
+    EXPECT_FALSE(alias.Open((directory.path + "/alias").c_str(), "relay.pcap",
+                            CaptureClock));
+    for (const auto& suffix : {"/.", "/../", "//"}) {
+        nexus::test::PcapCapture lexical;
+        EXPECT_FALSE(lexical.Open((directory.path + suffix).c_str(),
+                                  "relay.pcap", CaptureClock));
+    }
+    nexus::test::PcapCapture name;
+    EXPECT_FALSE(name.Open(directory.path.c_str(), "other.pcap", CaptureClock));
+    ASSERT_EQ(chmod(directory.path.c_str(), 0755), 0);
+    nexus::test::PcapCapture mode;
+    EXPECT_FALSE(mode.Open(directory.path.c_str(), "relay.pcap", CaptureClock));
+    ASSERT_EQ(chmod(directory.path.c_str(), 0700), 0);
+}
+TEST(NxLwipPcap, InvalidFramesAndClockCannotSealAPartialCaptureAsComplete) {
+    const std::array<size_t, 3> sizes{0U, 13U, 1515U};
+    std::array<uint8_t, 1515> frame{};
+    for (const size_t size : sizes) {
+        CaptureDirectory directory;
+        nexus::test::PcapCapture capture;
+        capture_time = 10U;
+        ASSERT_TRUE(
+            capture.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+        nexus::test::PcapCapture::Record(&capture, frame.data(), size);
+        EXPECT_FALSE(capture.Finish());
+        EXPECT_EQ(capture.Frames(), 0U);
+    }
+    for (const uint64_t bad_time :
+         {UINT64_C(9), UINT64_C(20000001), UINT64_MAX}) {
+        CaptureDirectory directory;
+        nexus::test::PcapCapture capture;
+        capture_time = 10U;
+        ASSERT_TRUE(
+            capture.Open(directory.path.c_str(), "client.pcap", CaptureClock));
+        capture_time = bad_time;
+        nexus::test::PcapCapture::Record(&capture, frame.data(), 14U);
+        EXPECT_FALSE(capture.Finish());
+        EXPECT_EQ(capture.Frames(), 0U);
+    }
+}
+
 } /* namespace */
 extern "C" uint32_t nx_lwip_port_now_ms(void) {
     return NowMs();

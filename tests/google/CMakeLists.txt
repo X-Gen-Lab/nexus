@@ -673,6 +673,18 @@ if(TARGET Nexus::LwIPTCPStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set_tests_properties(nexus_network_tcp_stream_test PROPERTIES TIMEOUT 30)
 endif()
 
+# A selected RX payload-loan profile is a separate static stack domain.
+if(TARGET Nexus::LwIPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    nexus_google_test(nexus_network_lwip_loaned_test
+        SOURCES network_lwip_loaned_test.cpp LIBRARIES Nexus::LwIPLoanedRXStorage)
+endif()
+if(TARGET Nexus::LwIPTCPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    nexus_google_test(nexus_network_tcp_loaned_stream_test
+        SOURCES network_tcp_stream_test.cpp
+        LIBRARIES Nexus::LwIPTCPLoanedRXStorage)
+    set_tests_properties(nexus_network_tcp_loaned_stream_test PROPERTIES TIMEOUT 30)
+endif()
+
 # The explicit entropy instance uses the real reviewed LL over a register model.
 nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES entropy_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/entropy.c"
@@ -721,4 +733,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
         GTest::gtest nexus_build_options nexus_owned_warnings)
     add_dependencies(nexus_network_tcp_stream_test
         nexus_lwip_mqtt_interop_client)
+endif()
+
+# The reviewed full boot model uses the supplier's ordinary Linux test port.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    include("${CMAKE_CURRENT_SOURCE_DIR}/mcuboot.cmake")
 endif()

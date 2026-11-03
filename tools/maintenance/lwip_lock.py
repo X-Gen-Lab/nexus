@@ -12,20 +12,21 @@ import re
 import subprocess
 import sys
 
-sys.dont_write_bytecode = True
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     fields, parse_json, snapshot,
 )
 
-COMMIT = "77dcd25a72509eb83f72b033d219b1d40cd8eb95"
-TREE = "260547a417890e813eaac769f4fcbdaec75686b2"
+COMMIT = "1f53f34b4aa7c6583540c0f4c35142fa66616c78"
+TREE = "7e65d6e65cefeffa2be44be0bb0ee51136626f1d"
 UPSTREAM = "https://github.com/lwip-tcpip/lwip.git"
 FETCH = "https://github.com/X-Gen-Lab/lwip.git"
 LOCK = ROOT / "dependencies/lwip.lock.json"
 REVIEWED_FILE_MAP_SHA256 = (
-    "e97ae2d419daa8478879e94ed90469084d9bd7ff87b32e811250c91ceefbfd9c"
+    "2491e60fddb9b34a04d211e6bb6f75b80c188c0b6ca6c3f6090fb5f0f0756e2b"
 )
 
 
@@ -83,7 +84,7 @@ def verify(source, lock_path=LOCK, *, development=False, source_sdk=False):
 
     Source-SDK callers first execute the owning SDK manifest verifier. Its
     explicit scope checks the exact payload closure without inventing Git state.
-    Development input can select the official upstream checkout but never gains
+    Development input selects a clean reviewed checkout but never gains
     the production organization-gitlink admission result.
     """
     source = Path(source).absolute()

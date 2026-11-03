@@ -88,3 +88,10 @@ def resolve_counter_domains(controllers):
     for item in controllers:
         if item["kind"] == "eth_frames":
             item["clock_domain"] = domains[("mac-ptp", item["controller"])]
+
+
+def controller_editor_schema(schema):
+    """Complete this category through the sole authored schema composer."""
+    schema["properties"]["address"] = {
+        "type": "array", "minItems": 6, "maxItems": 6,
+        "items": {"type": "integer", "minimum": 0, "maximum": 255}}

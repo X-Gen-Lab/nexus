@@ -1,7 +1,7 @@
 """Reviewed byte frames and an independent nine-bit IRQ personality."""
 from dataclasses import dataclass
 
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import fail, integer, mode_traits
 
 
 DEFAULT = {"data_bits": 8, "parity": "none", "stop_bits": 1, "flow": "none"}
@@ -159,3 +159,92 @@ def emit_probe_factory(result):
                    f'            return &nx_io_irq_probe_{item.controller};']
     return header, source + ['        default:', '            return NULL;',
                              '    }', '}']
+
+
+def validate_selection(selection, route, provider, ram_size):
+    """Admit frame and receive-storage policy for the selected UART mode."""
+    if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
+        fail("UART requires baud, RX profile and IRQ priority")
+    integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
+    validate(selection, route, provider)
+    if selection["mode"] == "irq-words":
+        if selection["rx_profile"] != "words":
+            fail("Word UART requires RX words, never byte/event storage")
+        integer(selection.get("rx_capacity"), 1,
+                min(4096, ram_size // 2), "UART RX word capacity")
+    elif selection["rx_profile"] == "blocks":
+        if not mode_traits("uart", selection["mode"]).block_stream:
+            fail("UART RX blocks requires irq-blocks or a reviewed "
+                 "RX-DMA provider")
+        if "rx_capacity" in selection:
+            fail("UART RX blocks has no generated ring capacity; "
+                 "storage is caller-owned")
+    elif mode_traits("uart", selection["mode"]).block_stream:
+        fail("UART block provider requires RX blocks format")
+    elif selection["rx_profile"] in {"bytes", "events"}:
+        integer(selection.get("rx_capacity"), 1,
+                min(4096, ram_size // 16), "UART RX capacity")
+    else:
+        fail("Unsupported UART receive profile")
+
+
+def normalize_authored(selection, name, obj):
+    """Flatten only UART authoring; hardware and mode selection stay later."""
+    obj(selection, {"id", "authored_kind", "binding", "mode", "baud",
+                    "rx", "irq"},
+        {"frame", "stream", "fifo"}, f"uart.{name}")
+    rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
+    irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"},
+              f"uart.{name}.irq")
+    selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
+    if "capacity" in rx:
+        selection["rx_capacity"] = rx["capacity"]
+    if "calls_os" in irq:
+        selection["calls_os"] = irq["calls_os"]
+    if "probe" in irq:
+        selection["irq_probe"] = irq["probe"]
+    if selection["mode"] == "irq":
+        selection["mode"] = "irq-byte-event"
+
+
+def receive_editor_schema(properties, fields, record):
+    """Complete UART-owned nested schema through the shared record builder."""
+    if "rx" in fields:
+        properties["rx"] = record({"format", "capacity"}, {"format"})
+        properties["rx"]["properties"]["format"]["enum"] = [
+            "bytes", "events", "blocks", "words"]
+    if "frame" in fields:
+        properties["frame"] = record(
+            {"data_bits", "parity", "stop_bits", "flow"},
+            {"data_bits", "parity", "stop_bits", "flow"})
+        frame = properties["frame"]["properties"]
+        frame["data_bits"] = {"enum": [7, 8, 9]}
+        frame["stop_bits"] = {"enum": [1, 2]}
+        frame["parity"] = {"enum": ["none", "even", "odd"]}
+        frame["flow"] = {"const": "none"}
+
+
+def fifo_editor_schema(properties, fields, record):
+    """Complete the optional UART FIFO through the same record builder."""
+    if "fifo" in fields:
+        names = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
+                 "tx_budget_bytes"}
+        properties["fifo"] = record(names, names)
+        for name in ("rx_budget_bytes", "tx_budget_bytes"):
+            properties["fifo"]["properties"][name] = {
+                "type": "integer", "minimum": 1, "maximum": 16}
+
+
+def controller_editor_schema(schema):
+    """Complete this category through the sole authored schema composer."""
+    uart = schema
+    irq = uart["properties"]["irq"]
+    irq["properties"]["probe"] = {"type": "boolean"}
+    uart["properties"]["frame"]["properties"]["flow"] = {"type": "string"}
+    uart["allOf"] = [{
+        "if": {"properties": {"mode": {"const": RTSCTS_MODE}},
+               "required": ["mode"]},
+        "then": {"properties": {
+            "frame": {"const": dict(RTSCTS_FRAME)}}},
+        "else": {"properties": {
+            "frame": {"properties": {"flow": {"const": "none"}}}}}}]

@@ -5,7 +5,8 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 from tools.configure.ir import Record, freeze
-from tools.configure.contracts import CONTROLLER_CONTRACTS, CONTROLLER_KINDS
+from tools.configure.contracts import (
+    CONTROLLER_CONTRACTS, CONTROLLER_KINDS, ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS)
 
 
 @dataclass(frozen=True)
@@ -45,10 +46,6 @@ KINDS = frozenset(CONTROLLER_KINDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
                  "flash_load_limit_bytes", "image_prefix_bytes",
                  "image_suffix_bytes", "regions", "mpu"}
-ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
-                   "i2c": {"controller", "driver", "address", "model_bytes"}}
-USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
-                       "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
 TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
 
@@ -90,19 +87,8 @@ def normalize(data, path, root, fail, obj, integer, text):
             selection["id"] = name
             selection["authored_kind"] = kind
             if kind == "uart":
-                obj(selection, {"id", "authored_kind", "binding", "mode", "baud", "rx", "irq"},
-                    {"frame", "stream", "fifo"}, f"uart.{name}")
-                rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
-                irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"}, f"uart.{name}.irq")
-                selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
-                if "capacity" in rx:
-                    selection["rx_capacity"] = rx["capacity"]
-                if "calls_os" in irq:
-                    selection["calls_os"] = irq["calls_os"]
-                if "probe" in irq:
-                    selection["irq_probe"] = irq["probe"]
-                if selection["mode"] == "irq":
-                    selection["mode"] = "irq-byte-event"
+                from tools.configure import uart_formats
+                uart_formats.normalize_authored(selection, name, obj)
             elif "irq" in INSTANCE_FIELDS[kind] and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
@@ -159,7 +145,9 @@ def read(path, snapshots, root, fail, obj, integer, text):
 
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
-    from tools.configure import kernel, threadx, uart_formats
+    from tools.configure import (
+        kernel, threadx, uart_formats, stream_profiles, timer_advanced, can,
+        i2c_timing_selection, ethernet)
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
@@ -192,38 +180,12 @@ def editor_schema():
         if "irq" in fields:
             properties["irq"] = record({"priority", "calls_os"}, {"priority"})
             properties["irq"]["properties"]["calls_os"] = {"type": "boolean"}
-        if "rx" in fields:
-            properties["rx"] = record({"format", "capacity"}, {"format"})
-            properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks", "words"]
-        if "frame" in fields:
-            properties["frame"] = record(
-                {"data_bits", "parity", "stop_bits", "flow"},
-                {"data_bits", "parity", "stop_bits", "flow"})
-            frame = properties["frame"]["properties"]
-            frame["data_bits"] = {"enum": [7, 8, 9]}
-            frame["stop_bits"] = {"enum": [1, 2]}
-            frame["parity"] = {"enum": ["none", "even", "odd"]}
-            frame["flow"] = {"const": "none"}
-        if "stream" in fields:
-            stream_fields = {"max_units_per_second", "units_per_block",
-                             "blocks", "release_delay_us", "target_delay_us",
-                             "on_exhaustion", "source"}
-            stream = record(stream_fields, stream_fields)
-            for name in stream_fields - {"on_exhaustion", "source"}:
-                stream["properties"][name] = {"type": "integer", "minimum": 0}
-            stream["properties"]["on_exhaustion"] = {
-                "const": "stop-and-report-gap"}
-            properties["stream"] = stream
+        uart_formats.receive_editor_schema(properties, fields, record)
+        stream_profiles.nested_editor_schema(properties, fields, record)
         if "watchdog" in fields:
             properties["watchdog"] = record({"lower", "upper"},
                                              {"lower", "upper"})
-        if "fifo" in fields:
-            names = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
-                     "tx_budget_bytes"}
-            properties["fifo"] = record(names, names)
-            for name in ("rx_budget_bytes", "tx_budget_bytes"):
-                properties["fifo"]["properties"][name] = {
-                    "type": "integer", "minimum": 1, "maximum": 16}
+        uart_formats.fifo_editor_schema(properties, fields, record)
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
@@ -274,39 +236,20 @@ def editor_schema():
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
         if kind == "lptim":
-            properties[kind]["additionalProperties"]["required"].append("tick_hz")
-            properties[kind]["additionalProperties"]["properties"]["tick_hz"] = {
-                "type": "integer", "minimum": 1, "maximum": 4294967295}
+            timer_advanced.lptim_editor_schema(
+                properties[kind]["additionalProperties"])
         if kind == "can_fd":
-            filter_fields = {"id", "mask", "format", "fifo"}
-            filters = record(filter_fields, filter_fields)
-            filters["properties"]["format"] = {"enum": ["standard", "extended"]}
-            filters["properties"]["fifo"] = {"enum": [0, 1]}
-            properties[kind]["additionalProperties"]["properties"]["filters"] = {
-                "type": "array", "items": filters, "maxItems": 36}
+            can.fd_editor_schema(
+                properties[kind]["additionalProperties"], record)
         if kind == "uart":
-            uart = properties[kind]["additionalProperties"]
-            irq = uart["properties"]["irq"]
-            irq["properties"]["probe"] = {"type": "boolean"}
-            uart["properties"]["frame"]["properties"]["flow"] = {"type": "string"}
-            uart["allOf"] = [{
-                "if": {"properties": {"mode": {"const": uart_formats.RTSCTS_MODE}},
-                       "required": ["mode"]},
-                "then": {"properties": {
-                    "frame": {"const": dict(uart_formats.RTSCTS_FRAME)}}},
-                "else": {"properties": {
-                    "frame": {"properties": {"flow": {"const": "none"}}}}}}]
+            uart_formats.controller_editor_schema(
+                properties[kind]["additionalProperties"])
         if kind == "i2c":
-            timing_fields = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
-                             "bus_hz_min", "rise_ns_max", "fall_ns_max", "source"}
-            timing = record(timing_fields, timing_fields)
-            for name in timing_fields - {"source"}:
-                timing["properties"][name] = {"type": "integer", "minimum": 0}
-            properties[kind]["additionalProperties"]["properties"]["timing"] = timing
+            i2c_timing_selection.controller_editor_schema(
+                properties[kind]["additionalProperties"], record)
         if kind in {"eth", "eth_frames"}:
-            properties[kind]["additionalProperties"]["properties"]["address"] = {
-                "type": "array", "minItems": 6, "maxItems": 6,
-                "items": {"type": "integer", "minimum": 0, "maximum": 255}}
+            ethernet.controller_editor_schema(
+                properties[kind]["additionalProperties"])
     for kind, fields in ENDPOINT_FIELDS.items():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
     endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})

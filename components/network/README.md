@@ -1,16 +1,18 @@
 # Optional lwIP Ethernet adapter
 
 This optional component integrates lwIP 2.2.1, commit
-`77dcd25a72509eb83f72b033d219b1d40cd8eb95`, tree
-`260547a417890e813eaac769f4fcbdaec75686b2`, through the reviewed
+`1f53f34b4aa7c6583540c0f4c35142fa66616c78`, tree
+`7e65d6e65cefeffa2be44be0bb0ee51136626f1d`, through the reviewed
 `X-Gen-Lab/lwip` organization gitlink. Source admission does not establish a
 qualified network platform, a new software candidate or physical Ethernet
-acceptance.
+acceptance. The curated source is based on upstream commit
+`77dcd25a72509eb83f72b033d219b1d40cd8eb95`; its only upstream C change is
+the documented sizing-condition exception in `ext/lwip/NEXUS_CURATED_SOURCE.md`.
 
 CMake defines the explicit `Nexus::LwIP` target but does not build or link the
 stack into firmware unless the external composition selects that target.
 Configuration verifies the exact clean checkout, organization origin, parent
-index gitlink and fixed closure of 310 source/header/license files through
+index gitlink and fixed closure of 311 source/header/license/curation-notice files through
 `tools/maintenance/lwip_lock.py`. The verifier rechecks observed source bytes;
 a dirty file cannot be hidden merely by an unchanged Git status. Configuration
 never downloads dependencies or writes to the upstream checkout.
@@ -97,6 +99,45 @@ are not retained by the MAC. A successful link output means admission, not
 delivery to a peer; the provider's later wire failure remains packet loss for
 the selected protocol. TCP retransmission and product recovery retain their
 normal responsibilities.
+
+The adapter additionally preserves a failed final TX result until
+`nx_lwip_adapter_service` reports that exact result once. An accepted transfer
+may settle inline; its admission still returns `ERR_OK`. Another link output
+before error observation returns `ERR_IF` without copying or admitting the new
+frame. Successful inline completion remains immediately reusable without a
+service round trip. Borrowed transfers still return `ERR_MEM` backpressure.
+Service checks completion before and after MAC, timer and bounded RX progress;
+an inline failure produced during that progress is reported in that invocation.
+
+After acquiring a settled failure, service consumes it by preparing the existing
+unborrowed request back to READY. It does not close the adapter, reset the MAC,
+replay bytes or require a stop/restart merely because one packet was lost. The
+product chooses whether the actual provider state needs recovery; persistent
+provider health errors may still be reported independently. A settled TX error
+has return precedence when the same progress call also reports a MAC/RX error;
+there is no aggregate error history. The optional typed TCP facade keeps its
+existing policy: BUSY/EXHAUSTED are temporary, while other network-service errors
+fail that connection. Observing a frame error does not promise transparent
+connection recovery. An ACTIVE or QUARANTINED request is never cleared by outcome
+observation. The selected
+TX path adds no error queue or per-instance field. This is an error-observability improvement;
+the earlier best-effort packet-loss contract did not promise this notification.
+
+发送结果可观察性：ACCEPTED 仍只表示接纳，不能证明线上成功。传输可以在 submit
+返回前以失败 SETTLED；该次接纳仍返回 `ERR_OK`，但最终错误保留到
+`nx_lwip_adapter_service` 精确报告一次。在此之前，新 link output 返回 `ERR_IF`，
+不会复制或接纳新帧；成功的 inline 完成仍可直接复用，无需额外 service 往返。
+仍被借用的请求继续以 `ERR_MEM` 表达背压。service 会在 MAC、timer 和有界 RX
+处理前后检查结果，因此该次处理内产生的 inline 错误也会在本次返回。
+
+service 只在 acquire 观察到 SETTLED 后消费错误，把已有且无借用的请求准备为
+READY；不自动关闭 adapter、复位 MAC、重放字节，也不会因单帧丢失强制 stop／
+restart。产品根据真实 provider 状态选择恢复；provider 的持续健康错误仍可独立
+报告。同次处理也有 MAC／RX 错误时，已结清的 TX 错误优先返回，不提供错误历史
+聚合。可选 typed TCP facade 保留既有策略：BUSY／EXHAUSTED 视为暂态，其他
+network-service 错误使该连接失败；帧错误可观察不等于连接一定透明恢复。
+ACTIVE／QUARANTINED 的借用不会被清除。TX 路径不新增错误队列或实例字段。这是对错误可观察性的完善，之前的
+best-effort 丢包合同没有承诺这项通知。
 
 RX fragment views are caller-owned and sized for the selected descriptor
 geometry. Insufficient view capacity leaves the hardware frame queued. After
@@ -238,3 +279,61 @@ means this context retains no new PCB, pbuf or configuration reference. Products
 budget the shared pool and handle every connection's error; this adapter adds no
 second allocator or hidden reservation pool. The four-CLOSED-PCB rejection test
 has no reclaimable victim and does not establish a universal no-reclaim rule.
+
+## Optional RX payload loans / 可选 RX 负载借用
+
+The [selected RX-loan contract](../../docs/reference/api/components.md#lwip-loaned-rx-contract)
+defines the authoritative composition and lifetime rules. Select
+`Nexus::LwIPLoanedRX` or `Nexus::LwIPTCPLoanedRX`, and use their respective
+`Storage` targets only at static composition. The existing targets and their
+24-block resource descriptions above refer to copied RX. One image selects
+one singleton stack profile; CMake rejects a copied/loaned mixture.
+
+Each caller-owned frame slot supplies a writable 136 B copied prefix and
+custom-pbuf metadata. Only the remaining immutable `PBUF_ROM` payload tails
+reference MAC bytes; raw users clone before writing. Supply nonzero exact slots
+and at least `slot_count * base.rx_capacity` pieces. Reference operations and
+adapter calls share the serialized NO_SYS owner. Final pbuf frees only mark
+release-ready pieces; later owner service or stop performs exact MAC release.
+Failed release closes admission and retains storage; stop remains BUSY while
+pbuf references remain. The enhanced F407/GD470 provider's independent held
+loans do not imply universal capacity or guaranteed ACK progress.
+
+This selected profile retains two spare 512 B pool payloads, the existing
+16 KiB arena and unchanged other fixed pools. External slots, pieces, prefixes,
+MAC buffers and TX bytes still have explicit storage costs; TX and ICMP reply
+fallback use bounded RAM. Pool counts do not prove complete SRAM fit. Selected
+C11 link-only external development probes pass a 32 KiB SRAM budget on F407
+and GD470 with two frame slots, four pieces, a 2048 B main stack and no libc
+heap. Their measured SRAM is 24344 B and 24316 B respectively; real MAC rings
+and payload buffers are not supplied by those probes. Source/installed-SDK
+qualification remains separate. This option adds no DMA/cache,
+PHY, throughput or physical HIL qualification.
+The curated organization fork exempts only this explicit custom-RX/custom-pbuf
+profile from the stock `PBUF_POOL`/`TCP_WND` sizing heuristic; all other sanity
+checks stay active. The exemption does not prove stock-upstream admission.
+
+[选定 RX 借用合同](../../docs/reference/api/components.md#lwip-loaned-rx-contract)
+是装配与生命周期规则的权威来源。显式选择 `Nexus::LwIPLoanedRX` 或
+`Nexus::LwIPTCPLoanedRX`，只在静态装配处使用各自的 `Storage` target。
+上文既有 target 及其 24 块资源描述适用于复制 RX。每个镜像只选择一个单例协议栈
+配置；CMake 拒绝混合复制与借用配置。
+
+每个调用方自备帧槽包含可写的 136 B 复制前缀及 custom-pbuf 元数据。只有前缀后
+剩余的只读 `PBUF_ROM` 负载尾段引用 MAC 原始字节；raw 用户写入前必须克隆。
+显式提供非零帧槽数和至少 `slot_count * base.rx_capacity` 个 piece。
+引用操作和 adapter 调用共享同一个串行 NO_SYS 所有者。最后一次 pbuf free 只标记
+piece 已可归还；后续 owner service 或 stop 才精确归还 MAC 借用。归还失败关闭
+准入并保留存储；仍有 pbuf 引用时 stop 保持 BUSY。增强型 F407／GD470 provider
+的独立持有借用不代表通用容量或 ACK 必定推进。
+
+此显式配置保留两个备用 512 B 池负载块，沿用既有 16 KiB arena 和其他固定池。
+外部 slot、piece、前缀、MAC 缓冲区与 TX 字节仍有显式存储成本；TX 和 ICMP 回复
+回退使用有界 RAM。池计数不能证明完整 SRAM 可容纳。C11 外部开发配置的链接
+探针使用两个帧槽、四个 piece、2048 B 主栈且无 libc heap，F407／GD470 的
+SRAM 分别为 24344 B／24316 B，均通过 32 KiB 预算。这些探针没有提供真实
+MAC 环和负载缓冲区；源码及已安装 SDK 资格仍需独立验证。该选项不新增
+DMA／cache、PHY、吞吐量或物理 HIL 资格。
+维护的组织 fork 仅让此显式 custom-RX／custom-pbuf 配置豁免原版
+`PBUF_POOL`／`TCP_WND` 容量启发式检查；其他 sanity 检查全部保留。
+此豁免不能证明原版上游也准入该配置。

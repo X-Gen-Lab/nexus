@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4a1fa0b28f0098c67cc1ca234809b2b685a3bfe27cd9f41a65016dfdbe8a9bec\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 44e1f0d74d7291b13dee552861b35e0c97225d747ddaf5dd1fd6a42cc7aae1fe\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
@@ -1499,3 +1499,54 @@ msgid ""
 msgstr ""
 "首个范围使用经过审查的 8 MHz HSE Board 或固定 16 MHz HSI。这些值来自经过验证的装配事实，不猜测硬件。start "
 "检查准确的 PLL48 与 HCLK；调用方将源/PLLQ/HCLK 依赖保持至 stop。"
+
+msgid "MCUboot control and explicit Flash composition"
+msgstr "MCUboot 控制与显式 Flash 装配"
+
+msgid "`Nexus::MCUBootControl` exposes the stateless public control API below. It uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked boot image. These targets are outside the default platform assembly."
+msgstr "`Nexus::MCUBootControl` 暴露下述无状态公共控制 API，仅使用 Nexus 类型。`Nexus::MCUBootPort` 是独立的具体 Flash 装配边界；`Nexus::MCUBootBootStorage` 属于独立链接的 boot 镜像。这些 target 均不属于默认平台装配。"
+
+msgid "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
+msgstr "helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 [MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API 不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
+
+msgid "mcuboot_control.h"
+msgstr "mcuboot_control.h"
+
+msgid "Stateless control of a fixed MCUboot overwrite-only image."
+msgstr "固定 MCUboot 覆盖镜像的无状态控制。"
+
+msgid "The selected single-image profile supports permanent requests only. This API neither downloads nor verifies an image, resets hardware, confirms a trial image, or provides rollback. Applications own authorization, valid candidate bytes, maintenance scheduling, platform lifetime and reset policy. Author  Nexus Team"
+msgstr "所选单镜像配置仅支持永久更新请求。此 API 不下载或校验镜像、不复位硬件、不确认试运行镜像，也不提供回滚。应用负责授权、有效候选字节、维护调度、平台生命周期和复位策略。作者  Nexus Team"
+
+msgid "Requested upgrade behavior; TEST is explicitly unsupported."
+msgstr "请求的更新行为；明确不支持 TEST。"
+
+msgid "Upstream observed action, not a physical or image-health verdict."
+msgstr "上游观察到的动作，不是物理或镜像健康结论。"
+
+msgid "TEST and REVERT can be observed in foreign trailer metadata; their presence does not add support for those modes to overwrite-only firmware."
+msgstr "外部 trailer 元数据中可能观察到 TEST 和 REVERT；出现这些值不会为覆盖模式固件增加相应模式支持。"
+
+msgid "Query upstream's planned action for image zero."
+msgstr "查询上游对镜像零的计划动作。"
+
+msgid "Task/boot context only. Caller serializes access and supplies the immutable Flash operation hook and its finite deadline for the whole call. All referenced areas, regions, clock and provider remain alive through return. The pinned upstream API treats an unreadable secondary trailer as empty; NONE therefore does not establish secondary availability or image validity."
+msgstr "仅限 task／boot 上下文。调用方串行化访问，为整个调用提供不可变 Flash operation hook 及其有限 deadline。所有被引用的 area、region、时钟与 provider 持续存活至返回。固定上游 API 将不可读的 secondary trailer 视为空，因此 NONE 不能证明 secondary 可用或镜像有效。"
+
+msgid "Receives a value on success only; never retained."
+msgstr "仅在成功时接收值；不保留该指针。"
+
+msgid "NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for upstream PANIC, an unknown value or a reported read error."
+msgstr "已知动作返回 NX_SUCCESS，NULL 返回 NX_ERROR_INVALID，上游 PANIC、未知值或报告的读取错误返回 NX_ERROR_IO。"
+
+msgid "Request a permanent upgrade using the upstream public trailer API."
+msgstr "使用上游公共 trailer API 请求永久更新。"
+
+msgid "Same serialized finite operation/lifetime contract as query. Return settles current Flash access; a timeout is not a physical pulse abort. This does not prove candidate authenticity, promise old-image recovery, renew the deadline, stop infrastructure or reset the MCU."
+msgstr "沿用 query 的串行化、有限 operation 与生命周期合同。返回时当前 Flash 访问已结清；超时不是中止物理脉冲。该调用不证明候选真实性、不承诺恢复旧镜像、不续期 deadline、不停止基础设施，也不复位 MCU。"
+
+msgid "PERMANENT requests an update; TEST rejects without access."
+msgstr "PERMANENT 请求更新；TEST 无访问即拒绝。"
+
+msgid "NX_SUCCESS after upstream completes and reports PERMANENT on readback, NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an upstream error. An error can follow partial persistent trailer modification, including a pending TEST that cannot be silently promoted."
+msgstr "上游完成且读回报告 PERMANENT 后返回 NX_SUCCESS；TEST 返回 NX_ERROR_UNSUPPORTED，未知请求返回 NX_ERROR_INVALID，读回其他已知动作返回 NX_ERROR_STATE，上游错误返回 NX_ERROR_IO。部分持久 trailer 修改后仍可能返回错误，包括不能悄悄提升为永久更新的 pending TEST。"

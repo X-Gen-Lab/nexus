@@ -305,7 +305,7 @@ class ConsumerTransportTests(unittest.TestCase):
         from tools.release import transport
         row = ("f407 i2s2 slave tx", "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
                "f407-i2s2-slave-tx")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         self.assertEqual(transport.SELECTED_CONSUMERS[-1], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected f407 i2s2 slave tx source/.git", transport.FIXTURES)
@@ -343,7 +343,7 @@ class ConsumerTransportTests(unittest.TestCase):
         from tools.release import transport
         row = ("u575 mpu gpio", "tools/configure/assemblies/u575-mpu-gpio-write.toml",
                "u575-mpu-gpio")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         self.assertEqual(transport.SELECTED_CONSUMERS[-2], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected u575 mpu gpio source/.git", transport.FIXTURES)
@@ -409,7 +409,7 @@ class ConsumerTransportTests(unittest.TestCase):
         row = ("u575 lpdma copy",
                "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
                "u575-lpdma-copy")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         self.assertIn(row, transport.SELECTED_CONSUMERS)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected u575 lpdma copy source/.git", transport.FIXTURES)
@@ -421,7 +421,7 @@ class ConsumerTransportTests(unittest.TestCase):
         row = ("u575 lptim1 lpbam",
                "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
                "u575-lptim1-lpbam")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         self.assertEqual(transport.SELECTED_CONSUMERS[-3], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertEqual(consumer_module().SELECTED_CONSUMERS[-3], row)
@@ -522,7 +522,7 @@ class ConsumerTransportTests(unittest.TestCase):
         }
         self.assertTrue(expected.issubset(set(transport.SELECTED_CONSUMERS)),
                         expected - set(transport.SELECTED_CONSUMERS))
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
         for name, _, _ in expected:
             self.assertIn("selected " + name + " source/.git",
                           transport.FIXTURES)
@@ -617,7 +617,7 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 59)
+        self.assertEqual(len(list(raw.rglob(".git"))), 64)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
         self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
         self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
@@ -628,10 +628,10 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v14")
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v14")
-        self.assertEqual(len(list(raw.rglob(".git"))), 59)
-        self.assertEqual(len(manifest["consumer_images"]), 62)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v15")
+        self.assertEqual(len(list(raw.rglob(".git"))), 64)
+        self.assertEqual(len(manifest["consumer_images"]), 67)
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
@@ -667,6 +667,18 @@ class ConsumerTransportTests(unittest.TestCase):
         self.assertEqual(len(list(raw.rglob(".git"))), 56)
         self.assertEqual(sum((raw / image).is_file()
                              for image in transport.IMAGES), 59)
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_complete_v14_matrix_cannot_claim_selected_rx_or_mcuboot(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for profile in transport.SERVICE_CONSUMERS[9:]:
+            for suffix in ("source", "build"):
+                shutil.rmtree(raw / (profile.name + " " + suffix))
+        self.assertEqual(len(list(raw.rglob(".git"))), 59)
+        self.assertEqual(sum((raw / image).is_file()
+                             for image in transport.IMAGES), 62)
         with self.assertRaisesRegex(ValueError, "Exact current consumer"):
             transport.pack(raw, base / "transport", COMMIT)
 
@@ -945,9 +957,9 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         packed = base / "transport"
         manifest = transport.pack(raw, packed, COMMIT)
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v14")
-        self.assertEqual(len(manifest["consumer_roots"]), 59)
-        self.assertEqual(len(manifest["consumer_images"]), 62)
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v15")
+        self.assertEqual(len(manifest["consumer_roots"]), 64)
+        self.assertEqual(len(manifest["consumer_images"]), 67)
         transport.verify(packed, COMMIT)
         archive = packed / transport.ARCHIVE
         original_archive = archive.read_bytes()

@@ -8,6 +8,7 @@ import unittest
 import subprocess
 from tools.maintenance import dependency_proposals as proposals
 from tools.maintenance import (cmsis_device_lock, lwip_lock, mbedtls_lock, coremqtt_lock,
+                               mcuboot_lock,
                                source_catalogue, stm32f1_hal_lock, stm32f4_hal_lock)
 from tools.maintenance.stm32_ll_lock import PROFILES
 import os
@@ -298,7 +299,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 if item.path in {official.directory, official.cmsis_directory}:
                     review = {"commit": (official.commit
                         if item.path == official.directory else official.cmsis_commit)}
-            if item.identifier == "googletest":
+            if item.identifier in ("googletest", "mcuboot"):
                 review = {"commit": json.loads(
                     (ROOT / item.source_lock).read_text())["commit"]}
             if item.identifier == "lwip":
@@ -407,7 +408,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.assertEqual(record["upstream_url"], lwip_lock.UPSTREAM)
         self.assertEqual(record["fetch_url"], lwip_lock.FETCH)
         lock = json.loads((self.root / "dependencies/lwip.lock.json").read_text())
-        self.assertEqual(len(lock["files"]), 310)
+        self.assertEqual(len(lock["files"]), 311)
         observed = {Path(item["path"]).relative_to(self.root).as_posix()
                     for item in record["identities"]}
         expected = {".gitmodules", "dependencies/lwip.lock.json"}
@@ -417,6 +418,66 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.assertFalse(result["source_dirty"])
         self.assertFalse(result["locks_changed"])
         self.assertFalse(result["software_qualified"])
+
+    def test_mcuboot_inventory_records_exact_pin_closure_and_upstream(self):
+        result = proposals.inventory(self.root)
+        record = next(item for item in result["dependencies"]
+                      if item["id"] == "mcuboot")
+        self.assertEqual(record["revision"], mcuboot_lock.COMMIT)
+        self.assertEqual(record["upstream_revision"],
+                         "6d3b3d2c38ab20c242e5b9abb04d050086383eb2")
+        self.assertEqual(record["upstream_url"],
+                         "https://github.com/mcu-tools/mcuboot.git")
+        self.assertEqual(record["fetch_url"],
+                         "https://github.com/X-Gen-Lab/mcuboot.git")
+        lock = json.loads((self.root / "dependencies/mcuboot.lock.json").read_text())
+        self.assertEqual(len(lock["files"]), 80)
+        observed = {Path(item["path"]).relative_to(self.root).as_posix()
+                    for item in record["identities"]}
+        expected = {".gitmodules", "dependencies/mcuboot.lock.json"}
+        expected.update("ext/mcuboot/" + name for name in lock["files"])
+        self.assertEqual(observed, expected)
+        self.assertIn("ext/mcuboot/NEXUS_CURATED_SOURCE.md", observed)
+        self.assertIn("ext/mcuboot/LICENSE", observed)
+        self.assertIn("ext/mcuboot/NOTICE", observed)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["locks_changed"])
+        self.assertFalse(result["software_qualified"])
+
+    def test_mcuboot_inventory_rejects_rehashed_omission_and_foreign_origin(self):
+        lock = self.root / "dependencies/mcuboot.lock.json"
+        original = lock.read_bytes()
+        changed = json.loads(original)
+        del changed["files"]["boot/bootutil/src/bootutil_public.c"]
+        lock.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(ValueError,
+                                    "MCUboot reviewed source/notice closure"):
+            proposals.inventory(self.root)
+        lock.write_bytes(original)
+        checkout = self.root / "ext/mcuboot"
+        self.git(checkout, "remote", "set-url", "origin",
+                 "https://github.com/mcu-tools/mcuboot.git")
+        with self.assertRaisesRegex(ValueError,
+                                    "Source checkout differs.*ext/mcuboot"):
+            proposals.inventory(self.root)
+        self.git(checkout, "remote", "set-url", "origin",
+                 "https://github.com/X-Gen-Lab/mcuboot.git")
+        self.assertFalse(proposals.inventory(self.root)["source_dirty"])
+
+    def test_mcuboot_inventory_rechecks_bytes_hidden_from_git_status(self):
+        checkout = self.root / "ext/mcuboot"
+        relative = "boot/bootutil/src/bootutil_public.c"
+        source = checkout / relative
+        original = source.read_bytes()
+        self.git(checkout, "update-index", "--assume-unchanged", relative)
+        source.write_bytes(original + b"\n/* changed inventory observation */\n")
+        self.assertEqual(self.git(checkout, "status", "--porcelain"), "")
+        with self.assertRaisesRegex(ValueError,
+                                    "MCUboot selected source bytes differ"):
+            proposals.inventory(self.root)
+        source.write_bytes(original)
+        self.git(checkout, "update-index", "--no-assume-unchanged", relative)
+        self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
     def test_lwip_inventory_rejects_rehashed_omission_and_foreign_transport(self):
         lock = self.root / "dependencies/lwip.lock.json"

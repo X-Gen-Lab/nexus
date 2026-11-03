@@ -7,7 +7,7 @@ admitted. Its conservative delay model follows the maintained AN4235 review.
 """
 from tools.configure import i2c_timing
 from tools.configure.ir import I2cTimingSelectionIR, freeze
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import fail, integer, mode_traits
 
 
 FIELDS = frozenset(("kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
@@ -64,3 +64,24 @@ def resolve(selection, clock, provider, *, clock_plan=None):
         sdadel_ns_max=calculation.sdadel_ns_max,
         time_unit=calculation.time_unit, rate_scope=calculation.rate_scope,
         reference=calculation.reference, assumptions=freeze(values))
+
+
+def validate_selection(selection, provider):
+    """Check the reviewed bus limit and the selected execution contract."""
+    limits = provider.LIMITS.get("i2c_hz", (100000, 100000))
+    integer(selection.get("max_hz", 100000), *limits,
+            "Reviewed I2C maximum frequency")
+    if mode_traits("i2c", selection["mode"]).irq:
+        if "irq_priority" not in selection:
+            fail("Asynchronous I2C requires an explicit IRQ priority")
+    elif {"irq_priority", "calls_os"} & selection.keys():
+        fail("Polling I2C has no IRQ options")
+
+
+def controller_editor_schema(schema, record):
+    """Complete this category through the sole authored schema composer."""
+    timing_fields = FIELDS
+    timing = record(timing_fields, timing_fields)
+    for name in timing_fields - {"source"}:
+        timing["properties"][name] = {"type": "integer", "minimum": 0}
+    schema["properties"]["timing"] = timing

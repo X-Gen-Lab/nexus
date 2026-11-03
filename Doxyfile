@@ -26,6 +26,7 @@ INPUT                  += components/network/include/nexus
 INPUT                  += components/tls/include/nexus
 INPUT                  += components/mqtt/include/nexus
 INPUT                  += components/tmp117/include/nexus
+INPUT                  += components/mcuboot/include/nexus
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.h
 RECURSIVE              = YES

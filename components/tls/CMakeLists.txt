@@ -11,6 +11,7 @@ function(nexus_add_tls)
     if(NOT TARGET Nexus::Config OR NOT TARGET Nexus::IO)
         message(FATAL_ERROR "TLS requires a configured Nexus assembly")
     endif()
+    find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     get_target_property(nexus_tls_root Nexus::Config NEXUS_SOURCE_DIR)
     if(NOT nexus_tls_root OR "${nexus_tls_root}" MATCHES "-NOTFOUND$")
         message(FATAL_ERROR "TLS requires the assembly source identity")
@@ -94,6 +95,10 @@ function(nexus_add_tls)
     target_link_libraries(nexus_tls PUBLIC Nexus::IO
         PRIVATE MbedTLS::mbedtls nexus_build_options nexus_owned_warnings)
     add_library(Nexus::TLS ALIAS nexus_tls)
+    set_property(TARGET nexus_tls PROPERTY
+        INTERFACE_NEXUS_CRYPTO_ABI mbedtls4-psa)
+    set_property(TARGET nexus_tls APPEND PROPERTY
+        COMPATIBLE_INTERFACE_STRING NEXUS_CRYPTO_ABI)
 
     # Only static composition opts into the exact supplier storage layout.
     # Ordinary users of tls.h inherit neither vendor headers nor profile macros.

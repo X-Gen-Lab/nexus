@@ -59,6 +59,32 @@ Components are explicit targets; a chip-specific target still requires its
 exact SoC, mode and backend, and its presence does not extend the public support
 matrix.
 
+## Optional network data and boot boundaries
+
+Optional network targets keep copied RX and payload-loaned RX as distinct,
+explicit stack profiles; one image selects one profile. The copied TCP byte
+face copies accepted writes into bounded stack storage. A payload-loaned RX
+frame instead has a copied writable prefix and immutable MAC-backed tails.
+Final pbuf free marks release readiness; the serialized owner performs the
+actual MAC release later. Outstanding references or failed release retain
+storage and withdrawal responsibility. The
+{ref}`network composition contract <lwip-loaned-rx-contract>` owns the exact
+public/Storage targets, capacities and failure rules. These optional components
+fit FIG-01's component boundary without adding a worker or runtime registry.
+
+MCUboot exposes distinct control and full-boot targets. The reference links the
+application and bootloader as separate images. The generic C11 control target
+requests or queries trailer state; an explicit concrete Flash port uses
+caller-owned regions, a valid clock and one finite deadline for each operation.
+Only the separate boot image selects verification and overwrite-copy code. The
+[canonical MCUboot contract and ownership diagram](../../components/mcuboot/README.md)
+own those dependencies and product reset/recovery duties. The selected profile
+provides permanent overwrite only; partial trailer writes leave product
+recovery responsibility and imply no rollback. The
+{ref}`control API <mcuboot-control-contract>` neither authenticates candidate
+bytes nor starts hardware. Source documentation, software models and linked budgets do not
+establish new firmware-candidate or physical HIL qualification.
+
 ## Platform and CPU-only Runtime
 
 | Consumption entry | Provided assembly | External responsibility |

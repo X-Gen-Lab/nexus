@@ -718,6 +718,113 @@ TEST_F(EthernetFramesMac,
     ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
     EXPECT_NE(0U, snapshot.mac.discarded);
 }
+TEST_F(EthernetFramesMac,
+       IndependentReceiveLoansReleaseInReverseAndRejectAStaleEpoch) {
+    Start();
+    RxFrame(0U, 300U);
+    rxslots[0].data[0] = 0xa1U;
+    rxslots[1].data[0] = 0xa2U;
+    std::array<uint8_t, 256> first_bytes{};
+    std::array<uint8_t, 44> first_tail{};
+    std::memcpy(first_bytes.data(), rxslots[0].data, first_bytes.size());
+    std::memcpy(first_tail.data(), rxslots[1].data, first_tail.size());
+    Progress();
+    nx_eth_frames_rx_loan_t first_loan{}, second_loan{};
+    nx_eth_fragment_t first_views[2]{}, second_views[2]{};
+    ASSERT_EQ(NX_SUCCESS, Acquire(&first_loan, first_views, 2U));
+    EXPECT_EQ(0U, first_loan.first_slot);
+    EXPECT_EQ(2U, first_loan.descriptor_count);
+    EXPECT_EQ(2U, first_loan.fragment_count);
+    EXPECT_EQ(300U, first_loan.length);
+    EXPECT_EQ(rxslots[0].data, first_views[0].data);
+    EXPECT_EQ(rxslots[1].data, first_views[1].data);
+    EXPECT_EQ(256U, first_views[0].length);
+    EXPECT_EQ(44U, first_views[1].length);
+
+    RxFrame(2U, 300U);
+    rxslots[2].data[0] = 0xb1U;
+    rxslots[3].data[0] = 0xb2U;
+    std::array<uint8_t, 256> second_bytes{};
+    std::array<uint8_t, 44> second_tail{};
+    std::memcpy(second_bytes.data(), rxslots[2].data, second_bytes.size());
+    std::memcpy(second_tail.data(), rxslots[3].data, second_tail.size());
+    Progress();
+    ASSERT_EQ(NX_SUCCESS, Acquire(&second_loan, second_views, 2U));
+    EXPECT_EQ(2U, second_loan.first_slot);
+    EXPECT_NE(first_loan.epoch, second_loan.epoch);
+    EXPECT_EQ(2U, second_loan.descriptor_count);
+    EXPECT_EQ(2U, second_loan.fragment_count);
+    EXPECT_EQ(300U, second_loan.length);
+    EXPECT_EQ(rxslots[2].data, second_views[0].data);
+    EXPECT_EQ(rxslots[3].data, second_views[1].data);
+    EXPECT_EQ(256U, second_views[0].length);
+    EXPECT_EQ(44U, second_views[1].length);
+    nx_eth_frames_state_t snapshot{};
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
+    EXPECT_EQ(2U, snapshot.mac.held_rx);
+    Progress();
+    for (size_t i = 0U; i < 4U; ++i) {
+        EXPECT_EQ(0U, rx[i].status & own);
+    }
+    EXPECT_EQ(0, std::memcmp(first_bytes.data(), first_views[0].data,
+                             first_bytes.size()));
+    EXPECT_EQ(0, std::memcmp(first_tail.data(), first_views[1].data,
+                             first_tail.size()));
+    EXPECT_EQ(0, std::memcmp(second_bytes.data(), second_views[0].data,
+                             second_bytes.size()));
+    EXPECT_EQ(0, std::memcmp(second_tail.data(), second_views[1].data,
+                             second_tail.size()));
+
+    ASSERT_EQ(NX_SUCCESS, Release(&second_loan));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
+    EXPECT_EQ(1U, snapshot.mac.held_rx);
+    EXPECT_EQ(0U, rx[0].status & own);
+    EXPECT_EQ(0U, rx[1].status & own);
+    EXPECT_NE(0U, rx[2].status & own);
+    EXPECT_NE(0U, rx[3].status & own);
+    EXPECT_EQ(0, std::memcmp(first_bytes.data(), first_views[0].data,
+                             first_bytes.size()));
+    EXPECT_EQ(0, std::memcmp(first_tail.data(), first_views[1].data,
+                             first_tail.size()));
+    ASSERT_EQ(NX_SUCCESS, Release(&first_loan));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
+    EXPECT_EQ(0U, snapshot.mac.held_rx);
+    for (size_t i = 0U; i < 4U; ++i) {
+        EXPECT_NE(0U, rx[i].status & own);
+    }
+
+    /* Advance the actual ring to reuse the first head without a reset. */
+    for (size_t i = 4U; i < count; i += 2U) {
+        RxFrame(i, 300U);
+        Progress();
+        nx_eth_frames_rx_loan_t transit{};
+        nx_eth_fragment_t views[2]{};
+        ASSERT_EQ(NX_SUCCESS, Acquire(&transit, views, 2U));
+        ASSERT_EQ(NX_SUCCESS, Release(&transit));
+    }
+    RxFrame(0U, 300U);
+    Progress();
+    nx_eth_frames_rx_loan_t current{};
+    nx_eth_fragment_t current_views[2]{};
+    ASSERT_EQ(NX_SUCCESS, Acquire(&current, current_views, 2U));
+    EXPECT_EQ(first_loan.first_slot, current.first_slot);
+    EXPECT_GT(current.epoch, first_loan.epoch);
+    auto stale = current;
+    stale.epoch = first_loan.epoch;
+    EXPECT_EQ(NX_ERROR_STATE, Release(&stale));
+    EXPECT_EQ(NX_ERROR_STATE, Release(&first_loan));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
+    EXPECT_EQ(1U, snapshot.mac.held_rx);
+    EXPECT_EQ(0U, rx[0].status & own);
+    EXPECT_EQ(0U, rx[1].status & own);
+    EXPECT_EQ(rxslots[0].data, current_views[0].data);
+    EXPECT_EQ(rxslots[1].data, current_views[1].data);
+    ASSERT_EQ(NX_SUCCESS, Release(&current));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
+    EXPECT_EQ(0U, snapshot.mac.held_rx);
+    EXPECT_NE(0U, rx[0].status & own);
+    EXPECT_NE(0U, rx[1].status & own);
+}
 TEST_F(EthernetFramesMac, EpochNeverReusesAnAlreadyReleasedReceiveIncarnation) {
     Start();
     RxFrame(0U, 64U);

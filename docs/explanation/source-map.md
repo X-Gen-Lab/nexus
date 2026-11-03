@@ -85,6 +85,24 @@ components/
 :relative-images:
 ```
 
+## Selected network and boot contracts
+
+The [network component contract](../../components/network/README.md) owns
+adapter execution, copied TCP bytes, TX outcome observation and shutdown. The
+{ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the
+optional copied/loaned stack profiles and the separate public/Storage target
+boundaries. Final pbuf free marks a loan ready; the serialized owner later
+releases the exact MAC loan. Stop retains storage while references or failed
+releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL.
+
+The [MCUboot component contract](../../components/mcuboot/README.md) owns the
+selected overwrite-only profile, explicit Flash composition, the
+boot/application ownership diagram and product recovery duties. The
+{ref}`public control API <mcuboot-control-contract>` renders only the generic
+C11 header. Concrete Flash-port types and private boot/profile headers remain
+outside that API surface. Model and linked-image evidence do not establish
+power-cut recovery or physical Flash qualification.
+
 ## Exact SoC implementations
 
 ```{include} ../../soc/README.md

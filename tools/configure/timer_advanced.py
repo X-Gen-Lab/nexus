@@ -5,7 +5,7 @@ physical break circuit. Capture ring storage remains supplied by the caller.
 """
 from dataclasses import dataclass
 
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import UINT32_MAX, fail, integer
 
 
 @dataclass(frozen=True)
@@ -84,3 +84,32 @@ def validate_selection(selection, route, provider):
         for key in ("break_active_high", "idle_high", "idle_complement_high"):
             if type(selection[key]) is not bool:
                 fail("Timer safe polarity requires explicit boolean policy")
+
+
+def validate_pwm_selection(selection, provider):
+    """Require the explicit fixed PWM period, duty and source tick policy."""
+    if not {"period_ticks", "duty_ticks", "tick_hz"}.issubset(selection):
+        fail("PWM requires explicit period, duty and tick_hz")
+    integer(selection["period_ticks"], 1, provider.LIMITS["pwm_period"],
+            "PWM period")
+    integer(selection["duty_ticks"], 0, selection["period_ticks"], "PWM duty")
+    integer(selection["tick_hz"], 1, context="PWM tick_hz")
+
+
+def lptim_selection_fields(selection, fields):
+    """Add IRQ options only to the explicit interrupt-counter mode."""
+    if selection["mode"] == "irq-counter16-oneshot":
+        return fields | {"irq_priority", "calls_os"}
+    return fields
+
+
+def validate_lptim_selection(selection):
+    """The selected low-power timer always requires an explicit tick rate."""
+    integer(selection.get("tick_hz"), 1, UINT32_MAX, "LPTIM tick_hz")
+
+
+def lptim_editor_schema(schema):
+    """Complete this category through the sole authored schema composer."""
+    schema["required"].append("tick_hz")
+    schema["properties"]["tick_hz"] = {
+        "type": "integer", "minimum": 1, "maximum": 4294967295}

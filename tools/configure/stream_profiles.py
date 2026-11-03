@@ -140,3 +140,15 @@ def emit_factory(result):
                        f'            return &s_nx_stream_profile_{name};']
         source += ['        default:', '            return NULL;', '    }', '}']
     return header, source
+
+
+def nested_editor_schema(properties, fields, record):
+    """Use the same stream fields for authored completion and resolution."""
+    if "stream" in fields:
+        stream_fields = FIELDS
+        stream = record(stream_fields, stream_fields)
+        for name in stream_fields - {"on_exhaustion", "source"}:
+            stream["properties"][name] = {"type": "integer", "minimum": 0}
+        stream["properties"]["on_exhaustion"] = {
+            "const": "stop-and-report-gap"}
+        properties["stream"] = stream

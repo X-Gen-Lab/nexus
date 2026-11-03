@@ -8,6 +8,7 @@
  */
 #include "fixture.h"
 #include "nexus/network/lwip_tcp_storage.h"
+#include "pcap.h"
 #include "support/lwip_frame_pair.h"
 extern "C" {
 #include "lwip/init.h"
@@ -27,6 +28,7 @@ constexpr nx_time_us_t fixture_limit = UINT64_C(15000000);
 static uint64_t origin_us = 0U;
 static size_t receive_calls = 0U;
 static size_t transmit_calls = 0U;
+static nexus::test::PcapCapture* current_capture = nullptr;
 
 static uint64_t RawNow() {
     timespec now{};
@@ -74,6 +76,8 @@ const nx_eth_frames_ops_t real_ops{FrameEndpoint::Submit,
 static bool Initialize(FrameEndpoint& endpoint) {
     nexus::test::lwip_pair::current_endpoint = &endpoint;
     endpoint.port = {&real_ops, &endpoint};
+    endpoint.on_transmit = nexus::test::PcapCapture::Record;
+    endpoint.on_transmit_context = current_capture;
     nx_lwip_config_t config{};
     config.port = &endpoint.port;
     config.clock = {Now, nullptr};
@@ -375,10 +379,13 @@ static bool Exchange(int control, char command) {
 }
 
 [[noreturn]] static void RelayMain(int wire, int control, unsigned port,
-                                   bool partial) {
+                                   bool partial, const char* case_directory) {
     (void)prctl(PR_SET_PDEATHSIG, SIGTERM);
+    nexus::test::PcapCapture capture;
+    current_capture = &capture;
     Relay relay(wire, control, partial);
-    bool okay = relay.Start(port);
+    bool okay =
+        capture.Open(case_directory, "relay.pcap", Now) && relay.Start(port);
     char ready = okay ? 'R' : 'E';
     (void)send(control, &ready, 1U, MSG_NOSIGNAL);
     bool quit = !okay;
@@ -414,6 +421,13 @@ static bool Exchange(int control, char command) {
         }
     }
     okay = relay.Stop() && okay;
+    const bool captured = capture.Finish();
+    std::printf("relay_capture_frames=%zu relay_capture_bytes=%zu "
+                "relay_capture_complete=%u\n",
+                capture.Frames(), capture.Bytes(), captured ? 1U : 0U);
+    std::fflush(stdout);
+    current_capture = nullptr;
+    okay = captured && okay;
     close(wire);
     close(control);
     _exit(okay ? 0 : 1);
@@ -522,7 +536,7 @@ extern "C" bool nx_chain_stop(void) {
 }
 
 int main(int argc, char** argv) {
-    if (argc != 4) {
+    if (argc != 5) {
         return 2;
     }
     char* end = nullptr;
@@ -551,21 +565,24 @@ int main(int argc, char** argv) {
         close(frames[0]);
         close(control[0]);
         RelayMain(frames[1], control[1], static_cast<unsigned>(port),
-                  std::strcmp(argv[2], "backpressure") == 0);
+                  std::strcmp(argv[2], "backpressure") == 0, argv[4]);
     }
     if (child < 0) {
         return 2;
     }
     close(frames[1]);
     close(control[1]);
+    nexus::test::PcapCapture capture;
+    bool captured = capture.Open(argv[4], "client.pcap", Now);
+    current_capture = &capture;
     Client client(frames[0], control[0]);
     current_client = &client;
     pollfd ready{control[0], POLLIN, 0};
     char response = 0;
     int result = 1;
-    if (poll(&ready, 1U, 2000) == 1 &&
+    if (captured && poll(&ready, 1U, 2000) == 1 &&
         recv(control[0], &response, 1U, 0) == 1 && response == 'R') {
-        result = nx_chain_client(argc, argv);
+        result = nx_chain_client(4, argv);
     }
     bool joined = Exchange(control[0], 'Q');
     int status = 0;
@@ -590,7 +607,12 @@ int main(int argc, char** argv) {
     joined = joined && reaped && WIFEXITED(status) && WEXITSTATUS(status) == 0;
     close(frames[0]);
     close(control[0]);
+    captured = capture.Finish() && captured;
+    current_capture = nullptr;
+    std::printf("client_capture_frames=%zu client_capture_bytes=%zu "
+                "client_capture_complete=%u\n",
+                capture.Frames(), capture.Bytes(), captured ? 1U : 0U);
     std::printf("relay_joined=%u two_tcp_connections=1 phy_qualified=0\n",
                 joined ? 1U : 0U);
-    return result == 0 && joined ? 0 : 1;
+    return result == 0 && joined && captured ? 0 : 1;
 }

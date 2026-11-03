@@ -125,9 +125,10 @@ the installed source SDK explicitly excludes those contract targets.
 
 ## Device and executable-window consumers
 
-Consumer policy `nexus-sdk-consumers-v14` retains the complete v13 plan and adds
-three independent C11 consumers: Native TMP117, F407 TMP117 and the F407 image
-window. The full plan contains 59 source/build roots and 62 linked images. A plan
+Consumer policy `nexus-sdk-consumers-v15` preserves the complete v14 prefix and
+adds five independent C11 consumers: F407/GD470 loaned RX, Native/F407 MCUboot
+Control and a separate F407 full boot image. The full plan contains 64 source/build
+roots and 67 linked images. A plan
 entry records required execution; these counts alone do not establish a pass.
 
 The TMP117 compositions explicitly link `Nexus::TMP117I2C`, own a settled software
@@ -147,11 +148,35 @@ Its report still binds source, layout, configuration, ELF and checked resources.
 All three profiles audit actual C11/CPU/enum flags and public include boundaries;
 ARM images reject linked libc heap and C++ runtime. Native heap use is unassessed.
 
+The selected RX compositions own exactly two slots and four piece records, with
+only two 512-byte spare pbufs. Generic application translation units see opaque
+Nexus APIs; the composition explicitly links the selected Storage target. These
+ARM probes only link and measure resources: the fixture has no physical MAC/PHY,
+packet execution or usable random source, and no measured stack or timing.
+
+MCUboot Control uses the official public trailer implementation. Native executes
+NONE-to-PERMANENT control on the public, nonpersistent NOR model with two complete
+4,096-byte sectors, a four-byte program unit and one finite same-epoch operation.
+This does not authenticate a candidate. F407 Control uses a NULL operation so even
+an accidental run cannot modify Flash. Its empty assembly has no provider-retention
+observation. The separate full boot image retains official verification and copy
+code, an attributed public upstream test key and regions derived from one layout.
+It is ARM link evidence, without executed image authentication, Flash modification,
+handoff, reset, rollback or physical qualification. No production key is supplied.
+
+The complete 311-file lwIP and 80-file MCUboot reviewed source/notice closures,
+component helpers, generic/explicit headers and canonical consumer inputs are
+mandatory SDK payload. MCUboot's CLI first invokes the complete SDK verifier; its
+own source hash check cannot independently admit an incomplete SDK. ARM consumers
+retain the C11/CPU/enum checks and reject linked libc heap/C++ runtime. Native heap
+use remains unassessed. The full current plan must execute before qualification.
+
 ### 中文
 
-消费策略 `nexus-sdk-consumers-v14` 完整保留 v13 原有计划，再增加三个独立 C11
-工程：Native TMP117、F407 TMP117 和 F407 执行镜像窗口。全量计划为 59 个源码／
-构建根目录、62 个链接镜像；这些数量定义必须执行的范围，本身不代表验收通过。
+消费策略 `nexus-sdk-consumers-v15` 精确保留 v14 全部前缀，增加五个独立 C11
+工程：F407／GD470 借用 RX、Native／F407 MCUboot Control，以及单独的 F407
+完整引导镜像。全量计划为 64 个源码／构建根目录、67 个链接镜像；这些数量定义
+必须执行的范围，本身不代表验收通过。
 
 TMP117 组合显式链接 `Nexus::TMP117I2C`，调用者持有完全结清的软件 I2C endpoint，
 并使用六个公共组件函数。Native 实际执行有界的正向采样与清理；F407 使用同一软件
@@ -165,3 +190,22 @@ CMake 目标列为 SDK 必需内容；未选择的器件代码仍可由链接器
 不适用；报告仍绑定源码、布局、配置、ELF 和已检查资源。三个工程均检查实际
 C11／CPU／枚举 ABI 编译参数与公共头文件边界；ARM 拒绝链接 libc heap 和 C++
 运行时。Native 的 heap 使用保持未评估，不借用 ARM 的结论。
+
+借用 RX 组合精确持有两个 slot 和四个 piece 记录，只选择两个 512 字节备用 pbuf。
+通用应用翻译单元仅见 Nexus 不透明接口；组合层显式链接所选 Storage 目标。
+ARM 参考仅建立链接与资源观察，没有物理 MAC／PHY、报文执行、可用随机源，
+也没有实测栈峰值或时序。
+
+MCUboot Control 使用官方 trailer 公共实现。Native 在公开的非持久 NOR 模型上
+实际执行 NONE→PERMANENT 控制：两个完整 4,096 字节擦除扇区、四字节编程单元，
+同一时基上的一个有限操作 deadline。这不认证候选镜像。F407 Control 使用 NULL
+操作，意外执行也不能修改 Flash；空装配不适用 provider 保留观察。完整引导作为
+独立 ARM 镜像，保留官方验证与复制代码、明确署名的上游公开测试密钥，以及由唯一
+布局派生的区域。它只提供链接证据，未执行镜像认证、Flash 修改、跳转、复位、
+回滚或实板验证，不提供生产密钥。
+
+完整的 311 文件 lwIP 与 80 文件 MCUboot 已评审源码／许可闭包、组件 helper、
+通用与显式头文件、标准消费输入均属于 SDK 必需内容。MCUboot CLI 先调用完整 SDK
+验证器，局部源码 hash 检查不能单独准入不完整 SDK。ARM 继续检查实际 C11／CPU／
+枚举参数并拒绝链接 libc heap／C++ 运行时；Native heap 仍未评估。必须实际执行
+当前完整计划后才能形成软件资格。

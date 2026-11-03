@@ -97,6 +97,7 @@ struct Observed {
     uint16_t id;
     uint8_t qos;
     nx_result_t status;
+    bool duplicate;
     std::string topic;
     std::vector<uint8_t> payload;
 };
@@ -121,7 +122,8 @@ class Mqtt : public testing::Test {
     }
     static void callback(void* p, const nx_mqtt_event_t* e) {
         auto* f = static_cast<Mqtt*>(p);
-        Observed value{e->kind, e->packet_id, e->qos, e->status, {}, {}};
+        Observed value{e->kind,      e->packet_id, e->qos, e->status,
+                       e->duplicate, {},           {}};
         if (e->topic_size) {
             value.topic.assign(e->topic, e->topic_size);
         }
@@ -242,6 +244,48 @@ TEST_F(Mqtt, IncomingQosOneBorrowsOnlyDuringCallbackAndSendsPuback) {
     EXPECT_EQ(events[0].topic, "a");
     EXPECT_EQ(events[0].payload, (std::vector<uint8_t>{'z'}));
     EXPECT_EQ(stream.tx, (std::vector<uint8_t>{0x40, 2, 0, 42}));
+}
+TEST_F(Mqtt, IncomingDuplicateQosOneDeliversAgainAndAcknowledgesEachPacket) {
+    connect();
+    unsigned callbacks = 0U;
+    on_event = [&] {
+        ++callbacks;
+        EXPECT_EQ(nx_mqtt_deinit(&client), NX_ERROR_BUSY);
+    };
+    stream.feed({0x32, 6, 0, 1, 'a', 0, 42, 'z'});
+    ASSERT_EQ(nx_mqtt_process(&client, limit()), NX_SUCCESS);
+    ASSERT_EQ(events.size(), 1U);
+    EXPECT_FALSE(events[0].duplicate);
+    EXPECT_EQ(stream.tx, (std::vector<uint8_t>{0x40, 2, 0, 42}));
+
+    /* QoS1 is at-least-once delivery; product idempotence stays external. */
+    stream.feed({0x3a, 6, 0, 1, 'a', 0, 42, 'z'});
+    ASSERT_EQ(nx_mqtt_process(&client, limit()), NX_SUCCESS);
+    ASSERT_EQ(events.size(), 2U);
+    EXPECT_EQ(callbacks, 2U);
+    EXPECT_TRUE(events[1].duplicate);
+    for (const auto& observed : events) {
+        EXPECT_EQ(observed.kind, NX_MQTT_EVENT_PUBLISH);
+        EXPECT_EQ(observed.id, 42U);
+        EXPECT_EQ(observed.qos, 1U);
+        EXPECT_EQ(observed.status, NX_SUCCESS);
+        EXPECT_EQ(observed.topic, "a");
+        EXPECT_EQ(observed.payload, (std::vector<uint8_t>{'z'}));
+    }
+    EXPECT_EQ(stream.tx,
+              (std::vector<uint8_t>{0x40, 2, 0, 42, 0x40, 2, 0, 42}));
+    EXPECT_TRUE(std::all_of(incoming.begin(), incoming.end(),
+                            [](const MQTTPubAckInfo_t& record) {
+                                return record.publishState == MQTTStateNull;
+                            }));
+    EXPECT_EQ(nx_mqtt_fault(&client), NX_SUCCESS);
+    ASSERT_EQ(nx_mqtt_deinit(&client), NX_SUCCESS);
+    buffer.fill(0xa5U);
+    EXPECT_EQ(events[0].payload, (std::vector<uint8_t>{'z'}));
+    EXPECT_EQ(events[1].payload, (std::vector<uint8_t>{'z'}));
+    const auto calls = stream.reads + stream.writes;
+    EXPECT_EQ(nx_mqtt_process(&client, limit()), NX_ERROR_STATE);
+    EXPECT_EQ(stream.reads + stream.writes, calls);
 }
 TEST_F(Mqtt, SubscribeAndUnsubscribeHaveBoundedAckLifecycle) {
     connect();

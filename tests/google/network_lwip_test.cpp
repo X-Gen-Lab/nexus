@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
+#include <memory>
 #include <vector>
 extern "C" {
 #include "lwip/init.h"
@@ -29,6 +30,8 @@ struct Mac {
     nx_eth_frames_state_t state{};
     nx_result_t release_result{NX_SUCCESS};
     nx_result_t stop_result{NX_SUCCESS};
+    nx_result_t completion_result{NX_SUCCESS};
+    bool complete_on_service{};
     bool held{};
     bool immediate{true};
     size_t releases{};
@@ -49,7 +52,9 @@ struct Mac {
         }
         self.sent.push_back(bytes);
         if (self.immediate) {
-            nx_request_settle(&request->base, NX_SUCCESS, bytes.size());
+            nx_request_settle(
+                &request->base, self.completion_result,
+                self.completion_result == NX_SUCCESS ? bytes.size() : 0U);
         } else {
             self.pending = request;
         }
@@ -104,7 +109,16 @@ struct Mac {
         ++self.stops;
         return self.stop_result;
     }
-    static nx_result_t Service(void*) {
+    static nx_result_t Service(void* context) {
+        auto& self = *static_cast<Mac*>(context);
+        if (self.complete_on_service && self.pending != nullptr) {
+            auto* request = self.pending;
+            self.pending = nullptr;
+            nx_request_settle(&request->base, self.completion_result,
+                              self.completion_result == NX_SUCCESS
+                                  ? request->fragments[0].length
+                                  : 0U);
+        }
         return NX_SUCCESS;
     }
 };
@@ -147,8 +161,9 @@ class NetworkLwip : public testing::Test {
         mac.release_result = NX_SUCCESS;
         mac.stop_result = NX_SUCCESS;
         if (mac.pending != nullptr) {
-            nx_request_settle(&mac.pending->base, NX_ERROR_CANCELLED, 0U);
+            auto* pending = mac.pending;
             mac.pending = nullptr;
+            nx_request_settle(&pending->base, NX_ERROR_CANCELLED, 0U);
         }
         (void)nx_lwip_adapter_stop(&adapter);
     }
@@ -168,6 +183,32 @@ class NetworkLwip : public testing::Test {
         std::memcpy(frame.data(), header, sizeof(header));
         std::memcpy(frame.data() + sizeof(header), arp, sizeof(arp));
         return frame;
+    }
+    static std::vector<uint8_t> ArpRequestFor(uint8_t address) {
+        auto request = ArpRequest();
+        request[41] = address;
+        return request;
+    }
+    static err_t SendPayload() {
+        auto* pcb = udp_new();
+        if (pcb == nullptr) {
+            return ERR_MEM;
+        }
+        auto* packet = pbuf_alloc(PBUF_TRANSPORT, 3U, PBUF_RAM);
+        if (packet == nullptr) {
+            udp_remove(pcb);
+            return ERR_MEM;
+        }
+        const uint8_t bytes[]{3U, 5U, 7U};
+        ip_addr_t peer{};
+        IP_ADDR4(&peer, 10U, 0U, 0U, 1U);
+        err_t result = pbuf_take(packet, bytes, sizeof(bytes));
+        if (result == ERR_OK) {
+            result = udp_sendto(pcb, packet, &peer, 1234U);
+        }
+        pbuf_free(packet);
+        udp_remove(pcb);
+        return result;
     }
     static void Checksum(std::vector<uint8_t>& frame, size_t start, size_t size,
                          size_t field) {
@@ -267,8 +308,9 @@ TEST_F(NetworkLwip, AsyncTransmitCopiesAndRemainsBorrowedUntilRealSettlement) {
     mac.stop_result = NX_ERROR_BUSY;
     EXPECT_EQ(NX_ERROR_BUSY, nx_lwip_adapter_stop(&adapter));
     EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&mac.pending->base));
-    nx_request_settle(&mac.pending->base, NX_ERROR_CANCELLED, 0U);
+    auto* pending = mac.pending;
     mac.pending = nullptr;
+    nx_request_settle(&pending->base, NX_ERROR_CANCELLED, 0U);
     mac.stop_result = NX_SUCCESS;
     EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
     EXPECT_EQ(nullptr, netif_default);
@@ -372,6 +414,12 @@ TEST_F(NetworkLwip, PoolExhaustionReleasesFrameAndReportsBoundedOverload) {
     for (auto* packet : packets) {
         pbuf_free(packet);
     }
+    mac.received = ArpRequest();
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_FALSE(mac.held);
+    EXPECT_EQ(2U, mac.releases);
+    ASSERT_EQ(1U, mac.sent.size());
+    EXPECT_EQ(2U, mac.sent[0][21]);
 }
 TEST_F(NetworkLwip, SecondAdapterRejectsWithoutTakingOverDefaultRoute) {
     Start();
@@ -428,6 +476,307 @@ TEST_F(NetworkLwip, ReceiveOverloadDoesNotStarveDueStackTimers) {
         pbuf_free(packet);
     }
 }
+
+TEST_F(NetworkLwip, StaticAddressChangesOnlyAfterCompleteAdapterWithdrawal) {
+    Start();
+    config.address[3] = 9U;
+    EXPECT_EQ(2U, ip4_addr4(netif_ip4_addr(&adapter.interface)));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_lwip_adapter_start(&adapter, &config));
+    EXPECT_EQ(2U, ip4_addr4(netif_ip4_addr(&adapter.interface)));
+    mac.received = ArpRequest();
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    ASSERT_EQ(ERR_OK, SendPayload());
+    ASSERT_GE(mac.sent.back().size(), 45U);
+    EXPECT_EQ(2U, mac.sent.back()[29]);
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
+    ASSERT_EQ(nullptr, netif_default);
+
+    /* All raw PCBs/callbacks/loans joined before fresh storage is initialized.
+     */
+    adapter = {};
+    Start();
+    EXPECT_EQ(9U, ip4_addr4(netif_ip4_addr(&adapter.interface)));
+    mac.received = ArpRequest();
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_TRUE(mac.sent.empty());
+    mac.received = ArpRequestFor(9U);
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    ASSERT_EQ(1U, mac.sent.size());
+    EXPECT_EQ(9U, mac.sent[0][31]);
+    mac.sent.clear();
+    ASSERT_EQ(ERR_OK, SendPayload());
+    ASSERT_EQ(1U, mac.sent.size());
+    ASSERT_GE(mac.sent[0].size(), 45U);
+    EXPECT_EQ(17U, mac.sent[0][23]);
+    EXPECT_EQ(9U, mac.sent[0][29]);
+    EXPECT_EQ(7U, mac.sent[0][44]);
+}
+
+TEST_F(NetworkLwip, RepeatedLinkFactsCloseRoutesAndAllowExplicitFreshTraffic) {
+    Start();
+    const nx_eth_link_t down{false, false, 0U};
+    const nx_eth_link_t up{true, true, 100U};
+    constexpr unsigned cycles = 8U;
+    for (unsigned cycle = 0U; cycle < cycles; ++cycle) {
+        SCOPED_TRACE(cycle);
+        ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_apply_link(&adapter, &down));
+        EXPECT_FALSE(netif_is_link_up(&adapter.interface));
+        EXPECT_FALSE(mac.state.mac.link.up);
+        mac.sent.clear();
+        EXPECT_EQ(ERR_RTE, SendPayload());
+        EXPECT_TRUE(mac.sent.empty());
+        EXPECT_EQ(nullptr, mac.pending);
+        ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_apply_link(&adapter, &up));
+        EXPECT_TRUE(netif_is_link_up(&adapter.interface));
+        EXPECT_TRUE(mac.state.mac.link.up);
+        mac.received = ArpRequest();
+        ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+        mac.sent.clear();
+        ASSERT_EQ(ERR_OK, SendPayload());
+        ASSERT_EQ(1U, mac.sent.size());
+        ASSERT_GE(mac.sent[0].size(), 45U);
+        EXPECT_EQ(17U, mac.sent[0][23]);
+        EXPECT_EQ(3U, mac.sent[0][42]);
+        EXPECT_EQ(7U, mac.sent[0][44]);
+    }
+    RecordProperty("link_cycles", static_cast<int>(cycles));
+}
+
+TEST_F(NetworkLwip,
+       CompoundCleanupRetainsRxAndTxUntilEachOwnerReallyWithdraws) {
+    Start();
+    mac.received = ArpRequest();
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    mac.immediate = false;
+    ASSERT_EQ(ERR_OK, SendPayload());
+    ASSERT_NE(nullptr, mac.pending);
+    mac.release_result = NX_ERROR_IO;
+    mac.received = ArpRequest();
+    EXPECT_EQ(NX_ERROR_IO, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_TRUE(mac.held);
+    EXPECT_TRUE(adapter.receive_held);
+    EXPECT_TRUE(adapter.closing);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&mac.pending->base));
+    const auto stops = mac.stops;
+    EXPECT_EQ(NX_ERROR_IO, nx_lwip_adapter_stop(&adapter));
+    EXPECT_EQ(stops, mac.stops);
+    EXPECT_EQ(&adapter.interface, netif_default);
+    config.address[3] = 9U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_lwip_adapter_start(&adapter, &config));
+    EXPECT_EQ(2U, ip4_addr4(netif_ip4_addr(&adapter.interface)));
+    EXPECT_EQ(NX_ERROR_STATE, nx_lwip_adapter_service(&adapter, 1U));
+
+    mac.release_result = NX_SUCCESS;
+    mac.stop_result = NX_ERROR_BUSY;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_lwip_adapter_stop(&adapter));
+    EXPECT_FALSE(mac.held);
+    EXPECT_FALSE(adapter.receive_held);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&mac.pending->base));
+    mac.stop_result = NX_ERROR_IO;
+    EXPECT_EQ(NX_ERROR_IO, nx_lwip_adapter_stop(&adapter));
+    EXPECT_TRUE(adapter.attached);
+    mac.stop_result = NX_SUCCESS;
+    /* Even an inconsistent provider success cannot revoke the visible loan. */
+    EXPECT_EQ(NX_ERROR_BUSY, nx_lwip_adapter_stop(&adapter));
+    ASSERT_NE(nullptr, mac.pending);
+    auto* pending = mac.pending;
+    mac.pending = nullptr;
+    nx_request_settle(&pending->base, NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
+    EXPECT_EQ(nullptr, netif_default);
+    EXPECT_FALSE(adapter.attached);
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
+
+    adapter = {};
+    mac.immediate = true;
+    Start();
+    mac.received = ArpRequestFor(9U);
+    ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    ASSERT_EQ(1U, mac.sent.size());
+    EXPECT_EQ(9U, mac.sent[0][31]);
+}
+
+/** \brief Caller timer remains live across netif detach; no lwIP reinit. */
+struct PersistentTimer {
+    unsigned fired = 0U;
+    PersistentTimer() = default;
+    PersistentTimer(const PersistentTimer&) = delete;
+    PersistentTimer& operator=(const PersistentTimer&) = delete;
+    static void Fire(void* context) {
+        ++static_cast<PersistentTimer*>(context)->fired;
+    }
+    ~PersistentTimer() {
+        sys_untimeout(Fire, this);
+    }
+};
+
+TEST_F(NetworkLwip, RepeatedDetachAndRestartPreservesTheLiveGlobalTimerDomain) {
+    PersistentTimer timer;
+    constexpr unsigned cycles = 4U;
+    for (unsigned cycle = 0U; cycle < cycles; ++cycle) {
+        SCOPED_TRACE(cycle);
+        config.address[3] = static_cast<uint8_t>(20U + cycle);
+        Start();
+        sys_timeout(1U, PersistentTimer::Fire, &timer);
+        ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
+        ASSERT_EQ(nullptr, netif_default);
+        const uint32_t previous = now_ms;
+        now_ms += 2U;
+        adapter = {};
+        Start();
+        EXPECT_GT(now_ms, previous);
+        ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+        EXPECT_EQ(cycle + 1U, timer.fired);
+        EXPECT_EQ(20U + cycle, ip4_addr4(netif_ip4_addr(&adapter.interface)));
+        EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_stop(&adapter));
+    }
+    RecordProperty("restart_cycles", static_cast<int>(cycles));
+}
+using TestPacket = std::unique_ptr<pbuf, decltype(&pbuf_free)>;
+
+/** \brief Fixed complete raw frame; this test does not claim wire delivery. */
+static TestPacket RawFrame(uint8_t marker) {
+    TestPacket packet(pbuf_alloc(PBUF_RAW, 60U, PBUF_RAM), pbuf_free);
+    if (packet) {
+        std::array<uint8_t, 60> bytes{};
+        bytes.fill(marker);
+        bytes[12] = 0x88U;
+        bytes[13] = 0xb5U;
+        EXPECT_EQ(ERR_OK, pbuf_take(packet.get(), bytes.data(), bytes.size()));
+    }
+    return packet;
+}
+
+TEST_F(NetworkLwip, InlineSuccessReusesStorageWithoutServiceRoundTrip) {
+    Start();
+    for (uint8_t marker = 1U; marker <= 4U; ++marker) {
+        auto packet = RawFrame(marker);
+        ASSERT_NE(nullptr, packet);
+        EXPECT_EQ(ERR_OK, adapter.interface.linkoutput(&adapter.interface,
+                                                       packet.get()));
+        EXPECT_EQ(marker, tx[0]);
+        EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&adapter.transmit.base));
+        EXPECT_EQ(nullptr, mac.pending);
+    }
+    EXPECT_EQ(4U, mac.sent.size());
+    EXPECT_EQ(0U, mac.stops);
+}
+
+TEST_F(NetworkLwip, InlineFailureSurvivesSecondOutputUntilReportedOnce) {
+    Start();
+    for (auto failure : {NX_ERROR_IO, NX_ERROR_EXHAUSTED}) {
+        mac.sent.clear();
+        mac.completion_result = failure;
+        auto first = RawFrame(0x11U);
+        auto second = RawFrame(0x22U);
+        ASSERT_NE(nullptr, first);
+        ASSERT_NE(nullptr, second);
+        ASSERT_EQ(ERR_OK, adapter.interface.linkoutput(&adapter.interface,
+                                                       first.get()));
+        nx_result_t completed = NX_SUCCESS;
+        size_t bytes = 1U;
+        ASSERT_EQ(NX_SUCCESS, nx_request_result(&adapter.transmit.base,
+                                                &completed, &bytes));
+        ASSERT_EQ(failure, completed);
+        EXPECT_EQ(0U, bytes);
+        EXPECT_EQ(nullptr, mac.pending);
+        const auto preserved = tx;
+        mac.completion_result = NX_SUCCESS;
+        EXPECT_EQ(ERR_IF, adapter.interface.linkoutput(&adapter.interface,
+                                                       second.get()));
+        EXPECT_EQ(preserved, tx);
+        EXPECT_EQ(1U, mac.sent.size());
+        EXPECT_EQ(failure, nx_lwip_adapter_service(&adapter, 1U));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&adapter.transmit.base));
+        EXPECT_TRUE(adapter.attached);
+        EXPECT_FALSE(adapter.closing);
+        EXPECT_EQ(0U, mac.stops);
+        EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+        EXPECT_EQ(ERR_OK, adapter.interface.linkoutput(&adapter.interface,
+                                                       second.get()));
+        EXPECT_EQ(2U, mac.sent.size());
+        EXPECT_EQ(0x22U, tx[0]);
+    }
+}
+
+TEST_F(NetworkLwip, DeferredFailureReturnsOnceWithoutRevokingActiveBorrow) {
+    Start();
+    mac.immediate = false;
+    mac.completion_result = NX_ERROR_TIMEOUT;
+    auto first = RawFrame(0x31U);
+    auto second = RawFrame(0x32U);
+    ASSERT_NE(nullptr, first);
+    ASSERT_NE(nullptr, second);
+    ASSERT_EQ(ERR_OK,
+              adapter.interface.linkoutput(&adapter.interface, first.get()));
+    ASSERT_NE(nullptr, mac.pending);
+    const auto preserved = tx;
+    EXPECT_EQ(ERR_MEM,
+              adapter.interface.linkoutput(&adapter.interface, second.get()));
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&adapter.transmit.base));
+    EXPECT_EQ(preserved, tx);
+    mac.complete_on_service = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_EQ(nullptr, mac.pending);
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&adapter.transmit.base));
+    EXPECT_TRUE(adapter.attached);
+    EXPECT_FALSE(adapter.closing);
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    mac.immediate = true;
+    mac.completion_result = NX_SUCCESS;
+    EXPECT_EQ(ERR_OK,
+              adapter.interface.linkoutput(&adapter.interface, second.get()));
+    EXPECT_EQ(2U, mac.sent.size());
+}
+
+struct OutputTimer {
+    netif* interface;
+    pbuf* packet;
+    err_t result{ERR_MEM};
+    OutputTimer(netif* selected, pbuf* bytes)
+        : interface(selected), packet(bytes) {
+    }
+    OutputTimer(const OutputTimer&) = delete;
+    OutputTimer& operator=(const OutputTimer&) = delete;
+    static void Fire(void* context) {
+        auto& timer = *static_cast<OutputTimer*>(context);
+        timer.result =
+            timer.interface->linkoutput(timer.interface, timer.packet);
+    }
+    ~OutputTimer() {
+        sys_untimeout(Fire, this);
+    }
+};
+
+TEST_F(NetworkLwip, TimerInlineFailureIsReportedInTheSameServiceInvocation) {
+    Start();
+    auto packet = RawFrame(0x41U);
+    ASSERT_NE(nullptr, packet);
+    OutputTimer timer(&adapter.interface, packet.get());
+    mac.completion_result = NX_ERROR_IO;
+    sys_timeout(1U, OutputTimer::Fire, &timer);
+    now_ms += 2U;
+    EXPECT_EQ(NX_ERROR_IO, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_EQ(ERR_OK, timer.result);
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&adapter.transmit.base));
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_EQ(1U, mac.sent.size());
+}
+
+TEST_F(NetworkLwip, RxReplyInlineFailureIsReportedAfterExactLoanRelease) {
+    Start();
+    mac.completion_result = NX_ERROR_EXHAUSTED;
+    mac.received = ArpRequest();
+    EXPECT_EQ(NX_ERROR_EXHAUSTED, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_FALSE(mac.held);
+    EXPECT_EQ(1U, mac.releases);
+    EXPECT_EQ(1U, mac.sent.size());
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&adapter.transmit.base));
+    EXPECT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
+    EXPECT_EQ(1U, mac.sent.size());
+}
+
 } /* namespace */
 extern "C" uint32_t nx_lwip_port_now_ms(void) {
     return now_ms;

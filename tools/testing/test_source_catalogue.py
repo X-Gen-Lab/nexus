@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
-        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 22)
-        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 17)
-        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 16)
+        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 23)
+        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 18)
+        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 17)
         self.assertEqual(len(catalogue.HOST_TEST_DEPENDENCIES), 1)
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")
         self.assertTrue(all(item.parent is None
@@ -50,7 +50,7 @@ class SourceCatalogueTests(unittest.TestCase):
 
     def test_real_root_and_nested_declarations_match_exact_catalogue(self):
         root = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
-        self.assertEqual(len(root), 17)
+        self.assertEqual(len(root), 18)
         nested = catalogue.declared_modules(
             (ROOT / "ext/freertos/.gitmodules").read_bytes(), "ext/freertos")
         self.assertEqual(set(nested), {
@@ -71,6 +71,20 @@ class SourceCatalogueTests(unittest.TestCase):
                          "https://github.com/X-Gen-Lab/lwip.git")
         self.assertEqual(item.notice, "COPYING")
         self.assertEqual(item.source_lock, "dependencies/lwip.lock.json")
+        modules = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
+        self.assertEqual(modules[item.path], item.fetch_url)
+
+    def test_mcuboot_has_exact_optional_runtime_provenance_and_lock(self):
+        item = catalogue.dependency("mcuboot")
+        self.assertEqual(item.path, "ext/mcuboot")
+        self.assertEqual(item.scope, "runtime")
+        self.assertIsNone(item.parent)
+        self.assertEqual(item.upstream_url,
+                         "https://github.com/mcu-tools/mcuboot.git")
+        self.assertEqual(item.fetch_url,
+                         "https://github.com/X-Gen-Lab/mcuboot.git")
+        self.assertEqual(item.notice, "LICENSE")
+        self.assertEqual(item.source_lock, "dependencies/mcuboot.lock.json")
         modules = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
         self.assertEqual(modules[item.path], item.fetch_url)
 

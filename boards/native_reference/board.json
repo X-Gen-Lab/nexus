@@ -27,6 +27,11 @@
       "route": "spi0"
     },
     {
+      "id": "flash0",
+      "controller": "FLASH0",
+      "route": "flash0"
+    },
+    {
       "id": "rtc0",
       "controller": "RTC0",
       "route": "rtc0"

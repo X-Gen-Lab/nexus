@@ -751,4 +751,102 @@ TEST(TlsUtcConversion, ReentrantUtcHandlesEpochAndGregorianCenturyRules) {
     EXPECT_EQ(2, result.tm_mon);
     EXPECT_EQ(1, result.tm_mday);
 }
+
+/** \brief Finite official-arena pressure, released before any domain teardown.
+ */
+struct ArenaPressure {
+    static constexpr size_t block_bytes = 64U;
+    std::array<void*, NX_TLS_ARENA_BYTES / block_bytes> blocks{};
+    size_t count = 0U;
+
+    ArenaPressure() = default;
+    ArenaPressure(const ArenaPressure&) = delete;
+    ArenaPressure& operator=(const ArenaPressure&) = delete;
+
+    void Release() {
+        while (count != 0U) {
+            mbedtls_free(blocks[--count]);
+            blocks[count] = nullptr;
+        }
+    }
+    ~ArenaPressure() {
+        Release();
+    }
+};
+
+TEST_F(TlsFront,
+       ArenaExhaustionRejectsWithoutIoAndRecoversAfterExplicitRelease) {
+    ASSERT_EQ(NX_SUCCESS, nx_tls_runtime_start(&runtime, &config, 100000U));
+    ArenaPressure pressure;
+    bool exhausted = false;
+    const auto first = reinterpret_cast<uintptr_t>(arena.data());
+    const auto end = first + arena.size();
+    for (; pressure.count < pressure.blocks.size(); ++pressure.count) {
+        void* block = mbedtls_calloc(1U, ArenaPressure::block_bytes);
+        if (block == nullptr) {
+            exhausted = true;
+            break;
+        }
+        pressure.blocks[pressure.count] = block;
+        const auto address = reinterpret_cast<uintptr_t>(block);
+        EXPECT_GE(address, first);
+        EXPECT_LE(address, end - ArenaPressure::block_bytes);
+        const auto* bytes = static_cast<const uint8_t*>(block);
+        for (size_t index = 0U; index < ArenaPressure::block_bytes; ++index) {
+            EXPECT_EQ(0U, bytes[index]);
+        }
+    }
+    ASSERT_TRUE(exhausted);
+    ASSERT_GT(pressure.count, 0U);
+    void* refused = mbedtls_calloc(1U, ArenaPressure::block_bytes);
+    EXPECT_EQ(nullptr, refused);
+    mbedtls_free(refused);
+    RecordProperty("arena_pressure_blocks", static_cast<int>(pressure.count));
+    RecordProperty(
+        "arena_pressure_payload_bytes",
+        static_cast<int>(pressure.count * ArenaPressure::block_bytes));
+    ASSERT_GT(ca.size(), ArenaPressure::block_bytes);
+    const auto selected = Client();
+    EXPECT_EQ(NX_ERROR_IO, nx_tls_initialize(&session, &selected, 100000U));
+    EXPECT_EQ(0U, peer.writes);
+    EXPECT_EQ(0U, peer.reads);
+    EXPECT_EQ(nullptr, nx_tls_stream(&session));
+    EXPECT_FALSE(session.initialized);
+    EXPECT_FALSE(runtime.session_active);
+    EXPECT_TRUE(runtime.initialized);
+    nx_tls_diagnostic_t diagnostic{};
+    ASSERT_EQ(NX_SUCCESS, nx_tls_diagnostic(&session, &diagnostic));
+    EXPECT_EQ(NX_TLS_CLOSED, diagnostic.state);
+    EXPECT_EQ(0U, diagnostic.pending_plaintext);
+    EXPECT_EQ(NX_SUCCESS, nx_tls_abort(&session));
+
+    /* Returning only explicit pressure allocations restores admission. */
+    pressure.Release();
+    ASSERT_EQ(NX_SUCCESS, nx_tls_initialize(&session, &selected, 100000U));
+    peer.Start();
+    ASSERT_EQ(NX_SUCCESS, Handshake());
+    nx_result_t closing = NX_ERROR_BUSY;
+    for (unsigned step = 0U; step < 5000U && closing == NX_ERROR_BUSY; ++step) {
+        closing = nx_tls_close_step(&session, 1000000U);
+    }
+    ASSERT_EQ(NX_SUCCESS, closing);
+    uint8_t output = 0U;
+    size_t received = 1U;
+    nx_result_t finished = NX_ERROR_BUSY;
+    for (unsigned step = 0U; step < 5000U && finished == NX_ERROR_BUSY;
+         ++step) {
+        finished = nx_tls_try_read(&session, &output, 1U, &received, 1000000U);
+        if (finished == NX_ERROR_BUSY) {
+            usleep(1000U);
+        }
+    }
+    EXPECT_EQ(NX_SUCCESS, finished);
+    EXPECT_EQ(0U, received);
+    EXPECT_EQ(NX_SUCCESS, nx_tls_abort(&session));
+    EXPECT_EQ(0, peer.Stop());
+    ASSERT_EQ(NX_SUCCESS, nx_tls_runtime_stop(&runtime));
+    for (uint8_t byte : arena) {
+        EXPECT_EQ(0U, byte);
+    }
+}
 } /* namespace */

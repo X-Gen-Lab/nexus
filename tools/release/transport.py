@@ -22,7 +22,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v14"
+CONSUMER_POLICY = "nexus-sdk-consumers-v15"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -170,6 +170,16 @@ SERVICE_CONSUMERS = (
                     "device_tmp117"),
     ServiceConsumer("f407 image window", "assembly.toml", "arm-image", True,
                     "image_window"),
+    ServiceConsumer("f407 loaned rx", "f407.toml", "arm-loaned-rx", True,
+                    "loaned_rx"),
+    ServiceConsumer("gd470 loaned rx", "gd470.toml", "arm-loaned-rx", True,
+                    "loaned_rx"),
+    ServiceConsumer("native mcuboot control", "native.toml", "native-boot-control",
+                    False, "mcuboot_control"),
+    ServiceConsumer("f407 mcuboot control", "f407.toml", "arm-boot-control",
+                    True, "mcuboot_control"),
+    ServiceConsumer("f407 mcuboot boot", "assembly.toml", "arm-boot", True,
+                    "mcuboot_boot"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 

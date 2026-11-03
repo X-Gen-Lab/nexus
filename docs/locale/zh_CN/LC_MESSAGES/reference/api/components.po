@@ -6,7 +6,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 7fa75b0c5d67b8613c7ec9272e98c30b90ae2cadd4cf758f1eec59edcb57f9c4\n"
+"X-Nexus-Source-SHA256: 57a71720422100f05edf3c113dbba5ed3505134daf76f181e31935d2836b99dc\n"
 
 msgid "Optional common components"
 msgstr "可选通用组件"
@@ -82,6 +82,99 @@ msgstr "普通 TLS／MQTT 调用者包含 `tls.h` 或 `client.h`，并链接 `Ne
 
 msgid "The TLS profile is one serialized TLS 1.2 client/PSA domain using ECDHE-ECDSA P-256 and AES-128-GCM/SHA-256. It requires explicit DER trust, trusted UTC and a reviewed entropy-quality assertion. Its 64 KiB caller arena and 512 B TX stage exclude session metadata, transport memory and stack. Join facade users, abort the session, then stop the runtime; failed or BUSY cleanup retains its resources. The MQTT 3.1.1 profile provides clean sessions and QoS0/1; callbacks borrow incoming views only until return. Explicit DISCONNECT and TLS close report local progress and do not replace lower-layer drain or peer acknowledgement. The component contracts detail [network](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md), [TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md) and [MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mqtt/README.md) ownership and fixed profile limits."
 msgstr "TLS 配置是单一串行 TLS 1.2 客户端／PSA 域，使用 ECDHE-ECDSA P-256 和 AES-128-GCM/SHA-256。它要求显式 DER 信任材料、可信 UTC 和经过审查的熵质量声明。调用者提供的 64 KiB 内存区和 512 B TX 暂存区不包含会话元数据、传输存储和栈。先 join 全部接口使用者，再 abort 会话，然后停止 runtime；失败或 BUSY 的清理仍保留资源。MQTT 3.1.1 配置提供 clean session 和 QoS0/1；回调仅在返回前借用传入视图。显式 DISCONNECT 和 TLS close 表示本地推进，不替代下层排空或对端确认。[网络](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)、[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md) 和 [MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mqtt/README.md) 组件合同详细规定所有权及固定配置限制。"
+
+msgid "For both Ethernet adapter profiles, successful link output reports frame admission. A failed SETTLED TX outcome remains observable once through `nx_lwip_adapter_service`; until that observation, another link output cannot overwrite or reuse the TX buffer. Observing the error clears only the settled, unborrowed request. It adds no error queue or instance storage and does not reset the MAC, replay a packet or choose a product recovery policy. An ACTIVE or QUARANTINED borrow remains retained. The TCP byte facade keeps its existing connection-failure policy; frame-error observation does not promise recovery."
+msgstr "对于两种 Ethernet adapter 配置，link output 成功表示帧已被接纳。失败的 SETTLED TX 结果会保留，并通过 `nx_lwip_adapter_service` 报告一次；在该次观察之前，另一次 link output 不得覆盖或复用 TX 缓冲区。观察错误只会清除已经结清且不再被借用的请求。此机制不新增错误队列或实例存储，也不复位 MAC、重放数据包或选择产品恢复策略。ACTIVE 或 QUARANTINED 的借用仍被保留。TCP 字节 facade 保留其既有的连接失败策略；观察到帧错误不承诺恢复。"
+
+msgid "Selected lwIP RX payload loans"
+msgstr "选定的 lwIP RX 负载借用"
+
+msgid "Select one singleton NO_SYS stack profile per image. The default `Nexus::LwIP` and `Nexus::LwIPTCP` profiles retain copied RX and their existing storage layouts. The explicit targets below select RX payload loans; CMake rejects an image combining copied and loaned profiles, including a copied TCP target combined with loaned adapter storage. These targets create no second stack, netif, executor, worker or allocator."
+msgstr "每个镜像选择一个单例 NO_SYS 协议栈配置。默认 `Nexus::LwIP` 和 `Nexus::LwIPTCP` 配置保留复制式 RX 及其既有存储布局。下列显式目标选择 RX 负载借用；CMake 拒绝在同一镜像中组合复制式与借用式配置，也拒绝将复制式 TCP 目标与借用式 adapter 存储组合。这些目标不创建第二个协议栈、netif、执行器、worker 或分配器。"
+
+msgid "Loaned RX adapter caller"
+msgstr "借用式 RX adapter 调用方"
+
+msgid "`Nexus::LwIPLoanedRX`, `nexus/network/lwip_loaned_rx.h`"
+msgstr "`Nexus::LwIPLoanedRX`, `nexus/network/lwip_loaned_rx.h`"
+
+msgid "Opaque adapter; explicit loaned start"
+msgstr "不透明 adapter；显式借用式启动"
+
+msgid "Loaned RX TCP byte caller"
+msgstr "借用式 RX TCP 字节调用方"
+
+msgid "`Nexus::LwIPTCPLoanedRX`, `nexus/network/lwip_tcp.h`"
+msgstr "`Nexus::LwIPTCPLoanedRX`, `nexus/network/lwip_tcp.h`"
+
+msgid "Existing copied byte-stream contract"
+msgstr "既有的复制式字节流合同"
+
+msgid "Static loaned RX composition"
+msgstr "静态借用式 RX 装配"
+
+msgid "`Nexus::LwIPLoanedRXStorage`, `nexus/network/lwip_loaned_rx_storage.h`"
+msgstr "`Nexus::LwIPLoanedRXStorage`, `nexus/network/lwip_loaned_rx_storage.h`"
+
+msgid "Exact adapter, frame-slot and custom-pbuf storage"
+msgstr "精确的 adapter、帧槽和 custom-pbuf 存储"
+
+msgid "Static TCP composition over loaned RX"
+msgstr "基于借用式 RX 的静态 TCP 装配"
+
+msgid "`Nexus::LwIPTCPLoanedRXStorage`, `nexus/network/lwip_tcp_storage.h`"
+msgstr "`Nexus::LwIPTCPLoanedRXStorage`, `nexus/network/lwip_tcp_storage.h`"
+
+msgid "Exact selected TCP layout; also provide loaned adapter storage"
+msgstr "精确的选定 TCP 布局；同时提供借用式 adapter 存储"
+
+msgid "The owner initializes lwIP once and attaches with `nx_lwip_loaned_adapter_start`. Supply zero-initialized, disjoint adapter, TX, fragment-view, frame-slot and custom-pbuf-piece storage. Select a nonzero `slot_count` and at least `slot_count * base.rx_capacity` pieces, with fragment capacity sized for the actual provider geometry. MAC payload spans must also be disjoint from adapter, TX/view and slot/piece storage. Invalid acquired spans are released without delivery. All raw APIs, reference operations, callbacks, service and stop share the same serialized, nonreentrant task owner. Live or reentrant attachment cannot erase retained references or tokens."
+msgstr "owner 只初始化 lwIP 一次，并通过 `nx_lwip_loaned_adapter_start` 挂接。须提供零初始化且互不重叠的 adapter、TX、片段视图、帧槽和 custom-pbuf 片段存储。选择非零 `slot_count`，并提供至少 `slot_count * base.rx_capacity` 个片段；片段容量须按实际 provider 的描述符布局确定。MAC 负载区间也必须与 adapter、TX／视图及槽／片段存储互不重叠。获取到的无效区间会被释放，不会交付。所有 raw API、引用操作、回调、service 和 stop 共用同一个串行、不可重入的任务 owner。对仍存活实例的再次挂接或重入挂接不会清除保留中的引用或令牌。"
+
+msgid "Each frame slot copies at most 136 B into its own writable `PBUF_REF` prefix. That prefix covers the 14 B Ethernet header, maximum 60 B IPv4 header and maximum 60 B TCP header, including the fields that official TCP input updates in place. The prefix can include payload; a frame of at most 136 B is copied entirely. Only bytes beyond the prefix reference the original immutable MAC fragments through `PBUF_ROM` tails. Raw consumers must treat those tails as read-only and clone before writing. This is RX payload-tail zero-copy; whole-frame and TX zero-copy are not provided. ICMP echo uses the official copy-for-reply path. VLAN delivery, IPv6, DHCP, DNS and IP reassembly remain unselected."
+msgstr "每个帧槽最多将 136 B 复制到自身可写的 `PBUF_REF` 前缀。该前缀覆盖 14 B Ethernet 头、最大 60 B IPv4 头和最大 60 B TCP 头，包括官方 TCP 输入路径会原地更新的字段。前缀可能包含负载；不超过 136 B 的帧会被完整复制。只有前缀之后的字节通过 `PBUF_ROM` 尾部引用原始、不可变的 MAC 片段。raw 消费方必须将这些尾部视为只读，并在写入前克隆。这是 RX 负载尾部零复制；不提供整帧或 TX 零复制。ICMP echo 使用官方的复制后回复路径。VLAN 交付、IPv6、DHCP、DNS 和 IP 重组仍未选用。"
+
+msgid "A retained head or tail pbuf reference keeps its frame slot and exact MAC loan live. The final custom-pbuf free only marks pieces returned; it never calls the provider or rearms DMA. Subsequent owner service or stop releases the exact loan after every piece's final reference is gone. A failed release retains the token and storage and closes further adapter admission. Products first close PCBs and join raw users, callbacks, queues and observers. Stop returns BUSY while any pbuf reference remains and detaches only after exact RX release and the existing MAC/TX withdrawal obligations. Failed drain never revokes a loan."
+msgstr "保留的头部或尾部 pbuf 引用会使其帧槽及精确 MAC 借用持续存活。custom-pbuf 的最终释放只标记片段已归还；它从不调用 provider，也不重新武装 DMA。在每个片段的最后一个引用都结束后，后续 owner service 或 stop 才释放精确借用。释放失败会保留令牌与存储，并关闭后续 adapter 接纳。产品须先关闭 PCB，并等待 raw 用户、回调、队列和观察者退出。只要仍有任何 pbuf 引用，stop 就返回 BUSY；只有精确 RX 释放及既有 MAC／TX 撤离义务均已完成后才解除挂接。排空失败绝不撤销借用。"
+
+msgid "Slot count is metadata capacity, not a provider capability or an ACK-progress promise. Concurrent acquisition also requires independent provider loans and enough descriptors for the actual frames. The maintained enhanced F407 and GD470 MAC engine supports independent held RX heads and reverse-order release in software models; this fact does not establish universal capacity, lossless operation or progress under arbitrary retained traffic. Products budget and release loans for their selected frame geometry and workload."
+msgstr "槽数是元数据容量，不是 provider 能力，也不是 ACK 推进承诺。并发获取还要求 provider 支持独立借用，并为实际帧提供足够描述符。维护中的 enhanced F407 和 GD470 MAC 引擎在软件模型中支持独立持有 RX 头及逆序释放；该事实不建立通用容量、无损运行或任意保留流量下的推进保证。产品须针对所选帧布局和工作负载预算并释放借用。"
+
+msgid "The selected loaned profile keeps two spare 512 B `PBUF_POOL` payload blocks; the copied profile keeps its existing 24 blocks. The 16 KiB arena and other fixed protocol pools remain unchanged. RX custom-pbuf metadata, 136 B prefixes, MAC buffers and the copied TX buffer are additional caller-supplied storage. TX and ICMP reply fallback may use the existing bounded RAM allocator. These counts require the curated organization fork's narrow exemption of the explicit custom-RX/custom-pbuf profile from the stock `PBUF_POOL`/`TCP_WND` sizing heuristic. Every other stack sanity check remains active. This exemption does not establish stock-upstream admission or complete SRAM fit. Nominal pool counts are not a complete SRAM measurement."
+msgstr "选定的借用式配置保留两个备用的 512 B `PBUF_POOL` 载荷块；复制式配置仍使用既有的 24 块。16 KiB arena 和其他固定协议池保持不变。RX custom-pbuf 元数据、136 B 前缀、MAC 缓冲区和复制式 TX 缓冲区仍需调用方另行提供存储。TX 和 ICMP 回复回退可使用既有的有界 RAM 分配器。该池容量需要维护的组织 fork，仅让显式 custom-RX／custom-pbuf 配置豁免原版 `PBUF_POOL`／`TCP_WND` 容量启发式检查。其他协议栈 sanity 检查全部保留。此豁免不能证明原版上游也准入该配置，或证明完整 SRAM 可容纳。标称池计数不是完整 SRAM 测量。"
+
+msgid "C11 link-only external development probes use two frame slots, four pieces, a 2048 B main stack and zero libc heap. The selected images pass a 32 KiB SRAM budget. The copied-profile BIN bytes and caller storage match the same source baseline with the common TX-outcome improvement, for both reference chips."
+msgstr "C11 仅链接的外部开发配置探针使用两个帧槽、四个 piece、2048 B 主栈且无 libc heap。选定镜像通过 32 KiB SRAM 预算。对于两款参考芯片，复制式配置的 BIN 字节和调用方存储均与同一源码、包含公共 TX 结果可观察性改进的基线一致。"
+
+msgid "Link-only reference"
+msgstr "仅链接参考配置"
+
+msgid "Copied RX flash / SRAM (B)"
+msgstr "复制式 RX Flash／SRAM（B）"
+
+msgid "Loaned RX flash / SRAM (B)"
+msgstr "借用式 RX Flash／SRAM（B）"
+
+msgid "STM32F407VE"
+msgstr "STM32F407VE"
+
+msgid "32616 / 35416"
+msgstr "32616 / 35416"
+
+msgid "33244 / 24344"
+msgstr "33244 / 24344"
+
+msgid "GD32F470ZG"
+msgstr "GD32F470ZG"
+
+msgid "33920 / 35388"
+msgstr "33920 / 35388"
+
+msgid "34548 / 24316"
+msgstr "34548 / 24316"
+
+msgid "These probes do not provide a real MAC descriptor ring or payload buffers. The selected adapter costs 628 B more Flash and 11072 B less total SRAM in this exact fixture. Reducing the selected pool from 24 to two blocks saves 11616 B with unchanged adapter behavior and layout. These are image/link measurements; installed-SDK qualification and actual DMA/cache, PHY, throughput, latency and physical HIL evidence remain separate."
+msgstr "这些探针没有提供真实的 MAC 描述符环或载荷缓冲区。在此精确配置中，选定 adapter 多占用 628 B Flash，总 SRAM 减少 11072 B。保持 adapter 行为和布局不变，将选定池从 24 块减少到两块可节省 11616 B。这些数据来自镜像／链接测量；已安装 SDK 资格及实际 DMA／cache、PHY、吞吐量、延迟和物理 HIL 证据仍须独立取得。"
 
 msgid "Reference software-host interoperability chain"
 msgstr "软件主机互通参考链路"
@@ -161,8 +254,8 @@ msgstr "成功、输入无效，或 netif 已连接时的 BUSY。"
 msgid "Progress MAC, bounded complete RX frames and stack timer callbacks."
 msgstr "推进 MAC、有界数量的完整 RX 帧以及协议栈定时器回调。"
 
-msgid "Same task owner as every lwIP raw API/callback. Timer callback cost is governed by the fixed stack profile and application callbacks; this is not a hard bound on the entire invocation. RX bytes are copied before exact release. A failed release retains its token and closes progress; stop retries release without feeding duplicate bytes into the stack."
-msgstr "与全部 lwIP 原始 API／回调由同一任务所有者执行。定时器回调成本由固定协议栈配置及应用回调决定；这里不对整个调用的耗时建立硬上界。先复制 RX 字节，再精确归还借用。归还失败时保留 token 并关闭后续推进；stop 重试归还，不向协议栈重复投递字节。"
+msgid "Same task owner as every lwIP raw API/callback. Timer callback cost is governed by the fixed stack profile and application callbacks; this is not a hard bound on the entire invocation. The copying profile copies RX bytes before exact release. The explicit loaned-RX profile retains immutable payload tails until its custom-pbuf references end. A failed release retains its token and closes progress; stop retries release without feeding duplicate bytes into the stack. Inline and deferred TX failure remain observable before request reuse; while pending, new link output returns ERR_IF without admitting bytes. Success inline completion remains immediately reusable. Consuming an already-settled failure makes the TX request READY, without automatic reset, replay, adapter close or forced restart. The product chooses provider recovery; an actual unfinished borrow is never revoked."
+msgstr "与所有 lwIP raw API／回调共用同一任务 owner。定时器回调开销由固定协议栈配置和应用回调决定；这不构成整个调用的硬性时间上界。复制式配置在精确归还令牌前复制 RX 字节。显式借用式 RX 配置保留不可变载荷尾部，直到 custom-pbuf 引用结束。release 失败会保留令牌并关闭后续接收推进；stop 重试 release，不会将重复字节送入协议栈。inline 和延后结清的 TX 失败在请求复用前均保持可观察；尚未观察时，新 link output 返回 ERR_IF，不接纳字节。inline SUCCESS 仍可立即复用。消费已结清的失败会将 TX 请求置为 READY，不会自动复位、重放、关闭 adapter 或强制重启。产品决定 provider 恢复策略；实际尚未结束的借用绝不会被撤销。"
 
 msgid "[inout] Live storage, including any unfinished loans."
 msgstr "[inout] 仍有效且包含所有未结束借用的存储。"
@@ -170,8 +263,8 @@ msgstr "[inout] 仍有效且包含所有未结束借用的存储。"
 msgid "[in] Nonzero maximum acquired frames this invocation."
 msgstr "[in] 此次调用最多取得的帧数，必须为正数。"
 
-msgid "Success or the first actual provider/release/state error."
-msgstr "成功，或首个实际 provider／归还／状态错误。"
+msgid "Success, one pending settled TX failure, or provider/release/state error. A settled TX failure is consumed once before further progress."
+msgstr "成功、一个待观察的已结清 TX 失败，或 provider／release／状态错误。已结清的 TX 失败会在继续推进前消费一次。"
 
 msgid "Apply a proven external PHY fact to the MAC, then the netif."
 msgstr "先将经过确认的外部 PHY 事实应用到 MAC，再应用到 netif。"
@@ -232,6 +325,60 @@ msgstr "显式静态 IPv4 配置及调用者拥有的帧存储。"
 
 msgid "The serialized stack owner initializes lwIP once before attachment. The port, clock, TX buffer and views outlive attachment and all loans. Clock and provider deadlines use the same live monotonic domain. No default worker, lock, PHY, address, DHCP, DNS or heap is provided."
 msgstr "串行协议栈所有者在连接之前仅初始化一次 lwIP。接口、时钟、TX 缓冲区和视图的生命周期必须覆盖连接及全部借用。时钟与 provider 截止时间使用同一有效单调域。不提供默认 worker、锁、PHY、地址、DHCP、DNS 或堆。"
+
+msgid "lwip_loaned_rx.h"
+msgstr "lwip_loaned_rx.h"
+
+msgid "Explicit immutable RX-payload loan profile for lwIP."
+msgstr "lwIP 的显式不可变 RX 负载借用配置。"
+
+msgid "Exact selected backend slot, defined by its storage target."
+msgstr "由其存储目标定义的精确选定后端槽。"
+
+msgid "Exact selected custom-pbuf piece, not a packet allocator."
+msgstr "精确选定的 custom-pbuf 片段，不是数据包分配器。"
+
+msgid "Attach the explicitly selected payload-zero-copy RX profile."
+msgstr "挂接显式选定的负载零复制 RX 配置。"
+
+msgid "Task-only, same serialized nonreentrant NO_SYS owner as all raw calls. Select only the loaned profile and its storage target in this image. Ethernet/ARP/max IPv4/max TCP headers are copied; immutable payload tails are loaned. This is not whole-frame or TX zero-copy. No VLAN, IPv6, DHCP, DNS, reassembly, worker, heap or physical link is added. MAC payload spans must be disjoint from the adapter, TX/view storage and all selected slot/piece metadata; admission releases invalid loans. Final custom-pbuf frees only mark a slot ready. Subsequent service or stop performs exact provider release. Failed release preserves the token and closes admission. Stop returns BUSY while references remain. Products close PCBs and all raw observers before adapter withdrawal."
+msgstr "仅限任务上下文，与所有 raw 调用使用同一个串行、不可重入的 NO_SYS owner。此镜像中只选择借用式配置及其存储目标。Ethernet／ARP／最大 IPv4／最大 TCP 头会被复制；不可变负载尾部被借用。这不是整帧或 TX 零复制。不新增 VLAN、IPv6、DHCP、DNS、重组、worker、堆或物理链路。MAC 负载区间必须与 adapter、TX／视图存储及所有选定槽／片段元数据互不重叠；接纳路径会释放无效借用。custom-pbuf 的最终释放只标记槽已就绪。后续 service 或 stop 执行精确 provider 释放。释放失败会保留令牌并关闭接纳。引用尚存时，stop 返回 BUSY。产品须在 adapter 撤离前关闭 PCB 和所有 raw 观察者。"
+
+msgid "[inout] Zero-initialized selected backend storage."
+msgstr "[inout] 零初始化的选定后端存储。"
+
+msgid "[in] Disjoint stable storage description; copied on success."
+msgstr "[in] 互不重叠且稳定的存储描述；成功时复制。"
+
+msgid "Success, invalid configuration, or an already attached owner."
+msgstr "成功、配置无效，或已有挂接的 owner。"
+
+msgid "Caller-selected RX loan and fragment metadata, without a hidden pool."
+msgstr "调用方选定的 RX 借用和片段元数据，不含隐藏池。"
+
+msgid "Slots and pieces are zero-initialized and remain live through final pbuf release, exact MAC release and adapter detachment. Supply at least slot_count * base.rx_capacity pieces. Each slot owns one copied 136-byte writable header prefix. Remaining packet payload references immutable MAC bytes; raw consumers must not write those PBUF_ROM tail bytes. The exact provider descriptor geometry still limits concurrent loans."
+msgstr "槽和片段须零初始化，并持续存活至最终 pbuf 释放、精确 MAC 释放和 adapter 解除挂接完成。至少提供 slot_count * base.rx_capacity 个片段。每个槽拥有一个复制的 136 字节可写头部前缀。其余数据包负载引用不可变 MAC 字节；raw 消费方不得写入这些 PBUF_ROM 尾部字节。实际 provider 的精确描述符布局仍限制并发借用数。"
+
+msgid "lwip_loaned_rx_storage.h"
+msgstr "lwip_loaned_rx_storage.h"
+
+msgid "This selected-profile header belongs only at static composition. Its fields describe retained frame and pbuf storage, not a mutable consumer interface."
+msgstr "此选定配置的头文件仅用于静态装配。其字段描述保留中的帧与 pbuf 存储，不是可变的消费方接口。"
+
+msgid "Exact selected RX-loan/custom-pbuf composition storage."
+msgstr "精确选定的 RX 借用／custom-pbuf 装配存储。"
+
+msgid "One caller-owned custom-pbuf header with its unique owning slot."
+msgstr "一个调用方拥有的 custom-pbuf 头及其唯一归属槽。"
+
+msgid "Private backend fields; raw users own only normal pbuf references."
+msgstr "私有后端字段；raw 用户只拥有普通 pbuf 引用。"
+
+msgid "One exact RX token shared by all retained pieces of that frame."
+msgstr "由该帧所有保留片段共享的一个精确 RX 令牌。"
+
+msgid "The union provides eight-byte alignment in the maintained profile. A free callback only decrements references; it never touches hardware. A slot cannot be reused until the provider accepts the exact release. Raw users cannot access a pbuf after returning its final reference."
+msgstr "该联合体在维护中的配置下提供八字节对齐。释放回调只减少引用数；它从不访问硬件。只有 provider 接受精确释放后才可复用槽。raw 用户在归还 pbuf 的最后一个引用后不得再访问它。"
 
 msgid "lwip_tcp.h"
 msgstr "lwip_tcp.h"

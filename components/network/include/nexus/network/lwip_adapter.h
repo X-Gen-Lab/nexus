@@ -54,12 +54,21 @@ nx_result_t nx_lwip_adapter_start(nx_lwip_adapter_t* adapter,
  * \brief Progress MAC, bounded complete RX frames and stack timer callbacks.
  * \param[in,out] adapter: Live storage, including any unfinished loans.
  * \param[in] receive_budget: Nonzero maximum acquired frames this invocation.
- * \return Success or the first actual provider/release/state error.
+ * \return Success, one pending settled TX failure, or provider/release/state
+ *         error. A settled TX failure is consumed once before further progress.
  * \note Same task owner as every lwIP raw API/callback. Timer callback cost is
  *       governed by the fixed stack profile and application callbacks; this is
- *       not a hard bound on the entire invocation. RX bytes are copied before
- *       exact release. A failed release retains its token and closes progress;
- *       stop retries release without feeding duplicate bytes into the stack.
+ *       not a hard bound on the entire invocation. The copying profile copies
+ *       RX bytes before exact release. The explicit loaned-RX profile retains
+ *       immutable payload tails until its custom-pbuf references end. A failed
+ *       release retains its token and closes progress; stop retries release
+ *       without feeding duplicate bytes into the stack.
+ *       Inline and deferred TX failure remain observable before request reuse;
+ *       while pending, new link output returns ERR_IF without admitting bytes.
+ *       Success inline completion remains immediately reusable. Consuming an
+ *       already-settled failure makes the TX request READY, without automatic
+ *       reset, replay, adapter close or forced restart. The product chooses
+ *       provider recovery; an actual unfinished borrow is never revoked.
  */
 nx_result_t nx_lwip_adapter_service(nx_lwip_adapter_t* adapter,
                                     size_t receive_budget);

@@ -8,6 +8,9 @@
 #define NEXUS_TESTS_SUPPORT_LWIP_FRAME_PAIR_H
 
 #include "nexus/network/lwip_storage.h"
+#if defined(NEXUS_LWIP_LOANED_RX)
+#include "nexus/network/lwip_loaned_rx_storage.h"
+#endif
 extern "C" {
 #include "lwip/init.h"
 }
@@ -41,6 +44,10 @@ inline uint32_t virtual_now = 0U;
  * Busy provider operations retain outstanding requests and loans.
  * The optional submit hook runs synchronously before request admission; its
  * context stays caller-owned until the hook is cleared or the child exits.
+ * The optional transmit hook runs only after one complete successful IPC send,
+ * before request settlement. It copies spans synchronously, must not throw or
+ * reenter, and cannot change the provider's borrow or settlement contract.
+ * Retries and deliberate discards do not invoke that hook.
  */
 struct FrameEndpoint {
     uint32_t role;
@@ -50,7 +57,19 @@ struct FrameEndpoint {
     nx_lwip_adapter_t adapter{};
     alignas(32) std::array<uint8_t, NX_ETH_FRAME_MAX> transmit_bytes{};
     std::array<nx_eth_fragment_t, 2> receive_views{};
+#if defined(NEXUS_LWIP_LOANED_RX)
+    struct ReceiveSlot {
+        std::array<uint8_t, NX_ETH_FRAME_MAX> bytes{};
+        uint64_t epoch{};
+        size_t length{};
+        bool held{};
+    };
+    std::array<ReceiveSlot, 8> receive_slots{};
+    std::array<nx_lwip_rx_slot_t, 8> stack_slots{};
+    std::array<nx_lwip_rx_piece_t, 16> stack_pieces{};
+#else
     std::array<uint8_t, NX_ETH_FRAME_MAX> receive_bytes{};
+#endif
     nx_eth_frames_tx_request_t* pending = nullptr;
     uint64_t receive_epoch = 0U;
     bool receive_held = false;
@@ -63,6 +82,8 @@ struct FrameEndpoint {
     bool drop_tcp = false;
     void (*on_submit)(void*) = nullptr;
     void* on_submit_context = nullptr;
+    void (*on_transmit)(void*, const uint8_t*, size_t) = nullptr;
+    void* on_transmit_context = nullptr;
 
     explicit FrameEndpoint(uint32_t identity, int socket)
         : role(identity), wire(socket),
@@ -140,6 +161,10 @@ struct FrameEndpoint {
                 nx_request_settle(&request->base, NX_ERROR_IO, 0U);
                 return NX_ERROR_IO;
             }
+            if (worker.on_transmit != nullptr) {
+                worker.on_transmit(worker.on_transmit_context, bytes,
+                                   fragment.length);
+            }
         } else {
             ++worker.dropped;
         }
@@ -150,14 +175,28 @@ struct FrameEndpoint {
     static nx_result_t Acquire(void* context, nx_eth_frames_rx_loan_t* loan,
                                nx_eth_fragment_t* fragments, size_t capacity) {
         auto& worker = *static_cast<FrameEndpoint*>(context);
+#if defined(NEXUS_LWIP_LOANED_RX)
+        size_t index = 0U;
+        while (index < worker.receive_slots.size() &&
+               worker.receive_slots[index].held) {
+            ++index;
+        }
+        if (index == worker.receive_slots.size()) {
+            return NX_ERROR_BUSY;
+        }
+        auto& receive = worker.receive_slots[index];
+        auto& receive_bytes = receive.bytes;
+#else
         if (worker.receive_held) {
             return NX_ERROR_BUSY;
         }
+        auto& receive_bytes = worker.receive_bytes;
+#endif
         if (capacity < 2U) {
             return NX_ERROR_OVERFLOW;
         }
-        const auto length = recv(worker.wire, worker.receive_bytes.data(),
-                                 worker.receive_bytes.size(), MSG_DONTWAIT);
+        const auto length = recv(worker.wire, receive_bytes.data(),
+                                 receive_bytes.size(), MSG_DONTWAIT);
         if (length < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
             return NX_ERROR_EMPTY;
         }
@@ -172,20 +211,45 @@ struct FrameEndpoint {
         loan->epoch = worker.receive_epoch;
         loan->length = worker.received_length;
         loan->fragment_count = 2U;
-        fragments[0] = {worker.receive_bytes.data(), 13U};
-        fragments[1] = {worker.receive_bytes.data() + 13U,
+#if defined(NEXUS_LWIP_LOANED_RX)
+        receive.epoch = worker.receive_epoch;
+        receive.length = worker.received_length;
+        receive.held = true;
+        loan->first_slot = index;
+        loan->descriptor_count = 1U;
+#endif
+        fragments[0] = {receive_bytes.data(), 13U};
+        fragments[1] = {receive_bytes.data() + 13U,
                         worker.received_length - 13U};
         return NX_SUCCESS;
     }
     static nx_result_t Release(void* context,
                                const nx_eth_frames_rx_loan_t* loan) {
         auto& worker = *static_cast<FrameEndpoint*>(context);
+#if defined(NEXUS_LWIP_LOANED_RX)
+        if (loan->identity != &worker ||
+            loan->first_slot >= worker.receive_slots.size()) {
+            return NX_ERROR_STATE;
+        }
+        auto& receive = worker.receive_slots[loan->first_slot];
+        if (!receive.held || loan->epoch != receive.epoch ||
+            loan->length != receive.length || loan->descriptor_count != 1U ||
+            loan->fragment_count != 2U) {
+            return NX_ERROR_STATE;
+        }
+        receive.held = false;
+        worker.receive_held = false;
+        for (const auto& slot : worker.receive_slots) {
+            worker.receive_held = worker.receive_held || slot.held;
+        }
+#else
         if (!worker.receive_held || loan->identity != &worker ||
             loan->epoch != worker.receive_epoch ||
             loan->length != worker.received_length) {
             return NX_ERROR_STATE;
         }
         worker.receive_held = false;
+#endif
         return NX_SUCCESS;
     }
     static nx_result_t Apply(void* context, const nx_eth_link_t* observed) {
@@ -244,7 +308,15 @@ inline void FrameEndpoint::Initialize() {
     config.netmask[1] = 255U;
     config.netmask[2] = 255U;
     lwip_init();
-    if (nx_lwip_adapter_start(&adapter, &config) != NX_SUCCESS) {
+#if defined(NEXUS_LWIP_LOANED_RX)
+    const nx_lwip_loaned_config_t loaned{
+        config, stack_slots.data(), stack_slots.size(), stack_pieces.data(),
+        stack_pieces.size()};
+    const auto started = nx_lwip_loaned_adapter_start(&adapter, &loaned);
+#else
+    const auto started = nx_lwip_adapter_start(&adapter, &config);
+#endif
+    if (started != NX_SUCCESS) {
         _exit(81);
     }
     const nx_eth_link_t observed{true, true, 100U};

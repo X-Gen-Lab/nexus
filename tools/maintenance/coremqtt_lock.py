@@ -11,7 +11,8 @@ import re
 import subprocess
 import sys
 
-sys.dont_write_bytecode = True
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.maintenance.lwip_lock import git  # noqa: E402
