@@ -10,6 +10,9 @@
 #include "stm32u575_provider.h"
 #include "stm32u5xx_ll_usart.h"
 #include <limits.h>
+#ifndef NX_U575_UART_CLEAR_TC
+#define NX_U575_UART_CLEAR_TC(controller) LL_USART_ClearFlag_TC(controller)
+#endif
 #ifndef NX_U575_UART_RECEIVE8
 #define NX_U575_UART_RECEIVE8(controller) LL_USART_ReceiveData8(controller)
 #endif
@@ -157,7 +160,7 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         p->tx_complete = false;
         p->terminal = NX_SUCCESS;
         p->drain_deadline = NX_DEADLINE_NEVER;
-        NX_U575_WRITE(&p->registers->ICR, USART_ICR_TCCF);
+        NX_U575_UART_CLEAR_TC(p->registers);
         NX_U575_WRITE(&p->registers->CR1,
                       NX_U575_READ(&p->registers->CR1) | USART_CR1_TXEIE);
         nx_arch_dsb();

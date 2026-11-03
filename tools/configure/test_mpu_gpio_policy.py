@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.configure import authored, configure, kernel, memory, runtime
 
@@ -118,6 +119,78 @@ class MpuGpioPolicyTests(unittest.TestCase):
             with self.subTest(text=changed), self.assertRaisesRegex(
                     ValueError, "GPIO|gpio"):
                 self.resolve(changed)
+
+    def test_selected_gpio_keeps_exact_controller_mask_and_resource_owner(self):
+        result = self.resolve(self.assembly())
+        gpio, = result.controllers
+        self.assertEqual((gpio.kind, gpio.controller, gpio.mode,
+                          gpio.options.mask),
+                         ("gpio", "GPIOC", "output", 0x80))
+        claims = {item.key: item.owner for item in result.resource_plan.claims}
+        self.assertEqual(claims["pin:PC7"], gpio.id)
+        self.assertFalse(result.physical_qualified)
+
+    def rejected_selections(self):
+        text = self.assembly()
+        return {
+            "missing": text[:text.index("[gpio.led]")],
+            "port": text.replace('binding="led0"', 'binding="gpio-a0"'),
+            "mask": text.replace('binding="led0"', 'binding="gpio-c0"'),
+            "mode": text.replace('mode="output"', 'mode="input"'),
+            "extra": text + ('[gpio.extra]\n'
+                              'binding="gpio-a0"\nmode="output"\n'),
+        }
+
+    def test_wrong_protected_selection_rejects_before_bundle_publication(self):
+        message = "GPIO user I/O requires the single exact PC7 output binding"
+        with tempfile.TemporaryDirectory() as value:
+            directory = Path(value)
+            assembly = directory / "assembly.toml"
+            output = directory / "generated"
+            for name, rejected in self.rejected_selections().items():
+                with self.subTest(selection=name):
+                    assembly.write_text(self.assembly())
+                    configure.configure(assembly, output, root=ROOT)
+                    self.assertTrue((output / "bindings.c").is_file())
+                    assembly.write_text(rejected)
+                    original = assembly.read_bytes()
+                    with patch.object(configure, "generate") as emit:
+                        with self.assertRaisesRegex(ValueError, message):
+                            configure.configure(assembly, output, root=ROOT)
+                    emit.assert_not_called()
+                    self.assertEqual(assembly.read_bytes(), original)
+                    self.assertFalse(output.exists())
+                    self.assertFalse(list(directory.glob(
+                        ".generated.nexus-previous*")))
+                    self.assertFalse(list(directory.glob(
+                        ".generated.nexus-pending*")))
+
+    def test_unprotected_gpio_keeps_ordinary_non_pc7_selection(self):
+        text = self.assembly()
+        text = text[:text.index("[memory.mpu]")] + (
+            '[gpio.other]\nbinding="gpio-a0"\nmode="output"\n')
+        result = self.resolve(text)
+        self.assertEqual(result.kernel.user_io, "none")
+        self.assertEqual(result.controllers[0].controller, "GPIOA")
+
+    def test_provider_admits_the_final_protected_selection(self):
+        provider = configure.maintained("stm32u575")
+        with tempfile.TemporaryDirectory() as value:
+            path = Path(value) / "assembly.toml"
+            path.write_text(self.assembly())
+            assembly = configure.load_assembly(path, ROOT)
+            selected = configure.resolve_ir(path, ROOT).to_dict()["controllers"]
+        provider.validate_user_io_context(
+            assembly, "STM32U575ZIT6Q", selected=selected)
+        with self.assertRaisesRegex(
+                ValueError, "single exact PC7 output binding"):
+            provider.validate_user_io_context(
+                assembly, "STM32U575ZIT6Q", selected=[])
+        for family in ("stm32f407", "gd32f470", "native"):
+            with self.subTest(family=family), self.assertRaisesRegex(
+                    ValueError, "GPIO user I/O requires"):
+                configure.maintained(family).validate_user_io_context(
+                    assembly, "STM32U575ZIT6Q", selected=selected)
 
     def test_m7_remains_a_real_negative_not_a_fabricated_mpu_port(self):
         with self.assertRaisesRegex(ValueError, "MPU|GPIO"):

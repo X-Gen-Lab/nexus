@@ -78,6 +78,8 @@ void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value);
 #undef NX_U575_READ
 #define NX_U575_READ(reg) nx_u575_devices_read(reg)
 #ifndef NX_U575_PWM_DEFAULT_PORT
+#define NX_U575_PWM_SET_COUNTER(timer, value)                                  \
+    NX_U575_WRITE(&(timer)->CNT, (value))
 #define NX_U575_PWM_SET_PRESCALER(timer, value)                                \
     NX_U575_WRITE(&(timer)->PSC, (value))
 #define NX_U575_PWM_SET_AUTORELOAD(timer, value)                               \

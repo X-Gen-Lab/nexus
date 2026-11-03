@@ -1087,12 +1087,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     for controller in selected:
         children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
         enhanced_endpoints.complete_controller(controller, children, provider)
-    if gpio_user and (len(selected) != 1 or
-            selected[0]["kind"] != "gpio" or
-            selected[0]["controller"] != "GPIOC" or
-            selected[0]["mode"] != "output" or
-            selected[0]["mask"] != 0x80):
-        fail("GPIO user I/O requires the single exact PC7 output binding")
+    if gpio_user:
+        provider.validate_user_io_context(assembly, part, selected=selected)
     resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
     triggers = trigger_graph.resolve_fixed(selected, routes)
     adc.complete_triggers(selected, triggers)

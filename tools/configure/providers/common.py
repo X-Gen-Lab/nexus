@@ -119,7 +119,7 @@ def configuration_header(result):
     return []
 
 
-def validate_user_io_context(assembly, part):
+def validate_user_io_context(assembly, part, *, selected=None):
     """Protected user GPIO is admitted only by its exact maintained family."""
     fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
 

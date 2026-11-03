@@ -1,4 +1,4 @@
-# Exact changed messages reviewed against canonical source.
+# Page translations; exact canonical source identity and review state below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 9c0514f2a0c4609824a38ed42bc21766435eaa7867cf97177b0ebebc43fff07b\n"
+"X-Nexus-Source-SHA256: e884c041355da8e0a7a0f6f71be6fa41a4a97694bfa22a1327a10761eda1657a\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -740,8 +740,22 @@ msgstr "此前的开发 overlay 已在 H743 family descriptor 与 SoC source-loc
 msgid "Bounded official-operation increments"
 msgstr "有界官方操作增量"
 
-msgid "The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1, word RDR/TDR operations carrying UART byte values, and RTC write-protection keys and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order, clock admission, timed phases and loan withdrawal remain in the same providers. H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged."
-msgstr "当前开发源码对 U575 PWM 的 PSC/ARR/CCR1 使用已锁定 LL setter，对 UART RDR/TDR 使用承载字节值的字访问，并对 RTC 写保护密钥和 Alarm A 清除命令使用已锁定 LL 操作。既有屏障、精确 readback、IRQ／错误顺序、时钟准入、定时阶段和借用撤离仍由原 provider 负责。H743 SPI 轮询及 DMA 清理使用接收 controller 的 LL byte port；屏蔽 CSTART 的 CSUSP 命令、quiet tail、Cache 所有权和 DMA／IRQ join 保持不变。"
+#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:218
+msgid ""
+"The current development source uses locked LL setters for U575 PWM "
+"PSC/ARR/CNT/CCR1, word RDR/TDR operations carrying UART byte values, UART "
+"TC-only clears, and RTC write-protection keys and Alarm A clear commands. "
+"Existing barriers, exact readbacks, IRQ/error order, clock admission, "
+"timed phases and loan withdrawal remain in the same providers. H743 SPI "
+"polling and DMA cleanup use controller-valued LL byte ports; masked "
+"CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain "
+"unchanged."
+msgstr ""
+"当前开发源码对 U575 PWM 的 PSC/ARR/CNT/CCR1 使用已锁定 LL setter，对 UART RDR/TDR "
+"使用承载字节值的字访问，并对 UART TC 单独清除、RTC 写保护密钥和 Alarm A 清除命令使用已锁定 LL 操作。既有屏障、精确 "
+"readback、IRQ／错误顺序、时钟准入、定时阶段和借用撤离仍由原 provider 负责。H743 SPI 轮询及 DMA 清理使用接收 "
+"controller 的 LL byte port；CSTART／CSUSP 的掩码处理、quiet tail、Cache 所有权及 DMA／IRQ"
+" join 保持不变。"
 
 msgid "U575 GPIO now sends four existing command sites through the actual HAL GPIO C unit: public write, initialization preload, stop and serial TX idle. Its private 15-file lock admits that unit and required headers; no HAL initialization or tick is invoked. Disjoint authorized masks remain one BSRR command, and empty public writes retain success without invoking HAL's nonempty-mask assertion."
 msgstr "U575 GPIO 现将四个既有命令位置交给实际 HAL GPIO C 单元：公共 write、初始化预装载、stop 和串口 TX 空闲电平。其私有 15 文件锁准入该单元及必需头文件；不会调用 HAL 初始化或 tick。已授权且不相交的掩码仍由一条 BSRR 命令处理；公共空掩码 write 仍返回成功，并避免调用 HAL 的非空掩码断言。"
@@ -754,6 +768,33 @@ msgstr "I2C 叶操作比较保留 V1 TX 的直接访问，因为已锁定 LL hel
 
 msgid "H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including the IRQ-byte companions of selected DMA modes. The provider retains saved-status ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog key, configuration and refresh commands use the locked LL IWDG header, including watchdog-only assemblies without a GPIO source. Irreversible ownership precedes activation; synchronization, exact readback, failed-update bounds and recovery responsibility remain in the same C provider."
 msgstr "H743 USART3 的 IRQ-byte RDR/TDR 访问使用锁定的 LL 字操作，也包括选定 DMA 模式的 IRQ-byte 配套路径。provider 保留已保存状态的处理顺序、RX 错误／丢失、TC 完成和完整撤回。U575 看门狗的密钥、配置和刷新命令使用锁定的 LL IWDG 头，也适用于不引入 GPIO 源文件的 watchdog-only 装配。不可撤销的所有权先于激活记录；同步、精确读回、更新失败后的边界和恢复责任仍由同一 C provider 维护。"
+
+#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:239
+msgid ""
+"Review the selected target and its private include graph, not only the C "
+"file that exports an ops table. Every H743 UART selection compiles shared "
+"`uart.c`, so its byte IRQ changes also require review in DMA/FIFO "
+"compositions; that does not convert the separate data engines. The private"
+" I2C port headers bind the shared V1/V2 algorithms to the selected locked "
+"LL operations and belong in the current source review even when a frozen "
+"file inventory predates those headers."
+msgstr ""
+"评审所选构建目标及其私有 include 图，而不只评审导出 ops 表的 C 文件。每个 H743 UART 选择都会编译共享的 "
+"`uart.c`，因此，其字节 IRQ 变化在 DMA／FIFO 组合中也需要评审；这并不意味着独立的数据引擎已转换。私有 I2C port "
+"头文件将共享 V1／V2 算法绑定到所选的已锁定 LL 操作；即使冻结的文件清单形成于这些头文件之前，当前源码评审也需要包含它们。"
+
+#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:246
+msgid ""
+"Keep three decisions separate for each mode: the selected hardware owner, "
+"the exact ordinary operations already delegated to official code, and the "
+"remaining command/snapshot exceptions or leaf candidates. A preserved IRQ "
+"snapshot, atomic mask or quiet interval does not justify unrelated "
+"handwritten configuration. Source review and unchanged file hashes do not "
+"replace the current compiler, model, installed-SDK, resource or physical "
+"evidence."
+msgstr ""
+"对每个模式，分别判断三件事：所选硬件 owner、已委托给官方代码的精确常规操作，以及剩余的命令／快照例外或叶操作候选。保留 IRQ "
+"快照、原子掩码或静默间隔，并不能成为无关手写配置的理由。源码评审和未变化的文件哈希，不能替代当前的编译器验证、模型、已安装 SDK、资源或物理证据。"
 
 msgid "GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in isolated C11 compile-contract units. Each includes the real SDK before locally expanding register macros as integer addresses. Runtime providers retain their mask and IRQ checks and ordinary SDK register access. The contract units emit no firmware code or data; no compiler-specific constant folding or scanner exception is needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset contract. Source compilation, linked-image costs and physical behavior remain separate verification scopes."
 msgstr "GD32F470 CAN 和 Ethernet 在独立 C11 编译合同单元中核对 20 项和 25 项已复核的 SDK 寄存器偏移。每个单元先包含真实 SDK，再仅在本文件内将寄存器宏展开为整数地址。运行时 provider 保留位掩码、IRQ 检查和普通 SDK 寄存器访问。这些合同单元不生成固件代码或数据，无需编译器特定常量折叠或扫描器例外。Raw 与 enhanced Ethernet 选择同一份 MAC/DMA/VLAN/PTP 偏移合同。源码编译、链接镜像成本和物理行为仍属于分别执行的验证范围。"

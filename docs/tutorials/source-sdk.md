@@ -22,17 +22,23 @@ access does not grant template access. The independent SDK verification below
 does not require that private repository. Set
 `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that
 checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit
-recorded with the chosen platform delivery. These are separate identities: the
-template's expected platform revision does not prove which SDK was used.
-Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product
-directory outside both input checkouts:
+recorded with the chosen platform delivery. Set `NEXUS_EXPECTED_REVISION` to
+the exact 40-character platform commit from that verified delivery. These are
+separate identities: the template's expected platform revision does not prove
+which SDK was used. Run these commands from
+`$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product directory outside both
+input checkouts:
 
 ```sh
+: "${NEXUS_EXPECTED_REVISION:?select the reviewed platform commit}"
+python cmake/package/package_source_sdk.py \
+    --verify "$NEXUS_SDK_PREFIX/share/nexus/src"
 python tools/dev/dev.py create --templates "$NEXUS_EXAMPLES_DIR" \
     --revision "$NEXUS_EXAMPLES_REVISION" --template native \
     --output /tmp/my-nexus-product
 cmake -S /tmp/my-nexus-product -B /tmp/my-nexus-product-build -G Ninja \
-    -DNexus_DIR="$NEXUS_SDK_PREFIX/lib/cmake/Nexus"
+    -DNexus_DIR="$NEXUS_SDK_PREFIX/lib/cmake/Nexus" \
+    -DNEXUS_EXPECTED_SOURCE_REVISION="$NEXUS_EXPECTED_REVISION"
 cmake --build /tmp/my-nexus-product-build --parallel 2
 ctest --test-dir /tmp/my-nexus-product-build \
     --output-on-failure --no-tests=error
@@ -52,8 +58,8 @@ is a software model, not a host serial port. The example uses strong factory
 references, provides request storage, observes settlement and stops the platform.
 A timeout is an error, not permission to release outstanding storage.
 
-For a development checkout instead of an installed SDK, replace `Nexus_DIR`
-with `-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout and
+For a development checkout, replace both installed-SDK CMake arguments with
+`-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout and
 does not qualify an SDK. Select `qiming`, `sky` or `liangshan` for the maintained
 MCU template. SDK consumers add
 `-DCMAKE_TOOLCHAIN_FILE="$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake"`;
@@ -70,6 +76,35 @@ again; use the [configuration and ownership guide](../guides/developer-workflow.
 to inspect reviewed bindings. Do not repair generated files or suppress a rejected
 selection. Keep product sources; remove only your own build output after
 retaining needed logs.
+
+## Upgrade an existing product
+
+Select a newly qualified Source SDK and its reviewed 40-character platform
+commit. Set `NEXUS_NEXT_SDK_PREFIX` and `NEXUS_NEXT_REVISION` to those inputs;
+use a new build directory outside the product and SDK:
+
+```sh
+: "${NEXUS_NEXT_SDK_PREFIX:?select the next verified SDK prefix}"
+: "${NEXUS_NEXT_REVISION:?select the reviewed next platform commit}"
+python "$NEXUS_NEXT_SDK_PREFIX/share/nexus/src/cmake/package/package_source_sdk.py" \
+    --verify "$NEXUS_NEXT_SDK_PREFIX/share/nexus/src"
+cmake -S /tmp/my-nexus-product -B /tmp/my-nexus-product-upgrade-build -G Ninja \
+    -DNexus_DIR="$NEXUS_NEXT_SDK_PREFIX/lib/cmake/Nexus" \
+    -DNEXUS_EXPECTED_SOURCE_REVISION="$NEXUS_NEXT_REVISION"
+cmake --build /tmp/my-nexus-product-upgrade-build --parallel 2
+ctest --test-dir /tmp/my-nexus-product-upgrade-build \
+    --output-on-failure --no-tests=error
+```
+
+Keep the product's authored sources and `.nexus-template.json`; that file records
+its template origin, not the current SDK selection. Do not reuse the old CMake
+cache across SDK prefixes. Two source revisions may advertise the same semantic
+version; the explicit source pin rejects a different revision. A pin mismatch is
+a configuration error: preserve its diagnostic and select the reviewed inputs.
+Review the product's `find_package()` version requirement and changed assembly
+constraints; do not automatically loosen that version requirement. Rerun the
+product's required Native tests and MCU links before accepting the upgrade. An older SDK's results do not qualify
+the new SDK, and a successful link does not qualify physical hardware.
 
 ## Maintainer: verify the complete SDK consumer
 

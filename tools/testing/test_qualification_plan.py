@@ -276,7 +276,7 @@ class QualificationPlanTests(unittest.TestCase):
                 arguments = stage["args"]
                 self.assertIn("--parallel", arguments)
                 self.assertEqual(arguments[arguments.index("--parallel") + 1],
-                                 "2")
+                                 "4")
                 self.assertNotIn("--source", arguments)
                 self.assertNotIn("--filter", arguments)
         validate_plan(self.plan)

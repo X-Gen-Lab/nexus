@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "declared-io-ve-software-fixture",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f407",
+  "source_revision": "reviewed-silicon-selection-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    },
+    {
+      "id": "adc_scan",
+      "controller": "ADC1",
+      "route": "adc1-scan-pa0-pa1"
+    },
+    {
+      "id": "can1",
+      "controller": "CAN1",
+      "route": "can1-pa11-pa12"
+    },
+    {
+      "id": "can2",
+      "controller": "CAN2",
+      "route": "can2-pb12-pb13"
+    },
+    {
+      "id": "edge0",
+      "controller": "EXTI0",
+      "route": "exti0-pa0"
+    },
+    {
+      "id": "a",
+      "controller": "GPIOA",
+      "route": "gpio-pa0",
+      "mask": 1,
+      "initial": 0
+    },
+    {
+      "id": "b",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "mask": 4,
+      "initial": 0
+    },
+    {
+      "id": "e",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "mask": 8,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software-only reviewed STM32F407VET6 pad selection.",
+    "No physical PCB, connector or electrical declaration.",
+    "External devices, rails, pulls and wiring are not inspected.",
+    "Nominal ADC reference is not a measured analog voltage.",
+    "Clock frequency and physical operation are not verified.",
+    "GPIOG and Ethernet routes are not declared for this exact part."
+  ],
+  "provenance": [
+    {
+      "repository": "https://github.com/X-Gen-Lab/nexus",
+      "tree": "67cf38c426b4efe5884e1b63c10df21260a04908",
+      "scope": "Reviewed STM32F407 silicon facts and routes; no PCB claim."
+    },
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 Table7 LQFP100; from SoC references.json."
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22; reference from SoC references.json."
+    }
+  ]
+}

@@ -99,6 +99,8 @@ void nx_u575_model_irq_restore(nx_arch_irq_state_t previous);
     NX_U575_WRITE(&(controller)->KR, (0xAAAAU))
 #endif
 #ifndef NX_U575_UART_DEFAULT_PORT
+#define NX_U575_UART_CLEAR_TC(controller)                                      \
+    NX_U575_WRITE(&(controller)->ICR, USART_ICR_TCCF)
 #define NX_U575_UART_RECEIVE8(controller)                                      \
     ((uint8_t)NX_U575_READ(&(controller)->RDR))
 #define NX_U575_UART_TRANSMIT8(controller, value)                              \

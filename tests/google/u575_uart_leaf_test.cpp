@@ -36,6 +36,7 @@ class U575UartDefaultLeaf : public testing::Test {
         g_u575_model.uart2 = &registers[1];
         for (unsigned i = 0U; i < 2U; ++i) {
             g_u575_uart_leaf_decoy[i] = {};
+            g_u575_uart_leaf_decoy[i].ICR = 0x11223344U + i;
             g_u575_uart_leaf_decoy[i].TDR = 0x10203040U + i;
             g_u575_uart_leaf_decoy[i].RDR = 0x50607080U + i;
             registers[i].ISR = USART_ISR_TXE | USART_ISR_TC;
@@ -52,6 +53,7 @@ class U575UartDefaultLeaf : public testing::Test {
     }
     void TearDown() override {
         for (unsigned i = 0U; i < 2U; ++i) {
+            EXPECT_EQ(0x11223344U + i, g_u575_uart_leaf_decoy[i].ICR);
             EXPECT_EQ(0x10203040U + i, g_u575_uart_leaf_decoy[i].TDR);
             EXPECT_EQ(0x50607080U + i, g_u575_uart_leaf_decoy[i].RDR);
         }
@@ -72,7 +74,9 @@ TEST_F(U575UartDefaultLeaf, ActualDataPortsUseBothSelectedControllers) {
         nx_request_initialize(&requests[i].base);
         ASSERT_EQ(NX_SUCCESS,
                   nx_uart_tx_prepare(&requests[i], &bytes[i], 1U, 10000U));
+        registers[i].ICR = 0xaabbccddU;
         ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&ports[i], &requests[i]));
+        EXPECT_EQ(USART_ICR_TCCF, registers[i].ICR);
         registers[i].TDR = 0xaabbccddU;
         registers[i].ISR = USART_ISR_TEACK | USART_ISR_REACK | USART_ISR_TXE;
         nx_stm32u575_uart_irq(&states[i]);

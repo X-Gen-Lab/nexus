@@ -72,6 +72,21 @@ TEST_F(U575Pwm, ForeignTimerRejectsBeforeHardwareEffects) {
     EXPECT_EQ(0U, g_u575_model.writes);
     EXPECT_FALSE(state.retained);
 }
+TEST_F(U575Pwm, RefusedCounterResetRetainsTimerAndPinBeforeStart) {
+    timer.CNT = 7U;
+    g_u575_model.ignore_write = &timer.CNT;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_pwm_initialize(&state));
+    EXPECT_EQ(7U, timer.CNT);
+    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(pin.retained);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(0U, timer.CCER);
+    EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
+    EXPECT_EQ(1U, (pin.registers->MODER >> 12U) & 3U);
+    g_u575_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_pwm_close(&state));
+    EXPECT_FALSE(state.retained);
+}
 TEST_F(U575Pwm, RefusedStopRetainsPinAndTimerUntilRetry) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_pwm_initialize(&state));
     ASSERT_EQ(NX_SUCCESS, nx_pwm_port_start(&face));

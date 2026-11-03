@@ -1,4 +1,4 @@
-# Independently reviewed translations; exact canonical source identity below.
+# Page translations; exact canonical source identity and review state below.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a7c3c13ec7607f3f4cab67c6b9a10a910a89b4f9c108501ddf4471df31747b79\n"
+"X-Nexus-Source-SHA256: b92dc43a361cab892426406e5f07a07f6c62c9d839315a43da5006d48ee05d43\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -183,6 +183,9 @@ msgstr ""
 "`false`；未知 PCB 事实不会因解析成功变为已验证。 现有记录从[软件证据入口](../status/software-"
 "verification.md)进入，实际执行范围 以各记录中的不可变源码为准。配置、软件和物理阶段是不同证据，并非会自动晋级的 单个“支持等级”。"
 
+msgid "运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用 {ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有 capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。 它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。"
+msgstr "运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用 {ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有 capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。 它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。"
+
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:64
 msgid "显式关联已封存候选"
 msgstr "显式关联已封存候选"
@@ -310,8 +313,12 @@ msgid "`exti0-pa0`"
 msgstr "`exti0-pa0`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "—"
-msgstr "—"
+msgid "`tests/contracts/declared_io_assembly/gd303.toml`"
+msgstr "`tests/contracts/declared_io_assembly/gd303.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f303/drivers/exti.c`"
+msgstr "`soc/gd32/gd32f303/drivers/exti.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI1"
@@ -320,10 +327,6 @@ msgstr "EXTI1"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`exti1-pa1`"
 msgstr "`exti1-pa1`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f303/drivers/exti.c`"
-msgstr "`soc/gd32/gd32f303/drivers/exti.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "FMC"
@@ -394,6 +397,10 @@ msgid "`gpio-pa4`, `gpio-pa5`"
 msgstr "`gpio-pa4`, `gpio-pa5`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f303/drivers/gpio.c`"
+msgstr "`soc/gd32/gd32f303/drivers/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "output"
 msgstr "output"
 
@@ -408,10 +415,6 @@ msgstr ""
 "`tests/contracts/mainstream_assembly/gd303-io.toml`, "
 "`tools/configure/assemblies/gd32-f303-baremetal-io.toml`, "
 "`tools/configure/assemblies/gd32-f303-freertos-io.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f303/drivers/gpio.c`"
-msgstr "`soc/gd32/gd32f303/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "I2C0"
@@ -558,6 +561,10 @@ msgstr "low-rate-scan"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`adc0-pa0-pa1`"
 msgstr "`adc0-pa0-pa1`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "—"
+msgstr "—"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`tests/contracts/gd32_assembly/adc-scan.toml`"
@@ -748,6 +755,18 @@ msgid "`gpiob0`, `gpiob1`"
 msgstr "`gpiob0`, `gpiob1`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/gd470-input.toml`"
+msgstr "`tests/contracts/declared_io_assembly/gd470-input.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/gd32/gd32f470/drivers/gpio.c`"
+msgstr "`soc/gd32/gd32f470/drivers/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/gd470.toml`"
+msgstr "`tests/contracts/declared_io_assembly/gd470.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOD"
 msgstr "GPIOD"
 
@@ -768,10 +787,6 @@ msgstr ""
 "`tools/configure/assemblies/liangshan-baremetal.toml`, "
 "`tools/configure/assemblies/liangshan-freertos-gpio.toml`, "
 "`tools/configure/assemblies/liangshan-freertos.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/gd32/gd32f470/drivers/gpio.c`"
-msgstr "`soc/gd32/gd32f470/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "dma-messages"
@@ -1216,6 +1231,14 @@ msgid "FLASH"
 msgstr "FLASH"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/f103.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f103.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/stm32/stm32f103/drivers/gpio.c`"
+msgstr "`soc/stm32/stm32f103/drivers/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
 "`tests/contracts/mainstream_assembly/f103-io-freertos.toml`, "
@@ -1234,10 +1257,6 @@ msgstr ""
 "`tools/configure/assemblies/stm32-f103-exti.toml`, "
 "`tools/configure/assemblies/stm32-f103-freertos.toml`, "
 "`tools/configure/assemblies/stm32-f103-watchdog.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32f103/drivers/gpio.c`"
-msgstr "`soc/stm32/stm32f103/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`i2c1-pb6-pb7`"
@@ -1397,9 +1416,11 @@ msgstr "`soc/stm32/stm32f407/drivers/adc_stream.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-continuous.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-adc-continuous.toml`"
 
@@ -1418,10 +1439,12 @@ msgstr "`stm32f407zg-qiming-v31`"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/can_assembly/stm32-both.toml`, "
-"`tests/contracts/can_assembly/stm32-first.toml`"
+"`tests/contracts/can_assembly/stm32-first.toml`, "
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`"
 msgstr ""
 "`tests/contracts/can_assembly/stm32-both.toml`, "
-"`tests/contracts/can_assembly/stm32-first.toml`"
+"`tests/contracts/can_assembly/stm32-first.toml`, "
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "CAN2"
@@ -1432,8 +1455,12 @@ msgid "`can2-pb12-pb13`"
 msgstr "`can2-pb12-pb13`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`tests/contracts/can_assembly/stm32-both.toml`"
-msgstr "`tests/contracts/can_assembly/stm32-both.toml`"
+msgid ""
+"`tests/contracts/can_assembly/stm32-both.toml`, "
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`"
+msgstr ""
+"`tests/contracts/can_assembly/stm32-both.toml`, "
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "ETH"
@@ -1452,6 +1479,18 @@ msgid "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`"
 msgstr "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/declared_io_assembly/f407.toml`, "
+"`tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
+msgstr ""
+"`tests/contracts/declared_io_assembly/f407.toml`, "
+"`tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/stm32/stm32f407/drivers/exti.c`"
+msgstr "`soc/stm32/stm32f407/drivers/exti.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI5"
 msgstr "EXTI5"
 
@@ -1466,10 +1505,6 @@ msgid ""
 msgstr ""
 "`tests/contracts/stm32_assembly/ve-exti.toml`, "
 "`tests/contracts/stm32_assembly/zg-exti.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32f407/drivers/exti.c`"
-msgstr "`soc/stm32/stm32f407/drivers/exti.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI6"
@@ -1495,6 +1530,29 @@ msgstr ""
 msgid "`soc/stm32/stm32f407/drivers/flash.c`"
 msgstr "`soc/stm32/stm32f407/drivers/flash.c`"
 
+msgid "`gpio-pa0`"
+msgstr "`gpio-pa0`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/declared_io_assembly/f407-input.toml`, "
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`"
+msgstr ""
+"`tests/contracts/declared_io_assembly/f407-input.toml`, "
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/stm32/stm32f407/drivers/gpio.c`"
+msgstr "`soc/stm32/stm32f407/drivers/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
+"`tests/contracts/declared_io_assembly/ve-duplex.toml`"
+msgstr ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
+"`tests/contracts/declared_io_assembly/ve-duplex.toml`"
+
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pb2`"
 msgstr "`gpio-pb2`"
@@ -1505,19 +1563,17 @@ msgstr "`stm32f407ve-sky-qingchun`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
 "`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
 "`tools/configure/assemblies/sky-baremetal.toml`, "
 "`tools/configure/assemblies/sky-freertos-gpio.toml`, "
 "`tools/configure/assemblies/sky-freertos.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
 "`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
 "`tools/configure/assemblies/sky-baremetal.toml`, "
 "`tools/configure/assemblies/sky-freertos-gpio.toml`, "
 "`tools/configure/assemblies/sky-freertos.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32f407/drivers/gpio.c`"
-msgstr "`soc/stm32/stm32f407/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOE"
@@ -1529,12 +1585,14 @@ msgstr "`gpio-pe3`, `gpio-pe4`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, "
 "`tests/contracts/physical_platform_assembly/stm32-gpio.toml`, "
 "`tools/configure/assemblies/qiming-baremetal-gpio.toml`, "
 "`tools/configure/assemblies/qiming-baremetal.toml`, "
 "`tools/configure/assemblies/qiming-freertos-gpio.toml`, "
 "`tools/configure/assemblies/qiming-freertos.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, "
 "`tests/contracts/physical_platform_assembly/stm32-gpio.toml`, "
 "`tools/configure/assemblies/qiming-baremetal-gpio.toml`, "
 "`tools/configure/assemblies/qiming-baremetal.toml`, "
@@ -1548,6 +1606,14 @@ msgstr "GPIOG"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pg9`"
 msgstr "`gpio-pg9`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/f407-input.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407-input.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/f407.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -1791,10 +1857,12 @@ msgstr "`usart1-pa9-pa10`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-duplex.toml`, "
 "`tests/contracts/stm32_assembly/zg-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-duplex.toml`, "
 "`tests/contracts/stm32_assembly/zg-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`"
@@ -1805,9 +1873,11 @@ msgstr "`soc/stm32/stm32f407/drivers/uart_duplex.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, "
 "`tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, "
 "`tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 
@@ -1832,6 +1902,9 @@ msgstr ""
 "`tests/contracts/stm32_assembly/zg-dma.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, "
 "`tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
+
+msgid "`soc/stm32/stm32f407/drivers/uart_hal.c`"
+msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -1877,9 +1950,11 @@ msgstr "`soc/stm32/stm32f407/drivers/uart.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart9n1.toml`"
 
@@ -1889,10 +1964,12 @@ msgstr "`soc/stm32/stm32f407/drivers/uart_word.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-continuous.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, "
 "`tests/contracts/io_evolution_assembly/f407-uart-stream-profile.toml`, "
 "`tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-continuous.toml`"
@@ -1903,10 +1980,12 @@ msgstr "`soc/stm32/stm32f407/drivers/uart_receive.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
+"`tests/contracts/declared_io_assembly/ve-rx-idle.toml`, "
 "`tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-idle.toml`"
 msgstr ""
+"`tests/contracts/declared_io_assembly/ve-rx-idle.toml`, "
 "`tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-rx-dma-idle.toml`"
@@ -2082,6 +2161,14 @@ msgid "`stm32g474re-hse24-reference`"
 msgstr "`stm32g474re-hse24-reference`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/g474-input.toml`"
+msgstr "`tests/contracts/declared_io_assembly/g474-input.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/stm32/stm32g474/drivers/gpio.c`"
+msgstr "`soc/stm32/stm32g474/drivers/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "named-states"
 msgstr "named-states"
 
@@ -2108,10 +2195,6 @@ msgstr ""
 "`tests/contracts/g474_assembly/io.toml`, "
 "`tests/contracts/g474_assembly/mainstream-freertos.toml`, "
 "`tests/contracts/g474_assembly/mainstream.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32g474/drivers/gpio.c`"
-msgstr "`soc/stm32/stm32g474/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -2148,6 +2231,10 @@ msgstr ""
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pd2`"
 msgstr "`gpio-pd2`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/g474-output.toml`"
+msgstr "`tests/contracts/declared_io_assembly/g474-output.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOF"
@@ -2400,6 +2487,10 @@ msgid "`soc/stm32/stm32h743/drivers/exti.c`"
 msgstr "`soc/stm32/stm32h743/drivers/exti.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/h743.toml`"
+msgstr "`tests/contracts/declared_io_assembly/h743.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32h743/drivers/flash.c`"
 msgstr "`soc/stm32/stm32h743/drivers/flash.c`"
 
@@ -2410,6 +2501,10 @@ msgstr "`gpio-pb0`"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
 msgstr "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`soc/stm32/stm32h743/drivers/gpio.c`"
+msgstr "`soc/stm32/stm32h743/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -2460,10 +2555,6 @@ msgstr ""
 "`tools/configure/assemblies/h743-high-peripherals.toml`, "
 "`tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, "
 "`tools/configure/assemblies/nucleo-h743-freertos-uart.toml`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`soc/stm32/stm32h743/drivers/gpio.c`"
-msgstr "`soc/stm32/stm32h743/drivers/gpio.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-pe11`"
@@ -2682,6 +2773,10 @@ msgid "`soc/stm32/stm32u575/drivers/adc.c`"
 msgstr "`soc/stm32/stm32u575/drivers/adc.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid "`tests/contracts/declared_io_assembly/u575.toml`"
+msgstr "`tests/contracts/declared_io_assembly/u575.toml`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/exti.c`"
 msgstr "`soc/stm32/stm32u575/drivers/exti.c`"
 
@@ -2786,6 +2881,16 @@ msgstr "GPIOH"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`gpio-ph0`, `gpio-ph1`, `gpio-ph3`"
 msgstr "`gpio-ph0`, `gpio-ph1`, `gpio-ph3`"
+
+#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
+msgid ""
+"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
+"`tests/contracts/u575_assembly/mainstream.toml`, "
+"`tests/contracts/u575_assembly/watchdog.toml`"
+msgstr ""
+"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
+"`tests/contracts/u575_assembly/mainstream.toml`, "
+"`tests/contracts/u575_assembly/watchdog.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32u575/drivers/watchdog.c`"
@@ -3064,22 +3169,3 @@ msgstr "`soc/native/drivers/uart_word.c`"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"
-
-msgid "`soc/stm32/stm32f407/drivers/uart_hal.c`"
-msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"
-
-msgid "`gpio-pa0`"
-msgstr "`gpio-pa0`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
-"`tests/contracts/u575_assembly/mainstream.toml`, "
-"`tests/contracts/u575_assembly/watchdog.toml`"
-msgstr ""
-"`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
-"`tests/contracts/u575_assembly/mainstream.toml`, "
-"`tests/contracts/u575_assembly/watchdog.toml`"
-
-msgid "运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用 {ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有 capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。 它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。"
-msgstr "运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用 {ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有 capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。 它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。"

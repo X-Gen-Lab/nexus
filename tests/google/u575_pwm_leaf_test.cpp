@@ -36,6 +36,7 @@ class U575PwmDefaultLeaf : public testing::Test {
     void SetUp() override {
         nx_u575_devices_reset();
         g_u575_pwm_leaf_decoy = {};
+        g_u575_pwm_leaf_decoy.CNT = 0x13572468U;
         g_u575_pwm_leaf_decoy.PSC = 0x11223344U;
         g_u575_pwm_leaf_decoy.ARR = 0x55667788U;
         g_u575_pwm_leaf_decoy.CCR1 = 0x99aabbccU;
@@ -57,6 +58,7 @@ class U575PwmDefaultLeaf : public testing::Test {
         state.pin = 6U;
     }
     void TearDown() override {
+        EXPECT_EQ(0x13572468U, g_u575_pwm_leaf_decoy.CNT);
         EXPECT_EQ(0x11223344U, g_u575_pwm_leaf_decoy.PSC);
         EXPECT_EQ(0x55667788U, g_u575_pwm_leaf_decoy.ARR);
         EXPECT_EQ(0x99aabbccU, g_u575_pwm_leaf_decoy.CCR1);
@@ -65,10 +67,12 @@ class U575PwmDefaultLeaf : public testing::Test {
 };
 TEST_F(U575PwmDefaultLeaf,
        ActualStoresProgramSelectedTimerAndKeepTheFixedBase) {
+    timer.CNT = 0xabcdef01U;
     ASSERT_EQ(NX_SUCCESS, nx_stm32u575_pwm_initialize(&state));
     EXPECT_EQ(3U, timer.PSC);
     EXPECT_EQ(999U, timer.ARR);
     EXPECT_EQ(250U, timer.CCR1);
+    EXPECT_EQ(0U, timer.CNT);
     EXPECT_EQ(0U, timer.CR2);
     EXPECT_EQ(0U, timer.SR);
     EXPECT_EQ(pin.mask << 16U, pin.registers->BSRR);

@@ -173,38 +173,59 @@ class RequiredAnalysisTests(unittest.TestCase):
                                      self.report, timeout=budget), 1)
 
     def test_parallel_execution_is_bounded_and_reports_are_deterministic(self):
-        sources = [self.source.with_name(f"sample{index}.c") for index in range(4)]
-        for source in sources:
-            source.write_text('int sample(void) { return 1; }\n')
-        self.database(sources)
-        tool = self.root / 'concurrent-analyzer'
-        activity = self.root / 'activity.jsonl'
-        tool.write_text(
-            f'#!{sys.executable}\nimport json,pathlib,sys,time\n'
-            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
-            f"with open({str(activity)!r}, 'a') as stream: stream.write(json.dumps(['start', time.monotonic()])+'\\n')\n"
-            "source = pathlib.Path(sys.argv[1]); index = int(source.stem.removeprefix('sample'))\n"
-            "source.with_name('ready' + str(index)).touch()\n"
-            "partner = source.with_name('ready' + str(index ^ 1)); deadline = time.monotonic() + 5\n"
-            "while not partner.exists():\n"
-            " if time.monotonic() >= deadline: sys.exit(9)\n"
-            " time.sleep(0.005)\n"
-            "print(sys.argv[1])\n"
-            f"with open({str(activity)!r}, 'a') as stream: stream.write(json.dumps(['end', time.monotonic()])+'\\n')\n")
-        tool.chmod(0o700)
-        self.assertEqual(quality_tools.run('tidy', self.root, self.build, str(tool), self.report,
-                             parallel=2), 0, self.report.read_text())
-        active = maximum = 0
-        for event, _ in sorted((json.loads(line) for line in activity.read_text().splitlines()), key=lambda item: item[1]):
-            active += 1 if event == 'start' else -1
-            maximum = max(maximum, active)
-        self.assertEqual(active, 0)
-        self.assertEqual(maximum, 2)
-        report = self.report.read_text()
-        invocation_sources = [json.loads(line[len('Invocation: '):])[1]
-                              for line in report.splitlines() if line.startswith('Invocation: ')
-                              and '--version' not in line]
-        self.assertEqual(invocation_sources, list(map(str, sources)))
+        for budget in (2, 4):
+            with self.subTest(parallel=budget):
+                # Two waves require every admitted worker to rendezvous before
+                # any can finish. A smaller pool cannot satisfy that barrier.
+                directory = self.source.parent / ("parallel-" + str(budget))
+                directory.mkdir()
+                sources = [directory / f"sample{index}.c"
+                           for index in range(2 * budget)]
+                for source in sources:
+                    source.write_text('int sample(void) { return 1; }\n')
+                self.database(sources)
+                tool = directory / 'concurrent-analyzer'
+                activity = directory / 'activity.jsonl'
+                tool.write_text(
+                    f'#!{sys.executable}\nimport json,pathlib,sys,time\n'
+                    "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+                    f"with open({str(activity)!r}, 'a') as stream: "
+                    "stream.write(json.dumps(['start', time.monotonic()])+'\\n')\n"
+                    "source = pathlib.Path(sys.argv[1]); "
+                    "index = int(source.stem.removeprefix('sample'))\n"
+                    f"first = (index // {budget}) * {budget}\n"
+                    "source.with_name('ready' + str(index)).touch()\n"
+                    f"wave = [source.with_name('ready' + str(value)) "
+                    f"for value in range(first, first + {budget})]\n"
+                    "deadline = time.monotonic() + 5\n"
+                    "while not all(path.exists() for path in wave):\n"
+                    " if time.monotonic() >= deadline: sys.exit(9)\n"
+                    " time.sleep(0.005)\n"
+                    "print(sys.argv[1])\n"
+                    f"with open({str(activity)!r}, 'a') as stream: "
+                    "stream.write(json.dumps(['end', time.monotonic()])+'\\n')\n")
+                tool.chmod(0o700)
+                self.assertEqual(quality_tools.run(
+                    'tidy', self.root, self.build, str(tool), self.report,
+                    parallel=budget), 0, self.report.read_text())
+                active = maximum = 0
+                events = [json.loads(line) for line in
+                          activity.read_text().splitlines()]
+                self.assertEqual(len(events), 2 * len(sources))
+                for event, _ in sorted(events, key=lambda item: item[1]):
+                    active += 1 if event == 'start' else -1
+                    maximum = max(maximum, active)
+                    self.assertGreaterEqual(active, 0)
+                    self.assertLessEqual(active, budget)
+                self.assertEqual(active, 0)
+                self.assertEqual(maximum, budget)
+                report = self.report.read_text()
+                invocation_sources = [json.loads(line[len('Invocation: '):])[1]
+                                      for line in report.splitlines()
+                                      if line.startswith('Invocation: ')
+                                      and '--version' not in line]
+                self.assertEqual(invocation_sources, list(map(str, sources)))
+                self.assertEqual(report.count('Exit code: 0'), len(sources))
 
     def test_parallel_timeout_keeps_failure_and_other_context_results(self):
         other = self.source.with_name('other.c')

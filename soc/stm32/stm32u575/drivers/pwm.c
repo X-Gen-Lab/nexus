@@ -17,6 +17,10 @@
 #define NX_U575_PWM_SET_AUTORELOAD(timer, value)                               \
     LL_TIM_SetAutoReload((timer), (value))
 #endif
+#ifndef NX_U575_PWM_SET_COUNTER
+#define NX_U575_PWM_SET_COUNTER(timer, value)                                  \
+    LL_TIM_SetCounter((timer), (value))
+#endif
 #ifndef NX_U575_PWM_SET_COMPARE_CH1
 #define NX_U575_PWM_SET_COMPARE_CH1(timer, value)                              \
     LL_TIM_OC_SetCompareCH1((timer), (value))
@@ -62,6 +66,11 @@ static bool autoreload_checked(TIM_TypeDef* timer, uint32_t value) {
     nx_arch_dsb();
     return NX_U575_READ(&timer->ARR) == value;
 }
+static bool counter_checked(TIM_TypeDef* timer, uint32_t value) {
+    NX_U575_PWM_SET_COUNTER(timer, value);
+    nx_arch_dsb();
+    return NX_U575_READ(&timer->CNT) == value;
+}
 static bool compare_checked(TIM_TypeDef* timer, uint32_t value) {
     NX_U575_PWM_SET_COMPARE_CH1(timer, value);
     nx_arch_dsb();
@@ -91,7 +100,7 @@ static nx_result_t epoch(nx_stm32u575_pwm_state_t* p) {
     if ((NX_U575_READ(&r->SR) & TIM_SR_UIF) == 0U)
         return NX_ERROR_TIMEOUT;
     if (!write_checked(&r->SR, 0U) || !write_checked(&r->CR2, 0U) ||
-        !write_checked(&r->CNT, 0U))
+        !counter_checked(r, 0U))
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }

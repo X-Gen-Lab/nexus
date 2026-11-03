@@ -215,9 +215,9 @@ no runtime forwarding. These changes do not rewrite the frozen source review.
 
 ### Bounded official-operation increments
 
-The current development source uses locked LL setters for U575 PWM PSC/ARR/CCR1,
-word RDR/TDR operations carrying UART byte values, and RTC write-protection keys
-and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order,
+The current development source uses locked LL setters for U575 PWM PSC/ARR/CNT/CCR1,
+word RDR/TDR operations carrying UART byte values, UART TC-only clears, and RTC
+write-protection keys and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order,
 clock admission, timed phases and loan withdrawal remain in the same providers.
 H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked
 CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged.
@@ -235,6 +235,20 @@ key, configuration and refresh commands use the locked LL IWDG header, including
 watchdog-only assemblies without a GPIO source. Irreversible ownership precedes
 activation; synchronization, exact readback, failed-update bounds and recovery
 responsibility remain in the same C provider.
+
+Review the selected target and its private include graph, not only the C file
+that exports an ops table. Every H743 UART selection compiles shared `uart.c`,
+so its byte IRQ changes also require review in DMA/FIFO compositions; that does
+not convert the separate data engines. The private I2C port headers bind the
+shared V1/V2 algorithms to the selected locked LL operations and belong in the
+current source review even when a frozen file inventory predates those headers.
+
+Keep three decisions separate for each mode: the selected hardware owner, the
+exact ordinary operations already delegated to official code, and the remaining
+command/snapshot exceptions or leaf candidates. A preserved IRQ snapshot, atomic
+mask or quiet interval does not justify unrelated handwritten configuration.
+Source review and unchanged file hashes do not replace the current compiler,
+model, installed-SDK, resource or physical evidence.
 
 GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in
 isolated C11 compile-contract units. Each includes the real SDK before locally

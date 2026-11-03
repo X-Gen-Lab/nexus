@@ -25,8 +25,9 @@ supersedes that default. The SDK coordinator divides its total allocation into
 one job per consumer, including each consumer's nested configure/build/check
 commands. Selected-provider builds propagate their chosen allocation to nested
 Nexus/CMake defaults. Malformed or nonpositive selected budgets fail before
-execution. The analysis plan retains its reviewed explicit two-job allocation;
-standalone analyzer execution defaults to one job.
+execution. The maintained software plan uses four analyzer workers on an
+exclusive four-CPU, 16-GiB runner. Do not overlap those stages with other
+build lanes. Standalone analyzer execution defaults to one job.
 
 This is a per-invocation budget. Concurrent independent invocations still need
 an orchestrator to divide runner CPU and memory capacity; no machine-wide CPU

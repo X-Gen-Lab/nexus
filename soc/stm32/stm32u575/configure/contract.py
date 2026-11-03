@@ -266,10 +266,17 @@ def validate_mode_context(selection, route, *, backend, clock_profile):
         common.fail("RTSCTS FIFO UART requires its reviewed baremetal owner")
 
 
-def validate_user_io_context(assembly, part):
+def validate_user_io_context(assembly, part, *, selected=None):
+    """Admit the exact platform first, then its complete protected I/O set."""
     if (part != "STM32U575ZIT6Q" or assembly.clock_profile != "msis4" or
             assembly.layout is not None or assembly.power is not None):
         common.fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+    if selected is not None and (len(selected) != 1 or
+            selected[0]["kind"] != "gpio" or
+            selected[0]["controller"] != "GPIOC" or
+            selected[0]["mode"] != "output" or
+            selected[0]["mask"] != 0x80):
+        common.fail("GPIO user I/O requires the single exact PC7 output binding")
 
 
 def i2c_timing_clock(clock, clock_plan):

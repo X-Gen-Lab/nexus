@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "declared-io-f407-output-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "5e82bab618b4a26f4ae2f1975cdb7fef2ea554d9-software-selection-only",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "a_output",
+      "controller": "GPIOA",
+      "route": "gpio-pa0",
+      "mask": 1,
+      "initial": 0
+    },
+    {
+      "id": "b_output",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "mask": 4,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software-only selection of existing reviewed SoC pad routes; no PCB connector, attached device, voltage, rail, pull, measured frequency or physical HIL claim.",
+    "GPIOB PB2 is an additional reviewed SoC route selection; no physical Board assertion."
+  ],
+  "provenance": [
+    {
+      "repository": "https://github.com/X-Gen-Lab/nexus",
+      "tree": "5e82bab618b4a26f4ae2f1975cdb7fef2ea554d9",
+      "scope": "Software-only authored reviewed SoC pad selection; no physical Board or electrical qualification"
+    }
+  ]
+}

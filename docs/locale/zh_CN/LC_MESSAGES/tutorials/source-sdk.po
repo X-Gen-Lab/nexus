@@ -1,4 +1,4 @@
-# Exact changed messages reviewed against canonical source.
+# Exact message set bound to the canonical source.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b86b06ca46f3f505a28aa5f0086444e2629874c9ba967c7d8339a050b3f93637\n"
+"X-Nexus-Source-SHA256: 579a602029d39fda8382884154db8a94395dcac2753034ae077804b3e16240ca\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:9
 msgid "Build an independent Source SDK consumer"
@@ -28,8 +28,8 @@ msgstr ""
 msgid "Create and run an application"
 msgstr "创建并运行应用"
 
-msgid "Obtain a verified Source SDK and the external [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That repository is private and requires its own GitHub access; public Nexus or SDK access does not grant template access. The independent SDK verification below does not require that private repository. Set `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit recorded with the chosen platform delivery. These are separate identities: the template's expected platform revision does not prove which SDK was used. Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product directory outside both input checkouts:"
-msgstr "取得经过验证的 Source SDK 和外部 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout。该仓库是私有仓库，需要单独的 GitHub 访问权限；公开 Nexus 或 SDK 的权限不包含模板权限。下方独立 SDK 验证不需要该私有仓库。将 `NEXUS_SDK_PREFIX` 设置为已安装 SDK prefix，将 `NEXUS_EXAMPLES_DIR` 设置为该 checkout，将 `NEXUS_EXAMPLES_REVISION` 设置为所选平台交付关联的精确 40 位示例 commit。这些是独立身份：模板预期的平台 revision 不证明实际用了哪个 SDK。从 `$NEXUS_SDK_PREFIX/share/nexus/src` 执行以下命令，在两个输入 checkout 外选择新的产品目录："
+msgid "Obtain a verified Source SDK and the external [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That repository is private and requires its own GitHub access; public Nexus or SDK access does not grant template access. The independent SDK verification below does not require that private repository. Set `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit recorded with the chosen platform delivery. Set `NEXUS_EXPECTED_REVISION` to the exact 40-character platform commit from that verified delivery. These are separate identities: the template's expected platform revision does not prove which SDK was used. Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product directory outside both input checkouts:"
+msgstr "取得经过验证的 Source SDK 和外部 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout。该仓库是私有仓库，需要单独的 GitHub 访问权限；公开 Nexus 或 SDK 的权限不包含模板权限。下方独立 SDK 验证不需要该私有仓库。将 `NEXUS_SDK_PREFIX` 设置为已安装 SDK prefix，将 `NEXUS_EXAMPLES_DIR` 设置为该 checkout，将 `NEXUS_EXAMPLES_REVISION` 设置为所选平台交付关联的精确 40 位示例 commit。将 `NEXUS_EXPECTED_REVISION` 设置为该已验证交付中的精确 40 位平台 commit。这些是独立身份：模板预期的平台 revision 不证明实际用了哪个 SDK。从 `$NEXUS_SDK_PREFIX/share/nexus/src` 执行以下命令，在两个输入 checkout 外选择新的产品目录："
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:38
 msgid ""
@@ -59,25 +59,8 @@ msgstr ""
 "UART 是软件模型，不是 host 串口。示例使用 strong factory 引用，提供请求存储，观察结清并停止平台。timeout "
 "是错误，不能授权释放未结清存储。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:52
-msgid ""
-"For a development checkout instead of an installed SDK, replace `Nexus_DIR` "
-"with `-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout "
-"and does not qualify an SDK. Select `qiming`, `sky` or `liangshan` for the "
-"maintained MCU template. SDK consumers add "
-"`-DCMAKE_TOOLCHAIN_FILE=\"$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-"
-"gcc.cmake\"`; checkout consumers instead select "
-"`-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-"
-"gcc.cmake`. Use the locked ARM compiler. An MCU link is software evidence; "
-"board bring-up and electrical verification remain separate."
-msgstr ""
-"使用开发检出而非已安装 SDK 时，将 `Nexus_DIR` 替换为 "
-"`-DNEXUS_SOURCE=/absolute/path/to/nexus`。这仅验证该检出，不建立 SDK 资格。已维护的 MCU 模板选择 "
-"`qiming`、`sky` 或 `liangshan`。SDK 消费方增加 "
-"`-DCMAKE_TOOLCHAIN_FILE=\"$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-"
-"gcc.cmake\"`；源码检出消费方则选择 "
-"`-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-"
-"gcc.cmake`。使用锁定的 ARM 编译器。MCU 链接属于软件证据；板卡启动和电气验证仍单独进行。"
+msgid "For a development checkout, replace both installed-SDK CMake arguments with `-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout and does not qualify an SDK. Select `qiming`, `sky` or `liangshan` for the maintained MCU template. SDK consumers add `-DCMAKE_TOOLCHAIN_FILE=\"$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake\"`; checkout consumers instead select `-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-gcc.cmake`. Use the locked ARM compiler. An MCU link is software evidence; board bring-up and electrical verification remain separate."
+msgstr "使用开发 checkout 时，将两个已安装 SDK 的 CMake 参数替换为 `-DNEXUS_SOURCE=/absolute/path/to/nexus`。这仅验证该 checkout，不建立 SDK 资格。已维护的 MCU 模板选择 `qiming`、`sky` 或 `liangshan`。SDK 消费方增加 `-DCMAKE_TOOLCHAIN_FILE=\"$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake\"`；源码 checkout 消费方则选择 `-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-gcc.cmake`。使用锁定的 ARM 编译器。MCU 链接属于软件证据；板卡启动和电气验证仍单独进行。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:62
 msgid ""
@@ -94,6 +77,15 @@ msgstr ""
 "SDK／接口和固定模板版本。模板修正需要新的已复核提交，不能修改固定模板字节。成功创建后，编辑产品 authored "
 "装配并重新配置；通过[配置与所有权指南](../guides/developer-workflow.md)检查已复核 "
 "binding。不要修补生成文件或压制拒绝。保留产品源码；保存必要日志后只删除自有构建输出。"
+
+msgid "Upgrade an existing product"
+msgstr "升级现有产品"
+
+msgid "Select a newly qualified Source SDK and its reviewed 40-character platform commit. Set `NEXUS_NEXT_SDK_PREFIX` and `NEXUS_NEXT_REVISION` to those inputs; use a new build directory outside the product and SDK:"
+msgstr "选择新完成资格验证的 Source SDK 及其已复核的 40 位平台 commit。将 `NEXUS_NEXT_SDK_PREFIX` 和 `NEXUS_NEXT_REVISION` 设置为这两个输入；在产品和 SDK 目录之外使用新的构建目录："
+
+msgid "Keep the product's authored sources and `.nexus-template.json`; that file records its template origin, not the current SDK selection. Do not reuse the old CMake cache across SDK prefixes. Two source revisions may advertise the same semantic version; the explicit source pin rejects a different revision. A pin mismatch is a configuration error: preserve its diagnostic and select the reviewed inputs. Review the product's `find_package()` version requirement and changed assembly constraints; do not automatically loosen that version requirement. Rerun the product's required Native tests and MCU links before accepting the upgrade. An older SDK's results do not qualify the new SDK, and a successful link does not qualify physical hardware."
+msgstr "保留产品的 authored 源码和 `.nexus-template.json`；该文件记录模板来源，不表示当前选择的 SDK。不同 SDK prefix 之间不要复用旧的 CMake cache。两个源码 revision 可能声明相同的语义版本；显式源码 pin 会拒绝不同的 revision。pin 不匹配属于配置错误：保留诊断并选择已复核的输入。复核产品的 `find_package()` 版本要求及变化的装配约束；不要自动放宽该版本要求。接受升级前，重新执行产品要求的 Native 测试和 MCU 链接。旧 SDK 的结果不能建立新 SDK 的资格；链接成功也不能建立物理硬件资格。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:71
 msgid "Maintainer: verify the complete SDK consumer"
