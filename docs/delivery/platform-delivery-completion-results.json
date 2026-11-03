@@ -170,7 +170,7 @@
     "scope": "Use current_iteration_20261028 retained_delivery_scopes and each observation archive for verified local navigation. Original N01-N14 and previous iteration paths retain their identities. No public obtainability or final combined software candidate is claimed.",
     "previous_iteration_archives": "unchanged; retain their original P/E identity"
   },
-  "updated_date": "2026-10-28",
+  "updated_date": "2026-11-03",
   "platform_baseline_scope": "Original N01-N14 baseline; not the current iteration or the current checkout.",
   "current_iteration_20261028": {
     "kind": "c_firmware_lifecycle_and_delivery_development_increment",
@@ -624,6 +624,345 @@
           "scope": "Reviewed live MMIO/wait/private ownership algorithm dispatch; fixed typed calls, progress/diagnostic markers and C queries remain permitted."
         }
       }
+    }
+  },
+  "source_version_records_20261103": {
+    "kind": "source_versioned_development_observations",
+    "date": "2026-11-03",
+    "identity_rules": "These records extend the existing results index. Historical executions, current development, artifact survival and final acceptance remain separate. Counts overlap and are never added across scopes. No record creates a new firmware candidate or physical qualification.",
+    "accepted_public_source": {
+      "commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "tree": "b3188fafc8516c6a51fbbd0c98a82ea5493ea1ad",
+      "classification": "previous_accepted_software_development_source_not_new_formal_candidate",
+      "ordinary_complete_index_gate": {
+        "status": "actually_passed_before_environment_outage",
+        "google_programs": 414,
+        "google_cases": 7226,
+        "tool_tests": {
+          "testing": 1992,
+          "configure": 1226,
+          "ci": 495,
+          "workflows": 166
+        },
+        "tool_cases_total": 3879,
+        "io_properties": 233,
+        "failures": 0,
+        "skips": 0,
+        "scope": "The ordinary Native Debug complete-index gate for this exact source; not all four Native modes or the complete formal software plan.",
+        "retained_archive": {
+          "path": "/workspace/nexus/build/iteration-20261102/tcp-device-image-ordinary-gate-attempt03.tar.gz",
+          "sha256": "f8da57a5c576a0da5deceab8ef0d884dcd673c38beb1d4216741dd695cc7cca7",
+          "bytes": 6883005,
+          "restored_regular_members": 4703,
+          "scope": "raw commands/receipts/XML/compiler metadata andfailed attempts; notbinarypayloads orformalsoftwarecandidate",
+          "obtainability": "execution_host_local_only"
+        }
+      },
+      "installed_source_sdk": {
+        "policy": "nexus-sdk-consumers-v14",
+        "status": "actually_passed_before_environment_outage",
+        "consumer_roots": 59,
+        "images": 62,
+        "commands_including_initial_sdk_verify": 246,
+        "separate_sdk_verify": "actually_passed_before_environment_outage",
+        "retained_archive": {
+          "path": "/workspace/nexus/build/iteration-20261102/nexus-source-sdk-6c3a380a.tar.gz",
+          "sha256": "db2576f7aee3eefdd1cd384a7b2fb4b57ce8fb4d584b59b8e018088447b4c41f",
+          "bytes": 14087896,
+          "restored_regular_members": 3877,
+          "snapshot_sha256": "2c0014ec2b8fca478ee8ec3eaf5437c123aa15f7915c1545a39798b206aec0aa",
+          "obtainability": "execution_host_local_only"
+        },
+        "archive_metadata_record": "build/iteration-20261102/nexus-source-sdk-6c3a380a-archive.json",
+        "original_restore_verify_exit": 0,
+        "survival_limit": "The retained metadata records the original actual restore and verification. Several temporary raw v14 consumer/verification receipts were lost in the outage. This status update does not claim a new raw v14 verification or consumer execution."
+      },
+      "documentation": {
+        "status": "clean_source_english_and_chinese_build_actually_passed_before_outage",
+        "scope": "Exact accepted 6c3a380a documentation execution; later docs and feature source do not inherit that execution.",
+        "raw_receipt_survival": "Some original TMP/SHM receipt copies are now lost; this record does not recreate them or claim a new build."
+      },
+      "physical_hil": "not_executed",
+      "publishable_candidate": false
+    },
+    "private_reference_metadata": {
+      "repository": "X-Gen-Lab/nexus-examples",
+      "immutable_commit_prefix": "2e932bbc",
+      "platform_sdk_commit": "7fd36f8a0b4226c5e8a8e9caa518312c20df9e21",
+      "pull_request": 24,
+      "ordinary_gate": {
+        "python_cases": 86,
+        "ctest_tests": 23,
+        "google_programs": 13,
+        "google_cases": 146,
+        "scope": "Immutable private source at its recorded SDK pin, not the later uncommitted 6c3a380a pin or gateway follow-up."
+      },
+      "later_development": {
+        "platform_sdk_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "source_status": "earlier_uncommitted_observation_now_has_separate_accepted_commit_record",
+        "focused_scopes": {
+          "peer_cases": 11,
+          "main_cases": 4,
+          "real_broker_cases": 5,
+          "style_files": 24
+        },
+        "status": "earlier_development_observations_accepted_later_in_ff86eb49",
+        "count_note": "These are different and potentially overlapping scopes; do not sum them or relabel them as the immutable ordinary gate.",
+        "focused_scopes_source_scope": "Earlier focused development observations retain their own source; they are not the latest fresh-run or immutable ordinary-gate result.",
+        "latest_fresh_run": {
+          "source_five_real_broker_cases": "passed",
+          "installed_five_real_broker_cases": "passed",
+          "installed_existing_ctest_tests": 2,
+          "closing_sdk_verify_exit": 0,
+          "full_private_ordinary_gate": "passed_in_separate_ff86eb49_record",
+          "source_status": "accepted_private_commit",
+          "publication_boundary": "Aggregates and approved commit/PR metadata only; no private tree, binary identity, payload path or receipt is public."
+        }
+      },
+      "publication_boundary": "Public records contain only aggregate counts and commit/PR metadata. Private source, payload paths, receipts and archives stay outside the public platform and its packages.",
+      "physical_hil": "not_executed",
+      "accepted_current_source": {
+        "commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+        "platform_sdk_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "status": "ordinary_gate_passed_and_commit_pushed",
+        "pull_request": 24,
+        "pull_request_state": "draft",
+        "pull_request_head_commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+        "pr_metadata_authority": "Root actual GitHub readback after private visibility was freshly verified before push.",
+        "ordinary_gate": {
+          "python_cases": 89,
+          "ctest_tests": 28,
+          "google_programs": 18,
+          "google_cases": 204,
+          "failures": 0,
+          "skips": 0
+        },
+        "source_real_broker_cases": 5,
+        "installed_real_broker_cases": 5,
+        "installed_existing_ctest_tests": 2,
+        "separate_closing_sdk_verify_exit": 0,
+        "scope": "Private development source at the exact public 6c3a380a SDK pin. Source and installed runs retain their own executions and are not ten distinct broker cases. This private scope is separate from the public eb4/v15 result.",
+        "physical_hil": "not_executed",
+        "new_candidate": false
+      }
+    },
+    "current_feature_cohort": {
+      "source_base": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+      "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+      "source_identity_status": "accepted_public_commit_pushed",
+      "implemented_scope": [
+        "optional RX payload-loan public and Storage/profile boundaries",
+        "stateless generic MCUboot control and separate explicit Flash composition",
+        "settled TX error observation",
+        "real host frame PCAP capture and bounded F407 network link reference",
+        "resolver and command-line refinements",
+        "Source SDK policy v15 and five additional consumer roots"
+      ],
+      "ordinary_complete_index_gate": {
+        "status": "passed_and_original_archive_independently_audited_restored",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "google_programs": 420,
+        "google_cases": 7335,
+        "tool_cases": 3950,
+        "tool_domains": {
+          "testing": 2062,
+          "configure": 1226,
+          "ci": 495,
+          "workflows": 167
+        },
+        "failures": 0,
+        "skips": 0,
+        "io_property_rows": 233,
+        "io_unproven": 8,
+        "summary": "build/recovery-20261103/ordinary/accepted-ordinary-summary.json",
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/ordinary/accepted-ordinary-evidence.tar.gz",
+          "sha256": "a8f425f2e8cd78a8ac8ee91a9b51e59ead307d70b14a3800777686e810085d1e",
+          "size": 6842596
+        },
+        "restored_files": 5173,
+        "scope": "Original complete-index ordinary Native Debug Google/tool gate only; record/input metadata archive, no binary payload or software candidate.",
+        "retention_limit": "Object/archive/executable bytes and dependency/tool binary payloads; the original io-property snapshot preserves their exact hashes/contexts. This compact archive cannot replay full binary-input verification after those separately-held original bytes disappear.",
+        "full_software_plan": "not_inferred",
+        "source_sdk_qualification": "not_inferred",
+        "physical_hil": "not_executed",
+        "io_property_counting": "233 bounded executed properties and 8 separate unproven entries; unproven entries are not included in 233."
+      },
+      "installed_source_sdk": {
+        "policy": "nexus-sdk-consumers-v15",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "snapshot_sha256": "05eb409d3aa47f4694b155a370c801ed222a329c9d7acd0a735ea92fb22b3e1d",
+        "consumer_roots": 64,
+        "images": 67,
+        "actual_commands": 270,
+        "command_exits": "all_zero",
+        "status": "accepted_full_clean_consumer_execution_and_independent_archive_relocation_audit",
+        "separate_closing_sdk_verification_exit": 0,
+        "sdk_manifest_unchanged": true,
+        "transport_pack_and_archive_readback_exit": 0,
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/full-eb4aba66-attempt01/transport/consumer-raw.tar.gz",
+          "sha256": "7e5d1ac6bada9cd9bb25e4822cdf6e2fa1494839cba219e625414dd25ccde850",
+          "bytes": 20089082
+        },
+        "independent_archive_audit": "passed",
+        "scope": "Actual clean exact-source SDK consumer execution. Separate verification and archive audit retain their own identities; no full software plan, firmware candidate or physical qualification follows.",
+        "final_summary": "build/recovery-20261103/clean-sdk/final-summary.json",
+        "source_manifest_sha256": "d956cab0936db8d3eb1f1e4445c83866073f31ae44122a1c3b9fe8cc048ab526",
+        "consumer_archive_manifest": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/full-eb4aba66-attempt01/transport/consumer-raw-manifest.json",
+          "sha256": "020801e411275d2039d642f82b62c8e4bf964ef5ed85fd71411c723853bad5c7",
+          "size": 4241094
+        },
+        "source_prefix_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/source-prefix-eb4aba66-attempt01/archive/59ebf399c7a1b46bcab73ba9582779e8e0dff61154a5718aa552da75a2ba4697.tar.gz",
+          "sha256": "59ebf399c7a1b46bcab73ba9582779e8e0dff61154a5718aa552da75a2ba4697",
+          "size": 13940050
+        },
+        "source_prefix_actual_restored_regular_members": 3997,
+        "restored_sdk_verification_exit": 0,
+        "independent_review": "build/recovery-20261103/clean-sdk/independent-final-review.json",
+        "complete_software_plan_executed": false,
+        "new_candidate": false,
+        "reproducibility_claim": false
+      },
+      "documentation": {
+        "status": "fresh_clean_strict_english_chinese_html_passed",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "pages": 132,
+        "locale_records": 264,
+        "commands": 4,
+        "command_exits": "all_zero",
+        "duration_seconds": 174.73850989341736,
+        "summary": "build/recovery-20261103/docs/eb4-clean-strict/summary.json",
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/eb4-clean-strict/clean-eb4-strict-docs.tar.gz",
+          "sha256": "661c5aafb9611f3a3838781e5d132ab68da28ee52b5d5e6623d781a3065ed80c",
+          "bytes": 17976762
+        },
+        "regular_members_readback_verified": 3484,
+        "scope": "One fresh clean exact-eb4 Doxygen/gettext/English/Chinese HTML build. The later ten-path status follow-up is separate; no publication or firmware qualification inferred."
+      },
+      "focused_tls_observation": {
+        "cases": 205,
+        "scope": "Earlier focused development source execution; no new combined-source or firmware-candidate claim."
+      },
+      "native_model_board_policy": {
+        "scope": "NativeBoard software-model facts may declare FLASH capacity zero; this does not change a physical Board or grant hardware capability.",
+        "regression": "Actual resolver RED followed by 145-case GREEN retained in the recovery work; not the final ordinary gate."
+      },
+      "qualification": false,
+      "physical_hil": "not_executed",
+      "classification": "ordinary_gate_accepted_formal_plan_and_candidate_not_inferred",
+      "sdk_development_observations": {
+        "summary": "build/recovery-20261103/sdk/handoff-summary.json",
+        "status": "five_observations_across_two_development_prefixes",
+        "prefixes": [
+          {
+            "snapshot_sha256": "188d1b545306dfa2d13f730229267b35a4518e1b04ace99d713a0726b1ec8e8a",
+            "accepted_consumers": [
+              "f407 loaned rx",
+              "gd470 loaned rx"
+            ],
+            "closing_sdk_verification": "passed",
+            "overall_report_status": "failed",
+            "scope": "Two accepted loaned observations before separate Native admission failure",
+            "publishable": false,
+            "production_admitted": false
+          },
+          {
+            "snapshot_sha256": "e2ac91bdc30d14d6be7401dc88bfc3857bd59b28713a15756ef9b46c9b587524",
+            "accepted_consumers": [
+              "native mcuboot control",
+              "f407 mcuboot control",
+              "f407 mcuboot boot"
+            ],
+            "closing_sdk_verification": "passed",
+            "overall_report_status": "passed",
+            "scope": "Three remaining MCUboot observations accepted",
+            "publishable": false,
+            "production_admitted": false
+          }
+        ],
+        "scope": "Two loaned-RX observations and three MCUboot observations are retained at their actual distinct development prefixes. They are not the clean combined-source 64-root/67-image result reported separately above."
+      }
+    },
+    "recovery_network_development": {
+      "source_base": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "receipt_manifest": "build/recovery-20261103/network/manifest.json",
+      "archive": {
+        "path": "/workspace/nexus/build/recovery-20261103/network/network-receipts.tar.gz",
+        "size": 970075,
+        "sha256": "ffa4d67c37c096d9cbe15b0082377aef845383fd4b40cc4b2c7bdbd06c942d03"
+      },
+      "arm": {
+        "flash_footprint_bytes": 134304,
+        "static_sram_bytes": 107832,
+        "msp_bytes": 8192,
+        "total_sram_bytes": 116024,
+        "libc_heap_bytes": 0,
+        "actual_c_translation_units": 217,
+        "optimization": "Effective -Os on every actual C translation unit; no LTO.",
+        "fixed_mcuboot_128k_payload_allowance_bytes": 129536,
+        "payload_excess_bytes": 4768,
+        "scope": "Source-bound development ARM link and budgets only. Actual compiler/configure inputs were unchanged; two unrelated tool inputs changed during the broad monitor, so there is no clean full-root claim."
+      },
+      "host": {
+        "real_broker_cases": 5,
+        "pcap_files": 10,
+        "scope": "Real host TLS/mTLS and MQTT through the maintained ciphertext relay; not ARM/PHY/Board execution."
+      },
+      "entropy": "F407 RNG FULL_SOURCE is an explicit software assumption; physical min-entropy is not measured.",
+      "trusted_utc": "Denied with NX_ERROR_PERMISSION; no ARM authenticated TLS/broker claim.",
+      "qualification": false,
+      "physical_hil": "not_executed"
+    },
+    "bounded_scope_decisions": {
+      "IT-R04": {
+        "status": "existing_bounded_implementation_current_integration_and_physical_acceptance_open",
+        "selection": "STM32H743ZIT6 V, fixed HSI64, Cache off, baremetal, SPI4 lifecycle pause/resume",
+        "source": "tests/google/h743_runtime_clock_test.cpp",
+        "source_audit": "The current file declares 17 TEST_F cases. This is a source count, not a new execution receipt or proof of the complete PM exit.",
+        "scope": "Reuse the existing clock-domain/provider lease and retained cleanup mechanism. No new generic PM framework is planned by this row."
+      },
+      "IT-S06": {
+        "status": "conditional_no_current_need",
+        "decision": "The reviewed Settings, explicit Flash-region and MCUboot consumers use byte-oriented storage. No current file-oriented consumer requires a filesystem, so no filesystem dependency or adapter is added. Reopen selection when a real file contract and medium are supplied."
+      },
+      "IT-X04": {
+        "status": "conditional_no_current_need",
+        "decision": "No new probe requirement is currently established. Preserve the existing OpenOCD identity/provenance/timeout/lock path; add no new runner until an actual probe requires it."
+      }
+    },
+    "remaining_exits": {
+      "V-A01": "Private annex and complete applicable-mode inventory remain open.",
+      "V-I03_V-I05_V-I06": "Per-configuration/runtime cost, service/rearm, held-consumer/backpressure and contention comparisons remain open; link budgets are not measured timing or stack high-water.",
+      "F01": "Purpose/input/output/failure/cost inventory and explicit disposition of overlapping checks remain open.",
+      "F07": "Controlled same-coverage cold/warm time and memory comparison remains open.",
+      "V-K05": "The complete real onboarding/developer path remains open.",
+      "V-J07": "Test-retention review needs obsolete-contract or independent equivalent-coverage evidence; counts must not be reduced to manufacture passing results.",
+      "formal_software_plan": {
+        "required_stages": 159,
+        "status": "not_executed_for_current_feature_cohort"
+      },
+      "oci_and_fresh_offline_builds": "Existing recipe/fresh-daemon and fresh offline reproducibility exits remain open.",
+      "server_rules_and_remote_analysis": "Use actual current server readbacks and analysis disposition; local policy or ordinary gates do not establish remote enforcement.",
+      "physical_hil": "not_executed",
+      "new_software_candidate": "not_created"
+    },
+    "current_remote_rule_observation": {
+      "date": "2026-11-03",
+      "branch": "main",
+      "observed_commit": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+      "protected": false,
+      "rulesets": [],
+      "create_ruleset_attempt": "actual_HTTP_403_Resource_not_accessible_by_integration",
+      "raw_location": "build/recovery-20261103/remote-rules",
+      "scope": "No service-side protection was established. Repository permission metadata and local policy do not prove administration capability or configured enforcement."
     }
   }
 }

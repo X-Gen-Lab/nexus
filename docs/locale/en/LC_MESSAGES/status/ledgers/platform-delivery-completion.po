@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 03f528da884d9f1015de4a8b669871e8a1140d578824dc04a6a9bef3dd6951f4\n"
+"X-Nexus-Source-SHA256: 1496e8b4051f3e70fddd7f8fd2e7e04d18e28638656ae9ca58ff796bb3a328ca\n"
 
 #: ../../../../workspace/nexus/docs/status/ledgers/platform-delivery-completion.md:9
 msgid "平台交付完善台账"
@@ -3490,9 +3490,6 @@ msgstr "IT-R01"
 msgid "只读运行状态观察"
 msgstr "Read-only runtime-state observation"
 
-msgid "io/;components/;tests/google/"
-msgstr "io/;components/;tests/google/"
-
 msgid "先以 UART/SPI 复用真实 owner/provider 事实提供可选观察；不创建第二状态机，快照不授予操作权限，关闭观察不增加热路径常驻成本。"
 msgstr "Start with optional UART/SPI observations derived from real owner/provider facts; add no second state machine, grant no operation authority from snapshots, and impose no resident hot-path cost when disabled."
 
@@ -3511,9 +3508,6 @@ msgstr "IT-R04"
 msgid "精确 runtime PM 路径"
 msgstr "Exact runtime-PM path"
 
-msgid "components/;soc/;tools/hil/;tests/google/"
-msgstr "components/;soc/;tools/hil/;tests/google/"
-
 msgid "固定控制器、电源/clock、pin 与唤醒依赖并验证 suspend/resume 回滚；软件结果和真实功耗、保留范围、唤醒时序分别验收。"
 msgstr "Fix controller, power/clock, pin and wake dependencies and verify suspend/resume rollback; accept software results separately from actual power, retention and wake timing."
 
@@ -3523,9 +3517,6 @@ msgstr "IT-R05"
 msgid "第二传感器与采样合同"
 msgstr "Second sensor and sampling contract"
 
-msgid "components/;tests/google/;tools/hil/"
-msgstr "components/;tests/google/;tools/hil/"
-
 msgid "用第二个实际器件检验单位、有效性、时间来源、校准、overflow 与 sample lifetime；复用 bus owner，覆盖坏值、过期、总线失败、取消与多实例。"
 msgstr "Use a second actual device to test units, validity, time provenance, calibration, overflow and sample lifetime; reuse bus owners and cover invalid or stale values, bus failures, cancellation and multiple instances."
 
@@ -3534,9 +3525,6 @@ msgstr "IT-N01"
 
 msgid "首发联网范围与预算"
 msgstr "Initial networking scope and budgets"
-
-msgid "components/;dependencies/;docs/delivery/next-iterations.md"
-msgstr "components/;dependencies/;docs/delivery/next-iterations.md"
 
 msgid "固定一个精确 SoC/Board/PHY/backend 和 IPv4 纵切片，声明 MTU、连接、帧、任务、存储及排除项；裸机与 RTOS 组合分别准入。"
 msgstr "Fix one exact SoC/Board/PHY/backend and IPv4 slice, declaring MTU, connections, frames, tasks, storage and exclusions; admit bare-metal and RTOS combinations separately."
@@ -3582,9 +3570,6 @@ msgstr "IT-N06"
 
 msgid "熵接口与首个 provider"
 msgstr "Entropy interface and first provider"
-
-msgid "io/;soc/;components/;tests/google/;tools/hil/"
-msgstr "io/;soc/;components/;tests/google/;tools/hil/"
 
 msgid "明确来源、健康失败、可用量、上下文、deadline 和关闭合同；不足或硬件错误明确失败，不使用时间戳或固定种子替代真实熵。"
 msgstr "Specify source, health failure, available quantity, context, deadline and shutdown contracts; fail explicitly on shortage or hardware error rather than substituting timestamps or fixed seeds for entropy."
@@ -3643,9 +3628,6 @@ msgstr "IT-S03"
 msgid "镜像维护窄端口"
 msgstr "Narrow image-maintenance ports"
 
-msgid "components/;io/;tests/google/"
-msgstr "components/;io/;tests/google/"
-
 msgid "使用显式 Flash region 检查 image bounds、对齐、擦写、同步、busy 与状态读回；不自动预留分区，不把 CRC 当签名认证。"
 msgstr "Check image bounds, alignment, erase/program, sync, busy and state readback within explicit Flash regions; reserve no partitions automatically and do not treat CRC as signature authentication."
 
@@ -3655,9 +3637,6 @@ msgstr "IT-S04"
 msgid "成熟 bootloader 外部集成"
 msgstr "External integration of a mature bootloader"
 
-msgid "components/;cmake/;dependencies/;docs/"
-msgstr "components/;cmake/;dependencies/;docs/"
-
 msgid "评估 MCUboot 等成熟方案，分别构建 bootloader 与应用并验证资源可行性；产品拥有分区、信任根、签名、确认、回滚和反降级策略。"
 msgstr "Evaluate mature choices such as MCUboot, build bootloader and application independently and verify resource feasibility; products own partitions, trust roots, signing, confirmation, rollback and anti-downgrade policy."
 
@@ -3666,9 +3645,6 @@ msgstr "IT-S05"
 
 msgid "镜像故障与资源验证"
 msgstr "Image fault and resource validation"
-
-msgid "tests/;tools/testing/;tools/hil/"
-msgstr "tests/;tools/testing/;tools/hil/"
 
 msgid "验证越界、部分写、无效镜像、版本及状态异常和 ARM image/link 布局；物理掉电、真实启动、确认和回滚按实板记录独立验收。"
 msgstr "Verify out-of-bounds access, partial writes, invalid images, version/state faults and ARM image/link layouts; accept physical power cuts, boot, confirmation and rollback through separate station records."
@@ -3748,9 +3724,6 @@ msgstr "IT-E01"
 msgid "工业控制外部参考系统"
 msgstr "External industrial-control reference system"
 
-msgid "components/;docs/;X-Gen-Lab/nexus-examples"
-msgstr "components/;docs/;X-Gen-Lab/nexus-examples"
-
 msgid "组合现有采集、Modbus、owner、Storage 和 watchdog，实际展示启动、运行、维护、停止、失败与恢复；任务、寄存器表和产品策略保持外部。"
 msgstr "Compose existing acquisition, Modbus, owners, Storage and watchdog to exercise startup, operation, maintenance, shutdown, failure and recovery; keep tasks, register maps and product policy external."
 
@@ -3763,20 +3736,8 @@ msgstr "External network-gateway reference system"
 msgid "用精确外部组合完成 Ethernet→TCP/TLS→MQTT，展示断网、耗尽、重连和关闭；凭据、授权和业务策略外置，私有源及证据不进入公共包。"
 msgstr "Complete Ethernet→TCP/TLS→MQTT in an exact external composition, exercising disconnection, exhaustion, reconnect and shutdown; keep credentials, authorization and business policy external and private source/evidence out of public packages."
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`7258acf6d69723c4055021783da9e18e2d2f0bc90dd1f5a0b2d52cc928b41cae`。"
-msgstr "This page is derived from the original CSV, not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source file: `docs/design/platform-delivery-completion.csv`; SHA-256: `7258acf6d69723c4055021783da9e18e2d2f0bc90dd1f5a0b2d52cc928b41cae`."
-
-msgid "in_progress"
-msgstr "in_progress"
-
-msgid "development_checks_reported_full_gate_and_sdk_pending"
-msgstr "development_checks_reported_full_gate_and_sdk_pending"
-
 msgid "tools/configure/integration_package.py;docs/guides/provider-porting.md"
 msgstr "tools/configure/integration_package.py;docs/guides/provider-porting.md"
-
-msgid "tools/configure/test_external_package.py"
-msgstr "tools/configure/test_external_package.py"
 
 msgid "tools/configure/integration_package.py;tools/configure/ir.py;tools/configure/configure.py"
 msgstr "tools/configure/integration_package.py;tools/configure/ir.py;tools/configure/configure.py"
@@ -3793,35 +3754,17 @@ msgstr "cmake/platform/Firmware.cmake;tools/configure/dependencies.py"
 msgid "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;cmake/package/verification/common_services/external/assembly.toml"
 msgstr "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;cmake/package/verification/common_services/external/assembly.toml"
 
-msgid "tools/testing/test_sdk_services_policy.py;tools/configure/test_external_package.py"
-msgstr "tools/testing/test_sdk_services_policy.py;tools/configure/test_external_package.py"
-
 msgid "tools/configure/dependencies.py;tools/maintenance/capabilities.py;tools/configure/integration_package.py"
 msgstr "tools/configure/dependencies.py;tools/maintenance/capabilities.py;tools/configure/integration_package.py"
 
 msgid "cmake/package/verification/common_services/external/assembly.toml;tools/configure/test_external_package.py"
 msgstr "cmake/package/verification/common_services/external/assembly.toml;tools/configure/test_external_package.py"
 
-msgid "tools/configure/test_external_package.py;tools/testing/test_sdk_services_policy.py"
-msgstr "tools/configure/test_external_package.py;tools/testing/test_sdk_services_policy.py"
-
 msgid "os/wait.c;os/include/nexus/os/wait.h"
 msgstr "os/wait.c;os/include/nexus/os/wait.h"
 
-msgid "tests/google/wait_select_test.cpp"
-msgstr "tests/google/wait_select_test.cpp"
-
 msgid "dependencies/lwip.lock.json;components/network/CMakeLists.txt;tools/maintenance/lwip_lock.py"
 msgstr "dependencies/lwip.lock.json;components/network/CMakeLists.txt;tools/maintenance/lwip_lock.py"
-
-msgid "tools/testing/test_lwip_lock.py;tools/testing/test_lwip_sdk.py"
-msgstr "tools/testing/test_lwip_lock.py;tools/testing/test_lwip_sdk.py"
-
-msgid "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_adapter.h"
-msgstr "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_adapter.h"
-
-msgid "tests/google/network_lwip_test.cpp"
-msgstr "tests/google/network_lwip_test.cpp"
 
 msgid "components/network/port/lwipopts.h;components/network/src/lwip_adapter.c"
 msgstr "components/network/port/lwipopts.h;components/network/src/lwip_adapter.c"
@@ -3829,41 +3772,137 @@ msgstr "components/network/port/lwipopts.h;components/network/src/lwip_adapter.c
 msgid "components/network/src/lwip_adapter.c;components/network/README.md"
 msgstr "components/network/src/lwip_adapter.c;components/network/README.md"
 
-msgid "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp"
-msgstr "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp"
-
-msgid "components/network/src/lwip_adapter.c;cmake/package/verification/common_services/services.c"
-msgstr "components/network/src/lwip_adapter.c;cmake/package/verification/common_services/services.c"
-
-msgid "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp;tools/testing/test_sdk_services_policy.py"
-msgstr "tests/google/network_lwip_test.cpp;tests/google/network_tcp_pair_test.cpp;tools/testing/test_sdk_services_policy.py"
-
 msgid "components/settings/src/settings.c;components/settings/include/nexus/components/settings.h"
 msgstr "components/settings/src/settings.c;components/settings/include/nexus/components/settings.h"
-
-msgid "tests/google/settings_test.cpp;tools/testing/test_settings_component.py"
-msgstr "tests/google/settings_test.cpp;tools/testing/test_settings_component.py"
 
 msgid "components/settings/src/settings.c"
 msgstr "components/settings/src/settings.c"
 
-msgid "tests/google/settings_test.cpp"
-msgstr "tests/google/settings_test.cpp"
-
 msgid "tools/dev/device.py;tools/hil/serial_echo.py"
 msgstr "tools/dev/device.py;tools/hil/serial_echo.py"
-
-msgid "tools/testing/test_dev_serial_rates.py;tools/testing/test_dev_serial_ownership.py"
-msgstr "tools/testing/test_dev_serial_rates.py;tools/testing/test_dev_serial_ownership.py"
 
 msgid "tools/dev/artifacts.py;tools/dev/dev.py"
 msgstr "tools/dev/artifacts.py;tools/dev/dev.py"
 
-msgid "tools/testing/test_dev_artifacts.py"
-msgstr "tools/testing/test_dev_artifacts.py"
-
 msgid "tools/dev/plan.py;tools/dev/dev.py"
 msgstr "tools/dev/plan.py;tools/dev/dev.py"
 
-msgid "tools/testing/test_dev_plan_preview.py"
-msgstr "tools/testing/test_dev_plan_preview.py"
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`a76590a479285dfff655634eeb662ce24b288f78ac1a24bcf8a7657348819b2e`。"
+msgstr "This page is derived from the original CSV; it is not another status authority, execution record or software qualification. The original IDs, order and every original field come from the {download}`original ledger <../../design/platform-delivery-completion.csv>`. Source file: `docs/design/platform-delivery-completion.csv`; SHA-256: `a76590a479285dfff655634eeb662ce24b288f78ac1a24bcf8a7657348819b2e`."
+
+msgid "ordinary_accepted_eb4aba66_installed_sdk_status_in_source_record"
+msgstr "ordinary_accepted_eb4aba66_installed_sdk_status_in_source_record"
+
+msgid "docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md"
+msgstr "docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md"
+
+msgid "optional_observation_ordinary_accepted_eb4aba66_exact_scope_in_source_record"
+msgstr "optional_observation_ordinary_accepted_eb4aba66_exact_scope_in_source_record"
+
+msgid "core/include/nexus/core/request_observer.h;io/include/nexus/io/observation.h;components/owner_observer/"
+msgstr "core/include/nexus/core/request_observer.h;io/include/nexus/io/observation.h;components/owner_observer/"
+
+msgid "existing_h743_fixed64_cache_off_spi4_integration_and_physical_exits_open"
+msgstr "existing_h743_fixed64_cache_off_spi4_integration_and_physical_exits_open"
+
+msgid "components/clock_domain/;soc/stm32/stm32h743/;tests/google/h743_runtime_clock_test.cpp"
+msgstr "components/clock_domain/;soc/stm32/stm32h743/;tests/google/h743_runtime_clock_test.cpp"
+
+msgid "tmp117_bounded_contract_ordinary_accepted_eb4aba66_physical_scope_separate"
+msgstr "tmp117_bounded_contract_ordinary_accepted_eb4aba66_physical_scope_separate"
+
+msgid "components/tmp117/;tests/google/tmp117_test.cpp"
+msgstr "components/tmp117/;tests/google/tmp117_test.cpp"
+
+msgid "recovery_134304_flash_116024_sram_budget_development_current_acceptance_in_source_record"
+msgstr "recovery_134304_flash_116024_sram_budget_development_current_acceptance_in_source_record"
+
+msgid "tests/contracts/f407_qiming_network/;components/network/;components/tls/;components/mqtt/"
+msgstr "tests/contracts/f407_qiming_network/;components/network/;components/tls/;components/mqtt/"
+
+msgid "selected_stack_profiles_ordinary_accepted_eb4aba66_installed_sdk_separate"
+msgstr "selected_stack_profiles_ordinary_accepted_eb4aba66_installed_sdk_separate"
+
+msgid "payload_loans_tx_outcome_ordinary_accepted_eb4aba66_sdk_and_hil_separate"
+msgstr "payload_loans_tx_outcome_ordinary_accepted_eb4aba66_sdk_and_hil_separate"
+
+msgid "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_loaned_rx.h;docs/reference/api/components.md"
+msgstr "components/network/src/lwip_adapter.c;components/network/include/nexus/network/lwip_loaned_rx.h;docs/reference/api/components.md"
+
+msgid "copied_and_loaned_profile_contracts_ordinary_accepted_eb4aba66_sdk_separate"
+msgstr "copied_and_loaned_profile_contracts_ordinary_accepted_eb4aba66_sdk_separate"
+
+msgid "bounded_ipv4_tcp_ordinary_accepted_eb4aba66_physical_scope_separate"
+msgstr "bounded_ipv4_tcp_ordinary_accepted_eb4aba66_physical_scope_separate"
+
+msgid "f407_entropy_contract_ordinary_accepted_eb4aba66_physical_entropy_open"
+msgstr "f407_entropy_contract_ordinary_accepted_eb4aba66_physical_entropy_open"
+
+msgid "io/include/nexus/io/entropy.h;soc/stm32/stm32f407/drivers/entropy.c;soc/stm32/stm32f407/entropy_instance.c;tests/google/entropy_test.cpp"
+msgstr "io/include/nexus/io/entropy.h;soc/stm32/stm32f407/drivers/entropy.c;soc/stm32/stm32f407/entropy_instance.c;tests/google/entropy_test.cpp"
+
+msgid "bounded_tls_ordinary_accepted_eb4aba66_earlier205_scope_retained"
+msgstr "bounded_tls_ordinary_accepted_eb4aba66_earlier205_scope_retained"
+
+msgid "components/tls/;dependencies/mbedtls.lock.json;tests/google/tls_client_test.cpp"
+msgstr "components/tls/;dependencies/mbedtls.lock.json;tests/google/tls_client_test.cpp"
+
+msgid "bounded_mqtt_ordinary_accepted_eb4aba66_host_broker_scope_separate"
+msgstr "bounded_mqtt_ordinary_accepted_eb4aba66_host_broker_scope_separate"
+
+msgid "components/mqtt/;dependencies/coremqtt.lock.json;tests/google/mqtt_client_test.cpp"
+msgstr "components/mqtt/;dependencies/coremqtt.lock.json;tests/google/mqtt_client_test.cpp"
+
+msgid "recovery_host5_pcap10_arm_budget_development_current_acceptance_in_source_record"
+msgstr "recovery_host5_pcap10_arm_budget_development_current_acceptance_in_source_record"
+
+msgid "tests/contracts/lwip_mqtt_interop/;tests/contracts/f407_qiming_network/;tools/testing/mqtt_tls_interop.py"
+msgstr "tests/contracts/lwip_mqtt_interop/;tests/contracts/f407_qiming_network/;tools/testing/mqtt_tls_interop.py"
+
+msgid "explicit_mcuboot_control_flash_contracts_ordinary_accepted_eb4aba66_sdk_separate"
+msgstr "explicit_mcuboot_control_flash_contracts_ordinary_accepted_eb4aba66_sdk_separate"
+
+msgid "components/mcuboot/port/flash_map_backend/flash_map_backend.h;components/mcuboot/include/nexus/components/mcuboot_control.h"
+msgstr "components/mcuboot/port/flash_map_backend/flash_map_backend.h;components/mcuboot/include/nexus/components/mcuboot_control.h"
+
+msgid "selected_mcuboot_overwrite_contract_ordinary_accepted_eb4aba66_physical_open"
+msgstr "selected_mcuboot_overwrite_contract_ordinary_accepted_eb4aba66_physical_open"
+
+msgid "components/mcuboot/;dependencies/mcuboot.lock.json;tests/contracts/mcuboot_link/"
+msgstr "components/mcuboot/;dependencies/mcuboot.lock.json;tests/contracts/mcuboot_link/"
+
+msgid "mcuboot_model_contracts_ordinary_accepted_eb4aba66_sdk_and_physical_separate"
+msgstr "mcuboot_model_contracts_ordinary_accepted_eb4aba66_sdk_and_physical_separate"
+
+msgid "tests/google/mcuboot_control_test.cpp;tests/google/mcuboot_boot_test.cpp;tests/contracts/mcuboot_link/"
+msgstr "tests/google/mcuboot_control_test.cpp;tests/google/mcuboot_boot_test.cpp;tests/contracts/mcuboot_link/"
+
+msgid "conditional_no_current_need"
+msgstr "conditional_no_current_need"
+
+msgid "reviewed_consumers_byte_oriented_no_filesystem_dependency_added"
+msgstr "reviewed_consumers_byte_oriented_no_filesystem_dependency_added"
+
+msgid "optional_gdb_client_contract_ordinary_accepted_eb4aba66_exact_scope_separate"
+msgstr "optional_gdb_client_contract_ordinary_accepted_eb4aba66_exact_scope_separate"
+
+msgid "tools/dev/device.py;tools/testing/test_dev_gdb_client.py"
+msgstr "tools/dev/device.py;tools/testing/test_dev_gdb_client.py"
+
+msgid "no_new_probe_requirement_existing_openocd_path_preserved_no_runner_added"
+msgstr "no_new_probe_requirement_existing_openocd_path_preserved_no_runner_added"
+
+msgid "current_cli_contracts_ordinary_accepted_eb4aba66_exact_scope_in_source_record"
+msgstr "current_cli_contracts_ordinary_accepted_eb4aba66_exact_scope_in_source_record"
+
+msgid "focused_fault_sanitizer_host_scopes_retained_current_formal_plan_open"
+msgstr "focused_fault_sanitizer_host_scopes_retained_current_formal_plan_open"
+
+msgid "private_ff86eb49_sdk6c3a380a_ordinary_accepted_physical_scope_open"
+msgstr "private_ff86eb49_sdk6c3a380a_ordinary_accepted_physical_scope_open"
+
+msgid "X-Gen-Lab/nexus-examples"
+msgstr "X-Gen-Lab/nexus-examples"
+
+msgid "private_ff86eb49_sdk6c3a380a_source_installed_broker5_and_ordinary_accepted_physical_open"
+msgstr "private_ff86eb49_sdk6c3a380a_source_installed_broker5_and_ordinary_accepted_physical_open"
