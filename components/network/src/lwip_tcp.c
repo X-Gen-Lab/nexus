@@ -341,7 +341,8 @@ static nx_result_t progress(nx_lwip_tcp_t* client) {
         client->diagnostic.state != NX_LWIP_TCP_CONNECTING) {
         err_t output = tcp_output(client->pcb);
         if (output != ERR_OK) {
-            client->diagnostic.stack_error = output;
+            /* Keep the stack's signed numeric error in the diagnostic. */
+            client->diagnostic.stack_error = (int)output;
             if (output != ERR_MEM && output != ERR_BUF) {
                 return failed(client, NX_ERROR_IO, output);
             }
@@ -452,7 +453,7 @@ nx_result_t nx_lwip_tcp_try_write(nx_lwip_tcp_t* client, const uint8_t* data,
          * it. */
         *accepted = count;
         err_t output = tcp_output(client->pcb);
-        client->diagnostic.stack_error = output;
+        client->diagnostic.stack_error = (int)output;
         if (output != ERR_OK && output != ERR_MEM && output != ERR_BUF) {
             (void)failed(client, NX_ERROR_IO, output);
         }
@@ -568,7 +569,7 @@ nx_result_t nx_lwip_tcp_close(nx_lwip_tcp_t* client, nx_time_us_t deadline) {
     err_t error = tcp_close(pcb);
     if (error != ERR_OK) {
         attach(client);
-        client->diagnostic.stack_error = error;
+        client->diagnostic.stack_error = (int)error;
         leave_call(client);
         return error == ERR_MEM ? NX_ERROR_BUSY
                                 : failed(client, NX_ERROR_IO, error);

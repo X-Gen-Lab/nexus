@@ -670,6 +670,8 @@ if(TARGET Nexus::LwIPTCPStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_stream_test
         SOURCES network_tcp_stream_test.cpp
         LIBRARIES Nexus::LwIPTCPStorage)
+    target_link_options(nexus_network_tcp_stream_test PRIVATE
+        "LINKER:--wrap=tcp_output" "LINKER:--wrap=tcp_close")
     set_tests_properties(nexus_network_tcp_stream_test PROPERTIES TIMEOUT 30)
 endif()
 
@@ -682,6 +684,8 @@ if(TARGET Nexus::LwIPTCPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_loaned_stream_test
         SOURCES network_tcp_stream_test.cpp
         LIBRARIES Nexus::LwIPTCPLoanedRXStorage)
+    target_link_options(nexus_network_tcp_loaned_stream_test PRIVATE
+        "LINKER:--wrap=tcp_output" "LINKER:--wrap=tcp_close")
     set_tests_properties(nexus_network_tcp_loaned_stream_test PROPERTIES TIMEOUT 30)
 endif()
 

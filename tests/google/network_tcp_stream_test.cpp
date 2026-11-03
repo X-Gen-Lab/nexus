@@ -46,6 +46,8 @@ enum class Action : uint32_t {
     CrossHook,
     Drop,
     DropNextData,
+    OutputFailure,
+    CloseFailure,
     Exit
 };
 struct Command {
@@ -72,6 +74,8 @@ struct Snapshot {
     uint32_t dropped;
     uint32_t data_attempts;
     uint32_t provider_calls;
+    uint32_t output_failures;
+    uint32_t close_failures;
     nx_result_t cross_read;
     nx_result_t cross_write;
     nx_result_t cross_service;
@@ -90,6 +94,40 @@ struct Snapshot {
 };
 uint8_t pattern(size_t offset, uint32_t identity) {
     return static_cast<uint8_t>((offset * 7U + identity * 41U) % 251U);
+}
+/* Only the exact selected external PCB operation is replaced. Other peer,
+ * handshake and progress calls continue through the pinned real stack. */
+struct StackFailure {
+    tcp_pcb* pcb{};
+    err_t error = ERR_OK;
+    uint32_t skip{};
+    uint32_t observed{};
+};
+StackFailure output_failure;
+StackFailure close_failure;
+err_t selected_error(uint32_t selection) {
+    switch (selection & 0xffU) {
+        case 1U:
+            return ERR_MEM;
+        case 2U:
+            return ERR_BUF;
+        case 3U:
+            return ERR_RTE;
+        default:
+            return ERR_CONN;
+    }
+}
+bool reject_operation(StackFailure& failure, tcp_pcb* pcb) {
+    if (failure.pcb != pcb || pcb == nullptr) {
+        return false;
+    }
+    if (failure.skip != 0U) {
+        --failure.skip;
+        return false;
+    }
+    failure.pcb = nullptr;
+    ++failure.observed;
+    return true;
 }
 struct Worker : FrameEndpoint {
     struct Peer {
@@ -442,6 +480,16 @@ struct Worker : FrameEndpoint {
             case Action::DropNextData:
                 drop_next_data = true;
                 break;
+            case Action::OutputFailure:
+                output_failure.pcb = client.pcb;
+                output_failure.error = selected_error(command.value);
+                output_failure.skip = command.value >> 8U;
+                break;
+            case Action::CloseFailure:
+                close_failure.pcb = client.pcb;
+                close_failure.error = selected_error(command.value);
+                close_failure.skip = 0U;
+                break;
             case Action::Exit:
                 on_submit = nullptr;
                 for (size_t j = 0U; j < 2U; ++j) {
@@ -479,6 +527,8 @@ struct Worker : FrameEndpoint {
         value.dropped = dropped;
         value.data_attempts = data_attempts;
         value.provider_calls = provider_calls;
+        value.output_failures = output_failure.observed;
+        value.close_failures = close_failure.observed;
         value.cross_read = cross_read;
         value.cross_write = cross_write;
         value.cross_service = cross_service;
@@ -733,6 +783,77 @@ TEST(NxLwipTcpPair,
     EXPECT_EQ(NX_SUCCESS, pair.Call(1U, Action::Abort).result);
     EXPECT_FALSE(pair.states[1].held[0]);
     EXPECT_FALSE(pair.states[1].pcb[0]);
+}
+TEST(NxLwipTcpPair, ServicePreservesSignedRetryableAndFatalOutputDiagnostics) {
+    const std::array<int, 3> errors{ERR_MEM, ERR_BUF, ERR_RTE};
+    for (uint32_t selection = 1U; selection <= errors.size(); ++selection) {
+        SCOPED_TRACE(selection);
+        Pair pair;
+        pair.Connect();
+        pair.Call(1U, Action::OutputFailure, 0U, selection);
+        const auto failed = pair.Call(1U, Action::ClientService);
+        EXPECT_EQ(failed.output_failures, 1U);
+        EXPECT_EQ(failed.diagnostic[0].stack_error, errors[selection - 1U]);
+        EXPECT_LT(failed.diagnostic[0].stack_error, 0);
+        EXPECT_EQ(failed.result, selection == 3U ? NX_ERROR_IO : NX_ERROR_BUSY);
+        EXPECT_EQ(failed.diagnostic[0].state, selection == 3U
+                                                  ? NX_LWIP_TCP_FAILED
+                                                  : NX_LWIP_TCP_ESTABLISHED);
+        EXPECT_TRUE(failed.pcb[0]);
+        EXPECT_GT(failed.callback_refs[0], 0U);
+        EXPECT_EQ(NX_SUCCESS, pair.Call(1U, Action::Abort).result);
+        EXPECT_FALSE(pair.states[1].pcb[0]);
+        EXPECT_EQ(pair.states[1].callback_refs[0], 0U);
+    }
+}
+TEST(NxLwipTcpPair, CopiedWriteKeepsAcceptanceAndSignedOutputDiagnostics) {
+    const std::array<int, 3> errors{ERR_MEM, ERR_BUF, ERR_RTE};
+    for (uint32_t selection = 1U; selection <= errors.size(); ++selection) {
+        SCOPED_TRACE(selection);
+        Pair pair;
+        pair.Connect();
+        /* try_write first progresses once; reject only the output following
+         * the successful real tcp_write COPY admission. */
+        pair.Call(1U, Action::OutputFailure, 0U, selection | (1U << 8U));
+        const auto copied = pair.Call(1U, Action::Write, 0U, 17U);
+        EXPECT_EQ(copied.output_failures, 1U);
+        EXPECT_EQ(copied.result, NX_SUCCESS);
+        EXPECT_EQ(copied.enqueued[0], 17U);
+        EXPECT_EQ(copied.diagnostic[0].stack_error, errors[selection - 1U]);
+        EXPECT_LT(copied.diagnostic[0].stack_error, 0);
+        EXPECT_EQ(copied.diagnostic[0].state, selection == 3U
+                                                  ? NX_LWIP_TCP_FAILED
+                                                  : NX_LWIP_TCP_ESTABLISHED);
+        EXPECT_TRUE(copied.pcb[0]);
+        EXPECT_EQ(NX_SUCCESS, pair.Call(1U, Action::Abort).result);
+        EXPECT_FALSE(pair.states[1].pcb[0]);
+    }
+}
+TEST(NxLwipTcpPair, RejectedCloseKeepsSignedCodeAndRestoresCallbackOwnership) {
+    const std::array<uint32_t, 2> selections{1U, 4U};
+    const std::array<int, 2> errors{ERR_MEM, ERR_CONN};
+    for (size_t index = 0U; index < selections.size(); ++index) {
+        SCOPED_TRACE(index);
+        Pair pair;
+        pair.Connect();
+        pair.Call(1U, Action::CloseFailure, 0U, selections[index]);
+        const auto refused = pair.Call(1U, Action::Close);
+        EXPECT_EQ(refused.close_failures, 1U);
+        EXPECT_EQ(refused.result, index == 0U ? NX_ERROR_BUSY : NX_ERROR_IO);
+        EXPECT_EQ(refused.diagnostic[0].stack_error, errors[index]);
+        EXPECT_LT(refused.diagnostic[0].stack_error, 0);
+        EXPECT_EQ(refused.diagnostic[0].state,
+                  index == 0U ? NX_LWIP_TCP_CLOSING : NX_LWIP_TCP_FAILED);
+        EXPECT_TRUE(refused.pcb[0]);
+        EXPECT_GT(refused.callback_refs[0], 0U);
+        if (index == 0U) {
+            EXPECT_EQ(NX_SUCCESS, pair.Call(1U, Action::Close).result);
+        } else {
+            EXPECT_EQ(NX_SUCCESS, pair.Call(1U, Action::Abort).result);
+        }
+        EXPECT_FALSE(pair.states[1].pcb[0]);
+        EXPECT_EQ(pair.states[1].callback_refs[0], 0U);
+    }
 }
 TEST(NxLwipTcpPair, UnacknowledgedCloseKeepsTheFirstDeadlineAndItsContext) {
     Pair pair;
@@ -1113,4 +1234,14 @@ extern "C" uint32_t nx_lwip_port_random_u32(void) {
 }
 extern "C" void nx_lwip_port_assert(const char* message) {
     Assert(message);
+}
+extern "C" err_t __real_tcp_output(tcp_pcb* pcb);
+extern "C" err_t __wrap_tcp_output(tcp_pcb* pcb) {
+    return reject_operation(output_failure, pcb) ? output_failure.error
+                                                 : __real_tcp_output(pcb);
+}
+extern "C" err_t __real_tcp_close(tcp_pcb* pcb);
+extern "C" err_t __wrap_tcp_close(tcp_pcb* pcb) {
+    return reject_operation(close_failure, pcb) ? close_failure.error
+                                                : __real_tcp_close(pcb);
 }
