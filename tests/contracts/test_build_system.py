@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 from pathlib import Path
 import shutil
 import subprocess
@@ -65,7 +66,8 @@ class BuildSystemTests(unittest.TestCase):
             'set_target_properties(nexus_platform PROPERTIES\n'
             ' NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"\n'
             ' NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"\n'
-            ' NEXUS_SOC_FAMILY native NEXUS_BACKEND baremetal\n'
+            ' NEXUS_SOC_FAMILY native NEXUS_CPU_ARCH native\n'
+            ' NEXUS_BACKEND baremetal\n'
             ' NEXUS_COMPONENT_TARGETS "")\n'
             'add_library(Nexus::Platform ALIAS nexus_platform)\n')
         (self.source / "main.cpp").write_text(source or (
@@ -102,6 +104,83 @@ class BuildSystemTests(unittest.TestCase):
         self.assertIn("-flto", self.application_compile_command())
         self.build_application()
         self.run_command(str(self.build / "bin/app"))
+
+    def tls_fixture(self, optimization):
+        """Use the real TLS helper from a separate C11 composition directory."""
+        assembly_path = ROOT / "tools/configure/assemblies/native-empty.toml"
+        assembly = assembly_path.read_text()
+        (self.source / "assembly.toml").write_text(assembly.replace(
+            'optimization = "Os"', f'optimization = "{optimization}"'))
+        (self.source / "main.c").write_text(
+            '#include "nexus/tls/storage.h"\n'
+            'static nx_tls_session_t session;\n'
+            'int main(void) {\n'
+            '    return nx_tls_abort(&session) == NX_SUCCESS ? 0 : 1;\n'
+            '}\n')
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(tls_policy_consumer LANGUAGES C)\n'
+            'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+            'set(NEXUS_ASSEMBLY_FILE\n'
+            '    "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
+            'set(NEXUS_BUILD_TESTS OFF)\n'
+            'set(NEXUS_BUILD_WORKLOAD OFF)\n'
+            f'add_subdirectory("{ROOT.as_posix()}" nexus-sdk)\n'
+            'nexus_add_tls()\n'
+            'if(DEFINED CMAKE_POLICY_DEFAULT_CMP0069)\n'
+            '  message(FATAL_ERROR "TLS leaked a supplier policy default")\n'
+            'endif()\n'
+            'nexus_add_firmware(app SOURCES main.c\n'
+            '    LIBRARIES Nexus::TLSStorage)\n')
+
+    def tls_compiled_commands(self):
+        """Require executed supplier objects and the actual executable link."""
+        built = self.run_command(self.cmake, "--build", str(self.build),
+                                 "--target", "app", "--verbose",
+                                 "--parallel", "1")
+        self.run_command(str(self.build / "bin/app"))
+        database = self.build / "compile_commands.json"
+        commands = json.loads(database.read_text())
+        compiled = [entry for entry in commands
+                    if Path(entry["file"]).suffix == ".c"
+                    and (Path(entry["directory"]) / entry["output"]).is_file()]
+        supplier_root = ROOT / "ext/mbedtls"
+        supplier = [entry for entry in compiled
+                    if Path(entry["file"]).is_relative_to(supplier_root)]
+        self.assertTrue(supplier, "The actual TLS supplier was not compiled")
+        for name in ("ssl_tls.c", "psa_crypto.c"):
+            self.assertTrue(any(Path(entry["file"]).name == name
+                                for entry in supplier), name)
+        application = next(entry for entry in compiled
+                           if Path(entry["file"]) == self.source / "main.c")
+        links = [line for line in built.stdout.splitlines()
+                 if " -o bin/app " in line]
+        self.assertEqual(len(links), 1, built.stdout)
+        return supplier + [application], shlex.split(links[0])
+
+    def test_tls_supplier_lto_reaches_actual_c_commands_and_link(self):
+        self.tls_fixture("Os-lto")
+        self.configure(arguments=("-DCMAKE_BUILD_TYPE=Release",))
+        commands, link = self.tls_compiled_commands()
+        for entry in commands:
+            with self.subTest(source=entry["file"]):
+                arguments = shlex.split(entry["command"])
+                self.assertIn("-std=c11", arguments)
+                lto = any(flag.startswith("-flto") for flag in arguments)
+                self.assertTrue(lto, entry["command"])
+        self.assertTrue(any(flag.startswith("-flto") for flag in link), link)
+
+    def test_tls_supplier_no_lto_keeps_actual_c_commands_and_link_plain(self):
+        self.tls_fixture("Os")
+        self.configure(arguments=("-DCMAKE_BUILD_TYPE=Release",))
+        commands, link = self.tls_compiled_commands()
+        for entry in commands:
+            with self.subTest(source=entry["file"]):
+                arguments = shlex.split(entry["command"])
+                self.assertIn("-std=c11", arguments)
+                lto = any(flag.startswith("-flto") for flag in arguments)
+                self.assertFalse(lto, entry["command"])
+        self.assertFalse(any(flag.startswith("-flto") for flag in link), link)
 
     def test_default_product_warnings_are_consumer_owned(self):
         self.fixture(source="int main() { int unused = 3; return 0; }\n")

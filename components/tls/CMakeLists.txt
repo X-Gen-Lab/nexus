@@ -59,6 +59,8 @@ function(nexus_add_tls)
 
     # Normal scoped variables deliberately select one profile; upstream options
     # honor CMP0077. A second independently configured PSA domain is unsupported.
+    # Honor selected IPO when upstream resets an older policy scope.
+    set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
     set(CMAKE_POLICY_DEFAULT_CMP0126 NEW)
     set(ENABLE_PROGRAMS OFF)
