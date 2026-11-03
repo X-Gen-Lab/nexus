@@ -28,6 +28,8 @@ GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
 OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/Legacy/stm32_hal_legacy.h", "Inc/stm32f4xx_hal_def.h",
     "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_ll_adc.h",
+    "Inc/stm32f4xx_ll_bus.h", "Inc/stm32f4xx_ll_rcc.h",
+    "Inc/stm32f4xx_ll_rng.h",
     "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_i2c.h",
     "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
     "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
@@ -320,7 +322,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_official_f4_required_payload_has_the_reviewed_transport_graph(self):
         lock_path = ROOT / "dependencies/stm32f4-hal.lock.json"
         lock = json.loads(lock_path.read_text())
-        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 25)
+        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 28)
         self.assertEqual(set(lock["files"]), OFFICIAL_F4_VERIFIED_FILES)
         for name in OFFICIAL_F4_VERIFIED_FILES:
             with self.subTest(name=name):
@@ -955,11 +957,22 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
             for item in ALL_SOURCE_DEPENDENCIES))
         (self.root / "baseline").write_text("committed source baseline\n")
         self.git(self.root, "add", ".")
+        self.path = "vendors/st/stm32f4_hal"
+        owning_entries = source_sdk.tree_entries(ROOT)
+        # Validate the complete owning graph while selecting only the real F4
+        # checkout below. Other dependencies remain uninitialized Gitlinks.
+        for item in ALL_SOURCE_DEPENDENCIES:
+            if item.path == self.path:
+                continue
+            row = owning_entries[item.path]
+            self.assertEqual(row[:2], ("160000", "commit"))
+            (self.root / item.path).mkdir(parents=True, exist_ok=True)
+            self.git(self.root, "update-index", "--add", "--cacheinfo",
+                     "160000", row[2], item.path)
         self.commit(self.root, "committed baseline without new dependency")
         self.baseline = self.git(self.root, "rev-parse", "HEAD").strip()
-        self.path = "vendors/st/stm32f4_hal"
         self.checkout = self.root / self.path
-        self.checkout.parent.mkdir(parents=True)
+        self.checkout.parent.mkdir(parents=True, exist_ok=True)
         self.git(self.root, "clone", "--quiet", "--shared",
                  str(ROOT / self.path), str(self.checkout))
         self.git(self.checkout, "remote", "set-url", "origin",
@@ -1031,7 +1044,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         entries, index = source_sdk.dependency_snapshot(self.root, False)
         self.assertIsNone(index)
         self.assertNotIn(self.path, entries)
-        with self.assertRaisesRegex(ValueError, "required dependency Gitlink"):
+        with self.assertRaisesRegex(ValueError, "missing top-level dependency Gitlink"):
             source_sdk.dependency_records(self.root, entries)
         with self.assertRaisesRegex(ValueError, "dirty source checkout"):
             source_sdk.prepare(self.root, self.root.parent / (self.root.name + " output"))
@@ -2573,7 +2586,7 @@ class SourceSDKTests(unittest.TestCase):
         result = self.run_process([sys.executable, "-B", str(ROOT / "cmake/package/package_source_sdk.py"),
                                   "--source", str(repo), "--output", str(self.directory / "must not export empty SDK")])
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("required dependency Gitlink", result.stderr)
+        self.assertIn("missing top-level dependency Gitlink", result.stderr)
         self.assertFalse((self.directory / "must not export empty SDK").exists())
 
 

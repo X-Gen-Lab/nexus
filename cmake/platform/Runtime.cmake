@@ -68,6 +68,8 @@ function(nexus_add_runtime)
         endforeach()
     endforeach()
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
+    # CPU-only assembly must not probe or define unrelated host OS support.
+    set(_nexus_runtime_scope TRUE)
     foreach(layer core arch io os components)
         add_subdirectory("${NEXUS_SOURCE_DIR}/${layer}"
             "${NEXUS_BINARY_DIR}/${layer}" EXCLUDE_FROM_ALL)

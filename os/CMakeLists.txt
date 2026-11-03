@@ -15,7 +15,7 @@ add_library(nexus_os_baremetal STATIC baremetal/notify.c)
 target_link_libraries(nexus_os_baremetal PUBLIC nexus_os_wait
     PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
 
-if(NEXUS_CPU_ARCH STREQUAL "native")
+if(NEXUS_CPU_ARCH STREQUAL "native" AND NOT _nexus_runtime_scope)
     find_package(Threads REQUIRED)
     add_library(nexus_os_native STATIC native/native.c)
     target_include_directories(nexus_os_native PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/native/include")

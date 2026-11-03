@@ -234,6 +234,52 @@ class SDKVerificationCallTests(unittest.TestCase):
                               capture_output=True, text=True, timeout=30,
                               check=False)
 
+    def direct_configure(self, before="", after=""):
+        (self.root / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(direct_sdk_scope NONE)\n'
+            f'set(Python3_EXECUTABLE "{sys.executable}")\n'
+            f'set(NEXUS_SOURCE_DIR "{self.source}")\n' + before +
+            f'include("{self.source}/cmake/platform/SDK.cmake")\n' + after)
+        return subprocess.run([shutil.which("cmake"), "-S", str(self.root),
+                               "-B", str(self.root / "direct-build"), "-G", "Ninja"],
+                              capture_output=True, text=True, timeout=30,
+                              check=False)
+
+    def test_direct_entry_publishes_the_actually_verified_sdk_source(self):
+        result = self.direct_configure(after=(
+            'get_property(source GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/verified-source.txt" "${source}")\n'))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.root / "direct-build/verified-source.txt").read_text(),
+                         str(self.source))
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+
+    def test_direct_entry_without_manifest_never_claims_sdk_scope(self):
+        (self.source / ".nexus-source-sdk.json").unlink()
+        result = self.direct_configure(after=(
+            'get_property(source GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/verified-source.txt" "${source}")\n'))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.root / "direct-build/verified-source.txt").read_text(), "")
+        self.assertFalse((self.source.parent / "count").exists())
+
+    def test_direct_entry_rejects_conflicting_previously_admitted_sdk(self):
+        result = self.direct_configure(before=(
+            f'set_property(GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE "{self.root}/other-sdk")\n'))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("only one resolved Nexus source SDK", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+
+    def test_direct_entry_still_rejects_modified_payload_before_scope_publication(self):
+        (self.source / "payload").write_text("changed")
+        result = self.direct_configure(after=(
+            'file(WRITE "${CMAKE_BINARY_DIR}/after-admission.txt" "unexpected")\n'))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("actual payload changed", result.stdout + result.stderr)
+        self.assertFalse((self.root / "direct-build/after-admission.txt").exists())
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+
     def test_package_and_provider_entries_each_verify(self):
         result = self.configure()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

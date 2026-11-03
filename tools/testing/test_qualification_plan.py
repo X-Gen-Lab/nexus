@@ -409,12 +409,15 @@ class QualificationPlanTests(unittest.TestCase):
                 self.assertTrue(expected)
                 self.assertEqual(observed[name], expected)
 
-    def test_complete_boundary_domains_follow_installed_sdk_consumers(self):
+    def test_boundary_domains_fail_before_expensive_native_compilation(self):
         names = [stage["name"] for stage in self.stages]
-        previous = names.index("sdk-consumers")
-        self.assertEqual(names[previous:previous + 4],
-                         ["sdk-consumers", "contract-tools", "freertos-tools",
-                          "providers-mainstream_assembly"])
+        contracts = names.index("contract-tools")
+        kernel = names.index("freertos-tools")
+        self.assertEqual(kernel, contracts + 1)
+        self.assertLess(kernel, names.index("configure-native-debug"),
+                        "Check isolated SDK/runtime boundaries before Native builds")
+        consumers = names.index("sdk-consumers")
+        self.assertEqual(names[consumers + 1], "providers-mainstream_assembly")
 
     def test_image_artifact_script_bootstraps_without_import_environment(self):
         script = ROOT / "tests/contracts/test_image_artifacts.py"

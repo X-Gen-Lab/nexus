@@ -9,6 +9,12 @@ if(EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json")
     if(NOT sdk_result EQUAL 0)
         message(FATAL_ERROR "Source SDK identity failed: ${sdk_error}")
     endif()
+    # Publish the verified source scope for direct and package consumers.
+    get_property(sdk_existing_source GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE)
+    if(sdk_existing_source AND NOT sdk_existing_source STREQUAL NEXUS_SOURCE_DIR)
+        message(FATAL_ERROR "One build may contain only one resolved Nexus source SDK")
+    endif()
+    set_property(GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE "${NEXUS_SOURCE_DIR}")
 endif()
 
 include_guard(GLOBAL)

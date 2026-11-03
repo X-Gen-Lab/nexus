@@ -43,6 +43,28 @@
       ]
     },
     {
+      "name": "contract-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "contracts",
+        "--report",
+        "{output}/contract-tests.json"
+      ],
+      "timeout_s": 16200
+    },
+    {
+      "name": "freertos-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "freertos",
+        "--report",
+        "{output}/freertos-tests.json"
+      ],
+      "timeout_s": 1800
+    },
+    {
       "name": "configure-native-debug",
       "checker": "configure",
       "args": [
@@ -857,28 +879,6 @@
         "{output}/sdk-consumers"
       ],
       "timeout_s": 7200
-    },
-    {
-      "name": "contract-tools",
-      "checker": "tool_tests",
-      "args": [
-        "--suite",
-        "contracts",
-        "--report",
-        "{output}/contract-tests.json"
-      ],
-      "timeout_s": 16200
-    },
-    {
-      "name": "freertos-tools",
-      "checker": "tool_tests",
-      "args": [
-        "--suite",
-        "freertos",
-        "--report",
-        "{output}/freertos-tests.json"
-      ],
-      "timeout_s": 1800
     },
     {
       "name": "providers-mainstream_assembly",
