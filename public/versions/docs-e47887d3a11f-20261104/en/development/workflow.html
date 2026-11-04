@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Develop with TDD and normal commit gates &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Maintain clear and verifiable documentation" href="documentation.html" />
+    <link rel="prev" title="Maintaining Nexus" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/development/workflow.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/development/workflow.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="develop-with-tdd-and-normal-commit-gates">
+<span id="docs-development-workflow"></span><h1>Develop with TDD and normal commit gates<a class="headerlink" href="#develop-with-tdd-and-normal-commit-gates" title="Link to this heading">¶</a></h1>
+<p>This workflow preserves current C11 architecture, formatting and explicit evidence.
+Codex owns platform maintenance; independent agents review high-risk changes.
+No fictitious personnel or local file can establish GitHub branch protection.</p>
+<section id="install-and-check-tools">
+<h2>Install and check tools<a class="headerlink" href="#install-and-check-tools" title="Link to this heading">¶</a></h2>
+<p>First complete the <a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">fixed source and recursive dependency guide</span></a>.
+From that repository root, install the maintenance tools:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/setup/install_dev_tools.py
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>dependencies/environment-tools.txt
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>Windows uses <code class="docutils literal notranslate"><span class="pre">.venv/Scripts/python.exe</span></code>. Installation establishes pre-commit and
+commit-msg hooks. Hooks inspect staged inputs without staging or silently fixing
+files. Preserve unstaged work and actual failure diagnostics; never bypass hooks.</p>
+</section>
+<section id="prepare-the-pinned-host-test-framework">
+<h2>Prepare the pinned host test framework<a class="headerlink" href="#prepare-the-pinned-host-test-framework" title="Link to this heading">¶</a></h2>
+<p>GoogleTest and GoogleMock are provided by the Git submodule <code class="docutils literal notranslate"><span class="pre">ext/googletest</span></code>. The lock records official version 1.16.0 at upstream base <code class="docutils literal notranslate"><span class="pre">6910c9d9165801d8827d628cb72eb7ea9dd538c5</span></code>; the Gitlink and selected lock commit pin organization patch <code class="docutils literal notranslate"><span class="pre">58ec32c09ed8a099e55cbdab9418597c4fd9b14f</span></code> on that base, including the host-test <code class="docutils literal notranslate"><span class="pre">RE</span></code> copy-assignment ownership fix. Dependency inventory records the official upstream base and the selected patch separately.
+The recursive checkout above includes it. For an existing checkout, prepare the
+Native dependency scope explicitly before running tests:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>prepare<span class="w"> </span>--scope<span class="w"> </span>native<span class="w"> </span>--allow-network
+</pre></div>
+</div>
+<p>To initialize only this submodule, use
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">submodule</span> <span class="pre">update</span> <span class="pre">--init</span> <span class="pre">--recursive</span> <span class="pre">ext/googletest</span></code> instead. Preparation may
+use the network; CMake configuration uses only the prepared local source and
+fails if the required source is missing, differs from the pin or has local
+modifications. It neither fetches a dependency nor substitutes a system
+installation. The framework stays in the host test graph; ARM builds and firmware
+SDK consumers do not require it.</p>
+</section>
+<section id="execute-red-green-and-review">
+<h2>Execute RED, GREEN and review<a class="headerlink" href="#execute-red-green-and-review" title="Link to this heading">¶</a></h2>
+<p>For new C behavior or defect fixes, first add a meaningful GoogleTest/GoogleMock
+regression. Execute it and retain the expected failure reason and original command.
+Implement the smallest correct production change, execute GREEN, then refactor.
+Mock external ports/MMIO, not the implementation being tested. Cover relevant
+rejection, cancellation, drain, overflow, quarantine and instance isolation.
+Python production tools use stdlib unittest with the same actual RED/GREEN rule.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/tdd_gate.py<span class="w"> </span>--all<span class="w"> </span>--preset<span class="w"> </span>native-debug
+</pre></div>
+</div>
+<p>The full gate builds the pinned offline framework and executes discovered cases
+with fresh reports and no filters/shards. Empty, skipped, partial, stale or changed
+inputs fail. The hook checks the staged tree remains unchanged; CI independently
+executes the gate. The framework is host-only C++17; firmware remains C11.
+Automation proves execution, while retained development logs document historical
+RED/GREEN order. Pure prose or diagram edits need corresponding document checks
+and semantic review rather than mirrored implementation tests.</p>
+</section>
+<section id="associate-a-complete-local-software-plan-with-a-pull-request">
+<h2>Associate a complete local software plan with a pull request<a class="headerlink" href="#associate-a-complete-local-software-plan-with-a-pull-request" title="Link to this heading">¶</a></h2>
+<p>When GitHub Actions is unavailable, <code class="docutils literal notranslate"><span class="pre">tools/maintenance/local_ci.py</span></code> checks an
+existing execution of the maintained <code class="docutils literal notranslate"><span class="pre">tools/dev/plans/software.json</span></code>. The default
+mode is read-only: it verifies actual complete stages, command receipts, clean
+source, inputs and the same plan before reporting the exact source and scope.
+It does not run the plan or convert interrupted or partial reports into success.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/maintenance/local_ci.py<span class="w"> </span>--report<span class="w"> </span>/path/to/software/report.json
+</pre></div>
+</div>
+<p>Explicit <code class="docutils literal notranslate"><span class="pre">--publish</span></code> uses an already configured authorized GitHub credential and
+an existing open PR. It checks the PR head/base twice and publishes only to the
+verified head SHA under <code class="docutils literal notranslate"><span class="pre">nexus/local-software-plan</span></code>; a later head cannot inherit
+that status. Its retained receipt distinguishes pending, confirmed and unconfirmed
+publication. Observations do not form an atomic GitHub merge transaction.</p>
+<p>This status establishes only the maintained local plan scope. It is not a GitHub
+Actions job, a sealed software candidate, a configured branch rule or a product
+release. Server rules need their own real readback; independent agent review does
+not invent a CODEOWNERS account or a human approval. The existing release workflow
+still requires its declared final-main CI jobs and trusted publication checks;
+a local status cannot silently replace those requirements.</p>
+</section>
+<section id="keep-feedback-fast-and-evidence-complete">
+<h2>Keep feedback fast and evidence complete<a class="headerlink" href="#keep-feedback-fast-and-evidence-complete" title="Link to this heading">¶</a></h2>
+<p>Use a focused development run for the behavior being changed, then execute the
+normal complete acceptance gates for the final source. Discover the maintained
+case names instead of adding duplicate test programs. Retain the original RED
+failure, GREEN result and actual command. A filter or a cached result cannot
+qualify a complete candidate.</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">tools/dev/dev.py</span> <span class="pre">timings</span> <span class="pre">/path/to/receipts</span></code> summarizes existing process
+receipts without rerunning work. Separate preparation, configuration, compilation,
+tests, documentation and SDK consumption. Preserve failed/cancelled attempts and
+unknown CPU or RSS observations; overlapping wall times are not additive elapsed
+time. Compare equivalent source/tool/profile scopes before attributing a speedup.</p>
+<p>On Linux, a normally reaped process, including a nonzero exit, can have
+<code class="docutils literal notranslate"><span class="pre">resource_usage</span></code> observed by <code class="docutils literal notranslate"><span class="pre">wait4</span></code>: user/system CPU seconds and
+<code class="docutils literal notranslate"><span class="pre">maximum_process_rss_bytes</span></code>.
+The scope is the waited process and descendants it has already reaped. The RSS
+value is the largest observed single-process peak, not simultaneous process-tree
+memory. Timeout, cancellation, launch failure, older receipts and other platforms
+retain unknown values rather than estimating them from wall time.</p>
+<p>The timings summary exposes <code class="docutils literal notranslate"><span class="pre">measured_resource_attempts</span></code> and
+<code class="docutils literal notranslate"><span class="pre">maximum_observed_process_rss_bytes</span></code> while preserving each original receipt.
+Aggregate <code class="docutils literal notranslate"><span class="pre">cpu_seconds</span></code>, <code class="docutils literal notranslate"><span class="pre">peak_rss_bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">cache_hits</span></code> remain unknown because
+nested receipts can double-count work and these observations do not establish a
+global memory peak or cache behavior. Compare cold and warm attempts separately
+under the same toolchain, source and profile; measurements from a small tool
+regression do not quantify whole-project build improvement.</p>
+<p>Choose an explicit finite compiler budget for available RAM and disk, not just
+CPU count. Reuse verified source/tool preparation and ordinary incremental builds;
+invalidate changed configuration, dependencies and generated inputs normally.
+Do not cache acceptance reports, restore incompatible objects or parallelize two
+mutations of the same build tree. Full gate discovery, actual exits, output
+identities and failure/cancellation retention remain mandatory.</p>
+<p>Before running a long qualification plan, select an explicit finite outer
+command budget and a fresh canonical absolute output path outside the platform
+input checkout, without symlink or parent-path aliases. <code class="docutils literal notranslate"><span class="pre">NEXUS_COMMAND_TIMEOUT</span></code>
+supplies the default where a process call has no explicit timeout; it does not
+replace the plan’s stage deadlines. The maintained software plan packages an SDK
+under its output, so the existing SDK boundary rejects an output inside the
+platform checkout or with path aliases.</p>
+<p>Check the invocation environment first: maintained provider and TrustZone
+qualification reject every <code class="docutils literal notranslate"><span class="pre">GIT_</span></code> variable, including the display-only
+<code class="docutils literal notranslate"><span class="pre">GIT_PAGER</span></code>. Omit an injected <code class="docutils literal notranslate"><span class="pre">GIT_PAGER</span></code> only from this launched process, and
+stop if other <code class="docutils literal notranslate"><span class="pre">GIT_</span></code> names remain. Follow the
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/dev/README.md">development command reference</a> for the maintained
+invocation. Preserve failed and interrupted attempts; a larger retry budget and
+successful early stages do not establish a completed plan or a sealed candidate.</p>
+<p>Before deleting a test, identify its behavioral obligation and independent
+remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate
+of the same contract. Keep tests that expose rejected ownership, retained borrows,
+instance isolation, cancellation, IRQ ordering, real vendor behavior or external
+SDK consumption. A passing implementation-shaped assertion alone is not an
+independent substitute. If the audit finds no safe deletion, retain the test;
+shrinking a count is not an optimization objective.</p>
+</section>
+<section id="preserve-style-and-scope">
+<h2>Preserve style and scope<a class="headerlink" href="#preserve-style-and-scope" title="Link to this heading">¶</a></h2>
+<p>Use the unchanged <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> and <code class="docutils literal notranslate"><span class="pre">.editorconfig</span></code>: 80 columns, four spaces,
+attached braces, type-attached pointer stars and backslash Doxygen comments.
+Public headers document context, deadline, ownership and failures. Source comments
+explain invariants and hardware ordering instead of repeating declaration parameters.
+New/changed files pass whole-file checks; existing frozen debt may only shrink.</p>
+<p>Commit one reviewable change with Conventional Commits. Review interface/configuration
+changes together with diagrams, examples, translation and execution scope. Keep
+products, workers, private PCB and recovery policy outside Nexus. Record actual
+source/configuration/tool/ELF identities and physical pending items; a successful
+commit or CI does not promote a product release.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintaining Nexus</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Develop with TDD and normal commit gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Maintain clear and verifiable documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">Find the implementation authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">Coding Standards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,2010 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>I/O evolution implementation ledger &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Original SoC workstream ledger" href="soc-refinement.html" />
+    <link rel="prev" title="I/O refinement ledger" href="platform-refinement.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/status/ledgers/io-evolution.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../../zh_CN/status/ledgers/io-evolution.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="i-o">
+<span id="status-ledgers-io-evolution"></span><h1>I/O evolution implementation ledger<a class="headerlink" href="#i-o" title="Link to this heading">¶</a></h1>
+<p>This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and every original field come from the <a class="reference download internal" download="" href="../../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">original</span> <span class="pre">ledger</span></code></a>. Source: <code class="docutils literal notranslate"><span class="pre">docs/design/io-evolution-execution.csv</span></code>; SHA-256: <code class="docutils literal notranslate"><span class="pre">ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1</span></code>.</p>
+<p>Different ledgers overlap in scope; do not add their counts or calculate a project-wide completion rate. Interpret implementation, software and physical status separately. <code class="docutils literal notranslate"><span class="pre">development_passed</span></code> does not mean execution at the current documentation HEAD. Consult the exact results index for the source and scope of <code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code>. Absolute <code class="docutils literal notranslate"><span class="pre">/workspace</span></code> and <code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> locators retain their original bytes and only identify the original execution host. See the <a class="reference internal" href="../software-verification.html"><span class="std std-doc">software-evidence entry</span></a> for retrievable archives and member locations.</p>
+<p><strong>Original exit fields</strong> are only fields actually present in the original CSV. Tasks, qualification prerequisites and contract links also retain their original wording; they cannot be used to invent an execution.</p>
+<p>This table contains 42 original records; this is only the source row count.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#io-01" id="id1">IO-01</a></p></li>
+<li><p><a class="reference internal" href="#io-02" id="id2">IO-02</a></p></li>
+<li><p><a class="reference internal" href="#io-03" id="id3">IO-03</a></p></li>
+<li><p><a class="reference internal" href="#io-04" id="id4">IO-04</a></p></li>
+<li><p><a class="reference internal" href="#io-05" id="id5">IO-05</a></p></li>
+<li><p><a class="reference internal" href="#io-06" id="id6">IO-06</a></p></li>
+<li><p><a class="reference internal" href="#io-07" id="id7">IO-07</a></p></li>
+<li><p><a class="reference internal" href="#io-08" id="id8">IO-08</a></p></li>
+<li><p><a class="reference internal" href="#io-09" id="id9">IO-09</a></p></li>
+<li><p><a class="reference internal" href="#io-10" id="id10">IO-10</a></p></li>
+<li><p><a class="reference internal" href="#io-11" id="id11">IO-11</a></p></li>
+<li><p><a class="reference internal" href="#io-12" id="id12">IO-12</a></p></li>
+<li><p><a class="reference internal" href="#io-13" id="id13">IO-13</a></p></li>
+<li><p><a class="reference internal" href="#io-14" id="id14">IO-14</a></p></li>
+<li><p><a class="reference internal" href="#io-15" id="id15">IO-15</a></p></li>
+<li><p><a class="reference internal" href="#io-16" id="id16">IO-16</a></p></li>
+<li><p><a class="reference internal" href="#io-17" id="id17">IO-17</a></p></li>
+<li><p><a class="reference internal" href="#io-18" id="id18">IO-18</a></p></li>
+<li><p><a class="reference internal" href="#io-19" id="id19">IO-19</a></p></li>
+<li><p><a class="reference internal" href="#io-20" id="id20">IO-20</a></p></li>
+<li><p><a class="reference internal" href="#io-21" id="id21">IO-21</a></p></li>
+<li><p><a class="reference internal" href="#io-22" id="id22">IO-22</a></p></li>
+<li><p><a class="reference internal" href="#io-23" id="id23">IO-23</a></p></li>
+<li><p><a class="reference internal" href="#io-24" id="id24">IO-24</a></p></li>
+<li><p><a class="reference internal" href="#io-25" id="id25">IO-25</a></p></li>
+<li><p><a class="reference internal" href="#io-26" id="id26">IO-26</a></p></li>
+<li><p><a class="reference internal" href="#io-27" id="id27">IO-27</a></p></li>
+<li><p><a class="reference internal" href="#io-28" id="id28">IO-28</a></p></li>
+<li><p><a class="reference internal" href="#io-29" id="id29">IO-29</a></p></li>
+<li><p><a class="reference internal" href="#io-30" id="id30">IO-30</a></p></li>
+<li><p><a class="reference internal" href="#io-31" id="id31">IO-31</a></p></li>
+<li><p><a class="reference internal" href="#io-32" id="id32">IO-32</a></p></li>
+<li><p><a class="reference internal" href="#io-33" id="id33">IO-33</a></p></li>
+<li><p><a class="reference internal" href="#io-34" id="id34">IO-34</a></p></li>
+<li><p><a class="reference internal" href="#io-35" id="id35">IO-35</a></p></li>
+<li><p><a class="reference internal" href="#io-36" id="id36">IO-36</a></p></li>
+<li><p><a class="reference internal" href="#io-37" id="id37">IO-37</a></p></li>
+<li><p><a class="reference internal" href="#io-38" id="id38">IO-38</a></p></li>
+<li><p><a class="reference internal" href="#io-39" id="id39">IO-39</a></p></li>
+<li><p><a class="reference internal" href="#io-40" id="id40">IO-40</a></p></li>
+<li><p><a class="reference internal" href="#io-41" id="id41">IO-41</a></p></li>
+<li><p><a class="reference internal" href="#io-42" id="id42">IO-42</a></p></li>
+</ul>
+</nav>
+<section id="io-01">
+<span id="status-io-evolution-io-01"></span><h2><a class="toc-backref" href="#id1" role="doc-backlink">IO-01</a><a class="headerlink" href="#io-01" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>capabilities</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Single authority for exact provider and mode support</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/selected_contracts.py;tools/configure/io_traits.py;tools/configure/factory.py;tools/maintenance/work_packages.py;docs/delivery/capabilities.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Existing catalogue plus selected metadata; document exact boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-02">
+<span id="status-io-evolution-io-02"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">IO-02</a><a class="headerlink" href="#io-02" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>traits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Optional immutable typed I/O traits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/io_traits.py;tools/configure/factory.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Capability switch controls all emitted readonly trait objects</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-03">
+<span id="status-io-evolution-io-03"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">IO-03</a><a class="headerlink" href="#io-03" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>silicon</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Observed silicon identity and revision admission</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>core/include/nexus/core/silicon.h;core/src/silicon.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Exact documents and revision policy; unknown is explicit; factory stays cold</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-04">
+<span id="status-io-evolution-io-04"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">IO-04</a><a class="headerlink" href="#io-04" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>lifecycle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Admission cancellation drain epochs and quarantine regression matrix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Fresh complete no-skip software gate for this iteration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-05">
+<span id="status-io-evolution-io-05"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">IO-05</a><a class="headerlink" href="#io-05" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>budgets</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Bounded IRQ and service execution observation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Optional probes compile out; explicit service and IRQ budgets</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-06">
+<span id="status-io-evolution-io-06"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">IO-06</a><a class="headerlink" href="#io-06" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>stream</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Rate block hold-time loss and backpressure budgets</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Actual selected-provider configuration validates stream budget</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-07">
+<span id="status-io-evolution-io-07"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">IO-07</a><a class="headerlink" href="#io-07" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>hil</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Board fixtures and fault-injection station preparation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/hil;tools/testing/test_hil_io_protocols.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Prepare software tooling; physical tests remain not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-08">
+<span id="status-io-evolution-io-08"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">IO-08</a><a class="headerlink" href="#io-08" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>measurement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Linked resource and runtime cost comparison</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement;tests/contracts/uart_rx_compact_assembly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Fresh exact ELF comparison; no inferred physical timing or energy</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-09">
+<span id="status-io-evolution-io-09"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">IO-09</a><a class="headerlink" href="#io-09" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>resources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Hierarchical controller base channel resource claims</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Compatible shared base plus channels requires one actual hardware owner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-10">
+<span id="status-io-evolution-io-10"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">IO-10</a><a class="headerlink" href="#io-10" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>resources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Physical peripheral identity and mutually exclusive personalities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Canonical aliases and personality conflicts rejected</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-11">
+<span id="status-io-evolution-io-11"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">IO-11</a><a class="headerlink" href="#io-11" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>events</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Typed hardware event graph and startup ordering</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/trigger_graph.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Validate event cycles with owned stop gates; emit selected reviewed routes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-12">
+<span id="status-io-evolution-io-12"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">IO-12</a><a class="headerlink" href="#io-12" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>dma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Selected DMA engines lanes requests and reachability</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dma_topology.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Exact provider tuples; reject physical lane collisions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-13">
+<span id="status-io-evolution-io-13"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">IO-13</a><a class="headerlink" href="#io-13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>dma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Descriptor ownership placement cache and chain cancellation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-chain.toml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Static validation plus actual linked-list provider drain and loans</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-14">
+<span id="status-io-evolution-io-14"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">IO-14</a><a class="headerlink" href="#io-14" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>uart</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Explicit line formats flow control and independent nine-bit I/O</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/uart_word.h</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Native and exact STM32/GD32 register paths; compact byte default</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-15">
+<span id="status-io-evolution-io-15"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">IO-15</a><a class="headerlink" href="#io-15" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>uart</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Bounded FIFO IRQ service and concurrent stream load</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Bounded batch and IRQ latency observations on exact providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-16">
+<span id="status-io-evolution-io-16"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">IO-16</a><a class="headerlink" href="#io-16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>spi</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Whole-CS segments dummy cycles and 8/16-bit words</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Native STM32F407 GD32F470 polling then async DMA loan and drain</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-17">
+<span id="status-io-evolution-io-17"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">IO-17</a><a class="headerlink" href="#io-17" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>i2c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Kernel-clock timing and long-message reload</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/common/i2c_v2.c;tools/configure/i2c_timing.py;tools/configure/i2c_timing_selection.py;tests/google/i2c_v2_long_factory_test.cpp</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Reviewed electrical timing inputs; preserve message START and STOP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-18">
+<span id="status-io-evolution-io-18"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">IO-18</a><a class="headerlink" href="#io-18" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>adc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Explicit sample formats groups triggers and provenance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-group.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Integer storage metadata and actual provider group support</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-19">
+<span id="status-io-evolution-io-19"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">IO-19</a><a class="headerlink" href="#io-19" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>pwm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Atomic multi-channel shadow commit and break fault handling</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Single timer owner; no automatic restart after break</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-20">
+<span id="status-io-evolution-io-20"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">IO-20</a><a class="headerlink" href="#io-20" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>capture</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Counter widths filters encoders and overcapture</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Wrap-safe capture and reviewed encoder modes on real providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-21">
+<span id="status-io-evolution-io-21"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">IO-21</a><a class="headerlink" href="#io-21" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>timestamps</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Timestamp source domain epoch frequency and uncertainty</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Reject incompatible domains and distinguish observation from event time</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-22">
+<span id="status-io-evolution-io-22"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">IO-22</a><a class="headerlink" href="#io-22" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>diagnostics</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Optional state recovery ownership and checked service entry</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/src/mechanisms/observation.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Checked dispatch is distinct from I/O progress or settlement</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-23">
+<span id="status-io-evolution-io-23"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">IO-23</a><a class="headerlink" href="#io-23" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>memory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Remove unused TX DMA fields from RX-only providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Fresh linked RAM measurements and duplex lifecycle regression</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-24">
+<span id="status-io-evolution-io-24"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">IO-24</a><a class="headerlink" href="#io-24" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>flash</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Busy-bank pulse RAM closure cache ECC and watchdog contract</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-ram.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Uncancellable pulse and complete execution closure verified per profile</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-25">
+<span id="status-io-evolution-io-25"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">IO-25</a><a class="headerlink" href="#io-25" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>providers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Reuse reviewed peripheral IP generations and official HAL/LL</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Private implementation sharing with exact per-family facts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-26">
+<span id="status-io-evolution-io-26"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">IO-26</a><a class="headerlink" href="#io-26" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>h743</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Cold PLL voltage latency and kernel-clock profiles</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-clock.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Readback rollback and exact reference identity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-27">
+<span id="status-io-evolution-io-27"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">IO-27</a><a class="headerlink" href="#io-27" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>h743</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>UART continuous duplex DMA and SPI DMA with cache</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Selected SRAM reachability and held-buffer protection</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-28">
+<span id="status-io-evolution-io-28"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">IO-28</a><a class="headerlink" href="#io-28" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>u575</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Finite GPDMA provider and USART errata handling</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-gpdma.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-29">
+<span id="status-io-evolution-io-29"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">IO-29</a><a class="headerlink" href="#io-29" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>g474</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Synchronous PWM ADC trigger and comparator break reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-adc.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Generic control capture mechanisms; product algorithms external</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-30">
+<span id="status-io-evolution-io-30"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">IO-30</a><a class="headerlink" href="#io-30" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>power</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Optional runtime clock and power transitions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-domain-sleep.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Active I/O leases rollback and monotonic deadline continuity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-31">
+<span id="status-io-evolution-io-31"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">IO-31</a><a class="headerlink" href="#io-31" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>pinctrl</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Explicit default sleep safe levels wake and retention</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-pin-states.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>No invented board wiring; selected reviewed state only</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-32">
+<span id="status-io-evolution-io-32"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">IO-32</a><a class="headerlink" href="#io-32" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>u575</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>LPDMA autonomous Stop2 and LPBAM reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Selected low-power peripheral SRAM4 and wake/stop ownership</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>partial_exact_reference_implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-33">
+<span id="status-io-evolution-io-33"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">IO-33</a><a class="headerlink" href="#io-33" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>canfd</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>CAN FD payload timing BRS ESI and message RAM</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-fd.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Classic CAN remains compact; exact FDCAN provider required</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-34">
+<span id="status-io-evolution-io-34"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">IO-34</a><a class="headerlink" href="#io-34" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>ethernet</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>VLAN scatter gather frame loans and hardware timestamps</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Actual hardware descriptor ownership and truthful global abort</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-35">
+<span id="status-io-evolution-io-35"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">IO-35</a><a class="headerlink" href="#io-35" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>usb</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Optional class adapters and exact PHY endpoint capabilities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Control reset ACK ZLP and device mode before additional USB modes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-36">
+<span id="status-io-evolution-io-36"></span><h2><a class="toc-backref" href="#id36" role="doc-backlink">IO-36</a><a class="headerlink" href="#io-36" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>time</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>RTC LPTIM alarms wrap backup and reset domains</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Wall-clock and monotonic domains remain separate</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-37">
+<span id="status-io-evolution-io-37"></span><h2><a class="toc-backref" href="#id37" role="doc-backlink">IO-37</a><a class="headerlink" href="#io-37" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>storage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>SDMMC and serial memory block command mapped interfaces</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>XIP cache DMA loans and erase ownership are explicit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-38">
+<span id="status-io-evolution-io-38"></span><h2><a class="toc-backref" href="#id38" role="doc-backlink">IO-38</a><a class="headerlink" href="#io-38" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>i3c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Bounded discovery IBI and hot-join caller storage</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>No implicit factory discovery; exact peripheral reference required</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-39">
+<span id="status-io-evolution-io-39"></span><h2><a class="toc-backref" href="#id39" role="doc-backlink">IO-39</a><a class="headerlink" href="#io-39" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>security</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>TrustZone peripheral broker and attribution</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Principal and memory validation; copied and borrowed data distinct</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-40">
+<span id="status-io-evolution-io-40"></span><h2><a class="toc-backref" href="#id40" role="doc-backlink">IO-40</a><a class="headerlink" href="#io-40" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>multicore</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>AMP resource partition and epoch-safe IPC</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Unique hardware owner and explicit remote reset/cache contract</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-41">
+<span id="status-io-evolution-io-41"></span><h2><a class="toc-backref" href="#id41" role="doc-backlink">IO-41</a><a class="headerlink" href="#io-41" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>audio</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>I2S SAI PDM framing and continuous DMA loans</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Frame-slot format and bounded underrun; optional external codec</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="io-42">
+<span id="status-io-evolution-io-42"></span><h2><a class="toc-backref" href="#id42" role="doc-backlink">IO-42</a><a class="headerlink" href="#io-42" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>IO-42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>multimedia</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Camera display accelerator planar and strided buffers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io;soc;io/include/nexus/io/frame_stream.h;components/soc/stm32/stm32h743_frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Frame completion backpressure external memory and 2D DMA ownership</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>in_progress</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>not_qualified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintenance_owner</span></code></p></td>
+<td><p>Codex</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">Support scope and platform selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../release-0.1.0.html">Nexus 0.1.0 Source SDK developer preview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">Software verification, source identity and evidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">Documentation-system implementation and formal acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL and physical-board status</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">Original ledgers, exit conditions and derived views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">Iteration directions and admission conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

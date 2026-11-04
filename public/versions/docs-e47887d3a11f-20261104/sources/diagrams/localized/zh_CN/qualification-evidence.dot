@@ -1,0 +1,41 @@
+// FIG-11 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph QualificationEvidence {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-11 软件、工装与物理资格分别取得\n所有结论绑定 source / config / artifact / 执行 scope"];
+    identity [label="clean source / dependency / toolchain / config\n同一 ELF / BIN / map 字节身份", fillcolor="#f8fafc"];
+    host [label="Host / model\n真实 GoogleTest/GoogleMock + 工具 tests\n算法与失败路径软件证据"];
+    arm [label="ARM compile / link / resource\n实际指令、ABI、布局与预算"];
+    sdk [label="Source SDK 独立 consumer\n移动 prefix，实际构建/运行或链接"];
+    reproduce [label="两次独立断网 clean build\n同 ELF/BIN 字节，原始命令与工具身份"];
+    tooling [label="HIL fixture / station / protocol 工装\n边界与负路径软件检查"];
+    software [label="scope proof + candidate seal\n无签名软件候选，保留原始证据", fillcolor="#f0fdf4"];
+    hardware [label="实际 station：PCB / silicon / probes / wires\n刷入同镜像后执行测量与错误注入", fillcolor="#f8fafc"];
+    physical [label="按实际已执行项目记录物理结果\n无设备时为 not_executed", fillcolor="#fff7ed"];
+    admission [label="产品按实际软件 + 物理 scope 准入\n发布/安全认证由外部政策另行决定", fillcolor="#fefce8"];
+    identity -> host [label="实际执行"];
+    identity -> arm [label="实际执行"];
+    identity -> sdk [label="实际执行"];
+    identity -> reproduce [label="实际执行"];
+    identity -> tooling [label="实际执行"];
+    host -> software [label="验证证据"];
+    arm -> software [label="验证证据"];
+    sdk -> software [label="验证证据"];
+    reproduce -> software [label="验证证据"];
+    tooling -> software [label="工装 scope；不是物理测量"];
+    identity -> hardware [label="同镜像提供给实际设备", style=dashed];
+    hardware -> physical [label="只取真实 station 结果"];
+    software -> admission [label="软件范围"];
+    physical -> admission [label="物理范围独立审查"];
+    { rank=same; host; arm; sdk; }
+    { rank=same; software; physical; }
+}

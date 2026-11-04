@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>I/O evolution: static resources and explicit data contracts &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mapped storage, AMP, image handoff, RTC and frame boundaries" href="io-extension-boundaries.html" />
+    <link rel="prev" title="Integration, resource assembly and source-SDK contract" href="integration-contracts.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/io-evolution.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/io-evolution.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="i-o-evolution-static-resources-and-explicit-data-contracts">
+<span id="io-evolution"></span><h1>I/O evolution: static resources and explicit data contracts<a class="headerlink" href="#i-o-evolution-static-resources-and-explicit-data-contracts" title="Link to this heading">¶</a></h1>
+<p>Use this page to extend an I/O mode without adding hidden execution, ambiguous
+units or a second resource owner. It describes the current iteration’s software
+mechanisms and their boundaries. The <a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">42-item</span> <span class="pre">execution</span> <span class="pre">ledger</span></code></a>
+owns implementation, software and hardware status; this page does not replace
+that ledger or declare the iteration complete. The current <a class="reference internal" href="../explanation/gpio-pin-states.html"><span class="std std-doc">GPIO pin-state
+explanation</span></a> describes the exact selected G474
+images, retained cold lease and independent provider/Platform cleanup; wake and
+retention remain separate work. The sealed <code class="docutils literal notranslate"><span class="pre">c4249e98</span></code> candidate
+retains its original scope. New code must establish its own execution evidence.</p>
+<section id="assembly-and-execution-have-different-responsibilities">
+<h2>Assembly and execution have different responsibilities<a class="headerlink" href="#assembly-and-execution-have-different-responsibilities" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="Open SVG at full size"><img alt="FIG-16: current I/O assembly and runtime responsibilities; arrows identify generation, lookup, calls and copied observations" src="../_images/io-evolution.svg" /></a></p>
+<p><strong>FIG-16 is a current mechanism view, not a hardware qualification diagram.</strong>
+The upper group shows build-time facts and generated objects. The lower group
+shows runtime calls. Solid arrows carry their written meaning; dashed arrows
+mark an explicitly optional mechanism. No arrow creates a scheduler, worker,
+global device registry or implicit hardware discovery.</p>
+<p>One authored TOML assembly selects reviewed SoC modes and Board routes. The
+strict resolver checks fields, capacities and resource constraints before
+publishing immutable typed IR and an atomic generated bundle. CMake remains
+the only software target graph. An invalid input does not select a convenient
+fallback or leave a usable partial configuration.</p>
+<p>The generated factory returns an existing static face by typed identity. Lookup
+does not allocate, initialize hardware, read silicon, acquire locks or start
+tasks. After explicit startup, ordinary I/O calls the face’s shared read-only
+operations table with the instance’s private context. Applications own execution
+progress, scheduling and shutdown. Optional enhanced faces share their intended
+controller owner; a second face does not grant a second hardware executor.</p>
+<p>The diagram’s source contracts are <a class="reference internal" href="../explanation/factory.html"><span class="std std-doc">factory and instances</span></a>,
+<a class="reference internal" href="../explanation/ownership.html"><span class="std std-doc">ownership</span></a>, <a class="reference internal" href="build-system.html"><span class="std std-doc">configuration generation</span></a>,
+the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/ir.py">typed IR</a> and the public headers linked below.
+The <a class="reference download internal" download="" href="../_downloads/71f80052b561631ec4f956480dbca046/io-evolution.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a> owns diagram topology;
+locale labels do not change its edges.</p>
+</section>
+<section id="describe-resources-before-generating-instances">
+<h2>Describe resources before generating instances<a class="headerlink" href="#describe-resources-before-generating-instances" title="Link to this heading">¶</a></h2>
+<p>The resource, trigger and DMA plans are compiler output. They let reviewers see
+why a selected combination is legal; they do not program an additional hardware
+mode or create a runtime resource manager.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Plan</p></th>
+<th class="head"><p>Responsibility</p></th>
+<th class="head"><p>Boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/resource_graph.py">Resource graph</a></p></td>
+<td><p>Physical IP aliases, personalities and hierarchical claims</p></td>
+<td><p>Existing controller-exclusive modes remain exclusive; compatible sharing needs exact reviewed facts</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/trigger_graph.py">Trigger graph</a></p></td>
+<td><p>Event source, route, sink, startup ordering and stop responsibility</p></td>
+<td><p>Existing Timer-to-ADC-to-DMA routes are projected as facts; a new graph edge is not a new trigger provider</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/dma_topology.py">DMA topology</a></p></td>
+<td><p>Separate execution lanes from requests; validate descriptor spans, memory, Cache and security facts</p></td>
+<td><p>Validating a descriptor chain does not implement linked-list DMA execution</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/i2c_timing.py">I2C timing</a></p></td>
+<td><p>Check explicit clock and electrical bounds using exact arithmetic</p></td>
+<td><p>The calculated unstretched-master rate is not measured bus speed or an allowance for unsupported filter settings</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Startup dependencies must form a directed acyclic graph. A runtime event chain
+may contain an explicitly autonomous cycle, but its declared stop owner must own
+the whole cyclic component and its stopping action must cut every cycle. This
+is a configuration proof about supplied facts, not proof that silicon has stopped.
+IRQ, DMA, bus and request drain still follow their provider contracts.</p>
+<p>Do not infer that two timer channels can share a controller merely because their
+pin assignments differ. Common base frequency, update events, trigger outputs,
+break inputs, reset and clock ownership can still conflict. Likewise, two typed
+interfaces for one physical IP do not create two independent peripherals.</p>
+</section>
+<section id="bind-declared-stream-budgets-to-the-actual-pool">
+<h2>Bind declared stream budgets to the actual pool<a class="headerlink" href="#bind-declared-stream-budgets-to-the-actual-pool" title="Link to this heading">¶</a></h2>
+<p>An optional <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/stream_profile.h">stream profile</a> binds
+immutable capacity assumptions to one selected continuous UART or ADC face.
+The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/stream_profiles.py">resolver</a> generates this constant
+only when the assembly authors a profile. Factory lookup returns that existing
+profile; it neither creates a pool nor starts acquisition. Unprofiled entry
+points retain their own contracts and do not implicitly enforce this profile.</p>
+<p>The current F407/F470 double-buffer modes require two hardware targets, one
+replacement and enough additional blocks for the declared FIFO-frontier release
+delay. The calculation rounds retained blocks up and checks integer overflow,
+the 32-bit address extent and the 16-bit DMA counter. Target-replacement latency
+must be strictly shorter than a block’s declared fill time. UART units are
+bytes; ADC units are complete scans containing one <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> per selected
+channel. ADC resolution bits do not change this storage width.</p>
+<p>Cold profile admission checks the caller’s actual block count, equal capacities,
+existing loans, state and payload/control disjointness before invoking the
+original provider. Pool users must already be joined. Alias checking is bounded
+by the configured pool and is quadratic; it adds no checks to the IRQ or steady
+data path. The application still owns pool storage, consumer release order and
+execution progress. Rate, release delay and IRQ latency are authored assumptions,
+with <code class="docutils literal notranslate"><span class="pre">physical_qualified</span> <span class="pre">=</span> <span class="pre">false</span></code>. Exhaustion stops and reports a gap. It does
+not create UART backpressure, lossless transport or preservation of ADC samples
+that would have occurred while the trigger was stopped.</p>
+</section>
+<section id="optional-traits-report-selected-behavior">
+<h2>Optional traits report selected behavior<a class="headerlink" href="#optional-traits-report-selected-behavior" title="Link to this heading">¶</a></h2>
+<p>The existing <code class="docutils literal notranslate"><span class="pre">factory.capabilities</span></code> switch controls generated read-only trait
+objects. <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/io_traits.py">Selected I/O traits</a> describe a
+reviewed provider and mode, including formats, limits, abort scope, continuity,
+timestamp origin and DMA policy. Turning the switch off emits no new trait
+objects. It does not change the two-pointer base face or add mutable device state.</p>
+<p>A continuity value such as <code class="docutils literal notranslate"><span class="pre">double_buffer</span></code> or <code class="docutils literal notranslate"><span class="pre">rearm_gap</span></code> describes a mechanism,
+not demonstrated throughput. A Cache line requirement describes the selected
+provider policy, not proof that a particular clock profile enabled Cache. CAN
+mailbox counts are provider-specific facts. Traits grant neither Board wiring
+authorization nor physical qualification and cannot override admission checks.</p>
+<p>Controller and endpoint records describe their own interfaces. Do not apply a
+parent controller’s byte-SPI or ordinary-I2C limits to an enhanced endpoint.
+A per-request word-width marker does not mean unlimited length. Check the
+selected face, count units and provider limit before allocating caller storage.</p>
+</section>
+<section id="cold-silicon-admission-is-an-explicit-step">
+<h2>Cold silicon admission is an explicit step<a class="headerlink" href="#cold-silicon-admission-is-an-explicit-step" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/core/include/nexus/core/silicon.h">Silicon preflight</a> reads one explicit,
+bounded source in caller-serialized cold Thread context. It copies device-group,
+revision and Flash-density observations and compares an immutable policy. It
+does not discover devices, enable clocks, change option bytes or retain a loan.
+The default platform does not invoke this optional helper automatically.</p>
+<p>A device group and Flash density cannot prove an exact orderable part, package
+or PCB. Revision rules bind a reviewed source digest and required workaround
+mask; the helper does not authenticate that source or prove a workaround was
+implemented. Unknown revisions require rejection or an explicit unreviewed
+policy. That policy cannot bypass a blocked revision, missing observation,
+device or density mismatch, or missing required workaround.</p>
+<p>The caller decides whether to start hardware after admission. Reading a revision
+does not establish electrical behavior, errata coverage for every mode or HIL.</p>
+<p>The read-only <code class="docutils literal notranslate"><span class="pre">capabilities.py</span> <span class="pre">--assembly</span></code> view projects this review separately
+for the system-clock owner and each selected controller as <code class="docutils literal notranslate"><span class="pre">silicon_admission</span></code>.
+It uses the existing policy and typed IR. An endpoint or companion does not
+inherit its owner’s review; an owner with no applicable record reports <code class="docutils literal notranslate"><span class="pre">null</span></code>.
+H743’s selected clock and SPI DMA records retain their own revision/profile
+scope, while G474 ADC retains its device, density, workaround and review-digest
+fields. These are reviewed admission rules, not observed identity, broader
+errata coverage or physical qualification.</p>
+</section>
+<section id="use-units-that-match-the-selected-data-path">
+<h2>Use units that match the selected data path<a class="headerlink" href="#use-units-that-match-the-selected-data-path" title="Link to this heading">¶</a></h2>
+<p>The enhanced contracts are separate typed interfaces. Their existence does not
+change the limits of the ordinary byte interfaces or enable a mode in every
+provider. Current generated selection and execution status remain in the ledger.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mechanism</p></th>
+<th class="head"><p>Units and ownership</p></th>
+<th class="head"><p>Current boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/uart_format.h">UART frame description</a></p></td>
+<td><p>Data bits exclude parity; stop and flow settings are explicit</p></td>
+<td><p>Provider and reviewed Board routes must admit the combination; changing a format is a cold operation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/uart_word.h">UART words</a></p></td>
+<td><p>Each <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> carries a nine-bit value; counts and transferred prefixes are words</p></td>
+<td><p>Independent Native, STM32F407 and GD32F470 IRQ paths; DMA and other providers do not inherit this interface</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/spi_transaction.h">SPI whole-CS transaction</a></p></td>
+<td><p>Up to 16 segments, one common 8/16-bit word width, complete-word prefix</p></td>
+<td><p>Synchronous polling extension with explicit provider limits; existing byte-span and finite DMA contracts remain separate</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/spi_dma_transaction.h">Segmented SPI DMA</a></p></td>
+<td><p>Words; explicit TX/RX addresses and caller-owned fixed cells; one width across at most 16 segments</p></td>
+<td><p>Independent asynchronous request contract; provider integration and software verification remain specific to the selected mode</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/i2c_long.h">Long I2C messages</a></p></td>
+<td><p>Bytes; one START per message; a later message causes repeated START</p></td>
+<td><p>Enhanced messages allow up to 65,535 bytes; ordinary messages retain their existing limit and require no additional face</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/adc_format.h">ADC integer format</a></p></td>
+<td><p>Explicit signedness, byte order, storage width, padding and scan order</p></td>
+<td><p>Layout validation and decoding do not add injected conversion, wider acquisition or synchronized ADC hardware</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/pwm_group.h">PWM group</a></p></td>
+<td><p>A complete fixed-base duty/trigger batch in declared timer ticks</p></td>
+<td><p>A coherent staged batch is not an observed update; generated selection, analog wiring and ADC synchronization are separate exits</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>UART word requests retain the ordinary ACCEPTED-to-SETTLED borrowing rule. A
+cancel or deadline never returns the request or payload early. The owner keeps
+servicing wire completion and drain; failure to prove drain retains QUARANTINED
+storage. Byte UART buffers and state do not become nine-bit buffers implicitly.</p>
+<p>F407 and F470 RX-only DMA modes now use a compact receive owner with ordinary
+IRQ TX. Only a duplex DMA mode embeds the separate TX-DMA extension. Both reuse
+the same receive loan algorithm and shared read-only public operations layout;
+there is no stored optional implementation pointer or runtime TX-provider
+selection. RX-only operation does not acquire or withdraw the unrelated TX-DMA
+lane. Duplex vectors decode their real outer owner and its separate components.
+The receive pool excludes the complete duplex object, including its extension.</p>
+<p>RX and TX admission exclude both the TX payload and the complete TX request
+descriptor from every future RX target, in both admission orders. Stopping first
+closes admission and drains RX producer and consumer loans, then drains selected
+TX memory and wire activity, and finally withdraws the UART and RX vector.
+Failed drain retains the corresponding storage and responsibility. Actual linked
+ELF comparisons determine Flash and RAM savings; host <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> expectations alone
+do not establish MCU costs or an unchanged instruction path.</p>
+<p>The separate H743 <code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code> selection combines continuous RX
+with finite TX DMA on one USART3 owner. Its exact V/HSI64/baremetal reference
+uses AXI SRAM with Cache off or on; requests and the complete RX pool remain
+disjoint and borrowed through their respective drain. The existing
+<code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code> selection retains IRQ TX. See the
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/README.md#selected-continuous-rx-and-finite-tx-dma-duplex">H743 provider contract</a>
+for the three-vector, cold-restart and retained-taint boundaries. Neither
+selection expands to RTOS, PLL384 or D2 RAM.</p>
+<p>The synchronous whole-CS interface validates every segment and data span before
+hardware use. A null TX pointer
+means repeated dummy words, a null RX pointer means discard, and both may be null
+for clock-only phases. All segments share one asserted CS interval. Polling
+return releases the synchronous borrow only after CS is released and either wire
+drain or provider reset is proven; timeout cannot preempt an in-flight word.
+An error never replays earlier command phases. The asynchronous segmented
+interface has a separate admission, descriptor and cancellation contract.</p>
+<p>The STM32F407/GD32F470 segmented DMA mechanism is a service-driven finite chain.
+Hardware DMA moves one segment, then the owner proves its drain before service
+arms the next. CS stays asserted across segments, but SCK gaps are permitted;
+this is not hardware linked-list DMA or a gapless transfer guarantee. The request,
+all descriptors, all spans and explicit fixed dummy/discard cells stay borrowed
+until acquire-observed SETTLED. Intermediate completion, cancel and timeout do
+not release them. Caller-driven service remains necessary; wake attachment and
+recovery capabilities cannot be inferred from the base SPI port.</p>
+<p>The optional <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/bus_owner/include/nexus/components/spi_dma_owner.h">segmented SPI owner</a>
+adapts this enhanced face to the existing bounded BusOwner queue. Caller-supplied
+slots and epochs remain the queue authority; no worker, payload copy or second
+controller owner is added. One uniquely scheduled executor services the inner
+request. Only after acquire-observed inner SETTLED does it detach private
+descriptor references and allow outer settlement. Queue time counts toward the
+outer deadline. Failed drain retains inner and outer borrows; late cancellation
+cannot replace an earlier terminal result.</p>
+<p>An owner binding must prove that the endpoint’s actual provider controller
+matches the selected enhanced controller. Matching a common sequence table and
+logical parent pointer alone is insufficient. The Native word model supplies an
+independent backend and checks its actual model-controller identity; it models
+8/16-bit words, fixed cells, selected CS, faults and retained drain rather than
+forwarding to a byte-SPI implementation. A model’s controller identity is a
+software identity, not observed silicon. Family hooks, generated owner bindings,
+publisher handoff and each target’s execution evidence remain separate checks.
+Join publishers and observers before reclaiming their storage; an empty queue
+or a stopped transfer alone is not publisher join.</p>
+<p>I2C hardware reload advances a long message without inserting another address
+phase. STOP and successful bus-idle observation precede successful return.
+On failure, the returned byte count records provider progress, including writes
+handed to TXDR before their wire ACK is known. The count does not authorize replay.
+Cancellation or failure does not justify replaying an acknowledged prefix or
+silently performing bus recovery. The enhanced face and base I2C interface share
+one executor. Timing inputs must include their reviewed clock and electrical
+bounds; a calculation is not a measurement of rise time or clock stretching.
+After physical STOP and bus idle are proved, refused STOP-flag or CR2 cleanup
+reports IO and preserves the actual progress count. The controller retains fault
+responsibility and rejects new admission until explicit recovery; already-drained
+caller storage may return.</p>
+<p>ADC decoding reads only consumer-owned or acquired, producer-detached storage.
+It handles one-to-four-byte integer samples without allocating, retaining a
+pointer or performing calibrated voltage conversion. The consumer must first
+join producer/DMA access. Declared regular/injected groups and trigger identities
+describe an already supported mode; they do not start conversion or turn a
+software observation into a sample-aperture timestamp.</p>
+<p>The G474 <code class="docutils literal notranslate"><span class="pre">shared-fixed-pwm</span></code> selection gives two ordinary PWM factory faces one
+physical TIM3 owner: CH1/PA6 and CH2/PA7 AF2, with a common fixed 170 MHz kernel,
+tick and period. The two existing declarations derive one cold construction,
+two readonly channel references, compatible base claims and exclusive lane/pad
+claims. There is no authored share flag, runtime registry, timer IRQ or DMA.
+Each set changes only its own CCR preload. A channel joining a running peer
+adopts the current phase without UG or counter restart; independent calls do
+not provide coherent group start or a full first pulse. Channel stop preserves
+the peer and establishes its own declared inactive GPIO level; only the last
+lane stops CEN. The lifecycle caller quiesces both channel users before final
+Platform stop. Physical close precedes outer pin/clock release, retaining
+cleanup responsibility if reset, inactive-level or restoration proof fails.
+The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/g474-pwm-shared.toml">canonical software reference</a>
+requires the complete pair and excludes other whole-TIM3 or PA6/PA7 owners.
+Its Board choices do not establish PCB wiring, electrical safety or HIL.</p>
+<p>PWM group commit stages one coherent shadow batch; <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> does not prove the
+timer already applied it. A partial hardware-write failure must withdraw output
+and retain fault responsibility. Clearing a break does not enable output. The
+ordinary G474 PWM-group provider does not supply PCB pin selection, analog
+threshold measurements or a power stage, and does not itself create a
+synchronized ADC session. A selected software reference now generates exclusive
+TIM1/COMP1 construction, fixed
+PA8/PA9/PA10 PWM pads and PA1/PA4 comparator pads. Its cold lifecycle owns the
+selected clock/reset, safe levels, comparator setup and settling, shared break
+vector and reverse cleanup. Partial cleanup failure retains responsibility.
+The separate <a class="reference internal" href="pwm-adc.html"><span class="std std-doc">finite coupled PWM/ADC owner</span></a> now binds one fixed
+TIM1/ADC1/COMP1/DMA window without independently startable PWM-group or ADC
+subfaces. Neither selection establishes a fitted PCB route or analog accuracy.</p>
+<p>Separate concrete G474 providers implement TIM5 CH1 capture on PA0 and TIM3
+two-input quadrature counting on PA6/PA7. Capture publishes raw 32-bit counter
+facts and explicit overcapture/loss under its bounded ring contract. Encoder
+reports a raw 16-bit count; it does not extend wrap, supply an index input or
+estimate speed. Separate
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/contracts/g474_control_assembly/timer-capture.toml">capture</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/contracts/g474_control_assembly/encoder.toml">encoder</a> software
+references now generate their own static faces, typed getters and cold
+pin/clock/vector lifecycle with whole-timer ownership and source/vector drain.
+Startup starts neither a capture session nor encoder counting. The application
+supplies the capture ring and explicitly starts and stops each session. Failed
+source/vector or storage drain retains cleanup
+responsibility. These exact selections do not inherit PWM-group capabilities,
+synchronize ADC apertures or establish external wiring. Product control and
+recovery policies remain external.</p>
+</section>
+<section id="preserve-a-single-owner-for-h743-flash-timing">
+<h2>Preserve a single owner for H743 Flash timing<a class="headerlink" href="#preserve-a-single-owner-for-h743-flash-timing" title="Link to this heading">¶</a></h2>
+<p>The selected fixed-HSI32/64 Flash path checks actual clock, requested and observed
+voltage scale, Cache state and Flash programming-delay fields before a program
+or erase pulse. Read latency alone does not satisfy the programming contract.
+An optional cold timing owner changes the reviewed Flash field only with both
+banks idle, verifies readback and retains its saved state until reverse cleanup
+has safely restored it. The generated Flash assembly selects this owner; a build
+without Flash does not acquire it. Product erase regions and recovery policy
+remain outside this repository.</p>
+<p>This is a bounded programming-timing correction for the selected existing clock
+profiles. It does not enable a new high-speed clock, change option bytes, qualify
+all silicon revisions or establish physical Flash endurance. The separate
+selected <a class="reference internal" href="h743-high-clock.html"><span class="std std-doc">V-only HSI/PLL384 reference</span></a> now implements distinct
+CPU/bus/kernel clock domains and a cold clock/voltage/Flash lifecycle. Its joint
+owner replaces the fixed-HSI Flash timing owner for that high profile; support
+does not extend to unreviewed cuts, Cache-on execution or physical qualification.</p>
+<p>The selected V/cache-off Flash implementation now requires the
+<a class="reference internal" href="h743-flash-ram.html"><span class="std std-doc">private RAM maintenance boundary</span></a>: cold copy/readiness,
+one selected workspace, a CPU-only stack bridge, RAM-owned VTOR and a temporary
+MPU guard. Deadline expiry after trigger only latches the result; actual both-bank
+drain, LOCK and protection/vector restoration precede any return. Production-ELF
+closure and complete software exits remain open, so IO-24 stays <code class="docutils literal notranslate"><span class="pre">in_progress</span></code>.</p>
+</section>
+<section id="observe-time-without-inventing-timing-guarantees">
+<h2>Observe time without inventing timing guarantees<a class="headerlink" href="#observe-time-without-inventing-timing-guarantees" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/observation.h">Timestamp facts</a> distinguish hardware
+events, IRQ observations, service observations and acquire observations. A
+caller supplies extended ticks, a domain, an epoch, an exact stated tick rate
+and explicit uncertainty knowledge. The domain owner extends counter wrap and
+changes epoch after discontinuity, reset or rate change.</p>
+<p>Elapsed-time comparison requires matching domain, epoch and rate, ordered ticks
+and a representable uncertainty bound. It does not synchronize clocks, convert
+time domains, access a hardware clock or prove that two facts refer to causally
+paired events. Unknown uncertainty is different from a known zero bound.</p>
+<p>The optional timestamp budget evaluator consumes these same facts in O(1)
+work. It reports <code class="docutils literal notranslate"><span class="pre">WITHIN</span></code> only when the complete error interval fits the
+inclusive maximum, <code class="docutils literal notranslate"><span class="pre">EXCEEDED</span></code> only when its lower bound exceeds that maximum,
+and <code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> otherwise. A successful comparison does not by itself mean
+within budget. The public timestamp contract owns the exact units and errors.</p>
+<p>Checked UART/SPI/I2C service reports an invalid face or an absent service method.
+<code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> establishes one dispatch only. It does not establish progress, health,
+SETTLED, wire completion or permission to reclaim storage. The ordinary service
+context, serialization and lifetime rules still apply, with no hidden worker.</p>
+<p>The optional <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/cycle_probe.h">raw cycle probe</a> brackets
+one selected vector or one explicit typed service call with real Arch counter
+snapshots. The initial generated path accepts <code class="docutils literal notranslate"><span class="pre">probe</span> <span class="pre">=</span> <span class="pre">true</span></code> inside
+<code class="docutils literal notranslate"><span class="pre">[uart.NAME.irq]</span></code> only for a reviewed F407/F470 IRQ-word UART selection. It adds
+one sidecar per physical vector and
+a pure typed getter for that sidecar. Unselected macros evaluate no arguments,
+create no sidecar and add no provider state or operations-table fields. The
+optional library is linked only when selected; linked ELF checks establish the
+actual default and selected cost.</p>
+<p>The exact F407 Qiming USART1 and GD470 Liangshan USART0 word references now
+have linked probe-off/on evidence. OFF retains none of the optional observer’s
+sidecar, probe/counter helpers, probe getter or observed-service symbols; ON
+brackets exactly one original provider IRQ dispatch. Their original provider
+state sizes remain unchanged. The links also retain the explicit service
+wrapper; they are not runtime I/O captures.</p>
+<p>A readable counter pair is a raw modulo-2^32 difference, including probe cost
+and preemption. Multiple wraps, reset and clock-epoch continuity are unknown;
+<code class="docutils literal notranslate"><span class="pre">elapsed_known</span></code> is always false. The probe neither enables nor resets DWT.
+Unavailable samples and same-sidecar reentry are counted, and diagnostic totals
+saturate instead of wrapping. Different nested vectors require distinct
+sidecars. This is neither elapsed-time validation nor IRQ arrival latency,
+exclusive execution time or a passed budget.</p>
+<p>Privileged Task snapshot saves and restores the incoming local interrupt mask
+for a bounded statistics copy. A task producer must use that same executor or
+be joined before reading; masking local IRQs does not join another preempted
+Task, core or security state. Reclaim joins all tokens, producers and readers.
+Typed UART-word and segmented-SPI service wrappers dispatch the original service
+once even when observation is unavailable. Observation failure never stops
+drain or releases a QUARANTINED borrow. Consumers must prove private state and
+borrowed storage disjoint from the optional observer. Raw probe samples cannot
+be promoted to validated timing budgets without independent continuity proof.</p>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/hil/README.md">HIL measurement protocol</a> uses schema 2 for
+measurement runs, contexts and traces. Cycle measurements require actual DWT
+endpoints, a live owner/epoch, admitted independent capture-clock facts and a
+CPU-frequency envelope covering that counter epoch and capture interval. This
+envelope must include actual oscillator tolerance, calibration and drift. A
+nominal rate or authored wrap limit cannot replace it. This does not change the separate
+SoC, OS or selected-mode raw protocols. IO-05 is implemented within this selected
+software scope; physical execution remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+</section>
+<section id="prepare-exact-hil-protocols-without-promoting-software-facts">
+<h2>Prepare exact HIL protocols without promoting software facts<a class="headerlink" href="#prepare-exact-hil-protocols-without-promoting-software-facts" title="Link to this heading">¶</a></h2>
+<p>The existing <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/hil/workloads.py">HIL workload planner</a> now contains
+four additional exact protocols. Selection inspects resolved controller and
+endpoint facts; a chip’s advertised peripherals do not select a workload.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Protocol</p></th>
+<th class="head"><p>Required selected mechanism</p></th>
+<th class="head"><p>Additional station obligations</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uart_word_wire</span></code></p></td>
+<td><p>IRQ 9N1 word face and word RX profile</p></td>
+<td><p>MCU/FPGA peer with native nine-bit hardware and raw bit-8-preserving captures; waveform and load/TC/settlement order</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spi_dma_whole_cs_segments</span></code></p></td>
+<td><p>Enhanced DMA face and same-controller <code class="docutils literal notranslate"><span class="pre">spi-dma-transaction</span></code> endpoint</p></td>
+<td><p>CS/SCK/data waveforms, fixed-cell tests and independent memory/wire drain facts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">i2c_v2_long_timing</span></code></p></td>
+<td><p>G474/H743/U575 long endpoint and authored AF50..260 ns/DNF0 timing projection</p></td>
+<td><p>Measured clock, rise/fall and voltage; 255/256/257/511/512-byte boundaries; TXDR progress separate from wire ACK</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pwm_group_comp_break</span></code></p></td>
+<td><p>Exclusive generated G474 TIM1/COMP1 and its exact five-pad route</p></td>
+<td><p>Analog limits, passive loads, coherent commits, break latch, safe stop and IRQ join</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Plans remain <code class="docutils literal notranslate"><span class="pre">prepared_unbound</span></code> and every physical case remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.
+The authoring template leaves instrument identities and limits null. Full
+workload and station admission still require a separately selected, reviewed
+8N1 byte smoke console. An eight-bit USB serial adapter cannot validate nine-bit
+words; a word-only or no-console software fixture does not satisfy that station
+contract. Actual instruments, positive workload amounts, waveform acquisition,
+numeric limits and equipment execution remain necessary. No new acquisition
+schema, hidden hardware action or qualification follows from these selectors.</p>
+</section>
+<section id="cost-and-validation-stay-visible">
+<h2>Cost and validation stay visible<a class="headerlink" href="#cost-and-validation-stay-visible" title="Link to this heading">¶</a></h2>
+<p>Build-time resource plans do not impose a runtime graph walk. Optional traits
+are constant data. Separate enhanced faces keep the simple path independent;
+their selected provider state, buffers and code still cost space and must be
+measured in an actual linked image. Segment validation depends on descriptor
+count, and silicon-policy validation depends on rule count. Do not infer cycles,
+worst-case latency or zero memory growth from an interface diagram.</p>
+<p>The following static observations bind clean source
+<code class="docutils literal notranslate"><span class="pre">bacdc5b8a5d64baebb92517e770d0abac28421b8</span></code>, baremetal and <code class="docutils literal notranslate"><span class="pre">-Os</span></code>, with zero heap
+and a reserved 2048-byte MSP. The metadata reference selects Qiming
+STM32F407ZGT6, HSE8/PLL168, UART1 IRQ bytes at 115200 baud with a 32-byte RX ring.
+B enables traits but permits garbage collection; C uses the same compiled
+objects and explicitly retains the traits getter. A disables traits and also
+links to 8012 Flash bytes, but its different comparison profile is rejected by
+the strict A/B comparison; equal totals do not override that rejection.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Exact link treatment</p></th>
+<th class="head"><p>Flash load / footprint bytes</p></th>
+<th class="head"><p>Reserved SRAM bytes, including MSP</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>F407 byte UART traits, B→C</p></td>
+<td><p>8012→8052 (+40)</p></td>
+<td><p>2256→2256 (+0)</p></td>
+</tr>
+<tr class="row-odd"><td><p>F407 word UART whole probe selection, OFF→ON</p></td>
+<td><p>7636→8356 (+720)</p></td>
+<td><p>2248→2288 (+40)</p></td>
+</tr>
+<tr class="row-even"><td><p>GD470 word UART whole probe selection, OFF→ON</p></td>
+<td><p>9228→9952 (+724)</p></td>
+<td><p>2220→2260 (+40)</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The metadata delta is one 24-byte readonly trait record and its 16-byte getter;
+it adds no reserved SRAM and leaves the ordinary UART producer objects
+unchanged. It does not establish whole-system runtime equivalence. The word
+references use 9N1, 115200 baud, 32-word RX and priority 5; F407 uses HSE8/PLL168,
+GD470 HXTAL25/PLL200. Their 40-byte SRAM delta is a 36-byte sidecar plus four
+bytes of alignment padding. Provider state remains 56/48 bytes, and face/ops
+stay readonly.</p>
+<p>Probe ON includes the sidecar/getter/snapshot fixture and an explicitly retained
+service wrapper. These are whole optional-selection costs; the actual comparison
+profiles differ, so they are neither a strict same-profile comparison nor an
+isolated pure-IRQ cost. No I/O traffic was run. IRQ/service duration, arrival
+latency, WCET, energy and physical HIL remain unmeasured or not executed.</p>
+<p>The original command receipts, raw logs, ELF/map artifacts, independent reviews
+and failed attempts are retained once under
+<code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/io-linked-cost/</span></code>. Its <code class="docutils literal notranslate"><span class="pre">portable-index.json</span></code> identifies
+each unchanged package envelope, member manifest and compact archive. Use the
+existing evidence-store verify/restore commands with the indexed archive path;
+these records describe the pinned source above, not qualification of a later
+commit.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Evidence</p></th>
+<th class="head"><p>What it establishes</p></th>
+<th class="head"><p>What it does not establish</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Metadata and resolver tests</p></td>
+<td><p>Rejection and generated-plan behavior for supplied facts</p></td>
+<td><p>New hardware execution or a reviewed PCB route</p></td>
+</tr>
+<tr class="row-odd"><td><p>GoogleTest/GoogleMock and register models</p></td>
+<td><p>Executed production-code contracts under the stated host model</p></td>
+<td><p>Real IRQ latency, electrical timing, uninterrupted throughput or power</p></td>
+</tr>
+<tr class="row-even"><td><p>ARM ELF, map and resource checks</p></td>
+<td><p>Actual compilation, linking, retention and static budgets</p></td>
+<td><p>Runtime correctness or measured stack high-water marks</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fresh offline builds and candidate verification</p></td>
+<td><p>Their exact clean source, SDK and same-artifact software scope</p></td>
+<td><p>Qualification of later commits or physical hardware</p></td>
+</tr>
+<tr class="row-even"><td><p>Physical station execution</p></td>
+<td><p>The exact Board, firmware, wiring and measured conditions</p></td>
+<td><p>Automatic qualification of a family, package or unrelated mode</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The current iteration’s physical status remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code> until a station
+runs the applicable checks. Applications, protocol policy, product partitions,
+control algorithms and recovery policy remain in external consumer projects.</p>
+</section>
+<section id="work-that-is-still-a-separate-implementation">
+<h2>Work that is still a separate implementation<a class="headerlink" href="#work-that-is-still-a-separate-implementation" title="Link to this heading">¶</a></h2>
+<p>The ledger retains the exits for broader linked-list DMA selections, broader
+high-throughput H743 configurations, U575 general peripheral LPBAM, broader or
+continuous synchronized control groups, advanced Ethernet/USB, external storage,
+TrustZone services, multicore transport, audio and frame devices. A public type,
+validated topology or model does not complete these exits. Each mode needs its
+own provider, reviewed route, failure and ownership tests, ARM/SDK checks,
+resource costs and physical evidence where applicable. Finite
+<a class="reference internal" href="u575-uart-gpdma.html"><span class="std std-doc">U575 UART GPDMA TX</span></a>, its separate
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx">hardware-chain TX selection</a>, the <a class="reference internal" href="pwm-adc.html"><span class="std std-doc">joint PWM/ADC window</span></a>, selected
+<a class="reference internal" href="can-fd.html"><span class="std std-doc">G474 CAN FD modes</span></a> and the separately selected
+<a class="reference internal" href="u575-stop2-copy.html"><span class="std std-doc">finite SRAM4/LPDMA1 channel-0 Stop2 copy</span></a> now have specific
+software paths; those selections do not complete the broader exits or establish
+external wiring, measured performance or HIL. The finite GPDMA chain implements
+actual hardware node fetch and descriptor/payload drain for one contiguous SRAM1
+source. That GPDMA selection does not select noncontiguous scatter/gather,
+circular chains, RX DMA or autonomous low-power execution. The separate SRAM4
+copy uses the same concrete Stop2 owner for AlarmA14, independent WUT escape and
+compound RTC/DMA/IRQ/gate/clock final release; general peripheral LPBAM and the
+full IO-32/SOC-35 exits remain open.</p>
+<p>The dedicated <a class="reference internal" href="u575-lptim1-lpbam.html"><span class="std std-doc">single-tuple LPTIM1 LPBAM reference</span></a>
+adds one finite SRAM4 CCR1/RCR=0/ARR update under that same concrete Stop2 owner.
+The first word uses hardware request13 with BREQ1 and reserved DREQ0; two fixed
+continuation LLIs write RCR and ARR last. Explicit start/stop retains partial
+preparation and failed-drain responsibility. Fresh write-OK and all final-access
+proofs are necessary for success; success establishes synchronized register
+writes, not complete waveform playback. There is no GPIO route or physical HIL
+result, and general peripheral LPBAM and the original IO-32/SOC-35 exits remain
+open.</p>
+<p>Use <a class="reference internal" href="integration-contracts.html"><span class="std std-doc">platform integration contracts</span></a>,
+<a class="reference internal" href="io-lifecycle-matrix.html"><span class="std std-doc">the lifecycle matrix</span></a>,
+<a class="reference internal" href="../reference/platforms/qualification.html"><span class="std std-doc">software qualification</span></a> and
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">the</span> <span class="pre">42-item</span> <span class="pre">ledger</span></code></a> when reviewing or delivering a
+change. Update that single ledger with actual evidence; do not replace pending
+work by a broad claim that the platform supports an entire MCU family.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

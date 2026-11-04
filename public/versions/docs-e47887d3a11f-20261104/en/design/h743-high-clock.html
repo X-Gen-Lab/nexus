@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>H743 V-only high-clock profile &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Explicit I2C bus recovery" href="i2c-bus-clear.html" />
+    <link rel="prev" title="H743 Flash maintenance from a private RAM execution pod" href="h743-flash-ram.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/h743-high-clock.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/h743-high-clock.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="h743-v-only-high-clock-profile">
+<span id="design-h743-high-clock"></span><h1>H743 V-only high-clock profile<a class="headerlink" href="#h743-v-only-high-clock-profile" title="Link to this heading">¶</a></h1>
+<p>Use <code class="docutils literal notranslate"><span class="pre">hsi64-pll384-cache-off</span></code> when a cold STM32H743ZIT6 reference needs distinct
+CPU, bus and peripheral clock domains. This page explains the current fixed
+profile, its joint owner and failure boundaries. It covers V revision <code class="docutils literal notranslate"><span class="pre">0x2003</span></code>
+only, with Cache off. Physical HIL remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>; software execution
+does not measure supply, junction temperature, clock accuracy or communication.</p>
+<section id="one-assembly-selects-one-clock-owner">
+<h2>One assembly selects one clock owner<a class="headerlink" href="#one-assembly-selects-one-clock-owner" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-05: current generated Platform lifecycle; arrows describe explicit startup, reverse cleanup and retained responsibilities" src="../_images/platform-lifecycle.svg" /></a></p>
+<p>FIG-05 describes the common Platform lifecycle. For this exact reference, its
+SoC startup expands to clock owner, System timebase and selected consumers, in
+that order. The reverse path must withdraw consumers and System before the clock
+owner. The diagram is not a frequency-transition sequence or physical proof;
+the exact clock stages below specialize its lifecycle responsibilities.</p>
+<p>One TOML <code class="docutils literal notranslate"><span class="pre">clock</span></code> selection resolves through reviewed
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/soc.json">SoC facts</a> into immutable clock-domain IR.
+The generated bundle selects the private implementation and CMake selects its
+translation unit. The typed factory still returns existing static faces without
+MMIO, allocation, clock setup or discovery. Runtime calls enter the selected
+provider directly through its shared read-only operations table.</p>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/private/stm32h743_clock.h">private clock contract</a> owns
+admission and clock responsibility. <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/system.c">System</a> owns
+TIM2 and its vector. The generated
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/configure/emission.py">lifecycle glue</a> orders
+them and preserves startup and cleanup diagnostics. Their effect masks are
+different namespaces; the platform projects retained responsibility without
+treating the numeric masks as interchangeable.</p>
+</section>
+<section id="admit-an-exact-cold-configuration">
+<h2>Admit an exact cold configuration<a class="headerlink" href="#admit-an-exact-cold-configuration" title="Link to this heading">¶</a></h2>
+<p>Automatic high-profile admission requires DEV_ID <code class="docutils literal notranslate"><span class="pre">0x450</span></code>, REV_ID <code class="docutils literal notranslate"><span class="pre">0x2003</span></code> (V)
+and the factory-default HSI user trim. ES0392 Rev15 Table 2 maps <code class="docutils literal notranslate"><span class="pre">0x1003</span></code> to
+both Y and W, and <code class="docutils literal notranslate"><span class="pre">0x2001</span></code> to X. The reviewed DS12110 Rev11 electrical chapter
+explicitly covers V; the Y/W ambiguity and lack of an explicitly reviewed X
+chapter prevent admitting those IDs. They and unknown revisions return
+<code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span></code> without acquiring effects. There is no automatic fallback or
+user-overridable revision allowlist.</p>
+<p>Startup requires the real reset-owned call sequence before SysTick, a scheduler,
+I/O or another clock owner has run. Matching register values cannot prove that
+history. The diagnostic deliberately avoids reading SysTick CTRL because its
+COUNTFLAG is read-clear; zero LOAD/VAL are not proof that ENABLE is clear.
+Bootloader adoption and runtime frequency scaling require separate contracts.</p>
+<p>Cold checks include ready LDO/VOS3, inactive Flash pulses and programming modes,
+reset PLL configuration, quiet consumers and known-clean disabled caches.
+Readable disabled cache bits do not prove that foreign dirty lines are absent.
+Supply, temperature, package and PCB cannot be qualified by IDCODE or readback.</p>
+</section>
+<section id="keep-clock-domains-and-uncertainty-separate">
+<h2>Keep clock domains and uncertainty separate<a class="headerlink" href="#keep-clock-domains-and-uncertainty-separate" title="Link to this heading">¶</a></h2>
+<p>The following are reviewed design bounds, not frequency measurements. CPU and
+PLL-derived domains include the conservative PLL-ready deviation in addition to
+the HSI envelope. Unmultiplied HSI kernels do not inherit that PLL multiplier.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Domain</p></th>
+<th class="head"><p>Nominal frequency</p></th>
+<th class="head"><p>Reviewed design interval</p></th>
+<th class="head"><p>Consumer responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CPU</p></td>
+<td><p>384 MHz</p></td>
+<td><p>364.56..397.8 MHz</p></td>
+<td><p>PLL1P, M=10/N=120/P=2</p></td>
+</tr>
+<tr class="row-odd"><td><p>HCLK</p></td>
+<td><p>192 MHz</p></td>
+<td><p>182.28..198.9 MHz</p></td>
+<td><p>CPU /2</p></td>
+</tr>
+<tr class="row-even"><td><p>APB1..4</p></td>
+<td><p>96 MHz</p></td>
+<td><p>91.14..99.45 MHz</p></td>
+<td><p>HCLK /2</p></td>
+</tr>
+<tr class="row-odd"><td><p>TIM2/TIM3</p></td>
+<td><p>192 MHz</p></td>
+<td><p>182.28..198.9 MHz</p></td>
+<td><p>Doubled APB timer kernel, not CPU frequency</p></td>
+</tr>
+<tr class="row-even"><td><p>USART3/I2C1</p></td>
+<td><p>64 MHz</p></td>
+<td><p>62..65 MHz</p></td>
+<td><p>Explicit HSI kernel selectors</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI4</p></td>
+<td><p>96 MHz</p></td>
+<td><p>91.14..99.45 MHz</p></td>
+<td><p>APB2; divider admission uses its upper bound</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC12 input</p></td>
+<td><p>64 MHz</p></td>
+<td><p>62..65 MHz</p></td>
+<td><p>per_ck from HSI; input selection is not ADC conversion setup</p></td>
+</tr>
+<tr class="row-odd"><td><p>Selected ADC1 conversion</p></td>
+<td><p>16 MHz</p></td>
+<td><p>15.5..16.25 MHz</p></td>
+<td><p>Provider selects async /4 after acquiring ADC12</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The empty profile configures ADC12’s input selector but does not initialize an
+ADC or its divider. TIM2 uses PSC191 for a nominal 1 MHz counter. A software
+millisecond remains an HSI-derived nominal interval; PSC383 would halve the
+counter rate and is rejected by the production-model tests. TIM3 likewise uses
+its actual 192 MHz kernel when admitting an integer tick divisor.</p>
+<section id="where-the-hsi-envelope-comes-from">
+<h3>Where the HSI envelope comes from<a class="headerlink" href="#where-the-hsi-envelope-comes-from" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://www.st.com/resource/en/datasheet/stm32h743vi.pdf">DS12110 Rev11</a>
+Table 134, page 232, gives V-cut factory HSI frequency 63.7..64.3 MHz at
+VDD 3.3 V and junction 30 °C. It separately specifies voltage drift
+−0.12..+0.03% over VDD 1.62..3.6 V and temperature drift −2..+1% over
+−40 °C..TJmax. Factory frequency limits use production testing; the full
+temperature drift uses characterization. These assurance levels remain distinct.
+The narrower −20..105 °C row is not the full-temperature envelope. Suffix 6
+junction limits must not be confused with ambient limits or thermal dissipation.</p>
+<p>Conservative multiplicative endpoints are
+<code class="docutils literal notranslate"><span class="pre">63.7</span> <span class="pre">×</span> <span class="pre">0.98</span> <span class="pre">×</span> <span class="pre">0.9988</span> <span class="pre">=</span> <span class="pre">62.3510888</span> <span class="pre">MHz</span></code> and
+<code class="docutils literal notranslate"><span class="pre">64.3</span> <span class="pre">×</span> <span class="pre">1.01</span> <span class="pre">×</span> <span class="pre">1.0003</span> <span class="pre">=</span> <span class="pre">64.9624829</span> <span class="pre">MHz</span></code>.
+The additive lower estimate <code class="docutils literal notranslate"><span class="pre">63.7</span> <span class="pre">−</span> <span class="pre">64.3</span> <span class="pre">×</span> <span class="pre">(0.02</span> <span class="pre">+</span> <span class="pre">0.0012)</span></code> is 62.33684 MHz.
+The selected 62..65 MHz interval covers these compositions; it is a reviewed
+engineering envelope, not a literal datasheet interval. RM0433 Rev9’s PLL-ready
+deviation adds the conservative factor 0.98..1.02, yielding
+<code class="docutils literal notranslate"><span class="pre">62</span> <span class="pre">×</span> <span class="pre">6</span> <span class="pre">×</span> <span class="pre">0.98</span> <span class="pre">=</span> <span class="pre">364.56</span> <span class="pre">MHz</span></code> through <code class="docutils literal notranslate"><span class="pre">65</span> <span class="pre">×</span> <span class="pre">6</span> <span class="pre">×</span> <span class="pre">1.02</span> <span class="pre">=</span> <span class="pre">397.8</span> <span class="pre">MHz</span></code>.
+The design stays below the reviewed VOS1 CPU/HCLK/APB limits of 400/200/100 MHz.
+Different source assumptions require a new reviewed profile.</p>
+</section>
+<section id="local-uart-arithmetic-does-not-qualify-a-link">
+<h3>Local UART arithmetic does not qualify a link<a class="headerlink" href="#local-uart-arithmetic-does-not-qualify-a-link" title="Link to this heading">¶</a></h3>
+<p>At requested 115200 baud, oversampling 16 and prescaler 1, the selected HSI64
+kernel produces BRR556. Nominal baud is about 115107.914; the 62..65 MHz
+source envelope produces about 111510.791..116906.475 baud, or
+−3.202438..+1.481315% relative to the request. The lower endpoint already
+exceeds a hypothetical 2% local budget. Nominal divider accuracy alone cannot
+establish acceptable communication over the whole source envelope.</p>
+<p>The platform checks local divider representability and exposes the selected
+source bounds. It does not invent a zero-error peer, require product peer-budget
+fields or silently choose another source. The external product must evaluate
+the complete transmitter, receiver, quantization, line and wakeup budget in
+RM0433 Rev9 section 48.5.8, then obtain physical evidence for its link.</p>
+</section>
+</section>
+<section id="establish-protection-before-speed-and-retain-failed-cleanup">
+<h2>Establish protection before speed and retain failed cleanup<a class="headerlink" href="#establish-protection-before-speed-and-retain-failed-cleanup" title="Link to this heading">¶</a></h2>
+<p>The selected joint owner stores one four-byte effect record. It owns the
+reversible SYSCFG gate, voltage request, shared Flash timing, bus prescalers,
+PLL configuration/source and USART/I2C/ADC kernel selectors. It does not own
+consumer requests, buffers, worker tasks or a scheduler.</p>
+<ol class="arabic simple">
+<li><p>Validate cold prerequisites, acquire the reversible gate and reject foreign
+overdrive. Prove VOS1 readiness and Flash LATENCY2/WRHIGHFREQ2 readback.</p></li>
+<li><p>Program the fixed bus dividers and wait 32 ordered RCC observations before
+programming PLL1. RM0433 section 8.7.8 allows HPRE propagation up to 16
+slowest-APB periods; this profile has APB=HCLK/2. Readable HPRE alone is
+not proof that the effective divider has settled.</p></li>
+<li><p>Establish PLL1, observe readiness, request its source and prove actual SWS
+before publishing the nominal CPU clock. Acquire and verify the kernel
+selectors, then start System and selected consumers.</p></li>
+<li><p>Stop admission, drain and join consumers, and withdraw System. A failed
+consumer or System stop retains the clock owner and its protections.</p></li>
+<li><p>Restore only owned selectors; each may already be at its baseline or owned
+target. A foreign selector rejects without clobbering its register. Prove
+actual HSI selection before disabling PLL or reducing bus, Flash and voltage
+protections. Clear an effect only after its restoration is observed.</p></li>
+</ol>
+<p>A startup error preserves its primary result while ordered cleanup reports its
+own failure and retained responsibility. A failed restore keeps the same owner
+alive for retry; timeout does not authorize releasing unproved effects. This is
+a single fixed cold profile, not a general-purpose clock tree manager.</p>
+<p>High-profile Flash pulses require the observed V-cut, VOS1, HCLK, 2WS/WR2 and
+Cache-off combination. The high owner replaces the fixed-HSI optional Flash
+timing owner; both must not manage the same timing field. A pulse never retunes
+ACR. Original voltage, unswapped-bank, region, alignment and fresh-erase
+requirements still apply. All-FF readback does not prove virgin ECC cells.
+Busy-bank instruction fetch may stall; an unabortable pulse must settle before
+return, and failure to prove final withdrawal retains the calling frame through
+the existing terminal fault path. There is no tight physical deadline promise.</p>
+<p>I2C timing requires explicit kernel and electrical bounds; PCLK is not its
+selected 64 MHz kernel. SPI divider selection uses 99.45 MHz, while its stored
+nominal source remains 96 MHz. For a 1.5 MHz ceiling it selects /128, rather
+than /64 from nominal arithmetic. Wire-tail drain and CS release remain required
+even after the caller’s deadline. ADC’s 16-bit storage does not establish
+measured effective resolution or calibrated voltage.</p>
+</section>
+<section id="selection-cost-executed-scope-and-next-exits">
+<h2>Selection cost, executed scope and next exits<a class="headerlink" href="#selection-cost-executed-scope-and-next-exits" title="Link to this heading">¶</a></h2>
+<p>Only the high profile emits the joint owner and selects <code class="docutils literal notranslate"><span class="pre">clock.c</span></code>. The four
+existing fixed-HSI/cache profiles retain their own lifecycle and do not call
+this owner. The four-byte record is a source-level selected-state fact, not a
+measured whole-image RAM delta; alignment, retained code and linked ELF costs
+must be observed separately. No allocation or extra hot-path forwarding layer
+is introduced by clock selection.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Executed development scope</p></th>
+<th class="head"><p>Actual result</p></th>
+<th class="head"><p>Boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_clock_test.cpp">Clock tests</a></p></td>
+<td><p>38 GoogleTest cases passed</p></td>
+<td><p>V-only rejection, ordering, partial effects and retry in external register models</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_system_test.cpp">High System tests</a></p></td>
+<td><p>19 cases passed</p></td>
+<td><p>Actual clock owner plus TIM2, IRQ, nominal time and failure cleanup</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_kernel_test.cpp">Kernel tests</a></p></td>
+<td><p>30 cases passed</p></td>
+<td><p>Distinct domains, divider bounds, Flash admission and mixed-selector rollback</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_factory_test.cpp">Generated factory tests</a></p></td>
+<td><p>10 cases passed</p></td>
+<td><p>Normal TOML/IR/generated lifecycle, cold lookup, consumer calls and stop-failure retry</p></td>
+</tr>
+<tr class="row-even"><td><p>Three normal ARM configurations</p></td>
+<td><p>Configure and build returned zero</p></td>
+<td><p>Exact empty, UART and peripheral fixtures below; code generation and linking, not hardware</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The ARM presets are <code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-empty</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-uart</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-peripherals</span></code>. Their maintained inputs are
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/h743-high-empty.toml">empty</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/h743-high-uart.toml">UART</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/h743-high-peripherals.toml">peripherals</a>.
+These records describe this development iteration; they do not establish a
+clean software candidate, offline reproducibility or physical qualification.
+The <a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">I/O</span> <span class="pre">ledger</span></code></a> remains the status authority.</p>
+<p>High Cache-on, continuous H743 DMA, SPI DMA, additional silicon cuts, bootloader
+handoff and running-clock transitions have separate implementation and
+acceptance exits. Existing finite DMA modes do not imply these extensions.
+Physical clock, voltage, temperature, UART, SPI, I2C, ADC and Flash tests remain
+<code class="docutils literal notranslate"><span class="pre">not_executed</span></code> until connected equipment actually measures the selected image.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Mapped storage, AMP, image handoff, RTC and frame boundaries &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Bounded I/O lifecycle property matrix" href="io-lifecycle-matrix.html" />
+    <link rel="prev" title="I/O evolution: static resources and explicit data contracts" href="io-evolution.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/io-extension-boundaries.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/io-extension-boundaries.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="mapped-storage-amp-image-handoff-rtc-and-frame-boundaries">
+<span id="io-extension-boundaries"></span><h1>Mapped storage, AMP, image handoff, RTC and frame boundaries<a class="headerlink" href="#mapped-storage-amp-image-handoff-rtc-and-frame-boundaries" title="Link to this heading">¶</a></h1>
+<p>This page explains five bounded software increments and their assembly and
+ownership contracts. It helps integrators select the exact mechanism and retain
+storage through failure. These implementations do not complete the original
+IO-32/37–42 or SOC-33–35 exit conditions. Physical HIL remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>;
+software development results do not establish a clean software candidate.</p>
+<section id="selection-and-source-identity">
+<h2>Selection and source identity<a class="headerlink" href="#selection-and-source-identity" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Increment</p></th>
+<th class="head"><p>Public assembly</p></th>
+<th class="head"><p>Current software scope</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Mapped ownership</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nexus::MappedStorage</span></code>; Native-only <code class="docutils literal notranslate"><span class="pre">Nexus::NativeMappedStorage</span></code></p></td>
+<td><p>Caller-owned read slots and one writer; coherent Native NOR bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>AMP epoch/cache core</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nexus::AMPIPC</span></code></p></td>
+<td><p>Explicit unidirectional lanes, caller-owned shared records and hardware ports</p></td>
+</tr>
+<tr class="row-even"><td><p>Running-image tail handoff</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nexus::STM32F407Handoff</span></code></p></td>
+<td><p>Exact STM32F407VET6/ZGT6 baremetal Platform only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Retained RTC AlarmA</p></td>
+<td><p>Normal U575 Platform/factory; <code class="docutils literal notranslate"><span class="pre">u575-rtc-run.toml</span></code></p></td>
+<td><p>TZEN=0, MSIS4, baremetal, prepared retained LSE calendar, RUN polling</p></td>
+</tr>
+<tr class="row-even"><td><p>Frame layouts and DMA2D</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nexus::IO</span></code>; optional <code class="docutils literal notranslate"><span class="pre">Nexus::H743FrameDMA2D</span></code></p></td>
+<td><p>Common frame contracts; exact H743 V, D-Cache off, RGB565 copy or fixed ARGB8888-to-RGB565 PFC in AXI SRAM</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Optional component targets are linked explicitly through
+<code class="docutils literal notranslate"><span class="pre">nexus_add_firmware(...</span> <span class="pre">LIBRARIES</span> <span class="pre">...)</span></code>. They do not create factory entries or
+discover hardware. RTC uses the maintained
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/u575-rtc-run.toml">assembly</a> and
+<code class="docutils literal notranslate"><span class="pre">nx_factory_rtc(NX_RTC_ID_CALENDAR)</span></code>. Its pinless software reference Board has
+unknown PCB identity and does not establish an LSE crystal route. The DMA2D
+public consumer is an explicit component fixture, without TOML/factory routing.</p>
+</section>
+<section id="ownership-and-progress">
+<h2>Ownership and progress<a class="headerlink" href="#ownership-and-progress" title="Link to this heading">¶</a></h2>
+<p id="fig-23-io-extension-ownership"><a class="nexus-diagram-link reference internal" href="../_images/io-extension-ownership.svg" title="Open SVG at full size"><img alt="FIG-23: current software ownership; each labeled arrow denotes a call, supplied storage or proof, and the selected mechanisms are independent" src="../_images/io-extension-ownership.svg" /></a></p>
+<p>FIG-23 is a current software architecture figure. The external owner supplies
+storage, serializes each executor, advances service and joins users. Dashed edges
+show required external ports or proof. No arrow implies automatic enrollment, a hidden
+worker or one mechanism invoking another. The source basis is the public headers
+and implementations linked below; the figure establishes no hardware result.</p>
+<p>Accepted asynchronous requests borrow their metadata and buffers until
+acquire-observed <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>. Rejected admission retains no new borrow or residual
+hardware effects. Cancellation and deadlines request withdrawal; the caller must
+continue the required service. Failed drain retains <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code> storage and
+recovery responsibility. The provider detaches actual references before its final
+release-publication. Consumers, controls and observers must also be joined before
+their own storage is reused. See the
+<a class="reference internal" href="../explanation/ownership.html"><span class="std std-doc">shared lifecycle contract</span></a>.</p>
+<section id="mapped-ownership-and-coherent-native-nor">
+<h3>Mapped ownership and coherent Native NOR<a class="headerlink" href="#mapped-ownership-and-coherent-native-nor" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/mapped_storage/include/nexus/components/mapped_storage.h">public face</a>
+and <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/mapped_storage/include/nexus/components/mapped_storage_owner.h">owner</a>
+use exact instance/slot/epoch loans. Copying a token creates no new loan; epochs
+never wrap. A live supported CPU/XIP/DMA-read loan excludes every PROGRAM/ERASE
+writer to the entire aperture. All command, cache and DMA writers must use the
+sole backend. Consumers join before release; failed final unmap retains the exact
+loan and blocks writers. Stop permanently closes admission and waits for all maps
+and the writer without revoking them.</p>
+<p>Writer admission checks geometry, alignment, overflow and aliasing against owner,
+slots, backend context and aperture before effects. Accepted PROGRAM retains its
+input until settlement; partial effects remain visible and are never replayed.
+After backend recovery, continued service can retry failed drain. The
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/mapped_storage/include/nexus/components/native_mapped_storage.h">Native backend</a>
+preserves caller bytes, programs only 1-to-0, erases to <code class="docutils literal notranslate"><span class="pre">0xff</span></code> and mutates at most
+the configured byte quantum per service call. It accepts coherent CPU reads only.
+Physical QUADSPI/serial memory, SDMMC, XIP/cache/DMA qualification and resource
+factory assembly remain open.</p>
+</section>
+<section id="amp-epoch-cache-lanes">
+<h3>AMP epoch/cache lanes<a class="headerlink" href="#amp-epoch-cache-lanes" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/amp_ipc/include/nexus/components/amp_ipc.h">AMP API</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/amp_ipc/include/nexus/components/amp_ipc_storage.h">caller-storage constructor</a>
+use separate offer and ACK cache lines, exact peer/local boot epochs and a
+nonwrapping slot sequence. One serialized privileged Thread executes each lane
+role. The caller supplies storage, coherent acquire/release control access,
+cache clean/invalidate and a unique hardware-role claim. The configured power-of-two
+cache granule is 1..64 B and divides 64 B. The claim port rejects a reused or
+non-increasing local boot epoch, including after normal join. Authoritative nonzero
+boot-epoch history must survive CPU/whole-device resets and fail closed at exhaustion.</p>
+<p>Accepted send retains its payload until an acquire-observed exact
+epoch-pair/sequence ACK or explicit proof that the old peer’s CPU, DMA, IRQ and
+observers can never again access the exact lane/payload under that execution epoch.
+Elapsed timeouts never release a loan; observing a changed peer epoch faults
+and closes the lane. Restoring an old shared word cannot reopen it. Receive invalidates descriptors and payload before producing a
+readonly view. The caller joins readers before <code class="docutils literal notranslate"><span class="pre">finish</span></code>; a valid <code class="docutils literal notranslate"><span class="pre">finish</span></code> consumes
+that view even if ACK cache clean or epoch validation fails, while local state
+remains retained for retry
+or recovery. <code class="docutils literal notranslate"><span class="pre">close</span></code> blocks admission; <code class="docutils literal notranslate"><span class="pre">join</span></code> waits for ACKs and finished views;
+<code class="docutils literal notranslate"><span class="pre">reset_join</span></code> additionally requires exact peer-stop proof. There is no cancel or
+blocking-wait API. Exact multicore target, cache attributes, atomicity and resource
+partition are unselected; single-core H743 is not an AMP target.</p>
+</section>
+<section id="f407-masked-tail-handoff-and-clock-barrier">
+<h3>F407 masked tail handoff and clock barrier<a class="headerlink" href="#f407-masked-tail-handoff-and-clock-barrier" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h">handoff component</a>
+reuses the existing ClockDomain barrier. Initialize once, explicitly enroll every
+owner, close admission, cancel/drain/join all users, stop the actual Platform and
+release exact leases. An empty foreign domain, stale epoch or retained lease
+rejects. The domain cannot discover unenrolled users or other bus masters.</p>
+<p>The caller enters privileged MSP Thread with <code class="docutils literal notranslate"><span class="pre">PRIMASK=1</span></code>, <code class="docutils literal notranslate"><span class="pre">BASEPRI=FAULTMASK=0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">CONTROL=0</span></code>. It must establish stopped System, HSI16/reset buses, no active
+FP/lazy context or MPU, no enabled/pending/active SysTick/NVIC source, no live
+peripheral/DMA gate and idle Flash with <code class="docutils literal notranslate"><span class="pre">ACR=0</span></code> (ART/prefetch disabled).
+Rejection preserves masks and writes no
+MMIO; reading SysTick CTRL consumes COUNTFLAG. The 98-entry Flash vector table is
+512 B aligned and fits the exact generated/observed 512 KiB or 1 MiB density.
+MSP is 8 B aligned in <code class="docutils literal notranslate"><span class="pre">(0x20000000,0x20020000]</span></code>; Thumb PC’s first halfword lies
+in physical Flash. Shared device ID <code class="docutils literal notranslate"><span class="pre">0x413</span></code> cannot establish exact-part/PCB identity.
+The caller excludes NMI/HardFault, debugger and other masters throughout transfer.</p>
+<p>Successful tail transfer never returns: it sets VTOR, disables CP10/11 with
+barriers, clears CONTROL/PSP, replaces MSP and branches while masked. Main SRAM
+persists until target startup. The target accepts masked entry and resets
+controllers before enabling gates; no source deadline survives. Image selection,
+authentication, partitions and recovery stay external. Live RTOS/FPU adoption,
+H743/cache handoff, DVFS and deep-STOP continuity remain open.</p>
+</section>
+<section id="u575-retained-lse-calendar-in-run">
+<h3>U575 retained LSE calendar in RUN<a class="headerlink" href="#u575-retained-lse-calendar-in-run" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/drivers/rtc.c">RTC provider</a> requires an external boot
+owner to preserve a valid 24-hour BCD calendar, <code class="docutils literal notranslate"><span class="pre">BYPSHAD</span></code>, prescalers 127/255,
+actual LSE 32768 Hz, <code class="docutils literal notranslate"><span class="pre">RTCSEL=LSE</span></code>, <code class="docutils literal notranslate"><span class="pre">RTCEN</span></code>, <code class="docutils literal notranslate"><span class="pre">LSERDY</span></code>, <code class="docutils literal notranslate"><span class="pre">RTCAPBEN</span></code>, <code class="docutils literal notranslate"><span class="pre">PWREN</span></code> and
+<code class="docutils literal notranslate"><span class="pre">DBP</span></code>. Boot hands over locked WPR; it remains locked between calls with no other
+writer. Calibration, shift, binary mode, another RTC owner and a live RTC vector
+reject. Accepted service briefly unlocks WPR with CA/53, checks the protected
+write and unconditionally relocks with FF. The provider does not write calendar,
+RCC, PWR or TAMP, enable an IRQ or repair/reset the backup domain.
+Year-00 provenance remains external; INITS cannot
+prove it. <code class="docutils literal notranslate"><span class="pre">set</span></code> returns <code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span></code>.</p>
+<p>ES0499 Rev12 sections 2.2.3 and 2.2.16 identify oscillator-stop limitations for
+LSE drive codes 00/01 on revision X; Table 3 marks these limitations repaired on
+W/U. This reference does not qualify a silicon revision, so its crystal-mode
+profile requires <code class="docutils literal notranslate"><span class="pre">LSEBYP=0</span></code> and conservatively admits only <code class="docutils literal notranslate"><span class="pre">LSEDRV=10/11</span></code> on
+every revision. It never writes either field. Section 2.2.1 separately requires
+external boot and Board owners to exclude PC13 transitions for crystal LSE on
+this LQFP part. LSE bypass is unaffected by section 2.2.1 and is outside this
+selected profile. GPIO reads cannot prove that electrical condition, and this
+software reference declares no PCB route or measured oscillator behavior.</p>
+<p>Reads try at most eight coherent SSR/TR/DR pairs and preserve output on invalid
+or unstable data. Natural year 99-to-00 rollover preserves the domain; successful
+reopen advances a nonwrapping 64-bit domain. AlarmA borrows one request. Core
+monotonic deadlines remain independent of calendar time. One service phase per
+call disables ALRAE with readback and a 100 µs Core-time crossing guard, clears
+and observes ALRAF, then restores saved alarm registers with readback before
+detaching and settling. Failed disable/clear/restore retains quarantine. Foreign
+clock/configuration drift permanently retains responsibility for external
+recovery. This mode provides no Stop2, LPDMA, VBAT-continuity or wake qualification.</p>
+</section>
+<section id="complete-frames-and-fixed-h743-dma2d-formats">
+<h3>Complete frames and fixed H743 DMA2D formats<a class="headerlink" href="#complete-frames-and-fixed-h743-dma2d-formats" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/frame_stream.h">frame contract</a> binds a copied,
+checked layout to an existing <code class="docutils literal notranslate"><span class="pre">nx_stream</span></code> pool. Audio layouts retain full stored
+slots, including inactive SAI slots; PDM uses byte-interleaved lanes and complete
+eight-frame groups. Planar layouts accept up to four disjoint checked stride
+intervals. These are data contracts, not SAI/DCMI providers. Publication requires
+complete frame bytes. Empty acquisition increments a saturating underrun counter
+without choosing silence/repeat policy. DMA-view release requires actual engine,
+IRQ and peripheral detachment facts and exact control identity/epoch.</p>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h">DMA2D component</a>
+has one caller-owned executor and no queue. It admits exact H743 V ID <code class="docutils literal notranslate"><span class="pre">0x20030450</span></code>,
+D-Cache off and exclusive cold DMA2D. The two request formats are RGB565 copy
+(the zero value) and fixed ARGB8888-to-RGB565 pixel format conversion (PFC).
+Unknown formats are rejected; CLUT, blending, other formats and IRQ operation
+remain unsupported. Both surfaces must occupy AXI SRAM
+<code class="docutils literal notranslate"><span class="pre">[0x24000000,0x24080000)</span></code>. No Board connection or physical result is inferred.</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">width_bytes</span></code> always count source bytes. Source addresses, x, widths and
+strides align to two bytes for RGB565 or four for ARGB8888. ARGB8888 input on
+this little-endian MCU stores B, G, R, A bytes; RGB565 discards alpha with no
+channel or byte swap. Output addresses and strides align to two bytes; output
+row bytes equal <code class="docutils literal notranslate"><span class="pre">width_bytes</span> <span class="pre">/</span> <span class="pre">source_pixel_bytes</span> <span class="pre">*</span> <span class="pre">2</span></code>. Destination stride and
+capacity remain bytes. With <code class="docutils literal notranslate"><span class="pre">LOM=0</span></code>, foreground and output offsets count their
+own format’s pixels: source padding divided by four for PFC or two for copy,
+and output padding divided by two. Each pixel gap is at most <code class="docutils literal notranslate"><span class="pre">0x3fff</span></code>; bits
+15:14 are ignored in pixel mode despite the 16-bit register field (RM0433 Rev9,
+sections 18.5.5 and 18.5.20). Width is at
+most <code class="docutils literal notranslate"><span class="pre">0x3fff</span></code> pixels and height at most <code class="docutils literal notranslate"><span class="pre">0xffff</span></code> rows. Successful request results
+report output bytes without stride padding. Arithmetic, AXI spans and hardware
+bounds are checked before acceptance.</p>
+<p>Destination writes and every ownership control must be disjoint from every
+source-pool slot’s full capacity, including frame tails and other free slots.
+Admission scans the bounded pool in O(n), comparing seven fixed controls per
+slot. Acceptance borrows the request, exact live source-frame loan and output;
+the selected source slot remains immutable through final access. Rejection
+leaves the original source loan with its caller. Submit <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> means
+ACCEPTED, including a subsequent setup/readback failure; such a failure keeps
+all borrows until service proves drain. The first observed failure remains
+latched across cancellation and recoverable cache/IRQ guard restoration.</p>
+<p>Successful completion requires TC and START-clear. Cancel/error drain instead
+requires START/CLUT/IRQ withdrawal without requiring TC. START and ABORT writes
+preserve the selected mode. START is a read/set bit: writing zero has no
+effect. ABORT requests hardware withdrawal without reasserting a previously
+cleared START. The provider releases the loan only after the hardware proof
+and clearing FGMAR/OMAR/NLR. Failed proof retains every borrow in quarantine;
+continued service can recover an actual drain. If an active owner observes its
+required RCC gate off or DMA2D reset asserted, transfer history is uncertain
+and quarantine is permanent: restoring registers to zero cannot revoke the
+borrow, and service, stop or reinitialization cannot reclaim it. An unobserved
+reset pulse is not detectable; exclusive gate/reset ownership remains a
+mandatory precondition. System-level recovery stays external. Stop closes
+admission and returns <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> for active work; only after all loans settle does
+it reset the controller and withdraw its owned gate. These software and ELF
+checks establish no PFC throughput, latency or HIL result.</p>
+</section>
+</section>
+<section id="validation-and-remaining-exits">
+<h2>Validation and remaining exits<a class="headerlink" href="#validation-and-remaining-exits" title="Link to this heading">¶</a></h2>
+<p>Maintained regressions are
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/mapped_storage_test.cpp">mapped storage</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/amp_ipc_test.cpp">AMP</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/stm32f407_handoff_test.cpp">handoff</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/u575_rtc_test.cpp">RTC</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/frame_stream_test.cpp">frame layouts</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_frame_dma2d_test.cpp">DMA2D</a>.
+They exercise software contracts and external hardware models; they do not
+establish electrical, retained-power, multicore or station behavior. Exact
+execution and frozen-source identities belong in the
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/testing/evidence/io-extensions-20261020/README.md">compact development evidence</a>
+and delivery records. The original
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">I/O</span></code></a> and <a class="reference download internal" download="" href="../_downloads/99f801eac159da083b9107f1c02855a6/soc-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">SoC</span></code></a> ledgers
+retain their full exits and authoritative status. No exit is narrowed by this page.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

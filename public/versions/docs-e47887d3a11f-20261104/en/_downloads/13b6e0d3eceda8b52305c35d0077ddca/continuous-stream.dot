@@ -1,0 +1,57 @@
+// FIG-15 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph ContinuousStream {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-15 STM32F407 USART1 连续 RX：caller-owned block 贷款
+DMA2 stream2 channel4；双目标 + 至少一个替换块"];
+    subgraph clusterSlots {
+        label="块状态与 token（slot + monotonic epoch）"; color="#64748b";
+        free [label="FREE：可保留为下一 producer 目标"];
+        filling [label="FILLING：两个硬件目标 + 待替换贷款
+硬件仍可能写入，不得交给 consumer"];
+        ready [label="READY：旧地址已脱离所有硬件目标
+payload immutable，携带 boundary / loss"];
+        borrowed [label="BORROWED：consumer acquire
+最后使用后匹配 token release"];
+        free -> filling [label="preposted reserve / 显式 DMA 域验证"];
+        filling -> ready [label="FIFO publish：旧块已证明脱离"];
+        ready -> borrowed [label="consumer acquire"];
+        borrowed -> free [label="匹配 release；stale/double 不改变贷款", constraint=false];
+    }
+    irq [label="DMA TC IRQ：保留第三个 FREE 块
+替换完成的非活动 target"];
+    proof [label="同时证明两 target 地址 / CT / EN
+无新 TC或错误；旧地址完全消失"];
+    noSpare [label="无 FREE / CT异常 / 新错误
+立即撤 RX source，实际 disable/drain", fillcolor="#fff7ed"];
+    retained [label="disable 未证明：全部 producer loan 保留
+Task service 有界重试；consumer loan不回收", fillcolor="#fff7ed"];
+    loss [label="排空后发布可靠正长度前缀 / LIFO abort未来贷款
+记录可观察 loss / 停止间隙，不猜丢失字节"];
+    budget [label="预算：IRQ + target替换时间 < 一块填充时间
+consumer frontier release delay 决定所需块数
+TC 标志不能恢复任意合并回绕", fillcolor="#fefce8"];
+    stop [label="rx_stop 关闭 admission；不再 rearm
+写源 + engine排空，consumer释放，outstanding=0
+成功后还需 observers / 调用者退出"];
+    filling -> irq [label="TC 是边界提示"];
+    irq -> proof [label="备用块存在"];
+    proof -> ready [label="全部证明成立"];
+    irq -> noSpare [label="无法替换"];
+    proof -> noSpare [label="任何证明失败"];
+    noSpare -> retained [label="写源未排空"];
+    noSpare -> loss [label="实际写源排空"];
+    loss -> ready [label="可靠前缀与 flags", constraint=false];
+    budget -> irq [label="实板需测量最坏 latency", style=dashed];
+    borrowed -> stop [label="归还 loan 后判断成功"];
+    loss -> stop [label="显式停止路径"];
+}

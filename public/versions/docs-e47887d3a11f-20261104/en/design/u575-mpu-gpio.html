@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>U575 MPU-v2 scalar GPIO WRITE authority &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="U575 retained elapsed-time domain" href="u575-retained-time.html" />
+    <link rel="prev" title="U575 single-tuple LPTIM1 LPBAM across Stop2" href="u575-lptim1-lpbam.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/u575-mpu-gpio.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/u575-mpu-gpio.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="u575-mpu-v2-scalar-gpio-write-authority">
+<h1>U575 MPU-v2 scalar GPIO WRITE authority<a class="headerlink" href="#u575-mpu-v2-scalar-gpio-write-authority" title="Link to this heading">¶</a></h1>
+<p>This implementation reference selects STM32U575ZIT6Q TZEN0, MSIS4, one security
+world, FreeRTOS MPU-wrapper-v2 and the actual Cortex-M33 eight-region port. One
+protected task may WRITE GPIOC PC7 through one immutable grant. Software evidence
+now includes real C host models, a normal M33 reset link and one relocated
+development-SDK consumer with the maintained static ELF gate. Runtime MPU
+exception behavior and electrical HIL are not executed. It establishes no M7 MPU
+support or general user-device gateway.</p>
+<p>Link the selected <code class="docutils literal notranslate"><span class="pre">Nexus::U575MpuGpio</span></code> target through the maintained
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/u575-mpu-gpio-write.toml">assembly</a>. The ordinary
+profile keeps the pinned 70-entry syscall numbering and delay/tick services.
+Only <code class="docutils literal notranslate"><span class="pre">user_io=&quot;gpio-write&quot;</span></code> selects the 71-entry derivation, new slot 70 and
+protected task pin/epoch fields. Resource claims apply only to measured compiled
+contexts and actual images; the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/testing/evidence/u575-mpu-gpio-20261020/README.md">source-bound evidence</a>
+keeps selected/default scope and historical phases explicit.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/u575-mpu-gpio.svg" title="Open SVG at full size"><img alt="FIG-29: exact protected task, immutable authority and one guarded BSRR effect; close/join precede task deletion; software links do not establish runtime isolation" src="../_images/u575-mpu-gpio.svg" /></a></p>
+<p>The <a class="reference internal" href="../assets/diagrams/README.html#fig-29-u575-mpu-gpio"><span class="std std-ref">figure contract</span></a> distinguishes actual calls,
+protected authority, saved-mask exclusion and lifecycle responsibility. No arrow
+creates a worker, dynamic handle registry, user MMIO mapping or asynchronous
+request protocol.</p>
+<section id="five-explicit-memory-domains">
+<h2>Five explicit memory domains<a class="headerlink" href="#five-explicit-memory-domains" title="Link to this heading">¶</a></h2>
+<p>The maintained normal memory generator accepts five explicit, nonempty,
+32-byte-aligned reservations. Their Flash and RAM sums may be less than the
+physical capacity; the remaining tail stays unassigned, rather than becoming
+user memory. Overflow, overlap, malformed sizes and insufficient privileged
+MSP/static budget are rejected before generation. These are software reference
+reservations, not a product partition policy.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Domain</p></th>
+<th class="head"><p>Reference reservation</p></th>
+<th class="head"><p>Contents and access</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Privileged Flash</p></td>
+<td><p>24 KiB</p></td>
+<td><p>Vectors, ordinary code/rodata, kernel, public I/O helpers and concrete provider; user execution forbidden</p></td>
+</tr>
+<tr class="row-odd"><td><p>Syscall Flash</p></td>
+<td><p>256 B</p></td>
+<td><p>Real pinned FreeRTOS veneers, including selected SVC70; narrow user-executable entry region</p></td>
+</tr>
+<tr class="row-even"><td><p>User Flash</p></td>
+<td><p>1 KiB</p></td>
+<td><p>Explicit user entry and all three Nexus user wrappers; executable, read-only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Privileged RAM</p></td>
+<td><p>8 KiB</p></td>
+<td><p>Kernel/TCB, protected syscall stack, authority, provider state and MSP</p></td>
+</tr>
+<tr class="row-even"><td><p>User RAM</p></td>
+<td><p>2 KiB</p></td>
+<td><p>Explicit user stack and user DATA/BSS; data mappings are XN</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The actual reset path must validate the exact part/security identity before
+copying user DATA and zeroing user BSS from the strong linker spans. The new
+bounded initializer validates every range before any store. Ordinary vendor
+startup still initializes privileged DATA/BSS; no runtime linker or pathname-based
+partition substitutes for this normal graph. The assembly does not select SRAM4
+or the baremetal Stop2 owners.</p>
+</section>
+<section id="bind-the-one-trusted-authority">
+<h2>Bind the one trusted authority<a class="headerlink" href="#bind-the-one-trusted-authority" title="Link to this heading">¶</a></h2>
+<p>Use the declarations in the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/os/freertos/include/nexus/os/freertos_mpu_gpio.h">authority header</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/os/freertos/include/nexus/os/freertos_mpu.h">protected task header</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/os/freertos/include/nexus/os/freertos_user.h">user entry header</a>. Define
+exactly one immutable <code class="docutils literal notranslate"><span class="pre">nx_freertos_mpu_gpio_binding</span></code> in privileged Flash. It names
+a disjoint privileged-RAM task/control pair and a read-only grant. The grant names
+the read-only generated <code class="docutils literal notranslate"><span class="pre">nx_binding_led</span></code> pointer slot, logical LED device and
+mask <code class="docutils literal notranslate"><span class="pre">0x80</span></code>; it never accepts a user pointer as authority.</p>
+<p>Before reading nested fields, the implementation checks full object extents,
+alignment and the five linked ranges: binding, grant, pointer slot, face and ops
+must fit privileged Flash; task, control and the complete concrete provider
+context must fit disjoint privileged RAM. The SoC validator requires the actual
+initialized GPIOC PC7 output provider and exact ops identity. Metadata bounds do
+not themselves prove every instruction’s MPU permissions: the final normal ELF
+must also place the complete helper/provider function extents in privileged Flash.</p>
+<p>One privileged lifecycle owner serializes task start/delete and authority
+open/close/join. Binding, grant, task metadata, control and provider remain valid
+for the linked image lifetime; open through join also forbids GPIO stop or
+reconfiguration. Only cold startup zero-initializes the metadata. The task’s monotonic epoch
+survives deletion; join clears only the captured task epoch. Task-epoch wrap
+rejects rather than reusing an incarnation. NMI, HardFault, DMA and another
+security world never write these objects.</p>
+</section>
+<section id="enter-through-the-real-protected-port">
+<h2>Enter through the real protected port<a class="headerlink" href="#enter-through-the-real-protected-port" title="Link to this heading">¶</a></h2>
+<p>Start the statically provided restricted task, then open the fixed authority
+before allowing its user calls. Open checks the actual live task handle equals
+its selected static TCB and snapshots that task epoch while pinning deletion.
+There is no caller-provided principal, lookup table or borrowed pointer argument.</p>
+<p>The user calls <code class="docutils literal notranslate"><span class="pre">nx_freertos_user_gpio_write(device,</span> <span class="pre">set,</span> <span class="pre">reset)</span></code>. Its real veneer
+enters SVC70 through the pinned protected call stack/origin checks. The dispatcher
+obtains the actual <code class="docutils literal notranslate"><span class="pre">xTaskGetCurrentTaskHandle()</span></code> before entering the saved-mask
+boundary, then rechecks open phase, live TCB/epoch, device and grant through the
+single real <code class="docutils literal notranslate"><span class="pre">nx_gpio_port_write()</span></code> effect. The selected provider performs exactly
+one bounded BSRR write. No kernel API, wait, allocation or product callback runs
+inside that effect boundary; the scalar result returns in R0.</p>
+<p>Unknown device, wrong current task or bits outside <code class="docutils literal notranslate"><span class="pre">0x80</span></code> return PERMISSION.
+Zero combined masks or overlapping set/reset return INVALID; closed/stale
+incarnations return STATE; invalid privileged metadata returns INVALID; an
+unsupported context returns CONTEXT. These rejections perform no GPIO effect.
+READ, toggle, arbitrary pointers, user MMIO, DMA, IRQ and copied/asynchronous I/O
+are outside this API. Delay and tick-read remain separate services 6 and 13;
+the final ELF must prove all three Nexus user entries and their actual veneers
+are in the permitted execution regions.</p>
+<p>Lifecycle controls require privileged Thread and a scheduler that is running
+or not yet started, never suspended. FAULTMASK and BASEPRI must be zero except
+the selected port’s canonical bootstrap BASEPRI before scheduler start. Service
+requires a running scheduler and zero BASEPRI. Incoming PRIMASK is saved and
+restored. This single-core exclusion is insufficient for an unmodeled writer;
+products must preserve the exact single-owner assumptions.</p>
+</section>
+<section id="close-join-and-delete-explicitly">
+<h2>Close, join and delete explicitly<a class="headerlink" href="#close-join-and-delete-explicitly" title="Link to this heading">¶</a></h2>
+<p>Close revokes new effects but retains the task pin. Join requires closed state
+and the same live incarnation, enters the saved-mask exclusion, removes the pin
+and detaches the authority’s handle/task epoch. No scalar effect can straddle
+that single-core boundary. Join does not delete the task, stop GPIO or reset
+the task lifetime epoch. A failed close/join retains the obligation and storage.</p>
+<p>Task deletion while pinned returns BUSY. After join, the lifecycle owner may
+delete the other task; self-delete is rejected. A protected closing marker is
+set before the real kernel deletion outside the IRQ guard, preventing reopen
+during deletion. The owner then clears the handle under a second guard while
+preserving the task epoch. Products still own user quiescence, task stack lifetime,
+scheduler startup, safe outputs and eventual provider/platform stop.</p>
+</section>
+<section id="evidence-and-remaining-exits">
+<h2>Evidence and remaining exits<a class="headerlink" href="#evidence-and-remaining-exits" title="Link to this heading">¶</a></h2>
+<p>Executable tests preceded production changes and exposed actual authority,
+task, provider-context and startup failures. The reviewed removal of an unexposed
+control counter retains the actual task epoch: its final model result is a
+behavior-preserving refactor GREEN, not a new behavioral RED. The maintained
+Native CMake target runs the final cases. Configuration and pinned-port checks
+retain default and unsupported-profile coverage. The
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c">public consumer</a>
+uses the normal firmware graph, including real reset startup. The
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/testing/evidence/u575-mpu-gpio-20261020/README.md">source-bound evidence</a>
+records exact source phases, raw execution, compiled ABI facts, resources and the
+single relocated development-SDK consumer; it does not claim the complete current
+SDK transport plan passed.</p>
+<p>The selected ELF gate checks complete five-domain ranges, immutable authority
+pointers, protected objects, compiled task/control sizes, actual slots 6/13/70,
+three user wrappers and real veneers. Its explicit supported GNU Os startup
+shape checks actual reset/identity/user-initialization calls and DATA/BSS bounds;
+unrecognized shapes fail closed. These static layout, opcode and call facts do
+not execute protected SVC entry/exit. Runtime MPU faults, task switching, actual
+PC7 output, interrupt latency and HIL are not executed. The general IO-39/SOC-36
+exits, other devices, multiple tasks/grants and M7 MPU remain open; a typed
+interface or host model does not close them.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,524 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>H743 Flash maintenance from a private RAM execution pod &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="H743 V-only high-clock profile" href="h743-high-clock.html" />
+    <link rel="prev" title="Fault observation and retained responsibility" href="fault-observation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/h743-flash-ram.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/h743-flash-ram.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="h743-flash-maintenance-from-a-private-ram-execution-pod">
+<span id="design-h743-flash-ram"></span><h1>H743 Flash maintenance from a private RAM execution pod<a class="headerlink" href="#h743-flash-maintenance-from-a-private-ram-execution-pod" title="Link to this heading">¶</a></h1>
+<p>This page specifies the selected STM32H743ZIT6 V/cache-off RAM maintenance
+boundary for synchronous program and erase. The ordinary selected link requires
+explicit data-operand closure and a byte-checked assembly return gate before an
+image is admitted. These checks retain the caller, C/ABI and external-owner
+preconditions below. The figures keep their <strong>target IO-24</strong> identity until the
+original implementation and evidence exits are satisfied. This page does not
+establish a software candidate or physical qualification. Physical HIL is
+<code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>The public Flash face still exposes physical geometry and synchronous operations.
+The selected provider now requires cold RAM preparation; it has no fallback that
+executes a physical pulse through the former ordinary Flash-resident path.
+Existing image/control-alias guards, programming timing and clock ownership
+remain prerequisites. Source integration or a successful link alone cannot
+establish the entire IO-24 exit.</p>
+<p>Flash admission requires V revision <code class="docutils literal notranslate"><span class="pre">0x2003</span></code> for every selected Flash profile,
+including fixed HSI32/64 and HSI64/PLL384; unknown cuts are rejected. This
+restriction and the selected RAM workspace do not extend to the other peripheral
+providers or to assemblies without Flash. Their existing profile contracts
+remain authoritative.</p>
+<section id="keep-one-controller-owner-and-a-cold-factory">
+<h2>Keep one controller owner and a cold factory<a class="headerlink" href="#keep-one-controller-owner-and-a-cold-factory" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/h743-flash-ram-architecture.svg" title="Open SVG at full size"><img alt="FIG-17 target: static face lookup and explicit preparation are separate from the direct runtime call; the private RAM boundary owns CPU protection and Flash settlement" src="../_images/h743-flash-ram-architecture.svg" /></a></p>
+<p>FIG-17 is the <strong>target</strong> architecture and its required ownership boundary; it does
+not claim that all implementation and production-ELF exits have passed.
+Solid arrows describe the explicitly labelled lookup, call or copy relationship.
+The dashed external precondition is a caller responsibility, not a platform task.
+The factory returns an existing immutable Flash face; it performs no MMIO,
+allocation, execution-pod copy or maintenance. Once acquired, ordinary I/O enters
+the selected private provider through the face’s shared read-only operations.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Owner</p></th>
+<th class="head"><p>Responsibility in the target design</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Generated Platform lifecycle</p></td>
+<td><p>Select only the required private workspace and code; order preparation and reverse cleanup; retain failed cleanup responsibility</p></td>
+</tr>
+<tr class="row-odd"><td><p>H743 Flash provider</p></td>
+<td><p>Validate the physical operation, region, source and destination; stage command/input for the single execution owner</p></td>
+</tr>
+<tr class="row-even"><td><p>Private RAM owner and bridge</p></td>
+<td><p>Prove copy/layout/context, install a private stack and RAM vectors, preserve CPU state and keep the entire busy transaction in RAM</p></td>
+</tr>
+<tr class="row-odd"><td><p>Private MPU guard</p></td>
+<td><p>Temporarily own the selector, selected descriptor and control changes; prove installation and exact restoration</p></td>
+</tr>
+<tr class="row-even"><td><p>Existing System</p></td>
+<td><p>Own the monotonic TIM2 domain and epoch; RAM maintenance must preserve that contract</p></td>
+</tr>
+<tr class="row-odd"><td><p>External maintenance caller</p></td>
+<td><p>Serialize calls as the single execution owner; quiesce and join other bus masters and users, provide freshly erased consumer regions and choose watchdog/recovery policy</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>There is no second Flash owner, runtime registry, heap, mandatory OS lock, hidden
+worker or automatic watchdog feed. Application tasks, update policy, partitions,
+authentication and reset policy remain in external repositories.</p>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/flash.h">public Flash contract</a> requires one
+execution owner and no concurrent program/erase calls. The external caller owns
+that scheduling; an active-state check does not provide a hidden concurrent lock.</p>
+<p>The generated Platform owns exactly one existing private Flash workspace and
+its embedded MPU guard. Public consumers select Flash in the authored TOML,
+obtain the immutable face through <code class="docutils literal notranslate"><span class="pre">nx_factory_flash</span></code>, and use the ordinary
+Platform start/stop lifecycle for preparation and cleanup. They do not supply a
+workspace or include private SDK types. Cold construction rejects a foreign
+workspace before copying or publishing ownership; admission, external-buffer
+checks and cleanup retain the same fixed binding. The physical binding also
+requires the official FLASH, TIM2 and SCB identities and the unswapped physical
+Flash base. This adds no RAM storage, allocator or runtime registry.</p>
+</section>
+<section id="prepare-bytes-and-context-before-making-flash-busy">
+<h2>Prepare bytes and context before making Flash busy<a class="headerlink" href="#prepare-bytes-and-context-before-making-flash-busy" title="Link to this heading">¶</a></h2>
+<p>Cold preparation must validate the selected load/run ranges, copy the audited
+code/literals into admitted AXI SRAM and verify the resulting layout before
+publishing readiness. Private vectors, stack, command, deadline operands,
+workspace and terminal diagnostics must remain in admitted RAM throughout the
+busy interval. Selected RAM cannot overlap submitted buffers, executable/load
+bytes, vectors, control MMIO, current System state or other private metadata.
+Half-open range checks must reject overflow and partial aliases before access.</p>
+<p>Public reads, the program path’s erased-region precheck and every programmed
+flashword readback inspect the current <code class="docutils literal notranslate"><span class="pre">SNECCERR</span></code>/<code class="docutils literal notranslate"><span class="pre">DBECCERR</span></code> sticky flags in both
+banks. An observed flag reports <code class="docutils literal notranslate"><span class="pre">IO</span></code>; these physical-data read checks do not
+acknowledge it with W1C. This includes events already latched on entry: the
+status cannot identify their source or establish recovery from a DBECC exception.
+Corrected data may compare equal, so an observed event must be reported before
+an all-FF input no-op or a subsequent pulse can hide it. This does not remove the
+separate target-bank W1C phase in erase/pulse preparation.</p>
+<p>The final call must re-observe actual privileged Thread context, masks, Cache
+state and floating-point state; successful cold preparation alone does not prove
+the later call context. Entry requires PRIMASK, BASEPRI and FAULTMASK to be zero;
+an IRQ call or live lazy FP context is inadmissible. The deadline must be finite
+in the existing System TIM2 domain; <code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> is unsupported. The bridge
+preserves distinct MSP and PSP, CONTROL including FPCA, and incoming PRIMASK.
+Before C runs, it captures incoming MPU CTRL, RNR and region15 RBAR/RASR in
+r8-r11, with selector ownership and verified rollback. Selected C instructions
+must not write those capture registers. The C transaction publishes and reads
+back RAM VTOR before guard installation. After C cleanup, the assembly gate
+checks hardware against the protected captures and restores the linker-known
+original vector; only then may the bridge restore the caller’s exact CPU state.</p>
+<p>At bridge entry, the caller must own at least 260 readable/writable bytes below
+the incoming MSP and below the active Thread stack pointer: 36 bytes for saved
+registers plus a conservative 224 bytes for two nested extended exception frames
+and alignment. This reserve is additional to ordinary provider C frames. It
+covers transitions before private MSP/RAM VTOR take ownership and after they
+withdraw. The private-stack ELF bound separately includes its exception reserve;
+it does not prove an arbitrary incoming application stack extent. Original
+NMI/HardFault aliases must retain the admitted nonreturning default behavior.
+During the RAM window, both handlers name the fixed workspace directly and
+remain in the nonreturning RAM diagnostic path.</p>
+<p>The source/ELF closure must include actual instructions, veneers, literals,
+direct and indirect calls, handlers, terminal paths and compiler-generated
+helpers. A section name, C attribute, caller-authored <code class="docutils literal notranslate"><span class="pre">ram_safe</span></code> flag or unused
+matching literal is insufficient. Firmware remains C11; test machinery does not
+become a firmware dependency.</p>
+<p>The normal firmware link for a selected H743 Flash assembly now invokes the
+automatic RAM audit. It checks the complete copied pod and workspace against the
+actual ELF sections and LOAD segments: the RX run range has one matching Flash
+load range, their bytes agree, and the vector, stack and workspace extents are
+disjoint from the pod and wholly in writable RAM. The immutable Flash image guard
+must contain the actual linked endpoints and cover every file-backed LOAD. These
+checks are part of the normal link, rather than only synthetic checker fixtures.
+Changing a guard byte in a real firmware ELF is rejected by the same audit.</p>
+<p>The audit decodes actual CPU-bridge, return-gate and programming-leaf bytes,
+RAM direct control flow and literal residency. Every selected explicit read and
+store must resolve to the exact owned workspace/System fields, an allowed MMIO
+register and width, a proved stack slot or an in-pod literal. Unknown operands
+are rejected. Staged commands, source words and saved command fields cannot be
+rewritten by RAM C code. The sole dynamic write base is isolated in the checked
+programming leaf: each invocation performs eight fixed staged-word reads and
+eight ascending 32-bit stores, with no read through the destination. A bounded
+call/CFG analysis permits at most one such invocation per transaction and rejects
+positive-count cycles.</p>
+<p>The conservative private-stack bound uses emitted compiler <code class="docutils literal notranslate"><span class="pre">.su</span></code> records and
+exception reserve. Register/stack/call joins preserve finite alternatives,
+including Unknown; exhausted alternative or operand-product bounds reject the
+image. Stack-address analysis follows actual direct-call inputs and outputs,
+fixed push/pop slots and stack-passed arguments. Register-offset SP loads and
+explicit spills of stack-derived pointers fail closed. The layout report
+separates copied bytes, workspace bytes and their combined static RAM extent;
+alignment outside those extents belongs to the ordinary resource report. These
+are selected byte/address and protocol checks under explicit compiler AAPCS,
+C object-lifetime and exclusive-ownership preconditions. They do not establish
+general C memory safety, measured stack use, timing or physical behavior.</p>
+</section>
+<section id="protect-the-cpu-from-code-domain-speculation">
+<h2>Protect the CPU from Code-domain speculation<a class="headerlink" href="#protect-the-cpu-from-code-domain-speculation" title="Link to this heading">¶</a></h2>
+<p>Cache-off is necessary for this reference, but it is not a branch-predictor-off
+proof. PM0253 Rev6 describes speculative Normal-memory and branch-target reads;
+CCR.BP is read-only and always one, and BPIALL is not implemented. DSB completes
+prior explicit accesses; it does not disable later prediction. AN4838 Rev11
+section 3.4 recommends using MPU memory attributes to prevent speculative
+prefetch. The target therefore combines the audited explicit-access closure with
+a temporary Code-domain memory-type guard.</p>
+<p>The first admitted implementation requires the actual unified 16-region MPU.
+An enabled incoming MPU, unsupported TYPE, or HFNMIENA without ENABLE is rejected.
+Disabled CTRL values 0 and 4 are preserved exactly. <strong>CTRL=0 does not prove that
+all descriptors are disabled:</strong> all 16 RASR.EN values must be observed. An enabled
+foreign descriptor is rejected before policy writes. Scanning RNR is itself an
+owned selector effect and must be rolled back on every returning path; a refused
+rollback retains responsibility in RAM.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Selected region 15 field</p></th>
+<th class="head"><p>Target value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Base and half-open extent</p></td>
+<td><p>0; <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0x20000000)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>SIZE / SRD / ENABLE</p></td>
+<td><p>28 / 0 / 1: 512 MiB, every subregion enabled</p></td>
+</tr>
+<tr class="row-even"><td><p>XN / AP</p></td>
+<td><p>1 / 001: no instructions; privileged read/write</p></td>
+</tr>
+<tr class="row-odd"><td><p>TEX / C / B / S</p></td>
+<td><p>0 / 0 / 0 / 0: Strongly-ordered, implicitly shared</p></td>
+</tr>
+<tr class="row-even"><td><p>RASR</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x11000039</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>CTRL</p></td>
+<td><p>7: ENABLE, PRIVDEFENA and HFNMIENA</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>XN prohibits Code-domain instruction fetch; Strongly-ordered replaces the Normal
+memory type that permits speculative reads. AP001 permits the eight explicit
+CPU stores needed to program one 32-byte flashword. AP000 would prevent those
+stores and is therefore unsuitable for the unified program/erase path. AP001
+also permits explicit reads: the independently audited RAM graph must exclude
+them. This is not a blanket no-bus-access permission check.</p>
+<p>The owner saves the exact observed CTRL and RNR before the first selector
+write. After selecting region15 and observing that selection, it captures the
+corresponding RBAR/RASR before the first descriptor write. The bridge’s independent r8-r11 captures prevent the
+final return gate from treating mutable guard state as its own integrity proof.
+RBAR readback includes the selected region number, so base comparisons mask the
+real register fields. Disabled descriptor fields need not be zero and must
+survive restoration. Readback and DSB/ISB prove guard installation before any
+program store or erase START. HFNMIENA retains that policy in NMI/HardFault.
+The final assembly gate independently checks restored CTRL, selected descriptor
+and selector against its captures. Every temporary selector effect is recorded
+before a write and cleared only after exact restore/readback. No ordinary
+Flash-resident Arch or vendor MPU helper may be called during this window.</p>
+</section>
+<section id="a-deadline-expires-a-physical-pulse-does-not-cancel">
+<h2>A deadline expires; a physical pulse does not cancel<a class="headerlink" href="#a-deadline-expires-a-physical-pulse-does-not-cancel" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/h743-flash-ram-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-18 target: deadline expiry latches a result while the RAM transaction retains protection, waits for actual both-bank drain and restores state before return" src="../_images/h743-flash-ram-lifecycle.svg" /></a></p>
+<p>FIG-18 shows protocol stages, not a new public request enum. Every arrow is a
+guarded control-flow transition. The returning path requires the following
+sequence; the terminal path has no edge back to ordinary code.</p>
+<ol class="arabic simple">
+<li><p>Reject invalid input or a deadline already expired before trigger. Prove
+rollback of every acquired pre-trigger selector/protection effect while both
+banks are idle. Every C transaction return, including rejected vector
+publication and guard/deadline refusal, reaches the assembly gate on private
+MSP. It proves both banks idle, zero retained guard effects, the exact saved
+target control plus LOCK, and restored MPU hardware before restoring VTOR.
+An unproved condition enters RAM fail-stop.</p></li>
+<li><p>Stage a validated command and input, enter the RAM bridge, install RAM vectors
+and prove the MPU guard before starting the physical operation.</p></li>
+<li><p>Perform only the explicit validated program stores or erase START. Observe
+real BSY/QW/WBNE for both banks and retain all command/workspace ownership.</p></li>
+<li><p>If the absolute deadline expires after trigger, latch <code class="docutils literal notranslate"><span class="pre">TIMEOUT</span></code> and continue
+actual RAM polling. Do not clear busy bits, withdraw protection, release
+storage or jump to a Flash error handler to manufacture settlement.</p></li>
+<li><p>After both banks are actually idle, prove target LOCK, complete the required
+barrier and restore/read back MPU state in C. The assembly return gate then
+independently checks that hardware against the protected captures, restores
+and reads back linker-known <code class="docutils literal notranslate"><span class="pre">g_pfnVectors</span></code>, and completes DSB/ISB. The bridge
+may restore the exact caller context and return to ordinary code only after
+this gate succeeds.</p></li>
+<li><p>Report the settled result. Hardware failure reports <code class="docutils literal notranslate"><span class="pre">IO</span></code>; otherwise a latched
+expiry reports <code class="docutils literal notranslate"><span class="pre">TIMEOUT</span></code>, and successful completion reports <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code>.</p></li>
+</ol>
+<p>Permanently busy hardware never reaches the returning path. It remains in the
+RAM drain path with protection and storage retained. Unprovable lock, protection,
+vector or time-domain state likewise takes a nonreturning RAM fail-stop path.
+The bridge, its protected captures and the final hardware gate are checked from
+actual ARM bytes; a named C return function or a zero software ledger alone
+cannot authorize return. A host watchdog may observe and terminate its isolated
+test process; that is not device drain or product recovery. This design promises
+no hidden reset, watchdog service, RTOS progress or bounded wall-time return.</p>
+<p>The selected deadline uses the existing TIM2 domain and epoch. Any wrap extension
+must have an actual supported service/pulse bound; one pending UIF cannot count
+an arbitrary number of masked wraps. A lost or exhausted epoch cannot resume
+deadline consumers with a plausible zero. RTOS/SysTick compensation and product
+time recovery require their own reviewed contract. Long masked Flash maintenance
+does not inherit the short Arch critical-section latency contract.</p>
+</section>
+<section id="cpu-protection-does-not-quiesce-the-system">
+<h2>CPU protection does not quiesce the system<a class="headerlink" href="#cpu-protection-does-not-quiesce-the-system" title="Link to this heading">¶</a></h2>
+<p>This MPU guard constrains the CPU. It neither stops DMA1/2, MDMA, Ethernet, USB,
+display engines and debug access nor joins their late IRQ or publication paths.
+Before calling maintenance, the external owner must withdraw and join every
+master that can access the busy Flash domain, including descriptors and input
+sources, or supply an independently proved disjoint plan. Address ranges alone
+do not prove that a worker or bus master has stopped.</p>
+<p>The same caller must choose how its product tolerates masked interrupts,
+watchdog expiry, power failure and a nonreturning fault. The platform does not
+select these policies or infer them from a Board reference. This design does
+not admit Cache-on programming, enabled foreign MPU regions, bank swap,
+option/OTP writes, every H7 cut, bootloader adoption or runtime clock changes.</p>
+</section>
+<section id="keep-cost-and-evidence-tied-to-the-actual-bytes">
+<h2>Keep cost and evidence tied to the actual bytes<a class="headerlink" href="#keep-cost-and-evidence-tied-to-the-actual-bytes" title="Link to this heading">¶</a></h2>
+<p>Selected-only source and instance generation must keep unselected images free
+of the RAM pod, workspace and calls. Actual selected/unselected ELF comparison
+must separately report Flash LOAD/footprint, copied executable bytes, static RAM,
+alignment padding and the real call/exception stack requirement. An array size
+or host <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> is not linked cost, measured stack use, throughput or WCET.
+This page makes no measured cost, stack high-water, throughput or WCET claim.</p>
+<p>The selected PLL384 peripheral reference is authored once in
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/h743-high-peripherals.toml">h743-high-peripherals.toml</a>.
+The maintained catalogue, normal preset, generated host factory and installed
+Source SDK consumer use that same input. Moving its source authority does not
+change its V-cut, baremetal, Cache-off or <code class="docutils literal notranslate"><span class="pre">poll-word</span></code> restrictions.</p>
+<p>The existing <code class="docutils literal notranslate"><span class="pre">performance.yml</span></code> qualification-only path accepts this canonical
+input with an explicit <code class="docutils literal notranslate"><span class="pre">gpio</span></code> workload and exact source SHA. That workload starts
+the selected Platform and exercises GPIO; it does not fetch the public Flash face.
+RAM-pod retention alone therefore does not prove retention of every public Flash
+operation. The installed public Flash consumer and exact linked retention checks
+remain separate evidence. A successful future run can establish only its actual
+source, image and reproduced scope; it does not close the full IO-24 exit or
+change physical HIL from <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>The same ELF audit reports <code class="docutils literal notranslate"><span class="pre">public_flash_linkage</span></code>. <code class="docutils literal notranslate"><span class="pre">retained_verified</span></code> means the
+observed readonly operation table contains four Thumb pointers associated with
+the known public operations in <code class="docutils literal notranslate"><span class="pre">flash.c</span></code>. <code class="docutils literal notranslate"><span class="pre">not_retained</span></code> means the named table
+was not observed. <code class="docutils literal notranslate"><span class="pre">retained_not_proved</span></code> preserves retained executable targets
+whose method identity cannot be proved after LTO renaming or missing metadata;
+it neither rejects a valid build nor claims verified method identity. Explicit
+null, non-Thumb or recognized invalid entries still reject. This distinction
+does not relax the existing RAM closure proof; RAM-pod retention cannot replace
+public-face linkage evidence.</p>
+<p><code class="docutils literal notranslate"><span class="pre">linked_resources</span></code> reports whole-image allocation through the existing resource
+observer. The RAM pod and workspace are subsets of those totals, not additional
+allocations to sum again. These observations audit actual linked bytes; they do
+not execute a Flash pulse, establish a stack peak or measure busy-bank behavior.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Evidence required before software exit</p></th>
+<th class="head"><p>Boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Real GoogleTest/GoogleMock RED then GREEN</p></td>
+<td><p>Actual provider/bridge boundary, failures, late drain and instance isolation; no mock implementation</p></td>
+</tr>
+<tr class="row-odd"><td><p>Normal TOML/generated lifecycle and factory tests</p></td>
+<td><p>One authored assembly, immutable IR, real selected-only constructor and retained cleanup</p></td>
+</tr>
+<tr class="row-even"><td><p>Actual emitted ARM firmware and closure report</p></td>
+<td><p>Copied bytes, decoded calls/literals/register flow, guard values, no premature return, vectors/stack/time and image/control aliases</p></td>
+</tr>
+<tr class="row-odd"><td><p>Selected and unselected ARM resource checks</p></td>
+<td><p>Exact emitted source graph, retention and separate RAM/Flash costs</p></td>
+</tr>
+<tr class="row-even"><td><p>Clean SDK, full gates and candidate evidence</p></td>
+<td><p>Exact source/configuration/dependencies/tools; no reuse of older commit results</p></td>
+</tr>
+<tr class="row-odd"><td><p>Physical station execution</p></td>
+<td><p>Real silicon/PCB/electrical conditions, speculative traffic, pulse timing, power loss, watchdog and interrupt behavior</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Synthetic checker fixtures establish only their checker behavior. Host register
+models do not measure the real branch predictor, bus contention or IRQ latency.
+The physical RAM functions and exception entries name the existing generated
+workspace, existing System epoch and official MMIO identities directly. The
+assembly return gate consumes the C result and protected MPU captures; it checks
+drain, LOCK, restored protection and the fixed original vector before caller
+restoration. Byte-defined checks reject missing/reordered reads, comparisons,
+barriers or failure branches rather than trusting a function name or argument.</p>
+<p>A passing selected audit establishes its bounded explicit-operand and return
+protocol proof under the stated caller, compiler and ownership preconditions.
+It is not a general C interpreter, speculative-bus measurement or hardware
+qualification. Missing production proof remains an open exit. The
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">IO-01–42</span> <span class="pre">ledger</span></code></a> remains the implementation-status
+authority; per-profile execution, source identities, SDK checks and remaining
+software-candidate obligations belong in delivery evidence.</p>
+<p>The implementation is split between <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/flash_ram_owner.c">cold preparation and admission</a>,
+the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/flash_ram_enter.S">CPU bridge and assembly return gate</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/flash_ram_transaction.c">RAM vector publication</a>,
+the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/flash_mpu.c">MPU transaction</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/flash_ram.c">physical pulse/time observations</a>.
+Their private workspace and checked C/assembly prefix are declared in
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/private/stm32h743_flash_ram.h">the RAM contract</a>.
+These links locate current work; they do not substitute for the required
+execution and production-ELF evidence.</p>
+<p>Primary references are PM0253 Rev6 sections 2.3 and 4.6–4.8, AN4838 Rev11
+section 3.4, RM0433 Rev9’s Flash maps/read-while-write rules and ES0392 Rev15
+section 2.1.2. The source-identity record and selected provider evidence must
+accompany the implementation review. See also the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/README.md">H743 provider scope</a>,
+<a class="reference internal" href="h743-high-clock.html"><span class="std std-doc">V-only clock contract</span></a>, <a class="reference internal" href="io-evolution.html"><span class="std std-doc">I/O evolution</span></a>,
+<a class="reference internal" href="arch-contracts.html"><span class="std std-doc">Arch contract</span></a> and <a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">qualification boundary</span></a>.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

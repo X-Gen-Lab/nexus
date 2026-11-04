@@ -1,0 +1,38 @@
+// FIG-06 current: Core request helper transitions and ownership conditions.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// REJECTED and ACCEPTED are admission results, not request enum states.
+digraph requestLifecycle {
+    graph [label="FIG-06 当前Core请求状态与借用", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.55, ranksep=0.70];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    fresh [shape=point, label="", fillcolor="#0f172a"];
+    ready [label="READY：无 provider 借用", fillcolor="#f8fafc"];
+    settled [label="SETTLED：provider 的最终访问是 release 发布", fillcolor="#f0fdf4"];
+    subgraph clusterBorrowed {
+        label="provider 借用保持"; color="#64748b"; fontname="Noto Sans CJK SC";
+        queued [label="QUEUED"];
+        active [label="ACTIVE"];
+        draining [label="DRAINING"];
+        quarantined [label="QUARANTINED：存储与责任保留", fillcolor="#fff7ed"];
+        { rank=same; queued; active; }
+        { rank=same; draining; quarantined; }
+    }
+    fresh -> ready [label="首次初始化"];
+    ready:w -> ready:w [label="REJECTED / 无借用 prepare：无残留引用或效果"];
+    ready -> queued [label="适配器 ACCEPTED"];
+    ready -> active [label="直接 provider ACCEPTED"];
+    queued -> active [label="执行推进", constraint=false];
+    queued -> draining [label="取消 / 停机推进"];
+    active -> draining [label="完成 / cancel / deadline"];
+    active -> quarantined [label="不能安全排空"];
+    draining -> quarantined [label="排空失败", constraint=false];
+    queued -> settled [label="队列等引用已排空"];
+    active -> settled [label="全部必要引用已排空"];
+    draining -> settled [label="排空后 release 发布"];
+    quarantined -> settled [label="仅实际恢复和排空证明成立"];
+    settled:e -> ready:e [label="消费结果、确认相关观察者 join／退出后 prepare",
+                          constraint=false];
+}

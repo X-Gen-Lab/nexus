@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>U575 finite SRAM4 copy across Stop2 &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="U575 dual-world GPIO reference contract" href="u575-trustzone-contract.html" />
+    <link rel="prev" title="U575 retained elapsed-time domain" href="u575-retained-time.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/u575-stop2-copy.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/u575-stop2-copy.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="u575-finite-sram4-copy-across-stop2">
+<h1>U575 finite SRAM4 copy across Stop2<a class="headerlink" href="#u575-finite-sram4-copy-across-stop2" title="Link to this heading">¶</a></h1>
+<p>This page describes the implemented STM32U575ZIT6Q TZEN0 baremetal finite-copy
+contract. Focused software models, independent source review, a selected public Cortex-M33
+reset-image link and one relocated installed development-SDK consumer have passed.
+The complete clean v7 verification plan, current CI/offline qualification and
+physical validation remain separate; these development checks establish no
+physical result. The complete
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">IO-32</span></code></a> and <a class="reference download internal" download="" href="../_downloads/99f801eac159da083b9107f1c02855a6/soc-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">SOC-35</span></code></a>
+exits remain open; physical HIL is <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">Nexus::U575LpdmaCopy</span></code> receiver uses only LPDMA1 channel 0 and the
+16 KiB nonsecure SRAM4 window at <code class="docutils literal notranslate"><span class="pre">0x28000000..0x28003fff</span></code>. The same concrete
+<code class="docutils literal notranslate"><span class="pre">Nexus::U575Stop2Copy</span></code> owner controls RTC AlarmA, WUT and the full sleep/recovery
+sequence. The WUT-only <code class="docutils literal notranslate"><span class="pre">Nexus::U575Stop2</span></code> is an alternative target; selecting both
+is rejected by CMake. This is a finite memory-to-memory copy, with no peripheral
+route, general LPBAM plan, RTOS worker, queue or generated factory.</p>
+<p id="fig-27-u575-stop2-copy"><a class="nexus-diagram-link reference internal" href="../_images/u575-stop2-copy.svg" title="Open SVG at full size"><img alt="FIG-27: current selected SRAM4 copy and compound Stop2 release; labeled arrows distinguish private calls, hardware triggers and final-access proofs; selected ARM and installed-SDK development checks passed; full qualification and physical validation remain open" src="../_images/u575-stop2-copy.svg" /></a></p>
+<p>FIG-27 is separate from the WUT-only FIG-24. Solid arrows name calls, hardware
+events or ordered cleanup; dashed arrows name external premises or open physical
+exits. An idle DMA channel alone cannot release this compound loan.</p>
+<section id="prepare-the-exact-memory-and-clock-owners">
+<h2>Prepare the exact memory and clock owners<a class="headerlink" href="#prepare-the-exact-memory-and-clock-owners" title="Link to this heading">¶</a></h2>
+<p>The maintained <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/u575-lpdma-copy-stop2.toml">assembly</a>
+selects SRAM4 explicitly. Link only <code class="docutils literal notranslate"><span class="pre">Nexus::U575Stop2Copy</span></code> for this mode; it brings
+the copy and retained-time dependencies. Its reset-only startup must begin with
+the DMA gates off, verify the existing Range4 supply and SRAM4 power/retention
+state, enable SRAM4, initialize
+its DATA/BSS, then enable and read back LPDMA1EN. It preserves NOINIT bytes; their
+presence proves neither valid data nor a constructed descriptor. Runtime owners
+must not rescue lost SRAM4 by changing its power-down fields.</p>
+<p>At runtime, the external gate owner keeps SRAM4EN and LPDMA1EN enabled and the
+hardware configuration stable through stop and all joins. All four LPDMA channels
+and vectors must initially be quiet; no other channel may start. The selected
+profile requires TZEN0, unswapped Flash, effective MSIS4 and MSIK4, equal buses, true
+Range4 (<code class="docutils literal notranslate"><span class="pre">VOS=00</span></code>, <code class="docutils literal notranslate"><span class="pre">VOSRDY=1</span></code>, <code class="docutils literal notranslate"><span class="pre">BOOSTEN=0</span></code>) and caches off. The existing
+<a class="reference internal" href="u575-retained-time.html#select-and-use-the-stop2-owner"><span class="std std-ref">Stop2 contract</span></a> supplies
+the remaining masked-MSP, stopped-RUN, SRAM-retention and external exclusions.</p>
+<p>Source, destination and the whole 24 B, four-byte-aligned generated LLI workspace
+must be disjoint spans inside that exact SRAM4 window. CPU owner storage and the
+request may remain in retained SRAM1, but all control storage must be separate
+from the borrowed spans. Both blocks use incrementing byte transfers; length is
+at least 2 B and every extent must fit the window. The provider generates all six
+LLI words; callers supply no raw DMA instructions.</p>
+<p>Use the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h">retained-time API</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h">copy API</a>
+and <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h">Stop2 copy API</a>
+as the declaration authority. One privileged Thread serializes lifecycle and
+control calls; no ISR or concurrent producer uses these objects. Copied faces
+retain the same owner identity and require their own external observer joins.</p>
+</section>
+<section id="admit-trigger-and-recover-one-copy">
+<h2>Admit, trigger and recover one copy<a class="headerlink" href="#admit-trigger-and-recover-one-copy" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Initialize the retained clock with
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_retained_time_initialize_alarm_a_copy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">wake_owner=nx_stm32u575_stop2_identity()</span></code>. Initialize the Stop2 owner and
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_lpdma_copy_initialize</span></code> with that same live clock and identity.
+Initial RTC AlarmA, WUT and IRQ state must be quiet. The ordinary read-only
+clock initializer does not authorize this AlarmA mode.</p></li>
+<li><p>Initialize the request base, obtain a successful
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_retained_time_sample</span></code>, then call
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_lpdma_copy_request_prepare</span></code> with the separate snapshot, SRAM4
+spans, workspace and an absolute deadline in this retained domain or NEVER.
+Preparation copies metadata without borrowing or touching the buffers or
+workspace. Rejection leaves request bytes unchanged. End old Core TIM2
+deadlines before Platform stop; no deadline is converted between domains.</p></li>
+<li><p>Enroll every RUN producer and observer in the exact Stop2 ClockDomain. Close
+admission, stop Platform/System, join actual producers, IRQ/DMA users and
+deadline consumers, then release their leases after real drain. Call
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_stop2_copy_enter</span></code> with this closed, empty barrier, the concrete
+copy face, prepared request, <code class="docutils literal notranslate"><span class="pre">escape_ticks</span></code> in 4096..65536 RTC/16 ticks
+(nominal 2..32 s) and a positive per-phase <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code>.</p></li>
+<li><p>Keep privileged MSP Thread, CONTROL=0, PRIMASK=1 and BASEPRI=FAULTMASK=0 through
+entry and every retained recovery attempt. No scheduler may have started.
+The Stop2 owner privately validates readiness, arms the receiver and validates
+sleep before enabling the RTC producer. Rejection retains no new loan;
+<code class="docutils literal notranslate"><span class="pre">accepted=true</span></code> borrows the request, both buffers and workspace even if a
+later setup step fails.</p></li>
+</ol>
+<p>AlarmA uses all calendar mask bits, ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. Its next
+whole-second event drives rising trigger 14 for the first <code class="docutils literal notranslate"><span class="pre">floor(length/2)</span></code>
+bytes. The generated second LLI copies the remaining bytes without a trigger;
+TCEM selects completion of the last LLI and the final link is zero. The owner
+preserves ALRAF and DMA pending while the producer is enabled. Cleanup clears
+them only after producer withdrawal. WUT supplies an
+independent escape wake. Channel-0 IRQ114 or RTC IRQ2 may wake masked WFI without
+executing an interrupt handler. A pending wake may return immediately;
+<code class="docutils literal notranslate"><span class="pre">wait_executed</span></code> proves WFI ran, never physical Stop2 residency. WUT escape without
+an AlarmA event latches TIMEOUT and drains the finite receiver.</p>
+<p>The returned <code class="docutils literal notranslate"><span class="pre">accepted</span></code>, <code class="docutils literal notranslate"><span class="pre">dma_wake</span></code> and <code class="docutils literal notranslate"><span class="pre">transition</span></code> describe admission and the
+sleep boundary. They are not the final copy result. Read result and transferred
+count only after acquire-observing the request’s SETTLED state. A deadline or
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_lpdma_copy_cancel</span></code> requests withdrawal without revoking any borrow;
+late cancellation after observed DMA completion rejects STATE. Public
+<code class="docutils literal notranslate"><span class="pre">service</span></code> performs bounded DMA progress/drain and <code class="docutils literal notranslate"><span class="pre">stop</span></code> closes copy admission;
+neither can independently publish SETTLED.</p>
+<p>After wake or setup failure, verify the selected RUN access profile before any
+RTC or DMA MMIO. An unknown profile permits CPU deep-bit/vector withdrawal only
+and retains the compound loan and peripheral effects. Keep RUN admission closed and
+all storage alive until an external reviewed owner restores the required profile.
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_stop2_recover</span></code> retries the same compound cleanup without another WFI.
+Observed external LPDMA1 reset during an active loan permanently quarantines the
+loan. Deasserting reset or observing quiet reset values cannot prove the prior
+master’s final access; only an actual external system reset ends that responsibility.</p>
+<p>With a valid profile, withdraw and observe AlarmA/WUT producers before DMA drain.
+The receiver proves idle, using suspend/SUSPF when enabled, then writes the
+full-word channel RESET value and observes the complete CCR equal to zero before
+clearing channel address/link references, flags and NVIC pending state. Checking
+EN/SUSP alone cannot detect an ignored RESET write when the channel is already
+disabled; the full-word write also clears the ordinary interrupt-enable fields. It restores only
+its claimed channel-0 privilege and LPDMA/SRAM4 SMEN/AMEN bits, preserving RTC and
+unrelated bits; it owns no whole-controller reset or engine-enable gate. Only
+after all RTC, DMA, IRQ, power, gate and clock restoration is complete does Stop2
+detach its face/request references and call the private final release. SETTLED
+is then the provider’s final request access. Any failed proof retains the whole
+loan, including when the DMA itself is already idle.
+The retained copy marker remains live until final release succeeds, including
+when hardware effects are already zero; it rejects ordinary entry and another
+copy. Recovery retries final release too.</p>
+<p>Hardware isolation may finish with a tainted retained clock and publish an error;
+it cannot produce a fresh successful elapsed-time result. Join all clock users
+before explicit clock stop/reopen; a new generation invalidates every old binding
+and deadline. Reopen RUN admission and restart Platform only after no effects
+remain, creating a fresh Core TIM2 epoch. Retained samples resolve 3906.25 µs;
+WUT uses separate 2048 Hz ticks. <code class="docutils literal notranslate"><span class="pre">max_gap_seconds</span></code> must cover the full interval
+plus externally bounded arm, wake and drain latency. <code class="docutils literal notranslate"><span class="pre">poll_limit</span></code> bounds
+observations, not elapsed time; WFI has no CPU duration bound if hardware wake
+fails.</p>
+</section>
+<section id="scope-and-evidence">
+<h2>Scope and evidence<a class="headerlink" href="#scope-and-evidence" title="Link to this heading">¶</a></h2>
+<p>The public headers and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/drivers/lpdma_copy.c">copy implementation</a> define the source
+contract; the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/soc/stm32/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h">private collaboration</a>
+connects only the concrete Stop2 owner. Meaningful RED preceded the production
+changes. Focused Native execution passed 30 receiver cases, 33 retained-clock
+cases, 17 coupled cases using all three real C owners and Core, and 30 WUT-only
+compatibility cases (21 unit plus 9 real-clock cases). Independent source review
+is complete. Four direct-source Cortex-M33 images passed development checks:
+the public copy reset image and three default/retained/WUT omission images.
+One relocated, nonpublishable installed-SDK consumer also compiled and linked
+against the reviewed source. The direct-source copy image uses 15,816 B Flash;
+the installed consumer uses 15,840 B, with the 24 B difference from source-path
+strings and alignment. Each reserves 2,384 B SRAM1 including the 2,048 B MSP,
+64 B SRAM4 and no heap. The development receipts bind these checks to their exact sources. This is not execution of the full
+clean v7 plan of 50 images or current whole-candidate CI/offline qualification.
+No earlier software candidate or physical result is inherited by this copy.</p>
+<p>This slice does not implement peripheral LPBAM, general autonomous scheduling,
+SRAM4-only operation, DVFS, RTOS Tick compensation, TrustZone sleep, Standby or
+VBAT continuity. Physical copy correctness, Stop2 residency, retention, current,
+oscillator accuracy and wake latency remain unexecuted. Software-model and ARM
+link results must bind their exact source; the original IO-32/SOC-35 exits remain
+open and unchanged.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GPIO 引脚状态：在同一保留租约下显式选择寄存器图像 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="源码旁的权威合同" href="source-map.html" />
+    <link rel="prev" title="RTC 与 LPTIM：独立时间域与请求借用" href="rtc-lptim.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/explanation/gpio-pin-states.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/explanation/gpio-pin-states.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="gpio-pin-states-explicit-images-under-one-retained-lease">
+<span id="explanation-gpio-pin-states"></span><h1>GPIO 引脚状态：在同一保留租约下显式选择寄存器图像<a class="headerlink" href="#gpio-pin-states-explicit-images-under-one-retained-lease" title="Link to this heading">¶</a></h1>
+<p>本文说明如何选择明确编写的 <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SLEEP</span></code> GPIO 图像，同时保持原有 pad 所有权。当前命名状态装配仅限 STM32G474RET6、GPIOA、baremetal 和 <code class="docutils literal notranslate"><span class="pre">hse24-pll170</span></code>。其中 PA5 软件 Board 夹具不建立 PCB 接线、电气安全或硬件低功耗行为资格。公共头文件的存在不会自动为其他 provider 增加该模式。</p>
+<p>公共 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/pin_state.h">pin-state 声明</a>是 API 合同的权威来源。<a class="reference internal" href="../design/io-evolution.html"><span class="std std-doc">I/O 演进设计</span></a>及其实施台账将本机制与后续 wake、retention 和电源模式工作分开记录。本文解释接入和责任边界，不替代这些声明，也不将 IO-31 标记为完成。</p>
+<section id="one-authored-plan-three-distinct-identities">
+<h2>一份编写的计划，三种不同身份<a class="headerlink" href="#one-authored-plan-three-distinct-identities" title="Link to this heading">¶</a></h2>
+<p>Board 事实明确给出两个 GPIO 图像。普通 TOML 以 <code class="docutils literal notranslate"><span class="pre">mode</span> <span class="pre">=</span> <span class="pre">&quot;named-states&quot;</span></code> 选择 GPIO binding；严格解析产生不可变寄存器计划和既有静态 provider 存储。它不引入运行时字符串、堆、worker、动态注册表或第二个引脚配置权威。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_id_t</span></code> 标识一个生成的 factory 实例。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_port_t</span></code> 是该实例的不可变公共 face，包含共享 readonly 操作表和该实例的私有 context。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nx_pin_state_selection_t</span></code> 选择 <code class="docutils literal notranslate"><span class="pre">NX_PIN_STATE_DEFAULT</span></code> 或 <code class="docutils literal notranslate"><span class="pre">NX_PIN_STATE_SLEEP</span></code>；它不是 factory 实例 ID。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">nx_factory_pin_state()</span></code> 直接返回既有 face，不访问硬件。普通 GPIO 查找不会返回命名状态实例。生命周期工作属于显式 Platform start/stop；运行选择通过 <code class="docutils literal notranslate"><span class="pre">nx_pin_state_select()</span></code> 直接进入 provider。</p>
+<p>选定配置由以下维护文件给出：</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../cmake/package/verification/io_evolution/boards/g474-pin-states"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hse24-pll170"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16384</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+
+<span class="k">[gpio.status]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"state-a5"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"named-states"</span>
+</pre></div>
+</div>
+<p>软件 Board 明确规定：<code class="docutils literal notranslate"><span class="pre">default</span></code> 为 PA5 output、push-pull、low speed、no pull、level zero，<code class="docutils literal notranslate"><span class="pre">sleep</span></code> 为 analog/no-pull。这些是夹具值，不是根据板名推断的安全电平。产品必须提供已审查的电气事实及自身策略，不能将这些名称当作安全保证。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/gpio-pin-states.svg" title="打开 SVG 大图"><img alt="当前 G474 命名 GPIO 所有权：冷态租约、受检查的选择以及独立的 Platform 清理" src="../_images/gpio-pin-states.svg" /></a></p>
+<p>FIG-22 描述当前选定的软件生命周期。箭头分别表示构建期生成、纯查找、状态选择和清理。每条失败路径都保留尚未证明已释放的责任；渲染成功不建立物理转换或 HIL 结果。</p>
+</section>
+<section id="cold-startup-acquires-responsibility-before-driving">
+<h2>冷态启动先取得责任，再驱动输出<a class="headerlink" href="#cold-startup-acquires-responsibility-before-driving" title="Link to this heading">¶</a></h2>
+<p>生成的 Platform 拥有精确选定的 pads、bank gate 及原始冷态快照。冷态准入在接受硬件效果前检查选定资源。命名状态初始化要求选定 pads 处于 input 或 analog、未锁定，且 bank 已供钟并未处于 reset。既有 output 或 AF 所有权不构成接管该 pad 的许可。</p>
+<p>初始化在开放实例前证明已达到编写的 <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> 图像。启动失败可能留下部分效果及清理责任。Platform rollback 必须执行受检查的 provider stop 与原始快照恢复，不能因为构造返回错误就丢弃租约。必须保持 owner、不可变计划及其完整存储有效，直到清理实际成功。</p>
+</section>
+<section id="selection-is-serialized-privileged-work">
+<h2>选择操作在串行特权上下文中执行<a class="headerlink" href="#selection-is-serialized-privileged-work" title="Link to this heading">¶</a></h2>
+<p>调用者提供同一 CPU 上唯一、串行、不可重入的特权 Thread 执行者。调用入口的中断屏蔽状态必须清零。ISR/NMI、竞争的 pad 或 RCC 写者、时钟转换和寄存器接管不能与调用并发。这些是接入前提，不是寄存器数值匹配或取得 factory 指针后自动获得的许可。</p>
+<p>provider 在有界中断屏蔽区间内执行并恢复保存的中断状态。GPIO 寄存器访问前先检查 bank gate/reset，再检查选定 lock 位，不接管已锁定 pad。bank 不可用时直接拒绝，不暗中开启时钟或清除 reset。即使重新选择同一状态，也检查干净的已提交图像；外部偏移可以返回 <code class="docutils literal notranslate"><span class="pre">STATE</span></code> 并保留 dirty 责任，而不是静默接受已被修改的图像。</p>
+<p>转换时，provider 首先证明整个选定组已撤驱动，再设置所需输出 latch 与电气字段，应用目标 mode，并检查实际目标图像。只有这些证明完成后才提交新选择。掩码保留未选中的 pads。这个顺序描述软件行为，不证明 pad 电压无毛刺、外部偏置或电气稳定时间。</p>
+<p>部分失败后，寄存器图像可能既不等于旧图像，也不等于目标图像。租约仍被保留；调用者不能复用存储或将 pads 交给其他写者。尚未 stop 的已初始化实例可以显式重试受支持的目标；其他情况应继续受检查的 Platform 清理。初始化失败或已经撤回的 provider 不能通过选择操作重新开放。没有隐藏后台修复、自动时钟恢复，也不会因 deadline 到期而释放所有权。</p>
+</section>
+<section id="stop-has-two-separate-completion-boundaries">
+<h2>stop 有两个不同的完成边界<a class="headerlink" href="#stop-has-two-separate-completion-boundaries" title="Link to this heading">¶</a></h2>
+<p>私有 provider stop 证明选定驱动已撤回。成功是该 provider 的最后一次访问，但不会仅凭这个结果恢复 Platform 冷态快照或释放 bank 租约；这些仍是独立的生成 Platform 清理步骤。</p>
+<p>Platform 先恢复保存的选定 pad 图像并证明恢复成功，再释放自身 GPIO gate 责任。如果 provider stop 成功后，快照恢复失败，尚待恢复的快照及租约继续存活。如果快照恢复已经证明完成，而仅 gate 清理失败，则只保留剩余 gate 责任。必须保持完整存储有效，直到整个 Platform stop 成功，重试时只推进未完成的清理。不能重复构造、清零存储，也不能将首个错误解释为所有资源仍完整运行或全部已释放。</p>
+</section>
+<section id="use-the-public-selected-face">
+<h2>使用公共 selected face<a class="headerlink" href="#use-the-public-selected-face" title="Link to this heading">¶</a></h2>
+<p>Platform start 成功后，外部产品只使用公共及生成头文件。下面的片段是维护链接夹具中的命名状态分支；外层夹具负责 start 和 stop。它不是独立应用，也不表示物理执行结果。</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_pin_state_port_t</span><span class="o">*</span><span class="w"> </span><span class="n">pins</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">nx_factory_pin_state</span><span class="p">(</span><span class="n">NX_PIN_STATE_ID_STATUS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_result_t</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_pin_state_select</span><span class="p">(</span><span class="n">pins</span><span class="p">,</span><span class="w"> </span><span class="n">NX_PIN_STATE_SLEEP</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">selected</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">selected</span><span class="p">;</span>
+<span class="w">    </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_pin_state_select</span><span class="p">(</span><span class="n">pins</span><span class="p">,</span><span class="w"> </span><span class="n">NX_PIN_STATE_DEFAULT</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">selected</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">selected</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>factory 查找、同步选择和最终 Platform 清理不分配 request 或 transfer buffer。操作在至多 16 个选定 pad bit 上执行有界工作；readonly 计划、可变 provider 状态及 Platform 保存的快照是不同的成本项。这个结构性结论不表示已测 MCU 延迟、总 RAM 或最坏中断屏蔽时间。</p>
+</section>
+<section id="current-scope-and-verification-boundary">
+<h2>当前范围与验证边界<a class="headerlink" href="#current-scope-and-verification-boundary" title="Link to this heading">¶</a></h2>
+<p>当前源码为精确的 G474 参考配置实现命名 GPIO 图像、冷态所有权与显式选择。派生<a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">能力矩阵</span></a>记录选定模式和源定义，不建立板卡资格，也不会执行固件镜像。</p>
+<p>Native 寄存器/factory 测试建立其实际执行的软件和失败路径证据。真实 ARM 链接、installed SDK 消费和 HIL 各自需要匹配源码的证据。公共接口和图示不建立 AF 切换、wake 路由、retention、deep Sleep/STOP 进入、单调时间连续性、PCB 安全或真实 pad 时序。这些仍属于独立合同与工作包。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">架构解释</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rtc-lptim.html">RTC 与 LPTIM：独立时间域与请求借用</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GPIO 引脚状态：在同一保留租约下显式选择寄存器图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o-contracts-and-shared-mechanisms">类型化 I/O 合同与共享机制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">可选通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#soc-packages-and-private-providers">SoC 包与私有 provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">可复用 IP 实现</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#reviewed-board-facts">经过审查的 Board 事实</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

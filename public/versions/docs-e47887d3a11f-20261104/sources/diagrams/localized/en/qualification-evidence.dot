@@ -1,0 +1,41 @@
+// FIG-11 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph QualificationEvidence {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-11 Separate software, fixture and physical qualification\nEvery conclusion binds source / config / artifact / execution scope"];
+    identity [label="Clean source / dependency / toolchain / config\nIdentical ELF / BIN / map bytes", fillcolor="#f8fafc"];
+    host [label="Host / model\nActual GoogleTest/GoogleMock + tool tests\nSoftware evidence for algorithms and failure paths"];
+    arm [label="ARM compile / link / resources\nActual instructions, ABI, layout and budgets"];
+    sdk [label="Independent Source SDK consumer\nRelocated prefix, actual build/run or link"];
+    reproduce [label="Two independent network-disabled clean builds\nSame ELF/BIN bytes, original commands and tool identities"];
+    tooling [label="HIL fixture / station / protocol tooling\nSoftware checks for boundaries and negative paths"];
+    software [label="Scope proof + candidate seal\nUnsigned software candidate retaining original evidence", fillcolor="#f0fdf4"];
+    hardware [label="Actual station: PCB / silicon / probes / wires\nFlash the same image, then measure and inject faults", fillcolor="#f8fafc"];
+    physical [label="Record physical results only for actually executed cases\nWithout equipment: not_executed", fillcolor="#fff7ed"];
+    admission [label="Product admission under actual software + physical scope\nRelease / safety certification decided by external policy", fillcolor="#fefce8"];
+    identity -> host [label="Actual execution"];
+    identity -> arm [label="Actual execution"];
+    identity -> sdk [label="Actual execution"];
+    identity -> reproduce [label="Actual execution"];
+    identity -> tooling [label="Actual execution"];
+    host -> software [label="Verify evidence"];
+    arm -> software [label="Verify evidence"];
+    sdk -> software [label="Verify evidence"];
+    reproduce -> software [label="Verify evidence"];
+    tooling -> software [label="Fixture scope, not physical measurement"];
+    identity -> hardware [label="Same image supplied to actual equipment", style=dashed];
+    hardware -> physical [label="Only actual station results"];
+    software -> admission [label="Software scope"];
+    physical -> admission [label="Independent review of physical scope"];
+    { rank=same; host; arm; sdk; }
+    { rank=same; software; physical; }
+}

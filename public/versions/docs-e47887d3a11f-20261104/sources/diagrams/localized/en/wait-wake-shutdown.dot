@@ -1,0 +1,56 @@
+// FIG-08 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph WaitWakeShutdown {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-08 Predicate wait and external shutdown\na notification is a hint, not hardware progress"];
+    subgraph clusterWait {
+        label="nx_wait_until: task, one waiter"; color="#64748b";
+        ready1 [label="ready(context): authoritative predicate"];
+        arm [label="port.arm(): capture notification sequence"];
+        ready2 [label="ready(context): recheck after arm"];
+        wait [label="port.wait(sequence, absolute deadline)\nbackend checks sequence / absolute deadline"];
+        ready3 [label="final ready check after error / TIMEOUT"];
+        success [label="predicate true -> SUCCESS", fillcolor="#f0fdf4"];
+        error [label="predicate false -> actual port error", fillcolor="#fff7ed"];
+        ready1 -> success [label="true"];
+        ready1 -> arm [label="false"];
+        arm -> ready2 [label="armed"];
+        ready2 -> success [label="true"];
+        ready2 -> wait [label="false"];
+        wait -> ready1 [label="SUCCESS hint: repeat predicate check", constraint=false];
+        wait -> ready3 [label="error / TIMEOUT"];
+        ready3 -> success [label="concurrent completion visible"];
+        ready3 -> error [label="completion not observed"];
+    }
+    executor [label="One executor: service / drain\nIRQ: latched facts + wake hint", fillcolor="#fefce8"];
+    executor -> wait [label="wake(sequence): hint", style=dashed];
+    executor -> ready1 [label="release publication → acquire observation", style=dashed];
+    subgraph clusterShutdown {
+        label="application-owned shutdown, not implicit wait"; color="#64748b";
+        close [label="1 Close producer admission\nOwner stop requests cancellation of accepted operations"];
+        drain [label="2 keep owner / IRQ service and drain progressing\nproducer / observer only acquire-observe SETTLED"];
+        producerJoin [label="3 join producer after its borrow drains\nrelated observers must finish their final access"];
+        join [label="4 prove owner idle including publication exit\nrequest executor to finish, then join"];
+        hardware [label="5 prove hardware RX / IRQ publishers quiescent\ndetach wake, then join other publishers"];
+        stop [label="6 finally destroy notification / queue / guard\nretain platform clock / Tick for a running kernel"];
+        keep [label="failed drain / join / quiesce retains storage\nexternal escalation, no forced reclaim", fillcolor="#fff7ed"];
+        close -> drain [label="no new producer work"];
+        drain -> producerJoin [label="Actual SETTLED and observer exit"];
+        producerJoin -> join [label="producer final access ended"];
+        join -> hardware [label="owner executor has exited"];
+        hardware -> stop [label="all publishers have exited"];
+        drain -> keep [label="not drained"];
+        join -> keep [label="not joined"];
+        hardware -> keep [label="publisher remains active"];
+    }
+    executor -> drain [label="keep executing", style=dashed];
+}

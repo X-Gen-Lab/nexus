@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>采用显式整数帧的有限 ADC 序列 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="CPU、原子操作与运行时装配契约" href="arch-contracts.html" />
+    <link rel="prev" title="当前设计与实施台账" href="README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/adc-group.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/design/adc-group.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="finite-adc-sequences-with-explicit-integer-frames">
+<span id="adc-group"></span><h1>采用显式整数帧的有限 ADC 序列<a class="headerlink" href="#finite-adc-sequences-with-explicit-integer-frames" title="Link to this heading">¶</a></h1>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">nx_adc_group_port_t</span></code>，由同一物理 owner 采集完整、有序的 ADC 帧。当前参考选择 STM32G474RET6、HSE24/PLL170 与 baremetal，使用 regular 普通 DMA 或一个 injected 帧。整数布局、触发来源、芯片期待与存储所有权均显式定义。控制算法、经校准的工程量与产品采样策略由外部工程负责。实板 HIL 为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+<section id="select-one-static-owner">
+<h2>选择一个静态 owner<a class="headerlink" href="#select-one-static-owner" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="打开 SVG 大图"><img alt="FIG-16：当前装配、静态 factory 查找和直达 provider 的调用；只选择一个 ADC 序列 owner" src="../_images/io-evolution.svg" /></a></p>
+<p><strong>FIG-16 描述共用的装配和所有权机制，不是 ADC 时序测量。</strong> 此处生成的接口为 <code class="docutils literal notranslate"><span class="pre">nx_adc_group_port_t</span></code>；其私有 context 拥有选定的 ADC1 序列以及可选的 DMA/TIM6 资源。应用拥有请求和完整的原始帧数组。生成、查找和运行时调用箭头保持各自不同的含义。factory 查找不会执行转换、校准、资源取得或任务调度。</p>
+<p>四份维护中的完整输入分别选择<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml">regular 软件触发</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml">regular TIM6</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml">injected 软件触发</a>或<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml">injected TIM6</a>。其纯软件 Board 提供 PA0/PA1 模拟路由与电压假设，不建立已安装模拟电路、源阻抗或连接器可达性的事实。解析器在发布一个原子 bundle 前拒绝 ADC/common、DMA、定时器、向量与引脚资源冲突。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>owner</p></th>
+<th class="head"><p>责任</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>手写装配与定型 IR</p></td>
+<td><p>选择逻辑 rank 顺序、采样码、命名芯片布局、触发及精确资源声明</p></td>
+</tr>
+<tr class="row-odd"><td><p>Platform Construction</p></td>
+<td><p>在产生效果前准入实际芯片；取得并恢复引脚、内核时钟选择、门控与系统时间</p></td>
+</tr>
+<tr class="row-even"><td><p>私有 provider</p></td>
+<td><p>独立复查冷态芯片；编程真实 SQR/JSQR/SMPR，负责源/ADC/DMA/向量排空并保留部分效果</p></td>
+</tr>
+<tr class="row-odd"><td><p>应用执行者</p></td>
+<td><p>串行执行特权、未屏蔽中断的任务调用，保持单调 deadline 并显式推进 service</p></td>
+</tr>
+<tr class="row-even"><td><p>应用存储</p></td>
+<td><p>保持已接受元数据不可变，在 acquire 观察 SETTLED 前禁止其他主体访问完整原始数组</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>factory 通过 <code class="docutils literal notranslate"><span class="pre">nx_factory_adc_group</span></code> 返回既有的 <code class="docutils literal notranslate"><span class="pre">NX_ADC_GROUP_ID_SAMPLES</span></code> 接口。两指针接口共享一个 const 五操作方法表。在 32 位目标上，这些结构开销为每个接口 8 B、每张共享表 20 B；私有状态、请求和调用者数组另行计入。普通单次 ADC、连续 block ADC 与 PWM/ADC 的状态和方法表不会增长。没有分配器、最大池、隐藏 worker 或运行时注册表。</p>
+</section>
+<section id="exact-hardware-profiles-and-layout">
+<h2>精确硬件配置与布局<a class="headerlink" href="#exact-hardware-profiles-and-layout" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>选择</p></th>
+<th class="head"><p>实际执行与有限边界</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Regular，软件触发</p></td>
+<td><p>真实 ADC <code class="docutils literal notranslate"><span class="pre">CONT1</span></code> 扫描序列与有限普通 DMA；软件 service 不模拟逐次转换或逐帧触发</p></td>
+</tr>
+<tr class="row-odd"><td><p>Regular，TIM6</p></td>
+<td><p>TIM6 TRGO 上升沿驱动每个完整 regular 扫描；有限普通 DMA 结束于完整物理 rank 边界</p></td>
+</tr>
+<tr class="row-even"><td><p>Injected，软件触发</p></td>
+<td><p>一次软件 JADSTART、JQDIS1 及新 JEOS；任务只在源/向量排空后复制整组</p></td>
+</tr>
+<tr class="row-odd"><td><p>Injected，TIM6</p></td>
+<td><p>独占 TIM6 OPM 的一次更新驱动一个 injected 组；完全撤离前不准入第二个 context 或触发</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>所有选择均使用 ADC12 SYSCLK/8 = 21.25 MHz、HCLK 170 MHz、单端无符号 12 位普通采样。regular 最多 16 个物理 rank，injected 最多四个。regular 拥有 DMA1 channel1、DMAMUX1 channel0/request5 与向量 11/18。injected 拥有向量 18，不进行 DMA 通道准入或访问。软件触发不租用 TIM6；TIM6 触发另行独占整个定时器，计数 tick 为 1 MHz。所有向量采用逻辑优先级 5，不调用内核。</p>
+<p>维护中的输入选择通道 <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">1]</span></code>、采样码 <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code> 与标称 3300 mV。通道 1 为 PA0，通道 2 为 PA1。provider 还准入经审查的内部通道 16/17/18，分别对应温度、VBAT 和 VREF。每个物理通道只有一个 SMPR 字段，因此同一通道重复出现于逻辑序列时，不能选择不同采样码。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_adc_group_info</span></code> 报告实际不可变通道顺序、采样码查表、物理 rank 数和整数格式。存储采用小端、两字节无符号 12 位，LSB 偏移为零。普通布局的样本步幅为 2；Z 布局每个逻辑 rank 占用两个物理槽，因此步幅为 4。扫描步幅等于逻辑通道数乘样本步幅。消费者在 SETTLED 后使用 <code class="docutils literal notranslate"><span class="pre">nx_adc_format_decode</span></code>，忽略被丢弃的填充槽。原始数组不是浮点电压数组。</p>
+<p>regular 请求包含 1 至 <code class="docutils literal notranslate"><span class="pre">floor(65535</span> <span class="pre">/</span> <span class="pre">physical_ranks)</span></code> 个完整帧，并受实际 DMA 可达内存范围限制。injected 请求恰好包含一帧。四个参考 bundle 选择可写 SRAM1/2 域，不授权 CCM 别名。精确字节长度必须等于 <code class="docutils literal notranslate"><span class="pre">frame_count</span> <span class="pre">*</span> <span class="pre">scan_stride</span></code>，包含所有填充并按半字对齐。部分 rank、EOC、JEOC 或 DMA 前缀均不能建立有效帧结果。</p>
+<p>软件触发的身份为零，TIM6 的身份为非零装配来源。该值不是计数器、孔径时间戳、物理线路身份或实测相位关系。<code class="docutils literal notranslate"><span class="pre">period_us</span></code> 描述所选定时器周期，不描述瞬时 ADC 孔径。</p>
+</section>
+<section id="observe-silicon-and-execute-its-actual-algorithm">
+<h2>观察芯片并执行真实算法<a class="headerlink" href="#observe-silicon-and-execute-its-actual-algorithm" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">g474-adc-group-x</span></code>、<code class="docutils literal notranslate"><span class="pre">g474-adc-group-y</span></code> 与 <code class="docutils literal notranslate"><span class="pre">g474-adc-group-z</span></code> 命名配置分别期待修订 0x2003、0x2002 与 0x2001。配置是不可变期待，不是实读硬件。Platform 准入与独立私有构造函数使用既有 <code class="docutils literal notranslate"><span class="pre">nx_stm32_identity_read</span></code> source 和共享 core 芯片策略，对比实际 IDCODE 与 Flash 大小寄存器。错误 group/密度、密度不可用、未知 cut 或与期待不符的 cut 均拒绝。普通重新启动会再次观察，不缓存准入结果。四个规范输入均选择 X 布局；Y/Z 选择必须观察到匹配 cut，并取得各自独立的资格记录。一次 X factory 执行不能为这些配置建立资格。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32g474/reviews/adc-group.json">经审查的模式记录</a> 是 cut 规则及所需 workaround mask 的唯一来源。provider 不维护第二份修订允许列表或 reader。group 和密度本身不能识别精确封装或可订购料号；选定的 SoC 与 Board 仍必须授权各自的精确路由。</p>
+<p>Z 配置将每个物理通道 rank 重复两次，保留每对的第一个槽。因此最多允许八个逻辑 regular rank 或两个逻辑 injected rank。显式原始步幅保留额外槽，没有隐藏打包缓冲区。每种配置均丢弃一次真实预转换扫描，并在每次有效采样前后实际禁用/重新启用 ADC。这些是实际寄存器算法，不能由 workaround 元数据推定已经执行。</p>
+<p>固定 HCLK/ADC 比值为 8，避开 ES0430 第 2.7.5 节大于 10 的条件。JQDIS1、单个 ADC 组、无双重转换、无自动 injected 转换、无抢占等约束排除另外的动态 context 情况。这些模式限制不为未选择的连续 injected 队列或其他时钟比值建立资格。</p>
+</section>
+<section id="sampling-time-and-real-priming">
+<h2>采样时间与真实预转换<a class="headerlink" href="#sampling-time-and-real-priming" title="Link to this heading">¶</a></h2>
+<p>八个采样码分别代表 2.5、6.5、12.5、24.5、47.5、92.5、247.5 和 640.5 个 ADC 周期。每个物理 rank 另需 12.5 个转换周期。报告的半周期查表及展开扫描预算包含所有丢弃 rank。在所选 ADC 时钟下，内部 VREF 至少需 code 5，温度至少需 code 6，VBAT 至少需 code 7。冷态初始化只启用选定的内部源；选择温度时等待 122 us，否则等待 22 us；执行校准后再等待至少四个 ADC 周期。这些未屏蔽中断的等待不建立模拟精度或校准电压。</p>
+<p>校准没有独立的新完成标志。短保护区围绕 ADCAL 命令、屏障和紧随的 busy 观察，保存并恢复进入时的中断屏蔽状态；等待完成时不屏蔽中断。初始化要求先观察 ADCAL1，再观察硬件清为 ADCAL0。首次观察为零具有歧义：命令可能被拒绝，也可能在读取前已经完成校准。此时保守报告 IO，保留部分效果，供完成退出的清理和冷态重试。未变化的 CALFACT 或标称 116 周期时长均不能证明新完成；不会写入因子哨兵值。</p>
+<p>每个已接受请求取得有效采样前，provider 执行并丢弃一次完整软件扫描。regular 预转换暂时使用已借用的原始输出范围作为 DMA 存储，injected 使用 JDR 寄存器组。调用者不能将其作为有效样本读取。预转换期间禁用看门狗与周期触发源。空闲时禁用 ADC；任务延迟后必须真实重新预转换，不能只更新时间戳。</p>
+<p>硬件触发的精确周期必须容纳完整展开扫描和异步触发裕量。必要冷态新鲜度预算为 <code class="docutils literal notranslate"><span class="pre">period_us</span> <span class="pre">+</span> <span class="pre">ceil(scan_halfcycles</span> <span class="pre">*</span> <span class="pre">4</span> <span class="pre">/</span> <span class="pre">170)</span> <span class="pre">&lt;</span> <span class="pre">1000</span></code>；较慢采样码因此降低可准入的最大周期。配置与私有构造函数采用相同物理单位，拒绝不可能满足的预算，不进行舍入。运行时新鲜度检查仍需覆盖实际任务/装载延迟。陈旧装载保留借用，合法撤离进行中的硬件，再丢弃一次真实扫描后才发布有效帧。</p>
+<p>可选模拟看门狗将原始上下阈值应用于选定组。丢弃预转换期间禁用看门狗，有效窗口中锁存终止 IO 故障。它不提供产品跳闸策略、比较器 break 路由、安全输出或保证的反应时间。</p>
+</section>
+<section id="admit-advance-and-consume">
+<h2>准入、推进与消费<a class="headerlink" href="#admit-advance-and-consume" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>取得静态定型接口并显式启动 Platform。启动会校准冷态 owner，但不启动采样或隐藏任务。</p></li>
+<li><p>初始化请求，取得当前不可变 info，为独立完整原始数组准备有限的绝对单调 deadline。prepare 不借用、不触碰样本字节，本身不验证芯片或 DMA 域。</p></li>
+<li><p>通过唯一的特权、未屏蔽中断的任务执行者提交。拒绝不保留指针或新效果。<code class="docutils literal notranslate"><span class="pre">NX_SUCCESS</span></code> 表示 ACCEPTED，包括装载失败后可能已通过实际撤离而 SETTLED 的情况。</p></li>
+<li><p>保持描述符与数组有效。IRQ 只记录有界的所属事实；同一任务显式调用 service，推进预转换、采样与排空。应用停止调用 service 后，没有 worker 代为推进。</p></li>
+<li><p>acquire 观察 <code class="docutils literal notranslate"><span class="pre">NX_REQUEST_SETTLED</span></code> 后检查结果并解码有效帧。在重新 prepare 同一存储前，另行等待所有外部观察者退出。普通成功不会自动重装。</p></li>
+</ol>
+<p>provider 在准入前拒绝回绕、重叠、控制别名和不完整范围；已知控制描述符在首次读取字段前即拒绝。没有可信完成时间戳时，首次在 deadline 或之后观察到完成则报告 TIMEOUT。deadline 前已观察的完成允许稍后结束必要撤离。该观察规则不是物理执行时间或 service 延迟保证。</p>
+</section>
+<section id="withdraw-before-releasing-the-loan">
+<h2>归还借用前先撤离<a class="headerlink" href="#withdraw-before-releasing-the-loan" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="打开 SVG 大图"><img alt="FIG-06：当前请求生命周期；在实际源和引用撤离前，取消和隔离继续保留 ADC 帧存储" src="../_images/request-lifecycle.svg" /></a></p>
+<p><strong>FIG-06 提供共享请求状态合同。</strong> ACCEPTED 和 REJECTED 是准入结果，不是新增请求状态。在本 provider 中，SETTLED 必须具备下述硬件与引用证明。</p>
+<ol class="arabic simple">
+<li><p>对于 TIM6，先证明 CEN0，再选择基于 enable 的静默 MMS 路由。冷态/重装 UG 位于该静默路由后，并要求新 UIF 及其确认；stop 不发出 UG，也不产生额外更新触发。</p></li>
+<li><p>只请求匹配的 regular 或 injected stop，观察所属 START/STOP 撤离，然后合法禁用 ADC 并观察 ADEN/ADDIS0。只有 JADSTART0 后才能改变 JEXTEN；ADDIS 不能替代组排空。</p></li>
+<li><p>对于 regular DMA，证明 EN0，撤离地址、剩余计数和 DMAMUX。TC 与 CNDTR0 本身不会停止 CONT1 扫描或硬件触发。</p></li>
+<li><p>在 W1C 前保留已捕获的 TE/OVR/看门狗故障，只确认已观察的所属标志，并在排空与最终发布期间复查。</p></li>
+<li><p>禁用并等待选定向量及活跃发布者退出。最终元数据保护区先分离请求，再以 release 发布 SETTLED，作为 provider 的最后一次访问。injected JDR 值只在完整的新 JEOS 与排空后复制。</p></li>
+</ol>
+<p>成功恰好报告所请求帧数。错误、取消和超时报告的保证有效帧数为零，即使原始存储看起来具有部分或完整前缀。首次终止原因保持锁存。计数器、ADC、DMA 或向量拒绝撤离时，保留 QUARANTINED 存储及恢复责任，service 可以重试同一真实排空。已退出前任的重复 stop 不能撤离后继 owner 的控制器。</p>
+<p>公共 stop 关闭新准入并排空已接受请求，其成功不释放引脚、内部源使能或时钟租约。最终 Platform close 只有在完整请求/源/向量撤离后才恢复逻辑优先级和公共配置，随后释放外层资源。close 失败保留未完成租约，供重试。故障恢复必须显式完成退出的冷态 close 与 restart，不会自动重放。</p>
+</section>
+<section id="sources-and-software-evidence">
+<h2>来源与软件证据<a class="headerlink" href="#sources-and-software-evidence" title="Link to this heading">¶</a></h2>
+<p>权威 API 为<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/adc_group.h">公共组合同</a>。<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32g474/drivers/adc_group.c">私有 provider</a> 实现真实序列、定时器、看门狗与 DMA 迁移。选定的官方 ADC/DMAMUX 定义保持私有，由 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/dependencies/stm32g4-hal.lock.json">STM32G4 依赖记录</a> 锁定。RM0440 Rev9、DS12288 Rev6 与 ES0430 Rev9 建立经审查的硬件事实；模式记录绑定其来源身份与算法范围。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/adc_group_test.cpp">公共 GoogleTest/GoogleMock 合同</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/g474_adc_group_test.cpp">外部寄存器/事件测试</a>及<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/g474_adc_group_factory_test.cpp">正常生成 factory 测试</a>执行真实 common/provider 代码，覆盖完整 rank 边界、整数解码、丢弃预转换、真实连续 regular 扫描、OPM、别名、deadline/迟到故障、拒绝撤离、实例交接及保留清理。独立准入用例使用真实 IDCODE/Flash 大小存储和同一生成策略，不替换 reader 或比较函数。</p>
+<p>当前开发验证通过八项公共 API 用例、55 项真实 provider 用例，以及四个正常生成 factory 程序各 16 项用例，共 127 项，无失败或跳过。四个规范 X 配置也均通过正常 ARM 配置/构建、资源预算，以及一个接口、一张方法表和五个方法槽的保留检查。这些是模型及固件链接结果，不代表已经完成模拟信号实测、正常 Y/Z 配置的资格或干净且可复现的软件候选。</p>
+<p>实际模型结果和 ARM ELF/资源检查属于其精确来源、配置与执行记录。链接不会执行 ADC，也不证明模拟波形。干净且可复现的软件候选、已安装 SDK 组合与实板 station 验收分别具有独立证据。模型、框图或策略 mask 均不建立 PCB 接线、实测精度、孔径时序、物理 HIL 或经过安全资格认定的控制系统。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

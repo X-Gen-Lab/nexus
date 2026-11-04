@@ -4,7 +4,7 @@ This branch contains reviewed standard-library verification code and ready-built
 
 Run `python3 -B verifier/verify_documentation.py public publication.json` before committing. The validation job has only `contents: read`; a separate deployment job only deploys the verified Pages artifact. The workflow runs only on `X-Gen-Lab/nexus` and `refs/heads/docs-delivery`.
 
-Current producer: `b1b903da47eda722a6be3e98edced5cfa36221b1`. Product release and MCU hardware qualification are outside this documentation delivery.
+Current producer: `e47887d3a11f6136726fdc992d66df1f40b36691`. Product release and MCU hardware qualification are outside this documentation delivery.
 
 Local commits use this artifact branch’s pre-commit configuration to verify the
 prepared publication and check the actual Conventional Commit message. Both hooks

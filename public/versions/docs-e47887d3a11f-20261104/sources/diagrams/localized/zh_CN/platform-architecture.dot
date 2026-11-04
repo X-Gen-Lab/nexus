@@ -1,0 +1,48 @@
+// FIG-01 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph PlatformArchitecture {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-01 当前平台分层与外部边界"];
+    subgraph clusterExternal {
+        label="外部产品工程：产品与安全政策"; color="#64748b";
+        product [label="任务 / 服务 / 协议 / 私有分区\n调度、预算、恢复与停机协调", fillcolor="#f8fafc"];
+        assembly [label="外部 TOML 装配\nBoard / backend / 实例 / 资源预算", fillcolor="#f8fafc"];
+    }
+    subgraph clusterNexus {
+        label="Nexus：可复用机制与已维护 provider"; color="#64748b";
+        components [label="可选组件：owner / 器件 / 存储窄端口", style="rounded,dashed,filled"];
+        os [label="可选 OS：任务、等待与通知端口\n任务存储与内核启动由外部提供", style="rounded,dashed,filled"];
+        platform [label="Platform：生成的静态装配\ntyped factory／start／stop"];
+        io [label="I/O：公共类型、只读 face、checked dispatch"];
+        soc [label="SoC provider：控制器 / IRQ / DMA\n私有状态、时钟、timebase、内存事实"];
+        arch [label="Arch：CPU 原语与显式机制\nmask／barrier／cache／MPU／SAU"];
+        core [label="Core：status / deadline / request\n小型共用合同，无硬件 registry"];
+        board [label="Board：引脚 / 晶振 / 授权路线 / 来源\n构建期事实，不是日常 I/O 转发层", fillcolor="#fefce8"];
+    }
+    hardware [label="所选 MCU 与 PCB\n实板资格需独立取得", fillcolor="#f8fafc"];
+    assembly -> platform [label="解析后生成（构建期）", style=dashed];
+    board -> platform [label="事实与授权（构建期）", style=dashed];
+    product -> platform [label="取得身份、显式启停"];
+    product -> io [label="日常直接 I/O"];
+    product -> components [label="显式选择", style=dashed];
+    product -> os [label="显式选择", style=dashed];
+    components -> io [label="按组件合同访问设备"];
+    components -> core [label="使用共用合同"];
+    os -> core [label="等待与时间合同"];
+    io -> soc [label="ops(context, ...) 分派"];
+    io -> core [label="检查与生命周期合同"];
+    soc -> arch [label="调用 CPU 原语"];
+    soc -> core [label="使用请求与时间合同"];
+    soc -> hardware [label="所选寄存器 / IRQ / DMA"];
+    { rank=same; components; os; }
+    { rank=same; arch; core; }
+}

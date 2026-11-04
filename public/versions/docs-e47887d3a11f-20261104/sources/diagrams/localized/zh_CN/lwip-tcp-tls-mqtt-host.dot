@@ -1,0 +1,20 @@
+// FIG-32 reference: software-host data flow, not a firmware/HIL result.
+// Source: public byte/TCP/adapter contracts and the maintained host relay fixture.
+digraph LwipTcpTlsMqttHost {
+    graph [label="FIG-32 软件主机互通参考",
+           rankdir=LR, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.7,
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.18,0.14"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    client [label="Nexus 客户端进程\nMQTT／TLS 客户端\n只读字节接口／TCP／lwIP\n单一串行协议栈所有者"];
+    relay [label="仅测试的对端进程\nlwIP 原始 TCP 对端\n透明密文中继\nPOSIX socket／独立协议栈所有者",
+           fillcolor="#f8fafc"];
+    broker [label="本地 Mosquitto\nTLS 与 MQTT 端点", fillcolor="#f0fdf4"];
+    client -> relay [dir=both, label="TCP A\n软件以太网帧接口"];
+    relay -> broker [dir=both, label="TCP B\n主机 socket 字节"];
+    client -> broker [dir=both, style=dashed, constraint=false,
+                      label="一条端到端 TLS 会话\n中继不终止 TLS"];
+}

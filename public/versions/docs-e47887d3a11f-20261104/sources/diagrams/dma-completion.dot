@@ -1,0 +1,72 @@
+// FIG-07 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph DmaCompletion {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-07 STM32F407 有限 DMA 完成时序
+上到下为先后；Task service 与 IRQ 分开，取消保持借用"];
+    subgraph clusterUart {
+        label="USART1 TX：DMA2 stream7 channel4"; color="#64748b";
+        u1 [label="Task：submit 验证 / admit
+ACCEPTED 后 request + payload 借用"];
+        u2 [label="Task：配置 TX DMA / UART DMAT
+DMA 写 UART DR，线上移出"];
+        u3 [label="DMA IRQ：TC / NDTR / 错误观察
+撤 DMAT 与 DMA source；观察实际 EN"];
+        u4 [label="UART IRQ：独立观察真正 TC
+记录线上完成事实及 deadline"];
+        u5 [label="Task service：EN / IRQ source / TC 排空
+最终错误观察，清 active 引用"];
+        u6 [label="最后 release 发布 SETTLED
+Task acquire 观察，读取最终 result/count", fillcolor="#f0fdf4"];
+        uFail [label="UART cancel / deadline / DMA错误\n撤 DMAT / DMA source，保留 request 与payload", fillcolor="#fff7ed"];
+        uQuarantine [label="UART drain 未证明：QUARANTINED\n保留 DMA / IRQ / 执行与恢复责任", fillcolor="#fff7ed"];
+        u2 -> uFail [label="终止事件", style=dashed];
+        uFail -> u5 [label="只有实际 UART drain 成立", style=dashed];
+        uFail -> uQuarantine [label="预算耗尽且未证明排空"];
+        u1 -> u2 [label="有效 admission"];
+        u2 -> u3 [label="DMA 阶段完成（不是 wire TC）"];
+        u3 -> u4 [label="最后串行位移出后才有 TC"];
+        u4 -> u5 [label="执行者显式推进"];
+        u5 -> u6 [label="所有必要引用脱离"];
+    }
+    subgraph clusterSpi {
+        label="SPI1：RX stream0 / TX stream3，DMA2 channel3"; color="#64748b";
+        s1 [label="Task：admit + 选 endpoint
+独占 TX/RX buffers 与控制器"];
+        s2 [label="Task：使能 RX 后使能 TX
+DMA 双向推进，CS 保持"];
+        s3 [label="两个 DMA IRQ：分别观察 TC
+分别禁用 engine / IRQ source"];
+        s4 [label="Task service：真实 BSY=0 且 TXE=1
+两引擎排空，检查后到错误"];
+        s5 [label="Task：撤 SPI DMA/SPE、清状态
+发出 CS 释放命令，清 active/endpoint 引用"];
+        s6 [label="最后 release 发布 SETTLED
+Task acquire 观察，读取最终 result/count", fillcolor="#f0fdf4"];
+        sFail [label="SPI cancel / deadline / DMA错误\n撤双DMA与SPI写源，保留 request / buffers", fillcolor="#fff7ed"];
+        sQuarantine [label="SPI drain 未证明：QUARANTINED\n保留 engines / IRQ / CS 与恢复责任", fillcolor="#fff7ed"];
+        s2 -> sFail [label="终止事件", style=dashed];
+        sFail -> s4 [label="检查真实 SPI / 双引擎 drain", style=dashed];
+        sFail -> sQuarantine [label="预算耗尽且未证明排空"];
+        s1 -> s2 [label="有效 admission"];
+        s2 -> s3 [label="RX/TX 分别完成"];
+        s3 -> s4 [label="TC 不替代外设 idle"];
+        s4 -> s5 [label="排空条件成立"];
+        s5 -> s6 [label="最终 provider 访问"];
+    }
+    { rank=same; u1; s1; }
+    { rank=same; u2; s2; }
+    { rank=same; u3; s3; }
+    { rank=same; u4; s4; }
+    { rank=same; u5; s5; }
+    { rank=same; u6; s6; }
+}

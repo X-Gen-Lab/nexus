@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>H743 仅限 V 修订的高频配置 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="显式 I2C 总线恢复" href="i2c-bus-clear.html" />
+    <link rel="prev" title="从私有 RAM 执行区维护 H743 Flash" href="h743-flash-ram.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/h743-high-clock.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/design/h743-high-clock.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="h743-v-only-high-clock-profile">
+<span id="design-h743-high-clock"></span><h1>H743 仅限 V 修订的高频配置<a class="headerlink" href="#h743-v-only-high-clock-profile" title="Link to this heading">¶</a></h1>
+<p>冷启动 STM32H743ZIT6 参考配置需要区分 CPU、总线与外设时钟域时，可选择 <code class="docutils literal notranslate"><span class="pre">hsi64-pll384-cache-off</span></code>。本页说明当前固定配置、统一 owner 及失败边界，仅覆盖 V 修订 <code class="docutils literal notranslate"><span class="pre">0x2003</span></code>，Cache 关闭。实板 HIL 仍为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>；软件执行不能测量供电、结温、时钟精度或通信表现。</p>
+<section id="one-assembly-selects-one-clock-owner">
+<h2>一份装配选择一个时钟 owner<a class="headerlink" href="#one-assembly-selects-one-clock-owner" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-lifecycle.svg" title="打开 SVG 大图"><img alt="FIG-05：当前生成 Platform 的生命周期；箭头表示显式启动、逆序清理与保留责任" src="../_images/platform-lifecycle.svg" /></a></p>
+<p>FIG-05 描述通用 Platform 生命周期。对本精确参考配置，SoC 启动依次展开为时钟 owner、System 时基和选定 consumer。逆向路径必须先撤销 consumer 与 System，再撤销时钟 owner。该图不是调频时序或物理证明；下文的精确时钟阶段细化了图中的生命周期责任。</p>
+<p>一项 TOML <code class="docutils literal notranslate"><span class="pre">clock</span></code> 选择经已审<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/soc.json">SoC 事实</a>解析为不可变时钟域 IR。生成 bundle 选择私有实现，CMake 选择其编译单元。typed factory 仍只返回已有静态 face，不执行 MMIO、分配、时钟设置或探测。运行调用通过共享只读方法表直接进入选定 provider。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/private/stm32h743_clock.h">私有时钟合同</a>负责准入与时钟责任，<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/system.c">System</a>负责 TIM2 及其向量。生成的<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/configure/emission.py">生命周期装配</a>规定调用顺序并保留启动、清理诊断。两者的 effect mask 属于不同命名空间；平台投影仍保留的责任，不能把数值 mask 当作可互换标识。</p>
+</section>
+<section id="admit-an-exact-cold-configuration">
+<h2>准入精确的冷态配置<a class="headerlink" href="#admit-an-exact-cold-configuration" title="Link to this heading">¶</a></h2>
+<p>高频配置的自动准入要求 DEV_ID <code class="docutils literal notranslate"><span class="pre">0x450</span></code>、REV_ID <code class="docutils literal notranslate"><span class="pre">0x2003</span></code>（V）及出厂默认 HSI 用户 trim。ES0392 Rev15 表 2 将 <code class="docutils literal notranslate"><span class="pre">0x1003</span></code> 同时映射到 Y/W，将 <code class="docutils literal notranslate"><span class="pre">0x2001</span></code> 映射到 X。已审 DS12110 Rev11 电气章节明确覆盖 V；Y/W 无法区分，X 又缺少明确审查对应的电气章节，因此不能准入这些 ID。它们与未知修订均返回 <code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span></code>，不取得效果。没有自动回退或可由用户覆盖的修订允许列表。</p>
+<p>启动必须遵循实际由 reset owner 控制的调用顺序，发生在 SysTick、调度器、I/O 或其他时钟 owner 运行之前。寄存器值相符不能证明这些历史前提。诊断刻意不读取 SysTick CTRL，因为 COUNTFLAG 是读清位；LOAD/VAL 为零不能证明 ENABLE 已清零。接管 bootloader 和运行时调频需要独立合同。</p>
+<p>冷态检查包括 LDO/VOS3 就绪、Flash 脉冲及编程模式未活动、PLL 配置处于复位值、consumer 静止，以及已知干净且关闭的 cache。可读的 cache 关闭位不能证明没有外来脏行。IDCODE 或读回不能建立供电、温度、封装及 PCB 的资格。</p>
+</section>
+<section id="keep-clock-domains-and-uncertainty-separate">
+<h2>分别表达时钟域与不确定度<a class="headerlink" href="#keep-clock-domains-and-uncertainty-separate" title="Link to this heading">¶</a></h2>
+<p>下列数值是已审设计边界，不是频率测量值。CPU 与源于 PLL 的时钟域在 HSI 包络之外计入保守的 PLL-ready 偏差。未经倍频的 HSI kernel 不承担该 PLL 系数。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>时钟域</p></th>
+<th class="head"><p>名义频率</p></th>
+<th class="head"><p>已审设计区间</p></th>
+<th class="head"><p>consumer 责任</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CPU</p></td>
+<td><p>384 MHz</p></td>
+<td><p>364.56..397.8 MHz</p></td>
+<td><p>PLL1P，M=10/N=120/P=2</p></td>
+</tr>
+<tr class="row-odd"><td><p>HCLK</p></td>
+<td><p>192 MHz</p></td>
+<td><p>182.28..198.9 MHz</p></td>
+<td><p>CPU /2</p></td>
+</tr>
+<tr class="row-even"><td><p>APB1..4</p></td>
+<td><p>96 MHz</p></td>
+<td><p>91.14..99.45 MHz</p></td>
+<td><p>HCLK /2</p></td>
+</tr>
+<tr class="row-odd"><td><p>TIM2/TIM3</p></td>
+<td><p>192 MHz</p></td>
+<td><p>182.28..198.9 MHz</p></td>
+<td><p>APB 倍频后的 timer kernel，不是 CPU 频率</p></td>
+</tr>
+<tr class="row-even"><td><p>USART3/I2C1</p></td>
+<td><p>64 MHz</p></td>
+<td><p>62..65 MHz</p></td>
+<td><p>显式 HSI kernel selector</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI4</p></td>
+<td><p>96 MHz</p></td>
+<td><p>91.14..99.45 MHz</p></td>
+<td><p>APB2；分频准入使用其上界</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC12 输入</p></td>
+<td><p>64 MHz</p></td>
+<td><p>62..65 MHz</p></td>
+<td><p>per_ck 源自 HSI；输入选择不等于配置 ADC 转换</p></td>
+</tr>
+<tr class="row-odd"><td><p>选定 ADC1 转换</p></td>
+<td><p>16 MHz</p></td>
+<td><p>15.5..16.25 MHz</p></td>
+<td><p>provider 取得 ADC12 后选择 async /4</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>空配置设置 ADC12 输入 selector，但不初始化 ADC 或其分频器。TIM2 使用 PSC191 得到名义 1 MHz 计数器。软件毫秒仍是源于 HSI 的名义时间；PSC383 会使计数速率减半，真实生产模型测试会拒绝该错误。TIM3 同样使用实际 192 MHz kernel 准入整数 tick 分频。</p>
+<section id="where-the-hsi-envelope-comes-from">
+<h3>HSI 包络的来源<a class="headerlink" href="#where-the-hsi-envelope-comes-from" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://www.st.com/resource/en/datasheet/stm32h743vi.pdf">DS12110 Rev11</a>表 134、第 232 页给出 V 修订在 VDD 3.3 V、结温 30 °C 下的出厂 HSI 频率 63.7..64.3 MHz，并分别规定 VDD 1.62..3.6 V 下的电压漂移 −0.12..+0.03%，以及 −40 °C..TJmax 下的温度漂移 −2..+1%。出厂频率边界通过生产测试保证，完整温度漂移使用特性表征，二者保证程度不同。−20..105 °C 的较窄行不是完整温度包络；后缀 6 的结温边界不能与环境温度或热耗散条件混淆。</p>
+<p>保守乘法端点为 <code class="docutils literal notranslate"><span class="pre">63.7</span> <span class="pre">×</span> <span class="pre">0.98</span> <span class="pre">×</span> <span class="pre">0.9988</span> <span class="pre">=</span> <span class="pre">62.3510888</span> <span class="pre">MHz</span></code> 和 <code class="docutils literal notranslate"><span class="pre">64.3</span> <span class="pre">×</span> <span class="pre">1.01</span> <span class="pre">×</span> <span class="pre">1.0003</span> <span class="pre">=</span> <span class="pre">64.9624829</span> <span class="pre">MHz</span></code>。加法下界估计 <code class="docutils literal notranslate"><span class="pre">63.7</span> <span class="pre">−</span> <span class="pre">64.3</span> <span class="pre">×</span> <span class="pre">(0.02</span> <span class="pre">+</span> <span class="pre">0.0012)</span></code> 为 62.33684 MHz。选定 62..65 MHz 区间覆盖这些组合，是已审工程包络，不是数据手册原文区间。RM0433 Rev9 的 PLL-ready 偏差再计入保守系数 0.98..1.02，得到 <code class="docutils literal notranslate"><span class="pre">62</span> <span class="pre">×</span> <span class="pre">6</span> <span class="pre">×</span> <span class="pre">0.98</span> <span class="pre">=</span> <span class="pre">364.56</span> <span class="pre">MHz</span></code> 至 <code class="docutils literal notranslate"><span class="pre">65</span> <span class="pre">×</span> <span class="pre">6</span> <span class="pre">×</span> <span class="pre">1.02</span> <span class="pre">=</span> <span class="pre">397.8</span> <span class="pre">MHz</span></code>。设计保持低于已审 VOS1 的 CPU/HCLK/APB 上限 400/200/100 MHz；不同源假设需要新的已审配置。</p>
+</section>
+<section id="local-uart-arithmetic-does-not-qualify-a-link">
+<h3>本地 UART 算术不能建立链路资格<a class="headerlink" href="#local-uart-arithmetic-does-not-qualify-a-link" title="Link to this heading">¶</a></h3>
+<p>请求 115200 baud、16 倍过采样、预分频 1 时，选定 HSI64 kernel 得到 BRR556。名义 baud 约为 115107.914；62..65 MHz 源包络对应约 111510.791..116906.475 baud，相对请求值为 −3.202438..+1.481315%。下端点已超过假设的 2% 本地预算。因此，仅名义分频精度不能证明整个源包络内的通信均可接受。</p>
+<p>平台检查本地分频的可表示性并提供选定源边界，不虚构零误差对端，不要求产品对端预算字段，也不暗中改选时钟源。外部产品必须按 RM0433 Rev9 第 48.5.8 节评估发送端、接收端、量化、线路与唤醒的完整预算，再取得其链路的物理证据。</p>
+</section>
+</section>
+<section id="establish-protection-before-speed-and-retain-failed-cleanup">
+<h2>先建立保护再提速，清理失败保留责任<a class="headerlink" href="#establish-protection-before-speed-and-retain-failed-cleanup" title="Link to this heading">¶</a></h2>
+<p>选定的统一 owner 保存一份四字节 effect 记录，拥有可撤回的 SYSCFG gate、电压请求、共享 Flash 时序、总线预分频、PLL 配置与源，以及 USART/I2C/ADC kernel selector。它不拥有 consumer 请求、缓冲区、worker task 或调度器。</p>
+<ol class="arabic simple">
+<li><p>校验冷态前提，取得可撤回 gate 并拒绝外来 overdrive，证明 VOS1 已就绪，以及 Flash LATENCY2/WRHIGHFREQ2 的读回结果。</p></li>
+<li><p>配置固定总线分频，在配置 PLL1 前等待 32 次有序 RCC 观测。RM0433 第 8.7.8 节允许 HPRE 传播最长占用 16 个最慢 APB 周期，本配置 APB=HCLK/2。能读回 HPRE 不能证明有效分频器已稳定。</p></li>
+<li><p>建立 PLL1、观察就绪、请求切换时钟源，并在发布名义 CPU 时钟前证明实际 SWS。取得并验证 kernel selector，然后启动 System 与选定 consumer。</p></li>
+<li><p>关闭准入，排空并 join consumer，然后撤销 System。任一 consumer 或 System 停止失败都保留时钟 owner 及其保护。</p></li>
+<li><p>仅恢复自有 selector；每个字段可以已处于基线或自有目标值。遇到外来 selector 时拒绝，不覆盖所在寄存器。关闭 PLL 或降低总线、Flash 和电压保护前，必须证明实际已选择 HSI。只有观察到恢复成功后才清除对应 effect。</p></li>
+</ol>
+<p>启动错误保留 primary 结果，有序清理另行报告自己的失败和保留责任。恢复失败使同一 owner 继续存活以供重试；timeout 不能授权释放未被证明已撤回的效果。这是单一固定冷态配置，不是通用时钟树管理器。</p>
+<p>高频配置的 Flash 脉冲要求观察到 V 修订、VOS1、HCLK、2WS/WR2 及 Cache-off 组合。高频 owner 替代固定 HSI 的可选 Flash 时序 owner，二者不能管理同一时序字段。脉冲期间不重新调整 ACR；原有电压、未交换 bank、区域、对齐和新鲜擦除要求仍适用。全 FF 读回不能证明 ECC 单元尚未编程。忙 bank 取指可能停顿；不可中止的脉冲必须结束后才能返回，无法证明最终撤回时，现有终止故障路径会保留调用帧。因此不承诺严格物理 deadline。</p>
+<p>I2C 时序需要显式 kernel 和电气边界；PCLK 不是其选定的 64 MHz kernel。SPI 分频使用 99.45 MHz，而保存的名义源仍为 96 MHz。1.5 MHz 上限对应 /128，而非按名义值算出的 /64。即使调用者 deadline 到期，仍必须完成线上尾部排空与 CS 释放。ADC 的 16 位存储不能建立实测有效精度或校准电压的结论。</p>
+</section>
+<section id="selection-cost-executed-scope-and-next-exits">
+<h2>选入成本、已执行范围与下一退出条件<a class="headerlink" href="#selection-cost-executed-scope-and-next-exits" title="Link to this heading">¶</a></h2>
+<p>仅高频配置生成统一 owner 并选入 <code class="docutils literal notranslate"><span class="pre">clock.c</span></code>。已有四种固定 HSI/cache 配置保留各自生命周期，不调用此 owner。四字节记录是源码层面的选配状态事实，不是整幅镜像 RAM 增量的测量；对齐、代码保留及已链接 ELF 成本须分别观察。选择时钟不引入分配或额外热路径转发层。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>已执行开发范围</p></th>
+<th class="head"><p>实际结果</p></th>
+<th class="head"><p>边界</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_clock_test.cpp">时钟测试</a></p></td>
+<td><p>38 个 GoogleTest case 通过</p></td>
+<td><p>外部寄存器模型中的 V-only 拒绝、顺序、部分效果与重试</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_system_test.cpp">高频 System 测试</a></p></td>
+<td><p>19 个 case 通过</p></td>
+<td><p>真实时钟 owner 加 TIM2、IRQ、名义时间和失败清理</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_kernel_test.cpp">Kernel 测试</a></p></td>
+<td><p>30 个 case 通过</p></td>
+<td><p>独立时钟域、分频边界、Flash 准入和混合 selector 回退</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/google/h743_high_factory_test.cpp">生成 factory 测试</a></p></td>
+<td><p>10 个 case 通过</p></td>
+<td><p>正常 TOML/IR/生成生命周期、冷查找、consumer 调用及停止失败重试</p></td>
+</tr>
+<tr class="row-even"><td><p>三个正常 ARM 配置</p></td>
+<td><p>configure 和 build 返回零</p></td>
+<td><p>下述精确 empty、UART、peripheral fixture；覆盖代码生成和链接，不是硬件</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>ARM preset 为 <code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-empty</span></code>、<code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-uart</span></code> 和 <code class="docutils literal notranslate"><span class="pre">fixture-io-evolution-h743-high-peripherals</span></code>。其维护输入是 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/h743-high-empty.toml">empty</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/h743-high-uart.toml">UART</a> 和 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/assemblies/h743-high-peripherals.toml">peripherals</a>。这些记录描述本开发迭代，不建立 clean 软件候选、离线可复现或物理资格。<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">I/O</span> <span class="pre">台账</span></code></a>仍是状态权威。</p>
+<p>高频 Cache-on、H743 连续 DMA、SPI DMA、更多硅片修订、bootloader 接管及运行时切换时钟均有独立实施和验收退出条件。已有有限 DMA 模式不能推导出这些扩展。物理时钟、电压、温度、UART、SPI、I2C、ADC 和 Flash 测试均保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>，直到连接的设备实际测量选定镜像。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

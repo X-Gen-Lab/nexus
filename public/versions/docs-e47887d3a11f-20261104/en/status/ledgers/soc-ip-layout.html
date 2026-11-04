@@ -1,0 +1,2280 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SoC/IP layout ledger &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Original build-system workstream ledger" href="build-system.html" />
+    <link rel="prev" title="Original SoC workstream ledger" href="soc-refinement.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/status/ledgers/soc-ip-layout.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../../zh_CN/status/ledgers/soc-ip-layout.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="soc-ip">
+<span id="status-ledgers-soc-ip-layout"></span><h1>SoC/IP layout ledger<a class="headerlink" href="#soc-ip" title="Link to this heading">¶</a></h1>
+<p>This page derives from the original CSV; it is not a new status authority, execution record or software qualification. Original identifiers, order and all original fields come from the <a class="reference download internal" download="" href="../../_downloads/54d3210c5ae2d22e8f681860fb75b4b2/soc-ip-layout-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">original</span> <span class="pre">ledger</span></code></a>. Source file: <code class="docutils literal notranslate"><span class="pre">docs/design/soc-ip-layout-execution.csv</span></code>; SHA-256: <code class="docutils literal notranslate"><span class="pre">0564d12a1125e718b7560defc8a7cbb184c77ebeb1b13ba1eea1331b2cac8fa4</span></code>.</p>
+<p>Different ledgers overlap in scope; do not add their counts or calculate a project-wide completion rate. Interpret implementation, software and physical status separately. <code class="docutils literal notranslate"><span class="pre">development_passed</span></code> does not mean execution at the current documentation HEAD. Consult the exact results index for the source and scope of <code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code>. Absolute <code class="docutils literal notranslate"><span class="pre">/workspace</span></code> and <code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> locators retain their original bytes and only identify the original execution host. See the <a class="reference internal" href="../software-verification.html"><span class="std std-doc">software-evidence entry</span></a> for retrievable archives and member locations.</p>
+<p><strong>Original exit fields</strong> are only fields actually present in the original CSV. Tasks, qualification prerequisites and contract links also retain their original wording; they cannot be used to invent an execution.</p>
+<p>This table contains 48 original records; this is only the source row count.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#r01" id="id1">R01</a></p></li>
+<li><p><a class="reference internal" href="#r02" id="id2">R02</a></p></li>
+<li><p><a class="reference internal" href="#r03" id="id3">R03</a></p></li>
+<li><p><a class="reference internal" href="#r04" id="id4">R04</a></p></li>
+<li><p><a class="reference internal" href="#r05" id="id5">R05</a></p></li>
+<li><p><a class="reference internal" href="#r06" id="id6">R06</a></p></li>
+<li><p><a class="reference internal" href="#r07" id="id7">R07</a></p></li>
+<li><p><a class="reference internal" href="#r08" id="id8">R08</a></p></li>
+<li><p><a class="reference internal" href="#r09" id="id9">R09</a></p></li>
+<li><p><a class="reference internal" href="#r10" id="id10">R10</a></p></li>
+<li><p><a class="reference internal" href="#r11" id="id11">R11</a></p></li>
+<li><p><a class="reference internal" href="#r12" id="id12">R12</a></p></li>
+<li><p><a class="reference internal" href="#r13" id="id13">R13</a></p></li>
+<li><p><a class="reference internal" href="#r14" id="id14">R14</a></p></li>
+<li><p><a class="reference internal" href="#r15" id="id15">R15</a></p></li>
+<li><p><a class="reference internal" href="#r16" id="id16">R16</a></p></li>
+<li><p><a class="reference internal" href="#r17" id="id17">R17</a></p></li>
+<li><p><a class="reference internal" href="#r18" id="id18">R18</a></p></li>
+<li><p><a class="reference internal" href="#r19" id="id19">R19</a></p></li>
+<li><p><a class="reference internal" href="#r20" id="id20">R20</a></p></li>
+<li><p><a class="reference internal" href="#r21" id="id21">R21</a></p></li>
+<li><p><a class="reference internal" href="#r22" id="id22">R22</a></p></li>
+<li><p><a class="reference internal" href="#r23" id="id23">R23</a></p></li>
+<li><p><a class="reference internal" href="#r24" id="id24">R24</a></p></li>
+<li><p><a class="reference internal" href="#r25" id="id25">R25</a></p></li>
+<li><p><a class="reference internal" href="#r26" id="id26">R26</a></p></li>
+<li><p><a class="reference internal" href="#r27" id="id27">R27</a></p></li>
+<li><p><a class="reference internal" href="#r28" id="id28">R28</a></p></li>
+<li><p><a class="reference internal" href="#r29" id="id29">R29</a></p></li>
+<li><p><a class="reference internal" href="#r30" id="id30">R30</a></p></li>
+<li><p><a class="reference internal" href="#r31" id="id31">R31</a></p></li>
+<li><p><a class="reference internal" href="#r32" id="id32">R32</a></p></li>
+<li><p><a class="reference internal" href="#r33" id="id33">R33</a></p></li>
+<li><p><a class="reference internal" href="#r34" id="id34">R34</a></p></li>
+<li><p><a class="reference internal" href="#r35" id="id35">R35</a></p></li>
+<li><p><a class="reference internal" href="#r36" id="id36">R36</a></p></li>
+<li><p><a class="reference internal" href="#r37" id="id37">R37</a></p></li>
+<li><p><a class="reference internal" href="#r38" id="id38">R38</a></p></li>
+<li><p><a class="reference internal" href="#r39" id="id39">R39</a></p></li>
+<li><p><a class="reference internal" href="#r40" id="id40">R40</a></p></li>
+<li><p><a class="reference internal" href="#r41" id="id41">R41</a></p></li>
+<li><p><a class="reference internal" href="#r42" id="id42">R42</a></p></li>
+<li><p><a class="reference internal" href="#r43" id="id43">R43</a></p></li>
+<li><p><a class="reference internal" href="#r44" id="id44">R44</a></p></li>
+<li><p><a class="reference internal" href="#r45" id="id45">R45</a></p></li>
+<li><p><a class="reference internal" href="#r46" id="id46">R46</a></p></li>
+<li><p><a class="reference internal" href="#r47" id="id47">R47</a></p></li>
+<li><p><a class="reference internal" href="#r48" id="id48">R48</a></p></li>
+</ul>
+</nav>
+<section id="r01">
+<span id="status-soc-ip-layout-r01"></span><h2><a class="toc-backref" href="#id1" role="doc-backlink">R01</a><a class="headerlink" href="#r01" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Branch and source baseline</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Record actual source revision and branch before edits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>AGENTS.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>.git/local-recovery/soc-ip-layout/baseline.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Local and GitHub refactor/soc-ip-layout branches start at 890a6026384b.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r02">
+<span id="status-soc-ip-layout-r02"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">R02</a><a class="headerlink" href="#r02" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Per-file responsibility and destination map</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Review every moved file and distinguish shared IP from SoC integration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>.git/local-recovery/soc-ip-layout/path-map.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared IP and 35 family production modules reviewed; import-normalized family AST unchanged. These are original migration-baseline identities and counts, not current P totals; final execution is recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r03">
+<span id="status-soc-ip-layout-r03"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">R03</a><a class="headerlink" href="#r03" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Exact platform mode resource and rejection baseline</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Record maintained selections and rejection behavior without expanding support</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/configurations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>136 exact assemblies including all 71 catalogue entries resolved in both source trees; no effective decision changes. Existing negative contracts remain enforced. These are original migration-baseline identities and counts, not current P totals; final execution is recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r04">
+<span id="status-soc-ip-layout-r04"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">R04</a><a class="headerlink" href="#r04" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Test identities and execution domains</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Map retained cases to Native; tool; ARM and physical domains</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests;tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration/case-mapping.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Original 1035 configure cases retained one-to-one; 132 family cases relocated; 8 migration regressions added. These are original migration-baseline identities and counts, not current P totals; final execution is recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r05">
+<span id="status-soc-ip-layout-r05"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">R05</a><a class="headerlink" href="#r05" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Flash RAM ops and IRQ baseline</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Record actual linked resource and retention baseline for comparisons</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/resources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>32 prior resource reports from 16 presets retained with matching ELF hash/size. Historical baseline capture; not new execution or new-source resource qualification. Only resource reports were copied; ELF/map identities were observed at capture, not retained as new build evidence. Final P comparisons are recorded in R46.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r06">
+<span id="status-soc-ip-layout-r06"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">R06</a><a class="headerlink" href="#r06" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Single execution ledger</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Maintain exactly R01-R48 with implementation and execution separated</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>One R01-R48 task record; implementation, software and physical status stay separate. Final software tested_source=P=92e669233957a2e450a528394e8f4dd0794c7049, tree=6e38d4c43d59330a0a9a9b7cac21f591d9c2719f; integrated M=c79fd9672a9fe56379744d834cfccd822bc40be1 has the same tree. This documentation update records P and does not claim its own software qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r07">
+<span id="status-soc-ip-layout-r07"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">R07</a><a class="headerlink" href="#r07" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Explicit family descriptors</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Declare canonical source directories and configuration modules without discovery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/providers/descriptor.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Explicit vendor/source/configuration directories; no family-prefix path inference.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r08">
+<span id="status-soc-ip-layout-r08"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">R08</a><a class="headerlink" href="#r08" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Module loading and type identity</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Explicit loading preserves common Python type identity and import boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/providers;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Normal selected SoC packages and canonical shared types; six actual RED/GREEN loading regressions.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r09">
+<span id="status-soc-ip-layout-r09"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">R09</a><a class="headerlink" href="#r09" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Input closure and freshness</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Moved configuration dependencies remain in identity and stale-input rejection</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dependencies.py;tools/configure/bundle.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>All executing package initializers/helpers hashed; migrated sources protected from owned output overwrite.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r10">
+<span id="status-soc-ip-layout-r10"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">R10</a><a class="headerlink" href="#r10" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>SDK roots and required members</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Source SDK includes declared SoC configuration and IP driver inputs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/sdk-driver-red.log;build/soc-ip-layout/sdk-driver-green.log;build/soc-ip-layout/sdk-payload.log;build/soc-ip-layout/sdk-selection.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>New shared driver transport regression RED then GREEN; 20 device payload and 45 selection/portable tests pass. Actual final P installed consumers are recorded in R45.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r11">
+<span id="status-soc-ip-layout-r11"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">R11</a><a class="headerlink" href="#r11" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Family test discovery</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Retain and execute tests under tools/configure/tests/providers/&lt;family&gt;</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/tests/providers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration/case-mapping.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Family tests remain in existing tools/configure discovery domain; no new runner.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r12">
+<span id="status-soc-ip-layout-r12"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">R12</a><a class="headerlink" href="#r12" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Style source capability and measurement coverage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Include drivers and SoC configuration in existing observers and gates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/maintenance;tools/measurement;scripts/validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/quality-tools-green.log;build/soc-ip-layout/baseline/io-lifecycle-green.log;build/soc-ip-layout/capabilities-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>New drivers remain covered by style, private include, ops/source/retention, static analysis and target-local lifecycle checks; independent review closed all migration findings.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r13">
+<span id="status-soc-ip-layout-r13"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">R13</a><a class="headerlink" href="#r13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move Native configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use soc/native/configure with explicit imports and retained tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/native/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r14">
+<span id="status-soc-ip-layout-r14"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">R14</a><a class="headerlink" href="#r14" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move F103 and GD303 configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use each exact family configure package and retained tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f103/configure;soc/gd32/gd32f303/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r15">
+<span id="status-soc-ip-layout-r15"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">R15</a><a class="headerlink" href="#r15" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move F407 and GD470 configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use each exact family configure package and retained tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f407/configure;soc/gd32/gd32f470/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r16">
+<span id="status-soc-ip-layout-r16"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">R16</a><a class="headerlink" href="#r16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move G474 configuration and helpers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Co-locate G474 contract; construction; emission and selected helpers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32g474/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r17">
+<span id="status-soc-ip-layout-r17"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">R17</a><a class="headerlink" href="#r17" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move H743 configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Co-locate H743 contract; construction; emission and selected helpers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32h743/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r18">
+<span id="status-soc-ip-layout-r18"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">R18</a><a class="headerlink" href="#r18" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move U575 configuration and clear old production paths</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Co-locate U575 policy and remove obsolete family production packages</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32u575/configure;tools/configure/providers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 exact tree d9270fefe377be519e2fb10d223eed8125566223; canonical commit 7b985c4c619a966c886c3cbf01902ccbfb68c955. Ordinary complete-index gates: 3215 tool tests and 352 programs / 6352 Google cases. This result does not qualify subsequent behavior changes. The first outer hook log and sync receipt retain the historical assertion; reused build/native-debug/tdd bytes are not its original detailed evidence. Final P gates and execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r19">
+<span id="status-soc-ip-layout-r19"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">R19</a><a class="headerlink" href="#r19" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move UART V1 channel DMA engine</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Select reviewed algorithm and private headers from drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/uart/uart_v1_channel_dma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r20">
+<span id="status-soc-ip-layout-r20"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">R20</a><a class="headerlink" href="#r20" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move I2C V1 asynchronous engine</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Select reviewed IRQ/DMA algorithm and private headers from drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v1_async</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r21">
+<span id="status-soc-ip-layout-r21"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">R21</a><a class="headerlink" href="#r21" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move I2C V2 engine</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Select reviewed polling algorithm and private headers from drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r22">
+<span id="status-soc-ip-layout-r22"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">R22</a><a class="headerlink" href="#r22" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Split legacy_devices and move ADC</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate private legacy interfaces and select the ADC algorithm from drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/adc/legacy_adc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r23">
+<span id="status-soc-ip-layout-r23"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">R23</a><a class="headerlink" href="#r23" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move legacy PWM</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Select fixed PWM algorithm and narrow private contract from drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/timer/legacy_pwm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r24">
+<span id="status-soc-ip-layout-r24"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">R24</a><a class="headerlink" href="#r24" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move legacy Flash and SoC helpers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Select Flash algorithm; place STM32 identity helper; retain UART collaboration and update READMEs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/flash/legacy_flash;soc/stm32/common/stm32_identity.h;soc/common/uart_control.h;drivers/README.md;soc/common/README.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared focused run: 17 targets; 17/17 CTest; 267 Google cases; zero skipped. Aggregate scope is not a per-row test count or complete qualification. Physical HIL not executed. The preserved shared-drivers XML matches the original report hash; its embedded generic Native XML path was later reused. Final P execution is separately recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r25">
+<span id="status-soc-ip-layout-r25"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">R25</a><a class="headerlink" href="#r25" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Centralize part package RAM and Flash geometry</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use one exact fact authority for part; package; memory and physical geometry</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/part-red.log;build/soc-ip-layout/facts-ir/clock-red.log;build/soc-ip-layout/facts-ir/parts-clocks-green.log;build/soc-ip-layout/facts-ir/f407-flash.xml;build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/all-flash-red.log;build/soc-ip-layout/flash-geometry/summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Exact PartPolicy and optional-memory admission; physical numbers remain in soc.json and frozen PhysicalPartIR views. All seven MCU Flash geometries derive readonly C from validated facts; six retain global symbols and F407 uses selected static geometry. Final focused configuration suite: 364 tests; separate integration/bundle suite: 143 tests. These overlapping scopes are not additive or final-source qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r26">
+<span id="status-soc-ip-layout-r26"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">R26</a><a class="headerlink" href="#r26" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Typed controller integration record</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use explicit typed integration data without family-name inference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure/providers/common.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/integration-red.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>ControllerIntegrationIR composes existing canonical claims/DMA/IRQ/clock/pin/hardware objects; PhysicalPartIR reuses frozen facts. No new JSON/hash field or route resolver. Actual production consumers: F407 primary SPI and F407/GD470 paired secondary paths. Other constructors and explicit legacy fixture adapters remain. 364-test focused suite and overlapping 52-test final closure passed; no final-source qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r27">
+<span id="status-soc-ip-layout-r27"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">R27</a><a class="headerlink" href="#r27" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Clock reset pin and state integration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Make integration ownership explicit without hidden side effects</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Exact family clock, GPIO/preflight, ControllerBinding and secondary cold hooks own chip integration. Common resource leases/IRQ/drain ordering remain. Focused configuration and bundle suites passed; no runtime registration or broader clock/Board/backend qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r28">
+<span id="status-soc-ip-layout-r28"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">R28</a><a class="headerlink" href="#r28" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Consume existing IRQ DMA and memory IR consistently</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use reviewed immutable IR instead of duplicated derived facts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure/ir.py;tools/configure/memory.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/claims-red.log;build/soc-ip-layout/facts-ir/primary-dma-red.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Typed owned_claims uses canonical ResourcePlanIR; selected hardware/DMA/IRQ/clock/pin consumers use ControllerIntegrationIR rather than reparsing routes. Meaningful omitted-lane/claim regressions recorded; other maintained typed or explicit legacy adapters remain. Focused suites are not final ARM/SDK qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r29">
+<span id="status-soc-ip-layout-r29"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">R29</a><a class="headerlink" href="#r29" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move family special cases out of common tools</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Keep family policy in exact SoC configure packages and common mechanisms shared</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/parts-clocks-green.log;build/soc-ip-layout/r30/green-final.log;build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/r29-hardware;build/soc-ip-layout/r29-public-policies;build/soc-ip-layout/facts-ir/final-closure-green.log;build/quality/soc-ip-config-r32/profile-python-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Explicit SoC hardware/secondary, clock/linker/runtime-power, GPIO/preflight, selected support, UART/stream/endpoint and CAN/coupled/pin policies implemented. Generated-output equivalence checked in separately recorded 18-, 23- and 8-configuration scopes; test counts overlap and must not be added. Remaining common family literals are explicit dependency paths and ThreadX cross-Board/backend OS admission. F103/GD303 frozen LegacyTransportProfile supplies exact wiring without family fallback; its 38-test focused run is separate and overlaps related suites.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r30">
+<span id="status-soc-ip-layout-r30"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">R30</a><a class="headerlink" href="#r30" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Capability revision and support projection</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Derive current views from exact reviewed facts without new support claims</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/maintenance;docs/delivery/capabilities.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/r30/red.log;build/soc-ip-layout/r30/owner-red.log;build/soc-ip-layout/r30/green-final.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>98 tests passed across 10 focused modules. Existing silicon policy/IR projects separately for clock and controller owners; absent review stays null and companion/endpoint policy is not inherited. No broader support or hardware observation.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r31">
+<span id="status-soc-ip-layout-r31"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">R31</a><a class="headerlink" href="#r31" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>I2C V2 const configuration pilot</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate immutable configuration from mutable transfer state</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v2;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Selected G474/H743/U575 const configuration and separate BSS runtime implemented. Shared focused execution: 9 targets / 121 Google cases and 38 related Python tests passed; not per-row counts. Development ARM cost comparison is recorded in R46; final P complete gates and scoped execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r32">
+<span id="status-soc-ip-layout-r32"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">R32</a><a class="headerlink" href="#r32" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>UART DMA const configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate immutable configuration from mutable request and block state</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/uart/uart_v1_channel_dma;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Selected F103/GD303 UART DMA immutable config and BSS runtime implemented; duplex receive extension remains separate. Static config/resources share runtime lifetime and successful stop preserves binding. Final focused run: 3 targets / 65 Google cases plus 38 Python tests. Host execution covers actual SoC wrapper/engine/GPIO; generated DMA factory runtime is not claimed. Development ARM comparison is recorded separately in R46; final P complete gates and scoped execution are recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r33">
+<span id="status-soc-ip-layout-r33"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">R33</a><a class="headerlink" href="#r33" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Shared ops immutable faces and direct IRQ</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Preserve shared readonly methods; independent contexts and direct IRQ entry</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers;soc;io</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green;build/quality/soc-ip-config-r31/i2c-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Shared readonly ops, immutable public faces, distinct static contexts and direct IRQ entry symbols retained for the selected I2C V2 and UART DMA changes; no hot-path dispatch layer. Focused UART wrapper/engine/GPIO and I2C model suites passed. Development ARM linked retention/costs are recorded in R46; final P scoped validation is recorded in R43-R48.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r34">
+<span id="status-soc-ip-layout-r34"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">R34</a><a class="headerlink" href="#r34" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Move initialization and stop logic into C</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Keep explicit lifecycle ordering and cleanup responsibilities in concrete code</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Selected I2C V2, F103/GD303 UART DMA and legacy ADC/PWM/Flash cold integration lives in concrete C preparation with existing stop paths. U575 engine stop precedes clock release. UART AHB DMA gate and Platform ordering remain generated; legacy I2C V1 and other peripherals retain family-emitted behavior. Focused suites overlap and are not additive or whole-platform qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r35">
+<span id="status-soc-ip-layout-r35"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">R35</a><a class="headerlink" href="#r35" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Retained failure and retry contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Preserve partial effects and borrows until proved drain or explicit retry</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tests/google</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Selected I2C V2, UART DMA and legacy ADC/PWM/Flash live/retained guards, failed-drain responsibility and stop/retry contracts passed focused regressions. UART guards precede config/pin mutation and include outstanding wake/RX loans; failed withdrawal retains config and borrowed storage. Counts across focused suites overlap; final-source and physical qualification are separate.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r36">
+<span id="status-soc-ip-layout-r36"></span><h2><a class="toc-backref" href="#id36" role="doc-backlink">R36</a><a class="headerlink" href="#r36" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Split legacy ADC PWM and Flash integration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate exact SoC integration from reusable algorithms and narrow contracts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f103/drivers/devices.c;soc/gd32/gd32f303/drivers/devices.c;drivers/adc/legacy_adc;drivers/timer/legacy_pwm;drivers/flash/legacy_flash</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>final_P_native_arm_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r36/legacy-high-green;build/quality/soc-ip-config-r36/legacy-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-candidate/legacy-devices/report.json;build/quality/soc-ip-candidate/f103-flash-only-retention.json;build/quality/soc-ip-candidate/gd303-flash-only-retention.json;build/quality/soc-ip-candidate/completion-summary.json;build/quality/soc-ip-candidate/source-snapshot.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/providers/mainstream_assembly/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>F103/GD303 concrete C ADC/PWM/Flash prepare entries and existing shared close paths implemented. Final two factory targets: 11 Google cases, including full independent 128-sector geometry, live rebind, failed stop/retry and failed initialization cleanup/restart; GD303 foreign oversampling stays unchanged on BUSY. Earlier 6-target/97-case and 40-Python results overlap and are not additive. Four exact legacy ARM builds and two independent Flash-only retention consumers also passed on the 184-file dirty development overlay. This is development evidence, not final clean-source qualification; other peripheral emission is unchanged. Final clean P separately passed all four Native modes and the four f103/gd303 devices baremetal/FreeRTOS fixtures at mainstream_assembly indices 0/1/8/9. The two extra Flash-only consumers remain development observations; they were not rerun or relabeled as P.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r37">
+<span id="status-soc-ip-layout-r37"></span><h2><a class="toc-backref" href="#id37" role="doc-backlink">R37</a><a class="headerlink" href="#r37" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Review CMake private includes and Runtime boundary</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Selected targets retain source ownership and vendor includes stay private</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/runtime-green.log;build/soc-ip-layout/integration-audit/cmake/observations.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Three real RED Runtime inclusion regressions then 18 tests GREEN. Eight family consumer include closures show no private leakage; two Cortex-M4 baremetal/FreeRTOS Ninja/ARM configurations exclude SoC/driver/Board objects. This audit configured targets; it did not build production firmware.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r38">
+<span id="status-soc-ip-layout-r38"></span><h2><a class="toc-backref" href="#id38" role="doc-backlink">R38</a><a class="headerlink" href="#r38" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Converge SDK transport manifest</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use required payload closure without redundant source authorities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/sdk-closure-red.log;build/soc-ip-layout/integration-audit/sdk-closure-green.log;build/soc-ip-layout/integration-audit/required-comparison.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>48 selection/admission/descriptor tests passed. SDK requirements reuse public source_names and descriptor facts/payload; no prior required member removed. Additional declared family helpers are included dynamically. Actual final P relocated SDK execution is recorded in R45.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r39">
+<span id="status-soc-ip-layout-r39"></span><h2><a class="toc-backref" href="#id39" role="doc-backlink">R39</a><a class="headerlink" href="#r39" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Incremental configuration transaction regressions</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Exercise changed-module invalidation and failed reconfiguration through existing gates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/incremental-green.log;build/soc-ip-layout/facts-ir/incremental-receipt.json;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Fresh Native consumer CMake/Ninja configure/build and no-change rebuild executed; changing a declared family module triggered CMake and selected regeneration. All receipt commands exit zero. Separate 143-test integration/bundle suite covers transaction boundaries; not a fresh final-source SDK or full firmware matrix qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r40">
+<span id="status-soc-ip-layout-r40"></span><h2><a class="toc-backref" href="#id40" role="doc-backlink">R40</a><a class="headerlink" href="#r40" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Existing CLI diagnostics</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Existing commands report exact provider inputs and failures without a new framework</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/configure.py;tools/configure/experience.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/diagnostic-red.log;build/soc-ip-layout/integration-audit/diagnostic-green.log;build/soc-ip-layout/integration-audit/cli/summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>35 focused tests passed; eight exact provider-check runs emitted static bundles and identity mismatch rejected. provider_module_missing applies only to the selected entry/parent package; other import errors remain explicit. No compile/link or physical qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r41">
+<span id="status-soc-ip-layout-r41"></span><h2><a class="toc-backref" href="#id41" role="doc-backlink">R41</a><a class="headerlink" href="#r41" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Bilingual documentation diagrams and porting migration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Current source maps; diagram links; READMEs and reviewed gettext match implementation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>README.md;README_CN.md;drivers/README.md;soc/README.md;soc/common/README.md;tools/configure/README.md;docs/explanation;docs/guides/provider-porting.md;docs/design;docs/delivery/architecture.md;docs/assets/diagrams/README.md;docs/locale</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>clean_P_docs_and_D_review_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/documentation/phase1-clean-build.json;build/soc-ip-layout-docs-review.json;build/soc-ip-layout/documentation/phase2-source-scan-final.json;build/soc-ip-layout/documentation/phase2-diagram-check.json;build/soc-ip-layout/documentation/phase2-diagram-review.json;build/soc-ip-layout/documentation/phase2-po-independent-review.json;build/soc-ip-layout/documentation/phase2-review-admission.json;build/soc-ip-layout/documentation/phase2-translations-final.json;build/soc-ip-layout-docs-92e669233957/documentation-build.json;build/soc-ip-layout/documentation/final-d-extraction/extraction.json;build/soc-ip-layout/documentation/final-d-source-check.json;build/soc-ip-layout/documentation/final-d-po-independent-review.json;build/soc-ip-layout/documentation/final-d-review-admission.json;build/soc-ip-layout/documentation/final-d-translations.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Phase-1 clean 7b985 strict bilingual build and independent 18-catalog review retained. Phase-2 current content complete: FIG-31 independent source/visual review, locked diagram verification, 131-page source scan, actual gettext extraction and whole-site 262 locale checks passed. Nine catalogs independently reviewed: 101 new messages and 945 unchanged reviewed entries. Clean P strict bilingual build passed with 262 locale checks; its receipt has qualification=false and SHA256 acdca47f4ccf9f1438a8c50f25dd8bea4135821922da202181a5237738ff8166. This later documentation-only update records P; its actual gettext/review and clean-D build are separate documentation evidence, not firmware or physical qualification. D content validation actually passed: fresh locked gettext, 131-page source scan, independent semantic review of 22 new messages with 127 baseline pairs unchanged, and 262 whole-site locale checks. Clean-D strict build is a separate postcommit receipt; no future success or D self-hash is recorded here.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r42">
+<span id="status-soc-ip-layout-r42"></span><h2><a class="toc-backref" href="#id42" role="doc-backlink">R42</a><a class="headerlink" href="#r42" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Examples candidate consumption</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Consume the concrete candidate in the external examples repository</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>X-Gen-Lab/nexus-examples</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/local-ci-soc-ip-layout-92e669233957/execution.json;/workspace/nexus-examples/build/soc-ip-layout-validation-92e669233957/sdk-examples-validation-evidence.json;/workspace/nexus-examples/build/soc-ip-layout-candidate-92e669233957/ordinary-hook-evidence.json;.git/local-recovery/soc-ip-layout/examples-main-merge.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Exact P consumed by clean examples 0f15022e4d5f5c51991b134d0b9d6082dcf88de9, tree bb60f413b911ec212b59b77cea1734971eddbd9f. Complete canonical local CI passed: Native, installed SDK consumer, 16 ARM presets and 32 main-matrix ELFs for platform_reference/uart_owner_runtime; dedicated example targets remain separately recorded. Formal lock and Gitlink match P; candidate_validation=false. Ordinary hook retained 80 tool tests and 15 CTest / 69 Google cases with no skips. PR15 merged as bd3b90f135600b6405459347cb9e2cff5692d2e3 with the same examples tree. This is exact code-candidate consumption, not physical execution.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r43">
+<span id="status-soc-ip-layout-r43"></span><h2><a class="toc-backref" href="#id43" role="doc-backlink">R43</a><a class="headerlink" href="#r43" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R43</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Four Native modes and complete tool suites</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Execute maintained modes and complete applicable tool domains with fresh nonempty reports</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/google;tools/dev;tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/report.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/tool-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/configure-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/ci-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/workflow-tests.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Tested clean P=92e669233957a2e450a528394e8f4dd0794c7049. All four Native modes debug/release/ASan-UBSan/TSan actually passed: each 372 CTest and 6396 Google cases, zero failures/errors/skips. Complete applicable tool domains passed: testing 1527, configure 1071, ci 490, workflows 159 (3247 total); other tool domains are not inferred from these four. Original executions are retained in candidate evidence. A remains interrupted/running after its 90 completed stages; this row closes the actual completed Native/tool scopes, not a single full-plan pass. The separate ordinary complete-index hook archive records 3247 tools and 352 Google programs / 6396 cases.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r44">
+<span id="status-soc-ip-layout-r44"></span><h2><a class="toc-backref" href="#id44" role="doc-backlink">R44</a><a class="headerlink" href="#r44" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R44</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>ARM and Runtime matrix</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Compile and link exact maintained ARM and CPU Runtime configurations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts;tools/measurement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>segmented_execution_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/report.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/interruption-observation.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/cortex_runtime/report.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Tested P=92e669233957a2e450a528394e8f4dd0794c7049: original maintained plan has actual exact segmented coverage A90+B69. A retains running and no source_after after environment interruption; B executed_passed with the exact original suffix, zero stage exits and unchanged clean source. B report SHA256 f8ecf185eadbef7e33d7a667366da7de34241ce243a5d417b5b453ae3bb99694. All original names/order/checkers/args/timeouts and raw identities were checked; no merged executed_passed report was invented. B reran all 865 tidy and 865 cppcheck contexts. CPU Runtime passed 104 variants with source_inputs_stable=true; its full_platform_status stays not_qualified and expected rejections are separate from positive images. ARM/provider/retention/resource fixtures retain their exact original reports; linked software does not establish MCU execution.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r45">
+<span id="status-soc-ip-layout-r45"></span><h2><a class="toc-backref" href="#id45" role="doc-backlink">R45</a><a class="headerlink" href="#r45" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R45</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Relocated SDK integrity</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Verify required installed members and independent relocated consumers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/sdk-relocation-92e669233957/execution.json;/workspace/nexus-examples/build/soc-ip-layout-validation-92e669233957/sdk-examples-validation-evidence.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/source_sdk.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/verify_relocated_sdk.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Publishable source SDK binds clean P=92e669233957a2e450a528394e8f4dd0794c7049 and its exact tree. Actual package verification and independent relocated consumers passed at platform-sdk-92e669233957/SDK relocated, including Native C/C++, Runtime and maintained firmware selections; source closure and exported inputs retain original member hashes. The independent SDK/examples archive preserves those executions. Candidate completion-2 reverified the relocated SDK with exit 0. Initial completion used an incorrect verifier root and failed; its original failed receipt remains, followed by the actual corrected execution. No source change or guard weakening was used.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r46">
+<span id="status-soc-ip-layout-r46"></span><h2><a class="toc-backref" href="#id46" role="doc-backlink">R46</a><a class="headerlink" href="#r46" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R46</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Resource retention and cost comparison</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Compare actual Flash RAM ops and IRQ retention for the same selections</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>final_P_comparison_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-candidate/cost-summary.json;build/quality/soc-ip-candidate/uart/report.json;build/quality/soc-ip-candidate/legacy-devices/report.json;build/quality/soc-ip-candidate/f103-flash-only-retention.json;build/quality/soc-ip-candidate/gd303-flash-only-retention.json;build/quality/soc-ip-candidate/completion-summary.json;build/quality/soc-ip-candidate/source-snapshot.json;build/quality/soc-ip-final-p-92e669233957/final-cost-summary.json;build/quality/soc-ip-final-p-92e669233957/final-cost-summary.csv;build/quality/soc-ip-cost-package-92e669233957/package.json;build/quality/soc-ip-cost-package-92e669233957/artifact-summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Historical 184-file dirty development overlay comparisons remain separately identified in their original reports. Final clean P versus 7b985: all 11 strict comparisons passed from actual A/B build artifacts with independent ELF/map/IRQ review; no rebuild for path normalization. I2C total loaded Flash delta G474/H743/U575 = -4/+40/+64 B, composed of code/alignment +108/+152/+224 B, readonly config +24 B each, path-pool/alignment -136/-136/-184 B; reserved RAM -24/-16/-24 B and state 28 to 8 B. Eight UART totals range +168 to +392 B Flash, with code/alignment +336 to +384 B, readonly config 60 B and negative source-path/alignment contributions; all reserve 48 B less RAM, TX state 96 to 48 B and duplex 144 to 96 B. Source-root string reductions are not architecture savings. UART selected IRQ code at most +2 B/one static instruction, up to two config loads; duplex channel local push frame grows 16 to 24 B while MSP reservation is unchanged. No new selected IRQ indirect call; cycles/WCET/dynamic stack high-water are not measured. Portable cost evidence archive SHA256 fb0f63bcae83f7a5b278a311f67107bf4f8c99fcee0014638b0fb26c0936567f, 4035953 B / 1184 files; original source/tool/SDK inputs remain explicit external dependencies.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r47">
+<span id="status-soc-ip-layout-r47"></span><h2><a class="toc-backref" href="#id47" role="doc-backlink">R47</a><a class="headerlink" href="#r47" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R47</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Independent review main integration and formal examples pin</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Complete review and ordinary gates before approved integration and exact examples pin</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>AGENTS.md;X-Gen-Lab/nexus-examples</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>integrated_reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/r47-independent-review.json;build/soc-ip-layout/phase2-hook-evidence/manifest.json;build/soc-ip-layout/codeql-pr36-review/review.json;build/soc-ip-layout/codeql-pr36-review/comments.json;build/soc-ip-layout/codeql-pr36-review/remote-status.json;.git/local-recovery/soc-ip-layout/platform-main-merge.json;.git/local-recovery/soc-ip-layout/examples-main-merge.json;.git/local-recovery/soc-ip-layout/platform-merge-import-apply.json;.git/local-recovery/soc-ip-layout/examples-merge-import-apply.json;/workspace/nexus-examples/build/soc-ip-layout-candidate-92e669233957/ordinary-hook-evidence.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Independent production review completed without blocking findings; normal complete-index hooks passed on the tree integrated as P. PR36 actually merged to M=c79fd9672a9fe56379744d834cfccd822bc40be1, tree exactly equal to P; PR15 merged to bd3b90f135600b6405459347cb9e2cff5692d2e3, tree equal to tested examples bb60f413b911ec212b59b77cea1734971eddbd9f, with formal lock/Gitlink P. Actual signed GitHub commit objects and local lease/import receipts retained. All 14 CodeQL review comments were assessed: no confirmed production dangling/late binding or exercised test UAF, with nonblocking maintenance suggestions retained; they are not all labeled false positives. Remote Security Analysis 40388967544 CPP/Python jobs passed, not a local CodeQL run or zero-alert/zero-defect claim. This documentation-only follow-up does not retest M as a new software source.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r48">
+<span id="status-soc-ip-layout-r48"></span><h2><a class="toc-backref" href="#id48" role="doc-backlink">R48</a><a class="headerlink" href="#r48" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R48</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Clean software delivery and two fresh offline reproductions</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Bind clean source and actual reproducible artifacts; physical HIL stays not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence;docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>software_qualified</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-candidate-92e669233957/reproduction-quiet1.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate/candidate.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate_verify.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/finish-candidate-r48-2.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/execution-receipts.json;build/soc-ip-layout/qualification-timeout-92e669233957/manifest.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/interruption-observation.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/finish-candidate-r48.command.json;/workspace/nexus-examples/build/platform-software-final-92e669233957/report.json;build/soc-ip-layout/software-92e669233957/report.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>Sealed software candidate binds clean P=92e669233957a2e450a528394e8f4dd0794c7049, exact configuration and actual same ELF/BIN/map inputs. Existing six scopes passed: host_contracts, arm_link, resource_budget, source_sdk, reproducibility, hil_tooling; owned candidate verifier and parent completion-2 process exit 0. Two fresh distinct network-none builds passed declared container-boundary verification and bit_exact_elf_bin with no differing artifacts; map bit equality is not claimed. Candidate SHA256 35c8301ac95cdc7eee6b125e5ed8170ef44800bb6eb4995361d02c364660c060. Portable archive SHA256 7f89e8ec33a543e150e7165a3e4252aa11a96d62fe5d3187a9b0d4791aa618b4, 433850915 B / 6401 files. Signature unsigned; product promotion not_performed; HIL not_executed. Maintained-plan evidence is exact A90+B69 segmented coverage, not a single successful 159-stage run. Original output-boundary, timeout, GIT_PAGER-admission, interruption and initial SDK-root failures retain original outcomes; none was rewritten as passed. D only records P and obtains its own separate documentation receipt.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">Support scope and platform selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../release-0.1.0.html">Nexus 0.1.0 Source SDK developer preview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">Software verification, source identity and evidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">Documentation-system implementation and formal acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL and physical-board status</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">Original ledgers, exit conditions and derived views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">Iteration directions and admission conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

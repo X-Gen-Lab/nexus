@@ -1,0 +1,46 @@
+// FIG-04 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph FactoryInstances {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-04 静态实例与共享多态表\n参考结构：两个同类实例；controller 与 endpoint 分离"];
+    caller [label="应用：assembly-local typed ID", fillcolor="#f8fafc"];
+    factory [label="typed factory\n有界 switch → 既有 const face\n非法 ID → NULL；不初始化、不分配"];
+    subgraph clusterUart {
+        label="按配置选入的 UART 实例"; color="#64748b";
+        faceA [label="只读 UART face A\nops* + context*"];
+        faceB [label="只读 UART face B\nops* + context*"];
+        ops [label="const 同模式 UART ops\n同 provider 共享一份", fillcolor="#fefce8"];
+        stateA [label="私有 state A\n独立 active 引用 / RX storage"];
+        stateB [label="私有 state B\n独立 active 引用 / RX storage"];
+        { rank=same; faceA; faceB; }
+        { rank=same; stateA; stateB; }
+    }
+    subgraph clusterBus {
+        label="总线身份：独立 factory 类与命名空间"; color="#64748b";
+        controller [label="SPI controller face\n真正控制器状态 / recovery"];
+        endpoint [label="SPI device endpoint face\nCS / mode / 频率 + controller 引用"];
+        i2c [label="I2C 同样分开\ncontroller 与 address endpoint"];
+    }
+    caller -> factory [label="查找（不是热路径每次调用）"];
+    factory -> faceA [label="返回既有引用"];
+    factory -> faceB [label="返回既有引用"];
+    faceA -> ops [label="只读 ops 引用"];
+    faceB -> ops [label="只读 ops 引用"];
+    faceA -> stateA [label="独立 context 引用"];
+    faceB -> stateB [label="独立 context 引用"];
+    ops -> stateA [label="方法接收本次 context", style=dashed];
+    ops -> stateB [label="方法接收本次 context", style=dashed];
+    factory -> controller [label="controller ID"];
+    factory -> endpoint [label="device ID"];
+    endpoint -> controller [label="实际总线引用 / admission"];
+    endpoint -> i2c [style=invis];
+}

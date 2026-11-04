@@ -1,0 +1,51 @@
+// FIG-12 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph ReleaseRecovery {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-12 Separate docs / SDK / evidence recovery\nindependent payloads, actual external receipts"];
+    docs [label="docs: HTML / local diagrams / editable DOT\ndoc-source and software-evidence identity", group="docs"];
+    sdk [label="Source SDK: complete installed prefix\nsource / dependencies / license closure", group="sdk"];
+    candidate [label="candidate and evidence: same source/config/image\nscope reports and original execution logs", group="evidence"];
+    docsSeal [label="delivery.package -> verify\nManifest excludes itself and checksums\nArchive hash is recorded in the outer receipt", group="docs"];
+    sdkSeal [label="package_source_sdk.prepare / verify\nSource/dependency manifests and required-file closure\nActual consumers establish only their software scope", group="sdk"];
+    proofSeal [label="candidate.py / proof.py → store.export_tree\ncandidate proof then evidence archive\nrevalidate scope and preserve byte closure\narchival is not test re-execution", group="evidence"];
+    docsPublish [label="delivery.publish: versions/<release-id> / stable\nTrusted deployment selects an immutable verified documentation version", group="docs"];
+    sdkPublish [label="delivery owner stores immutable SDK package\nstable download index and archive receipt", group="sdk"];
+    proofPublish [label="Delivery owner stores complete content-ID archive + outer receipt\nIndependent long-term storage beyond short-lived CI artifacts", group="evidence"];
+    docsDownload [label="delivery.post_deploy: actual HTTP site and downloads\nVerify manifest / stable / payload / archive", group="docs"];
+    sdkDownload [label="Download the complete SDK independently\nVerify archive hash and member path / size / hash", group="sdk"];
+    proofDownload [label="store.verify_external: actual independently stored evidence\nVerify archive / inventory / all payload bytes", group="evidence"];
+    docsRestore [label="delivery.restore -> new root\nVerify offline HTML / anchors / local diagrams / downloads", group="docs"];
+    sdkRestore [label="Restore the full prefix to a new root, then SDK verify\nBuild independent consumers; actually run Native", group="sdk"];
+    proofRestore [label="store.restore_tree -> new root, then verify\nVerify scope proof and same-artifact refs\nNo new HIL or product qualification", group="evidence"];
+    receipt [label="Record actual publication / download / restoration separately\nAbsent actions remain not_executed; any failure prevents promotion", fillcolor="#f0fdf4"];
+    docs -> docsSeal [label="docs-only payload"];
+    docsSeal -> docsPublish [label="validated"];
+    docsPublish -> docsDownload [label="actual deployment URL"];
+    docsDownload -> docsRestore [label="downloaded identical package"];
+    docsRestore -> receipt [label="doc results"];
+    sdk -> sdkSeal [label="SDK-only payload"];
+    sdkSeal -> sdkPublish [label="validated for this scope"];
+    sdkPublish -> sdkDownload [label="actual storage location"];
+    sdkDownload -> sdkRestore [label="full prefix, not just source subtree"];
+    sdkRestore -> receipt [label="SDK consumer results"];
+    candidate -> proofSeal [label="candidate and full evidence closure"];
+    proofSeal -> proofPublish [label="actual scope proof validated"];
+    proofPublish -> proofDownload [label="actual storage and receipt"];
+    proofDownload -> proofRestore [label="reject missing / changed / unsafe paths"];
+    proofRestore -> receipt [label="evidence restoration results"];
+    { rank=same; docs; sdk; candidate; }
+    { rank=same; docsSeal; sdkSeal; proofSeal; }
+    { rank=same; docsPublish; sdkPublish; proofPublish; }
+    { rank=same; docsDownload; sdkDownload; proofDownload; }
+    { rank=same; docsRestore; sdkRestore; proofRestore; }
+}

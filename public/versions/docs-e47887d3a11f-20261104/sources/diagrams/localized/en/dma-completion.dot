@@ -1,0 +1,59 @@
+// FIG-07 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph DmaCompletion {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-07 STM32F407 finite DMA completion order\nTop-to-bottom order; task service and IRQ separate; cancellation retains borrow"];
+    subgraph clusterUart {
+        label="USART1 TX: DMA2 stream7 channel4"; color="#64748b";
+        u1 [label="Task: validate submit / admit\nACCEPTED borrows request + payload"];
+        u2 [label="Task: configure TX DMA / UART DMAT\nDMA writes UART DR; UART shifts bits onto the wire"];
+        u3 [label="DMA IRQ: observe TC / NDTR / errors\nWithdraw DMAT and DMA source; observe actual EN"];
+        u4 [label="UART IRQ: independently observe real TC\nLatch wire completion and deadline facts"];
+        u5 [label="Task service: drain EN / IRQ source / TC\nFinal error observation; detach active references"];
+        u6 [label="Final release-publication of SETTLED\nTask acquire-observes and reads final result/count", fillcolor="#f0fdf4"];
+        uFail [label="UART cancel / deadline / DMA error\nWithdraw DMAT / DMA source; retain request and payload", fillcolor="#fff7ed"];
+        uQuarantine [label="UART drain not proven: QUARANTINED\nRetain DMA / IRQ / execution and recovery responsibility", fillcolor="#fff7ed"];
+        u2 -> uFail [label="Termination event", style=dashed];
+        uFail -> u5 [label="Only after actual UART drain is established", style=dashed];
+        uFail -> uQuarantine [label="Budget exhausted without proven drain"];
+        u1 -> u2 [label="Valid admission"];
+        u2 -> u3 [label="DMA phase complete, not wire TC"];
+        u3 -> u4 [label="TC only after the final serial bit leaves"];
+        u4 -> u5 [label="Executor explicitly advances"];
+        u5 -> u6 [label="All necessary references detached"];
+    }
+    subgraph clusterSpi {
+        label="SPI1: RX stream0 / TX stream3, DMA2 channel3"; color="#64748b";
+        s1 [label="Task: admit + select endpoint\nExclusive TX/RX buffers and controller"];
+        s2 [label="Task: enable RX before TX\nBidirectional DMA progress; retain CS"];
+        s3 [label="Two DMA IRQs: observe each TC separately\nDisable each engine / IRQ source separately"];
+        s4 [label="Task service: actual BSY=0 and TXE=1\nBoth engines drained; check late errors"];
+        s5 [label="Task: withdraw SPI DMA/SPE, clear state\nIssue CS release; detach active/endpoint references"];
+        s6 [label="Final release-publication of SETTLED\nTask acquire-observes and reads final result/count", fillcolor="#f0fdf4"];
+        sFail [label="SPI cancel / deadline / DMA error\nWithdraw both DMA and SPI write sources; retain request / buffers", fillcolor="#fff7ed"];
+        sQuarantine [label="SPI drain not proven: QUARANTINED\nRetain engines / IRQ / CS and recovery responsibility", fillcolor="#fff7ed"];
+        s2 -> sFail [label="Termination event", style=dashed];
+        sFail -> s4 [label="Check actual SPI / both-engine drain", style=dashed];
+        sFail -> sQuarantine [label="Budget exhausted without proven drain"];
+        s1 -> s2 [label="Valid admission"];
+        s2 -> s3 [label="RX/TX complete separately"];
+        s3 -> s4 [label="TC does not replace peripheral idle"];
+        s4 -> s5 [label="Drain conditions established"];
+        s5 -> s6 [label="Final provider access"];
+    }
+    { rank=same; u1; s1; }
+    { rank=same; u2; s2; }
+    { rank=same; u3; s3; }
+    { rank=same; u4; s4; }
+    { rank=same; u5; s5; }
+    { rank=same; u6; s6; }
+}

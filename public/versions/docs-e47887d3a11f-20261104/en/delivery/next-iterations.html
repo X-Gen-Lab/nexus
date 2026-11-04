@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Next iterations and team execution &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OS delivery scope and verification" href="os.html" />
+    <link rel="prev" title="External-project migration" href="migration.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/delivery/next-iterations.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/delivery/next-iterations.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Next iterations and team execution<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>Selected software delivery in this round is fixed to public P2 <code class="docutils literal notranslate"><span class="pre">ab532250</span></code>: two complete 159-stage runs, SDK v15, eight candidates / 16 fresh network-disabled builds, P2 strict bilingual documentation and actual public recovery of the unsigned outer archive have completed. Independent QA followup <code class="docutils literal notranslate"><span class="pre">706ee80</span></code> passed the ordinary complete-index gate and full Python174 analysis: all 38 findings, comprising 30 notes / 6 warnings / 2 errors, uniquely map to previously reviewed dispositions; seven old findings disappeared and none is new. Current private E <code class="docutils literal notranslate"><span class="pre">f59debf1</span></code> pins P2, with 17 presets / 116 commands, five real C broker scenarios each in source and installed builds, three recipes and the public SDK walk actually passed. E completed a normal nonforce push and exact readback of <code class="docutils literal notranslate"><span class="pre">f59debf1</span></code>; the repository remains private and private main is unchanged. Later D/deployment and final FF await actual results. The published <code class="docutils literal notranslate"><span class="pre">v0.2.1</span></code> preview at <code class="docutils literal notranslate"><span class="pre">b1b903da</span></code> and historical candidates at <code class="docutils literal notranslate"><span class="pre">7590b2d4</span></code> retain their original identities. See <a class="reference internal" href="../status/software-verification.html#p2-unsigned-software-ab532250"><span class="std std-ref">current P2 unsigned software delivery</span></a> for exact source, execution and obtainability boundaries.</p>
+<p>The goals are independent external SoC/provider integration, usable industrial control and secure networking, and diagnosable failure and upgrade paths. Preserve static factories, read-only faces, C11 hardware behavior, explicit execution and borrowing contracts; optional features must not become default threads, global device registries or maximum-size pools.</p>
+<p>The tables preserve the original 71 planning IDs and their mapping to 107 authoritative tasks, without creating another status ledger. The <a class="reference download internal" download="" href="../_downloads/bba9cb694d1ab887c8df01b42b4ebe4b/platform-delivery-completion.csv"><code class="xref download docutils literal notranslate"><span class="pre">same</span> <span class="pre">delivery</span> <span class="pre">ledger</span></code></a> still contains 210 rows: the original 175 retain their historical identities, and the 35 <code class="docutils literal notranslate"><span class="pre">IT-</span></code> rows separately describe implementation and current development checks. The <a class="reference internal" href="../status/ledgers/platform-delivery-completion.html"><span class="std std-doc">readable view</span></a> is generated by the existing renderer; original IDs, order and exit conditions remain unchanged.</p>
+<p>External providers, Settings, wait-select, optional observation, TMP117, entropy, TLS, MQTT and developer tools have bounded implementations. RX payload loans, MCUboot control, TX error observation, PCAP, resolver/CLI refinements and SDK v15 belong to the current combination. Implementation, focused GREEN results, the complete gate and installed SDK are accepted separately. Test-source paths are review entry points and do not replace fresh execution receipts.</p>
+<p><code class="docutils literal notranslate"><span class="pre">IT-R04</span></code> reuses the existing H743 V/fixed HSI64/Cache-off/baremetal SPI4 lifecycle pause/resume path; it does not plan a new generic PM system. Current integration execution and physical acceptance remain open. Reviewed <code class="docutils literal notranslate"><span class="pre">IT-S06</span></code> consumers use Settings, explicit Flash regions and MCUboot byte storage, with no file-oriented consumer yet. <code class="docutils literal notranslate"><span class="pre">IT-X04</span></code> has no new probe requirement. No filesystem dependency or device runner is added until a real requirement enters through the original exit conditions.</p>
+<p>F01 reconciled current159 checks and their original costs. F07 completed an observational comparison on the same P2/tools/environment, retaining cache and RSS limitations without claiming controlled causal acceleration. N09 fresh-build-directory/warm configure-build observations establish only the selected Native trace; other MCU, CLI and F05 exits remain independent. Open work includes Flash/ECC event-owner/sticky/recovery details, seven vendor-leaf proposals, GD303 reference review, the physical developer path, later D/deployment/FF, server rules and physical HIL. Test retention decisions need original-contract or independent equivalent-coverage evidence; checks must not be removed to manufacture a pass.</p>
+<section id="id2">
+<h2>Work packages, dependencies and authoritative tasks<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Every item starts from exact part/Board/backend/controller/mode/route selections and memory, clock and security configuration. CPU profiles do not substitute for SoC/Board support; unselected components stay absent and actual ELF results explain added cost. Extend existing external Boards, resource graphs, capability queries, lifecycle diagnostics, Storage, ClockDomain and HIL.</p>
+<section id="id3">
+<h3>Baseline and delivery entry points<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0</span></code>. Admission and order: None; first check actual source and published assets.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-B01</span></code></p></td>
+<td><p>Version and qualification navigation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">G04</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-B02</span></code></p></td>
+<td><p>Exact support matrix</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A01</span></code>, <code class="docutils literal notranslate"><span class="pre">V-A01</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-B03</span></code></p></td>
+<td><p>Complete development-operation baseline</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-K05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-B04</span></code></p></td>
+<td><p>Same-context cost baseline</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A03</span></code>, <code class="docutils literal notranslate"><span class="pre">F01</span></code>, <code class="docutils literal notranslate"><span class="pre">F07</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-B05</span></code></p></td>
+<td><p>Server-side branch protection</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-X02</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="soc-provider">
+<h3>External SoC/provider integration<a class="headerlink" href="#soc-provider" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0</span></code>. Admission and order: IT-B02; fix the package contract before resolution, build, SDK and independent fixtures.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P01</span></code></p></td>
+<td><p>External SoC/provider package contract</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P02</span></code></p></td>
+<td><p>Immutable package context</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P03</span></code></p></td>
+<td><p>External-package identity and path admission</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P03</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P04</span></code></p></td>
+<td><p>External configuration resolution</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P05</span></code></p></td>
+<td><p>External CMake integration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P06</span></code></p></td>
+<td><p>Installed-SDK consumption of external packages</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P06</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P07</span></code></p></td>
+<td><p>External-package input and evidence closure</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P07</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-P08</span></code></p></td>
+<td><p>Independent integration acceptance fixture</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-P08</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id4">
+<h3>Configuration and diagnostics<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0–P1</span></code>. Admission and order: Reuse selected contracts and typed IR; external-package results must reach queries.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-C01</span></code></p></td>
+<td><p>Mode list/explain</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">N06</span></code>, <code class="docutils literal notranslate"><span class="pre">N08</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-C02</span></code></p></td>
+<td><p>Usage and lifecycle constraints</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-A02</span></code>, <code class="docutils literal notranslate"><span class="pre">B02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-C03</span></code></p></td>
+<td><p>Lifecycle diagnostics in user configuration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-C08</span></code>, <code class="docutils literal notranslate"><span class="pre">N08</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-C04</span></code></p></td>
+<td><p>Resolver-stage localization</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">D02</span></code>, <code class="docutils literal notranslate"><span class="pre">V-H01</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-C05</span></code></p></td>
+<td><p>CMake mode-query costs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F05</span></code>, <code class="docutils literal notranslate"><span class="pre">N09</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id5">
+<h3>Drivers and resource costs<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P1</span></code>. Admission and order: Review official implementations by complete mode; fix regression scope before changing each driver.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-D01</span></code></p></td>
+<td><p>Official-library and direct-access decisions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-A03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-A04</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-D02</span></code></p></td>
+<td><p>Shared-IP engine ownership</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-H04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-D03</span></code></p></td>
+<td><p>DMA memory and ownership</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">D04</span></code>, <code class="docutils literal notranslate"><span class="pre">V-G06</span></code>, <code class="docutils literal notranslate"><span class="pre">V-G07</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-D04</span></code></p></td>
+<td><p>Read-only configuration and mutable-state costs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-I01</span></code>, <code class="docutils literal notranslate"><span class="pre">V-I03</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-D05</span></code></p></td>
+<td><p>Full-mode regressions and cost comparisons</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-J02</span></code>, <code class="docutils literal notranslate"><span class="pre">V-J05</span></code>, <code class="docutils literal notranslate"><span class="pre">V-I06</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id6">
+<h3>Runtime and shutdown coordination<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P1–P2</span></code>. Entry and order: R01/R02 reuse existing observation and wait contracts. R04 checks integration, retention and recovery of the existing exact H743 path; public types do not imply generic PM.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-R01</span></code></p></td>
+<td><p>Read-only runtime-state observation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-R01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-R02</span></code></p></td>
+<td><p>Multi-source wait-set and explicit executor</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-R02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-R03</span></code></p></td>
+<td><p>Shutdown and recovery coordination</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">E02</span></code>, <code class="docutils literal notranslate"><span class="pre">E03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-C06</span></code>, <code class="docutils literal notranslate"><span class="pre">V-C08</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-R04</span></code></p></td>
+<td><p>Exact runtime-PM path</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-R04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-R05</span></code></p></td>
+<td><p>Second sensor and sampling contract</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-R05</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id7">
+<h3>Networking and secure connections<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0–P1</span></code>. Admission and order: N01→N02→N03/N04→N05; N06→N07→N08, followed by N09.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N01</span></code></p></td>
+<td><p>Initial networking scope and budgets</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N02</span></code></p></td>
+<td><p>Mature C network-stack integration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N03</span></code></p></td>
+<td><p>Ethernet-frames network-stack adapter</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N03</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N04</span></code></p></td>
+<td><p>Network execution and bounded memory</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N05</span></code></p></td>
+<td><p>Basic IPv4 networking</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N06</span></code></p></td>
+<td><p>Entropy interface and first provider</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N06</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N07</span></code></p></td>
+<td><p>TLS resource and trust ports</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N07</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N08</span></code></p></td>
+<td><p>Optional MQTT adapter</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N08</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-N09</span></code></p></td>
+<td><p>End-to-end networking fault and resource validation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-N09</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="settings">
+<h3>Settings and image maintenance<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P1–P2</span></code>. Admission and order: Reuse Storage; S03→S04→S05; enter S06 on a real file requirement.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S01</span></code></p></td>
+<td><p>Bounded Settings/KV</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S02</span></code></p></td>
+<td><p>Settings failure regressions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S03</span></code></p></td>
+<td><p>Narrow image-maintenance ports</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S03</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S04</span></code></p></td>
+<td><p>External integration of a mature bootloader</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S05</span></code></p></td>
+<td><p>Image fault and resource validation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-S06</span></code></p></td>
+<td><p>Filesystem admission and adaptation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-S06</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id8">
+<h3>Developer experience<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0–P1</span></code>. Admission and order: Reuse existing dev/provenance/station locks; extend explicit hosts and probes.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X01</span></code></p></td>
+<td><p>Complete template-to-firmware workflow</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">E05</span></code>, <code class="docutils literal notranslate"><span class="pre">V-K05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X02</span></code></p></td>
+<td><p>Optional GDB client workflow</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-X02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X03</span></code></p></td>
+<td><p>Serial host and baud-rate extensions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-X03</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X04</span></code></p></td>
+<td><p>Unified device-runner extension</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-X04</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X05</span></code></p></td>
+<td><p>Installed-SDK developer diagnostics</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-K01</span></code>, <code class="docutils literal notranslate"><span class="pre">V-K02</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-X06</span></code></p></td>
+<td><p>Firmware-artifact queries</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-X06</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id9">
+<h3>Test quality and execution efficiency<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0–P1</span></code>. Admission and order: First record same-coverage costs; retain complete commit gates and independent compile contexts.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T01</span></code></p></td>
+<td><p>Read-only test-plan preview</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-T01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T02</span></code></p></td>
+<td><p>Actual TDD handoff</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-J01</span></code>, <code class="docutils literal notranslate"><span class="pre">V-J02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T03</span></code></p></td>
+<td><p>Same-coverage validation costs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F07</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T04</span></code></p></td>
+<td><p>Evidence-based test cleanup</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F04</span></code>, <code class="docutils literal notranslate"><span class="pre">V-J07</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T05</span></code></p></td>
+<td><p>Resource budgets and early failure</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F03</span></code>, <code class="docutils literal notranslate"><span class="pre">F06</span></code>, <code class="docutils literal notranslate"><span class="pre">V-J08</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-T06</span></code></p></td>
+<td><p>Additional high-risk input and concurrency validation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-T06</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id10">
+<h3>External reference systems and documentation<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">P0–P1</span></code>. Admission and order: Reuse existing mechanisms for control; gateway depends on N; keep bilingual and external use current.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-E01</span></code></p></td>
+<td><p>External industrial-control reference system</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-E01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-E02</span></code></p></td>
+<td><p>External network-gateway reference system</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IT-E02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-E03</span></code></p></td>
+<td><p>Reference-system resources and failures</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-I05</span></code>, <code class="docutils literal notranslate"><span class="pre">V-K04</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-E04</span></code></p></td>
+<td><p>Bilingual documentation and architecture diagrams</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">E06</span></code>, <code class="docutils literal notranslate"><span class="pre">V-K07</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-E05</span></code></p></td>
+<td><p>From-scratch usage acceptance</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">N14</span></code>, <code class="docutils literal notranslate"><span class="pre">V-K05</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id11">
+<h3>Physical acceptance<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">After</span> <span class="pre">equipment</span> <span class="pre">connection</span></code>. Admission and order: After H01/H02, execute modes, networking, power cuts and performance; tooling is not measurement.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H01</span></code></p></td>
+<td><p>Real-station connection</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H02</span></code>, <code class="docutils literal notranslate"><span class="pre">H03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-P01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H02</span></code></p></td>
+<td><p>Startup and basic-fact measurements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-P02</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H03</span></code></p></td>
+<td><p>I/O completion and shutdown measurements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H06</span></code>, <code class="docutils literal notranslate"><span class="pre">H07</span></code>, <code class="docutils literal notranslate"><span class="pre">H08</span></code>, <code class="docutils literal notranslate"><span class="pre">V-P05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H04</span></code></p></td>
+<td><p>Complete networking measurements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H06</span></code>, <code class="docutils literal notranslate"><span class="pre">H10</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H05</span></code></p></td>
+<td><p>Power-cut and boot-maintenance measurements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H09</span></code>, <code class="docutils literal notranslate"><span class="pre">V-P06</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-H06</span></code></p></td>
+<td><p>Performance and low-power measurements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">H04</span></code>, <code class="docutils literal notranslate"><span class="pre">H05</span></code>, <code class="docutils literal notranslate"><span class="pre">H08</span></code>, <code class="docutils literal notranslate"><span class="pre">H10</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="id12">
+<h3>Candidates and publication<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<p>Priority: <code class="docutils literal notranslate"><span class="pre">Integration</span> <span class="pre">exit</span></code>. Admission and order: Freeze clean source; execute the full plan, SDK and offline reproduction before publication.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Planning ID</p></th>
+<th class="head"><p>Iteration work entry</p></th>
+<th class="head"><p>Authoritative task IDs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-L01</span></code></p></td>
+<td><p>Reproducible locked environment</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">I01</span></code>, <code class="docutils literal notranslate"><span class="pre">I02</span></code>, <code class="docutils literal notranslate"><span class="pre">I03</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-L02</span></code></p></td>
+<td><p>New-dependency maintenance closure</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-B01</span></code>, <code class="docutils literal notranslate"><span class="pre">V-B06</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-L03</span></code></p></td>
+<td><p>Frozen-source software acceptance</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">J02</span></code>, <code class="docutils literal notranslate"><span class="pre">J03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-L03</span></code>, <code class="docutils literal notranslate"><span class="pre">V-L04</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IT-L04</span></code></p></td>
+<td><p>New exact software candidate</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">N13</span></code>, <code class="docutils literal notranslate"><span class="pre">V-L07</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IT-L05</span></code></p></td>
+<td><p>Publication and independent recovery</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">V-L08</span></code>, <code class="docutils literal notranslate"><span class="pre">G05</span></code>, <code class="docutils literal notranslate"><span class="pre">G06</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+<section id="id13">
+<h2>Milestone exits<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Milestone</p></th>
+<th class="head"><p>Main scope</p></th>
+<th class="head"><p>Observable exit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>M1 Baseline and operations</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">B、C01、T01、X01</span></code></p></td>
+<td><p>Users find versions and support scope, explain configurations and test plans, and complete existing software workflows.</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2 Independent integration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">P、C02–C04、D</span></code></p></td>
+<td><p>An external maintainer delivers a verifiable integration without changing the main repository or inventing physical-chip qualification.</p></td>
+</tr>
+<tr class="row-even"><td><p>M3 Industrial control</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">D、R01–R03、S01–S02、E01</span></code></p></td>
+<td><p>An exact external system runs, persists, enters maintenance, stops and recovers with failure regressions.</p></td>
+</tr>
+<tr class="row-odd"><td><p>M4 Secure networking</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">N、E02–E03、X</span></code></p></td>
+<td><p>One exact composition completes bounded TCP/TLS/MQTT, resource checks and failure shutdown.</p></td>
+</tr>
+<tr class="row-even"><td><p>M5 Maintenance and conditional extensions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">S03–S06、R04–R05</span></code></p></td>
+<td><p>Complete image-maintenance and external reference builds; admit PM, sensors and filesystems under explicit conditions.</p></td>
+</tr>
+<tr class="row-odd"><td><p>M6 Qualification and publication</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">E04–E05、L、H</span></code></p></td>
+<td><p>Restore the frozen-source software candidate, SDK and bilingual docs; publish only actually executed physical scope.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Integration, control, networking and delivery may proceed in parallel; hand off shared contracts before changing behavior. Each increment includes implementation, actual regressions, current documentation and applicable full gates. Close software, physical and publication exits separately, never replacing completion with commit counts, generated plans or old test totals.</p>
+<p>Reusable mechanisms belong in the platform; tasks, protocol register maps, Flash partitions, keys, authorization and recovery policy remain external. Private application source and evidence stay out of public platform artifacts; software success for a reference system does not establish physical success.</p>
+<p>General DVFS, all-device PM, userspace I/O, general asynchronous TrustZone transport and multiple filesystems still need independent requirements and contracts. Learn from Zephyr external modules, device models, test planning, Settings and PM layering; fix a version or commit before code reuse rather than using rolling documentation as implementation identity.</p>
+</section>
+<section id="id14">
+<h2>Admission conditions for physical work and subsequent measurement<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<p>After equipment connection, first verify the three initial physical Boards and record PCB, oscillator, supply and wiring, then establish probe, serial and waveform/power-cut stations. Check actual G474, H743 and U575 reference boards separately; observe H743 supply mode and confirm U575 option bytes and boot state before running images. First check safe initial levels and clocks, then real UART TC, cancellation, RX loss, watchdog reset, Flash power cuts and EXTI/PWM/ADC. Qualify each mode only for the actually executed target tuple. Keep test outputs disconnected from product loads and follow station contracts for field operations.</p>
+<p>Use the same candidate ELF to measure cycles, IRQ latency, maximum service interval, stack high-water, loss and sustained load. Source/assembly inference helps locate causes but is not a measured timing result. Budget or provider changes require regenerated source/config/artifact evidence.</p>
+</section>
+<section id="id15">
+<h2>Expand capabilities according to measurements<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
+<p>F407/F470 already have bounded UART/SPI DMA, continuous UART RX/bidirectional DMA, bounded/continuous ADC trigger blocks, I2C IRQ/DMA, Classic CAN, USB FS PIO and Ethernet/capture/complementary-PWM exact software fixtures. First refine these existing modes with actual throughput, IRQ latency, inter-block gap, line-drain and overload measurements. Continuous modes cannot promise losslessness under arbitrary IRQ latency or consumer speed. I2C remains 100 kHz, 7-bit, 1–256 bytes per message, at most eight messages and exact routes; 10-bit or longer transactions are separate extensions.</p>
+<p>F103/GD303 add finite UART channel-DMA, normal RX blocks, IRQ-message I2C and physical Flash/single-shot ADC/fixed PWM; GD303 also maintains EXTI. Finite RX depends on owner service to rearm, so gaps, backpressure and loss require measurement; priority-zero I2C cannot notify a kernel. The GD303 hardware timer cascade also needs physical carry and Flash-stall observations; host models cannot establish bridge propagation delay.</p>
+<p>G474 adds ADC1 bulb shots/TIM6 normal-DMA blocks, polling I2C1 and ECC Flash; first-conversion discard, warmup, the exact 2.5–50 kHz trigger range and actual sampling aperture require measurement. H743 maintains finite UART RX DMA-IDLE, optional initialized D2 SRAM1 and seven finite peripheral classes. Cache-on DMA still requires exclusively owned complete lines; RX has service/rearm gaps and Flash requires Cache off. U575 TZEN0 has finite SPI/I2C/ADC/PWM/EXTI/Flash fixtures; VDDA/ASV, VDDIO2 and actual bus electrical behavior need separate acceptance. The independent TZEN1 reference only adds cooperative jobs of up to eight copied PC7 commands, retaining state in private Secure storage and no NS address across calls. It supplies no general asynchronous borrow, RTOS, dual-world factory or cross-domain DMA. Chip facts authorize neither additional modes/routes nor physical qualification. See <a class="reference internal" href="../design/soc-refinement.html"><span class="std std-doc">SOC-28–36</span></a> for sequencing and explicit exits:</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Direction</p></th>
+<th class="head"><p>Contract to fix before implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>New G474 modes or more controllers/routes</p></td>
+<td><p>Measured limits of existing bulb/finite-DMA/I2C/Flash paths; new controllers additionally fix IRQ/DMA conflicts, Board provenance, instance isolation and budgets</p></td>
+</tr>
+<tr class="row-odd"><td><p>H743 DMA and Cache</p></td>
+<td><p>Measured coherency of existing AXI/SRAM1 finite paths; other DMA1/2, BDMA and MDMA paths independently review reachability, cache-line ownership, maintenance points and retained borrows on failure</p></td>
+</tr>
+<tr class="row-even"><td><p>U575 DMA and security domains</p></td>
+<td><p>GPDMA/LPDMA descriptor lifecycle, memory/peripheral ownership, GTZC/MPCBB, actual TZEN entry and error handling</p></td>
+</tr>
+<tr class="row-odd"><td><p>New fixed clocks or runtime frequency changes</p></td>
+<td><p>Power/Flash/bus ordering, consumer reconfiguration, rollback and deadline domains; implement fixed profiles separately from dynamic transitions</p></td>
+</tr>
+<tr class="row-even"><td><p>Bootloader handover or deep STOP</p></td>
+<td><p>Active VTOR/mask/FP/DMA state, RAM ownership, RTC/LPTIM continuous domain, wake recovery and precision</p></td>
+</tr>
+<tr class="row-odd"><td><p>userspace I/O transport</p></td>
+<td><p>Actual principals, permissions, copy/pin, asynchronous borrows, exit reclamation and SVC/MPU/TZ gateways; the existing scalar broker does not replace transport</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Each extension first fixes owner, buffer, cancel/drain, ISR, deadline, alignment/cache and stop contracts. Then use GoogleTest/GoogleMock for an actual RED→GREEN production-provider vertical slice, followed by generated factory, ARM ELF, SDK and physical-boundary verification. Unselected modes retain no resources; growing generic-object costs are not imposed on every product.</p>
+<p>This iteration records source implementation, targeted developer execution and final integrated software qualification separately. Final acceptance must bind exact frozen source/configuration/tool/artifact identities; new documentation, source merges and historical counts do not replace actual execution. ECC Flash <code class="docutils literal notranslate"><span class="pre">program_flags</span></code>, fresh-erase provenance and per-pulse completion evidence also belong in the product caller contract. Physical equipment is absent, so physical items remain <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>; they are not promoted to safety certification or production release.</p>
+<p>Reuse existing narrow ports and static assembly first; allow explicitly versioned breaking changes when contracts cannot express hardware facts. Flash authentication, upgrades, manufacturing keys and industrial security policy belong to external products/independent mechanisms. Existing storage CRC or watchdog feed cannot establish their completion.</p>
+</section>
+<section id="id16">
+<h2>Ten-person roles and enterprise workflow<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Role</p></th>
+<th class="head text-right"><p>Seats</p></th>
+<th class="head"><p>Reviewable outputs owned</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Technical lead</p></td>
+<td class="text-right"><p>1</p></td>
+<td><p>Contracts, boundaries, budgets, support scope and cross-layer design review</p></td>
+</tr>
+<tr class="row-odd"><td><p>Core/I/O/OS</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>Ownership, concurrency, time, static resources and public ABI</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32/GD32 BSP</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>Exact facts/routes, SDK/startup/provider and fault models</p></td>
+</tr>
+<tr class="row-odd"><td><p>Generic devices/communications and external applications</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>Narrow-port components, device drivers and external composition</p></td>
+</tr>
+<tr class="row-even"><td><p>QA/HIL</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>Software faults, actual stations, timing/power-cut/sustained-load evidence</p></td>
+</tr>
+<tr class="row-odd"><td><p>Build/release</p></td>
+<td class="text-right"><p>1</p></td>
+<td><p>Single configuration/CMake graph, locks/SDK, CI and candidate/reproduction evidence</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Codex assumes all maintenance responsibility; <code class="docutils literal notranslate"><span class="pre">.github/maintainer-roles.json</span></code> uses <code class="docutils literal notranslate"><span class="pre">agent_managed</span></code>. Ten-person roles remain domain/capacity divisions without requiring named accounts. The same maintenance responsibility covers security, manufacturing and field interfaces; product permissions/processes remain in external application repositories.</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">tools/maintenance/ownership.py</span> <span class="pre">--require-assigned</span></code> verifies responsible agents, path coverage, backup domains and required gates. GoogleTest/GoogleMock, configuration, ARM, budget, SDK and evidence-identity checks continue. This policy fabricates no CODEOWNERS and claims no independent human review. Actual GitHub branch-rule/required-check configuration still needs remote verification. Commands are in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/maintenance/README.md">maintenance tools</a>.</p>
+<p>Issues describe concrete triggers and observable results. PRs state source/config/dependency/tool identities and affected contracts. Each commit automatically checks staged content and Conventional Commit; CI uses the same whole-file standard. New behavior and bug fixes require TDD: GoogleTest/GoogleMock for host contracts, unittest for Python tools. New cases run RED first, then a minimal GREEN fix. Mechanical gates do not prove historical editing order; PRs record commands, failure reasons and raw logs. IRQ, lifecycle, persistence and concurrency changes need actual failure-path regressions. Nightly/formal-candidate measurements, offline builds and station results are sealed separately; ordinary platform CI does not automatically promote production releases.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution-next-wave.html">Selected I/O and clock extension delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Next iterations and team execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">Exact support scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

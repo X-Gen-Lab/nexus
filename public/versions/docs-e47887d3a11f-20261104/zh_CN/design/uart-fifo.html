@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>有界的 UART 硬件 FIFO 字节收发 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="USB FS device 包所有权与接入边界" href="usb-device.html" />
+    <link rel="prev" title="UART 接收 DMA、双向 DMA 与电气适配" href="uart-dma-rs485.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/uart-fifo.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/design/uart-fifo.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="bounded-uart-hardware-fifo-bytes">
+<span id="uart-fifo"></span><h1>有界的 UART 硬件 FIFO 字节收发<a class="headerlink" href="#bounded-uart-hardware-fifo-bytes" title="Link to this heading">¶</a></h1>
+<p>当精确的 H743 或 U575 装配需要硬件 FIFO 缓冲，并要求明确限制每次中断处理的字节工作量时，可选择 <code class="docutils literal notranslate"><span class="pre">irq-fifo-bytes</span></code>。provider 使用现有公共 UART 接口、调用方持有的 TX 请求和静态 RX 字节环，不创建任务、worker、动态对象或第二个所有者。按阈值分批处理不代表已取得物理时延或无丢失吞吐量保证。独立选择的 <code class="docutils literal notranslate"><span class="pre">irq-fifo-rtscts-bytes</span></code> 模式在明确的四引脚软件参考路由上增加硬件 RTS 和 CTS，详见下文。</p>
+<section id="select-the-exact-controller-and-clock">
+<h2>选择精确的控制器与时钟<a class="headerlink" href="#select-the-exact-controller-and-clock" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/io-evolution.svg" title="打开 SVG 大图"><img alt="FIG-16：当前静态生成、定型查找和私有 I/O 所有权；FIFO 选择仍仅有一个 UART 所有者" src="../_images/io-evolution.svg" /></a></p>
+<p><strong>FIG-16 展示当前构造与运行时所有权，不表示 FIFO 时序或硅片资格。</strong> 工厂返回 一个 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_t</span></code>。选中的只读方法表调用私有 provider，后者由一份共享的编译期 算法和精确系列的官方 LL 叶操作组成。箭头仍分别表示生成、查找和调用，不增加 仅作转发的运行时层。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>选择</p></th>
+<th class="head"><p>H743 参考配置</p></th>
+<th class="head"><p>U575 参考配置</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>精确芯片</p></td>
+<td><p>STM32H743ZIT6</p></td>
+<td><p>STM32U575ZIT6Q，TZEN0</p></td>
+</tr>
+<tr class="row-odd"><td><p>控制器与路线</p></td>
+<td><p>USART3，PD8/PD9 AF7</p></td>
+<td><p>USART1，PA9/PA10 AF7</p></td>
+</tr>
+<tr class="row-even"><td><p>时钟配置</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hsi64-fixed-cache-off</span></code>，PCLK64MHz</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">msis4</span></code>，PCLK4MHz</p></td>
+</tr>
+<tr class="row-odd"><td><p>每方向硬件 FIFO 深度</p></td>
+<td><p>16字节</p></td>
+<td><p>8字节</p></td>
+</tr>
+<tr class="row-even"><td><p>包含 RDR 的最大 RX 暂存量</p></td>
+<td><p>17字节</p></td>
+<td><p>9字节</p></td>
+</tr>
+<tr class="row-odd"><td><p>向量</p></td>
+<td><p>USART3 IRQ39</p></td>
+<td><p>USART1 IRQ61</p></td>
+</tr>
+<tr class="row-even"><td><p>正常夹具</p></td>
+<td><p>裸机、优先级5、115200波特、8N1</p></td>
+<td><p>裸机、优先级5、115200波特、8N1</p></td>
+</tr>
+<tr class="row-odd"><td><p>该夹具中的软件 RX 环</p></td>
+<td><p>64字节</p></td>
+<td><p>64字节</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>额外的 RDR 级不能忽略：FIFO 深度不等于完整的 RX 积压容量。TX 移位寄存器也是独立的。本选择不改变关闭 FIFO 的普通 UART 或 DMA 模式。F407/F470 和其他 UART IP 不会从公共 API 自动继承 FIFO 支持。H743 高频配置、U575 Secure 执行、DMA、块／字 RX、非 8N1 帧和低功耗／自主运行仍不在这两种 FIFO 选择的范围内。普通 <code class="docutils literal notranslate"><span class="pre">irq-fifo-bytes</span></code> 仍不启用流控。</p>
+<p>这些完整输入使用现有 Board 路线。FIFO 子节与其他资源来自同一份手写装配配置 和定型 IR。</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selected FIFO software reference; no measured timing or HIL qualification.</span>
+<span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../../boards/stm32h743_nucleo_zi2"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hsi64-fixed-cache-off"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[uart.console]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart3"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"irq-fifo-bytes"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.console.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+
+<span class="k">[uart.console.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">calls_os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[uart.console.fifo]</span>
+<span class="n">rx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">tx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">rx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">tx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</pre></div>
+</div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selected FIFO software reference; no measured timing or HIL qualification.</span>
+<span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../../boards/stm32u575_nucleo_zi_q"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"msis4"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[uart.console]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"irq-fifo-bytes"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.console.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+
+<span class="k">[uart.console.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">calls_os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[uart.console.fifo]</span>
+<span class="n">rx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">tx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">rx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">tx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</pre></div>
+</div>
+</section>
+<section id="select-hardware-rts-and-cts-explicitly">
+<h2>明确选择硬件 RTS 和 CTS<a class="headerlink" href="#select-hardware-rts-and-cts-explicitly" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">irq-fifo-rtscts-bytes</span></code> 保留相同的公共字节接口和选配 FIFO 状态布局。它使用独立的只读方法表，选择同一算法的编译期特化版本，不为 FIFO 或普通 UART 增加可变流控标志、实例时钟字段、队列、任务或 worker。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>选择</p></th>
+<th class="head"><p>H743 软件参考配置</p></th>
+<th class="head"><p>U575 软件参考配置</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>精确芯片、控制器与时钟</p></td>
+<td><p>STM32H743ZIT6、USART3、<code class="docutils literal notranslate"><span class="pre">hsi64-fixed-cache-off</span></code></p></td>
+<td><p>STM32U575ZIT6Q、TZEN0、USART1、<code class="docutils literal notranslate"><span class="pre">msis4</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>TX / RX / CTS / RTS，均为 AF7</p></td>
+<td><p>PD8 / PD9 / PD11 / PD12</p></td>
+<td><p>PA9 / PA10 / PA11 / PA12</p></td>
+</tr>
+<tr class="row-even"><td><p>软件参考包</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stm32h743zi_rtscts_reference</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stm32u575zi_rtscts_reference</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>首批正常选择</p></td>
+<td><p>裸机、优先级 5、115200 波特、8N1、64 字节 RX 环</p></td>
+<td><p>裸机、优先级 5、115200 波特、8N1、64 字节 RX 环</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>新模式派生固定的 8N1 帧及 <code class="docutils literal notranslate"><span class="pre">flow</span> <span class="pre">=</span> <span class="pre">&quot;rts-cts&quot;</span></code>。省略 frame 子节时使用该值；显式提供 frame 时，必须包含全部四个字段并与派生值完全一致。该模式不选择仅 RTS、仅 CTS、调制解调器通知、极性反转、运行时格式变更、RS485-DE 共用或 FIFO/DMA 组合。现有四个 FIFO 阈值／预算字段仍需显式提供。</p>
+<p>这些包声明硅片封装引脚和 AF 编号，不建立 Nucleo 连接器、虚拟串口接线、产品 PCB 或对端电气兼容性结论。四个引脚都是独占资源；Board 若已将任一流控引脚保留给 USB、DE 或 GPIO，就与该 UART 选择冲突。双引脚 Board 绑定不会静默变成四引脚路由。</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selected FIFO software reference; no measured timing or HIL qualification.</span>
+<span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../../boards/stm32h743zi_rtscts_reference"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hsi64-fixed-cache-off"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[uart.console]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart-flow"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"irq-fifo-rtscts-bytes"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.console.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+
+<span class="k">[uart.console.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">calls_os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[uart.console.fifo]</span>
+<span class="n">rx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">tx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">rx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">tx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</pre></div>
+</div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selected FIFO software reference; no measured timing or HIL qualification.</span>
+<span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"../../../../boards/stm32u575zi_rtscts_reference"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"msis4"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[uart.console]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart-flow"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"irq-fifo-rtscts-bytes"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.console.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+
+<span class="k">[uart.console.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">calls_os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[uart.console.fifo]</span>
+<span class="n">rx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">tx_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"half"</span>
+<span class="n">rx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">tx_budget_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>硬件 CTS 限制下一个串行帧的启动，不禁止 CPU 向仍有空间的 TDR/FIFO 写入。CTS 升高后，已经开始移出的帧仍可结束。ISR 中的 CTS 标志与物理引脚电平相反；CTSIE 保持关闭。provider 不会为了完成取消或停止而绕过 CTS。持续的外部阻塞可能超过自由运行时的排空限额：请求进入 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>，其存储仍处于借用状态。只有真实的线上完成和经验证的撤回，才允许结算请求；之后物理 CTS 释放时也遵守该要求。对端恢复策略仍由外部负责。</p>
+<p>硬件 RTS 响应硬件接收暂存量，不响应软件环的水位。软件环满时，此特化版本停止读取 RDR，并撤回 RX 阈值、非空、满、IDLE 和错误中断源，随后读回确认。它保留当前头部及其错误标志，并保持 UE、RE 和 RTSE。硬件 FIFO/RDR 随后可继续积累数据，通过真实 RTS 施加背压。对端若忽略 RTS，或在其变化后继续发送过多数据，仍可能导致溢出；此设计不产生无条件的无丢失保证。</p>
+<p>公共字节读取释放环空间后，会重新启用选定的 RX 源并读回确认。如果保留的头部尚未达到阈值，非空电平源可在没有新字节或新 IDLE 边沿时推动处理。重新启用失败时返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_IO</span></code>，实际已复制的计数和字节仍有效；准入关闭，所有者继续承担清理责任。关闭中的读取不会重新启用这些源。撤回源后，先前挂起的向量可能产生有界的额外入口；暂停时该入口不得消费保留的头部。</p>
+<p>生成的冷装配在准备引脚前，会保存全部四个引脚及选定时钟门控的快照。进入 AF 模式前先将 TX 和 RTS 的 GPIO 锁存值设为高，并为 CTS 和 RX 配置上拉。输出类型、速度、上下拉、AF7 和模式字段都需要读回确认。只有观察到 UE 为零时才编程 CTSE/RTSE，并在首次启用前证明它们正确。整体停止在 TX 仍被借用时保持流控；只有各源和向量已撤离、发布者已退出，UE 为零且两个 ACK 清除后，才能清除流控／FIFO 字段并恢复原始四引脚快照和门控。缺少证明时继续保留所有权。GPIO 复位电平、未启用时的 AF 行为及物理启动／停止交接仍需实板验证。</p>
+</section>
+<section id="separate-thresholds-from-irq-budgets">
+<h2>区分阈值与 IRQ 预算<a class="headerlink" href="#separate-thresholds-from-irq-budgets" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>字段</p></th>
+<th class="head"><p>含义与允许值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fifo.rx_threshold</span></code></p></td>
+<td><p>硬件接收阈值：<code class="docutils literal notranslate"><span class="pre">eighth</span></code>、<code class="docutils literal notranslate"><span class="pre">quarter</span></code>、<code class="docutils literal notranslate"><span class="pre">half</span></code>、<code class="docutils literal notranslate"><span class="pre">three-quarters</span></code>、<code class="docutils literal notranslate"><span class="pre">seven-eighths</span></code> 或 <code class="docutils literal notranslate"><span class="pre">full</span></code>。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fifo.tx_threshold</span></code></p></td>
+<td><p>硬件空闲空间阈值：相同的分数名称，最后一项用 <code class="docutils literal notranslate"><span class="pre">empty</span></code> 代替 <code class="docutils literal notranslate"><span class="pre">full</span></code>。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fifo.rx_budget_bytes</span></code></p></td>
+<td><p>每次处理入口的最大 RDR 读取数；H743为1..16，U575为1..8。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fifo.tx_budget_bytes</span></code></p></td>
+<td><p>每次处理入口的最大 TDR 写入数，使用相同的逐芯片限制。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>四个字段全部显式填写。正常夹具的阈值为 <code class="docutils literal notranslate"><span class="pre">half</span></code>，RX 预算2、TX 预算3。预算独立于 阈值，可以小于硬件批量。定型 IR 将名称映射为已审查的官方 LL 原始0..5编码； 配置值不是已移位的寄存器掩码。RX 与 TX 的最后一个编码含义不同。精确系列的 状态语义保留在硬件叶操作中，不使用一个通用 FIFO 模型代替。</p>
+<p>稳定接收使用阈值、IDLE 和错误来源。处理程序先确认捕获的 IDLE，再排空数据。 若预算用尽后仍有数据，便启用电平敏感的 RX 非空来源并检查读回；后续有界入口 无需新流量或第二次 IDLE 即可读取短尾。空后以读回证明撤销该临时来源，不重写 未改变的掩码。必要变更被拒绝时关闭准入，并保留恢复责任。</p>
+<p>PE、FE 和 NE 描述当前 RDR 头部。先清除已捕获的标志，再弹出该头部；丢弃坏字节后重新读取下一个状态。不启用流控时，硬件溢出和软件环满会累计丢失状态，同时保留较早排队的有效字节；RTSCTS 特化版本则按上文所述，在环满时保留待处理的头部。<code class="docutils literal notranslate"><span class="pre">read_bytes</span></code> 可在返回已复制字节的同时返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_OVERFLOW</span></code>；该指示不等于精确的缺失字符数。没有待报告丢失状态时，空读取返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_EMPTY</span></code>。</p>
+</section>
+<section id="keep-the-task-and-request-contract">
+<h2>保持任务与请求契约<a class="headerlink" href="#keep-the-task-and-request-contract" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="打开 SVG 大图"><img alt="FIG-06：当前请求借用跨越排空与隔离，直至最终 release 发布" src="../_images/request-lifecycle.svg" /></a></p>
+<p><strong>FIG-06 描述共享请求生命周期；FIFO 空间不是请求完成状态。</strong> 可选的 QUEUED 路径属于显式适配器。取消与 deadline 到期都保留已接受存储。</p>
+<ol class="arabic simple">
+<li><p>从平台的特权且未屏蔽中断的任务所有者启动平台。检查首要错误、清理错误及剩余效果。构造失败可能保留冷租约，必须由同一所有者完成停止。</p></li>
+<li><p>获取 <code class="docutils literal notranslate"><span class="pre">nx_factory_uart(NX_UART_ID_CONSOLE)</span></code>。查找是纯操作，可早于启动；设备 操作要求平台已成功启动。</p></li>
+<li><p>请求只初始化一次，经 <code class="docutils literal notranslate"><span class="pre">nx_uart_tx_prepare</span></code> 准备，再通过 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_submit</span></code> 提交。deadline 使用当前有效的 <code class="docutils literal notranslate"><span class="pre">nx_time_now_us</span></code> 域中的绝对时间。已接受请求 与不可变 payload 须保持有效，直到以 acquire 观察到 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>。</p></li>
+<li><p>由串行化任务所有者调用 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_service</span></code>。IRQ 派发只搬运有界字节并锁存 事实，不结清请求。可选唤醒提示不能替代请求谓词。内核适配器须另行验证其 选中的 IRQ 策略。</p></li>
+<li><p>使用 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_cancel</span></code> 请求排空。排空或隔离期间继续 service 并保留存储。 平台停止前先汇合消费方和观察者；RX 环、唤醒目标与所有者须保持到停止成功。</p></li>
+</ol>
+<p>每次 TX 装载都检查请求、字节位置、终态原因和当前空间。TXFT、TX 非满和 TX FIFO 空都不能证明最后一个停止位已经离开引脚。只有装载后新观察到的 USART <code class="docutils literal notranslate"><span class="pre">TC</span></code> 才能证明线上完成；任务 service 仍须以读回证明 TX 来源撤回，再清除 active 引用 并以 release 发布 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>。</p>
+<p>取消与 deadline 观察阻止后续 payload 装载，并保留第一个终态原因。已装载的 FIFO/移位器字节仍在借用期内。8N1 排空允许最多 <code class="docutils literal notranslate"><span class="pre">(FIFO</span> <span class="pre">depth</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">10</span></code> 个串行位， 在现有单调时间域中向上取整并加上已审查余量。UART 与 TIM2 使用同一获准时钟， 不增加额外时钟字段。后续观察不刷新已有排空 deadline。到期仍缺少撤回证明时， 存储保持 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>，不会虚构 flush 或成功归还。</p>
+</section>
+<section id="prove-cold-programming-and-whole-stop">
+<h2>证明冷配置与完整停止<a class="headerlink" href="#prove-cold-programming-and-whole-stop" title="Link to this heading">¶</a></h2>
+<p>产生效果前，初始化验证状态/环/配置分离、精确控制器/向量、有效时钟/复位访问 以及外来控制处于静默。仅在观察到 <code class="docutils literal notranslate"><span class="pre">UE=0</span></code> 时配置 FIFOEN 与两个阈值，并检查最终 帧、使能、TEACK/REACK 和 NVIC 使能/优先级。首个效果之前记录所有权。清理失败 保留该标记和生成的冷租约、关闭准入并要求重试停止；首要错误本身不能证明回滚。</p>
+<p>完整停止先关闭准入并排空已接受的 TX 与唤醒发布者。证明来源撤回、禁用并汇合 向量（含 pending 与 active），再证明 <code class="docutils literal notranslate"><span class="pre">UE=0</span></code> 及 TEACK/REACK 清除。此后才可清除 FIFOEN/阈值字段并丢弃剩余 RX 硬件数据。证明缺失则保留所有权。成功停止的前任 再次停止时不访问硬件，即使后来已有新所有者接管控制器。</p>
+<p>跨度检查拒绝请求、payload、RX 输出/count、环、选中所有者/配置、活跃借用与 已控制 MMIO 之间的别名，包括已知 NVIC/系统窗口。环绕跨度与不合法输出对齐 在写入前拒绝。调用方仍须提供有效、可访问、类型正确的存储并遵守生命周期。</p>
+</section>
+<section id="run-finite-concurrent-acquisition">
+<h2>执行有限并发采集<a class="headerlink" href="#run-finite-concurrent-acquisition" title="Link to this heading">¶</a></h2>
+<p>外部 <code class="docutils literal notranslate"><span class="pre">nexus-examples</span></code> 应用 <code class="docutils literal notranslate"><span class="pre">apps/uart_fifo_acquisition</span></code> 使用公开 UART face，在有限 TX request 仍被借用时接收。其调用者拥有的采集区、service 时间戳和 request 存储均有固定边界。只有 acquire 观察到 SETTLED 后，才允许准备下一 payload 和 sequence。关闭流量窗口会请求取消并继续排空；排空到期或时钟损坏时仍保留存储。Platform cleanup 仅从冷态或实际已关闭的流量状态开始，在显式尝试预算内重试 BUSY／IO，Platform 撤回后绝不使用时钟。cleanup 耗尽不等于成功 join。</p>
+<p>可选的平台自有工装 <code class="docutils literal notranslate"><span class="pre">tests/contracts/uart_fifo_acquisition</span></code> 将该外部应用链接到两份精确 FIFO 参考装配，生成 reference 与 instrumented 镜像；私有 provider 头仍只在工装内部使用。instrumented 镜像使用一个 raw cycle probe 包装选定 IRQ 依赖。站点可以提供另行审查的、有界 dispatch marker；默认不选引脚或 marker。普通 reference 排除 wrapper 和 probe。链接证明必须读取实际向量，从其 strong stub 经 wrapper 跟踪到恰好一次真实 provider 分派，且传入选定的 state 实参。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tools/hil/uart_fifo.py</span></code> 保留 device／wire 采集和声明的换算参数，拒绝不一致的 session、计数、长度及源文件身份。四列 IRQ CSV 仅产生未验证的候选区间，不输出 <code class="docutils literal notranslate"><span class="pre">samples.irq_latency</span></code>；独立 assertion 来源、dispatch 关联、完整采集窗口和校准仍须审查，并满足既有 SOC-55 准入。raw DWT 区间和 wrapper 时长不能补出未观测的 IRQ 到达延迟。任何 parser、模型或链接检查都不建立实板执行证据。</p>
+</section>
+<section id="assess-cost-and-evidence-separately">
+<h2>分别评估成本与证据<a class="headerlink" href="#assess-cost-and-evidence-separately" title="Link to this heading">¶</a></h2>
+<p>仅选中所有者在普通 UART 前缀上增加 const 配置链接；配置包含四个单字节编码/ 预算。普通字节状态、公共方法与普通初始化保持不变。对象精确对齐、Flash 保留 与指令成本须来自选中 ARM ELF，不能从字段大小估算。</p>
+<p>IRQ 预算独立统计 RDR 读取与 TDR 写入。状态读取、来源变更、屏障和唤醒派发也 消耗 CPU。外部模型检查这些访问，并证明排空的阈值批次不重写未改变掩码。 计数不是实测周期、WCET 或吞吐量保证。另行获准的周期探针只能观察其声明平台； U575 未经审查的 DWT 能力保持关闭。</p>
+<p>在已准备锁定工具与依赖的仓库根目录执行：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-h743-uart-fifo
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-h743-uart-fifo
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-u575-uart-fifo
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>fixture-io-evolution-u575-uart-fifo
+</pre></div>
+</div>
+<p>成功的正常构建须产生 ELF/BIN/map、链接资源和 provider-retention 报告，包含一个 选中接口及其真实 FIFO 表。这些命令不烧录硬件或启动 UART 流量。产品协议与流量 产生仍由外部负责。</p>
+<p>当前开发验证通过90项真实 provider GoogleTest/GoogleMock，每系列45项，以及18项正常 TOML/生成工厂用例，每系列9项：共108项，无失败或跳过。模型使用锁定的官方 LL 阈值函数，分别表示 FIFO、RDR 和移位器状态。两个规范配置也均通过正常 ARM 配置/构建、资源预算，以及每镜像一个接口、一张方法表和七个方法槽的保留检查。</p>
+<p>独立的 RTSCTS 开发验证通过了 76 项真实 provider 用例，每个系列 38 项，以及 22 项正常 TOML／生成 factory 用例，每个系列 11 项，均无失败或跳过。两个精确四引脚正常配置也通过了 ARM 配置／构建。这些结果只建立所述参考选择的软件行为和链接证据，不证明对端响应、物理交接、时序或干净且可复现的软件候选。下文既有的无流控算术比较，不是新 RTSCTS 选择的实测成本比较。</p>
+<p>对于这两个精确的 <code class="docutils literal notranslate"><span class="pre">Os</span></code> FIFO 夹具，仅缩窄有界中间运算就移除了链接的软件除法辅助函数。H743 BIN/载入 Flash 从9216变为8372字节，节省844字节；U575 从8948变为8016字节，节省932字节。每个镜像的已分配/预留 RAM 保持2296字节，包含2048字节主栈预留。绝对 deadline 仍为64位。这些是该选中算术对比的实际制品大小，不表示 FIFO 零成本、与普通 IRQ 字节模式的比较、实测周期或 WCET，也不建立干净且可复现的软件候选。</p>
+<p>物理 HIL 为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。模型或链接结果均不证明振荡器精度、对端兼容性、U575 抗噪声、物理时延或硅片勘误资格。RM0433 Rev9 第48.5.4节/表402和 RM0456 Rev7 第66.5.5节/表674定义已审查 FIFO 形态；其他芯片和模式需要分别精确审查。</p>
+<p>另见<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/uart.h">公共 UART 契约</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/private/uart_fifo_impl.h">共享私有算法</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/uart_fifo.c">H743 特化</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/drivers/uart_fifo.c">U575 特化</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/drivers/uart_rtscts.c">H743 RTSCTS 特化</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/drivers/uart_rtscts.c">U575 RTSCTS 特化</a>, <a class="reference internal" href="u575-uart-gpdma.html"><span class="std std-doc">U575 有限 DMA 选择</span></a>及<a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">当前资格边界</span></a>.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

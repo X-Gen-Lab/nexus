@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>主流 MCU 接入与平台反馈 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="多控制器所有权" href="multiple-controllers.html" />
+    <link rel="prev" title="I/O 观察、容量与保留恢复" href="io-observation-recovery.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/mainstream-mcu-adaptation.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/design/mainstream-mcu-adaptation.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="mainstream-mcu-adaptation-and-feedback">
+<span id="design-mainstream-mcu-adaptation"></span><h1>主流 MCU 接入与平台反馈<a class="headerlink" href="#mainstream-mcu-adaptation-and-feedback" title="Link to this heading">¶</a></h1>
+<p>使用本页扩展精确的 STM32 或 GD32 料号，同时维护通用平台合同。本轮新增 STM32F103RBT6 和 GD32F303RCT6 参考接入，并扩展 G474、H743 和 U575 的选定模式。源码实现与已通过的软件候选分别记录。在已连接设备实际执行站点计划之前，所有适用的物理结果均保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-architecture.svg" title="打开 SVG 大图"><img alt="当前平台责任与外部产品边界" src="../_images/platform-architecture.svg" /></a></p>
+<p>FIG-01 是当前责任图，不表示所有外设或系列均已接入。箭头表达依赖：产品使用公共接口，私有 SoC provider 使用经过审查的厂商操作。<a class="reference internal" href="../explanation/platform-architecture.html"><span class="std std-doc">平台说明</span></a>中的 FIG-03 描述 TOML、事实、不可变 IR、原子生成和 CMake 选择。本轮不引入新的运行时注册表、默认工作者或强制 OS 层。</p>
+<section id="finite-parts-and-reference-configurations">
+<h2>精确料号与参考配置<a class="headerlink" href="#finite-parts-and-reference-configurations" title="Link to this heading">¶</a></h2>
+<p>精确料号表规定接入边界。源码实现、受审芯片路线、Board 接线、实际执行的软件资格和物理测量分别记录。增加一项不代表启用相同系列前缀下的所有型号。当前事实、路线与能力派生仍是权威；本页不建立另一份完成状态数据库。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>精确料号</p></th>
+<th class="head"><p>内核与主要存储</p></th>
+<th class="head"><p>参考边界</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407ZGT6</p></td>
+<td><p>M4F；1 MiB Flash；128 KiB SRAM 和 64 KiB CCM</p></td>
+<td><p>既有启明参考；仅包含受审路线与选定模式</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32F407VET6</p></td>
+<td><p>M4F；512 KiB Flash；128 KiB SRAM 和 64 KiB CCM</p></td>
+<td><p>既有天空星参考；封装与 Board 路线分别维护</p></td>
+</tr>
+<tr class="row-even"><td><p>GD32F470ZGT6</p></td>
+<td><p>M4F；1 MiB Flash；SRAM/TCM 区域合计 512 KiB</p></td>
+<td><p>既有梁山派参考；独立的 GD32 SDK 与 provider</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32G474RET6</p></td>
+<td><p>M4F；512 KiB Flash；96 KiB SRAM 和 32 KiB CCM</p></td>
+<td><p>既有 Nucleo 参考；本轮扩展选定外设</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32H743ZIT6</p></td>
+<td><p>M7；2 MiB Flash；按存储域区分 RAM</p></td>
+<td><p>固定 HSI/Cache、有限 USART3 DMA、可选且已初始化的 D2 SRAM1 与所选有限外设夹具；另有 V 修订 HSI64 裸机 SPI4 DMA 和连续 USART3 双缓冲 RX，均支持 Cache off/on；PLL384 参考保持 Cache off</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32U575ZIT6Q</p></td>
+<td><p>M33；2 MiB Flash；按存储域区分 RAM</p></td>
+<td><p>TZEN0 有限外设、所选 USART1 GPDMA TX、有限硬件链 TX 或有界 FIFO IRQ bytes；另有无引脚 LPTIM2 RUN 单次计数及独立 TZEN1 scalar GPIO／复制式协作 job</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32F103RBT6</p></td>
+<td><p>M3；128 KiB Flash；20 KiB SRAM</p></td>
+<td><p>NUCLEO-F103RB 源码参考配置；HSI8，有限的 GPIO/UART/SPI/I2C/ADC/PWM/EXTI/Flash/IWDG 选项</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F303RCT6</p></td>
+<td><p>M4F；256 KiB 代码 Flash；48 KiB SRAM</p></td>
+<td><p>采用 IRC8M 的芯片参考配置，提供有限外设选项和 TIMER1/TIMER4 时间级联；不虚构 PCB</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>H743 和 U575 的存储区域不能视为可互换的统一 DMA 堆。应查阅精确的 <code class="docutils literal notranslate"><span class="pre">soc.json</span></code> 存储域与 DMA 合同。同样，F407 CCM 不是普通的 DMA 可访问 SRAM；GD32F470 TCM 也有独立的可达性合同。GD32F303 选择 RC 型号，明确避开更大容量型号的代码/数据 Flash 分离；其他容量需要单独审查几何与可执行存储。</p>
+<p>NUCLEO-F103RB 接线来自 UM1724 Rev 17：PA5 对应 D13/用户 LED LD2；SB13/SB14 接通且 SB62/SB63 断开时，USART2 PA2/PA3 连接 ST-LINK VCP。这些是文档参考条件，不是对已连接实板的观察。HSI 配置不假设板上可选 HSE 或 ST-LINK MCO 的设置。GD32F303 引脚复用仍属于芯片路线，直到独立来源的 PCB 资料授权对应连接和电气条件。</p>
+</section>
+<section id="nine-i-o-classes-and-explicit-rejection">
+<h2>九类 I/O 与明确拒绝<a class="headerlink" href="#nine-i-o-classes-and-explicit-rejection" title="Link to this heading">¶</a></h2>
+<p>本表描述需要检查的软件范围，不代表已经执行的资格。“选定”始终指事实与夹具声明的控制器、路线和模式。“不在本次增量内”表示配置必须拒绝该选择；仅有寄存器头或上游库不足以准入。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>公共类别</p></th>
+<th class="head"><p>F407 和 F470 既有范围</p></th>
+<th class="head"><p>G474 增量</p></th>
+<th class="head"><p>H743 和 U575 增量</p></th>
+<th class="head"><p>F103 和 GD32F303 增量</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPIO</p></td>
+<td><p>选定输入/输出与安全初始化</p></td>
+<td><p>A/B/C/D/F/G 封装路线；保留 PF0/PF1/PG10</p></td>
+<td><p>H743 选定 GPIO；U575 A..G 与 H0/H1/H3 封装路线，受电源准入约束</p></td>
+<td><p>选定旧式 GPIO 输入/输出；仅受审引脚子集</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART</p></td>
+<td><p>选定 IRQ、有限/连续 RX 与 DMA 模式</p></td>
+<td><p>LPUART1、USART1/2/3 和 UART4/5 IRQ 字节模式</p></td>
+<td><p>H743 USART3 IRQ、有限 DMA TX/RX-IDLE 及独立 V/HSI64 裸机连续双缓冲 RX；U575 USART1/2 IRQ bytes、所选有限 USART1 GPDMA TX 或硬件链 TX；两系列均有独立有界 FIFO IRQ 选择</p></td>
+<td><p>USART2/USART0 IRQ 字节传输、有限通道 DMA TX 或双工有限 RX 块</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI</p></td>
+<td><p>选定字节模式与全双工 DMA 模式</p></td>
+<td><p>SPI1/2 有限 polling；不含 DMA</p></td>
+<td><p>H743 SPI4 与 U575 SPI1 有限轮询；独立 H743 V 修订、HSI64、裸机有限 SPI4 DMA（Cache off/on）</p></td>
+<td><p>F103 SPI1 和 GD303 SPI0 有限 polling</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C</p></td>
+<td><p>选定 polling 与共享异步引擎</p></td>
+<td><p>采用 HSI16 的 I2C1 PB8/PB9 有限轮询</p></td>
+<td><p>H743/U575 I2C1 PB8/PB9 有限 V2 轮询</p></td>
+<td><p>F103 I2C1/GD303 I2C0 PB6/PB7 IRQ 消息传输，标称 80 kHz，优先级为 0，不使用内核通知</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC</p></td>
+<td><p>选定单次、触发与 block 模式</p></td>
+<td><p>ADC1 PA0/IN1 bulb 单次采样，或由 TIM6 触发的有限普通模式 DMA 块</p></td>
+<td><p>H743 ADC1 PA3/INP15 16-bit 单次采样；U575 ADC4 PC0/channel1 12-bit 单次采样，须满足外部供电准入条件</p></td>
+<td><p>PA0/channel0，4 MHz 下的 12-bit 软件触发单次采样；显式校准与预热</p></td>
+</tr>
+<tr class="row-odd"><td><p>PWM/定时器</p></td>
+<td><p>选定 PWM、capture 与高级 timer 合同</p></td>
+<td><p>TIM3/4 CH1 独占固定 base PWM</p></td>
+<td><p>TIM3 CH1 PA6，独占且时基固定的 PWM</p></td>
+<td><p>F103 TIM3 CH1/GD303 TIMER2 CH0 PA6，独占且时基固定的 PWM</p></td>
+</tr>
+<tr class="row-even"><td><p>EXTI</p></td>
+<td><p>选定边沿与共享 IRQ 所有权</p></td>
+<td><p>PA0/PA1 选定事件</p></td>
+<td><p>选定的 PA0/PA1 事件；U575 具有分离的上升沿／下降沿挂起寄存器组</p></td>
+<td><p>两个确切型号上选定的 PA0/PA1 事件</p></td>
+</tr>
+<tr class="row-odd"><td><p>Flash</p></td>
+<td><p>选定几何与调用者提供的区域</p></td>
+<td><p>DBANK=1，不交换 bank；512 KiB，2 KiB 页，8-byte ECC 单元</p></td>
+<td><p>H743：2 MiB、128 KiB 扇区、32-byte 单元，Cache off；U575：TZEN0/SWAP0，2 MiB、8 KiB 页、16-byte 单元</p></td>
+<td><p>F103：128 KiB、1 KiB 页；GD303：256 KiB、2 KiB 页；两者均采用 2-byte 半字</p></td>
+</tr>
+<tr class="row-even"><td><p>看门狗</p></td>
+<td><p>选定不可逆看门狗生命周期</p></td>
+<td><p>独立 IWDG</p></td>
+<td><p>U575 IWDG 和 H743 IWDG1</p></td>
+<td><p>F103 IWDG 和 GD303 FWDGT</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>CAN、USB、Ethernet、DAC 与存储/协议服务属于独立能力，九类表不包含或授予这些能力资格。不支持的控制器、路线、传输模式和后端必须在解析阶段失败。不得从 DMA 回退到 polling，也不得替换其他控制器或引脚。<a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">派生能力矩阵</span></a>与既有 <a class="reference internal" href="soc-refinement.html"><span class="std std-doc">SoC 台账</span></a>继续作为实际权威。</p>
+<p>可选 Ethernet 合同也分别维护。原有 <code class="docutils literal notranslate"><span class="pre">eth</span></code> face 使用连续未标记帧和四字 descriptor。独立 <a class="reference internal" href="ethernet-frames.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">eth_frames</span></code> 选择</span></a>在精确 F407/F470 RMII 参考上使用八字 descriptor、SG frame loan、单个带内 VLAN C-tag 和 MAC 硬件事件时间戳；两者不能同时占用同一个 MAC。两个合同都不包含协议栈或网络时钟同步，软件装配也不为 PHY/PCB 接线建立资格。</p>
+<p>H743 SPI4 DMA 选择 DEV_ID <code class="docutils literal notranslate"><span class="pre">0x450</span></code>、REV_ID <code class="docutils literal notranslate"><span class="pre">0x2003</span></code>（V）、固定 HSI64/默认 trim、Cache off/on 和裸机。正常有限全双工请求借用所选已初始化 AXI SRAM 中互不重叠的 TX/RX span。Cache off 接纳 1..65535 bytes；Cache on 要求独占完整 32-byte lines，地址对齐，长度为对齐的 32..65504 bytes。DMA1 Stream2/3 与可选 USART3 Stream0 TX 或 Stream1 RX 资源独立。该模式不开放 PLL384、FreeRTOS、16-bit、固定 dummy/discard 或多段 SPI DMA。见 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32h743/README.md">H743 provider 合同</a>。</p>
+<p>独立 H743 <code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code> 模式使用 USART3、DMA1 Stream1/request45、DBM/CIRC 及至少三个等长、调用者拥有的 AXI SRAM 缓冲区。它选择 V 修订、固定 HSI64、裸机和 Cache off/on。task service 在 BRR/TIM2 推导的保守时限之前替换 inactive bank，并在 IRQ 外执行 Cache 维护。替换过晚或不确定、Cache 失败或没有 FREE 缓冲区时，停止生产并显式报告 loss；借用保持到实际排空。IDLE 关闭本次 producer 并发布排空后的 prefix；调用者须显式重新初始化 stream 再启动。TX 仍是有限 IRQ，不构成 DMA duplex。Cache-on 缓冲区独占完整对齐的 32-byte lines。该模式接纳 32..65535-byte Cache-off 缓冲区或 32..65504-byte Cache-on 缓冲区，不建立实测吞吐、时限或物理资格。</p>
+<p>U575 USART1 <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> 选择 TZEN0、MSIS4、8N1、Cache off，并通过 GPDMA1 channel0/request25 处理非安全 SRAM1 中的有限 payload；IRQ-byte RX 保持独立。<a class="reference internal" href="u575-uart-gpdma.html"><span class="std std-doc">GPDMA 合同</span></a>保留 ES0499 持续 DMAT、独立 UART 线上 TC 及完整 source/IRQ/publisher 排空。独立 <a class="reference internal" href="uart-fifo.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">irq-fifo-bytes</span></code> 选择</span></a>有显式阈值和每次 IRQ RX/TX 字节预算，不与 DMA 组合。这些选择不增加 USART2 DMA/FIFO、RX DMA、LPDMA、TrustZone transport 或自主低功耗执行。</p>
+<p>独立 U575 <code class="docutils literal notranslate"><span class="pre">dma-chain-tx</span></code> 模式使用同一 USART1/GPDMA channel 及独立 IRQ-byte RX。一次请求借用连续地址的 SRAM1 payload，最多三块，每块最多 65535 bytes，并使用最多两个 packed 12-byte 私有节点。整个 24-byte 节点数组按 32 bytes 对齐，位于同一 CLBAR 窗口。196605-byte 协议上限还要求真实可达且无别名的 RAM；它不为调用者保留整块 SRAM。payload 和节点保持 live，直到 fetch/channel/IRQ 排空且独立 UART TC 已观察。该有限选择不开放 scatter-gather 或循环链。</p>
+<p>独立无引脚 U575 LPTIM2 <code class="docutils literal notranslate"><span class="pre">irq-counter16-oneshot</span></code> 参考选择 TZEN0、MSIS4、裸机与 PCLK1/4，提供名义 1 MHz RUN counter。请求接受 2..65536 ticks；ARR 必须大于 reset CCR0，因此拒绝一个 tick。IRQ68 priority5 从不调用 OS。它不拥有外部引脚或 DMA，不承诺 Stop、backup 或 VBAT 连续性。PCB 与硅片修订仍未观察；软件模型与链接检查不测量物理时序。</p>
+<section id="exact-mode-boundaries">
+<h3>精确模式边界<a class="headerlink" href="#exact-mode-boundaries" title="Link to this heading">¶</a></h3>
+<p>G474 的 RE 封装包含 52 个 GPIO 焊盘，不能视为六个完整的十六引脚端口。固定 HSE 配置保留 PF0/PF1；PG10 因 NRST 选项保持不变而继续保留。GPIO 清单与 Board 连接器路线分别维护。SPI1/2 使用八位传输、模式 0..3、明确的低有效 CS，每次有限调用最多传输 256 字节。170 MHz 配置将请求 SCK 限制为 42.5 MHz：二分频会超过数据手册上限。G474 还将 TIM3 CH1 PA6 AF2 与 TIM4 CH1 PB6 AF2 实现为独立、独占整个控制器的 PWM 所有者：固定向上计数、有效高电平 base，整数时钟分频 1..65536，period 为 1..65535，暂存 duty 为 0..period。Capture、互补输出、break、IRQ、DMA 及共享 timer channel 均不在本次增量内。</p>
+<p>这些 PWM 限制描述计数器算术范围，不表示无条件的引脚频率。SPI/PWM 使用 OSPEEDR=11。DS12288 Table56 在 30 pF 下，将引脚翻转限制为 VDD 1.62..2.7 V 时 50 MHz、2.7..3.6 V 时 120 MHz；因此 period 为二时的逻辑 85 MHz 波形有适用条件。当前配置不建立 GPIO 供电、负载或脉宽适用性；这些条件必须由 Board 验证。</p>
+<p>Polling SPI 仅在证明移位器排空且 CS 无效后返回。若准入后的 reset 或 CS 撤回不能证明这一状态，执行者保留调用者缓冲及控制器/CS 所有者，屏蔽中断并调用平台故障观察者。观察者返回后继续停驻；外部产品恢复不得返回已释放的存储。空闲 stop/recovery 失败仍保留各自可重试的私有租约。</p>
+<p>H743 USART3 使用 PD8/PD9 AF7，以及 DMA1 Stream1 上普通模式的有限 RX DMA 块，DMAMUX1 channel 1 request 45。所有者负责处理完成并重新装载下一个块；块之间可能出现空隙。这不是循环或连续接收器。仅准入选定且已初始化的 AXI/SRAM1 域。Cache 关闭时，块包含 1..65535 字节。Cache 开启时，块必须独占完整的 32-byte Cache 行，地址和长度均须对齐，最大长度为 65504 字节。必须先撤离访问源、观察稳定的剩余计数并完成后置 Cache 失效操作，才能发布。消费者仍持有借用，或分离失败时，必须继续保留 DMA 流、Cache 及平台依赖。</p>
+<p>U575 新增 USART2 PA2/PA3 AF7 以及适用于该封装的 GPIO 路由。PG[15:2] 要求 VDDIO2 供电已经建立，并观察到 PWR 时钟／IO2SV 配置；平台不会使能未知的外部电源轨。IO2SV 是配置观察结果，不是电源轨电压测量。TZEN0 仍是通用平台配置。独立的 TZEN1 参考配置还接受至多包含八条 PC7 命令的协作式 GPIO 作业，命令会复制到一个 Secure 槽位中。SERVICE 每次最多推进一条命令，POLL 读取锁存状态，CANCEL 保留此前已产生的效果，CONSUME 仅释放已进入终态的作业。票据永不回绕；调用结束后不保留任何 NS 地址。这既不提供用户缓冲区借用，也不提供通用异步或跨安全域传输支持。</p>
+<p>F103 独立启动准入检查 CPU 可读的工厂 Flash 密度，不依赖仅调试模式可读的设备组或修订值。ES096 Rev15 第 2.2.2 节指出，正常软件读取 DBGMCU 返回零，因此设备组和修订仍未观察。配置中的 STM32F103RBT6 料号声明及封装仍需独立接入证据。参见 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32f103/README.md">F103 来源边界</a>。</p>
+<p>F103 使用 USART2 PA2/PA3 和 PA0/PA1 EXTI 事件。F103 SPI1 和 GD303 SPI0 使用默认的 PA5/PA6/PA7，以及显式指定、低电平有效的 PA4 CS；标称频率为 31.25 kHz..4 MHz，字长为八位，支持模式 0..3，每次有限调用最多传输 256 字节。它们的 SPI 装配不能同时选择 PA5 GPIO/LED 绑定。F103 TIM2 为 16-bit，标称频率为 1 MHz；其溢出服务间隔和中断屏蔽时长均须小于 65.536 ms。GD303 将 TIMER1 更新 TRGO 级联到 TIMER4 ITI0，并扩展高位溢出，服务间隔须小于 2^32 个标称微秒。这使低位计数在所述 800 ms Flash 擦除上限期间发生的回绕仍可保留；定时器桥接的进位传播仍需物理观察。两个配置都不建立经过校准的实际时间，也不证明同 bank 取指停顿后的 FreeRTOS tick 追赶。</p>
+</section>
+<section id="mode-resources-acquisition-and-physical-flash">
+<h3>模式资源、采集与物理 Flash<a class="headerlink" href="#mode-resources-acquisition-and-physical-flash" title="Link to this heading">¶</a></h3>
+<p>F103 USART2 的 TX 使用 DMA1 channel7，有限 RX 使用 channel6；GD303 USART0 使用 DMA0 channel3/channel4。仅 TX 的构造采用紧凑的 TX 状态与显式的 IRQ 字节环形缓冲区；只有双工构造才增加调用者提供的 RX 块。两者仅准入已声明、长度为 1..65535 字节的 SRAM 区间。在传输线 TC 和访问源撤离之前，内存 TC 不会使 TX 结清。有限 RX 仅在通道／DMAR 撤离且计数稳定后发布；所有者服务重新装载空闲块，因此空隙和可见丢失仍属于合同的一部分。替换块不可用绝不授权覆盖消费者借用的存储。它们的 PB6/PB7 I2C 使用优先级为零的 IRQ 处理，并拒绝内核通知；总线电压与上拉由外部负责。共享的旧式引擎仍是唯一的协议所有者。</p>
+<p>G474 ADC1 选择单端 12-bit bulb 采样，SYSCLK/128 = 1.328125 MHz，采样代码为 code0。软件触发的单次采样丢弃首次转换，并保留显式的预热与间隔保护。TIM6 触发的有限普通模式 DMA 块仅接受能整除 1 MHz 触发时基的 2.5–50 kHz 采样率。bulb 采样孔径取决于前一次 EOC 和下一次触发，而非仅由 SMPR 决定。IRQ 停止触发；服务先观察到 DMA/ADC 已撤离且 ADEN 已清零，再发布，随后由后续服务重新装载。准入的 SRAM1/2 域排除 CCM 别名，即便芯片可通过其 0x20018000 别名执行 DMA。32 KiB CCM 只计入一次。勘误和采样孔径界限见<a class="reference internal" href="stm32g474.html"><span class="std std-doc">确切的 G474 合同</span></a>。</p>
+<p>H743 的可选 D2 SRAM1 具有显式预算、时钟门控准入和启动时 DATA/BSS 初始化；NOINIT 仍由调用者拥有。DMA 在借用前重新检查 AXI/SRAM1 已初始化及其时钟状态。H743 ADC1 在 PA3/INP15 上提供 16-bit 原始单次采样，并采用与芯片修订版本匹配的 boost 配置和完整线性度校准；U575 ADC4 在满足外部 VDDA/ASV 准入条件后，提供 PC0/channel1 12-bit 单次采样。F103/GD303 在 4 MHz 下使用 PA0/channel0 12-bit 单次采样，并采用型号专属的预热与校准。这些格式和已声明的参考电压不代表经测量的模拟精度。它们确切选定的 PWM/EXTI 路由和引脚冲突仍由<a class="reference internal" href="../delivery/support.html"><span class="std std-doc">支持范围</span></a>及相邻的 SoC 合同规定。</p>
+<p>物理 Flash 暴露确切型号的完整空间，而不是产品分区。在要求提供的场景中，编写配置时指定的 <code class="docutils literal notranslate"><span class="pre">supply_mv</span></code> 是必需的软件假设，绝不是电压测量。<code class="docutils literal notranslate"><span class="pre">nx_flash_geometry_t.program_flags</span></code> 可设置 <code class="docutils literal notranslate"><span class="pre">NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE</span></code>：每个单元都须经过一次成功擦除，且此后未承受任何编程脉冲。全 FF 的读回结果不能证明隐藏的 ECC 历史；失败或中断的脉冲会消耗该单元的编程资格，直至下一次成功擦除。提供者不保留隐式历史位图。标志为零不免除提供者自身的编程规则，全 FF 的输入单元也不会触发脉冲。</p>
+<p>每次物理脉冲前，先清除残留的错误／完成状态并观察清除结果，再要求在实际忙状态／写缓冲排空后出现新的完成状态。G474、U575 和 F407 的 EOP 锁存受 EOPIE 控制；GD470 的结束标志使用 ENDIE。在临时置位选定的脉冲中断位期间，它们的轮询所有者独占租用处于禁用、非活动状态的 FLASH IRQ；NVIC 始终不使能该向量。清理时撤除脉冲模式和使能位、锁定控制器，并在保留优先级的同时确认挂起状态已经清除。按各自的寄存器合同，旧式 F103/GD303 和 H743 的完成标志无条件锁存；不能据此推断它们也具有中断使能前置条件。H743 等待 BSY/QW/WBNE 排空，并要求 Cache off；U575 在 TZEN0/SWAP0 下等待 BSY/WDW 排空。</p>
+<p>超时会阻止后续脉冲，但无法中止已经启动的脉冲。同 bank 的取指／IRQ 执行可能停顿；若控制器永久保持忙状态，就始终不能按“已完成”归还调用者存储。产品代码负责可写且擦除对齐的区域、电压、watchdog、执行位置和掉电恢复。通用 Flash 适配器不会虚构擦除历史。维护中的双 bank 存储算法在保存前擦除非活动 bank，分别写入不同的完整头部／载荷单元，并最后编程一个独立的提交单元；保存失败后，必须先重新打开／恢复，后续保存才能再次擦除该目标。</p>
+<p>看门狗激活不可逆，启动命令之后的编程失败也不例外。准备失败会保留未成功撤回的 LSI 或 debug 租约，供 stop 重试。已编程的标称时长与物理最短、最长时长分别记录。GD303 与 F470 数据手册提供内部 RC 标称频率，没有受审的最小/最大包络：编程成功返回 success，边界为零；已启用状态查询报告不支持边界，同时保留 enabled、irreversible 和实际 debug 事实。U575 拒绝预分频 LSI，标称最小时长为 375 微秒，确保 RLR 至少为二。其他芯片的边界均保留各自数据手册的适用条件。</p>
+</section>
+</section>
+<section id="official-sources-and-version-pairing">
+<h2>官方来源与版本配对<a class="headerlink" href="#official-sources-and-version-pairing" title="Link to this heading">¶</a></h2>
+<p>厂商文档建立芯片事实。库提供选定操作；示例可帮助识别执行顺序，但不建立通用平台合同。必须保留原始声明与许可证清单，锁定精确字节或 Git 提交，并将所选源码闭包纳入 Source SDK。官方 PDF URL 可能变化；后续下载必须匹配已记录摘要，或重新审查。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>来源</p></th>
+<th class="head"><p>实际观察的身份</p></th>
+<th class="head"><p>主要用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.st.com/resource/en/datasheet/stm32f103c8.pdf">STM32F103 中等容量数据手册</a></p></td>
+<td><p>DS5319 Rev 20，2025 年 7 月</p></td>
+<td><p>RB 存储、LQFP64 引脚、时钟限制与 16 位 timer</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.st.com/resource/en/reference_manual/cd00171190.pdf">STM32F1 参考手册</a></p></td>
+<td><p>RM0008 Rev 21，2021 年 2 月</p></td>
+<td><p>RCC、GPIO/AFIO、USART、DMA 与 TIM2 语义</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.st.com/resource/en/errata_sheet/cd00190234.pdf">STM32F1 中等容量勘误</a></p></td>
+<td><p>ES096 Rev 15，2022 年 3 月</p></td>
+<td><p>芯片修订适用性与受影响外设行为</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.st.com/resource/en/user_manual/dm00105823.pdf">NUCLEO-64 用户手册</a></p></td>
+<td><p>UM1724 Rev 17</p></td>
+<td><p>F103RB 身份、LED、VCP 与焊桥条件</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.gd32mcu.com/data/documents/datasheet/GD32F303xx_Datasheet_Rev3.0.pdf">GD32F303 数据手册</a></p></td>
+<td><p>Rev 3.0，2024 年 1 月</p></td>
+<td><p>RC 代码 Flash、RAM、封装与引脚定义</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.gd32mcu.com/data/documents/userManual/GD32F30x_User_Manual_Rev3.4.pdf">GD32F30x 用户手册</a></p></td>
+<td><p>Rev 3.4</p></td>
+<td><p>RCU、旧式 GPIO/AFIO、USART、DMA 与 timer 语义</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.gd32mcu.com/data/documents/errataSheet/Device%20limitations%20of%20GD32F30x_Rev1.4.pdf">GD32F30x 器件限制</a></p></td>
+<td><p>Rev 1.4，2026 年 4 月</p></td>
+<td><p>针对芯片修订的顺序与运行限制</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.gd32mcu.com/download/down/document_id/129/path_type/1">GD32F30x 官方固件下载</a></p></td>
+<td><p>Firmware Library 3.0.3；厂商 7z 归档</p></td>
+<td><p>受审器件定义与外设操作</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>实际观察的 GD32F303 Rev 3.0 PDF 为 2,394,885 B，SHA-256 为 <code class="docutils literal notranslate"><span class="pre">08119c470f3e98df6a2448720d9307dc82dcc059244818ae76a95e4b5fe158b9</span></code>。实际观察的固件 7z 为 15,892,832 B，SHA-256 为 <code class="docutils literal notranslate"><span class="pre">1cd66b58fc182ee6e2d2d98d78660bb0b822d642489997e9848d5ecb1f6657e1</span></code>；解压后或嵌套归档有各自独立身份。勘误 PDF 为 259,206 B，SHA-256 为 <code class="docutils literal notranslate"><span class="pre">5154b936ad2f7283fd5359dedfc137612666c0dc6af2734a5f325a609cbc459e</span></code>。不同名称的归档或修订不能与这些字节互换。</p>
+<p><a class="reference external" href="https://github.com/STMicroelectronics/STM32CubeF1/tree/d12e75247d5bcedc734f829b394517ab4c2726e3">STM32CubeF1 v1.8.7</a>固定 CMSIS Device F1 <code class="docutils literal notranslate"><span class="pre">c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22</span></code> 与 HAL <code class="docutils literal notranslate"><span class="pre">fee494a92b5ad331f92ad21f76c66a5cb83773ee</span></code>。独立标签 CMSIS v4.3.5 和 HAL v1.1.10 是不同提交，不得描述为这一官方 Cube 配对。导入依赖锁、选定文件和实际编译/链接结果决定接入的源码身份与兼容性。</p>
+<p>既有 F407 LL 依赖继续遵循<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/dependencies/stm32f4-hal.lock.json">其锁文件</a>和<a class="reference internal" href="official-stm32-provider.html"><span class="std std-doc">官方驱动接入合同</span></a>。F1、G4、H7 和 U5 不继承 F4 驱动资格。GD32 库保持独立依赖。必须审查每个导入文件的许可证和硬件假设；寄存器相似不能证明这两个条件成立。</p>
+</section>
+<section id="what-zephyr-contributes">
+<h2>借鉴 Zephyr 的内容<a class="headerlink" href="#what-zephyr-contributes" title="Link to this heading">¶</a></h2>
+<p>本次审查比较采用 <a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/tree/dccb09599635bdff17633fa7e9dab014b91dce90">Zephyr v4.4.2</a>，提交为 <code class="docutils literal notranslate"><span class="pre">dccb09599635bdff17633fa7e9dab014b91dce90</span></code>。其 <a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/west.yml">west manifest</a>固定自身 HAL 依赖。它是设计参考，不是另一份 Nexus 配置权威，也不表示 Zephyr 支持所有选定料号。特别是 GD32F3x0 和 GD32F30x 是不同外设系列。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>受审上游模式</p></th>
+<th class="head"><p>Nexus 应用与限制</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/serial/uart_stm32.c#L2702">静态 UART 配置、可变数据与共享 API</a></p></td>
+<td><p>保留生成的静态 context 与共享 typed 操作；factory 仍只进行冷路径查找</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/gpio/gpio_gd32.c#L176">分别处理 GD32 旧式与 AF GPIO 布局</a></p></td>
+<td><p>分别建模 CTL0/CTL1 与 MODER/AFR；启用输出模式之前预装输出电平</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/pinctrl/pinctrl_gd32_afio.c#L179">AFIO remap 属于整组引脚</a></p></td>
+<td><p>在生成阶段验证共享 remap 冲突；不得将旧式 remap 视为独立的逐引脚 AF</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/serial/uart_stm32.c#L231">UART 取得实际外设时钟</a></p></td>
+<td><p>使用已解析总线/内核时钟事实计算波特率；不假设等于 CPU 频率</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/serial/uart_stm32.c#L1788">UART TX 使用外设 TC</a></p></td>
+<td><p>区分 DMA 完成、线上完成与最终结算</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/serial/uart_stm32.c#L1936">DMA 缓冲的 cache 限制</a></p></td>
+<td><p>拒绝不支持的存储域，或实现明确的整缓存行所有权与维护</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/dccb09599635bdff17633fa7e9dab014b91dce90/drivers/dma/dma_gd32.c#L355">DMA 拒绝不支持的 block 形式</a></p></td>
+<td><p>保留引用之前拒绝不支持的链式、宽度与地址调整</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Nexus 不把强制内核集成、工作队列、设备 PM 或运行时发现复制到默认 MCU 路径。上游驱动的超时、取消或缓冲归还合同可能不同。必须保留 Nexus 绝对 deadline 与接受借用合同；复用寄存器操作不得引入第二个传输所有者。复制代码时保留上游声明；架构比较本身不导入源码。</p>
+</section>
+<section id="adaptation-must-improve-the-shared-platform">
+<h2>接入必须完善共享平台<a class="headerlink" href="#adaptation-must-improve-the-shared-platform" title="Link to this heading">¶</a></h2>
+<p>每个新料号首先识别精确差异：寄存器代际、时钟/复位域、中断拓扑、DMA 路线、缓存可达性、封装引脚、勘误和不可逆效果。将这些事实写入 SoC 描述与受审路线。PCB 电气事实保留在 Board 数据，产品策略保留在外部仓库。一个编译宏不能代替这些审查。</p>
+<p>只有硬件和所有权假设成立时才复用既有 provider。在两个具体接入证明语义与失败顺序相同之后，再抽取通用机制。优先使用编译期 helper，或带私有硬件端口的共享生产算法；避免仅转发的运行时层、系列名称条件链及重复生成常量的描述符。接受泛化前，必须测量代码、RAM 和栈。</p>
+<p>新增旧式 GPIO 接入应反馈完善封装验证、原子置位/复位、先输出后模式的顺序及 remap 冲突处理。对应 UART 应反馈完善时钟舍入、活动设备拒绝、IRQ mask 恢复、错误/数据读取顺序和晚到中断隔离。F103 TIM2 为 16 位，与 F407 的 32 位 TIM2 不同：overflow 扩展必须有明确的最大 service 间隔，不能静默沿用更长的回绕假设。</p>
+<p>本轮将反馈用于 timer 准入和清理：观察 timer gate 后重新检查保留的 slave、channel 和 trigger 状态；将仅 gate 租约与已准入 timer 分开；发出预分频更新时选择安静的 trigger 源。reset、trigger 恢复或 gate 撤回遭拒时，保留对应清理责任。看门狗审查同样反馈完善基于状态的安全观察、保守的混合 shadow 更新边界和可重试准备清理，不假设不同厂商拥有相同 RC 或 reload 语义。</p>
+<p>必须审查库的实际行为，包括隐藏副作用：GD32F4 的组合函数 <code class="docutils literal notranslate"><span class="pre">fwdgt_config</span></code> 在编程前启动不可逆计数器，将其视为可逆准备是不成立的。同样，新增 M3 映像使用 soft-float，既有 M4F 映像使用 hard-float。资源、保留、候选与复现工具从唯一的 resolved CPU 合同取得 ABI，并继续验证 ELF flags、链接配置和输入字节；绝不根据制品推断 ABI 来使其通过。</p>
+<p>官方 LL helper 是受审操作，不自动意味着执行有界。例如，F1 的 <code class="docutils literal notranslate"><span class="pre">ATOMIC_*</span></code> USART setter 可能包含 exclusive-store 重试循环。必要时在 provider 既有的保存/恢复 mask 区域中使用有界寄存器操作；安全的 LL 数据/标志操作仍保持私有。勘误审查必须考虑选定模式与芯片修订，包括 GD32F30x USART DMA 使能顺序、timer capture DMA/shadow 相互作用和 ADC 时钟约束。</p>
+</section>
+<section id="acceptance-sequence-and-next-admissions">
+<h2>验收顺序与后续接入<a class="headerlink" href="#acceptance-sequence-and-next-admissions" title="Link to this heading">¶</a></h2>
+<p>每项接入采用相同顺序：来源/许可证审查；失败的配置与真实 provider 测试；最小实现；测试通过；严格资源/模式拒绝；ARM 映像/资源检查；搬移后的 SDK 消费；clean-source 候选资格。保留真实 RED 失败与 GREEN 命令。GoogleTest/GoogleMock 仅用于主机，固件保持 C11 且默认无动态分配。<a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">资格合同</span></a>规定证据要求，而不是本页的文件或检查数量。</p>
+<p>凡选定模式可能到达的路径，均需执行部分启动失败、重试、逆序清理、实例隔离、接受后的取消、晚到 IRQ 和排空失败。排空失败保留 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code> 存储；超时从不撤销借用。只有所需引用脱离后，以 acquire 观察到 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>，才结束 provider 访问。调用者仍需排空自己的 observer 和控制引用。</p>
+<p>物理站点独立观察芯片/修订、Board/焊桥、时钟、映像、复位和 I/O 行为。性能结论要求相同映像、时钟、工作量和仪器。主机测试耗时与操作计数不等于 MCU cycles、IRQ latency、电气正确性或安全资格。没有设备连接时，依赖硬件的退出条件保持待执行。</p>
+<p>后续主流候选包括 STM32F072RBT6、STM32F303RET6、STM32G071RBT6、STM32L476RGT6 和 GD32E230F8P6。这些是建议的接入目标，不是已支持料号。实施前需确认官方封装/存储事实、源码许可证、工具链/ABI、有限外设集合及独立来源的 Board。其他 GD32F4xx 和 STM32F4 料号同样需要明确的变体事实与路线；SDK 头或相同内核均不授予支持。</p>
+<p>Bootloader 接管、运行时变频、deep STOP、通用跨域 DMA 与更广的 U575 异步 transport 仍遵循 <a class="reference internal" href="soc-refinement.html"><span class="std std-doc">SoC 完善台账</span></a>中的独立退出条件。本轮不会因增加一个 MCU 系列或链接官方库而关闭这些任务。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">采用显式整数帧的有限 ADC 序列</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD：固定物理 RAM 与明确的请求所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">开发体验与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">以太网帧借用与 MAC 硬件时钟</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">STM32F407 上的有限 I2S2 从机发送</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">从私有 RAM 执行区维护 H743 Flash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 仅限 V 修订的高频配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">有界 I3C controller 核心</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O 增量架构：静态资源与明确的数据合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">映射存储、AMP、镜像交接、RTC 与帧边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">主流 MCU 接入与平台反馈</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">官方驱动与 provider 迭代</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">由同一硬件 owner 管理的有限 PWM 与 ADC 窗口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">精确选定模式的 HIL 准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 选定外设平台</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 跨 Stop2 的 LPTIM1 单组 LPBAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 保留经过时间域</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 跨 Stop2 的有限 SRAM4 复制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 双域 GPIO 参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">STM32U575 USART1 有限 GPDMA TX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">有界的 UART 硬件 FIFO 字节收发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

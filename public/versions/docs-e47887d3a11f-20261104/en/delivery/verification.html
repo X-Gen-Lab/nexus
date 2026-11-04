@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Current evidence and acceptance boundaries &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Exact support scope" href="support.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/delivery/verification.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/delivery/verification.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Current evidence and acceptance boundaries<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>This page describes the scope and acceptance boundaries of platform execution reports. Each iteration establishes evidence for its actual source; old candidates, historical test counts and development directories do not qualify a new HEAD. The ledger status <code class="docutils literal notranslate"><span class="pre">implemented</span></code> records source and tool delivery; acceptance follows the tested code identity declared in the report. Original reports retain their own output paths and bind source, configuration, dependencies, tools, command exit codes and artifacts.</p>
+<p>See <a class="reference internal" href="../status/software-verification.html#p2-unsigned-software-ab532250"><span class="std std-ref">current P2 unsigned software delivery</span></a> for the complete software plan, SDK, eight candidates and actual public recovery of the latest selected P2 <code class="docutils literal notranslate"><span class="pre">ab532250</span></code>. Its C++183 analysis combines 109 validated existing results with 74 actual additional evaluations; full interpretation and individual review of all 1234 findings have completed. Independent QA <code class="docutils literal notranslate"><span class="pre">706ee80</span></code> completed ordinary gates and new-SHA Python174 analysis. The 38 findings, comprising 30 notes / 6 warnings / 2 errors, uniquely map to previously reviewed dispositions; seven old findings disappeared and none is new. Current private E <code class="docutils literal notranslate"><span class="pre">f59debf1</span></code> pins P2; 17 presets / 116 commands, five real C broker scenarios each in source and installed builds, three recipes and the public SDK walk passed. E completed a normal nonforce push and exact readback of <code class="docutils literal notranslate"><span class="pre">f59debf1</span></code>; the repository remains private and private main is unchanged. Later D/deployment/FF await actual results. Older P2, SoC/IP and <code class="docutils literal notranslate"><span class="pre">7590b2d4</span></code> records below retain their source identities and historical states. Their pending fields do not override this P2 round, and later commits do not inherit firmware qualification.</p>
+<section id="id2">
+<h2>Typed platform unification: exact source and execution boundaries<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>The code source P2 is <code class="docutils literal notranslate"><span class="pre">fc01d863c3374643c276195ae19a24e6f8b8c8ee</span></code>, with tree <code class="docutils literal notranslate"><span class="pre">e6f3d6310fd46265be49d47ef3fd7a4d944a8386</span></code>, in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/pull/38">platform PR 38</a>. External examples E is <code class="docutils literal notranslate"><span class="pre">acb5179ec09e0c2fae1911d32655296df39acedc</span></code>, with tree <code class="docutils literal notranslate"><span class="pre">4e4e504c28766f0790dc4cd4dc45e8f9bcc49beb</span></code>, in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus-examples/pull/16">examples PR 16</a>. PR state and software execution are separate facts; this section does not claim that either PR has merged.</p>
+<p>Candidate <code class="docutils literal notranslate"><span class="pre">typed-unification-fc01d863c337-acb5179ec09e</span></code> was sealed and actually passed its owned verifier. Its status is <code class="docutils literal notranslate"><span class="pre">software_qualified</span></code>, covering the six original scopes <code class="docutils literal notranslate"><span class="pre">host_contracts</span></code>, <code class="docutils literal notranslate"><span class="pre">arm_link</span></code>, <code class="docutils literal notranslate"><span class="pre">resource_budget</span></code>, <code class="docutils literal notranslate"><span class="pre">source_sdk</span></code>, <code class="docutils literal notranslate"><span class="pre">reproducibility</span></code> and <code class="docutils literal notranslate"><span class="pre">hil_tooling</span></code>. Its configuration SHA-256 is <code class="docutils literal notranslate"><span class="pre">0117c83ff7876bf3867338f31caec160c18815a629cb1c44bfe1a4ead410590b</span></code>. The candidate JSON is 2,366,210 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">f1c2af3ac73cb219b41b6d68f1c1b07db108357d0de8a92107ab7b1e8ec1ede6</span></code>. The original delivery index records the exact ELF/BIN/map byte identities. <code class="docutils literal notranslate"><span class="pre">hil_tooling</span></code> establishes tooling scope only; physical HIL remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>, signature status is <code class="docutils literal notranslate"><span class="pre">unsigned</span></code>, and product promotion is <code class="docutils literal notranslate"><span class="pre">not_performed</span></code>.</p>
+<p>R02 completed two independent fresh builds with <code class="docutils literal notranslate"><span class="pre">--network</span> <span class="pre">none</span></code>: four actual configure/build commands all returned 0. ELF/BIN bytes from the two independent outputs are identical; the original result is <code class="docutils literal notranslate"><span class="pre">bit_exact_elf_bin</span></code>. The selected input is the external example <code class="docutils literal notranslate"><span class="pre">reproduction/assemblies/qiming-baremetal.toml</span></code>: Qiming F407ZG, baremetal, <code class="docutils literal notranslate"><span class="pre">hse8-pll168</span></code>, <code class="docutils literal notranslate"><span class="pre">Os</span></code>, GPIO output and UART1 IRQ events with capacity 32, explicitly selecting the <code class="docutils literal notranslate"><span class="pre">uart-owner</span></code> component. This result does not extend to other boards, modes or physical timing.</p>
+<p>The persistent navigation entry is <code class="docutils literal notranslate"><span class="pre">/workspace/nexus-examples/build/platform-candidate-fc01d863c337-acb5179ec09e-01/delivery-index.json</span></code>, 4,716 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">5e99131826172355a95506b0293c8fe98f75cb07f3b6298f5f3805d6008caf43</span></code>. Its <code class="docutils literal notranslate"><span class="pre">candidate_portable</span></code> entry identifies the complete archive of 6,441 files: 434,092,822 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">a443e9c3b39528d5d5fbbdd19ee1c065496cd86b8df78cb5380aab4505bf3aa9</span></code>. <code class="docutils literal notranslate"><span class="pre">finalization_package</span></code> identifies a separate archive retaining original finalization reports and failed attempts. The <code class="docutils literal notranslate"><span class="pre">/tmp/...</span></code> paths above are original execution locators and may no longer exist after environment recovery. Restore original bytes through the index and member mapping without rewriting those locators. This host path is not a public download URL.</p>
+<p>Q02 independently executed all 159 stages of the complete maintained plan with status <code class="docutils literal notranslate"><span class="pre">executed_passed</span></code>. Its source observations before and after execution match exactly and identify clean P2. The original <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-unification/formal-fc01d863c337-02/report.json</span></code> is 201,097 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">8c67786b80b5fb64cb0f6f216c1dbf4c05ddb84f61ab2ef4542fb0f55e0910a2</span></code>. The maintained verifier checked every stage, original order, command exit code, plan and source identity. This is one complete Q02 execution, without a composed Q01 prefix. Its original <code class="docutils literal notranslate"><span class="pre">software_qualified=false</span></code> remains unchanged: a passed software plan is not a sealed candidate.</p>
+<p>The complete local examples execution for E passed: 17 presets (1 Native and 16 ARM), 98 actual commands, 39 ELF budget checks and 12 HIL preparations. HIL outputs are <code class="docutils literal notranslate"><span class="pre">prepared_unbound</span></code>, not connected-board or physical passes. The original <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-examples-typed-fc01d863c337-all-001/execution.json</span></code> is 15,662 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">c89682f4b2b30383dca2c3e845aad6170c6f4271b310886d72deb358b136348b</span></code>. E actually consumed <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-unification/formal-fc01d863c337-01/sdk</span></code>; its original command retains that real path and is not rewritten to the Q02 SDK. The failed Q01 plan and the SDK already generated within it have different scopes; passing examples do not retroactively pass the Q01 plan.</p>
+<p>R01 preparation independently checked the complete Q01 and Q02 SDK prefixes using the maintained <code class="docutils literal notranslate"><span class="pre">verify_source_sdk</span></code>, confirming 2,931 source files, identical source-manifest bytes and matching two CMake export files. The result is <code class="docutils literal notranslate"><span class="pre">verified_identical_installed_sdk_bytes</span></code>. Both manifests are 370,911 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">77c5fa4e0eb0c584b195ce92a59e8ac6129dc5d493c3e1184df89a9a5618248d</span></code>. The original result is <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-unification/candidate-fc01d863c337-acb5179ec09e-01/readiness.json</span></code>, 8,263 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">378fff8b25917b86bf88d4a9e5a2613947e0f4219c6f6c94bc6cf390babfaee0</span></code>. It retains E’s actual Q01 SDK input; Q02 is this iteration’s sole complete software-plan authority. Identical SDK bytes alone do not establish passing double builds or a qualified candidate.</p>
+<p>After recovery, the maintained <code class="docutils literal notranslate"><span class="pre">capabilities.py</span> <span class="pre">--candidate</span></code> query was rerun against a clean P2 checkout and actually returned 0 with <code class="docutils literal notranslate"><span class="pre">source_match=true</span></code>, but its result is <code class="docutils literal notranslate"><span class="pre">configuration_mismatch</span></code>. Comparing input sets by path shows the SDK’s additional <code class="docutils literal notranslate"><span class="pre">.nexus-source-sdk.json</span></code>, SHA-256 <code class="docutils literal notranslate"><span class="pre">77c5fa4e0eb0c584b195ce92a59e8ac6129dc5d493c3e1184df89a9a5618248d</span></code>. Input-record order also differs; all other configuration semantic fields are equal. Only <code class="docutils literal notranslate"><span class="pre">configuration=validated</span></code>; the model, ARM image, SDK, candidate and physical-query results remain <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>. Matching source does not relax full configuration-identity checks. The new observation is retained at <code class="docutils literal notranslate"><span class="pre">/workspace/nexus/.git/local-recovery/typed-platform-unification/capability-recovery/comparison.json</span></code>, SHA-256 <code class="docutils literal notranslate"><span class="pre">565993a80527d4e3c2e5af7ca7a00dd4448665023b5cee18560d0ba1050f0d87</span></code>. To positively verify sealed artifacts, restore the candidate and run <code class="docutils literal notranslate"><span class="pre">candidate.py</span> <span class="pre">verify</span> <span class="pre">--candidate</span></code>. That entry and the source-checkout capability association each retain their own scope.</p>
+<p>Q01 passed its first 90 stages and failed at stage 91 because the locked <code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> directory was absent from the execution PATH; that stage did not complete C static analysis. After correcting the environment and passing version checks, actual C11 probes and doctor, Q02 executed the complete plan again without composing a Q01 prefix. The Q01 failure remains recorded, but its original temporary report and command records were lost during environment recovery and cannot be reverified; they have not been relabeled as successful.</p>
+<p>R01 successfully executed <code class="docutils literal notranslate"><span class="pre">prepare-spec</span></code>, but its helper stopped before starting Docker because its toolchain digest comparison treated the 65-byte installer marker inconsistently. An independent inventory confirmed that all other bytes match the locked archive; the toolchain was unchanged. The finalization archive retains the original R01 records. That failed preparation is separate from R02’s actually completed pair of network-disabled builds.</p>
+<p>Code execution identity P2 and the documentation commit are recorded separately. Documentation edits, builds and publication create no new platform software qualification. A formal schema-2 documentation package sets explicit <code class="docutils literal notranslate"><span class="pre">qualification_references</span></code> only after the actual candidate verifies. The package’s own <code class="docutils literal notranslate"><span class="pre">documentation_source</span></code> and build receipts identify its documentation source; a referenced candidate retains its original P2 identity.</p>
+<p><code class="docutils literal notranslate"><span class="pre">local_ci.py</span></code> verified the complete Q02 report read-only and actually returned 0. The result <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-unification/root/local-ci-full-verified.json</span></code> is 2,385 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">2bb9bbcfb51c61d26f49435b4dc6cb3650cdae340db55d7e8c4aea7386e991ca</span></code>. Publishing <code class="docutils literal notranslate"><span class="pre">nexus/local-software-plan</span></code> to the exact P2 SHA was rejected by GitHub with HTTP 403 because the connection lacks <code class="docutils literal notranslate"><span class="pre">statuses:write</span></code>. The original <code class="docutils literal notranslate"><span class="pre">/tmp/nexus-unification/local-status-fc01d863.json</span></code> receipt has publication <code class="docutils literal notranslate"><span class="pre">unconfirmed</span></code>; it is 3,872 bytes, SHA-256 <code class="docutils literal notranslate"><span class="pre">4fa133eb62e7767048450743710f9ec292d349dbcaf3faaf062e258508992f2a</span></code>. An independent server readback found no statuses for that SHA, so neither successful publication nor a green remote status is claimed. Local verification does not impersonate Actions jobs, a release workflow or enabled branch protection.</p>
+</section>
+<section id="soc-ip">
+<h2>Historical SoC/IP layout execution<a class="headerlink" href="#soc-ip" title="Link to this heading">¶</a></h2>
+<p>Software execution for this SoC/IP refactor binds code commit P <code class="docutils literal notranslate"><span class="pre">92e669233957a2e450a528394e8f4dd0794c7049</span></code>, with tree <code class="docutils literal notranslate"><span class="pre">6e38d4c43d59330a0a9a9b7cac21f591d9c2719f</span></code>. Platform PR 36 was merged as <code class="docutils literal notranslate"><span class="pre">c79fd9672a9fe56379744d834cfccd822bc40be1</span></code>, whose tree equals P; external examples PR 15 was merged as <code class="docutils literal notranslate"><span class="pre">bd3b90f135600b6405459347cb9e2cff5692d2e3</span></code>, retaining the formal P pin. The <a class="reference download internal" download="" href="../_downloads/54d3210c5ae2d22e8f681860fb75b4b2/soc-ip-layout-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">48-item</span> <span class="pre">refactor</span> <span class="pre">ledger</span></code></a> records per-item results and original evidence. The maintained 159-stage plan has actual coverage through two executions on the same P: A’s retained complete results for the first 90 stages, plus B’s complete execution of the original remaining 69 stages.</p>
+<p>An execution-environment restart interrupted A’s static analysis. A’s original report remains <code class="docutils literal notranslate"><span class="pre">running</span></code>, without <code class="docutils literal notranslate"><span class="pre">source_after</span></code>; a separate interruption observation records source and boot identities observed later, and the restart cause is not established. B fully reran static analysis using the original suffix plan and returned <code class="docutils literal notranslate"><span class="pre">executed_passed</span></code>. Exact stages, order, command exit codes and source identities were checked; this was not a single complete-plan pass, and A’s completion state was not reconstructed. Independent relocated SDK consumption, sixteen ARM configurations and thirty-two main-matrix ELFs from the external examples, eleven resource comparisons and two fresh, network-none offline builds each have their own results. Candidate sealing for the existing six scopes and the owned verifier passed, with candidate status <code class="docutils literal notranslate"><span class="pre">software_qualified</span></code>; the signature remains <code class="docutils literal notranslate"><span class="pre">unsigned</span></code>, product promotion was not performed, and physical HIL is <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>This documentation update records only P’s software evidence. The document’s own identity comes from <code class="docutils literal notranslate"><span class="pre">source</span></code> and the actual execution receipts in its corresponding <code class="docutils literal notranslate"><span class="pre">documentation-build.json</span></code>; a documentation commit does not inherit or replace P’s software qualification. Failed and interrupted attempts retain their original status and evidence. A/B coverage is not relabeled as one <code class="docutils literal notranslate"><span class="pre">executed_passed</span></code> run, and partial work in an interrupted stage is not counted as completed execution.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Scope</p></th>
+<th class="head"><p>Maintained execution entry</p></th>
+<th class="head"><p>Qualification boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Native/Core/OS/components</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/dev/dev.py</span> <span class="pre">test</span> <span class="pre">--preset</span> <span class="pre">native-debug</span></code>, plus release, ASan/UBSan and TSan</p></td>
+<td><p>Actual software ownership, threads and fault behavior; no MCU electrical qualification</p></td>
+</tr>
+<tr class="row-odd"><td><p>GoogleTest／GoogleMock</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scripts/ci/tdd_gate.py</span> <span class="pre">--all</span></code>；<code class="docutils literal notranslate"><span class="pre">tests/google/</span></code></p></td>
+<td><p>Complete discovery and actual unfiltered execution, fresh XML, zero skips; not automatic proof of historical editing order</p></td>
+</tr>
+<tr class="row-even"><td><p>Cortex-M CPU mechanisms</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/google/arch_*</span></code>、<code class="docutils literal notranslate"><span class="pre">*atomic*</span></code>；<code class="docutils literal notranslate"><span class="pre">scripts/ci/arch_compile.py</span></code></p></td>
+<td><p>Nine-core macros/ABI/objects/instructions/atomic dependencies; production cache/MPU/SAU models; no expanded SoC/Board or hardware support</p></td>
+</tr>
+<tr class="row-odd"><td><p>CPU runtime / kernel</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scripts/ci/cortex_runtime.py</span></code>；<code class="docutils literal notranslate"><span class="pre">tests/contracts/cortex_runtime/</span></code></p></td>
+<td><p>Compilation/ELF audit of public <code class="docutils literal notranslate"><span class="pre">nexus_add_runtime</span></code> production source graph, Core/Arch/I/O/selected OS and actual kernel context; not MCU execution</p></td>
+</tr>
+<tr class="row-even"><td><p>Generator</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/testing/run_tool_tests.py</span> <span class="pre">--suite</span> <span class="pre">configure</span></code></p></td>
+<td><p>Platform/CPU-runtime TOML, frozen IR, explicit optional features/ABI, maintained Native factory types, resource conflicts, bad input and stale bundles</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tool gates</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/testing/run_tool_tests.py</span> <span class="pre">--suite</span> <span class="pre">testing</span></code>；<code class="docutils literal notranslate"><span class="pre">tests/contracts/test_*.py</span></code>；<code class="docutils literal notranslate"><span class="pre">scripts/ci/</span></code></p></td>
+<td><p>Actual negative paths, stable staging, report identities and execution exit codes</p></td>
+</tr>
+<tr class="row-even"><td><p>STM/GD register models</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/google/*dma*</span></code>, <code class="docutils literal notranslate"><span class="pre">*uart_stream*</span></code>, <code class="docutils literal notranslate"><span class="pre">*adc_stream*</span></code>, <code class="docutils literal notranslate"><span class="pre">gd32_multi_test.cpp</span></code> and existing C contracts</p></td>
+<td><p>Actual production TUs; memory/line drain, EN-disable refusal, late IRQ, borrow/isolation, calibration/stabilization</p></td>
+</tr>
+<tr class="row-odd"><td><p>Three-board base configurations</p></td>
+<td><p>Six ARM presets</p></td>
+<td><p>Actual startup/vector/provider linking, ELF/BIN/map and budgets</p></td>
+</tr>
+<tr class="row-even"><td><p>H743/U575 reference vertical slices</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scripts/ci/stm32h743.py</span></code>、<code class="docutils literal notranslate"><span class="pre">scripts/ci/stm32u575.py</span></code></p></td>
+<td><p>Each empty/selected × baremetal/FreeRTOS, actual vectors/resources/retention; H743 additionally checks pre-RAM power entry, without proving actual MCU execution</p></td>
+</tr>
+<tr class="row-odd"><td><p>Optional RAM placement</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scripts/ci/stm32_memory.py</span></code>、<code class="docutils literal notranslate"><span class="pre">scripts/ci/gd32_memory.py</span></code></p></td>
+<td><p>F407 CCM and GD ADDSRAM/TCM link/initialization domains; no power-loss/reset retention proof</p></td>
+</tr>
+<tr class="row-even"><td><p>Advanced-controller fixtures</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/contracts/{stm32,gd32}_assembly/*.toml</span></code></p></td>
+<td><p>Maintained controller types, DMA, block RX/trigger and actual multicontroller ARM linking; explicitly software Boards</p></td>
+</tr>
+<tr class="row-odd"><td><p>Minimum-resource matrix</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/measurement/compare.py</span></code></p></td>
+<td><p>60 three-board O2/Os/O3 ± LTO images; 18 empty-GC checks; actual face/ops storage costs</p></td>
+</tr>
+<tr class="row-even"><td><p>External examples</p></td>
+<td><p>Independent <code class="docutils literal notranslate"><span class="pre">X-Gen-Lab/nexus-examples</span></code></p></td>
+<td><p>This round’s formal P pin has Native execution, sixteen ARM configurations and thirty-two main-matrix ELFs (<code class="docutils literal notranslate"><span class="pre">platform_reference</span></code>/<code class="docutils literal notranslate"><span class="pre">uart_owner_runtime</span></code>); dedicated examples remain separately listed in the original report, and product implementation stays external</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source SDK</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cmake/package/package_source_sdk.py</span></code>、<code class="docutils literal notranslate"><span class="pre">verify_consumers.py</span></code></p></td>
+<td><p>Clean version, source closure/identity, relocated C/C++ Native/Runtime consumers and STM/GD firmware linking</p></td>
+</tr>
+<tr class="row-even"><td><p>Offline reproduction/candidates</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/evidence/reproduce.py</span></code>、<code class="docutils literal notranslate"><span class="pre">candidate.py</span></code>、<code class="docutils literal notranslate"><span class="pre">proof.py</span></code></p></td>
+<td><p>Two independent network-none builds with matching source/config/tool/ELF identities and required scope</p></td>
+</tr>
+<tr class="row-odd"><td><p>HIL</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tools/hil/prepare.py</span></code>, <code class="docutils literal notranslate"><span class="pre">admit.py</span></code>, three-board fixtures and station templates</p></td>
+<td><p>Fixtures prepared; no connected devices; all physical results <code class="docutils literal notranslate"><span class="pre">not_executed</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Canonical commits, gates and candidate evidence from the earlier SoC extension iteration are in the <a class="reference internal" href="soc-extensions-verification.html"><span class="std std-doc">SoC extension execution record</span></a>; the <a class="reference internal" href="soc-refinement-verification.html"><span class="std std-doc">earlier baseline record</span></a> retains its original version’s evidence. These historical results keep their original source scope and do not qualify this refactor. Versioned datasheet/manual/errata indexes establish provenance only; actual silicon revisions and workaround applicability for each mode require separate acceptance. <code class="docutils literal notranslate"><span class="pre">soc_costs.py</span></code> retains actual ELF/disassembly/tool invocations and comparable profiles. It does not interpret size differences across backends, routes or capacities as same-configuration optimization, or instruction counts as measured cycles.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tools/hil/soc_acceptance.py</span></code> provides nineteen plan/capture/validate contracts for SOC-37–55. Plan yields only <code class="docutils literal notranslate"><span class="pre">prepared_unbound</span></code>; reference G474/H743/U575 cannot bypass reference-only admission through renaming or recomputed metadata hashes. Actual station/tools, protocols, instruments, continuous nonempty samples and reviewed limits determine results. Physical Flash power cuts additionally require external erase-aligned test layouts outside every firmware LOAD.</p>
+<p>Earlier development execution directories <code class="docutils literal notranslate"><span class="pre">build/controller-routes-factory/</span></code> and <code class="docutils literal notranslate"><span class="pre">build/minimal-factory-resources/</span></code> retain independent attempts and original commands without overwriting old runs. Resource numbers describe only the corresponding ELF; source changes require new execution. MSP is explicitly reserved and heap=0; unused memory domains do not become resident merely because a chip has them. Assembly and ELF bytes do not substitute for actual cycles/IRQ latency.</p>
+<p>The earlier CPU/runtime development execution directory is <code class="docutils literal notranslate"><span class="pre">/workspace/nexus-all-cortex-evidence</span></code>. It retains original reports for CPU facts/schema, atomic publication/RMW, nine-core register models, optional-feature compilation and real kernel-context audits. Published reports record actual commands, exit codes, tools and hashes; passing counts and feature scope come from the execution results, without inheriting earlier numbers or a different combination. Source/installed Runtime consumers and full-platform consumers establish separate evidence: the former have no concrete startup, SoC, Board or factory, and cannot replace the latter or candidate sealing.</p>
+<p>RED logs are in <code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/</span></code>; GREEN is actual framework execution. Migration of already-correct contracts is explicitly marked; production behavior is not changed merely to manufacture RED. Commit hooks check staged snapshots/index trees at start/end, reject behavior changes during execution and publish no new success summary on failure.</p>
+<p>Formal software qualification requires clean source/dependencies, exact tools/configuration, nonzero fresh tests, matching ELF/BIN/map, current budgets, independent source-SDK consumption and offline double-build. <a class="reference internal" href="support.html"><span class="std std-doc">Exact support scope</span></a> is authoritative; software-fixture connectors are not inherited by reference Boards.</p>
+<p>All physical timing, precision, waveform, reset, power-cut and sustained-load items remain unexecuted. FP/MVE context switching, IRQ latency, cache/DMA coherence, MPU/SAU and security-world cooperation also lack physical acceptance. Optional restricted-MPU-task and split-runtime software execution cannot establish physical isolation. Actual HIL must record PCB, chip UID, probe/serial/power, station, budgets and the same candidate image.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution-next-wave.html">Selected I/O and clock extension delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">Next iterations and team execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">Exact support scope</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

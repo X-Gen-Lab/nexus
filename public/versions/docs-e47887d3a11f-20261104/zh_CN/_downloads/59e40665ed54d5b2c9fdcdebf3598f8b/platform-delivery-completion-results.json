@@ -1,0 +1,2621 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_platform_delivery_completion_development_index",
+  "date": "2026-10-24",
+  "time_zone": "Etc/UTC",
+  "scope": "N01-N14 original development observations are retained below. The 2026-10-28 A-J/X increment has separate exact-source and development-worktree observations in current_iteration_20261028; none establishes qualification of the final combined head. Current exact P2 selected software and unsigned artifact observations are appended under source_version_records_20261103.final_public_source_P2_ab532250; later D documentation and pending integration scopes retain separate identities.",
+  "platform_baseline": "9ac38931e9f15b27ebe50698a7daad8263928a20",
+  "task_authority": "docs/design/platform-delivery-completion.csv",
+  "previous_iteration": "docs/delivery/developer-experience-results.json",
+  "publishable_candidate": false,
+  "physical_hil": "not_executed",
+  "final_integration_authority": "The final change review and existing evidence-store package bind immutable platform/examples revisions and actual executions after source freeze. Expected CI, old receipts and development tests do not establish those exits.",
+  "maintained_execution_entries": {
+    "usb_ep0": "tests/google/usb_device_test.cpp",
+    "configuration": [
+      "tools/configure/test_experience.py",
+      "tools/testing/test_support_selection.py"
+    ],
+    "process_resources": [
+      "tools/testing/test_process_resources.py",
+      "tools/testing/test_dev_timings.py"
+    ],
+    "measurement_comparison": "tools/testing/test_hil_measurement_compare.py",
+    "h743_flash_ram": "tools/measurement/h743_flash_ram.py",
+    "examples_local_ci": "X-Gen-Lab/nexus-examples/scripts/local_ci.py",
+    "source_sdk": "cmake/package/verify_consumers.py",
+    "candidate": "tools/evidence/candidate.py",
+    "reproduction": "tools/evidence/reproduce.py"
+  },
+  "observations": {
+    "configuration_equivalence": {
+      "assemblies": 71,
+      "ir_equal": true,
+      "generated_files_checked": 710,
+      "unchanged_generated_files": 639,
+      "intentional_changes": "71 selection.cmake outputs add explicit family contract dependencies; no generated C/ABI change is claimed.",
+      "raw_record": "/tmp/nexus-next-20261024/configuration/equivalence-green.json",
+      "scope": "development worktree compared with the captured pre-refactor inputs"
+    },
+    "exact_support": {
+      "part": "STM32F407ZGT6",
+      "board": "stm32f407zg-qiming-v31",
+      "backend": "baremetal",
+      "clock_profile": "hse8-pll168",
+      "controller": "USART1",
+      "mode": "dma-tx",
+      "dma": [
+        "DMA2:stream7:channel4"
+      ],
+      "configuration": "validated",
+      "execution_stages": "not_assessed",
+      "raw_record": "/tmp/nexus-next-20261024/documentation/exact-support-observed.json",
+      "focused_contract_cases": 8
+    },
+    "process_resources": {
+      "method": "linux_wait4",
+      "scope": "waited_process_and_reaped_descendants",
+      "user_cpu_seconds": 0.063219,
+      "system_cpu_seconds": 0.01208,
+      "maximum_process_rss_bytes": 15499264,
+      "interpretation": "One observed tool-test attempt; single-process peak, not simultaneous tree RSS or a whole-build speedup.",
+      "raw_record": "/tmp/nexus-next-20261024/devtools/actual-resource-observation.json"
+    },
+    "measurement_comparison": {
+      "focused_contract_cases": 9,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Synthetic validator contracts; admission ELF service mocked, trace/hash/context/workload validation real. No physical baseline acquired.",
+      "raw_record": "/tmp/nexus-next-20261024/io-cost/handoff.json",
+      "complete_targeted_suite": {
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "modules": [
+          "tools.testing.test_hil_measurement_compare",
+          "tools.testing.test_hil_measurements",
+          "tools.testing.test_interface_storage",
+          "tests.contracts.test_interface_cost"
+        ],
+        "scope": "Synthetic validator/ELF contracts only; no physical HIL execution.",
+        "raw_record": "/tmp/nexus-next-20261024/io-cost/summary.json",
+        "raw_sha256": "0ca2ef4791d8ae3097e228cfe3461a1bdcf6be9cac5fa1069475482d701fa8c6",
+        "raw_log": "/tmp/nexus-next-20261024/io-cost/tests.log",
+        "count_note": "Includes the nine comparison cases above; not additional distinct cases."
+      }
+    },
+    "documentation": {
+      "current_pages": 131,
+      "ledger_views": 10,
+      "source_check": "passed_development_worktree",
+      "bilingual_admission": "fresh_gettext_and_independent_semantic_review_passed",
+      "api_xml": "Public include inputs unchanged; current gettext reuses the previously extracted XML. This is not a new Doxygen or strict HTML execution."
+    },
+    "usb_ep0": {
+      "native_cases": 78,
+      "stm32f407_cases": 11,
+      "gd32f470_cases": 11,
+      "scope": "Current development model executions; the malformed private-plan RED does not prove a legal lifecycle could reach NULL. CodeQL re-execution belongs to final CI.",
+      "raw_record": "/tmp/nexus-next-20261024/provider/handoff.json"
+    },
+    "h743_flash_ram": {
+      "scope": "current source development ARM links; common GPIO baseline, only PLL384 pair gives Flash selection delta; no pulse execution or software candidate",
+      "arm_cases": 23,
+      "commands": 52,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": [
+        {
+          "profile": "hsi32-fixed-cache-off",
+          "elf_sha256": "79406def38c9904bf64cd22f7162d4fc8fb267c671bb6bd528f2dffae172ea6d",
+          "configuration_sha256": "4c3dcfeef65a4b10b076797aef965c8d06c050e48f179959c1d57177802c4834",
+          "flash_load_bytes": 10620,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "hsi64-fixed-cache-off",
+          "elf_sha256": "437ddf5f1594ed7d209a1ac2da2db808e6caecde43927b8feb8cabe6361fbd20",
+          "configuration_sha256": "9d909190033ca2d2a5c9425d1a700cd4d6e7d131d5db7244b7bc1ecbefefe306",
+          "flash_load_bytes": 10532,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "hsi64-pll384-cache-off",
+          "elf_sha256": "111661996e56f8cd8c80294db3e3edda356da23d601e1e14d64491577535ef47",
+          "configuration_sha256": "1561c45dc0a83da84caeda3e949bb25613f1d39c8769923b9d46584f63f31223",
+          "flash_load_bytes": 12468,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "unselected",
+          "elf_sha256": "3d8944ae6504598862f08df4bcdbf41d2b77af3a5733b566e26f39f3e04aa78f",
+          "configuration_sha256": "71878e67f4354e8e5c7b95093eb9b3f9acba2eec934c4ed0812174b10b5ab495",
+          "flash_load_bytes": 6896,
+          "axi_reserved_bytes": 2160,
+          "public_flash_linkage": "not_observed_unselected"
+        }
+      ],
+      "pll384_flash_selection_delta": {
+        "flash_loaded_bytes": 5572,
+        "axi_reserved_bytes": 4100,
+        "scope": "same H743 high-clock baremetal cache-off GPIO assembly; Flash selection adds controller, RAM execution, generated lifecycle and reachable dependencies; not a before/after optimization or hardware performance result"
+      },
+      "pod_bytes": 2276,
+      "workspace_bytes": 1800,
+      "private_stack_capacity_bytes": 1024,
+      "private_stack_static_bound_bytes": 344,
+      "incoming_caller_stack_reserve_bytes": 260,
+      "pod_to_workspace_alignment_gap_bytes": 796,
+      "accounting": "Pod/workspace/private stack are nested within linked allocations; gap is reported separately and not allocated storage. Static bounds are not measured high-water marks.",
+      "physical_hil": "not_executed",
+      "raw_record": "/tmp/nexus-next-20261024/provider/h743-linked-costs.json"
+    }
+  },
+  "pending_exits": {
+    "ordinary_complete_index_gate": "pending_final_combined_source_execution",
+    "examples_locked_consumption": "pending_new_platform_pin",
+    "installed_sdk_consumers": "pending_final_combined_source_execution",
+    "formal_software_plan": "pending_final_combined_source_execution",
+    "two_independent_offline_builds": "pending_final_combined_source_execution",
+    "seal_and_verify": "pending_final_combined_source_execution",
+    "post_merge_source_association": "pending_actual_merge",
+    "physical_hil": "not_executed"
+  },
+  "evidence_archive_locator": {
+    "status": "selected_194_and_development_scopes_archived_final_combined_closure_pending",
+    "scope": "Use current_iteration_20261028 retained_delivery_scopes and each observation archive for verified local navigation. Original N01-N14 and previous iteration paths retain their identities. No public obtainability or final combined software candidate is claimed.",
+    "previous_iteration_archives": "unchanged; retain their original P/E identity"
+  },
+  "updated_date": "2026-11-04",
+  "platform_baseline_scope": "Original N01-N14 baseline; not the current iteration or the current checkout.",
+  "current_iteration_20261028": {
+    "kind": "c_firmware_lifecycle_and_delivery_development_increment",
+    "task_ids": "A01-J04 and X01-X05; original 64 exits unchanged",
+    "task_authority": "docs/design/platform-delivery-completion.csv",
+    "source_base": "3ea252c6144b7661e67f04235c0f737a28eda221",
+    "qualification": false,
+    "physical_hil": "not_executed",
+    "publication": "not_published",
+    "identity_rules": "Each observation retains its own commit/tree or frozen dirty-worktree manifest. Counts overlap and are not added across scopes. Later integration does not inherit an earlier execution identity.",
+    "committed_scopes": [
+      {
+        "commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "tree": "a0cec8678cd5611b2dd4e75a77251387521fd67b",
+        "scope": "First selected C lifecycle/configuration/tooling increment",
+        "ordinary_gate": {
+          "python_cases": 3424,
+          "google_programs": 357,
+          "google_cases": 6504,
+          "skipped": 0,
+          "scope": "Native Debug ordinary complete-index gate; not all four Native modes or the full software plan"
+        },
+        "sdk": {
+          "maintained_consumer_chains": 50,
+          "focused_cold_consumer_chains": 5,
+          "snapshot_sha256": "95286630193e218b6dbbaf5beacf18dbbdcf75334e092cacbf7564f0dcba620d",
+          "scope": "Actual installed C/C++ consumer chains, relocation verification and independent restore; not the later combined-source SDK"
+        },
+        "documentation": {
+          "current_pages": 132,
+          "strict_bilingual": "passed",
+          "package_verify_and_restore": "passed",
+          "publication": false,
+          "qualification_references": [],
+          "scope": "Actual Doxygen/gettext/English/Chinese strict build for this clean commit; later prose does not inherit this execution"
+        }
+      },
+      {
+        "commit": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "tree": "388c90dc7de8c619a13a547e185b96960996cc61",
+        "scope": "Legacy F103/GD303 full cold lifecycle and earlier I2C resource-cost increment",
+        "ordinary_gate": {
+          "python_cases": 3424,
+          "google_programs": 361,
+          "google_cases": 6552,
+          "skipped": 0,
+          "scope": "Ordinary complete-index Native Debug gate for this tree; later family and owner-guard changes require another execution"
+        },
+        "retained_ordinary_gate": {
+          "receipt": "build/c-cold-20261028/legacy/ordinary-gate/package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/legacy/ordinary-gate/store/d35e38599fea8bdc5fcdecaa646df640e3482c6569e826e28cbc261527d21888.tar.gz",
+            "sha256": "d35e38599fea8bdc5fcdecaa646df640e3482c6569e826e28cbc261527d21888",
+            "size": 4545891
+          },
+          "manifest_sha256": "e3d811d0e08de0ac952ff214f5710514702921ea53d21794896535e8ec61fdad",
+          "files": 31052,
+          "bytes": 51377411,
+          "obtainability": "execution_host_local_only"
+        }
+      },
+      {
+        "commit": "364f36658634e157b899ab62aacdcfaac21dbd9f",
+        "tree": "b7ccec5311cbee001a706ebd0ded68cd248a7b1c",
+        "scope": "Third integrated C cold-lifecycle, typed device-graph, generator cleanup and workflow/documentation increment; P4 fact-stage changes are a later scope.",
+        "ordinary_gate": {
+          "python_cases": 3453,
+          "python_domains": {
+            "testing": 1657,
+            "configure": 1144,
+            "ci": 493,
+            "workflows": 159
+          },
+          "google_programs": 386,
+          "google_cases": 6818,
+          "skipped": 0,
+          "scope": "Ordinary complete-index Native Debug gate for the exact same tree as locally validated bad14f24; not final P4 qualification, four Native modes, SDK, examples, strict documentation or physical acceptance."
+        },
+        "local_validated_commit": "bad14f24be67d0ba5a5e8d617ff011316088be88",
+        "commit_association": "build/c-cold-20261028/integration/commit-association-03.json",
+        "retained_ordinary_gate": {
+          "receipt": "build/c-cold-20261028/integration/ordinary-gate/package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/integration/ordinary-gate/store/7051d861d421e8ae5e8871443b31021b19dd710bf4111bc5a8ed921e0136aaf4.tar.gz",
+            "sha256": "7051d861d421e8ae5e8871443b31021b19dd710bf4111bc5a8ed921e0136aaf4",
+            "size": 5235658
+          },
+          "manifest_sha256": "b916ea1aff7b71f3d132d5fbfab4879ccfa590b5096464ac47b970a7ea0bde89",
+          "files": 34712,
+          "bytes": 57782326,
+          "obtainability": "execution_host_local_only"
+        }
+      }
+    ],
+    "family_development_scopes": {
+      "legacy_pair": {
+        "families": [
+          "stm32f103",
+          "gd32f303"
+        ],
+        "arm_fixtures": 30,
+        "asan_ubsan_cases": 352,
+        "qualification": false,
+        "scope": "One combined pair scope, not thirty fixtures or352 cases per family; actual C lifecycle/ownership models and ARM budgets"
+      },
+      "f407": {
+        "family": "stm32f407",
+        "arm_fixtures": 55,
+        "arm_matrix_commands": 179,
+        "additional_exact_presets": 3,
+        "additional_configure_build_commands": 6,
+        "debug_cases": 153,
+        "asan_ubsan_cases": 153,
+        "skipped": 0,
+        "source_manifest": "/dev/shm/nexus-next-f407/build/f407-full-increment-paths.json",
+        "archive": {
+          "receipt": "build/c-cold-20261028/f407/full-family-package.json",
+          "archive": {
+            "path": "/workspace/nexus/build/c-cold-20261028/f407/full-family-store/252cf6be31e2d3c45c1566cab5af961ca8f707ce4391b0d2c9cc537294891d48.tar.gz",
+            "sha256": "252cf6be31e2d3c45c1566cab5af961ca8f707ce4391b0d2c9cc537294891d48",
+            "size": 14362377
+          },
+          "manifest_sha256": "6619b50c8ed6593060d2099f3c39b5d39c6d44ed6de9726dc6a1d98270e787cf",
+          "files": 8376,
+          "bytes": 83416168,
+          "obtainability": "execution_host_local_only"
+        },
+        "scope": "Frozen 62-path family development delta, plus its four original pre-194 test before-images. Final merged tree and root-owned I2C guard are separate scopes."
+      },
+      "g474": {
+        "family": "stm32g474",
+        "arm_fixtures": 31,
+        "debug_cases": 612,
+        "asan_ubsan_cases": 612,
+        "source_manifest": "/dev/shm/nexus-next-g474/build/cold-g474/handoff.json",
+        "scope": "Frozen G474 family development scope, including selected and empty assemblies; not the final combined head"
+      },
+      "modern_pair": {
+        "families": [
+          "stm32h743",
+          "stm32u575"
+        ],
+        "arm_fixtures": 47,
+        "debug_cases": 1636,
+        "focused_asan_ubsan_cases": 109,
+        "scope": "Combined H743/U575 development observations: 47 matrix builds plus 8 maintained preset executions are overlapping scopes, not 55 independent capabilities. ASAN is a focused subset and does not establish a complete sanitizer matrix.",
+        "additional_maintained_presets": 8
+      },
+      "gd470": {
+        "family": "gd32f470",
+        "status": "family_implementation_integrated_final_gate_pending",
+        "source_manifest": "/dev/shm/nexus-next-gd470/build/gd470-cold/family-increment-paths.json",
+        "arm_scopes": {
+          "nonempty_primary_matrix": 33,
+          "nonempty_additional_matrix": 8,
+          "maintained_presets": 18,
+          "empty_presets_included": 2,
+          "observed_build_executions": 59,
+          "overlap": "These are overlapping build execution scopes, not 59 independent capabilities or configurations."
+        },
+        "models": [
+          {
+            "scope": "UART/control",
+            "programs": 11,
+            "debug_cases": 113,
+            "asan_ubsan_cases": 113
+          },
+          {
+            "scope": "packet/timer",
+            "programs": 6,
+            "debug_cases": 87,
+            "asan_ubsan_cases": 87
+          }
+        ],
+        "empty_scope": "Two maintained empty presets observed zero retained faces and no unselected providers.",
+        "scope": "Frozen 64-path development delta; shared test merges and the final integrated gate have separate identities."
+      }
+    },
+    "linked_costs": {
+      "earlier_committed_d21": {
+        "commit": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "reference_commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "profiles": 5,
+        "polling_flash_delta_bytes": -356,
+        "irq_dma_flash_delta_bytes": 76,
+        "scope": "Earlier reviewed compact I2C receipt before the later rejected-owner guard; not the final candidate costs"
+      },
+      "later_i2c_owner_guard": {
+        "status": "development_observed_pending_final_integrated_gate",
+        "reference_commit": "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "normal_cases": 25,
+        "asan_ubsan_cases": 25,
+        "arm_fixtures": 5,
+        "polling_flash_delta_bytes": -340,
+        "irq_dma_flash_delta_bytes": 96,
+        "ram_delta_range_bytes": [
+          -24,
+          -16
+        ],
+        "raw_record": "build/c-cold-20261028/f407/i2c-owner-costs.json",
+        "scope": "Same five authored profiles with the added rejected-owner guard; RAM savings trade against IRQ/DMA Flash growth. Not measured latency, throughput or power."
+      }
+    },
+    "engineering": {
+      "f03_job_budget": {
+        "status": "implemented_focused_and_review_passed_final_gate_pending",
+        "focused_cases": 132,
+        "independent_review_cases": 86,
+        "overlap": "The review subset overlaps the focused suite; do not add them.",
+        "handoff": "/dev/shm/nexus-next-workflow/build/workflow/f03-handoff.json",
+        "review_log": "/dev/shm/nexus-next-workflow/build/workflow/f03-independent-review.log",
+        "scope": "Explicit per-invocation allocation overrides inherited Nexus/CMake defaults. SDK divides that allocation into one-job workers. Independent invocations still need orchestrator allocation; no global semaphore or measured universal speedup."
+      },
+      "f05_incremental": {
+        "status": "implemented_development_observations_native_m4_m33_passed_final_gate_pending",
+        "raw_record": "/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json",
+        "scope": "Six actual input-change observations each in Native-empty, STM32F407ZGT6 Cortex-M4 GPIO and STM32U575ZIT6Q Cortex-M33 GPIO external consumers. Object rebuild sets match actual dependency closure, original source/configuration identities restore, and no test pass report is cached. ARM compile/link/budgets establish software scope only; full four Native modes and final clean-source qualification remain separate.",
+        "native_raw_record": "/dev/shm/nexus-next-workflow/build/workflow/f05-summary.json",
+        "arm_raw_record": "build/c-cold-20261028/workflow/incremental-arm-03/summary.json",
+        "scenario_order": [
+          "noop",
+          "private-c",
+          "public-header",
+          "toml",
+          "board",
+          "tool-lock"
+        ],
+        "rebuilt_object_counts": {
+          "stm32f407_m4": [
+            0,
+            1,
+            6,
+            5,
+            5,
+            0
+          ],
+          "stm32u575_m33": [
+            0,
+            1,
+            6,
+            2,
+            2,
+            0
+          ]
+        },
+        "arm_scenarios_passed": 12,
+        "arm_commands_executed": 34,
+        "arm_commands_exit_zero": 34,
+        "restored_source_files": 3644,
+        "restored_source_bytes": 256517352,
+        "source_scope": {
+          "root_head": "d21dfcab40058025928bbcc3e15b50e822f3125b",
+          "dirty_frozen_overlay": true,
+          "final_clean_qualification": false
+        },
+        "compiler_cache": "OFF",
+        "cache_namespace": "Actual maintained cache.py namespace CLI observed tool-lock newline change alter the namespace and exact input restoration restore the namespace. No compiler-cache hit/miss execution or dependency-version upgrade claim."
+      },
+      "i01_environment": {
+        "status": "audited_not_rebuilt",
+        "raw_record": "build/c-cold-20261028/workflow/environment-i01/provenance-audit.json",
+        "recipe_reproducible": false,
+        "missing_locked_python_distributions": 13,
+        "declared_python_distributions": 15,
+        "scope": "Base four-layer prefix and five direct APT pins match the observed image; Python/tool acquisition provenance and two independent recipe reconstructions remain open. Do not rewrite the declared recipe or historical image to conceal this gap."
+      },
+      "f04_test_disposition": {
+        "status": "partial",
+        "obsolete_gd_internal_helper_text_tests_removed": 2,
+        "replacement_oracle": "Actual generated UART mode factory programs execute the real C providers and their failure/ownership paths; text of an unreachable internal Python helper is no longer the behavior contract.",
+        "scope": "Scoped current-increment test contract/oracle groups and known obsolete helper replacements are reviewed; later owners retain their own changes. Whole-project retained/merged/removed test disposition remains open.",
+        "reviewed_contract_groups": 13,
+        "python_file_snapshot_count": 44,
+        "changed_method_snapshot_count": 106,
+        "case_removals_by_oracle_review": 0,
+        "arbitrary_fixture_count_assertions_removed": 1,
+        "raw_record": "build/c-cold-20261028/workflow/f04-review/review.json",
+        "oracle_sensitivity": "Old timer expected-close oracle used the same constructor under test and accepted an in-memory wrong-close mutation; the new explicit reviewed symbol rejects both family subtests. Restored behavior and both complete focused modules pass9/9. This is a test mutation, not a production defect RED claim."
+      },
+      "d02_device_graph": {
+        "status": "implemented_frozen_cross_device_stage_final_integrated_gate_pending",
+        "stage_cases": 4,
+        "complete_configure_cases": 1144,
+        "skipped": 0,
+        "exact_bundle_comparison": {
+          "assemblies": 299,
+          "files": 2990,
+          "fileset_and_bytes_equal": true
+        },
+        "raw_record": "build/c-cold-20261028/device-graph-stage/handoff.json",
+        "scope": "One complete frozen device graph after local validated controller/endpoint builders; USB FIFO, SPI face, ADC trigger, resource and DMA decisions complete before final assembly. Existing memory/layout/dependency stages remain; this is not a separate nominal typed stage for every normalizer. API-only RED and first failed environment/stale-oracle run are retained separately."
+      },
+      "d03_selected_consumption": {
+        "status": "implemented_uniform_consumption_audit_passed_integrated_gates_pending",
+        "assemblies": 305,
+        "families": 8,
+        "controllers": 542,
+        "explicit_hardware_bindings": 166,
+        "fixed_reviewed_or_model_leaf_controllers": 376,
+        "raw_record": "build/c-cold-20261028/integration/d03/results-01.json",
+        "scope": "Read-only selected resource/DMA/IRQ/clock/pin canonical identity, actual constructor emission and capability/query projection audit. Fixed reviewed SDK leaves are not an alternative selected route or owner authority. Source Python before/after hashes matched. Final combined-source gates remain separate."
+      },
+      "d02_fact_selection": {
+        "status": "implemented_frozen_fact_and_device_graph_stages_direct_readonly_validation_final_qualification_pending",
+        "source_base": "364f36658634e157b899ab62aacdcfaac21dbd9f",
+        "raw_record": "build/c-cold-20261028/fact-stage-increment/handoff.json",
+        "stage_and_container_cases": 12,
+        "complete_central_module_cases": 49,
+        "complete_configure_cases": 1156,
+        "skipped": 0,
+        "exact_bundle_comparison": {
+          "assemblies": 299,
+          "files": 2990,
+          "fileset_and_bytes_equal": true
+        },
+        "scope": "One frozen _FactResolution owns admitted readonly Board/SoC/routes/bindings/references/input identities. Part/family/variant are views of the same admitted Board/SoC, without duplicate stored selection. Central configure.obj/CPU.fields accept Mapping and common.sequence accepts explicit list/tuple while retaining strict raw JSON field/type/domain rejection. Providers consume the immutable containers directly; this is not a separate nominal type for every JSON leaf. Scratch source execution, missing-API/protocol RED and final-source qualification remain separate."
+      }
+    },
+    "retained_delivery_scopes": {
+      "sdk_prefix": {
+        "receipt": "build/c-cold-20261028/sdk-retention/prefix-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/8acb0087369a398543fb68176aac2620de07ec85c1740c325a8a3aeeea3f6004.tar.gz",
+          "sha256": "8acb0087369a398543fb68176aac2620de07ec85c1740c325a8a3aeeea3f6004",
+          "size": 10624526
+        },
+        "manifest_sha256": "71cdba82a2580e459b1738490de5791420f98c001b8ae28ce8713b1227851400",
+        "files": 2961,
+        "bytes": 75202534,
+        "obtainability": "execution_host_local_only"
+      },
+      "sdk_maintained_consumer_raw": {
+        "receipt": "build/c-cold-20261028/sdk-retention/maintained-consumers-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/9b952c06b2d240376f64678f5620dbb8aaa61bbabfafc0a6a0b715740e34bcbf.tar.gz",
+          "sha256": "9b952c06b2d240376f64678f5620dbb8aaa61bbabfafc0a6a0b715740e34bcbf",
+          "size": 13036594
+        },
+        "manifest_sha256": "45be8104fed53650ad9577c7ff41f1ca8c5a4e3bea6329f7305ca1d20d98c2b9",
+        "files": 9048,
+        "bytes": 72640556,
+        "obtainability": "execution_host_local_only"
+      },
+      "sdk_focused_consumer_raw": {
+        "receipt": "build/c-cold-20261028/sdk-retention/cold-consumers-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/sdk-retention/store/ee4f00ee5153d0ff7c520e993492127c0f87b470eff57d7dd3dd6938cc083250.tar.gz",
+          "sha256": "ee4f00ee5153d0ff7c520e993492127c0f87b470eff57d7dd3dd6938cc083250",
+          "size": 1673964
+        },
+        "manifest_sha256": "0553b1784cb40c5b84b7004c37393c109e99d7fe589e85f26cde3736d009a5fd",
+        "files": 1049,
+        "bytes": 8816852,
+        "obtainability": "execution_host_local_only"
+      },
+      "documentation_complete_tree": {
+        "receipt": "build/c-cold-20261028/docs/strict04/complete-tree-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/docs/strict04/complete-tree-store/1a09cfaba35a81eadee05907dff8b6f61aca2254d7e1d277374fe8146dba6838.tar.gz",
+          "sha256": "1a09cfaba35a81eadee05907dff8b6f61aca2254d7e1d277374fe8146dba6838",
+          "size": 62307423
+        },
+        "manifest_sha256": "1f580050a73069afc653be4c80c9706d36018de62b106a55a090ff9754a9b324",
+        "files": 7636,
+        "bytes": 299350700,
+        "obtainability": "execution_host_local_only"
+      },
+      "documentation_raw_build": {
+        "receipt": "build/c-cold-20261028/docs/strict04/raw-build-package.json",
+        "archive": {
+          "path": "/workspace/nexus/build/c-cold-20261028/docs/strict04/evidence-store/682ef342b6dd9f05ea3525fe7fe1d4ac7e54ab58d0258487efd50827bd253027.tar.gz",
+          "sha256": "682ef342b6dd9f05ea3525fe7fe1d4ac7e54ab58d0258487efd50827bd253027",
+          "size": 16397511
+        },
+        "manifest_sha256": "6749e26fd9eb5be9e22bd6b439861c5041616af4afa767a7ac9a25f81870667b",
+        "files": 2659,
+        "bytes": 112901242,
+        "obtainability": "execution_host_local_only"
+      },
+      "note": "Archives are verified local retention; they are not public download URLs or final-head qualification."
+    },
+    "remaining_exits": [
+      "Final integrated ordinary gate and all four complete Native modes",
+      "Final maintained ARM matrix and relocated installed SDK consumers",
+      "External examples pin and complete local execution",
+      "Fresh strict bilingual documents for the frozen combined source",
+      "Complete software plan, two independent offline builds and existing seal/verify",
+      "Independent OCI recipe reconstruction and provenance closure",
+      "Physical station execution for every applicable H task",
+      "Actual reviewed merge, GitHub synchronization and publication association"
+    ],
+    "github_sync": {
+      "status": "three_committed_increments_synced_p4_integration_pending",
+      "commits": [
+        "194ca6cb828652135ad1369d8c1a489d75a89fb0",
+        "d21dfcab40058025928bbcc3e15b50e822f3125b",
+        "364f36658634e157b899ab62aacdcfaac21dbd9f"
+      ],
+      "pull_request": "https://github.com/X-Gen-Lab/nexus/pull/41",
+      "scope": "The three exact committed increments are synchronized. P4 fact-stage/test consolidation worktree and final delivery require their own ordinary gate and clean-source qualification."
+    },
+    "documentation_status_closure": {
+      "status": "p4_fact_stage_and_p3_navigation_source_gettext_translation_review_passed_strict_html_pending",
+      "source_scope": "Uncommitted P4 guide/status data update after canonical P3; no new physical or final qualification is implied.",
+      "source_manifest": "build/c-cold-20261028/docs/fact-stage-p4/handoff.json",
+      "current_pages": 132,
+      "translation_language_page_records": 264,
+      "semantic_reviewer": "root maintenance agent",
+      "fresh_gettext": "/dev/shm/nexus-docs-status-closure-20261028/gettext-p4",
+      "translation_report": "build/c-cold-20261028/docs/fact-stage-p4/translation-admission.json",
+      "source_and_diagram_report": "build/c-cold-20261028/docs/fact-stage-p4/full-source-check.json",
+      "remaining": "Fresh strict English/Chinese HTML, immutable package and restore for the final frozen source."
+    },
+    "shared_cold_lifecycle": {
+      "status": "implemented_development_regressed_final_integrated_gate_pending",
+      "spi_admission": {
+        "raw_record": "build/c-cold-20261028/spi-admission/handoff.json",
+        "scope": "Shared read-only C sequence preflight runs before cold resource effects or failed-init marker; actual F407/GD470/Native factory rejection and retained-owner regressions; nonempty H743 resume admission precedes domain reopen."
+      },
+      "dead_generator_cleanup": {
+        "raw_record": "build/c-cold-20261028/generator-cleanup/handoff.json",
+        "scope": "Pure removal of unreachable hardware-generating paths;299 maintained assembly outputs compare identically except declared removal of the dead secondary.py dependency path."
+      },
+      "unused_default_macros": {
+        "raw_record": "build/c-cold-20261028/default-macro-cleanup/handoff.json",
+        "assemblies": 299,
+        "bindings_c_bytes_removed_each": 233,
+        "other_bundle_files_equal": 2691,
+        "scope": "Separate intentional literal deletion from bindings.c, with original bytes and per-file deltas retained; not represented as identical generated C."
+      },
+      "runtime_lease": {
+        "raw_directory": "build/c-cold-20261028/runtime-lease-c",
+        "clock_domain_cases": 28,
+        "generated_h743_runtime_factory_cases": 17,
+        "python_wiring_cases": 13,
+        "scope": "Seven private C cold helpers use the existing static domain/lease storage and explicit generated calls; ownership predicates no longer emitted by Python. Missing-API RED is not an old-behavior defect demonstration. Actual selected ARM runtime consumer trades+220Flash for unchangedAXI RAM; final integration remains separate.",
+        "raw_record": "build/c-cold-20261028/runtime-lease-c/handoff.json",
+        "arm_flash_delta_bytes": 220,
+        "arm_ram_delta_bytes": 0,
+        "arm_reference_flash_bytes": 15848,
+        "arm_current_flash_bytes": 16068,
+        "arm_axi_ram_bytes": 2536,
+        "final_bundle_comparison": {
+          "assemblies": 299,
+          "intentional_runtime_bindings_files_changed": 1,
+          "other_files_byte_equal": 2989
+        },
+        "residual_audit": {
+          "production_generator_sources": 119,
+          "reviewed_control_strings": 93,
+          "scope": "Reviewed live MMIO/wait/private ownership algorithm dispatch; fixed typed calls, progress/diagnostic markers and C queries remain permitted."
+        }
+      }
+    }
+  },
+  "source_version_records_20261103": {
+    "kind": "source_versioned_development_observations",
+    "date": "2026-11-03",
+    "identity_rules": "These records extend the existing results index. Historical executions, current development, artifact survival and final acceptance remain separate. Counts overlap and are never added across scopes. No record creates a new firmware candidate or physical qualification.",
+    "accepted_public_source": {
+      "commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "tree": "b3188fafc8516c6a51fbbd0c98a82ea5493ea1ad",
+      "classification": "previous_accepted_software_development_source_not_new_formal_candidate",
+      "ordinary_complete_index_gate": {
+        "status": "actually_passed_before_environment_outage",
+        "google_programs": 414,
+        "google_cases": 7226,
+        "tool_tests": {
+          "testing": 1992,
+          "configure": 1226,
+          "ci": 495,
+          "workflows": 166
+        },
+        "tool_cases_total": 3879,
+        "io_properties": 233,
+        "failures": 0,
+        "skips": 0,
+        "scope": "The ordinary Native Debug complete-index gate for this exact source; not all four Native modes or the complete formal software plan.",
+        "retained_archive": {
+          "path": "/workspace/nexus/build/iteration-20261102/tcp-device-image-ordinary-gate-attempt03.tar.gz",
+          "sha256": "f8da57a5c576a0da5deceab8ef0d884dcd673c38beb1d4216741dd695cc7cca7",
+          "bytes": 6883005,
+          "restored_regular_members": 4703,
+          "scope": "raw commands/receipts/XML/compiler metadata andfailed attempts; notbinarypayloads orformalsoftwarecandidate",
+          "obtainability": "execution_host_local_only"
+        }
+      },
+      "installed_source_sdk": {
+        "policy": "nexus-sdk-consumers-v14",
+        "status": "actually_passed_before_environment_outage",
+        "consumer_roots": 59,
+        "images": 62,
+        "commands_including_initial_sdk_verify": 246,
+        "separate_sdk_verify": "actually_passed_before_environment_outage",
+        "retained_archive": {
+          "path": "/workspace/nexus/build/iteration-20261102/nexus-source-sdk-6c3a380a.tar.gz",
+          "sha256": "db2576f7aee3eefdd1cd384a7b2fb4b57ce8fb4d584b59b8e018088447b4c41f",
+          "bytes": 14087896,
+          "restored_regular_members": 3877,
+          "snapshot_sha256": "2c0014ec2b8fca478ee8ec3eaf5437c123aa15f7915c1545a39798b206aec0aa",
+          "obtainability": "execution_host_local_only"
+        },
+        "archive_metadata_record": "build/iteration-20261102/nexus-source-sdk-6c3a380a-archive.json",
+        "original_restore_verify_exit": 0,
+        "survival_limit": "The retained metadata records the original actual restore and verification. Several temporary raw v14 consumer/verification receipts were lost in the outage. This status update does not claim a new raw v14 verification or consumer execution."
+      },
+      "documentation": {
+        "status": "clean_source_english_and_chinese_build_actually_passed_before_outage",
+        "scope": "Exact accepted 6c3a380a documentation execution; later docs and feature source do not inherit that execution.",
+        "raw_receipt_survival": "Some original TMP/SHM receipt copies are now lost; this record does not recreate them or claim a new build."
+      },
+      "physical_hil": "not_executed",
+      "publishable_candidate": false
+    },
+    "private_reference_metadata": {
+      "repository": "X-Gen-Lab/nexus-examples",
+      "immutable_commit_prefix": "2e932bbc",
+      "platform_sdk_commit": "7fd36f8a0b4226c5e8a8e9caa518312c20df9e21",
+      "pull_request": 24,
+      "ordinary_gate": {
+        "python_cases": 86,
+        "ctest_tests": 23,
+        "google_programs": 13,
+        "google_cases": 146,
+        "scope": "Immutable private source at its recorded SDK pin, not the later uncommitted 6c3a380a pin or gateway follow-up."
+      },
+      "later_development": {
+        "platform_sdk_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "source_status": "earlier_uncommitted_observation_now_has_separate_accepted_commit_record",
+        "focused_scopes": {
+          "peer_cases": 11,
+          "main_cases": 4,
+          "real_broker_cases": 5,
+          "style_files": 24
+        },
+        "status": "earlier_development_observations_accepted_later_in_ff86eb49",
+        "count_note": "These are different and potentially overlapping scopes; do not sum them or relabel them as the immutable ordinary gate.",
+        "focused_scopes_source_scope": "Earlier focused development observations retain their own source; they are not the latest fresh-run or immutable ordinary-gate result.",
+        "latest_fresh_run": {
+          "source_five_real_broker_cases": "passed",
+          "installed_five_real_broker_cases": "passed",
+          "installed_existing_ctest_tests": 2,
+          "closing_sdk_verify_exit": 0,
+          "full_private_ordinary_gate": "passed_in_separate_ff86eb49_record",
+          "source_status": "accepted_private_commit",
+          "publication_boundary": "Aggregates and approved commit/PR metadata only; no private tree, binary identity, payload path or receipt is public."
+        }
+      },
+      "publication_boundary": "Public records contain only aggregate counts and commit/PR metadata. Private source, payload paths, receipts and archives stay outside the public platform and its packages.",
+      "physical_hil": "not_executed",
+      "accepted_current_source": {
+        "commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+        "platform_sdk_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "status": "ordinary_gate_passed_and_commit_pushed",
+        "pull_request": 24,
+        "pull_request_state": "draft",
+        "pull_request_head_commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+        "pr_metadata_authority": "Root actual GitHub readback after private visibility was freshly verified before push.",
+        "ordinary_gate": {
+          "python_cases": 89,
+          "ctest_tests": 28,
+          "google_programs": 18,
+          "google_cases": 204,
+          "failures": 0,
+          "skips": 0
+        },
+        "source_real_broker_cases": 5,
+        "installed_real_broker_cases": 5,
+        "installed_existing_ctest_tests": 2,
+        "separate_closing_sdk_verify_exit": 0,
+        "scope": "Private development source at the exact public 6c3a380a SDK pin. Source and installed runs retain their own executions and are not ten distinct broker cases. This private scope is separate from the public eb4/v15 result.",
+        "physical_hil": "not_executed",
+        "new_candidate": false
+      }
+    },
+    "current_feature_cohort": {
+      "source_base": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+      "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+      "source_identity_status": "accepted_public_commit_pushed",
+      "implemented_scope": [
+        "optional RX payload-loan public and Storage/profile boundaries",
+        "stateless generic MCUboot control and separate explicit Flash composition",
+        "settled TX error observation",
+        "real host frame PCAP capture and bounded F407 network link reference",
+        "resolver and command-line refinements",
+        "Source SDK policy v15 and five additional consumer roots"
+      ],
+      "ordinary_complete_index_gate": {
+        "status": "passed_and_original_archive_independently_audited_restored",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "google_programs": 420,
+        "google_cases": 7335,
+        "tool_cases": 3950,
+        "tool_domains": {
+          "testing": 2062,
+          "configure": 1226,
+          "ci": 495,
+          "workflows": 167
+        },
+        "failures": 0,
+        "skips": 0,
+        "io_property_rows": 233,
+        "io_unproven": 8,
+        "summary": "build/recovery-20261103/ordinary/accepted-ordinary-summary.json",
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/ordinary/accepted-ordinary-evidence.tar.gz",
+          "sha256": "a8f425f2e8cd78a8ac8ee91a9b51e59ead307d70b14a3800777686e810085d1e",
+          "size": 6842596
+        },
+        "restored_files": 5173,
+        "scope": "Original complete-index ordinary Native Debug Google/tool gate only; record/input metadata archive, no binary payload or software candidate.",
+        "retention_limit": "Object/archive/executable bytes and dependency/tool binary payloads; the original io-property snapshot preserves their exact hashes/contexts. This compact archive cannot replay full binary-input verification after those separately-held original bytes disappear.",
+        "full_software_plan": "not_inferred",
+        "source_sdk_qualification": "not_inferred",
+        "physical_hil": "not_executed",
+        "io_property_counting": "233 bounded executed properties and 8 separate unproven entries; unproven entries are not included in 233."
+      },
+      "installed_source_sdk": {
+        "policy": "nexus-sdk-consumers-v15",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "snapshot_sha256": "05eb409d3aa47f4694b155a370c801ed222a329c9d7acd0a735ea92fb22b3e1d",
+        "consumer_roots": 64,
+        "images": 67,
+        "actual_commands": 270,
+        "command_exits": "all_zero",
+        "status": "accepted_full_clean_consumer_execution_and_independent_archive_relocation_audit",
+        "separate_closing_sdk_verification_exit": 0,
+        "sdk_manifest_unchanged": true,
+        "transport_pack_and_archive_readback_exit": 0,
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/full-eb4aba66-attempt01/transport/consumer-raw.tar.gz",
+          "sha256": "7e5d1ac6bada9cd9bb25e4822cdf6e2fa1494839cba219e625414dd25ccde850",
+          "bytes": 20089082
+        },
+        "independent_archive_audit": "passed",
+        "scope": "Actual clean exact-source SDK consumer execution. Separate verification and archive audit retain their own identities; no full software plan, firmware candidate or physical qualification follows.",
+        "final_summary": "build/recovery-20261103/clean-sdk/final-summary.json",
+        "source_manifest_sha256": "d956cab0936db8d3eb1f1e4445c83866073f31ae44122a1c3b9fe8cc048ab526",
+        "consumer_archive_manifest": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/full-eb4aba66-attempt01/transport/consumer-raw-manifest.json",
+          "sha256": "020801e411275d2039d642f82b62c8e4bf964ef5ed85fd71411c723853bad5c7",
+          "size": 4241094
+        },
+        "source_prefix_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/clean-sdk/source-prefix-eb4aba66-attempt01/archive/59ebf399c7a1b46bcab73ba9582779e8e0dff61154a5718aa552da75a2ba4697.tar.gz",
+          "sha256": "59ebf399c7a1b46bcab73ba9582779e8e0dff61154a5718aa552da75a2ba4697",
+          "size": 13940050
+        },
+        "source_prefix_actual_restored_regular_members": 3997,
+        "restored_sdk_verification_exit": 0,
+        "independent_review": "build/recovery-20261103/clean-sdk/independent-final-review.json",
+        "complete_software_plan_executed": false,
+        "new_candidate": false,
+        "reproducibility_claim": false
+      },
+      "documentation": {
+        "status": "fresh_clean_strict_english_chinese_html_passed",
+        "source_commit": "eb4aba660df27b6ecedf52fcb13dc1c95652ca0d",
+        "source_tree": "7586629e789ab5e7cb12cff8609694c04d684a09",
+        "pages": 132,
+        "locale_records": 264,
+        "commands": 4,
+        "command_exits": "all_zero",
+        "duration_seconds": 174.73850989341736,
+        "summary": "build/recovery-20261103/docs/eb4-clean-strict/summary.json",
+        "archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/eb4-clean-strict/clean-eb4-strict-docs.tar.gz",
+          "sha256": "661c5aafb9611f3a3838781e5d132ab68da28ee52b5d5e6623d781a3065ed80c",
+          "bytes": 17976762
+        },
+        "regular_members_readback_verified": 3484,
+        "scope": "One fresh clean exact-eb4 Doxygen/gettext/English/Chinese HTML build. The later ten-path status follow-up is separate; no publication or firmware qualification inferred."
+      },
+      "focused_tls_observation": {
+        "cases": 205,
+        "scope": "Earlier focused development source execution; no new combined-source or firmware-candidate claim."
+      },
+      "native_model_board_policy": {
+        "scope": "NativeBoard software-model facts may declare FLASH capacity zero; this does not change a physical Board or grant hardware capability.",
+        "regression": "Actual resolver RED followed by 145-case GREEN retained in the recovery work; not the final ordinary gate."
+      },
+      "qualification": false,
+      "physical_hil": "not_executed",
+      "classification": "ordinary_gate_accepted_formal_plan_and_candidate_not_inferred",
+      "sdk_development_observations": {
+        "summary": "build/recovery-20261103/sdk/handoff-summary.json",
+        "status": "five_observations_across_two_development_prefixes",
+        "prefixes": [
+          {
+            "snapshot_sha256": "188d1b545306dfa2d13f730229267b35a4518e1b04ace99d713a0726b1ec8e8a",
+            "accepted_consumers": [
+              "f407 loaned rx",
+              "gd470 loaned rx"
+            ],
+            "closing_sdk_verification": "passed",
+            "overall_report_status": "failed",
+            "scope": "Two accepted loaned observations before separate Native admission failure",
+            "publishable": false,
+            "production_admitted": false
+          },
+          {
+            "snapshot_sha256": "e2ac91bdc30d14d6be7401dc88bfc3857bd59b28713a15756ef9b46c9b587524",
+            "accepted_consumers": [
+              "native mcuboot control",
+              "f407 mcuboot control",
+              "f407 mcuboot boot"
+            ],
+            "closing_sdk_verification": "passed",
+            "overall_report_status": "passed",
+            "scope": "Three remaining MCUboot observations accepted",
+            "publishable": false,
+            "production_admitted": false
+          }
+        ],
+        "scope": "Two loaned-RX observations and three MCUboot observations are retained at their actual distinct development prefixes. They are not the clean combined-source 64-root/67-image result reported separately above."
+      }
+    },
+    "recovery_network_development": {
+      "source_base": "6c3a380a99336a5a7809b4a862449228c6365544",
+      "receipt_manifest": "build/recovery-20261103/network/manifest.json",
+      "archive": {
+        "path": "/workspace/nexus/build/recovery-20261103/network/network-receipts.tar.gz",
+        "size": 970075,
+        "sha256": "ffa4d67c37c096d9cbe15b0082377aef845383fd4b40cc4b2c7bdbd06c942d03"
+      },
+      "arm": {
+        "flash_footprint_bytes": 134304,
+        "static_sram_bytes": 107832,
+        "msp_bytes": 8192,
+        "total_sram_bytes": 116024,
+        "libc_heap_bytes": 0,
+        "actual_c_translation_units": 217,
+        "optimization": "Effective -Os on every actual C translation unit; no LTO.",
+        "fixed_mcuboot_128k_payload_allowance_bytes": 129536,
+        "payload_excess_bytes": 4768,
+        "scope": "Source-bound development ARM link and budgets only. Actual compiler/configure inputs were unchanged; two unrelated tool inputs changed during the broad monitor, so there is no clean full-root claim."
+      },
+      "host": {
+        "real_broker_cases": 5,
+        "pcap_files": 10,
+        "scope": "Real host TLS/mTLS and MQTT through the maintained ciphertext relay; not ARM/PHY/Board execution."
+      },
+      "entropy": "F407 RNG FULL_SOURCE is an explicit software assumption; physical min-entropy is not measured.",
+      "trusted_utc": "Denied with NX_ERROR_PERMISSION; no ARM authenticated TLS/broker claim.",
+      "qualification": false,
+      "physical_hil": "not_executed"
+    },
+    "bounded_scope_decisions": {
+      "IT-R04": {
+        "status": "existing_bounded_implementation_current_integration_and_physical_acceptance_open",
+        "selection": "STM32H743ZIT6 V, fixed HSI64, Cache off, baremetal, SPI4 lifecycle pause/resume",
+        "source": "tests/google/h743_runtime_clock_test.cpp",
+        "source_audit": "The current file declares 17 TEST_F cases. This is a source count, not a new execution receipt or proof of the complete PM exit.",
+        "scope": "Reuse the existing clock-domain/provider lease and retained cleanup mechanism. No new generic PM framework is planned by this row."
+      },
+      "IT-S06": {
+        "status": "conditional_no_current_need",
+        "decision": "The reviewed Settings, explicit Flash-region and MCUboot consumers use byte-oriented storage. No current file-oriented consumer requires a filesystem, so no filesystem dependency or adapter is added. Reopen selection when a real file contract and medium are supplied."
+      },
+      "IT-X04": {
+        "status": "conditional_no_current_need",
+        "decision": "No new probe requirement is currently established. Preserve the existing OpenOCD identity/provenance/timeout/lock path; add no new runner until an actual probe requires it."
+      }
+    },
+    "remaining_exits": {
+      "kind": "current_navigation_after_P2_append",
+      "current_source_record": "final_public_source_P2_ab532250",
+      "completed_selected_scopes": [
+        "normal ordinary complete-index P2",
+        "two complete159 current-source executions",
+        "four Native modes",
+        "1193compiler contexts each tidy/cppcheck",
+        "64root67image270command source/installed SDK",
+        "8candidates16freshnetworknonebuilds",
+        "exact P2 strictdocs officialpackage actualrestore",
+        "unsigned outerbundle authenticated remote recovery and same-producer liveverify",
+        "QA706 complete-index normal hooks and fresh174 Python with38 uniquely mapped reviewed findings",
+        "private E=f59debf pinsP2 complete17presets116commands source_and_installed5Cbrokers_each three_recipes public12command_walk"
+      ],
+      "F07": "Original exit satisfied by actual observational same-source/tool/env comparison and final clean complete gates; fresh_cold=false and controlled_causal=false.",
+      "F01": "Current159 purpose/input/output/failure/overlap declarations and original actual per-stage/attempt costs reconciled; retain original inventory as historical declarative input.",
+      "open_original_conditions": {
+        "N09": "Actual four-command fresh-build-directory/warm configure-build observation is source/tool/trace bound with all2642 compdb records unchanged, and warm15compile/10link. This selected Native observation does not automatically close other MCU, CLI or F05 invalidation exits; no third159 or OS-page-cache-cold/causal claim.",
+        "V_F07": "Selected static/ECC clarification only; event-owner/sticky/full recovery conditions remain explicit.",
+        "V_F08_V_F09": "Seven vendor-leaf proposal groups remain open.",
+        "V_G02": "GD303 references not_fully_audited.",
+        "private_E": "Current E=f59debf1a15913353462e69ba0039db1c010f284 pins P2; approved17presets116commands/source_and_installed5Cbrokers_each/three_recipes/public12command_walk all passed. Authenticated private visibility, normal nonforce feature push and exact readback completed; private main is unchanged. Private application bytes/raw remain private, physical not_executed.",
+        "CodeQL": "P2 Python174/all45 and CPP183 cross-attempt composite (109 fully decoded validated prior results plus74 actual evaluations, fresh interpret0) with1234 individual dispositions and DB recovery completed. QA706ee80/tree5c39 completed normal13-path hooks420/7342+3968, fresh Python174 create/analyze0 and unique38-survivor review mapping: 30note/6warning/2error, seven removed (two true FD failure-path fixes plus five equivalent cleanups), zero new or ambiguous matches. Both raw errors retain severity and authoritative unchanged-source Root dispositions. Original failed attempts stay failed; P2 firmware/CPP/SDK/candidates/two159 keep original identities. Current E software integration has independently passed; actual D/deploy/finalFF remain pending.",
+        "D_and_delivery": "Actual D review/build/package/restore/deploy/readback/finalFF pending.",
+        "N14_G05_J03": "Current outer bundle is public and actually recovered; full Native program/object bytes remain in42+4 local stores, not remotely replayed.",
+        "I01_I02_I03_V_X01": "Append owner actual fresh recipe/context/provenance receipts before updating these rows; two observed image configs differ and recipe reproducible=false is retained.",
+        "physical_hil": "not_executed",
+        "server_rules": "last actual403; no service enforcement established",
+        "Release_upload": "last actual401; unsigned public artifact append is a separate operation"
+      },
+      "conditional_no_current_need": [
+        "IT-S06",
+        "IT-X04"
+      ],
+      "history": "The prior remaining_exits object is preserved verbatim in remaining_exits_historical_pre_P2_20261103; old executions are not relabelled."
+    },
+    "current_remote_rule_observation": {
+      "date": "2026-11-03",
+      "branch": "main",
+      "observed_commit": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+      "protected": false,
+      "rulesets": [],
+      "create_ruleset_attempt": "actual_HTTP_403_Resource_not_accessible_by_integration",
+      "raw_location": "build/recovery-20261103/remote-rules",
+      "scope": "No service-side protection was established. Repository permission metadata and local policy do not prove administration capability or configured enforcement."
+    },
+    "final_public_source_P2_ab532250": {
+      "kind": "exact_source_software_acceptance_and_unsigned_artifact_observations",
+      "date": "2026-11-04",
+      "source": {
+        "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+        "dirty": false,
+        "public_dependency_mounts": 23,
+        "qualification_scope": "Frozen public P2 selected software scopes. Later D has a separate documentation identity and inherits no new firmware qualification."
+      },
+      "evidence": {
+        "ordinary_outcome": {
+          "path": "/workspace/nexus/build/recovery-20261103/contract-repair/ordinary/outcome-reconciliation.json",
+          "sha256": "22cb8f19c3d4b0dcfa3f3146b9bae95397123ee4d1242a9a39a625d51d1401a3",
+          "size": 574
+        },
+        "pair_continuation": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/retention-resume-20261103/state.json",
+          "sha256": "54605454152c14cb007115f269cc2833ebeffe903b2c9424f15901f3801be9bc",
+          "size": 4847
+        },
+        "comparison": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+          "sha256": "78a2c382598ddc70d592fb4abd2c2dba244f6d77bd6f132e281edfb44180951f",
+          "size": 365509
+        },
+        "comparison_semantics": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/comparison-semantics.json",
+          "sha256": "7afda1e5179f989ef35650c21f4e9752e6e7e3c2dd9a89bcec4649a71d4cb0ca",
+          "size": 2259
+        },
+        "profiles_and_strict_P2_docs": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json",
+          "sha256": "1ace69ec0c88a7bf244472faa8dc6e6d7eb2ab7c933c26b0752795d298867ad6",
+          "size": 8619
+        },
+        "unsigned_local_bundle": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/unsigned-local-bundle-handoff.json",
+          "sha256": "49d623f46781d7b890457a0dff8b4f624c06532e7e81f66772556b48bfa22d7a",
+          "size": 11964
+        },
+        "unsigned_local_bundle_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/unsigned-local-bundle-independent-review.json",
+          "sha256": "cb5ff59ec64678e71b64c4360aa0b92929d4925d59e1d3e21408ddc8efe8d0c9",
+          "size": 8478
+        },
+        "SDK_consumer_package_reconciliation": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/repeat-sdk-consumer-packages/outcome-reconciliation.json",
+          "sha256": "0b58e80a2374c7ab9d2e190571d4e5ebf4df9a02116eabcd64e9c65c6d4b1be6",
+          "size": 6805
+        },
+        "SDK_consumer_package_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/repeat-sdk-consumer-packages/completion-independent-review.json",
+          "sha256": "e1e02b69d615d0ea5f67fad24cd59c0f0f46094893c58e650efdd9b662c40290",
+          "size": 5400
+        },
+        "remote_recovery_liveverify": {
+          "path": "/workspace/nexus/build/recovery-20261103/publication-p2-transport-ab532250-20261104/remote-recovery-liveverify-handoff.json",
+          "sha256": "ba0f22a92896b1c21934f11ebb3dd32644be32360c7df6d2ee617f58e222b2f0",
+          "size": 19634
+        },
+        "remote_recovery_liveverify_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/publication-p2-transport-ab532250-20261104/remote-liveverify-completion-independent-review.json",
+          "sha256": "afaa63e47cc2f5e7f6cef456787af925865b8f3a0db867cb19418aeb9306b896",
+          "size": 8937
+        },
+        "historical_declarative_inventory": {
+          "path": "/workspace/nexus/build/recovery-20261103/validation-efficiency/stage-inventory.json",
+          "sha256": "6c91a71eaecb72bd4941678ca01cd161a44efa35eeae48fa927d59f0701665c8",
+          "size": 443045
+        },
+        "historical_retention_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/validation-efficiency/audit.json",
+          "sha256": "3a519029d4f8f8101bd6be317c6ff0ec4615843efb5d3063578eca21256f7867",
+          "size": 14404
+        },
+        "P2_Flash_static_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-review.json",
+          "sha256": "8ae3da52edcdd01bf8c811300eb77205e15a47376ec51ee67d04587959846a75",
+          "size": 38964
+        },
+        "P2_Flash_static_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-independent-review.json",
+          "sha256": "dbe83b3fa399dd6744233aa957eb7e6c4472e2b27003bfd8fb7bd501e7ad3b75",
+          "size": 3894
+        },
+        "ECC_addendum": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-ECC-clarification-addendum.md",
+          "sha256": "229aa1bff57fbbae30ae0f08392a44780edf9ca687594948ee284630a1869cb3",
+          "size": 4334
+        },
+        "ECC_inputs": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-ECC-clarification-addendum.inputs.json",
+          "sha256": "3d300159d2743fc8b6dda0d293316180cb4158c41fad77bee019a9abfce5d893",
+          "size": 6771
+        },
+        "ECC_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/ECC-independent-review.json",
+          "sha256": "fca551f1020be6403474e8ace930270fe1fc1a6e204b606bdcd7d4a9376624c5",
+          "size": 5156
+        }
+      },
+      "ordinary_complete_index": {
+        "status": "accepted_and_pushed_with_normal_hooks",
+        "source_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "google_programs": 420,
+        "google_cases": 7342,
+        "tool_cases_four_ordinary_domains": 3964,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "reconciliation_ref": "ordinary_outcome",
+        "qualification_scope": "Ordinary complete-index Native Debug; formal domain counts remain separate. Original BrokenPipe final-output driver error is preserved."
+      },
+      "formal_software_execution": {
+        "status": "two_independent_complete159_executions_passed_and_retained",
+        "plan_file": {
+          "path": "/dev/shm/nexus-final-20261103/tools/dev/plans/software.json",
+          "sha256": "abb2b775000e652a09aa6d8ba8a2dcc31f2c736fff8ea2196697ed1c35515cb9",
+          "size": 55199
+        },
+        "phases": {
+          "baseline": {
+            "status": "executed_passed",
+            "report": {
+              "path": "/tmp/nexus-final-p2-baseline-repeat-20261103/baseline/report.json",
+              "sha256": "15c5044e55701eeb1b7e572d0fb7292cf47c5f19412324c4866a4fd0177783d2",
+              "size": 214863
+            },
+            "maintained_verified_execution": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/verified-execution.json",
+              "sha256": "7956ab1f009870f7c982bbe496df6f7a32eb2ab4680c33757803596b1d6a7d95",
+              "size": 2816
+            },
+            "stage_count": 159,
+            "semantic_plan_sha256": "e88fedefcec29e6cf16bff31dfa5434ca945c0fc706e0bece3cc04724566e02c",
+            "report_software_qualified_original_value": false,
+            "stage_duration_s_sum": 6742.878869825003,
+            "stage_duration_s_by_checker": {
+              "tool_tests": 1831.4527490920045,
+              "configure": 372.27172192099897,
+              "build": 421.18881087900445,
+              "quality_tools": 1269.545275643999,
+              "native_contracts": 654.9634969469989,
+              "arch_compile": 10.543867727999896,
+              "cortex_runtime": 278.3993257250004,
+              "cache_control_compile": 0.669557043001987,
+              "os_profiles": 41.29020882699842,
+              "os_threadx": 80.62521999599994,
+              "stm32_memory": 17.168548964000365,
+              "gd32_memory": 24.202416567997716,
+              "stm32h743": 121.64196162000007,
+              "stm32u575": 45.4552517129996,
+              "u575_trustzone": 6.704865899999277,
+              "source_sdk": 5.639830613999948,
+              "sdk_consumers": 740.7087468130012,
+              "provider_assemblies": 819.3506821240007,
+              "hil_prepare": 1.0563317069972982
+            },
+            "original_attempt_costs_reference": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+              "json_pointer": "/cold/cost/attempts",
+              "entries": 159,
+              "fields": [
+                "receipt",
+                "command",
+                "duration_seconds",
+                "exit_code",
+                "outcome",
+                "resource_usage"
+              ]
+            },
+            "attempt_duration_seconds_sum": 6742.71109218799,
+            "observed_stage_attempt_interval_union_seconds": 6742.710856041,
+            "maximum_observed_process_rss_bytes": 730820608,
+            "top5_stage_duration_s": [
+              {
+                "name": "contract-tools",
+                "duration_s": 866.027734618001
+              },
+              {
+                "name": "cppcheck",
+                "duration_s": 818.0822078620004
+              },
+              {
+                "name": "sdk-consumers",
+                "duration_s": 740.7087468130012
+              },
+              {
+                "name": "testing",
+                "duration_s": 688.3919131850016
+              },
+              {
+                "name": "tidy",
+                "duration_s": 451.4630677819987
+              }
+            ]
+          },
+          "repeat": {
+            "status": "executed_passed",
+            "report": {
+              "path": "/tmp/nexus-final-p2-baseline-repeat-20261103/repeat/report.json",
+              "sha256": "e82ebc51bef44a494876b5f0f8f1423f29c1d8a90e9f3a1133c16b54835f4f9d",
+              "size": 214155
+            },
+            "maintained_verified_execution": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/verified-execution.json",
+              "sha256": "5b82719dea7bfd96352d3eb3e18d939015e9083ccc405e4b87963cf2a6d6c4c9",
+              "size": 2814
+            },
+            "stage_count": 159,
+            "semantic_plan_sha256": "e88fedefcec29e6cf16bff31dfa5434ca945c0fc706e0bece3cc04724566e02c",
+            "report_software_qualified_original_value": false,
+            "stage_duration_s_sum": 6387.3383756820185,
+            "stage_duration_s_by_checker": {
+              "tool_tests": 1809.6298964159942,
+              "configure": 356.34822072002135,
+              "build": 331.22430463001365,
+              "quality_tools": 1173.0117670149994,
+              "native_contracts": 636.7608695439922,
+              "arch_compile": 9.294832846993813,
+              "cortex_runtime": 254.98154998599784,
+              "cache_control_compile": 0.5170372360007605,
+              "os_profiles": 36.471065249003004,
+              "os_threadx": 65.88735504900251,
+              "stm32_memory": 15.149967332996312,
+              "gd32_memory": 22.339008253999054,
+              "stm32h743": 109.77311430999544,
+              "stm32u575": 41.95110079799633,
+              "u575_trustzone": 6.672300083999289,
+              "source_sdk": 5.462124150006275,
+              "sdk_consumers": 696.0577807880036,
+              "provider_assemblies": 815.0543157230059,
+              "hil_prepare": 0.7517655499977991
+            },
+            "original_attempt_costs_reference": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+              "json_pointer": "/warm/cost/attempts",
+              "entries": 159,
+              "fields": [
+                "receipt",
+                "command",
+                "duration_seconds",
+                "exit_code",
+                "outcome",
+                "resource_usage"
+              ]
+            },
+            "attempt_duration_seconds_sum": 6387.179869632957,
+            "observed_stage_attempt_interval_union_seconds": 6387.179537077,
+            "maximum_observed_process_rss_bytes": 730624000,
+            "top5_stage_duration_s": [
+              {
+                "name": "contract-tools",
+                "duration_s": 847.1008052230027
+              },
+              {
+                "name": "cppcheck",
+                "duration_s": 764.0722152820017
+              },
+              {
+                "name": "sdk-consumers",
+                "duration_s": 696.0577807880036
+              },
+              {
+                "name": "testing",
+                "duration_s": 687.255109081998
+              },
+              {
+                "name": "tidy",
+                "duration_s": 408.93955173299764
+              }
+            ]
+          }
+        },
+        "no_filter_or_shard": true,
+        "current_checker_results_reexecuted_in_each_phase": true,
+        "modes": {
+          "native-debug": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-release": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-asan": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-tsan": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          }
+        },
+        "analyzers": {
+          "tidy": {
+            "semantic_compiler_contexts": 1193,
+            "owned_translation_units": 1303,
+            "parallel": 4,
+            "exit_code": 0
+          },
+          "cppcheck": {
+            "semantic_compiler_contexts": 1193,
+            "owned_translation_units": 1303,
+            "parallel": 4,
+            "exit_code": 0
+          }
+        },
+        "counting": "Native modes overlap in semantic cases and are not added. CTest registrations and Google cases are different counting domains. 159 is a stage count, not a unique case count. Ordinary3964 does not include formal contracts326/freertos4 as a new unique aggregate.",
+        "retention": {
+          "baseline_actual_restored_batches": 42,
+          "repeat_new_actual_restored_batches": 4,
+          "logical_paths_each_phase": 141072,
+          "prior_byte_references_used_for_repeat": true,
+          "full_inventory_and_final_source_identity": "passed",
+          "sole_full_indexes_and_all_local_archives_preserved": true,
+          "baseline_index_metadata": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/retention-index.json",
+            "sha256": "660f3875fff38f4b97c1e670cc35c32ae1c12e074370bae64f598af880a16145",
+            "size": 175362588
+          },
+          "repeat_index_metadata": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/retention-index.json",
+            "sha256": "ea544537132f2423bb2f1374f9dfcab7823a383f646b8e433265b08f044f32c6",
+            "size": 177341288
+          },
+          "original_retention_RAM_failure_preserved": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/inside-failure.json",
+            "sha256": "517fe550afe18b316ee1b019c31893e65f07a232f700d6f5d21a524654fa5f27",
+            "size": 911
+          },
+          "successful_continuation_ref": "pair_continuation",
+          "no_automatic_same_canonical_nanosecond_mtime_replay_claim": true
+        },
+        "historical_failure": "P48 stage91 contracts326 had13failures2errors. That source and failed controller remain historical; none of its checker success/failure is adopted as current P2 qualification."
+      },
+      "validation_contract_inventory": {
+        "status": "all_current159_mapped_with_original_stage_and_attempt_costs",
+        "historical_declarative_inventory_ref": "historical_declarative_inventory",
+        "historical_inventory_source_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "historical_rows_not_requalified": 160,
+        "reused_current_name_and_checker_contracts": 157,
+        "missing_declared_purpose_input_output_failure_overlap_fields": 0,
+        "execution_identity_and_argv_override": "Use exact current report stages, checker_source, argv, command_receipt and raw identities; old input selectors and null costs do not establish current execution.",
+        "added_stage_contracts": [
+          {
+            "name": "contract-tools",
+            "domain": "complete tests/contracts unittest discovery and imported maintained modules",
+            "outputs": "fresh contract-tests.json and original stage raw/receipt",
+            "cases_each_phase": 326,
+            "failure": "zero/incomplete execution, failure/error/skip/expected failure/unexpected success, or nonzero runner exit rejects",
+            "overlap": "retain complete contracts domain once per formal run; the three retired boundary registrations are covered by the original131 contract-case identity mapping, without deleting any case"
+          },
+          {
+            "name": "freertos-tools",
+            "domain": "complete os/freertos overlay unittest discovery and imports",
+            "outputs": "fresh freertos-tests.json and original stage raw/receipt",
+            "cases_each_phase": 4,
+            "failure": "zero/incomplete execution, failure/error/skip/expected failure/unexpected success, or nonzero runner exit rejects",
+            "overlap": "retain once in the explicit tools domain; four Native modes remain independent"
+          }
+        ],
+        "retired_registrations_only": [
+          "source-sdk-boundaries",
+          "build-artifact-boundaries",
+          "image-artifact-boundaries"
+        ],
+        "same_name_semantic_overrides": {
+          "tidy": "parallel2→4; all1193 distinct compiler contexts retained",
+          "cppcheck": "parallel2→4; all1193 distinct compiler contexts retained",
+          "providers-multi_controller_assembly": "18 original fixtures retained plus16 declared_io fixtures =34; exact selectors are in both current argv"
+        },
+        "retention_review_ref": "historical_retention_review",
+        "test_removal_decision": "retain reviewed tests; no obsolete-contract or independent-equivalent deletion proved; no count reduction to create passing results",
+        "costs": "All159 stage duration_s per phase remain in original reports and all159 original attempt duration/RSS records per phase remain in the comparison. This append references them, without a second159-row ledger.",
+        "unobserved_metrics": [
+          "aggregate nested CPU",
+          "simultaneous process-tree peak RSS",
+          "measured cache counters"
+        ]
+      },
+      "observational_cost_comparison": {
+        "status": "completed_same_source_tool_input_environment_comparison",
+        "comparison_ref": "comparison",
+        "semantics_ref": "comparison_semantics",
+        "baseline_cache_state": "existing fixed Native compiler outputs from prior failed source; current CMake/Ninja revalidates dependencies; every current159 checker/test/analyzer/provider/SDKconsumer executes anew; ccache disabled; OS page cache uncontrolled",
+        "repeat_cache_state": "same fixed Native compiler outputs after current baseline; current CMake/Ninja revalidates dependencies; new complete phase/provider/SDKconsumer roots; every current159 checker/test/analyzer executes anew; ccache disabled; OS page cache uncontrolled",
+        "storage_intervention": {
+          "path": "/workspace/nexus/build/recovery-20261103/native-debug-live-migration-20261103/migration-complete.json",
+          "sha256": "6889deb41e78e9c079e22b48b0f686634909da6c25daf6c0c43a0a06dbefa9e9",
+          "size": 3086
+        },
+        "same_environment_input_bytes": true,
+        "comparison_qualification_original_value": false,
+        "observed_wall_seconds_difference": 355.5313189640001,
+        "observed_wall_ratio": 1.0556632731082902,
+        "fresh_cold_claim": false,
+        "controlled_causal_speedup_claim": false,
+        "RSS_scope": "linux_wait4 maximum observed process RSS for waited process and reaped descendants; not a simultaneous process-tree peak; no aggregate CPU or peak-RSS delta is inferred.",
+        "time_scope": "Report stage duration_s sums, original attempt cumulative duration, interval-union wall, and outer qualify/wrapper durations have different definitions. Preserve each original value; never add nested durations or call the cumulative stage sum total wall.",
+        "F07_original_exit_disposition": "satisfied for the current selected same-source/tool/environment observations and final clean complete gates; the original exit does not require fresh cold or a causal speedup claim",
+        "N09_disposition": "separate cold/warm requirement; current reused-output baseline is not a new cold build. See ignored N09 feasibility preparation; no third159 run is implied."
+      },
+      "installed_source_sdk": {
+        "status": "complete_current_P2_source_installed_consumer_execution_and_actual_package_restore_passed",
+        "policy": "nexus-sdk-consumers-v15",
+        "consumer_roots": 64,
+        "images": 67,
+        "actual_commands": 270,
+        "command_exits": "all_zero",
+        "separate_owned_final_verification": "passed",
+        "producer_phase": "repeat",
+        "sdk_archive": {
+          "sha256": "93ba56043e1d5c9289197e97f3fb1dd268fbfaeae8f031f5dee4b5f09939f5fb",
+          "size": 13942391
+        },
+        "entire_consumer_archive": {
+          "sha256": "41432dc67b99ec472edb143d4da84051cd8f6b9951f58576d8ee24b2c112e0bd",
+          "size": 20775238
+        },
+        "actual_export_restore_full_inventory": "passed",
+        "reconciliation_ref": "SDK_consumer_package_reconciliation",
+        "original_outer_namespace_view": "running_preserved",
+        "original_outer_state": "absent_preserved",
+        "synthetic_outer_exit_success_claim": false,
+        "independent_review_ref": "SDK_consumer_package_independent_review"
+      },
+      "software_candidates": {
+        "status": "eight_selected_candidates_sealed_actual_restored_and_reverified",
+        "exact_profiles": 8,
+        "fresh_network_disabled_firmware_builds": 16,
+        "network": "none",
+        "reproduction": "bit_exact_ELF_BIN_per_profile",
+        "six_scope_operations_seal_store_actual_restore_reverify": "passed",
+        "profiles": [
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/45e1b24f032ea11418c05d6c3dbaccc0e2a63d19bbf2e6d56217c63e188ee39f.tar.gz",
+              "sha256": "45e1b24f032ea11418c05d6c3dbaccc0e2a63d19bbf2e6d56217c63e188ee39f",
+              "size": 43411906
+            },
+            "profile": "h743-baremetal-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/05ce4821b67c715896e89f466395d16d095cc5f6b007584eebc544c227af1649.tar.gz",
+              "sha256": "05ce4821b67c715896e89f466395d16d095cc5f6b007584eebc544c227af1649",
+              "size": 43488751
+            },
+            "profile": "h743-baremetal-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/e4404443ba55c96907e3950a564b9ec5a0a493012d7ea1d0c8ed2133bb94dc39.tar.gz",
+              "sha256": "e4404443ba55c96907e3950a564b9ec5a0a493012d7ea1d0c8ed2133bb94dc39",
+              "size": 43521673
+            },
+            "profile": "h743-freertos-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/787505f5ebbffb61d12f916b31366347d721a7c25f6d8cfb0b0f7c6ef68e4acf.tar.gz",
+              "sha256": "787505f5ebbffb61d12f916b31366347d721a7c25f6d8cfb0b0f7c6ef68e4acf",
+              "size": 43591134
+            },
+            "profile": "h743-freertos-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/5f050da46133163f3b7e160b3f94637b2a5ec07677ae1d84d81a35531209561e.tar.gz",
+              "sha256": "5f050da46133163f3b7e160b3f94637b2a5ec07677ae1d84d81a35531209561e",
+              "size": 43414618
+            },
+            "overlay_free_after": 2774212608,
+            "profile": "u575-baremetal-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/cb6d7f997fdccff45e77ecfe2afc456d81708d6764d8933fefc18e070bdeb181.tar.gz",
+              "sha256": "cb6d7f997fdccff45e77ecfe2afc456d81708d6764d8933fefc18e070bdeb181",
+              "size": 43501725
+            },
+            "overlay_free_after": 2694057984,
+            "profile": "u575-baremetal-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/65d1bce52f2e1ca095b99609852cad0aae6bd90710e581f49a4832387b04c5b1.tar.gz",
+              "sha256": "65d1bce52f2e1ca095b99609852cad0aae6bd90710e581f49a4832387b04c5b1",
+              "size": 43521216
+            },
+            "overlay_free_after": 2613895168,
+            "profile": "u575-freertos-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/25e1dbb819722d84ac9ec036e8f5345b135cf026e1428d934fed153cdc758e6a.tar.gz",
+              "sha256": "25e1dbb819722d84ac9ec036e8f5345b135cf026e1428d934fed153cdc758e6a",
+              "size": 43605037
+            },
+            "overlay_free_after": 2533515264,
+            "profile": "u575-freertos-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          }
+        ],
+        "hil_uart_profiles_prepared": 4,
+        "hil_preparation_state": "prepared_unbound",
+        "physical_status": "not_executed",
+        "signed_product_release": false,
+        "evidence_ref": "profiles_and_strict_P2_docs",
+        "preserved_attempts": "Original VFS preflight0firmwarebuilds, UID configure failure0firmwarebuilds and SDK empty-stdout assembly failure remain historical. Receipt-only empty stdout is expressed using original completed_command_inputs; no invented raw stream."
+      },
+      "strict_documentation_for_P2": {
+        "status": "passed",
+        "source_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "source_tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+        "wrapper_exit_code": 0,
+        "actual_operations": [
+          {
+            "name": "strict-bilingual-build",
+            "exit_code": 0
+          },
+          {
+            "name": "official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "verify-official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "restore-official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "verify-restored-documentation",
+            "exit_code": 0
+          }
+        ],
+        "inner_operations": [
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/doxygen.attempts/1793760053360519390-3f91c84175e84f64b892123eea000321/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/gettext.attempts/1793760054431572626-99ee610d9f05440a9523e341d4470d95/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/html-en.attempts/1793760081061001418-8dbcb599cdc34d648bcafaca05288f35/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/html-zh_CN.attempts/1793760131271648245-89dc99692e7d410383da91d449448628/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          }
+        ],
+        "canonical_source_pages": 132,
+        "reviewed_translation_records": 264,
+        "strict_build_report": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/site/documentation-build.json",
+          "size": 59531,
+          "sha256": "c09aa89a2e5dbc845b6531b7a573f4bff1aea821ac705b77b3cbeb0331f5bf0d"
+        },
+        "official_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/packages/software-ab53225033df-20261103.tar.gz",
+          "sha256": "e93c32617695e9a77b53ef38c6f87be504349b6aa25e1593113c192e1b6ac577",
+          "size": 16001721
+        },
+        "actual_restore_and_restored_verify": "passed",
+        "evidence_ref": "profiles_and_strict_P2_docs",
+        "scope": "Exact P2 Doxygen/gettext/English/Chinese build and official package. Not P48f437; not a later D build or deployed website."
+      },
+      "unsigned_bundle_and_public_recovery": {
+        "status": "original_prepare_verify_export_actual_restore_restored_verify_and_public_remote_recovery_passed",
+        "signature_status": "unsigned",
+        "trust": "local_observation_no_oidc",
+        "production_qualification": false,
+        "publication_authorized": false,
+        "files": 6657,
+        "logical_bytes": 433814378,
+        "outer_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211.tar.gz",
+          "sha256": "ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211",
+          "size": 401386855
+        },
+        "manifest_sha256": "92ae9ebf07069d3a4cd588a94d04d0864d3b323616f35483dfd35adbaee76279",
+        "bundle_ref": "unsigned_local_bundle",
+        "independent_bundle_review_ref": "unsigned_local_bundle_independent_review",
+        "remote": {
+          "repository": "X-Gen-Lab/nexus",
+          "visibility": "public",
+          "branch": "documentation-assets",
+          "commit": "71b4f0e4cc9168e708513fb647b903c4bb39c71e",
+          "tree": "4620bb75d2e7ee7e7766d9634a0ccce309735572",
+          "parent": "d14d093879362d6a1796ee9e0d47f75f793e5135",
+          "namespace": "docs-public-p2-ab532250-20261104",
+          "transport_descriptor_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json",
+          "transport_helper_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/p2_outer_transport.py",
+          "envelope_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/local-preview.package.json",
+          "descriptor_sha256": "6435d1790e77ab32dfc83516b690d605dd7158543c653d9663c8c7dbe9023e7b",
+          "ordered_parts": 12,
+          "authenticated_raw_readbacks": 17,
+          "historical_members_preserved": 492,
+          "historical_README_prefix_bytes_preserved": 822,
+          "independent_whole_join_and_maintained_store_actual_restore": "passed",
+          "same_original_Native_producer_verify_local_exit": 0,
+          "two_private_bindings_used": 2,
+          "source_clean_and23dependencies": true,
+          "parent_unchanged": true,
+          "no_orphan_intervention": true,
+          "evidence_ref": "remote_recovery_liveverify",
+          "independent_review_ref": "remote_recovery_liveverify_independent_review",
+          "independent_review_status": "passed"
+        },
+        "remote_Native_program_object_byte_recovery": false,
+        "retention_boundary": "The remote outer bundle omits full Native program/object bytes. Original42+4 local stores/fullindexes/priorrefs/aliases retain complete selected recoverable bytes and modes. Remote verify-local actually used the same still-live Native producers; this is not a from-scratch remote Native replay.",
+        "not_claimed": [
+          "signature/OIDC",
+          "product release",
+          "hosted GitHub CI equivalence",
+          "physical HIL",
+          "automatic canonical-path/nanosecond-mtime restore"
+        ],
+        "maintained_bundle_member_navigation": {
+          "entry": "local-release.json",
+          "entry_role": "Original paths, modes, hashes and retained evidence member mapping; use this before interpreting original host locators.",
+          "SDK_envelope": "packages/0.json",
+          "consumer_envelope": "packages/1.json",
+          "candidate_envelopes": "packages/2.json through packages/9.json in original selection order",
+          "SDK_archive": "archives/93ba56043e1d5c9289197e97f3fb1dd268fbfaeae8f031f5dee4b5f09939f5fb.tar.gz",
+          "ENTIREconsumer_archive": "archives/41432dc67b99ec472edb143d4da84051cd8f6b9951f58576d8ee24b2c112e0bd.tar.gz",
+          "documentation_archive": "documentation/e93c32617695e9a77b53ef38c6f87be504349b6aa25e1593113c192e1b6ac577.tar.gz",
+          "retained_evidence_members": "evidence/<original_sha256>.<original_permission_octal> as listed in local-release.json; never guess or rewrite original producer paths."
+        }
+      },
+      "bounded_open_original_exits": {
+        "V_F07": {
+          "status": "partial_bounded_static_review_and_ECC_addendum_only",
+          "refs": [
+            "P2_Flash_static_review",
+            "P2_Flash_static_independent_review",
+            "ECC_addendum",
+            "ECC_inputs",
+            "ECC_independent_review"
+          ],
+          "still_not_assessed": [
+            "G474 stale/sticky first-event ownership disposition",
+            "U575 exact sticky/exception-delivery details",
+            "full ECC recovery contract"
+          ],
+          "demonstrated_C_contract_bug": false
+        },
+        "V_F08_V_F09": "Seven operation-specific vendor-leaf proposal groups remain unresolved/ununimplemented; full159 is not all-HAL/SPL migration. Retain exact mode decisions and only change accepted leaves with genuine TDD and affected requalification.",
+        "V_G02": "GD303 references.json remains not_fully_audited; no adjacent-family inference.",
+        "conditional_no_current_need": [
+          "IT-S06",
+          "IT-X04"
+        ]
+      },
+      "subsequent_actual_results": {
+        "CodeQL": {
+          "status": "P2_CodeQL_QA_Python_review_and_current_E_software_feature_push_complete_D_pending",
+          "verified_official_CLI_version": "2.27.1",
+          "downloaded_verified_inputs_only": false,
+          "actual_results": {
+            "source_P2": {
+              "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d"
+            },
+            "python_P2": {
+              "status": "complete_query_and_all45_concrete_dispositions_recorded_followup_requalification_pending",
+              "query_evaluations": 174,
+              "SARIF_rule_count": 172,
+              "results": 45,
+              "query_exit_code": 0,
+              "disposition_counts": {
+                "reviewed_nondefect_intentional_contract_or_cleanup": 38,
+                "confirmed_test_only_failure_path_defects": 2,
+                "equivalent_nonbehavioral_maintenance_cleanups": 5
+              },
+              "query_completion_ref": "python_query_summary",
+              "all45_dispositions_ref": "python_all45_dispositions",
+              "original_SARIF": {
+                "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python.sarif",
+                "size": 596432,
+                "sha256": "f9c12e0d1d4a33bc1b01eb43e50c5367c4f44973c29dfb4acecc4354ae2814a1"
+              },
+              "original_SARIF_and_results_unchanged": true,
+              "true_defects": "Two test-only unexpected-open failure paths leaked successfully returned PTY descriptors; focused RED/GREEN and permanent regressions completed, normal commit and fresh full Python analysis remain pending.",
+              "retention": {
+                "status": "official_native_bundle_portable_actual_restore_native_unbundle_resolve_passed_then_expanded_DBs_retired",
+                "native_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/native/python-db.zip",
+                  "sha256": "ed9912ec3d7c5907e416a45fd84492db1a44086e4f734362288e57c88d55a3ce",
+                  "size": 157886915
+                },
+                "portable_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/store/c21a55f4c49bf6f265381456657deb16a688d3770208e008953c64b99e861ca7.tar.gz",
+                  "sha256": "c21a55f4c49bf6f265381456657deb16a688d3770208e008953c64b99e861ca7",
+                  "size": 156301560
+                },
+                "portable_files": 300,
+                "portable_logical_bytes": 167652384,
+                "completion_ref": "python_retention_completed",
+                "portable_restore_closure_ref": "python_portable_restore_closure",
+                "actual_restore": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/portable-restored.json",
+                  "sha256": "0058bd80b20623626b46e2451650ee68b94993552ec74b19cbffc25617e9710c",
+                  "size": 268
+                },
+                "recovered_native_unbundle": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/recovered-native-unbundle.attempts/1793767203971889216-a972cad206f84fd4b303cdaf3e16d4cf/receipt.json",
+                  "sha256": "4d078ceea18f65630a0b936d67884b6abccb39836d049c08a1049455f5757f29",
+                  "size": 1769
+                },
+                "recovered_native_resolve": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/recovered-native-resolve.attempts/1793767207002560116-077dbd3639fc4fe68a51627d26987fa0/receipt.json",
+                  "sha256": "9249ad48b24c9f6a211ad8d1160c7fef4d17d8faebba9337ad280bc094f5e2e4",
+                  "size": 1624
+                },
+                "later_original_expanded_retirement_ref": "python_original_expanded_retirement",
+                "later_derived_retirement_ref": "python_derived_retirement",
+                "current_expanded_DB_state": "original working and both unbundled expanded DBs retired; canonical native ZIP and portable archive retained",
+                "early_fields_are_historical_only": [
+                  "completed.json/no_original_expanded_DB_retired=true",
+                  "completed.json/working_copy_and_both_unbundled_DBs_kept=true",
+                  "completed.json/original_DB_and_source_bytes_modes_kept=true"
+                ],
+                "cache_format_boundary": "Official bundle recovers the finalized analysis DB while compacting cache format; no exact replay of every original cache file/name/byte is claimed.",
+                "preserved_restore_failure": "Original hardlink ctime postcheck failure and later unchanged-other-stat/full SHA-mode restore reconciliation remain separate; successful restore APIs were not rerun."
+              }
+            },
+            "cpp_P2": {
+              "status": "complete_P2_CPP183_cross_attempt_composite_fresh_interpret_and_all1234_reviewed_host_followup_gate_pending",
+              "source_scope": "Exact P2 with all23 dependencies and complete maintained Native manual build trace. Original /dev/shm/nexus-codeql-p2/source has since been retired; use the original extraction scope, DB source ZIP and clean/all23 Base P2 crosscheck, not a current-live source-path claim.",
+              "database_create": {
+                "exit_code": 0,
+                "original_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-create.attempts/1793768249874903890-510e18b6bb73493a8aefd93324a60bd0/receipt.json",
+                  "sha256": "887031c0d0fbdf40b447d89fe68e2063000c4b6b9fe41cf146eb6292968a4f70",
+                  "size": 1783
+                },
+                "summary_ref": "cpp_create_summary"
+              },
+              "N09": {
+                "status": "four_real_same_trace_commands_completed_selected_Native_scope_only",
+                "phases": [
+                  {
+                    "name": "configure",
+                    "exit_code": 0,
+                    "duration_seconds": 63.268894987995736,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-configure.attempts/1793768253378946353-f4d000496dce42d6850034cda0331f6d/receipt.json",
+                      "sha256": "c8e4af806cf1056848aa80e1f323fcc2fa5bff71acdd901a49af63c5924a9e5f",
+                      "size": 1344
+                    }
+                  },
+                  {
+                    "name": "build",
+                    "exit_code": 0,
+                    "duration_seconds": 1998.5678938229976,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-build.attempts/1793768318783048201-0ae0db1c7e734728ba3efc87f4c3140f/receipt.json",
+                      "sha256": "ac694b5aea1d0178bb32ccab761a6f268a9ca211a8281dec1f965e30f17c77e3",
+                      "size": 1339
+                    }
+                  },
+                  {
+                    "name": "warm-configure",
+                    "exit_code": 0,
+                    "duration_seconds": 58.80843232099869,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-warm-configure.attempts/1793770319435856517-1d6a4a004e7a4cd38fa247bd41b832c0/receipt.json",
+                      "sha256": "aa30069509263a7a03faf454ad9fb6b9747de0034ceaf592663773b10ae19788",
+                      "size": 1353
+                    }
+                  },
+                  {
+                    "name": "warm-build",
+                    "exit_code": 0,
+                    "duration_seconds": 70.31657571999676,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-warm-build.attempts/1793770380227350725-08e8f899444845e8af71fdb74a78f1be/receipt.json",
+                      "sha256": "769606aabd5d7a502fc846c4d51fac161dc480890c9957cd16e6f2b5756aeb88",
+                      "size": 1342
+                    }
+                  }
+                ],
+                "phase_ref": "cpp_N09_phases",
+                "compilation_database_records_each_phase": 2642,
+                "all_four_compdb_bytes_identical_sha256": "98859b63c01d6e77f2c6fff9e087275d9511e443950bede7f0909a9265eeb433",
+                "complete_record_context_set_sha256": "a8a9efd9e0d6d5b8abb4337c27a75552463596bc4d97ef6db28761664a6103d0",
+                "ordered_full_argv_context_set_sha256": "f7948e407e286f9fd4fb86bd8acb8037125823cc5c98bd010ea8b159f3a9693f",
+                "warm_actual_compiles": 15,
+                "warm_actual_links": 10,
+                "warm_noop": false,
+                "limits": "Fresh build directory plus same-argv warm configure/build in one inherited trace; no OS-page-cache-cold, causal speedup, new tests, all-MCU, all-F05-invalidation or third-full159 claim."
+              },
+              "original_5400_seconds": {
+                "status": "failed_original_budget_exhausted_without_complete_CPP_query",
+                "budget_passed": false,
+                "first_query_exit_code": 137,
+                "first_query_ref": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze.command.json",
+                  "sha256": "adad3771455712c991444c550e42d8d31a74d3d20b61cf092a87b7ece023fdb5",
+                  "size": 1751
+                },
+                "bounded_retry_exit_code": 124,
+                "bounded_retry_outcome": "timed_out",
+                "bounded_retry_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-retry-resource-bounded.attempts/1793771545957185779-6ea2c141b51e4befa40b8bf92ff437a9/receipt.json",
+                  "sha256": "2cff28195092cb02b28e80b0731afcbb48b7ea2c2e5b50d045bd1edcea1827eb",
+                  "size": 2036
+                },
+                "withdrawal_complete": true,
+                "withdrawal_stable": true,
+                "whole183_complete": false,
+                "complete_CPP_SARIF": null,
+                "summary_ref": "cpp_original_budget_exhausted"
+              },
+              "independent_query_only_2700_seconds": {
+                "status": "failed_timed_out_124_original_attempt_preserved",
+                "budget_seconds": 2700,
+                "actual_command": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+                  "size": 2297,
+                  "sha256": "6573563a4e6f11e412b48c1dee9efbcb741236d9da33ce28d11c2f33faee8112"
+                },
+                "actual_state": null,
+                "complete_CPP_SARIF": null,
+                "findings": null,
+                "per_finding_dispositions": null,
+                "binding_policy": "Earlier running observation remains historical. This attempt actually timed out124 and remains failed; complete composite is recorded only under its own continuation and fresh interpret identities.",
+                "current_resource_repair": "Historical failed supplemental attempt; later composite has independent successful identities.",
+                "owner_reported_database_location": "/dev/shm/nexus-codeql-p2/cpp-db",
+                "database_migration_actual_receipt": null,
+                "command_outcome_at_observation": "running",
+                "command_exit_code_at_observation": null,
+                "command_started_ns": 1793774284949743821,
+                "command_argv": [
+                  "/home/agent/.cache/nexus/analyzers/codeql-2.27.1/cpp/codeql/codeql",
+                  "database",
+                  "analyze",
+                  "/dev/shm/nexus-codeql-p2/cpp-db",
+                  "codeql/cpp-queries@1.9.0:codeql-suites/cpp-security-and-quality.qls",
+                  "--format=sarif-latest",
+                  "--output=/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-full183.sarif",
+                  "--threads=2",
+                  "--ram=4096",
+                  "--rerun",
+                  "--max-disk-cache=768",
+                  "--logdir=/tmp/nexus-codeql-p2/cpp-supplemental-query-tool-logs"
+                ],
+                "deadline_monotonic": 69312.55724172,
+                "controller_pid": 2247060,
+                "query_PGID": 2247204,
+                "expected_complete_queries": 183,
+                "expected_new_SARIF": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-full183.sarif",
+                "final_attempt_receipt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.attempts/1793774284949646444-88e56b85f3e941debb144a41c383b8b4/receipt.json",
+                  "size": 2114,
+                  "sha256": "54da2e275cc0620a61e0274db3dea9dd0bbcfe549a2eab7e2036c3e28b38bc89"
+                },
+                "earlier_running_observation": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+                  "size": 1129,
+                  "sha256": "5d37ef17b3cf4302857602f6749846d544c4ef237eb132da4488d5a53554f2a4"
+                },
+                "final_exit_code": 124,
+                "final_outcome": "timed_out",
+                "withdrawal_complete": true,
+                "withdrawal_stable": true
+              },
+              "resource_repair": {
+                "status": "historical_logs_completely_preserved_in_TMP_duplicate_source_retired",
+                "actual_ref": "cpp_space_repair_actual",
+                "successful_retry_attempt_ref": "cpp_space_repair_successful_retry_attempt",
+                "successful_retry_exit_code": 0,
+                "successful_retry_withdrawal_complete": true,
+                "successful_retry_withdrawal_stable": true,
+                "first_attempt_failed_view_ref": "cpp_space_repair_first_failed_view",
+                "first_attempt_exit_code": 1,
+                "original_source_no_longer_live": true,
+                "original_source_path": "/dev/shm/nexus-codeql-p2/source",
+                "original_DB_log_path_no_longer_live": true,
+                "retained_historical_logs": "/tmp/nexus-codeql-p2/cpp-original-extraction-and-failed-query-logs",
+                "current_database": "/dev/shm/nexus-codeql-p2/cpp-db",
+                "binding": "Resource repair and its successful routine retry do not establish query completion; preserve first failed post-assert attempt and all original OOM/timeout logs."
+              },
+              "approved_semantic_amendment": {
+                "status": "approved_semantics_only_not_an_execution_result",
+                "authority": "Root formal revision communicated by manager; replaces the earlier self-imposed full-rerun-only retry restriction",
+                "fixed_scope": "Same immutable P2 source semantics and identity, finalized dataset, CodeQL CLI2.27.1, full183 fixed queries, libraries and models",
+                "allowed_operation": "Official --no-rerun may complete missing queries, followed by a new complete full-suite interpret; report the resulting complete analysis as cross-attempt composition, not a single fresh183 run",
+                "full_rerun_required": "When target source semantics change, first extract and finalize a database for the new source, then run complete queries; rerun on the old database does not update its source. With unchanged Source/dataset but changed fixed-query/model identities or insufficient reuse evidence, run a complete rerun on that same database. No-rerun reuse requires unchanged Source/dataset/CLI/query/model identities and complete per-query completion evidence.",
+                "per_query_reuse_required": [
+                  "completed query log",
+                  "runinfo",
+                  "complete readable BQRS",
+                  "current input and query identity binding",
+                  "source attempt provenance"
+                ],
+                "missing_per_query_evidence": "Do not reuse that result; recompute the query. A partial or unreadable BQRS never counts as a completed query.",
+                "final_admission": [
+                  "all183 fixed queries map one-to-one with selected completed results",
+                  "no required query missing",
+                  "no timeout warning in the complete selected-result/fresh-interpret admission",
+                  "new full-suite interpret completed and fresh complete SARIF admitted",
+                  "all findings preserved and individually disposed"
+                ],
+                "historical_attempts": "Earlier timeout/cancel/OOM attempts keep their original failed outcomes and raw; approval does not change them to passed",
+                "qualification_claim": "Cross-attempt complete analysis may satisfy only this unchanged input scope after actual final admission; approval itself grants no analysis success"
+              },
+              "approved_continuation_90_minutes": {
+                "status": "full183_composite_query_results_complete_fresh_fullsuite_interpretation_completed",
+                "new_overall_budget_seconds": 5400,
+                "budget_boundary": "A separately authorized new90min continuation budget; original5400 language failure and supplemental2700 attempts retain their own identities/outcomes",
+                "mode": "official_no_rerun_missing_queries_then_fresh_fullsuite_interpret",
+                "required_unchanged_queries": 183,
+                "namespace_receipt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-namespace-recovery1-parent.actual.json",
+                  "size": 2011,
+                  "sha256": "6bc04b8488f0dc11eb26b3703a6eb6680dba5050b7efc85c1b3c7b5dd7e40a60"
+                },
+                "actual_continuation_command": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/run-queries.command.json",
+                  "size": 1932,
+                  "sha256": "95881e0e0eb9b6532d91309085cc21b9cc64829663841702daf1ca0eba05f65d"
+                },
+                "query_attempt_receipts": [
+                  {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/run-queries.attempts/1793782129904642680-61ec2289d9d84ce5b4b808f9178ec07e/receipt.json",
+                    "sha256": "c3e5481b1db0936225dfdd3bd988e2f42168e58288a2190cd2034f4cec5bcd39",
+                    "size": 1728
+                  }
+                ],
+                "per_query_result_bindings": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/complete-183-query-origins.actual.json",
+                  "size": 410811,
+                  "sha256": "028cd9788113409eec65890363290dc9df0c26ec3b62fe6dc37de90b6f0c9723"
+                },
+                "composite_source_attempts": {
+                  "validated_prior_completed_results": 109,
+                  "new_actual_evaluations": 74,
+                  "provenance_ref": "cpp_complete183_query_origins",
+                  "prior_attempts_keep_original_outcomes": true
+                },
+                "fresh_fullsuite_interpret": {
+                  "exit_code": 0,
+                  "original_attempt": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/fresh-fullsuite-interpret.attempts/1793783484816926217-bb17a1985e5847d7bbe801cd8f5efa81/receipt.json",
+                    "sha256": "f47a3b96dcfe2c4e6ceba044cb9195354ee78a2c866adc768a11637815ecbb35",
+                    "size": 1791
+                  },
+                  "command": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/fresh-fullsuite-interpret.command.json",
+                    "sha256": "e15e0051ef4b25f3168c01dc393f58aabae8f39920807bb827c52fd68d4fafbe",
+                    "size": 2009
+                  }
+                },
+                "full183_one_to_one_admission": {
+                  "selected_queries": 183,
+                  "unique_paths_and_IDs": true,
+                  "no_missing_results": true,
+                  "semantic_metadata_packs_models_equal": true,
+                  "proof_ref": "cpp_composite_semantic_projection",
+                  "query_origins_ref": "cpp_complete183_query_origins",
+                  "summary_ref": "cpp_complete_composite_summary"
+                },
+                "complete_CPP_SARIF": {
+                  "path": "/tmp/nexus-codeql-p2/cpp-composite-recovery1-final.sarif",
+                  "sha256": "1bf57a05cba3cf6a99331ad75b8c809501fd6f5e8dad60e403fa74fcabb841d6",
+                  "size": 2611548
+                },
+                "findings": {
+                  "path": "/tmp/nexus-codeql-p2/cpp-composite-findings.actual.json",
+                  "sha256": "d6c28745f74a87fe3140b962d071162d5f8fe9e9eef3050a0eb7acbdcbb86dc4",
+                  "size": 2654612
+                },
+                "per_finding_dispositions": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/all1234-review-coverage-followup-pending.json",
+                  "size": 4373,
+                  "sha256": "99ca82dba9e1089d8a8d82abf8a26cc7c303083262b69202ca452651b14d5492"
+                },
+                "reporting_kind": "cross_attempt_composite_analysis_not_single_fresh183",
+                "execution_result": "complete_cross_attempt_183_analysis_and_1234_review_coverage_separate_host_followup_gate_pending"
+              },
+              "finding_review": {
+                "result_count": 1234,
+                "severity_counts": {
+                  "note": 729,
+                  "warning": 503,
+                  "error": 2
+                },
+                "all_original_results_structurally_unchanged": true,
+                "each_result_reviewed_once": true,
+                "missing": [],
+                "duplicate": [],
+                "coverage_ref": "cpp_all1234_review_coverage",
+                "authored17_documentation_advisories_independent_review_ref": "cpp_Root17_documentation_review",
+                "confirmed_defects": [
+                  959,
+                  1045
+                ],
+                "finding_free": false,
+                "historical_coverage_followup_fields": "The sealed all1234 receipt describes followup status at creation; later RED/GREEN/fork identities below are additive evidence, not a rewrite of that receipt.",
+                "merge_clearance_from_this_review": false
+              },
+              "retention": {
+                "status": "native_bundle_first_roundtrip_portable_actual_restore_recovered_native_unbundle_resolve_completed",
+                "completed_ref": "cpp_native_portable_retention_completed",
+                "native_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/native/cpp-db.zip",
+                  "sha256": "6e32bc403669206d40804a2898a8ebe603497424165d4cab5ca1341f224614ba",
+                  "size": 282379460
+                },
+                "portable_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/store/731acec3d45307ca52f6278beb18dc30b2dedbf79e59fef48f7a9bbcf68e8b4a.tar.gz",
+                  "sha256": "731acec3d45307ca52f6278beb18dc30b2dedbf79e59fef48f7a9bbcf68e8b4a",
+                  "size": 378855766
+                },
+                "portable_files": 6121,
+                "portable_logical_bytes": 1635344986,
+                "all183_BQRS_recovered_from_actual_store_restore": true,
+                "recovered_native_unbundle_and_resolve_exit_codes": [
+                  0,
+                  0
+                ],
+                "derived_recovered_expanded_retired": [
+                  "/tmp/nexus-codeql-p2/cpp-db-unbundled-from-store",
+                  "/tmp/nexus-codeql-p2/cpp-analysis-portable-restored",
+                  "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/portable-input"
+                ],
+                "canonical_Native_TMP_restoration_ref": "cpp_all_temporary_canonical_restoration",
+                "canonical_status": "all_temporary_Native_and_TMP_absences_restored_verified_overlay_copies_retired",
+                "original_source_path_retired": true,
+                "path_state_boundary": "These receipts establish actual recovery and retirement at their recorded times; early live-path fields are not a current-live assertion. Original raw failures, SARIF and findings remain unchanged."
+              }
+            },
+            "test_only_QA_followup": {
+              "status": "normal13_QA_commit_fresh174_Python_all38_review_and_current_E_software_feature_push_complete_D_pending",
+              "base_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "RED_ref": "FD_actual_RED",
+              "frozen_probe_GREEN_ref": "FD_frozen_probe_GREEN",
+              "permanent_and_normal_serial_GREEN_ref": "FD_permanent_serial_GREEN",
+              "permanent_and_normal_serial_tests": 21,
+              "actual_followup_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+              "actual_followup_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+              "normal_complete_index_hooks": {
+                "status": "passed",
+                "normal_commit_exit_code": 0,
+                "original_commit_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/commit.attempts/1793787212210725180-2cff092e12c8467f9a4627c511b920b5/receipt.json",
+                  "size": 1544,
+                  "sha256": "44dc93a7edd4af7c6769e1cb9547a5d748be5b94539f14a5c4ddd1134a909360"
+                },
+                "namespace_completion": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/state.json",
+                  "size": 1125,
+                  "sha256": "40df7a815f9a11ada70106878a41108321b3d8851a42bdf39835e8d82056b35c"
+                },
+                "google_programs": 420,
+                "google_cases": 7342,
+                "tool_cases_four_ordinary_domains": 3968,
+                "failures": 0,
+                "errors": 0,
+                "skips": 0,
+                "final_summary_ref": "QA_normal_commit_and_exact_remote_readback"
+              },
+              "fresh_full_Python174_result": {
+                "status": "complete174_create_analyze_zero_and_all38_existing_dispositions_uniquely_mapped",
+                "source_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+                "source_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+                "source_clean_and_unchanged": true,
+                "complete_queries": 174,
+                "execution_ref": "QA_Python174_actual",
+                "actual_commands": [
+                  {
+                    "command": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create.command.json",
+                      "size": 1898,
+                      "sha256": "c1d79b75df9e825d701097853db11d5c28f56e1d4d4d79878428e1c614736182"
+                    },
+                    "immutable_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create.attempts/1793790199739863079-8127939e69204bcb99219a9bfd64a62b/receipt.json",
+                      "size": 1714,
+                      "sha256": "b873ee74e1945d2696f9d500e85be00281f93943262b249942238228990817a4"
+                    },
+                    "exit_code": 0,
+                    "duration_seconds": 36.224848095997004
+                  },
+                  {
+                    "command": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-analyze.command.json",
+                      "size": 1934,
+                      "sha256": "3165187d5f679590a9416e4dc4f3036d4bec1f69daa22fa07d87257fe40cbc57"
+                    },
+                    "immutable_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-analyze.attempts/1793790235975954880-4a98edd74fd748b0af2cf1c9a48bd523/receipt.json",
+                      "size": 1749,
+                      "sha256": "317b25d0d6d355eab63e6bdbaaa3fabbd4e6cdb5e1af07c6f1f090920f145a04"
+                    },
+                    "exit_code": 0,
+                    "duration_seconds": 96.86840282200137
+                  }
+                ],
+                "SARIF": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python.sarif",
+                  "sha256": "bb44c9f1d576f4cf21f3f2c1f19d19190f9b18e16d7a715c07b25d188a86394a",
+                  "size": 592992
+                },
+                "findings": 38,
+                "effective_severity": {
+                  "error": 2,
+                  "note": 30,
+                  "warning": 6
+                },
+                "severity_correction_ref": "QA_Python38_severity_correction",
+                "per_result_mapping_ref": "QA_Python_old45_to_new38_mapping",
+                "matched_old_to_new": 38,
+                "new_unmatched_results": 0,
+                "ambiguous_matches": 0,
+                "removed_old_result_indices": [
+                  17,
+                  22,
+                  24,
+                  41,
+                  42,
+                  43,
+                  44
+                ],
+                "removed_confirmed_FD_defects": [
+                  41,
+                  42
+                ],
+                "removed_equivalent_cleanup_indices": [
+                  17,
+                  22,
+                  24,
+                  43,
+                  44
+                ],
+                "survivors_with_unchanged_source_blob": 36,
+                "changed_file_survivors_independently_reread": {
+                  "14": 14,
+                  "25": 22
+                },
+                "existing_nondefect_dispositions_reusable": true,
+                "raw_error_findings": {
+                  "count": 2,
+                  "rule": "py/uninitialized-local-variable",
+                  "disposition": "Unchanged correlated-control-flow false positives with unchanged source blobs; authoritative Root review reused by exact identity. Raw severity stays error.",
+                  "Root_review_ref": "QA_Python_two_error_Root_review"
+                },
+                "finding_free": false,
+                "original_main_reporting_correction": "Original main record defaulted all missing result.level to warning. Additive correction inherits matching rule defaultConfiguration.level: 30note/6warning/2error; original main/SARIF/attempt bytes unchanged.",
+                "retention_boundary": "This binds actual scan and per-result mapping only; do not infer a later QA DB archival/restore operation from P2 DB recovery."
+              },
+              "expected_parent": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "expected_committed_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+              "prepared_followup_config": "build/recovery-20261103/codeql-p2/fd-leak-tdd/python-followup.config.pending.json",
+              "qualification_boundary": "QA706ee80 has its own normal complete-index gate and fresh complete174 Python analysis with38 reviewed surviving findings. Private E=f59debf pins P2 and has independently completed approved software integration aggregates. Actual D remains a separate obligation. Firmware, CPP production analysis, SDK, eight candidates and both full159 runs retain exact P2 identities; this round did not run a third159.",
+              "earlier_five_file_reviewed_tree": "c7a3e06fd48d4f7401fb2d33a39272616ca96543",
+              "earlier_five_file_count": 5,
+              "earlier_five_file_source_files": [
+                "cmake/package/verify_consumers.py",
+                "tools/testing/test_dev_serial_rates.py",
+                "tools/testing/test_entropy_target.py",
+                "tools/testing/test_mbedtls_lock.py",
+                "tools/testing/test_mqtt_tls_interop.py"
+              ],
+              "changed_path_count": 13,
+              "source_paths": [
+                "cmake/package/verify_consumers.py",
+                "dependencies/googletest.lock.json",
+                "ext/googletest",
+                "tests/google/network_lwip_test.cpp",
+                "tools/maintenance/dependency_proposals.py",
+                "tools/maintenance/googletest_lock.py",
+                "tools/testing/README.md",
+                "tools/testing/test_dependency_proposals.py",
+                "tools/testing/test_dev_serial_rates.py",
+                "tools/testing/test_entropy_target.py",
+                "tools/testing/test_googletest_submodule.py",
+                "tools/testing/test_mbedtls_lock.py",
+                "tools/testing/test_mqtt_tls_interop.py"
+              ],
+              "confirmed_CPP_host_fixes": [
+                {
+                  "result_index": 959,
+                  "scope": "GoogleTest POSIX RE latent copy-assignment ownership",
+                  "RED_ref": "RE_actual_RED",
+                  "same_frozen_probe_GREEN_ref": "RE_frozen_probe_GREEN",
+                  "normal_fork_commit_push_readback_ref": "RE_normal_fork_commit_push_readback",
+                  "upstream_selftests_ref": "RE_full_upstream_selftests",
+                  "upstream_registered_tests": 63,
+                  "upstream_failed": 0,
+                  "upstream_skipped": 0,
+                  "official_upstream_version": "1.16.0",
+                  "official_upstream_commit": "6910c9d9165801d8827d628cb72eb7ea9dd538c5",
+                  "selected_org_patch_commit": "58ec32c09ed8a099e55cbdab9418597c4fd9b14f",
+                  "current_Nexus_assignment_trigger_demonstrated": false
+                },
+                {
+                  "result_index": 1045,
+                  "scope": "lwIP test fixture fatal assertion cleanup for UDP PCB/TCP PCB/pbuf and Arena owned packets",
+                  "RED_ref": "lwIP_actual_RED",
+                  "same_frozen_probe_GREEN_ref": "lwIP_frozen_probe_and_full_module_GREEN",
+                  "failure_modes": 5,
+                  "each_original_case_still_fatal_failures": 1,
+                  "each_injection_count": 1,
+                  "GREEN_UDP_TCP_pbuf_residual_counts": 0,
+                  "normal_unwrapped_module_tests": 24,
+                  "normal_unwrapped_module_failures": 0,
+                  "normal_unwrapped_module_skipped": 0,
+                  "causal_isolation_dependency": "unchanged P2 official6910 headers and libraries; final normal QA separately uses selected58ec"
+                }
+              ],
+              "machine_provenance_fix": {
+                "scope": "Keep official upstream6910 distinct from selected org patch58ec in lock admission and inventory",
+                "RED_ref": "GTest_provenance_actual_RED",
+                "GREEN_ref": "GTest_provenance_actual_GREEN",
+                "RED_exit_code": 1,
+                "GREEN_exit_code": 0,
+                "GREEN_tests": 19
+              },
+              "normal_complete_index_hook_observation": {
+                "status": "completed_with_actual_normal_commit",
+                "admission_ref": "normal13_retry1_admission",
+                "staged_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+                "changed_paths": 13,
+                "selected_GTest_gitlink": "58ec32c09ed8a099e55cbdab9418597c4fd9b14f",
+                "final_hook_result": {
+                  "status": "passed",
+                  "normal_commit_exit_code": 0,
+                  "original_commit_attempt": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/commit.attempts/1793787212210725180-2cff092e12c8467f9a4627c511b920b5/receipt.json",
+                    "size": 1544,
+                    "sha256": "44dc93a7edd4af7c6769e1cb9547a5d748be5b94539f14a5c4ddd1134a909360"
+                  },
+                  "namespace_completion": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/state.json",
+                    "size": 1125,
+                    "sha256": "40df7a815f9a11ada70106878a41108321b3d8851a42bdf39835e8d82056b35c"
+                  },
+                  "google_programs": 420,
+                  "google_cases": 7342,
+                  "tool_cases_four_ordinary_domains": 3968,
+                  "failures": 0,
+                  "errors": 0,
+                  "skips": 0,
+                  "final_summary_ref": "QA_normal_commit_and_exact_remote_readback"
+                },
+                "normal_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+                "observation_policy": "Admission is historical; actual completed normal commit receipt and namespace completion bind the final outcome."
+              },
+              "prepared_followup_config_binding": "Actual QA706ee80/tree5c39 was extracted into its independently frozen source and a fresh Python database, then all174 queries were evaluated. Earlier five-file c7a preparation is historical.",
+              "actual_E_result": {
+                "status": "completed_approved_public_software_aggregate",
+                "result_pointer": "/source_version_records_20261103/final_public_source_P2_ab532250/subsequent_actual_results/private_current_E",
+                "public_safe_summary": {
+                  "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/E-public-safe-summary.json",
+                  "size": 1195,
+                  "sha256": "7bf5397859d9a8a29d58dca42046bd303adf19f1b81fee360c57609c07fbdadd"
+                },
+                "qualification_boundary": "Private application raw and payloads remain private. E pins P2; it does not relabel P2 firmware evidence as QA706 or D."
+              },
+              "actual_D_result": null,
+              "actual_nonforce_push_exact_readback": {
+                "status": "completed",
+                "summary_ref": "QA_normal_commit_and_exact_remote_readback"
+              },
+              "earlier_five_file_source_review_ref": "five_file_independent_review",
+              "admitted_final_staged_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2"
+            }
+          },
+          "hosted_service_association": "not_inferred",
+          "aggregate_closed": false,
+          "evidence": {
+            "python_query_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-query-release.summary.json",
+              "size": 4743,
+              "sha256": "2553eb806505dcb49252f6285efef5543b31fab877cd0446bba80a2331e4631e"
+            },
+            "python_all45_dispositions": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-triage/all45-dispositions-followup-pending.json",
+              "size": 94701,
+              "sha256": "e18db9404d71a59799f8aa10ae928d9d8628b07f41ce4c7c8c3139ca421c723a"
+            },
+            "python_retention_completed": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/completed.json",
+              "size": 6386,
+              "sha256": "2367fc672bd0bf2842be5b51e5b513d9d897aed57eb9d00db342169b3b51532c"
+            },
+            "python_portable_restore_closure": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/portable-restore-closed.json",
+              "size": 1629,
+              "sha256": "d5a2a3db4e03f79002c1a37f74f63e5a842ba76408502e55f8612382db5d0c5e"
+            },
+            "python_original_expanded_retirement": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/original-expanded-db-retirement-format-fixed.command.json",
+              "size": 1813,
+              "sha256": "c22a8f349c8f6ec422ddaae52c6a3fb80a9b86513b84f1d1ce44141fdb1effb3"
+            },
+            "python_derived_retirement": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/authorized-derived-retirement.json",
+              "size": 32537,
+              "sha256": "c6f120e5df2a415f37f20f068c3b48eed30e0a1a5d891a87e1cdd7631b362b65"
+            },
+            "cpp_create_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-create-release.summary.json",
+              "size": 10531,
+              "sha256": "91be836b78d8379786ed15e79d3cd378e800f8cba1f9b9e359f1c76e8f1d3140"
+            },
+            "cpp_N09_phases": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-phases.N09.json",
+              "size": 16281,
+              "sha256": "b7a5a2ab1756a58585b3b2a34f705ad0c2137c72a0915e07421c4be93cde7ff0"
+            },
+            "cpp_original_budget_exhausted": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-original-language-budget-exhausted.json",
+              "size": 2492,
+              "sha256": "bb5b8672f81740b588f23f42d11598fcf31114693039de444fd86a38e6a43593"
+            },
+            "five_file_independent_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/root-final-five-files-independent-review.json",
+              "size": 3811,
+              "sha256": "02feecb1f25cc4de7c6a4439c805981cdc2f296645c020debab054e492e4b235"
+            },
+            "FD_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/actual-RED-handoff.json",
+              "size": 4820,
+              "sha256": "a3810bad02544fb54f984b9285db6ae9dfa6c5d3d66ce30c2fea27aef711dafa"
+            },
+            "FD_frozen_probe_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/GREEN-refactor-frozen-probe.command.json",
+              "size": 1750,
+              "sha256": "c58bda8cba94510f808d3ef104ae1ca7de8ee7b9b969ccaf44122836c16ee9b4"
+            },
+            "FD_permanent_serial_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/GREEN-permanent-and-normal-serial.command.json",
+              "size": 1644,
+              "sha256": "44a0bed3ff6b34e5a06b3ffc41dac06e1dba74c0f73f502f52ec1a49401aadb7"
+            },
+            "cpp_space_repair_first_failed_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair.command.json",
+              "size": 1617,
+              "sha256": "5985dc64bff0f3995483ac6ece37cd4cf27834c97221ab67f394e451212ad13a"
+            },
+            "cpp_space_repair_successful_retry_attempt": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair-retry1.attempts/1793774199694342416-d43f4cd12b714a859f7aea0e68852978/receipt.json",
+              "size": 1463,
+              "sha256": "ff8f0a9cf1f86852b85e96aa46dfd8d786e6e3976bf5a5cc7d3692c7ecb911d3"
+            },
+            "cpp_space_repair_successful_retry_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair-retry1.command.json",
+              "size": 1650,
+              "sha256": "cb22e1e6d915fdf4c0c6bff6ed7537a47522a701af97c2c0d8e569adf9f75aa1"
+            },
+            "cpp_space_repair_actual": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair.actual.json",
+              "size": 1975233,
+              "sha256": "3788657eb2c33e6f765b5f4fe666a3e3a2a6fecb97925843f8cefb8c1a59b6de"
+            },
+            "cpp_complete_composite_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-composite-query-release.summary.json",
+              "size": 2493,
+              "sha256": "7654f3a8d5e8e62e7e036c14fc6cd85ae4158802e21e63709ff7e22069463def"
+            },
+            "cpp_composite_budget": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/budget.actual.json",
+              "size": 2782,
+              "sha256": "6f82b8dedd867560fc9ef199bf15d44c3b81c0dc94896f76d8ae098238be2ae8"
+            },
+            "cpp_composite_semantic_projection": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/completed-semantic-projection.actual.json",
+              "size": 973,
+              "sha256": "dfb53fe9d293df3563dfde2de72fb72e6d1eb1802df376d68022c40711dca334"
+            },
+            "cpp_complete183_query_origins": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/complete-183-query-origins.actual.json",
+              "size": 410811,
+              "sha256": "028cd9788113409eec65890363290dc9df0c26ec3b62fe6dc37de90b6f0c9723"
+            },
+            "cpp_all1234_review_coverage": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/all1234-review-coverage-followup-pending.json",
+              "size": 4373,
+              "sha256": "99ca82dba9e1089d8a8d82abf8a26cc7c303083262b69202ca452651b14d5492"
+            },
+            "cpp_Root17_documentation_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/root-17-documentation-advisories.readonly.json",
+              "size": 14183,
+              "sha256": "e7ab2e7543cc3366ef3cb48bc538b84b0485e4139f607522c50c3e4fffa6029b"
+            },
+            "cpp_native_portable_retention_completed": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/completed.json",
+              "size": 41580,
+              "sha256": "eed0a3f14dc83387a9ada9d1d498de2e2702a09747df9a422cae281239f0f1e5"
+            },
+            "cpp_all_temporary_canonical_restoration": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/all-temporary-canonical-restoration.actual.json",
+              "size": 4248,
+              "sha256": "b639edf22120698ee26a10feb09ea98f2e67564211f504a924320a5def4b696e"
+            },
+            "cpp_composite_namespace": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-namespace-recovery1-parent.actual.json",
+              "size": 2011,
+              "sha256": "6bc04b8488f0dc11eb26b3703a6eb6680dba5050b7efc85c1b3c7b5dd7e40a60"
+            },
+            "RE_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/red-retry1/handoff.json",
+              "size": 10796,
+              "sha256": "dfb0a5f5c2031ca18143caca10ba84fc6506d858d4ea6478e36acb395e491ea9"
+            },
+            "RE_frozen_probe_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/green/handoff.json",
+              "size": 10607,
+              "sha256": "99b98a2edf17c258ac800fcf43624eeb695c6046ffbd3281b226951a579df2ae"
+            },
+            "RE_full_upstream_selftests": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/upstream-all-tests-control-v1/handoff.json",
+              "size": 12819,
+              "sha256": "07b105f447c4a468704256004a2bcc6743450f3403b7a195b9c1ede63cac4404"
+            },
+            "RE_normal_fork_commit_push_readback": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/fork-normal-commit-and-push-20261104/completed.json",
+              "size": 1655,
+              "sha256": "1cb89ea2e3315f6f1bbc498c6d64d8229f4a01ac4fc5cb130ca1e4efdf712c60"
+            },
+            "lwIP_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/lwip-fixture-cleanup-tdd/RED-actual-20261104/actual-RED-handoff.json",
+              "size": 7877,
+              "sha256": "b56a535bbcf2c4d311ae812bc5c50e9e3cfb2cbf4d6647de614b9cf0a6471b6d"
+            },
+            "lwIP_frozen_probe_and_full_module_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/lwip-fixture-cleanup-tdd/GREEN-actual-20261104/GREEN-completion-handoff.json",
+              "size": 22103,
+              "sha256": "991bb14861852197ab64cfa67d11615ff3c5cb78f3560980276eeccf2ec1a050"
+            },
+            "GTest_provenance_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-machine-provenance-tdd/RED-actual-20261104/handoff.json",
+              "size": 3440,
+              "sha256": "295edcbf13231212868fabf808da41a49136dda9f83b5408bed106a74b7b16ee"
+            },
+            "GTest_provenance_actual_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-machine-provenance-tdd/GREEN-actual-20261104/result.json",
+              "size": 2460,
+              "sha256": "3f86c0a421693f230bdeabd68cdc3322396d26825708dfc08cf4dbdeec8d7065"
+            },
+            "normal13_retry1_admission": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/admission.json",
+              "size": 5957,
+              "sha256": "1604e76cd90245fb5fb64227e8f1c0e8791d70f65d6de7082999c761ece7966b"
+            },
+            "cpp_supplemental2700_final_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+              "size": 2297,
+              "sha256": "6573563a4e6f11e412b48c1dee9efbcb741236d9da33ce28d11c2f33faee8112"
+            },
+            "QA_normal_commit_and_exact_remote_readback": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/actual-QA-commit-push-20261104/completed.json",
+              "size": 1482,
+              "sha256": "d9c78f5c539b455d1a0d7ee5d8de3bae9ef871d117acd42eae6ccfb94693834e"
+            },
+            "QA_Python174_actual": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create-analyze.actual.json",
+              "size": 10456,
+              "sha256": "c4dd86302df8e48c4f6ed0a3deb12dad42a387fd0d920020d6c0d186f6d60603"
+            },
+            "QA_Python38_severity_correction": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-findings-severity-scope-correction.actual.json",
+              "size": 2896,
+              "sha256": "a7ac8ff84a2d6bb5f2953ec83b7cfddfc61283977b5dd9d2ba9a2bdce1ef3fdc"
+            },
+            "QA_Python_old45_to_new38_mapping": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-old45-to-new38.readonly.json",
+              "size": 127462,
+              "sha256": "092de5633dc76b2e49b4ee6170595e7632f13508e8b9084be7c81f5d81d1e4b0"
+            },
+            "QA_Python_two_error_Root_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-triage/root-two-errors-independent.readonly.json",
+              "size": 4481,
+              "sha256": "8df4ee7594489e9b7aa4512ad525b039af1eaadd0acbd75b3ad677f9046b023f"
+            }
+          }
+        },
+        "private_current_E": {
+          "status": "actual_software_integration_public_SDK_walk_and_private_feature_push_exact_readback_completed",
+          "previous_approved_private_commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+          "previous_platform_pin": "6c3a380a99336a5a7809b4a862449228c6365544",
+          "actual_approved_public_metadata": {
+            "all_software_failures_errors_skips": 0,
+            "complete_presets": 17,
+            "installed_CTest": 2,
+            "installed_broker_private_C_cases": 5,
+            "native_CTest": 28,
+            "physical_status": "not_executed",
+            "private_Google_cases": 204,
+            "private_Google_programs": 18,
+            "private_examples_commit": "f59debf1a15913353462e69ba0039db1c010f284",
+            "public_generic_installed_SDK_walk_commands": 12,
+            "public_generic_walk_CTest": 1,
+            "public_pin": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+            "public_tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+            "public_walk": {
+              "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/state.json",
+              "sha256": "063b4ebbc30225f47298693be816c129d1fbccbeffad77aa51c0ff078bdebaa6",
+              "size": 4206
+            },
+            "qualification_boundary": "Private application execution artifacts remain private. P2 firmware evidence is not relabelled as QA706 or final docs Source. The broker helper qualification=false is preserved; actual C cases and ownership/cleanup are independently checked.",
+            "source_broker_private_C_cases": 5,
+            "status": "actual_software_integration_and_public_SDK_walk_passed",
+            "usage_recipes_covered_by_current_full_execution": 3
+          },
+          "publication_boundary": "Only approved commit/pin/PR metadata and aggregate results may enter this public index; private raw paths and payloads remain private.",
+          "public_safe_summary": {
+            "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/E-public-safe-summary.json",
+            "size": 1195,
+            "sha256": "7bf5397859d9a8a29d58dca42046bd303adf19f1b81fee360c57609c07fbdadd"
+          },
+          "approved_additional_public_aggregates": {
+            "maintained_local_CI_commands": 116,
+            "all_command_exits": 0,
+            "expected_deadline_rejection_result": 4,
+            "expected_missing_client_certificate_result": 6,
+            "expected_rejection_is_failure": false,
+            "SDK_payload_unchanged": true,
+            "origin_unchanged": true
+          },
+          "private_feature_push_and_exact_readback": {
+            "repository_visibility": "private",
+            "authenticated_visibility_confirmed": true,
+            "normal_nonforce_push": true,
+            "exact_feature_head": "f59debf1a15913353462e69ba0039db1c010f284",
+            "exact_ls_remote_readback": "f59debf1a15913353462e69ba0039db1c010f284",
+            "private_main_updated": false,
+            "publication_boundary": "Approved nonprivate aggregate only; private receipt paths and raw are not published."
+          },
+          "original_broker_environment_attempt": "First source-broker attempt failed in the Docker bridge environment and remains failed. Restoring the original docker0 and existing maintained bridge contract enabled actual successful C broker execution; no new Source change was required."
+        },
+        "D_documentation": {
+          "status": "canonical_and_actual_exact_gettext_catalogs_prepared_final_semantic_review_strict_package_restore_pending",
+          "documentation_source": null,
+          "reviewed_catalog_source_identity": null,
+          "qualification_inheritance_from_P2": false,
+          "initial_semantic_review": {
+            "status": "initial_actual_Source_and_changed_catalog_meanings_reviewed_final_differences_POT_and_strict_pending",
+            "receipt": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/root-initial-documentation-semantic-review.readonly.json",
+              "size": 6649,
+              "sha256": "26257562fc5a71922252941e396a5162d973f4e673a111ff1f6cdc3b30c5323d"
+            },
+            "qualification_boundary": "Initial review binds the recorded source and catalogs only; Python/E/finalD differences require subsequent review. Actual POT exact-set, final digest, strict package and restore remain pending."
+          },
+          "actual_gettext_preparation": {
+            "exit_code": 0,
+            "duration_seconds": 10.917027591000078,
+            "original_attempt": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext-after-E-push.attempts/1793792359036483787-b3fadf533e94408ab06021744a2334c2/receipt.json",
+              "size": 1919,
+              "sha256": "974b17ee5688d4e4ee27eed8d8c635c6dbd9dfcc11bc13200ca4ef1e7217111b"
+            },
+            "initial_successful_extraction": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext.command.json",
+              "size": 2120,
+              "sha256": "84d2e50b648ac9b9526706060e31abd2bd6c714733ae1fa9e397707f0f5c6d63"
+            },
+            "final_wording_update_extraction": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext-after-E-push.command.json",
+              "size": 2156,
+              "sha256": "4a007923cae3ba88625e89a92e88471104ee730233a72cc8ce57f2e0ad01aa27"
+            },
+            "changed_catalogs": 12,
+            "actual_POT_sets_exact": true,
+            "catalogs_nonempty_no_fuzzy": true,
+            "Reviewed": false,
+            "scope": "Preparation only, reusing original P2 Doxygen XML for unchanged public C declarations. No Doxygen/HTML/strictD/package/restore execution or final clean D-source identity is established by this step."
+          }
+        },
+        "website_and_main": {
+          "status": "pending_actual_deployment_deployed_bytes_readback_final_FF_and_postmerge_association",
+          "actual_results": null,
+          "current_observed_main": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+          "old_tags": "v0.2.0/v0.2.1 retain their original identities"
+        },
+        "server_branch_rules": {
+          "status": "last_actual_ruleset_POST_HTTP403_not_configured",
+          "local_policy_is_server_enforcement": false
+        },
+        "Release_asset_upload": {
+          "status": "last_actual_HTTP401_preserved",
+          "public_artifact_append_does_not_rewrite_that_result": true
+        },
+        "physical_hil": "not_executed"
+      },
+      "physical_hil": "not_executed",
+      "counting_policy": "Do not sum overlapping stages/tests/Native modes or promote product/physical qualification.",
+      "evidence_obtainability": "The small handoff/review locators identify original host metadata and must not be advertised as public download URLs. Recover the public outer archive through its pinned descriptor; local-release.json maps retained original evidence identities to exact payload members. Post-bundle completion reviews remain separate small local observations until explicitly published in D."
+    },
+    "remaining_exits_historical_pre_P2_20261103": {
+      "V-A01": "Private annex and complete applicable-mode inventory remain open.",
+      "V-I03_V-I05_V-I06": "Per-configuration/runtime cost, service/rearm, held-consumer/backpressure and contention comparisons remain open; link budgets are not measured timing or stack high-water.",
+      "F01": "Purpose/input/output/failure/cost inventory and explicit disposition of overlapping checks remain open.",
+      "F07": "Controlled same-coverage cold/warm time and memory comparison remains open.",
+      "V-K05": "The complete real onboarding/developer path remains open.",
+      "V-J07": "Test-retention review needs obsolete-contract or independent equivalent-coverage evidence; counts must not be reduced to manufacture passing results.",
+      "formal_software_plan": {
+        "required_stages": 159,
+        "status": "not_executed_for_current_feature_cohort"
+      },
+      "oci_and_fresh_offline_builds": "Existing recipe/fresh-daemon and fresh offline reproducibility exits remain open.",
+      "server_rules_and_remote_analysis": "Use actual current server readbacks and analysis disposition; local policy or ordinary gates do not establish remote enforcement.",
+      "physical_hil": "not_executed",
+      "new_software_candidate": "not_created"
+    }
+  }
+}

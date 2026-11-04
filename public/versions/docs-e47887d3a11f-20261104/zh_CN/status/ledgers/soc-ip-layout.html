@@ -1,0 +1,2288 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SoC/IP 目录整理台账 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="构建系统原专项台账" href="build-system.html" />
+    <link rel="prev" title="SoC 原专项台账" href="soc-refinement.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/status/ledgers/soc-ip-layout.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../../en/status/ledgers/soc-ip-layout.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="soc-ip">
+<span id="status-ledgers-soc-ip-layout"></span><h1>SoC/IP 目录整理台账<a class="headerlink" href="#soc-ip" title="Link to this heading">¶</a></h1>
+<p>本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
+原编号、顺序和全部原字段来自 <a class="reference download internal" download="" href="../../_downloads/54d3210c5ae2d22e8f681860fb75b4b2/soc-ip-layout-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">原台账</span></code></a>。
+源文件：<code class="docutils literal notranslate"><span class="pre">docs/design/soc-ip-layout-execution.csv</span></code>；SHA-256：<code class="docutils literal notranslate"><span class="pre">0564d12a1125e718b7560defc8a7cbb184c77ebeb1b13ba1eea1331b2cac8fa4</span></code>。</p>
+<p>不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
+物理状态分别解释；<code class="docutils literal notranslate"><span class="pre">development_passed</span></code> 不表示当前文档 HEAD 已执行。
+<code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code> 要回到精确结果索引判断源码和范围。
+绝对 <code class="docutils literal notranslate"><span class="pre">/workspace</span></code>、<code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> 定位保留原字节，仅说明原执行主机位置；
+可取得归档及 member 定位见 <a class="reference internal" href="../software-verification.html"><span class="std std-doc">软件证据入口</span></a>。</p>
+<p><strong>原退出字段</strong>只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
+也按原文保留，不能据此补造某次执行。</p>
+<p>本表包含 48 条原记录，仅表示来源行数。</p>
+<nav class="contents local" id="id1">
+<ul class="simple">
+<li><p><a class="reference internal" href="#r01" id="id2">R01</a></p></li>
+<li><p><a class="reference internal" href="#r02" id="id3">R02</a></p></li>
+<li><p><a class="reference internal" href="#r03" id="id4">R03</a></p></li>
+<li><p><a class="reference internal" href="#r04" id="id5">R04</a></p></li>
+<li><p><a class="reference internal" href="#r05" id="id6">R05</a></p></li>
+<li><p><a class="reference internal" href="#r06" id="id7">R06</a></p></li>
+<li><p><a class="reference internal" href="#r07" id="id8">R07</a></p></li>
+<li><p><a class="reference internal" href="#r08" id="id9">R08</a></p></li>
+<li><p><a class="reference internal" href="#r09" id="id10">R09</a></p></li>
+<li><p><a class="reference internal" href="#r10" id="id11">R10</a></p></li>
+<li><p><a class="reference internal" href="#r11" id="id12">R11</a></p></li>
+<li><p><a class="reference internal" href="#r12" id="id13">R12</a></p></li>
+<li><p><a class="reference internal" href="#r13" id="id14">R13</a></p></li>
+<li><p><a class="reference internal" href="#r14" id="id15">R14</a></p></li>
+<li><p><a class="reference internal" href="#r15" id="id16">R15</a></p></li>
+<li><p><a class="reference internal" href="#r16" id="id17">R16</a></p></li>
+<li><p><a class="reference internal" href="#r17" id="id18">R17</a></p></li>
+<li><p><a class="reference internal" href="#r18" id="id19">R18</a></p></li>
+<li><p><a class="reference internal" href="#r19" id="id20">R19</a></p></li>
+<li><p><a class="reference internal" href="#r20" id="id21">R20</a></p></li>
+<li><p><a class="reference internal" href="#r21" id="id22">R21</a></p></li>
+<li><p><a class="reference internal" href="#r22" id="id23">R22</a></p></li>
+<li><p><a class="reference internal" href="#r23" id="id24">R23</a></p></li>
+<li><p><a class="reference internal" href="#r24" id="id25">R24</a></p></li>
+<li><p><a class="reference internal" href="#r25" id="id26">R25</a></p></li>
+<li><p><a class="reference internal" href="#r26" id="id27">R26</a></p></li>
+<li><p><a class="reference internal" href="#r27" id="id28">R27</a></p></li>
+<li><p><a class="reference internal" href="#r28" id="id29">R28</a></p></li>
+<li><p><a class="reference internal" href="#r29" id="id30">R29</a></p></li>
+<li><p><a class="reference internal" href="#r30" id="id31">R30</a></p></li>
+<li><p><a class="reference internal" href="#r31" id="id32">R31</a></p></li>
+<li><p><a class="reference internal" href="#r32" id="id33">R32</a></p></li>
+<li><p><a class="reference internal" href="#r33" id="id34">R33</a></p></li>
+<li><p><a class="reference internal" href="#r34" id="id35">R34</a></p></li>
+<li><p><a class="reference internal" href="#r35" id="id36">R35</a></p></li>
+<li><p><a class="reference internal" href="#r36" id="id37">R36</a></p></li>
+<li><p><a class="reference internal" href="#r37" id="id38">R37</a></p></li>
+<li><p><a class="reference internal" href="#r38" id="id39">R38</a></p></li>
+<li><p><a class="reference internal" href="#r39" id="id40">R39</a></p></li>
+<li><p><a class="reference internal" href="#r40" id="id41">R40</a></p></li>
+<li><p><a class="reference internal" href="#r41" id="id42">R41</a></p></li>
+<li><p><a class="reference internal" href="#r42" id="id43">R42</a></p></li>
+<li><p><a class="reference internal" href="#r43" id="id44">R43</a></p></li>
+<li><p><a class="reference internal" href="#r44" id="id45">R44</a></p></li>
+<li><p><a class="reference internal" href="#r45" id="id46">R45</a></p></li>
+<li><p><a class="reference internal" href="#r46" id="id47">R46</a></p></li>
+<li><p><a class="reference internal" href="#r47" id="id48">R47</a></p></li>
+<li><p><a class="reference internal" href="#r48" id="id49">R48</a></p></li>
+</ul>
+</nav>
+<section id="r01">
+<span id="status-soc-ip-layout-r01"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">R01</a><a class="headerlink" href="#r01" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>分支与源码基线</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>修改前记录实际源码版本和分支</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>AGENTS.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>.git/local-recovery/soc-ip-layout/baseline.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>本地与 GitHub 的 refactor/soc-ip-layout 分支均从 890a6026384b 开始。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r02">
+<span id="status-soc-ip-layout-r02"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">R02</a><a class="headerlink" href="#r02" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>逐文件职责和目标位置映射</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>审查每个迁移文件，区分共享 IP 与 SoC 集成</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>.git/local-recovery/soc-ip-layout/path-map.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>已审查共享 IP 和 35 个系列生产模块；导入规范化后的系列 AST 未改变。这些是原迁移基线的身份与计数，不是当前 P 的总计；最终执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r03">
+<span id="status-soc-ip-layout-r03"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">R03</a><a class="headerlink" href="#r03" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>精确平台模式、资源与拒绝行为基线</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>记录维护的选择与拒绝行为，不扩大支持范围</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/configurations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>136 份精确装配（包括目录中的全部 71 项）在两份源码树中均完成解析，实际选择决策未变。既有负向合同继续执行。这些是原迁移基线身份与计数，不是当前 P 的总计；最终执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r04">
+<span id="status-soc-ip-layout-r04"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">R04</a><a class="headerlink" href="#r04" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>测试身份与执行域</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>将保留的用例映射到 Native、工具、ARM 与物理执行域</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests;tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration/case-mapping.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>原 1035 个 configure 用例逐一保留；132 个系列用例迁移；新增 8 个迁移回归。这些是原迁移基线身份与计数，不是当前 P 的总计；最终执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r05">
+<span id="status-soc-ip-layout-r05"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">R05</a><a class="headerlink" href="#r05" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Flash、RAM、ops 与 IRQ 基线</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>记录实际链接的资源和保留基线，供后续比较</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/resources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>保留来自 16 个 preset 的 32 份历史资源报告，ELF 摘要与大小匹配。这是历史基线采集，不是新执行或新源码的资源资格。只复制了资源报告；ELF/map 身份在采集时观察，并未作为新的构建证据保留。最终 P 比较记录在 R46。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r06">
+<span id="status-soc-ip-layout-r06"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">R06</a><a class="headerlink" href="#r06" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>baseline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>唯一执行台账</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>严格维护 R01–R48，将实现与执行状态分开</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>唯一的 R01–R48 任务记录；实现、软件和物理状态分别维护。最终软件受测源码 tested_source=P=92e669233957a2e450a528394e8f4dd0794c7049，tree=6e38d4c43d59330a0a9a9b7cac21f591d9c2719f；已集成 M=c79fd9672a9fe56379744d834cfccd822bc40be1 的 tree 相同。本次文档更新只记录 P，不声称文档自身取得软件资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r07">
+<span id="status-soc-ip-layout-r07"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">R07</a><a class="headerlink" href="#r07" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>显式系列描述符</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>显式声明规范源码目录与配置模块，不进行发现</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/providers/descriptor.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>显式厂家、源码与配置目录；不从系列名称前缀推断路径。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r08">
+<span id="status-soc-ip-layout-r08"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">R08</a><a class="headerlink" href="#r08" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>模块加载与类型身份</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>显式加载保留公共 Python 类型身份和导入边界</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/providers;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>采用普通的选定 SoC 包和规范共享类型；实际执行了六个加载回归的 RED/GREEN。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r09">
+<span id="status-soc-ip-layout-r09"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">R09</a><a class="headerlink" href="#r09" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>输入闭包与新鲜度</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>迁移后的配置依赖继续纳入身份和陈旧输入拒绝</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dependencies.py;tools/configure/bundle.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>全部实际执行的包初始化模块和辅助模块均计算摘要；迁移后的源码受输出所有权保护，不会被覆盖。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r10">
+<span id="status-soc-ip-layout-r10"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">R10</a><a class="headerlink" href="#r10" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>SDK 根目录与必需成员</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>源码 SDK 包含声明的 SoC 配置与 IP 驱动输入</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/sdk-driver-red.log;build/soc-ip-layout/sdk-driver-green.log;build/soc-ip-layout/sdk-payload.log;build/soc-ip-layout/sdk-selection.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>新共享驱动传输回归先 RED 后 GREEN；20 个设备 payload 测试和 45 个选择／可搬移测试通过。最终 P 的实际安装消费记录在 R45。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r11">
+<span id="status-soc-ip-layout-r11"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">R11</a><a class="headerlink" href="#r11" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>系列测试发现</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>保留并执行 tools/configure/tests/providers/&lt;family&gt; 下的测试</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/tests/providers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration/case-mapping.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>系列测试保留在现有 tools/configure 发现域；没有新增 runner。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r12">
+<span id="status-soc-ip-layout-r12"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">R12</a><a class="headerlink" href="#r12" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>infrastructure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>风格、源码、能力和测量覆盖</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>把 drivers 和 SoC 配置纳入已有观察工具与门禁</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/maintenance;tools/measurement;scripts/validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/baseline/quality-tools-green.log;build/soc-ip-layout/baseline/io-lifecycle-green.log;build/soc-ip-layout/capabilities-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>新驱动继续受风格、私有 include、ops／源码／链接保留、静态分析和目标局部生命周期检查覆盖；独立审查已关闭全部迁移发现。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r13">
+<span id="status-soc-ip-layout-r13"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">R13</a><a class="headerlink" href="#r13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 Native 配置</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用 soc/native/configure，保留显式导入与测试</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/native/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r14">
+<span id="status-soc-ip-layout-r14"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">R14</a><a class="headerlink" href="#r14" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 F103 与 GD303 配置</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用各精确系列的 configure 包并保留测试</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f103/configure;soc/gd32/gd32f303/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r15">
+<span id="status-soc-ip-layout-r15"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">R15</a><a class="headerlink" href="#r15" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 F407 与 GD470 配置</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用各精确系列的 configure 包并保留测试</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f407/configure;soc/gd32/gd32f470/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r16">
+<span id="status-soc-ip-layout-r16"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">R16</a><a class="headerlink" href="#r16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 G474 配置与辅助模块</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>就近放置 G474 合同、构造、生成和选定辅助模块</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32g474/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r17">
+<span id="status-soc-ip-layout-r17"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">R17</a><a class="headerlink" href="#r17" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 H743 配置</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>就近放置 H743 合同、构造、生成和选定辅助模块</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32h743/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r18">
+<span id="status-soc-ip-layout-r18"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">R18</a><a class="headerlink" href="#r18" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>configuration_providers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 U575 配置并清理旧生产路径</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>就近放置 U575 策略，移除废弃系列生产包</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32u575/configure;tools/configure/providers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>phase1_complete_index_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/configuration;.git/local-recovery/soc-ip-layout/sync-first.json;build/soc-ip-layout/commit-gates.log;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>第一阶段精确 tree 为 d9270fefe377be519e2fb10d223eed8125566223；规范提交为 7b985c4c619a966c886c3cbf01902ccbfb68c955。普通完整暂存区门禁执行了 3215 个工具测试和 352 个程序／6352 个 Google 用例。该结果不为后续行为变更建立资格。最初外层 hook 日志和同步收条保留历史声明；后来复用的 build/native-debug/tdd 字节不是原始详细证据。最终 P 门禁与执行记录在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r19">
+<span id="status-soc-ip-layout-r19"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">R19</a><a class="headerlink" href="#r19" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 UART V1 channel DMA 引擎</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>从 drivers 选择经审查的算法与私有头文件</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/uart/uart_v1_channel_dma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r20">
+<span id="status-soc-ip-layout-r20"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">R20</a><a class="headerlink" href="#r20" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 I2C V1 异步引擎</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>从 drivers 选择经审查的 IRQ/DMA 算法与私有头文件</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v1_async</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r21">
+<span id="status-soc-ip-layout-r21"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">R21</a><a class="headerlink" href="#r21" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 I2C V2 引擎</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>从 drivers 选择经审查的轮询算法与私有头文件</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r22">
+<span id="status-soc-ip-layout-r22"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">R22</a><a class="headerlink" href="#r22" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>拆分 legacy_devices 并迁移 ADC</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>拆开私有 legacy 接口，从 drivers 选择 ADC 算法</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/adc/legacy_adc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r23">
+<span id="status-soc-ip-layout-r23"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">R23</a><a class="headerlink" href="#r23" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 legacy PWM</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>从 drivers 选择固定 PWM 算法及窄私有合同</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/timer/legacy_pwm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r24">
+<span id="status-soc-ip-layout-r24"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">R24</a><a class="headerlink" href="#r24" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>shared_drivers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>迁移 legacy Flash 与 SoC 辅助模块</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>选择 Flash 算法，放置 STM32 身份辅助模块，保留 UART 协作并更新 README</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/flash/legacy_flash;soc/stm32/common/stm32_identity.h;soc/common/uart_control.h;drivers/README.md;soc/common/README.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/native-debug/quality/soc-ip-layout-shared-drivers/;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.xml;build/native-debug/quality/soc-ip-layout-shared-drivers/ctest-results.execution.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>共享定向执行：17 个目标、17/17 CTest、267 个 Google 用例、零跳过。聚合范围不是逐行测试数量或完整资格。物理 HIL 未执行。保留的 shared-drivers XML 与原报告摘要匹配；其中嵌入的通用 Native XML 路径后来被复用。最终 P 的执行另记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r25">
+<span id="status-soc-ip-layout-r25"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">R25</a><a class="headerlink" href="#r25" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>集中维护料号、封装、RAM 和 Flash 几何</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>为料号、封装、内存与物理几何使用唯一精确事实权威</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/part-red.log;build/soc-ip-layout/facts-ir/clock-red.log;build/soc-ip-layout/facts-ir/parts-clocks-green.log;build/soc-ip-layout/facts-ir/f407-flash.xml;build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/all-flash-red.log;build/soc-ip-layout/flash-geometry/summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>实现精确 PartPolicy 与可选内存准入；物理数值仍在 soc.json 及冻结 PhysicalPartIR 视图。七款 MCU 的 Flash 几何均从已校验事实生成只读 C；六款保留全局符号，F407 使用选定的静态几何。最终定向配置套件有 364 个测试；独立集成／bundle 套件有 143 个测试。这些范围重叠，不能相加，也不是最终源码资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r26">
+<span id="status-soc-ip-layout-r26"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">R26</a><a class="headerlink" href="#r26" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>类型化控制器集成记录</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用显式类型化集成数据，不从系列名称推断</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure/providers/common.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/integration-red.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>ControllerIntegrationIR 组合已有规范 claims/DMA/IRQ/clock/pin/hardware 对象；PhysicalPartIR 复用冻结事实。没有新增 JSON/hash 字段或 route resolver。实际生产消费点是 F407 主 SPI 以及 F407/GD470 配对次级路径。其他构造器和显式 legacy 夹具适配仍保留。364 项定向套件及与之重叠的 52 项最终闭包测试通过；不建立最终源码资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r27">
+<span id="status-soc-ip-layout-r27"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">R27</a><a class="headerlink" href="#r27" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>时钟、复位、引脚与状态集成</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>显式表达集成所有权，不引入隐藏副作用</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>精确系列的 clock、GPIO/preflight、ControllerBinding 和次级冷态 hook 负责芯片集成。公共资源租约／IRQ／排空顺序保留。定向配置与 bundle 套件通过；没有运行时注册，也不扩大时钟／Board／backend 资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r28">
+<span id="status-soc-ip-layout-r28"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">R28</a><a class="headerlink" href="#r28" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>一致消费已有 IRQ、DMA 和内存 IR</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用经审查的不可变 IR，避免重复派生事实</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure/ir.py;tools/configure/memory.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log;build/soc-ip-layout/facts-ir/claims-red.log;build/soc-ip-layout/facts-ir/primary-dma-red.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>类型化 owned_claims 使用规范 ResourcePlanIR；选定 hardware/DMA/IRQ/clock/pin 消费者使用 ControllerIntegrationIR，不重新解析 routes。已记录有意义的漏 lane／claim 回归；其他维护的类型化适配或显式 legacy 适配仍保留。定向套件不是最终 ARM/SDK 资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r29">
+<span id="status-soc-ip-layout-r29"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">R29</a><a class="headerlink" href="#r29" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>将系列特例移出公共工具</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>把系列策略放入精确 SoC configure 包，公共机制继续共享</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/parts-clocks-green.log;build/soc-ip-layout/r30/green-final.log;build/soc-ip-layout/facts-ir/final-focused.log;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/r29-hardware;build/soc-ip-layout/r29-public-policies;build/soc-ip-layout/facts-ir/final-closure-green.log;build/quality/soc-ip-config-r32/profile-python-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>已实现显式 SoC hardware/secondary、clock/linker/runtime-power、GPIO/preflight、selected support、UART/stream/endpoint 与 CAN/coupled/pin 策略。生成输出等价性在分别记录的 18、23、8 个配置范围检查；测试计数重叠，不得相加。剩余公共系列字面量是显式依赖路径和 ThreadX 跨 Board/backend OS 准入。F103/GD303 冻结 LegacyTransportProfile 提供精确接线，不使用系列回退；其 38 项定向执行单独记录，与相关套件重叠。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r30">
+<span id="status-soc-ip-layout-r30"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">R30</a><a class="headerlink" href="#r30" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>facts_and_ir</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>能力、revision 与支持投影</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>从经审查的精确事实派生当前视图，不作新支持声明</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/maintenance;docs/delivery/capabilities.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/r30/red.log;build/soc-ip-layout/r30/owner-red.log;build/soc-ip-layout/r30/green-final.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>十个定向模块的 98 个测试通过。已有硅片策略／IR 分别投影给 clock 与 controller owner；缺少审查时保留 null，companion/endpoint 策略不继承。不扩大支持，也没有硬件观察。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r31">
+<span id="status-soc-ip-layout-r31"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">R31</a><a class="headerlink" href="#r31" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>I2C V2 常量配置试点</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>把不可变配置与可变传输状态分离</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/i2c/i2c_v2;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>已实现选定 G474/H743/U575 常量配置及独立 BSS 运行态。共享定向执行中 9 个目标／121 个 Google 用例及 38 个相关 Python 测试通过；不是逐行计数。开发 ARM 成本比较记在 R46；最终 P 完整门禁与限定范围执行记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r32">
+<span id="status-soc-ip-layout-r32"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">R32</a><a class="headerlink" href="#r32" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>UART DMA 常量配置</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>把不可变配置与可变 request／block 状态分离</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers/uart/uart_v1_channel_dma;soc</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>已实现选定 F103/GD303 UART DMA 不可变配置与 BSS 运行态；双向接收扩展保持独立。静态配置／资源与运行态具有同一生命周期，成功停止后保留绑定。最终定向执行为 3 个目标／65 个 Google 用例加 38 个 Python 测试。主机执行覆盖真实 SoC wrapper／engine／GPIO；不声称生成 DMA factory 的运行时验证。开发 ARM 比较另记在 R46；最终 P 完整门禁与限定范围执行记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r33">
+<span id="status-soc-ip-layout-r33"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">R33</a><a class="headerlink" href="#r33" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>共享 ops、不可变 face 与直接 IRQ</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>保留共享只读方法、独立 context 与直接 IRQ 入口</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>drivers;soc;io</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green;build/quality/soc-ip-config-r31/i2c-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>选定 I2C V2 和 UART DMA 变更保留共享只读 ops、不可变公共 face、不同静态 context 与直接 IRQ 入口符号；没有热路径分发层。定向 UART wrapper／engine／GPIO 与 I2C 模型套件通过。开发 ARM 链接保留／成本记在 R46；最终 P 的限定验证记在 R43–R48。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r34">
+<span id="status-soc-ip-layout-r34"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">R34</a><a class="headerlink" href="#r34" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>将初始化和停止逻辑迁入 C</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>在具体代码中保留显式生命周期顺序与清理责任</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tools/configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>选定 I2C V2、F103/GD303 UART DMA 和 legacy ADC/PWM/Flash 冷态集成已进入具体 C prepare，保留已有 stop 路径。U575 引擎停止先于时钟归还。UART AHB DMA 门控及 Platform 顺序仍由生成器产生；legacy I2C V1 和其他外设仍由系列生成行为。定向套件重叠，不能相加或视为整个平台资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r35">
+<span id="status-soc-ip-layout-r35"></span><h2><a class="toc-backref" href="#id36" role="doc-backlink">R35</a><a class="headerlink" href="#r35" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>失败后保留与重试合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>直到证明已排空或显式重试前，保留部分副作用与借用</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;tests/google</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r31/i2c-bind-red;build/quality/soc-ip-config-r31/i2c-config-overlap-red;build/quality/soc-ip-config-r31/i2c-green;build/quality/soc-ip-config-r31/i2c-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-config-r32/prepare-red;build/quality/soc-ip-config-r32/prepare-green;build/quality/soc-ip-config-r32/profile-python-green.log;build/quality/soc-ip-config-r32/uart-ring-red;build/quality/soc-ip-config-r32/uart-ring-green</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>选定 I2C V2、UART DMA 和 legacy ADC/PWM/Flash 的 live／retained 守卫、排空失败责任及 stop/retry 合同通过定向回归。UART 守卫先于配置／引脚变更，并包含尚存 wake/RX loan；撤销失败保留配置和借用存储。定向套件计数重叠；最终源码与物理资格分别建立。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r36">
+<span id="status-soc-ip-layout-r36"></span><h2><a class="toc-backref" href="#id37" role="doc-backlink">R36</a><a class="headerlink" href="#r36" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>static_configuration_and_lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>拆分 legacy ADC、PWM 与 Flash 集成</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>分离精确 SoC 集成与可复用算法，缩窄合同</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32/stm32f103/drivers/devices.c;soc/gd32/gd32f303/drivers/devices.c;drivers/adc/legacy_adc;drivers/timer/legacy_pwm;drivers/flash/legacy_flash</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>final_P_native_arm_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-config-r36/legacy-high-green;build/quality/soc-ip-config-r36/legacy-python-green.log;build/quality/soc-ip-config-r36/legacy-final-green;build/quality/soc-ip-candidate/legacy-devices/report.json;build/quality/soc-ip-candidate/f103-flash-only-retention.json;build/quality/soc-ip-candidate/gd303-flash-only-retention.json;build/quality/soc-ip-candidate/completion-summary.json;build/quality/soc-ip-candidate/source-snapshot.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/providers/mainstream_assembly/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>已实现 F103/GD303 具体 C ADC/PWM/Flash prepare 入口和已有共享 close 路径。最终两个 factory 目标执行 11 个 Google 用例，包括完整独立 128 扇区几何、活动重绑定、停止失败／重试、初始化失败清理／重启；GD303 外部 oversampling 在 BUSY 时保持不变。此前 6 目标／97 用例与 40 个 Python 结果存在重叠，不能相加。四份精确 legacy ARM 构建及两个独立 Flash-only 链接保留消费者也在 184 文件脏开发覆盖层上通过。这是开发证据，不是最终 clean-source 资格；其他外设生成逻辑未变。最终干净 P 另通过全部四种 Native 模式，以及 mainstream_assembly 索引 0/1/8/9 的四份 f103/gd303 devices 裸机／FreeRTOS 夹具。额外两个 Flash-only 消费者保留为开发观察，没有重跑或重标为 P。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r37">
+<span id="status-soc-ip-layout-r37"></span><h2><a class="toc-backref" href="#id38" role="doc-backlink">R37</a><a class="headerlink" href="#r37" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>审查 CMake 私有 include 与 Runtime 边界</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>选定 target 保持源码所有权，厂家 include 留在私有范围</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc;drivers;cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/runtime-green.log;build/soc-ip-layout/integration-audit/cmake/observations.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>实际执行三个 Runtime 纳入回归的 RED，随后 18 个测试 GREEN。八个系列消费者 include 闭包无私有泄漏；两个 Cortex-M4 裸机／FreeRTOS Ninja/ARM 配置排除 SoC/driver/Board 对象。本次审计配置了目标，没有构建生产固件。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r38">
+<span id="status-soc-ip-layout-r38"></span><h2><a class="toc-backref" href="#id39" role="doc-backlink">R38</a><a class="headerlink" href="#r38" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>收敛 SDK 传输清单</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>使用必需 payload 闭包，不增加重复源码权威</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/sdk-closure-red.log;build/soc-ip-layout/integration-audit/sdk-closure-green.log;build/soc-ip-layout/integration-audit/required-comparison.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>48 个 selection/admission/descriptor 测试通过。SDK 必需项复用公共 source_names 和 descriptor facts/payload；未删除任何旧必需成员。额外声明的系列辅助模块动态纳入。最终 P 的实际搬移 SDK 执行记在 R45。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r39">
+<span id="status-soc-ip-layout-r39"></span><h2><a class="toc-backref" href="#id40" role="doc-backlink">R39</a><a class="headerlink" href="#r39" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>增量配置事务回归</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>通过已有门禁覆盖模块变更失效及重新配置失败</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/facts-ir/incremental-green.log;build/soc-ip-layout/facts-ir/incremental-receipt.json;build/soc-ip-layout/facts-ir/integration-bundle-green.log;build/soc-ip-layout/facts-ir/final-closure-green.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>实际执行了 fresh Native consumer 的 CMake/Ninja 配置／构建和无变更重建；修改已声明系列模块会触发 CMake 与选定重新生成。全部收条中的命令退出为零。独立 143 项 integration/bundle 套件覆盖事务边界；这不是最终源码的 fresh SDK 或完整固件矩阵资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r40">
+<span id="status-soc-ip-layout-r40"></span><h2><a class="toc-backref" href="#id41" role="doc-backlink">R40</a><a class="headerlink" href="#r40" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>已有 CLI 诊断</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>已有命令报告精确 provider 输入和失败，不增加新框架</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/configure.py;tools/configure/experience.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>focused_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/integration-audit/diagnostic-red.log;build/soc-ip-layout/integration-audit/diagnostic-green.log;build/soc-ip-layout/integration-audit/cli/summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>35 项定向测试通过；八个精确 provider-check 实际生成静态 bundle，并拒绝身份不匹配。provider_module_missing 只适用于选定入口／父包；其他导入错误仍显式报告。不建立编译／链接或物理资格。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r41">
+<span id="status-soc-ip-layout-r41"></span><h2><a class="toc-backref" href="#id42" role="doc-backlink">R41</a><a class="headerlink" href="#r41" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>双语文档、图与接入迁移</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>当前源码映射、图链接、README 和经审查 gettext 与实现一致</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>README.md;README_CN.md;drivers/README.md;soc/README.md;soc/common/README.md;tools/configure/README.md;docs/explanation;docs/guides/provider-porting.md;docs/design;docs/delivery/architecture.md;docs/assets/diagrams/README.md;docs/locale</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>clean_P_docs_and_D_review_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/documentation/phase1-clean-build.json;build/soc-ip-layout-docs-review.json;build/soc-ip-layout/documentation/phase2-source-scan-final.json;build/soc-ip-layout/documentation/phase2-diagram-check.json;build/soc-ip-layout/documentation/phase2-diagram-review.json;build/soc-ip-layout/documentation/phase2-po-independent-review.json;build/soc-ip-layout/documentation/phase2-review-admission.json;build/soc-ip-layout/documentation/phase2-translations-final.json;build/soc-ip-layout-docs-92e669233957/documentation-build.json;build/soc-ip-layout/documentation/final-d-extraction/extraction.json;build/soc-ip-layout/documentation/final-d-source-check.json;build/soc-ip-layout/documentation/final-d-po-independent-review.json;build/soc-ip-layout/documentation/final-d-review-admission.json;build/soc-ip-layout/documentation/final-d-translations.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>保留第一阶段干净 7b985 严格双语构建与独立 18 份 catalog 审查。第二阶段当前内容完成：FIG-31 独立源码／视觉审查、锁定图验证、131 页源码扫描、实际 gettext 提取及全站 262 项 locale 检查通过。九份 catalog 独立审查：101 条新消息及 945 条未变的已审条目。干净 P 严格双语构建及 262 项 locale 检查通过；收条 qualification=false，SHA256 为 acdca47f4ccf9f1438a8c50f25dd8bea4135821922da202181a5237738ff8166。后来的纯文档更新只记录 P；其实际 gettext／审查和 clean-D 构建是独立文档证据，不是固件或物理资格。D 内容校验实际通过：fresh locked gettext、131 页源码扫描、独立语义审查 22 条新消息（127 条基线消息对未变）和 262 项全站 locale 检查。Clean-D 严格构建是独立提交后收条；此处未预先记录未来成功或 D 自身摘要。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r42">
+<span id="status-soc-ip-layout-r42"></span><h2><a class="toc-backref" href="#id43" role="doc-backlink">R42</a><a class="headerlink" href="#r42" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>build_integration_and_docs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>示例消费候选</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>在独立外部示例仓库消费具体候选</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>X-Gen-Lab/nexus-examples</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/local-ci-soc-ip-layout-92e669233957/execution.json;/workspace/nexus-examples/build/soc-ip-layout-validation-92e669233957/sdk-examples-validation-evidence.json;/workspace/nexus-examples/build/soc-ip-layout-candidate-92e669233957/ordinary-hook-evidence.json;.git/local-recovery/soc-ip-layout/examples-main-merge.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>干净 examples 0f15022e4d5f5c51991b134d0b9d6082dcf88de9（tree bb60f413b911ec212b59b77cea1734971eddbd9f）消费精确 P。完整规范本地 CI 通过：Native、已安装 SDK consumer、16 个 ARM preset 及 platform_reference/uart_owner_runtime 的 32 个主矩阵 ELF；专用示例目标单独记录。正式 lock 与 Gitlink 匹配 P；candidate_validation=false。普通 hook 保留 80 个工具测试和 15 CTest／69 Google 用例，零跳过。PR15 合并为 bd3b90f135600b6405459347cb9e2cff5692d2e3，examples tree 相同。这是精确代码候选消费，不是物理执行。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r43">
+<span id="status-soc-ip-layout-r43"></span><h2><a class="toc-backref" href="#id44" role="doc-backlink">R43</a><a class="headerlink" href="#r43" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R43</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>四种 Native 模式与完整工具套件</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>执行维护模式和全部适用工具域，使用新鲜且非空报告</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/google;tools/dev;tools/configure/tests;tools/testing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/report.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/tool-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/configure-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/ci-tests.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/workflow-tests.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json;build/soc-ip-layout/phase2-hook-evidence/manifest.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>受测干净 P=92e669233957a2e450a528394e8f4dd0794c7049。四种 Native 模式 debug/release/ASan-UBSan/TSan 均实际通过：每种 372 CTest 和 6396 Google 用例，零失败／错误／跳过。全部适用工具域通过：testing 1527、configure 1071、ci 490、workflows 159（共 3247）；不从这四域推断其他工具域。原始执行保存在候选证据中。A 在完成 90 阶段后仍保留 interrupted/running；本行关闭已实际完成的 Native／工具范围，不表示一次完整计划通过。独立普通完整暂存区 hook 归档记录 3247 个工具测试和 352 个 Google 程序／6396 个用例。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r44">
+<span id="status-soc-ip-layout-r44"></span><h2><a class="toc-backref" href="#id45" role="doc-backlink">R44</a><a class="headerlink" href="#r44" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R44</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>ARM 与 Runtime 矩阵</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>编译链接精确维护的 ARM 与 CPU Runtime 配置</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts;tools/measurement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>segmented_execution_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/report.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/interruption-observation.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/cortex_runtime/report.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/host_contracts.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>受测 P=92e669233957a2e450a528394e8f4dd0794c7049：原维护计划具有实际精确分段覆盖 A90+B69。环境中断后 A 保留 running 且没有 source_after；B 按原精确后缀 executed_passed，阶段退出全部为零，干净源码未变。B 报告 SHA256 为 f8ecf185eadbef7e33d7a667366da7de34241ce243a5d417b5b453ae3bb99694。全部原名称／顺序／checker／参数／超时和原始身份已核对，没有构造合并 executed_passed 报告。B 重跑全部 865 个 tidy 和 865 个 cppcheck 上下文。CPU Runtime 104 个变体通过，source_inputs_stable=true；full_platform_status 仍为 not_qualified，预期拒绝与正向镜像分开。ARM/provider/retention/resource 夹具保留精确原报告；链接通过不建立 MCU 执行。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r45">
+<span id="status-soc-ip-layout-r45"></span><h2><a class="toc-backref" href="#id46" role="doc-backlink">R45</a><a class="headerlink" href="#r45" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R45</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>搬移 SDK 完整性</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>验证必需已安装成员及独立搬移消费者</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>executed_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/sdk-relocation-92e669233957/execution.json;/workspace/nexus-examples/build/soc-ip-layout-validation-92e669233957/sdk-examples-validation-evidence.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/source_sdk.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/verify_relocated_sdk.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>可发布源码 SDK 绑定干净 P=92e669233957a2e450a528394e8f4dd0794c7049 及其精确 tree。在 platform-sdk-92e669233957/SDK relocated 实际包验证与独立搬移消费通过，覆盖 Native C/C++、Runtime 和维护的固件选择；源码闭包与导出输入保留原成员摘要。独立 SDK/examples 归档保留这些执行。候选 completion-2 以退出码 0 再验证搬移 SDK。最初 completion 使用错误 verifier 根目录并失败；原失败收条保留，随后是实际修正执行。没有源码变化或守卫削弱。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r46">
+<span id="status-soc-ip-layout-r46"></span><h2><a class="toc-backref" href="#id47" role="doc-backlink">R46</a><a class="headerlink" href="#r46" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R46</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>资源保留与成本比较</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>对相同选择比较实际 Flash、RAM、ops 与 IRQ 保留</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement;tests/contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>final_P_comparison_passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/quality/soc-ip-candidate/cost-summary.json;build/quality/soc-ip-candidate/uart/report.json;build/quality/soc-ip-candidate/legacy-devices/report.json;build/quality/soc-ip-candidate/f103-flash-only-retention.json;build/quality/soc-ip-candidate/gd303-flash-only-retention.json;build/quality/soc-ip-candidate/completion-summary.json;build/quality/soc-ip-candidate/source-snapshot.json;build/quality/soc-ip-final-p-92e669233957/final-cost-summary.json;build/quality/soc-ip-final-p-92e669233957/final-cost-summary.csv;build/quality/soc-ip-cost-package-92e669233957/package.json;build/quality/soc-ip-cost-package-92e669233957/artifact-summary.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>184 文件脏开发覆盖层的历史比较在原报告中单独标识。最终干净 P 对比 7b985：11 组严格比较均基于实际 A/B 构建产物通过，并经独立 ELF/map/IRQ 审查；未为了路径规范化重建。I2C 加载 Flash 总变化 G474/H743/U575 = -4/+40/+64 B，组成为代码／对齐 +108/+152/+224 B、每项只读配置 +24 B、路径池／对齐 -136/-136/-184 B；预留 RAM -24/-16/-24 B，状态 28→8 B。八组 UART 的 Flash 总变化为 +168 至 +392 B，含代码／对齐 +336 至 +384 B、只读配置 60 B，以及负的源码路径／对齐贡献；预留 RAM 均减少 48 B，TX 状态 96→48 B、双向状态 144→96 B。源码根路径字符串缩短不是架构节省。UART 选定 IRQ 代码最多增加 2 B／一条静态指令、最多两次配置读取；双向 channel 的局部 push 栈帧从 16 增至 24 B，MSP 预留不变。选定 IRQ 没有新增间接调用；cycles/WCET／动态栈高水位未测量。可搬移成本证据归档 SHA256 为 fb0f63bcae83f7a5b278a311f67107bf4f8c99fcee0014638b0fb26c0936567f，4035953 B／1184 文件；原源码／工具／SDK 输入仍是显式外部依赖。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r47">
+<span id="status-soc-ip-layout-r47"></span><h2><a class="toc-backref" href="#id48" role="doc-backlink">R47</a><a class="headerlink" href="#r47" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R47</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>独立审查、主干集成与正式示例 pin</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>批准集成和精确示例 pin 前完成审查与普通门禁</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>AGENTS.md;X-Gen-Lab/nexus-examples</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>integrated_reviewed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/soc-ip-layout/r47-independent-review.json;build/soc-ip-layout/phase2-hook-evidence/manifest.json;build/soc-ip-layout/codeql-pr36-review/review.json;build/soc-ip-layout/codeql-pr36-review/comments.json;build/soc-ip-layout/codeql-pr36-review/remote-status.json;.git/local-recovery/soc-ip-layout/platform-main-merge.json;.git/local-recovery/soc-ip-layout/examples-main-merge.json;.git/local-recovery/soc-ip-layout/platform-merge-import-apply.json;.git/local-recovery/soc-ip-layout/examples-merge-import-apply.json;/workspace/nexus-examples/build/soc-ip-layout-candidate-92e669233957/ordinary-hook-evidence.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>独立生产审查完成，无阻塞发现；普通完整暂存区 hook 在集成为 P 的 tree 上通过。PR36 实际合并为 M=c79fd9672a9fe56379744d834cfccd822bc40be1，tree 与 P 完全相同；PR15 合并为 bd3b90f135600b6405459347cb9e2cff5692d2e3，tree 与受测 examples bb60f413b911ec212b59b77cea1734971eddbd9f 相同，正式 lock/Gitlink 指向 P。保留实际签名 GitHub commit 对象与本地 lease/import 收条。14 条 CodeQL 审查意见均已评估：未确认生产悬空／晚绑定或已执行测试 UAF，保留非阻塞维护建议；没有把全部意见标为误报。远程 Security Analysis 40388967544 的 CPP/Python jobs 通过，这不是本地 CodeQL 执行或零告警／零缺陷声明。纯文档后续更新没有把 M 当新软件源码重新测试。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="r48">
+<span id="status-soc-ip-layout-r48"></span><h2><a class="toc-backref" href="#id49" role="doc-backlink">R48</a><a class="headerlink" href="#r48" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>R48</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">work_package</span></code></p></td>
+<td><p>verification_and_delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>干净软件交付与两次 fresh 离线复现</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>绑定干净源码和实际可复现产物；物理 HIL 保持 not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence;docs/design/soc-ip-layout-execution.csv</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>software_qualified</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-examples/build/platform-candidate-92e669233957/reproduction-quiet1.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate/candidate.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate_verify.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/finish-candidate-r48-2.command.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/candidate-portable.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/completion-2/execution-receipts.json;build/soc-ip-layout/qualification-timeout-92e669233957/manifest.json;/workspace/nexus-examples/build/platform-software-cleanenv-92e669233957/interruption-observation.json;/workspace/nexus-examples/build/platform-software-recovery-92e669233957/report.json;/workspace/nexus-examples/build/platform-candidate-92e669233957/finish-candidate-r48.command.json;/workspace/nexus-examples/build/platform-software-final-92e669233957/report.json;build/soc-ip-layout/software-92e669233957/report.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">notes</span></code></p></td>
+<td><p>封存软件候选绑定干净 P=92e669233957a2e450a528394e8f4dd0794c7049、精确配置和实际同一 ELF/BIN/map 输入。已有六个 scope 通过：host_contracts、arm_link、resource_budget、source_sdk、reproducibility、hil_tooling；owned candidate verifier 和父 completion-2 进程退出码均为 0。两次 fresh、独立 network-none 构建通过声明的容器边界验证及 bit_exact_elf_bin，产物无差异；不声称 map 字节相同。候选 SHA256 为 35c8301ac95cdc7eee6b125e5ed8170ef44800bb6eb4995361d02c364660c060。可搬移归档 SHA256 为 7f89e8ec33a543e150e7165a3e4252aa11a96d62fe5d3187a9b0d4791aa618b4，433850915 B／6401 文件。签名 unsigned；产品提升 not_performed；HIL not_executed。维护计划证据是精确 A90+B69 分段覆盖，不是一次成功的 159 阶段执行。原输出边界、超时、GIT_PAGER 准入、中断和初始 SDK 根路径失败保留原结果；没有重写为 passed。D 只记录 P，并取得自身独立文档收条。</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">状态与证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../release-0.1.0.html">Nexus 0.1.0 Source SDK 开发者预览版</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RTC 与 LPTIM：独立时间域与请求借用 &#8212; Nexus Embedded Platform 0.2.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=c5f3bd33"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="GPIO 引脚状态：在同一保留租约下显式选择寄存器图像" href="gpio-pin-states.html" />
+    <link rel="prev" title="借用、完成与观察者生命周期" href="ownership.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/explanation/rtc-lptim.md">e47887d3a11f</a>; 代码引用: e47887d3a11f. <a href="../../en/explanation/rtc-lptim.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="rtc-and-lptim-separate-time-domains-and-retained-requests">
+<span id="explanation-rtc-lptim"></span><h1>RTC 与 LPTIM：独立时间域与请求借用<a class="headerlink" href="#rtc-and-lptim-separate-time-domains-and-retained-requests" title="Link to this heading">¶</a></h1>
+<p>本文说明如何通过静态类型化 factory 查找和显式 Platform 生命周期使用 Native 原始日历 RTC 与有限计数 LPTIM。一份普通 TOML 装配选择独立实例；公共调用直接进入对应 provider。此 Native 主机模型范围不提供 MCU RTC/LPTIM 驱动、产品时钟服务或硬件低功耗连续性。</p>
+<p>公共声明 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/rtc.h">rtc.h</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/lptim.h">lptim.h</a> 和仅供主机使用的<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/io/include/nexus/io/native/rtc_lptim_model.h">模型控制</a>是权威合同。本文解释所有权和使用边界，不重复完整返回值参考。</p>
+<section id="current-implementation-and-planned-integration">
+<h2>当前实现与后续接入<a class="headerlink" href="#current-implementation-and-planned-integration" title="Link to this heading">¶</a></h2>
+<p>当前实现包含公共 C 包装层和 Native provider。包装层验证接口面，再通过只读操作表把调用分发到其上下文。Native 实例共享两个只读操作表，每类设备一个；各实例保留独立状态。实现没有堆、注册表、隐藏 worker、请求队列或强制 OS 适配层。</p>
+<p>构造属于内部接入边界。生成的 Platform 准备流程只对全新 owner 存储构造一次，复制所选 Core 时钟接口面而不调用其时间读取函数，并开放准入。已构造 owner 后续启动使用显式私有重新开放。外部产品使用公共头文件和生成头文件，不使用私有 provider 构造函数。RTC 初始保持未设置，直到显式调用公共 set。</p>
+<p>所选 Native 主机模型现已实现显式私有重新开放和普通类型化配置装配。私有重新开放在真实撤源并完成外部 join 后改变 owner 代次，而不重新构造存储。H743 和 U575 RTC/LPTIM 适配仍是未来目标，需要独立的硬件合同和验证证据。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/rtc-lptim-lifecycle.svg" title="打开 SVG 大图"><img alt="当前 Native RTC/LPTIM 装配、所有权与最终发布；虚线硬件分支是未来目标" src="../_images/rtc-lptim-lifecycle.svg" /></a></p>
+<p>FIG-21 区分当前 Native 构建期装配、运行调用和请求源推进，边上的文字说明各自关系。虚线硬件分支是目标，不建立物理驱动、IRQ、STOP／VBAT 连续性或 HIL 结果。factory 返回已有接口面，绝不执行生命周期操作。</p>
+</section>
+<section id="three-domains-three-meanings">
+<h2>三个域，各自承担不同含义<a class="headerlink" href="#three-domains-three-meanings" title="Link to this heading">¶</a></h2>
+<p>Core deadline 使用绝对单调微秒，通过复制的 <code class="docutils literal notranslate"><span class="pre">nx_clock_t</span></code> 接口面读取。原接口描述符可以按值复制，但其上下文始终被借用：装配方必须保证上下文的完整生命周期、存储不重叠、有限且单调的读数，以及调用不重入。观察到的 Core 时间大于或等于有限 deadline 时，该 deadline 到期。<code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> 不读取 deadline 时钟，但也不会推进日历或计数器。</p>
+<p>RTC 使用原始年份 <code class="docutils literal notranslate"><span class="pre">00..99</span></code>、月／日和 24 小时时间，不包含 UTC、世纪、时区或闰秒。原始年份模 4 等于零时为闰年。星期是独立的 <code class="docutils literal notranslate"><span class="pre">1..7</span></code> 字段。自然发生的 <code class="docutils literal notranslate"><span class="pre">99</span> <span class="pre">-&gt;</span> <span class="pre">00</span></code> 回绕会推进日历，但不创建新的设置域；显式设置成功会推进不回绕的代次。</p>
+<p>RTC alarm 匹配未来某次日／时／分／秒模式，没有月／年字段或通配掩码。若模式已经匹配当前秒，提交返回 <code class="docutils literal notranslate"><span class="pre">STATE</span></code>；provider 不会静默把它解释为以后的重复事件。UTC 转换、日期选择、校时、重复调度与授权策略由产品负责。</p>
+<p>LPTIM 接受一次 <code class="docutils literal notranslate"><span class="pre">1..65536</span></code> tick 的有限计数。正值 <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code> 是固定声明的单位速率，不是振荡器精度实测值。16 位采样值模 65536：完整的 65536 tick 计数可以采样为零。单凭计数器为零不能证明完成或低功耗连续性。已开放且空闲时返回零和 <code class="docutils literal notranslate"><span class="pre">running=false</span></code>；关闭后的公共 read／sample 返回 <code class="docutils literal notranslate"><span class="pre">STATE</span></code>，且不改变输出。</p>
+<p>RTC 和 LPTIM 域包含 owner 地址与受检查的 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 代次。两者使用不同类型，也不是 Core deadline token。RTC 设置、私有重新开放和已完成的 LPTIM 撤源会使旧域失效。token 只比较身份而不解引用身份地址；它既不授予权限，也不建立跨启动身份。在结束或复用 owner 存储前，必须退役所有 token 和外部观察者。</p>
+<p>代次不会静默回绕。Native RTC 在 <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code> 时执行 set 返回 <code class="docutils literal notranslate"><span class="pre">EXHAUSTED</span></code>；Native LPTIM 在该上限时会在接受请求前拒绝提交，从而保证此前已接受的计数始终能够执行预留的最终代次递增。耗尽并不授予重置已停止 owner 或丢弃借用的权限。</p>
+</section>
+<section id="who-owns-storage-and-execution">
+<h2>谁拥有存储，谁推进执行<a class="headerlink" href="#who-owns-storage-and-execution" title="Link to this heading">¶</a></h2>
+<p>每个实例的所有调用都由一个串行、不可重入的任务执行者负责，包括读取、模型控制和生命周期操作。接口面、操作表、私有 owner 与被借用的时钟上下文必须覆盖所有已接受请求及独立观察者／控制者的退出过程。实现没有隐式跨任务锁，也未提供 ISR 调用合同。产品若需要跨任务取消，必须在 provider 外显式提供稳定槽位／代次控制和 join。</p>
+<p>完整请求由调用方拥有。准备请求前先初始化 Core base；只能在所有 join 完成后，准备未被借用的 <code class="docutils literal notranslate"><span class="pre">READY</span></code> 或结果已消费的 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code> 存储。prepare 复制元数据，不建立借用。请求及输入／输出范围必须对齐、不发生地址回绕，且与已知受保护对象不重叠。这些检查不是通用的无效指针或内存访问判定器；不透明上下文范围以及存储映射和生命周期仍由装配方负责。</p>
+<p>每个实例最多接受一个请求。submit 先验证生命周期、空闲状态、当前域和设备类别的范围，再读取有限 deadline。<code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> 表示 ACCEPTED；拒绝不会保留请求引用或请求源效果。被拒绝的请求仍归调用方所有。可选操作表方法缺失时返回 <code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span></code>；公共输入格式不合法时，可以在分发到 provider 前返回 <code class="docutils literal notranslate"><span class="pre">INVALID</span></code>。</p>
+<p>ACCEPTED 后，调用方必须保持请求的每个字节有效且不可修改，直到以 acquire 观察到 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>；随后消费结果，并在复用前 join 所有独立控制者或观察者。取消、到期、停止、撤源失败或采样到完成标志都不会撤销该借用。</p>
+</section>
+<section id="source-progression-terminal-cause-and-final-access">
+<h2>请求源推进、终止原因与最终访问<a class="headerlink" href="#source-progression-terminal-cause-and-final-access" title="Link to this heading">¶</a></h2>
+<p>主机模型推进只改变请求源状态。RTC 每次推进限制为 <code class="docutils literal notranslate"><span class="pre">0..86400</span></code> 秒，最多进位一天；日历已初始化时，即使准入关闭仍可推进。LPTIM 每次推进限制为 <code class="docutils literal notranslate"><span class="pre">0..65536</span></code> tick，并在计数目标处饱和；未 armed 的请求源不累计。这些 hook 既不读取 Core 时间，也不访问或结清请求。设置或清除撤源 hold 同样不会结清请求。</p>
+<p>显式公共 service 检查谓词并推进撤源。cancel 和 stop 可以直接调用撤源过程，因此在没有 hold 时可能立即结清；service 不是唯一的最终发布者。首次 service 观察时，已到期的有限 deadline 优先于 pending 事件；更早执行的 cancel 或 stop 则可能先锁存 <code class="docutils literal notranslate"><span class="pre">CANCELLED</span></code>。原因一旦锁存，在等待撤源期间保持首次终止原因不变。</p>
+<p>若撤源被 hold 阻止，请求继续被借用并保持 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>。cancel 可以因接受取消而返回 <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code>，而 service／stop 返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>。解除模型 hold 只是让后续真实撤源成为可能；执行者仍须调用适当的公共 service／cancel／stop 操作。只要这些工作尚未结束，就必须保持 owner 和请求存活。</p>
+<p>成功撤源先禁用请求源、清除 pending 状态，并从 owner 脱离请求引用。LPTIM 还会在发布前记录最终 tick 进度并推进代次。随后 provider 才以 release 发布 <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>，作为对请求的最终访问。RTC 的 <code class="docutils literal notranslate"><span class="pre">transferred</span></code> 成功时为 1，其他结果为 0。LPTIM 的 <code class="docutils literal notranslate"><span class="pre">transferred</span></code> 是最终观察到的 tick 数，包含 hold 阻止撤源期间继续累计的 tick；它不会在首次锁存取消／超时时冻结。</p>
+<p>stop 会立即关闭准入，即使撤源返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>。关闭后的读取和提交仍被拒绝，而 service／cancel 仍可排空保留的借用。重复执行已完成的干净 stop 是幂等的。stop 成功不会结束 owner 存储生命周期，也不会免除外部 join。重新开放是独立的显式私有生命周期操作，不是查找、模型推进或重复调用构造函数的副作用。</p>
+</section>
+<section id="explicit-private-reopen-preserves-identity-and-responsibility">
+<h2>显式私有重新开放保留身份与责任<a class="headerlink" href="#explicit-private-reopen-preserves-identity-and-responsibility" title="Link to this heading">¶</a></h2>
+<p>构造函数在 owner 存储生命周期内只允许成功调用一次。内部 <code class="docutils literal notranslate"><span class="pre">nx_native_rtc_start</span></code> 和 <code class="docutils literal notranslate"><span class="pre">nx_native_lptim_start</span></code> 操作重新开放同一个稳定 owner；它们不是公共应用 SDK API。操作要求 owner 有效、已构造且已关闭，不保留 active 请求、armed 请求源、pending 事件或终止责任。调用方还必须证明外部控制者和观察者已经 join；检查 owner 字段不能替代这些外部 join 的证明。</p>
+<p>完整范围验证后，保留的请求／请求源责任优先返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>，随后才判断未构造／已开放的 <code class="docutils literal notranslate"><span class="pre">STATE</span></code>。已关闭且完成 join 的 owner 在 <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code> 时返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_EXHAUSTED</span></code>。每次拒绝都保持所有 owner 字节、请求源事实、故障状态、时钟和代次不变。start 不是幂等操作：干净且已经开放的 owner 返回 <code class="docutils literal notranslate"><span class="pre">STATE</span></code>。被 hold 阻止撤源的已关闭借用仍被保留并保持 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>；start 或重复构造都不能撤销它。</p>
+<p>成功时，私有 start 先检查代次余量，递增代次，再开放准入。它不读取 Core 时间、不推进请求源、不重新构造对象，也不增加状态字段或 owner 池。它保留 RTC 已设置／未设置状态及日历、LPTIM 固定 <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code>、复制的时钟绑定和外部撤源 hold。其他方面已经空闲且完成 join 的 owner 上，hold 标志属于外部故障，不是活动借用；重新开放会保留该故障，而不是静默清除。</p>
+<p>最后一次允许的重新开放可以把 <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span> <span class="pre">-</span> <span class="pre">1</span></code> 推进到 <code class="docutils literal notranslate"><span class="pre">UINT64_MAX</span></code>；之后再次干净停止后，重新开放就会因代次耗尽而拒绝。外部仍持有的旧 <code class="docutils literal notranslate"><span class="pre">READY</span></code> 域保持过期，提交时被拒绝且请求不变。不得通过回绕、重置为一或隐式重新构造来修复耗尽。模型请求源推进和结果消费仍与该生命周期迁移分开。</p>
+</section>
+<section id="typed-assembly-uses-the-existing-configuration-path">
+<h2>类型化装配沿用现有配置路径<a class="headerlink" href="#typed-assembly-uses-the-existing-configuration-path" title="Link to this heading">¶</a></h2>
+<p>下面维护的 pair 夹具是一份完整 Native 装配。普通 <code class="docutils literal notranslate"><span class="pre">[rtc.name]</span></code> 和 <code class="docutils literal notranslate"><span class="pre">[lptim.name]</span></code> 段沿用现有不可变 <code class="docutils literal notranslate"><span class="pre">ControllerIR</span> <span class="pre">-&gt;</span> <span class="pre">provider</span> <span class="pre">-&gt;</span> <span class="pre">factory</span></code> 路径解析。<code class="docutils literal notranslate"><span class="pre">calendar-alarm</span></code> 没有日期或时区配置项；<code class="docutils literal notranslate"><span class="pre">counter16-oneshot</span></code> 要求显式、正值、<code class="docutils literal notranslate"><span class="pre">uint32_t</span></code> 范围内的 <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code>。未知策略／IRQ 字段和重复控制器占用会被拒绝，而不是被自动修复。</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native_reference"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"model"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[factory]</span>
+<span class="n">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[rtc.calendar_a]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"rtc0"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"calendar-alarm"</span>
+
+<span class="k">[rtc.calendar_b]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"rtc1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"calendar-alarm"</span>
+
+<span class="k">[lptim.counter_a]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lptim0"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"counter16-oneshot"</span>
+<span class="n">tick_hz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+
+<span class="k">[lptim.counter_b]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lptim1"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"counter16-oneshot"</span>
+<span class="n">tick_hz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span>
+</pre></div>
+</div>
+<p>Native 主机模型事实提供不带引脚或 IRQ 路由的 RTC0／RTC1 和 LPTIM0／LPTIM1。两个软件 RTC 实例用于验证隔离，不代表真实芯片具有两个 RTC 外设。生成器只发射选中的静态状态、只读接口面和纯类型化查找。所选共享 deadline 适配器读取 <code class="docutils literal notranslate"><span class="pre">nx_time_now_us()</span></code>，不推进任何 RTC/LPTIM 请求源。空装配不发射选中的 RTC/LPTIM 状态或该适配器。</p>
+</section>
+<section id="public-and-generated-entry-points">
+<h2>公共入口与生成入口<a class="headerlink" href="#public-and-generated-entry-points" title="Link to this heading">¶</a></h2>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">nexus_factory.h</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">nx_factory_rtc(id)</span></code> 或 <code class="docutils literal notranslate"><span class="pre">nx_factory_lptim(id)</span></code> 取得接口面。ID 只属于所选装配和设备类别；无效／未选入的 ID 返回 NULL。接口面和共享操作表在启动前已经存在，但 RTC read 和 LPTIM sample 会拒绝已关闭／未构造状态下的调用。查找既不构造 owner，也不读取时钟。</p>
+<p>外部生命周期 owner 调用 <code class="docutils literal notranslate"><span class="pre">nx_platform_start()</span></code>，并检查 <code class="docutils literal notranslate"><span class="pre">primary</span></code>、<code class="docutils literal notranslate"><span class="pre">cleanup</span></code> 和 <code class="docutils literal notranslate"><span class="pre">remaining_effects</span></code>。随后按需显式设置 RTC、复制当前域、准备调用方请求，再通过公共 port 提交。它分别推进所需模型请求源和公共 service。启动不会创建调度器，推进 Core 时间也不会推进日历或有限计数。</p>
+<p>若 <code class="docutils literal notranslate"><span class="pre">nx_platform_stop()</span></code> 返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>，必须保留每个被借用的请求及其 owner，推进真实撤源、消费最终结果并 join 外部使用者，然后重试 stop。再次 start 前必须完成 Platform 停机；它不会静默重新构造对象或重新开放尚未结束的 stop。<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/consumers/native-time-pair.c">pair consumer</a> 和 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/cmake/package/verification/io_evolution/consumers/native-time-empty.c">empty consumer</a> 是维护的公共／生成入口主机验证程序，不是硬件应用示例。</p>
+</section>
+<section id="costs-and-verification-boundary">
+<h2>成本与验证边界<a class="headerlink" href="#costs-and-verification-boundary" title="Link to this heading">¶</a></h2>
+<p>公共接口面包含两个指针；每实例状态保存复制的时钟接口面、域以及设备类别专用的日历／计数状态。每次只保留一个请求。RTC 模型不按秒循环，工作量有界；LPTIM 使用有界饱和算术。此结构避免动态分配和队列容量成本，但不建立字节预算、栈上界、WCET、振荡器精度或 MCU 功耗结果。这些指标必须针对实际选择的构建与硬件测量。</p>
+<p>本文描述的 Native 行为与显式私有重新开放以另行记录的手工验证证据为基础。phase3 manifest 不记录这些手工程序的重新执行。</p>
+<p>phase3 开发证据绑定已冻结的含未提交修改源码元组，其 source-and-execution manifest SHA-256 为 <code class="docutils literal notranslate"><span class="pre">85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f</span></code>。它记录配置测试、生成的 pair／empty 程序和聚焦的已安装开发 SDK consumer。它不继承 main 分支验证资格，也不建立干净的可发布 SDK、完整 SDK 矩阵、重复复现、全仓库 CI 或物理结果。</p>
+<p>本文未建立 H743／U575 RTC 或 LPTIM provider、ARM RTC/LPTIM 执行、备份域复位／所有权、振荡器选择／校准、STOP 模式唤醒、VBAT 持久化、硬件保持或实板 HIL 结果。未来适配必须证明精确 SoC／Board／时钟／IRQ／安全域和保留存储合同；芯片数据手册中的能力或公共 API 本身都不能替代这些证明。</p>
+<p>相关机制：<a class="reference internal" href="ownership.html"><span class="std std-doc">请求所有权</span></a>、<a class="reference internal" href="factory.html"><span class="std std-doc">类型化 factory</span></a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/native/drivers/rtc_lptim.c">Native provider 源码</a>和 <a class="reference internal" href="../design/io-evolution.html"><span class="std std-doc">I/O 演进合同</span></a>。产品调度、协议状态、持久化策略和私有板级接线保留在外部仓库。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">架构解释</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RTC 与 LPTIM：独立时间域与请求借用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gpio-pin-states.html">GPIO 引脚状态：在同一保留租约下显式选择寄存器图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o-contracts-and-shared-mechanisms">类型化 I/O 合同与共享机制</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">可选通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#soc-packages-and-private-providers">SoC 包与私有 provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">可复用 IP 实现</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#reviewed-board-facts">经过审查的 Board 事实</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

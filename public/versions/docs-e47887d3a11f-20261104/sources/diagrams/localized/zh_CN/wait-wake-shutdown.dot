@@ -1,0 +1,56 @@
+// FIG-08 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph WaitWakeShutdown {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-08 Predicate wait 与外部 shutdown 责任\n通知只提示重查；等待本身不推进硬件"];
+    subgraph clusterWait {
+        label="nx_wait_until：Task / 单 waiter"; color="#64748b";
+        ready1 [label="ready(context) 权威谓词"];
+        arm [label="port.arm() 捕获 sequence"];
+        ready2 [label="再次 ready(context)"];
+        wait [label="port.wait(sequence, absolute deadline)\n后端检查 sequence / deadline"];
+        ready3 [label="wait error / TIMEOUT 后最终 ready"];
+        success [label="谓词 true → SUCCESS", fillcolor="#f0fdf4"];
+        error [label="谓词仍 false → 真实 port error", fillcolor="#fff7ed"];
+        ready1 -> success [label="true"];
+        ready1 -> arm [label="false"];
+        arm -> ready2 [label="已 arm"];
+        ready2 -> success [label="true"];
+        ready2 -> wait [label="false"];
+        wait -> ready1 [label="SUCCESS hint：循环重查", constraint=false];
+        wait -> ready3 [label="error / TIMEOUT"];
+        ready3 -> success [label="并发完成已可见"];
+        ready3 -> error [label="仍未完成"];
+    }
+    executor [label="唯一 executor：service／drain\nIRQ：锁存事实＋唤醒提示", fillcolor="#fefce8"];
+    executor -> wait [label="wake(sequence) 提示", style=dashed];
+    executor -> ready1 [label="release 发布 → acquire 观察", style=dashed];
+    subgraph clusterShutdown {
+        label="应用拥有的退出顺序（不是 wait 隐式行为）"; color="#64748b";
+        close [label="1 关闭 producer admission\nowner stop 请求已接受操作取消"];
+        drain [label="2 保持 owner / IRQ service 与 drain\nproducer / observer 仅 acquire 观察 SETTLED"];
+        producerJoin [label="3 producer 借用已结清后 join\n相关 observers 最终访问另需退出"];
+        join [label="4 确认 owner idle 含 publication 退出\n请求 owner 执行者结束并 join"];
+        hardware [label="5 硬件 RX / IRQ publishers quiescent\ndetach wake，再 join 其他发布者"];
+        stop [label="6 最后销毁 notification / queue / guard\n仍运行内核保留 platform clock / Tick"];
+        keep [label="drain / join / quiesce 失败：存储责任保留\n外部政策决定升级；不强制释放", fillcolor="#fff7ed"];
+        close -> drain [label="不再产生新工作"];
+        drain -> producerJoin [label="实际 SETTLED 与 observer 退出"];
+        producerJoin -> join [label="producer 最终访问结束"];
+        join -> hardware [label="owner execution 已退出"];
+        hardware -> stop [label="publishers 全部退出"];
+        drain -> keep [label="未排空"];
+        join -> keep [label="未 join"];
+        hardware -> keep [label="仍有 publisher"];
+    }
+    executor -> drain [label="继续推进", style=dashed];
+}

@@ -1,0 +1,864 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Official drivers and provider iteration &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OS backend integration" href="os-backend-integration.html" />
+    <link rel="prev" title="Nexus next-generation platform: design from first principles" href="next-generation-platform.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/official-stm32-provider.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/official-stm32-provider.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="official-drivers-and-provider-iteration">
+<span id="design-official-stm32-provider"></span><h1>Official drivers and provider iteration<a class="headerlink" href="#official-drivers-and-provider-iteration" title="Link to this heading">¶</a></h1>
+<p>Use this contract when changing a SoC provider or integrating an official driver.
+Nexus keeps static assembly, typed factories and public C11 I/O contracts. Official
+HAL/LL code is private implementation input. This page defines the integration
+boundary and work-package exits; it does not qualify every external library,
+maintained mode, source revision or physical board.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-architecture.svg" title="Open SVG at full size"><img alt="Current platform responsibilities and external product boundary" src="../_images/platform-architecture.svg" /></a></p>
+<p>FIG-01 remains the current responsibility diagram. Reusing official code changes
+the private SoC implementation, not the public dependency direction. FIG-03 in
+<a class="reference internal" href="../explanation/platform-architecture.html"><span class="std std-doc">the architecture explanation</span></a> shows the
+existing build-time generation path. Neither diagram implies a new runtime
+registry, HAL manager, default worker or mandatory OS layer.</p>
+<section id="vendor-first-target-and-current-implementation">
+<h2>Vendor-first target and current implementation<a class="headerlink" href="#vendor-first-target-and-current-implementation" title="Link to this heading">¶</a></h2>
+<p>Official hardware libraries are the default input for further provider work.
+Reuse reviewed HAL transport when it satisfies the complete selected mode;
+otherwise bind suitable LL or SPL primitives to the required bounded mechanism.
+Nexus retains admission, borrowed storage, deadlines, result publication and
+resource responsibility. Direct register helpers remain justified exceptions for
+an exact SDK gap, erratum, atomic operation or demonstrated budget.</p>
+<p>The selected F407 UART <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> provider uses official HAL finite TX with a
+disjoint LL IRQ receiver under one private owner. Other F407 UART modes retain
+their existing engines; G4, H7 and U5 retain their reviewed LL integrations.
+GD32F470 compiles selected official SPL C units. Source selection, model tests,
+ARM links and physical execution remain separate evidence. An include, primitive
+call or finite-TX fixture alone does not establish a complete transport or family
+qualification.</p>
+<p>The <a class="reference download internal" download="" href="../_downloads/bba9cb694d1ab887c8df01b42b4ebe4b/platform-delivery-completion.csv"><code class="xref download docutils literal notranslate"><span class="pre">existing</span> <span class="pre">delivery-completion</span> <span class="pre">ledger</span></code></a>
+appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while
+preserving the older rows and frozen results. Each new row starts with its real
+implementation, software and physical status; a plan has no execution evidence.
+The <a class="reference internal" href="../status/ledgers/platform-delivery-completion.html"><span class="std std-doc">derived ledger view</span></a>
+uses the same renderer. No second support or completion database is introduced.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Boundary</p></th>
+<th class="head"><p>Required responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Official transport</p></td>
+<td><p>Own the selected peripheral transfer, IRQ/DMA and vendor state machine</p></td>
+</tr>
+<tr class="row-odd"><td><p>LL/SPL primitive</p></td>
+<td><p>Encode reviewed hardware operations without claiming a complete transport</p></td>
+</tr>
+<tr class="row-even"><td><p>Nexus adapter</p></td>
+<td><p>Bridge admission, borrow, absolute deadline, errors, callbacks, drain and final settlement</p></td>
+</tr>
+<tr class="row-odd"><td><p>Exact SoC</p></td>
+<td><p>Bind SDK pairing, clock/reset, IRQ/DMA route, memory/Cache and silicon restrictions</p></td>
+</tr>
+<tr class="row-even"><td><p>Board/product</p></td>
+<td><p>Supply reviewed wiring, electrical state, execution, storage, partitions and recovery policy</p></td>
+</tr>
+<tr class="row-odd"><td><p>Static assembly</p></td>
+<td><p>Construct existing contexts/faces and fixed IRQ connections; select one implementation before execution</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>A private Handle can live in static provider storage. A public face still calls
+its selected immutable ops with that instance context. No universal HAL manager,
+name registry, default worker or extra forwarding-only layer is required. One
+live controller behavior domain has one hardware transport owner. Selecting HAL
+transport replaces the corresponding independent register transport; Handle
+readiness and Nexus request lifetime remain different contracts.</p>
+<section id="complete-maintained-scope">
+<h3>Complete maintained scope<a class="headerlink" href="#complete-maintained-scope" title="Link to this heading">¶</a></h3>
+<p>The iteration covers the existing exact selections for STM32F103, STM32F407,
+STM32G474, STM32H743, STM32U575, GD32F303 and GD32F470. The three launch Boards are
+Qiming F407ZGT6, Sky F407VET6 and Liangshan GD32F470ZGT6. Current Sky bindings
+cover LED, UART, Flash and IWDG; additional electrical routes need review before
+physical execution.</p>
+<p>The 71-entry assembly catalogue is one input, not the complete closure. Derive
+navigation from the existing capability/provider/source catalogues, provider
+fixtures, installed-SDK consumers, selected components and external examples.
+The maintained <code class="docutils literal notranslate"><span class="pre">tools/maintenance/work_packages.py</span></code> joins existing authorities;
+it does not execute tests or grant support. A mode needs its exact part/density,
+Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA,
+memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch
+coverage and the independent ThreadX subset do not expand this SoC matrix.</p>
+<p>The frozen source review at <code class="docutils literal notranslate"><span class="pre">89485943</span></code> preserves all 217 declared identities,
+including its 33 unselected identities and 19 Native MODEL rows. Separate source
+annexes now review those 33 declarations, seven components and seven system
+owners. The fresh <code class="docutils literal notranslate"><span class="pre">5e82bab6</span></code> matrix selects 29 identities in 11 ARM images and
+rejects four reserved G474 selections; it does not execute those images or change
+the original inventory. Authorized private examples still need a separate annex.</p>
+<p>F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling,
+H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
+separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
+chained, duplex or cross-domain operation.</p>
+</section>
+<section id="fixed-clock-admission">
+<h3>Fixed clock admission<a class="headerlink" href="#fixed-clock-admission" title="Link to this heading">¶</a></h3>
+<p>The reviewed software-trim gates run in cold preflight. An unexpected adjustment
+in a gated profile is rejected before the startup transaction writes hardware or
+acquires resources. Factory calibration remains independent and unchanged;
+admission does not retune an oscillator. These checks add no work to the normal
+I/O call path and establish no measured clock accuracy or physical timing
+qualification.</p>
+<p>F103 HSI8 and GD303 IRC8 require adjustment 16 in <code class="docutils literal notranslate"><span class="pre">RCC_CR.HSITRIM</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RCU_CTL.IRC8MADJ</span></code>, respectively. H743’s exact-revision-V HSI admission requires
+<code class="docutils literal notranslate"><span class="pre">RCC_HSICFGR.HSITRIM=64</span></code>; older fixed nominal profiles retain their existing
+revision-specific boundary. U575’s selected MSIS4 range requires
+<code class="docutils literal notranslate"><span class="pre">RCC_ICSCR2.MSITRIM1=16</span></code>; its separate I2C1 HSI16 gate continues to require
+<code class="docutils literal notranslate"><span class="pre">RCC_ICSCR3.HSITRIM=16</span></code>. The U575 selection follows the pinned official
+HAL/CMSIS range-to-trim mapping and reset definitions.</p>
+<p>F407 HSE8/PLL168, GD470 HXTAL25/PLL200 and G474 HSE24/PLL170 retain their
+external primary clocks. Their internal-clock admission checks are
+<code class="docutils literal notranslate"><span class="pre">RCC_CR.HSITRIM=16</span></code>, <code class="docutils literal notranslate"><span class="pre">RCU_CTL.IRC16MADJ=16</span></code> and <code class="docutils literal notranslate"><span class="pre">RCC_ICSCR.HSITRIM=64</span></code>,
+respectively. They constrain the nominal bootstrap and fallback clocks; G474
+also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows
+RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment
+stating 16 is stale.</p>
+</section>
+<section id="production-promotion-gates">
+<h3>Production promotion gates<a class="headerlink" href="#production-promotion-gates" title="Link to this heading">¶</a></h3>
+<p>The selected F407 <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> implementation preserves the complete mode, including
+IRQ RX bytes/events, frame/error/loss ordering, timestamps, wake and storage.
+HAL owns finite TX DMA, the UART TC completion sequence and transmit abort;
+the private provider owns their integration with the disjoint LL receiver and
+Nexus lifetime. The older serialized finite-TX reference remains evaluation
+evidence for its narrower contract, not the production mode’s qualification.
+Other modes require their own complete evaluation before replacement.</p>
+<p>The serialized reference’s <code class="docutils literal notranslate"><span class="pre">hal_depth</span></code> IRQ guard is not an MCU preemption design.
+Production must establish allowed HAL nesting, short guards, pending-fact
+handling and real IRQ service ordering. Do not mask all interrupts around vendor
+calls that may wait. An abort callback can run synchronously in task context;
+bridges record bounded facts and use notification permitted in the actual
+context. Product callbacks and final settlement do not run arbitrarily inside
+vendor callback stacks.</p>
+<p>A Handle-only callback does not carry a request epoch. Before Handle reuse,
+prove withdrawal of the previous hardware, IRQ and callback references; stamping
+the current epoch onto a late callback is not proof of association. Establish
+admission before a vendor call can retain references, and treat a startup error
+after admission as accepted work requiring explicit withdrawal.</p>
+<p>Review every reachable vendor wait, including bootstrap/runtime progression,
+millisecond quantization, 32-bit tick wrap and low-power suspension. Initial UART
+work keeps the existing system-clock and OS startup choices. Selected HAL modules
+do not authorize default SysTick acquisition or interrupt-policy changes.
+UART/SPI <code class="docutils literal notranslate"><span class="pre">uint16_t</span> <span class="pre">Size</span></code> parameters must match the selected public <code class="docutils literal notranslate"><span class="pre">size_t</span></code>
+contract without truncation, hidden splitting or implicit bounce storage.</p>
+<p>SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA
+addresses and counts. GPIO needs one combined set/reset command; selected U5
+GPIO commands now use private <code class="docutils literal notranslate"><span class="pre">HAL_GPIO_WriteMultipleStatePin</span></code> with the admitted
+GPIO source closure. Separate set/reset calls cannot substitute. DMA disable
+still needs actual readback and withdrawal proof before returning borrowed
+storage.</p>
+<p>Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware
+close must preserve the selected quiet interval before disabling the shifter.
+U575 HAL also contains its Device-gated persistent-DMAT workaround. These API
+fits do not prove callback, deadline or loan withdrawal; review ordinary LL/SPL
+setters separately from justified command/snapshot exceptions.</p>
+</section>
+<section id="ordered-implementation-and-acceptance">
+<h3>Ordered implementation and acceptance<a class="headerlink" href="#ordered-implementation-and-acceptance" title="Link to this heading">¶</a></h3>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Phase</p></th>
+<th class="head"><p>Ledger work</p></th>
+<th class="head"><p>Exit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>G0</p></td>
+<td><p>V-A: exact scope and contract</p></td>
+<td><p>Every maintained selection has a bounded migration decision and baseline</p></td>
+</tr>
+<tr class="row-odd"><td><p>G1</p></td>
+<td><p>V-B/V-C/V-D: dependencies and integration</p></td>
+<td><p>Private SDK build, static contexts, resource responsibility, time and IRQ contracts are established</p></td>
+</tr>
+<tr class="row-even"><td><p>G2</p></td>
+<td><p>V-E and first GD32 work</p></td>
+<td><p>Complete F407 UART behavior and selected GD32 official primitives execute their real regressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>G3</p></td>
+<td><p>V-F/V-G/V-H/V-I</p></td>
+<td><p>Each applicable peripheral/family has a reviewed implementation and comparable cost; unused replaced production paths are removed</p></td>
+</tr>
+<tr class="row-even"><td><p>G4</p></td>
+<td><p>V-J/V-K</p></td>
+<td><p>Test contexts, relocated SDK consumers, external examples and both documentation languages agree</p></td>
+</tr>
+<tr class="row-odd"><td><p>G5</p></td>
+<td><p>V-L</p></td>
+<td><p>Clean source P, examples E, dependencies, configuration and original artifacts are associated without inheriting old qualification</p></td>
+</tr>
+<tr class="row-even"><td><p>G6</p></td>
+<td><p>V-P/V-X</p></td>
+<td><p>Connected physical execution and actual external environment/publication exits are observed separately</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Keep developer tests focused, execute the ordinary complete-index gate for each
+functional increment, and run the complete qualification plan for the frozen
+source. New behavior and fixes require actual RED then GREEN. Pure equivalent
+refactors use the applicable regressions and output checks without fabricated
+RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only.
+Preserve original attempts and compare complete providers, not only Handle sizes.
+Without connected equipment, physical rows remain <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+</section>
+</section>
+<section id="implementation-boundary">
+<h2>Implementation boundary<a class="headerlink" href="#implementation-boundary" title="Link to this heading">¶</a></h2>
+<p>The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at
+<code class="docutils literal notranslate"><span class="pre">b6f0ed3829f3829eb358a2e7417d80bba1a42db7</span></code>. Its CMSIS Device pairing comes from
+STM32CubeF4 v1.28.3. The machine authority is
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/dependencies/stm32f4-hal.lock.json">the official-driver lock</a>, checked
+against the selected Git dependency and imported SDK bytes. The selected API is
+<code class="docutils literal notranslate"><span class="pre">stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx</span></code>. Its 25-file closure retains
+the earlier LL/ETH definitions and license, and adds the reviewed HAL headers
+plus UART, DMA and RCC C units. GPIO/Flash declarations are required by RCC
+compilation; their C implementations, PWR and global <code class="docutils literal notranslate"><span class="pre">stm32f4xx_hal.c</span></code> are not
+selected. This lock is not a declaration that all HAL modules are supported or
+validated.</p>
+<p>CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The
+Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family
+entries while keeping their Device/startup, HAL/LL and imported vendor bytes.
+The internal <code class="docutils literal notranslate"><span class="pre">nexus_cmsis_core</span></code> target supplies CPU headers; it does not change
+public Nexus types, Arch context/ownership contracts or the selected peripheral
+state machine. <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/vendors/VERSIONS.md">Vendor versions</a> distinguishes the
+release, Core version macros, literal pack metadata and license identities.
+Actual include closure, firmware links and installed-SDK consumption require
+current-source evidence; a common Core pin does not transfer F4 qualification to
+G4, H7, U5 or GD32.</p>
+<p>The earlier development overlay added H743 <code class="docutils literal notranslate"><span class="pre">hal_driver_h7</span></code> to the family descriptor
+and SoC source-lock projection, matching its existing pinned LL build input.
+Private capture, advanced-PWM and UART-FIFO templates retain specialization
+contracts; pin-state has optional implementation/default-macro scoping, while
+CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports
+now take the selected controller and directly call private LL functions, with
+no runtime forwarding. These changes do not rewrite the frozen source review.</p>
+<section id="bounded-official-operation-increments">
+<h3>Bounded official-operation increments<a class="headerlink" href="#bounded-official-operation-increments" title="Link to this heading">¶</a></h3>
+<p>The current development source uses locked LL setters for U575 PWM PSC/ARR/CNT/CCR1,
+word RDR/TDR operations carrying UART byte values, UART TC-only clears, and RTC
+write-protection keys and Alarm A clear commands. Existing barriers, exact readbacks, IRQ/error order,
+clock admission, timed phases and loan withdrawal remain in the same providers.
+H743 SPI polling and DMA cleanup use controller-valued LL byte ports; masked
+CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain unchanged.</p>
+<p>U575 GPIO now sends four existing command sites through the actual HAL GPIO C
+unit: public write, initialization preload, stop and serial TX idle. Its private
+15-file lock admits that unit and required headers; no HAL initialization or tick
+is invoked. Disjoint authorized masks remain one BSRR command, and empty public
+writes retain success without invoking HAL’s nonempty-mask assertion.</p>
+<p>H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including
+the IRQ-byte companions of selected DMA modes. The provider retains saved-status
+ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog
+key, configuration and refresh commands use the locked LL IWDG header, including
+watchdog-only assemblies without a GPIO source. Irreversible ownership precedes
+activation; synchronization, exact readback, failed-update bounds and recovery
+responsibility remain in the same C provider.</p>
+<p>Review the selected target and its private include graph, not only the C file
+that exports an ops table. Every H743 UART selection compiles shared <code class="docutils literal notranslate"><span class="pre">uart.c</span></code>,
+so its byte IRQ changes also require review in DMA/FIFO compositions; that does
+not convert the separate data engines. The private I2C port headers bind the
+shared V1/V2 algorithms to the selected locked LL operations and belong in the
+current source review even when a frozen file inventory predates those headers.</p>
+<p>Keep three decisions separate for each mode: the selected hardware owner, the
+exact ordinary operations already delegated to official code, and the remaining
+command/snapshot exceptions or leaf candidates. A preserved IRQ snapshot, atomic
+mask or quiet interval does not justify unrelated handwritten configuration.
+Source review and unchanged file hashes do not replace the current compiler,
+model, installed-SDK, resource or physical evidence.</p>
+<p>GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in
+isolated C11 compile-contract units. Each includes the real SDK before locally
+expanding register macros as integer addresses. Runtime providers retain their mask and
+IRQ checks and ordinary SDK register access. The contract units emit no firmware
+code or data; no compiler-specific constant folding or scanner exception is
+needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset
+contract. Source compilation, linked-image costs and physical behavior remain
+separate verification scopes.</p>
+<p>Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575
+receive/transmit to locked LL operations in the existing shared engines. They add
+no runtime forwarder, vendor Handle, state or generated hardware algorithm.
+Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual
+old-GREEN baselines and real-default probes remain development evidence;
+final clean-source gates, complete SDK consumption and qualification are pending.</p>
+<p>F407 uses official LL operations inside its existing provider state machines,
+with one selected HAL transport for UART <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code>. That transport retains request
+admission, absolute deadlines, wire completion, cancellation, drain and quarantine.
+It does not replace F407 IRQ-word, IRQ-block, RX-DMA or duplex providers. G4, H7
+and U5 do not inherit F4 support or dependency qualification. GD32 remains a
+separate provider.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Owner</p></th>
+<th class="head"><p>Responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Official HAL/LL/CMSIS</p></td>
+<td><p>Reviewed hardware operations and selected vendor algorithms</p></td>
+</tr>
+<tr class="row-odd"><td><p>Family provider</p></td>
+<td><p>Exact peripheral behavior, private state, IRQ and error bridge</p></td>
+</tr>
+<tr class="row-even"><td><p>Common I/O</p></td>
+<td><p>Admission, public results, borrowed storage and final publication contracts</p></td>
+</tr>
+<tr class="row-odd"><td><p>Generated Platform</p></td>
+<td><p>Static context/face construction and explicit C-call ordering for resource acquisition, startup and reverse cleanup</p></td>
+</tr>
+<tr class="row-even"><td><p>External product</p></td>
+<td><p>Execution progress, workers, budgets, partitions and recovery policy</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Only one state machine may own a live peripheral operation. An adapter must not
+run a HAL transfer engine and a second independent register engine over the same
+interrupt flags or DMA channel. Mixed LL/register operations require explicit
+ordering and ownership. Vendor types, mutable handles and headers stay out of
+public interfaces. Factory lookup returns an existing face without initializing
+hardware or allocating storage.</p>
+</section>
+</section>
+<section id="selected-f407-hal-uart-transport">
+<h2>Selected F407 HAL UART transport<a class="headerlink" href="#selected-f407-hal-uart-transport" title="Link to this heading">¶</a></h2>
+<p>The same authored <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> mode selects a static private owner, immutable cold
+configuration, one <code class="docutils literal notranslate"><span class="pre">UART_HandleTypeDef</span></code>, one <code class="docutils literal notranslate"><span class="pre">DMA_HandleTypeDef</span></code> and a shared
+readonly Nexus ops table. The factory still returns the existing Nexus face;
+neither vendor types nor callback registration become a public interface. The
+private callback ABI sets <code class="docutils literal notranslate"><span class="pre">USE_HAL_UART_REGISTER_CALLBACKS=1</span></code> consistently for
+the adapter and selected official C units. TX completion/error/transmit-abort/MSP
+and TX half-transfer callbacks are explicitly bound per Handle, without a global
+product callback override or runtime controller registry.</p>
+<p>One provider owns both UART behavior domains. The LL receiver consumes RX
+status/data once, then temporarily masks RXNE/parity/error enables while
+<code class="docutils literal notranslate"><span class="pre">HAL_UART_IRQHandler</span></code> observes TX facts. HAL receive state remains idle, RX
+buffer/size/count and <code class="docutils literal notranslate"><span class="pre">hdmarx</span></code> remain empty, and DMAR stays clear. This prevents
+HAL error/abort paths from claiming the IRQ receiver. An unexpected receive
+domain or Handle/route identity change closes admission and retains quarantine;
+it does not adopt or abort a foreign DMA owner.</p>
+<p>Admission establishes the request and payload borrow before a HAL call can
+retain them or invoke a synchronous callback. Callbacks latch bounded facts;
+task service alone withdraws transfer pointers and publishes final settlement.
+DMA completion still differs from UART TC and from full reference withdrawal.
+Cancel, timeout and deinitialization failures retain the request or cold lease
+until the same owner proves actual drain. Stop checks peripheral enables,
+DMA addresses/counts and pending/active IRQ references before releasing pins
+or clocks. A Handle is reused only after this withdrawal; official <code class="docutils literal notranslate"><span class="pre">HAL_DMA_Init</span></code> restores
+the reusable idle state where required, without assigning READY by hand.</p>
+<p>The production IRQ gate saves the incoming CPU mask for short state changes.
+If a relevant UART/DMA IRQ preempts a task HAL call, it disables only that
+selected vector, leaves its hardware fact pending and restores the vector when
+the retained HAL stack exits. It does not spin or let a level IRQ tail-chain
+indefinitely inside that task call. Every <code class="docutils literal notranslate"><span class="pre">HAL_DMA_IRQHandler</span></code> entry requires EN readback clear, including an IRQ
+with only HT or no observed error: an error can arrive after a flag snapshot.
+While EN remains set, an HT-only event is acknowledged and HTIE disabled with
+official primitives; its registered private no-op callback is not invoked and
+no transfer state advances. Observed errors or inconsistent terminal facts
+withdraw DMAT and request disable once. Refused disable masks that DMA vector
+and quarantines the borrow; task service retries and dispatches HAL only after
+EN is clear. This excludes the pinned handler’s <code class="docutils literal notranslate"><span class="pre">SystemCoreClock/9600</span></code> wait
+(17,500 iterations at 168 MHz) from the selected IRQ path.
+This is a bounded-path design, not measured interrupt latency or WCET.</p>
+<p>The target-private compile profile replaces CMSIS exclusive-retry RMW macros
+with one saved-mask word update. This profile requires a single CPU owner of
+the aligned UART control words and no NMI, fault/panic logger or other writer.
+It preserves the incoming mask and leaves vendor source unchanged. The same
+profile uses nearest OVER16 BRR rounding with overflow-safe quotient/remainder;
+cold validation rejects zero baud or an out-of-field divisor before UART enable.
+It does not grant dynamic clock or arbitrary format support.</p>
+<p>Only the selected HAL UART/DMA/RCC source units enter the provider’s private
+build. <code class="docutils literal notranslate"><span class="pre">HAL_Init</span></code>, <code class="docutils literal notranslate"><span class="pre">HAL_InitTick</span></code> and a HAL SysTick handler are not selected.
+<code class="docutils literal notranslate"><span class="pre">HAL_GetTick</span></code> reads <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code> milliseconds modulo <code class="docutils literal notranslate"><span class="pre">2^32</span></code> from the existing live TIM2 epoch;
+bootstrap retains its separate finite polling limits. <code class="docutils literal notranslate"><span class="pre">SystemCoreClock</span></code> follows
+the last confirmed 16 MHz HSI or 168 MHz PLL observation, including partial
+startup and cleanup failures. Official RCC frequency getters use the selected
+prescaler tables rather than a fabricated constant clock.</p>
+<p>The actual adapter/official-source model and clock tests establish their
+recorded software scope. Generated factory execution, selected ARM/SDK links,
+stack/cycle comparisons and the complete current-source gate remain separate
+exits. Physical IRQ latency, wire timing and long-load HIL are not executed
+without connected equipment. Do not infer a resource improvement from vendor
+reuse or a passing model.</p>
+<p>A paired development ARM firmware measurement uses the same F407ZG baremetal
+<code class="docutils literal notranslate"><span class="pre">uart_rx_compact_assembly/f407-dma-tx.toml</span></code>, UART workload and <code class="docutils literal notranslate"><span class="pre">NX_UART_ID_UART1</span></code>,
+GCC 14.3 M4F hard-float, <code class="docutils literal notranslate"><span class="pre">-Os</span></code>, no LTO and compiler cache off. Both builds add
+measurement-only <code class="docutils literal notranslate"><span class="pre">-ffile-prefix-map=&lt;each-source-root&gt;=.</span></code> so different absolute
+source-root spellings in retained <code class="docutils literal notranslate"><span class="pre">__FILE__</span></code> diagnostics do not bias Flash cost.
+Their resolved configuration bytes are identical. The normalized pair is:</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Measurement (bytes)</p></th>
+<th class="head"><p>Old LL (<code class="docutils literal notranslate"><span class="pre">9c0460b9</span></code>)</p></th>
+<th class="head"><p>Selected HAL</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Flash LOAD / footprint</p></td>
+<td><p>12,592</p></td>
+<td><p>18,188</p></td>
+<td><p>+5,596</p></td>
+</tr>
+<tr class="row-odd"><td><p>Static RAM</p></td>
+<td><p>248</p></td>
+<td><p>456</p></td>
+<td><p>+208</p></td>
+</tr>
+<tr class="row-even"><td><p>MSP reservation</p></td>
+<td><p>2,048</p></td>
+<td><p>2,048</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Libc heap reservation</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The ordinary new build without that measurement-only option loads 18,200 Flash
+bytes and uses 456 static RAM bytes. Both the ordinary build and normalized pair
+fit this fixture’s 64 KiB Flash and 32 KiB static RAM budgets; MSP remains a
+separate 2,048-byte reservation and heap remains zero. This compares the complete
+increment, including clock metadata and shared RX changes, not isolated HAL
+overhead. The engineering decision favors reviewed official finite-TX reuse for
+this F407 mode at the explicit cost; it is not a memory/performance win or a
+mandate to use HAL for every family.</p>
+<p>The observed final ordinary ELF retains no <code class="docutils literal notranslate"><span class="pre">HAL_Init</span></code>, <code class="docutils literal notranslate"><span class="pre">HAL_InitTick</span></code>,
+<code class="docutils literal notranslate"><span class="pre">HAL_IncTick</span></code>, <code class="docutils literal notranslate"><span class="pre">HAL_RCC_ClockConfig</span></code> or <code class="docutils literal notranslate"><span class="pre">HAL_RCC_OscConfig</span></code>, and contains no
+exclusive instructions. These are observations of this image, not all possible
+callers. Stack high-water, execution cycles and physical behavior remain
+unmeasured. Final-source or other-configuration costs require their own
+ELF/map/resources.</p>
+</section>
+<section id="build-time-provider-contract">
+<h2>Build-time provider contract<a class="headerlink" href="#build-time-provider-contract" title="Link to this heading">¶</a></h2>
+<p>Each constructor returns the frozen <code class="docutils literal notranslate"><span class="pre">Construction</span></code> record from
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/configure/providers/common.py">provider common contracts</a>. It names
+<code class="docutils literal notranslate"><span class="pre">state_type</span></code>, <code class="docutils literal notranslate"><span class="pre">definitions</span></code>, <code class="docutils literal notranslate"><span class="pre">initialize</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, <code class="docutils literal notranslate"><span class="pre">retain_on_failed_init</span></code>,
+<code class="docutils literal notranslate"><span class="pre">exports</span></code> and <code class="docutils literal notranslate"><span class="pre">pin_snapshots</span></code>. The common emitter consumes these decisions rather
+than reconstructing state types or failed-init responsibility from a family name.
+<code class="docutils literal notranslate"><span class="pre">initialize</span></code> is an immutable <code class="docutils literal notranslate"><span class="pre">DirectCall</span></code>; <code class="docutils literal notranslate"><span class="pre">stop</span></code> is a tuple of these calls.
+Arguments are explicit static <code class="docutils literal notranslate"><span class="pre">Symbol</span></code> or <code class="docutils literal notranslate"><span class="pre">Address</span></code> values, uint32 constants,
+booleans, NULL, or nested direct calls such as absolute-deadline construction.
+Free-form expressions, casts, assignments and function-pointer/member-call
+expressions reject.
+<code class="docutils literal notranslate"><span class="pre">definitions</span></code>, <code class="docutils literal notranslate"><span class="pre">exports</span></code> and <code class="docutils literal notranslate"><span class="pre">face_definitions</span></code> remain C source strings for
+declarations, static configuration, storage, faces and fixed forwarding. Concrete
+C adapters own hardware algorithms. The real C compiler establishes symbol
+and parameter types. This is a narrow Python generation contract, not a complete
+C AST; these Python records introduce no additional runtime metadata or dispatch
+into the MCU image.</p>
+<p>The family owns numerical limits, supported modes, exact routes and construction
+semantics. The resolver owns strict fields, immutable inputs and resource
+conflicts. CMake owns source selection and target dependencies. Preserve these
+separate authorities: generation must not create a second source build graph,
+and a syntactically valid configuration must not imply unimplemented hardware.</p>
+</section>
+<section id="selected-immutable-i2c-v2-configuration">
+<h2>Selected immutable I2C V2 configuration<a class="headerlink" href="#selected-immutable-i2c-v2-configuration" title="Link to this heading">¶</a></h2>
+<p>The selected G474, H743 and U575 polling I2C V2 providers separate the private
+<code class="docutils literal notranslate"><span class="pre">nx_i2c_v2_config_t</span></code> from <code class="docutils literal notranslate"><span class="pre">nx_i2c_v2_state_t</span></code>. The generated readonly configuration
+holds register/reset addresses, the reset mask, timing, finite polling budget
+and the explicitly selected BERR and one-byte RX reload quirks. Zero-initialized
+runtime storage keeps a configuration pointer and <code class="docutils literal notranslate"><span class="pre">initialized</span></code>, <code class="docutils literal notranslate"><span class="pre">retained</span></code>,
+<code class="docutils literal notranslate"><span class="pre">active</span></code> and <code class="docutils literal notranslate"><span class="pre">fault</span></code> state. Public faces, shared ops and factory lookup stay the
+same. This split is not a measured Flash or RAM saving.</p>
+<p>The private <code class="docutils literal notranslate"><span class="pre">nx_i2c_v2_bind</span></code> runs under the serialized privileged task owner with
+interrupts unmasked.
+It validates the configuration and rejects overlap with runtime or hardware
+storage. An initialized, retained or active owner rejects rebinding without
+mutation; successful binding itself has no hardware effects. The immutable
+configuration must live as long as its runtime owner; successful stop releases
+hardware ownership but preserves the binding. Do not reset a live owner merely
+to replace its configuration.</p>
+<p>Concrete G474/H743 <code class="docutils literal notranslate"><span class="pre">i2c_prepare</span></code> entries bind first, then prepare pins and
+initialize the engine. U575’s separate mutable clock owner rejects a retained
+clock before binding, and acquires the selected clock before engine initialization.
+Its <code class="docutils literal notranslate"><span class="pre">i2c_close</span></code> stops the engine first; it releases the clock only after that stop
+succeeds. Failed drain retains the relevant runtime and clock responsibility
+for explicit cleanup or retry.</p>
+<p>The family emitter now supplies static configuration and calls these concrete C
+entries. The existing <code class="docutils literal notranslate"><span class="pre">Construction</span></code> record and generated Platform still order
+C calls for resource phases, controller starts and reverse cleanup. Other
+maintained peripheral modes use their own family static bindings and concrete C
+preparation; this does not move every platform lifecycle into a new common
+abstraction.</p>
+<p>See the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/drivers/i2c/i2c_v2/i2c_v2.h">private shared contract</a> and the
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/soc/stm32/stm32u575/drivers/i2c.c">U575 integration</a> for exact parameters
+and failure ordering. The <a class="reference download internal" download="" href="../_downloads/54d3210c5ae2d22e8f681860fb75b4b2/soc-ip-layout-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">refactor</span> <span class="pre">ledger</span></code></a> separates
+focused software evidence, final linked cost comparison and physical execution.</p>
+</section>
+<section id="selected-immutable-uart-dma-configuration">
+<h2>Selected immutable UART DMA configuration<a class="headerlink" href="#selected-immutable-uart-dma-configuration" title="Link to this heading">¶</a></h2>
+<p>The selected F103 and GD303 UART DMA modes use <code class="docutils literal notranslate"><span class="pre">nx_uart_v1_dma_config_t</span></code> for
+register/channel addresses, DMA memory domains, IRQ withdrawal and wake-validation
+callbacks, byte-ring or duplex receive storage, capacity, baud, IRQ policy and
+channel shifts. The selected profile identifies the active storage union member.
+<code class="docutils literal notranslate"><span class="pre">nx_uart_v1_dma_state_t</span></code> retains the configuration pointer, deadlines, active
+request and wake references, ring cursors, publication state and lifecycle flags.
+Duplex embeds its own mutable receive extension; byte mode does not reserve one.
+Configuration and its referenced resources have the runtime owner’s lifetime.
+Successful stop preserves the binding, and zero-initialized runtime binds only
+during cold admission.</p>
+<p>Each family’s concrete <code class="docutils literal notranslate"><span class="pre">uart_dma_prepare</span></code> and <code class="docutils literal notranslate"><span class="pre">uart_duplex_prepare</span></code> requires a
+serialized privileged task with interrupts unmasked. After null/profile checks,
+it checks the existing cold owner before preparing exact pins and calling the
+initializer. Retained hardware, active requests, wake publishers and duplex RX
+loans prevent rebinding; the candidate receive extension is checked even before
+a configuration is bound. Failed withdrawal retains the same configuration and
+outstanding loans for ordinary stop or retry. The shared readonly ops, public
+faces and direct IRQ symbols remain unchanged; no hot-path dispatch layer is
+added.</p>
+<p>The family’s frozen <code class="docutils literal notranslate"><span class="pre">LegacyTransportProfile</span></code> supplies exact wiring to the
+existing emitter without family-name fallback. For these UART modes the selected
+<code class="docutils literal notranslate"><span class="pre">Construction.initialize</span></code> calls concrete C preparation; generation supplies
+static configuration, faces and IRQ forwarding. Concrete C adapters now own AHB
+DMA gates, pin resources and retained cleanup. The generated Platform keeps
+explicit phase ordering and typed C calls. Legacy I2C V1 and the other maintained
+peripheral cold paths follow the same C hardware-algorithm boundary.</p>
+<p>See the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h">UART private contract</a>
+for the exact storage, callback and lifetime requirements. Host tests exercise
+the actual SoC wrapper, shared engine and GPIO model; generated factory validation
+and final ARM resource measurements remain separate evidence scopes.</p>
+</section>
+<section id="selected-legacy-cold-integration">
+<h2>Selected legacy cold integration<a class="headerlink" href="#selected-legacy-cold-integration" title="Link to this heading">¶</a></h2>
+<p>F103 and GD303 keep concrete ADC, PWM and Flash <code class="docutils literal notranslate"><span class="pre">prepare</span></code> entries in their
+respective <code class="docutils literal notranslate"><span class="pre">drivers/devices.c</span></code>. These privileged task entries require interrupts
+unmasked and reject the relevant live, retained or faulted owner before replacing
+its resource binding. The exact C adapter owns register addresses, fixed pin and
+gate relationships, system-clock state and chip-specific cold checks. Family
+generation still validates the selected Board/mode and supplies its chosen values.
+The existing shared <code class="docutils literal notranslate"><span class="pre">nx_legacy_*_close</span></code> paths retain stop and drain responsibility.</p>
+<p>The ADC and PWM owners now reference their own readonly hardware descriptions,
+<code class="docutils literal notranslate"><span class="pre">nx_legacy_adc_config_t</span></code> and <code class="docutils literal notranslate"><span class="pre">nx_legacy_pwm_config_t</span></code>, supplied by each exact SoC.
+Register addresses, gates and fixed pad facts move out of mutable owner storage.
+ADC reference voltage and PWM tick/period/duty/inactive level remain selected
+owner state; they are not promoted into shared hardware facts. Configuration
+must outlive the owner and cannot overlap its state or API output storage.
+This does not turn these drivers into the I2C V2 type; Flash keeps its separate
+private contract. Actual linked costs depend on the exact selected image.</p>
+<p>Selected U575 USART1 <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> and <code class="docutils literal notranslate"><span class="pre">dma-chain-tx</span></code> use static cold configuration and
+concrete C preparation. Their C adapters own admission, binding and pin preparation
+before existing finite/chain initialization. Selected F407 SPI polling/DMA and paired-controller DMA, plus
+GD470 SPI0/SPI4 polling and finite full-duplex DMA, move prepare/close behavior
+into concrete C while preserving the same Platform snapshot slots and retained
+cleanup responsibility. GD470 also moves its conditional EXTI close into C.
+The hot transfer engines, public faces and direct IRQ ownership are unchanged.</p>
+<p>The maintained Native, F103, F407, G474, H743, U575, GD303 and GD470 selections
+now keep hardware algorithms in C11, including selected GPIO, IRQ UART, ADC, PWM,
+EXTI, preflight, shared resources and retained cleanup. Host Python supplies static
+configuration, storage, faces and fixed typed calls; the generated Platform still
+owns explicit startup and reverse-cleanup ordering. Review the actual selected
+C path rather than inferring support from a call field or directory. The
+<a class="reference internal" href="../status/software-verification.html#sealed-cold-lifecycle-baseline"><span class="std std-ref">sealed cold-lifecycle baseline</span></a>
+records the exact final source and software evidence; physical timing remains
+unexecuted.</p>
+</section>
+<section id="conditions-for-full-hal-transport">
+<h2>Conditions for full HAL transport<a class="headerlink" href="#conditions-for-full-hal-transport" title="Link to this heading">¶</a></h2>
+<p>Before accepting a Handle-based mode, establish a progressing time source for
+every HAL wait it can reach. Review bootstrap clock waits, <code class="docutils literal notranslate"><span class="pre">HAL_GetTick</span></code>, tick
+reinitialization and interrupt-priority grouping. Do not let default HAL startup
+silently acquire SysTick or change OS policy. Public operations consume one
+absolute monotonic deadline, including queue and preparation time.</p>
+<p>Establish request identity and borrowed references before enabling hardware or
+calling an API that can invoke a callback synchronously. Callback bridges publish
+bounded facts and optional wake hints; they do not execute arbitrary product
+callbacks. Check the complete HAL call stack before publishing settlement or
+allowing reentrant submission. A HAL lock is not a task mutex or a controller
+ownership policy.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/dma-completion.svg" title="Open SVG at full size"><img alt="Reference finite-DMA completion and failure responsibilities" src="../_images/dma-completion.svg" /></a></p>
+<p>FIG-07 is the existing F407 finite-DMA reference. DMA completion, wire completion,
+HAL internal readiness and Nexus settlement remain different facts. Preserve the
+<a class="reference internal" href="../explanation/ownership.html"><span class="std std-doc">public ownership contract</span></a>: abort or timeout starts
+withdrawal; it does not return storage. Detach every required hardware, IRQ and
+queue reference before the provider’s final release-publication of <code class="docutils literal notranslate"><span class="pre">SETTLED</span></code>.
+Failed drain retains <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code> storage and an explicit recovery obligation.
+Circular DMA must never overwrite a consumer-owned block to emulate progress.</p>
+</section>
+<section id="caller-owned-lifecycle-diagnostics">
+<h2>Caller-owned lifecycle diagnostics<a class="headerlink" href="#caller-owned-lifecycle-diagnostics" title="Link to this heading">¶</a></h2>
+<p>Generated headers expose <code class="docutils literal notranslate"><span class="pre">nx_platform_diagnostic_t</span></code> and the optional
+<code class="docutils literal notranslate"><span class="pre">nx_platform_start_diagnosed</span></code> / <code class="docutils literal notranslate"><span class="pre">nx_platform_stop_diagnosed</span></code> entries. The original
+start/stop entry points remain available. A null diagnostic pointer uses the
+original behavior; a nonnull pointer supplies caller-owned cold-path output and
+is never retained. It adds no static registry, labels or default instance RAM.
+Cold code/stack cost still belongs in the linked-image comparison.</p>
+<p><code class="docutils literal notranslate"><span class="pre">phase</span></code> and <code class="docutils literal notranslate"><span class="pre">cleanup_phase</span></code> distinguish <code class="docutils literal notranslate"><span class="pre">NONE</span></code>, <code class="docutils literal notranslate"><span class="pre">CONTEXT</span></code>, <code class="docutils literal notranslate"><span class="pre">SYSTEM</span></code>, <code class="docutils literal notranslate"><span class="pre">RESOURCES</span></code>
+and <code class="docutils literal notranslate"><span class="pre">CONTROLLER</span></code>. A controller phase carries its zero-based index in
+<code class="docutils literal notranslate"><span class="pre">resolved.json.controllers</span></code>; it is not a per-kind factory ID. <code class="docutils literal notranslate"><span class="pre">SIZE_MAX</span></code> means
+no controller. Successful calls clear the diagnostic. A failed start records the
+primary location and, if cleanup fails, a separate cleanup location. Existing
+primary result, cleanup result and remaining effects remain authoritative;
+diagnostics neither perform recovery nor establish that a retained borrow ended.</p>
+</section>
+<section id="work-package-exits-and-existing-authorities">
+<h2>Work-package exits and existing authorities<a class="headerlink" href="#work-package-exits-and-existing-authorities" title="Link to this heading">¶</a></h2>
+<p>The following table assigns exits to the iteration work packages. It is a design
+checklist, not a second support or completion database. Current support continues
+to come from <a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">the derived capability matrix</span></a>, exact
+provider facts and reviewed fixtures. Existing ledgers retain original IDs,
+statuses and evidence; do not relabel historical results as new-source execution.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Work package</p></th>
+<th class="head"><p>Exit and maintained authority</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Configuration and provider contract</p></td>
+<td><p>Explicit construction and failed-init responsibility; deterministic generation and rejection tests; <a class="reference internal" href="integration-contracts.html"><span class="std std-doc">integration contract</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Official driver reuse</p></td>
+<td><p>Locked source/license/pairing, private build and SDK closure, mode-specific real-driver tests; <a class="reference internal" href="source-compatibility.html"><span class="std std-doc">source compatibility</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Hardware/resource description</p></td>
+<td><p>Exact pins, IRQ, DMA, clocks and memory; no invented Board wiring or silent fallback; <a class="reference internal" href="soc-refinement.html"><span class="std std-doc">SoC ledger</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Lifecycle and diagnostics</p></td>
+<td><p>Every partial effect either withdrawn or retained; caller-owned cold diagnostics never revoke a borrow; <a class="reference internal" href="io-lifecycle-matrix.html"><span class="std std-doc">lifecycle matrix</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>I/O ownership</p></td>
+<td><p>Real acceptance, cancel, late IRQ, overflow, instance isolation and drain regressions; <a class="reference internal" href="io-observation-recovery.html"><span class="std std-doc">I/O recovery contract</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Arch, OS and components</p></td>
+<td><p>Exact backend/CPU scope, unchanged masks, explicit execution and wait/observer shutdown; <a class="reference internal" href="os-contracts.html"><span class="std std-doc">OS contract</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Performance and resources</p></td>
+<td><p>Same configuration/toolchain/workload comparison, actual ELF/RAM/stack reports; <a class="reference internal" href="soc-execution-budgets.html"><span class="std std-doc">execution budgets</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Test plan and HIL</p></td>
+<td><p>Reviewed applicability plus fresh executed results; software and physical status separate; <a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">qualification</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>External consumption and documentation</p></td>
+<td><p>Relocated Source SDK consumer, external examples and complete reviewed English/Chinese pages; <a class="reference download internal" download="" href="../_downloads/627f2f57f03b30c8b6242525d8433d77/build-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">build</span> <span class="pre">ledger</span></code></a> and <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">documentation</span> <span class="pre">ledger</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The read-only work-package view joins existing provider, capability, SDK-required
+source and reviewed lifecycle-test authorities. It retains exact scopes and shows
+unmapped properties instead of inventing aliases. It does not execute tests,
+verify a complete installed SDK or establish software/physical qualification.
+See <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tools/maintenance/README.md">maintenance tools</a> for the actual command
+and output limits.</p>
+</section>
+<section id="comparison-and-replacement">
+<h2>Comparison and replacement<a class="headerlink" href="#comparison-and-replacement" title="Link to this heading">¶</a></h2>
+<p>Compare official and existing implementations with the same chip, clock, memory,
+route, mode, capacity, OS, compiler, optimization and workload. Record Flash LOAD
+and footprint separately, per-domain static RAM, caller-owned storage, stack
+reservation versus measured peak, IRQ/service behavior and cleanup failures.
+Operation counts and host timings are not physical cycles, latency or WCET.</p>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/contracts/io_storage_cost/spi_endpoints/README.md">SPI cost fixture</a>
+links 0/1/2/4 endpoints against the unchanged <code class="docutils literal notranslate"><span class="pre">89485943</span></code> Source SDK: development
+LOAD/footprint is 3,048/7,880/7,940/8,064 B, with static SRAM 72/176/208/280 B,
+plus 2,048 B MSP and zero heap. Nonzero images consume public controller topology;
+the four-way image uses three CS banks, so its delta is not a linear endpoint
+cost. These link observations do not establish timing, HIL or new-source
+qualification.</p>
+<p>The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a
+DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers
+use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads:
+isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack.
+GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL
+call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated
+translation-unit results are not whole-provider resource, stack-peak, timing or
+hardware qualification.</p>
+<p>Retain an old implementation only while it provides a needed comparison or an
+unreplaced maintained mode. Select one normal production implementation after its
+contract and costs are accepted; remove unused switches and duplicate state.
+A dedicated LL/register path is justified by a demonstrated semantic gap or
+measured budget, not by a general assertion that vendor code is slow.</p>
+</section>
+<section id="validation-and-delivery-boundary">
+<h2>Validation and delivery boundary<a class="headerlink" href="#validation-and-delivery-boundary" title="Link to this heading">¶</a></h2>
+<p>New behavior follows RED, GREEN and refactor with the normal commit/CI gates.
+Host C tests use GoogleTest/GoogleMock; tool tests use stdlib unittest. Mock an
+external port when checking the adapter contract, then separately execute real
+official code with the adapter. ARM links establish selected image/resource
+properties. Real equipment is required for IRQ timing, DMA/Cache coherence,
+electrical behavior and long-load conclusions.</p>
+<p>A software candidate still requires clean source, exact dependency/configuration
+identity, independent SDK consumption and two fresh network-disabled builds of
+the same artifacts. No iteration checklist or derived work-package report grants
+that status. Existing release tags/assets and original evidence remain immutable.
+Without connected boards, HIL stays <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>; do not call a software-only
+iteration a product release or safety qualification.</p>
+<p>Selected F407VE/ZG and GD470 offset images now have reviewed configuration,
+startup, vector/linker and ELF-to-BIN boundaries; the
+<a class="reference internal" href="../reference/configuration/assembly.html#physical-flash-and-the-selected-image"><span class="std std-ref">assembly reference</span></a>
+distinguishes their image window from complete physical Flash. This is not boot
+authentication, Flash access control or running-image handoff qualification.
+The F407 handoff retains PRIMASK=1 and startup does not unmask it; an offset
+FreeRTOS link cannot establish a valid FreeRTOS handoff.</p>
+<p>Bootloader handoff, dynamic reclocking, deep STOP, broader H743 DMA and generic
+U575 cross-domain I/O retain their separate unimplemented or partial exits in the
+<a class="reference internal" href="soc-refinement.html"><span class="std std-doc">SoC refinement ledger</span></a>. Official drivers do not automatically
+supply the platform contracts for these features.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i3c-controller.html">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

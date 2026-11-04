@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Bounded I3C controller core &#8212; Nexus Embedded Platform 0.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=7a7ae71a"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Integration, resource assembly and source-SDK contract" href="integration-contracts.html" />
+    <link rel="prev" title="Explicit I2C bus recovery" href="i2c-bus-clear.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/docs/design/i3c-controller.md">e47887d3a11f</a>; code reference: e47887d3a11f. <a href="../../zh_CN/design/i3c-controller.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="bounded-i3c-controller-core">
+<h1>Bounded I3C controller core<a class="headerlink" href="#bounded-i3c-controller-core" title="Link to this heading">¶</a></h1>
+<p>This contract explains how an external controller port uses the optional
+<code class="docutils literal notranslate"><span class="pre">Nexus::I3CController</span></code> C11 core for explicit discovery, finite SDR transfers and
+copied IBI/hot-join events. The core has no hardware provider for a currently
+supported Nexus chip. STM32H563 is a compile-only reference, with physical
+initialization, wire drain, reset proof and PCB routing still unimplemented.</p>
+<p>The public contracts are
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/i3c_controller/include/nexus/components/i3c_controller.h">request and endpoint API</a>
+and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/i3c_controller/include/nexus/components/i3c_controller_storage.h">caller storage and port contract</a>.
+The caller supplies one controller object, a PID/address policy table, target
+state records, an event ring, request metadata, payloads, a monotonic clock and
+one immutable hardware operations table. There are no workers, object pools,
+implicit discovery or OS locks. One serialized thread executor calls every API;
+these APIs do not establish concurrent or IRQ access safety. Every hardware
+leaf and injected clock callback must be non-reentrant and must not call the
+core, invoke application code or mutate retained core storage.</p>
+<p id="fig-26-i3c-core-lifecycle"><a class="nexus-diagram-link reference internal" href="../_images/i3c-core-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-26: current bounded I3C core; labeled arrows separate synchronous port calls, borrowed request lifetime and required whole-bus proofs" src="../_images/i3c-core-lifecycle.svg" /></a></p>
+<p>FIG-26 describes the <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/components/i3c_controller/src/i3c_controller.c">current implementation</a>.
+Solid arrows label software calls, copied observations or retained state; dashed
+arrows label required external proofs. The hardware port is an injected contract,
+not an implemented H563 provider. There is one active request and no software
+transfer queue; the bounded FIFO work belongs to the external controller port.</p>
+<section id="assembly-and-operation">
+<h2>Assembly and operation<a class="headerlink" href="#assembly-and-operation" title="Link to this heading">¶</a></h2>
+<p>The existing component graph exposes an optional static library. External CPU
+Runtime consumers select the component explicitly; the Runtime does not generate
+a SoC, Board, physical instance or factory. A future physical typed factory may
+return an existing controller object; it must not discover a target or substitute
+an endpoint for a controller. Caller-authored 48-bit PIDs and conservative dynamic
+addresses are policy, not runtime names or factory IDs.</p>
+<p>Construction validates representable, aligned and separate controller, target,
+event and policy storage, duplicate PIDs/addresses, every required port leaf and
+a service batch of 1..8 B before claiming hardware. Rejection retains no storage
+or hardware ownership. The port must uniquely claim the controller, IRQs, clock
+and pins. Successful claim also asserts an independently established baseline
+proof that every target dynamic address is invalidated, including targets that
+stayed powered across MCU reset. The caller establishes that proof before
+construction; a missing proof rejects without attempting reset or retaining
+ownership. Its context and supplied storage must outlive every observer. The caller must
+keep complete port/clock context spans separate from all request, payload and
+output storage; the core has no declared context extents with which to prove
+those aliases.</p>
+<ol class="arabic simple">
+<li><p>Initialize unused request metadata with <code class="docutils literal notranslate"><span class="pre">nx_request_initialize</span></code>, then prepare
+an explicit DISCOVER, PRIVATE or supported CCC request. Use an absolute
+deadline in the injected clock domain; <code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> is explicit.</p></li>
+<li><p>Submit the request. A rejection leaves the caller’s request and output ticket
+unborrowed and unchanged by admission. Successful admission borrows request
+metadata and payload; TX data remain immutable.</p></li>
+<li><p>Call <code class="docutils literal notranslate"><span class="pre">nx_i3c_service</span></code> from the same executor. One call performs one aggregate
+FIFO/event observation with at most the selected batch capacity, or one
+quiescence proof. The port cannot retain command/span pointers or call the
+application. <code class="docutils literal notranslate"><span class="pre">transferred</span></code> counts bytes handed to/from the FIFO, not proven
+target side effects; errors never trigger replay.</p></li>
+<li><p>Read results only after acquire-observing SETTLED. Cancellation and timeout
+request withdrawal and preserve the borrow. Frame completion first enters
+DRAINING. Only actual wire, FIFO, IRQ and port-observer quiescence permits the
+core to detach all references and release-publish SETTLED as its final request
+access. Failed proof enters QUARANTINED; keep request and payload alive and
+continue explicit recovery/service.</p></li>
+</ol>
+<p>PRIVATE transfers contain 1..65535 B. The CCC whitelist permits ENEC/DISEC writes
+and direct GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS reads with their defined
+lengths. Address mutation, HDR, controller handoff and legacy I2C are excluded.
+The core does not interpret product registers or own external recovery policy.</p>
+</section>
+<section id="discovery-identities-and-reset">
+<h2>Discovery identities and reset<a class="headerlink" href="#discovery-identities-and-reset" title="Link to this heading">¶</a></h2>
+<p>DISCOVER is finite and explicit. Each observed PID must match the authored table.
+Before requesting an assignment, the core increments that target’s nonwrapping
+epoch and records its address as tentative. Only the subsequent hardware
+assignment acknowledgement confirms the endpoint. An observation can acknowledge
+the preceding target and announce the next identity; the core confirms first.
+Unknown, duplicate or malformed identities and incomplete assignments fault
+admission. Epoch exhaustion rejects a new incarnation rather than wrapping.</p>
+<p>A partial DAA failure, cancellation, deadline, controller reset or failed drain
+must retain every confirmed and tentative dynamic address. It must not clear the
+table or reuse an address that may still be held by a target. Closed admission is
+required for <code class="docutils literal notranslate"><span class="pre">nx_i3c_reset</span></code>. Its external port proof must establish both wire/
+FIFO/IRQ/observer quiescence and invalidation of <strong>every target’s dynamic
+address</strong>. A peripheral reset or FIFO flush alone cannot return SUCCESS. A failed
+proof retains all requests and records. Successful proof invalidates endpoint
+records while preserving their epoch counters; old endpoint and cancellation
+identities cannot address a later incarnation. Reopen requires an idle,
+unfaulted controller.</p>
+</section>
+<section id="copied-events-and-shutdown">
+<h2>Copied events and shutdown<a class="headerlink" href="#copied-events-and-shutdown" title="Link to this heading">¶</a></h2>
+<p>IBI data contain at most four copied bytes. The confirmed BCR must advertise
+IBI capability in bit1; bit2 requires 1..4 B including the mandatory data byte
+(MDB), otherwise the event contains zero data bytes. Accepted IBI events carry
+the exact confirmed endpoint epoch. Unknown-address, tentative, unadvertised, malformed or oversized IBI observations
+increase a saturating rejection counter. A hot-join event has no endpoint and
+requests caller-controlled discovery; it never creates an object or starts work.
+The caller chooses the positive ring capacity and consumes events explicitly.
+Overflow drops only the new event, preserves queued events and increments a
+saturating overflow counter. There is no timestamp or loss-free delivery claim.</p>
+<p>Close prevents admission while keeping active loans, address records and events.
+Stop closes and withdraws active work, returns BUSY while requests or events
+remain, and returns STATE while faulted or assigned/tentative addresses remain. In that state, the caller must
+explicitly obtain the whole-bus reset proof before final stop; final proven
+quiescence then permits release of the physical claim. The
+controller storage is a permanent identity/tombstone after stop and cannot be
+reconstructed; it and copied ticket/endpoint storage must remain valid until
+external controls have joined. Product code owns scheduling, service frequency,
+recovery decisions and the final shutdown sequence.</p>
+<p>Construction checks duplicate identities/addresses in O(target_count²). DAA and
+IBI lookups scan the explicit target count; ring operations are O(1). Each service
+pump handles at most the selected 1..8 B batch, one IBI and one hot-join
+observation. Caller storage grows with target count, event capacity and exact
+request/payload sizes. These are software bounds, not measured wire latency.</p>
+</section>
+<section id="stm32h563-compile-reference-and-evidence-boundary">
+<h2>STM32H563 compile reference and evidence boundary<a class="headerlink" href="#stm32h563-compile-reference-and-evidence-boundary" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/e47887d3a11f6136726fdc992d66df1f40b36691/tests/evidence/i3c-controller/README.md">compact source and execution evidence</a>
+retains the pinned official facts, exact source identities and raw development
+records. H563 has one I3C1 peripheral; its control/status FIFOs contain two words
+each and TX/RX FIFOs eight bytes each. The hardware target table has at most four
+IBI slots. ES0565 Rev 8 requires <code class="docutils literal notranslate"><span class="pre">NOARBH=0</span></code> and the documented SDA pull-up
+preparation for 1 ms before controller enable. These facts constrain a future
+port; they do not provide a reviewed quiescence or all-target reset algorithm.</p>
+<p>The public Cortex-M33 Runtime consumer checks C11/API/link closure only. Compiling
+pinned CMSIS/HAL/LL declarations does not establish a physical implementation,
+full H5 family support, a board route, voltage/timing qualification, full-speed
+operation or real IBI timestamps. Currently supported Nexus chips lack I3C, and
+no existing SoC capability is changed. Physical HIL remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+<p>Host GoogleTest/GoogleMock cases exercise the actual C core while mocking only
+hardware and clock leaves. Development RED/GREEN execution logs bind source hashes and raw
+results; the ordinary complete-index gates, SDK closure and ARM consumer must
+run after integration. Development execution does not establish a clean software
+candidate, reproducibility or physical qualification. The original
+<a class="reference download internal" download="" href="../_downloads/9c97866ef495e5f586d3e94d45fd8e89/io-evolution-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">IO-38</span></code></a> exit remains open and unchanged.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adc-group.html">Finite ADC sequences with explicit integer frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="can-fd.html">CAN FD with fixed physical RAM and explicit request ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer-experience.html">Developer experience and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet-frames.html">Ethernet frame loans and the MAC hardware clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f407-i2s2-slave-tx.html">Finite I2S2 slave TX on STM32F407</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-flash-ram.html">H743 Flash maintenance from a private RAM execution pod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="h743-high-clock.html">H743 V-only high-clock profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Bounded I3C controller core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-evolution.html">I/O evolution: static resources and explicit data contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-extension-boundaries.html">Mapped storage, AMP, image handoff, RTC and frame boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mainstream-mcu-adaptation.html">Mainstream MCU adaptation and feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="official-stm32-provider.html">Official drivers and provider iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pwm-adc.html">Finite PWM and ADC windows with one hardware owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selected-mode-hil.html">Exact selected-mode HIL preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 selected peripheral platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-lptim1-lpbam.html">U575 single-tuple LPTIM1 LPBAM across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-mpu-gpio.html">U575 MPU-v2 scalar GPIO WRITE authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-retained-time.html">U575 retained elapsed-time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-stop2-copy.html">U575 finite SRAM4 copy across Stop2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 dual-world GPIO reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-uart-gpdma.html">Finite USART1 GPDMA TX on STM32U575</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-fifo.html">Bounded UART hardware FIFO bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>
