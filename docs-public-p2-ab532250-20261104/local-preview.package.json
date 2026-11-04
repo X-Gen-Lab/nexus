@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211.tar.gz",
+    "sha256": "ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211",
+    "size": 401386855
+  },
+  "bytes": 433814378,
+  "files": 6657,
+  "kind": "portable_evidence",
+  "manifest_sha256": "92ae9ebf07069d3a4cd588a94d04d0864d3b323616f35483dfd35adbaee76279",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

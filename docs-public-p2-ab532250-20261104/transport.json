@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "kind": "fixed_P2_unsigned_outer_bundle_transport",
+  "source": {
+    "repository": "X-Gen-Lab/nexus",
+    "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+    "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d"
+  },
+  "namespace": "docs-public-p2-ab532250-20261104",
+  "part_limit_bytes": 33554432,
+  "archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211.tar.gz",
+    "sha256": "ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211",
+    "size": 401386855,
+    "mode": 384
+  },
+  "parts": [
+    {
+      "name": "part-00000",
+      "ordinal": 0,
+      "offset": 0,
+      "size": 33554432,
+      "sha256": "fe7f20995f40030cddb7c45509faae3916ca8cc43733e3f9d7e005db6c66bd37",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00001",
+      "ordinal": 1,
+      "offset": 33554432,
+      "size": 33554432,
+      "sha256": "37c8c5b72d5d2bc2766b4e1f42f8768f779ccbf6c0d5b6fe9610cc2821eac7d5",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00002",
+      "ordinal": 2,
+      "offset": 67108864,
+      "size": 33554432,
+      "sha256": "2868073d3094fd5519f7f35cdacf22e576a723d6e4e5c536b8eb5c8fc81edba0",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00003",
+      "ordinal": 3,
+      "offset": 100663296,
+      "size": 33554432,
+      "sha256": "f397b6ddf2ad49071fd35a1a7dd97933e4e448e16d7412abbbf040b7d3afa112",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00004",
+      "ordinal": 4,
+      "offset": 134217728,
+      "size": 33554432,
+      "sha256": "44dc01f5a10b2d87817d24a67e7c0bd62fc0af6c1394afe4c55138c0fef6c28d",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00005",
+      "ordinal": 5,
+      "offset": 167772160,
+      "size": 33554432,
+      "sha256": "114b63a4514f4fe7b592264010fc43de377ba0b6de601c42007ba5d97bd9ccf9",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00006",
+      "ordinal": 6,
+      "offset": 201326592,
+      "size": 33554432,
+      "sha256": "2804e8e493185d6bdff5d03246204d94ea972bb1be705332942995024e6407c9",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00007",
+      "ordinal": 7,
+      "offset": 234881024,
+      "size": 33554432,
+      "sha256": "ae77f4d2e2929c5e9a27d16a753d6e71b888ded2f931c024c9ccaf9c911990d7",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00008",
+      "ordinal": 8,
+      "offset": 268435456,
+      "size": 33554432,
+      "sha256": "0f8a2610c7de05a09043e3399319aed42c226907ccdeed7f475dc38dbdef5864",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00009",
+      "ordinal": 9,
+      "offset": 301989888,
+      "size": 33554432,
+      "sha256": "a091ada891712a92a583dea3d1dae183e35a204e6e82bb0507860056fd28dbd1",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00010",
+      "ordinal": 10,
+      "offset": 335544320,
+      "size": 33554432,
+      "sha256": "c14b26a1765fe03cf030b86ab541129bcb2d793cdb3daed780029f30e9d3c7ac",
+      "mode": "100644"
+    },
+    {
+      "name": "part-00011",
+      "ordinal": 11,
+      "offset": 369098752,
+      "size": 32288103,
+      "sha256": "7165d299eba9e247b719421726373c8114e2912b6fd479c3f48b59203abadc00",
+      "mode": "100644"
+    }
+  ],
+  "envelope": {
+    "name": "local-preview.package.json",
+    "size": 533,
+    "sha256": "a20c34867f8f3499b150c8da5d08462e9788aae9f63b7c5c9b97613690b44d98",
+    "original_path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/local-preview.package.json",
+    "original_mode": 384,
+    "mode": "100644"
+  },
+  "helper": {
+    "name": "p2_outer_transport.py",
+    "size": 18559,
+    "sha256": "62af90e47e9db29967662960713f6183af32f1d6a93647322ff5aadf52fb8987",
+    "mode": "100644"
+  },
+  "actual_bundle_owner_state": {
+    "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/bundle-control/operator-state.json",
+    "size": 4535,
+    "sha256": "f13b71a5274a6a7e9dde0d078fe88f155e143da15e3c34edf302f25a60d65589"
+  },
+  "scope": "Only the completed public P2 outer bundle. Inner SDK/consumer/eight candidates/docs remain unchanged. No private examples, six private historical archives, mixed f9 archive, or 42+4 local-only Native retention archives are selected.",
+  "signature_status": "unsigned",
+  "publication_authorized": false,
+  "physical_status": "not_executed",
+  "remote_inner_restore": "pending separate actual operation",
+  "remote_live_verification": "pending separate actual operation"
+}
