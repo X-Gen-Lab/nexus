@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/store/d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81.tar.gz",
+    "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81",
+    "size": 1699748
+  },
+  "bytes": 20192521,
+  "files": 355,
+  "kind": "portable_evidence",
+  "manifest_sha256": "f2437ec284571568866b223326093eba210869dc527519b9ae23a886d053fe96",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "independent_Source_scoped_public_CodeQL_and_delivery_supplement_transport",
+  "namespace": "docs-public-codeql-qa706-d-e47887d3-20261104",
+  "source_scopes": {
+    "D": {
+      "commit": "e47887d3a11f6136726fdc992d66df1f40b36691",
+      "scope": "Independent strict bilingual documentation/package/recovery",
+      "tree": "72a0b2a7878e6a8389ebfaac8c38f14f9a9e4a39"
+    },
+    "E": "Only approved1195B public-safe summary; all private raw/source excluded",
+    "P2": {
+      "CPP": "183 composite queries/1234 results,109 preserved+74 actual supplemental; original failed budgets remain failures",
+      "Python": "174 original queries/45 results",
+      "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+      "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d"
+    },
+    "QA706": {
+      "commit": "706ee80b12a653a1820685c530b21e9668d82064",
+      "scope": "Normal complete-index gate+host resource ownership/provenance fixes; fresh Python174/38 mapped results. No new full159/firmware relabel.",
+      "tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2"
+    }
+  },
+  "part_limit_bytes": 33554432,
+  "archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/store/d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81.tar.gz",
+    "size": 1699748,
+    "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81",
+    "mode": 384
+  },
+  "parts": [
+    {
+      "name": "part-00000",
+      "ordinal": 0,
+      "offset": 0,
+      "size": 1699748,
+      "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81",
+      "mode": "100644"
+    }
+  ],
+  "envelope": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/supplement.package.json",
+    "size": 542,
+    "sha256": "66a8168969335866f8ad41d9f64c87a150daf0c58207e2e68fce220cdde0e9e9",
+    "mode": 384,
+    "name": "supplement.package.json",
+    "transport_mode": "100644"
+  },
+  "helper": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-p2-preparation/p2_outer_transport.py",
+    "size": 18559,
+    "sha256": "62af90e47e9db29967662960713f6183af32f1d6a93647322ff5aadf52fb8987",
+    "mode": 384,
+    "name": "p2_outer_transport.py",
+    "transport_mode": "100644",
+    "role": "Unchanged previously verified split_stream/join_stream API only. Its fixed P2 --prepare/--join CLI intentionally does not accept this supplement descriptor."
+  },
+  "selection_manifest": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-p2-preparation/codeql-supplement-20261104/selection.pending.json",
+    "size": 316674,
+    "sha256": "0ecb0b4812efc8e6f66863614047ab954400f7d97a8adc0f7d64530cfaec7065",
+    "mode": 384
+  },
+  "selection_embedded_member": "SELECTION.json",
+  "actual_store_export_attempt": {
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/local-store-export.attempts/1793794553831696727-74599a36c462470db962c62acc02b64a/receipt.json",
+    "size": 1758,
+    "sha256": "abe3956885f653863bffc70b4eca4b9bd4e49edf7e39b22f8bdc8f2aafad3c46",
+    "mode": 384
+  },
+  "unsigned": true,
+  "product_promotion": false,
+  "physical_status": "not_executed",
+  "scope": "Exact P2 scan originals, separately scoped QA706 fixes/normal gate/fresh Python174 and D strict docs. All original pending/failure/severity-reporting history unchanged and read with later real closure. Only explicit1195B public E summary; no private E raw, DB, CLI bundle, fullNative, productrelease or newfull159 claim.",
+  "remote_readback_join_actual_store_restore": "pending manager publication and independent recovery"
+}
