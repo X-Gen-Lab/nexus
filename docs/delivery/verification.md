@@ -5,10 +5,16 @@
 `implemented` 表示源码和工具已落地；验收状态以报告声明的受测代码身份为准。
 原始报告保留各自输出路径，绑定源码、配置、依赖、工具、命令返回码和产物。
 
-最新已封存的 `7590b2d4` 平台结果及公开／私有恢复入口见
-{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。
-本页后续 P2、SoC/IP 等记录保持原始源码与历史状态；其 pending 字段不覆盖
-该后续封存观察，后续文档提交也不继承 `7590b2d4` 的固件资格。
+本轮最新选定 P2 `ab532250` 的完整软件计划、SDK、八候选与公开实际恢复见
+{ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`；其 C++183 是
+109 个验证既有结果加 74 个实际补算的组合分析，完整 interpret 与1234条逐项审查
+已完成。独立 QA `706ee80` 普通门禁及新 SHA Python174 复扫完成，38 条 finding
+为 30 note／6 warning／2 error，唯一对应原已审处置；七条旧 finding 消失且无新增。
+当前私有 E `f59debf1` 固定 P2，17 presets／116 命令、source／installed 各五个
+真实 C broker 场景、三个 recipes 和公共 SDK walk 均通过；E 已正常 nonforce push 并精确读回 `f59debf1`，仓库保持 private、private main 未更新；
+后续 D／部署／FF 仍待实际结果。本页后续旧 P2、SoC/IP 和
+`7590b2d4` 记录保留各自源码与历史状态；其 pending 字段不覆盖本轮 P2，后续提交
+不继承固件资格。
 
 ## 类型化平台统一：精确源码与执行边界
 

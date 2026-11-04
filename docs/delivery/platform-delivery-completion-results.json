@@ -3,7 +3,7 @@
   "kind": "nexus_platform_delivery_completion_development_index",
   "date": "2026-10-24",
   "time_zone": "Etc/UTC",
-  "scope": "N01-N14 original development observations are retained below. The 2026-10-28 A-J/X increment has separate exact-source and development-worktree observations in current_iteration_20261028; none establishes qualification of the final combined head.",
+  "scope": "N01-N14 original development observations are retained below. The 2026-10-28 A-J/X increment has separate exact-source and development-worktree observations in current_iteration_20261028; none establishes qualification of the final combined head. Current exact P2 selected software and unsigned artifact observations are appended under source_version_records_20261103.final_public_source_P2_ab532250; later D documentation and pending integration scopes retain separate identities.",
   "platform_baseline": "9ac38931e9f15b27ebe50698a7daad8263928a20",
   "task_authority": "docs/design/platform-delivery-completion.csv",
   "previous_iteration": "docs/delivery/developer-experience-results.json",
@@ -170,7 +170,7 @@
     "scope": "Use current_iteration_20261028 retained_delivery_scopes and each observation archive for verified local navigation. Original N01-N14 and previous iteration paths retain their identities. No public obtainability or final combined software candidate is claimed.",
     "previous_iteration_archives": "unchanged; retain their original P/E identity"
   },
-  "updated_date": "2026-11-03",
+  "updated_date": "2026-11-04",
   "platform_baseline_scope": "Original N01-N14 baseline; not the current iteration or the current checkout.",
   "current_iteration_20261028": {
     "kind": "c_firmware_lifecycle_and_delivery_development_increment",
@@ -939,6 +939,1669 @@
       }
     },
     "remaining_exits": {
+      "kind": "current_navigation_after_P2_append",
+      "current_source_record": "final_public_source_P2_ab532250",
+      "completed_selected_scopes": [
+        "normal ordinary complete-index P2",
+        "two complete159 current-source executions",
+        "four Native modes",
+        "1193compiler contexts each tidy/cppcheck",
+        "64root67image270command source/installed SDK",
+        "8candidates16freshnetworknonebuilds",
+        "exact P2 strictdocs officialpackage actualrestore",
+        "unsigned outerbundle authenticated remote recovery and same-producer liveverify",
+        "QA706 complete-index normal hooks and fresh174 Python with38 uniquely mapped reviewed findings",
+        "private E=f59debf pinsP2 complete17presets116commands source_and_installed5Cbrokers_each three_recipes public12command_walk"
+      ],
+      "F07": "Original exit satisfied by actual observational same-source/tool/env comparison and final clean complete gates; fresh_cold=false and controlled_causal=false.",
+      "F01": "Current159 purpose/input/output/failure/overlap declarations and original actual per-stage/attempt costs reconciled; retain original inventory as historical declarative input.",
+      "open_original_conditions": {
+        "N09": "Actual four-command fresh-build-directory/warm configure-build observation is source/tool/trace bound with all2642 compdb records unchanged, and warm15compile/10link. This selected Native observation does not automatically close other MCU, CLI or F05 invalidation exits; no third159 or OS-page-cache-cold/causal claim.",
+        "V_F07": "Selected static/ECC clarification only; event-owner/sticky/full recovery conditions remain explicit.",
+        "V_F08_V_F09": "Seven vendor-leaf proposal groups remain open.",
+        "V_G02": "GD303 references not_fully_audited.",
+        "private_E": "Current E=f59debf1a15913353462e69ba0039db1c010f284 pins P2; approved17presets116commands/source_and_installed5Cbrokers_each/three_recipes/public12command_walk all passed. Authenticated private visibility, normal nonforce feature push and exact readback completed; private main is unchanged. Private application bytes/raw remain private, physical not_executed.",
+        "CodeQL": "P2 Python174/all45 and CPP183 cross-attempt composite (109 fully decoded validated prior results plus74 actual evaluations, fresh interpret0) with1234 individual dispositions and DB recovery completed. QA706ee80/tree5c39 completed normal13-path hooks420/7342+3968, fresh Python174 create/analyze0 and unique38-survivor review mapping: 30note/6warning/2error, seven removed (two true FD failure-path fixes plus five equivalent cleanups), zero new or ambiguous matches. Both raw errors retain severity and authoritative unchanged-source Root dispositions. Original failed attempts stay failed; P2 firmware/CPP/SDK/candidates/two159 keep original identities. Current E software integration has independently passed; actual D/deploy/finalFF remain pending.",
+        "D_and_delivery": "Actual D review/build/package/restore/deploy/readback/finalFF pending.",
+        "N14_G05_J03": "Current outer bundle is public and actually recovered; full Native program/object bytes remain in42+4 local stores, not remotely replayed.",
+        "I01_I02_I03_V_X01": "Append owner actual fresh recipe/context/provenance receipts before updating these rows; two observed image configs differ and recipe reproducible=false is retained.",
+        "physical_hil": "not_executed",
+        "server_rules": "last actual403; no service enforcement established",
+        "Release_upload": "last actual401; unsigned public artifact append is a separate operation"
+      },
+      "conditional_no_current_need": [
+        "IT-S06",
+        "IT-X04"
+      ],
+      "history": "The prior remaining_exits object is preserved verbatim in remaining_exits_historical_pre_P2_20261103; old executions are not relabelled."
+    },
+    "current_remote_rule_observation": {
+      "date": "2026-11-03",
+      "branch": "main",
+      "observed_commit": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+      "protected": false,
+      "rulesets": [],
+      "create_ruleset_attempt": "actual_HTTP_403_Resource_not_accessible_by_integration",
+      "raw_location": "build/recovery-20261103/remote-rules",
+      "scope": "No service-side protection was established. Repository permission metadata and local policy do not prove administration capability or configured enforcement."
+    },
+    "final_public_source_P2_ab532250": {
+      "kind": "exact_source_software_acceptance_and_unsigned_artifact_observations",
+      "date": "2026-11-04",
+      "source": {
+        "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+        "dirty": false,
+        "public_dependency_mounts": 23,
+        "qualification_scope": "Frozen public P2 selected software scopes. Later D has a separate documentation identity and inherits no new firmware qualification."
+      },
+      "evidence": {
+        "ordinary_outcome": {
+          "path": "/workspace/nexus/build/recovery-20261103/contract-repair/ordinary/outcome-reconciliation.json",
+          "sha256": "22cb8f19c3d4b0dcfa3f3146b9bae95397123ee4d1242a9a39a625d51d1401a3",
+          "size": 574
+        },
+        "pair_continuation": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/retention-resume-20261103/state.json",
+          "sha256": "54605454152c14cb007115f269cc2833ebeffe903b2c9424f15901f3801be9bc",
+          "size": 4847
+        },
+        "comparison": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+          "sha256": "78a2c382598ddc70d592fb4abd2c2dba244f6d77bd6f132e281edfb44180951f",
+          "size": 365509
+        },
+        "comparison_semantics": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/comparison-semantics.json",
+          "sha256": "7afda1e5179f989ef35650c21f4e9752e6e7e3c2dd9a89bcec4649a71d4cb0ca",
+          "size": 2259
+        },
+        "profiles_and_strict_P2_docs": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json",
+          "sha256": "1ace69ec0c88a7bf244472faa8dc6e6d7eb2ab7c933c26b0752795d298867ad6",
+          "size": 8619
+        },
+        "unsigned_local_bundle": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/unsigned-local-bundle-handoff.json",
+          "sha256": "49d623f46781d7b890457a0dff8b4f624c06532e7e81f66772556b48bfa22d7a",
+          "size": 11964
+        },
+        "unsigned_local_bundle_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/unsigned-local-bundle-independent-review.json",
+          "sha256": "cb5ff59ec64678e71b64c4360aa0b92929d4925d59e1d3e21408ddc8efe8d0c9",
+          "size": 8478
+        },
+        "SDK_consumer_package_reconciliation": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/repeat-sdk-consumer-packages/outcome-reconciliation.json",
+          "sha256": "0b58e80a2374c7ab9d2e190571d4e5ebf4df9a02116eabcd64e9c65c6d4b1be6",
+          "size": 6805
+        },
+        "SDK_consumer_package_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-delivery-ab532250-20261104/repeat-sdk-consumer-packages/completion-independent-review.json",
+          "sha256": "e1e02b69d615d0ea5f67fad24cd59c0f0f46094893c58e650efdd9b662c40290",
+          "size": 5400
+        },
+        "remote_recovery_liveverify": {
+          "path": "/workspace/nexus/build/recovery-20261103/publication-p2-transport-ab532250-20261104/remote-recovery-liveverify-handoff.json",
+          "sha256": "ba0f22a92896b1c21934f11ebb3dd32644be32360c7df6d2ee617f58e222b2f0",
+          "size": 19634
+        },
+        "remote_recovery_liveverify_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/publication-p2-transport-ab532250-20261104/remote-liveverify-completion-independent-review.json",
+          "sha256": "afaa63e47cc2f5e7f6cef456787af925865b8f3a0db867cb19418aeb9306b896",
+          "size": 8937
+        },
+        "historical_declarative_inventory": {
+          "path": "/workspace/nexus/build/recovery-20261103/validation-efficiency/stage-inventory.json",
+          "sha256": "6c91a71eaecb72bd4941678ca01cd161a44efa35eeae48fa927d59f0701665c8",
+          "size": 443045
+        },
+        "historical_retention_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/validation-efficiency/audit.json",
+          "sha256": "3a519029d4f8f8101bd6be317c6ff0ec4615843efb5d3063578eca21256f7867",
+          "size": 14404
+        },
+        "P2_Flash_static_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-review.json",
+          "sha256": "8ae3da52edcdd01bf8c811300eb77205e15a47376ec51ee67d04587959846a75",
+          "size": 38964
+        },
+        "P2_Flash_static_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-independent-review.json",
+          "sha256": "dbe83b3fa399dd6744233aa957eb7e6c4472e2b27003bfd8fb7bd501e7ad3b75",
+          "size": 3894
+        },
+        "ECC_addendum": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-ECC-clarification-addendum.md",
+          "sha256": "229aa1bff57fbbae30ae0f08392a44780edf9ca687594948ee284630a1869cb3",
+          "size": 4334
+        },
+        "ECC_inputs": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-ECC-clarification-addendum.inputs.json",
+          "sha256": "3d300159d2743fc8b6dda0d293316180cb4158c41fad77bee019a9abfce5d893",
+          "size": 6771
+        },
+        "ECC_independent_review": {
+          "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/ECC-independent-review.json",
+          "sha256": "fca551f1020be6403474e8ace930270fe1fc1a6e204b606bdcd7d4a9376624c5",
+          "size": 5156
+        }
+      },
+      "ordinary_complete_index": {
+        "status": "accepted_and_pushed_with_normal_hooks",
+        "source_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "google_programs": 420,
+        "google_cases": 7342,
+        "tool_cases_four_ordinary_domains": 3964,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "reconciliation_ref": "ordinary_outcome",
+        "qualification_scope": "Ordinary complete-index Native Debug; formal domain counts remain separate. Original BrokenPipe final-output driver error is preserved."
+      },
+      "formal_software_execution": {
+        "status": "two_independent_complete159_executions_passed_and_retained",
+        "plan_file": {
+          "path": "/dev/shm/nexus-final-20261103/tools/dev/plans/software.json",
+          "sha256": "abb2b775000e652a09aa6d8ba8a2dcc31f2c736fff8ea2196697ed1c35515cb9",
+          "size": 55199
+        },
+        "phases": {
+          "baseline": {
+            "status": "executed_passed",
+            "report": {
+              "path": "/tmp/nexus-final-p2-baseline-repeat-20261103/baseline/report.json",
+              "sha256": "15c5044e55701eeb1b7e572d0fb7292cf47c5f19412324c4866a4fd0177783d2",
+              "size": 214863
+            },
+            "maintained_verified_execution": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/verified-execution.json",
+              "sha256": "7956ab1f009870f7c982bbe496df6f7a32eb2ab4680c33757803596b1d6a7d95",
+              "size": 2816
+            },
+            "stage_count": 159,
+            "semantic_plan_sha256": "e88fedefcec29e6cf16bff31dfa5434ca945c0fc706e0bece3cc04724566e02c",
+            "report_software_qualified_original_value": false,
+            "stage_duration_s_sum": 6742.878869825003,
+            "stage_duration_s_by_checker": {
+              "tool_tests": 1831.4527490920045,
+              "configure": 372.27172192099897,
+              "build": 421.18881087900445,
+              "quality_tools": 1269.545275643999,
+              "native_contracts": 654.9634969469989,
+              "arch_compile": 10.543867727999896,
+              "cortex_runtime": 278.3993257250004,
+              "cache_control_compile": 0.669557043001987,
+              "os_profiles": 41.29020882699842,
+              "os_threadx": 80.62521999599994,
+              "stm32_memory": 17.168548964000365,
+              "gd32_memory": 24.202416567997716,
+              "stm32h743": 121.64196162000007,
+              "stm32u575": 45.4552517129996,
+              "u575_trustzone": 6.704865899999277,
+              "source_sdk": 5.639830613999948,
+              "sdk_consumers": 740.7087468130012,
+              "provider_assemblies": 819.3506821240007,
+              "hil_prepare": 1.0563317069972982
+            },
+            "original_attempt_costs_reference": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+              "json_pointer": "/cold/cost/attempts",
+              "entries": 159,
+              "fields": [
+                "receipt",
+                "command",
+                "duration_seconds",
+                "exit_code",
+                "outcome",
+                "resource_usage"
+              ]
+            },
+            "attempt_duration_seconds_sum": 6742.71109218799,
+            "observed_stage_attempt_interval_union_seconds": 6742.710856041,
+            "maximum_observed_process_rss_bytes": 730820608,
+            "top5_stage_duration_s": [
+              {
+                "name": "contract-tools",
+                "duration_s": 866.027734618001
+              },
+              {
+                "name": "cppcheck",
+                "duration_s": 818.0822078620004
+              },
+              {
+                "name": "sdk-consumers",
+                "duration_s": 740.7087468130012
+              },
+              {
+                "name": "testing",
+                "duration_s": 688.3919131850016
+              },
+              {
+                "name": "tidy",
+                "duration_s": 451.4630677819987
+              }
+            ]
+          },
+          "repeat": {
+            "status": "executed_passed",
+            "report": {
+              "path": "/tmp/nexus-final-p2-baseline-repeat-20261103/repeat/report.json",
+              "sha256": "e82ebc51bef44a494876b5f0f8f1423f29c1d8a90e9f3a1133c16b54835f4f9d",
+              "size": 214155
+            },
+            "maintained_verified_execution": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/verified-execution.json",
+              "sha256": "5b82719dea7bfd96352d3eb3e18d939015e9083ccc405e4b87963cf2a6d6c4c9",
+              "size": 2814
+            },
+            "stage_count": 159,
+            "semantic_plan_sha256": "e88fedefcec29e6cf16bff31dfa5434ca945c0fc706e0bece3cc04724566e02c",
+            "report_software_qualified_original_value": false,
+            "stage_duration_s_sum": 6387.3383756820185,
+            "stage_duration_s_by_checker": {
+              "tool_tests": 1809.6298964159942,
+              "configure": 356.34822072002135,
+              "build": 331.22430463001365,
+              "quality_tools": 1173.0117670149994,
+              "native_contracts": 636.7608695439922,
+              "arch_compile": 9.294832846993813,
+              "cortex_runtime": 254.98154998599784,
+              "cache_control_compile": 0.5170372360007605,
+              "os_profiles": 36.471065249003004,
+              "os_threadx": 65.88735504900251,
+              "stm32_memory": 15.149967332996312,
+              "gd32_memory": 22.339008253999054,
+              "stm32h743": 109.77311430999544,
+              "stm32u575": 41.95110079799633,
+              "u575_trustzone": 6.672300083999289,
+              "source_sdk": 5.462124150006275,
+              "sdk_consumers": 696.0577807880036,
+              "provider_assemblies": 815.0543157230059,
+              "hil_prepare": 0.7517655499977991
+            },
+            "original_attempt_costs_reference": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json",
+              "json_pointer": "/warm/cost/attempts",
+              "entries": 159,
+              "fields": [
+                "receipt",
+                "command",
+                "duration_seconds",
+                "exit_code",
+                "outcome",
+                "resource_usage"
+              ]
+            },
+            "attempt_duration_seconds_sum": 6387.179869632957,
+            "observed_stage_attempt_interval_union_seconds": 6387.179537077,
+            "maximum_observed_process_rss_bytes": 730624000,
+            "top5_stage_duration_s": [
+              {
+                "name": "contract-tools",
+                "duration_s": 847.1008052230027
+              },
+              {
+                "name": "cppcheck",
+                "duration_s": 764.0722152820017
+              },
+              {
+                "name": "sdk-consumers",
+                "duration_s": 696.0577807880036
+              },
+              {
+                "name": "testing",
+                "duration_s": 687.255109081998
+              },
+              {
+                "name": "tidy",
+                "duration_s": 408.93955173299764
+              }
+            ]
+          }
+        },
+        "no_filter_or_shard": true,
+        "current_checker_results_reexecuted_in_each_phase": true,
+        "modes": {
+          "native-debug": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-release": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-asan": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          },
+          "native-tsan": {
+            "google_programs": 420,
+            "google_cases": 7342,
+            "ctest_tests": 440
+          }
+        },
+        "analyzers": {
+          "tidy": {
+            "semantic_compiler_contexts": 1193,
+            "owned_translation_units": 1303,
+            "parallel": 4,
+            "exit_code": 0
+          },
+          "cppcheck": {
+            "semantic_compiler_contexts": 1193,
+            "owned_translation_units": 1303,
+            "parallel": 4,
+            "exit_code": 0
+          }
+        },
+        "counting": "Native modes overlap in semantic cases and are not added. CTest registrations and Google cases are different counting domains. 159 is a stage count, not a unique case count. Ordinary3964 does not include formal contracts326/freertos4 as a new unique aggregate.",
+        "retention": {
+          "baseline_actual_restored_batches": 42,
+          "repeat_new_actual_restored_batches": 4,
+          "logical_paths_each_phase": 141072,
+          "prior_byte_references_used_for_repeat": true,
+          "full_inventory_and_final_source_identity": "passed",
+          "sole_full_indexes_and_all_local_archives_preserved": true,
+          "baseline_index_metadata": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/retention-index.json",
+            "sha256": "660f3875fff38f4b97c1e670cc35c32ae1c12e074370bae64f598af880a16145",
+            "size": 175362588
+          },
+          "repeat_index_metadata": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/retention-index.json",
+            "sha256": "ea544537132f2423bb2f1374f9dfcab7823a383f646b8e433265b08f044f32c6",
+            "size": 177341288
+          },
+          "original_retention_RAM_failure_preserved": {
+            "path": "/workspace/nexus/build/recovery-20261103/final-p2-baseline-repeat-20261103/control/inside-failure.json",
+            "sha256": "517fe550afe18b316ee1b019c31893e65f07a232f700d6f5d21a524654fa5f27",
+            "size": 911
+          },
+          "successful_continuation_ref": "pair_continuation",
+          "no_automatic_same_canonical_nanosecond_mtime_replay_claim": true
+        },
+        "historical_failure": "P48 stage91 contracts326 had13failures2errors. That source and failed controller remain historical; none of its checker success/failure is adopted as current P2 qualification."
+      },
+      "validation_contract_inventory": {
+        "status": "all_current159_mapped_with_original_stage_and_attempt_costs",
+        "historical_declarative_inventory_ref": "historical_declarative_inventory",
+        "historical_inventory_source_commit": "6c3a380a99336a5a7809b4a862449228c6365544",
+        "historical_rows_not_requalified": 160,
+        "reused_current_name_and_checker_contracts": 157,
+        "missing_declared_purpose_input_output_failure_overlap_fields": 0,
+        "execution_identity_and_argv_override": "Use exact current report stages, checker_source, argv, command_receipt and raw identities; old input selectors and null costs do not establish current execution.",
+        "added_stage_contracts": [
+          {
+            "name": "contract-tools",
+            "domain": "complete tests/contracts unittest discovery and imported maintained modules",
+            "outputs": "fresh contract-tests.json and original stage raw/receipt",
+            "cases_each_phase": 326,
+            "failure": "zero/incomplete execution, failure/error/skip/expected failure/unexpected success, or nonzero runner exit rejects",
+            "overlap": "retain complete contracts domain once per formal run; the three retired boundary registrations are covered by the original131 contract-case identity mapping, without deleting any case"
+          },
+          {
+            "name": "freertos-tools",
+            "domain": "complete os/freertos overlay unittest discovery and imports",
+            "outputs": "fresh freertos-tests.json and original stage raw/receipt",
+            "cases_each_phase": 4,
+            "failure": "zero/incomplete execution, failure/error/skip/expected failure/unexpected success, or nonzero runner exit rejects",
+            "overlap": "retain once in the explicit tools domain; four Native modes remain independent"
+          }
+        ],
+        "retired_registrations_only": [
+          "source-sdk-boundaries",
+          "build-artifact-boundaries",
+          "image-artifact-boundaries"
+        ],
+        "same_name_semantic_overrides": {
+          "tidy": "parallel2→4; all1193 distinct compiler contexts retained",
+          "cppcheck": "parallel2→4; all1193 distinct compiler contexts retained",
+          "providers-multi_controller_assembly": "18 original fixtures retained plus16 declared_io fixtures =34; exact selectors are in both current argv"
+        },
+        "retention_review_ref": "historical_retention_review",
+        "test_removal_decision": "retain reviewed tests; no obsolete-contract or independent-equivalent deletion proved; no count reduction to create passing results",
+        "costs": "All159 stage duration_s per phase remain in original reports and all159 original attempt duration/RSS records per phase remain in the comparison. This append references them, without a second159-row ledger.",
+        "unobserved_metrics": [
+          "aggregate nested CPU",
+          "simultaneous process-tree peak RSS",
+          "measured cache counters"
+        ]
+      },
+      "observational_cost_comparison": {
+        "status": "completed_same_source_tool_input_environment_comparison",
+        "comparison_ref": "comparison",
+        "semantics_ref": "comparison_semantics",
+        "baseline_cache_state": "existing fixed Native compiler outputs from prior failed source; current CMake/Ninja revalidates dependencies; every current159 checker/test/analyzer/provider/SDKconsumer executes anew; ccache disabled; OS page cache uncontrolled",
+        "repeat_cache_state": "same fixed Native compiler outputs after current baseline; current CMake/Ninja revalidates dependencies; new complete phase/provider/SDKconsumer roots; every current159 checker/test/analyzer executes anew; ccache disabled; OS page cache uncontrolled",
+        "storage_intervention": {
+          "path": "/workspace/nexus/build/recovery-20261103/native-debug-live-migration-20261103/migration-complete.json",
+          "sha256": "6889deb41e78e9c079e22b48b0f686634909da6c25daf6c0c43a0a06dbefa9e9",
+          "size": 3086
+        },
+        "same_environment_input_bytes": true,
+        "comparison_qualification_original_value": false,
+        "observed_wall_seconds_difference": 355.5313189640001,
+        "observed_wall_ratio": 1.0556632731082902,
+        "fresh_cold_claim": false,
+        "controlled_causal_speedup_claim": false,
+        "RSS_scope": "linux_wait4 maximum observed process RSS for waited process and reaped descendants; not a simultaneous process-tree peak; no aggregate CPU or peak-RSS delta is inferred.",
+        "time_scope": "Report stage duration_s sums, original attempt cumulative duration, interval-union wall, and outer qualify/wrapper durations have different definitions. Preserve each original value; never add nested durations or call the cumulative stage sum total wall.",
+        "F07_original_exit_disposition": "satisfied for the current selected same-source/tool/environment observations and final clean complete gates; the original exit does not require fresh cold or a causal speedup claim",
+        "N09_disposition": "separate cold/warm requirement; current reused-output baseline is not a new cold build. See ignored N09 feasibility preparation; no third159 run is implied."
+      },
+      "installed_source_sdk": {
+        "status": "complete_current_P2_source_installed_consumer_execution_and_actual_package_restore_passed",
+        "policy": "nexus-sdk-consumers-v15",
+        "consumer_roots": 64,
+        "images": 67,
+        "actual_commands": 270,
+        "command_exits": "all_zero",
+        "separate_owned_final_verification": "passed",
+        "producer_phase": "repeat",
+        "sdk_archive": {
+          "sha256": "93ba56043e1d5c9289197e97f3fb1dd268fbfaeae8f031f5dee4b5f09939f5fb",
+          "size": 13942391
+        },
+        "entire_consumer_archive": {
+          "sha256": "41432dc67b99ec472edb143d4da84051cd8f6b9951f58576d8ee24b2c112e0bd",
+          "size": 20775238
+        },
+        "actual_export_restore_full_inventory": "passed",
+        "reconciliation_ref": "SDK_consumer_package_reconciliation",
+        "original_outer_namespace_view": "running_preserved",
+        "original_outer_state": "absent_preserved",
+        "synthetic_outer_exit_success_claim": false,
+        "independent_review_ref": "SDK_consumer_package_independent_review"
+      },
+      "software_candidates": {
+        "status": "eight_selected_candidates_sealed_actual_restored_and_reverified",
+        "exact_profiles": 8,
+        "fresh_network_disabled_firmware_builds": 16,
+        "network": "none",
+        "reproduction": "bit_exact_ELF_BIN_per_profile",
+        "six_scope_operations_seal_store_actual_restore_reverify": "passed",
+        "profiles": [
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/45e1b24f032ea11418c05d6c3dbaccc0e2a63d19bbf2e6d56217c63e188ee39f.tar.gz",
+              "sha256": "45e1b24f032ea11418c05d6c3dbaccc0e2a63d19bbf2e6d56217c63e188ee39f",
+              "size": 43411906
+            },
+            "profile": "h743-baremetal-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/05ce4821b67c715896e89f466395d16d095cc5f6b007584eebc544c227af1649.tar.gz",
+              "sha256": "05ce4821b67c715896e89f466395d16d095cc5f6b007584eebc544c227af1649",
+              "size": 43488751
+            },
+            "profile": "h743-baremetal-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/e4404443ba55c96907e3950a564b9ec5a0a493012d7ea1d0c8ed2133bb94dc39.tar.gz",
+              "sha256": "e4404443ba55c96907e3950a564b9ec5a0a493012d7ea1d0c8ed2133bb94dc39",
+              "size": 43521673
+            },
+            "profile": "h743-freertos-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/787505f5ebbffb61d12f916b31366347d721a7c25f6d8cfb0b0f7c6ef68e4acf.tar.gz",
+              "sha256": "787505f5ebbffb61d12f916b31366347d721a7c25f6d8cfb0b0f7c6ef68e4acf",
+              "size": 43591134
+            },
+            "profile": "h743-freertos-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/5f050da46133163f3b7e160b3f94637b2a5ec07677ae1d84d81a35531209561e.tar.gz",
+              "sha256": "5f050da46133163f3b7e160b3f94637b2a5ec07677ae1d84d81a35531209561e",
+              "size": 43414618
+            },
+            "overlay_free_after": 2774212608,
+            "profile": "u575-baremetal-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/cb6d7f997fdccff45e77ecfe2afc456d81708d6764d8933fefc18e070bdeb181.tar.gz",
+              "sha256": "cb6d7f997fdccff45e77ecfe2afc456d81708d6764d8933fefc18e070bdeb181",
+              "size": 43501725
+            },
+            "overlay_free_after": 2694057984,
+            "profile": "u575-baremetal-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/65d1bce52f2e1ca095b99609852cad0aae6bd90710e581f49a4832387b04c5b1.tar.gz",
+              "sha256": "65d1bce52f2e1ca095b99609852cad0aae6bd90710e581f49a4832387b04c5b1",
+              "size": 43521216
+            },
+            "overlay_free_after": 2613895168,
+            "profile": "u575-freertos-empty",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          },
+          {
+            "candidate_archive": {
+              "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/25e1dbb819722d84ac9ec036e8f5345b135cf026e1428d934fed153cdc758e6a.tar.gz",
+              "sha256": "25e1dbb819722d84ac9ec036e8f5345b135cf026e1428d934fed153cdc758e6a",
+              "size": 43605037
+            },
+            "overlay_free_after": 2533515264,
+            "profile": "u575-freertos-uart",
+            "status": "candidate_passed_actualrestored_reverified_six_expansions_retired"
+          }
+        ],
+        "hil_uart_profiles_prepared": 4,
+        "hil_preparation_state": "prepared_unbound",
+        "physical_status": "not_executed",
+        "signed_product_release": false,
+        "evidence_ref": "profiles_and_strict_P2_docs",
+        "preserved_attempts": "Original VFS preflight0firmwarebuilds, UID configure failure0firmwarebuilds and SDK empty-stdout assembly failure remain historical. Receipt-only empty stdout is expressed using original completed_command_inputs; no invented raw stream."
+      },
+      "strict_documentation_for_P2": {
+        "status": "passed",
+        "source_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+        "source_tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+        "wrapper_exit_code": 0,
+        "actual_operations": [
+          {
+            "name": "strict-bilingual-build",
+            "exit_code": 0
+          },
+          {
+            "name": "official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "verify-official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "restore-official-package",
+            "exit_code": 0
+          },
+          {
+            "name": "verify-restored-documentation",
+            "exit_code": 0
+          }
+        ],
+        "inner_operations": [
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/doxygen.attempts/1793760053360519390-3f91c84175e84f64b892123eea000321/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/gettext.attempts/1793760054431572626-99ee610d9f05440a9523e341d4470d95/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/html-en.attempts/1793760081061001418-8dbcb599cdc34d648bcafaca05288f35/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          },
+          {
+            "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/documentation-attempts/9630a23961a14e0785253ee39926ecd5/html-zh_CN.attempts/1793760131271648245-89dc99692e7d410383da91d449448628/receipt.json",
+            "exit_code": 0,
+            "outcome": "completed"
+          }
+        ],
+        "canonical_source_pages": 132,
+        "reviewed_translation_records": 264,
+        "strict_build_report": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/site/documentation-build.json",
+          "size": 59531,
+          "sha256": "c09aa89a2e5dbc845b6531b7a573f4bff1aea821ac705b77b3cbeb0331f5bf0d"
+        },
+        "official_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/docs/ab532250-clean-strict/packages/software-ab53225033df-20261103.tar.gz",
+          "sha256": "e93c32617695e9a77b53ef38c6f87be504349b6aa25e1593113c192e1b6ac577",
+          "size": 16001721
+        },
+        "actual_restore_and_restored_verify": "passed",
+        "evidence_ref": "profiles_and_strict_P2_docs",
+        "scope": "Exact P2 Doxygen/gettext/English/Chinese build and official package. Not P48f437; not a later D build or deployed website."
+      },
+      "unsigned_bundle_and_public_recovery": {
+        "status": "original_prepare_verify_export_actual_restore_restored_verify_and_public_remote_recovery_passed",
+        "signature_status": "unsigned",
+        "trust": "local_observation_no_oidc",
+        "production_qualification": false,
+        "publication_authorized": false,
+        "files": 6657,
+        "logical_bytes": 433814378,
+        "outer_archive": {
+          "path": "/workspace/nexus/build/recovery-20261103/final-candidates-ab532250/store/ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211.tar.gz",
+          "sha256": "ae5e4437aab2610aa07df6aa0b937fd9940e2d0739150f1dcab3bfbb806d2211",
+          "size": 401386855
+        },
+        "manifest_sha256": "92ae9ebf07069d3a4cd588a94d04d0864d3b323616f35483dfd35adbaee76279",
+        "bundle_ref": "unsigned_local_bundle",
+        "independent_bundle_review_ref": "unsigned_local_bundle_independent_review",
+        "remote": {
+          "repository": "X-Gen-Lab/nexus",
+          "visibility": "public",
+          "branch": "documentation-assets",
+          "commit": "71b4f0e4cc9168e708513fb647b903c4bb39c71e",
+          "tree": "4620bb75d2e7ee7e7766d9634a0ccce309735572",
+          "parent": "d14d093879362d6a1796ee9e0d47f75f793e5135",
+          "namespace": "docs-public-p2-ab532250-20261104",
+          "transport_descriptor_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json",
+          "transport_helper_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/p2_outer_transport.py",
+          "envelope_url": "https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/local-preview.package.json",
+          "descriptor_sha256": "6435d1790e77ab32dfc83516b690d605dd7158543c653d9663c8c7dbe9023e7b",
+          "ordered_parts": 12,
+          "authenticated_raw_readbacks": 17,
+          "historical_members_preserved": 492,
+          "historical_README_prefix_bytes_preserved": 822,
+          "independent_whole_join_and_maintained_store_actual_restore": "passed",
+          "same_original_Native_producer_verify_local_exit": 0,
+          "two_private_bindings_used": 2,
+          "source_clean_and23dependencies": true,
+          "parent_unchanged": true,
+          "no_orphan_intervention": true,
+          "evidence_ref": "remote_recovery_liveverify",
+          "independent_review_ref": "remote_recovery_liveverify_independent_review",
+          "independent_review_status": "passed"
+        },
+        "remote_Native_program_object_byte_recovery": false,
+        "retention_boundary": "The remote outer bundle omits full Native program/object bytes. Original42+4 local stores/fullindexes/priorrefs/aliases retain complete selected recoverable bytes and modes. Remote verify-local actually used the same still-live Native producers; this is not a from-scratch remote Native replay.",
+        "not_claimed": [
+          "signature/OIDC",
+          "product release",
+          "hosted GitHub CI equivalence",
+          "physical HIL",
+          "automatic canonical-path/nanosecond-mtime restore"
+        ],
+        "maintained_bundle_member_navigation": {
+          "entry": "local-release.json",
+          "entry_role": "Original paths, modes, hashes and retained evidence member mapping; use this before interpreting original host locators.",
+          "SDK_envelope": "packages/0.json",
+          "consumer_envelope": "packages/1.json",
+          "candidate_envelopes": "packages/2.json through packages/9.json in original selection order",
+          "SDK_archive": "archives/93ba56043e1d5c9289197e97f3fb1dd268fbfaeae8f031f5dee4b5f09939f5fb.tar.gz",
+          "ENTIREconsumer_archive": "archives/41432dc67b99ec472edb143d4da84051cd8f6b9951f58576d8ee24b2c112e0bd.tar.gz",
+          "documentation_archive": "documentation/e93c32617695e9a77b53ef38c6f87be504349b6aa25e1593113c192e1b6ac577.tar.gz",
+          "retained_evidence_members": "evidence/<original_sha256>.<original_permission_octal> as listed in local-release.json; never guess or rewrite original producer paths."
+        }
+      },
+      "bounded_open_original_exits": {
+        "V_F07": {
+          "status": "partial_bounded_static_review_and_ECC_addendum_only",
+          "refs": [
+            "P2_Flash_static_review",
+            "P2_Flash_static_independent_review",
+            "ECC_addendum",
+            "ECC_inputs",
+            "ECC_independent_review"
+          ],
+          "still_not_assessed": [
+            "G474 stale/sticky first-event ownership disposition",
+            "U575 exact sticky/exception-delivery details",
+            "full ECC recovery contract"
+          ],
+          "demonstrated_C_contract_bug": false
+        },
+        "V_F08_V_F09": "Seven operation-specific vendor-leaf proposal groups remain unresolved/ununimplemented; full159 is not all-HAL/SPL migration. Retain exact mode decisions and only change accepted leaves with genuine TDD and affected requalification.",
+        "V_G02": "GD303 references.json remains not_fully_audited; no adjacent-family inference.",
+        "conditional_no_current_need": [
+          "IT-S06",
+          "IT-X04"
+        ]
+      },
+      "subsequent_actual_results": {
+        "CodeQL": {
+          "status": "P2_CodeQL_QA_Python_review_and_current_E_software_feature_push_complete_D_pending",
+          "verified_official_CLI_version": "2.27.1",
+          "downloaded_verified_inputs_only": false,
+          "actual_results": {
+            "source_P2": {
+              "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d"
+            },
+            "python_P2": {
+              "status": "complete_query_and_all45_concrete_dispositions_recorded_followup_requalification_pending",
+              "query_evaluations": 174,
+              "SARIF_rule_count": 172,
+              "results": 45,
+              "query_exit_code": 0,
+              "disposition_counts": {
+                "reviewed_nondefect_intentional_contract_or_cleanup": 38,
+                "confirmed_test_only_failure_path_defects": 2,
+                "equivalent_nonbehavioral_maintenance_cleanups": 5
+              },
+              "query_completion_ref": "python_query_summary",
+              "all45_dispositions_ref": "python_all45_dispositions",
+              "original_SARIF": {
+                "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python.sarif",
+                "size": 596432,
+                "sha256": "f9c12e0d1d4a33bc1b01eb43e50c5367c4f44973c29dfb4acecc4354ae2814a1"
+              },
+              "original_SARIF_and_results_unchanged": true,
+              "true_defects": "Two test-only unexpected-open failure paths leaked successfully returned PTY descriptors; focused RED/GREEN and permanent regressions completed, normal commit and fresh full Python analysis remain pending.",
+              "retention": {
+                "status": "official_native_bundle_portable_actual_restore_native_unbundle_resolve_passed_then_expanded_DBs_retired",
+                "native_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/native/python-db.zip",
+                  "sha256": "ed9912ec3d7c5907e416a45fd84492db1a44086e4f734362288e57c88d55a3ce",
+                  "size": 157886915
+                },
+                "portable_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/store/c21a55f4c49bf6f265381456657deb16a688d3770208e008953c64b99e861ca7.tar.gz",
+                  "sha256": "c21a55f4c49bf6f265381456657deb16a688d3770208e008953c64b99e861ca7",
+                  "size": 156301560
+                },
+                "portable_files": 300,
+                "portable_logical_bytes": 167652384,
+                "completion_ref": "python_retention_completed",
+                "portable_restore_closure_ref": "python_portable_restore_closure",
+                "actual_restore": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/portable-restored.json",
+                  "sha256": "0058bd80b20623626b46e2451650ee68b94993552ec74b19cbffc25617e9710c",
+                  "size": 268
+                },
+                "recovered_native_unbundle": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/recovered-native-unbundle.attempts/1793767203971889216-a972cad206f84fd4b303cdaf3e16d4cf/receipt.json",
+                  "sha256": "4d078ceea18f65630a0b936d67884b6abccb39836d049c08a1049455f5757f29",
+                  "size": 1769
+                },
+                "recovered_native_resolve": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/recovered-native-resolve.attempts/1793767207002560116-077dbd3639fc4fe68a51627d26987fa0/receipt.json",
+                  "sha256": "9249ad48b24c9f6a211ad8d1160c7fef4d17d8faebba9337ad280bc094f5e2e4",
+                  "size": 1624
+                },
+                "later_original_expanded_retirement_ref": "python_original_expanded_retirement",
+                "later_derived_retirement_ref": "python_derived_retirement",
+                "current_expanded_DB_state": "original working and both unbundled expanded DBs retired; canonical native ZIP and portable archive retained",
+                "early_fields_are_historical_only": [
+                  "completed.json/no_original_expanded_DB_retired=true",
+                  "completed.json/working_copy_and_both_unbundled_DBs_kept=true",
+                  "completed.json/original_DB_and_source_bytes_modes_kept=true"
+                ],
+                "cache_format_boundary": "Official bundle recovers the finalized analysis DB while compacting cache format; no exact replay of every original cache file/name/byte is claimed.",
+                "preserved_restore_failure": "Original hardlink ctime postcheck failure and later unchanged-other-stat/full SHA-mode restore reconciliation remain separate; successful restore APIs were not rerun."
+              }
+            },
+            "cpp_P2": {
+              "status": "complete_P2_CPP183_cross_attempt_composite_fresh_interpret_and_all1234_reviewed_host_followup_gate_pending",
+              "source_scope": "Exact P2 with all23 dependencies and complete maintained Native manual build trace. Original /dev/shm/nexus-codeql-p2/source has since been retired; use the original extraction scope, DB source ZIP and clean/all23 Base P2 crosscheck, not a current-live source-path claim.",
+              "database_create": {
+                "exit_code": 0,
+                "original_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-create.attempts/1793768249874903890-510e18b6bb73493a8aefd93324a60bd0/receipt.json",
+                  "sha256": "887031c0d0fbdf40b447d89fe68e2063000c4b6b9fe41cf146eb6292968a4f70",
+                  "size": 1783
+                },
+                "summary_ref": "cpp_create_summary"
+              },
+              "N09": {
+                "status": "four_real_same_trace_commands_completed_selected_Native_scope_only",
+                "phases": [
+                  {
+                    "name": "configure",
+                    "exit_code": 0,
+                    "duration_seconds": 63.268894987995736,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-configure.attempts/1793768253378946353-f4d000496dce42d6850034cda0331f6d/receipt.json",
+                      "sha256": "c8e4af806cf1056848aa80e1f323fcc2fa5bff71acdd901a49af63c5924a9e5f",
+                      "size": 1344
+                    }
+                  },
+                  {
+                    "name": "build",
+                    "exit_code": 0,
+                    "duration_seconds": 1998.5678938229976,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-build.attempts/1793768318783048201-0ae0db1c7e734728ba3efc87f4c3140f/receipt.json",
+                      "sha256": "ac694b5aea1d0178bb32ccab761a6f268a9ca211a8281dec1f965e30f17c77e3",
+                      "size": 1339
+                    }
+                  },
+                  {
+                    "name": "warm-configure",
+                    "exit_code": 0,
+                    "duration_seconds": 58.80843232099869,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-warm-configure.attempts/1793770319435856517-1d6a4a004e7a4cd38fa247bd41b832c0/receipt.json",
+                      "sha256": "aa30069509263a7a03faf454ad9fb6b9747de0034ceaf592663773b10ae19788",
+                      "size": 1353
+                    }
+                  },
+                  {
+                    "name": "warm-build",
+                    "exit_code": 0,
+                    "duration_seconds": 70.31657571999676,
+                    "original_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-warm-build.attempts/1793770380227350725-08e8f899444845e8af71fdb74a78f1be/receipt.json",
+                      "sha256": "769606aabd5d7a502fc846c4d51fac161dc480890c9957cd16e6f2b5756aeb88",
+                      "size": 1342
+                    }
+                  }
+                ],
+                "phase_ref": "cpp_N09_phases",
+                "compilation_database_records_each_phase": 2642,
+                "all_four_compdb_bytes_identical_sha256": "98859b63c01d6e77f2c6fff9e087275d9511e443950bede7f0909a9265eeb433",
+                "complete_record_context_set_sha256": "a8a9efd9e0d6d5b8abb4337c27a75552463596bc4d97ef6db28761664a6103d0",
+                "ordered_full_argv_context_set_sha256": "f7948e407e286f9fd4fb86bd8acb8037125823cc5c98bd010ea8b159f3a9693f",
+                "warm_actual_compiles": 15,
+                "warm_actual_links": 10,
+                "warm_noop": false,
+                "limits": "Fresh build directory plus same-argv warm configure/build in one inherited trace; no OS-page-cache-cold, causal speedup, new tests, all-MCU, all-F05-invalidation or third-full159 claim."
+              },
+              "original_5400_seconds": {
+                "status": "failed_original_budget_exhausted_without_complete_CPP_query",
+                "budget_passed": false,
+                "first_query_exit_code": 137,
+                "first_query_ref": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze.command.json",
+                  "sha256": "adad3771455712c991444c550e42d8d31a74d3d20b61cf092a87b7ece023fdb5",
+                  "size": 1751
+                },
+                "bounded_retry_exit_code": 124,
+                "bounded_retry_outcome": "timed_out",
+                "bounded_retry_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-retry-resource-bounded.attempts/1793771545957185779-6ea2c141b51e4befa40b8bf92ff437a9/receipt.json",
+                  "sha256": "2cff28195092cb02b28e80b0731afcbb48b7ea2c2e5b50d045bd1edcea1827eb",
+                  "size": 2036
+                },
+                "withdrawal_complete": true,
+                "withdrawal_stable": true,
+                "whole183_complete": false,
+                "complete_CPP_SARIF": null,
+                "summary_ref": "cpp_original_budget_exhausted"
+              },
+              "independent_query_only_2700_seconds": {
+                "status": "failed_timed_out_124_original_attempt_preserved",
+                "budget_seconds": 2700,
+                "actual_command": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+                  "size": 2297,
+                  "sha256": "6573563a4e6f11e412b48c1dee9efbcb741236d9da33ce28d11c2f33faee8112"
+                },
+                "actual_state": null,
+                "complete_CPP_SARIF": null,
+                "findings": null,
+                "per_finding_dispositions": null,
+                "binding_policy": "Earlier running observation remains historical. This attempt actually timed out124 and remains failed; complete composite is recorded only under its own continuation and fresh interpret identities.",
+                "current_resource_repair": "Historical failed supplemental attempt; later composite has independent successful identities.",
+                "owner_reported_database_location": "/dev/shm/nexus-codeql-p2/cpp-db",
+                "database_migration_actual_receipt": null,
+                "command_outcome_at_observation": "running",
+                "command_exit_code_at_observation": null,
+                "command_started_ns": 1793774284949743821,
+                "command_argv": [
+                  "/home/agent/.cache/nexus/analyzers/codeql-2.27.1/cpp/codeql/codeql",
+                  "database",
+                  "analyze",
+                  "/dev/shm/nexus-codeql-p2/cpp-db",
+                  "codeql/cpp-queries@1.9.0:codeql-suites/cpp-security-and-quality.qls",
+                  "--format=sarif-latest",
+                  "--output=/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-full183.sarif",
+                  "--threads=2",
+                  "--ram=4096",
+                  "--rerun",
+                  "--max-disk-cache=768",
+                  "--logdir=/tmp/nexus-codeql-p2/cpp-supplemental-query-tool-logs"
+                ],
+                "deadline_monotonic": 69312.55724172,
+                "controller_pid": 2247060,
+                "query_PGID": 2247204,
+                "expected_complete_queries": 183,
+                "expected_new_SARIF": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-full183.sarif",
+                "final_attempt_receipt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.attempts/1793774284949646444-88e56b85f3e941debb144a41c383b8b4/receipt.json",
+                  "size": 2114,
+                  "sha256": "54da2e275cc0620a61e0274db3dea9dd0bbcfe549a2eab7e2036c3e28b38bc89"
+                },
+                "earlier_running_observation": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+                  "size": 1129,
+                  "sha256": "5d37ef17b3cf4302857602f6749846d544c4ef237eb132da4488d5a53554f2a4"
+                },
+                "final_exit_code": 124,
+                "final_outcome": "timed_out",
+                "withdrawal_complete": true,
+                "withdrawal_stable": true
+              },
+              "resource_repair": {
+                "status": "historical_logs_completely_preserved_in_TMP_duplicate_source_retired",
+                "actual_ref": "cpp_space_repair_actual",
+                "successful_retry_attempt_ref": "cpp_space_repair_successful_retry_attempt",
+                "successful_retry_exit_code": 0,
+                "successful_retry_withdrawal_complete": true,
+                "successful_retry_withdrawal_stable": true,
+                "first_attempt_failed_view_ref": "cpp_space_repair_first_failed_view",
+                "first_attempt_exit_code": 1,
+                "original_source_no_longer_live": true,
+                "original_source_path": "/dev/shm/nexus-codeql-p2/source",
+                "original_DB_log_path_no_longer_live": true,
+                "retained_historical_logs": "/tmp/nexus-codeql-p2/cpp-original-extraction-and-failed-query-logs",
+                "current_database": "/dev/shm/nexus-codeql-p2/cpp-db",
+                "binding": "Resource repair and its successful routine retry do not establish query completion; preserve first failed post-assert attempt and all original OOM/timeout logs."
+              },
+              "approved_semantic_amendment": {
+                "status": "approved_semantics_only_not_an_execution_result",
+                "authority": "Root formal revision communicated by manager; replaces the earlier self-imposed full-rerun-only retry restriction",
+                "fixed_scope": "Same immutable P2 source semantics and identity, finalized dataset, CodeQL CLI2.27.1, full183 fixed queries, libraries and models",
+                "allowed_operation": "Official --no-rerun may complete missing queries, followed by a new complete full-suite interpret; report the resulting complete analysis as cross-attempt composition, not a single fresh183 run",
+                "full_rerun_required": "When target source semantics change, first extract and finalize a database for the new source, then run complete queries; rerun on the old database does not update its source. With unchanged Source/dataset but changed fixed-query/model identities or insufficient reuse evidence, run a complete rerun on that same database. No-rerun reuse requires unchanged Source/dataset/CLI/query/model identities and complete per-query completion evidence.",
+                "per_query_reuse_required": [
+                  "completed query log",
+                  "runinfo",
+                  "complete readable BQRS",
+                  "current input and query identity binding",
+                  "source attempt provenance"
+                ],
+                "missing_per_query_evidence": "Do not reuse that result; recompute the query. A partial or unreadable BQRS never counts as a completed query.",
+                "final_admission": [
+                  "all183 fixed queries map one-to-one with selected completed results",
+                  "no required query missing",
+                  "no timeout warning in the complete selected-result/fresh-interpret admission",
+                  "new full-suite interpret completed and fresh complete SARIF admitted",
+                  "all findings preserved and individually disposed"
+                ],
+                "historical_attempts": "Earlier timeout/cancel/OOM attempts keep their original failed outcomes and raw; approval does not change them to passed",
+                "qualification_claim": "Cross-attempt complete analysis may satisfy only this unchanged input scope after actual final admission; approval itself grants no analysis success"
+              },
+              "approved_continuation_90_minutes": {
+                "status": "full183_composite_query_results_complete_fresh_fullsuite_interpretation_completed",
+                "new_overall_budget_seconds": 5400,
+                "budget_boundary": "A separately authorized new90min continuation budget; original5400 language failure and supplemental2700 attempts retain their own identities/outcomes",
+                "mode": "official_no_rerun_missing_queries_then_fresh_fullsuite_interpret",
+                "required_unchanged_queries": 183,
+                "namespace_receipt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-namespace-recovery1-parent.actual.json",
+                  "size": 2011,
+                  "sha256": "6bc04b8488f0dc11eb26b3703a6eb6680dba5050b7efc85c1b3c7b5dd7e40a60"
+                },
+                "actual_continuation_command": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/run-queries.command.json",
+                  "size": 1932,
+                  "sha256": "95881e0e0eb9b6532d91309085cc21b9cc64829663841702daf1ca0eba05f65d"
+                },
+                "query_attempt_receipts": [
+                  {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/run-queries.attempts/1793782129904642680-61ec2289d9d84ce5b4b808f9178ec07e/receipt.json",
+                    "sha256": "c3e5481b1db0936225dfdd3bd988e2f42168e58288a2190cd2034f4cec5bcd39",
+                    "size": 1728
+                  }
+                ],
+                "per_query_result_bindings": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/complete-183-query-origins.actual.json",
+                  "size": 410811,
+                  "sha256": "028cd9788113409eec65890363290dc9df0c26ec3b62fe6dc37de90b6f0c9723"
+                },
+                "composite_source_attempts": {
+                  "validated_prior_completed_results": 109,
+                  "new_actual_evaluations": 74,
+                  "provenance_ref": "cpp_complete183_query_origins",
+                  "prior_attempts_keep_original_outcomes": true
+                },
+                "fresh_fullsuite_interpret": {
+                  "exit_code": 0,
+                  "original_attempt": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/fresh-fullsuite-interpret.attempts/1793783484816926217-bb17a1985e5847d7bbe801cd8f5efa81/receipt.json",
+                    "sha256": "f47a3b96dcfe2c4e6ceba044cb9195354ee78a2c866adc768a11637815ecbb35",
+                    "size": 1791
+                  },
+                  "command": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/fresh-fullsuite-interpret.command.json",
+                    "sha256": "e15e0051ef4b25f3168c01dc393f58aabae8f39920807bb827c52fd68d4fafbe",
+                    "size": 2009
+                  }
+                },
+                "full183_one_to_one_admission": {
+                  "selected_queries": 183,
+                  "unique_paths_and_IDs": true,
+                  "no_missing_results": true,
+                  "semantic_metadata_packs_models_equal": true,
+                  "proof_ref": "cpp_composite_semantic_projection",
+                  "query_origins_ref": "cpp_complete183_query_origins",
+                  "summary_ref": "cpp_complete_composite_summary"
+                },
+                "complete_CPP_SARIF": {
+                  "path": "/tmp/nexus-codeql-p2/cpp-composite-recovery1-final.sarif",
+                  "sha256": "1bf57a05cba3cf6a99331ad75b8c809501fd6f5e8dad60e403fa74fcabb841d6",
+                  "size": 2611548
+                },
+                "findings": {
+                  "path": "/tmp/nexus-codeql-p2/cpp-composite-findings.actual.json",
+                  "sha256": "d6c28745f74a87fe3140b962d071162d5f8fe9e9eef3050a0eb7acbdcbb86dc4",
+                  "size": 2654612
+                },
+                "per_finding_dispositions": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/all1234-review-coverage-followup-pending.json",
+                  "size": 4373,
+                  "sha256": "99ca82dba9e1089d8a8d82abf8a26cc7c303083262b69202ca452651b14d5492"
+                },
+                "reporting_kind": "cross_attempt_composite_analysis_not_single_fresh183",
+                "execution_result": "complete_cross_attempt_183_analysis_and_1234_review_coverage_separate_host_followup_gate_pending"
+              },
+              "finding_review": {
+                "result_count": 1234,
+                "severity_counts": {
+                  "note": 729,
+                  "warning": 503,
+                  "error": 2
+                },
+                "all_original_results_structurally_unchanged": true,
+                "each_result_reviewed_once": true,
+                "missing": [],
+                "duplicate": [],
+                "coverage_ref": "cpp_all1234_review_coverage",
+                "authored17_documentation_advisories_independent_review_ref": "cpp_Root17_documentation_review",
+                "confirmed_defects": [
+                  959,
+                  1045
+                ],
+                "finding_free": false,
+                "historical_coverage_followup_fields": "The sealed all1234 receipt describes followup status at creation; later RED/GREEN/fork identities below are additive evidence, not a rewrite of that receipt.",
+                "merge_clearance_from_this_review": false
+              },
+              "retention": {
+                "status": "native_bundle_first_roundtrip_portable_actual_restore_recovered_native_unbundle_resolve_completed",
+                "completed_ref": "cpp_native_portable_retention_completed",
+                "native_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/native/cpp-db.zip",
+                  "sha256": "6e32bc403669206d40804a2898a8ebe603497424165d4cab5ca1341f224614ba",
+                  "size": 282379460
+                },
+                "portable_archive": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/store/731acec3d45307ca52f6278beb18dc30b2dedbf79e59fef48f7a9bbcf68e8b4a.tar.gz",
+                  "sha256": "731acec3d45307ca52f6278beb18dc30b2dedbf79e59fef48f7a9bbcf68e8b4a",
+                  "size": 378855766
+                },
+                "portable_files": 6121,
+                "portable_logical_bytes": 1635344986,
+                "all183_BQRS_recovered_from_actual_store_restore": true,
+                "recovered_native_unbundle_and_resolve_exit_codes": [
+                  0,
+                  0
+                ],
+                "derived_recovered_expanded_retired": [
+                  "/tmp/nexus-codeql-p2/cpp-db-unbundled-from-store",
+                  "/tmp/nexus-codeql-p2/cpp-analysis-portable-restored",
+                  "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/portable-input"
+                ],
+                "canonical_Native_TMP_restoration_ref": "cpp_all_temporary_canonical_restoration",
+                "canonical_status": "all_temporary_Native_and_TMP_absences_restored_verified_overlay_copies_retired",
+                "original_source_path_retired": true,
+                "path_state_boundary": "These receipts establish actual recovery and retirement at their recorded times; early live-path fields are not a current-live assertion. Original raw failures, SARIF and findings remain unchanged."
+              }
+            },
+            "test_only_QA_followup": {
+              "status": "normal13_QA_commit_fresh174_Python_all38_review_and_current_E_software_feature_push_complete_D_pending",
+              "base_commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "RED_ref": "FD_actual_RED",
+              "frozen_probe_GREEN_ref": "FD_frozen_probe_GREEN",
+              "permanent_and_normal_serial_GREEN_ref": "FD_permanent_serial_GREEN",
+              "permanent_and_normal_serial_tests": 21,
+              "actual_followup_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+              "actual_followup_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+              "normal_complete_index_hooks": {
+                "status": "passed",
+                "normal_commit_exit_code": 0,
+                "original_commit_attempt": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/commit.attempts/1793787212210725180-2cff092e12c8467f9a4627c511b920b5/receipt.json",
+                  "size": 1544,
+                  "sha256": "44dc93a7edd4af7c6769e1cb9547a5d748be5b94539f14a5c4ddd1134a909360"
+                },
+                "namespace_completion": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/state.json",
+                  "size": 1125,
+                  "sha256": "40df7a815f9a11ada70106878a41108321b3d8851a42bdf39835e8d82056b35c"
+                },
+                "google_programs": 420,
+                "google_cases": 7342,
+                "tool_cases_four_ordinary_domains": 3968,
+                "failures": 0,
+                "errors": 0,
+                "skips": 0,
+                "final_summary_ref": "QA_normal_commit_and_exact_remote_readback"
+              },
+              "fresh_full_Python174_result": {
+                "status": "complete174_create_analyze_zero_and_all38_existing_dispositions_uniquely_mapped",
+                "source_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+                "source_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+                "source_clean_and_unchanged": true,
+                "complete_queries": 174,
+                "execution_ref": "QA_Python174_actual",
+                "actual_commands": [
+                  {
+                    "command": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create.command.json",
+                      "size": 1898,
+                      "sha256": "c1d79b75df9e825d701097853db11d5c28f56e1d4d4d79878428e1c614736182"
+                    },
+                    "immutable_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create.attempts/1793790199739863079-8127939e69204bcb99219a9bfd64a62b/receipt.json",
+                      "size": 1714,
+                      "sha256": "b873ee74e1945d2696f9d500e85be00281f93943262b249942238228990817a4"
+                    },
+                    "exit_code": 0,
+                    "duration_seconds": 36.224848095997004
+                  },
+                  {
+                    "command": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-analyze.command.json",
+                      "size": 1934,
+                      "sha256": "3165187d5f679590a9416e4dc4f3036d4bec1f69daa22fa07d87257fe40cbc57"
+                    },
+                    "immutable_attempt": {
+                      "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-analyze.attempts/1793790235975954880-4a98edd74fd748b0af2cf1c9a48bd523/receipt.json",
+                      "size": 1749,
+                      "sha256": "317b25d0d6d355eab63e6bdbaaa3fabbd4e6cdb5e1af07c6f1f090920f145a04"
+                    },
+                    "exit_code": 0,
+                    "duration_seconds": 96.86840282200137
+                  }
+                ],
+                "SARIF": {
+                  "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python.sarif",
+                  "sha256": "bb44c9f1d576f4cf21f3f2c1f19d19190f9b18e16d7a715c07b25d188a86394a",
+                  "size": 592992
+                },
+                "findings": 38,
+                "effective_severity": {
+                  "error": 2,
+                  "note": 30,
+                  "warning": 6
+                },
+                "severity_correction_ref": "QA_Python38_severity_correction",
+                "per_result_mapping_ref": "QA_Python_old45_to_new38_mapping",
+                "matched_old_to_new": 38,
+                "new_unmatched_results": 0,
+                "ambiguous_matches": 0,
+                "removed_old_result_indices": [
+                  17,
+                  22,
+                  24,
+                  41,
+                  42,
+                  43,
+                  44
+                ],
+                "removed_confirmed_FD_defects": [
+                  41,
+                  42
+                ],
+                "removed_equivalent_cleanup_indices": [
+                  17,
+                  22,
+                  24,
+                  43,
+                  44
+                ],
+                "survivors_with_unchanged_source_blob": 36,
+                "changed_file_survivors_independently_reread": {
+                  "14": 14,
+                  "25": 22
+                },
+                "existing_nondefect_dispositions_reusable": true,
+                "raw_error_findings": {
+                  "count": 2,
+                  "rule": "py/uninitialized-local-variable",
+                  "disposition": "Unchanged correlated-control-flow false positives with unchanged source blobs; authoritative Root review reused by exact identity. Raw severity stays error.",
+                  "Root_review_ref": "QA_Python_two_error_Root_review"
+                },
+                "finding_free": false,
+                "original_main_reporting_correction": "Original main record defaulted all missing result.level to warning. Additive correction inherits matching rule defaultConfiguration.level: 30note/6warning/2error; original main/SARIF/attempt bytes unchanged.",
+                "retention_boundary": "This binds actual scan and per-result mapping only; do not infer a later QA DB archival/restore operation from P2 DB recovery."
+              },
+              "expected_parent": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+              "expected_committed_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+              "prepared_followup_config": "build/recovery-20261103/codeql-p2/fd-leak-tdd/python-followup.config.pending.json",
+              "qualification_boundary": "QA706ee80 has its own normal complete-index gate and fresh complete174 Python analysis with38 reviewed surviving findings. Private E=f59debf pins P2 and has independently completed approved software integration aggregates. Actual D remains a separate obligation. Firmware, CPP production analysis, SDK, eight candidates and both full159 runs retain exact P2 identities; this round did not run a third159.",
+              "earlier_five_file_reviewed_tree": "c7a3e06fd48d4f7401fb2d33a39272616ca96543",
+              "earlier_five_file_count": 5,
+              "earlier_five_file_source_files": [
+                "cmake/package/verify_consumers.py",
+                "tools/testing/test_dev_serial_rates.py",
+                "tools/testing/test_entropy_target.py",
+                "tools/testing/test_mbedtls_lock.py",
+                "tools/testing/test_mqtt_tls_interop.py"
+              ],
+              "changed_path_count": 13,
+              "source_paths": [
+                "cmake/package/verify_consumers.py",
+                "dependencies/googletest.lock.json",
+                "ext/googletest",
+                "tests/google/network_lwip_test.cpp",
+                "tools/maintenance/dependency_proposals.py",
+                "tools/maintenance/googletest_lock.py",
+                "tools/testing/README.md",
+                "tools/testing/test_dependency_proposals.py",
+                "tools/testing/test_dev_serial_rates.py",
+                "tools/testing/test_entropy_target.py",
+                "tools/testing/test_googletest_submodule.py",
+                "tools/testing/test_mbedtls_lock.py",
+                "tools/testing/test_mqtt_tls_interop.py"
+              ],
+              "confirmed_CPP_host_fixes": [
+                {
+                  "result_index": 959,
+                  "scope": "GoogleTest POSIX RE latent copy-assignment ownership",
+                  "RED_ref": "RE_actual_RED",
+                  "same_frozen_probe_GREEN_ref": "RE_frozen_probe_GREEN",
+                  "normal_fork_commit_push_readback_ref": "RE_normal_fork_commit_push_readback",
+                  "upstream_selftests_ref": "RE_full_upstream_selftests",
+                  "upstream_registered_tests": 63,
+                  "upstream_failed": 0,
+                  "upstream_skipped": 0,
+                  "official_upstream_version": "1.16.0",
+                  "official_upstream_commit": "6910c9d9165801d8827d628cb72eb7ea9dd538c5",
+                  "selected_org_patch_commit": "58ec32c09ed8a099e55cbdab9418597c4fd9b14f",
+                  "current_Nexus_assignment_trigger_demonstrated": false
+                },
+                {
+                  "result_index": 1045,
+                  "scope": "lwIP test fixture fatal assertion cleanup for UDP PCB/TCP PCB/pbuf and Arena owned packets",
+                  "RED_ref": "lwIP_actual_RED",
+                  "same_frozen_probe_GREEN_ref": "lwIP_frozen_probe_and_full_module_GREEN",
+                  "failure_modes": 5,
+                  "each_original_case_still_fatal_failures": 1,
+                  "each_injection_count": 1,
+                  "GREEN_UDP_TCP_pbuf_residual_counts": 0,
+                  "normal_unwrapped_module_tests": 24,
+                  "normal_unwrapped_module_failures": 0,
+                  "normal_unwrapped_module_skipped": 0,
+                  "causal_isolation_dependency": "unchanged P2 official6910 headers and libraries; final normal QA separately uses selected58ec"
+                }
+              ],
+              "machine_provenance_fix": {
+                "scope": "Keep official upstream6910 distinct from selected org patch58ec in lock admission and inventory",
+                "RED_ref": "GTest_provenance_actual_RED",
+                "GREEN_ref": "GTest_provenance_actual_GREEN",
+                "RED_exit_code": 1,
+                "GREEN_exit_code": 0,
+                "GREEN_tests": 19
+              },
+              "normal_complete_index_hook_observation": {
+                "status": "completed_with_actual_normal_commit",
+                "admission_ref": "normal13_retry1_admission",
+                "staged_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2",
+                "changed_paths": 13,
+                "selected_GTest_gitlink": "58ec32c09ed8a099e55cbdab9418597c4fd9b14f",
+                "final_hook_result": {
+                  "status": "passed",
+                  "normal_commit_exit_code": 0,
+                  "original_commit_attempt": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/commit.attempts/1793787212210725180-2cff092e12c8467f9a4627c511b920b5/receipt.json",
+                    "size": 1544,
+                    "sha256": "44dc93a7edd4af7c6769e1cb9547a5d748be5b94539f14a5c4ddd1134a909360"
+                  },
+                  "namespace_completion": {
+                    "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/state.json",
+                    "size": 1125,
+                    "sha256": "40df7a815f9a11ada70106878a41108321b3d8851a42bdf39835e8d82056b35c"
+                  },
+                  "google_programs": 420,
+                  "google_cases": 7342,
+                  "tool_cases_four_ordinary_domains": 3968,
+                  "failures": 0,
+                  "errors": 0,
+                  "skips": 0,
+                  "final_summary_ref": "QA_normal_commit_and_exact_remote_readback"
+                },
+                "normal_commit": "706ee80b12a653a1820685c530b21e9668d82064",
+                "observation_policy": "Admission is historical; actual completed normal commit receipt and namespace completion bind the final outcome."
+              },
+              "prepared_followup_config_binding": "Actual QA706ee80/tree5c39 was extracted into its independently frozen source and a fresh Python database, then all174 queries were evaluated. Earlier five-file c7a preparation is historical.",
+              "actual_E_result": {
+                "status": "completed_approved_public_software_aggregate",
+                "result_pointer": "/source_version_records_20261103/final_public_source_P2_ab532250/subsequent_actual_results/private_current_E",
+                "public_safe_summary": {
+                  "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/E-public-safe-summary.json",
+                  "size": 1195,
+                  "sha256": "7bf5397859d9a8a29d58dca42046bd303adf19f1b81fee360c57609c07fbdadd"
+                },
+                "qualification_boundary": "Private application raw and payloads remain private. E pins P2; it does not relabel P2 firmware evidence as QA706 or D."
+              },
+              "actual_D_result": null,
+              "actual_nonforce_push_exact_readback": {
+                "status": "completed",
+                "summary_ref": "QA_normal_commit_and_exact_remote_readback"
+              },
+              "earlier_five_file_source_review_ref": "five_file_independent_review",
+              "admitted_final_staged_tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2"
+            }
+          },
+          "hosted_service_association": "not_inferred",
+          "aggregate_closed": false,
+          "evidence": {
+            "python_query_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-query-release.summary.json",
+              "size": 4743,
+              "sha256": "2553eb806505dcb49252f6285efef5543b31fab877cd0446bba80a2331e4631e"
+            },
+            "python_all45_dispositions": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-triage/all45-dispositions-followup-pending.json",
+              "size": 94701,
+              "sha256": "e18db9404d71a59799f8aa10ae928d9d8628b07f41ce4c7c8c3139ca421c723a"
+            },
+            "python_retention_completed": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/completed.json",
+              "size": 6386,
+              "sha256": "2367fc672bd0bf2842be5b51e5b513d9d897aed57eb9d00db342169b3b51532c"
+            },
+            "python_portable_restore_closure": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/portable-restore-closed.json",
+              "size": 1629,
+              "sha256": "d5a2a3db4e03f79002c1a37f74f63e5a842ba76408502e55f8612382db5d0c5e"
+            },
+            "python_original_expanded_retirement": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/original-expanded-db-retirement-format-fixed.command.json",
+              "size": 1813,
+              "sha256": "c22a8f349c8f6ec422ddaae52c6a3fb80a9b86513b84f1d1ce44141fdb1effb3"
+            },
+            "python_derived_retirement": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-python-retention-20261104/authorized-derived-retirement.json",
+              "size": 32537,
+              "sha256": "c6f120e5df2a415f37f20f068c3b48eed30e0a1a5d891a87e1cdd7631b362b65"
+            },
+            "cpp_create_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-create-release.summary.json",
+              "size": 10531,
+              "sha256": "91be836b78d8379786ed15e79d3cd378e800f8cba1f9b9e359f1c76e8f1d3140"
+            },
+            "cpp_N09_phases": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-trace-phases.N09.json",
+              "size": 16281,
+              "sha256": "b7a5a2ab1756a58585b3b2a34f705ad0c2137c72a0915e07421c4be93cde7ff0"
+            },
+            "cpp_original_budget_exhausted": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-original-language-budget-exhausted.json",
+              "size": 2492,
+              "sha256": "bb5b8672f81740b588f23f42d11598fcf31114693039de444fd86a38e6a43593"
+            },
+            "five_file_independent_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/root-final-five-files-independent-review.json",
+              "size": 3811,
+              "sha256": "02feecb1f25cc4de7c6a4439c805981cdc2f296645c020debab054e492e4b235"
+            },
+            "FD_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/actual-RED-handoff.json",
+              "size": 4820,
+              "sha256": "a3810bad02544fb54f984b9285db6ae9dfa6c5d3d66ce30c2fea27aef711dafa"
+            },
+            "FD_frozen_probe_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/GREEN-refactor-frozen-probe.command.json",
+              "size": 1750,
+              "sha256": "c58bda8cba94510f808d3ef104ae1ca7de8ee7b9b969ccaf44122836c16ee9b4"
+            },
+            "FD_permanent_serial_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/GREEN-permanent-and-normal-serial.command.json",
+              "size": 1644,
+              "sha256": "44a0bed3ff6b34e5a06b3ffc41dac06e1dba74c0f73f502f52ec1a49401aadb7"
+            },
+            "cpp_space_repair_first_failed_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair.command.json",
+              "size": 1617,
+              "sha256": "5985dc64bff0f3995483ac6ece37cd4cf27834c97221ab67f394e451212ad13a"
+            },
+            "cpp_space_repair_successful_retry_attempt": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair-retry1.attempts/1793774199694342416-d43f4cd12b714a859f7aea0e68852978/receipt.json",
+              "size": 1463,
+              "sha256": "ff8f0a9cf1f86852b85e96aa46dfd8d786e6e3976bf5a5cc7d3692c7ecb911d3"
+            },
+            "cpp_space_repair_successful_retry_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair-retry1.command.json",
+              "size": 1650,
+              "sha256": "cb22e1e6d915fdf4c0c6bff6ed7537a47522a701af97c2c0d8e569adf9f75aa1"
+            },
+            "cpp_space_repair_actual": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-supplemental-space-repair.actual.json",
+              "size": 1975233,
+              "sha256": "3788657eb2c33e6f765b5f4fe666a3e3a2a6fecb97925843f8cefb8c1a59b6de"
+            },
+            "cpp_complete_composite_summary": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-composite-query-release.summary.json",
+              "size": 2493,
+              "sha256": "7654f3a8d5e8e62e7e036c14fc6cd85ae4158802e21e63709ff7e22069463def"
+            },
+            "cpp_composite_budget": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/budget.actual.json",
+              "size": 2782,
+              "sha256": "6f82b8dedd867560fc9ef199bf15d44c3b81c0dc94896f76d8ae098238be2ae8"
+            },
+            "cpp_composite_semantic_projection": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/completed-semantic-projection.actual.json",
+              "size": 973,
+              "sha256": "dfb53fe9d293df3563dfde2de72fb72e6d1eb1802df376d68022c40711dca334"
+            },
+            "cpp_complete183_query_origins": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-cache-control-recovery1/complete-183-query-origins.actual.json",
+              "size": 410811,
+              "sha256": "028cd9788113409eec65890363290dc9df0c26ec3b62fe6dc37de90b6f0c9723"
+            },
+            "cpp_all1234_review_coverage": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/all1234-review-coverage-followup-pending.json",
+              "size": 4373,
+              "sha256": "99ca82dba9e1089d8a8d82abf8a26cc7c303083262b69202ca452651b14d5492"
+            },
+            "cpp_Root17_documentation_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-triage/root-17-documentation-advisories.readonly.json",
+              "size": 14183,
+              "sha256": "e7ab2e7543cc3366ef3cb48bc538b84b0485e4139f607522c50c3e4fffa6029b"
+            },
+            "cpp_native_portable_retention_completed": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2-cpp-retention-20261104/completed.json",
+              "size": 41580,
+              "sha256": "eed0a3f14dc83387a9ada9d1d498de2e2702a09747df9a422cae281239f0f1e5"
+            },
+            "cpp_all_temporary_canonical_restoration": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/all-temporary-canonical-restoration.actual.json",
+              "size": 4248,
+              "sha256": "b639edf22120698ee26a10feb09ea98f2e67564211f504a924320a5def4b696e"
+            },
+            "cpp_composite_namespace": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/composite-private-namespace-recovery1-parent.actual.json",
+              "size": 2011,
+              "sha256": "6bc04b8488f0dc11eb26b3703a6eb6680dba5050b7efc85c1b3c7b5dd7e40a60"
+            },
+            "RE_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/red-retry1/handoff.json",
+              "size": 10796,
+              "sha256": "dfb0a5f5c2031ca18143caca10ba84fc6506d858d4ea6478e36acb395e491ea9"
+            },
+            "RE_frozen_probe_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/green/handoff.json",
+              "size": 10607,
+              "sha256": "99b98a2edf17c258ac800fcf43624eeb695c6046ffbd3281b226951a579df2ae"
+            },
+            "RE_full_upstream_selftests": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/upstream-all-tests-control-v1/handoff.json",
+              "size": 12819,
+              "sha256": "07b105f447c4a468704256004a2bcc6743450f3403b7a195b9c1ede63cac4404"
+            },
+            "RE_normal_fork_commit_push_readback": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-re-copy-assignment-tdd/fork-normal-commit-and-push-20261104/completed.json",
+              "size": 1655,
+              "sha256": "1cb89ea2e3315f6f1bbc498c6d64d8229f4a01ac4fc5cb130ca1e4efdf712c60"
+            },
+            "lwIP_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/lwip-fixture-cleanup-tdd/RED-actual-20261104/actual-RED-handoff.json",
+              "size": 7877,
+              "sha256": "b56a535bbcf2c4d311ae812bc5c50e9e3cfb2cbf4d6647de614b9cf0a6471b6d"
+            },
+            "lwIP_frozen_probe_and_full_module_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/lwip-fixture-cleanup-tdd/GREEN-actual-20261104/GREEN-completion-handoff.json",
+              "size": 22103,
+              "sha256": "991bb14861852197ab64cfa67d11615ff3c5cb78f3560980276eeccf2ec1a050"
+            },
+            "GTest_provenance_actual_RED": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-machine-provenance-tdd/RED-actual-20261104/handoff.json",
+              "size": 3440,
+              "sha256": "295edcbf13231212868fabf808da41a49136dda9f83b5408bed106a74b7b16ee"
+            },
+            "GTest_provenance_actual_GREEN": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/gtest-machine-provenance-tdd/GREEN-actual-20261104/result.json",
+              "size": 2460,
+              "sha256": "3f86c0a421693f230bdeabd68cdc3322396d26825708dfc08cf4dbdeec8d7065"
+            },
+            "normal13_retry1_admission": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/normal-resource-ownership-private-namespace-retry1-control-20261104/admission.json",
+              "size": 5957,
+              "sha256": "1604e76cd90245fb5fb64227e8f1c0e8791d70f65d6de7082999c761ece7966b"
+            },
+            "cpp_supplemental2700_final_view": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/cpp-analyze-supplemental-full183.command.json",
+              "size": 2297,
+              "sha256": "6573563a4e6f11e412b48c1dee9efbcb741236d9da33ce28d11c2f33faee8112"
+            },
+            "QA_normal_commit_and_exact_remote_readback": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/fd-leak-tdd/actual-QA-commit-push-20261104/completed.json",
+              "size": 1482,
+              "sha256": "d9c78f5c539b455d1a0d7ee5d8de3bae9ef871d117acd42eae6ccfb94693834e"
+            },
+            "QA_Python174_actual": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-create-analyze.actual.json",
+              "size": 10456,
+              "sha256": "c4dd86302df8e48c4f6ed0a3deb12dad42a387fd0d920020d6c0d186f6d60603"
+            },
+            "QA_Python38_severity_correction": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-findings-severity-scope-correction.actual.json",
+              "size": 2896,
+              "sha256": "a7ac8ff84a2d6bb5f2953ec83b7cfddfc61283977b5dd9d2ba9a2bdce1ef3fdc"
+            },
+            "QA_Python_old45_to_new38_mapping": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python-old45-to-new38.readonly.json",
+              "size": 127462,
+              "sha256": "092de5633dc76b2e49b4ee6170595e7632f13508e8b9084be7c81f5d81d1e4b0"
+            },
+            "QA_Python_two_error_Root_review": {
+              "path": "/workspace/nexus/build/recovery-20261103/codeql-p2/python-triage/root-two-errors-independent.readonly.json",
+              "size": 4481,
+              "sha256": "8df4ee7594489e9b7aa4512ad525b039af1eaadd0acbd75b3ad677f9046b023f"
+            }
+          }
+        },
+        "private_current_E": {
+          "status": "actual_software_integration_public_SDK_walk_and_private_feature_push_exact_readback_completed",
+          "previous_approved_private_commit": "ff86eb49410197d7be6760842f78ec7a17c94932",
+          "previous_platform_pin": "6c3a380a99336a5a7809b4a862449228c6365544",
+          "actual_approved_public_metadata": {
+            "all_software_failures_errors_skips": 0,
+            "complete_presets": 17,
+            "installed_CTest": 2,
+            "installed_broker_private_C_cases": 5,
+            "native_CTest": 28,
+            "physical_status": "not_executed",
+            "private_Google_cases": 204,
+            "private_Google_programs": 18,
+            "private_examples_commit": "f59debf1a15913353462e69ba0039db1c010f284",
+            "public_generic_installed_SDK_walk_commands": 12,
+            "public_generic_walk_CTest": 1,
+            "public_pin": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+            "public_tree": "2309ae92e019fac68c6f463cbee205c3726fe73d",
+            "public_walk": {
+              "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/state.json",
+              "sha256": "063b4ebbc30225f47298693be816c129d1fbccbeffad77aa51c0ff078bdebaa6",
+              "size": 4206
+            },
+            "qualification_boundary": "Private application execution artifacts remain private. P2 firmware evidence is not relabelled as QA706 or final docs Source. The broker helper qualification=false is preserved; actual C cases and ownership/cleanup are independently checked.",
+            "source_broker_private_C_cases": 5,
+            "status": "actual_software_integration_and_public_SDK_walk_passed",
+            "usage_recipes_covered_by_current_full_execution": 3
+          },
+          "publication_boundary": "Only approved commit/pin/PR metadata and aggregate results may enter this public index; private raw paths and payloads remain private.",
+          "public_safe_summary": {
+            "path": "/workspace/nexus/build/recovery-20261103/onboarding/finalP2-ab532250/E-public-safe-summary.json",
+            "size": 1195,
+            "sha256": "7bf5397859d9a8a29d58dca42046bd303adf19f1b81fee360c57609c07fbdadd"
+          },
+          "approved_additional_public_aggregates": {
+            "maintained_local_CI_commands": 116,
+            "all_command_exits": 0,
+            "expected_deadline_rejection_result": 4,
+            "expected_missing_client_certificate_result": 6,
+            "expected_rejection_is_failure": false,
+            "SDK_payload_unchanged": true,
+            "origin_unchanged": true
+          },
+          "private_feature_push_and_exact_readback": {
+            "repository_visibility": "private",
+            "authenticated_visibility_confirmed": true,
+            "normal_nonforce_push": true,
+            "exact_feature_head": "f59debf1a15913353462e69ba0039db1c010f284",
+            "exact_ls_remote_readback": "f59debf1a15913353462e69ba0039db1c010f284",
+            "private_main_updated": false,
+            "publication_boundary": "Approved nonprivate aggregate only; private receipt paths and raw are not published."
+          },
+          "original_broker_environment_attempt": "First source-broker attempt failed in the Docker bridge environment and remains failed. Restoring the original docker0 and existing maintained bridge contract enabled actual successful C broker execution; no new Source change was required."
+        },
+        "D_documentation": {
+          "status": "canonical_and_actual_exact_gettext_catalogs_prepared_final_semantic_review_strict_package_restore_pending",
+          "documentation_source": null,
+          "reviewed_catalog_source_identity": null,
+          "qualification_inheritance_from_P2": false,
+          "initial_semantic_review": {
+            "status": "initial_actual_Source_and_changed_catalog_meanings_reviewed_final_differences_POT_and_strict_pending",
+            "receipt": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/root-initial-documentation-semantic-review.readonly.json",
+              "size": 6649,
+              "sha256": "26257562fc5a71922252941e396a5162d973f4e673a111ff1f6cdc3b30c5323d"
+            },
+            "qualification_boundary": "Initial review binds the recorded source and catalogs only; Python/E/finalD differences require subsequent review. Actual POT exact-set, final digest, strict package and restore remain pending."
+          },
+          "actual_gettext_preparation": {
+            "exit_code": 0,
+            "duration_seconds": 10.917027591000078,
+            "original_attempt": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext-after-E-push.attempts/1793792359036483787-b3fadf533e94408ab06021744a2334c2/receipt.json",
+              "size": 1919,
+              "sha256": "974b17ee5688d4e4ee27eed8d8c635c6dbd9dfcc11bc13200ca4ef1e7217111b"
+            },
+            "initial_successful_extraction": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext.command.json",
+              "size": 2120,
+              "sha256": "84d2e50b648ac9b9526706060e31abd2bd6c714733ae1fa9e397707f0f5c6d63"
+            },
+            "final_wording_update_extraction": {
+              "path": "/workspace/nexus/build/recovery-20261103/reconciliation-template/20261104-D-final-preparation/gettext-final-20261104/gettext-after-E-push.command.json",
+              "size": 2156,
+              "sha256": "4a007923cae3ba88625e89a92e88471104ee730233a72cc8ce57f2e0ad01aa27"
+            },
+            "changed_catalogs": 12,
+            "actual_POT_sets_exact": true,
+            "catalogs_nonempty_no_fuzzy": true,
+            "Reviewed": false,
+            "scope": "Preparation only, reusing original P2 Doxygen XML for unchanged public C declarations. No Doxygen/HTML/strictD/package/restore execution or final clean D-source identity is established by this step."
+          }
+        },
+        "website_and_main": {
+          "status": "pending_actual_deployment_deployed_bytes_readback_final_FF_and_postmerge_association",
+          "actual_results": null,
+          "current_observed_main": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+          "old_tags": "v0.2.0/v0.2.1 retain their original identities"
+        },
+        "server_branch_rules": {
+          "status": "last_actual_ruleset_POST_HTTP403_not_configured",
+          "local_policy_is_server_enforcement": false
+        },
+        "Release_asset_upload": {
+          "status": "last_actual_HTTP401_preserved",
+          "public_artifact_append_does_not_rewrite_that_result": true
+        },
+        "physical_hil": "not_executed"
+      },
+      "physical_hil": "not_executed",
+      "counting_policy": "Do not sum overlapping stages/tests/Native modes or promote product/physical qualification.",
+      "evidence_obtainability": "The small handoff/review locators identify original host metadata and must not be advertised as public download URLs. Recover the public outer archive through its pinned descriptor; local-release.json maps retained original evidence identities to exact payload members. Post-bundle completion reviews remain separate small local observations until explicitly published in D."
+    },
+    "remaining_exits_historical_pre_P2_20261103": {
       "V-A01": "Private annex and complete applicable-mode inventory remain open.",
       "V-I03_V-I05_V-I06": "Per-configuration/runtime cost, service/rearm, held-consumer/backpressure and contention comparisons remain open; link budgets are not measured timing or stack high-water.",
       "F01": "Purpose/input/output/failure/cost inventory and explicit disposition of overlapping checks remain open.",
@@ -953,16 +2616,6 @@
       "server_rules_and_remote_analysis": "Use actual current server readbacks and analysis disposition; local policy or ordinary gates do not establish remote enforcement.",
       "physical_hil": "not_executed",
       "new_software_candidate": "not_created"
-    },
-    "current_remote_rule_observation": {
-      "date": "2026-11-03",
-      "branch": "main",
-      "observed_commit": "b1b903da47eda722a6be3e98edced5cfa36221b1",
-      "protected": false,
-      "rulesets": [],
-      "create_ruleset_attempt": "actual_HTTP_403_Resource_not_accessible_by_integration",
-      "raw_location": "build/recovery-20261103/remote-rules",
-      "scope": "No service-side protection was established. Repository permission metadata and local policy do not prove administration capability or configured enforcement."
     }
   }
 }

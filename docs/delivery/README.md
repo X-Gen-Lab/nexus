@@ -9,10 +9,16 @@
 实际 CI、Release 和文档发布见{ref}`0.2.1 预览交付 <sdk-preview-v021>`。
 预览没有建立新的正式软件候选或物理资格。
 
-最新封存的软件候选基线仍是 `7590b2d4`，完整软件计划、八个精确配置候选和恢复
-结果见{ref}`最终冷态生命周期交付 <sealed-cold-lifecycle-baseline>`。
-两种交付保留各自源码、配置和范围；旧结果不因新版本发布而转移资格。
-下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在原交付台账。
+本轮最新选定软件候选固定 P2 `ab532250`，两轮完整159、八候选／16 次 fresh
+断网构建、SDK v15、P2 严格双语包和无签名 outer 公开实际恢复见
+{ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`。独立 QA 后续
+`706ee80` 已通过普通完整索引门禁及完整 Python174 复扫，38 条 finding（含
+2 error）全部唯一对应原已审处置，七条旧 finding 消失且无新增。私有 E `f59debf1` 固定 P2，
+17 presets／116 命令、source／installed 各五个真实 C broker 场景、三个 recipes 及公共
+SDK walk 均实际通过，私有原件保持私有。E 已正常 nonforce push 并精确读回 `f59debf1`，
+仓库保持 private、private main 未更新；后续 D／部署／FF 仍待各自实际结果。历史 `7590b2d4` 及上述预览保持原身份，资格不随
+文档或 QA 提交转移。下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在
+原交付台账。
 
 文档系统的后续整理见 [架构与交付规划](../design/documentation-system.md)。
 对应文档工具、正文和图册已实现，实际文档验收与固件资格分别记录；当前资料总入口为

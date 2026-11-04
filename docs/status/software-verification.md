@@ -12,9 +12,85 @@ source_language: zh_CN
 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map 字节，不能只看 passed。
 资格规则由 [资格合同](../delivery/qualification.md)维护。
 
-## 当前开发基线与恢复进度
+(p2-unsigned-software-ab532250)=
+## 当前 P2 无签名软件交付与独立 QA 后续
 
-当前已接受的公共开发源码为 `eb4aba660df27b6ecedf52fcb13dc1c95652ca0d`，
+本轮软件资格固定公共源码 `ab53225033dfb759e93c90beb6301a3048bbcfda`，tree
+`2309ae92e019fac68c6f463cbee205c3726fe73d`，23 个公共依赖 clean。普通完整索引
+门禁实际通过 420 个 Google 程序、7342 个用例和四个工具域合计 3964 个用例，
+零失败、错误或跳过。两次独立完整 159 阶段计划均实际通过；每种 Native 模式各
+420 程序／7342 用例／440 项 CTest，四模式计数不相加。tidy、cppcheck 各保留
+1193 个编译上下文／1303 个自有 TU，实际返回 0。
+
+SDK v15 的 64 个 root／67 个镜像／270 条命令及独立验证通过。H743／U575 ×
+baremetal／FreeRTOS × empty／UART 的 8 个候选完成 16 次 fresh 断网构建，
+各对 ELF／BIN 逐字节一致，seal、实际恢复和恢复后复核通过。四个 UART 的 HIL
+仅为 `prepared_unbound`。精确 P2 严格文档完成 132 个 canonical 页面、264 条
+reviewed 记录，Doxygen／gettext／EN／ZH、官方包及实际恢复复核均通过。
+
+同 P2、工具和环境的完整计划比较保留每阶段原始成本与失败诊断。baseline／repeat
+的阶段耗时累计分别为 6742.878869825／6387.338375682 秒，attempt interval-union
+分别为 6742.710856041／6387.179537077 秒；它们是不同口径。最大观测进程 RSS
+为 730820608／730624000 B，不能当作并发进程树峰值。缓存复用和存储迁位使本轮
+比较属于 observational，`fresh_cold` 与 `controlled_causal_speedup` 均为 false。
+F01 的 157 项同名检查及两个新增工具域、三个仅退休注册的原用例映射均保留。
+N09 另有同一 CodeQL trace 内实际 fresh build directory configure/build 与 warm
+configure/build，四份 compilation database 的 2642 条记录相同，warm 实际执行
+15 次 compile／10 次 link；这不关闭其他 MCU、CLI 或 F05 的独立退出条件。
+
+无签名公开交付从[固定的 12 片传输描述](https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json)
+取得。它绑定 401386855 B 的 outer archive；已独立 join、实际恢复 6657 个文件／
+433814378 B，恢复当时，由同一 producer 及当时仍存活的资格产物执行 `verify-local` 通过。
+先读恢复后的 `local-release.json` 查 archive/member 和原证据身份。远端包不含
+全部 Native binary／object；42＋4 个本地 stores／fullindexes 保留完整可恢复
+bytes／mode，不声明远端 Native 字节重建或自动重放原路径／nsmtime。
+它为 `unsigned`、`local_observation_no_oidc`，未建立产品 Release、签名、hosted CI
+或实板资格。
+
+P2 Python 实际完成 174 个 query、45 条 finding 逐项处置。C++ 完成同一不可变
+输入的跨 attempt 组合分析：109 项经完整解码验证的既有结果与 74 项实际补算，
+随后 fresh full-suite interpret 返回 0；183 个 query 一一覆盖，1234 条原 finding
+均逐项审查，无缺漏或重复。这不是单次 fresh 183，也不是零缺陷结果。原 OOM、
+timeout 和取消尝试保留失败；Python／C++ DB 的 native 与 portable 实际恢复、
+派生展开退休及临时 Native／TMP 回填分别保留收条，早期 live 字段不作当前存活声明。
+
+真实发现的 Python FD 失败路径、GoogleTest `RE` 复制赋值及 lwIP fixture fatal
+assertion 清理问题均有实际 RED／GREEN。机器依赖清单还修复了 official upstream
+base 与 selected organization patch 的混淆。独立 QA 后续提交为
+`706ee80b12a653a1820685c530b21e9668d82064`，tree
+`5c39d9cfce75ed33354a13e1329c6e668b0463d2`；13-path 普通完整索引门禁通过
+420 个 Google 程序／7342 个用例和 3968 个工具用例，零失败、错误或跳过。
+其 GoogleTest pin 为官方 1.16.0 基线 `6910c9d9` 上的组织补丁 `58ec32c0`。
+该新 SHA 已重新提取 Python DB 并实际完成全部 174 个 query：create／analyze
+分别为 36.224848／96.868403 秒，均返回 0。38 条 finding 为 30 note／6 warning／
+2 error；七条旧 finding 消失，其中两条为真实 FD 失败路径修复、五条为等价清理，
+无新增或歧义匹配。剩余38条唯一对应原已审处置：其中36项所在源码的 blob 未变，两条变更文件
+中的 survivor 已独立重读；两条 error 仍保留原严重度及准确源码身份的 Root 误报处置，
+不称为零 error／零 finding。固件、C++ 分析、SDK、8 个候选和两次完整159保留 P2
+身份，不转移资格；本轮未重跑第三次159。
+
+当前私有 E 固定 `f59debf1a15913353462e69ba0039db1c010f284`，平台 pin 为 P2
+`ab532250`。完整 17 presets／116 条维护 CI 命令均返回 0，Native 为 28 项 CTest／
+18 个 Google 程序／204 用例，installed 为 2 项 CTest；各域不相加。source 与
+installed 各五个真实 C broker 场景通过，deadline 的 exit code 4、缺 client certificate
+的 exit code 6 均为预期拒绝，join／release／cleanup 实际闭合。三个 usage recipes 由本次
+完整执行覆盖；公共安装版 SDK walk 完成 12 条命令及 1 项 CTest，SDK payload 与
+origin 均未变。私有应用源码、payload 与原始日志保持私有，仅公开批准的聚合数据；
+broker helper 的 `qualification=false` 保留，真实 C 用例与所有权清理另行核验。
+首次 source broker 的 Docker bridge 环境失败保留，恢复原 docker0 后原维护 bridge
+合同实际通过；不改写首失败。E 已在认证确认仓库为 private 后，正常 nonforce push 并精确读回同一 `f59debf1`；
+private main 未更新，物理仍未执行。
+
+后续 D 的独立双语审查／严格文档包／恢复、真实部署读回和最终 FF 仍须分别绑定
+实际文档源码。服务端规则的原 403、Release 上传的原 401 均保留。物理 42 项仍为
+`not_executed`；Flash／ECC event-owner／sticky 边界、七组 vendor-leaf 提案和 GD303
+引用审查不因本轮软件通过而关闭。完整数据与取得边界见
+[同一结果索引](../delivery/platform-delivery-completion-results.json)的
+`source_version_records_20261103.final_public_source_P2_ab532250`。
+
+## 历史 eb4 开发记录与恢复进度
+
+该历史阶段接受的公共开发源码为 `eb4aba660df27b6ecedf52fcb13dc1c95652ca0d`，
 tree 为 `7586629e789ab5e7cb12cff8609694c04d684a09`。其普通完整索引 Native
 Debug 门禁实际通过 420 个 Google 程序、7335 个用例和 3950 个工具用例，
 零失败或跳过。I/O 性质报告记录 233 条有界执行性质，并另列 8 条 unproven；
@@ -47,11 +123,11 @@ resolver RED→145 项 GREEN 保留原开发范围，不替代当前源码的实
 五个真实 broker 场景，均零失败或跳过。该私有范围与公共 `eb4aba66`／v15 分开。
 早期 peer 11、main 4、broker 5 和 24 个文件 style 检查保留原源码范围，不与
 新执行相加。公开平台仅记录聚合与提交／PR 元数据，私有源码、payload 路径、
-receipt 和归档保持私有；当前 PR 24 仍为 draft。
+receipt 和归档保持私有；当时 PR 24 仍为 draft。
 
-历史 `v0.2.1` 与 `7590b2d4` 的原执行不变。当前完整计划、fresh 离线复现、
-OCI／新 daemon、服务端规则、当前扫描处置和 HIL 仍按原退出独立验收；全部物理
-状态继续为 `not_executed`，没有新的固件候选。
+本节 `eb4aba66` 历史记录当时没有完整计划、fresh 离线复现或新的固件候选。
+`v0.2.1` 与 `7590b2d4` 的原执行不变；后来的 P2 资格与 QA 后续见上方当前节，
+服务端规则和 HIL 仍按各自原退出独立验收。
 
 (sdk-preview-v021)=
 ## 0.2.1 软件预览：b1b903da

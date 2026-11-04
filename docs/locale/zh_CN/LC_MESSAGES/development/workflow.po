@@ -1,4 +1,4 @@
-# Independently reviewed translations; exact canonical source identity below.
+# Prepared changed messages; independent semantic review and actual gettext admission pending.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 92b2768858bcffa19e1f36393d69023c5a2cf540edda6e5b5c2009f2434feb44\n"
+"X-Nexus-Source-SHA256: e76377ca9a2a191a3cc63e943a8ebab4399b02995b4fa5688bcd62f8bcfc63e3\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
@@ -48,17 +48,6 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:30
 msgid "Prepare the pinned host test framework"
 msgstr "准备锁定的主机测试框架"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:32
-msgid ""
-"GoogleTest and GoogleMock are the Git submodule `ext/googletest`, pinned to "
-"version 1.16.0 and commit `6910c9d9165801d8827d628cb72eb7ea9dd538c5`. The "
-"recursive checkout above includes it. For an existing checkout, prepare the "
-"Native dependency scope explicitly before running tests:"
-msgstr ""
-"GoogleTest 与 GoogleMock 通过 Git 子模块 `ext/googletest` 引入，锁定版本 1.16.0 和 commit "
-"`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。上面的递归检出已包含它。已有检出应在运行测试前显式准备 "
-"Native 依赖范围："
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:41
 msgid ""
@@ -296,3 +285,6 @@ msgid ""
 msgstr ""
 "每次使用 Conventional Commits 提交一个可评审变更。将接口／配置变化与图示、示例、翻译和执行范围一起评审。产品、执行任务、私有 "
 "PCB 和恢复策略保留在 Nexus 外。记录实际源码／配置／工具／ELF 身份与物理待执行项；成功 commit 或 CI 不将结果升级为产品发行。"
+
+msgid "GoogleTest and GoogleMock are provided by the Git submodule `ext/googletest`. The lock records official version 1.16.0 at upstream base `6910c9d9165801d8827d628cb72eb7ea9dd538c5`; the Gitlink and selected lock commit pin organization patch `58ec32c09ed8a099e55cbdab9418597c4fd9b14f` on that base, including the host-test `RE` copy-assignment ownership fix. Dependency inventory records the official upstream base and the selected patch separately. The recursive checkout above includes it. For an existing checkout, prepare the Native dependency scope explicitly before running tests:"
+msgstr "GoogleTest 和 GoogleMock 由 Git 子模块 `ext/googletest` 提供。锁文件记录官方 1.16.0 的 upstream 基线 `6910c9d9165801d8827d628cb72eb7ea9dd538c5`；Gitlink 与锁文件所选 commit 固定该基线上的组织补丁 `58ec32c09ed8a099e55cbdab9418597c4fd9b14f`，其中包含 host 测试框架 `RE` 复制赋值的所有权修复。依赖清单分别记录官方 upstream 基线与所选补丁。 上面的递归 checkout 包含该子模块。对于已有 checkout，请在运行测试前显式准备 Native 依赖范围："

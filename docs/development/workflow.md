@@ -29,8 +29,7 @@ files. Preserve unstaged work and actual failure diagnostics; never bypass hooks
 
 ## Prepare the pinned host test framework
 
-GoogleTest and GoogleMock are the Git submodule `ext/googletest`, pinned to
-version 1.16.0 and commit `6910c9d9165801d8827d628cb72eb7ea9dd538c5`.
+GoogleTest and GoogleMock are provided by the Git submodule `ext/googletest`. The lock records official version 1.16.0 at upstream base `6910c9d9165801d8827d628cb72eb7ea9dd538c5`; the Gitlink and selected lock commit pin organization patch `58ec32c09ed8a099e55cbdab9418597c4fd9b14f` on that base, including the host-test `RE` copy-assignment ownership fix. Dependency inventory records the official upstream base and the selected patch separately.
 The recursive checkout above includes it. For an existing checkout, prepare the
 Native dependency scope explicitly before running tests:
 

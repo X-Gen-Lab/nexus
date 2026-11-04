@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`a76590a479285dfff655634eeb662ce24b288f78ac1a24bcf8a7657348819b2e`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`413273431902252980fe72e3554e8a2a4d1d46f3f7f578d598f50456c1ccf83b`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -156,10 +156,10 @@ source_language: zh_CN
 | `task_id` | N09 |
 | `task` | 真实热点与执行效率优化 |
 | `implementation_status` | implemented |
-| `software_status` | final_stage_costs_observed_at_7590b2d4_complete_controlled_cold_warm_comparison_open |
+| `software_status` | current_ab532250_stage_costs_and_context_diagnostics_retained_actual_cold_warm_selected_scope_disposition_open |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/dev/process.py;tools/dev/timings.py;tools/configure/ |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-next-20261024/configuration/git-after-measurements.jsonl;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-next-20261024/configuration/git-after-measurements.jsonl;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/comparison-semantics.json |
 | `exit_condition` | 同环境 cold/warm 对比；不同编译上下文和失败诊断完整；不缓存成功测试报告。 |
 | `owner` | codex |
 
@@ -216,10 +216,10 @@ source_language: zh_CN
 | `task_id` | N13 |
 | `task` | 当前正式软件候选 |
 | `implementation_status` | implemented |
-| `software_status` | eight_exact_candidates_software_qualified_at_7590b2d4_other_configurations_not_promoted |
+| `software_status` | eight_exact_P2_candidates16_fresh_network_none_builds_bitexact_sealed_restored_verified_at_ab532250 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/ |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json |
 | `exit_condition` | 最终 clean source 执行完整 software plan；锁定环境两份独立断网构建实际比较 ELF/BIN；经既有流程 seal/verify。 |
 | `owner` | codex |
 
@@ -231,10 +231,10 @@ source_language: zh_CN
 | `task_id` | N14 |
 | `task` | 文档与原始证据维护 |
 | `implementation_status` | implemented_documentation |
-| `software_status` | sdk_docs_starters_upgrade_and_remote_recovery_passed_at_7590b2d4 |
+| `software_status` | P2_SDK_docs_candidates_outer_recovery_and_current_public_installed_SDK_walk12commands1CTest_passed_D_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/;tools/documentation/;tools/evidence/ |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/documentation/final-checks.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-next-20261024/documentation/final-checks.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | 当前状态从既有索引派生；历史保留原身份；一份 raw 归档与小索引并验证恢复；外部用户实际完成 install/create/build/run/upgrade。 |
 | `owner` | codex |
 
@@ -711,10 +711,10 @@ source_language: zh_CN
 | `task_id` | E04 |
 | `task` | Advanced usage recipes |
 | `implementation_status` | implemented |
-| `software_status` | selected_advanced_recipes_implemented_examples_5fb06175_normal_gate_passed_platform_7590b2d4_no_hil_or_new_formal_qualification |
+| `software_status` | three_current_advanced_recipes_covered_by_full17_presets116commands_at_private_f59debf_pinned_P2_no_HIL |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | io;docs;X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus-examples/pull/19;https://github.com/X-Gen-Lab/nexus-examples/pull/20;https://github.com/X-Gen-Lab/nexus-examples/blob/5fb06175aab72292fb075e8a9ea67096203a86dc/docs/developer-recipes.md |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus-examples/pull/19;https://github.com/X-Gen-Lab/nexus-examples/pull/20;https://github.com/X-Gen-Lab/nexus-examples/blob/5fb06175aab72292fb075e8a9ea67096203a86dc/docs/developer-recipes.md;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | Continuous DMA cache FIFO shared SPI Flash RAM pause/resume and maintained lowpower slices have reusable recipes |
 | `owner` | codex |
 
@@ -726,10 +726,10 @@ source_language: zh_CN
 | `task_id` | E05 |
 | `task` | External starters and examples |
 | `implementation_status` | implemented |
-| `software_status` | 17_presets_four_starters_and_standalone_consumers_passed_at_7590b2d4_examples_b029cc4b |
+| `software_status` | current17_presets116commands_native28CTest18Google204_installed2CTest_passed_private_f59debf_pinned_P2 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | io;docs;X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | All 17 maintained presets four starters and standalone public consumers use the final pinned platform |
 | `owner` | codex |
 
@@ -741,10 +741,10 @@ source_language: zh_CN
 | `task_id` | E06 |
 | `task` | Bilingual current architecture docs |
 | `implementation_status` | implemented |
-| `software_status` | 132_page_strict_bilingual_package_and_consumers_passed_at_7590b2d4 |
+| `software_status` | P2_strict_bilingual132pages264records_and_current_E_examples_compiled_D_final_docs_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | io;docs;X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/docs;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/docs;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | English Chinese diagrams ownership call directions failures and exact support agree and examples compile |
 | `owner` | codex |
 
@@ -755,11 +755,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | F01 |
 | `task` | Validation contract and cost inventory |
-| `implementation_status` | partial |
-| `software_status` | validation_domain_inventory_and_final_stage_costs_at_7590b2d4_full_disposition_scope_retained |
+| `implementation_status` | implemented_current159_contract_cost_inventory |
+| `software_status` | current159_contract_overlap_and_actual_stage_attempt_costs_reconciled_at_ab532250 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/dev;scripts/ci;tests |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json |
 | `exit_condition` | Each required check has purpose domain input output failure and measured cost; overlaps have explicit disposition |
 | `owner` | codex |
 
@@ -771,10 +771,10 @@ source_language: zh_CN
 | `task_id` | F02 |
 | `task` | Formal analyzer parallel budget |
 | `implementation_status` | implemented |
-| `software_status` | bounded_tidy_cppcheck_all1135_contexts_each_passed_at_7590b2d4_speedup_not_measured |
+| `software_status` | bounded_tidy_cppcheck_all1193_contexts_each1303_owned_TUs_parallel4_passed_at_ab532250 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/dev;scripts/ci;tests |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/workflow;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028/workflow;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/verified-execution.json;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/verified-execution.json |
 | `exit_condition` | Formal tidy/cppcheck use bounded existing parallelism without dropping semantic compiler contexts |
 | `owner` | codex |
 
@@ -845,11 +845,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | F07 |
 | `task` | Measured complete validation comparison |
-| `implementation_status` | pending |
-| `software_status` | complete_controlled_cold_warm_comparison_not_executed_at_7590b2d4 |
+| `implementation_status` | implemented_selected_same_environment_comparison |
+| `software_status` | same_P2_tool_env_complete159_pair_actual_time_max_process_RSS_coverage_observed_no_freshcold_no_causal_speedup |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/dev;scripts/ci;tests |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline-repeat-costs.json;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/comparison-semantics.json |
 | `exit_condition` | Same environment comparison shows actual time/memory/coverage; final clean source executes complete applicable gates |
 | `owner` | codex |
 
@@ -861,10 +861,10 @@ source_language: zh_CN
 | `task_id` | G01 |
 | `task` | Maintained end-to-end orchestration |
 | `implementation_status` | partial |
-| `software_status` | final_scopes_executed_at_7590b2d4_maintained_orchestration_consolidation_open |
+| `software_status` | P2_qualify_candidates_SDK_docs_local_and_remote_recovery_plus_current_E_and_public_walk_passed_D_deploy_FF_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/documentation;tools/evidence;tools/release;docs |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;build/recovery-20261103/final-delivery-ab532250-20261104/unsigned-local-bundle-handoff.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | Existing qualify/candidate examples docs release commands form one maintained source-bound workflow |
 | `owner` | codex |
 
@@ -921,10 +921,10 @@ source_language: zh_CN
 | `task_id` | G05 |
 | `task` | Portable retention and independent restore |
 | `implementation_status` | implemented |
-| `software_status` | public90_archives_and_private_examples_authenticated_recovery_passed_at_7590b2d4 |
+| `software_status` | P2_unsigned_outer_public_remote_join_store_restore_sameNative_verify_passed_fullNative_bytes_local42plus4 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/documentation;tools/evidence;tools/release;docs |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json;build/recovery-20261103/publication-p2-transport-ab532250-20261104/remote-recovery-liveverify-handoff.json |
 | `exit_condition` | Necessary source SDK binaries config logs verifiers docs and licenses remain obtainable outside original checkout and tmp |
 | `owner` | codex |
 
@@ -1161,10 +1161,10 @@ source_language: zh_CN
 | `task_id` | J02 |
 | `task` | Final software integration qualification |
 | `implementation_status` | implemented |
-| `software_status` | formal159_sdk_examples_b029cc4b_and_bilingual_docs_passed_at_7590b2d4 |
+| `software_status` | P2_ordinary_twofull159_fourNative_SDK_strictdocs8candidates_and_current_private_E_passed_D_final_docs_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/delivery;tools/release |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;build/c-cold-20261028/legacy/ordinary-gate/package.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus-examples/blob/1baac7b7946a3d71e855e41365972b0781af5291/docs-examples-delivery-20261029-gb029cc4b/recovery-index.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | Frozen clean source completes ordinary gates maintained ARM modes installed SDK examples and bilingual documentation |
 | `owner` | codex |
 
@@ -1176,10 +1176,10 @@ source_language: zh_CN
 | `task_id` | J03 |
 | `task` | Independent delivery closure verification |
 | `implementation_status` | implemented |
-| `software_status` | source_bound_candidate_sdk_docs_and_raw_closures_recovered_at_7590b2d4 |
+| `software_status` | P2_candidate_SDK_docs_unsigned_outer_closures_restored_remote_sameproducer_verified_native_fullbytes_local |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/delivery;tools/release |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;build/c-cold-20261028;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;https://github.com/X-Gen-Lab/nexus/blob/d14d093879362d6a1796ee9e0d47f75f793e5135/docs-asset-retention-20261030/WITHDRAWAL.md;https://github.com/X-Gen-Lab/nexus-examples/blob/8aa825c7d2cd8f58f4fa84869f16700aea400783/docs-legacy-examples-retention-20261030/retention-index.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json |
 | `exit_condition` | Exact source config dependencies tools binaries raw reports docs and licenses form a verified restorable closure |
 | `owner` | codex |
 
@@ -1280,11 +1280,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-A06 |
 | `task` | 分离完成状态 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_separate_scope_reporting |
+| `software_status` | P2_record_separates_implementation_ordinary_formal_candidates_unsigned_artifacts_docs_physical_and_pending_services |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/official-stm32-provider.md;tools/maintenance/work_packages.py;tools/maintenance/capabilities.py |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;docs/delivery/platform-delivery-completion-results.json |
 | `exit_condition` | 实现、软件、实板与交付分别记录；试点通过不关闭整个家族任务。 |
 | `owner` | codex |
 
@@ -1805,11 +1805,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-F07 |
 | `task` | Flash 官方流程评价 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_bounded_P2_Flash_static_and_ECC_review |
+| `software_status` | P2_seven_context_bounded_static_review_and_independent_ECC_clarification_event_owner_sticky_recovery_not_assessed |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | soc/;drivers/;io/;components/;cmake/package/verification/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-review.json;/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-flash-static-independent-review.json;/workspace/nexus/build/recovery-20261103/reconciliation-template/P2-V-F07-ECC-clarification-addendum.md;/workspace/nexus/build/recovery-20261103/reconciliation-template/ECC-independent-review.json |
 | `exit_condition` | 核对几何、ECC、执行域、供电、pulse 结清及错误恢复。 |
 | `owner` | codex |
 
@@ -2315,11 +2315,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-K04 |
 | `task` | 失败与恢复示例 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_existing_private_reference_and_public_SDK_path |
+| `software_status` | current_private_f59debf_pinned_P2_source_installed5Cbroker_cases_each_join_release_cleanup_expected_rejections_passed_physical_open |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | 示例覆盖拒绝、取消、失败 drain、join、stop 和恢复。 |
 | `owner` | codex |
 
@@ -2330,11 +2330,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-K05 |
 | `task` | 完整开发入口 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | partial_selected_existing_private_reference_and_public_SDK_path |
+| `software_status` | current_public_installed_SDK_walk12commands1CTest_passed_at_P2_physical_flash_debug_monitor_not_executed |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | 核对 create/configure/explain/diff/flash/debug/monitor 的真实用户路径。 |
 | `owner` | codex |
 
@@ -2360,11 +2360,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-K07 |
 | `task` | 双语与代码风格 |
-| `implementation_status` | partial_existing_bilingual_content_and_new_provider_translation |
-| `software_status` | fresh_gettext_132_pages_264_records_passed_clean_source_html_pending |
+| `implementation_status` | implemented_P2_strict_bilingual_scope |
+| `software_status` | P2_132canonicalpages264reviewedrecords_Doxygen_gettext_EN_ZH_package_restore_verify_all0_laterD_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/;X-Gen-Lab/nexus-examples;docs/;tools/dev/ |
-| `evidence_paths` | build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json |
+| `evidence_paths` | build/vendor-first-20261030/next/vendor-docs-integration-20261030/handoff.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json |
 | `exit_condition` | 中英文、gettext、schema、链接及严格文档检查完整，沿用现有格式和 Doxygen。 |
 | `owner` | codex |
 
@@ -2420,11 +2420,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L03 |
 | `task` | P 的完整软件计划 |
-| `implementation_status` | partial_formal_89485943_attempt_executed |
-| `software_status` | 13_stages_passed_asan_build_inner_timeout_124_new_source_full_run_pending |
+| `implementation_status` | implemented_current_P2_complete_formal_plan |
+| `software_status` | two_current_P2_full159_fourNative420programs7342cases440CTest_each_all_applicable_checks_passed |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | ;/workspace/nexus-software-qualification-89485943-20261030/report.json |
+| `evidence_paths` | ;/workspace/nexus-software-qualification-89485943-20261030/report.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/baseline/verified-execution.json;build/recovery-20261103/final-p2-baseline-repeat-20261103/control/repeat/verified-execution.json |
 | `exit_condition` | 在 P 上实际完成完整计划、四种 Native 和全部适用检查。 |
 | `owner` | codex |
 
@@ -2435,11 +2435,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L04 |
 | `task` | P 的 SDK 与消费 |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented_selected_P2_SDK_and_consumers |
+| `software_status` | P2_v15_64roots67images270commands_sdk_and_ENTIREconsumer_actualrestored_ownedverified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | （原字段为空） |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;build/recovery-20261103/final-delivery-ab532250-20261104/repeat-sdk-consumer-packages/outcome-reconciliation.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json |
 | `exit_condition` | P 的 SDK、资源报告和独立外部消费具有同源同产物记录。 |
 | `owner` | codex |
 
@@ -2480,11 +2480,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | V-L07 |
 | `task` | 受控环境与离线复现 |
-| `implementation_status` | partial_two_89485943_offline_uart_pairs |
-| `software_status` | h743_u575_baremetal_uart_elf_bin_identical_new_source_eight_profiles_pending |
+| `implementation_status` | implemented_eight_selected_P2_offline_pairs |
+| `software_status` | P2_8profiles16fresh_network_none_builds_bitexact_ELF_BIN_controlled_environment_identity_retained |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/release/;tools/evidence/;tools/dev/;X-Gen-Lab/nexus-examples;docs/status/ |
-| `evidence_paths` | ;/workspace/nexus-offline-matrix-89485943-20261030/two-pair-handoff.json |
+| `evidence_paths` | ;/workspace/nexus-offline-matrix-89485943-20261030/two-pair-handoff.json;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250;build/recovery-20261103/final-delivery-ab532250-20261104/profiles-and-strict-docs-handoff.json;https://github.com/X-Gen-Lab/nexus/blob/71b4f0e4cc9168e708513fb647b903c4bb39c71e/docs-public-p2-ab532250-20261104/transport.json |
 | `exit_condition` | 分别证明受控环境与两次新鲜离线构建的实际范围，不继承旧资格。 |
 | `owner` | codex |
 
@@ -3156,10 +3156,10 @@ source_language: zh_CN
 | `task_id` | IT-E01 |
 | `task` | 工业控制外部参考系统 |
 | `implementation_status` | partial |
-| `software_status` | private_ff86eb49_sdk6c3a380a_ordinary_accepted_physical_scope_open |
+| `software_status` | current_private_f59debf_pinned_P2_full17presets116commands_28CTest18Google204_installed2CTest_passed_physical_scope_open |
 | `hardware_status` | not_executed |
 | `implementation_paths` | X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | 组合现有采集、Modbus、owner、Storage 和 watchdog，实际展示启动、运行、维护、停止、失败与恢复；任务、寄存器表和产品策略保持外部。 |
 | `owner` | codex |
 
@@ -3171,9 +3171,9 @@ source_language: zh_CN
 | `task_id` | IT-E02 |
 | `task` | 联网网关外部参考系统 |
 | `implementation_status` | partial |
-| `software_status` | private_ff86eb49_sdk6c3a380a_source_installed_broker5_and_ordinary_accepted_physical_open |
+| `software_status` | current_private_f59debf_pinned_P2_source_installed5realCbroker_cases_each_passed_join_release_cleanup_physical_open |
 | `hardware_status` | not_executed |
 | `implementation_paths` | X-Gen-Lab/nexus-examples |
-| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md |
+| `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;docs/status/software-verification.md;docs/delivery/platform-delivery-completion-results.json#source_version_records_20261103.final_public_source_P2_ab532250.subsequent_actual_results.private_current_E |
 | `exit_condition` | 用精确外部组合完成 Ethernet→TCP/TLS→MQTT，展示断网、耗尽、重连和关闭；凭据、授权和业务策略外置，私有源及证据不进入公共包。 |
 | `owner` | codex |

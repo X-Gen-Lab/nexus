@@ -379,6 +379,14 @@ clang-tidy消费实际compile commands与生成配置，只检查owned边界。v
 
 分析并行度必须有正整数上限，按可用内存与 runner 容量选择；默认串行，CI 可显式使用 `--parallel 2`。各子进程使用独立输出，全部退出后再汇总；任一执行失败或诊断越界仍失败。超时或取消必须停止并回收已启动进程，不能留下后台分析，也不能把空报告当成功。并行执行时间与任务累计时间分别报告。
 
+CodeQL 的数据库与中间查询缓存放在 tmpfs 时，文件占用与查询进程、子进程和内核内存共用同一 cgroup 预算；不同 tmpfs 的可用空间不能相加当作独立 RAM。按实际余量显式设置 `--ram`、`--threads` 和 `--max-disk-cache`，并为数据库增长、执行中的临时文件及其他进程留出空间。`--ram` 是 evaluator 的内存目标，file-backed mmap 可能使实际占用超过它；`--max-disk-cache` 限定中间结果缓存，不能作为执行中查询、全部临时文件或整个 cgroup 的硬配额。不能依据 `build/` 路径判定缓存角色；清理前按 producer 角色与实际引用分类，postlink audit JSON、`.su`、`*.compiler.raw` 和 `*.objdump.raw` 属于 producer 证据，并保留原失败与恢复事实。
+
+OOM 或中断后保留原失败及 partial 尝试的命令、收条、日志和结果身份，确认进程已完全退出，再核对已 finalized 数据库的核心身份、源码、工具和查询范围。需要清理可再生缓存时，使用该固定版本的官方 `database cleanup --cache-cleanup=clear --max-disk-cache=0 -- <database>`，核对清理前后核心数据库身份；在同一不可变源码的失败恢复过程中，不重新提取已验证的数据库。
+
+目标源码语义改变时，必须先为新源码重新提取并 finalize 数据库，再执行完整查询；在旧数据库上 `--rerun` 不会更新其中的源码。仅当 Source／dataset 不变，但固定查询或模型身份变化，或复用证据不足时，才在同一数据库上完整 `--rerun`。只有原 Source／dataset／CLI／固定查询及模型全部不变，且每个复用 query 的完成证据齐备时，才可用官方 `--no-rerun` 补缺；证据须包括完成日志、runinfo、完整可读 BQRS 及当前输入身份绑定，缺证 query 必须重算。随后执行新的完整 suite interpret，最终本次 C++ 的 183 项须一一对应、无 missing／timeout warning，完整解释与 SARIF 验收通过后才可记录跨 attempt 组合分析完成；不能称为单次 fresh 183，旧 timeout／cancel attempt 仍为失败，逐项 finding 处置仍需实际结果。
+
+本次 4 CPU／16 GiB 环境记录的 RAM 目标 4 GiB、缓存目标 768 MiB 和 2 个查询线程，对应实际参数 `--ram=4096 --max-disk-cache=768 --threads=2`。这些数值只描述本环境的一次资源调整，不建立其他环境的默认值、最优配置、峰值保证或查询通过结论。
+
 Cppcheck 2.13不读取编译数据库中的`-isystem`。工具按每个真实翻译单元将其投影为`-I`，保留普通目录先于系统目录的搜索顺序；编译器ABI查询仍使用原始参数。分析边界与clang-tidy一致：只对该翻译单元实际SYSTEM目录中、位于`vendors/`或`ext/`的第三方头文件逐一排除，并记录具体路径、规范路径与SHA-256。自有头文件、第三方实现文件、非SYSTEM目录及指向自有文件的别名仍接受检查；不能全局关闭诊断或重封基线。此边界用于分析自有代码，不能证明第三方代码没有缺陷。
 
 本规则集是工程检查基线，不构成MISRA、功能安全或其他认证。若产品要求标准符合性，另立准确standard/version、覆盖范围、deviation、工具资格与独立review项目，不能仅凭`cert-*`或analyzer配置宣称合规。
@@ -437,7 +445,7 @@ E1–E6描述工程验收领域，不是另一套排期或任务真源。唯一�
 
 GoogleTest 承担断言、fixture 和边界场景；GoogleMock 只替代硬件、时间、通知和执行器等依赖端口。测试实际调用 Nexus 的公共 API，不能把被测 provider、factory 或 owner 整体 mock 掉，再用期望调用证明自身正确。优先检查不同实例的隔离、零副作用拒绝、资源冲突、deadline、取消后的排空和最终发布顺序。正常路径和失败路径共同确定合同，不要求为了数字重复实现细节。
 
-框架源通过 Git 子模块 `ext/googletest` 引入，`dependencies/googletest.lock.json` 与 Gitlink 固定同一版本和准确 commit；当前为 1.16.0、`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。依赖准备显式执行，CMake 只使用已准备的本地源码，不下载、不回退到系统框架；缺失、版本不符或子模块工作区有修改即失败。`tests/google/CMakeLists.txt` 启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime 或测试框架依赖。许可与 notice 随锁定的子模块源码保留。
+框架源通过 Git 子模块 `ext/googletest` 引入。`dependencies/googletest.lock.json` 记录官方 1.16.0 的 upstream 基线 `6910c9d9165801d8827d628cb72eb7ea9dd538c5`；Gitlink 与锁文件所选 commit 固定该基线上的组织补丁 `58ec32c09ed8a099e55cbdab9418597c4fd9b14f`，其中包含 host 测试框架 `RE` 复制赋值的所有权修复。依赖清单分别记录官方 upstream 基线与所选补丁。依赖准备显式执行，CMake 只使用已准备的本地源码，不下载、不回退到系统框架；缺失、版本不符或子模块工作区有修改即失败。`tests/google/CMakeLists.txt` 启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime 或测试框架依赖。许可与 notice 随锁定的子模块源码保留。
 
 统一执行入口为：
 

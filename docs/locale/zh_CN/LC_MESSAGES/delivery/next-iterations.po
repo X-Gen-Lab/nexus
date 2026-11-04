@@ -1,4 +1,4 @@
-# Authored translation; review state is explicit in catalog metadata.
+# Prepared changed messages; independent semantic review and actual gettext admission pending.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1b61f6caf10cda8ad65277921ff251eed83814ae3f531fa1a1106be1c81a336b\n"
+"X-Nexus-Source-SHA256: 1218b1e41b4c37bdc3c85448f9f3039e77955c024eac06a72b908f7e0f9e01c8\n"
 
 msgid "后续迭代与团队执行"
 msgstr "后续迭代与团队执行"
@@ -927,9 +927,6 @@ msgstr "实板接入后，先核对三块首发实际 Board、记录 PCB/晶振/
 msgid "按测量增加能力"
 msgstr "按测量增加能力"
 
-msgid "本轮以已接受的公共开发源码 `eb4aba66` 继续；其普通完整索引门禁已实际通过。 安装版 SDK、独立归档核验和私有参考系统分别保留自己的接受范围。已发布 `v0.2.1` 的 `b1b903da` 预览和 `7590b2d4` 封存候选保留原身份。源码、 实际执行和证据留存范围见[软件证据入口](../status/software-verification.md)。"
-msgstr "本轮以已接受的公共开发源码 `eb4aba66` 继续；其普通完整索引门禁已实际通过。 安装版 SDK、独立归档核验和私有参考系统分别保留自己的接受范围。已发布 `v0.2.1` 的 `b1b903da` 预览和 `7590b2d4` 封存候选保留原身份。源码、 实际执行和证据留存范围见[软件证据入口](../status/software-verification.md)。"
-
 msgid "下表保留原 71 个规划编号及其到 107 个权威任务的映射，不另建状态台账。 {download}`同一交付台账 <../design/platform-delivery-completion.csv>`仍有 210 行，原 175 行 保持历史身份；35 个 `IT-` 行分别描述实现与当前开发检查。[派生视图](../status/ledgers/platform-delivery-completion.md) 由原 renderer 生成，原编号、顺序和退出条件不变。"
 msgstr "下表保留原 71 个规划编号及其到 107 个权威任务的映射，不另建状态台账。 {download}`同一交付台账 <../design/platform-delivery-completion.csv>`仍有 210 行，原 175 行 保持历史身份；35 个 `IT-` 行分别描述实现与当前开发检查。[派生视图](../status/ledgers/platform-delivery-completion.md) 由原 renderer 生成，原编号、顺序和退出条件不变。"
 
@@ -939,8 +936,11 @@ msgstr "外置 provider、Settings、wait-select、可选观察、TMP117、熵�
 msgid "`IT-R04` 复用已有 H743 V／固定 HSI64／Cache off／裸机 SPI4 的生命周期 pause/resume，不规划新的通用 PM。它仍需当前集成执行与实板验收。`IT-S06` 的 已审调用方使用 Settings、显式 Flash region 和 MCUboot 字节存储，尚无文件语义 消费者；`IT-X04` 尚无新探针需求。因此暂不增加文件系统依赖或设备 runner， 真实需求出现后再按原退出条件进入。"
 msgstr "`IT-R04` 复用已有 H743 V／固定 HSI64／Cache off／裸机 SPI4 的生命周期 pause/resume，不规划新的通用 PM。它仍需当前集成执行与实板验收。`IT-S06` 的 已审调用方使用 Settings、显式 Flash region 和 MCUboot 字节存储，尚无文件语义 消费者；`IT-X04` 尚无新探针需求。因此暂不增加文件系统依赖或设备 runner， 真实需求出现后再按原退出条件进入。"
 
-msgid "仍开放的工作包括 `V-A01` 私有附录／模式清单，`V-I03`／`V-I05`／`V-I06` 成本、rearm、背压与竞争比较，`F01` 检查处置，`F07` cold/warm 比较， `V-K05` 完整开发入口和 `V-J07` 测试保留审查。当前完整 159 阶段计划、OCI／ fresh 离线构建、服务端规则和物理 HIL 也未由这些开发结果关闭。"
-msgstr "仍开放的工作包括 `V-A01` 私有附录／模式清单，`V-I03`／`V-I05`／`V-I06` 成本、rearm、背压与竞争比较，`F01` 检查处置，`F07` cold/warm 比较， `V-K05` 完整开发入口和 `V-J07` 测试保留审查。当前完整 159 阶段计划、OCI／ fresh 离线构建、服务端规则和物理 HIL 也未由这些开发结果关闭。"
-
 msgid "优先级：`P1–P2`。进入与顺序：R01/R02 复用现有观察与等待合同；R04 核对已有精确 H743 路径的集成、保留与恢复，不从公共类型推导通用 PM。"
 msgstr "优先级：`P1–P2`。进入与顺序：R01/R02 复用现有观察与等待合同；R04 核对已有精确 H743 路径的集成、保留与恢复，不从公共类型推导通用 PM。"
+
+msgid "本轮选定软件交付固定公共 P2 `ab532250`，完整两轮159、SDK v15、8 个候选／ 16 次 fresh 断网构建、P2 严格双语文档及无签名 outer 的公开实际恢复均已完成。 独立 QA 后续 `706ee80` 的普通完整索引门禁与完整 Python174 复扫通过：38 条 finding 为 30 note／6 warning／2 error，全部唯一对应原已审处置；七条旧 finding 消失且无新增。当前私有 E `f59debf1` 固定 P2 的 17 presets／ 116 命令、source／installed 各五个真实 C broker 场景、三个 recipes 和公共 SDK walk 均实际通过；E 已正常 nonforce push 并精确读回 `f59debf1`， 仓库保持 private、private main 未更新；后续 D／部署及最终 FF 仍待实际结果。已发布 `v0.2.1` 的 `b1b903da` 预览与 `7590b2d4` 历史候选保留原身份。精确源码、执行及 取得边界见{ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`。"
+msgstr "本轮选定软件交付固定公共 P2 `ab532250`，完整两轮159、SDK v15、8 个候选／ 16 次 fresh 断网构建、P2 严格双语文档及无签名 outer 的公开实际恢复均已完成。 独立 QA 后续 `706ee80` 的普通完整索引门禁与完整 Python174 复扫通过：38 条 finding 为 30 note／6 warning／2 error，全部唯一对应原已审处置；七条旧 finding 消失且无新增。当前私有 E `f59debf1` 固定 P2 的 17 presets／ 116 命令、source／installed 各五个真实 C broker 场景、三个 recipes 和公共 SDK walk 均实际通过；E 已正常 nonforce push 并精确读回 `f59debf1`， 仓库保持 private、private main 未更新；后续 D／部署及最终 FF 仍待实际结果。已发布 `v0.2.1` 的 `b1b903da` 预览与 `7590b2d4` 历史候选保留原身份。精确源码、执行及 取得边界见{ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`。"
+
+msgid "F01 当前159检查与原成本已对账；F07 完成同 P2／工具／环境的 observational 比较，缓存与 RSS 限制保留，不能称为受控因果提速。N09 的 fresh build directory／ warm configure-build 只证明选定 Native trace，其他 MCU、CLI 与 F05 退出仍独立。 继续开放 Flash／ECC event-owner／sticky／恢复细节、七组 vendor-leaf 提案、GD303 引用审查、物理开发入口、后续 D／部署／FF、 服务端规则和物理 HIL。测试保留须有原合同或独立等价覆盖依据，不能为通过而减项。"
+msgstr "F01 当前159检查与原成本已对账；F07 完成同 P2／工具／环境的 observational 比较，缓存与 RSS 限制保留，不能称为受控因果提速。N09 的 fresh build directory／ warm configure-build 只证明选定 Native trace，其他 MCU、CLI 与 F05 退出仍独立。 继续开放 Flash／ECC event-owner／sticky／恢复细节、七组 vendor-leaf 提案、GD303 引用审查、物理开发入口、后续 D／部署／FF、 服务端规则和物理 HIL。测试保留须有原合同或独立等价覆盖依据，不能为通过而减项。"
