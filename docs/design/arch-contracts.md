@@ -122,6 +122,11 @@ dirty line。工作量随实际 set 数量增加，不承诺固定延迟。该�
 启用、不 clear 所有 region，不访问另一个世界的 alias。Handler 或 enabled MPU
 调用被拒绝，不通过自动关 MPU 改变保护策略。
 
+MPU 和 SAU 单区域编程的成功表示已验证参数并按架构要求完成寄存器写入及屏障；
+它不声明全配置逐项 readback、实际访问权限测试或物理隔离。不能把 Cache 冷启停
+的 selector/CCR readback 保证继承到这些接口。增加读回验证必须先审查具体寄存器的
+RES0、读敏感字段和实际实现范围；失败还须保留调用者原有的恢复责任。
+
 v8 MAIR 更新只改变指定 byte，保留相邻属性。调用者拥有使用该 attribute 的
 所有 region 与有效内存策略；实现不做 cache 维护。MPU 的后续 enable、重配和
 上下文切换属于 Arch 层之外的 OS 或产品集成责任。平台已有明确范围的
@@ -170,6 +175,12 @@ SAU MMIO 返回 absent-hardware 结果，纯 encoder 仍可使用。模型不执
 锁定 ARM 编译器门禁分别验证九核的宏、ABI、对象、指令和未解析符号，再编译
 所选 Core/Arch/OS kernel 组合。FPU/MVE/security 的可选组合按事实单独执行，不
 从一种组合继承到所有组合。每次记录真实命令、返回码、工具身份与输出 hash。
+
+维护门禁目前使用锁定的 `arm-none-eabi-gcc`。公共源码接受 GCC/Clang 的相关语法，
+不等于已完成 Clang、Arm Compiler 或任意版本 GCC 的整套资格。生产 `atomic.h`
+必须按函数验证 load/store/add/sub/CAS 的实际指令、内存序与 helper 依赖；IRQ save、
+restore、查询和 barrier 也分别检查，不能用同一目标内另一个函数的指令填补缺失。
+这些软件检查仍不测量 exclusive 重试次数、IRQ 延迟或最坏执行周期。
 
 本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
 封存还须遵循 [qualification](../delivery/qualification.md)。旧 HEAD 的通过数、

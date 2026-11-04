@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 30dea5b5864244bc38559d4ba0e86b2d9d7d0daffd6dbfab040d8cdcf2b53068\n"
+"X-Nexus-Source-SHA256: 2911c164f922791732fbc1b67e906cf1537fae5cc906917a20e2298536370f01\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/os-contracts.md:1
 msgid "OS 执行与生命周期合同"
@@ -336,10 +336,6 @@ msgstr "coordinator 关闭 admission；owner stop 请求所有已接受操作取
 msgid "owner 保持 service/drain；producer/observer 仅观察 acquire `SETTLED`。"
 msgstr "owner 保持 service/drain；producer/observer 仅观察 acquire `SETTLED`。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/design/os-contracts.md:150
-msgid "coordinator join producer；成功后 request 和 bytes 的业务 borrow 已解除。"
-msgstr "coordinator join producer；成功后 request 和 bytes 的业务 borrow 已解除。"
-
 #: ../../../workspace/nexus-build-system-20261012/docs/design/os-contracts.md:151
 msgid "coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。"
 msgstr "coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。"
@@ -357,20 +353,6 @@ msgstr ""
 "销毁 notification/queue/guard。Native/裸机随后可执行 platform stop；正在运行的 FreeRTOS 保留 "
 "platform 时钟和 Tick，coordinator 发布状态后挂起。产品通过显式 reset 或完整 scheduler-stop port "
 "才能关闭内核基础设施，不能从 I/O idle 推导内核停止。"
-
-#: ../../../workspace/nexus-build-system-20261012/docs/design/os-contracts.md:157
-msgid ""
-"失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY "
-"只是防护，不替代未来 publisher 已停止的证明。 外部 [UARTOwner 示例](https://github.com/X-Gen-"
-"Lab/nexus-examples/tree/codex/next-generation-"
-"platform/apps/uart_owner_runtime) 实现单 coordinator 的单调停止 "
-"milestones；失败后只重试失败阶段，不重复已成功 join。"
-msgstr ""
-"失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY "
-"只是防护，不替代未来 publisher 已停止的证明。 外部 [UARTOwner 示例](https://github.com/X-Gen-"
-"Lab/nexus-examples/tree/codex/next-generation-"
-"platform/apps/uart_owner_runtime) 实现单 coordinator 的单调停止 "
-"milestones；失败后只重试失败阶段，不重复已成功 join。"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/os-contracts.md:162
 msgid "低功耗、诊断与安全边界"
@@ -658,3 +640,60 @@ msgstr ""
 
 msgid "默认公开 user 服务为无指针的 delay/tick-read，经真实 MPU veneer/SVC。独立选定的 [U575 MPU-v2 scalar GPIO WRITE](u575-mpu-gpio.md) 增加单任务、只读固定 PC7 grant 与真实 slot70；它不建立泛用用户对象池、I/O handle、任意指针调用或隐式升权。 该精确增量已有 host 软件模型、normal M33 reset 链接与单个搬移 development SDK consumer 的静态 ELF 证明；源码阶段与资源记录见[证据说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md)，不建立完整 SDK、runtime MPU 隔离或物理资格。 受维护基础软件组合为 M3、M4 integer/ FP、M23、M33 integer/FP、M55 integer-MVE、M85 float-MVE 及明确 16-region 事实。 Native、M0/M0+、M7 kernel MPU 和 MPU+split 当前 fail closed。基础 Arch/普通 OS 对 这些 CPU 的支持仍独立存在。用户任务不是可 join wrapper，必须永久运行；单 privileged owner 在所有外部用户 quiescent 后显式删除另一任务，自删拒绝。没有隐藏 reaper。"
 msgstr "默认公开 user 服务为无指针的 delay/tick-read，经真实 MPU veneer/SVC。独立选定的 [U575 MPU-v2 scalar GPIO WRITE](u575-mpu-gpio.md) 增加单任务、只读固定 PC7 grant 与真实 slot70；它不建立泛用用户对象池、I/O handle、任意指针调用或隐式升权。 该精确增量已有 host 软件模型、normal M33 reset 链接与单个搬移 development SDK consumer 的静态 ELF 证明；源码阶段与资源记录见[证据说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md)，不建立完整 SDK、runtime MPU 隔离或物理资格。 受维护基础软件组合为 M3、M4 integer/ FP、M23、M33 integer/FP、M55 integer-MVE、M85 float-MVE 及明确 16-region 事实。 Native、M0/M0+、M7 kernel MPU 和 MPU+split 当前 fail closed。基础 Arch/普通 OS 对 这些 CPU 的支持仍独立存在。用户任务不是可 join wrapper，必须永久运行；单 privileged owner 在所有外部用户 quiescent 后显式删除另一任务，自删拒绝。没有隐藏 reaper。"
+
+msgid "Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回 `BUSY`，且不能读取外部 owner 尚未发布的 pthread identity 或 started 状态。 其他 start/join 操作仍由唯一外部 lifecycle owner 串行执行；这一修正不提供多 joiner 或跨任务竞争 start 的能力。创建失败不保留 entry/context；资源耗尽与非法参数分别报告。"
+msgstr "Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回 `BUSY`，且不能读取外部 owner 尚未发布的 pthread identity 或 started 状态。 其他 start/join 操作仍由唯一外部 lifecycle owner 串行执行；这一修正不提供多 joiner 或跨任务竞争 start 的能力。创建失败不保留 entry/context；资源耗尽与非法参数分别报告。"
+
+msgid "`nx_wait_select()` 的校验和就绪扫描随候选数线性增长。每个 predicate 必须有界， 不阻塞、不执行设备 service；调用者在成功消费后推进自己的 cursor，才能公平轮转。 比较 1、4、16 个候选时应记录扫描次数、任务负载和事件消费规则，不能从一次主机 耗时推导 MCU 最坏延迟。通知合并不累计业务事件，队列或锁存状态才拥有事件数量。"
+msgstr "`nx_wait_select()` 的校验和就绪扫描随候选数线性增长。每个 predicate 必须有界， 不阻塞、不执行设备 service；调用者在成功消费后推进自己的 cursor，才能公平轮转。 比较 1、4、16 个候选时应记录扫描次数、任务负载和事件消费规则，不能从一次主机 耗时推导 MCU 最坏延迟。通知合并不累计业务事件，队列或锁存状态才拥有事件数量。"
+
+msgid "选择"
+msgstr "选择"
+
+msgid "适用条件与额外责任"
+msgstr "适用条件与额外责任"
+
+msgid "普通 notify"
+msgstr "普通 notify"
+
+msgid "调用方持有独立通知控制；publisher 全部退出后才销毁"
+msgstr "调用方持有独立通知控制；publisher 全部退出后才销毁"
+
+msgid "direct notify"
+msgstr "direct notify"
+
+msgid "已存在且唯一的 receiver、独占 index；receiver 生命周期覆盖所有 publisher"
+msgstr "已存在且唯一的 receiver、独占 index；receiver 生命周期覆盖所有 publisher"
+
+msgid "joinable task"
+msgstr "joinable task"
+
+msgid "entry 可以返回；completion 后仍保留 control/stack，直到外部 join 成功"
+msgstr "entry 可以返回；completion 后仍保留 control/stack，直到外部 join 成功"
+
+msgid "permanent task"
+msgstr "permanent task"
+
+msgid "entry 永不返回；没有 join/completion 存储，误返回必须 fail-stop"
+msgstr "entry 永不返回；没有 join/completion 存储，误返回必须 fail-stop"
+
+msgid "raw queue"
+msgstr "raw queue"
+
+msgid "已有独立停止协议；payload copy 成本随 item 大小增长"
+msgstr "已有独立停止协议；payload copy 成本随 item 大小增长"
+
+msgid "closable queue"
+msgstr "closable queue"
+
+msgid "需要关闭 admission 并唤醒 waiter；额外 control 和每操作 waiter 由调用方提供"
+msgstr "需要关闭 admission 并唤醒 waiter；额外 control 和每操作 waiter 由调用方提供"
+
+msgid "Native destroy 可能只释放部分 POSIX 资源。首次销毁撤销公开操作准入；每个资源只在 实际销毁成功后解除 ownership。失败后保持同一 control，仅重试 destroy；不得重新 init、进入 wait/send/receive 或释放存储。关闭和 join 仍须先完成，不能依靠 destroy 替代 publisher quiescence。内核 queue payload、调度器挂起区与实际 IRQ mask 区的 成本分别计算；scheduler suspended 不等于所有中断均被屏蔽。"
+msgstr "Native destroy 可能只释放部分 POSIX 资源。首次销毁撤销公开操作准入；每个资源只在 实际销毁成功后解除 ownership。失败后保持同一 control，仅重试 destroy；不得重新 init、进入 wait/send/receive 或释放存储。关闭和 join 仍须先完成，不能依靠 destroy 替代 publisher quiescence。内核 queue payload、调度器挂起区与实际 IRQ mask 区的 成本分别计算；scheduler suspended 不等于所有中断均被屏蔽。"
+
+msgid "coordinator join producer；必须已 acquire 观察每个 accepted request 的 `SETTLED`。 再排空 slot control 并 detach/join observer；最后一次 callback 返回之前，request、slot 和观察者存储均不可复用。业务 payload 还须满足其自身的其他借用合同。"
+msgstr "coordinator join producer；必须已 acquire 观察每个 accepted request 的 `SETTLED`。 再排空 slot control 并 detach/join observer；最后一次 callback 返回之前，request、slot 和观察者存储均不可复用。业务 payload 还须满足其自身的其他借用合同。"
+
+msgid "失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY 只是防护，不替代未来 publisher 已停止的证明。 每个成功 milestone 只执行一次；超时继续使用原 absolute deadline 的结果，不靠反复 构造新 deadline 掩盖失败。恢复重试由外部策略给出新预算，且继续保留未归还资源。 外部 [UARTOwner 示例](https://github.com/X-Gen-Lab/nexus-examples/tree/codex/next-generation-platform/apps/uart_owner_runtime) 实现单 coordinator 的单调停止 milestones；失败后只重试失败阶段，不重复已成功 join。"
+msgstr "失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY 只是防护，不替代未来 publisher 已停止的证明。 每个成功 milestone 只执行一次；超时继续使用原 absolute deadline 的结果，不靠反复 构造新 deadline 掩盖失败。恢复重试由外部策略给出新预算，且继续保留未归还资源。 外部 [UARTOwner 示例](https://github.com/X-Gen-Lab/nexus-examples/tree/codex/next-generation-platform/apps/uart_owner_runtime) 实现单 coordinator 的单调停止 milestones；失败后只重试失败阶段，不重复已成功 join。"

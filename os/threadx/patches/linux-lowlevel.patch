@@ -1,0 +1,155 @@
+--- a/tx_initialize_low_level.c
++++ b/tx_initialize_low_level.c
+@@ -1,3 +1,7 @@
++/* Nexus build-derived Linux timer: reviewed upstream source identity;
++ * MONOTONIC clock/wait, normalized carry, errno and blocked resume wait;
++ * synchronized official state/current observers after mutex publication.
++ * Original ThreadX copyright and MIT license remain below. */
+ /***************************************************************************
+  * Copyright (c) 2024 Microsoft Corporation
+  * Copyright (c) 2026-present Eclipse ThreadX contributors
+@@ -27,6 +31,8 @@
+ /* Include necessary system files.  */
+ 
+ #include "tx_api.h"
++#include "tx_thread.h"
++#include <stdatomic.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <signal.h>
+@@ -48,7 +54,45 @@
+ #define SUSPEND_SIG SIGUSR1
+ #define RESUME_SIG  SIGUSR2
+ 
++/* Published only after the real recursive mutex is initialized.
++   Before then the supported caller is the single bootstrap thread. */
++static _Atomic unsigned int _nx_linux_mutex_ready;
++
++unsigned int nx_threadx_linux_system_state(void)
++{
++    unsigned int state;
++    if (!atomic_load_explicit(&_nx_linux_mutex_ready, memory_order_acquire))
++        return (unsigned int)_tx_thread_system_state;
++    tx_linux_mutex_lock(_tx_linux_mutex);
++    state = (unsigned int)_tx_thread_system_state;
++    tx_linux_mutex_unlock(_tx_linux_mutex);
++    return state;
++}
++
++unsigned int nx_threadx_linux_return_flags(void)
++{
++    unsigned int flags;
++    if (!atomic_load_explicit(&_nx_linux_mutex_ready, memory_order_acquire))
++        return (unsigned int)(_tx_thread_system_state | _tx_thread_preempt_disable);
++    tx_linux_mutex_lock(_tx_linux_mutex);
++    flags = (unsigned int)(_tx_thread_system_state | _tx_thread_preempt_disable);
++    tx_linux_mutex_unlock(_tx_linux_mutex);
++    return flags;
++}
++
++struct TX_THREAD_STRUCT *nx_threadx_linux_current(void)
++{
++    TX_THREAD *current;
++    if (!atomic_load_explicit(&_nx_linux_mutex_ready, memory_order_acquire))
++        return _tx_thread_current_ptr;
++    tx_linux_mutex_lock(_tx_linux_mutex);
++    current = _tx_thread_current_ptr;
++    tx_linux_mutex_unlock(_tx_linux_mutex);
++    return current;
++}
++
+ static sigset_t     _tx_linux_thread_wait_mask;
++
+ static __thread int _tx_linux_thread_suspended;
+ static sem_t        _tx_linux_thread_timer_wait;
+ static sem_t        _tx_linux_thread_other_wait;
+@@ -68,8 +112,8 @@
+ 
+ #ifdef TX_LINUX_DEBUG_ENABLE
+ 
+-extern ULONG        _tx_thread_system_state;
+-extern UINT         _tx_thread_preempt_disable;
++extern volatile ULONG _tx_thread_system_state;
++extern volatile UINT _tx_thread_preempt_disable;
+ extern TX_THREAD    *_tx_thread_current_ptr;
+ extern TX_THREAD    *_tx_thread_execute_ptr;
+ 
+@@ -258,9 +302,11 @@
+     /* Create the system critical section.  This is used by the
+        scheduler thread (which is the main thread) to block all
+        other stuff out.  */
+-    pthread_mutexattr_init(&attr);
+-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+-    pthread_mutex_init(&_tx_linux_mutex, &attr);
++    if (pthread_mutexattr_init(&attr) != 0 ||
++        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0 ||
++        pthread_mutex_init(&_tx_linux_mutex, &attr) != 0)
++        abort();
++    atomic_store_explicit(&_nx_linux_mutex_ready, 1, memory_order_release);
+     sem_init(&_tx_linux_semaphore, 0, 0);
+ #ifdef TX_LINUX_NO_IDLE_ENABLE
+     sem_init(&_tx_linux_semaphore_no_idle, 0, 0);
+@@ -330,16 +376,16 @@
+     while(1)
+     {
+ 
+-        clock_gettime(CLOCK_REALTIME, &ts);
++        clock_gettime(CLOCK_MONOTONIC, &ts);
+         ts.tv_nsec += timer_periodic_nsec;
+-        if (ts.tv_nsec > 1000000000)
++        if (ts.tv_nsec >= 1000000000)
+         {
+             ts.tv_nsec -= 1000000000;
+             ts.tv_sec++;
+         }
+         do
+         {
+-            if (sem_timedwait(&_tx_linux_timer_semaphore, &ts) == 0)
++            if (sem_clockwait(&_tx_linux_timer_semaphore, CLOCK_MONOTONIC, &ts) == 0)
+             {
+                 break;
+             }
+@@ -383,6 +429,8 @@
+ 
+ void    _tx_linux_thread_suspend_handler(int sig)
+ {
++    int saved_errno = errno;
++    int resume_signal;
+     (VOID)sig;
+ 
+     if(pthread_equal(pthread_self(), _tx_linux_timer_id))
+@@ -391,11 +439,22 @@
+         tx_linux_sem_post_nolock(&_tx_linux_thread_other_wait);
+ 
+     if(_tx_linux_thread_suspended)
++    {
++        errno = saved_errno;
+         return;
++    }
+ 
+     _tx_linux_thread_suspended = 1;
+-    sigsuspend(&_tx_linux_thread_wait_mask);
++    /* Consume the blocked resume signal without nested user handlers.
++       GNU libc sigwait uses its signal-wait syscall/cancellation path;
++       an invalid wait cannot grant a successful resume. */
++    if (sigwait(&_tx_linux_thread_wait_mask, &resume_signal) != 0 ||
++        resume_signal != RESUME_SIG)
++    {
++        abort();
++    }
+     _tx_linux_thread_suspended = 0;
++    errno = saved_errno;
+ }
+ 
+ void    _tx_linux_thread_suspend(pthread_t thread_id)
+@@ -430,8 +489,8 @@
+     sem_init(&_tx_linux_thread_timer_wait, 0, 0);
+     sem_init(&_tx_linux_thread_other_wait, 0, 0);
+ 
+-    sigfillset(&_tx_linux_thread_wait_mask);
+-    sigdelset(&_tx_linux_thread_wait_mask, RESUME_SIG);
++    sigemptyset(&_tx_linux_thread_wait_mask);
++    sigaddset(&_tx_linux_thread_wait_mask, RESUME_SIG);
+ 
+     sigfillset(&sa.sa_mask);
+     sa.sa_flags = 0;

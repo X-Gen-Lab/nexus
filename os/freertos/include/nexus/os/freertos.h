@@ -143,6 +143,8 @@ nx_result_t nx_freertos_notify_destroy(nx_freertos_notify_t* notification);
  * \param[in]       context: Entry context kept until join
  * \return          SUCCESS or invalid/context/start error
  * \note            Task/startup context. No hidden worker or maximum pool.
+ *                  Stack and task control must not overlap; known span wrap
+ *                  and overlap reject before any kernel object is created.
  *                  Entry must return in privileged Thread mode, with manual
  *                  interrupt masks restored and the scheduler resumed after
  *                  any temporary suspension.
@@ -190,6 +192,8 @@ nx_result_t nx_freertos_task_join(nx_freertos_task_t* task,
  * \param[in]       depth: Number of items
  * \param[in]       item_size: Bytes copied per item
  * \return          SUCCESS or invalid/context/start error
+ * \note            The used depth times item_size payload must not overlap
+ *                  queue control. Span wrap rejects before kernel mutation.
  */
 nx_result_t nx_freertos_queue_init(nx_freertos_queue_t* queue, uint8_t* storage,
                                    size_t storage_bytes, size_t depth,

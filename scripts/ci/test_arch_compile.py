@@ -23,11 +23,7 @@ class CortexCompilerPolicyTests(unittest.TestCase):
         )
 
     def assembly(self, cpu):
-        domain = ("mrs r0, basepri\nmrs r1, faultmask\n"
-                  if gate.profile(cpu).mainline else "")
-        return ("mrs r0, primask\ncpsid i\nmsr primask, r0\n"
-                "mrs r0, ipsr\nmrs r0, control\ndmb sy\ndsb sy\nisb sy\n"
-                + domain)
+        return self.function_assembly(cpu)
 
     def test_scope_is_exact_and_unknown_cpu_fails_closed(self):
         self.assertEqual(tuple(gate.PROFILES), (
@@ -122,7 +118,7 @@ class CortexCompilerPolicyTests(unittest.TestCase):
             with self.subTest(cpu=cpu):
                 gate.check_instructions(cpu, self.assembly(cpu))
                 if gate.profile(cpu).mainline:
-                    bad = self.assembly(cpu).replace('mrs r0, basepri\n', '')
+                    bad = self.assembly(cpu).replace('mrs r2, basepri\n', '')
                 else:
                     bad = self.assembly(cpu) + 'mrs r0, basepri\n'
                 with self.assertRaisesRegex(ValueError, 'mask register'):
@@ -155,12 +151,120 @@ class CortexCompilerPolicyTests(unittest.TestCase):
 
     def test_required_barrier_and_irq_instructions_cannot_disappear(self):
         for instruction in ('cpsid i', 'dmb sy', 'dsb sy', 'isb sy',
-                            'mrs r0, control'):
+                            'mrs r1, control'):
             with self.subTest(instruction=instruction):
                 with self.assertRaisesRegex(ValueError, 'required instruction'):
                     gate.check_instructions(
                         'cortex-m4', self.assembly('cortex-m4').replace(
                             instruction, ''))
+
+    def function_assembly(self, cpu='cortex-m4'):
+        priority = ('mrs r2, basepri\nmrs r3, faultmask\n'
+                    if gate.profile(cpu).mainline else '')
+        bodies = {
+            'nx_arch_irq_save': 'mrs r0, primask\ncpsid i\ndsb sy\nisb sy\nbx lr',
+            'nx_arch_irq_restore': 'dsb sy\nmsr primask, r0\nisb sy\nbx lr',
+            'nx_arch_irq_masks': 'mrs r1, primask\n' + priority + 'bx lr',
+            'nx_arch_irq_is_masked': 'mrs r0, primask\nbx lr',
+            'nx_arch_exception_number': 'mrs r0, ipsr\nbx lr',
+            'nx_arch_is_privileged': 'mrs r0, ipsr\nmrs r1, control\nbx lr',
+            'nx_arch_in_isr': 'mrs r0, ipsr\nbx lr',
+            'nx_arch_dmb': 'dmb sy\nbx lr',
+            'nx_arch_dsb': 'dsb sy\nbx lr',
+            'nx_arch_isb': 'isb sy\nbx lr',
+            'nx_arch_cycle_snapshot': 'movs r0, #0\nbx lr',
+        }
+        return ''.join(f'.type {name}, %function\n{name}:\n{body}\n'
+                       f'.size {name}, .-{name}\n' for name, body in bodies.items())
+
+    def test_per_function_irq_order_cannot_borrow_another_functions_barrier(self):
+        text = self.function_assembly()
+        gate.check_instructions('cortex-m4', text)
+        bad = text.replace('nx_arch_irq_restore:\ndsb sy\n',
+                           'nx_arch_irq_restore:\n')
+        with self.assertRaisesRegex(ValueError, 'irq_restore.*barrier|irq_restore.*order'):
+            gate.check_instructions('cortex-m4', bad)
+        swapped = text.replace('mrs r0, primask\ncpsid i',
+                               'cpsid i\nmrs r0, primask')
+        with self.assertRaisesRegex(ValueError, 'irq_save.*order'):
+            gate.check_instructions('cortex-m4', swapped)
+
+    def test_function_audit_reads_actual_objdump_without_counting_literal_data(self):
+        text = ('00000000 <nx_probe>:\n'
+                ' 0: f3ef 8010 mrs r0, PRIMASK\n'
+                ' 4: f3bf 8f4f dsb sy\n'
+                ' 8: 4770 bx lr\n'
+                ' a: bf00 nop\n'
+                ' c: e000ed14 .word 0xe000ed14\n')
+        metrics = gate.function_costs(text)
+        self.assertEqual(metrics['nx_probe']['static_instructions'], 4)
+        self.assertFalse(metrics['nx_probe']['wcet_established'])
+
+    def test_real_header_atomic_probe_has_explicit_helper_and_mask_contract(self):
+        gate.check_nexus_atomic_symbols('cortex-m23', '')
+        gate.check_nexus_atomic_symbols('cortex-m0',
+            ' U nx_arch_irq_save\n U nx_arch_irq_restore\n')
+        with self.assertRaisesRegex(ValueError, 'production atomic'):
+            gate.check_nexus_atomic_symbols('cortex-m23',
+                ' U __atomic_compare_exchange_4\n')
+        with self.assertRaisesRegex(ValueError, 'production atomic'):
+            gate.check_nexus_atomic_symbols('cortex-m0', '')
+
+    def atomic_assembly(self, cpu):
+        functions = {}
+        for suffix in ('load_relaxed', 'load_acquire', 'store_relaxed',
+                       'store_release'):
+            load = suffix.startswith('load')
+            body = 'ldr r0, [r0]' if load else 'str r1, [r0]'
+            if suffix == 'load_acquire':
+                body += '\ndmb sy'
+            if suffix == 'store_release':
+                body = 'dmb sy\n' + body
+            functions['nx_probe_atomic_' + suffix] = body + '\nbx lr'
+        for suffix in ('fetch_add_acq_rel', 'fetch_add_release',
+                       'fetch_sub_acq_rel', 'fetch_sub_release',
+                       'compare_exchange_acq_rel'):
+            body = ('bl nx_arch_irq_save\nldr r4, [r5]\n'
+                    'str r0, [r5]\nbl nx_arch_irq_restore\nbx lr'
+                    if gate.profile(cpu).atomic_lock_free == 1 else
+                    'dmb sy\nldrex r2, [r0]\nstrex r3, r1, [r0]\n'
+                    'cmp r3, #0\nbne 0b\ndmb sy\nbx lr')
+            functions['nx_probe_atomic_' + suffix] = body
+        return ''.join(f'.type {name}, %function\n{name}:\n{body}\n'
+                       f'.size {name}, .-{name}\n'
+                       for name, body in functions.items())
+
+    def test_production_atomic_instruction_audit_is_per_operation(self):
+        for cpu in gate.PROFILES:
+            text = self.atomic_assembly(cpu)
+            gate.check_nexus_atomic_instructions(cpu, text)
+            if gate.profile(cpu).atomic_lock_free == 1:
+                bad = text.replace('bl nx_arch_irq_restore', 'nop', 1)
+            else:
+                bad = text.replace('strex r3, r1, [r0]', 'str r1, [r0]', 1)
+            with self.assertRaisesRegex(ValueError, 'atomic.*RMW'):
+                gate.check_nexus_atomic_instructions(cpu, bad)
+        text = self.atomic_assembly('cortex-m23')
+        with self.assertRaisesRegex(ValueError, 'atomic.*publication'):
+            gate.check_nexus_atomic_instructions('cortex-m23', text.replace(
+                'nx_probe_atomic_load_relaxed:\n',
+                'nx_probe_atomic_load_relaxed:\ncpsid i\n'))
+        with self.assertRaisesRegex(ValueError, 'atomic.*ordering'):
+            gate.check_nexus_atomic_instructions('cortex-m23', text.replace(
+                'nx_probe_atomic_store_release:\ndmb sy',
+                'nx_probe_atomic_store_release:\nnop'))
+
+    def test_machine_relocations_bind_each_irq_fallback_call(self):
+        text = self.atomic_assembly('cortex-m0')
+        for operation in ('save', 'restore'):
+            text = text.replace('bl nx_arch_irq_' + operation,
+                '0: f7ff fffe bl 0 <nx_probe_atomic_fetch_add_acq_rel>\n'
+                '0: R_ARM_THM_CALL nx_arch_irq_' + operation)
+        gate.check_nexus_atomic_instructions('cortex-m0', text)
+        with self.assertRaisesRegex(ValueError, 'atomic.*RMW'):
+            gate.check_nexus_atomic_instructions('cortex-m0', text.replace(
+                'R_ARM_THM_CALL nx_arch_irq_restore',
+                'R_ARM_THM_CALL nx_arch_irq_save', 1))
 
 
 class CortexCompilerExecutionTests(unittest.TestCase):
@@ -211,6 +315,33 @@ class CortexCompilerExecutionTests(unittest.TestCase):
                               ['tool'], -11, b'', b'compiler crashed')):
             with self.assertRaisesRegex(ValueError, 'command failed'):
                 recorder.execute(['tool'], 'crash', reject=True)
+
+    def test_independent_cmsis_reference_rejects_changed_production_address(self):
+        import os
+        root = Path(__file__).resolve().parents[2]
+        selected = gate.tools(os.environ.get('NEXUS_ARM_GCC',
+                                             'arm-none-eabi-gcc'))
+        source = root / 'tests/contracts/arch_cmsis_layout_probe.c'
+        for cpu in gate.PROFILES:
+            with self.subTest(cpu=cpu):
+                command = gate.cmsis_layout_command(
+                    root, selected['gcc'], cpu, source,
+                    self.root / (cpu + '.o'))
+                completed = subprocess.run(command, capture_output=True,
+                                           text=True, timeout=30)
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+        private = self.root / 'private'
+        private.mkdir()
+        original = root / 'arch/arm/cortex_m/private/registers.h'
+        (private / original.name).write_text(original.read_text().replace(
+            '0xe000ed14U', '0xe000ed18U'))
+        command = gate.cmsis_layout_command(root, selected['gcc'], 'cortex-m7',
+                                            source, self.root / 'changed.o')
+        command[1:1] = ['-I', str(self.root)]
+        completed = subprocess.run(command, capture_output=True, text=True,
+                                   timeout=30)
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn('CMSIS register address', completed.stderr)
 
 
 if __name__ == '__main__':

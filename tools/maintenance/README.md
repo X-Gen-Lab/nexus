@@ -34,6 +34,14 @@ becoming historical success. Physical HIL remains separately unassessed, even
 when the software candidate is valid. No candidate changes the aggregate family
 table or qualifies other Boards, controllers, modes or routes.
 
+An exact assembly query also projects its resolved `os` selection: kernel source
+commit, actual port/CPU ABI, Tick policy, enabled optional capabilities and
+caller-owned stack/storage restrictions. Startup minima are not measured stack
+peaks. Ordinary/direct notification and joinable/permanent tasks remain explicit
+choices; Native queue roles do not imply independently measured object layouts.
+The existing candidate association still owns execution evidence. A configuration
+query alone reports execution and linked costs as unassessed/unmeasured.
+
 Without `--candidate`, queries keep their configuration-only behavior and need
 no Git or evidence observation. A portable candidate must first be restored with
 the existing artifact tools; this command reads the seal and its payloads without

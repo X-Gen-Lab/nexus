@@ -26,6 +26,19 @@ nx_time_us_t nx_deadline_after(nx_time_us_t now, uint64_t duration_us) {
     return now + duration_us;
 }
 
+/** \brief Reject a nonfinite sum before publishing a bounded-wait deadline. */
+nx_result_t nx_deadline_finite_after(nx_time_us_t now, uint64_t duration_us,
+                                     nx_time_us_t* deadline) {
+    if (deadline == NULL || now == NX_DEADLINE_NEVER) {
+        return NX_ERROR_INVALID;
+    }
+    if (duration_us >= NX_DEADLINE_NEVER - now) {
+        return NX_ERROR_EXHAUSTED;
+    }
+    *deadline = now + duration_us;
+    return NX_SUCCESS;
+}
+
 /** \brief Establish one stable-frequency counter domain. */
 nx_result_t nx_clock32_initialize(nx_clock32_t* clock, uint32_t counter,
                                   uint32_t frequency_hz) {
@@ -43,6 +56,14 @@ nx_result_t nx_clock32_initialize(nx_clock32_t* clock, uint32_t counter,
 nx_result_t nx_clock32_observe(nx_clock32_t* clock, uint32_t counter,
                                nx_time_us_t* time_us) {
     if (clock == NULL || time_us == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    uintptr_t state = (uintptr_t)clock;
+    uintptr_t output = (uintptr_t)time_us;
+    if (sizeof(*clock) > UINTPTR_MAX - state ||
+        sizeof(*time_us) > UINTPTR_MAX - output ||
+        (state < output + sizeof(*time_us) &&
+         output < state + sizeof(*clock))) {
         return NX_ERROR_INVALID;
     }
     if (!clock->initialized || clock->frequency_hz == 0) {

@@ -1,0 +1,19 @@
+--- upstream/portasm.c
++++ reviewed/portasm.c
+@@ -206,6 +206,8 @@
+         "   dsb                                             \n"
+         "   isb                                             \n"
+         "   svc %0                                          \n" /* System call to start the first task. */
++        " .global __nexus_mpu_start_svc_return \n"
++        " __nexus_mpu_start_svc_return: \n"
+         "   nop                                             \n"
+         ::"i" ( portSVC_START_SCHEDULER ) : "memory"
+     );
+@@ -434,6 +436,7 @@
+             "blt syscall_enter              \n"
+             "cmp r2, %1                     \n"
+             "beq syscall_exit               \n"
++            " mov r1, lr \n"
+             "b vPortSVCHandler_C            \n"
+             "                               \n"
+             "syscall_enter:                 \n"

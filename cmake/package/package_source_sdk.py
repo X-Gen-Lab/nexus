@@ -176,7 +176,8 @@ REQUIRED_FILES = (
     "cmake/platform/CMSISCore.cmake",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
     "arch/include/nexus/arch/arch.h", "arch/arm/cortex_m/nx_arch_cortex_m.c",
-    "arch/arm/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
+    "arch/arm/cortex_m/private/compiler.h",
+    "arch/arm/cortex_m/private/registers.h", "arch/native/nx_arch_native.c",
     "arch/include/nexus/arch/atomic.h", "arch/include/nexus/arch/features.h",
     "arch/include/nexus/arch/cache.h", "arch/include/nexus/arch/mpu.h",
     "arch/include/nexus/arch/security.h", "arch/arm/cortex_m/private/mechanisms.h",
@@ -566,6 +567,20 @@ for _mode in ("platform", "runtime"):
         _mode, None, sdk=True))
 for _descriptor in provider_descriptors.families():
     REQUIRED_FILES += _descriptor.fact_files + _descriptor.owned_payload
+REQUIRED_FILES += (
+    "os/reviewed_patch.py",
+    "os/freertos/patches/m7-integer-port.c.patch",
+    "os/freertos/patches/m7-integer-portmacro.h.patch",
+    "os/threadx/patches/linux-lowlevel.patch",
+    "os/threadx/patches/linux-scheduler.patch",
+)
+REQUIRED_FILES += tuple("os/freertos/mpu/patches/" + name + ".patch"
+                        for name in (
+                            "arm_cm3_mpu-port", "arm_cm4_mpu-port", "v8-port",
+                            "v8-baseline-assembly", "v8-mainline-assembly",
+                            "v7-veneers", "v8-baseline-veneers",
+                            "v8-mainline-veneers", "gpio-numbers",
+                            "gpio-veneers"))
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")

@@ -26,6 +26,7 @@ typedef struct {
     uint32_t sequence;
     bool initialized;
     bool waiting;
+    uint8_t resources;
 } nx_native_notify_t;
 
 /**
@@ -46,11 +47,13 @@ typedef struct {
     size_t users;
     bool closed;
     bool initialized;
+    uint8_t resources;
 } nx_native_queue_t;
 
 /**
  * \brief           Explicit task handle; stack storage is supplied at start
- * \note            Start/join are serialized by one external lifecycle owner;
+ * \note            Zero-initialize before the first start; successful join
+ *                  permits reuse. Start/join have one external lifecycle owner;
  *                  there is one joiner. An entry may attempt a self-join, which
  *                  returns BUSY. External cancellation and detachment are
  *                  unsupported.
@@ -70,8 +73,10 @@ uint64_t nx_native_now_us(void);
 /**
  * \brief           Initialize a notification in unused caller storage
  * \param[out]      notification: Storage kept alive through all publishers
- * \return          NX_SUCCESS or an initialization error
+ * \return          NX_SUCCESS, BUSY or an initialization error
  * \note            Task context; POSIX signal handlers are unsupported.
+ *                  BUSY retains resources: keep storage and retry destroy only.
+ *                  Other failures leave no resources; initialization may retry.
  */
 nx_result_t nx_native_notify_init(nx_native_notify_t* notification);
 /**
@@ -84,10 +89,11 @@ nx_wait_port_t nx_native_notify_port(nx_native_notify_t* notification);
 /**
  * \brief           Destroy after external publisher quiescence
  * \param[in,out]   notification: Live storage with no future publishers
- * \return          NX_SUCCESS or BUSY when a waiter is still registered
+ * \return          NX_SUCCESS or BUSY while a waiter/resource remains
  * \note            Stop and join publishers first. The check cannot authorize a
- *                  future call to race destruction. No storage access is
- *                  allowed afterward.
+ *                  future call to race destruction. After success, no storage
+ *                  access is allowed. A partial destroy disables new ports;
+ *                  retain storage and retry destroy without reinitialization.
  */
 nx_result_t nx_native_notify_destroy(nx_native_notify_t* notification);
 /**
@@ -97,8 +103,13 @@ nx_result_t nx_native_notify_destroy(nx_native_notify_t* notification);
  * \param[in]       storage_bytes: Actual byte capacity
  * \param[in]       depth: Number of items, greater than zero
  * \param[in]       item_size: Bytes per item, greater than zero
- * \return          NX_SUCCESS or invalid/initialization error
+ * \return          NX_SUCCESS or invalid/initialization error; BUSY retains
+ *                  resources for a subsequent destroy
  * \note            Task context; caller keeps buffer until successful destroy.
+ *                  Used depth times item_size bytes must not overlap the
+ *                  complete queue control; wrapping spans reject at admission.
+ *                  After initialization BUSY, only destroy is allowed. Other
+ *                  failures leave no resources and permit initialization again.
  */
 nx_result_t nx_native_queue_init(nx_native_queue_t* queue, void* storage,
                                  size_t storage_bytes, size_t depth,
@@ -139,7 +150,9 @@ nx_result_t nx_native_queue_close(nx_native_queue_t* queue);
 /**
  * \brief           Destroy quiesced and drained queue storage
  * \param[in,out]   queue: Closed queue, no future users
- * \return          NX_SUCCESS or BUSY if users/items remain
+ * \return          NX_SUCCESS or BUSY if users/items/resources remain
+ * \note            A partial destroy closes all public operations. Retain
+ *                  storage and retry destroy; do not reinitialize it yet.
  */
 nx_result_t nx_native_queue_destroy(nx_native_queue_t* queue);
 /**
@@ -149,10 +162,13 @@ nx_result_t nx_native_queue_destroy(nx_native_queue_t* queue);
  * \param[in]       stack_bytes: Host stack size, at least PTHREAD_STACK_MIN
  * \param[in]       entry: Returning bounded application entry
  * \param[in]       context: Entry context, kept alive until join
- * \return          NX_SUCCESS or invalid/start error
+ * \return          NX_SUCCESS or invalid/start error; EXHAUSTED when POSIX
+ *                  cannot create another task
  * \note            Task context. No default task, pool or hidden stack exists.
+ *                  Stack and complete task control must not overlap; wrapping
+ *                  spans reject before POSIX task creation.
  *                  POSIX library bookkeeping is host-runtime allocation, not
- *                  MCU RAM evidence.
+ *                  MCU RAM evidence. Failure retains no entry/context borrow.
  */
 nx_result_t nx_native_task_start(nx_native_task_t* task, void* stack,
                                  size_t stack_bytes, void (*entry)(void*),
@@ -167,6 +183,7 @@ nx_result_t nx_native_task_start(nx_native_task_t* task, void* stack,
  *                  simultaneous joiners and external pthread_cancel/detach are
  *                  unsupported. Stop/join publishers before destroying their
  *                  notification or queue storage.
+ *                  Inactive private pointer values do not retain a borrow.
  */
 nx_result_t nx_native_task_join(nx_native_task_t* task);
 

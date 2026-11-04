@@ -257,17 +257,8 @@ msgstr "[in] 有效传输的字节／样本数。"
 msgid "[in] Live request storage with no concurrent reuse."
 msgstr "[in] 存续的请求存储，且不得并发复用。"
 
-msgid "[out] Final operation result."
-msgstr "[out] 最终操作结果。"
-
-msgid "[out] Valid byte/sample count."
-msgstr "[out] 有效字节／样本数。"
-
 msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
 msgstr "成功返回 NX_SUCCESS；仍在借用时返回 NX_ERROR_BUSY；参数无效时拒绝。"
-
-msgid "[inout] Zero-initialized, unbound adapter-owned slot."
-msgstr "[inout] 零初始化、尚未绑定且由适配器拥有的槽。"
 
 msgid "[in] Live storage to bind; binding itself is not admission."
 msgstr "[in] 待绑定的存续存储；绑定本身不表示准入。"
@@ -392,20 +383,11 @@ msgstr "[in] 非零且稳定的计数器频率。"
 msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
 msgstr "成功返回 NX_SUCCESS；参数无效返回 NX_ERROR_INVALID。"
 
-msgid "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
-msgstr "即使空闲，也必须至少每 2^32 个 tick 观察一次。仅凭两次快照无法检测多次漏掉的回绕。计数器须在等待期间持续运行，频率不得变化。"
-
 msgid "[inout] Initialized, single-owner extension state."
 msgstr "[inout] 已初始化、仅有一个所有者的扩展状态。"
 
 msgid "[in] Current counter snapshot."
 msgstr "[in] 当前计数器快照。"
-
-msgid "[out] Extended elapsed microseconds."
-msgstr "[out] 扩展后的已用微秒数。"
-
-msgid "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
-msgstr "返回 NX_SUCCESS、NX_ERROR_STATE 或 NX_ERROR_EXHAUSTED。"
 
 msgid "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
 msgstr "成功返回 SUCCESS；身份标识过期／已释放返回 STATE；参数无效返回 INVALID；时间倒退返回 IO；计数器饱和，不复用 epoch。"
@@ -413,6 +395,44 @@ msgstr "成功返回 SUCCESS；身份标识过期／已释放返回 STATE；参�
 msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout. U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates; autonomous operation and DMA borrow admission require their own provider."
 msgstr "这些属性用于变量定义，置于类型之前，每个声明只定义一个变量；它们不是函数或指令属性。每次使用都有独立的输入 section，便于回收未使用存储。DATA 在复位时从 Flash 复制初始值；BSS 在复位时清零；NOINIT 既不复制也不清零，读取前必须初始化。不承诺掉电保持。BSS/NOINIT 拒绝非零初始值。存储按字对齐，并受显式 ELF 预算约束。未选入时使用会触发编译错误。TCM 仅用于 CPU 数据，绝不能用作 DMA 或可执行存储。CCM 同样仅用于 CPU 数据，放置在其中不授予总线主设备访问权限。ADDSRAM DMA 仍须由 provider 验证地址、对齐和所有权。普通存储、主 MSP 及未选入的镜像保留现有布局。U575 SRAM4 选择还会准备由复位流程拥有的 PWR/SRAM4/LPDMA 运行门控；自主运行及 DMA 借用接纳仍需各自的 provider。"
 
-# Retained prior translation; replaced by the current public-header note.
-#~ msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
-#~ msgstr "这些属性用于变量定义，置于类型之前，每个声明只定义一个变量；它们不是函数或指令属性。每次使用都有独立的输入 section，便于回收未使用存储。DATA 在复位时从 Flash 复制初始值；BSS 在复位时清零；NOINIT 既不复制也不清零，读取前必须初始化。不承诺掉电保持。BSS/NOINIT 拒绝非零初始值。存储按字对齐，并受显式 ELF 预算约束。未选入时使用会触发编译错误。TCM 仅用于 CPU 数据，绝不能用作 DMA 或可执行存储。CCM 同样仅用于 CPU 数据，放置在其中不授予总线主设备访问权限。ADDSRAM DMA 仍须由 provider 验证地址、对齐和所有权。普通存储、主 MSP 及未选入的镜像保留现有布局。"
+msgid "Outputs are separate writable objects, disjoint from the complete request and each other. They remain unchanged on rejection. The caller establishes these spans; this hot helper validates NULL arguments and the settled predicate, not arbitrary storage provenance."
+msgstr "输出为独立可写对象，与完整请求及彼此均不重叠。拒绝时保持不变。调用者确立这些范围；此热路径 helper 验证 NULL 参数和已结清谓词，不验证任意存储来源。"
+
+msgid "[out] Distinct final operation result."
+msgstr "[out] 独立的最终操作结果。"
+
+msgid "[out] Distinct valid byte/sample count."
+msgstr "[out] 独立的有效字节／样本数。"
+
+msgid "Zero-initialize only before first publication. After the last usable UINT64_MAX epoch, retire this slot. Replacing its storage requires every old command and observer joined; clearing a live epoch is not retirement."
+msgstr "只在首次发布之前零初始化。最后可用 UINT64_MAX epoch 之后，退役此 slot。替换其存储要求所有旧命令和观察者均已 join；清除仍存活的 epoch 并非退役。"
+
+msgid "[inout] Initialized, unbound adapter-owned stable slot."
+msgstr "[inout] 已初始化且未绑定的适配器所属稳定 slot。"
+
+msgid "Construct a finite deadline without selecting infinite wait."
+msgstr "构造有限 deadline，不选择无限等待。"
+
+msgid "Bounded task/IRQ arithmetic, without reads of a clock, allocation or retained references. Clock readiness and domain lifetime remain the caller's responsibility. Use nx_deadline_after only when saturation to an infinite wait is intentional."
+msgstr "有界的任务／IRQ 算术，不读取时钟、不分配，也不保留引用。时钟就绪和域生命周期仍由调用者负责。仅在明确希望饱和为无限等待时使用 nx_deadline_after。"
+
+msgid "[in] Current finite time in the consumer's clock domain."
+msgstr "[in] 消费者时钟域中的当前有限时间。"
+
+msgid "[in] Relative duration in microseconds; zero is valid."
+msgstr "[in] 相对时长，单位微秒；零合法。"
+
+msgid "[out] Finite result, unchanged on failure."
+msgstr "[out] 有限结果，失败时保持不变。"
+
+msgid "SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED when the sum reaches NX_DEADLINE_NEVER or would overflow."
+msgstr "SUCCESS；输出为 NULL 或 now 非有限时返回 INVALID；和达到 NX_DEADLINE_NEVER 或将溢出时返回 EXHAUSTED。"
+
+msgid "Observe strictly before 2^32 ticks elapse, even when idle. Multiple missed wraps cannot be detected from two snapshots, nor can one complete wrap at equal snapshots. Counter must continue through waits; frequency cannot change. No concurrent initialize/reset or observation."
+msgstr "必须在 2^32 个 tick 经过之前严格提前观察，即使空闲时也如此。两个快照无法检测漏过的多次回绕，也无法检测快照相等时恰好完整回绕一次。等待期间计数器必须持续运行，频率不得改变。不得并发初始化／复位或观察。"
+
+msgid "[out] Distinct extended elapsed microseconds."
+msgstr "[out] 独立的扩展后经过时间，单位微秒。"
+
+msgid "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
+msgstr "SUCCESS；输出为 NULL／重叠时返回 INVALID；时钟未初始化时返回 STATE；或返回 EXHAUSTED。失败不改变扩展状态或输出。"

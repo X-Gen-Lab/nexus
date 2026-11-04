@@ -2,6 +2,20 @@
 # Explicit static-only maintained FreeRTOS CPU port source targets.
 # Author: Nexus Team
 set(kernel_root "${CMAKE_CURRENT_SOURCE_DIR}/../../ext/freertos")
+get_filename_component(reviewed_patch
+    "${CMAKE_CURRENT_SOURCE_DIR}/../reviewed_patch.py" ABSOLUTE)
+set(mpu_patch_root "${CMAKE_CURRENT_SOURCE_DIR}/mpu/patches")
+set(mpu_patches
+    "${mpu_patch_root}/arm_cm3_mpu-port.patch"
+    "${mpu_patch_root}/arm_cm4_mpu-port.patch"
+    "${mpu_patch_root}/v8-port.patch"
+    "${mpu_patch_root}/v8-baseline-assembly.patch"
+    "${mpu_patch_root}/v8-mainline-assembly.patch"
+    "${mpu_patch_root}/v7-veneers.patch"
+    "${mpu_patch_root}/v8-baseline-veneers.patch"
+    "${mpu_patch_root}/v8-mainline-veneers.patch"
+    "${mpu_patch_root}/gpio-numbers.patch"
+    "${mpu_patch_root}/gpio-veneers.patch")
 set(maintained_ports
     GCC/ARM_CM0 GCC/ARM_CM3 GCC/ARM_CM4F GCC/ARM_CM7/r0p1
     GCC/ARM_CM3_MPU GCC/ARM_CM4_MPU
@@ -18,7 +32,10 @@ if(NEXUS_FREERTOS_PORT STREQUAL "nexus/ARM_CM7_integer")
     set(overlay "${CMAKE_CURRENT_SOURCE_DIR}/prepare_m7_integer.py")
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
         "${overlay}" "${kernel_root}/portable/GCC/ARM_CM3/port.c"
-        "${kernel_root}/portable/GCC/ARM_CM3/portmacro.h")
+        "${kernel_root}/portable/GCC/ARM_CM3/portmacro.h"
+        "${reviewed_patch}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/patches/m7-integer-port.c.patch"
+        "${CMAKE_CURRENT_SOURCE_DIR}/patches/m7-integer-portmacro.h.patch")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${overlay}"
         --kernel-root "${kernel_root}" --output "${port_root}"
         RESULT_VARIABLE overlay_result
@@ -69,7 +86,7 @@ if(NEXUS_OS_MEMORY_PROTECTION)
             "${mpu_stdout}${mpu_stderr}")
     endif()
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${mpu_prepare}" "${mpu_veneers}")
+        "${mpu_prepare}" "${mpu_veneers}" "${reviewed_patch}" ${mpu_patches})
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${mpu_prepare}"
         --source "${mpu_veneers}" --output "${mpu_output}/veneers.c" --veneers
         ${mpu_gpio_arguments}

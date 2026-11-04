@@ -112,6 +112,34 @@ executed measurements. An observation is not a software candidate or release.
 Three-board HIL preparation uses the existing `tools/hil` exact-build protocols;
 unknown station facts and numeric budgets remain unbound until equipment exists.
 
+The existing OS resource matrix also offers opt-in Core/Arch probes, sharing its
+Runtime targets and compiler tuple rather than defining another firmware graph:
+
+```sh
+python scripts/ci/os_resources.py --output /new/os-resource-observation \
+    --core-arch-costs --native-commands build/native-debug/compile_commands.json
+```
+
+The eight M0/M4, standard/minimal, Os/O2 variants retain actual OS objects and
+zero/one/two/four Core instance ELFs, maps and decoded function shapes. The
+Native compile database supplies the actual maintained compiler flags for small
+executed wait/select and diagnostic boundary-call counters. N=1/4/16 scans and
+caller-maintained cyclic cursor order are observed; predicate bodies must still
+be bounded by their caller. Queue depth/item/waiter grids are explicitly
+`derived_budget` values from measured ABI sizes and declared dimensions, not
+executed throughput. Saved IRQ masks and scheduler suspension remain distinct.
+No probe adds default production instrumentation, measured cycles, stack peaks,
+contention bounds or physical qualification. The output directory must be fresh.
+
+既有 OS 资源矩阵提供可选 Core/Arch 探针，共用 Runtime 目标与编译器，不另建固件
+源码图。八组 M0/M4、standard/minimal、Os/O2 记录实际 OS 对象，以及 0/1/2/4 个
+Core 实例的 ELF、map 和静态指令形状。Native 编译数据库提供维护目标的真实参数，
+用于执行 wait/select 与诊断边界调用计数；实际观察 N=1/4/16 扫描和调用方维护的
+循环游标，调用方仍须保证 predicate 有界。队列深度、item、waiter 表明确属于
+`derived_budget`，由实测 ABI 和声明维度推导，不是吞吐实测。IRQ 保存/恢复与
+调度暂停分别说明；不增加默认生产仪表状态，也不建立周期、栈峰值、竞争上界或
+物理资格。输出目录必须为新目录。
+
 这些结果只证明链接后存储量。动态栈峰值、周期、中断延迟、电气行为和物理资格都需要
 各自真实执行的测量。观察记录不是软件候选或发布。三板 HIL 准备沿用 `tools/hil`
 绑定精确构建的协议；设备未接入前，站点事实和数值预算继续保持未绑定。

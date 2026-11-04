@@ -101,6 +101,8 @@ nx_arch_result_t nx_arch_mpu_v8_encode(const nx_arch_mpu_v8_region_t* region,
  *                  writes its fields, restores incoming RNR and leaves CTRL
  *                  unchanged. No allocation, OS calls, implicit MPU enable,
  *                  bulk clear or Secure access to the Non-secure alias.
+ *                  OK confirms validated writes and DSB/ISB completion, not
+ *                  register readback or an effective protection policy.
  */
 nx_arch_result_t nx_arch_mpu_v7_program(uint32_t index,
                                         const nx_arch_mpu_v7_region_t* region);
@@ -117,6 +119,8 @@ nx_arch_result_t nx_arch_mpu_v7_program(uint32_t index,
  * \note            Privileged masked Thread, disabled MPU and exclusive local
  *                  ownership required. No MAIR updates or cross-world alias
  *                  access. Incoming RNR and CTRL are preserved.
+ *                  OK has the same write-and-barrier meaning as v7_program;
+ *                  it does not verify readback or an enabled memory policy.
  */
 nx_arch_result_t nx_arch_mpu_v8_program(uint32_t index,
                                         const nx_arch_mpu_v8_region_t* region);
@@ -137,6 +141,7 @@ nx_arch_result_t nx_arch_mpu_v8_program(uint32_t index,
  *                  this slot. Privileged masked Thread, disabled MPU and
  *                  exclusive local ownership required. No CTRL or RNR writes,
  *                  no cache maintenance, and no cross-world register access.
+ *                  OK confirms the write and barriers, without readback.
  */
 nx_arch_result_t nx_arch_mpu_v8_attribute_set(uint32_t index,
                                               uint32_t attribute);

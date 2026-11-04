@@ -6,6 +6,51 @@ import unittest
 
 
 class OSResourceGateTests(unittest.TestCase):
+    def test_core_cost_storage_requires_actual_zero_one_two_four_symbols(self):
+        gate = self.gate()
+        sizes = {"request": 24, "slot": 16, "observer": 56,
+                 "clock": 8, "clock32": 24}
+        for count in (0, 1, 2, 4):
+            text = "\n".join(
+                f"20000000 {size * count:08x} B nx_core_{name}__bytes"
+                for name, size in sizes.items()) if count else ""
+            result = gate.core_storage(text, count, sizes)
+            self.assertEqual(sum(result.values()), count * sum(sizes.values()))
+        with self.assertRaisesRegex(ValueError, "storage"):
+            gate.core_storage("20000000 00000018 B nx_core_request__bytes", 0,
+                              sizes)
+        with self.assertRaisesRegex(ValueError, "storage"):
+            gate.core_storage("", 1, sizes)
+
+    def test_queue_dimensions_are_explicit_derived_budgets_not_measurements(self):
+        rows = self.gate().queue_budgets(self.sizes())
+        self.assertEqual(len(rows), 27)
+        row = next(item for item in rows if
+                   (item["depth"], item["item_bytes"], item["waiters"]) ==
+                   (16, 64, 4))
+        self.assertEqual(row["payload_bytes"], 1024)
+        self.assertEqual(row["raw_queue_bytes"], 1104)
+        self.assertEqual(row["closable_queue_bytes"], 1456)
+        self.assertEqual(row["classification"], "derived_budget")
+        self.assertEqual(row["copy_bytes_per_success"], 64)
+        self.assertEqual(row["cycles_status"], "not_measured")
+
+    def test_select_counter_admission_requires_real_complete_operation_counts(self):
+        gate = self.gate()
+        rows = [{"sources": count, "case": case,
+                 "predicate_calls": count * multiplier,
+                 "arm_calls": int(case == "timeout"),
+                 "wait_calls": int(case == "timeout")}
+                for count in (1, 4, 16)
+                for case, multiplier in (("timeout", 3), ("last_ready", 1),
+                                          ("fair_cursor", 1))]
+        gate.check_select_counts(rows)
+        rows[-1]["predicate_calls"] += 1
+        with self.assertRaisesRegex(ValueError, "predicate"):
+            gate.check_select_counts(rows)
+        with self.assertRaisesRegex(ValueError, "complete"):
+            gate.check_select_counts(rows[:-1])
+
     def gate(self):
         return importlib.import_module("os_resources")
 

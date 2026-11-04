@@ -138,19 +138,25 @@ void nx_request_settle(nx_request_t* request, nx_result_t result,
  *
  * \param[in]       request: Live request storage with no concurrent reuse.
  *
- * \param[out]      result: Final operation result.
+ * \param[out]      result: Distinct final operation result.
  *
- * \param[out]      transferred: Valid byte/sample count.
+ * \param[out]      transferred: Distinct valid byte/sample count.
  *
  * \return          NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid
  *                  arguments.
+ *
+ * \note            Outputs are separate writable objects, disjoint from the
+ *                  complete request and each other. They remain unchanged on
+ *                  rejection. The caller establishes these spans; this hot
+ *                  helper validates NULL arguments and the settled predicate,
+ *                  not arbitrary storage provenance.
  */
 nx_result_t nx_request_result(const nx_request_t* request, nx_result_t* result,
                               size_t* transferred);
 /**
  * \brief           Bind a stable slot to a new request incarnation.
  *
- * \param[in,out]   slot: Zero-initialized, unbound adapter-owned slot.
+ * \param[in,out]   slot: Initialized, unbound adapter-owned stable slot.
  *
  * \param[in]       request: Live storage to bind; binding itself is not
  *                  admission.
@@ -159,6 +165,11 @@ nx_result_t nx_request_result(const nx_request_t* request, nx_result_t* result,
  *
  * \return          NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity
  *                  repeats.
+ *
+ * \note            Zero-initialize only before first publication. After the
+ *                  last usable UINT64_MAX epoch, retire this slot. Replacing
+ *                  its storage requires every old command and observer joined;
+ *                  clearing a live epoch is not retirement.
  */
 nx_result_t nx_request_slot_bind(nx_request_slot_t* slot, nx_request_t* request,
                                  uint64_t* epoch);

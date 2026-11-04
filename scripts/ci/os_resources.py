@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import sys
 
@@ -36,6 +37,60 @@ PUBLIC_HOT_PATHS = (
     'nx_freertos_closable_queue_send_until',
     'nx_freertos_closable_queue_receive_until',
 )
+CORE_OBJECTS = frozenset({'request', 'slot', 'observer', 'clock', 'clock32'})
+
+
+def core_storage(text: str, count: int, sizes: dict) -> dict:
+    """Check measured object symbols against the actual target ABI."""
+    if type(count) is not int or count not in {0, 1, 2, 4}:
+        raise ValueError('Core storage requires zero/one/two/four instances')
+    measured = {}
+    for size, name in re.findall(
+            r'^\s*[0-9a-fA-F]+\s+([0-9a-fA-F]+)\s+[bBdD]\s+'
+            r'nx_core_(\w+)__bytes\s*$', text, re.MULTILINE):
+        if name in measured:
+            raise ValueError('Duplicate Core storage symbol')
+        measured[name] = int(size, 16)
+    expected = CORE_OBJECTS if count else set()
+    if measured.keys() != expected or any(
+            measured[name] != count * sizes[name] for name in measured):
+        raise ValueError('Core storage differs from actual instance/ABI sizes')
+    return measured
+
+
+def queue_budgets(sizes: dict) -> list[dict]:
+    """Derive declared dimensions from measured ABI; never claim execution."""
+    return [{
+        'depth': depth, 'item_bytes': item, 'waiters': waiters,
+        'payload_bytes': depth * item,
+        'raw_queue_bytes': sizes['raw_queue'] + depth * item,
+        'closable_queue_bytes': (sizes['closable_queue'] + depth * item +
+                                 waiters * sizes['queue_waiter']),
+        'copy_bytes_per_success': item,
+        'close_broadcast_bound': waiters,
+        'classification': 'derived_budget', 'cycles_status': 'not_measured',
+        'exclusions': 'Caller task stacks, kernel scheduling and bus costs',
+        'exclusion_domains': {
+            'wrapper_metadata': 'scheduler_suspend',
+            'kernel_payload_copy': 'kernel_critical_section'}}
+        for depth in (1, 4, 16) for item in (1, 8, 64)
+        for waiters in (0, 1, 4)]
+
+
+def check_select_counts(rows: list[dict]) -> None:
+    """Require the complete real callback-count fixture, not timing claims."""
+    expected = {(count, case) for count in (1, 4, 16)
+                for case in ('timeout', 'last_ready', 'fair_cursor')}
+    if (not isinstance(rows, list) or len(rows) != len(expected) or
+            {(row.get('sources'), row.get('case')) for row in rows} != expected):
+        raise ValueError('A complete select count observation set is required')
+    for row in rows:
+        count, timeout = row['sources'], row['case'] == 'timeout'
+        if (type(row['predicate_calls']) is not int or
+                row['predicate_calls'] != count * (3 if timeout else 1) or
+                row['arm_calls'] != int(timeout) or
+                row['wait_calls'] != int(timeout)):
+            raise ValueError('Actual predicate/arm/wait counts differ')
 
 
 def matrix() -> tuple[dict, ...]:
@@ -316,7 +371,9 @@ def source_inputs(root: Path) -> list[dict]:
     result = {item['path']: item for item in os_profiles.source_inputs(root)}
     for path in (Path(__file__), root / 'tests/contracts/os_resources/main.c',
                  root / 'tests/contracts/os_resources/CMakeLists.txt',
-                 root / 'tests/contracts/os_resources/linker.ld'):
+                 root / 'tests/contracts/os_resources/linker.ld',
+                 root / 'tests/contracts/os_resources/core_arch_probe.c',
+                 root / 'tests/contracts/os_resources/operation_probe.c'):
         identity = compiler_gate.digest(path)
         result[identity['path']] = identity
     return [result[name] for name in sorted(result)]
@@ -333,8 +390,117 @@ def check_optimization(objects: list[dict], optimization: str) -> None:
             raise ValueError('Actual object has a competing optimization or LTO policy')
 
 
+def core_cost_observations(recorder, selected_tools, build, variant):
+    """Inspect opt-in linked probes built by the same Runtime target graph."""
+    observations = []
+    for count in (0, 1, 2, 4):
+        label = variant['name'] + '-core-' + str(count)
+        elf = build / f'nexus_core_arch_cost_{count}.elf'
+        symbols = recorder.execute(
+            [selected_tools['nm'], '-S', '--defined-only', str(elf)],
+            label + '-symbols', nonempty=True)
+        check_static_image(symbols)
+        compiler_gate.check_arch_symbols(recorder.execute(
+            [selected_tools['nm'], '-u', str(elf)], label + '-undefined'))
+        sizes = {}
+        for value, name in re.findall(
+                r'^\s*([0-9a-fA-F]+)\s+A\s+__nexus_core_size_(\w+)\s*$',
+                symbols, re.MULTILINE):
+            if name in sizes or not int(value, 16):
+                raise ValueError('Invalid actual Core ABI size symbol')
+            sizes[name] = int(value, 16)
+        if not CORE_OBJECTS <= sizes.keys():
+            raise ValueError('Incomplete actual Core ABI size symbols')
+        storage = core_storage(symbols, count, sizes)
+        image = os_profiles.image_size(recorder.execute(
+            [selected_tools['size'], str(elf)], label + '-size', nonempty=True))
+        body = recorder.execute([selected_tools['objdump'], '-d', str(elf)],
+                                label + '-disassembly', nonempty=True)
+        functions = compiler_gate.function_costs(body)
+        observations.append({
+            'instances': count, 'sizes': sizes, 'storage': storage,
+            'image': image, 'functions': functions,
+            'elf': compiler_gate.digest(elf),
+            'map': compiler_gate.digest(elf.with_suffix('.map')),
+            'classification': 'actual_linked_probe',
+            'physical_status': 'not_executed', 'cycles_status': 'not_measured'})
+    baseline = observations[0]['image']
+    for row in observations:
+        row['delta_from_zero'] = {
+            key: row['image'][key] - value for key, value in baseline.items()}
+    return observations
+
+
+def host_operation_counts(root, recorder, database):
+    """Execute real wait/diagnostic code with counted external boundary calls."""
+    database = database.resolve()
+    rows = json.loads(database.read_text(encoding='utf-8'))
+    sources = [root / 'os/wait.c', root / 'os/diagnostic.c']
+    inputs = [compiler_gate.digest(database)]
+    compiled = []
+    selected_flags = None
+    for source in sources:
+        matches = [row for row in rows if
+                   (Path(row['directory']) / row['file']).resolve() == source]
+        if len(matches) > 1:
+            target = 'nexus_os_' + source.stem + '.dir/'
+            matches = [row for row in matches if target in
+                       (row.get('command') or ' '.join(row['arguments']))]
+        if len(matches) != 1:
+            raise ValueError('One actual Native compile context required: ' + str(source))
+        row = matches[0]
+        argv = row.get('arguments') or shlex.split(row['command'])
+        if any(arg.startswith('@') for arg in argv) or '-mthumb' in argv:
+            raise ValueError('A transparent Native compiler context is required')
+        flags = []
+        index = 1
+        while index < len(argv):
+            arg = argv[index]
+            if arg in {'-o', '-MF', '-MT', '-MQ'}:
+                index += 2
+                continue
+            if arg in {'-c', '-MD', '-MMD', '-MP'}:
+                index += 1
+                continue
+            if (Path(row['directory']) / arg).resolve() == source:
+                index += 1
+                continue
+            flags.append(arg)
+            index += 1
+        compiler = shutil.which(argv[0])
+        if compiler is None:
+            raise ValueError('Actual Native compiler unavailable')
+        inputs.append(compiler_gate.digest(source))
+        target = recorder.output / (source.stem + '-operation-probe.o')
+        recorder.execute([compiler, *flags, '-c', str(source), '-o', str(target)],
+                         source.stem + '-operation-compile')
+        compiled.append(str(target))
+        selected_flags = (compiler, flags)
+    compiler, flags = selected_flags
+    source = root / 'tests/contracts/os_resources/operation_probe.c'
+    inputs.extend([compiler_gate.digest(source), compiler_gate.digest(Path(compiler))])
+    target = recorder.output / 'operation-probe.o'
+    recorder.execute([compiler, *flags, '-c', str(source), '-o', str(target)],
+                     'counted-operation-fixture-compile')
+    binary = recorder.output / 'operation-probe'
+    recorder.execute([compiler, *flags, *compiled, str(target), '-o', str(binary)],
+                     'counted-operation-fixture-link')
+    result = json.loads(recorder.execute([str(binary)], 'actual-operation-counts',
+                                        nonempty=True))
+    check_select_counts(result['select'])
+    if (len(result['diagnostic']) != 5 or any(
+            row['save_calls'] != 1 or row['restore_calls'] != 1
+            for row in result['diagnostic'])):
+        raise ValueError('Actual diagnostic saved-mask counts differ')
+    if any(compiler_gate.digest(Path(item['path'])) != item for item in inputs):
+        raise ValueError('Operation probe input changed during execution')
+    return {**result, 'inputs': inputs, 'binary': compiler_gate.digest(binary),
+            'classification': 'actual_host_boundary_call_counts',
+            'cycles_status': 'not_measured', 'physical_status': 'not_executed'}
+
+
 def execute_variant(root: Path, recorder, selected_tools: dict,
-                    variant: dict) -> dict:
+                    variant: dict, *, core_arch=False) -> dict:
     directory = recorder.output / variant['name']
     assembly = write_inputs(directory / 'inputs', variant)
     build = directory / 'build'
@@ -347,10 +513,15 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
         str(root / 'cmake/toolchains/arm-gcc.cmake'),
         '-DCMAKE_C_COMPILER=' + selected_tools['gcc'],
         '-DPython3_EXECUTABLE=' + sys.executable,
-        '-DNEXUS_RUNTIME_ASSEMBLY=' + str(assembly)],
+        '-DNEXUS_RUNTIME_ASSEMBLY=' + str(assembly),
+        '-DNEXUS_CORE_ARCH_COSTS=' + ('ON' if core_arch else 'OFF')],
         variant['name'] + '-configure')
+    targets = ['nexus_os_resources']
+    if core_arch:
+        targets.extend('nexus_core_arch_cost_' + str(count)
+                       for count in (0, 1, 2, 4))
     recorder.execute([cmake, '--build', str(build), '--parallel', '2',
-                      '--target', 'nexus_os_resources'],
+                      '--target', *targets],
                      variant['name'] + '-build')
     resolved_path = build / 'nexus-runtime/generated/resolved-cpu.json'
     resolved = json.loads(resolved_path.read_text(encoding='utf-8'))
@@ -391,6 +562,9 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
             'kernel_port': variant['profile']['irq']['kernel_port'],
             'resources': {'sizes': sizes, 'storage': storage, 'idle': idle,
                           'accounting': accounting, 'image': image},
+            'queue_budgets': queue_budgets(sizes),
+            'core_arch_costs': (core_cost_observations(
+                recorder, selected_tools, build, variant) if core_arch else None),
             'hot_paths': paths, 'compiled_objects': objects,
             'assembly': compiler_gate.digest(assembly),
             'facts': compiler_gate.digest(assembly.parent / 'cpu.json'),
@@ -402,7 +576,8 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
             'cycles_status': 'not_measured'}
 
 
-def run(root: Path, compiler: str, output: Path) -> int:
+def run(root: Path, compiler: str, output: Path, *, core_arch=False,
+        native_commands=None) -> int:
     root, output = root.resolve(), output.resolve()
     if output.exists() and any(output.iterdir()):
         raise ValueError('OS resource qualification output must be fresh')
@@ -427,11 +602,14 @@ def run(root: Path, compiler: str, output: Path) -> int:
         report['tools'] = {name: compiler_gate.digest(Path(path))
                            for name, path in selected_tools.items()}
         report['source_inputs'] = source_inputs(root)
+        if native_commands is not None:
+            report['operation_counts'] = host_operation_counts(
+                root, recorder, native_commands)
         variants = matrix()
         report['expected_variants'] = len(variants)
         for variant in variants:
             report['variants'].append(execute_variant(
-                root, recorder, selected_tools, variant))
+                root, recorder, selected_tools, variant, core_arch=core_arch))
             cortex_runtime.verify_source_inputs(report['source_inputs'])
             (output / 'report.json').write_text(
                 json.dumps(report, indent=2, sort_keys=True) + '\n')
@@ -455,12 +633,18 @@ def main() -> int:
                         default=Path(__file__).resolve().parents[2])
     parser.add_argument('--compiler', default='arm-none-eabi-gcc')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--core-arch-costs', action='store_true',
+                        help='Build actual opt-in Core zero/one/two/four probes')
+    parser.add_argument('--native-commands', type=Path,
+                        help='Actual Native compile database for real callback counts')
     args = parser.parse_args()
     compiler = shutil.which(args.compiler)
     if compiler is not None:
         os.environ['PATH'] = (str(Path(compiler).parent) + os.pathsep +
                               os.environ.get('PATH', ''))
-    return run(args.root, args.compiler, args.output)
+    return run(args.root, args.compiler, args.output,
+               core_arch=args.core_arch_costs,
+               native_commands=args.native_commands)
 
 
 if __name__ == '__main__':

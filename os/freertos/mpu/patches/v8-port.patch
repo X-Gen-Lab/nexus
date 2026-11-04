@@ -1,0 +1,45 @@
+--- upstream/port.c
++++ reviewed/port.c
+@@ -34,6 +34,8 @@
+ /* Scheduler includes. */
+ #include "FreeRTOS.h"
+ #include "task.h"
++#include "guard.h"
++static PRIVILEGED_DATA nx_freertos_mpu_start_t xNexusMpuStart;
+ 
+ /* MPU includes. */
+ #include "mpu_wrappers.h"
+@@ -443,7 +445,7 @@
+ /**
+  * @brief C part of SVC handler.
+  */
+-portDONT_DISCARD void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) PRIVILEGED_FUNCTION;
++portDONT_DISCARD void vPortSVCHandler_C( uint32_t * pulCallerStackAddress, uint32_t ulNexusExceptionReturn ) PRIVILEGED_FUNCTION;
+ 
+ #if ( ( configENABLE_MPU == 1 ) && ( configUSE_MPU_WRAPPERS_V1 == 0 ) )
+ 
+@@ -1030,7 +1032,7 @@
+ }
+ /*-----------------------------------------------------------*/
+ 
+-void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) /* PRIVILEGED_FUNCTION portDONT_DISCARD */
++void vPortSVCHandler_C( uint32_t * pulCallerStackAddress, uint32_t ulNexusExceptionReturn ) /* PRIVILEGED_FUNCTION portDONT_DISCARD */
+ {
+     #if ( ( configENABLE_MPU == 1 ) && ( configUSE_MPU_WRAPPERS_V1 == 1 ) )
+         #if defined( __ARMCC_VERSION )
+@@ -1107,6 +1109,7 @@
+         #endif /* configENABLE_TRUSTZONE */
+ 
+         case portSVC_START_SCHEDULER:
++            if( nx_freertos_mpu_start_consume(&xNexusMpuStart, pulCallerStackAddress, ulNexusExceptionReturn) == pdFALSE ) { return; }
+             #if ( configENABLE_TRUSTZONE == 1 )
+             {
+                 /* De-prioritize the non-secure exceptions so that the
+@@ -1620,6 +1623,7 @@
+ 
+ BaseType_t xPortStartScheduler( void ) /* PRIVILEGED_FUNCTION */
+ {
++    if( nx_freertos_mpu_start_arm(&xNexusMpuStart) == pdFALSE ) { return pdFALSE; }
+     /* An application can install FreeRTOS interrupt handlers in one of the
+      * following ways:
+      * 1. Direct Routing - Install the functions SVC_Handler and PendSV_Handler

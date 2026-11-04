@@ -444,16 +444,6 @@ msgid "Create one task from its exact caller-owned stack and TCB."
 msgstr "Create one task from its exact caller-owned stack and TCB."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
-msgid ""
-"Task/startup context. No hidden worker or maximum pool. Entry must return in"
-" privileged Thread mode, with manual interrupt masks restored and the "
-"scheduler resumed after any temporary suspension."
-msgstr ""
-"Task/startup context. No hidden worker or maximum pool. Entry must return in"
-" privileged Thread mode, with manual interrupt masks restored and the "
-"scheduler resumed after any temporary suspension."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized unused control storage"
 msgstr "[out] Zero-initialized unused control storage"
 
@@ -1534,16 +1524,8 @@ msgid "Initialize a notification in unused caller storage."
 msgstr "Initialize a notification in unused caller storage."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "Task context; POSIX signal handlers are unsupported."
-msgstr "Task context; POSIX signal handlers are unsupported."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Storage kept alive through all publishers"
 msgstr "[out] Storage kept alive through all publishers"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or an initialization error"
-msgstr "NX_SUCCESS or an initialization error"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Bind a single-waiter latched notification port."
@@ -1562,28 +1544,12 @@ msgid "Destroy after external publisher quiescence."
 msgstr "Destroy after external publisher quiescence."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Stop and join publishers first. The check cannot authorize a future call to "
-"race destruction. No storage access is allowed afterward."
-msgstr ""
-"Stop and join publishers first. The check cannot authorize a future call to "
-"race destruction. No storage access is allowed afterward."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Live storage with no future publishers"
 msgstr "[inout] Live storage with no future publishers"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or BUSY when a waiter is still registered"
-msgstr "NX_SUCCESS or BUSY when a waiter is still registered"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Initialize an explicit bounded byte-copy queue."
 msgstr "Initialize an explicit bounded byte-copy queue."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "Task context; caller keeps buffer until successful destroy."
-msgstr "Task context; caller keeps buffer until successful destroy."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Unused caller storage"
@@ -1600,10 +1566,6 @@ msgstr "[in] Number of items, greater than zero"
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Bytes per item, greater than zero"
 msgstr "[in] Bytes per item, greater than zero"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or invalid/initialization error"
-msgstr "NX_SUCCESS or invalid/initialization error"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Copy one item to the queue."
@@ -1670,20 +1632,8 @@ msgid "[inout] Closed queue, no future users"
 msgstr "[inout] Closed queue, no future users"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or BUSY if users/items remain"
-msgstr "NX_SUCCESS or BUSY if users/items remain"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Start a task using the supplied host stack."
 msgstr "Start a task using the supplied host stack."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Task context. No default task, pool or hidden stack exists. POSIX library "
-"bookkeeping is host-runtime allocation, not MCU RAM evidence."
-msgstr ""
-"Task context. No default task, pool or hidden stack exists. POSIX library "
-"bookkeeping is host-runtime allocation, not MCU RAM evidence."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Zero-initialized unused caller handle"
@@ -1706,26 +1656,8 @@ msgid "[in] Entry context, kept alive until join"
 msgstr "[in] Entry context, kept alive until join"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or invalid/start error"
-msgstr "NX_SUCCESS or invalid/start error"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Join after requesting cooperative application stop."
 msgstr "Join after requesting cooperative application stop."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"May block until entry returns. No forced cancellation. Caller may release "
-"context, handle and stack only after success. One external owner serializes "
-"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
-" are unsupported. Stop/join publishers before destroying their notification "
-"or queue storage."
-msgstr ""
-"May block until entry returns. No forced cancellation. Caller may release "
-"context, handle and stack only after success. One external owner serializes "
-"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
-" are unsupported. Stop/join publishers before destroying their notification "
-"or queue storage."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Started task; caller must not be the joined task"
@@ -1768,16 +1700,6 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Explicit task handle; stack storage is supplied at start."
 msgstr "Explicit task handle; stack storage is supplied at start."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Start/join are serialized by one external lifecycle owner; there is one "
-"joiner. An entry may attempt a self-join, which returns BUSY. External "
-"cancellation and detachment are unsupported."
-msgstr ""
-"Start/join are serialized by one external lifecycle owner; there is one "
-"joiner. An entry may attempt a self-join, which returns BUSY. External "
-"cancellation and detachment are unsupported."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:96
 msgid "secure_context.h"
@@ -2585,3 +2507,45 @@ msgstr "One caller-owned authoritative readiness source."
 
 msgid "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."
 msgstr "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."
+
+msgid "Task/startup context. No hidden worker or maximum pool. Stack and task control must not overlap; known span wrap and overlap reject before any kernel object is created. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+msgstr "Task/startup context. No hidden worker or maximum pool. Stack and task control must not overlap; known span wrap and overlap reject before any kernel object is created. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+
+msgid "The used depth times item_size payload must not overlap queue control. Span wrap rejects before kernel mutation."
+msgstr "The used depth times item_size payload must not overlap queue control. Span wrap rejects before kernel mutation."
+
+msgid "Task context; POSIX signal handlers are unsupported. BUSY retains resources: keep storage and retry destroy only. Other failures leave no resources; initialization may retry."
+msgstr "Task context; POSIX signal handlers are unsupported. BUSY retains resources: keep storage and retry destroy only. Other failures leave no resources; initialization may retry."
+
+msgid "NX_SUCCESS, BUSY or an initialization error"
+msgstr "NX_SUCCESS, BUSY or an initialization error"
+
+msgid "Stop and join publishers first. The check cannot authorize a future call to race destruction. After success, no storage access is allowed. A partial destroy disables new ports; retain storage and retry destroy without reinitialization."
+msgstr "Stop and join publishers first. The check cannot authorize a future call to race destruction. After success, no storage access is allowed. A partial destroy disables new ports; retain storage and retry destroy without reinitialization."
+
+msgid "NX_SUCCESS or BUSY while a waiter/resource remains"
+msgstr "NX_SUCCESS or BUSY while a waiter/resource remains"
+
+msgid "NX_SUCCESS or invalid/initialization error; BUSY retains resources for a subsequent destroy"
+msgstr "NX_SUCCESS or invalid/initialization error; BUSY retains resources for a subsequent destroy"
+
+msgid "A partial destroy closes all public operations. Retain storage and retry destroy; do not reinitialize it yet."
+msgstr "A partial destroy closes all public operations. Retain storage and retry destroy; do not reinitialize it yet."
+
+msgid "NX_SUCCESS or BUSY if users/items/resources remain"
+msgstr "NX_SUCCESS or BUSY if users/items/resources remain"
+
+msgid "NX_SUCCESS or invalid/start error; EXHAUSTED when POSIX cannot create another task"
+msgstr "NX_SUCCESS or invalid/start error; EXHAUSTED when POSIX cannot create another task"
+
+msgid "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage. Inactive private pointer values do not retain a borrow."
+msgstr "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage. Inactive private pointer values do not retain a borrow."
+
+msgid "Task context; caller keeps buffer until successful destroy. Used depth times item_size bytes must not overlap the complete queue control; wrapping spans reject at admission. After initialization BUSY, only destroy is allowed. Other failures leave no resources and permit initialization again."
+msgstr "Task context; caller keeps buffer until successful destroy. Used depth times item_size bytes must not overlap the complete queue control; wrapping spans reject at admission. After initialization BUSY, only destroy is allowed. Other failures leave no resources and permit initialization again."
+
+msgid "Task context. No default task, pool or hidden stack exists. Stack and complete task control must not overlap; wrapping spans reject before POSIX task creation. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence. Failure retains no entry/context borrow."
+msgstr "Task context. No default task, pool or hidden stack exists. Stack and complete task control must not overlap; wrapping spans reject before POSIX task creation. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence. Failure retains no entry/context borrow."
+
+msgid "Zero-initialize before the first start; successful join permits reuse. Start/join have one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
+msgstr "Zero-initialize before the first start; successful join permits reuse. Start/join have one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."

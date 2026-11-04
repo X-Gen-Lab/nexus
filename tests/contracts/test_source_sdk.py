@@ -138,6 +138,23 @@ class CMSISCoreSelectionTests(unittest.TestCase):
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_reviewed_kernel_overlays_are_required_relocatable_sdk_payload(self):
+        required = {"os/reviewed_patch.py",
+                    "os/freertos/patches/m7-integer-port.c.patch",
+                    "os/freertos/patches/m7-integer-portmacro.h.patch",
+                    "os/threadx/patches/linux-lowlevel.patch",
+                    "os/threadx/patches/linux-scheduler.patch"}
+        required.update("os/freertos/mpu/patches/" + name + ".patch"
+                        for name in (
+                            "arm_cm3_mpu-port", "arm_cm4_mpu-port", "v8-port",
+                            "v8-baseline-assembly", "v8-mainline-assembly",
+                            "v7-veneers", "v8-baseline-veneers",
+                            "v8-mainline-veneers", "gpio-numbers",
+                            "gpio-veneers"))
+        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
+                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertTrue(all(source_sdk.selected(name) for name in required))
+
     def test_transport_verifier_and_nested_declarations_are_required(self):
         required = {"tools/maintenance/freertos_transport.py",
                     "ext/freertos/.gitmodules",
@@ -675,6 +692,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_exposed_io_core_clock_and_provider_closures_are_required(self):
         required = {
             "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+            "arch/arm/cortex_m/private/registers.h",
             "os/wait.c", "os/include/nexus/os/wait.h",
             "os/baremetal/notify.c", "os/native/native.c",
             "components/CMakeLists.txt",
@@ -1846,6 +1864,7 @@ class SourceSDKTests(unittest.TestCase):
                      "arch/include/nexus/arch/arch.h",
                      "arch/arm/cortex_m/nx_arch_cortex_m.c",
                      "arch/arm/cortex_m/private/compiler.h",
+                     "arch/arm/cortex_m/private/registers.h",
                      "arch/native/nx_arch_native.c",
                      "vendors/arm/CMSIS_6/LICENSE",
                      "vendors/arm/CMSIS_6/CMSIS/Core/Include/cmsis_gcc.h",

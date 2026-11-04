@@ -7,6 +7,7 @@
  */
 #ifndef NEXUS_ARCH_CORTEX_M_COMPILER_H
 #define NEXUS_ARCH_CORTEX_M_COMPILER_H
+#include "registers.h"
 #include <stdint.h>
 
 #if !(defined(__GNUC__) || defined(__clang__))
@@ -110,13 +111,13 @@ NX_ARCH_HW_INLINE void nx_arch_hw_isb(void) {
 }
 #if NEXUS_ARCH_HAS_DWT_CYCCNT
 NX_ARCH_HW_INLINE uint32_t nx_arch_hw_demcr(void) {
-    return *(volatile const uint32_t*)0xe000edfcu;
+    return *(volatile const uint32_t*)NX_ARCH_REG_DEMCR;
 }
 NX_ARCH_HW_INLINE uint32_t nx_arch_hw_dwt_control(void) {
-    return *(volatile const uint32_t*)0xe0001000u;
+    return *(volatile const uint32_t*)NX_ARCH_REG_DWT_CTRL;
 }
 NX_ARCH_HW_INLINE uint32_t nx_arch_hw_cyccnt(void) {
-    return *(volatile const uint32_t*)0xe0001004u;
+    return *(volatile const uint32_t*)NX_ARCH_REG_DWT_COUNT;
 }
 #endif
 #endif

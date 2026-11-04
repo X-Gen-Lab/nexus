@@ -43,15 +43,24 @@ class ThreadXLinuxOverlayTests(unittest.TestCase):
             self.assertFalse(output.exists())
 
     def test_mismatching_exact_patch_boundary_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "boundary"):
-            prepare.replace_once("unrelated", "old", "new")
-        with self.assertRaisesRegex(ValueError, "boundary"):
-            prepare.replace_once("old old", "old", "new")
+        with tempfile.TemporaryDirectory() as directory:
+            source, output = self.fixture(directory)
+            patch_directory = Path(directory) / "patches"
+            patch_directory.mkdir()
+            reviewed = prepare.PATCH_DIRECTORY / "linux-lowlevel.patch"
+            changed = reviewed.read_text().replace(
+                ' #include "tx_api.h"', ' #include "unreviewed.h"', 1)
+            (patch_directory / reviewed.name).write_text(changed)
+            with patch.object(prepare, "PATCH_DIRECTORY", patch_directory):
+                with self.assertRaises(ValueError):
+                    prepare.prepare(source, output)
+            self.assertFalse(output.exists())
 
     def test_incomplete_patch_cannot_be_published(self):
         with tempfile.TemporaryDirectory() as directory:
             source, output = self.fixture(directory)
-            with patch.object(prepare, "replace_once", side_effect=lambda text, old, new: text):
+            with patch.object(prepare, "apply_reviewed_patch",
+                              side_effect=lambda text, path: text):
                 with self.assertRaisesRegex(ValueError, "incomplete"):
                     prepare.prepare(source, output)
             self.assertFalse(output.exists())
@@ -111,11 +120,12 @@ class ThreadXLinuxOverlayTests(unittest.TestCase):
     def test_source_change_during_derivation_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             source, output = self.fixture(directory)
-            actual = prepare.replace_once
-            def changing(text, old, new):
+            actual = prepare.apply_reviewed_patch
+            def changing(text, path):
                 source.write_bytes(source.read_bytes() + b"\n")
-                return actual(text, old, new)
-            with patch.object(prepare, "replace_once", side_effect=changing):
+                return actual(text, path)
+            with patch.object(prepare, "apply_reviewed_patch",
+                              side_effect=changing):
                 with self.assertRaisesRegex(ValueError, "changed"):
                     prepare.prepare(source, output)
             self.assertFalse(output.exists())

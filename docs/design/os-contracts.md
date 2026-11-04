@@ -37,6 +37,11 @@ flowchart TD
 公共 Wait 是跨后端合同；任务、队列和内核专属能力仍显式使用后端类型，不伪装成所有
 RTOS 都提供同样的能力。生成的 typed factory 返回既有设备 face，不创建 OS 对象。
 
+Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回
+`BUSY`，且不能读取外部 owner 尚未发布的 pthread identity 或 started 状态。
+其他 start/join 操作仍由唯一外部 lifecycle owner 串行执行；这一修正不提供多 joiner
+或跨任务竞争 start 的能力。创建失败不保留 entry/context；资源耗尽与非法参数分别报告。
+
 ## 等待、时钟与完成
 
 `nx_wait_until()` 使用 `ready → arm → ready → wait → ready`。后端必须把序号观察与
@@ -53,6 +58,11 @@ FreeRTOS 使用 `nx_time_now_us()`，裸机使用初始化时提供的时钟。�
 helper 在后端错误后保留一次最终 `ready` 检查：已观察到真实完成可以胜出。
 裸机未就绪返回 `BUSY`，调用方继续显式调度。队列立即可用的操作采用 try 语义；
 只有需要阻塞时才消耗 deadline，失败不改调用方输出。
+
+`nx_wait_select()` 的校验和就绪扫描随候选数线性增长。每个 predicate 必须有界，
+不阻塞、不执行设备 service；调用者在成功消费后推进自己的 cursor，才能公平轮转。
+比较 1、4、16 个候选时应记录扫描次数、任务负载和事件消费规则，不能从一次主机
+耗时推导 MCU 最坏延迟。通知合并不累计业务事件，队列或锁存状态才拥有事件数量。
 
 等待不推进 UART/SPI service。共享控制器的生产者不能在 `ready` 内 service；其唯一
 execution owner 在取消、停止和排空期间仍须运行。timeout/cancel 请求不等于最终
@@ -143,11 +153,28 @@ permanent TCB、调用方栈、Idle 栈和内核全局对象。保持现有 four
 共享 ops 表是否值得采用由实际 linked image 和实例数决定。构建时间报告只比较
 RAM/Flash/instruction，CPU cycle/latency 必须实测，不能从反汇编字节数推导。
 
+| 选择 | 适用条件与额外责任 |
+| --- | --- |
+| 普通 notify | 调用方持有独立通知控制；publisher 全部退出后才销毁 |
+| direct notify | 已存在且唯一的 receiver、独占 index；receiver 生命周期覆盖所有 publisher |
+| joinable task | entry 可以返回；completion 后仍保留 control/stack，直到外部 join 成功 |
+| permanent task | entry 永不返回；没有 join/completion 存储，误返回必须 fail-stop |
+| raw queue | 已有独立停止协议；payload copy 成本随 item 大小增长 |
+| closable queue | 需要关闭 admission 并唤醒 waiter；额外 control 和每操作 waiter 由调用方提供 |
+
+Native destroy 可能只释放部分 POSIX 资源。首次销毁撤销公开操作准入；每个资源只在
+实际销毁成功后解除 ownership。失败后保持同一 control，仅重试 destroy；不得重新
+init、进入 wait/send/receive 或释放存储。关闭和 join 仍须先完成，不能依靠 destroy
+替代 publisher quiescence。内核 queue payload、调度器挂起区与实际 IRQ mask 区的
+成本分别计算；scheduler suspended 不等于所有中断均被屏蔽。
+
 ## 产品停止顺序
 
 1. coordinator 关闭 admission；owner stop 请求所有已接受操作取消。
 2. owner 保持 service/drain；producer/observer 仅观察 acquire `SETTLED`。
-3. coordinator join producer；成功后 request 和 bytes 的业务 borrow 已解除。
+3. coordinator join producer；必须已 acquire 观察每个 accepted request 的 `SETTLED`。
+   再排空 slot control 并 detach/join observer；最后一次 callback 返回之前，request、slot
+   和观察者存储均不可复用。业务 payload 还须满足其自身的其他借用合同。
 4. coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。
 5. 停止硬件 RX/IRQ publisher 并 detach wake；join 其他可能的发布者。
 6. 销毁 notification/queue/guard。Native/裸机随后可执行 platform stop；正在运行的
@@ -156,6 +183,8 @@ RAM/Flash/instruction，CPU cycle/latency 必须实测，不能从反汇编字�
 
 失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许
 释放的终态。一次 destroy 返回 BUSY 只是防护，不替代未来 publisher 已停止的证明。
+每个成功 milestone 只执行一次；超时继续使用原 absolute deadline 的结果，不靠反复
+构造新 deadline 掩盖失败。恢复重试由外部策略给出新预算，且继续保留未归还资源。
 外部 [UARTOwner 示例](https://github.com/X-Gen-Lab/nexus-examples/tree/codex/next-generation-platform/apps/uart_owner_runtime)
 实现单 coordinator 的单调停止 milestones；失败后只重试失败阶段，不重复已成功 join。
 

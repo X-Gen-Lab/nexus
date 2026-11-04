@@ -14,6 +14,89 @@
 #include <string.h>
 #include <time.h>
 
+enum {
+    NATIVE_MUTEX = 1u,
+    NATIVE_FIRST_CONDITION = 2u,
+    NATIVE_SECOND_CONDITION = 4u
+};
+
+/* Only the executing pthread reads its identity; no startup handshake is
+ * needed. */
+static _Thread_local nx_native_task_t* current_task;
+
+/** \brief Preserve resource exhaustion and permission failures at admission. */
+static nx_result_t creation_result(int error) {
+    if (error == EAGAIN || error == ENOMEM) {
+        return NX_ERROR_EXHAUSTED;
+    }
+    if (error == EINVAL) {
+        return NX_ERROR_INVALID;
+    }
+    if (error == EPERM || error == EACCES) {
+        return NX_ERROR_PERMISSION;
+    }
+    return NX_ERROR_IO;
+}
+
+/** \brief Reject overlapping or wrapping known caller storage spans. */
+static bool storage_disjoint(const void* control, size_t control_bytes,
+                             const void* storage, size_t storage_bytes) {
+    uintptr_t control_begin = (uintptr_t)control;
+    uintptr_t storage_begin = (uintptr_t)storage;
+    if (control_bytes > UINTPTR_MAX - control_begin ||
+        storage_bytes > UINTPTR_MAX - storage_begin) {
+        return false;
+    }
+    return control_begin + control_bytes <= storage_begin ||
+           storage_begin + storage_bytes <= control_begin;
+}
+
+/** \brief Release an owned condition once, retaining failed cleanup for retry.
+ */
+static nx_result_t condition_release(pthread_cond_t* condition,
+                                     uint8_t* resources, uint8_t bit) {
+    if ((*resources & bit) == 0u) {
+        return NX_SUCCESS;
+    }
+    if (pthread_cond_destroy(condition) != 0) {
+        return NX_ERROR_BUSY;
+    }
+    *resources &= (uint8_t)~bit;
+    return NX_SUCCESS;
+}
+
+/** \brief Release the mutex only after every owned condition is released. */
+static nx_result_t mutex_release(pthread_mutex_t* mutex, uint8_t* resources) {
+    if ((*resources & NATIVE_MUTEX) == 0u) {
+        return NX_SUCCESS;
+    }
+    if (pthread_mutex_destroy(mutex) != 0) {
+        return NX_ERROR_BUSY;
+    }
+    *resources &= (uint8_t)~NATIVE_MUTEX;
+    return NX_SUCCESS;
+}
+
+/** \brief Continue notification cleanup from its last successful release. */
+static nx_result_t notification_release(nx_native_notify_t* notification) {
+    if (condition_release(&notification->condition, &notification->resources,
+                          NATIVE_FIRST_CONDITION) != NX_SUCCESS) {
+        return NX_ERROR_BUSY;
+    }
+    return mutex_release(&notification->mutex, &notification->resources);
+}
+
+/** \brief Preserve queue cleanup ownership through intermediate failures. */
+static nx_result_t queue_release(nx_native_queue_t* queue) {
+    if (condition_release(&queue->readable, &queue->resources,
+                          NATIVE_FIRST_CONDITION) != NX_SUCCESS ||
+        condition_release(&queue->writable, &queue->resources,
+                          NATIVE_SECOND_CONDITION) != NX_SUCCESS) {
+        return NX_ERROR_BUSY;
+    }
+    return mutex_release(&queue->mutex, &queue->resources);
+}
+
 /** \brief Convert an absolute microsecond deadline without tick rounding. */
 static struct timespec absolute_time(uint64_t us) {
     struct timespec value = {(time_t)(us / 1000000u),
@@ -116,13 +199,18 @@ nx_result_t nx_native_notify_init(nx_native_notify_t* notification) {
         return NX_ERROR_INVALID;
     }
     memset(notification, 0, sizeof(*notification));
-    if (pthread_mutex_init(&notification->mutex, NULL) != 0) {
-        return NX_ERROR_IO;
+    int error = pthread_mutex_init(&notification->mutex, NULL);
+    if (error != 0) {
+        return creation_result(error);
     }
-    if (condition_init(&notification->condition) != 0) {
-        pthread_mutex_destroy(&notification->mutex);
-        return NX_ERROR_IO;
+    notification->resources = NATIVE_MUTEX;
+    error = condition_init(&notification->condition);
+    if (error != 0) {
+        return notification_release(notification) == NX_SUCCESS
+                   ? creation_result(error)
+                   : NX_ERROR_BUSY;
     }
+    notification->resources |= NATIVE_FIRST_CONDITION;
     notification->initialized = true;
     return NX_SUCCESS;
 }
@@ -139,21 +227,20 @@ nx_wait_port_t nx_native_notify_port(nx_native_notify_t* notification) {
 
 /** \brief Release synchronization only after all publishers are quiesced. */
 nx_result_t nx_native_notify_destroy(nx_native_notify_t* notification) {
-    if (notification == NULL || !notification->initialized) {
+    if (notification == NULL ||
+        (!notification->initialized && notification->resources == 0u)) {
         return NX_ERROR_INVALID;
     }
-    pthread_mutex_lock(&notification->mutex);
-    bool waiting = notification->waiting;
-    pthread_mutex_unlock(&notification->mutex);
-    if (waiting) {
-        return NX_ERROR_BUSY;
+    if (notification->initialized) {
+        pthread_mutex_lock(&notification->mutex);
+        bool waiting = notification->waiting;
+        pthread_mutex_unlock(&notification->mutex);
+        if (waiting) {
+            return NX_ERROR_BUSY;
+        }
+        notification->initialized = false;
     }
-    if (pthread_cond_destroy(&notification->condition) != 0 ||
-        pthread_mutex_destroy(&notification->mutex) != 0) {
-        return NX_ERROR_BUSY;
-    }
-    notification->initialized = false;
-    return NX_SUCCESS;
+    return notification_release(notification);
 }
 
 /** \brief Allocate only per-instance queue metadata supplied by the caller. */
@@ -161,22 +248,26 @@ nx_result_t nx_native_queue_init(nx_native_queue_t* queue, void* storage,
                                  size_t storage_bytes, size_t depth,
                                  size_t item_size) {
     if (queue == NULL || storage == NULL || depth == 0 || item_size == 0 ||
-        depth > storage_bytes / item_size) {
+        depth > storage_bytes / item_size ||
+        !storage_disjoint(queue, sizeof *queue, storage, depth * item_size)) {
         return NX_ERROR_INVALID;
     }
     memset(queue, 0, sizeof(*queue));
-    if (pthread_mutex_init(&queue->mutex, NULL) != 0) {
-        return NX_ERROR_IO;
+    int error = pthread_mutex_init(&queue->mutex, NULL);
+    if (error != 0) {
+        return creation_result(error);
     }
-    if (condition_init(&queue->readable) != 0) {
-        pthread_mutex_destroy(&queue->mutex);
-        return NX_ERROR_IO;
+    queue->resources = NATIVE_MUTEX;
+    error = condition_init(&queue->readable);
+    if (error == 0) {
+        queue->resources |= NATIVE_FIRST_CONDITION;
+        error = condition_init(&queue->writable);
     }
-    if (condition_init(&queue->writable) != 0) {
-        pthread_cond_destroy(&queue->readable);
-        pthread_mutex_destroy(&queue->mutex);
-        return NX_ERROR_IO;
+    if (error != 0) {
+        return queue_release(queue) == NX_SUCCESS ? creation_result(error)
+                                                  : NX_ERROR_BUSY;
     }
+    queue->resources |= NATIVE_SECOND_CONDITION;
     queue->bytes = storage;
     queue->depth = depth;
     queue->item_size = item_size;
@@ -263,27 +354,25 @@ nx_result_t nx_native_queue_close(nx_native_queue_t* queue) {
 
 /** \brief Require quiesced callers and drained items before reclamation. */
 nx_result_t nx_native_queue_destroy(nx_native_queue_t* queue) {
-    if (queue == NULL || !queue->initialized) {
+    if (queue == NULL || (!queue->initialized && queue->resources == 0u)) {
         return NX_ERROR_INVALID;
     }
-    pthread_mutex_lock(&queue->mutex);
-    bool busy = !queue->closed || queue->users != 0 || queue->count != 0;
-    pthread_mutex_unlock(&queue->mutex);
-    if (busy) {
-        return NX_ERROR_BUSY;
+    if (queue->initialized) {
+        pthread_mutex_lock(&queue->mutex);
+        bool busy = !queue->closed || queue->users != 0 || queue->count != 0;
+        pthread_mutex_unlock(&queue->mutex);
+        if (busy) {
+            return NX_ERROR_BUSY;
+        }
+        queue->initialized = false;
     }
-    if (pthread_cond_destroy(&queue->readable) != 0 ||
-        pthread_cond_destroy(&queue->writable) != 0 ||
-        pthread_mutex_destroy(&queue->mutex) != 0) {
-        return NX_ERROR_BUSY;
-    }
-    queue->initialized = false;
-    return NX_SUCCESS;
+    return queue_release(queue);
 }
 
 /** \brief Execute caller entry without retaining storage after thread exit. */
 static void* task_entry(void* argument) {
     nx_native_task_t* task = argument;
+    current_task = task;
     task->entry(task->context);
     return NULL;
 }
@@ -292,14 +381,17 @@ static void* task_entry(void* argument) {
 nx_result_t nx_native_task_start(nx_native_task_t* task, void* stack,
                                  size_t stack_bytes, void (*entry)(void*),
                                  void* context) {
-    if (task == NULL || stack == NULL || entry == NULL || task->started) {
+    if (task == NULL || stack == NULL || entry == NULL ||
+        !storage_disjoint(task, sizeof *task, stack, stack_bytes) ||
+        task->started) {
         return NX_ERROR_INVALID;
     }
     pthread_attr_t attributes;
-    if (pthread_attr_init(&attributes) != 0) {
-        return NX_ERROR_IO;
+    int error = pthread_attr_init(&attributes);
+    if (error != 0) {
+        return creation_result(error);
     }
-    int error = pthread_attr_setstack(&attributes, stack, stack_bytes);
+    error = pthread_attr_setstack(&attributes, stack, stack_bytes);
     if (error == 0) {
         task->entry = entry;
         task->context = context;
@@ -307,7 +399,9 @@ nx_result_t nx_native_task_start(nx_native_task_t* task, void* stack,
     }
     pthread_attr_destroy(&attributes);
     if (error != 0) {
-        return NX_ERROR_INVALID;
+        task->entry = NULL;
+        task->context = NULL;
+        return creation_result(error);
     }
     task->started = true;
     return NX_SUCCESS;
@@ -315,11 +409,14 @@ nx_result_t nx_native_task_start(nx_native_task_t* task, void* stack,
 
 /** \brief Preserve stack and context until actual execution has exited. */
 nx_result_t nx_native_task_join(nx_native_task_t* task) {
-    if (task == NULL || !task->started) {
+    if (task == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (pthread_equal(task->thread, pthread_self())) {
+    if (task == current_task) {
         return NX_ERROR_BUSY;
+    }
+    if (!task->started) {
+        return NX_ERROR_INVALID;
     }
     if (pthread_join(task->thread, NULL) != 0) {
         return NX_ERROR_IO;

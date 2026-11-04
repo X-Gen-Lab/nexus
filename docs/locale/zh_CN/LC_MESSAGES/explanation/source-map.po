@@ -281,10 +281,6 @@ msgstr ""
 "调用者。NMI、HardFault、其他核、DMA 和另一安全世界位于互斥域之外。其他维护核使用编译器无锁 RMW；exclusive "
 "重试不建立固定周期上限。发布前初始化字，并保持其生命周期直到每个读者／写者停止。"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:109
-msgid "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
-msgstr "Native 模拟递归互斥与 C11 屏障，不模拟真实 NVIC、DMA、物理时序或信号安全中断。Debug 与 Release 都会在非法恢复嵌套时中止。GoogleTest/GoogleMock 在九种 CPU 配置中，以窄寄存器／指令硬件边界编译真实 Cortex-M 算法；普通 ARM 路径内联该边界，绝不链接 mock。Native 测试执行真实递归互斥、严格 token 嵌套和上下文查询。缓存、MPU、安全模型只 mock 外部 CPU/MMIO 操作，运行生产 C 算法，包括在状态变更前拒绝。锁定的官方 CMSIS-Core v6.4.0 头 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、`core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、`m-profile/armv8m_mpu.h` 和 `m-profile/armv7m_cachel1.h` 提供经审查的寄存器布局依据。共享的私有 Core 来源不改变 Nexus 公共的上下文、所有权、屏蔽恢复或 cache/MPU/SAU 合同，也不建立新的处理器／profile 支持或物理资格。实际 IRQ 延迟、特权转换、DMA／缓存一致性与 CPU 时序需要 HIL。"
-
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:58
 msgid "Typed I/O"
 msgstr "类型化 I/O"
@@ -1007,3 +1003,120 @@ msgstr "[网络组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUM
 
 msgid "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
 msgstr "[MCUboot 组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)负责定义选定覆盖配置、显式 Flash 装配、boot／应用所有权图和产品恢复责任。{ref}`公共控制 API <mcuboot-control-contract>`仅呈现通用 C11 头文件。具体 Flash port 类型与私有 boot／profile 头文件不属于该 API 表面。模型与已链接镜像证据不建立掉电恢复或物理 Flash 资格。"
+
+msgid "Admission, shutdown and reuse"
+msgstr "准入、关闭与复用"
+
+msgid "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
+msgstr "对全新、尚未发布的存储只初始化一次。`nx_request_prepare` 只重置 READY 请求或结果已消费的 SETTLED 实例。它无法发现尚未归还的适配器借用、控制命令或观察者；所属适配器必须等待它们结束。由唯一串行执行者接纳并推进请求。请求状态是 release/acquire 谓词，与通知是否已送达无关。"
+
+msgid "The complete shutdown order is:"
+msgstr "完整关闭顺序为："
+
+msgid "Close admission and stop new controls or observation bindings."
+msgstr "关闭准入，停止接纳新的控制命令或观察绑定。"
+
+msgid "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
+msgstr "由唯一执行者取消并排空硬件、IRQ、DMA 和延后执行引用。排空失败时，请求及 payload 继续保留在 QUARANTINED；超时或解除观察者绑定均不授权回收。"
+
+msgid "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
+msgstr "以 release 发布 SETTLED 之前，解除提供者的每个引用，并取得生命周期独立的唤醒目标。结清是提供者对请求及 payload 的最后一次访问。待发送的通知不得继续持有请求引用。"
+
+msgid "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
+msgstr "以 acquire 观察 SETTLED 并消费结果。另行确认排队中的控制命令完成，等待所有任务、诊断及完成观察者结束，包括已在执行的调用。在适配器的保护下解除其附属记录绑定。"
+
+msgid "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
+msgstr "释放稳定 slot。只有此后才能 prepare／重新绑定请求、回收其存储，或在所有其他消费者均已结束后停止依赖项。"
+
+msgid "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
+msgstr "适配器同步 bind、lookup 和 release。epoch 标识一个稳定 slot 生命周期内的实例，并非全局唯一的线缆协议 ID。`UINT64_MAX` 是最后可用 epoch；下一次 bind 拒绝且不改变 slot 或输出。应退役已耗尽的 slot；任何旧命令仍能寻址该存储时绝不能将其清零。替换存储或重新启动 owner 前，必须先等待所有控制命令和观察者结束，并撤销全部旧引用。"
+
+msgid "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
+msgstr "维护的 UART／SPI 示例 [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) 使用真实 Native 提供者和 owner 适配器：排空失败保留硬件，恢复后结清，观察者解除绑定，此后提供者 stop 才成功。`core_lifecycle_test.cpp` 还检查完整合法转换矩阵、prepare 拒绝及最后可用 epoch。C 合同目标中的发布回归在真实主机线程之间观察结果，不依赖唤醒提示。这些测试均不授权并发准入或未经保护的 slot 访问。"
+
+msgid "Clock domains and bounded waits"
+msgstr "时钟域与有界等待"
+
+msgid "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
+msgstr "`nx_clock32_t` 具有唯一执行 owner、稳定的非零频率和不中断的计数器。其最大观察间隔严格小于 `2^32 / frequency_hz` 秒：1 MHz 时为 4294.967296 秒。完整回绕后的相等快照与没有推进无法区分。应计入空闲、屏蔽期间的工作、Flash 维护、睡眠和 owner 的最坏延迟；此 helper 无法检测漏过的回绕。成功观察同时提交 tick 扩展状态和输出。非法参数、别名或耗尽均不改变二者。输出存储必须与完整扩展状态分离。"
+
+msgid "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
+msgstr "选定物理时钟具有独立审阅的溢出／service 合同；通用 32-bit helper 不建立该提供者的就绪状态。停止、重启、更换时钟或改变频率均建立新时钟域。撤销旧时钟前须等待所有 deadline 消费者结束；数值相同的时间戳也不能使旧 deadline 有效。这是生命周期规则，并不强制每个请求都具有 generation 字段。终止性的时钟故障保留借用，并遵循选定提供者的 fail-stop 合同。"
+
+msgid "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
+msgstr "必须有限等待时，在准入之前使用 `nx_deadline_finite_after(now, duration, &end)` 并处理失败。它拒绝非有限 `now` 哨兵及达到该哨兵的和，且不改写 `end`；零 duration 合法。`nx_deadline_after` 保持其显式饱和到无限等待的语义。两个 helper 均不读取时钟，也不证明就绪；时钟值为零不是启动确认。"
+
+msgid "Optional observation and minimal fault capture"
+msgstr "可选观察与最小故障记录"
+
+msgid "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
+msgstr "请求观察提供复制的诊断视图，并非另一个执行 owner。其 gaps 和转换计数描述采样观察，并非 IRQ 延迟、WCET 或所有中间状态。稳定 slot 的生命周期覆盖观察者；调用者将采样与请求复用及 slot 释放串行化。helper 拒绝输出与已知控制对象重叠。只有调用者知道完整请求、payload 和外部 context 范围，必须保持它们互不重叠且存活。"
+
+msgid "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
+msgstr "弱符号 `nx_fault_observe` 保持无状态。产品可链接一个有界 C11 覆盖实现，写入显式拥有且调试器可见的记录。以下最小示例特意不保存时钟、任务名或动态指针："
+
+msgid "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
+msgstr "这是在终止停机后检查的尽力取证存储，不保证并发读取或嵌套故障下的一致性。`volatile` 不是锁，也不是 release/acquire 协议。所属产品选择合法可写内存及保留要求。hook 不能修复损坏的栈、宣称安全输出、释放借用或依赖时钟、内核及传输。它从不改变输入 mask。如果它返回，报告故障的终止路径仍会停驻。既有 FreeRTOS fail-stop 测试覆盖此真实 hook 边界、保留的请求以及 PRIMASK／BASEPRI／FAULTMASK 保持。不向默认 Core 镜像增加 snapshot、队列、worker 或记录。"
+
+msgid "Stack and explicitly placed memory"
+msgstr "栈与显式放置的内存"
+
+msgid "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
+msgstr "使用 `nx_stack_observe` 前，调用者先取得外部静止访问租约：栈 owner 已停止／join，读取期间不得在被采样栈上执行或接收异常。提供原先已填充的低地址区域，排除活动帧、当前 SP 和独立计算大小的异常／context 预留。启动代码建立 MSP 填充来源依据；helper 不推断它。绝不填充正在使用的栈，也不通过屏蔽中断包围无界扫描。成本受声明的字节数限制；预留空间或恰与填充值相同的写入会掩盖使用，因此结果不是已证明的栈峰值。`tests/google/stack_observation_test.cpp` 检查边界、只读行为和别名拒绝；OS 栈快照 helper 另行负责其任务上下文规则。"
+
+msgid "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
+msgstr "内存放置宏每次声明只适用于一个静态变量定义，并且仅在配置声明的装配选定该区域时使用："
+
+msgid "Suffix"
+msgstr "后缀"
+
+msgid "Reset initialization"
+msgstr "复位初始化"
+
+msgid "Caller obligation"
+msgstr "调用者责任"
+
+msgid "DATA"
+msgstr "DATA"
+
+msgid "Copy initializer from Flash"
+msgstr "从 Flash 复制初值"
+
+msgid "Budget both load and run regions"
+msgstr "同时计入加载区和运行区预算"
+
+msgid "BSS"
+msgstr "BSS"
+
+msgid "Zero storage"
+msgstr "存储清零"
+
+msgid "Use no nonzero initializer"
+msgstr "不得使用非零初值"
+
+msgid "NOINIT"
+msgstr "NOINIT"
+
+msgid "Neither copy nor clear"
+msgstr "不复制也不清零"
+
+msgid "Initialize or validate before every read"
+msgstr "每次读取之前初始化或验证"
+
+msgid "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
+msgstr "选择匹配的 ADDSRAM／TCM／CCM／SRAM1／SRAM4 宏；不存在隐式回退区域。启动／链接器测试与已链接 ELF 建立复制／清零范围、对齐、垃圾回收及预算的证据。单独 NOINIT 不承诺复位或断电保留。除非精确 SoC 合同授权所选 bus master 访问，否则将 TCM／CCM 放置视为仅供 CPU 使用。内存放置本身从不授予 DMA 可达性、cache 一致性、对齐或借用权限。默认主栈及普通存储布局保持不变。"
+
+msgid "Exact silicon admission"
+msgstr "精确芯片准入"
+
+msgid "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
+msgstr "可选冷态 `nx_silicon_preflight` 在调用者建立合法特权、MMIO 和安全状态之后、取得 I/O 资源之前，读取选定来源一次。它从不启用时钟或修复硬件。策略、严格排序的精确 revision 规则及其审阅来源 SHA256 应一同保存；摘要标识审阅输入，并非认证或已应用 workaround 的证明。构建提供经审阅的已应用 workaround mask。显式观察到的数值 revision 零合法。"
+
+msgid "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
+msgstr "`allow_unreviewed` 不能绕过被阻止的 revision、缺失的观察、group／density 不匹配或缺失的 workaround。已完成的拒绝复制其诊断原因，但不授权启动；来源失败时输出保持不变。device group 和 density 不建立封装、PCB 或物理资格。`silicon_admission_test.cpp` 使用真实 preflight 实现和显式 mock 身份来源测试这些区别。"
+
+msgid "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
+msgstr "Native 对递归互斥和 C11 fence 建模；它不模拟真实 NVIC、DMA、物理时序或信号安全的中断。非法 restore 嵌套在 Debug 和 Release 中均会 abort。GoogleTest／GoogleMock 针对九个 CPU profile，通过狭窄的寄存器／指令硬件边界编译真实 Cortex-M 算法；普通 ARM 路径将该边界内联，从不链接 mock。Native 测试执行真实递归互斥、严格 token 嵌套和 context 查询。Cache、MPU 和 security 模型只 mock 外部 CPU／MMIO 操作，运行生产 C 算法，包括状态变化前的拒绝。锁定的官方 CMSIS-Core v6.4.0 头文件 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、`core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、`m-profile/armv8m_mpu.h` 及 `m-profile/armv7m_cachel1.h` 提供经审阅的寄存器布局参考。共享私有 `registers.h` 统一保存使用中的当前域地址。`tests/contracts/arch_cmsis_layout_probe.c` 独立将这些事实及使用中的 MPU／SAU／cache 字段与九个 CPU profile 的官方头文件比较。编译门禁验证干净的锁定 Core 和实际 include 来源；生产 target 保持仅依赖 Nexus 的边界。共享私有 Core 源码不改变 Nexus 公共 context、ownership、mask 恢复或 cache／MPU／SAU 合同，也不建立新的处理器／profile 或物理支持。真实 IRQ 延迟、特权转换、DMA／cache 一致性及 CPU 时序需要 HIL。"
+
+msgid "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."
+msgstr "`scripts/ci/arch_compile.py` 使用真实 GNU ARM 编译器，以 O2 编译所有声明的 CPU／FPU／MVE／security／DSP ABI 变体。单独的真实生产 `atomic.h` probe 保留全部九个公共操作。逐函数审计将保存的 mask、恢复屏障、发布访问和 exclusive RMW 绑定到每个操作；真实 relocation 记录将 M0／M0+ 调用绑定到 saved-PRIMASK 端口。机器指令计数描述静态代码形状，并不限制 exclusive 重试次数，也不建立时序、唤醒延迟或 WCET。ARM Clang 资格、SoC 启动、Board 接线及物理行为仍属独立证据范围。MPU／SAU 编程成功表示参数经验证后的写入和屏障；这些机制不验证读回或已启用的策略。"

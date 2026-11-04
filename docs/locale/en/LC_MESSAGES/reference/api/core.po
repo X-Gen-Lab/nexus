@@ -257,17 +257,8 @@ msgstr "[in] Valid transferred bytes/samples."
 msgid "[in] Live request storage with no concurrent reuse."
 msgstr "[in] Live request storage with no concurrent reuse."
 
-msgid "[out] Final operation result."
-msgstr "[out] Final operation result."
-
-msgid "[out] Valid byte/sample count."
-msgstr "[out] Valid byte/sample count."
-
 msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
 msgstr "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
-
-msgid "[inout] Zero-initialized, unbound adapter-owned slot."
-msgstr "[inout] Zero-initialized, unbound adapter-owned slot."
 
 msgid "[in] Live storage to bind; binding itself is not admission."
 msgstr "[in] Live storage to bind; binding itself is not admission."
@@ -392,20 +383,11 @@ msgstr "[in] Nonzero stable counter frequency."
 msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
 msgstr "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
 
-msgid "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
-msgstr "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
-
 msgid "[inout] Initialized, single-owner extension state."
 msgstr "[inout] Initialized, single-owner extension state."
 
 msgid "[in] Current counter snapshot."
 msgstr "[in] Current counter snapshot."
-
-msgid "[out] Extended elapsed microseconds."
-msgstr "[out] Extended elapsed microseconds."
-
-msgid "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
-msgstr "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
 
 msgid "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
 msgstr "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
@@ -413,6 +395,44 @@ msgstr "SUCCESS, STATE for stale/released identity, INVALID for invalid argument
 msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout. U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates; autonomous operation and DMA borrow admission require their own provider."
 msgstr "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout. U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates; autonomous operation and DMA borrow admission require their own provider."
 
-# Retained prior translation; replaced by the current public-header note.
-#~ msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
-#~ msgstr "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
+msgid "Outputs are separate writable objects, disjoint from the complete request and each other. They remain unchanged on rejection. The caller establishes these spans; this hot helper validates NULL arguments and the settled predicate, not arbitrary storage provenance."
+msgstr "Outputs are separate writable objects, disjoint from the complete request and each other. They remain unchanged on rejection. The caller establishes these spans; this hot helper validates NULL arguments and the settled predicate, not arbitrary storage provenance."
+
+msgid "[out] Distinct final operation result."
+msgstr "[out] Distinct final operation result."
+
+msgid "[out] Distinct valid byte/sample count."
+msgstr "[out] Distinct valid byte/sample count."
+
+msgid "Zero-initialize only before first publication. After the last usable UINT64_MAX epoch, retire this slot. Replacing its storage requires every old command and observer joined; clearing a live epoch is not retirement."
+msgstr "Zero-initialize only before first publication. After the last usable UINT64_MAX epoch, retire this slot. Replacing its storage requires every old command and observer joined; clearing a live epoch is not retirement."
+
+msgid "[inout] Initialized, unbound adapter-owned stable slot."
+msgstr "[inout] Initialized, unbound adapter-owned stable slot."
+
+msgid "Construct a finite deadline without selecting infinite wait."
+msgstr "Construct a finite deadline without selecting infinite wait."
+
+msgid "Bounded task/IRQ arithmetic, without reads of a clock, allocation or retained references. Clock readiness and domain lifetime remain the caller's responsibility. Use nx_deadline_after only when saturation to an infinite wait is intentional."
+msgstr "Bounded task/IRQ arithmetic, without reads of a clock, allocation or retained references. Clock readiness and domain lifetime remain the caller's responsibility. Use nx_deadline_after only when saturation to an infinite wait is intentional."
+
+msgid "[in] Current finite time in the consumer's clock domain."
+msgstr "[in] Current finite time in the consumer's clock domain."
+
+msgid "[in] Relative duration in microseconds; zero is valid."
+msgstr "[in] Relative duration in microseconds; zero is valid."
+
+msgid "[out] Finite result, unchanged on failure."
+msgstr "[out] Finite result, unchanged on failure."
+
+msgid "SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED when the sum reaches NX_DEADLINE_NEVER or would overflow."
+msgstr "SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED when the sum reaches NX_DEADLINE_NEVER or would overflow."
+
+msgid "Observe strictly before 2^32 ticks elapse, even when idle. Multiple missed wraps cannot be detected from two snapshots, nor can one complete wrap at equal snapshots. Counter must continue through waits; frequency cannot change. No concurrent initialize/reset or observation."
+msgstr "Observe strictly before 2^32 ticks elapse, even when idle. Multiple missed wraps cannot be detected from two snapshots, nor can one complete wrap at equal snapshots. Counter must continue through waits; frequency cannot change. No concurrent initialize/reset or observation."
+
+msgid "[out] Distinct extended elapsed microseconds."
+msgstr "[out] Distinct extended elapsed microseconds."
+
+msgid "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
+msgstr "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."

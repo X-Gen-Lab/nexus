@@ -1,0 +1,24 @@
+--- a/tx_thread_schedule.c
++++ b/tx_thread_schedule.c
+@@ -1,3 +1,6 @@
++/* Nexus build-derived Linux scheduler: exact reviewed upstream identity;
++ * held-mutex run acknowledgement avoids redundant timer signal suspension.
++ * Original ThreadX copyright and MIT license remain below. */
+ /***************************************************************************
+  * Copyright (c) 2024 Microsoft Corporation
+  * Copyright (c) 2026-present Eclipse ThreadX contributors
+@@ -179,11 +182,10 @@
+             else
+             {
+ 
+-                /* It is woken up by TX_THREAD. */
+-                /* Suspend timer thread and let ThreadX thread wake up first. */
+-                _tx_linux_thread_suspend(_tx_linux_timer_id);
++                /* The held scheduler mutex excludes timer context save.
++                   Receive the selected thread's existing run acknowledgement
++                   before allowing the timer to enter the kernel. */
+                 tx_linux_sem_wait(&_tx_linux_semaphore);
+-                _tx_linux_thread_resume(_tx_linux_timer_id);
+ 
+             }
+         }

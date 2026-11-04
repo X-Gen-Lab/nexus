@@ -60,8 +60,9 @@ nx_arch_result_t nx_arch_sau_encode(const nx_arch_sau_region_t* region,
  *                  region support. Does not modify CTRL, ALLNS, another region,
  *                  another security world's registers or enable the SAU.
  *                  Current RNR is restored; DSB/ISB complete region writes.
- *                  Policy, secure gateways and IDAU configuration stay
- * external.
+ *                  OK confirms validated writes and barriers, not register
+ *                  readback or an effective attribution policy. Policy,
+ *                  secure gateways and IDAU configuration stay external.
  */
 nx_arch_result_t nx_arch_sau_write(uint32_t index,
                                    const nx_arch_sau_region_t* region);

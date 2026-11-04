@@ -11,10 +11,12 @@
 #include "nexus/os/baremetal.h"
 #include "nexus/os/native.h"
 #include <atomic>
+#include <cerrno>
 #include <condition_variable>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <mutex>
+#include <new>
 #include <thread>
 #include <vector>
 
@@ -103,12 +105,94 @@ struct NativeStack {
     alignas(4096) unsigned char bytes[262144];
 };
 
+/** \brief Let a real child finish entry before pthread_create returns. */
+struct CreateBoundary {
+    std::mutex mutex;
+    std::condition_variable completion;
+    bool finished = false;
+
+    void await() {
+        std::unique_lock<std::mutex> lock(mutex);
+        completion.wait(lock, [this] { return finished; });
+    }
+
+    void finish() {
+        std::lock_guard<std::mutex> lock(mutex);
+        finished = true;
+        completion.notify_one();
+    }
+};
+
+thread_local CreateBoundary* selectedCreate = nullptr;
+
+/** \brief Fail selected POSIX resource boundaries around real objects. */
+class ResourceBoundary {
+  public:
+    MOCK_METHOD(int, create,
+                (pthread_t*, const pthread_attr_t*, void* (*)(void*), void*));
+    MOCK_METHOD(int, initialize, (pthread_cond_t*, const pthread_condattr_t*));
+    MOCK_METHOD(int, initialize, (pthread_attr_t*));
+    MOCK_METHOD(int, destroy, (pthread_cond_t*));
+    MOCK_METHOD(int, destroy, (pthread_mutex_t*));
+};
+
+thread_local ResourceBoundary* selectedResources = nullptr;
+
 } /* namespace */
 
 extern "C" int __real_pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
 extern "C" int __real_pthread_cond_timedwait(pthread_cond_t*, pthread_mutex_t*,
                                              const struct timespec*);
 extern "C" int __real_clock_gettime(clockid_t, struct timespec*);
+extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*,
+                                     void* (*)(void*), void*);
+extern "C" int __real_pthread_cond_init(pthread_cond_t*,
+                                        const pthread_condattr_t*);
+extern "C" int __real_pthread_cond_destroy(pthread_cond_t*);
+extern "C" int __real_pthread_mutex_destroy(pthread_mutex_t*);
+extern "C" int __real_pthread_attr_init(pthread_attr_t*);
+
+/** \brief Preserve actual creation while selecting a legal early execution. */
+extern "C" int __wrap_pthread_create(pthread_t* thread,
+                                     const pthread_attr_t* attributes,
+                                     void* (*entry)(void*), void* context) {
+    int error =
+        selectedResources != nullptr
+            ? selectedResources->create(thread, attributes, entry, context)
+            : __real_pthread_create(thread, attributes, entry, context);
+    if (error == 0 && selectedCreate != nullptr) {
+        selectedCreate->await();
+    }
+    return error;
+}
+
+/** \brief Inject initialization failure without replacing queue behavior. */
+extern "C" int __wrap_pthread_cond_init(pthread_cond_t* condition,
+                                        const pthread_condattr_t* attributes) {
+    return selectedResources != nullptr
+               ? selectedResources->initialize(condition, attributes)
+               : __real_pthread_cond_init(condition, attributes);
+}
+
+/** \brief Fail task attribute admission before creating any task. */
+extern "C" int __wrap_pthread_attr_init(pthread_attr_t* attributes) {
+    return selectedResources != nullptr
+               ? selectedResources->initialize(attributes)
+               : __real_pthread_attr_init(attributes);
+}
+
+/** \brief Record each condition release and preserve ordinary POSIX calls. */
+extern "C" int __wrap_pthread_cond_destroy(pthread_cond_t* condition) {
+    return selectedResources != nullptr
+               ? selectedResources->destroy(condition)
+               : __real_pthread_cond_destroy(condition);
+}
+
+/** \brief Record mutex release after its conditions have been released. */
+extern "C" int __wrap_pthread_mutex_destroy(pthread_mutex_t* mutex) {
+    return selectedResources != nullptr ? selectedResources->destroy(mutex)
+                                        : __real_pthread_mutex_destroy(mutex);
+}
 
 /** \brief Every ordinary test retains the actual monotonic host clock. */
 extern "C" int __wrap_clock_gettime(clockid_t clock, struct timespec* value) {
@@ -578,6 +662,89 @@ TEST(NativeQueue, RepeatedCloseIsIdempotentAndRejectsFutureAdmission) {
     EXPECT_EQ(nx_native_queue_close(&queue), NX_ERROR_INVALID);
 }
 
+TEST(NativeQueue, PayloadCannotOverwriteControlOrItsTail) {
+    for (size_t offset : {size_t{0}, sizeof(nx_native_queue_t) - 1U}) {
+        SCOPED_TRACE(offset);
+        nx_native_queue_t queue{};
+        auto* overlapping = reinterpret_cast<unsigned char*>(&queue) + offset;
+        nx_result_t result = nx_native_queue_init(&queue, overlapping, 1, 1, 1);
+        if (result == NX_SUCCESS) {
+            EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+            EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+        }
+        EXPECT_EQ(result, NX_ERROR_INVALID);
+    }
+}
+
+TEST(NativeQueue, PayloadSpanCannotWrapTheAddressSpace) {
+    nx_native_queue_t queue{};
+    auto* wrapping = reinterpret_cast<void*>(UINTPTR_MAX - 3U);
+    nx_result_t result = nx_native_queue_init(&queue, wrapping, 8, 2, 4);
+    if (result == NX_SUCCESS) {
+        EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+        EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    }
+    EXPECT_EQ(result, NX_ERROR_INVALID);
+}
+
+TEST(NativeQueue, AdjacentControlAndPayloadRemainUsable) {
+    struct {
+        nx_native_queue_t queue{};
+        uint32_t payload[2];
+    } storage;
+    ASSERT_EQ(nx_native_queue_init(&storage.queue, storage.payload,
+                                   sizeof storage.payload, 2, sizeof(uint32_t)),
+              NX_SUCCESS);
+    uint32_t sent = 42U;
+    uint32_t received = 0U;
+    EXPECT_EQ(nx_native_queue_send(&storage.queue, &sent, 0), NX_SUCCESS);
+    EXPECT_EQ(nx_native_queue_receive(&storage.queue, &received, 0),
+              NX_SUCCESS);
+    EXPECT_EQ(received, sent);
+    EXPECT_EQ(nx_native_queue_close(&storage.queue), NX_SUCCESS);
+    EXPECT_EQ(nx_native_queue_destroy(&storage.queue), NX_SUCCESS);
+}
+
+TEST(NativeTask, ControlCannotOccupyTheSuppliedStack) {
+    NativeStack stack;
+    auto* task = ::new (stack.bytes) nx_native_task_t{};
+    unsigned calls = 0;
+    auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
+    testing::StrictMock<ResourceBoundary> resources;
+    EXPECT_CALL(resources, initialize(testing::A<pthread_attr_t*>()))
+        .Times(testing::AnyNumber())
+        .WillRepeatedly(testing::Invoke(__real_pthread_attr_init));
+    ON_CALL(resources, create(testing::_, testing::_, testing::_, testing::_))
+        .WillByDefault(testing::Return(EAGAIN));
+    EXPECT_CALL(resources,
+                create(testing::_, testing::_, testing::_, testing::_))
+        .Times(0);
+    selectedResources = &resources;
+    nx_result_t result = nx_native_task_start(
+        task, stack.bytes, sizeof stack.bytes, entry, &calls);
+    selectedResources = nullptr;
+    EXPECT_EQ(result, NX_ERROR_INVALID);
+    EXPECT_FALSE(task->started);
+    EXPECT_EQ(task->entry, nullptr);
+    EXPECT_EQ(task->context, nullptr);
+    EXPECT_EQ(calls, 0U);
+}
+
+TEST(NativeTask, AdjacentStackAndControlRemainUsable) {
+    struct {
+        NativeStack stack;
+        nx_native_task_t task{};
+        unsigned calls = 0;
+    } storage;
+    auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
+    ASSERT_EQ(nx_native_task_start(&storage.task, storage.stack.bytes,
+                                   sizeof storage.stack.bytes, entry,
+                                   &storage.calls),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_native_task_join(&storage.task), NX_SUCCESS);
+    EXPECT_EQ(storage.calls, 1U);
+}
+
 TEST(NativeTask, JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse) {
     NativeStack stack;
     nx_native_task_t task{};
@@ -613,6 +780,151 @@ TEST(NativeTask, JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse) {
         EXPECT_FALSE(task.started);
     }
     EXPECT_EQ(nx_native_task_join(&task), NX_ERROR_INVALID);
+}
+
+TEST(NativeTask, EntryMayRejectSelfJoinBeforeCreateReturns) {
+    NativeStack stack;
+    nx_native_task_t task{};
+    CreateBoundary created;
+    struct Context {
+        nx_native_task_t* task;
+        CreateBoundary* boundary;
+        nx_result_t selfJoin = NX_SUCCESS;
+    } context{&task, &created};
+    auto entry = [](void* opaque) {
+        auto* state = static_cast<Context*>(opaque);
+        state->selfJoin = nx_native_task_join(state->task);
+        state->boundary->finish();
+    };
+    selectedCreate = &created;
+    nx_result_t result = nx_native_task_start(
+        &task, stack.bytes, sizeof(stack.bytes), entry, &context);
+    selectedCreate = nullptr;
+    ASSERT_EQ(result, NX_SUCCESS);
+    EXPECT_EQ(context.selfJoin, NX_ERROR_BUSY);
+    EXPECT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    EXPECT_FALSE(task.started);
+}
+
+TEST(NativeTask, CreationExhaustionDoesNotRetainEntryOrContext) {
+    NativeStack stack;
+    nx_native_task_t task{};
+    unsigned calls = 0;
+    auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
+    testing::StrictMock<ResourceBoundary> resources;
+    EXPECT_CALL(resources, initialize(testing::A<pthread_attr_t*>()))
+        .WillOnce(testing::Invoke(__real_pthread_attr_init));
+    EXPECT_CALL(resources, create(&task.thread, testing::_, testing::_, &task))
+        .WillOnce(testing::Return(EAGAIN));
+    selectedResources = &resources;
+    nx_result_t result = nx_native_task_start(
+        &task, stack.bytes, sizeof(stack.bytes), entry, &calls);
+    selectedResources = nullptr;
+    EXPECT_EQ(result, NX_ERROR_EXHAUSTED);
+    EXPECT_FALSE(task.started);
+    EXPECT_EQ(task.entry, nullptr);
+    EXPECT_EQ(task.context, nullptr);
+    EXPECT_EQ(calls, 0U);
+    ASSERT_EQ(nx_native_task_start(&task, stack.bytes, sizeof(stack.bytes),
+                                   entry, &calls),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    EXPECT_EQ(calls, 1U);
+}
+
+class NativeTaskAttributeFailure : public testing::TestWithParam<int> {};
+
+TEST_P(NativeTaskAttributeFailure, ExhaustionRetainsUnusedReusableHandle) {
+    NativeStack stack;
+    nx_native_task_t task{};
+    unsigned calls = 0;
+    auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
+    testing::StrictMock<ResourceBoundary> resources;
+    EXPECT_CALL(resources, initialize(testing::A<pthread_attr_t*>()))
+        .WillOnce(testing::Return(GetParam()));
+    selectedResources = &resources;
+    nx_result_t result = nx_native_task_start(
+        &task, stack.bytes, sizeof(stack.bytes), entry, &calls);
+    selectedResources = nullptr;
+    EXPECT_EQ(result, NX_ERROR_EXHAUSTED);
+    EXPECT_FALSE(task.started);
+    EXPECT_EQ(task.entry, nullptr);
+    EXPECT_EQ(task.context, nullptr);
+    EXPECT_EQ(calls, 0U);
+    ASSERT_EQ(nx_native_task_start(&task, stack.bytes, sizeof(stack.bytes),
+                                   entry, &calls),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    EXPECT_EQ(calls, 1U);
+}
+
+INSTANTIATE_TEST_SUITE_P(ResourceErrors, NativeTaskAttributeFailure,
+                         testing::Values(EAGAIN, ENOMEM));
+
+TEST(NativeNotify, PartialDestroyRetriesOnlyOwnedResources) {
+    nx_native_notify_t notification;
+    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    testing::StrictMock<ResourceBoundary> resources;
+    testing::InSequence order;
+    EXPECT_CALL(resources, destroy(&notification.condition))
+        .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
+    EXPECT_CALL(resources, destroy(&notification.mutex))
+        .WillOnce(testing::Return(EBUSY));
+    EXPECT_CALL(resources, destroy(&notification.mutex))
+        .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
+    selectedResources = &resources;
+    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_native_notify_port(&notification).context, nullptr);
+    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    selectedResources = nullptr;
+}
+
+TEST(NativeQueue, PartialDestroyRetriesOnlyOwnedResources) {
+    nx_native_queue_t queue;
+    uint32_t storage[1];
+    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
+                                   sizeof(uint32_t)),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    testing::StrictMock<ResourceBoundary> resources;
+    testing::InSequence order;
+    EXPECT_CALL(resources, destroy(&queue.readable))
+        .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
+    EXPECT_CALL(resources, destroy(&queue.writable))
+        .WillOnce(testing::Return(EBUSY));
+    EXPECT_CALL(resources, destroy(&queue.writable))
+        .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
+    EXPECT_CALL(resources, destroy(&queue.mutex))
+        .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
+    selectedResources = &resources;
+    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_ERROR_BUSY);
+    EXPECT_FALSE(queue.initialized);
+    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    selectedResources = nullptr;
+}
+
+TEST(NativeQueue, FailedCreationCanFinishItsFailedRollback) {
+    nx_native_queue_t queue;
+    uint32_t storage[1];
+    testing::StrictMock<ResourceBoundary> resources;
+    testing::InSequence order;
+    EXPECT_CALL(resources, initialize(&queue.readable, testing::_))
+        .WillOnce(testing::Invoke(__real_pthread_cond_init));
+    EXPECT_CALL(resources, initialize(&queue.writable, testing::_))
+        .WillOnce(testing::Return(EAGAIN));
+    EXPECT_CALL(resources, destroy(&queue.readable))
+        .WillOnce(testing::Return(EBUSY));
+    EXPECT_CALL(resources, destroy(&queue.readable))
+        .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
+    EXPECT_CALL(resources, destroy(&queue.mutex))
+        .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
+    selectedResources = &resources;
+    EXPECT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
+                                   sizeof(uint32_t)),
+              NX_ERROR_BUSY);
+    EXPECT_FALSE(queue.initialized);
+    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    selectedResources = nullptr;
 }
 
 TEST(NativeTask, SmallStackRejectionRetainsUnusedHandle) {

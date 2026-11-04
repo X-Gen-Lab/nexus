@@ -1,0 +1,116 @@
+--- upstream/port.c
++++ reviewed/port.c
+@@ -38,6 +38,8 @@
+ /* Scheduler includes. */
+ #include "FreeRTOS.h"
+ #include "task.h"
++#include "guard.h"
++static PRIVILEGED_DATA nx_freertos_mpu_start_t xNexusMpuStart;
+ #include "mpu_syscall_numbers.h"
+ 
+ #ifndef __VFP_FP__
+@@ -190,7 +192,7 @@
+  * C portion of the SVC handler.  The SVC handler is split between an asm entry
+  * and a C wrapper for simplicity of coding and maintenance.
+  */
+-void vSVCHandler_C( uint32_t * pulRegisters ) __attribute__( ( noinline ) ) PRIVILEGED_FUNCTION;
++void vSVCHandler_C( uint32_t * pulRegisters, uint32_t ulNexusExceptionReturn ) __attribute__( ( noinline ) ) PRIVILEGED_FUNCTION;
+ 
+ /*
+  * Function to enable the VFP.
+@@ -389,6 +391,7 @@
+             "blt syscall_enter              \n"
+             "cmp r2, %1                     \n"
+             "beq syscall_exit               \n"
++            " mov r1, lr \n"
+             "b vSVCHandler_C                \n"
+             "                               \n"
+             "syscall_enter:                 \n"
+@@ -428,7 +431,7 @@
+ #endif /* #if ( configUSE_MPU_WRAPPERS_V1 == 0 ) */
+ /*-----------------------------------------------------------*/
+ 
+-void vSVCHandler_C( uint32_t * pulParam ) /* PRIVILEGED_FUNCTION */
++void vSVCHandler_C( uint32_t * pulParam, uint32_t ulNexusExceptionReturn ) /* PRIVILEGED_FUNCTION */
+ {
+     uint8_t ucSVCNumber;
+     uint32_t ulPC;
+@@ -455,6 +458,7 @@
+     switch( ucSVCNumber )
+     {
+         case portSVC_START_SCHEDULER:
++            if( nx_freertos_mpu_start_consume(&xNexusMpuStart, pulParam, ulNexusExceptionReturn) == pdFALSE ) { return; }
+             prvRestoreContextOfFirstTask();
+             break;
+ 
+@@ -816,6 +820,7 @@
+  */
+ BaseType_t xPortStartScheduler( void )
+ {
++    if( nx_freertos_mpu_start_arm(&xNexusMpuStart) == pdFALSE ) { return pdFALSE; }
+     /* Errata 837070 workaround must only be enabled on Cortex-M7 r0p0
+      * and r0p1 cores. */
+     #if ( configENABLE_ERRATA_837070_WORKAROUND == 1 )
+@@ -991,6 +996,8 @@
+         " dsb                   \n"
+         " isb                   \n"
+         " svc %0                \n" /* System call to start first task. */
++        " .global __nexus_mpu_start_svc_return \n"
++        " __nexus_mpu_start_svc_return: \n"
+         " nop                   \n"
+         " .ltorg                \n"
+         ::"i" ( portSVC_START_SCHEDULER ) : "memory" );
+@@ -1240,16 +1247,12 @@
+          * exported from linker scripts. */
+         extern uint32_t * __privileged_functions_start__;
+         extern uint32_t * __privileged_functions_end__;
+-        extern uint32_t * __FLASH_segment_start__;
+-        extern uint32_t * __FLASH_segment_end__;
+         extern uint32_t * __privileged_data_start__;
+         extern uint32_t * __privileged_data_end__;
+     #else
+         /* Declaration when these variable are exported from linker scripts. */
+         extern uint32_t __privileged_functions_start__[];
+         extern uint32_t __privileged_functions_end__[];
+-        extern uint32_t __FLASH_segment_start__[];
+-        extern uint32_t __FLASH_segment_end__[];
+         extern uint32_t __privileged_data_start__[];
+         extern uint32_t __privileged_data_end__[];
+     #endif /* if defined( __ARMCC_VERSION ) */
+@@ -1264,13 +1267,13 @@
+     if( portMPU_TYPE_REG == portEXPECTED_MPU_TYPE_VALUE )
+     {
+         /* First setup the unprivileged flash for unprivileged read only access. */
+-        portMPU_REGION_BASE_ADDRESS_REG = ( ( uint32_t ) __FLASH_segment_start__ ) | /* Base address. */
++        portMPU_REGION_BASE_ADDRESS_REG = ( ( uint32_t ) __nexus_user_flash_start__ ) | /* Base address. */
+                                           ( portMPU_REGION_VALID ) |
+                                           ( portUNPRIVILEGED_FLASH_REGION );
+ 
+         portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_ONLY ) |
+                                        ( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
+-                                       ( prvGetMPURegionSizeSetting( ( uint32_t ) __FLASH_segment_end__ - ( uint32_t ) __FLASH_segment_start__ ) ) |
++                                       ( prvGetMPURegionSizeSetting( ( uint32_t ) __nexus_user_flash_end__ - ( uint32_t ) __nexus_user_flash_start__ ) ) |
+                                        ( portMPU_REGION_ENABLE );
+ 
+         /* Setup the privileged flash for privileged only access.  This is where
+@@ -1296,14 +1299,15 @@
+                                        prvGetMPURegionSizeSetting( ( uint32_t ) __privileged_data_end__ - ( uint32_t ) __privileged_data_start__ ) |
+                                        ( portMPU_REGION_ENABLE );
+ 
+-        /* By default allow everything to access the general peripherals.  The
+-         * system peripherals and registers are protected. */
+-        portMPU_REGION_BASE_ADDRESS_REG = ( portPERIPHERALS_START_ADDRESS ) |
++        /* Nexus: exact read-only executable SVC window. Privileged MMIO
++         * uses the enabled background map; users have no peripheral grant. */
++        portMPU_REGION_BASE_ADDRESS_REG = ( ( uint32_t ) __nexus_syscall_flash_start__ ) |
+                                           ( portMPU_REGION_VALID ) |
+                                           ( portGENERAL_PERIPHERALS_REGION );
+ 
+-        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) |
+-                                       ( prvGetMPURegionSizeSetting( portPERIPHERALS_END_ADDRESS - portPERIPHERALS_START_ADDRESS ) ) |
++        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_ONLY ) |
++                                       ( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
++                                       ( prvGetMPURegionSizeSetting( ( uint32_t ) __nexus_syscall_flash_end__ - ( uint32_t ) __nexus_syscall_flash_start__ ) ) |
+                                        ( portMPU_REGION_ENABLE );
+ 
+         /* Enable the memory fault exception. */
