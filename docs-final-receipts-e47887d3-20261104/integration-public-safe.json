@@ -1,0 +1,32 @@
+{
+  "status": "both_PRs_merged_read_back",
+  "observed_repository_heads": {
+    "X-Gen-Lab/nexus": "e47887d3a11f6136726fdc992d66df1f40b36691",
+    "X-Gen-Lab/nexus-examples": "f59debf1a15913353462e69ba0039db1c010f284"
+  },
+  "pull_requests": [
+    {
+      "repository": "X-Gen-Lab/nexus",
+      "number": 46,
+      "state": "closed",
+      "merged": true,
+      "draft": false,
+      "head": "e47887d3a11f6136726fdc992d66df1f40b36691",
+      "merged_at": "2026-11-04T12:24:36Z",
+      "url": "https://github.com/X-Gen-Lab/nexus/pull/46"
+    },
+    {
+      "repository": "X-Gen-Lab/nexus-examples",
+      "number": 24,
+      "state": "closed",
+      "merged": true,
+      "draft": false,
+      "head": "f59debf1a15913353462e69ba0039db1c010f284",
+      "merged_at": "2026-11-04T12:24:39Z",
+      "url": "https://github.com/X-Gen-Lab/nexus-examples/pull/24"
+    }
+  ],
+  "integration": "normal nonforce fast-forward; no new merge commit",
+  "private_application_execution_artifacts": "remain private",
+  "scope": "approved public-safe aggregate, no private application raw/source"
+}

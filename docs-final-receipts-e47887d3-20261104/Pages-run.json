@@ -1,0 +1,33 @@
+{
+  "kind": "actual_GitHub_Pages_run_observation",
+  "run_id": 41827344011,
+  "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/41827344011",
+  "head_sha": "86bac5040dc3b0fc3ba45d88290a21f46d3cea1b",
+  "status": "completed",
+  "conclusion": "success",
+  "attempt": 1,
+  "workflow_path": ".github/workflows/docs-publish.yml",
+  "jobs": [
+    {
+      "id": 126565350168,
+      "name": "Verify prepared publication",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-04T12:13:04Z",
+      "completed_at": "2026-11-04T12:15:17Z",
+      "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/41827344011/job/126565350168"
+    },
+    {
+      "id": 126566471194,
+      "name": "Deploy verified documentation",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-04T12:15:20Z",
+      "completed_at": "2026-11-04T12:15:39Z",
+      "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/41827344011/job/126566471194"
+    }
+  ],
+  "base_url_from_deploy_job_log": "https://x-gen-lab.github.io/nexus/",
+  "deploy_log_line": "2026-11-04T12:15:37.4964785Z Evaluated environment url: https://x-gen-lab.github.io/nexus/",
+  "observer_triggered_or_retried": false
+}

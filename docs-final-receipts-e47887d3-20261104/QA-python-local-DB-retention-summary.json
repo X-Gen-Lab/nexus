@@ -1,0 +1,62 @@
+{
+  "actual_restore_report": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/portable-restored.json",
+    "sha256": "e6557bd944672224378ebd2bd2b89ee738ebf9d299591ccea2ca46921c9ea1d5",
+    "size": 251
+  },
+  "all_retired_paths_currently_absent": true,
+  "both_native_recoveries_all174_BQRS_and_srczip_equal": true,
+  "eight_commands_completed0": true,
+  "full_completion_record": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/completed.json",
+    "sha256": "1e881067fc5a2fb873eea46b0f727d4c2f7e799ffde7aba444cfd90b7c4d2b25",
+    "size": 1027647
+  },
+  "heavy_lane_released": true,
+  "native_archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/native/python-db.zip",
+    "sha256": "fcfce2ad5c1110f6ff47c48fa9af99aeab712b1150d004398d0715c706ccf6be",
+    "size": 20472523
+  },
+  "native_cache_exact_byte_replay_claim": false,
+  "original_DB_retained_live": "/tmp/nexus-codeql-test-followup-20261104/python-db",
+  "original_SARIF": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-test-followup-20261104/python.sarif",
+    "sha256": "bb44c9f1d576f4cf21f3f2c1f19d19190f9b18e16d7a715c07b25d188a86394a",
+    "size": 592992
+  },
+  "portable_archive": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/store/be2fb9834b997a2125bafa52768a9facf355706298a10ea889b23363a4f6b7f3.tar.gz",
+    "sha256": "be2fb9834b997a2125bafa52768a9facf355706298a10ea889b23363a4f6b7f3",
+    "size": 21137809
+  },
+  "portable_files": 117,
+  "portable_logical_bytes": 24592281,
+  "portable_manifest_sha256": "4e75e3cd056d5eff927995237b3a44637c7991772576d9a3ed96b0a59c8d7bdb",
+  "portable_package": {
+    "path": "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/python-analysis.package.json",
+    "sha256": "79fb0fe418c07395d9cea0e16ca4add900147bbb083933da361e8f924fb800e4",
+    "size": 541
+  },
+  "public_upload_performed": false,
+  "query_repeated": false,
+  "resources_after": {
+    "/dev/shm": 2379214848,
+    "/tmp": 6357557248,
+    "/workspace": 943738880
+  },
+  "retired_only_five_owned_derived_paths": [
+    "/tmp/nexus-codeql-test-followup-20261104/python-db-bundle-working-706",
+    "/tmp/nexus-codeql-test-followup-20261104/python-db-unbundled-first-706",
+    "/workspace/nexus/build/recovery-20261103/codeql-706-python-retention-20261104/portable-input",
+    "/tmp/nexus-codeql-test-followup-20261104/python-db-unbundled-from-store-706",
+    "/tmp/nexus-codeql-test-followup-20261104/python-analysis-portable-restored-706"
+  ],
+  "source": {
+    "commit": "706ee80b12a653a1820685c530b21e9668d82064",
+    "root": "/dev/shm/nexus-codeql-test-followup-20261104/source",
+    "tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2"
+  },
+  "source_and_original_DB_unchanged": true,
+  "status": "native_bundle_two_official_unbundle_resolve_and_portable_actual_restore_passed"
+}

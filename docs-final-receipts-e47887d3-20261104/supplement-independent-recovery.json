@@ -1,0 +1,139 @@
+{
+  "actual_restore_immutable_attempt": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-store-actual-restore.attempts/1793794732566264602-1f671562c944484c877bbec9d102596f/receipt.json",
+    "sha256": "d50abbbe5de98b620e582303bd1bc5957e19b067a17c6315219b3043b8659a82",
+    "size": 2061
+  },
+  "actual_restore_report": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-actual-restored.json",
+    "sha256": "77404c0397c4f4fc10cbb2af5e1e9e8d21a704093675edfe47bd4158bb1d897c",
+    "size": 280
+  },
+  "all354_selected_SHA_size_mode_plus_selection_manifest_match_actual_restored_store_manifest": true,
+  "append_result": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/append-control/result.json",
+    "sha256": "e3c277ec013f5f3b158108d91b216f0bb2198057479caebca9857ba1678e7d68",
+    "size": 3267
+  },
+  "authenticated_downloads": [
+    {
+      "bytes": 18559,
+      "independent_local": {
+        "mode": 420,
+        "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-readback/docs-public-codeql-qa706-d-e47887d3-20261104/p2_outer_transport.py",
+        "sha256": "62af90e47e9db29967662960713f6183af32f1d6a93647322ff5aadf52fb8987",
+        "size": 18559
+      },
+      "local": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/payload/p2_outer_transport.py",
+      "mode": "100644",
+      "path": "docs-public-codeql-qa706-d-e47887d3-20261104/p2_outer_transport.py",
+      "sha256": "62af90e47e9db29967662960713f6183af32f1d6a93647322ff5aadf52fb8987"
+    },
+    {
+      "bytes": 1699748,
+      "independent_local": {
+        "mode": 420,
+        "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-readback/docs-public-codeql-qa706-d-e47887d3-20261104/part-00000",
+        "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81",
+        "size": 1699748
+      },
+      "local": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/payload/part-00000",
+      "mode": "100644",
+      "path": "docs-public-codeql-qa706-d-e47887d3-20261104/part-00000",
+      "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81"
+    },
+    {
+      "bytes": 542,
+      "independent_local": {
+        "mode": 420,
+        "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-readback/docs-public-codeql-qa706-d-e47887d3-20261104/supplement.package.json",
+        "sha256": "66a8168969335866f8ad41d9f64c87a150daf0c58207e2e68fce220cdde0e9e9",
+        "size": 542
+      },
+      "local": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/payload/supplement.package.json",
+      "mode": "100644",
+      "path": "docs-public-codeql-qa706-d-e47887d3-20261104/supplement.package.json",
+      "sha256": "66a8168969335866f8ad41d9f64c87a150daf0c58207e2e68fce220cdde0e9e9"
+    },
+    {
+      "bytes": 3688,
+      "independent_local": {
+        "mode": 420,
+        "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-readback/docs-public-codeql-qa706-d-e47887d3-20261104/transport.json",
+        "sha256": "1e49e226d63126a6da393d41cdfd5cb7c70f641878372e3cd5df398ae34e4d16",
+        "size": 3688
+      },
+      "local": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/payload/transport.json",
+      "mode": "100644",
+      "path": "docs-public-codeql-qa706-d-e47887d3-20261104/transport.json",
+      "sha256": "1e49e226d63126a6da393d41cdfd5cb7c70f641878372e3cd5df398ae34e4d16"
+    }
+  ],
+  "branch": "documentation-assets",
+  "commit": "bbe6e98174fe9bce71a9ae870319e49600904452",
+  "finished_ns": 1793794733169068389,
+  "full_restored_inventory_verified_by_maintained_store_API": true,
+  "independent_join": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-join.json",
+    "sha256": "5d56139260cc62d9ad5ba20db88d92c8c1cfaa1ba84020e91e98d7132dfa736e",
+    "size": 482
+  },
+  "namespace": "docs-public-codeql-qa706-d-e47887d3-20261104",
+  "no_DB_fullNative_CLI_or_privateE_raw": true,
+  "no_remote_Git_mutation_by_recovery_owner": true,
+  "only_public_E_summary_bytes": 1195,
+  "original_P2_namespace_and_71b_history_unchanged_by_this_operation": true,
+  "original_envelope_unchanged": {
+    "mode": 420,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/independent-readback/docs-public-codeql-qa706-d-e47887d3-20261104/supplement.package.json",
+    "sha256": "66a8168969335866f8ad41d9f64c87a150daf0c58207e2e68fce220cdde0e9e9",
+    "size": 542
+  },
+  "physical_status": "not_executed",
+  "product_promotion": false,
+  "qualification_scope": "Recoverable proof capsule only; no newfull159/firmware/physical/remoteCI or independently reexecuted scan claim. Original scan/results/pending/failure records remain Source scoped.",
+  "repository": "X-Gen-Lab/nexus",
+  "resources_after": {
+    "/dev/shm": 2379214848,
+    "/tmp": 6357557248,
+    "/workspace": 989065216
+  },
+  "restored_files": 355,
+  "restored_logical_bytes": 20192521,
+  "source_scopes": {
+    "D": {
+      "commit": "e47887d3a11f6136726fdc992d66df1f40b36691",
+      "scope": "Independent strict bilingual documentation/package/recovery",
+      "tree": "72a0b2a7878e6a8389ebfaac8c38f14f9a9e4a39"
+    },
+    "E": "Only approved1195B public-safe summary; all private raw/source excluded",
+    "P2": {
+      "CPP": "183 composite queries/1234 results,109 preserved+74 actual supplemental; original failed budgets remain failures",
+      "Python": "174 original queries/45 results",
+      "commit": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+      "tree": "2309ae92e019fac68c6f463cbee205c3726fe73d"
+    },
+    "QA706": {
+      "commit": "706ee80b12a653a1820685c530b21e9668d82064",
+      "scope": "Normal complete-index gate+host resource ownership/provenance fixes; fresh Python174/38 mapped results. No new full159/firmware relabel.",
+      "tree": "5c39d9cfce75ed33354a13e1329c6e668b0463d2"
+    }
+  },
+  "status": "published_exactcommit_independent_authenticated4file_readback_whole_join_and_maintained_store_actual_restore_passed",
+  "trusted_prepared_record": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/prepared.actual.json",
+    "sha256": "6eed784a655c942e56dc1b86120ac0c24f39b3b7d12a0746564c614d11ef7fec",
+    "size": 164603
+  },
+  "whole_archive": {
+    "mode": 384,
+    "path": "/workspace/nexus/build/recovery-20261103/publication-codeql-supplement-20261104/authenticated-joined.tar.gz",
+    "sha256": "d84a0b3501dab0a49bcaf4b348ce441249c4ad88ad9c7ab98f8aaba148778e81",
+    "size": 1699748
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "status": "not_configured",
+  "actual_create_exit": 1,
+  "actual_HTTP_status": "403",
+  "message": "Resource not accessible by integration",
+  "payload_sha256": "1b80bf78bd904aee48189a5ed4ba9f98307da60046c433970b904de2d76d975d",
+  "fresh_list_before_create": [],
+  "original_failure_preserved": true,
+  "no_retry_or_bypass": true
+}

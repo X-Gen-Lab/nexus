@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "checkouts": [
+    {
+      "role": "public_root",
+      "root": "/workspace/nexus",
+      "head": "e47887d3a11f6136726fdc992d66df1f40b36691",
+      "branch": "main",
+      "clean": true
+    },
+    {
+      "role": "private_root",
+      "root": "/workspace/nexus-examples",
+      "head": "f59debf1a15913353462e69ba0039db1c010f284",
+      "branch": "main",
+      "clean": true
+    },
+    {
+      "role": "private_qualified_worktree",
+      "root": "/workspace/nexus-examples/build/iteration-20261102/source",
+      "head": "f59debf1a15913353462e69ba0039db1c010f284",
+      "branch": "detached",
+      "clean": true
+    }
+  ],
+  "git_worktree_constraint": "main remains in root private checkout; qualified linked worktree is detached at the exact same merged SHA, without bypassing Git worktree branch ownership guard",
+  "private_root_external_nexus": "ab53225033dfb759e93c90beb6301a3048bbcfda",
+  "private_root_four_preexisting_uninitialized_optional_submodules": "remain uninitialized; initialized recursive pins match; qualification worktree retains all23",
+  "old_tags_and_dedicated_artifact_branches_preserved": true
+}

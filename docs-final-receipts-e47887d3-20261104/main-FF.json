@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "repositories": [
+    {
+      "repository": "public",
+      "root": "/workspace/nexus",
+      "head": "e47887d3a11f6136726fdc992d66df1f40b36691",
+      "previous_main": "b1b903da47eda722a6be3e98edced5cfa36221b1",
+      "feature": "feat/platform-iteration-20261102",
+      "remote_readback": "e47887d3a11f6136726fdc992d66df1f40b36691\trefs/heads/main",
+      "nonforce_fast_forward": true,
+      "new_merge_commit_created": false
+    },
+    {
+      "repository": "private",
+      "root": "/workspace/nexus-examples/build/iteration-20261102/source",
+      "head": "f59debf1a15913353462e69ba0039db1c010f284",
+      "previous_main": "c61826333e3317679ebcab59d61595f72f131a3b",
+      "feature": "feat/platform-services-20261102",
+      "remote_readback": "f59debf1a15913353462e69ba0039db1c010f284\trefs/heads/main",
+      "nonforce_fast_forward": true,
+      "new_merge_commit_created": false
+    }
+  ],
+  "checkout_branch_sync": "pending until owned producers finish",
+  "hardware_status": "not_executed"
+}

@@ -2556,6 +2556,46 @@
       "path": "docs-public-codeql-qa706-d-e47887d3-20261104/transport.json",
       "bytes": 3688,
       "sha256": "1e49e226d63126a6da393d41cdfd5cb7c70f641878372e3cd5df398ae34e4d16"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/post-deploy.json",
+      "bytes": 1137178,
+      "sha256": "765ac881e7a6345b8bf592762393ca63cbafd8ed69f387e56891c3ff4bab3c89"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/Pages-run.json",
+      "bytes": 1231,
+      "sha256": "dfd90625aa2dea2bbaa06595a706b84654dd2bfcafc8d4b4f61dd9234ffd557f"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/supplement-independent-recovery.json",
+      "bytes": 6988,
+      "sha256": "6b831d3eea304fea6cdf4bc4c31ea3890448162cfe5b613315c326a60acd02b5"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/integration-public-safe.json",
+      "bytes": 1080,
+      "sha256": "7f06756f281c37706bf75299d218c475f84baacad95d4213551553f6b936b0e4"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/main-checkouts.json",
+      "bytes": 1147,
+      "sha256": "e29929460c8df100e2afcf8557c173eb6949cc6b78ab31f0347efb0458b6d686"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/main-FF.json",
+      "bytes": 1029,
+      "sha256": "14601496b4b28fe318bdd370068e2675424b267004ce716a2d62b30c4bd09118"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/governance-fresh-observation.json",
+      "bytes": 336,
+      "sha256": "c55e4cb3afe1e2d6658bd06b9aaf4fedced5ad1840f288b0eb6d94223fcb5f46"
+    },
+    {
+      "path": "docs-final-receipts-e47887d3-20261104/QA-python-local-DB-retention-summary.json",
+      "bytes": 2972,
+      "sha256": "8ee28c7da7364b6075d148a17098b40ef53d65581a2e1bb66c9918473541036b"
     }
   ],
   "physical_hil": "not_executed",
