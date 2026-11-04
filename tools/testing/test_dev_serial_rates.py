@@ -95,8 +95,14 @@ class DeveloperSerialRateTests(unittest.TestCase):
                 self.assertEqual(attributes[2] & termios.CSIZE, termios.CS8)
                 self.assertFalse(attributes[2] & (termios.PARENB |
                                                  termios.CSTOPB))
-                with self.assertRaises(OSError) as failure:
-                    os.open(path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+                unexpected = None
+                try:
+                    with self.assertRaises(OSError) as failure:
+                        unexpected = os.open(
+                            path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+                finally:
+                    if unexpected is not None:
+                        os.close(unexpected)
                 self.assertEqual(failure.exception.errno, errno.EBUSY)
         self.assertEqual(termios.tcgetattr(slave), original)
         descriptor = os.open(path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
@@ -351,8 +357,14 @@ device._monitor(sys.argv[3], 30, 9600,
                     report = device.execute(self.plan(), self.root / "owned")
             self.assertEqual(termios.tcgetattr(slave)[4:6],
                              [termios.B9600] * 2)
-            with self.assertRaises(OSError) as failure:
-                os.open(path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+            unexpected = None
+            try:
+                with self.assertRaises(OSError) as failure:
+                    unexpected = os.open(
+                        path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+            finally:
+                if unexpected is not None:
+                    os.close(unexpected)
             self.assertEqual(failure.exception.errno, errno.EBUSY)
             self.assertTrue(report["station_quarantined"])
             self.assertEqual(report["terminal_restore"]["status"], "failed")
@@ -463,6 +475,60 @@ runpy.run_module("tools.dev.device", run_name="__main__", alter_sys=True)
                              os.O_NONBLOCK)
         os.close(descriptor)
 
+
+class UnexpectedSuccessfulOpenFDTests(unittest.TestCase):
+    def check_existing_case(self, method_name):
+        existing = DeveloperSerialRateTests(method_name)
+        original_terminal = existing.terminal
+        original_open = os.open
+        terminal = {}
+        returned = []
+        result = unittest.TestResult()
+
+        def observed_terminal():
+            value = original_terminal()
+            terminal.update(slave=value[0], path=value[1])
+            return value
+
+        def one_unexpected_success(path, flags, *arguments, **keywords):
+            expected = os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK
+            if (flags == expected and terminal and not returned
+                    and Path(path) == terminal["path"]):
+                descriptor = os.dup(terminal["slave"])
+                returned.append(descriptor)
+                return descriptor
+            return original_open(path, flags, *arguments, **keywords)
+
+        existing.terminal = observed_terminal
+        try:
+            # The production device open also requires CLOEXEC and NOFOLLOW.
+            # Only the test's exact expected-EBUSY open may unexpectedly succeed.
+            with patch.object(os, "open", new=one_unexpected_success):
+                existing.run(result)
+            self.assertEqual(result.testsRun, 1)
+            self.assertEqual(result.errors, [])
+            self.assertEqual(len(result.failures), 1)
+            self.assertIn("OSError not raised", result.failures[0][1])
+            self.assertEqual(len(returned), 1)
+            with self.assertRaises(OSError) as closed:
+                os.fstat(returned[0])
+            self.assertEqual(closed.exception.errno, errno.EBADF)
+        finally:
+            for descriptor in returned:
+                try:
+                    os.close(descriptor)
+                except OSError as error:
+                    if error.errno != errno.EBADF:
+                        raise
+
+    def test_expected_busy_failure_closes_unexpected_fd_in_speed_case(self):
+        self.check_existing_case(
+            "test_pty_uses_selected_speed_and_restores_all_terminal_attributes")
+
+    def test_expected_busy_failure_closes_unexpected_fd_in_incomplete_withdrawal_case(
+            self):
+        self.check_existing_case(
+            "test_incomplete_withdrawal_keeps_terminal_unchanged_and_exclusive")
 
 if __name__ == "__main__":
     unittest.main()

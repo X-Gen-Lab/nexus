@@ -2,9 +2,10 @@
   "schema": 1,
   "name": "googletest",
   "version": "1.16.0",
-  "commit": "6910c9d9165801d8827d628cb72eb7ea9dd538c5",
+  "commit": "58ec32c09ed8a099e55cbdab9418597c4fd9b14f",
   "url": "https://github.com/google/googletest.git",
   "license": "BSD-3-Clause",
   "scope": "host GoogleTest/GoogleMock targets only; no configure-time network",
-  "path": "ext/googletest"
+  "path": "ext/googletest",
+  "upstream_commit": "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
 }

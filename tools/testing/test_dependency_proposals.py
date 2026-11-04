@@ -383,6 +383,9 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.assertEqual(record["revision"],
                          self.git(self.root / "ext/googletest",
                                   "rev-parse", "HEAD"))
+        self.assertEqual(record["upstream_revision"],
+                         "6910c9d9165801d8827d628cb72eb7ea9dd538c5")
+        self.assertNotEqual(record["revision"], record["upstream_revision"])
         self.assertEqual(record["upstream_url"],
                          "https://github.com/google/googletest.git")
         self.assertEqual({Path(item["path"]).relative_to(self.root).as_posix()

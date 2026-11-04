@@ -6,7 +6,7 @@ import signal
 from types import SimpleNamespace
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock as mock
 
 SPEC = importlib.util.spec_from_file_location("interop", Path(__file__).with_name("mqtt_tls_interop.py"))
 MODULE = importlib.util.module_from_spec(SPEC)

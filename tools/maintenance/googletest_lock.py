@@ -19,6 +19,7 @@ from tools.configure.metadata import (  # noqa: E402
 from tools.maintenance import source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/google/googletest.git"
+UPSTREAM_COMMIT = "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
 DIRECTORY = "ext/googletest"
 LOCK_NAME = "dependencies/googletest.lock.json"
 SCOPE = "host GoogleTest/GoogleMock targets only; no configure-time network"
@@ -27,13 +28,15 @@ PREPARE = "python tools/dev/dev.py prepare --scope native --allow-network"
 
 def contract(lock):
     """Validate reviewed source placement and a complete, exact Git identity."""
-    fields(lock, {"schema", "name", "version", "commit", "path", "url",
-                  "license", "scope"}, "GoogleTest source lock")
+    fields(lock, {"schema", "name", "version", "commit", "upstream_commit",
+                  "path", "url", "license", "scope"}, "GoogleTest source lock")
     if (type(lock["schema"]) is not int or lock["schema"] != 1 or
             lock["name"] != "googletest" or lock["path"] != DIRECTORY or
             lock["url"] != ORIGIN or lock["license"] != "BSD-3-Clause" or
             lock["scope"] != SCOPE):
         raise ValueError("Exact host-only GoogleTest source lock required")
+    if lock["upstream_commit"] != UPSTREAM_COMMIT:
+        raise ValueError("Reviewed official GoogleTest upstream commit required")
     if (not isinstance(lock["commit"], str) or
             not re.fullmatch(r"[0-9a-f]{40}", lock["commit"]) or
             not isinstance(lock["version"], str) or
@@ -94,6 +97,12 @@ def verify(source, lock_path):
         raise ValueError("GoogleTest parent index gitlink differs from source lock")
     if git(source, "rev-parse", "HEAD") != lock["commit"]:
         raise ValueError("GoogleTest checkout commit differs from source lock")
+    try:
+        git(source, "merge-base", "--is-ancestor", lock["upstream_commit"],
+            lock["commit"])
+    except ValueError as error:
+        raise ValueError("GoogleTest selected commit must descend from its "
+                         "reviewed official upstream commit") from error
     if git(source, "config", "--get-all", "remote.origin.url") != approved_fetch:
         raise ValueError("GoogleTest checkout origin differs from approved fetch URL")
     if git(source, "status", "--porcelain", "--untracked-files=all"):

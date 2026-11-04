@@ -2,7 +2,6 @@
 import importlib
 import copy
 from contextlib import redirect_stderr
-import hashlib
 import io
 import json
 import os

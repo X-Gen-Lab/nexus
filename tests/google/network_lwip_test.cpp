@@ -3,7 +3,7 @@
  * \brief           Actual lwIP frame copying, ownership and stop contracts
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-11-02
+ * \date            2026-11-04
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/network/lwip_adapter.h"
@@ -13,6 +13,7 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <memory>
+#include <utility>
 #include <vector>
 extern "C" {
 #include "lwip/init.h"
@@ -22,6 +23,9 @@ extern "C" {
 #include "lwip/udp.h"
 }
 namespace {
+using TestPacket = std::unique_ptr<pbuf, decltype(&pbuf_free)>;
+using TestUdp = std::unique_ptr<udp_pcb, decltype(&udp_remove)>;
+using TestTcp = std::unique_ptr<tcp_pcb, decltype(&tcp_abort)>;
 uint32_t now_ms = 10U;
 struct Mac {
     nx_eth_frames_tx_request_t* pending{};
@@ -320,17 +324,17 @@ TEST_F(NetworkLwip, ActualUdpSendUsesArpAndCopiesRawStackPayload) {
     mac.received = ArpRequest();
     ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
     mac.sent.clear();
-    auto* pcb = udp_new();
+    TestUdp pcb(udp_new(), udp_remove);
     ASSERT_NE(nullptr, pcb);
     ip_addr_t peer{};
     IP_ADDR4(&peer, 10U, 0U, 0U, 1U);
-    auto* packet = pbuf_alloc(PBUF_TRANSPORT, 3U, PBUF_RAM);
+    TestPacket packet(pbuf_alloc(PBUF_TRANSPORT, 3U, PBUF_RAM), pbuf_free);
     ASSERT_NE(nullptr, packet);
     const uint8_t payload[]{1U, 2U, 3U};
-    ASSERT_EQ(ERR_OK, pbuf_take(packet, payload, sizeof(payload)));
-    EXPECT_EQ(ERR_OK, udp_sendto(pcb, packet, &peer, 1234U));
-    pbuf_free(packet);
-    udp_remove(pcb);
+    ASSERT_EQ(ERR_OK, pbuf_take(packet.get(), payload, sizeof(payload)));
+    EXPECT_EQ(ERR_OK, udp_sendto(pcb.get(), packet.get(), &peer, 1234U));
+    packet.reset();
+    pcb.reset();
     ASSERT_EQ(1U, mac.sent.size());
     const auto& bytes = mac.sent.front();
     ASSERT_GE(bytes.size(), 45U);
@@ -357,12 +361,12 @@ TEST_F(NetworkLwip, ActualIcmpEchoReplyUsesCheckedIpAndIcmpInput) {
 }
 TEST_F(NetworkLwip, ActualUdpInputDeliversCopiedPayloadAfterRelease) {
     Start();
-    auto* pcb = udp_new();
-    ASSERT_NE(nullptr, pcb);
-    ASSERT_EQ(ERR_OK, udp_bind(pcb, IP_ANY_TYPE, 1234U));
     std::vector<uint8_t> payload;
+    TestUdp pcb(udp_new(), udp_remove);
+    ASSERT_NE(nullptr, pcb);
+    ASSERT_EQ(ERR_OK, udp_bind(pcb.get(), IP_ANY_TYPE, 1234U));
     udp_recv(
-        pcb,
+        pcb.get(),
         [](void* context, struct udp_pcb*, struct pbuf* packet,
            const ip_addr_t*, u16_t) {
             auto& bytes = *static_cast<std::vector<uint8_t>*>(context);
@@ -375,7 +379,7 @@ TEST_F(NetworkLwip, ActualUdpInputDeliversCopiedPayloadAfterRelease) {
                                         0U,    0U,    7U, 8U,    9U};
     mac.received = IpFrame(17U, datagram);
     ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
-    udp_remove(pcb);
+    pcb.reset();
     EXPECT_EQ((std::vector<uint8_t>{7U, 8U, 9U}), payload);
     EXPECT_FALSE(mac.held);
     EXPECT_EQ(1U, mac.releases);
@@ -385,15 +389,15 @@ TEST_F(NetworkLwip, ActualTcpConnectEmitsSynWithPinnedStack) {
     mac.received = ArpRequest();
     ASSERT_EQ(NX_SUCCESS, nx_lwip_adapter_service(&adapter, 1U));
     mac.sent.clear();
-    auto* pcb = tcp_new();
+    TestTcp pcb(tcp_new(), tcp_abort);
     ASSERT_NE(nullptr, pcb);
     ip_addr_t peer{};
     IP_ADDR4(&peer, 10U, 0U, 0U, 1U);
-    ASSERT_EQ(ERR_OK, tcp_connect(pcb, &peer, 1234U, nullptr));
+    ASSERT_EQ(ERR_OK, tcp_connect(pcb.get(), &peer, 1234U, nullptr));
     ASSERT_EQ(1U, mac.sent.size());
     EXPECT_EQ(6U, mac.sent[0][23]);
     EXPECT_NE(0U, mac.sent[0][47] & 2U);
-    tcp_abort(pcb);
+    pcb.reset();
 }
 TEST_F(NetworkLwip, PoolExhaustionReleasesFrameAndReportsBoundedOverload) {
     Start();
@@ -440,16 +444,13 @@ TEST_F(NetworkLwip, CorruptIpChecksumDropsWithoutReplyAndReturnsHardwareLoan) {
     EXPECT_EQ(1U, mac.releases);
 }
 TEST_F(NetworkLwip, ArenaPreservesNativePointerAlignmentForOddPayloads) {
-    std::vector<struct pbuf*> packets;
+    std::vector<TestPacket> packets;
     for (uint16_t size = 1U; size < 33U; ++size) {
-        auto* packet = pbuf_alloc(PBUF_RAW, size, PBUF_RAM);
+        TestPacket packet(pbuf_alloc(PBUF_RAW, size, PBUF_RAM), pbuf_free);
         ASSERT_NE(nullptr, packet);
-        packets.push_back(packet);
-        EXPECT_EQ(0U,
-                  reinterpret_cast<uintptr_t>(packet) % alignof(struct pbuf));
-    }
-    for (auto* packet : packets) {
-        pbuf_free(packet);
+        EXPECT_EQ(0U, reinterpret_cast<uintptr_t>(packet.get()) %
+                          alignof(struct pbuf));
+        packets.push_back(std::move(packet));
     }
 }
 TEST_F(NetworkLwip, ReceiveOverloadDoesNotStarveDueStackTimers) {
@@ -632,8 +633,6 @@ TEST_F(NetworkLwip, RepeatedDetachAndRestartPreservesTheLiveGlobalTimerDomain) {
     }
     RecordProperty("restart_cycles", static_cast<int>(cycles));
 }
-using TestPacket = std::unique_ptr<pbuf, decltype(&pbuf_free)>;
-
 /** \brief Fixed complete raw frame; this test does not claim wire delivery. */
 static TestPacket RawFrame(uint8_t marker) {
     TestPacket packet(pbuf_alloc(PBUF_RAW, 60U, PBUF_RAM), pbuf_free);

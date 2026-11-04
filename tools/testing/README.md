@@ -9,6 +9,15 @@ tests. Configuration uses only this local source, rejects missing, modified or
 incorrectly pinned checkouts, and never downloads dependencies. Firmware and
 source SDK consumers do not require the host test submodule.
 
+The selected framework includes an organization-fork ownership fix on upstream
+1.16.0 (`6910c9d9165801d8827d628cb72eb7ea9dd538c5`). It disables `RE`
+copy-assignment while preserving deep-copy construction, preventing shallow
+ownership of POSIX regular-expression state. The lock and Gitlink select the
+patched commit; the lock's `upstream_commit` and official URL record upstream
+provenance, while
+`.gitmodules` selects the reviewed organization fork for retrieval. This patch
+applies only to host tests.
+
 Run the same check locally and in CI:
 
 ```sh

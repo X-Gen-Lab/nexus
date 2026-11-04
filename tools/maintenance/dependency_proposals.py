@@ -147,6 +147,7 @@ def inventory(root=ROOT):
             locked = parse_json(lock_bytes)
             if name == "googletest":
                 googletest_lock.verify(checkout, lock_path)
+                upstream_revision = locked["upstream_commit"]
             elif name == "lwip":
                 lwip_lock.verify(checkout, lock_path)
             elif name == "coremqtt":

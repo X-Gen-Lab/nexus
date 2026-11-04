@@ -14,6 +14,7 @@ from tools.maintenance import source_catalogue
 ROOT = Path(__file__).resolve().parents[2]
 ORIGIN = "https://github.com/google/googletest.git"
 FETCH = source_catalogue.dependency("googletest").fetch_url
+UPSTREAM_COMMIT = "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
 
 
 class GoogleTestSubmoduleTests(unittest.TestCase):
@@ -28,6 +29,10 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.git(self.root, "init", "--quiet")
         self.git(self.source, "init", "--quiet")
         self.git(self.source, "remote", "add", "origin", FETCH)
+        # Keep synthetic source contents, with a real reviewed upstream parent.
+        self.git(self.source, "fetch", "--quiet", "--depth=1",
+                 str(ROOT / "ext/googletest"), UPSTREAM_COMMIT)
+        self.git(self.source, "reset", "--soft", "FETCH_HEAD")
         (self.source / "CMakeLists.txt").write_text(
             "cmake_minimum_required(VERSION 3.31)\n"
             "project(googletest-distribution LANGUAGES CXX)\n"
@@ -39,6 +44,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.git(self.source, "commit", "--quiet", "-m", "source fixture")
         self.lock = {"schema": 1, "name": "googletest", "version": "1.16.0",
             "commit": self.git(self.source, "rev-parse", "HEAD"),
+            "upstream_commit": UPSTREAM_COMMIT,
             "path": "ext/googletest", "url": ORIGIN,
             "license": "BSD-3-Clause",
             "scope": "host GoogleTest/GoogleMock targets only; "
@@ -166,6 +172,27 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.lock_path.write_text(self.lock_path.read_text().replace(
             '"schema": 1', '"schema": 1, "schema": 1'))
         with self.assertRaisesRegex(ValueError, "Duplicate JSON"):
+            self.verify()
+
+    def test_missing_or_unreviewed_upstream_base_rejects(self):
+        for upstream in (None, True, "main", "a" * 39, "a" * 40,
+                         self.lock["commit"]):
+            with self.subTest(upstream=upstream):
+                if upstream is None:
+                    self.lock.pop("upstream_commit")
+                else:
+                    self.lock["upstream_commit"] = upstream
+                self.write_lock()
+                with self.assertRaises(ValueError):
+                    self.verify()
+
+    def test_selected_commit_requires_reviewed_upstream_ancestor(self):
+        self.git(self.source, "checkout", "--quiet", "--orphan", "unrelated")
+        self.git(self.source, "commit", "--quiet", "-m", "unrelated source")
+        self.lock["commit"] = self.git(self.source, "rev-parse", "HEAD")
+        self.write_lock()
+        self.git(self.root, "add", "ext/googletest", "dependencies")
+        with self.assertRaisesRegex(ValueError, "upstream"):
             self.verify()
 
     def test_unsafe_path_or_different_release_rejects(self):

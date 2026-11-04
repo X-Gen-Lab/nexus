@@ -452,8 +452,6 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     for name, path in canonical_sources.items():
         shutil.copyfile(path, source / name)
     secure = specification.scenario == "secure_services"
-    split = specification.scenario in {"secure_services", "loaned_rx",
-                                       "mcuboot_control"}
     boot = specification.scenario == "mcuboot_boot"
     (source / "private_headers.c").write_text(
         '#if __has_include("stm32f4xx.h") || '

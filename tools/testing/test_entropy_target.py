@@ -133,10 +133,10 @@ class EntropyTargetTests(unittest.TestCase):
         spec.loader.exec_module(module)
         required = {f"Inc/stm32f4xx_ll_{kind}.h"
                     for kind in ("bus", "rcc", "rng")}
-        self.assertTrue(required <= module.REVIEWED_FILES)
+        self.assertLessEqual(required, module.REVIEWED_FILES)
         lock = json.loads((ROOT / "dependencies/stm32f4-hal.lock.json")
                           .read_text())
-        self.assertTrue(required <= module.contract(lock))
+        self.assertLessEqual(required, module.contract(lock))
 
 
 if __name__ == "__main__":
