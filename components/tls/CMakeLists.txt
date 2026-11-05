@@ -94,7 +94,7 @@ function(nexus_add_tls)
     target_include_directories(nexus_tls PUBLIC
         "${nexus_tls_component}/include"
         "${nexus_tls_component}/../network/include")
-    target_link_libraries(nexus_tls PUBLIC Nexus::IO
+    target_link_libraries(nexus_tls PUBLIC Nexus::IOEntropy
         PRIVATE MbedTLS::mbedtls nexus_build_options nexus_owned_warnings)
     add_library(Nexus::TLS ALIAS nexus_tls)
     set_property(TARGET nexus_tls PROPERTY
