@@ -6385,8 +6385,77 @@
           }
         },
         "strict_bilingual_documentation": {
-          "status": "pending_clean_documentation_commit",
-          "scope": "Run once after this result record is committed; later receipt will bind that exact clean documentation revision, not inherit firmware qualification."
+          "status": "passed",
+          "scope": "Strict documentation build and local immutable archive only. The exact clean B documentation input includes the new software record. This later metadata update is not an HTML rebuild or new firmware/Board/HIL qualification.",
+          "documentation_revision": "d1fab73ec7843c1ece8bd5502a072151fa584ccd",
+          "documentation_tree": "725c2840d788da5ebd81d118d619b33f7a0a1d66",
+          "source_clean_before_and_after": true,
+          "source_identity_unchanged": true,
+          "languages": [
+            "en",
+            "zh_CN"
+          ],
+          "source_pages": 132,
+          "actual_html_files": {
+            "en": 228,
+            "zh_CN": 228
+          },
+          "translation_states": 264,
+          "source_errors": 0,
+          "translation_errors": 0,
+          "sphinx_build_warnings": 0,
+          "dependency_deprecation_observations": {
+            "count": 3,
+            "message": "Pinned Breathe emits RemovedInSphinx80Warning; retained in raw stderr, no suppression."
+          },
+          "summary": {
+            "path": "build/reference-platforms-20261106/docs/clean-d1fab73ec784/summary.json",
+            "bytes": 5907,
+            "sha256": "d8cdd2cf78c34ced38f2e73cef3a92d71f9588b2902458d3c5c36934acced086"
+          },
+          "build_manifest": {
+            "path": "/tmp/nexus-reference-docs-20261106/strict-d1fab73ec784/documentation-build.json",
+            "bytes": 59316,
+            "sha256": "6343ffbb82ee7e9e5d4266a7790025812a10a3bf038039c72c8f1bf4e75f1089"
+          },
+          "command_receipts": [
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/doxygen.attempts/1793908695634690858-2e55e008d803494aa0fbc4dd49bbbbb6/receipt.json",
+              "bytes": 1450,
+              "sha256": "ead3ce8a63d6f7b935cbc8e2f283912310fb7de7a67312d5cabae3f8f67ba9e5"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/gettext.attempts/1793908696352071467-1ebc9fd02cac453a825b885d67517851/receipt.json",
+              "bytes": 1732,
+              "sha256": "d1b602efe391fd219adeda368e67786e7aaf2ff2dc669ca5fbd46bb79aed3767"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/html-en.attempts/1793908724720856411-88ac765c78d548ebbe43df28c2141143/receipt.json",
+              "bytes": 1726,
+              "sha256": "8d3ee104b8b77a806e4ac7de9130f373d1bb58a7a4f9fbed7b2958390f23a25f"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/html-zh_CN.attempts/1793908774372585952-a33f2007c4be47798275e154dc8e2f32/receipt.json",
+              "bytes": 1741,
+              "sha256": "97ecf5203553d4604401425d1ac7718624ed59f520edfa0ed2bb0302200a963b"
+            }
+          ],
+          "portable_package": {
+            "archive": {
+              "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/e4d41333a9d3633cc19fa4ba856f0aaf40f107aa14d87c3a1db8bbaf669cf3b7.tar.gz",
+              "sha256": "e4d41333a9d3633cc19fa4ba856f0aaf40f107aa14d87c3a1db8bbaf669cf3b7",
+              "size": 59718120
+            },
+            "bytes": 387572149,
+            "files": 13260,
+            "kind": "portable_evidence",
+            "manifest_sha256": "f29f4a3baf7cfa0da7d633d7be0d996bb2d4b72082ed90b874980465af56d41c",
+            "product_promotion": false,
+            "schema_version": 1,
+            "signature_status": "unsigned"
+          },
+          "publication_status": "not_published_for_this_increment",
+          "firmware_qualification_inherited": false
         },
         "bounded_static_analysis": {
           "status": "passed",
