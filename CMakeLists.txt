@@ -54,6 +54,7 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/Firmware.cmake")
 
 add_subdirectory(core)
 add_subdirectory(arch)
+add_subdirectory(drivers)
 add_subdirectory(io)
 add_subdirectory(os)
 add_subdirectory(components EXCLUDE_FROM_ALL)
@@ -72,7 +73,8 @@ add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
 target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
     PRIVATE "${NEXUS_SOURCE_DIR}/io/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
-    PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
+    PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch
+        Nexus::DriverPrivateHeaders)
 if(NEXUS_RUNTIME_POWER)
     target_link_libraries(nexus_platform PUBLIC Nexus::ClockDomain)
     target_include_directories(nexus_platform PRIVATE

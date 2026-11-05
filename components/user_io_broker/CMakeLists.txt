@@ -6,5 +6,6 @@ target_include_directories(nexus_user_io_broker PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private")
 target_link_libraries(nexus_user_io_broker PUBLIC Nexus::Core Nexus::IO
-    Nexus::UARTOwner PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+    Nexus::IOGPIO Nexus::UARTOwner
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::UserIoBroker ALIAS nexus_user_io_broker)

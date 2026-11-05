@@ -9,6 +9,18 @@
 #include "gd32f470_provider.h"
 #include "nexus/io/dma.h"
 
+/** \brief Exact fixed-profile DMA ratio; reported integer Hz rounds down.
+ * \note TIMER2 is 100 MHz and ADC is HCLK200/6 MHz. Each ADC cycle therefore
+ *       consumes exactly three timer ticks; admission never divides by rounded
+ *       Hz. Two microsecond counter ticks still cover the required 14 ADC
+ *       stabilization cycles, including counter quantization.
+ */
+enum {
+    NX_GD32_ADC_DMA_CLOCK_HZ = 200000000U / 6U,
+    NX_GD32_ADC_DMA_TIMER_HZ = 100000000U,
+    NX_GD32_ADC_DMA_TICKS_PER_CYCLE = 3U
+};
+
 /**
  * \brief           Exact ADC0 / DMA1 channel0 selector0 / TIMER2 instance.
  * \note            Assembly owns DMA1 clock and analog Board wiring. Every
@@ -91,10 +103,11 @@ void nx_gd32_adc_stream_sequence(const nx_gd32_adc_state_t* adc,
  * \param[in]       deadline: Absolute deadline for initial ADC calibration.
  * \param[in]       priority: Unshifted DMA publisher priority, zero to fifteen.
  * \return          Success or INVALID/BUSY/CONTEXT/TIMEOUT before block loans.
- * \note            Fixed ADC clock is 12.5 MHz; sample time is fifteen cycles
- *                  plus twelve conversion cycles per channel. Timer source is
- *                  100 MHz. Electrical accuracy and source impedance require
- *                  physical qualification.
+ * \note            Fixed ADC clock is HCLK200/6 MHz; sample time is fifteen
+ *                  cycles plus twelve conversion cycles per channel. Timer is
+ *                  100 MHz, exactly three ticks per ADC cycle. VREFP and VDDA
+ *                  must be 2.6..3.6 V with VREFP<=VDDA. Source impedance and
+ *                  electrical accuracy require physical qualification.
  */
 nx_result_t nx_gd32_adc_stream_initialize(nx_gd32_adc_stream_state_t* state,
                                           const uint8_t* channels, size_t count,

@@ -327,7 +327,7 @@ class ProviderRetentionTests(unittest.TestCase):
         self.assertEqual(faces.get("nx_can_port_t"), "nx_can_ops_t")
         self.assertEqual(providers["nx_classic_can_ops"]["type"], "nx_can_ops_t")
         self.assertTrue(providers["nx_classic_can_ops"]["source"]["path"].endswith(
-            "/io/src/controllers/can_controller.c"))
+            "/drivers/can/classic_can/can_controller.c"))
         self.assertEqual(set(providers["nx_classic_can_ops"]["fields"]),
                          set(layouts["nx_can_ops_t"]))
 

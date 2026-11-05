@@ -272,7 +272,7 @@ Board route. Factory lookup remains a cold readonly face lookup.
 本次补齐六类选定外设：SPI1 有限轮询、I2C1 有限消息、ADC4 PC0 单次采样、
 TIM3 CH1 固定 PWM、PA0/PA1 EXTI 和完整物理 Flash。实例仍由 TOML 与不可变 IR
 静态生成，使用共享只读方法表及独立私有状态，没有隐藏任务或运行时注册表。
-私有 14 文件锁包含官方 LL 头文件、HAL GPIO C 单元及其必需头文件；LL 复用包括
+私有 15 文件锁包含官方 LL 头文件、HAL GPIO C 单元及其必需头文件；LL 复用包括
 配置编码、只读查询及选定的数据和控制操作。GPIO provider 的四个既有命令位置对
 已准入非空掩码调用一条合并的 `HAL_GPIO_WriteMultipleStatePin`；公共空掩码写入
 仍成功。不引入 `HAL_Init`、vendor tick、Handle 或第二个中断/传输 owner；具体范围见
@@ -372,6 +372,29 @@ TX selections above are maintained; LPDMA1, circular linked lists and RX DMA
 are not selected. SRAM2/3/4, backup
 SRAM and Secure aliases are outside this maintained DMA source domain.
 Secure and NonSecure aliases never count as two physical capacities.
+
+### Separate retained-time and Stop2 components
+
+The ordinary provider's SRAM1/GPDMA domain above is distinct from the optional
+retained-time components. They use explicit public component targets and an
+external boot/power owner; they do not silently extend every UART or Platform
+configuration. Default images select none of these targets.
+
+| Target | Maintained exact software boundary |
+| --- | --- |
+| `Nexus::U575RetainedTime` | Externally prepared LSE/RTC calendar and a separate retained ClockDomain; [source and lifecycle contract](../../../docs/design/u575-retained-time.md) |
+| `Nexus::U575Stop2` | WUT-only Stop2 and recovery under that retained-time contract; no RTOS tick compensation or VBAT continuity |
+| `Nexus::U575Stop2Copy` | Finite memory-to-memory LPDMA1 channel0 copy inside explicitly selected nonsecure SRAM4; [compound release contract](../../../docs/design/u575-stop2-copy.md) |
+| `Nexus::U575Stop2Lptim1` | One fixed SRAM4 tuple updating LPTIM1 CCR1/RCR/ARR through the same exclusive LPDMA channel; [selected LPBAM contract](../../../docs/design/u575-lptim1-lpbam.md) |
+
+The three Stop2 targets are mutually exclusive selections of the same concrete
+owner. Run admission closes and every user joins before stopping the TIM2
+Platform; retained deadlines remain in their separate generation. Wake recovery
+must prove final peripheral/DMA accesses, IRQ withdrawal and clock restoration
+before release or a fresh RUN epoch. An idle DMA channel, a wake interrupt or a
+cleared software ledger alone cannot return a compound loan. The implemented
+slices do not establish general LPBAM scheduling, TrustZone sleep, physical
+retention or completed IO-32/SOC-35 exits.
 
 ES0499 Rev 12 section 2.21.1 describes receive corruption from a sub-half-bit low
 glitch in the second half of a stop bit. Revisions W/U have no software workaround;

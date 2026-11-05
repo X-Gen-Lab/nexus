@@ -33,6 +33,8 @@ static uint32_t tx_order[3];
 static uint32_t next_order;
 static uint8_t forced_put_index;
 static size_t unclocked_fdcan_reads;
+static size_t message_ram_reads;
+static bool refill_receive;
 static bool FdcanAddress(const volatile uint32_t* reg) {
     const uintptr_t address = reinterpret_cast<uintptr_t>(reg);
     const uintptr_t controllers = reinterpret_cast<uintptr_t>(g_io33_fdcan);
@@ -124,6 +126,10 @@ uint32_t nx_io33_read(volatile const uint32_t* reg) {
         ++unclocked_fdcan_reads;
         return 0U;
     }
+    const uintptr_t address = reinterpret_cast<uintptr_t>(reg);
+    const uintptr_t ram = reinterpret_cast<uintptr_t>(g_io33_ram);
+    if (address >= ram && address - ram < sizeof(g_io33_ram))
+        ++message_ram_reads;
     if (reg == &g_io33_fdcan[0].TXFQS)
         return QueueStatus();
     if (reg == &g_io33_fdcan[0].TEST)
@@ -171,6 +177,12 @@ void nx_io33_write(volatile uint32_t* reg, uint32_t value) {
         const uint32_t next = (value + 1U) % 3U;
         *status =
             count == 0U ? 0U : (count - 1U) | (next << FDCAN_RXF0S_F0GI_Pos);
+        /* A fresh bus frame can fill the released element before the next
+         * provider read. IRQ work must remain bounded by initial occupancy. */
+        if (refill_receive && count != 0U) {
+            *status = 3U | (next << FDCAN_RXF0S_F0GI_Pos);
+            hw->IR |= reg == &hw->RXF0A ? FDCAN_IR_RF0N : FDCAN_IR_RF1N;
+        }
         return;
     }
     *reg = value;
@@ -242,6 +254,8 @@ class G474Fdcan : public testing::Test {
         next_order = 0U;
         forced_put_index = UINT8_MAX;
         unclocked_fdcan_reads = 0U;
+        message_ram_reads = 0U;
+        refill_receive = false;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         g_io33_rcc.CR = RCC_CR_HSEON | RCC_CR_HSERDY;
         /* Platform owns the APB gate before any FDCAN register/RAM access. */
@@ -282,6 +296,7 @@ class G474Fdcan : public testing::Test {
     }
     void TearDown() override {
         hold_init = hold_add = false;
+        refill_receive = false;
         irq_pending = irq_active = 0U;
         FinishAddScan();
         g_io33_fdcan[0].TXBCF |= g_io33_fdcan[0].TXBRP;
@@ -297,6 +312,45 @@ class G474Fdcan : public testing::Test {
         leaves = nullptr;
     }
 };
+TEST_F(G474Fdcan, ContinuousIngressCannotExceedInitialThreeFramesPerFifo) {
+    ASSERT_NO_FATAL_FAILURE(Start());
+    for (unsigned fifo = 0U; fifo < 2U; ++fifo) {
+        for (unsigned slot = 0U; slot < 3U; ++slot) {
+            const size_t offset = (fifo == 0U ? 44U : 98U) + slot * 18U;
+            g_io33_ram[offset] = 0x123U << 18U;
+            g_io33_ram[offset + 1U] = (15U << 16U) | (1U << 21U);
+            for (unsigned word = 2U; word < 18U; ++word)
+                g_io33_ram[offset + word] = UINT32_C(0xA55A33CC);
+        }
+    }
+    FDCAN1->RXF0S = FDCAN1->RXF1S = 3U;
+    FDCAN1->IR |= FDCAN_IR_RF0N | FDCAN_IR_RF1N;
+    refill_receive = true;
+    message_ram_reads = 0U;
+    EXPECT_CALL(external, Write(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(external, Write(&FDCAN1->RXF0A, _)).Times(3);
+    EXPECT_CALL(external, Write(&FDCAN1->RXF1A, _)).Times(3);
+    DeliverLine0();
+    EXPECT_LE(message_ram_reads, 6U * 18U);
+    EXPECT_EQ(FDCAN1->RXF0S & FDCAN_RXF0S_F0FL, 3U);
+    EXPECT_EQ(FDCAN1->RXF1S & FDCAN_RXF1S_F1FL, 3U);
+    EXPECT_NE(FDCAN1->IR & FDCAN_IR_RF0N, 0U);
+    EXPECT_NE(FDCAN1->IR & FDCAN_IR_RF1N, 0U);
+    refill_receive = false;
+    testing::Mock::VerifyAndClearExpectations(&external);
+    nx_can_fd_event_t received[8] = {};
+    size_t count = 0U;
+    ASSERT_EQ(nx_can_fd_port_read_events(&port, received, 8U, &count),
+              NX_SUCCESS);
+    ASSERT_EQ(count, 6U);
+    for (size_t i = 0U; i < count; ++i) {
+        EXPECT_EQ(received[i].kind, NX_CAN_EVENT_FRAME);
+        EXPECT_EQ(received[i].frame.payload_bytes, 64U);
+        EXPECT_EQ(received[i].frame.data[0], 0xCCU);
+        EXPECT_EQ(received[i].frame.data[63], 0xA5U);
+        EXPECT_EQ(received[i].fifo, i < 3U ? 0U : 1U);
+    }
+}
 TEST_F(G474Fdcan, ExactKernelTimingQueueAndSixtyFourBytesReachPhysicalRam) {
     ASSERT_NO_FATAL_FAILURE(Start());
     EXPECT_EQ(FDCAN_CONFIG->CKDIV, 0U);

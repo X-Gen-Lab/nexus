@@ -10,7 +10,8 @@ if(NEXUS_SOC_FAMILY STREQUAL "stm32h743")
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include")
     nexus_use_cmsis_core(nexus_h743_frame_dma2d)
     target_compile_definitions(nexus_h743_frame_dma2d PRIVATE STM32H743xx)
-    target_link_libraries(nexus_h743_frame_dma2d PUBLIC Nexus::IO Nexus::Core
+    target_link_libraries(nexus_h743_frame_dma2d PUBLIC Nexus::IO
+        Nexus::IOStream Nexus::Core
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     add_library(Nexus::H743FrameDMA2D ALIAS nexus_h743_frame_dma2d)
 endif()

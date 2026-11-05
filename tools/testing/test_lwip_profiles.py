@@ -37,6 +37,8 @@ class LwIPProfilesTests(unittest.TestCase):
             'add_library(Nexus::Config ALIAS fixture_config)\n'
             'add_library(fixture_io INTERFACE)\n'
             'add_library(Nexus::IO ALIAS fixture_io)\n'
+            'add_library(fixture_io_ethernet_frames INTERFACE)\n'
+            'add_library(Nexus::IOEthernetFrames ALIAS fixture_io_ethernet_frames)\n'
             'add_library(nexus_abi_options INTERFACE)\n'
             'add_library(nexus_build_options INTERFACE)\n'
             'add_library(nexus_owned_warnings INTERFACE)\n'

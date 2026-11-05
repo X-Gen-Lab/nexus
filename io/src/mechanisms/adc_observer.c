@@ -104,7 +104,7 @@ nx_result_t nx_adc_observer_record(nx_adc_observer_t* observer,
                                    const nx_stream_fill_t* fill,
                                    nx_time_us_t observed_at) {
     if (!valid(observer) || observer->stream == NULL || fill == NULL ||
-        fill->slot >= observer->count) {
+        fill->slot >= observer->count || observed_at == NX_DEADLINE_NEVER) {
         return NX_ERROR_INVALID;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();

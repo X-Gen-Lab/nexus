@@ -57,6 +57,15 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         self.assertEqual(self.events[-2:], ["build", "capture"])
         self.assertFalse((self.build / "tdd/execution.json").exists())
 
+    def preflight(self, *arguments, **keywords):
+        self.events.append("preflight-capture")
+        self.assertEqual(self.events[-2:],
+                         ["preflight-build", "preflight-capture"])
+        self.assertFalse(keywords.get("complete", False))
+        self.assertEqual(arguments[0], self.root)
+        self.assertEqual(arguments[1], self.build)
+        self.assertFalse((self.build / "tdd/execution.json").exists())
+
     def audit(self, *arguments, **keywords):
         self.events.append("audit")
         self.assertFalse(keywords.get("allow_subset", False))
@@ -66,11 +75,13 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         self.assertEqual(summary["suites"][0]["binary"], self.binary.name)
         return {"kind": "bounded-io-property-execution", "formal_proof": False}
 
-    def run_gate(self, capture=None, audit=None, execute=None):
+    def run_gate(self, capture=None, audit=None, execute=None, preflight=None):
         output = io.StringIO()
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "environment", return_value={}), \
                 patch.object(tdd_gate, "execute", side_effect=execute or self.execute), \
+                patch.object(matrix, "capture",
+                             side_effect=preflight or self.preflight), \
                 patch.object(matrix, "capture_complete", side_effect=capture or self.capture) as before, \
                 patch.object(matrix, "audit", side_effect=audit or self.audit) as after, \
                 redirect_stdout(output), redirect_stderr(output):
@@ -82,7 +93,8 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         self.assertEqual(status, 0, output)
         before.assert_called_once()
         after.assert_called_once()
-        self.assertEqual(self.events, ["preflight-build", "build", "capture",
+        self.assertEqual(self.events, ["preflight-build", "preflight-capture",
+                                       "build", "capture",
                                        "discovery", "execution", "audit"])
         report = self.build / "tdd/io-property-report.json"
         self.assertEqual(json.loads(report.read_text())["formal_proof"], False)

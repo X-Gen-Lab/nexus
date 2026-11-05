@@ -989,13 +989,11 @@ msgstr "[inout] 已绑定、由精确生产者持有的控制对象。"
 msgid "[in] Still FILLING, with a proved detached memory target."
 msgstr "[in] 仍为 FILLING，且已证明内存目标已分离。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:42
-msgid "[in] Software observation in the same clock domain."
-msgstr "[in] 同一时钟域中的软件观察。"
+msgid "[in] Finite software observation in the same clock domain; NX_DEADLINE_NEVER is not an observed time."
+msgstr "[in] 同一时钟域中的有限软件观察值；NX_DEADLINE_NEVER 不属于观察到的时间。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:42
-msgid "Success or STATE/EXHAUSTED without wrapping identities."
-msgstr "成功或 STATE/EXHAUSTED，不允许标识回绕。"
+msgid "Success or INVALID/STATE/EXHAUSTED without wrapping identities or changing a rejected record."
+msgstr "成功，或返回 INVALID/STATE/EXHAUSTED；不使身份回绕，也不改变被拒绝的记录。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:42
 msgid "Read only a currently acquired block's exact epoch record."
@@ -2184,6 +2182,125 @@ msgstr "共享方法；无环形缓冲、请求、分配、回调或工作线程
 msgid "Immutable identity; exact private state owns the whole controller."
 msgstr "不可变身份；精确的私有状态拥有整个控制器。"
 
+msgid "entropy.h"
+msgstr "entropy.h"
+
+msgid ""
+"The entropy face supplies bounded, health-admitted source words. "
+"`nx_entropy_fill` uses a finite absolute deadline and erases the complete"
+" admitted output on a read failure. It does not allocate, create a worker"
+" or establish entropy quality; it is not a DRBG. A source's existence "
+"does not authorize full entropy credit for a cryptographic library. See "
+"the explicit {ref}`F407 constructor <stm32f407-entropy-construction>` for"
+" its clock and shutdown prerequisites. GD32 entropy is not implemented."
+msgstr ""
+"熵源接口提供有界、通过健康检查的源数据字。`nx_entropy_fill` "
+"使用有限绝对截止时间；读取失败时擦除本次已准入的全部输出。它不分配内存、不创建工作线程，也不证明熵质量；它不是 "
+"DRBG。存在熵源不代表密码库可以按完整熵含量计入信用。时钟与关闭前提见显式 {ref}`F407 构造器 <stm32f407-entropy-"
+"construction>`。GD32 熵源尚未实现。"
+
+msgid "Explicit entropy source and finite all-or-erased filling."
+msgstr "显式熵源与有限的完整填充或全部擦除操作。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:145
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:353
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Static two-pointer source face with private mutable state."
+msgstr "含私有可变状态的静态双指针源接口。"
+
+msgid ""
+"Caller serializes use and lifecycle; face/table/state outlive each call. "
+"No buffer or request is retained after return. Source enable, clock "
+"dependencies, recovery and stop belong to its explicit lifecycle owner, "
+"not to TLS or this face."
+msgstr ""
+"调用方串行化使用和生命周期；接口、方法表和状态必须存活至每次调用结束。返回后不保留缓冲区或请求。源启用、时钟依赖、恢复和停止由显式生命周期所有者负责，不由"
+" TLS 或此接口负责。"
+
+msgid "Try to copy one complete source word without waiting."
+msgstr "尝试复制一个完整源数据字，不等待。"
+
+msgid ""
+"Invalid public spans reject before provider access. This wrapper cannot "
+"infer the extent of an opaque context; the caller proves its complete "
+"disjointness. Provider rejection never substitutes fixed values or "
+"timestamps for entropy."
+msgstr ""
+"公共存储区间无效时，在访问 provider 前拒绝。此包装层无法推断不透明上下文的范围；调用方证明其完整区间互不重叠。provider "
+"拒绝时绝不使用固定值或时间戳代替熵。"
+
+msgid "[in] Live immutable face on its serialized task executor"
+msgstr "[in] 在其串行任务执行器中使用的有效只读接口"
+
+msgid ""
+"[out] Naturally aligned writable word, disjoint from face, table and the "
+"complete private provider state"
+msgstr "[out] 自然对齐的可写数据字，与接口、方法表及完整 provider 私有状态互不重叠"
+
+msgid "SUCCESS, BUSY, IO, STATE, INVALID or UNSUPPORTED"
+msgstr "SUCCESS、BUSY、IO、STATE、INVALID 或 UNSUPPORTED"
+
+msgid "Fill exactly the requested bytes before a finite deadline."
+msgstr "在有限截止时间前恰好填满请求的字节。"
+
+msgid ""
+"Task-only synchronous polling; no heap, worker or OS wait. BUSY causes "
+"another clock-bounded poll. The supplied clock must continue advancing "
+"throughout the call; changing its domain or stopping its timer violates "
+"the contract. NX_DEADLINE_NEVER is rejected. Complete words are emitted "
+"least-significant byte first; unused final-word bytes are discarded. A "
+"zero-byte request validates face and clock but performs no clock/source "
+"access and accepts NULL output. Preflight rejection leaves output "
+"unchanged. Once admitted, any error erases the complete output using "
+"volatile writes; no partial entropy may be consumed. Output is disjoint "
+"from face/table/clock and all their opaque live contexts. This function "
+"detects known-span aliases, not opaque extents. Crypto libraries own "
+"conditioning, DRBGs and trust policy."
+msgstr ""
+"仅限任务上下文的同步轮询；无堆、工作线程或 OS 等待。BUSY "
+"导致下一次受时钟约束的轮询。所提供时钟必须在整个调用期间持续推进；更换时间域或停止计时器违反合同。拒绝 "
+"NX_DEADLINE_NEVER。完整数据字按最低有效字节在前输出；最后一个字中未用的字节被丢弃。零字节请求验证接口与时钟，但不访问时钟或源，并允许"
+" NULL 输出。准入前拒绝保持输出不变。准入后任何错误均通过 volatile "
+"写擦除全部输出；不得消费部分熵。输出与接口、方法表、时钟及其全部有效不透明上下文互不重叠。本函数检测已知区间别名，不推断不透明对象的范围。调理、DRBG"
+" 和信任策略由密码库负责。"
+
+msgid "[in] Live serialized source; no concurrent lifecycle change"
+msgstr "[in] 有效的串行化源；不得并发生命周期变更"
+
+msgid "[out] Writable byte span; NULL only for zero bytes"
+msgstr "[out] 可写字节区间；仅零字节时允许 NULL"
+
+msgid "[in] Exact required output size, not an entropy estimate"
+msgstr "[in] 所需输出的准确大小，不是熵含量估计"
+
+msgid "[in] Live monotonic microsecond clock in one stable domain"
+msgstr "[in] 单一稳定时间域内有效的单调微秒时钟"
+
+msgid "[in] Finite absolute deadline in that clock domain"
+msgstr "[in] 该时间域内的有限绝对截止时间"
+
+msgid ""
+"SUCCESS only for a complete fill; TIMEOUT, IO, STATE or source error; "
+"INVALID/UNSUPPORTED for preflight rejection"
+msgstr "仅完整填充返回 SUCCESS；否则为 TIMEOUT、IO、STATE 或源错误；准入前拒绝返回 INVALID/UNSUPPORTED"
+
+msgid "Shared immutable entropy-source methods."
+msgstr "共享的只读熵源方法。"
+
+msgid ""
+"try_read is task-only and bounded, never waits for hardware. SUCCESS "
+"copies one complete health-admitted 32-bit word; BUSY means no word yet, "
+"IO means a source/health failure, STATE means unavailable/closed. Failure"
+" leaves output unchanged. The provider owns hardware health and initial "
+"sample handling. No deterministic fallback, conditioning, DRBG or "
+"cryptographic certification is implied."
+msgstr ""
+"try_read 仅限任务上下文且执行有界，从不等待硬件。SUCCESS 复制一个完整、通过健康检查的 32 位数据字；BUSY "
+"表示尚无数据字，IO 表示源或健康检查失败，STATE 表示不可用或已关闭。失败保持输出不变。provider "
+"负责硬件健康检查与首样本处理。不隐含确定性回退、调理、DRBG 或密码学认证。"
+
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:111
 msgid "ethernet.h"
 msgstr "ethernet.h"
@@ -2934,11 +3051,6 @@ msgid ""
 "requests or value types. Forward identities neither construct nor acquire "
 "any device."
 msgstr "访问其布局、操作、请求或值类型前，须包含对应公共头文件。前置身份既不构造也不取得任何设备。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:145
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:353
-msgid "Typedefs"
-msgstr "类型定义"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:145
 msgid "Opaque identity; complete contracts live in its public header."
@@ -4314,14 +4426,8 @@ msgstr "[in] 同一时间域、epoch 和速率中稳定的末个事实。"
 msgid "[out] Distinct aligned result, unchanged on rejection."
 msgstr "[out] 独立且已对齐的结果，拒绝时保持不变。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:209
-msgid ""
-"SUCCESS, INVALID for malformed/overlapping storage, UNSUPPORTED for UNKNOWN "
-"source, STATE for incompatible domains or reversed ticks, EXHAUSTED for "
-"bound overflow."
-msgstr ""
-"返回 SUCCESS；存储格式无效或重叠时返回 INVALID，来源为 UNKNOWN 时返回 UNSUPPORTED，时间域不兼容或 tick "
-"倒退时返回 STATE，上界溢出时返回 EXHAUSTED。"
+msgid "SUCCESS, INVALID for malformed/misaligned/overlapping storage, UNSUPPORTED for UNKNOWN source, STATE for incompatible domains or reversed ticks, EXHAUSTED for bound overflow."
+msgstr "SUCCESS；存储参数无效、未对齐或重叠时返回 INVALID；来源为 UNKNOWN 时返回 UNSUPPORTED；时钟域不兼容或 ticks 逆序时返回 STATE；边界溢出时返回 EXHAUSTED。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:209
 msgid "Compare a complete timing-error interval with a budget."
@@ -7896,117 +8002,3 @@ msgstr ""
 "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible "
 "事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU "
 "调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。"
-
-msgid "entropy.h"
-msgstr "entropy.h"
-
-msgid ""
-"The entropy face supplies bounded, health-admitted source words. "
-"`nx_entropy_fill` uses a finite absolute deadline and erases the complete"
-" admitted output on a read failure. It does not allocate, create a worker"
-" or establish entropy quality; it is not a DRBG. A source's existence "
-"does not authorize full entropy credit for a cryptographic library. See "
-"the explicit {ref}`F407 constructor <stm32f407-entropy-construction>` for"
-" its clock and shutdown prerequisites. GD32 entropy is not implemented."
-msgstr ""
-"熵源接口提供有界、通过健康检查的源数据字。`nx_entropy_fill` "
-"使用有限绝对截止时间；读取失败时擦除本次已准入的全部输出。它不分配内存、不创建工作线程，也不证明熵质量；它不是 "
-"DRBG。存在熵源不代表密码库可以按完整熵含量计入信用。时钟与关闭前提见显式 {ref}`F407 构造器 <stm32f407-entropy-"
-"construction>`。GD32 熵源尚未实现。"
-
-msgid "Explicit entropy source and finite all-or-erased filling."
-msgstr "显式熵源与有限的完整填充或全部擦除操作。"
-
-msgid "Static two-pointer source face with private mutable state."
-msgstr "含私有可变状态的静态双指针源接口。"
-
-msgid ""
-"Caller serializes use and lifecycle; face/table/state outlive each call. "
-"No buffer or request is retained after return. Source enable, clock "
-"dependencies, recovery and stop belong to its explicit lifecycle owner, "
-"not to TLS or this face."
-msgstr ""
-"调用方串行化使用和生命周期；接口、方法表和状态必须存活至每次调用结束。返回后不保留缓冲区或请求。源启用、时钟依赖、恢复和停止由显式生命周期所有者负责，不由"
-" TLS 或此接口负责。"
-
-msgid "Try to copy one complete source word without waiting."
-msgstr "尝试复制一个完整源数据字，不等待。"
-
-msgid ""
-"Invalid public spans reject before provider access. This wrapper cannot "
-"infer the extent of an opaque context; the caller proves its complete "
-"disjointness. Provider rejection never substitutes fixed values or "
-"timestamps for entropy."
-msgstr ""
-"公共存储区间无效时，在访问 provider 前拒绝。此包装层无法推断不透明上下文的范围；调用方证明其完整区间互不重叠。provider "
-"拒绝时绝不使用固定值或时间戳代替熵。"
-
-msgid "[in] Live immutable face on its serialized task executor"
-msgstr "[in] 在其串行任务执行器中使用的有效只读接口"
-
-msgid ""
-"[out] Naturally aligned writable word, disjoint from face, table and the "
-"complete private provider state"
-msgstr "[out] 自然对齐的可写数据字，与接口、方法表及完整 provider 私有状态互不重叠"
-
-msgid "SUCCESS, BUSY, IO, STATE, INVALID or UNSUPPORTED"
-msgstr "SUCCESS、BUSY、IO、STATE、INVALID 或 UNSUPPORTED"
-
-msgid "Fill exactly the requested bytes before a finite deadline."
-msgstr "在有限截止时间前恰好填满请求的字节。"
-
-msgid ""
-"Task-only synchronous polling; no heap, worker or OS wait. BUSY causes "
-"another clock-bounded poll. The supplied clock must continue advancing "
-"throughout the call; changing its domain or stopping its timer violates "
-"the contract. NX_DEADLINE_NEVER is rejected. Complete words are emitted "
-"least-significant byte first; unused final-word bytes are discarded. A "
-"zero-byte request validates face and clock but performs no clock/source "
-"access and accepts NULL output. Preflight rejection leaves output "
-"unchanged. Once admitted, any error erases the complete output using "
-"volatile writes; no partial entropy may be consumed. Output is disjoint "
-"from face/table/clock and all their opaque live contexts. This function "
-"detects known-span aliases, not opaque extents. Crypto libraries own "
-"conditioning, DRBGs and trust policy."
-msgstr ""
-"仅限任务上下文的同步轮询；无堆、工作线程或 OS 等待。BUSY "
-"导致下一次受时钟约束的轮询。所提供时钟必须在整个调用期间持续推进；更换时间域或停止计时器违反合同。拒绝 "
-"NX_DEADLINE_NEVER。完整数据字按最低有效字节在前输出；最后一个字中未用的字节被丢弃。零字节请求验证接口与时钟，但不访问时钟或源，并允许"
-" NULL 输出。准入前拒绝保持输出不变。准入后任何错误均通过 volatile "
-"写擦除全部输出；不得消费部分熵。输出与接口、方法表、时钟及其全部有效不透明上下文互不重叠。本函数检测已知区间别名，不推断不透明对象的范围。调理、DRBG"
-" 和信任策略由密码库负责。"
-
-msgid "[in] Live serialized source; no concurrent lifecycle change"
-msgstr "[in] 有效的串行化源；不得并发生命周期变更"
-
-msgid "[out] Writable byte span; NULL only for zero bytes"
-msgstr "[out] 可写字节区间；仅零字节时允许 NULL"
-
-msgid "[in] Exact required output size, not an entropy estimate"
-msgstr "[in] 所需输出的准确大小，不是熵含量估计"
-
-msgid "[in] Live monotonic microsecond clock in one stable domain"
-msgstr "[in] 单一稳定时间域内有效的单调微秒时钟"
-
-msgid "[in] Finite absolute deadline in that clock domain"
-msgstr "[in] 该时间域内的有限绝对截止时间"
-
-msgid ""
-"SUCCESS only for a complete fill; TIMEOUT, IO, STATE or source error; "
-"INVALID/UNSUPPORTED for preflight rejection"
-msgstr "仅完整填充返回 SUCCESS；否则为 TIMEOUT、IO、STATE 或源错误；准入前拒绝返回 INVALID/UNSUPPORTED"
-
-msgid "Shared immutable entropy-source methods."
-msgstr "共享的只读熵源方法。"
-
-msgid ""
-"try_read is task-only and bounded, never waits for hardware. SUCCESS "
-"copies one complete health-admitted 32-bit word; BUSY means no word yet, "
-"IO means a source/health failure, STATE means unavailable/closed. Failure"
-" leaves output unchanged. The provider owns hardware health and initial "
-"sample handling. No deterministic fallback, conditioning, DRBG or "
-"cryptographic certification is implied."
-msgstr ""
-"try_read 仅限任务上下文且执行有界，从不等待硬件。SUCCESS 复制一个完整、通过健康检查的 32 位数据字；BUSY "
-"表示尚无数据字，IO 表示源或健康检查失败，STATE 表示不可用或已关闭。失败保持输出不变。provider "
-"负责硬件健康检查与首样本处理。不隐含确定性回退、调理、DRBG 或密码学认证。"

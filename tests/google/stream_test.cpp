@@ -300,6 +300,24 @@ TEST_F(AdcObserverStorage, StaleFillAndSequenceExhaustionDoNotRewriteRecord) {
     ASSERT_EQ(nx_adc_observer_unbind(&observer), NX_SUCCESS);
 }
 
+TEST_F(AdcObserverStorage, InfiniteDeadlineIsNotAnObservedClockSnapshot) {
+    ASSERT_EQ(nx_adc_observer_bind(&observer, &stream, owner, sizeof(owner)),
+              NX_SUCCESS);
+    nx_stream_fill_t fill = {};
+    ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+    const auto before = records[fill.slot];
+    EXPECT_EQ(nx_adc_observer_record(&observer, &fill, NX_DEADLINE_NEVER),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(observer.sequence, 0U);
+    EXPECT_TRUE(observer.discontinuity);
+    EXPECT_EQ(std::memcmp(&records[fill.slot], &before, sizeof(before)), 0);
+    ASSERT_EQ(nx_adc_observer_record(&observer, &fill, 123U), NX_SUCCESS);
+    EXPECT_EQ(records[fill.slot].sequence, 1U);
+    EXPECT_NE(records[fill.slot].flags & NX_ADC_OBSERVATION_DISCONTINUITY, 0U);
+    ASSERT_EQ(nx_stream_abort(&stream, &fill, true), NX_SUCCESS);
+    ASSERT_EQ(nx_adc_observer_unbind(&observer), NX_SUCCESS);
+}
+
 TEST_F(AdcObserverStorage, BoundObserverCannotBeReboundToAnotherOwner) {
     ASSERT_EQ(nx_adc_observer_bind(&observer, &stream, owner, sizeof(owner)),
               NX_SUCCESS);

@@ -5,6 +5,6 @@
  */
 #ifndef NEXUS_GD32F470_ETH_FRAMES_H
 #define NEXUS_GD32F470_ETH_FRAMES_H
-#include "../../../../io/private/eth_frames_mac.h"
+#include "../../../../drivers/ethernet/legacy_mac/eth_frames_mac.h"
 #include "gd32f4xx.h"
 #endif

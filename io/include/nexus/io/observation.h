@@ -62,7 +62,8 @@ typedef struct {
  * \param[in]       first: Stable aligned first fact, not concurrently modified.
  * \param[in]       last: Stable last fact in the same domain, epoch and rate.
  * \param[out]      out: Distinct aligned result, unchanged on rejection.
- * \return          SUCCESS, INVALID for malformed/overlapping storage,
+ * \return          SUCCESS, INVALID for malformed/misaligned/overlapping
+ *                  storage,
  *                  UNSUPPORTED for UNKNOWN source, STATE for incompatible
  *                  domains or reversed ticks, EXHAUSTED for bound overflow.
  * \note            Task/IRQ pure constant work; no clock, hardware, allocation,

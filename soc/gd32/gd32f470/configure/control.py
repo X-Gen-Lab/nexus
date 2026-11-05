@@ -37,7 +37,7 @@ def constructor(item, result):
     expected_sample = 1 if traits.dma else 7
     if not traits.continuous and item.options.sample_times != (expected_sample,) * len(channels):
         raise ValueError("ADC sampling differs from the selected provider")
-    if (not 1 <= item.options.reference_mv <= 3600 or
+    if (not 2600 <= item.options.reference_mv <= 3600 or
             not 1 <= item.options.timeout_ms <= 60000):
         raise ValueError("ADC requires bounded reference and startup wait")
     definitions = [f"static const uint8_t s_nx_adc_channels_{name}[] = {{ " +

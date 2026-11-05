@@ -363,9 +363,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_enhanced_frames_common_and_native_sources_are_required(self):
         required = {
             "io/include/nexus/io/ethernet_frames.h",
-            "io/private/eth_frames_mac.h",
+            "drivers/ethernet/legacy_mac/eth_frames_mac.h",
             "io/private/eth_frames_validation.h",
-            "io/src/api/ethernet_frames.c", "io/src/controllers/eth_frames_mac.c",
+            "io/src/api/ethernet_frames.c", "drivers/ethernet/legacy_mac/eth_frames_mac.c",
             "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
             "soc/native/drivers/ethernet_frames_access.h"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
@@ -441,7 +441,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(source_sdk.selected(name))
 
     def test_fifo_template_and_both_selected_family_leaves_are_required(self):
-        required = {"io/private/uart_fifo_impl.h"}
+        required = {"drivers/uart/usart_fifo/uart_fifo_impl.h"}
         for family in ("stm32h743", "stm32u575"):
             required.update({f"{source_directory(family)}/drivers/uart_fifo.c",
                              f"{source_directory(family)}/private/{family}_uart_fifo.h"})
@@ -700,15 +700,15 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "core/include/nexus/core/stack_observation.h",
             "core/src/stack_observation.c", "io/CMakeLists.txt",
             "io/include/nexus/io/usb_device.h", "io/src/api/usb_device.c",
-            "io/src/controllers/usb_device_controller.c", "io/private/usb_device_controller.h",
+            "drivers/usb/fs_device_pio/usb_device_controller.c", "drivers/usb/fs_device_pio/usb_device_controller.h",
             "soc/native/drivers/usb_device_access.h", "soc/native/drivers/usb_device.c",
             "io/include/nexus/io/ethernet.h", "io/include/nexus/io/mdio.h",
-            "io/src/controllers/eth_mac.c", "io/private/eth_mac.h",
+            "drivers/ethernet/legacy_mac/eth_mac.c", "drivers/ethernet/legacy_mac/eth_mac.h",
             "soc/native/drivers/ethernet_access.h", "soc/native/drivers/ethernet.c",
-            "io/src/controllers/can_controller.c", "io/private/can_controller.h",
+            "drivers/can/classic_can/can_controller.c", "drivers/can/classic_can/can_controller.h",
             "io/include/nexus/io/timer_capture.h",
             "io/include/nexus/io/advanced_pwm.h",
-            "io/private/timer_advanced_controller.h",
+            "drivers/timer/advanced_timer/timer_advanced_controller.h",
             "tools/configure/bindings.py", "tools/configure/emission.py",
             "tools/configure/usb_device.py", "tools/configure/ethernet.py",
             "tools/configure/timer_advanced.py",
@@ -1857,6 +1857,38 @@ class SourceSDKTests(unittest.TestCase):
             target.write_bytes(original)
 
     @_isolated_sdk_prefix
+    def test_rehashed_f407_ccm_initializer_omission_rejects_non_ccm_consumer(self):
+        import hashlib
+
+        assembly = self.sdk / "tools/configure/assemblies/qiming-baremetal.toml"
+        output = self.directory / "non-ccm consumer"
+        command = [sys.executable, "-B",
+                   str(self.sdk / "tools/configure/configure.py"),
+                   "--source-root", str(self.sdk), "--assembly", str(assembly),
+                   "--output", str(output)]
+        baseline = self.run_process(command)
+        self.assertEqual(baseline.returncode, 0,
+                         baseline.stdout + baseline.stderr)
+        self.assertIn("set(NEXUS_MEMORY_CCM 0)",
+                      (output / "selection.cmake").read_text())
+        identity_path = self.sdk / source_sdk.MANIFEST
+        identity = json.loads(identity_path.read_text())
+        name = "soc/stm32/stm32f407/memory_init.c"
+        (self.sdk / name).unlink()
+        identity["files_sha256"].pop(name)
+        identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
+            identity["files_sha256"], sort_keys=True,
+            separators=(",", ":")).encode()).hexdigest()
+        identity_path.write_text(json.dumps(identity) + "\n")
+        # Completeness is an installed-SDK contract even when this consumer
+        # never selects CCM. The actual resolver must reject the rehashed SDK
+        # before attempting selected generation; no verifier is replaced.
+        rejected = self.run_process(command)
+        self.assertNotEqual(rejected.returncode, 0,
+                            rejected.stdout + rejected.stderr)
+        self.assertIn("missing required sources/licenses", rejected.stderr)
+
+    @_isolated_sdk_prefix
     def test_rehashed_missing_arch_or_core_source_is_rejected(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
@@ -1996,16 +2028,16 @@ class SourceSDKTests(unittest.TestCase):
         old_identity = identity.read_bytes()
         names = (
             "core/src/fault.c", "core/include/nexus/core/fault.h",
-            "io/include/nexus/io/usb_device.h", "io/src/controllers/usb_device_controller.c",
-            "io/private/usb_device_controller.h", "soc/native/drivers/usb_device_access.h",
-            "io/include/nexus/io/ethernet.h", "io/src/controllers/eth_mac.c",
-            "io/private/eth_mac.h", "io/include/nexus/io/mdio.h",
+            "io/include/nexus/io/usb_device.h", "drivers/usb/fs_device_pio/usb_device_controller.c",
+            "drivers/usb/fs_device_pio/usb_device_controller.h", "soc/native/drivers/usb_device_access.h",
+            "io/include/nexus/io/ethernet.h", "drivers/ethernet/legacy_mac/eth_mac.c",
+            "drivers/ethernet/legacy_mac/eth_mac.h", "io/include/nexus/io/mdio.h",
             "soc/stm32/stm32f407/drivers/usb_device.c",
             "soc/gd32/gd32f470/drivers/ethernet.c",
             "soc/stm32/stm32f407/private/stm32f407_can.h",
-            "io/src/controllers/can_controller.c", "io/private/can_controller.h",
+            "drivers/can/classic_can/can_controller.c", "drivers/can/classic_can/can_controller.h",
             "io/include/nexus/io/advanced_pwm.h",
-            "io/private/timer_advanced_controller.h",
+            "drivers/timer/advanced_timer/timer_advanced_controller.h",
             "soc/gd32/gd32f470/drivers/timer_capture.c",
             "os/freertos/timebase_lowpower.c",
             "os/freertos/private/timebase_lowpower.h",

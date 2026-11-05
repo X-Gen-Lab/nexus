@@ -8,10 +8,38 @@ import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.evidence.identity import canonical_digest
-from tools.hil.admit import validate_fixture, validate_raw, validate_station
+from tools.hil.admit import (SOFTWARE_REFERENCE_TARGETS, validate_fixture,
+                             validate_raw, validate_station)
 from tools.hil.prepare import preparation_plan
 from tools.testing import test_hil_workloads
 from tests.contracts import test_hil_admission
+
+
+class HilFixtureSchemaTests(unittest.TestCase):
+    """Public schema facts stay aligned with the independent admission gate."""
+
+    def setUp(self):
+        self.root = Path(__file__).resolve().parents[2]
+        self.schema = json.loads((self.root /
+            "tools/schemas/hil-fixture.schema.json").read_text())
+
+    def test_part_inventory_accepts_all_existing_maintained_fixture_inputs(self):
+        for path in (self.root / "tools/hil/fixtures").glob("*.json"):
+            if path.name == "station.template.json":
+                continue
+            fixture = json.loads(path.read_text())
+            with self.subTest(fixture=path.name):
+                validate_fixture(fixture)
+                self.assertIn(fixture["part"],
+                              self.schema["properties"]["part"]["enum"])
+
+    def test_exact_reference_schema_matches_runtime_admission_authority(self):
+        alternatives = self.schema["$defs"]["software_reference_target"]["oneOf"]
+        targets = [(item["properties"]["board"]["const"],
+                    item["properties"]["part"]["const"])
+                   for item in alternatives]
+        self.assertEqual(len(targets), len(set(targets)))
+        self.assertEqual(set(targets), set(SOFTWARE_REFERENCE_TARGETS))
 
 
 class HilPlatformExtensionTests(unittest.TestCase):

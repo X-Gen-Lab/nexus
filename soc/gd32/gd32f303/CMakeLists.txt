@@ -48,6 +48,7 @@ endif()
 if(gd303_watchdog)
     list(APPEND gd303_sources drivers/watchdog.c)
 endif()
+
 if(gd303_adc)
     list(APPEND gd303_sources
         "${NEXUS_SOURCE_DIR}/drivers/adc/legacy_adc/legacy_adc.c")
@@ -88,3 +89,8 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
 set(NEXUS_SYSTEM_VENDOR_INCLUDES
     "${gd303_device}/Include" "${gd303_headers}" "${gd303_core}" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS GD32F30X_HD PARENT_SCOPE)
+
+# The selected SPI provider dispatches its owned CS through the GPIO API.
+if(gd303_spi)
+    target_link_libraries(nexus_soc_gd32f303 PRIVATE Nexus::IOGPIO)
+endif()

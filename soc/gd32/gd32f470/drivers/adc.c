@@ -8,6 +8,7 @@
  */
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
+#include "nexus/core/fault.h"
 #include "private/system.h"
 
 static nx_gd32_adc_state_t* s_adc;
@@ -19,29 +20,54 @@ typedef struct {
     uint32_t pull;
 } adc_pin_snapshot_t;
 
-/** \brief A failed cold constructor cannot delegate cleanup to its caller. */
+/** \brief Retain the constructor frame and remaining effects after bad cleanup.
+ */
+static _Noreturn void rollback_park(void) {
+    (void)nx_arch_irq_save();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
+}
+
+/** \brief Return rejection only after every selected restore is observed. */
 static void rollback(const adc_pin_snapshot_t pins[3], uint32_t added_clocks,
                      uint32_t common) {
     ADC_CTL1(ADC0) = 0u;
     nx_gd32_peripheral_barrier();
-    (void)ADC_CTL1(ADC0);
+    if (ADC_CTL1(ADC0) != 0u) {
+        rollback_park();
+    }
     ADC_SYNCCTL = common;
     nx_gd32_peripheral_barrier();
-    (void)ADC_SYNCCTL;
-    rcu_periph_clock_disable(RCU_ADC0);
+    if (ADC_SYNCCTL != common) {
+        rollback_park();
+    }
     for (unsigned index = 0u; index < 3u; ++index) {
         uint32_t fields = pins[index].fields;
         if (fields != 0u) {
             uint32_t gpio = GPIOA + index * 0x400u;
             GPIO_PUD(gpio) = (GPIO_PUD(gpio) & ~fields) | pins[index].pull;
             GPIO_CTL(gpio) = (GPIO_CTL(gpio) & ~fields) | pins[index].mode;
-            (void)GPIO_CTL(gpio);
+            nx_gd32_peripheral_barrier();
+            if ((GPIO_PUD(gpio) & fields) != pins[index].pull ||
+                (GPIO_CTL(gpio) & fields) != pins[index].mode) {
+                rollback_park();
+            }
         }
     }
+    /* Keep both ADC and GPIO powered until conversion/common/pads are proven
+     * restored. Never invalidate a required readback by dropping its gate.
+     */
+    rcu_periph_clock_disable(RCU_ADC0);
     nx_gd32_peripheral_barrier();
+    if ((RCU_APB2EN & RCU_APB2EN_ADC0EN) != 0u) {
+        rollback_park();
+    }
     RCU_AHB1EN &= ~added_clocks;
-    (void)RCU_AHB1EN;
     nx_gd32_peripheral_barrier();
+    if ((RCU_AHB1EN & added_clocks) != 0u) {
+        rollback_park();
+    }
 }
 
 /** \brief           Bound calibration waits without the SDK's infinite loop. */
@@ -51,6 +77,25 @@ static nx_result_t wait_clear(uint32_t mask, nx_time_us_t deadline) {
             return NX_ERROR_TIMEOUT;
         }
         if ((ADC_CTL1(ADC0) & mask) == 0u) {
+            return NX_SUCCESS;
+        }
+    }
+    return NX_ERROR_IO;
+}
+
+/** \brief Errata Rev1.6 2.4.3 requires two ADC clocks after observed EOC. */
+static nx_result_t wait_result(nx_time_us_t deadline) {
+    /* APB2/8 is 12.5 MHz. Two 1 us timer ticks guarantee at least 1 us
+     * despite counter quantization, exceeding the required 160 ns. Do not
+     * infer the delay from incidental SDK or deadline-call instruction cost.
+     */
+    nx_time_us_t ready = nx_deadline_after(nx_time_now_us(), 2u);
+    for (uint32_t polls = 0u; polls < 1000000u; ++polls) {
+        nx_time_us_t now = nx_time_now_us();
+        if (nx_deadline_expired(deadline, now)) {
+            return NX_ERROR_TIMEOUT;
+        }
+        if (nx_deadline_expired(ready, now)) {
             return NX_SUCCESS;
         }
     }
@@ -83,12 +128,13 @@ static nx_result_t power_on(nx_time_us_t deadline) {
     return status;
 }
 
-/** \brief           Bind reviewed channels after bounded ADC stabilization. */
-nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
-                                   const uint8_t* channels, size_t count,
-                                   uint32_t reference_mv,
-                                   nx_time_us_t deadline) {
-    if (!port || !channels || !count || count > 16u || !reference_mv) {
+/** \brief Acquire one shared ADC domain with the selected cold clock. */
+static nx_result_t initialize(nx_gd32_adc_state_t* port,
+                              const uint8_t* channels, size_t count,
+                              uint32_t reference_mv, nx_time_us_t deadline,
+                              uint32_t clock) {
+    if (!port || !channels || !count || count > 16u || reference_mv < 2600u ||
+        reference_mv > 3600u) {
         return NX_ERROR_INVALID;
     }
     for (size_t i = 0u; i < count; ++i) {
@@ -148,7 +194,12 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
     nx_gd32_peripheral_barrier();
     uint32_t common = ADC_SYNCCTL;
     adc_deinit();
-    adc_clock_config(ADC_ADCCK_PCLK2_DIV8);
+    adc_clock_config(clock);
+    nx_gd32_peripheral_barrier();
+    if ((ADC_SYNCCTL & ADC_SYNCCTL_ADCCK) != clock) {
+        rollback(pins, added_clocks, common);
+        return NX_ERROR_IO;
+    }
     ADC_CTL0(ADC0) = 0u;
     nx_result_t status = power_on(deadline);
     if (status != NX_SUCCESS) {
@@ -161,6 +212,28 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
                                   .initialized = true};
     s_adc = port;
     return NX_SUCCESS;
+}
+
+/** \brief Bind polling channels with the reviewed 12.5 MHz ADC clock. */
+nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
+                                   const uint8_t* channels, size_t count,
+                                   uint32_t reference_mv,
+                                   nx_time_us_t deadline) {
+    return initialize(port, channels, count, reference_mv, deadline,
+                      ADC_ADCCK_PCLK2_DIV8);
+}
+
+/** \brief HCLK/6 avoids errata 2.4.3 for autonomous DMA data reads. */
+nx_result_t nx_gd32_adc_dma_initialize(nx_gd32_adc_state_t* port,
+                                       const uint8_t* channels, size_t count,
+                                       uint32_t reference_mv,
+                                       nx_time_us_t deadline) {
+    /* Fixed HCLK200/APB2 100 MHz: ADC is 100/3 MHz, above APB2/4 and below
+     * the datasheet's 40 MHz maximum. Choose before power-on/calibration;
+     * the shared owner excludes incompatible polling or another ADC domain.
+     */
+    return initialize(port, channels, count, reference_mv, deadline,
+                      ADC_ADCCK_HCLK_DIV6);
 }
 
 /** \brief           Return raw count format without inventing calibrated volts.
@@ -223,8 +296,11 @@ nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
                 break;
             }
             if ((flags & ADC_STAT_EOC) != 0u) {
-                samples[(*count)++] =
-                    (uint16_t)(adc_routine_data_read(ADC0) & 0xFFFu);
+                status = wait_result(deadline);
+                if (status == NX_SUCCESS) {
+                    samples[(*count)++] =
+                        (uint16_t)(adc_routine_data_read(ADC0) & 0xFFFu);
+                }
                 break;
             }
             if (polls + 1u == 1000000u) {
@@ -262,8 +338,15 @@ nx_result_t nx_gd32_adc_stop(nx_gd32_adc_state_t* port) {
     }
     ADC_CTL1(ADC0) = 0u;
     nx_gd32_peripheral_barrier();
+    if (ADC_CTL1(ADC0) != 0u) {
+        return NX_ERROR_IO;
+    }
     ADC_STAT(ADC0) = 0u;
     rcu_periph_clock_disable(RCU_ADC0);
+    nx_gd32_peripheral_barrier();
+    if ((RCU_APB2EN & RCU_APB2EN_ADC0EN) != 0u) {
+        return NX_ERROR_IO;
+    }
     port->initialized = false;
     s_adc = NULL;
     return NX_SUCCESS;

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b8dd7cd8dd316a579f9d8e498a875cbe9e623b869e9df79fc8d6789283f1bf91\n"
+"X-Nexus-Source-SHA256: 1a1210fb8f57dc9e7709dd3f9e766fda82c8040d445b290456bc3390192465db\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
@@ -94,6 +94,117 @@ msgstr ""
 "`tests/contracts/core_contract_test.c` executes publication, admission, "
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
 "prove MCU interrupt ordering or worst-case execution time."
+
+msgid "Admission, shutdown and reuse"
+msgstr "Admission, shutdown and reuse"
+
+msgid "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
+msgstr "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
+
+msgid "The complete shutdown order is:"
+msgstr "The complete shutdown order is:"
+
+msgid "Close admission and stop new controls or observation bindings."
+msgstr "Close admission and stop new controls or observation bindings."
+
+msgid "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
+msgstr "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
+
+msgid "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
+msgstr "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
+
+msgid "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
+msgstr "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
+
+msgid "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
+msgstr "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
+
+msgid "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
+msgstr "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
+
+msgid "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
+msgstr "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
+
+msgid "Clock domains and bounded waits"
+msgstr "Clock domains and bounded waits"
+
+msgid "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
+msgstr "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
+
+msgid "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
+msgstr "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
+
+msgid "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
+msgstr "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
+
+msgid "Optional observation and minimal fault capture"
+msgstr "Optional observation and minimal fault capture"
+
+msgid "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
+msgstr "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
+
+msgid "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
+msgstr "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
+
+msgid "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
+msgstr "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
+
+msgid "Stack and explicitly placed memory"
+msgstr "Stack and explicitly placed memory"
+
+msgid "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
+msgstr "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
+
+msgid "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
+msgstr "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
+
+msgid "Suffix"
+msgstr "Suffix"
+
+msgid "Reset initialization"
+msgstr "Reset initialization"
+
+msgid "Caller obligation"
+msgstr "Caller obligation"
+
+msgid "DATA"
+msgstr "DATA"
+
+msgid "Copy initializer from Flash"
+msgstr "Copy initializer from Flash"
+
+msgid "Budget both load and run regions"
+msgstr "Budget both load and run regions"
+
+msgid "BSS"
+msgstr "BSS"
+
+msgid "Zero storage"
+msgstr "Zero storage"
+
+msgid "Use no nonzero initializer"
+msgstr "Use no nonzero initializer"
+
+msgid "NOINIT"
+msgstr "NOINIT"
+
+msgid "Neither copy nor clear"
+msgstr "Neither copy nor clear"
+
+msgid "Initialize or validate before every read"
+msgstr "Initialize or validate before every read"
+
+msgid "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
+msgstr "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
+
+msgid "Exact silicon admission"
+msgstr "Exact silicon admission"
+
+msgid "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
+msgstr "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
+
+msgid "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
+msgstr "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:51
 msgid "Arch"
@@ -351,6 +462,12 @@ msgstr ""
 "establish a fixed cycle bound. Initialize words before publication and "
 "retain their lifetime until every reader/writer has stopped."
 
+msgid "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
+msgstr "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
+
+msgid "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."
+msgstr "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."
+
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:58
 msgid "Typed I/O"
 msgstr "Typed I/O"
@@ -374,6 +491,12 @@ msgstr ""
 "matrix](/delivery/capabilities.md) identifies actual provider modes and "
 "reviewed routes. An interface header alone does not provide every operation "
 "on every chip or authorize PCB wiring."
+
+msgid "Physical Platform builds compile the selected controller domains and authored component dependencies from the CMake source contracts. Timestamp and diagnostic helpers remain available even for an empty assembly. Native models and CPU-only Runtime retain the complete public contract for caller-defined providers. Public headers remain available in every profile; unselected physical device operations do not become a second implicit provider. Compilation selection and final ELF garbage collection are measured separately."
+msgstr "Physical Platform builds compile the selected controller domains and authored component dependencies from the CMake source contracts. Timestamp and diagnostic helpers remain available even for an empty assembly. Native models and CPU-only Runtime retain the complete public contract for caller-defined providers. Public headers remain available in every profile; unselected physical device operations do not become a second implicit provider. Compilation selection and final ELF garbage collection are measured separately."
+
+msgid "Public component targets declare their own I/O domain dependencies. For example, `Nexus::TMP117I2C` links `Nexus::IOI2C`, so an external owner may supply an endpoint without inventing a physical controller in the assembly. Domain archives are excluded until selected or linked, and shared mechanisms compile once. Optional targets can still appear in `compile_commands.json`; selected Ninja command closures and fresh builds establish which sources actually compile."
+msgstr "Public component targets declare their own I/O domain dependencies. For example, `Nexus::TMP117I2C` links `Nexus::IOI2C`, so an external owner may supply an endpoint without inventing a physical controller in the assembly. Domain archives are excluded until selected or linked, and shared mechanisms compile once. Optional targets can still appear in `compile_commands.json`; selected Ninja command closures and fresh builds establish which sources actually compile."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "Source group"
@@ -408,24 +531,17 @@ msgid "Shared stream, DMA drain, wake, transaction and observation rules"
 msgstr "Shared stream, DMA drain, wake, transaction and observation rules"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "`src/controllers/`"
-msgstr "`src/controllers/`"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid ""
-"Shared CAN, USB and Ethernet controller engines selected by SoC targets"
-msgstr ""
-"Shared CAN, USB and Ethernet controller engines selected by SoC targets"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`private/`"
 msgstr "`private/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid ""
-"Private engine structures, hardware boundaries and direct provider templates"
-msgstr ""
-"Private engine structures, hardware boundaries and direct provider templates"
+msgid "Hardware-independent validation, sequence identity and calendar helpers"
+msgstr "Hardware-independent validation, sequence identity and calendar helpers"
+
+msgid "`../drivers/`"
+msgstr "`../drivers/`"
+
+msgid "Reviewed hardware IP engines and templates selected by SoC targets"
+msgstr "Reviewed hardware IP engines and templates selected by SoC targets"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`../soc/native/drivers/`"
@@ -927,6 +1043,12 @@ msgstr "Components"
 msgid "Optional common components"
 msgstr "Optional common components"
 
+msgid "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner, BMP280 core and SPI transport, [TMP117 one-shot I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md), instance-level Log, two-bank commit-last Storage, physical Flash region and Native file adapters, bounded Settings/KV staging, and pure Modbus RTU parsing. Unreferenced component code does not enter a firmware image."
+msgstr "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner, BMP280 core and SPI transport, [TMP117 one-shot I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md), instance-level Log, two-bank commit-last Storage, physical Flash region and Native file adapters, bounded Settings/KV staging, and pure Modbus RTU parsing. Unreferenced component code does not enter a firmware image."
+
+msgid "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
+msgstr "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
+
 #: ../../../../tmp/nexus-quality-20261019/components/README.md:9
 msgid ""
 "General mechanisms remain in their named component directories. Exact STM32 "
@@ -983,6 +1105,15 @@ msgstr ""
 "malformed inputs. A durable host file is not a physical Flash power-cut "
 "qualification."
 
+msgid "Selected network and boot contracts"
+msgstr "Selected network and boot contracts"
+
+msgid "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
+msgstr "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
+
+msgid "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
+msgstr "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
+
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:79
 msgid "Exact SoC implementations"
 msgstr "Exact SoC implementations"
@@ -1004,6 +1135,12 @@ msgstr ""
 "maintained family descriptor supplies the canonical source directory; "
 "directory names do not create another configuration authority or a runtime "
 "registry."
+
+msgid "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
+msgstr "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
+
+msgid "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
+msgstr "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
 
 #: ../../../../tmp/nexus-quality-20261019/soc/README.md:30
 msgid ""
@@ -1034,6 +1171,105 @@ msgstr ""
 "for actual evidence. CPU support, SDK macros and source-directory presence "
 "do not establish whole-family support. MCU physical HIL remains "
 "`not_executed`."
+
+msgid "Reusable IP implementations"
+msgstr "Reusable IP implementations"
+
+msgid "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
+msgstr "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
+
+msgid "Source directory"
+msgstr "Source directory"
+
+msgid "Maintained algorithm"
+msgstr "Maintained algorithm"
+
+msgid "`uart/uart_v1_channel_dma/`"
+msgstr "`uart/uart_v1_channel_dma/`"
+
+msgid "Legacy USART with fixed-channel DMA"
+msgstr "Legacy USART with fixed-channel DMA"
+
+msgid "`i2c/i2c_v1_async/`"
+msgstr "`i2c/i2c_v1_async/`"
+
+msgid "Reviewed V1 IRQ/DMA message sequencing"
+msgstr "Reviewed V1 IRQ/DMA message sequencing"
+
+msgid "`i2c/i2c_v2/`"
+msgstr "`i2c/i2c_v2/`"
+
+msgid "Reviewed V2 polling message sequencing"
+msgstr "Reviewed V2 polling message sequencing"
+
+msgid "`adc/legacy_adc/`"
+msgstr "`adc/legacy_adc/`"
+
+msgid "Legacy single-shot ADC"
+msgstr "Legacy single-shot ADC"
+
+msgid "`timer/legacy_pwm/`"
+msgstr "`timer/legacy_pwm/`"
+
+msgid "Legacy fixed PWM"
+msgstr "Legacy fixed PWM"
+
+msgid "`flash/legacy_flash/`"
+msgstr "`flash/legacy_flash/`"
+
+msgid "Legacy halfword Flash programming"
+msgstr "Legacy halfword Flash programming"
+
+msgid "`can/classic_can/`"
+msgstr "`can/classic_can/`"
+
+msgid "Reviewed classic mailboxes and shared filter domain"
+msgstr "Reviewed classic mailboxes and shared filter domain"
+
+msgid "`usb/fs_device_pio/`"
+msgstr "`usb/fs_device_pio/`"
+
+msgid "Reviewed FS device PIO endpoint and FIFO sequencing"
+msgstr "Reviewed FS device PIO endpoint and FIFO sequencing"
+
+msgid "`ethernet/legacy_mac/`"
+msgstr "`ethernet/legacy_mac/`"
+
+msgid "Normal and selected enhanced chained descriptors"
+msgstr "Normal and selected enhanced chained descriptors"
+
+msgid "`timer/advanced_timer/`"
+msgstr "`timer/advanced_timer/`"
+
+msgid "Capture and complementary PWM/break templates"
+msgstr "Capture and complementary PWM/break templates"
+
+msgid "`uart/usart_fifo/`"
+msgstr "`uart/usart_fifo/`"
+
+msgid "Bounded byte FIFO and selected RTS/CTS templates"
+msgstr "Bounded byte FIFO and selected RTS/CTS templates"
+
+msgid "`gpio/owned_pin_state/`"
+msgstr "`gpio/owned_pin_state/`"
+
+msgid "Owned-mask two-state GPIO transitions"
+msgstr "Owned-mask two-state GPIO transitions"
+
+msgid "`Nexus::DriverPrivateHeaders` supplies only private build-time include paths. Consumers link it privately; it contains no firmware source, object or state. The exact SoC target remains the sole source selector. Public checked dispatch, frame validation, sequence ownership and calendar arithmetic remain in `io/`. The classic CAN `cortex_m_port.h` keeps its byte-priority and word-NVIC accesses private. Native models override the same macros before inclusion; the extraction does not add a public Arch interface or change interrupt ordering. H743 and U575 share the four-byte immutable `uart_fifo_profile.h` value layout. SoC aliases retain their exact entry-point types without another runtime link."
+msgstr "`Nexus::DriverPrivateHeaders` supplies only private build-time include paths. Consumers link it privately; it contains no firmware source, object or state. The exact SoC target remains the sole source selector. Public checked dispatch, frame validation, sequence ownership and calendar arithmetic remain in `io/`. The classic CAN `cortex_m_port.h` keeps its byte-priority and word-NVIC accesses private. Native models override the same macros before inclusion; the extraction does not add a public Arch interface or change interrupt ordering. H743 and U575 share the four-byte immutable `uart_fifo_profile.h` value layout. SoC aliases retain their exact entry-point types without another runtime link."
+
+msgid "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
+msgstr "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
+
+msgid "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
+msgstr "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
+
+msgid "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
+msgstr "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
+
+msgid "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
+msgstr "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:86
 msgid ""
@@ -1120,201 +1356,3 @@ msgstr ""
 "supply or physical timing. Uninspected PCB revisions and jumpers remain "
 "unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
 "remains `not_executed`."
-
-msgid "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
-msgstr "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
-
-msgid "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
-msgstr "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
-
-msgid "Reusable IP implementations"
-msgstr "Reusable IP implementations"
-
-msgid "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
-msgstr "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
-
-msgid "Source directory"
-msgstr "Source directory"
-
-msgid "Maintained algorithm"
-msgstr "Maintained algorithm"
-
-msgid "`uart/uart_v1_channel_dma/`"
-msgstr "`uart/uart_v1_channel_dma/`"
-
-msgid "Legacy USART with fixed-channel DMA"
-msgstr "Legacy USART with fixed-channel DMA"
-
-msgid "`i2c/i2c_v1_async/`"
-msgstr "`i2c/i2c_v1_async/`"
-
-msgid "Reviewed V1 IRQ/DMA message sequencing"
-msgstr "Reviewed V1 IRQ/DMA message sequencing"
-
-msgid "`i2c/i2c_v2/`"
-msgstr "`i2c/i2c_v2/`"
-
-msgid "Reviewed V2 polling message sequencing"
-msgstr "Reviewed V2 polling message sequencing"
-
-msgid "`adc/legacy_adc/`"
-msgstr "`adc/legacy_adc/`"
-
-msgid "Legacy single-shot ADC"
-msgstr "Legacy single-shot ADC"
-
-msgid "`timer/legacy_pwm/`"
-msgstr "`timer/legacy_pwm/`"
-
-msgid "Legacy fixed PWM"
-msgstr "Legacy fixed PWM"
-
-msgid "`flash/legacy_flash/`"
-msgstr "`flash/legacy_flash/`"
-
-msgid "Legacy halfword Flash programming"
-msgstr "Legacy halfword Flash programming"
-
-msgid "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
-msgstr "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
-
-msgid "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
-msgstr "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
-
-msgid "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
-msgstr "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
-
-msgid "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
-msgstr "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
-
-msgid "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner, BMP280 core and SPI transport, [TMP117 one-shot I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md), instance-level Log, two-bank commit-last Storage, physical Flash region and Native file adapters, bounded Settings/KV staging, and pure Modbus RTU parsing. Unreferenced component code does not enter a firmware image."
-msgstr "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner, BMP280 core and SPI transport, [TMP117 one-shot I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md), instance-level Log, two-bank commit-last Storage, physical Flash region and Native file adapters, bounded Settings/KV staging, and pure Modbus RTU parsing. Unreferenced component code does not enter a firmware image."
-
-msgid "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
-msgstr "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
-
-msgid "Selected network and boot contracts"
-msgstr "Selected network and boot contracts"
-
-msgid "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
-msgstr "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
-
-msgid "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
-msgstr "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
-
-msgid "Admission, shutdown and reuse"
-msgstr "Admission, shutdown and reuse"
-
-msgid "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
-msgstr "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
-
-msgid "The complete shutdown order is:"
-msgstr "The complete shutdown order is:"
-
-msgid "Close admission and stop new controls or observation bindings."
-msgstr "Close admission and stop new controls or observation bindings."
-
-msgid "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
-msgstr "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
-
-msgid "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
-msgstr "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
-
-msgid "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
-msgstr "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
-
-msgid "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
-msgstr "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
-
-msgid "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
-msgstr "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
-
-msgid "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
-msgstr "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
-
-msgid "Clock domains and bounded waits"
-msgstr "Clock domains and bounded waits"
-
-msgid "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
-msgstr "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
-
-msgid "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
-msgstr "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
-
-msgid "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
-msgstr "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
-
-msgid "Optional observation and minimal fault capture"
-msgstr "Optional observation and minimal fault capture"
-
-msgid "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
-msgstr "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
-
-msgid "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
-msgstr "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
-
-msgid "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
-msgstr "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
-
-msgid "Stack and explicitly placed memory"
-msgstr "Stack and explicitly placed memory"
-
-msgid "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
-msgstr "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
-
-msgid "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
-msgstr "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
-
-msgid "Suffix"
-msgstr "Suffix"
-
-msgid "Reset initialization"
-msgstr "Reset initialization"
-
-msgid "Caller obligation"
-msgstr "Caller obligation"
-
-msgid "DATA"
-msgstr "DATA"
-
-msgid "Copy initializer from Flash"
-msgstr "Copy initializer from Flash"
-
-msgid "Budget both load and run regions"
-msgstr "Budget both load and run regions"
-
-msgid "BSS"
-msgstr "BSS"
-
-msgid "Zero storage"
-msgstr "Zero storage"
-
-msgid "Use no nonzero initializer"
-msgstr "Use no nonzero initializer"
-
-msgid "NOINIT"
-msgstr "NOINIT"
-
-msgid "Neither copy nor clear"
-msgstr "Neither copy nor clear"
-
-msgid "Initialize or validate before every read"
-msgstr "Initialize or validate before every read"
-
-msgid "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
-msgstr "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
-
-msgid "Exact silicon admission"
-msgstr "Exact silicon admission"
-
-msgid "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
-msgstr "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
-
-msgid "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
-msgstr "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
-
-msgid "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
-msgstr "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
-
-msgid "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."
-msgstr "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."

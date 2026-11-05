@@ -25,9 +25,10 @@ queues and observers actually withdraw their references.
 | Mode family | Bounded work and progress | Final ownership condition |
 |---|---|---|
 | GPIO | Direct authorized register command; toggle requires serialized writers | External direct writers joined before pin release |
-| UART IRQ bytes/events | At most one TX and one RX hardware byte per IRQ; reads copy one ring item per short critical section | Actual wire TC or reviewed reset abort, TX IRQ withdrawal and captured wake join |
+| UART IRQ bytes/events | Ordinary byte modes move at most one TX and one RX hardware byte per IRQ; reads copy one ring item per short critical section | Actual wire TC or reviewed reset abort, TX IRQ withdrawal and captured wake join |
+| UART FIFO bytes | Exact H743/U575 selections use explicit independent RX/TX budgets and hardware thresholds; FIFO space or empty is not wire completion | Actual wire TC, FIFO/source withdrawal and captured wake join; RTS/CTS ownership only in its separately selected mode |
 | UART IRQ blocks | One hardware byte per IRQ; block acquisition/release is explicit | Last prefix published, hardware sources withdrawn and every consumer loan returned |
-| UART finite TX DMA | One selected channel's terminal facts per IRQ; task service observes DMA and UART independently | DMA engine/source off and actual UART wire completion before SETTLED |
+| UART finite TX DMA | One selected channel's terminal facts per IRQ; task service observes DMA and UART independently; selected U575 hardware-chain TX additionally retains every fetched node | DMA engine/source/link references off and actual UART wire completion before SETTLED |
 | UART RX DMA idle/continuous and duplex | Selected bank/IDLE/error facts; caller supplies finite buffers/blocks and replacement capacity | Memory engine stopped and stable prefix/bank proven; RX loans and independent TX drain retained |
 | SPI short polling | Per-call finite length and absolute deadline; no IRQ mode fallback | Both controller and endpoint retain ownership for the complete CS interval |
 | SPI finite full-duplex DMA | Two selected engines; task service checks memory and shifter facts | Both DMA sources withdrawn, wire idle, then CS release and SETTLED |
@@ -46,17 +47,29 @@ queues and observers actually withdraw their references.
 
 The exact implementations and configured limits remain authoritative:
 
-- UART: `soc/*/*/drivers/uart*.c`; G474 and U575 use IRQ bytes. H743 RX also uses
-  IRQ bytes; its explicitly selected finite TX DMA has a separate memory/Cache
-  and drain contract. The F407, G474, H743 and U575 wire-drain allowance is
-  `20000000 / baud + 100` microseconds. GD IRQ uses its reviewed reset-abort
-  protocol; it is not assigned the ST wire-drain formula.
+- UART: `soc/*/*/drivers/uart*.c` and their selected shared engines. G474 selects
+  IRQ bytes. U575 separately selects IRQ bytes, bounded FIFO bytes or finite
+  single-block/hardware-chain GPDMA TX with IRQ RX. H743 additionally selects
+  finite or continuous DMA RX and continuous duplex; its memory/Cache and drain
+  contracts remain mode-specific. FIFO/RTS/CTS and DMA are not automatically
+  combined. The reviewed FIFO-disabled byte paths for F407, G474, H743 and U575
+  use the wire-drain allowance `20000000 / baud + 100` microseconds. The selected
+  FIFO paths instead use `ceil((depth + 1) * 10 * 1000000 / baud) + 100`
+  microseconds: depth 16 on H743 and depth 8 on U575, including one shifter frame.
+  GD IRQ uses its reviewed reset-abort protocol; it is not assigned either ST
+  wire-drain formula.
+- F103: the 16-bit TIM2 epoch requires overflow service within 65.536 ms. Its
+  synchronous same-bank Flash operations can stall instruction/vector fetch;
+  the declared 40 ms maximum page-erase duration does not include other masking
+  or service latency. This mode has no kernel tick catch-up or RAM execution
+  closure. Its priority-zero I2C receive windows likewise require the external
+  product to budget masking and service independently of nominal wire rate.
 - SPI: `soc/*/*/drivers/spi*.c`; the finite DMA drain allowance is 200 microseconds.
 - I2C: `drivers/i2c/i2c_v1_async/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
   is 1,000 microseconds. Polling STOP has separate finite work.
 - ADC/EXTI/timer: selected SoC driver and private state; scan, queue and channel
   limits come from resolved inputs or explicit caller storage.
-- CAN/USB/Ethernet: `io/src/controllers/can_controller.c`, `usb_device_controller.c` and
+- CAN/USB/Ethernet: `drivers/can/classic_can/can_controller.c`, `usb_device_controller.c` and
   `eth_mac.c`; poll/drain limits and selected capacities are validated at cold
   admission. IRQ notification remains a hint, never a replacement for predicates.
 

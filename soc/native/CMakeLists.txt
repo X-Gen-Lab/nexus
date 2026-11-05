@@ -11,30 +11,37 @@ target_link_libraries(nexus_io_native PUBLIC nexus_io nexus_arch
     PRIVATE nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_io_native PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private")
+target_link_libraries(nexus_io_native PRIVATE Nexus::DriverPrivateHeaders)
 add_library(nexus_can_native_engine OBJECT
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/can_controller.c")
+    "${NEXUS_SOURCE_DIR}/drivers/can/classic_can/can_controller.c")
 target_include_directories(nexus_can_native_engine PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers")
+target_link_libraries(nexus_can_native_engine PRIVATE
+    Nexus::DriverPrivateHeaders)
 target_link_libraries(nexus_can_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_options(nexus_can_native_engine PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/drivers/can_access.h")
 target_sources(nexus_io_native PRIVATE $<TARGET_OBJECTS:nexus_can_native_engine>)
 add_library(nexus_eth_native_engine OBJECT
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c")
+    "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c")
 target_include_directories(nexus_eth_native_engine PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers")
+target_link_libraries(nexus_eth_native_engine PRIVATE
+    Nexus::DriverPrivateHeaders)
 target_link_libraries(nexus_eth_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_definitions(nexus_eth_native_engine PRIVATE NX_ETH_NATIVE)
 target_sources(nexus_io_native PRIVATE $<TARGET_OBJECTS:nexus_eth_native_engine>)
 add_library(nexus_eth_frames_native_engine OBJECT
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c")
+    "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_frames_mac.c")
 target_include_directories(nexus_eth_frames_native_engine PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers")
+target_link_libraries(nexus_eth_frames_native_engine PRIVATE
+    Nexus::DriverPrivateHeaders)
 target_link_libraries(nexus_eth_frames_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_definitions(nexus_eth_frames_native_engine PRIVATE
@@ -42,10 +49,12 @@ target_compile_definitions(nexus_eth_frames_native_engine PRIVATE
 target_sources(nexus_io_native PRIVATE
     $<TARGET_OBJECTS:nexus_eth_frames_native_engine>)
 add_library(nexus_usb_native_engine OBJECT
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/usb_device_controller.c")
+    "${NEXUS_SOURCE_DIR}/drivers/usb/fs_device_pio/usb_device_controller.c")
 target_include_directories(nexus_usb_native_engine PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers")
+target_link_libraries(nexus_usb_native_engine PRIVATE
+    Nexus::DriverPrivateHeaders)
 target_link_libraries(nexus_usb_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_options(nexus_usb_native_engine PRIVATE

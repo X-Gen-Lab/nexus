@@ -352,7 +352,7 @@ nx_result_t nx_gd32_pwm_release(nx_gd32_pwm_state_t* port);
  *
  * \param[in]       count: Positive sequence length, at most 16.
  *
- * \param[in]       reference_mv: Explicit nominal positive Vref value.
+ * \param[in]       reference_mv: Nominal VREFP from 2600 through 3600 mV.
  *
  * \param[in]       deadline: Absolute startup calibration deadline.
  *
@@ -363,14 +363,34 @@ nx_result_t nx_gd32_pwm_release(nx_gd32_pwm_state_t* port);
  *                  Startup exclusively owns the shared ADC0/1/2 reset domain;
  *                  all three clocks and external clock-gated owners must be
  *                  idle. An enabled ADC clock returns BUSY before mutation.
- *                  Failed cold startup leaves storage unpublished, powers ADC0
- *                  off and restores selected pin mode/pull, newly enabled GPIO
- *                  clocks and the incoming shared ADC configuration.
+ *                  Failed cold startup returns only after observed ADC disable,
+ *                  shared configuration and selected pin mode/pull restore,
+ *                  followed by withdrawal of only added ADC/GPIO clocks. A
+ *                  refused cleanup masks IRQs, observes PLATFORM/IO and parks
+ *                  without returning or discarding the constructor frame and
+ *                  remaining effects. The observer cannot authorize reuse.
  */
 nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
                                    const uint8_t* channels, size_t count,
                                    uint32_t reference_mv,
                                    nx_time_us_t deadline);
+/** \brief Select HCLK/6 before calibration for autonomous DMA reads.
+ * \param[in,out] port: Fresh single-owner storage for the shared ADC domain.
+ * \param[in] channels: Stable reviewed external channel sequence.
+ * \param[in] count: Positive sequence length, at most sixteen.
+ * \param[in] reference_mv: Declared VREFP from 2600 through 3600 mV.
+ * \param[in] deadline: Absolute initial stabilization/calibration deadline.
+ * \return Same checked admission and proved failed-start rollback as polling.
+ * \note Fixed HCLK200/APB2 100 MHz gives ADC 100/3 MHz, above APB2/4 and
+ *       below the 40 MHz maximum. VDDA, VREFP<=VDDA and source impedance
+ *       require external Board evidence. No polling owner may coexist. A
+ *       refused cleanup enters the same terminal masked observer/park path;
+ *       it never returns a rejection with unowned hardware effects.
+ */
+nx_result_t nx_gd32_adc_dma_initialize(nx_gd32_adc_state_t* port,
+                                       const uint8_t* channels, size_t count,
+                                       uint32_t reference_mv,
+                                       nx_time_us_t deadline);
 /**
  * \brief           Release the controller after all executors are quiescent.
  * \param[in,out]   port: Initialized caller-owned storage.
@@ -384,9 +404,12 @@ nx_result_t nx_gd32_spi_stop(nx_gd32_spi_state_t* port);
  */
 nx_result_t nx_gd32_i2c_stop(nx_gd32_i2c_state_t* port);
 /**
- * \brief           Release the controller after all executors are quiescent.
- * \param[in,out]   port: Initialized caller-owned storage.
- * \return          Success or INVALID/BUSY/CONTEXT; BUSY retains storage.
+ * \brief           Release the ADC after observed conversion and gate stop.
+ * \param[in,out]   port: Initialized, joined single-executor owner storage.
+ * \return          Success or INVALID/BUSY/CONTEXT/IO; IO retains the owner.
+ * \note            Refused ADC disable or gate withdrawal keeps initialized
+ *                  storage and ownership for explicit stop retry. Do not
+ *                  reclaim the owner or resume consumers during failed stop.
  */
 nx_result_t nx_gd32_adc_stop(nx_gd32_adc_state_t* port);
 /** \brief Fixed USART0 vector; bounded payload moves and RX facts only. */

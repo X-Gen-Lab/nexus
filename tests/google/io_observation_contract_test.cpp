@@ -10,6 +10,7 @@
 #include "nexus/io/observation.h"
 #include "nexus/io/spi.h"
 #include "nexus/io/uart.h"
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -117,6 +118,30 @@ TEST(IOTimestamp, AliasedResultCannotRewriteAnInput) {
     output = reinterpret_cast<nx_io_timestamp_delta_t*>(&last);
     EXPECT_EQ(nx_io_timestamp_elapsed(&first, &last, output), NX_ERROR_INVALID);
     EXPECT_EQ(last.ticks, 20U);
+}
+
+TEST(IOTimestamp, MisalignedFactsAndResultRejectBeforeReadingOrWriting) {
+    auto first = event(10U, NX_IO_TIMESTAMP_HARDWARE_EVENT);
+    auto last = event(20U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    alignas(nx_io_timestamp_t) unsigned char
+        input[sizeof(nx_io_timestamp_t) + 1U]{};
+    std::memcpy(input + 1U, &first, sizeof(first));
+    const auto* misaligned =
+        reinterpret_cast<const nx_io_timestamp_t*>(input + 1U);
+    nx_io_timestamp_delta_t result{777U, 888U, 999U, true};
+    EXPECT_EQ(nx_io_timestamp_elapsed(misaligned, &last, &result),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_io_timestamp_elapsed(&last, misaligned, &result),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(result.ticks, 777U);
+    alignas(nx_io_timestamp_delta_t) unsigned char
+        output[sizeof(nx_io_timestamp_delta_t) + 1U]{};
+    auto* misaligned_output =
+        reinterpret_cast<nx_io_timestamp_delta_t*>(output + 1U);
+    EXPECT_EQ(nx_io_timestamp_elapsed(&first, &last, misaligned_output),
+              NX_ERROR_INVALID);
+    unsigned char untouched[sizeof(output)]{};
+    EXPECT_EQ(std::memcmp(output, untouched, sizeof(output)), 0);
 }
 
 TEST(IOTimestampBudget, OnlyTheCompleteErrorIntervalCanMeetTheLimit) {

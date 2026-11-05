@@ -100,11 +100,16 @@ nx_result_t nx_gd32_adc_stream_timing(size_t channels,
         }
         scan_cycles += cycles[code] + 12U;
     }
-    if (hz > UINT32_C(12500000) / scan_cycles ||
-        UINT32_C(100000000) % hz != 0U) {
+    if (NX_GD32_ADC_DMA_TIMER_HZ % hz != 0U) {
         return NX_ERROR_UNSUPPORTED;
     }
-    uint32_t ticks = UINT32_C(100000000) / hz;
+    uint32_t ticks = NX_GD32_ADC_DMA_TIMER_HZ / hz;
+    /* ADC is HCLK/6 and TIMER2 is HCLK/2: three exact timer ticks per
+     * ADC cycle. This admits no too-short scan through rounded Hz budgets.
+     */
+    if (ticks < scan_cycles * NX_GD32_ADC_DMA_TICKS_PER_CYCLE) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     uint32_t divider = (ticks + 65535U) / 65536U;
     for (; divider <= 65536U; ++divider) {
         if (ticks % divider == 0U && ticks / divider <= 65536U) {
@@ -233,8 +238,8 @@ nx_result_t nx_gd32_adc_stream_initialize(nx_gd32_adc_stream_state_t* state,
         (DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
         return NX_ERROR_BUSY;
     }
-    nx_result_t result = nx_gd32_adc_initialize(&state->adc, channels, count,
-                                                reference_mv, deadline);
+    nx_result_t result = nx_gd32_adc_dma_initialize(
+        &state->adc, channels, count, reference_mv, deadline);
     if (result != NX_SUCCESS) {
         return result;
     }

@@ -3306,5 +3306,27 @@
         }
       }
     }
+  },
+  "source_version_records_20261105": {
+    "drivers_io_soc_20261105": {
+      "status": "implementation_and_validation_in_progress",
+      "baseline_source": "35cc568e1a10a3b9dd0a6b70cebcb391ea3ffef1",
+      "scope": "Drivers source ownership, typed I/O boundaries, selected STM32/GD32 errata, source dependencies and actual bounded software checks.",
+      "physical_hil": "not_executed",
+      "software_candidate": "not_established_by_this_record",
+      "conditional_extensions": [
+        "runtime DVFS",
+        "general LPBAM",
+        "formal multi-world TrustZone transport",
+        "physical I3C provider",
+        "physical mapped storage backend",
+        "selected multicore AMP target"
+      ],
+      "limitations": [
+        "In-progress navigation does not establish new execution qualification.",
+        "Final source and raw command identities are recorded after actual integration checks.",
+        "Physical station execution requires connected equipment and reviewed Board facts."
+      ]
+    }
   }
 }

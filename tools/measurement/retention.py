@@ -86,9 +86,15 @@ def provider_initializers(path, source, root):
             name = include.group(1)
             if Path(name).name != name:
                 raise EvidenceError("provider template must be a direct private include")
-            template_path = root / "io/private" / name
-            if not template_path.is_file():
+            private = root / "io/private" / name
+            approved = set((root / "drivers").glob("*/*/" + name))
+            if private.is_file():
+                approved.add(private)
+            if not approved:
                 continue
+            if len(approved) != 1:
+                raise EvidenceError("ambiguous provider private template include")
+            template_path = approved.pop()
             template = re.sub(r"/\*.*?\*/|//[^\n]*", " ",
                               template_path.read_text(), flags=re.DOTALL)
             if re.search(r"^[ \t]*#[ \t]*(?:define|undef)[ \t]+" +
@@ -748,6 +754,7 @@ def component_owner_input_paths(root):
     paths.update((root / "components").rglob("src/*.c"))
     paths.update((root / "soc").rglob("drivers/*.c"))
     paths.update((root / "drivers").rglob("*.c"))
+    paths.update((root / "drivers").rglob("*.h"))
     paths.update((root / "io/src").rglob("*.c"))
     paths.update((root / "io/private").glob("*.h"))
     paths.add(root / "soc/stm32/stm32u575/stop2.c")

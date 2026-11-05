@@ -395,6 +395,43 @@ TEST_F(CanFactory, RefusedPadRestoreRetainsDomainAndTheExactPadUntilRetry) {
 }
 
 #ifndef NX_CAN_FACTORY_STM32
+TEST_F(CanFactory, UnsupportedFifoOrderRejectsBeforeColdPinOrDomainEffects) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
+    uint16_t snapshots[2]{};
+    const nx_gd32_platform_pin_config_t pins[] = {
+        {GPIOA, &snapshots[0], 0U, 11U}, {GPIOA, &snapshots[1], 0U, 12U}};
+    nx_gd32_can_config_t config{};
+    config.domain = first_state->domain;
+    config.events = first_state->events;
+    config.pins = pins;
+    config.capacity = first_state->capacity;
+    config.timing = first_state->timing;
+    config.irq_policy = first_state->irq_policy;
+    config.drain_timeout_us = first_state->drain_timeout_us;
+    config.poll_limit = first_state->poll_limit;
+    config.mode = first_state->mode;
+    config.index = first_state->index;
+    config.priority = first_state->sources[0].priority;
+    config.fifo_order = true;
+    uint8_t leases = 0U;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    const nx_can_controller_t prior = *first_state;
+    /* A forbidden hardware call returns safely so a failed assertion never
+     * lets this negative mode test proceed into unrelated acquisition. */
+    ON_CALL(ports, EnableClock(_)).WillByDefault(Return(NX_ERROR_IO));
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_EQ(nx_gd32_can_prepare(first_state, &config, &leases),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(std::memcmp(&prior, first_state, sizeof(prior)), 0);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    EXPECT_EQ(leases, 0U);
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
 TEST_F(CanFactory, AbsentColdReceiptCannotStopActiveController) {
     ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
     const nx_can_controller_t prior = *first_state;

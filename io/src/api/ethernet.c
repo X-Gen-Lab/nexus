@@ -6,7 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "eth_mac.h"
+#include "eth_validation.h"
 #include <stdint.h>
 
 bool nx_eth_frame_valid(const void* data, size_t length) {

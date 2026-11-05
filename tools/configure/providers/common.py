@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import DirectCall
+from tools.configure.calls import DirectCall, InitializeSequence
 
 UINT32_MAX = (1 << 32) - 1
 
@@ -119,6 +119,42 @@ def configuration_header(result):
     return []
 
 
+def _static_definitions(values):
+    """Reject executable algorithms while retaining static facts and thin IRQs.
+
+    This is an assembly boundary, not a C parser or a compiler replacement.
+    Address constants and initializer expressions remain compiler-checked;
+    generated function bodies may only forward fixed calls to concrete C.
+    """
+    code = re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+                  " ", "\n".join(values), flags=re.DOTALL)
+    identifier = r"[A-Za-z_][A-Za-z0-9_]*"
+    reference = rf"(?:&{identifier}(?:\.{identifier})*|{identifier}|[0-9]+[uU]?)"
+    call = rf"nx_{identifier}\s*\(\s*(?:{reference}(?:\s*,\s*{reference})*)?\s*\)\s*;"
+
+    def irq(match):
+        name, body = match.groups()
+        probe = re.fullmatch(rf"\s*NX_IO_IRQ_PROBE_BEGIN\(\s*({identifier})\s*\);"
+                             rf"\s*(.*?)\s*NX_IO_IRQ_PROBE_END\(\s*\1\s*\);\s*",
+                             body, flags=re.DOTALL)
+        if probe is not None:
+            body = probe.group(2)
+        if (not name.endswith("IRQHandler") or
+                re.fullmatch(rf"\s*(?:{call}\s*)+", body) is None):
+            fail("Construction static assembly permits only fixed thin IRQ calls")
+        return " "
+
+    code = re.sub(rf"\bvoid\s+({identifier})\s*\(\s*void\s*\)\s*\{{([^{{}}]*)\}}",
+                  irq, code)
+    if (re.search(r"\b(?:if|else|while|do|for|switch|case|default|goto|return)\b", code)
+            or re.search(rf"\b{identifier}[\s*]+{identifier}\s*"
+                         r"\([^;{}]*\)\s*\{", code)
+            or re.search(rf"->\s*{identifier}(?:\s*\[[^\]]*\])?\s*"
+                         r"(?:[+\-*/%&|^]?=(?!=)|\+\+|--)", code)
+            or re.search(rf"(?:\+\+|--)\s*{identifier}\s*->", code)):
+        fail("Construction static assembly cannot contain executable hardware algorithms")
+
+
 def validate_user_io_context(assembly, part, *, selected=None):
     """Protected user GPIO is admitted only by its exact maintained family."""
     fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
@@ -141,8 +177,17 @@ class Construction:
     face_context: str | None = None
     face_definitions: tuple[str, ...] = ()
     admission: tuple[DirectCall, ...] = ()
+    initialize_sequences: tuple[InitializeSequence, ...] = ()
 
     def __post_init__(self):
+        if not isinstance(self.initialize_sequences, (tuple, list)):
+            fail("Construction initialization sequences require an ordered sequence")
+        sequences = tuple(self.initialize_sequences)
+        if any(not isinstance(value, InitializeSequence) for value in sequences):
+            fail("Construction initialization sequences require typed direct calls")
+        if len({value.function for value in sequences}) != len(sequences):
+            fail("Construction initialization sequence names must be unique")
+        object.__setattr__(self, "initialize_sequences", sequences)
         if (not isinstance(self.state_type, str) or
                 re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", self.state_type)
                 is None):
@@ -171,6 +216,7 @@ class Construction:
             values = tuple(getattr(self, name))
             if any(not isinstance(value, str) for value in values):
                 fail(f"Construction {name} requires C source strings")
+            _static_definitions(values)
             object.__setattr__(self, name, values)
         snapshots = dict(self.pin_snapshots)
         if any(not isinstance(key, str) or not isinstance(value, str)

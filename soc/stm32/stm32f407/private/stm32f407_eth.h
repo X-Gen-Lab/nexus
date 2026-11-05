@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_STM32F407_ETH_H
 #define NEXUS_STM32F407_ETH_H
-#include "../../../../io/private/eth_mac.h"
+#include "../../../../drivers/ethernet/legacy_mac/eth_mac.h"
 #include "stm32f407xx.h"
 #ifdef __cplusplus
 extern "C" {

@@ -43,8 +43,7 @@ io/
   include/nexus/io/           public I/O contracts
   src/api/                   checked face dispatch
   src/mechanisms/            shared bounded I/O rules
-  src/controllers/           shared selected controller engines
-  private/                   private structures and hardware ports
+  private/                   hardware-independent validation and owner helpers
 components/
   <component>/               common mechanisms
   soc/stm32/<extension>/     explicitly selected STM32 extensions

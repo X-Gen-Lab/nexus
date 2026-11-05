@@ -25,7 +25,7 @@ function(nexus_google_test name)
     target_compile_features(${name} PRIVATE cxx_std_17)
     set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${name} PRIVATE nexus_build_options nexus_owned_warnings
-        GTest::gmock_main ${ARG_LIBRARIES})
+        GTest::gmock_main Nexus::DriverPrivateHeaders ${ARG_LIBRARIES})
     nexus_use_cmsis_host_model(${name})
     if(nexus_google_compressed_debug_enabled)
         target_link_options(${name} PRIVATE

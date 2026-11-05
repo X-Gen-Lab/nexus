@@ -67,6 +67,31 @@ class CanConfigurationTests(unittest.TestCase):
                         item, result, result.board_bindings, result.routes,
                         result.devices)
 
+    def test_gd470_fifo_transmit_order_is_rejected_before_any_bundle_is_published(self):
+        fixture = gate.ROOT / 'tests/contracts/can_assembly/gd32-first.toml'
+        base = fixture.read_text().replace('board_package="gd32_board"',
+            'board_package="' + str(fixture.parent / 'gd32_board') + '"')
+        for operation in ('loopback', 'normal', 'silent-loopback'):
+            with self.subTest(operation=operation):
+                content = base.replace('fifo_order=false', 'fifo_order=true')
+                content = content.replace('operation="loopback"',
+                                          f'operation="{operation}"')
+                path = self.root / 'gd470.toml'
+                path.write_text(content)
+                output = self.root / 'rejected'
+                with self.assertRaisesRegex(ValueError, 'CAN.*fifo_order'):
+                    gate.configure(path, output)
+                self.assertFalse(output.exists())
+
+    def test_stm32_retains_reviewed_fifo_order_and_gd470_fixtures_select_priority(self):
+        self.assertTrue(gate.resolve_ir(self.authored()).controllers[0].options.fifo_order)
+        for name in ('gd32-first.toml', 'gd32-both.toml'):
+            with self.subTest(name=name):
+                selected = gate.resolve_ir(gate.ROOT / 'tests/contracts/can_assembly' / name)
+                self.assertTrue(selected.controllers)
+                self.assertTrue(all(not item.options.fifo_order
+                                    for item in selected.controllers))
+
     def test_generated_factory_and_partial_start_cleanup_are_explicit(self):
         path = self.authored(second=True)
         output = self.root / 'generated'
@@ -119,7 +144,7 @@ class CanConfigurationTests(unittest.TestCase):
         selected = [row for row in rows if row["kind"] == "can"]
         self.assertEqual(len(selected), 4)
         for row in selected:
-            self.assertEqual(row["exports"], ["io/src/controllers/can_controller.c"])
+            self.assertEqual(row["exports"], ["drivers/can/classic_can/can_controller.c"])
             self.assertTrue(row["fixtures"])
 
     def test_no_can_configuration_produces_no_domain_state_or_driver_calls(self):

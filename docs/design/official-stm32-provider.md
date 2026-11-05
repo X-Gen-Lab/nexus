@@ -91,6 +91,35 @@ H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
 separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
 chained, duplex or cross-domain operation.
 
+### Exact STM32 errata review worksheet
+
+Use the exact document revision and selected mode when reviewing a change.
+The entries below locate existing controls and open evidence; they are not a
+second support ledger or a complete errata audit. Where a reference index
+exists, its `applicability_only` status remains authoritative; physical
+qualification remains `not_executed`. Inspect
+the document's revision table before applying a workaround to another cut.
+Do not replace an unavailable silicon observation with the authored part name.
+
+| Exact selection and source | Existing control to preserve | Review and acceptance boundary |
+| --- | --- | --- |
+| F103RBT6, ES096 Rev15 2.2.2 | Normal firmware uses the Flash-size word, never unavailable DBGMCU reads, for density admission; `debug_freeze=true` rejects before watchdog activation | A debugger's IDCODE observation and physical marking require independent station evidence; zero is not an observed revision A |
+| F103 USART2/I2C1/Flash, ES096 Rev15 2.3.9, 2.8.1/2/5 and 2.2.11 | Exclusive TE+RE pads; nominal80kHz I2C with priority-zero service and protected receive windows; control read/barrier before delayed-BSY polling | Review the complete selected mode, IRQ-mask budget and same-bank Flash stall against the65.536ms TIM2 service interval; no physical bus-clear or RTOS tick catch-up is implied |
+| F407 VE/ZG, ES0182 Rev19 Tables1–3 | Exact source identity and maintained provider contracts are retained in the [F407 reference index](../../soc/stm32/stm32f407/references.json) | The reference index records applicability, not complete per-mode workarounds; review each selected UART/SPI/I2C/ADC/DMA mode against its actual cut before physical qualification |
+| G474RET6 ADC/DMA/I2C/Flash, ES0430 Rev9 2.7.8–11, 2.3.1, 2.4.4, 2.15.1/2 and 2.2.2 | Selected ADC priming and aperture limits; specific DMA flag ACK; no DMAMUX synchronization fallback; HSI16 I2C; Flash data-cache disable/reset/restore | The [reference index](../../soc/stm32/stm32g474/references.json) and each separate ADC/group/PWM-ADC contract bound the selection; older single-shot restrictions do not describe every later group mode |
+| H743 reset, ES0392 Rev15 2.2.10 and RM0433 Rev9 6.4.1 | MMIO-only power entry before RAM writes; old-cut AXI READ_ISS_OVERRIDE is checked before stack use | Actual ARM entry bytes must retain both cut paths; static closure does not establish old-cut SRAM reliability |
+| H743 SPI4, ES0392 Rev15 2.22.5/6 | Disabled-CRC CRCSIZE and the selected final-SCK quiet interval remain in the actual provider | Preserve each mode's V-cut/trim, clock, FIFO, DMA and Cache restrictions; GPIO route inventory does not qualify a physical endpoint |
+| H743 Flash, RM0433 Rev9 and ES0392 Rev15 2.1.2 | V-only, Cache-off cold RAM preparation, actual both-bank drain, private vectors/stack and checked MPU return gate | Apply the [RAM maintenance exits](h743-flash-ram.md); public-face retention, explicit-operand closure, installed SDK and physical busy-bank behavior are independent observations |
+| U575 USART1, ES0499 Rev12 2.21.1/2 | Finite single-block and chain TX retain DMAT from before UE through whole stop; ordinary/FIFO RX keeps its separate bounded handling | The receive glitch has no software workaround on W/U; a quiet line or external filter is an electrical premise. Chain mode does not qualify general linked lists or RX DMA |
+| U575 RTC/Stop2, ES0499 Rev12 2.2.1/3/16 and 2.19.3 | Externally prepared LSE/BYPSHAD calendar, repeated complete tuples and retained clock generations | Inspect actual cut, PC13 activity, LSE population/drive and retained power; model success cannot establish oscillator continuity or wake accuracy |
+| U575 LPTIM1 LPBAM, ES0499 Rev12 2.17.1–3 | One fixed tuple; fresh write-OK proof before DIER withdrawal; selected reset shutdown and RCR0/LSE-to-PCLK premises | [The selected contract](u575-lptim1-lpbam.md) excludes a general autonomous scheduler; waveform, residency, retention and current need physical execution |
+
+For each changed row, keep the exact source/specification link, affected
+configuration, production-C failure regression, ARM/link observation and any
+external station premise in the existing work-package evidence. Missing
+revision, electrical or instrument inputs remain explicit. Merely including an
+official header or invoking a vendor workaround does not close those inputs.
+
 ### Fixed clock admission
 
 The reviewed software-trim gates run in cold preflight. An unexpected adjustment
@@ -115,6 +144,41 @@ respectively. They constrain the nominal bootstrap and fallback clocks; G474
 also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows
 RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment
 stating 16 is stale.
+
+### Cortex-M4F short-ISR constraint
+
+Arm776924 is explicitly listed by F407 ES0182 Rev19 section2.1.2, GD303 device
+limitations Rev1.4 section2.14.1 and GD470 device limitations Rev1.6
+section2.15.1. F407's applicability table marks every listed cut affected. These
+references must not be extended to a different CPU or chip from its name alone.
+
+The failure requires an enabled FPU and lazy context saving, an interrupted
+`VDIV` or `VSQRT` whose destination is s0–s15, a handler without floating-point
+instructions, and exception return within fourteen cycles of the interrupted
+instruction. The manufacturers' sufficient instruction-count workaround is
+**more than two executed instructions in every ISR, excluding exception
+return**. External stack-memory wait states are an alternative source condition,
+not a premise supplied by these internal-SRAM platform profiles.
+
+GD303, GD470 and F407 startup enables CP10/CP11. Their selected FreeRTOS CM4F
+port explicitly enables ASPEN/LSPEN. An integer-only current workload therefore
+does not make the platform FPU-disabled or exclude floating-point application
+code. Do not silently clear LSPEN in startup: the kernel re-enables it and its
+context/stack ABI requires a separately reviewed decision.
+
+Review the actual installed vector table and reachable instruction prefixes in
+each emitted configuration. A thin `ldr` plus tail branch needs its callee
+examined; unreachable `nop` alignment and literal-pool words are not executed
+work. A default nonreturning fault loop is distinct from an empty returning
+handler. Apply the same rule to external handlers, spurious/disabled-state fast
+paths, aliases and compiler/LTO changes. Source line counts and nominal clock
+frequency cannot prove this condition.
+
+Selected-image software review belongs with its actual ELF, resolved input,
+compiler commands and disassembly. It proves only those installed paths, not
+every declared mode or a connected device result. A new or replacement external
+ISR that can return within the excluded short prefix remains an open integration
+condition until its emitted path or another exact workaround is reviewed.
 
 ### Production promotion gates
 
@@ -187,7 +251,7 @@ The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at
 STM32CubeF4 v1.28.3. The machine authority is
 [the official-driver lock](../../dependencies/stm32f4-hal.lock.json), checked
 against the selected Git dependency and imported SDK bytes. The selected API is
-`stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`. Its 25-file closure retains
+`stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`. Its 28-file closure retains
 the earlier LL/ETH definitions and license, and adds the reviewed HAL headers
 plus UART, DMA and RCC C units. GPIO/Flash declarations are required by RCC
 compilation; their C implementations, PWR and global `stm32f4xx_hal.c` are not

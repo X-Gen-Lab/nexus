@@ -504,6 +504,31 @@ TEST_F(EthernetFramesMac,
     EXPECT_EQ(0x81U, first[12]);
     EXPECT_EQ(0xb0U, rest[1]);
 }
+TEST_F(EthernetFramesMac, OneIrqAdvancesOnlyOneTxAndOneRxDescriptor) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_submit(&port, &request));
+    tx[0].status = tx[1].status = 0U;
+    for (size_t i = 0U; i < count; ++i) {
+        rxslots[i].data[12] = 0x08U;
+        rxslots[i].data[13] = 0U;
+        rx[i].status = (68U << 16U) | 0x300U | 0x20U;
+    }
+    oracle.irq_pending = false;
+    nx_eth_frames_mac_irq(&mac);
+    EXPECT_EQ(mac.snapshot.mac.pending_tx, 1U);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(txslots[0].returned, 1U);
+    EXPECT_EQ(mac.snapshot.mac.received, 1U);
+    EXPECT_EQ(rxslots[0].state, NX_ETH_FRAMES_RX_READY);
+    EXPECT_EQ(rxslots[1].state, NX_ETH_FRAMES_RX_DMA);
+    EXPECT_TRUE(oracle.irq_pending);
+    nx_eth_frames_mac_irq(&mac);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(mac.snapshot.mac.received, 2U);
+    EXPECT_EQ(rxslots[1].state, NX_ETH_FRAMES_RX_READY);
+    EXPECT_EQ(rxslots[2].state, NX_ETH_FRAMES_RX_DMA);
+}
 TEST_F(EthernetFramesMac, IncompleteRxNeverExposesOneFragmentAsAFrame) {
     Start();
     rx[0].status = 0x200U;

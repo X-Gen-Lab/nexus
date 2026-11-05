@@ -10,6 +10,7 @@ extern "C" {
 #include "gd32f470_control_cold.h"
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
+#include "nexus/core/fault.h"
 #include "private/system.h"
 }
 #include <array>
@@ -29,6 +30,16 @@ enum class Fault {
     ResetFrozen,
     CalibrationFrozen
 };
+enum class CleanupFault {
+    None,
+    AdcDisable,
+    CommonRestore,
+    PinRestore,
+    PinPullRestore,
+    AdcGate,
+    GpioGate
+};
+struct ParkSignal {};
 
 /** \brief SDK boundaries are mocked; production MMIO algorithms remain real. */
 class ADCBoundary {
@@ -38,6 +49,8 @@ class ADCBoundary {
     MOCK_METHOD(void, ConfigurePin, (uint32_t, uint32_t, uint32_t, uint32_t));
     MOCK_METHOD(void, Reset, ());
     MOCK_METHOD(void, Prescaler, (uint32_t));
+    MOCK_METHOD(void, Observe,
+                (nx_fault_domain_t, nx_result_t, const char*, unsigned));
 };
 ADCBoundary* s_boundary;
 Fault s_fault;
@@ -50,6 +63,16 @@ bool s_gated_pins;
 unsigned s_reset_calibrations;
 unsigned s_calibrations;
 bool s_conversion_works;
+bool s_refuse_prescaler;
+bool s_delayed_eoc;
+bool s_frozen_eoc;
+unsigned s_eoc_hold_reads;
+unsigned s_early_data_reads;
+unsigned s_data_reads;
+nx_time_us_t s_eoc_time;
+CleanupFault s_cleanup_fault;
+bool s_cleanup_active;
+bool s_cleanup_injected;
 constexpr uint32_t kNeighborMask = 3U << 30U;
 } /* namespace */
 
@@ -63,6 +86,11 @@ extern "C" void rcu_periph_clock_enable(rcu_periph_enum peripheral) {
 /** \brief Release only the peripheral clock actually requested. */
 extern "C" void rcu_periph_clock_disable(rcu_periph_enum peripheral) {
     s_boundary->ClockDisable(peripheral);
+    if (s_cleanup_active && s_cleanup_fault == CleanupFault::AdcGate &&
+        peripheral == RCU_ADC0) {
+        s_cleanup_injected = true;
+        return;
+    }
     REG32(RCU + (static_cast<uint32_t>(peripheral) >> 6U)) &=
         ~(1U << (static_cast<uint32_t>(peripheral) & 31U));
 }
@@ -93,12 +121,20 @@ extern "C" void adc_deinit(void) {
 /** \brief Official divider configuration changes only its common bitfield. */
 extern "C" void adc_clock_config(uint32_t prescaler) {
     s_boundary->Prescaler(prescaler);
-    ADC_SYNCCTL =
-        (ADC_SYNCCTL & ~static_cast<uint32_t>(ADC_SYNCCTL_ADCCK)) | prescaler;
+    if (!s_refuse_prescaler) {
+        ADC_SYNCCTL =
+            (ADC_SYNCCTL & ~static_cast<uint32_t>(ADC_SYNCCTL_ADCCK)) |
+            prescaler;
+    }
 }
 
-/** \brief The unselected sample path retains the real SDK read boundary. */
+/** \brief Model the erratum's data latency independently of the EOC flag. */
 extern "C" uint16_t adc_routine_data_read(uint32_t peripheral) {
+    ++s_data_reads;
+    if (s_delayed_eoc && s_now - s_eoc_time < 2U) {
+        ++s_early_data_reads;
+        return UINT16_MAX;
+    }
     return static_cast<uint16_t>(ADC_RDATA(peripheral));
 }
 
@@ -122,6 +158,7 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
         }
         if (s_fault == Fault::Stability && s_powered_ticks == 3U) {
             s_now = 500U;
+            s_cleanup_active = true;
         }
         if (s_fault != Fault::Reset && s_fault != Fault::ResetFrozen) {
             if ((ADC_CTL1(ADC0) & ADC_CTL1_RSTCLB) != 0U) {
@@ -140,6 +177,18 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
             ADC_RDATA(ADC0) = 100U + (ADC_RSQ2(ADC0) & 31U);
             ADC_STAT(ADC0) |= ADC_STAT_EOC;
             ADC_CTL1(ADC0) &= ~ADC_CTL1_SWRCST;
+            if (s_delayed_eoc) {
+                s_eoc_time = s_now;
+                s_eoc_hold_reads = 2U;
+                return s_now;
+            }
+        }
+        if (s_delayed_eoc && (ADC_STAT(ADC0) & ADC_STAT_EOC) != 0U &&
+            (s_frozen_eoc || s_eoc_hold_reads != 0U)) {
+            if (s_eoc_hold_reads != 0U) {
+                --s_eoc_hold_reads;
+            }
+            return s_now;
         }
     }
     return ++s_now;
@@ -206,6 +255,37 @@ extern "C" void nx_arch_dsb(void) {
         GPIO_PUD(GPIOC) = UINT32_C(0xAAAAAAAA);
         s_gated_pins = false;
     }
+    if (!s_cleanup_active || s_cleanup_injected) {
+        return;
+    }
+    if (s_cleanup_fault == CleanupFault::AdcDisable && ADC_CTL1(ADC0) == 0U) {
+        ADC_CTL1(ADC0) = ADC_CTL1_ADCON;
+        s_cleanup_injected = true;
+    } else if (s_cleanup_fault == CleanupFault::CommonRestore &&
+               ADC_SYNCCTL == (ADC_ADCCK_PCLK2_DIV4 | ADC_SYNCCTL_VBATEN)) {
+        ADC_SYNCCTL &= ~ADC_SYNCCTL_VBATEN;
+        s_cleanup_injected = true;
+    } else if ((s_cleanup_fault == CleanupFault::PinRestore ||
+                s_cleanup_fault == CleanupFault::PinPullRestore) &&
+               (GPIO_CTL(GPIOA) & 15U) == 5U &&
+               (GPIO_PUD(GPIOA) & 15U) == 10U) {
+        if (s_cleanup_fault == CleanupFault::PinRestore) {
+            GPIO_CTL(GPIOA) ^= 1U;
+        } else {
+            GPIO_PUD(GPIOA) ^= 1U;
+        }
+        s_cleanup_injected = true;
+    } else if (s_cleanup_fault == CleanupFault::GpioGate &&
+               (RCU_AHB1EN & RCU_AHB1EN_PAEN) == 0U) {
+        RCU_AHB1EN |= RCU_AHB1EN_PAEN;
+        s_cleanup_injected = true;
+    }
+}
+
+/** \brief The test intercepts a terminal observer; firmware cannot unwind. */
+extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
+                                 const char* file, unsigned line) {
+    s_boundary->Observe(domain, reason, file, line);
 }
 
 /** \brief The register fixture has no physical instruction pipeline. */
@@ -238,6 +318,16 @@ class GD32ADCInitialize : public ::testing::Test {
         s_reset_calibrations = 0U;
         s_calibrations = 0U;
         s_conversion_works = false;
+        s_refuse_prescaler = false;
+        s_delayed_eoc = false;
+        s_frozen_eoc = false;
+        s_eoc_hold_reads = 0U;
+        s_early_data_reads = 0U;
+        s_data_reads = 0U;
+        s_eoc_time = 0U;
+        s_cleanup_fault = CleanupFault::None;
+        s_cleanup_active = false;
+        s_cleanup_injected = false;
         for (unsigned i = 0U; i < 3U; ++i) {
             initial_mode[i] = UINT32_C(0x55555555);
             initial_pull[i] = UINT32_C(0xAAAAAAAA);
@@ -307,6 +397,68 @@ class GD32ADCInitialize : public ::testing::Test {
     }
 };
 
+class GD32ADCCleanupFailure
+    : public GD32ADCInitialize,
+      public ::testing::WithParamInterface<CleanupFault> {};
+
+TEST_P(GD32ADCCleanupFailure, RefusedCleanupParksWithoutReturningAnOwner) {
+    s_fault = Fault::Stability;
+    s_cleanup_fault = GetParam();
+    EXPECT_CALL(boundary, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, ::testing::_,
+                                  ::testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                     unsigned line) {
+            EXPECT_TRUE(s_cleanup_injected);
+            EXPECT_EQ(s_mask, 1U);
+            EXPECT_NE(file, nullptr);
+            EXPECT_GT(line, 0U);
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+                 ParkSignal);
+    EXPECT_TRUE(s_cleanup_injected);
+    EXPECT_EQ(s_mask, 1U);
+    EXPECT_FALSE(state.initialized);
+    if (GetParam() != CleanupFault::GpioGate) {
+        EXPECT_NE(RCU_AHB1EN & RCU_AHB1EN_PAEN, 0U);
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    RetainedEffects, GD32ADCCleanupFailure,
+    ::testing::Values(CleanupFault::AdcDisable, CleanupFault::CommonRestore,
+                      CleanupFault::PinRestore, CleanupFault::PinPullRestore,
+                      CleanupFault::AdcGate, CleanupFault::GpioGate));
+
+class GD32ADCStopFailure : public GD32ADCInitialize,
+                           public ::testing::WithParamInterface<CleanupFault> {
+};
+
+TEST_P(GD32ADCStopFailure, RefusedStopRetainsTheOwnerUntilExplicitRetry) {
+    ASSERT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+              NX_SUCCESS);
+    s_cleanup_active = true;
+    s_cleanup_fault = GetParam();
+    EXPECT_CALL(boundary,
+                Observe(::testing::_, ::testing::_, ::testing::_, ::testing::_))
+        .Times(0);
+    EXPECT_EQ(nx_gd32_adc_stop(&state), NX_ERROR_IO);
+    EXPECT_TRUE(s_cleanup_injected);
+    EXPECT_TRUE(state.initialized);
+    EXPECT_NE(RCU_APB2EN & RCU_APB2EN_ADC0EN, 0U);
+    nx_adc_info_t info = {};
+    EXPECT_EQ(nx_gd32_adc_info(&state, &info), NX_SUCCESS);
+    s_cleanup_fault = CleanupFault::None;
+    s_cleanup_active = false;
+    EXPECT_EQ(nx_gd32_adc_stop(&state), NX_SUCCESS);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(RCU_APB2EN & RCU_APB2EN_ADC0EN, 0U);
+}
+
+INSTANTIATE_TEST_SUITE_P(RetryableStop, GD32ADCStopFailure,
+                         ::testing::Values(CleanupFault::AdcDisable,
+                                           CleanupFault::AdcGate));
+
 TEST_F(GD32ADCInitialize, StabilityDeadlineRollsBackPinsClocksAndCommonState) {
     FailAndRetry(Fault::Stability, NX_ERROR_TIMEOUT);
 }
@@ -351,6 +503,85 @@ TEST_F(GD32ADCInitialize, SuccessfulColdStartOnlyConfiguresSelectedPins) {
     EXPECT_EQ(ADC_CTL1(ADC0), ADC_CTL1_ADCON);
     EXPECT_EQ(state.channels, channels);
     EXPECT_EQ(state.channel_count, 5U);
+}
+
+TEST_F(GD32ADCInitialize, DatasheetReferenceFloorRejectsBeforeHardwareEffects) {
+    EXPECT_CALL(boundary, ClockEnable(::testing::_)).Times(0);
+    EXPECT_CALL(boundary, Reset()).Times(0);
+    EXPECT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 2599U, 200U),
+              NX_ERROR_INVALID);
+    EXPECT_FALSE(state.initialized);
+    ExpectRestored();
+}
+
+TEST_F(GD32ADCInitialize, RefusedDmaClockRollsBackBeforePowerOrCalibration) {
+    s_refuse_prescaler = true;
+    EXPECT_CALL(boundary, Prescaler(ADC_ADCCK_HCLK_DIV6)).Times(1);
+    EXPECT_EQ(nx_gd32_adc_dma_initialize(&state, channels, 5U, 3300U, 200U),
+              NX_ERROR_IO);
+    EXPECT_EQ(s_powered_ticks, 0U);
+    EXPECT_EQ(s_reset_calibrations, 0U);
+    EXPECT_EQ(s_calibrations, 0U);
+    ExpectRestored();
+}
+
+TEST_F(GD32ADCInitialize,
+       ColdReferenceFloorRejectsBeforeTimeOrHardwareEffects) {
+    const nx_gd32_adc_cold_config_t config{channels, 5U, 2599U, 100U};
+    EXPECT_CALL(boundary, ClockEnable(::testing::_)).Times(0);
+    EXPECT_CALL(boundary, Reset()).Times(0);
+    EXPECT_EQ(nx_gd32_adc_poll_cold_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(s_now, 100U);
+    EXPECT_FALSE(state.initialized);
+    ExpectRestored();
+}
+
+TEST_F(GD32ADCInitialize, EocWaitsForErrataDataVisibility) {
+    ASSERT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+              NX_SUCCESS);
+    s_conversion_works = true;
+    s_delayed_eoc = true;
+    uint16_t samples[5] = {};
+    size_t count = 0U;
+    ASSERT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_SUCCESS);
+    ASSERT_EQ(count, 5U);
+    EXPECT_EQ(s_early_data_reads, 0U);
+    EXPECT_EQ(s_data_reads, 5U);
+    for (size_t i = 0U; i < count; ++i) {
+        EXPECT_EQ(samples[i], 100U + channels[i]);
+    }
+}
+
+TEST_F(GD32ADCInitialize, EocGuardDeadlineDoesNotPublishOrReadAResult) {
+    ASSERT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+              NX_SUCCESS);
+    s_conversion_works = true;
+    s_delayed_eoc = true;
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    EXPECT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 3U, &count),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(count, 0U);
+    EXPECT_EQ(s_data_reads, 0U);
+    EXPECT_EQ(ADC_CTL1(ADC0), 0U);
+    EXPECT_FALSE(state.active);
+}
+
+TEST_F(GD32ADCInitialize, FrozenEocGuardFailsBoundedlyWithoutReadingAResult) {
+    ASSERT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+              NX_SUCCESS);
+    s_conversion_works = true;
+    s_delayed_eoc = true;
+    s_frozen_eoc = true;
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    EXPECT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_ERROR_IO);
+    EXPECT_EQ(count, 0U);
+    EXPECT_EQ(s_data_reads, 0U);
+    EXPECT_EQ(ADC_CTL1(ADC0), 0U);
+    EXPECT_FALSE(state.active);
 }
 
 TEST_F(GD32ADCInitialize, GatedPinsAreCapturedOnlyAfterClockObservation) {

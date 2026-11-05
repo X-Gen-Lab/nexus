@@ -26,7 +26,8 @@ target_include_directories(nexus_f407_i2s2_slave_tx PUBLIC
 target_include_directories(nexus_f407_i2s2_slave_tx SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_f407_i2s2_slave_tx)
-target_link_libraries(nexus_f407_i2s2_slave_tx PUBLIC Nexus::IO Nexus::Core
+target_link_libraries(nexus_f407_i2s2_slave_tx PUBLIC Nexus::IO
+    Nexus::IOStream Nexus::Core
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 target_compile_definitions(nexus_f407_i2s2_slave_tx PRIVATE STM32F407xx
     NEXUS_F407_I2S2_SLAVE_TX_SELECTED=1u

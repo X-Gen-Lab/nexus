@@ -57,12 +57,21 @@ nx_result_t nx_gd32_can_initialize(nx_can_controller_t* controller) {
         controller->domain->secondary_clock_mask != RCU_APB1EN_CAN1EN) {
         return NX_ERROR_INVALID;
     }
+    /* GD32F47x/F42x errata Rev1.6 2.13.1: FIFO-order abort can also withdraw
+     * another pending mailbox. This owner never replays a peer request. */
+    if (controller->fifo_order) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     uintptr_t address = controller->index == 0U ? CAN0 : CAN1;
     if (controller->registers != 0U && controller->registers != address) {
         return NX_ERROR_INVALID;
     }
     controller->registers = address;
     controller->clock_hz = 50000000U;
+    /* Rev1.6 2.13.2, TFO0: maximum extended ID must use mailbox0. Apply the
+     * conservative restriction to DATA and RTR until an exact cut is reviewed.
+     */
+    controller->max_extended_id_mailbox0 = true;
     const int16_t vectors[2][4] = {
         {CAN0_TX_IRQn, CAN0_RX0_IRQn, CAN0_RX1_IRQn, CAN0_EWMC_IRQn},
         {CAN1_TX_IRQn, CAN1_RX0_IRQn, CAN1_RX1_IRQn, CAN1_EWMC_IRQn}};

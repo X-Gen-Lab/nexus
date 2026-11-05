@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-delivery-completion.csv)。
-源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`413273431902252980fe72e3554e8a2a4d1d46f3f7f578d598f50456c1ccf83b`。
+源文件：`docs/design/platform-delivery-completion.csv`；SHA-256：`f170e5a8a6bee5b29bfb9daa631fd8f7e8e7f42b7e0268a36222c51f9356337c`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -38,7 +38,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | native_regressions_passed_at_7590b2d4_codeql_access_403_still_open |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | io/src/controllers/usb_device_controller.c;tests/google/usb_device_test.cpp |
+| `implementation_paths` | drivers/usb/fs_device_pio/usb_device_controller.c;tests/google/usb_device_test.cpp |
 | `evidence_paths` | docs/delivery/platform-delivery-completion-results.json;tests/google/usb_device_test.cpp;/tmp/nexus-next-20261024/provider/handoff.json;docs/status/software-verification.md;https://github.com/X-Gen-Lab/nexus/blob/ecb86832fced0192d620b9029ff2d54795fc6430/docs-platform-delivery-20261029-g7590b2d4/final-index-g7590b2d4.json;build/completion-20261030/remote/codeql-access.log |
 | `exit_condition` | CodeQL 有证据处置；错误路径不误释放请求、clock 或借用。 |
 | `owner` | codex |
@@ -2033,7 +2033,7 @@ source_language: zh_CN
 | `implementation_status` | implemented_reviewed_specialization_and_value_header_contracts |
 | `software_status` | pin_red4_green27_tools_50_google_and_arm_equivalence_full_gate_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;io/private/timer_capture_impl.h;io/private/advanced_pwm_impl.h;io/private/uart_fifo_impl.h;tools/testing/test_provider_templates.py |
+| `implementation_paths` | tools/configure/;drivers/;soc/;cmake/platform/;tools/dev/;drivers/timer/advanced_timer/timer_capture_impl.h;drivers/timer/advanced_timer/advanced_pwm_impl.h;drivers/uart/usart_fifo/uart_fifo_impl.h;tools/testing/test_provider_templates.py |
 | `evidence_paths` | build/vendor-first-20261030/template-contracts/actual-root/handoff.json;build/vendor-first-20261030/next/h05-value-headers/handoff.json |
 | `exit_condition` | 输入、导出符号、宏作用域及各 specialization 的验证明确。 |
 | `owner` | codex |

@@ -49,6 +49,14 @@ class H743Duplex : public testing::TestWithParam<bool> {
     nx_stream_t stream{};
     nx_stream_slot_t slots[4]{};
     nx_uart_tx_request_t request{};
+    testing::StrictMock<testing::MockFunction<nx_result_t()>> wake_callback;
+    nx_irq_wake_t wake{
+        static_cast<testing::MockFunction<nx_result_t()>*>(&wake_callback),
+        [](void* context) {
+            return static_cast<testing::MockFunction<nx_result_t()>*>(context)
+                ->Call();
+        },
+        false};
     uint8_t* memory = nullptr;
     std::array<uint8_t, 128> input{};
     void SetUp() override {
@@ -133,6 +141,82 @@ class H743Duplex : public testing::TestWithParam<bool> {
         nx_stream_block_t block{};
         while (nx_stream_acquire(&stream, &block) == NX_SUCCESS)
             ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    }
+    struct ConsumerLoan {
+        nx_stream_t* stream;
+        nx_stream_block_t block{};
+        ~ConsumerLoan() {
+            if (block.data != nullptr) {
+                EXPECT_EQ(NX_SUCCESS, nx_stream_release(stream, &block));
+            }
+        }
+    };
+    void CancelAtReceiveWrap(unsigned order) {
+        ASSERT_TRUE(Start(false));
+        EXPECT_CALL(wake_callback, Call())
+            .Times(testing::AtLeast(1))
+            .WillRepeatedly(testing::Invoke([this] {
+                EXPECT_TRUE(nx_arch_in_isr());
+                EXPECT_NE(0U, state.receive.uart.wake_publishers);
+                EXPECT_EQ(NX_ERROR_CONTEXT, nx_uart_port_stop(&port));
+                return NX_ERROR_IO;
+            }));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_attach_wake(&port, &wake, 0U));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+        nx_h743_uart_continuous_model_feed(input.data(), input.size());
+        auto& m = g_h743_uart_continuous_model;
+        for (unsigned i = 0U; i < 10000U && m.input_index < 64U; ++i)
+            Tick();
+        ASSERT_EQ(64U, m.input_index);
+        ConsumerLoan held_loan{&stream};
+        auto& held = held_loan.block;
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &held));
+        ASSERT_EQ(64U, held.length);
+        std::array<uint8_t, 64> snapshot{};
+        std::memcpy(snapshot.data(), held.data, snapshot.size());
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_uart_tx_prepare(&request, memory + 512U, 128U, 100000U));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        for (unsigned i = 0U; i < 10000U && m.input_index < 127U; ++i)
+            Tick();
+        ASSERT_EQ(127U, m.input_index);
+        if (order == 0U) {
+            ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &request));
+        }
+        for (unsigned i = 0U; i < 200U && m.input_index < 128U; ++i)
+            Tick(false);
+        ASSERT_EQ(128U, m.input_index);
+        ASSERT_TRUE(state.receive.pending);
+        if (order == 1U) {
+            ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &request));
+        }
+        nx_uart_port_service(&port);
+        if (order == 2U) {
+            ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &request));
+        }
+        for (unsigned i = 0U;
+             i < 1000U && nx_request_state(&request.base) != NX_REQUEST_SETTLED;
+             ++i)
+            Tick();
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+        EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+        /* This provider cannot turn NDTR into a proved partial wire count. */
+        EXPECT_EQ(0U, request.base.transferred);
+        EXPECT_GT(m.tx_count, 0U);
+        EXPECT_LT(m.tx_count, request.length);
+        EXPECT_EQ(0, std::memcmp(m.output, memory + 512U, m.tx_count));
+        EXPECT_EQ(0, std::memcmp(snapshot.data(), held.data, snapshot.size()));
+        EXPECT_NE(0U, DMA1_Stream1->CR & DMA_SxCR_EN);
+        ConsumerLoan next_loan{&stream};
+        auto& next = next_loan.block;
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &next));
+        ASSERT_EQ(64U, next.length);
+        EXPECT_EQ(0, std::memcmp(next.data, input.data() + 64U, 64U));
+        EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &next));
+        next = {};
+        EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &held));
+        held = {};
+        EXPECT_EQ(NX_SUCCESS, nx_uart_port_attach_wake(&port, nullptr, 0U));
     }
     void ReceiverTaint(bool finishing) {
         for (bool duplex : {false, true}) {
@@ -330,6 +414,18 @@ TEST_P(H743Duplex, CancellationRetainsPartialWireAndDoesNotStopRx) {
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
     EXPECT_TRUE(state.receive.retained);
+}
+
+TEST_P(H743Duplex, CancelBeforeReceiveWrapRetainsBothBorrowDomains) {
+    CancelAtReceiveWrap(0U);
+}
+
+TEST_P(H743Duplex, CancelBetweenReceiveIrqAndServiceRetainsBothBorrowDomains) {
+    CancelAtReceiveWrap(1U);
+}
+
+TEST_P(H743Duplex, CancelAfterReceiveWrapServiceRetainsBothBorrowDomains) {
+    CancelAtReceiveWrap(2U);
 }
 
 TEST_P(H743Duplex, TxExcludesEveryStreamBlockBeforeBorrowOrCacheEffects) {

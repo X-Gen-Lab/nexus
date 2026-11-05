@@ -41,6 +41,15 @@ CPU IRQ 数和 NVIC priority bits 做编译期/启动期检查。CAN 输入没�
 第一版采用单次发送 NART，关闭 ABOM，RX 使用 locked FIFO；过滤器只实现 32-bit
 mask，显式匹配 IDE，可选择匹配 RTR。过滤器归属与 bank/split 范围先验证再写。
 
+GD32F470 的所选模式固定为 identifier-priority（`TFO=0`），不接受 FIFO
+发送顺序。[锁定的官方勘误](../../soc/gd32/gd32f470/references.json) Rev1.6
+§2.13.1 说明 FIFO 顺序的 abort 可能影响另一个 pending mailbox，不能通过隐式
+重发修复；§2.13.2 说明 `TFO=0` 时最大 extended ID `0x1FFFFFFF` 在 mailbox1/2
+不能发送。因此 GD32 两个 controller 都只把该 ID 的 DATA/RTR 帧放入 mailbox0；
+mailbox0 忙时返回 BUSY，request 保持 READY，不写其他 mailbox，也不排队或重发。
+其余 ID 仍可使用三个 mailbox。STM32 不应用这项 GD32 限制。该保守选择覆盖当前
+未观测 silicon revision 的 provider，不声明勘误已在实际芯片修复。
+
 安全装配顺序是：reviewed Board electrical/pin handoff → domain initialize →
 各 controller initialize → 外部执行者启动。cold initialize 在 acknowledged
 init 中证明没有未知 TXRQ，并 drain retained RX FIFO；IER、四条 IRQ 使能与

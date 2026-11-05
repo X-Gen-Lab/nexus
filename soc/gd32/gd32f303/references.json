@@ -45,7 +45,11 @@
         "applicability": "Actual device marking/revision remains unobserved; selected UART DMA2.7.1/2.7.3 and I2C2.8.1 source workarounds reviewed separately from physical qualification.",
         "uart_dma_selected_profile": "Device limitations Rev1.4 2.7.1/2.7.3: TEN must precede DMA CHEN. Cold initialization enables TEN; every finite TX admission checks UEN/TEN before borrow or DMA enable. No mute or hardware flow-control claim.",
         "i2c_selected_profile": "Device limitations Rev1.4 2.8.1: higher-priority receive IRQ avoids BTC races; selected IRQ0, no kernel calls and nominal80kHz master-only profile. Slave/SMBus limitations remain outside admission.",
-        "adc": "Sections2.4.1/2.4.2:1msminimum afterADCON beforecalibration (provider2msnominalmargin); Board VDDAdecoupling/beadexternal; CK_ADC=APB/2 avoids<=APB/4 immediateRDATAhazard."
+        "adc": "Sections2.4.1/2.4.2:1msminimum afterADCON beforecalibration (provider2msnominalmargin); Board VDDAdecoupling/beadexternal; CK_ADC=APB/2 avoids<=APB/4 immediateRDATAhazard.",
+        "timer_selected_profile": "Section2.6.1 p12 concerns capture/compare-triggered DMA writes to shadowed compare registers. The selected TIMER2 fixed PWM and reserved TIMER1/TIMER4 cascade do not enable timer DMA requests; no timer DMA mode is admitted.",
+        "gpio_supply": "Section2.3.1 p11: USBFS_VBUS PA9 is not5V tolerant while VBUS function is disabled. USART0 PA9 is a3.3V software route, not permission to connect5V VBUS; external voltage and Board wiring require physical evidence.",
+        "excluded_modes": "Sections2.1/2.2 deep-sleep,standby,LXTAL;2.5 DAC;2.7.2/2.7.4-2.7.7 mute/hardware-flow;2.8.2/2.8.3 I2Cslave/SMBus;2.9 I2S;2.10 SDIO;2.11 EXMC;2.12 CAN;2.13 ENET are outside maintained selected modes. SDK declarations do not admit those modes.",
+        "core": "Section2.14.1 pp19-20 Arm776924: enabledFPU+lazycontext+veryshortISR can loseVDIV/VSQRT result. Package revision remains unobserved; generated and external IRQ instruction sequences and actual FP context require separate review, not an inherited F103 result."
       }
     }
   },

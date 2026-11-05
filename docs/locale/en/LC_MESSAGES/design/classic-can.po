@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fdd0ea4542bddfbdf9251bfd3aa81abe887781c08cec110d2e9126025bf44c71\n"
+"X-Nexus-Source-SHA256: 9021c0a226004abaad9ce57a91059bc118f058fc360eb46c4fd5991a06cc8537\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/classic-can.md:1
 msgid "Classic CAN 的平台机制与接入边界"
@@ -147,6 +147,9 @@ msgstr ""
 "locked RX FIFOs. Filters provide only 32-bit masks, explicitly match IDE and"
 " optionally RTR. Filter ownership and bank/split ranges are validated before"
 " writes."
+
+msgid "GD32F470 的所选模式固定为 identifier-priority（`TFO=0`），不接受 FIFO 发送顺序。[锁定的官方勘误](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/references.json) Rev1.6 §2.13.1 说明 FIFO 顺序的 abort 可能影响另一个 pending mailbox，不能通过隐式 重发修复；§2.13.2 说明 `TFO=0` 时最大 extended ID `0x1FFFFFFF` 在 mailbox1/2 不能发送。因此 GD32 两个 controller 都只把该 ID 的 DATA/RTR 帧放入 mailbox0； mailbox0 忙时返回 BUSY，request 保持 READY，不写其他 mailbox，也不排队或重发。 其余 ID 仍可使用三个 mailbox。STM32 不应用这项 GD32 限制。该保守选择覆盖当前 未观测 silicon revision 的 provider，不声明勘误已在实际芯片修复。"
+msgstr "The selected GD32F470 mode fixes identifier priority (`TFO=0`) and rejects FIFO transmit ordering. The [locked official errata](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/references.json) Rev1.6 §2.13.1 states that abort in FIFO order may affect another pending mailbox; implicit retransmission cannot repair this. Section 2.13.2 states that, with `TFO=0`, the maximum extended ID `0x1FFFFFFF` cannot transmit from mailbox1/2. Both GD32 controllers therefore place DATA/RTR frames with this ID only in mailbox0. When mailbox0 is busy, they return BUSY, leave the request READY and write no other mailbox; they neither queue nor retransmit it. Other IDs can still use all three mailboxes. STM32 does not adopt this GD32 restriction. This conservative selection covers the provider whose actual silicon revision is currently unobserved; it does not claim that the errata have been fixed in physical silicon."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/classic-can.md:44
 msgid ""

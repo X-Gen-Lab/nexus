@@ -73,4 +73,41 @@ TEST_F(UsbFactory, ActivationGetterReusesControllerWithoutHardwareOrStartup) {
     EXPECT_EQ(std::memcmp(before_nvic.data(), NVIC, before_nvic.size()), 0);
     testing::Mock::VerifyAndClearExpectations(&ports);
 }
+TEST_F(UsbFactory, ActivationAndPacketLoansSurviveJoinedColdRestart) {
+    const auto* activation = nx_factory_usb_activation(NX_USB_DEVICE_ID_FS);
+    ASSERT_NE(activation, nullptr);
+    nx_request_initialize(&request.base);
+    for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
+        ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+        EXPECT_EQ(nx_factory_usb_activation(NX_USB_DEVICE_ID_FS), activation);
+        ASSERT_EQ(nx_usb_in_prepare(&request, payload, sizeof(payload),
+                                    NX_USB_DATA, 0U, 10000U),
+                  NX_SUCCESS);
+        const auto writes = hardware->mmio_writes;
+        EXPECT_EQ(nx_usb_endpoint_submit(bulk, &request), NX_ERROR_STATE);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+        EXPECT_EQ(hardware->mmio_writes, writes);
+        const uint64_t epoch = state->snapshot.epoch;
+        ASSERT_EQ(nx_usb_activation_set(activation, epoch, 0x81U, true),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(bulk, &request), NX_SUCCESS);
+        EXPECT_EQ(nx_usb_activation_set(activation, epoch, 0x81U, false),
+                  NX_ERROR_BUSY);
+        EXPECT_EQ(static_cast<nx_usb_endpoint_t*>(bulk->context)->request,
+                  &request);
+        hardware->hold_disable = true;
+        EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+        EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+        EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_TRUE(state->clock_retained);
+        testing::Mock::VerifyAndClearExpectations(&ports);
+        hardware->hold_disable = false;
+        ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+        EXPECT_EQ(static_cast<nx_usb_endpoint_t*>(bulk->context)->request,
+                  nullptr);
+        EXPECT_FALSE(state->clock_retained);
+    }
+}
 #endif

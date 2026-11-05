@@ -5,6 +5,7 @@
  */
 #ifndef NEXUS_PRIVATE_ETH_MAC_H
 #define NEXUS_PRIVATE_ETH_MAC_H
+#include "eth_validation.h"
 #include "nexus/arch/arch.h"
 #include "nexus/io/dma.h"
 #include "nexus/io/ethernet.h"
@@ -84,8 +85,6 @@ extern const nx_mdio_ops_t nx_eth_mdio_ops;
 nx_result_t nx_eth_mac_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline);
 /** \brief At most one TX and one RX descriptor per interrupt invocation. */
 void nx_eth_mac_irq(nx_eth_mac_t* mac);
-/** \brief Private frame/header validation without effects. */
-bool nx_eth_frame_valid(const void* data, size_t length);
 #ifndef NX_ETH_READ
 #define NX_ETH_READ(base, offset)                                              \
     (*(volatile uint32_t*)((uintptr_t)(base) + (offset)))

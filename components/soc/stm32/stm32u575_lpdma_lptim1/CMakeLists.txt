@@ -24,7 +24,7 @@ nexus_use_cmsis_core(nexus_stm32u575_lpdma_lptim1)
 target_compile_definitions(nexus_stm32u575_lpdma_lptim1 PRIVATE
     STM32U575xx NEXUS_U575_STOP2_LPTIM1)
 target_link_libraries(nexus_stm32u575_lpdma_lptim1 PUBLIC
-    Nexus::U575RetainedTime PRIVATE Nexus::IO Nexus::Arch
+    Nexus::U575RetainedTime PRIVATE Nexus::IO Nexus::IODMA Nexus::Arch
     nexus_build_options nexus_owned_warnings)
 set_property(TARGET nexus_stm32u575_lpdma_lptim1 PROPERTY
     INTERFACE_NEXUS_U575_LPDMA_MODE lptim1)

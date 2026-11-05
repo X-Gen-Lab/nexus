@@ -7,14 +7,10 @@
 #define NEXUS_STM32H743_UART_FIFO_H
 
 #include "stm32h743_cold.h"
+#include "uart_fifo_profile.h"
 
 /** \brief Immutable exact-mode budgets; encodings 0..5 follow reviewed LL. */
-typedef struct {
-    uint8_t rx_threshold;
-    uint8_t tx_threshold;
-    uint8_t rx_budget;
-    uint8_t tx_budget;
-} nx_stm32h743_uart_fifo_profile_t;
+typedef nx_uart_fifo_profile_t nx_stm32h743_uart_fifo_profile_t;
 
 /** \brief Only selected FIFO mode retains this extra immutable-profile link. */
 typedef struct {

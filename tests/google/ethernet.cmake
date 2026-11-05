@@ -2,7 +2,7 @@
 nexus_google_test(nexus_ethernet_api_test SOURCES ethernet_api_test.cpp
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_ethernet_mac_test SOURCES ethernet_mac_test.cpp
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
 target_compile_options(nexus_ethernet_mac_test PRIVATE
@@ -11,7 +11,7 @@ target_compile_options(nexus_ethernet_mac_test PRIVATE
 foreach(eth_family stm32 gd32)
     set(eth_target "nexus_${eth_family}_ethernet_test")
     nexus_google_test(${eth_target} SOURCES ethernet_mac_test.cpp
-        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
     target_compile_options(${eth_target} PRIVATE

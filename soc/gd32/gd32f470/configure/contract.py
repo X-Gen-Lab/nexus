@@ -110,6 +110,8 @@ def validate_selection(selection, route):
         common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
     elif kind == "adc":
+        common.integer(selection.get("reference_mv"), 2600, 3600,
+                       "GD32F470 ADC reference_mv")
         if tuple(selection["channels"]) not in ADC_CHANNEL_SEQUENCES:
             common.fail("ADC channel sequence is not implemented by the provider")
         traits = common.mode_traits(kind, selection["mode"])

@@ -40,7 +40,7 @@ static inline bool
 nx_gd32_adc_cold_config_valid(const nx_gd32_adc_cold_config_t* config) {
     return config != NULL && config->channels != NULL &&
            config->channel_count != 0U && config->channel_count <= 16U &&
-           config->reference_mv != 0U && config->reference_mv <= 3600U &&
+           config->reference_mv >= 2600U && config->reference_mv <= 3600U &&
            config->timeout_us != 0U && config->timeout_us <= 60000000U;
 }
 /** \brief Form the cold absolute deadline in the actual Core time domain.
@@ -48,6 +48,9 @@ nx_gd32_adc_cold_config_valid(const nx_gd32_adc_cold_config_t* config) {
  * \param[in] config: Unchanged readonly sequence and startup wait.
  * \return Same checked context, calibration and local rollback as the driver.
  * \note No samples are borrowed by cold construction; no worker is started.
+ *       Unprovable failed-start cleanup retains the call frame and enters the
+ *       driver's terminal masked fault observation/park path; it cannot return
+ *       a rejection that authorizes configuration or resource reclamation.
  */
 static inline nx_result_t
 nx_gd32_adc_poll_cold_prepare(nx_gd32_adc_state_t* state,

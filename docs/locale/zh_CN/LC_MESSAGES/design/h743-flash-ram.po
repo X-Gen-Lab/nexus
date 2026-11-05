@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8f17d0425ab489ffe767131946bc88fd58fb191210f7f0a369af6bdf6e947eb7\n"
+"X-Nexus-Source-SHA256: 9e1ddaae3e33cbe3b13a22b4aa6621d11fcdae30f1ba1d136e5b02022d46dc82\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/h743-flash-ram.md:10
 msgid "H743 Flash maintenance from a private RAM execution pod"
@@ -800,6 +800,18 @@ msgstr ""
 "选定审计通过，表示在已声明调用者、编译器和所有权前提下，取得其有界显式操作数及返回协议证明；它不是通用 C "
 "解释器、推测总线访问测量或硬件资格。缺失的生产证明仍是开放退出项。{download}`IO-01–42 台账 <io-evolution-"
 "execution.csv>` 仍为实现状态权威；逐配置执行、源码身份、SDK 检查和剩余软件候选义务记录在交付证据中。"
+
+msgid "Execute the existing software checks"
+msgstr "执行现有软件检查"
+
+msgid "The maintained [normal ARM build-gate module](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_h743_ram_build_gate.py) builds `hsi32-fixed-cache-off`, `hsi64-fixed-cache-off` and `hsi64-pll384-cache-off` as baremetal through the real firmware graph, plus an unselected control. Each selected image must retain the actual readonly public Flash ops table with its `geometry`, `read`, `program` and `erase` methods. The module also checks the RAM layout, CPU bridge, explicit operand closure, return gate and whole-image resource observation. Corrupted real ELF inputs must reject; the unselected image must omit the RAM pod and its audit/stack-usage cost."
+msgstr "维护中的[常规 ARM 构建门禁模块](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/test_h743_ram_build_gate.py)通过真实固件目标图，以裸机配置构建 `hsi32-fixed-cache-off`、`hsi64-fixed-cache-off` 和 `hsi64-pll384-cache-off`，另构建一个未选入功能的对照镜像。每个选中镜像必须保留实际的只读公共 Flash 操作表及其 `geometry`、`read`、`program`、`erase` 方法。该模块还检查 RAM 布局、CPU 桥接、显式操作数闭包、返回门及整镜像资源观察。篡改后的真实 ELF 输入必须被拒绝；未选入功能的镜像必须不包含 RAM 维护区及其审计和栈用量成本。"
+
+msgid "Run that complete module with the prepared CMake, Ninja and locked ARM tools on `PATH`:"
+msgstr "将已准备的 CMake、Ninja 和锁定 ARM 工具加入 `PATH` 后，运行这个完整模块："
+
+msgid "Its disposable normal builds establish the checks actually executed for the current working source. They do not produce an installed-SDK software candidate. Retain the invocation receipt and actual result; the frozen-source qualification plan separately owns clean SDK consumption, source/tool identities and candidate artifacts. A pass in one layer never substitutes for another row in the exit table above."
+msgstr "这些临时常规构建证明当前工作源码实际执行过的检查，不会生成安装版 SDK 软件候选。保留调用收条和实际结果；冻结源码资格计划另外负责干净 SDK 消费、源码与工具身份及候选产物。某一层通过不能替代表中另一项退出条件。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/h743-flash-ram.md:328
 msgid ""

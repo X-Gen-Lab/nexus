@@ -311,7 +311,7 @@ RM0456 Rev7 section 66.5.5/table 674 define the reviewed FIFO shapes; other chip
 and modes need their own exact review.
 
 See the [public UART contract](../../io/include/nexus/io/uart.h),
-[shared private algorithm](../../io/private/uart_fifo_impl.h),
+[shared private algorithm](../../drivers/uart/usart_fifo/uart_fifo_impl.h),
 [H743 specialization](../../soc/stm32/stm32h743/drivers/uart_fifo.c),
 [U575 specialization](../../soc/stm32/stm32u575/drivers/uart_fifo.c),
 [H743 RTSCTS specialization](../../soc/stm32/stm32h743/drivers/uart_rtscts.c),

@@ -20,6 +20,15 @@ from scripts.ci.tdd_gate import checked_binary, validate_google_report
 MAX_CONTEXTS = 50000
 MAX_METADATA_BYTES = 32 * 1024 * 1024
 
+# Reviewed register models compile these shared engines once. Concrete SoC
+# wrappers and all other hardware TUs still require the property target itself.
+# These are evidence-owner constraints, never a source selection/build graph.
+SHARED_ENGINE_OWNERS = {
+    "drivers/can/classic_can/can_controller.c": "nexus_can_native_engine",
+    "drivers/usb/fs_device_pio/usb_device_controller.c": "nexus_usb_native_engine",
+    "drivers/ethernet/legacy_mac/eth_mac.c": "nexus_eth_native_engine",
+}
+
 
 def digest(path):
     """Hash existing regular bytes; do not traverse an evidence symlink."""
@@ -235,14 +244,20 @@ def build_inputs(root, build, catalogue, *, complete=False):
                 root.resolve()).as_posix()
             if (source == row["test_source"] or
                     source_name.startswith(("soc/", "drivers/"))):
-                # The complete Native model is shared by public test targets;
-                # hardware providers and test bodies retain target-local builds.
+                # Native models and explicitly reviewed engines may be shared;
+                # concrete providers and test bodies retain target-local builds.
                 owner = ("nexus_io_native" if source != row["test_source"] and
                          source_name.startswith("soc/native/drivers/") else row["target"])
-                marker = "/CMakeFiles/" + owner + ".dir/"
-                if not any(marker in Path(item["object"]).resolve().as_posix()
-                           for item in contexts[source]):
-                    raise ValueError("Reviewed test/provider compiled only for another target")
+                owners = {owner}
+                if source != row["test_source"] and source_name in SHARED_ENGINE_OWNERS:
+                    owners.add(SHARED_ENGINE_OWNERS[source_name])
+                if not any("/CMakeFiles/" + name + ".dir/" in
+                           Path(item["object"]).resolve().as_posix()
+                           for name in owners for item in contexts[source]):
+                    raise ValueError(
+                        "Reviewed test/provider compiled only for another target: "
+                        + row["id"] + ": " + source_name + " requires "
+                        + ", ".join(sorted(owners)))
     result = {"catalogue_sha256": observe_digest(catalogue),
               "plan_sha256": observe_digest(plan_path),
               "compile_commands_sha256": observe_digest(database_path),

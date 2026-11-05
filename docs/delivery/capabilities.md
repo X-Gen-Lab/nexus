@@ -90,6 +90,19 @@ python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/q
 family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确
 配置通过不等于所有 Board、backend、时钟或模式通过。
 
+专项执行记录可通过同一查询显式导航，无需将它包装成软件候选：
+
+```sh
+python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --results-index docs/delivery/platform-delivery-completion-results.json --record /source_version_records_20261104/core_arch_os_20261104
+```
+
+`--record` 使用 JSON Pointer，必须指向具体记录；工具保留索引文件哈希和原记录。
+`indexed_evidence` 分别报告源码与配置匹配，缺少完整源码或配置身份时保持
+`insufficient_identity`；记录提供 resolved 时另行比对完整投影，仅提供配置哈希时
+明确标记摘要匹配。上例的 Core／Arch／OS 专项没有完整装配身份，
+因此不能证明该 UART 模式通过。此导航不改变任何 `validation`、候选或物理状态；
+它与 `--candidate` 的原候选验证各自独立，也不从父记录继承执行范围。
+
 <!-- nexus-capabilities:start -->
 | SoC | Controller | Kind | Mode | Reviewed SoC routes | Declared reference Boards | Resolver fixtures | Selected production source |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -110,10 +123,10 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | gd32f470 | ADC0 | adc | single-shot | `adc0-pa0` | — | `tests/contracts/gd32_assembly/adc.toml` | `soc/gd32/gd32f470/drivers/adc.c` |
 | gd32f470 | ADC0 | adc | trigger-dma | `adc0-pa0`, `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/blocks.toml` | `soc/gd32/gd32f470/drivers/adc_stream.c` |
 | gd32f470 | ADC0 | adc | trigger-dma-continuous | `adc0-pa0`, `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/adc-continuous.toml`, `tests/contracts/io_evolution_assembly/gd470-adc-stream-profile.toml` | `soc/gd32/gd32f470/drivers/adc_continuous.c` |
-| gd32f470 | CAN0 | can | classic-irq | `can0-pa11-pa12` | — | `tests/contracts/can_assembly/gd32-both.toml`, `tests/contracts/can_assembly/gd32-first.toml` | `io/src/controllers/can_controller.c` |
-| gd32f470 | CAN1 | can | classic-irq | `can1-pb12-pb13` | — | `tests/contracts/can_assembly/gd32-both.toml` | `io/src/controllers/can_controller.c` |
-| gd32f470 | ENET | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/gd32-freertos.toml`, `tests/contracts/ethernet_assembly/gd32.toml` | `io/src/controllers/eth_mac.c` |
-| gd32f470 | ENET | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/gd470-eth-frames.toml` | `io/src/controllers/eth_frames_mac.c` |
+| gd32f470 | CAN0 | can | classic-irq | `can0-pa11-pa12` | — | `tests/contracts/can_assembly/gd32-both.toml`, `tests/contracts/can_assembly/gd32-first.toml` | `drivers/can/classic_can/can_controller.c` |
+| gd32f470 | CAN1 | can | classic-irq | `can1-pb12-pb13` | — | `tests/contracts/can_assembly/gd32-both.toml` | `drivers/can/classic_can/can_controller.c` |
+| gd32f470 | ENET | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/gd32-freertos.toml`, `tests/contracts/ethernet_assembly/gd32.toml` | `drivers/ethernet/legacy_mac/eth_mac.c` |
+| gd32f470 | ENET | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/gd470-eth-frames.toml` | `drivers/ethernet/legacy_mac/eth_frames_mac.c` |
 | gd32f470 | EXTI3 | exti | edge-event | `exti3-pe3` | — | `tests/contracts/gd32_assembly/exti.toml` | `soc/gd32/gd32f470/drivers/exti.c` |
 | gd32f470 | FMC | flash | poll-word | `physical-flash` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/flash.toml` | `soc/gd32/gd32f470/drivers/flash.c` |
 | gd32f470 | FWDGT | watchdog | independent | `independent-watchdog` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/watchdog.toml` | `soc/gd32/gd32f470/drivers/watchdog.c` |
@@ -145,7 +158,7 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | gd32f470 | USART1 | uart | dma-tx | `usart1-pa2-pa3` | — | `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml` | `soc/gd32/gd32f470/drivers/uart_dma.c` |
 | gd32f470 | USART1 | uart | irq-blocks | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/blocks.toml` | `soc/gd32/gd32f470/drivers/uart_stream.c` |
 | gd32f470 | USART1 | uart | irq-byte-event | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml` | `soc/gd32/gd32f470/drivers/uart.c` |
-| gd32f470 | USBFS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/gd32-freertos.toml`, `tests/contracts/usb_assembly/gd32-interrupt.toml`, `tests/contracts/usb_assembly/gd32.toml` | `io/src/controllers/usb_device_controller.c` |
+| gd32f470 | USBFS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/gd32-freertos.toml`, `tests/contracts/usb_assembly/gd32-interrupt.toml`, `tests/contracts/usb_assembly/gd32.toml` | `drivers/usb/fs_device_pio/usb_device_controller.c` |
 | stm32f103 | ADC1 | adc | single-shot | `adc-pa0` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, `tests/contracts/mainstream_assembly/f103-devices.toml` | `drivers/adc/legacy_adc/legacy_adc.c` |
 | stm32f103 | EXTI0 | exti | edge-event | `exti0-pa0` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-exti.toml`, `tools/configure/assemblies/stm32-f103-exti.toml` | `soc/stm32/stm32f103/drivers/exti.c` |
 | stm32f103 | EXTI1 | exti | edge-event | `exti1-pa1` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-exti.toml`, `tools/configure/assemblies/stm32-f103-exti.toml` | `soc/stm32/stm32f103/drivers/exti.c` |
@@ -163,10 +176,10 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | stm32f407 | ADC1 | adc | single-shot | `adc1-ch0-pa0` | — | `tests/contracts/stm32_assembly/ve-adc.toml`, `tests/contracts/stm32_assembly/zg-adc.toml` | `soc/stm32/stm32f407/drivers/adc.c` |
 | stm32f407 | ADC1 | adc | trigger-dma | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml` | `soc/stm32/stm32f407/drivers/adc_stream.c` |
 | stm32f407 | ADC1 | adc | trigger-dma-continuous | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, `tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, `tests/contracts/stm32_assembly/zg-adc-continuous.toml` | `soc/stm32/stm32f407/drivers/adc_continuous.c` |
-| stm32f407 | CAN1 | can | classic-irq | `can1-pa11-pa12` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/can_assembly/stm32-first.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `io/src/controllers/can_controller.c` |
-| stm32f407 | CAN2 | can | classic-irq | `can2-pb12-pb13` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `io/src/controllers/can_controller.c` |
-| stm32f407 | ETH | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, `tests/contracts/ethernet_assembly/stm32-zg.toml` | `io/src/controllers/eth_mac.c` |
-| stm32f407 | ETH | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/f407zg-eth-frames.toml` | `io/src/controllers/eth_frames_mac.c` |
+| stm32f407 | CAN1 | can | classic-irq | `can1-pa11-pa12` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/can_assembly/stm32-first.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `drivers/can/classic_can/can_controller.c` |
+| stm32f407 | CAN2 | can | classic-irq | `can2-pb12-pb13` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `drivers/can/classic_can/can_controller.c` |
+| stm32f407 | ETH | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, `tests/contracts/ethernet_assembly/stm32-zg.toml` | `drivers/ethernet/legacy_mac/eth_mac.c` |
+| stm32f407 | ETH | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/f407zg-eth-frames.toml` | `drivers/ethernet/legacy_mac/eth_frames_mac.c` |
 | stm32f407 | EXTI0 | exti | edge-event | `exti0-pa0` | — | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
 | stm32f407 | EXTI5 | exti | edge-event | `exti5-pa5` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
 | stm32f407 | EXTI6 | exti | edge-event | `exti6-pa6` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
@@ -185,7 +198,7 @@ family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际
 | stm32f407 | I2C2 | i2c | dma-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
 | stm32f407 | I2C2 | i2c | irq-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
 | stm32f407 | IWDG | watchdog | independent | `iwdg` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31` | `tests/contracts/stm32_assembly/ve-watchdog.toml`, `tests/contracts/stm32_assembly/zg-watchdog.toml` | `soc/stm32/stm32f407/drivers/watchdog.c` |
-| stm32f407 | OTG_FS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml` | `io/src/controllers/usb_device_controller.c` |
+| stm32f407 | OTG_FS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml` | `drivers/usb/fs_device_pio/usb_device_controller.c` |
 | stm32f407 | SPI1 | spi | dma | `spi1-pa5-pa6-pa7` | — | `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml` | `io/src/mechanisms/spi_dma_sequence.c`, `soc/stm32/stm32f407/drivers/spi_dma.c` |
 | stm32f407 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7` | — | `tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml` | `soc/stm32/stm32f407/drivers/spi.c` |
 | stm32f407 | SPI2 | spi | dma | `spi2-pb13-pb14-pb15` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `soc/stm32/stm32f407/drivers/spi_dma.c` |

@@ -39,7 +39,8 @@
       "sha256": "1d3da0f99b85013548d17df07919516bf862f8f38cbd1a61f08e75abb8e4c54f",
       "bytes": 2231932,
       "anchors": {
-        "applicability": "Table1 and Table2 p1; revision-specific device limitations Table3 pp2ff"
+        "applicability": "Table1 and Table2 p1; revision-specific device limitations Table3 pp2ff",
+        "arm_776924": "ES0182 Rev19 section2.1.2 pp6-7, Table3 marks all listed cuts affected: FPU enabled, lazy context enabled, VDIV/VSQRT destination s0-s15, no-FP ISR and exception return within14cycles can lose the result. Workarounds are disabling LSPEN or ensuring every ISR executes more than2instructions excluding exception return. The platform retains the selected FreeRTOS CM4F lazy-frame ABI; generated and external ISR paths must satisfy the latter condition, counting reachable callees rather than unreachable padding/data. A selected image without VDIV/VSQRT does not exclude the condition in external application code; physical revision and qualification remain unobserved."
       }
     }
   },

@@ -5,6 +5,7 @@
  */
 #ifndef NEXUS_PRIVATE_CAN_CONTROLLER_H
 #define NEXUS_PRIVATE_CAN_CONTROLLER_H
+#include "can_validation.h"
 #include "nexus/arch/arch.h"
 #include "nexus/io/can.h"
 #ifdef __cplusplus
@@ -79,10 +80,11 @@ typedef struct {
     nx_can_state_t snapshot;
     uint8_t index;
     bool fifo_order;
+    /** \brief Immutable reviewed family restriction, set by the cold binding.
+     */
+    bool max_extended_id_mailbox0;
 } nx_can_controller_t;
 extern const nx_can_ops_t nx_classic_can_ops;
-/** \brief Private common classic value validator; no retained reference. */
-bool nx_can_frame_valid(const nx_can_frame_t* frame);
 /** \brief Cold task-only filter programming; peer controllers must be stopped.
  */
 nx_result_t nx_can_filter_domain_initialize(nx_can_filter_domain_t* domain);
