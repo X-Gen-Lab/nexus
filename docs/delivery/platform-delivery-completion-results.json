@@ -4062,7 +4062,7 @@
             "A02#W5-01",
             "A02#W5-04"
           ],
-          "remaining": "A new exact SoC vertical slice requires an explicitly selected target and contracts; no additional chip support was fabricated.",
+          "remaining": "New references H563ZI, H743ZI + W25Q128JV and H747XI have now been selected. Their recorded provider/integration packages remain unimplemented; the completed external USB example does not establish their support.",
           "evidence_refs": [
             "E002",
             "E051"
@@ -4193,32 +4193,32 @@
         },
         "X04": {
           "title": "真实 I3C provider",
-          "state": "conditional_target_contract",
-          "actual": "现有公共接口/模型或协议合同不建立精确硬件provider。",
+          "state": "software_reference_selected_implementation_pending",
+          "actual": "User confirmed STM32H563ZI as the software reference for I3C. Readiness and concrete dependent work packages are recorded; no production support was added.",
           "authority_refs": [
             "A04#IO-38"
           ],
-          "remaining": "需指定受审芯片/controller/Board/SDK，完整discovery/IBI/hot-join/存储与IRQ合同；不得从头文件推定支持。",
+          "remaining": "Implement and verify the recorded exact provider, lifecycle, resource/clock/memory contracts and SDK consumption. Board/order-code/electrical unknowns remain explicit; physical HIL is not executed.",
           "evidence_refs": []
         },
         "X05": {
           "title": "物理 mapped 介质 backend",
-          "state": "conditional_target_contract",
-          "actual": "公共block/command/mapped接口和软件机制不等同物理介质接入。",
+          "state": "software_reference_selected_implementation_pending",
+          "actual": "User confirmed STM32H743ZI + W25Q128JV as the software reference for physical mapped storage. Readiness and concrete dependent work packages are recorded; no production support was added.",
           "authority_refs": [
             "A04#IO-37"
           ],
-          "remaining": "需精确controller/flash或SD卡、引脚/电气、XIP/cache/DMA/erase/掉电与loan所有权合同。",
+          "remaining": "Implement and verify the recorded exact provider, lifecycle, resource/clock/memory contracts and SDK consumption. Board/order-code/electrical unknowns remain explicit; physical HIL is not executed.",
           "evidence_refs": []
         },
         "X06": {
           "title": "精确双核 AMP",
-          "state": "conditional_target_contract",
-          "actual": "软件IPC接口或epoch模型不建立真实多核SoC支持。",
+          "state": "software_reference_selected_implementation_pending",
+          "actual": "User confirmed STM32H747XI as the software reference for dual-core AMP. Readiness and concrete dependent work packages are recorded; no production support was added.",
           "authority_refs": [
             "A04#IO-40"
           ],
-          "remaining": "需确定双核芯片和板卡、每核owner、共享RAM/cache、IRQ门铃、启动顺序及对端复位合同。",
+          "remaining": "Implement and verify the recorded exact provider, lifecycle, resource/clock/memory contracts and SDK consumption. Board/order-code/electrical unknowns remain explicit; physical HIL is not executed.",
           "evidence_refs": []
         }
       },
@@ -5185,6 +5185,881 @@
             "size": 159309
           }
         }
+      },
+      "next_software_references": {
+        "user_confirmed_at": "2026-11-06T00:57:56.857920+08:00",
+        "time_zone": "Asia/Shanghai",
+        "status": "references_selected_implementation_not_delivered",
+        "is_current_support": false,
+        "work_package_count": 26,
+        "plans": {
+          "X04": {
+            "readiness_plan": {
+              "approved_reference_selection": true,
+              "assessment_scope": "Bounded read-only source and dependency metadata inspection; no build, tests, source edits, staging or Git mutation.",
+              "baseline": {
+                "source_revision": "8ea179552119ddc71f690a8c868a31f4918cb0cc",
+                "source_sha256": {
+                  ".gitmodules": "80201ca966ad6f13b5037c5e44c16ee7cf8a9acfaa6a975a6d3f271859b37359",
+                  "components/i3c_controller/CMakeLists.txt": "c2d5f6ab49cfec58fdeb86a9c64c3b2e1fbd54099ef0e73b084d9afd31a8cd67",
+                  "components/i3c_controller/include/nexus/components/i3c_controller.h": "692865bd0d943fcd3eae3275025a6574f69232ab6cebc2123248bfa67fce421c",
+                  "components/i3c_controller/include/nexus/components/i3c_controller_storage.h": "c366e0b6fa2f52336a8bc50ceeb0185d4ef2c551f05a83907865decbb8721ea0",
+                  "components/i3c_controller/src/i3c_controller.c": "dd6747cab96ef8b3ca2dd3b1762ec17a6149d9a338dbf188fff90285d7a803be",
+                  "docs/design/i3c-controller.md": "264852200ead062ce6b95dcb4f12a9c6b89bb5b1d2bd2e391e34e5731806c698",
+                  "tests/contracts/i3c_runtime/CMakeLists.txt": "6a473309b3773a6df6b8fe275eb11f2d9675912c94f7b4fdcdb204654c8b5179",
+                  "tests/contracts/i3c_runtime/cpu.json": "026a8b37b69470b8df4ca3731abeaa11547d07fc86ea3d7571e6646073e15376",
+                  "tests/contracts/i3c_runtime/h563_reference.c": "3657e8f7d0b86cd6f2ed1b326fee73691f4b4cf054ff854935b2c13834764c08",
+                  "tests/evidence/i3c-controller/README.md": "915851766f3ddd946da09ff2d267ef4728a111f9ca512252fda435b33f5458f7",
+                  "tests/google/i3c_controller_test.cpp": "6e81ae7890a5d401e0f749e05ad6983f812dec66357e101e82c6721873b90854",
+                  "tools/testing/test_i3c_sdk.py": "c7f659beb12dc3d5765961802b943e668cdfaed69e6d8a1455c924400dcc312b"
+                },
+                "source_tree": "24efb81081e676ca0d935f3439c8eafdbe1caf70"
+              },
+              "dependencies": {
+                "candidate_reference_commits": {
+                  "cmsis_device_h5": "884b8dc78e41cbfca008363342b17f4a9e8641f7",
+                  "status": "Only verified as literals in h563_reference.c; not adopted as production locks or revalidated against upstream in this assessment.",
+                  "stm32h5_hal_ll": "16fea2d290119d6349b8f9a3b8538781ba1e1bdc"
+                },
+                "existing_reuse": "vendors/arm/CMSIS_6 already uses X-Gen-Lab/CMSIS_6 in .gitmodules; confirm H5 device/core compatibility rather than fork another Core.",
+                "next_action": "Verify organization access/existing forks, create forks if genuinely absent, then select one reviewed compatible SDK tuple and exact gitlinks/locks/provenance/license closure. No fork or submodule mutation performed.",
+                "required_upstreams": [
+                  {
+                    "default_branch": "main",
+                    "metadata_read": "GitHub connector GET succeeded",
+                    "organization_destination": "X-Gen-Lab/cmsis-device-h5",
+                    "organization_get_result": "404 Not Found: absent or not visible to this connection; not proof of global absence.",
+                    "reported_license": "Apache-2.0",
+                    "repository": "STMicroelectronics/cmsis-device-h5",
+                    "url": "https://github.com/STMicroelectronics/cmsis-device-h5"
+                  },
+                  {
+                    "default_branch": "main",
+                    "metadata_read": "GitHub connector GET succeeded",
+                    "organization_destination": "X-Gen-Lab/stm32h5xx-hal-driver",
+                    "organization_get_result": "404 Not Found: absent or not visible to this connection; not proof of global absence.",
+                    "reported_license": "BSD-3-Clause",
+                    "repository": "STMicroelectronics/stm32h5xx-hal-driver",
+                    "url": "https://github.com/STMicroelectronics/stm32h5xx-hal-driver"
+                  }
+                ]
+              },
+              "directory_guidance": "soc/stm32/stm32h563 owns integration/facts/private transport; use drivers/i3c/<reviewed-ip> only after real shared-IP review. Board facts under a confirmed Board name. Existing allocation-free component core remains reusable.",
+              "existing_contract": {
+                "design": "docs/design/i3c-controller.md",
+                "implementation": "components/i3c_controller/src/i3c_controller.c",
+                "port_and_storage": "components/i3c_controller/include/nexus/components/i3c_controller_storage.h",
+                "public_api": "components/i3c_controller/include/nexus/components/i3c_controller.h",
+                "target": "Nexus::I3CController",
+                "tests": [
+                  "tests/google/i3c_controller_test.cpp",
+                  "tests/google/i3c_controller.cmake",
+                  "tests/contracts/i3c_runtime",
+                  "tools/testing/test_i3c_sdk.py"
+                ],
+                "verified_source_contracts": [
+                  "Allocation-free C11 core; one active request; caller-owned controller/target/event/request/payload storage; one serialized Thread executor; no ISR or concurrent API safety.",
+                  "Explicit DAA, finite 1..65535-byte private SDR transfers and a narrow CCC whitelist; no automatic discovery, DMA, HDR, target role or controller handoff.",
+                  "One service pump uses selected 1..8-byte aggregate FIFO capacity; pump/begin/assign retain no supplied command/span pointers.",
+                  "Confirmed endpoint/ticket epochs; partial DAA retains confirmed and tentative dynamic addresses; copied IBI payload at most four bytes; bounded event ring and saturating loss counters.",
+                  "Cancel/deadline/frame-complete do not release borrows; actual wire/FIFO/IRQ/observer proof precedes settlement; failed proof quarantines.",
+                  "claim requires independently established all-target address invalidation; reset additionally proves every target address invalidated. Peripheral reset/FIFO flush alone is insufficient."
+                ]
+              },
+              "implementation_packages": [
+                {
+                  "dependencies": [],
+                  "exit": "Exact source/manual/license identities and unknowns recorded; clock/memory/IRQ/electrical routes reviewed; no fabricated Board facts.",
+                  "id": "H563-01",
+                  "priority": "P0",
+                  "scope": "Review exact silicon/Board/targets and official manuals; obtain organization SDK forks and compatible locked tuple.",
+                  "validation": "Read-only upstream/lock/provenance checks; negative exact-part/revision/unknown-route configuration cases before acceptance."
+                },
+                {
+                  "dependencies": [
+                    "H563-01"
+                  ],
+                  "exit": "One exact software-reference startup/clock/IRQ profile links with correct vector and memory layout; no H5 family-wide support inference.",
+                  "id": "H563-02",
+                  "priority": "P0",
+                  "scope": "Add exact H563 SoC startup, CPU facts, memory, reset/clock and private CMSIS/HAL/LL integration; keep Board wiring separate.",
+                  "validation": "TDD for new facts/selection behavior; actual ARM ELF/vector/ABI/resource checks and Native cold-state failure models."
+                },
+                {
+                  "dependencies": [
+                    "H563-01"
+                  ],
+                  "exit": "Complete operation-to-official-API/proof matrix; bounded service budget; no retained pump spans or false successful reset; unsupported proof stays explicit.",
+                  "id": "H563-03",
+                  "priority": "P0",
+                  "scope": "Freeze one coherent hardware transport owner and every nx_i3c_port_ops_t leaf contract, including prepare/start/withdraw/stop/recovery and all-target baseline/reset proof.",
+                  "validation": "Review HAL callback/buffer retention and blocking semantics against current synchronous port; choose official LL/HAL by complete mode rather than isolated calls."
+                },
+                {
+                  "dependencies": [
+                    "H563-02",
+                    "H563-03"
+                  ],
+                  "exit": "1..65535-byte TX/RX and FIFO tails preserve exact byte counts; service stays at declared batch budget; no allocation, hidden worker or second live transport owner.",
+                  "id": "H563-04",
+                  "priority": "P1",
+                  "scope": "Implement C11 finite SDR port with official SDK leaves, cold setup/rollback, FIFO pump, IRQ facts and explicit errata handling.",
+                  "validation": "Actual new C provider plus register/SDK-leaf models: FIFO empty/full, control/status depth, 0/1/7/8/9/65535 boundaries, errors and isolation. HAL asynchronous buffer loans must never outlive a pump span."
+                },
+                {
+                  "dependencies": [
+                    "H563-04"
+                  ],
+                  "exit": "Assignment ACK ordering, tentative addresses, PID/epoch identity and BCR-dependent event shape match core; four hardware IBI slots are represented honestly; no silent mode fallback.",
+                  "id": "H563-05",
+                  "priority": "P1",
+                  "scope": "Implement explicit DAA/whitelisted CCC/copied IBI/hot-join integration and hardware IBI slot limits.",
+                  "validation": "New provider models for ACK+next identity, unknown/duplicate target, incomplete DAA, IBI/MDB lengths, hot-join and overflow; authored target capacity beyond hardware budget rejects or has explicitly reviewed policy."
+                },
+                {
+                  "dependencies": [
+                    "H563-04",
+                    "H563-05"
+                  ],
+                  "exit": "No settlement before final access; failed withdrawal/reset retains references and addresses; successful final stop releases unique resources exactly once; warm-reset target state has a reviewed proof.",
+                  "id": "H563-06",
+                  "priority": "P0",
+                  "scope": "Close cancellation/deadline/error/stop/reset across complete controller, FIFO, wire, IRQ and observer lifetime.",
+                  "validation": "Actual RED→GREEN for late IRQ, residual FIFO/bus busy, failed abort/reset, partial DAA, held event, stale ticket and restart boundaries. Physical proof remains unqualified without real bus execution."
+                },
+                {
+                  "dependencies": [
+                    "H563-02",
+                    "H563-06"
+                  ],
+                  "exit": "Factory only returns existing static controller objects; endpoints remain runtime confirmed identities; one typed IR/config authority, exact resource claims and optional source closure; H563 selection only marked to achieved evidence tier.",
+                  "id": "H563-07",
+                  "priority": "P1",
+                  "scope": "Integrate static configuration/CMake/SDK and the existing typed factory model without implicit DAA or moving product target policy into platform facts.",
+                  "validation": "Unknown fields/routes/resource conflicts fail before generation; generated static-only assembly compiles; clean relocated Source SDK public C consumer links with private vendor headers hidden."
+                },
+                {
+                  "dependencies": [
+                    "H563-07"
+                  ],
+                  "exit": "Complete-index gates and exact ARM/SDK consumers pass; measured 0/1/2/4-instance RAM/ROM and worst selected service work recorded; physical_status remains not_executed until station runs.",
+                  "id": "H563-08",
+                  "priority": "P1",
+                  "scope": "Deliver regressions, measured software costs, bilingual contract/diagrams, support boundary and HIL fixture preparation.",
+                  "validation": "GoogleTest/GoogleMock actual C core+provider (mock only hardware leaves), stdlib tool tests, fresh reports and failure paths; prepare startup/clock/SDA-before-enable/DAA/TX/RX/IBI/hot-join/cancel/stop/reset HIL commands and required equipment."
+                }
+              ],
+              "initial_scope": "Finite SDR controller + explicit DAA/CCC + copied IBI/hot-join + complete stop/reset. Do not add DMA/HDR/target role/controller handoff/concurrent API promises to this first reference by inference.",
+              "kind": "next_reference_readiness_plan",
+              "local_integration_observations": {
+                "h5_gitmodules_entries_present": false,
+                "production_cmsis_h5_present": false,
+                "production_hal_h5_present": false,
+                "provider_status": "No production H563 provider found in inspected maintained paths. Existing h563_reference.c only compiles private official declarations and is excluded from public Runtime ELF.",
+                "runtime_fixture_warning": "tests/contracts/i3c_runtime/cpu.json is a generic CM33 soft-float, 48MHz, 480-external-IRQ CPU Runtime fixture; it is not an exact H563 SoC/clock/interrupt/memory profile.",
+                "soc_stm32h563_present": false
+              },
+              "physical_status": "not_executed",
+              "production_support_added": false,
+              "reference_facts_and_unknowns": {
+                "evidence_readiness_gap": {
+                  "action": "Recover the original immutable evidence/pointer before reusing its historical counts/pins; never reconstruct or claim a fresh passing execution from README prose.",
+                  "missing_referenced_members": [
+                    "development.tar.gz",
+                    "members.json",
+                    "summary.json"
+                  ],
+                  "observed_members": [
+                    "README.md"
+                  ],
+                  "path": "tests/evidence/i3c-controller"
+                },
+                "fact_qualification": "These are current source assertions/documented historical research, not newly executed header checks, fresh manual verification or physical measurements.",
+                "manual_prerequisites": [
+                  {
+                    "document": "RM0481",
+                    "required_review": "Obtain complete official manual, version/date/hash and exact H563 sections for clocks/reset, I3C FIFO/control/status/error/arbitration, DAA ACK ordering, abort/flush, IRQ/NVIC withdrawal, bus-idle and bus/target reset proof. Current evidence README explicitly says full RM0481 was not downloaded."
+                  },
+                  {
+                    "document": "Exact STM32H563ZI ordering-code datasheet",
+                    "required_review": "Confirm complete suffix/package, Flash/RAM map, CPU/FPU/cache/security/MPU/NVIC, RCC clock/reset/kernel selection, I3C pins/AF and electrical/timing/voltage limits; do not reuse generic Runtime facts."
+                  },
+                  {
+                    "document": "ES0565",
+                    "required_review": "Retrieve current applicable revision, map exact silicon revision and all I3C limitations/workarounds. Revalidate source-cited Rev8 NOARBH and SDA preparation requirements."
+                  },
+                  {
+                    "document": "AN5879 and applicable public I3C Basic protocol",
+                    "required_review": "Verify FIFO depths/thresholds, DAA/CCC/IBI/MDB/hot-join shapes, target address invalidation and reset assumptions against the chosen protocol and target-device manuals."
+                  }
+                ],
+                "repository_cited_hardware_facts": [
+                  "h563_reference.c asserts I3C1_EV_IRQn=123, I3C1_ER_IRQn=124, 16-bit DCNT, four DEVRX slots and byte/word FIFO register offsets.",
+                  "Current design cites two-word control/status FIFOs, eight-byte TX/RX FIFOs, four IBI slots, ES0565 Rev8 NOARBH=0 and 1ms SDA pull-up preparation."
+                ],
+                "unknown_inputs": [
+                  "Complete H563ZI part suffix and silicon revision.",
+                  "Actual Board/PCB revision, SDA/SCL wiring, VDDIO, external/internal pull-ups, target reset/power controls and clock source.",
+                  "Target-device PIDs/BCR/DCR behavior and whether all targets can remain powered across MCU reset.",
+                  "Reviewed whole-bus dynamic-address invalidation procedure and failure proof; MCU reset alone cannot establish it.",
+                  "Required SDR rate, event/target capacities and executor latency budget."
+                ]
+              },
+              "schema_version": 1,
+              "status": "planned_not_supported",
+              "target": "STM32H563ZI I3C"
+            },
+            "work_package_count": 8,
+            "source_plan": {
+              "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/next-reference-targets/h563-i3c.json",
+              "sha256": "777a786c6a677df87691fdf1f2ed55c00b15a71b1f8d5316bf34e27a8921ca02",
+              "size": 14560
+            }
+          },
+          "X05": {
+            "readiness_plan": {
+              "schema": 1,
+              "kind": "next_software_reference_readiness_and_execution_plan",
+              "target": {
+                "mcu_user_reference": "STM32H743ZI",
+                "existing_exact_part_fact": "STM32H743ZIT6 in dependencies/stm32h7.lock.json",
+                "serial_memory_user_reference": "Winbond W25Q128JV",
+                "status": "planned_not_implemented_not_qualified",
+                "scope": "New physical mapped-storage software reference; current completed delivery status is unchanged."
+              },
+              "review_method": {
+                "read_only": true,
+                "source_index_git_mutations": false,
+                "builds_configures_tests_run": false,
+                "scope": "Bounded source/contract/HAL availability assessment; not a complete new provider or hardware qualification."
+              },
+              "existing_reusable_facts": [
+                {
+                  "fact": "Nexus::MappedStorage already provides immutable face/ops, caller-owned slots/context/request, PROGRAM/ERASE, CPU/XIP/DMA reader tags, exact slot+epoch loans and writer tickets. No new public factory or runtime registry is needed to start a physical adapter.",
+                  "anchors": [
+                    "components/mapped_storage/include/nexus/components/mapped_storage.h:13-89",
+                    "components/mapped_storage/include/nexus/components/mapped_storage_owner.h:13-40"
+                  ]
+                },
+                {
+                  "fact": "Owner excludes all writes while any read loan exists; final release calls real unmap and retains loan on failure. Accepted writers retain descriptor/payload until drain→SETTLED; bad drain quarantines; stop closes admission and does not revoke loans.",
+                  "anchors": [
+                    "components/mapped_storage/src/mapped_storage_owner.c:49-118",
+                    "components/mapped_storage/src/mapped_storage_owner.c:144-207",
+                    "components/mapped_storage/src/mapped_storage_owner.c:223-284"
+                  ]
+                },
+                {
+                  "fact": "Native model supports only CPU_READ; it models bounded one-to-zero program/erase and fault/drain control. It provides no H743 hardware, XIP, DMA-routing or persistence proof. Existing README explicitly lists physical QUADSPI/factory/cache/DMA/XIP open.",
+                  "anchors": [
+                    "components/mapped_storage/src/native_mapped_storage.c:122-147",
+                    "components/mapped_storage/README.md:27-36"
+                  ]
+                },
+                {
+                  "fact": "H743 CMSIS exposes QUADSPI IRQ92 and AXI QSPI memory base0x90000000. These are controller facts, not proof of board wiring, timing, memory capacity or supported mapped reader modes.",
+                  "anchors": [
+                    "vendors/st/cmsis_device_h7/Include/stm32h743xx.h:147",
+                    "vendors/st/cmsis_device_h7/Include/stm32h743xx.h:2074"
+                  ]
+                },
+                {
+                  "fact": "Generic whole-line cache primitives and instruction synchronization already have explicit exclusion/context contracts. H743 internal-flash MPU RAM-maintenance sidecar exists, but owns exact generated region15/private workspace and is not a ready external-QSPI aperture guard. Reuse review discipline, not a foreign sidecar or claimed free region.",
+                  "anchors": [
+                    "arch/include/nexus/arch/cache.h:19-84",
+                    "soc/stm32/stm32h743/private/stm32h743_flash_mpu.h:26-71"
+                  ]
+                },
+                {
+                  "fact": "Official HAL QSPI source/header and MDMA source exist in the pinned vendor checkout. Current H7 HAL lock has5 selected files, selected_api stm32h743-ll-inline-i2c, no QSPI file. Source SDK cannot claim QSPI admission from checkout presence alone.",
+                  "anchors": [
+                    "dependencies/stm32h7-hal.lock.json",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c",
+                    "vendors/st/stm32h7_hal/Inc/stm32h7xx_hal_qspi.h"
+                  ],
+                  "vendor_commit": "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
+                  "cube_pairing": "STM32CubeH7 v1.13.0 /5abb9764b32e11a6557b90bf39531528019b5761"
+                },
+                {
+                  "fact": "HAL IT naming is not a bounded-service proof: HAL_QSPI_Command_IT calls a BUSY wait using HAL_GetTick; MemoryMapped similarly waits. Blocking/DMA/abort entry points require exact-path audit and timeout/clock integration before use in owner callbacks.",
+                  "anchors": [
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c:873-915",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c:1704-1748",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c:2159",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c:2224"
+                  ]
+                }
+              ],
+              "unknown_facts": [
+                "Board/PCB identity and revision, socket/package suffix of W25Q128JV and schematic are not supplied.",
+                "QUADSPI CLK/NCS/IO0..IO3 port+pin+AF, bank selection, all signal ownership conflicts, CS pullups and WP/HOLD/RESET wiring are unknown.",
+                "Flash VCC, MCU I/O voltage, level shifting, boot straps, trace length/loading and signal integrity are unknown.",
+                "Clock source/kernel selector/divider, verified SCK limit, sample shifting/delay block settings, dummy cycles, CS-high interval and temperature/voltage corner limits are unknown.",
+                "Exact Winbond official datasheet revision/errata, JEDEC and SFDP contents, startup protocol/QE/protection configuration and erase/program maximum timing must be acquired and bound to exact part before implementing numeric command policies.",
+                "No probe/serial access or connected H743ZI+W25Q128JV hardware evidence is established. Physical status remains not_executed."
+              ],
+              "initial_scope_recommendation": {
+                "first_software_slice": "Explicit optional H743 adapter behind existing nx_mapped_storage_backend_t, read-only CPU mapping plus finite page program/sector erase, caller-owned storage and existing owner lifecycle. Private HAL types stay internal. Board supplies exact routes/resources; no default inferred pinout.",
+                "capability_advertisement": "CPU_READ only after its source/model/link gates; XIP and DMA_READ remain UNSUPPORTED until their separate exit conditions. A software reference is labeled software/model/link only until HIL.",
+                "geometry": "Use exact verified datasheet/SFDP geometry.128Mbit implies nominal16MiB;256-byte page/4KiB sector are candidate W25Q128JV facts to verify, not assumed locked support. Public program_unit is minimum admitted byte unit, distinct from physical page boundary/chunk size.",
+                "reuse_boundary": "Start with minimal private H743 controller/HAL integration + explicit chip command facts; introduce shared reviewed serial-NOR engine only after actual reuse, without another public dynamic dispatch layer."
+              },
+              "work_packages": [
+                {
+                  "id": "Q01",
+                  "priority": "P0",
+                  "depends": [],
+                  "deliver": "Bind official H743 reference manual/datasheet/errata and exact W25Q128JV datasheet/SFDP/JEDEC evidence; record board unknowns. Define exact software reference profile and safe initial SCK separately from a physical board support claim.",
+                  "exit": "Facts carry source revision/hash/page anchors; numeric page/sector/status/QE/address limits are verified; contradictory identity or unsupported voltage/package/revision is rejected before WREN/program/erase. Wiring remains unresolved until supplied.",
+                  "tests": "TDD GoogleTest wrong-ID/density/unsupported-protocol/protected-status cases reject without write effects; no hardware claim."
+                },
+                {
+                  "id": "Q02",
+                  "priority": "P0",
+                  "depends": [
+                    "Q01"
+                  ],
+                  "deliver": "Extend existing H7 official-source admission/CMake with required QSPI/HAL core/RCC/GPIO dependencies; include MDMA only for a later selected DMA mode. Retain exact supplier commit/license/pairing and private HAL config/handles.",
+                  "exit": "Locked source closure and source SDK explicitly include required files; selected optional target compiles once and remains absent from an unselected image; no vendor header leakage to product source. HAL_GetTick uses the existing monotonic clock contract, no competing SysTick owner.",
+                  "tests": "Actual ARM C-only installed SDK public consumer and unselected-symbol/map checks, plus source-admission negative tests."
+                },
+                {
+                  "id": "Q03",
+                  "priority": "P0",
+                  "depends": [
+                    "Q01",
+                    "Q02"
+                  ],
+                  "deliver": "Cold QSPI clock/pin/reset/IRQ lease and identity/status initialization, exact readback/rollback. Program protection/QE only when explicitly permitted; preserve unrelated status/protection bits and chip configuration.",
+                  "exit": "Prepare/start failure returns only after effects restored; failed cleanup cannot release resource/handle ownership. MPU/aperture remains inaccessible while uninitialized. No mass erase or implicit bus/device reset as recovery policy.",
+                  "tests": "Actual production C+official HAL register model with refused clock/pin/abort/QE/status writes and repeated init/stop; prove retention and explicit retry/fault path."
+                },
+                {
+                  "id": "Q04",
+                  "priority": "P0",
+                  "depends": [
+                    "Q03"
+                  ],
+                  "deliver": "Bounded task-owned command state machine for JEDEC/SFDP/status, indirect read, WREN, page program, sector erase and WIP polling using reviewed HAL paths. Split program at real page boundaries and erase at verified sector boundaries.",
+                  "exit": "Each owner start/poll/cancel/drain callback has a concrete finite work budget; HAL IT waits audited, no HAL_MAX_DELAY or unbounded busy loop introduced in service. Progress reports completed bytes only after appropriate device completion, never QSPI FIFO movement or command launch.",
+                  "tests": "GoogleTest/GMock exact command/order, page-edge splits, unaligned/range/overflow rejection, WEL/protection failure, partial failure, WIP timeout and fixed bounded work per service call."
+                },
+                {
+                  "id": "Q05",
+                  "priority": "P0",
+                  "depends": [
+                    "Q04"
+                  ],
+                  "deliver": "CPU map/unmap adapter with exact16MiB-or-verified aperture, read-only/XN MPU policy, first-loan map and final-loan withdrawal, cache-line ownership and readback barriers. Keep reader tags truthful.",
+                  "exit": "Map failure is effect-free after verified rollback or retains through a nonreturn fault; unmap failure keeps final loan live. Controller aperture, speculation/CPU accessibility and cache maintenance are withdrawn in a reviewed order. No stale reads after program/erase→remap. Do not blindly clean old mapped-NOR lines back to serial flash.",
+                  "tests": "CPU-map model tests for multiple/stale/foreign loans, map failure, refused abort/MPU/cache withdrawal, cache-line edges, remap after mutation; cached/uncached exact ARM profiles link separately."
+                },
+                {
+                  "id": "Q06",
+                  "priority": "P0",
+                  "depends": [
+                    "Q04",
+                    "Q05"
+                  ],
+                  "deliver": "Prove cancellation/deadline/stop and irreversible internal flash-operation handling behind existing owner tickets. Acknowledge no replay and no implicit erase suspend/reset policy.",
+                  "exit": "Cancel stops future page/sector issuance; an already launched program/erase finishes or remains retained. Drain proves no future payload/descriptor/IRQ/DMA references and safe device command/map state; WIP/abort/withdrawal uncertainty stays BUSY or QUARANTINED. Active request cleared before acquire-observed SETTLED; stop never revokes reader loans.",
+                  "tests": "Finite event-order tests cancel/timeout/late IRQ/current page completion/unmap failure/retry; payload poisoning only after settlement; stopped admission and explicit stop retry."
+                },
+                {
+                  "id": "Q07",
+                  "priority": "P1",
+                  "depends": [
+                    "Q05",
+                    "Q06"
+                  ],
+                  "deliver": "Add exact typed configuration/factory/component composition with board resource facts, locked geometry, budgets and optional profile. Reuse existing instance-bound mapped face/owner; no new registry.",
+                  "exit": "Configuration rejects pin/kernel-clock/MPU-region/controller conflicts, missing exact flash part and unsupported cache/reader policy before code emission. Public optional target expresses real MappedStorage/Arch/HAL dependencies, independent of unrelated selected I/O.",
+                  "tests": "Actual resolver/typed-IR negative cases + GoogleTest native-instance/physical-model composition + minimal external/installed SDK link without Native/Runtime aggregates."
+                },
+                {
+                  "id": "Q08",
+                  "priority": "P1",
+                  "depends": [
+                    "Q05",
+                    "Q06",
+                    "Q07"
+                  ],
+                  "deliver": "Separate optional DMA_READ and indirect QSPI MDMA performance work only after exact bus reachability/power/cache domains are reviewed.",
+                  "exit": "A mapped DMA reader loan names a reviewed actual master and remains live through that master source withdrawal and publisher/consumer join. HAL QSPI indirect MDMA support is distinct and does not imply mapped-aperture DMA reachability. Quantify RAM/Flash and link cost before enabling, retain PIO baseline.",
+                  "tests": "Production model source/engine/cache failures + exact ARM link/resource matrix; physical DMA pattern/corruption/abort/latency remains HIL not_assessed until run."
+                },
+                {
+                  "id": "Q09",
+                  "priority": "P1",
+                  "depends": [
+                    "Q05",
+                    "Q06",
+                    "Q07"
+                  ],
+                  "deliver": "Optional XIP execution profile with explicit internal Flash/RAM execution closure and full MPU/cache/exception policy.",
+                  "exit": "Before final XIP loan release or any program/erase, join every instruction fetch including ISR/exception/VTOR/vector targets, return addresses, literal pools/rodata/veneer/callback/deferred work. Maintenance code+stack+constants+fault path+HAL calls execute outside changing aperture. Verify MPU region ownership, I-cache/D-cache/barrier sequence and exact linker/relocation closure; no authored boolean substitutes for proof. XIP stays UNSUPPORTED until software closure and required physical exits pass.",
+                  "tests": "Actual ELF/linker relocation/disassembly checks and refused transition models; hardware execute→join→erase/program→instruction coherency and interrupted/failed restore tests separately. No borrowed XIP instruction may continue past release."
+                },
+                {
+                  "id": "Q10",
+                  "priority": "P1",
+                  "depends": [
+                    "Q07"
+                  ],
+                  "deliver": "Prepare HIL tooling and bilingual supported-profile evidence using existing delivery/navigation systems, then execute when board facts/access exist.",
+                  "exit": "Software reports include exact source/config/toolchain/ELF identities and modeled/link-only scope. Physical exits: boot/probe identity, read patterns, page edges, erase verification, power-cycle persistence, bus waveform timing, cached remap, cancel/stop/recover; destructive operations confined to explicitly reserved scratch sectors. XIP/DMA/power-loss scope separately admitted.",
+                  "tests": "Fast focused GoogleTest production-HAL models + one smallest supported ARM/SDK consumer per dependency change, targeted sanitizers for new state machine; full existing gate once candidate freezes. No duplicate64-consumer reruns per small edit."
+                }
+              ],
+              "performance_and_space_principles": [
+                "Keep existing immutable ops/context and caller-sized map slots; one private HAL handle/controller/chip state per real selected instance. No heap, hidden task, queue, per-call allocation or duplicated whole image.",
+                "Bound every service callback; initial indirect PIO avoids MDMA descriptors and IRQ/cache state until measured need. Program payload is borrowed and page chunks reference the admitted external span; avoid an unconditional per-instance page copy buffer.",
+                "Report exact linked Flash/data/bss and stack estimate/call-chain limits for each selected profile; host timings and HAL API names do not establish MCU latency.",
+                "A read mapping permits shared readers but excludes all writers across the whole aperture, matching existing simple owner contract. Do not weaken this to per-range mutation for apparent throughput before a real use case."
+              ],
+              "qualification_exit_summary": {
+                "software": "Official facts+source locks, production C/HAL model RED→GREEN, bounded lifecycle and failure retention, exact ARM/installed SDK link, explicit reader capability and documentation scope.",
+                "physical_cpu_read_write": "Unknown board facts resolved and reserved scratch area approved by product; actual probe/clock/route/read/program/erase/cache/stop/power-cycle evidence bound to exact hardware.",
+                "dma_read": "Reviewed actual bus master, routing/cache/power exclusion and real source join; physical corruption/abort tests, not HAL_DMA function availability.",
+                "xip": "Actual execution closure and join/cache/MPU policy verified, then physical execution/remap/update tests; unsupported until both stages."
+              },
+              "reviewed_input_identities": [
+                {
+                  "path": "components/mapped_storage/README.md",
+                  "sha256": "170b02b47f8aba28d5bc91a367aec2e25ede8a5bfb33fee527727f82a438fb46"
+                },
+                {
+                  "path": "components/mapped_storage/CMakeLists.txt",
+                  "sha256": "2be3964f3d26f88cc4b631a8d09f24293e46480a8df15dd22ea9967379c24a32"
+                },
+                {
+                  "path": "components/mapped_storage/include/nexus/components/mapped_storage.h",
+                  "sha256": "c694485983e5da9939a87fbd717ef7d23b3f75b4d13a91fb2a7ca791d903980d"
+                },
+                {
+                  "path": "components/mapped_storage/include/nexus/components/mapped_storage_owner.h",
+                  "sha256": "3828e249dc1dd9cbcfbec0d1849f9fd1d5b52f628cf47da83cc55285c3e4b66e"
+                },
+                {
+                  "path": "components/mapped_storage/src/mapped_storage_owner.c",
+                  "sha256": "c3b744ff2a601057e6baefc40790bb77a44c01ccfab5afc46c0308bae5e83ace"
+                },
+                {
+                  "path": "components/mapped_storage/src/native_mapped_storage.c",
+                  "sha256": "117470768ba2754b91a9a2143250d44cdc7a9ef388f5e96692e5d046d6032205"
+                },
+                {
+                  "path": "tests/google/mapped_storage_test.cpp",
+                  "sha256": "14d8dd0c3f64bd86e51a4f0dde5095f6897ab421e41252e100157e5054949064"
+                },
+                {
+                  "path": "arch/include/nexus/arch/cache.h",
+                  "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26"
+                },
+                {
+                  "path": "soc/stm32/stm32h743/private/stm32h743_flash_mpu.h",
+                  "sha256": "606b82eec8d999e81378caad408c7073ae5e782d16fbd1b6589602d49c1b2985"
+                },
+                {
+                  "path": "soc/stm32/stm32h743/drivers/flash_mpu.c",
+                  "sha256": "60fc565c5b50bf32e65d9bd699e818b549808d46578329549dae5baab153002e"
+                },
+                {
+                  "path": "soc/stm32/stm32h743/memory_init.c",
+                  "sha256": "0006107412948be8c40968680dbd840ca41ee88184e3e81dcd0abf4299e9065d"
+                },
+                {
+                  "path": "soc/stm32/stm32h743/configure/memory.py",
+                  "sha256": "a0c584f427789c26dd5b90c3a8165dfd878c150299384857479105db4c1b253b"
+                },
+                {
+                  "path": "soc/stm32/stm32h743/CMakeLists.txt",
+                  "sha256": "b4e551e1025cd215ef64e21cb9f4c67cff1d8b42afb958a9e9e4d5eefcb7df35"
+                },
+                {
+                  "path": "cmake/platform/STM32Official.cmake",
+                  "sha256": "37e324bb8c9c75eb126f6384adf1ff72f306d0e2b20fab27d7b10044abe5981d"
+                },
+                {
+                  "path": "dependencies/stm32h7.lock.json",
+                  "sha256": "31b165b640640d95c804c911557dc9db2da56b50746465cf6d2960b34bbf088c"
+                },
+                {
+                  "path": "dependencies/stm32h7-hal.lock.json",
+                  "sha256": "108906d9076b6c0618504d15bc676bf44726b31658ef772587cf3ae16378ba59"
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_qspi.c",
+                  "sha256": "cd8e278936fe6c09d59949b6b05b3a2e52c5f3ae3d33ab7f7729ea33690845fc"
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Inc/stm32h7xx_hal_qspi.h",
+                  "sha256": "ed55223d786dfba78b8fb9e30c64898558c3c7044f2fdc689069decceb528648"
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_mdma.c",
+                  "sha256": "674d7a273d208509e2941cb88d9419f549cbdfd35d4aa81b2da135bf1c1a30ad"
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Include/stm32h743xx.h",
+                  "sha256": "9a4ea0860707868a1cc562140ba214d535fb5a64fde91b451b2767276eef7e03"
+                }
+              ]
+            },
+            "work_package_count": 10,
+            "source_plan": {
+              "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/next-reference-targets/h743-w25q128.json",
+              "sha256": "34c90cddec2d57f62667f51efe292fb7c38ef40537ca9cc3ba44842c7741a2bd",
+              "size": 19724
+            }
+          },
+          "X06": {
+            "readiness_plan": {
+              "kind": "next_software_reference_target_read_only_readiness_and_workplan",
+              "reference_target": "STM32H747XI dual-core AMP",
+              "status": "next_target_selected_not_implemented_or_supported",
+              "current_delivery_boundary": "Existing seven-chip software delivery is unchanged. This plan does not qualify a new SoC, board, runtime, peer reset or cache transport.",
+              "actions_taken": "Read local source and locked vendor availability only; no source/stage/Git mutation, build, new test execution or network/manual acquisition.",
+              "known_readiness": [
+                {
+                  "fact": "Nexus::AMPIPC exists as an optional allocation-free common C lane, not a selected Native/SoC hardware provider. Host GoogleTest/GoogleMock supplies mocked cache/control/ownership/reset ports; no physical cache/reset/IPC HIL is claimed.",
+                  "anchors": [
+                    "components/amp_ipc/CMakeLists.txt:1",
+                    "components/amp_ipc/README.md:42",
+                    "tests/google/amp_ipc.cmake:1"
+                  ]
+                },
+                {
+                  "fact": "Existing AMP API already specifies disjoint64-byte offer/ACK units, offset/length wire records, exact epoch+slot sequence ACK, retained payload borrow, bounded synchronous hardware callbacks, coherent acquire/release and trusted old-peer stop proof.",
+                  "anchors": [
+                    "components/amp_ipc/include/nexus/components/amp_ipc.h:15",
+                    "components/amp_ipc/include/nexus/components/amp_ipc.h:47",
+                    "components/amp_ipc/include/nexus/components/amp_ipc_storage.h:20"
+                  ]
+                },
+                {
+                  "fact": "Locked CMSIS device package contains STM32H747xx header (lists H747XI among matching devices), GCC startup and per-core CM7/CM4 flash linker templates. This is dependency availability, not an implemented Nexus H747 SoC.",
+                  "anchors": [
+                    "vendors/st/cmsis_device_h7/Include/stm32h7xx.h:68",
+                    "vendors/st/cmsis_device_h7/Include/stm32h7xx.h:169",
+                    "vendors/st/cmsis_device_h7/Include/stm32h747xx.h:215"
+                  ]
+                },
+                {
+                  "fact": "The device header requires CORE_CM4 or CORE_CM7, gives both FPU/MPU, M7 I/D cache, per-core CMSIS header, CM7/CM4 event IRQ64/65 and HSEM IRQ125/126. Exact route/current-core assignments still require manual validation.",
+                  "anchors": [
+                    "vendors/st/cmsis_device_h7/Include/stm32h747xx.h:124",
+                    "vendors/st/cmsis_device_h7/Include/stm32h747xx.h:182",
+                    "vendors/st/cmsis_device_h7/Include/stm32h747xx.h:224"
+                  ]
+                },
+                {
+                  "fact": "Locked H7 HAL/LL already includes HSEM take/release/notification and RCC EnableBootCore surfaces. They can be reused as bounded leaf operations after reviewing status/IRQ/side-effect contracts; they do not themselves prove cross-core cache coherence or peer/DMA termination.",
+                  "anchors": [
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_hsem.c:159",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_hsem.c:196",
+                    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_hsem.c:237",
+                    "vendors/st/stm32h7_hal/Inc/stm32h7xx_hal_rcc_ex.h:3925"
+                  ]
+                },
+                {
+                  "fact": "Current architecture profiles contain Cortex-M4/M7 ABI options and owned32-byte cache-line operations. The selected H747 core/profile/device combination and OS context are not yet verified; existing H743 remains a single-core platform.",
+                  "anchors": [
+                    "tools/configure/cpu.py:60",
+                    "arch/arm/cortex_m/nx_arch_cache.c:19",
+                    "components/amp_ipc/README.md:45"
+                  ]
+                }
+              ],
+              "architecture_decisions": [
+                "Build two independent firmware ELFs with separate CMake configurations, startup/vector/MSP/data/bss/heap/timebase/OS/HAL tick and ABI; orchestrate them with one checked pair manifest. Do not combine CM4 and CM7 objects or OS kernels into one runtime.",
+                "Model H747 once as a SoC plus explicit CM7/CM4 execution domains. Keep per-core assembly/factory narrow and static; a pair resolver validates disjoint physical peripheral/IRQ/DMA/pin/Flash/RAM claims and explicitly shared resources before either image is released.",
+                "M7 reference boot owner coordinates global supply/RCC/clock/Flash/common resets and peer launch; M4 per-core SystemInit must not reset global clocks. A core-local platform stop cannot disable a peer-owned timer, DMA, HSEM, SRAM or system source.",
+                "Select one reviewed physical shared SRAM window only after reference-manual reachability and alias checks. Header D2_AHBSRAM0x30000000 and D3_SRAM0x38000000 are candidates, not admitted sizes/addresses. Exclude private TCM and stacks by default; each image linker reserves shared bytes once outside bss clearing and ordinary allocator placement.",
+                "First reference transport uses explicitly verified noncacheable shared control and payload attributes on M7 and compatible M4 access; keep release/acquire barriers. Later cached payload is a separate mode with complete-line clean/invalidate plus its own evidence. HSEM locks/doorbells are not cache coherency mechanisms.",
+                "A lane remains unidirectional; bidirectional traffic uses two statically distinct lanes. HSEM channel ownership and notification IRQ routing are explicit. Doorbell coalescing/loss only affects wake hints; publication/ACK predicates remain authoritative and service can make bounded progress.",
+                "Keep one physical peripheral owner, including its DMA and IRQ. Avoid fine-grained cross-core locks in normal peripheral hot paths; cross-core services exchange offsets/lengths in shared windows, never local pointers or executable function pointers.",
+                "Do not implement stopped as peer-epoch change, heartbeat timeout, HSEM release or a core reset request alone. Reset join stays unsupported until the exact old CPU, DMA, IRQ and all payload observers are proved unable to resume accessing the lane.",
+                "An authoritative boot owner must persistently reject reused/decreasing epochs across warm and whole-chip resets as the existing contract requires. A freshly zeroed shared RAM counter or volatile static does not satisfy this. First hardware acceptance requires a reviewed retained/provisioned identity design or power-fail-safe persistent counter with wear/Flash safety evidence; do not weaken the common API.",
+                "Board description remains a software reference with unknown physical PCB revision and electrical wiring. Keep product-specific applications in the external examples repository."
+              ],
+              "work_packages": [
+                {
+                  "id": "H747-01",
+                  "priority": "P0",
+                  "depends_on": [],
+                  "tasks": [
+                    "Lock full ordering code/package/revision scope for H747XI; obtain exact official datasheet, dual-core reference manual, errata and vendor dual-core boot examples with versions/URLs/hashes.",
+                    "Extract per-core boot, shared domain, SRAM/alias, DMA, Flash-bank, HSEM/IRQ, cache/MPU and reset facts; separate header availability from reviewed support."
+                  ],
+                  "exit_conditions": [
+                    "Exact part/core/clock/revision source worksheet complete; all unknown hardware assumptions explicit; no inherited H743 reset/clock contract."
+                  ],
+                  "validation_plan": [
+                    "Schema/provenance tests; independent fact review against locked official sources."
+                  ],
+                  "resource_or_runtime_cost": "Facts/config only; no default firmware cost.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-02",
+                  "priority": "P0",
+                  "depends_on": [
+                    "H747-01"
+                  ],
+                  "tasks": [
+                    "Add per-core exact CPU/device definitions and startup/linker contracts; create separate M7 and M4 minimal empty-controller reference images and a pair manifest.",
+                    "Add two-image linker collision checks covering Flash, per-core RAM/stack/heap, shared NOLOAD region, vector alignment and boot addresses."
+                  ],
+                  "exit_conditions": [
+                    "Both independent Cortex-M7/M4 full ELFs link with expected macros/FPU/ABI/startup/vector bounds and disjoint allocations; manifest binds both image+config+tool/source IDs."
+                  ],
+                  "validation_plan": [
+                    "Actual ARM builds, compiler macro probes, readelf/objdump/map checks, noGC dependency smoke, negative overlap/ABI/core-selection fixtures."
+                  ],
+                  "resource_or_runtime_cost": "Two explicit images; shared window and per-core stacks/OS reserve reported separately, not double-counted.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-03",
+                  "priority": "P0",
+                  "depends_on": [
+                    "H747-02"
+                  ],
+                  "tasks": [
+                    "Implement M7 global startup/peer release and M4 local startup using reviewed HAL/LL leaves, bounded deadlines and source/readback receipts.",
+                    "Assign RCC, supply, Flash, HSEM clock, tick timers, peripheral/DMA/IRQ/reset resources statically; reject conflicts and unsafe per-core stop."
+                  ],
+                  "exit_conditions": [
+                    "Failed peer launch/global partial startup retains exact owner; M4 init cannot clobber running M7 clocks; local stop preserves peer resources."
+                  ],
+                  "validation_plan": [
+                    "Actual RED→fix→GREEN production C GoogleTest/MMIO models; negative shared-domain/config conflicts; two-core ELF source closure."
+                  ],
+                  "resource_or_runtime_cost": "Boot-only bounded code and explicit receipts; no registry, implicit worker or hot-path cross-core lock.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-04",
+                  "priority": "P0",
+                  "depends_on": [
+                    "H747-01",
+                    "H747-03"
+                  ],
+                  "tasks": [
+                    "Choose authoritative boot-epoch persistence/provisioning and exact core-stop proof policy; design reset domains and DMA/IRQ observer ownership.",
+                    "Initially return UNSUPPORTED for reset join if proof is unavailable; never reclaim accepted shared storage on timeout or new epoch alone."
+                  ],
+                  "exit_conditions": [
+                    "Epoch reuse/decrease/exhaustion and power-loss semantics reviewed; no volatile-only epoch reset accepted; normal close/join proven and reset support scope explicit."
+                  ],
+                  "validation_plan": [
+                    "Host fault/model tests for stale ACK, restart, partial reset, retained DMA and epoch persistence failure; physical reset proof reserved for HIL."
+                  ],
+                  "resource_or_runtime_cost": "Persistent identity bytes/wear/boot latency budget explicit; no hidden generic reset supervisor.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-05",
+                  "priority": "P0",
+                  "depends_on": [
+                    "H747-02",
+                    "H747-03",
+                    "H747-04"
+                  ],
+                  "tasks": [
+                    "Implement exact H747 AMP port: HSEM bounded claim, correct per-core notification, verified coherent32-bit control access, noncache shared MPU region and owned barriers.",
+                    "Bind existing AMPIPC common mechanism to two lanes; keep shared memory initialization under one boot owner and preserve peer-live data."
+                  ],
+                  "exit_conditions": [
+                    "No dual writer to a cache line, no heap/cross-core pointers; shared window aliases/attributes match per-core view; only exact ACK or reviewed stop proof releases loan."
+                  ],
+                  "validation_plan": [
+                    "Production port MMIO/cache/HSEM GoogleMock tests; actual two-ELF consumer; lost/coalesced IRQ, stale epoch, full lane, partial claim/cleanup and no-overwrite tests."
+                  ],
+                  "resource_or_runtime_cost": "Per wire slot256 bytes plus caller-local slot metadata and explicit payload; two64-byte boot words per reviewed lane topology; HSEM IDs/IRQ costs declared.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-06",
+                  "priority": "P1",
+                  "depends_on": [
+                    "H747-05"
+                  ],
+                  "tasks": [
+                    "Create per-core baremetal baseline first; then one reviewed RTOS backend per core with independent ticks, scheduler state, FPU context and IRQ syscall policy.",
+                    "Provide minimal external example ping-pong/loan transfer and commands for paired flash/debug, per-core logs and image identities."
+                  ],
+                  "exit_conditions": [
+                    "Baremetal pair software links first; RTOS pair separately qualifies ABI/ISR/FPU/tick closure; users can build/debug both images without hand-editing generated sources."
+                  ],
+                  "validation_plan": [
+                    "Actual ARM software matrix; public consumers and SourceSDK installed pair validation; host loss/backpressure/cancel coverage; no claim of intercore timing from host runs."
+                  ],
+                  "resource_or_runtime_cost": "Each selected OS has its own stack/heap/control cost; baseline remains allocation-free optional AMP.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-07",
+                  "priority": "P1",
+                  "depends_on": [
+                    "H747-05",
+                    "H747-06"
+                  ],
+                  "tasks": [
+                    "Prepare paired HIL manifests, SWD reset/core-attach sequence, clock/MPU dumps and trace schema.",
+                    "Measure bidirectional bytes/latency/load/stack/IRQ bounds; inject peer stall/reset, cache mode mistakes, stale lane data and retained DMA references."
+                  ],
+                  "exit_conditions": [
+                    "Physical reports bind both ELFs/configs, exact chip revision/PCB/probe/clock; source stop and no-overwrite proven within tested fault matrix; unknown cases remain explicit."
+                  ],
+                  "validation_plan": [
+                    "Hardware required for physical exit. Before connection, validate only plan/schema/tool dry-run; physical status remains not_executed."
+                  ],
+                  "resource_or_runtime_cost": "Bounded payload sizes and explicit counters; performance observations reported by mode/size/cache/clock/core load, not universal maxima.",
+                  "physical_required_for_software_exit": false
+                },
+                {
+                  "id": "H747-08",
+                  "priority": "P2",
+                  "depends_on": [
+                    "H747-07"
+                  ],
+                  "tasks": [
+                    "Consider cached payload, richer DMA-assisted transport or selective peripheral ownership only after measured bottlenecks justify them.",
+                    "Compare equal configuration full ELF resource and measured transfer costs; preserve common lane contract and cold/static composition."
+                  ],
+                  "exit_conditions": [
+                    "A concrete equal-config gain and full-line ownership evidence justify each new mode; regression to7chip baseline and SDK/docs checks pass."
+                  ],
+                  "validation_plan": [
+                    "Actual RED/GREEN defects only; compiler/artifact costs plus matched HIL throughput/latency/cache-fault measurements."
+                  ],
+                  "resource_or_runtime_cost": "No speculative runtime abstraction or manager added by default.",
+                  "physical_required_for_software_exit": false
+                }
+              ],
+              "physical_unknowns": [
+                "Full orderable part suffix/package/temperature/silicon revision and actual board/PCB revision are not specified by STM32H747XI alone.",
+                "No H747 board, crystal/supply/SMPS wiring, external devices, boot option bytes, reset/debug arrangement or physical core launch has been observed.",
+                "Exact shared-bank reachability/aliases, MPU/cache attributes and DMA masters must be source-reviewed for this target; header bases alone do not prove cross-core coherency.",
+                "No trusted monotonic boot identity persistence, exact peer-reset/DMA termination proof, hardware HSEM IRQ behavior or paired OS timing is currently implemented/qualified."
+              ],
+              "delivery_status_vocabulary": [
+                "dependency_available",
+                "source_reviewed",
+                "software_configured",
+                "arm_linked",
+                "model_executed",
+                "physical_not_executed",
+                "physical_observed_in_exact_scope"
+              ],
+              "source_identities": [
+                {
+                  "path": "components/amp_ipc/README.md",
+                  "sha256": "cbb00ffce4097351f6f55b1025516a2bafb37d91946a755d64162681b75cf49c",
+                  "bytes": 5164
+                },
+                {
+                  "path": "components/amp_ipc/CMakeLists.txt",
+                  "sha256": "ed671b03e4b31ee054d4c5ba16a620c2f21b2293adfd4f363e667928ff4fefd1",
+                  "bytes": 412
+                },
+                {
+                  "path": "components/amp_ipc/include/nexus/components/amp_ipc.h",
+                  "sha256": "90d45ac1bd262464b5eb6152ec5f1520568ccd79a62951e990fe76d1989e334d",
+                  "bytes": 7054
+                },
+                {
+                  "path": "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
+                  "sha256": "e9b915b5e1f9610699b3f6ff93d1556e3b555fdcb39a4b667ffb3ae95bf46354",
+                  "bytes": 2550
+                },
+                {
+                  "path": "components/amp_ipc/src/amp_ipc.c",
+                  "sha256": "c1d0625b268b9a7edb91391c34077d30f0cf0caec3df65b0d7732d3ecae41790",
+                  "bytes": 16241
+                },
+                {
+                  "path": "tests/google/amp_ipc.cmake",
+                  "sha256": "031e88849d7a01ab6466298cf9879c22f4edda9449dddb220950efd0a98f1345",
+                  "bytes": 173
+                },
+                {
+                  "path": "tests/google/amp_ipc_test.cpp",
+                  "sha256": "84bc75e2f1e1673062fb2f4691fc8ec29860b72b3cde2c7782ebf8754da75bd1",
+                  "bytes": 21655
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Include/stm32h7xx.h",
+                  "sha256": "99ac7d4598e20d9bd74e0e001f0e63c2a8eb0a3584242d9e442be31ceb616cb9",
+                  "bytes": 11834
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Include/stm32h747xx.h",
+                  "sha256": "78d84d7042b66f7ee07dc86a6e794b2a0774e464ae945961bed19573dd46ea07",
+                  "bytes": 2390718
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Source/Templates/gcc/startup_stm32h747xx.s",
+                  "sha256": "f74e06e89b7050677e33b98acff63c5b32ebb3a12bc7625391a253ee8d788585",
+                  "bytes": 29907
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Source/Templates/gcc/linker/stm32h747xx_flash_CM7.ld",
+                  "sha256": "bb3ddb4ba9da4c710b779495d8f49860380bd122b77bec9215d0cd200a4c5f02",
+                  "bytes": 5151
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Source/Templates/gcc/linker/stm32h747xx_flash_CM4.ld",
+                  "sha256": "93bda6313c71bc58c91b9f5f9dd4f2c151b481a5f720b7aec91120dd1c14208d",
+                  "bytes": 4916
+                },
+                {
+                  "path": "vendors/st/cmsis_device_h7/Source/Templates/system_stm32h7xx.c",
+                  "sha256": "95a8fc5a6d765a78a8b6f0dd1fedc48994096df544e611e951c6c2e4426570e6",
+                  "bytes": 19751
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Inc/stm32h7xx_hal_hsem.h",
+                  "sha256": "9375fc3023cde3f3ccf0a77a21d571d63acbe47f23149c2f226972cecdffdc6f",
+                  "bytes": 6827
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_hsem.c",
+                  "sha256": "9878195481869a883edb4c2c4e5f62b7f5764ffbb517bd38a2fae4e2150f8eb0",
+                  "bytes": 14796
+                },
+                {
+                  "path": "vendors/st/stm32h7_hal/Inc/stm32h7xx_hal_rcc_ex.h",
+                  "sha256": "cbebc9c87db8acada7da2fd06994a998528d447960ec62737fd65cace4fd34bf",
+                  "bytes": 211252
+                },
+                {
+                  "path": "tools/configure/cpu.py",
+                  "sha256": "10b50bef8bbb5df0e05f10538ef0e392c9ca09d1da913c6a5fc18f8af5602581",
+                  "bytes": 19128
+                },
+                {
+                  "path": "arch/arm/cortex_m/nx_arch_cache.c",
+                  "sha256": "81183e754e7ac5d5140b2a24df2ce59fc207361cddba637de90979ea0dee4a1e",
+                  "bytes": 3771
+                }
+              ]
+            },
+            "work_package_count": 8,
+            "source_plan": {
+              "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/next-reference-targets/h747-amp.json",
+              "sha256": "bb3825ab5aba245c3b61a7f6a05ded5d1c9fd27ceac830696882830f0ce3a51f",
+              "size": 18805
+            }
+          }
+        },
+        "limits": [
+          "User selection fixes reference direction; it does not establish complete order-code/PCB/electrical facts, provider implementation or qualification.",
+          "The current 64-chain/67-image SDK and seven-chip checks do not cover these additional reference providers.",
+          "H563 organization SDK dependencies are not integrated; upstreams are known, organization names returned 404 through the current connection. Existing organization repositories must be confirmed rather than assumed absent."
+        ]
       }
     }
   }
