@@ -15,7 +15,9 @@ extern "C" {
  * \note Context is one explicitly sized private state span. Geometry and
  * mapped address stay fixed. map SUCCESS establishes the
  * readable aperture; map failure leaves no effects. unmap SUCCESS proves all
- * aperture/cache references withdrawn; failure retains the last map loan.
+ * aperture/cache references withdrawn; failure retains the last map loan and
+ * closes reader/writer admission. Readers remain joined after a release
+ * attempt; a retained loan authorizes cleanup retry, not renewed access.
  * start is called only after request admission and mapping exclusion. start
  * errors may have effects and always proceed through drain. poll advances
  * bounded work, returns BUSY or a terminal result, and supplies monotonically

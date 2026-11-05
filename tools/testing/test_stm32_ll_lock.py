@@ -75,6 +75,23 @@ class MainstreamLLTests(unittest.TestCase):
         self.assertNotEqual(compatibility["paired_cmsis_commit"], profile.cmsis_commit)
         self.assertEqual(compatibility["files"], ["Include/stm32g4xx.h"])
 
+    def test_h7_reference_transports_close_qspi_mdma_and_hsem_inputs(self):
+        profile = PROFILES["h7"]
+        required = {
+            "Inc/stm32h7xx_ll_hsem.h", "Src/stm32h7xx_hal_qspi.c",
+            "Src/stm32h7xx_hal_mdma.c", "Inc/stm32h7xx_hal.h",
+            "Inc/stm32h7xx_hal_def.h", "Inc/stm32h7xx_hal_qspi.h",
+            "Inc/stm32h7xx_hal_mdma.h", "Inc/stm32h7xx_ll_delayblock.h",
+            "Inc/Legacy/stm32_hal_legacy.h",
+        }
+        lock = json.loads((ROOT / profile.lock_name).read_text())
+        self.assertFalse(required - profile.contract(lock))
+        for name in required:
+            changed = copy.deepcopy(lock)
+            changed["files"].pop(name)
+            with self.subTest(missing=name), self.assertRaises(ValueError):
+                profile.contract(changed)
+
 
 if __name__ == "__main__":
     unittest.main()

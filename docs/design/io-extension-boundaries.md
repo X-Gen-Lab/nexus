@@ -18,8 +18,8 @@ software development results do not establish a clean software candidate.
 
 | Increment | Public assembly | Current software scope |
 | --- | --- | --- |
-| Mapped ownership | `Nexus::MappedStorage`; Native-only `Nexus::NativeMappedStorage` | Caller-owned read slots and one writer; coherent Native NOR bytes |
-| AMP epoch/cache core | `Nexus::AMPIPC` | Explicit unidirectional lanes, caller-owned shared records and hardware ports |
+| Mapped ownership | `Nexus::MappedStorage`; `Nexus::NativeMappedStorage`; selected H743 reference | Caller-owned read slots and one writer; coherent Native NOR or the restricted serial-memory reference below |
+| AMP epoch/cache core | `Nexus::AMPIPC`; selected `Nexus::H747AMP` attachment | Explicit unidirectional lanes, caller-owned shared records and external paired-boot ownership |
 | Running-image tail handoff | `Nexus::STM32F407Handoff` | Exact STM32F407VET6/ZGT6 baremetal Platform only |
 | Retained RTC AlarmA | Normal U575 Platform/factory; `u575-rtc-run.toml` | TZEN=0, MSIS4, baremetal, prepared retained LSE calendar, RUN polling |
 | Frame layouts and DMA2D | `Nexus::IO`; optional `Nexus::H743FrameDMA2D` | Common frame contracts; exact H743 V, D-Cache off, RGB565 copy or fixed ARGB8888-to-RGB565 PFC in AXI SRAM |
@@ -59,9 +59,11 @@ and [owner](../../components/mapped_storage/include/nexus/components/mapped_stor
 use exact instance/slot/epoch loans. Copying a token creates no new loan; epochs
 never wrap. A live supported CPU/XIP/DMA-read loan excludes every PROGRAM/ERASE
 writer to the entire aperture. All command, cache and DMA writers must use the
-sole backend. Consumers join before release; failed final unmap retains the exact
-loan and blocks writers. Stop permanently closes admission and waits for all maps
-and the writer without revoking them.
+sole backend. Consumers join before release. A failed final unmap retains the
+exact loan for cleanup retry only; joined readers must not resume through the
+view. The portable owner closes new reader and writer admission, while release
+and stop cleanup may be retried. Stop permanently closes admission and waits for
+all maps and the writer without revoking them.
 
 Writer admission checks geometry, alignment, overflow and aliasing against owner,
 slots, backend context and aperture before effects. Accepted PROGRAM retains its
@@ -70,8 +72,34 @@ After backend recovery, continued service can retry failed drain. The
 [Native backend](../../components/mapped_storage/include/nexus/components/native_mapped_storage.h)
 preserves caller bytes, programs only 1-to-0, erases to `0xff` and mutates at most
 the configured byte quantum per service call. It accepts coherent CPU reads only.
-Physical QUADSPI/serial memory, SDMMC, XIP/cache/DMA qualification and resource
-factory assembly remain open.
+General serial-memory/SDMMC providers, XIP/cache/DMA qualification and resource
+factory assembly remain open. The selected H743 reference below does not close
+those broader exits.
+
+### Selected H743 serial-memory reference
+
+The initial STM32H743/W25Q128JV contract selects exact JEDEC ID `EF4018`,
+single-line commands, address and data, and both I-Cache and D-Cache off. The integrator supplies
+reviewed QUADSPI clocks, pins, memory placement and electrical preparation. This
+is an explicit software reference, not a new Board route or generic serial-memory
+factory. A source dependency on official QSPI code does not establish physical
+Flash behavior.
+
+Before an indirect command, the reference must exclude the entire mapped
+aperture through a checked MPU guard. It must reject an overlapping higher-priority
+region or an unproved layout rather than let a CPU reader bypass exclusion.
+Restoring the aperture requires a proved mapped controller and checked guard
+restoration; failure retains quarantine. The MPU does not stop DMA or other
+bus masters, whose exclusion remains an explicit external responsibility.
+
+The mapped owner remains the sole writer and controls the complete transition
+between memory-mapped reads and indirect PROGRAM/ERASE. Every live aperture loan
+and reader must be joined before leaving mapped mode; cancellation never revokes
+a map. Accepted writes retain input through real drain, and partial effects are
+not replayed. Restoring a memory-mapped register value does not prove a readable
+aperture or erase completion. Unsupported cache/XIP/DMA and other Flash parts need
+their own admission and final-access proof; the selected reference does not
+qualify them.
 
 ### AMP epoch/cache lanes
 
@@ -95,8 +123,34 @@ that view even if ACK cache clean or epoch validation fails, while local state
 remains retained for retry
 or recovery. `close` blocks admission; `join` waits for ACKs and finished views;
 `reset_join` additionally requires exact peer-stop proof. There is no cancel or
-blocking-wait API. Exact multicore target, cache attributes, atomicity and resource
-partition are unselected; single-core H743 is not an AMP target.
+blocking-wait API. The selected H747 attachment below narrows one multicore
+reference; it does not supply a general boot or partition policy. Single-core
+H743 is not an AMP target.
+
+### Selected H747 external paired-boot attachment
+
+The [H747 attachment](../../components/soc/stm32/stm32h747_amp/include/nexus/components/stm32h747_amp.h)
+connects the core to an already established Cortex-M7/Cortex-M4 paired boot.
+It does not launch or reset a CPU, set global clocks or create an MPU layout.
+The initial reference requires M7 D-Cache off, compatible noncacheable shared
+attributes and one complete shared reservation kept out of both startup-clearing
+ranges. Shared wire records, boot words and payloads must occupy that reservation; local
+endpoint, port and slot metadata stay outside it. Checking only the first address
+cannot establish the layout.
+
+Each role supplies a distinct HSEM claim and outgoing doorbell, a serialized
+privileged Thread executor and an external persistent boot-epoch authority.
+Reused epochs reject even after whole-device reset. A doorbell is a hint, never
+an ACK; the existing offer/ACK predicates remain authoritative. Joining an
+endpoint relinquishes its hardware role claim, not the peer CPU, shared SRAM or
+external boot runtime.
+
+The reference cannot prove that a stopped or reset peer has permanently lost
+access to an old epoch. That peer-reset proof is `UNSUPPORTED`; a timeout,
+changed peer epoch or unsuccessful join keeps payload and port storage alive.
+Applications must not replace this missing proof with a reset-register write or
+reuse borrowed storage. Physical multicore ordering, cache behavior and board
+qualification remain independent station work.
 
 ### F407 masked tail handoff and clock barrier
 

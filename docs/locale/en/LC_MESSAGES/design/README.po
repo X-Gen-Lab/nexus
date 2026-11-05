@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 198ea3b149e4510dca3aa594db5b0365544e9751c629f62f9df21289a2bced9e\n"
+"X-Nexus-Source-SHA256: 42f3ecd628097d8cade5cfdeb8dd561428f53347dc0a2f1ff62410e179a9a3b0\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:1
 msgid "当前设计与实施台账"
@@ -150,6 +150,12 @@ msgstr "[Architecture blueprint](next-generation-platform.md)"
 msgid "原理、执行、所有权、性能/空间与支持边界"
 msgstr ""
 "Principles, execution, ownership, performance/storage and support boundaries"
+
+msgid "{download}`SoC/IP 目录整理 48 项台账 <soc-ip-layout-execution.csv>`"
+msgstr "{download}`48-task SoC/IP layout ledger <soc-ip-layout-execution.csv>`"
+
+msgid "八组路径、配置、构建与验证任务；实现、软件执行和实板状态分别记录"
+msgstr "Eight groups covering paths, configuration, builds and verification; implementation, software execution and physical status are recorded separately"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
 msgid "[I/O 增量架构](io-evolution.md)"
@@ -472,11 +478,8 @@ msgstr ""
 msgid "[I3C controller 核心](i3c-controller.md)"
 msgstr "[I3C controller core](i3c-controller.md)"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
-msgid "单活动有限 SDR/DAA/CCC 与复制 IBI/hot-join；H563 仅编译参考，无物理 provider"
-msgstr ""
-"One active finite SDR/DAA/CCC request and copied IBI/hot-join events; H563 "
-"is a compile-only reference with no physical provider"
+msgid "单活动有限 SDR/DAA/CCC 与复制事件；H563 私有有界轮询参考，板级准备与整总线证明由外部提供"
+msgstr "One active finite SDR/DAA/CCC request and copied events; bounded private H563 polling reference with external Board preparation and whole-bus proofs"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
 msgid "[选定装配资格门禁](provider-assemblies.md)"
@@ -776,9 +779,3 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:121
 msgid "[Source compatibility and SDK versions](source-compatibility.md)"
 msgstr "[Source compatibility and SDK versions](source-compatibility.md)"
-
-msgid "{download}`SoC/IP 目录整理 48 项台账 <soc-ip-layout-execution.csv>`"
-msgstr "{download}`48-task SoC/IP layout ledger <soc-ip-layout-execution.csv>`"
-
-msgid "八组路径、配置、构建与验证任务；实现、软件执行和实板状态分别记录"
-msgstr "Eight groups covering paths, configuration, builds and verification; implementation, software execution and physical status are recorded separately"

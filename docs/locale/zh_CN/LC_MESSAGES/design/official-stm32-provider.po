@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5a3abc710623f5a88874a773b64641fbad2a2ab13982bda23bad4296a956ffa5\n"
+"X-Nexus-Source-SHA256: 4363e10966cd77a89430c97fb2224a030f78e938be09d6dc6a4defb4ef6ac721\n"
 
 msgid "Official drivers and provider iteration"
 msgstr "官方驱动与 provider 迭代"
@@ -47,7 +47,6 @@ msgstr "官方库优先目标与当前实现"
 
 msgid "Official hardware libraries are the default input for further provider work. Reuse reviewed HAL transport when it satisfies the complete selected mode; otherwise bind suitable LL or SPL primitives to the required bounded mechanism. Nexus retains admission, borrowed storage, deadlines, result publication and resource responsibility. Direct register helpers remain justified exceptions for an exact SDK gap, erratum, atomic operation or demonstrated budget."
 msgstr "官方硬件库是后续 provider 工作的默认输入。已审查 HAL transport 满足完整所选模式时予以复用；否则将合适的 LL 或 SPL 原语静态绑定到所需有界机制。Nexus 保留准入、借用存储、deadline、结果发布和资源责任。直接寄存器 helper 仅作为精确 SDK 缺口、erratum、原子操作或实测预算的有理由例外。"
-
 
 msgid "The selected F407 UART `dma-tx` provider uses official HAL finite TX with a disjoint LL IRQ receiver under one private owner. Other F407 UART modes retain their existing engines; G4, H7 and U5 retain their reviewed LL integrations. GD32F470 compiles selected official SPL C units. Source selection, model tests, ARM links and physical execution remain separate evidence. An include, primitive call or finite-TX fixture alone does not establish a complete transport or family qualification."
 msgstr "所选 F407 UART `dma-tx` provider 在一个私有 owner 内使用官方 HAL 有限 TX 和分离的 LL IRQ 接收器。其他 F407 UART 模式保留既有引擎；G4、H7 和 U5 保留已审查的 LL 集成。GD32F470 编译所选官方 SPL C 单元。源码选择、模型测试、ARM 链接和物理执行仍是分别取得的证据。仅 include、原语调用或有限 TX 夹具不能建立完整 transport 或系列资格。"
@@ -109,12 +108,61 @@ msgstr "本轮覆盖 STM32F103、STM32F407、STM32G474、STM32H743、STM32U575�
 msgid "The 71-entry assembly catalogue is one input, not the complete closure. Derive navigation from the existing capability/provider/source catalogues, provider fixtures, installed-SDK consumers, selected components and external examples. The maintained `tools/maintenance/work_packages.py` joins existing authorities; it does not execute tests or grant support. A mode needs its exact part/density, Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA, memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch coverage and the independent ThreadX subset do not expand this SoC matrix."
 msgstr "含 71 项的装配 catalogue 是一个输入，不是完整闭包。导航由现有 capability/provider/source catalogue、provider 夹具、已安装 SDK consumer、所选组件及外部示例派生。维护中的 `tools/maintenance/work_packages.py` 联查既有权威，不执行测试或授予支持。一个模式需要共同审查精确料号/density、Board/revision、route、backend/kernel policy、clock、format、IRQ/DMA、memory/Cache/security/power profile 和 SDK pin。CPU-only Arch 覆盖与独立 ThreadX 子集不扩大该 SoC 矩阵。"
 
-
 msgid "The frozen source review at `89485943` preserves all 217 declared identities, including its 33 unselected identities and 19 Native MODEL rows. Separate source annexes now review those 33 declarations, seven components and seven system owners. The fresh `5e82bab6` matrix selects 29 identities in 11 ARM images and rejects four reserved G474 selections; it does not execute those images or change the original inventory. Authorized private examples still need a separate annex."
 msgstr "冻结在 `89485943` 的源码审查保留全部 217 个已声明身份，其中包括当时未选入夹具的 33 个身份和 19 个 Native MODEL 行。独立源码附录现已审查这 33 项声明、七个组件和七个 system owner。全新 `5e82bab6` 矩阵在 11 个 ARM 镜像中选入 29 个身份，并拒绝四项被保留资源约束的 G474 选择；它没有执行这些镜像，也不改变原清单。已授权的私有示例仍需独立附录。"
 
 msgid "F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling, H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain separate checks. A finite HAL UART result cannot qualify FIFO, continuous, chained, duplex or cross-domain operation."
 msgstr "F103/GD303 errata、F407/GD470 stream DMA、G474 DMAMUX 与触发耦合、H743 Cache/域/线上完成以及 U575 GPDMA/保留/TrustZone 分别验证。有限 HAL UART 结果不能授予 FIFO、连续、链式、双向或跨域操作资格。"
+
+msgid "Additional software-reference sources"
+msgstr "新增的软件参考源码"
+
+msgid ""
+"H563 I3C, H743/W25Q128JV mapped storage and H747 paired-boot AMP are "
+"explicit software references alongside the seven maintained MCU SoC "
+"provider families. They do not create a new supported Board, imply "
+"general H5/H7 family coverage or inherit a physical result from header "
+"compilation."
+msgstr ""
+"H563 I3C、H743/W25Q128JV 映射存储和 H747 成对启动 AMP，是与七个已维护 MCU SoC provider "
+"家族并列记录的明确软件参考。它们不新增已支持 Board，不意味着通用 H5/H7 系列覆盖，也不从头文件编译继承实板结果。"
+
+msgid ""
+"H563 source verification uses the exact CMSIS-device/HAL children of "
+"STM32CubeH5 v1.7.0, retained in the organization forks and locked by "
+"[`stm32h5.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/dependencies/stm32h5.lock.json) and "
+"[`stm32h5-hal.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/dependencies/stm32h5-hal.lock.json). The selected "
+"HAL child includes the Cube-selected ETH correction after its own release"
+" tag; the Cube pair, not that tag alone, owns compatibility. Existing "
+"CMSIS Core 6 remains shared. H563 uses one bounded LL polling owner "
+"because HAL polling waits and interrupt-span retention do not match the "
+"existing I3C pump contract."
+msgstr ""
+"H563 源码验证采用 STM32CubeH5 v1.7.0 的精确 CMSIS-device/HAL 子版本，通过组织 fork 保留，并由 "
+"[`stm32h5.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/dependencies/stm32h5.lock.json) 与 "
+"[`stm32h5-hal.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/dependencies/stm32h5-hal.lock.json) 锁定。选定 HAL "
+"子版本包含其发布标签之后、由 Cube 选定的 ETH 修正；兼容性由 Cube 配对决定，不能只看该标签。既有 CMSIS Core 6 "
+"继续共享。H563 使用单一有界 LL 轮询 owner，因为 HAL 轮询等待与中断区间保留不符合既有 I3C pump 合同。"
+
+msgid ""
+"H743 and H747 reuse the already pinned H7 dependency commit. The SDK "
+"carries the union of separately reviewed H743/H747 device source closures"
+" under one Gitlink; each source lock retains its own selector, exact "
+"files and notice. This payload union does not select both startup files "
+"in firmware or change the H743 device macro. QSPI/HSEM input availability"
+" is distinct from transfer, boot and recovery correctness. See the [I3C "
+"contract](i3c-controller.md) and the [selected storage/AMP boundaries"
+"](io-extension-boundaries.md) for their narrower memory, progress and "
+"failure responsibilities."
+msgstr ""
+"H743 与 H747 复用已锁定的 H7 依赖提交。SDK 在同一 Gitlink 下携带分别审查的 H743/H747 "
+"器件源码闭包的并集；各源码锁保留自己的选择符、精确文件和许可声明。此 payload 并集不会在固件中同时选择两个启动文件，也不会改变 H743 "
+"器件宏。QSPI/HSEM 输入可用性与传输、启动和恢复正确性分别验证。更窄的内存、推进和失败责任见 [I3C 合同](i3c-"
+"controller.md)及[选定存储/AMP 边界](io-extension-boundaries.md)。"
 
 msgid "Exact STM32 errata review worksheet"
 msgstr "精确 STM32 勘误审查工作表"
@@ -609,7 +657,6 @@ msgstr "各家族冻结的 `LegacyTransportProfile` 向现有 emitter 提供精�
 msgid "See the [UART private contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h) for the exact storage, callback and lifetime requirements. Host tests exercise the actual SoC wrapper, shared engine and GPIO model; generated factory validation and final ARM resource measurements remain separate evidence scopes."
 msgstr "精确存储、callback 与寿命要求见 [UART 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)。主机测试执行实际 SoC wrapper、共享 engine 与 GPIO model；生成 factory 校验和最终 ARM 资源测量仍是独立证据范围。"
 
-
 msgid "Selected legacy cold integration"
 msgstr "选定 legacy 冷态集成"
 
@@ -911,7 +958,6 @@ msgstr ""
 "软件候选仍要求 clean source、精确依赖和配置身份、独立 SDK "
 "消费，以及同产物的两次全新断网构建。迭代检查表或派生工作包报告均不授予这一状态。既有 release "
 "tag、附件和原始证据保持不可变。没有连接实板时，HIL 保持 `not_executed`，不得把纯软件迭代称为产品发布或安全资格。"
-
 
 msgid "Selected F407VE/ZG and GD470 offset images now have reviewed configuration, startup, vector/linker and ELF-to-BIN boundaries; the [assembly reference](../reference/configuration/assembly.md#physical-flash-and-the-selected-image) distinguishes their image window from complete physical Flash. This is not boot authentication, Flash access control or running-image handoff qualification. The F407 handoff retains PRIMASK=1 and startup does not unmask it; an offset FreeRTOS link cannot establish a valid FreeRTOS handoff."
 msgstr "所选 F407VE/ZG 和 GD470 偏移镜像已有已审查的配置、startup、向量/linker 及 ELF-to-BIN 边界；[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)区分镜像窗口和完整物理 Flash。这不是启动认证、Flash 访问控制或运行态镜像交接资格。F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移 FreeRTOS 链接不能建立有效 FreeRTOS handoff。"

@@ -62,6 +62,26 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("official", result.stdout + result.stderr)
 
+    def test_h5_reference_verifies_locked_sources_without_selecting_hal_runtime(self):
+        from tools.maintenance import stm32h5_hal_lock as h5
+        result = self.configure(
+            'nexus_stm32_official(provider h5)\n'
+            'get_target_property(private provider INCLUDE_DIRECTORIES)\n'
+            'get_target_property(public provider INTERFACE_INCLUDE_DIRECTORIES)\n'
+            'get_target_property(sources provider SOURCES)\n'
+            'get_target_property(pin provider NEXUS_STM32_OFFICIAL_REVISION)\n'
+            'get_property(inputs DIRECTORY PROPERTY CMAKE_CONFIGURE_DEPENDS)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/properties" '
+            '"${private}\\n${public}\\n${sources}\\n${pin}\\n${inputs}\\n")\n')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        lines = (self.root / "build/properties").read_text().splitlines()
+        self.assertEqual(lines[:4], [str(ROOT / h5.DIRECTORY / "Inc"),
+                                     "public-NOTFOUND", "empty.c",
+                                     h5.PROFILE.commit])
+        observed = set(lines[4].split(";"))
+        self.assertFalse({str(ROOT / h5.DIRECTORY / name)
+                          for name in h5.PROFILE.selected_files} - observed)
+
     def test_f103_all_locked_driver_inputs_retrigger_source_verification(self):
         from tools.maintenance import stm32f1_hal_lock as f1
         generated = self.root / "generated"

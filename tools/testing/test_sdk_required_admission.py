@@ -73,6 +73,24 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                                     "file identity changed: ordinary.c"):
             self.sdk.verify(self.root)
 
+    def test_reference_component_omissions_reject_before_payload_reads(self):
+        self.complete_required_map()
+        for name in (
+                "components/soc/stm32/stm32h563_i3c/src/stm32h563_i3c_port.c",
+                "soc/stm32/stm32h743/drivers/w25q128_mapped.c",
+                "components/soc/stm32/stm32h747_amp/src/hardware.c"):
+            with self.subTest(missing=name):
+                original = self.files.pop(name, None)
+                try:
+                    self.write_manifest()
+                    with self.assertRaisesRegex(
+                            self.sdk.SDKError,
+                            "missing required sources/licenses"):
+                        self.sdk.verify(self.root)
+                finally:
+                    if original is not None:
+                        self.files[name] = original
+
     def test_complete_required_map_still_rejects_unsafe_payload_paths(self):
         self.complete_required_map()
         self.files = {"../outside.c": "d" * 64, **self.files}

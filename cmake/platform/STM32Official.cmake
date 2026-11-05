@@ -122,10 +122,10 @@ function(nexus_stm32f407_uart_hal target)
 endfunction()
 
 # Family-specific profiles share immutable-source verification, never register
-# layout, transfer state or hardware ownership. No vendor C runtime is selected.
+# layout, transfer state or hardware ownership. This helper selects no source.
 function(nexus_stm32_official target family)
     if(NOT ARGC EQUAL 2 OR NOT TARGET "${target}" OR
-            NOT family MATCHES "^(f1|g4|h7|u5)$")
+            NOT family MATCHES "^(f1|g4|h5|h7|u5)$")
         message(FATAL_ERROR "Official LL requires one owned target and reviewed family")
     endif()
     get_target_property(kind "${target}" TYPE)

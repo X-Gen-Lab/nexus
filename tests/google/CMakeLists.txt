@@ -633,7 +633,9 @@ include(h743_uart_continuous.cmake)
 include(uart_fifo_acquisition_probe.cmake)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
+include(h743_w25q128.cmake)
 include(amp_ipc.cmake)
+include(h747_amp.cmake)
 include(stm32f407_handoff.cmake)
 include(f407_i2s2_slave_tx.cmake)
 include(frame_stream.cmake)
@@ -642,6 +644,7 @@ include(u575_retained_time.cmake)
 include(u575_stop2.cmake)
 
 include(i3c_controller.cmake)
+include(h563_i3c_port.cmake)
 
 include(u575_memory.cmake)
 

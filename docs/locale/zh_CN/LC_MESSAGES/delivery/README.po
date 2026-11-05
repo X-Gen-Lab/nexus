@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 984e4b2cc282cf6c4d77d155a61034a9fd3c6fb2829f1f2077ff2ea1f0c63229\n"
+"X-Nexus-Source-SHA256: e93d434fe6a27fce5a649cf27fdaf1ce4d1e05eea9910631fb18e6e1dde48706\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:1
 msgid "当前平台交付"
@@ -31,6 +31,9 @@ msgstr "本轮最新选定软件候选固定 P2 `ab532250`，两轮完整159、�
 
 msgid "Drivers／I/O／SoC 的后续实现、勘误修复、目录归属、构建依赖和定向验证，统一从 {download}`本轮记录 <platform-delivery-completion-results.json>`中的 `source_version_records_20261105.drivers_io_soc_20261105` 进入。各项结果只覆盖记录的 源码、配置和实际执行范围；该记录不继承 P2 候选资格。实板项目与需要另选硬件目标的 扩展分别保留条件，物理 HIL 仍为 `not_executed`。"
 msgstr "Drivers／I/O／SoC 的后续实现、勘误修复、目录归属、构建依赖和定向验证，统一从 {download}`本轮记录 <platform-delivery-completion-results.json>`中的 `source_version_records_20261105.drivers_io_soc_20261105` 进入。各项结果只覆盖记录的 源码、配置和实际执行范围；该记录不继承 P2 候选资格。实板项目与需要另选硬件目标的 扩展分别保留条件，物理 HIL 仍为 `not_executed`。"
+
+msgid "新增 H563 I3C、H743/W25Q128JV 映射存储和 H747 成对启动 AMP 的有界软件参考， 从{download}`同一交付结果 <platform-delivery-completion-results.json>`中的 `source_version_records_20261106.reference_platforms_20261106` 进入，与上一轮 `90088b4f` 源码记录分别绑定。三项参考不新增 SoC、Board 或 HIL 支持；原 26 项 工作包的完整退出条件保持不变。Factory、启动、RTOS、cache、DMA、XIP 和 HIL 的 剩余条件按该记录逐项保留，不以这些有界实现代替全部退出。"
+msgstr "新增 H563 I3C、H743/W25Q128JV 映射存储和 H747 成对启动 AMP 的有界软件参考， 从{download}`同一交付结果 <platform-delivery-completion-results.json>`中的 `source_version_records_20261106.reference_platforms_20261106` 进入，与上一轮 `90088b4f` 源码记录分别绑定。三项参考不新增 SoC、Board 或 HIL 支持；原 26 项 工作包的完整退出条件保持不变。Factory、启动、RTOS、cache、DMA、XIP 和 HIL 的 剩余条件按该记录逐项保留，不以这些有界实现代替全部退出。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/delivery/README.md:8
 msgid ""

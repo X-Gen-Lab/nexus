@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
-        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 23)
-        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 18)
-        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 17)
+        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 25)
+        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 20)
+        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 19)
         self.assertEqual(len(catalogue.HOST_TEST_DEPENDENCIES), 1)
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")
         self.assertTrue(all(item.parent is None
@@ -50,7 +50,7 @@ class SourceCatalogueTests(unittest.TestCase):
 
     def test_real_root_and_nested_declarations_match_exact_catalogue(self):
         root = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
-        self.assertEqual(len(root), 18)
+        self.assertEqual(len(root), 20)
         nested = catalogue.declared_modules(
             (ROOT / "ext/freertos/.gitmodules").read_bytes(), "ext/freertos")
         self.assertEqual(set(nested), {

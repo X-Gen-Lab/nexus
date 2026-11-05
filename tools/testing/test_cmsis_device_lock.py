@@ -449,5 +449,29 @@ class STM32U5LockTests(DeviceLockContracts, unittest.TestCase):
     family = "u5"
 
 
+class STM32H747ReferenceLockTests(unittest.TestCase):
+    def test_pair_reference_uses_separate_selector_without_widening_h743(self):
+        reference = cmsis_device_lock.REVIEWED_DEVICES.get("STM32H747xx")
+        self.assertIsNotNone(reference)
+        lock = json.loads((ROOT / reference["lock_name"]).read_text())
+        expected = {"Include/stm32h747xx.h", "Include/stm32h7xx.h",
+                    "Include/system_stm32h7xx.h", "LICENSE.md",
+                    "Source/Templates/gcc/startup_stm32h747xx.s"}
+        self.assertEqual(cmsis_device_lock.contract(lock), expected)
+        self.assertNotIn("Include/stm32h747xx.h",
+            cmsis_device_lock.REVIEWED_DEVICES["STM32H743ZIT6"]["files"])
+
+    def test_source_sdk_preserves_both_reviewed_device_closures(self):
+        specification = importlib.util.spec_from_file_location(
+            "h747_reference_sdk", ROOT / "cmake/package/package_source_sdk.py")
+        sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(sdk)
+        names = sdk.dependency_entries(ROOT, "vendors/st/cmsis_device_h7")
+        self.assertIn("Include/stm32h743xx.h", names)
+        self.assertIn("Include/stm32h747xx.h", names)
+        self.assertIn("Source/Templates/gcc/startup_stm32h747xx.s", names)
+        self.assertNotIn("Include/stm32h750xx.h", names)
+
+
 if __name__ == "__main__":
     unittest.main()

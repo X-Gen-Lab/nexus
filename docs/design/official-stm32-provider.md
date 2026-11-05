@@ -91,6 +91,31 @@ H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain
 separate checks. A finite HAL UART result cannot qualify FIFO, continuous,
 chained, duplex or cross-domain operation.
 
+### Additional software-reference sources
+
+H563 I3C, H743/W25Q128JV mapped storage and H747 paired-boot AMP are explicit
+software references alongside the seven maintained MCU SoC provider families. They do not
+create a new supported Board, imply general H5/H7 family coverage or inherit a
+physical result from header compilation.
+
+H563 source verification uses the exact CMSIS-device/HAL children of
+STM32CubeH5 v1.7.0, retained in the organization forks and locked by
+[`stm32h5.lock.json`](../../dependencies/stm32h5.lock.json) and
+[`stm32h5-hal.lock.json`](../../dependencies/stm32h5-hal.lock.json). The selected
+HAL child includes the Cube-selected ETH correction after its own release tag;
+the Cube pair, not that tag alone, owns compatibility. Existing CMSIS Core 6
+remains shared. H563 uses one bounded LL polling owner because HAL polling waits
+and interrupt-span retention do not match the existing I3C pump contract.
+
+H743 and H747 reuse the already pinned H7 dependency commit. The SDK carries the
+union of separately reviewed H743/H747 device source closures under one Gitlink;
+each source lock retains its own selector, exact files and notice. This payload
+union does not select both startup files in firmware or change the H743 device
+macro. QSPI/HSEM input availability is distinct from transfer, boot and recovery
+correctness. See the [I3C contract](i3c-controller.md) and the
+[selected storage/AMP boundaries](io-extension-boundaries.md) for their narrower
+memory, progress and failure responsibilities.
+
 ### Exact STM32 errata review worksheet
 
 Use the exact document revision and selected mode when reviewing a change.

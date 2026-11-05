@@ -50,7 +50,9 @@ typedef struct {
  * \brief Stable instance-bound identity of one read mapping
  * \note Fields are immutable until release. Data stays read-only. Join every
  * CPU, XIP instruction fetch and DMA reader before release; a copied token
- * grants no additional loan. A failed release keeps the complete loan live.
+ * grants no additional loan. A failed release retains cleanup responsibility;
+ * readers remain joined and must not resume access through the view. The
+ * portable owner closes admission and permits release/stop cleanup retry.
  */
 typedef struct {
     const void* instance;

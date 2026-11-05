@@ -114,6 +114,9 @@ static nx_result_t release(void* context,
     if (owner->loans == 1) {
         nx_result_t result = owner->backend.unmap(owner->backend.context);
         if (result != NX_SUCCESS) {
+            /* The aperture may already be inaccessible. Retain cleanup
+             * responsibility without admitting another reader or writer. */
+            owner->accepting = false;
             return result;
         }
     }
