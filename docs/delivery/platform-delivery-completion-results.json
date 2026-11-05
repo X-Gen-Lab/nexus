@@ -3955,8 +3955,8 @@
         },
         "E02": {
           "title": "文档事实漂移与双语修正",
-          "state": "bilingual_content_and_navigation_checked",
-          "actual": "132 pages / 264 language states pass fresh exact gettext admission, including independently reviewed 203 to 233 navigation correction. Strict clean-source rendering is recorded separately after execution.",
+          "state": "bilingual_content_navigation_and_strict_render_checked",
+          "actual": "132 pages / 264 language states pass fresh exact gettext admission and independent numeric/content review. Complete strict English/Chinese HTML build passed at clean 45b23cba; source and outcome are separately bound from code90088b4f.",
           "authority_refs": [
             "A05#N14",
             "A05#E06",
@@ -4577,7 +4577,24 @@
             "sha256": "eeb3d8f33b69c49656fe69e292cd6fe3c3b862689cc40667d5b026194d2fad02",
             "size": 5259
           },
-          "strict_render": "A fresh strict build will be bound to its own clean documentation commit in a subsequent observation; no render success is predeclared here."
+          "strict_render": {
+            "status": "passed",
+            "source_commit": "45b23cba7b6d54af1f150e56f581f892802f8af6",
+            "source_tree": "11f32ce31e4423e9aafce7ded01e8f13371bfe65",
+            "source_dirty": false,
+            "languages": [
+              "en",
+              "zh_CN"
+            ],
+            "qualification": false,
+            "tool_lock_sha256": "9c33a22690587cd9c02f1b2d78e0f9a70313f4359afa67dd404b449c8f565288",
+            "scope": "Fresh complete strict Doxygen/gettext/English/Chinese HTML at this clean documentation source. The later observation-only recording commit does not inherit software-candidate, publication or HIL qualification.",
+            "receipt": {
+              "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/final-documentation-build.json",
+              "sha256": "7e0b3557b29f7a07c01cb4f9ab2ba6bd8e784ca45e5aa16736d7fe3f8de10676",
+              "size": 59210
+            }
+          }
         },
         "optional_component_domains": {
           "status": "passed",
@@ -5135,6 +5152,11 @@
           "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/gd32/cold-lifecycle-review.json",
           "sha256": "c00a0c3a24e360f7e7235fa18781b059470e32b4b32f9be5af0cf3f90ad29145",
           "size": 18989
+        },
+        "strict_bilingual_render": {
+          "path": "/workspace/nexus/build/iteration-drivers-io-soc-20261105/final-documentation-build.json",
+          "sha256": "7e0b3557b29f7a07c01cb4f9ab2ba6bd8e784ca45e5aa16736d7fe3f8de10676",
+          "size": 59210
         }
       },
       "limitations": [
