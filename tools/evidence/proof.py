@@ -7,6 +7,7 @@ from functools import lru_cache
 import importlib.util
 import math
 import shutil
+from subprocess import CompletedProcess
 import sys
 import tempfile
 
@@ -760,6 +761,109 @@ def validate_consumer_inputs(inputs, sdk_identity, sdk_manifest, kind,
         raise EvidenceError("consumer generated bindings lack their unique compile row")
 
 
+def validate_consumer_observation(inputs, sdk, source, build, kind,
+                                  specification, observation, rows, output):
+    """Replay exact maintained scenarios with original verified outputs."""
+    from tools.evidence.identity import canonical_digest
+    from tools.release.transport import selected_domain
+
+    checker = consumer_checker()
+    native = kind == "selected"
+    if native:
+        if selected_domain(specification) != "native-time":
+            raise EvidenceError("Native observation requires its canonical domain")
+    elif (kind != "services" or
+            checker.service_profile(specification).scenario not in {
+                "image_window", "mcuboot_control"} or not specification.arm):
+        raise EvidenceError("provider-free observation requires its canonical domain")
+    image = build / "bin" / ("installed_selected" if native
+                             else "installed_services.elf")
+    config = build / "nexus-sdk/generated"
+    originals = {
+        "elf": image, "resolved": config / "resolved.json",
+        "bindings": config / "bindings.c",
+        "compile_commands": build / "compile_commands.json",
+        "sdk_manifest": sdk / ".nexus-source-sdk.json",
+        "private_probe": source / "private_headers.c",
+    }
+    canonical = set()
+    if native:
+        originals.update({"canonical_source": sdk /
+            "cmake/package/verification/io_evolution/consumers" /
+            (specification[2] + ".c"),
+            "assembly": sdk / specification[1],
+            "public_source": source / "main.c"})
+    else:
+        authored = checker.service_sources(sdk, specification)
+        canonical.update(authored.values())
+        canonical.add(sdk / "cmake/package/verification" /
+                      specification.scenario / specification.assembly)
+        originals.update({"assembly": source / "assembly.toml",
+            **{"consumer/" + name: source / name for name in authored}})
+    with tempfile.TemporaryDirectory(prefix="nexus-consumer-observation-") as directory:
+        temporary = Path(directory)
+        mappings = ((str(sdk), str(temporary / "sdk")),
+                    (str(source), str(temporary / "source")),
+                    (str(build), str(temporary / "build")))
+        def relocated(value):
+            for original, target in mappings:
+                value = value.replace(original, target)
+            return value
+        metadata = {build / "resolved-sdk.txt", build / "resolved-config.txt",
+                    build / "compile_commands.json"}
+        resource = build / "bin/installed_services.resources.json"
+        if not native:
+            metadata.add(resource)
+        for original in {*originals.values(), *metadata, *canonical}:
+            target = Path(relocated(str(original)))
+            target.parent.mkdir(parents=True, exist_ok=True)
+            actual = inputs.path(original)
+            if original in metadata:
+                target.write_text(relocated(actual.read_text()))
+            else:
+                shutil.copyfile(actual, target)
+        def replay(argv):
+            symbol = ["nm" if native else "arm-none-eabi-nm", "-S",
+                      "--defined-only", "--format=posix", str(image)]
+            allowed = [[str(image)], symbol] if native else [symbol]
+            expected = next((original for original in allowed if
+                argv == [relocated(value) for value in original]), None)
+            matching = [row for row in rows if row.get("argv") == expected]
+            if expected is None or len(matching) != 1:
+                raise EvidenceError("unique actual consumer observation command required")
+            log = output / matching[0].get("log", "")
+            if log.parent != output or ".." in log.parts:
+                raise EvidenceError("consumer command leaves its original execution")
+            receipt = inputs.command(log, argv=expected,
+                                     stage="source-sdk-consumer")
+            streams = [inputs.path(receipt[name]["path"], stream=True).read_text(
+                errors="replace") for name in ("stdout", "stderr")]
+            return CompletedProcess(expected, receipt["exit_code"], *streams)
+        try:
+            arguments = (Path(relocated(str(sdk))), Path(relocated(str(source))),
+                         Path(relocated(str(build))))
+            expected = (checker.check_selected_image(*arguments, replay,
+                owner_specification=specification) if native else
+                checker.check_service_image(*arguments, specification, replay))
+        except ValueError as error:
+            raise EvidenceError("consumer checker rejected original inputs: " +
+                                str(error)) from error
+        # Relocation changes metadata paths only. Preserve the identities of
+        # the original bytes, including the unmodified compile database.
+        identities = {key: {name: inputs.identities[str(original)][name]
+                           for name in ("path", "sha256", "size")}
+                      for key, original in originals.items()}
+        if native:
+            expected.update(identities, name=specification[0],
+                            assembly=str(sdk / specification[1]))
+        else:
+            expected["inputs"] = identities
+            expected["resources"] = {name: inputs.identities[str(resource)][name]
+                                     for name in ("path", "sha256", "size")}
+        if canonical_digest(observation) != canonical_digest(expected):
+            raise EvidenceError("consumer observation differs from checker replay")
+
+
 def validate_sdk_consumers(report, manifest, resolver=verify_file_identity,
                            proof_inputs=None, *, consumer_index=None,
                            require_owned=True):
@@ -913,6 +1017,13 @@ def validate_sdk_consumers(report, manifest, resolver=verify_file_identity,
                     if (observed_elf != inputs.identities[str(path)] or
                             observation.get("resources") != resource_identity):
                         raise EvidenceError("consumer observation differs from its actual ELF")
+                    if kind == "services" and specification.scenario in {
+                            "image_window", "mcuboot_control"}:
+                        validate_consumer_observation(inputs, sdk, source, build,
+                            kind, specification, observation, rows, output)
+                        continue
+                    if not isinstance(observation.get("retention"), dict):
+                        raise EvidenceError("actual consumer provider retention required")
                     retained = load_json(inputs.resolve(observation["retention"]))
                     if (retained.get("status") != "passed" or
                             retained.get("elf") != observed_elf or
@@ -931,7 +1042,10 @@ def validate_sdk_consumers(report, manifest, resolver=verify_file_identity,
                 if (len(header) != 20 or header[:6] != b"\x7fELF\x02\x01" or
                         header[18:20] != b"\x3e\x00" or argvs.count([str(path)]) != 1):
                     raise EvidenceError("native consumer was built without actual execution")
-                if observation is not None and (
+                if kind == "selected":
+                    validate_consumer_observation(inputs, sdk, source, build,
+                        kind, specification, observation, rows, output)
+                elif observation is not None and (
                         observation.get("inputs", {}).get("elf") !=
                         inputs.identities[str(path)] or
                         observation.get("runtime_executed") is not True):

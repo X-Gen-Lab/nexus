@@ -12,8 +12,9 @@ import unittest
 
 from tools.configure import configure
 from tools.dev import process
-from tools.evidence import identity
-from tools.evidence.common import atomic_json, file_identity, stream_digest
+from tools.evidence import identity, proof
+from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
+                                   stream_digest, verify_file_identity)
 from tools.maintenance import support
 from tools.release.transport import consumer_plan
 
@@ -207,6 +208,98 @@ class InstalledConsumerSupportTests(unittest.TestCase):
             rejected = self.query(index, changed)
             self.assertEqual(rejected["staged_evidence"]["sdk_consumer"]["status"],
                              "corrupt")
+
+    def native_selected_observation(self, profile):
+        index, specification = next((index, specification)
+            for index, (kind, specification) in enumerate(consumer_plan(), 1)
+            if kind == "selected" and specification[2] == "native-time-" + profile)
+        source, build, command = self.producer.prepare_selected_consumer(
+            self.prefix, self.output, *specification,
+            lambda argv: self.execute(index, argv),
+            expected_revision=self.package["source_revision"])
+        # This helper regression uses a real development SDK. Full-plan
+        # admission independently requires the canonical publishable command.
+        self.execute(index, [*command, "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON"])
+        self.execute(index, ["cmake", "--build", str(build), "--parallel", "1",
+                             "--target", "installed_selected"])
+        observation = self.producer.check_selected_image(self.sdk, source, build,
+            lambda argv: self.execute(index, argv),
+            owner_specification=specification)
+        observation.update(name=specification[0],
+                           assembly=str(self.sdk / specification[1]))
+        inputs = proof.ScopeInputs({"evidence": [observation]},
+                                   verify_file_identity, None)
+        rows = [row for row in self.commands if row["consumer_index"] == index]
+        def validate(record=observation, commands=rows):
+            return proof.validate_consumer_observation(inputs, self.sdk,
+                source, build, "selected", specification, record, commands,
+                self.output)
+        validate()
+        self.assertEqual(observation["kind"], "native-time-host-observation")
+        self.assertNotIn("runtime_executed", observation)
+        self.assertNotIn("inputs", observation)
+        for update in ({"kind": "external-provider-host-model"},
+                       {"elf": observation["bindings"]},
+                       {"sdk_manifest": observation["elf"]},
+                       {"symbols": {"unselected": {
+                           "type": "b", "address": 1, "size": 1}}},
+                       {"inputs": {"elf": observation["elf"]},
+                        "runtime_executed": True}):
+            with self.subTest(update=update), self.assertRaises(EvidenceError):
+                validate({**observation, **update})
+        image = observation["elf"]["path"]
+        for omitted in ([image],
+                        ["nm", "-S", "--defined-only", "--format=posix", image]):
+            changed = [row for row in rows if row["argv"] != omitted]
+            with self.subTest(omitted=omitted), self.assertRaises(EvidenceError):
+                validate(commands=changed)
+        with self.assertRaises(EvidenceError):
+            validate(commands=[*rows, rows[-1]])
+
+    def test_native_selected_pair_replays_its_actual_observation(self):
+        self.native_selected_observation("pair")
+
+    def test_native_selected_empty_replays_its_actual_observation(self):
+        self.native_selected_observation("empty")
+
+    def test_arm_services_without_provider_retention_replay_their_checker(self):
+        for index, (kind, specification) in enumerate(consumer_plan(), 1):
+            if (kind != "services" or not specification.arm or
+                    specification.scenario not in {"image_window", "mcuboot_control"}):
+                continue
+            with self.subTest(scenario=specification.scenario):
+                source, build, command = self.producer.prepare_service_consumer(
+                    self.prefix, self.output, specification,
+                    lambda argv: self.execute(index, argv), fixture=True,
+                    expected_revision=self.package["source_revision"])
+                self.execute(index, command)
+                self.execute(index, ["cmake", "--build", str(build),
+                    "--parallel", "1", "--target", "installed_services"])
+                observation = self.producer.check_service_image(self.sdk,
+                    source, build, specification,
+                    lambda argv: self.execute(index, argv))
+                self.assertIsNone(observation["retention"])
+                self.assertFalse(observation["runtime_executed"])
+                result = self.query(index, observation)
+                selected = result["staged_evidence"]["sdk_consumer"]
+                self.assertEqual(selected["status"], "configuration_mismatch")
+                self.assertEqual(selected["trust"], "semantic_verified")
+                self.assertEqual(result["validation"]["installed_sdk"],
+                                 "not_assessed")
+                for update in ({"retention": observation["inputs"]["elf"]},
+                               {"runtime_executed": True},
+                               {"symbols": {}},
+                               {"forbidden_symbols": {"libc_heap": ["malloc"],
+                                                      "cpp_runtime": []}}):
+                    rejected = self.query(index, {**observation, **update})
+                    self.assertEqual(rejected["staged_evidence"]["sdk_consumer"]
+                                     ["status"], "corrupt")
+                symbol_command = self.commands.pop()
+                self.assertEqual(symbol_command["argv"][0], "arm-none-eabi-nm")
+                rejected = self.query(index, observation)
+                self.assertEqual(rejected["staged_evidence"]["sdk_consumer"]
+                                 ["status"], "corrupt")
+                self.commands.append(symbol_command)
 
     def test_sdk_verification_without_B_preserves_package_inventory(self):
         prefix = self.directory / "ordinary Python SDK"
