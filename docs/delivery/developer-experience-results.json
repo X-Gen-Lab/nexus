@@ -733,8 +733,189 @@
           "sha256": "7c1346f50ef236d3b56b3c638d4552b0e1aca0e9c4517d0d78c06a3bb72c64f2",
           "size": 54788
         },
-        "strict_bilingual_report": null,
-        "status": "strict_html_pending"
+        "strict_bilingual_report": {
+          "path": "/dev/shm/nexus-config-workflow-20261106/documentation-final/documentation-build.json",
+          "size": 59341,
+          "sha256": "997fd0977699297d5b391948d923a3cb126daa9230b98c1eb701fe355ff7e7a0"
+        },
+        "status": "strict_bilingual_html_and_package_verified",
+        "source": {
+          "root": "/workspace/nexus",
+          "commit": "fb647957abdb48406f2d35940750eba707e5988c",
+          "tree": "3965a1dea85e27cd4ba62b0fc7d8eb07f412cc9f",
+          "dirty": false,
+          "submodules": [
+            " f4445aa70cb211504bca2c9e4177cd74609f5fba ext/coremqtt (v2.3.1-1-gf4445aa)",
+            " 062e1e0d8b176ae73d257ac928766b33bea17b6f ext/freertos (V11.1.0-1-g062e1e0d8)",
+            " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+            " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+            " 58ec32c09ed8a099e55cbdab9418597c4fd9b14f ext/googletest (release-1.8.0-3519-g58ec32c0)",
+            " 1f53f34b4aa7c6583540c0f4c35142fa66616c78 ext/lwip (STABLE-2_2_1_RELEASE-1-g1f53f34)",
+            " d840a13e087a8742d5a060a4a4a42a33ac41e3ab ext/mbedtls (mbedtls-4.1.1-2-gd840a13)",
+            " dde0c4a0e448a0552f18817dcea633bb851fd288 ext/mbedtls/framework (dde0c4a)",
+            " 218c40fdee3b59c47e129156f6a938997fc0741d ext/mbedtls/tf-psa-crypto (218c40f)",
+            " dde0c4a0e448a0552f18817dcea633bb851fd288 ext/mbedtls/tf-psa-crypto/framework (dde0c4a)",
+            " 62471ebd5825ef05b7c10922a15ed70f8ade9426 ext/mcuboot (v2.4.0-1-g62471eb)",
+            " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+            " af1b110e46a1720349f6f125e386e126767699bd vendors/arm/CMSIS_6 (v6.4.0)",
+            " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+            " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+            " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+            " 884b8dc78e41cbfca008363342b17f4a9e8641f7 vendors/st/cmsis_device_h5 (v1.7.0)",
+            " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+            " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+            " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+            " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+            " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+            " 56e28dbebd720e3df2866dfaf438b525e9e8af04 vendors/st/stm32h5_hal (56e28db)",
+            " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+            " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+          ]
+        },
+        "tools": {
+          "prefix": "/home/agent/.cache/nexus/documentation/locked-20261024",
+          "lock_sha256": "9c33a22690587cd9c02f1b2d78e0f9a70313f4359afa67dd404b449c8f565288",
+          "tools": {
+            "doxygen": "1.14.0 (cbe58f6237b2238c9af7f51c6b7afb8bbf52c866)",
+            "font": "NotoSansCJK-Regular.ttc: \"Noto Sans CJK SC\" \"Regular\"",
+            "graphviz": "dot - graphviz version 2.42.4 (0)"
+          },
+          "target": {
+            "glibc": "2.41",
+            "machine": "x86_64",
+            "python": "3.12",
+            "qualified_host": "Debian 13 amd64 userland; CPython 3.12.14; kernel recorded by each preparation",
+            "scope": "Preparation closure; a downloaded tool identity does not establish firmware or HIL qualification.",
+            "system": "Linux"
+          },
+          "installation_receipt": "/home/agent/.cache/nexus/documentation/locked-20261024/installation.json",
+          "installation_sha256": "4c8d8b50e91b8a5ff20bbafd27088a8c1295384569d11348b7ecb0c1348c1786"
+        },
+        "canonical_pages": 132,
+        "translation_states": 264,
+        "html_pages_per_language": {
+          "en": 228,
+          "zh_CN": 228
+        },
+        "commands": [
+          {
+            "record": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/doxygen.command.json",
+              "size": 1669,
+              "sha256": "93f28b38ede73eadb28543757d52b26bf2a89862b05cf4556c49b1ad9509a624"
+            },
+            "receipt": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/doxygen.attempts/1793968564062424872-889793c6f6f945528d833f1283f27d0e/receipt.json",
+              "size": 1466,
+              "sha256": "e56893709bf5b455c6a63015aba4b8a7327c18f54d79cfbecd0286c581e8617e"
+            },
+            "stage": "documentation-doxygen",
+            "exit_code": 0,
+            "duration_seconds": 0.7167850940022618
+          },
+          {
+            "record": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/gettext.command.json",
+              "size": 1965,
+              "sha256": "423aa2825f175c01930892584e0a8e2815189c02fd2121d5a6504b0cc03fbff1"
+            },
+            "receipt": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/gettext.attempts/1793968564780174829-d0a7758f938a4ed191d97ff87ebe11f4/receipt.json",
+              "size": 1762,
+              "sha256": "9842f681487f28d1447849597121cf815291b144b5dcd209674ea05c434b6be8"
+            },
+            "stage": "documentation-gettext",
+            "exit_code": 0,
+            "duration_seconds": 26.912577498995233
+          },
+          {
+            "record": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/html-en.command.json",
+              "size": 1959,
+              "sha256": "8a9a3c4b3aa5b47f8671006f5ecc24addf11cbd028e15dbc1cde927367e8f642"
+            },
+            "receipt": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/html-en.attempts/1793968592593593211-dcaab034f2f14343bf8451c7ed295da9/receipt.json",
+              "size": 1756,
+              "sha256": "1e2c8aa479c7e673782a15f554c6bf8ba72912581e37ebf9d28e241a63d208f6"
+            },
+            "stage": "documentation-html-en",
+            "exit_code": 0,
+            "duration_seconds": 51.77318963399739
+          },
+          {
+            "record": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/html-zh_CN.command.json",
+              "size": 1977,
+              "sha256": "cbfab845aa2d3fcfb28eec2201fb2462171cc10039a3986376d0799a5b964f20"
+            },
+            "receipt": {
+              "path": "/dev/shm/nexus-config-workflow-20261106/documentation-attempts/3953a0855af64afd9be030b2d1178633/html-zh_CN.attempts/1793968644367774490-dbd07599d04940e4aabd36670933bd50/receipt.json",
+              "size": 1771,
+              "sha256": "3adb5623cc1549cc5baf05dd2c371bb2817e8ccf988c6a5b30e8af7cd2f6f591"
+            },
+            "stage": "documentation-html-zh_CN",
+            "exit_code": 0,
+            "duration_seconds": 57.91497552499641
+          }
+        ],
+        "diagnostics": "Four maintained stages exited zero under strict flags. Three original Breathe RemovedInSphinx80Warning diagnostics remain in original stderr streams; none was suppressed or rewritten.",
+        "local_package": {
+          "archive": {
+            "path": "/workspace/nexus/build/configuration-workflow-20261106/documentation-package/configuration-workflow-20261106.tar.gz",
+            "size": 16382132,
+            "sha256": "b62ba60035672b4ea6531cbcd4ce11fa3db415bc4442acac4a003375eae1a52c"
+          },
+          "manifest": {
+            "path": "/workspace/nexus/build/configuration-workflow-20261106/documentation-package/documentation-manifest.json",
+            "size": 469292,
+            "sha256": "9edd9d6a85cae6c908a2e24c7da978acaae63e4643a65ab9212c8f5960c3ea9b"
+          },
+          "verification": {
+            "path": "/workspace/nexus/docs/archive/evidence/20261106/configuration-workflow/documentation/package-verification.json",
+            "sha256": "1fbeafc90f160dfcaaf4f863852cd35d23f3f524a4bb63e13c12809adc9fe85c",
+            "size": 783
+          },
+          "payload_files": 2691,
+          "publication_status": "local_retention_only",
+          "archive_tracked_in_git": false,
+          "external_durable_persistence": "not_established",
+          "original_verification": {
+            "path": "/dev/shm/nexus-config-workflow-20261106/documentation-package-verification.json",
+            "sha256": "9c796e20198fc085465b5138b21bc89e0c8fd27edf35fc9a72e2a3ccdeddab61",
+            "size": 496668
+          }
+        },
+        "original_receipts": {
+          "package": {
+            "path": "/workspace/nexus/docs/archive/evidence/20261106/configuration-workflow/documentation/23dcca9d3a5836907c83a4ac93b992bf9da6194a9c61a1279e9bd6b744439c4d.json",
+            "size": 537,
+            "sha256": "5dc4c1f01dce5960f3b3a53f6f7b1b161c70a713d31e8867620abfbc4290ab8e"
+          },
+          "repository_descriptor": "docs/archive/evidence/20261106/configuration-workflow/documentation/23dcca9d3a5836907c83a4ac93b992bf9da6194a9c61a1279e9bd6b744439c4d.json",
+          "archive": {
+            "path": "/workspace/nexus/build/configuration-workflow-20261106/documentation-evidence-store/23dcca9d3a5836907c83a4ac93b992bf9da6194a9c61a1279e9bd6b744439c4d.tar.gz",
+            "sha256": "23dcca9d3a5836907c83a4ac93b992bf9da6194a9c61a1279e9bd6b744439c4d",
+            "size": 425965
+          },
+          "verification": {
+            "path": "/workspace/nexus/docs/archive/evidence/20261106/configuration-workflow/documentation/verification.json",
+            "size": 150,
+            "sha256": "e7d559f879b8b8c231492cfb88ecbbad522bad00338307e7217f0f7d86eaa04e"
+          },
+          "files": 28,
+          "bytes": 1794326,
+          "publication_status": "local_retention_only",
+          "archive_tracked_in_git": false,
+          "external_durable_persistence": "not_established"
+        },
+        "final_metadata_source_check": {
+          "path": "/dev/shm/nexus-config-workflow-20261106/final-metadata-source-check.json",
+          "size": 54788,
+          "sha256": "7c1346f50ef236d3b56b3c638d4552b0e1aca0e9c4517d0d78c06a3bb72c64f2"
+        },
+        "scope": "Strict build and immutable package bind the clean documentation C commit fb647957. Firmware/SDK acceptance remains bound to code B 95adce36. The follow-up changes only status/catalogue/index metadata and passes the whole-site source check; it does not inherit a new full firmware execution or candidate qualification.",
+        "qualification": false
       },
       "retained_evidence": {
         "kind": "portable_evidence_selection",
@@ -762,7 +943,24 @@
           "path": "/workspace/nexus/docs/archive/evidence/20261106/configuration-workflow/restore-verification.json",
           "sha256": "b0b6629d403d9ee9a369d828b332cba1fd51ef317701662b88ce7385120e4ae3",
           "size": 236
-        }
+        },
+        "publication_status": "local_retention_only",
+        "archive_tracked_in_git": false,
+        "external_durable_persistence": "not_established",
+        "repository_descriptor": "docs/archive/evidence/20261106/configuration-workflow/69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6.json",
+        "verification_argv": [
+          "python",
+          "-B",
+          "tools/evidence/store.py",
+          "verify",
+          "--package",
+          "docs/archive/evidence/20261106/configuration-workflow/69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6.json",
+          "--archive",
+          "<local-copy>/69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6.tar.gz",
+          "--report",
+          "<output>/verification.json"
+        ],
+        "publication_boundary": "Only descriptors, digests, verification summaries and result navigation are committed. The ignored raw archive is retained on this execution host; a fresh clone alone does not contain raw records. No external durable artifact publication is claimed."
       },
       "exact_assembly_evidence": [
         {

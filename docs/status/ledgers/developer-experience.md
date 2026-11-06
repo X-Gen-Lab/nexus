@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/developer-experience-execution.csv)。
-源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`。
+源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1161,7 +1161,7 @@ source_language: zh_CN
 | `task_id` | CF01 |
 | `task` | P0: Correct strong factory authoring and SDK guidance |
 | `implementation_status` | implemented |
-| `software_status` | factory_guidance_focused_passed_strict_docs_pending |
+| `software_status` | factory_guidance_and_strict_docs_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1356,7 +1356,7 @@ source_language: zh_CN
 | `task_id` | EP08 |
 | `task` | P1: Document one builtin or external provider onboarding path |
 | `implementation_status` | implemented |
-| `software_status` | provider_onboarding_source_checked_strict_docs_pending |
+| `software_status` | provider_onboarding_commands_and_strict_docs_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1626,7 +1626,7 @@ source_language: zh_CN
 | `task_id` | DX04 |
 | `task` | P1: Synchronize existing bilingual contracts navigation and diagrams |
 | `implementation_status` | implemented |
-| `software_status` | bilingual_source_check_passed_strict_html_pending |
+| `software_status` | strict_bilingual_docs_and_diagrams_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "kind": "documentation_package_verification_summary",
+  "status": "passed",
+  "qualification": false,
+  "original_report": {
+    "path": "/dev/shm/nexus-config-workflow-20261106/documentation-package-verification.json",
+    "sha256": "9c796e20198fc085465b5138b21bc89e0c8fd27edf35fc9a72e2a3ccdeddab61",
+    "size": 496668
+  },
+  "documentation_commit": "fb647957abdb48406f2d35940750eba707e5988c",
+  "manifest_sha256": "9edd9d6a85cae6c908a2e24c7da978acaae63e4643a65ab9212c8f5960c3ea9b",
+  "archive_sha256": "b62ba60035672b4ea6531cbcd4ce11fa3db415bc4442acac4a003375eae1a52c",
+  "scope": "Summary of the actual maintained CLI verification; original full report is retained in the local documentation evidence archive. No firmware or hardware qualification."
+}

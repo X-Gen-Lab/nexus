@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 93f33e97bd16870e926c6459dca2d1773df5a20e9e103bd4935cdefc163f3ac2\n"
+"X-Nexus-Source-SHA256: df5ec6de2ca8cfc5ec381a6e5fe04488fd579c255d9876ce7169e9673e935da0\n"
 
 msgid "开发体验执行台账"
 msgstr "Developer experience execution ledger"
@@ -2506,12 +2506,6 @@ msgstr ""
 "both locales; commands pass validation; no parallel status "
 "authority or inherited firmware qualification."
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`。"
-msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original identifiers, order and fields come from {download}`the original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`."
-
-msgid "factory_guidance_focused_passed_strict_docs_pending"
-msgstr "factory_guidance_focused_passed_strict_docs_pending"
-
 msgid "cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py"
 msgstr "cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py"
 
@@ -2583,9 +2577,6 @@ msgstr "current_source_and_installed_provider_consumers_verified"
 
 msgid "cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verify_consumers.py;tools/release/transport.py;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;.github/workflows/test_release.py"
 msgstr "cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verify_consumers.py;tools/release/transport.py;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;.github/workflows/test_release.py"
-
-msgid "provider_onboarding_source_checked_strict_docs_pending"
-msgstr "provider_onboarding_source_checked_strict_docs_pending"
 
 msgid "docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md"
 msgstr "docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md"
@@ -2692,8 +2683,17 @@ msgstr "ordinary_full_index_gate_passed"
 msgid "scripts/ci/tdd_gate.py;tools/dev/process.py;scripts/ci/style_gate.py;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
 msgstr "scripts/ci/tdd_gate.py;tools/dev/process.py;scripts/ci/style_gate.py;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
 
-msgid "bilingual_source_check_passed_strict_html_pending"
-msgstr "bilingual_source_check_passed_strict_html_pending"
-
 msgid "docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po"
 msgstr "docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po"
+
+msgid "factory_guidance_and_strict_docs_verified"
+msgstr "factory_guidance_and_strict_docs_verified"
+
+msgid "provider_onboarding_commands_and_strict_docs_verified"
+msgstr "provider_onboarding_commands_and_strict_docs_verified"
+
+msgid "strict_bilingual_docs_and_diagrams_verified"
+msgstr "strict_bilingual_docs_and_diagrams_verified"
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original identifiers, order and fields come from {download}`the original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`."
