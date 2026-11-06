@@ -12,6 +12,8 @@ source_language: zh_CN
 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map 字节，不能只看 passed。
 资格规则由 [资格合同](../delivery/qualification.md)维护。
 
+本轮 CF／EP／EV／MX／DX 32 项沿用[原执行 CSV](../design/developer-experience-execution.csv)与其[可读台账](ledgers/developer-experience.md)，实际结果从[现有结果索引](../delivery/developer-experience-results.json)的 `observations.configuration_workflow_20261106` 进入。代码门禁、SDK 消费、测量和严格双语文档分别绑定各自实际执行的源码、输入与原始收条；规划数量、历史计数和其他版本的成功均不作为本轮结果。软件资格与物理 HIL 仍按精确记录分别判断。
+
 (p2-unsigned-software-ab532250)=
 ## 当前 P2 无签名软件交付与独立 QA 后续
 

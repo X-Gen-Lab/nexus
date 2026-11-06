@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5b7aa173324bec352d7e172c9c5ee1c3ffa34f0d82c2b7a9b035d30300abe3b7\n"
+"X-Nexus-Source-SHA256: 3b84b850bc274f327a7359470a2d0c1636f31c1ebff96d4d4db501929cbc3b04\n"
 
 #: ../../../../workspace/nexus/docs/status/software-verification.md:9
 msgid "软件验证、源码身份与证据"
@@ -711,3 +711,6 @@ msgstr "The new project uses the [single C11 onboarding example](../guides/provi
 
 msgid "v15 的五个已有 profile"
 msgstr "Five existing v15 profiles"
+
+msgid "本轮 CF／EP／EV／MX／DX 32 项沿用{download}`原执行 CSV <../design/developer-experience-execution.csv>`与其[可读台账](ledgers/developer-experience.md)，实际结果从{download}`现有结果索引 <../delivery/developer-experience-results.json>`的 `observations.configuration_workflow_20261106` 进入。代码门禁、SDK 消费、测量和严格双语文档分别绑定各自实际执行的源码、输入与原始收条；规划数量、历史计数和其他版本的成功均不作为本轮结果。软件资格与物理 HIL 仍按精确记录分别判断。"
+msgstr "The 32 CF/EP/EV/MX/DX tasks retain the {download}`original execution CSV <../design/developer-experience-execution.csv>` and its [readable ledger](ledgers/developer-experience.md). Find actual results in `observations.configuration_workflow_20261106` of the {download}`existing results index <../delivery/developer-experience-results.json>`. Code gates, SDK consumption, measurements and strict bilingual documentation each bind their own executed source, inputs and original receipts; plan sizes, historical counts and successes from other versions are not current results. Software qualification and physical HIL remain separate and follow their exact records."

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d42faa0d1875f72c964a849acf543db36abde66c2641a88948fddf80b9d5357d\n"
+"X-Nexus-Source-SHA256: 35cd4ff6919aa231e303d0afb773f02b5e497a8cc6cefa0e02e349b35624de7c\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -3226,3 +3226,9 @@ msgstr "`soc/native/drivers/uart_word.c`"
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "UART1"
 msgstr "UART1"
+
+msgid "The SDK resolver includes `.nexus-source-sdk.json` in the complete IR `inputs`. Its `configuration_sha256` therefore differs from a checkout resolution of the same logical assembly. Preserve that manifest input: equality of selected devices is narrower than equality of the complete configuration and its provenance."
+msgstr "SDK resolver 将 `.nexus-source-sdk.json` 纳入完整 IR 的 `inputs`。因此，同一逻辑装配在 SDK 中与 checkout 中解析所得的 `configuration_sha256` 不同。必须保留这一 manifest 输入：选择相同设备不等于完整配置及其来源身份相同。"
+
+msgid "A direct API check using the SDK's own resolved IR can report `trust=semantic_verified` while a checkout CLI query of that SDK record reports `configuration_mismatch`. Semantic validation and configuration matching are separate observations. Evidence-to-source association through the CLI at a Gitless SDK root is not currently implemented; the direct API result does not establish equivalent end-to-end CLI evidence association."
+msgstr "使用 SDK 自身 resolved IR 的直接 API 核验可以报告 `trust=semantic_verified`，而 checkout CLI 查询该 SDK 记录时报告 `configuration_mismatch`。范围语义核验与配置匹配是独立观察。当前尚未实现从无 Git 元数据的 SDK 根目录通过 CLI 将证据关联到源码；直接 API 结果不建立等价的端到端 CLI 证据关联。"

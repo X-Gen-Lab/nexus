@@ -7,23 +7,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 7107b9cfbcbe9419328837e3058d748a5fe2a3031f44ab72446bc434a1c69001\n"
+"X-Nexus-Source-SHA256: 93f33e97bd16870e926c6459dca2d1773df5a20e9e103bd4935cdefc163f3ac2\n"
 
 msgid "开发体验执行台账"
 msgstr "Developer experience execution ledger"
-
-msgid ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/developer-experience-execution.csv>`。 "
-"源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`0aa120"
-"6f02edd06971c51ea1c12814666990395d11fb80941c07eb51e61b7dc6`。"
-msgstr ""
-"This page is derived from the original CSV; it is not a new status "
-"authority, execution record or software qualification. Original "
-"identifiers, order and fields come from {download}`the original "
-"ledger <../../design/developer-experience-execution.csv>`. Source: "
-"`docs/design/developer-experience-execution.csv`; SHA-256: "
-"`0aa1206f02edd06971c51ea1c12814666990395d11fb80941c07eb51e61b7dc6`."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:15
 msgid ""
@@ -2040,12 +2027,6 @@ msgstr "CF01"
 msgid "P0: Correct strong factory authoring and SDK guidance"
 msgstr "P0: Correct strong factory authoring and SDK guidance"
 
-msgid "planned"
-msgstr "planned"
-
-msgid "cmake/package/README.md;docs/reference/configuration/assembly.md"
-msgstr "cmake/package/README.md;docs/reference/configuration/assembly.md"
-
 msgid ""
 "Strong header is always generated; capabilities is independent; no "
 "invented authoring switch."
@@ -2058,9 +2039,6 @@ msgstr "CF02"
 
 msgid "P1: Use strong references in primary public SDK consumers"
 msgstr "P1: Use strong references in primary public SDK consumers"
-
-msgid "cmake/package/verify_consumers.py"
-msgstr "cmake/package/verify_consumers.py"
 
 msgid ""
 "Actual installed and relocated C11/C++17 primary consumers use "
@@ -2097,9 +2075,6 @@ msgstr "CF04"
 msgid "P1: Explain exact generated factory accessors"
 msgstr "P1: Explain exact generated factory accessors"
 
-msgid "tools/configure/factory.py;tools/configure/experience.py"
-msgstr "tools/configure/factory.py;tools/configure/experience.py"
-
 msgid ""
 "Include return type REF constant and getter derive from sole "
 "factory projection including hyphen word and enhanced endpoint "
@@ -2114,9 +2089,6 @@ msgstr "CF05"
 
 msgid "P0: Bind project creation and build instructions to one platform source"
 msgstr "P0: Bind project creation and build instructions to one platform source"
-
-msgid "tools/dev/projects.py"
-msgstr "tools/dev/projects.py"
 
 msgid ""
 "Explicit source or SDK selects actual resolver and compatibility "
@@ -2134,13 +2106,6 @@ msgid "P1: Exercise complete pinned project creation and consumption"
 msgstr "P1: Exercise complete pinned project creation and consumption"
 
 msgid ""
-"tools/testing/test_dev_projects.py;X-Gen-Lab/nexus-examples/scripts/"
-"test_starter_templates.py"
-msgstr ""
-"tools/testing/test_dev_projects.py;X-Gen-Lab/nexus-examples/scripts/"
-"test_starter_templates.py"
-
-msgid ""
 "Pinned manifest through create then selected SDK actual build and "
 "Native execution; spaces relocation and rollback covered; private "
 "template bytes stay private."
@@ -2156,13 +2121,6 @@ msgid "P1: Inspect provider manifest before trusted code loading"
 msgstr "P1: Inspect provider manifest before trusted code loading"
 
 msgid ""
-"tools/configure/integration_package.py;tools/configure/soc-package.s"
-"chema.json"
-msgstr ""
-"tools/configure/integration_package.py;tools/configure/soc-package.s"
-"chema.json"
-
-msgid ""
 "Read-only immutable manifest contract checks fields paths versions "
 "and hashes without provider import; editor schema derives from same "
 "contract."
@@ -2176,9 +2134,6 @@ msgstr "EP02"
 
 msgid "P1: Explicitly check and refresh declared package input hashes"
 msgstr "P1: Explicitly check and refresh declared package input hashes"
-
-msgid "tools/configure/integration_package.py"
-msgstr "tools/configure/integration_package.py"
 
 msgid ""
 "Only declared explicit inputs may refresh atomically; stale paths "
@@ -2210,9 +2165,6 @@ msgstr "EP04"
 msgid "P1: Diagnose selected provider CMake contract early"
 msgstr "P1: Diagnose selected provider CMake contract early"
 
-msgid "cmake/platform/Provider.cmake;CMakeLists.txt"
-msgstr "cmake/platform/Provider.cmake;CMakeLists.txt"
-
 msgid ""
 "Selected target startup system and private dependencies have clear "
 "configure errors; builtin and external reuse one CMake graph and "
@@ -2228,9 +2180,6 @@ msgstr "EP05"
 msgid "P1: Ship one canonical C provider lifecycle starter"
 msgstr "P1: Ship one canonical C provider lifecycle starter"
 
-msgid "cmake/package/verification/external_provider"
-msgstr "cmake/package/verification/external_provider"
-
 msgid ""
 "SDK exports one copyable C11 provider with complete facts "
 "configuration CMake and retained cleanup; source tests consume the "
@@ -2245,9 +2194,6 @@ msgstr "EP06"
 
 msgid "P1: Project SDK external fixture closure from verified manifest"
 msgstr "P1: Project SDK external fixture closure from verified manifest"
-
-msgid "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py"
-msgstr "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py"
 
 msgid ""
 "Required files copy and comparison share verified package inputs; "
@@ -2265,13 +2211,6 @@ msgid "P1: Execute source and relocated installed provider consumers"
 msgstr "P1: Execute source and relocated installed provider consumers"
 
 msgid ""
-"cmake/package/verification/external_provider;tools/release/transport"
-".py;tools/configure/test_external_package.py"
-msgstr ""
-"cmake/package/verification/external_provider;tools/release/transport"
-".py;tools/configure/test_external_package.py"
-
-msgid ""
 "Canonical Native lifecycle runs in source and installed SDK; "
 "reviewed MCU ARM consumers link; rollback withdrawal recovery and "
 "header boundaries checked without physical claims."
@@ -2285,13 +2224,6 @@ msgstr "EP08"
 
 msgid "P1: Document one builtin or external provider onboarding path"
 msgstr "P1: Document one builtin or external provider onboarding path"
-
-msgid ""
-"docs/guides/provider-porting.md;cmake/package/verification/external_"
-"provider/README.md"
-msgstr ""
-"docs/guides/provider-porting.md;cmake/package/verification/external_"
-"provider/README.md"
 
 msgid ""
 "Commands progress from starter through manifest init CMake SDK and "
@@ -2312,9 +2244,6 @@ msgstr ""
 "P2: Remove unrelated builtin behavior from external final generator "
 "identity"
 
-msgid "tools/configure/dependencies.py;tools/configure/providers/descriptor.py"
-msgstr "tools/configure/dependencies.py;tools/configure/providers/descriptor.py"
-
 msgid ""
 "Unselected builtin changes do not invalidate external final "
 "identity; common map selected package and public tool changes still "
@@ -2331,13 +2260,6 @@ msgid "P1: Expose exact assembly-level execution leaves in existing records"
 msgstr "P1: Expose exact assembly-level execution leaves in existing records"
 
 msgid ""
-"tools/maintenance/capabilities.py;docs/delivery/developer-experience"
-"-results.json"
-msgstr ""
-"tools/maintenance/capabilities.py;docs/delivery/developer-experience"
-"-results.json"
-
-msgid ""
 "Concrete model image and consumer records bind source resolved "
 "dependencies artifacts and raw reports; missing historical identity "
 "is never inherited or invented."
@@ -2352,9 +2274,6 @@ msgstr "EV02"
 msgid "P1: Associate independently verified stage evidence"
 msgstr "P1: Associate independently verified stage evidence"
 
-msgid "tools/maintenance/capabilities.py"
-msgstr "tools/maintenance/capabilities.py"
-
 msgid ""
 "Model ARM SDK and HIL use existing validators; one scope cannot "
 "promote another or manufacture a complete plan from partial runs."
@@ -2367,9 +2286,6 @@ msgstr "EV03"
 
 msgid "P0: Revalidate actual scope execution semantics"
 msgstr "P0: Revalidate actual scope execution semantics"
-
-msgid "tools/evidence/proof.py;tools/evidence/candidate.py"
-msgstr "tools/evidence/proof.py;tools/evidence/candidate.py"
 
 msgid ""
 "New sealing rejects arbitrary success empty filtered skipped "
@@ -2385,9 +2301,6 @@ msgstr "EV04"
 
 msgid "P1: Separate SDK package integrity consumer execution and full matrix"
 msgstr "P1: Separate SDK package integrity consumer execution and full matrix"
-
-msgid "tools/evidence/proof.py;tools/maintenance/capabilities.py"
-msgstr "tools/evidence/proof.py;tools/maintenance/capabilities.py"
 
 msgid ""
 "Each state is independently visible; exact consumer and full plan "
@@ -2417,9 +2330,6 @@ msgstr "EV06"
 msgid "P1: Explain tool environment and evidence mismatch dimensions"
 msgstr "P1: Explain tool environment and evidence mismatch dimensions"
 
-msgid "tools/maintenance/capabilities.py;tools/evidence/candidate.py"
-msgstr "tools/maintenance/capabilities.py;tools/evidence/candidate.py"
-
 msgid ""
 "Source config dependencies tools SDK artifacts and missing "
 "originals have explicit relations; current unobserved tools are not "
@@ -2436,13 +2346,6 @@ msgid "P1: Associate precise hardware evidence through existing HIL validators"
 msgstr "P1: Associate precise hardware evidence through existing HIL validators"
 
 msgid ""
-"tools/maintenance/capabilities.py;tools/hil/admit.py;tools/hil/measu"
-"re.py"
-msgstr ""
-"tools/maintenance/capabilities.py;tools/hil/admit.py;tools/hil/measu"
-"re.py"
-
-msgid ""
 "Station PCB chip fixture image workload and measurement scope "
 "retain freshness rules; software fixtures never become physical "
 "execution; absent physical raw stays not_executed."
@@ -2456,9 +2359,6 @@ msgstr "EV08"
 
 msgid "P1: Provide one readable development support command"
 msgstr "P1: Provide one readable development support command"
-
-msgid "tools/dev/dev.py;tools/maintenance/capabilities.py"
-msgstr "tools/dev/dev.py;tools/maintenance/capabilities.py"
 
 msgid ""
 "One read-only command shares human and JSON projections with "
@@ -2476,13 +2376,6 @@ msgid "P1: Prevent cross-selection evidence contamination end to end"
 msgstr "P1: Prevent cross-selection evidence contamination end to end"
 
 msgid ""
-"tools/testing/test_support_evidence.py;tools/testing/test_support_in"
-"dex.py"
-msgstr ""
-"tools/testing/test_support_evidence.py;tools/testing/test_support_in"
-"dex.py"
-
-msgid ""
 "Real validator composition rejects cross Board route backend clock "
 "cache security controller source SDK ELF and consumer mismatches; "
 "unchanged existing regressions remain."
@@ -2496,9 +2389,6 @@ msgstr "MX01"
 
 msgid "P1: Measure onboarding phases with exact cold and warm inputs"
 msgstr "P1: Measure onboarding phases with exact cold and warm inputs"
-
-msgid "tools/dev/timings.py;tools/configure/configure.py"
-msgstr "tools/dev/timings.py;tools/configure/configure.py"
 
 msgid ""
 "Record actual resolver manifest generation configure build test and "
@@ -2514,9 +2404,6 @@ msgstr "MX02"
 
 msgid "P2: Compare actual raw and strong factory image costs"
 msgstr "P2: Compare actual raw and strong factory image costs"
-
-msgid "tools/measurement;tools/configure/factory.py"
-msgstr "tools/measurement;tools/configure/factory.py"
 
 msgid ""
 "Same assembly compiler and optimization compare ELF map and symbol "
@@ -2535,9 +2422,6 @@ msgstr ""
 "P2: Measure actual instance Board and provider integration edit "
 "surfaces"
 
-msgid "tools/configure;docs/delivery/developer-experience-results.json"
-msgstr "tools/configure;docs/delivery/developer-experience-results.json"
-
 msgid ""
 "Report changed files public versus private behavior and repeated "
 "decisions for explicit integration cases; code size does not "
@@ -2552,9 +2436,6 @@ msgstr "MX04"
 
 msgid "P2: Measure empty single and multiple static instance costs"
 msgstr "P2: Measure empty single and multiple static instance costs"
-
-msgid "tools/measurement;tests/contracts/native_assembly"
-msgstr "tools/measurement;tests/contracts/native_assembly"
 
 msgid ""
 "Exact selected-instance cohorts report loaded Flash readonly data "
@@ -2571,9 +2452,6 @@ msgstr "DX01"
 msgid "P1: Retain real TDD order for changed behavior"
 msgstr "P1: Retain real TDD order for changed behavior"
 
-msgid "tools/testing;tests/contracts;tests/google"
-msgstr "tools/testing;tests/contracts;tests/google"
-
 msgid ""
 "Each changed behavior or defect has contemporaneous meaningful RED "
 "then GREEN; equivalent refactors preserve GREEN and no manufactured "
@@ -2589,9 +2467,6 @@ msgstr "DX02"
 msgid "P1: Keep independent coverage while avoiding duplicate fixtures"
 msgstr "P1: Keep independent coverage while avoiding duplicate fixtures"
 
-msgid "tools/testing;tests/contracts;cmake/package/verification"
-msgstr "tools/testing;tests/contracts;cmake/package/verification"
-
 msgid ""
 "One canonical reference feeds appropriate Python and real C tests; "
 "independent negative oracles remain; no repeated unchanged tool "
@@ -2606,9 +2481,6 @@ msgstr "DX03"
 
 msgid "P1: Complete bounded checks and ordinary full-index commit gate"
 msgstr "P1: Complete bounded checks and ordinary full-index commit gate"
-
-msgid "scripts/ci/tdd_gate.py;tools/dev/process.py"
-msgstr "scripts/ci/tdd_gate.py;tools/dev/process.py"
 
 msgid ""
 "Focused failures stop early; final source freeze ordinary hooks "
@@ -2626,17 +2498,202 @@ msgid "P1: Synchronize existing bilingual contracts navigation and diagrams"
 msgstr "P1: Synchronize existing bilingual contracts navigation and diagrams"
 
 msgid ""
-"docs/explanation/factory.md;docs/guides/provider-porting.md;docs/del"
-"ivery/capabilities.md;docs/assets/diagrams/factory-instances.dot"
+"Existing pages and diagrams describe exact current contracts in "
+"both locales; commands pass validation; no parallel status "
+"authority or inherited firmware qualification."
 msgstr ""
-"docs/explanation/factory.md;docs/guides/provider-porting.md;docs/del"
-"ivery/capabilities.md;docs/assets/diagrams/factory-instances.dot"
+"Existing pages and diagrams describe exact current contracts in "
+"both locales; commands pass validation; no parallel status "
+"authority or inherited firmware qualification."
 
-msgid ""
-"Existing pages and diagrams describe exact current contracts in "
-"both locales; commands pass validation; no parallel status "
-"authority or inherited firmware qualification."
-msgstr ""
-"Existing pages and diagrams describe exact current contracts in "
-"both locales; commands pass validation; no parallel status "
-"authority or inherited firmware qualification."
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original identifiers, order and fields come from {download}`the original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`."
+
+msgid "factory_guidance_focused_passed_strict_docs_pending"
+msgstr "factory_guidance_focused_passed_strict_docs_pending"
+
+msgid "cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py"
+msgstr "cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py"
+
+msgid "current_sdk_strong_consumers_verified"
+msgstr "current_sdk_strong_consumers_verified"
+
+msgid "cmake/package/verify_consumers.py;tools/testing/test_sdk_factory_strong.py"
+msgstr "cmake/package/verify_consumers.py;tools/testing/test_sdk_factory_strong.py"
+
+msgid "current_sdk_nominal_type_contract_verified"
+msgstr "current_sdk_nominal_type_contract_verified"
+
+msgid "accessor_projection_verified"
+msgstr "accessor_projection_verified"
+
+msgid "tools/configure/factory.py;tools/configure/experience.py;tools/configure/test_factory_includes.py"
+msgstr "tools/configure/factory.py;tools/configure/experience.py;tools/configure/test_factory_includes.py"
+
+msgid "selected_platform_create_consume_and_rollback_verified"
+msgstr "selected_platform_create_consume_and_rollback_verified"
+
+msgid "tools/dev/projects.py;tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py"
+msgstr "tools/dev/projects.py;tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py"
+
+msgid "pinned_project_current_sdk_consumption_verified"
+msgstr "pinned_project_current_sdk_consumption_verified"
+
+msgid "tools/dev/projects.py;tools/testing/test_project_consumption.py;tools/testing/test_dev_projects.py"
+msgstr "tools/dev/projects.py;tools/testing/test_project_consumption.py;tools/testing/test_dev_projects.py"
+
+msgid "static_manifest_contract_verified"
+msgstr "static_manifest_contract_verified"
+
+msgid "tools/configure/integration_package.py;tools/configure/soc-package.schema.json;tools/configure/providers/descriptor.py;tools/configure/test_provider_manifest.py"
+msgstr "tools/configure/integration_package.py;tools/configure/soc-package.schema.json;tools/configure/providers/descriptor.py;tools/configure/test_provider_manifest.py"
+
+msgid "explicit_atomic_input_refresh_verified"
+msgstr "explicit_atomic_input_refresh_verified"
+
+msgid "tools/configure/integration_package.py;tools/configure/test_provider_manifest.py"
+msgstr "tools/configure/integration_package.py;tools/configure/test_provider_manifest.py"
+
+msgid "external_board_first_authoring_verified"
+msgstr "external_board_first_authoring_verified"
+
+msgid "tools/configure/experience.py;tools/configure/test_provider_authoring.py"
+msgstr "tools/configure/experience.py;tools/configure/test_provider_authoring.py"
+
+msgid "selected_provider_cmake_contract_verified"
+msgstr "selected_provider_cmake_contract_verified"
+
+msgid "CMakeLists.txt;cmake/platform/Provider.cmake;tools/testing/test_selected_provider_contract.py"
+msgstr "CMakeLists.txt;cmake/platform/Provider.cmake;tools/testing/test_selected_provider_contract.py"
+
+msgid "canonical_c_provider_source_and_installed_verified"
+msgstr "canonical_c_provider_source_and_installed_verified"
+
+msgid "cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tools/testing/test_provider_sdk_starter.py;tools/configure/test_external_package.py"
+msgstr "cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tools/testing/test_provider_sdk_starter.py;tools/configure/test_external_package.py"
+
+msgid "manifest_fixture_closure_and_sdk_host_inputs_verified"
+msgstr "manifest_fixture_closure_and_sdk_host_inputs_verified"
+
+msgid "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_source_sdk.py"
+msgstr "cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_source_sdk.py"
+
+msgid "current_source_and_installed_provider_consumers_verified"
+msgstr "current_source_and_installed_provider_consumers_verified"
+
+msgid "cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verify_consumers.py;tools/release/transport.py;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;.github/workflows/test_release.py"
+msgstr "cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verify_consumers.py;tools/release/transport.py;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;.github/workflows/test_release.py"
+
+msgid "provider_onboarding_source_checked_strict_docs_pending"
+msgstr "provider_onboarding_source_checked_strict_docs_pending"
+
+msgid "docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md"
+msgstr "docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md"
+
+msgid "selected_external_identity_and_sdk_closure_verified"
+msgstr "selected_external_identity_and_sdk_closure_verified"
+
+msgid "tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/integration_package.py;tools/configure/test_provider_manifest.py"
+msgstr "tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/integration_package.py;tools/configure/test_provider_manifest.py"
+
+msgid "exact_assembly_execution_leaves_associated"
+msgstr "exact_assembly_execution_leaves_associated"
+
+msgid "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/testing/test_support_index.py;docs/delivery/developer-experience-results.json"
+msgstr "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/testing/test_support_index.py;docs/delivery/developer-experience-results.json"
+
+msgid "independent_stage_scope_validation_verified"
+msgstr "independent_stage_scope_validation_verified"
+
+msgid "tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/evidence/native_proof.py;tools/testing/test_support_stages.py"
+msgstr "tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/evidence/native_proof.py;tools/testing/test_support_stages.py"
+
+msgid "strict_scope_and_explicit_read_only_legacy_verified"
+msgstr "strict_scope_and_explicit_read_only_legacy_verified"
+
+msgid "tools/evidence/proof.py;tools/evidence/native_proof.py;tools/evidence/candidate.py;tools/evidence/legacy_sdk.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_reproduction_consumer.py;tools/testing/test_reproduction_boundary.py"
+msgstr "tools/evidence/proof.py;tools/evidence/native_proof.py;tools/evidence/candidate.py;tools/evidence/legacy_sdk.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_reproduction_consumer.py;tools/testing/test_reproduction_boundary.py"
+
+msgid "sdk_package_selected_consumer_and_full_plan_separated"
+msgstr "sdk_package_selected_consumer_and_full_plan_separated"
+
+msgid "tools/evidence/proof.py;tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/release/transport.py;tools/testing/test_support_sdk_consumption.py;.github/workflows/test_release.py"
+msgstr "tools/evidence/proof.py;tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/release/transport.py;tools/testing/test_support_sdk_consumption.py;.github/workflows/test_release.py"
+
+msgid "assertion_identity_execution_and_trust_separated"
+msgstr "assertion_identity_execution_and_trust_separated"
+
+msgid "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/proof.py;tools/testing/test_support_stages.py"
+msgstr "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/proof.py;tools/testing/test_support_stages.py"
+
+msgid "scope_mismatch_and_admission_tool_relations_verified"
+msgstr "scope_mismatch_and_admission_tool_relations_verified"
+
+msgid "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/identity.py"
+msgstr "tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/identity.py"
+
+msgid "hil_association_tools_verified_physical_not_executed"
+msgstr "hil_association_tools_verified_physical_not_executed"
+
+msgid "tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/hil/admit.py;tools/hil/measure.py;tools/testing/test_support_stages.py"
+msgstr "tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/hil/admit.py;tools/hil/measure.py;tools/testing/test_support_stages.py"
+
+msgid "read_only_support_command_and_sdk_inventory_verified"
+msgstr "read_only_support_command_and_sdk_inventory_verified"
+
+msgid "tools/dev/dev.py;tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/configure/configure.py;tools/configure/integration_package.py;tools/evidence/identity.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py"
+msgstr "tools/dev/dev.py;tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/configure/configure.py;tools/configure/integration_package.py;tools/evidence/identity.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py"
+
+msgid "exact_selection_and_real_sdk_contamination_rejection_verified"
+msgstr "exact_selection_and_real_sdk_contamination_rejection_verified"
+
+msgid "tools/testing/test_support_evidence.py;tools/testing/test_support_index.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/evidence/proof.py;tools/evidence/identity.py"
+msgstr "tools/testing/test_support_evidence.py;tools/testing/test_support_index.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/evidence/proof.py;tools/evidence/identity.py"
+
+msgid "current_onboarding_phases_measured"
+msgstr "current_onboarding_phases_measured"
+
+msgid "tools/dev/timings.py;tools/dev/process.py;tools/configure/configure.py"
+msgstr "tools/dev/timings.py;tools/dev/process.py;tools/configure/configure.py"
+
+msgid "current_raw_strong_elf_costs_measured"
+msgstr "current_raw_strong_elf_costs_measured"
+
+msgid "tools/measurement/resources.py;tools/measurement/elf.py;tools/configure/factory.py"
+msgstr "tools/measurement/resources.py;tools/measurement/elf.py;tools/configure/factory.py"
+
+msgid "integration_edit_surfaces_measured"
+msgstr "integration_edit_surfaces_measured"
+
+msgid "tools/configure/integration_package.py;tools/configure/dependencies.py;tools/configure/experience.py;tools/configure/factory.py;docs/delivery/developer-experience-results.json"
+msgstr "tools/configure/integration_package.py;tools/configure/dependencies.py;tools/configure/experience.py;tools/configure/factory.py;docs/delivery/developer-experience-results.json"
+
+msgid "current_static_instance_costs_and_pruning_measured"
+msgstr "current_static_instance_costs_and_pruning_measured"
+
+msgid "tools/measurement/resources.py;tools/measurement/elf.py;tests/contracts/native_assembly/multi.toml;tests/contracts/native_assembly/multi_board/board.json"
+msgstr "tools/measurement/resources.py;tools/measurement/elf.py;tests/contracts/native_assembly/multi.toml;tests/contracts/native_assembly/multi_board/board.json"
+
+msgid "red_green_handoffs_reviewed_with_declared_historical_gap"
+msgstr "red_green_handoffs_reviewed_with_declared_historical_gap"
+
+msgid "tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py;tools/testing/test_sdk_factory_strong.py;tools/configure/test_factory_includes.py;tools/configure/test_provider_manifest.py;tools/configure/test_provider_authoring.py;tools/testing/test_selected_provider_contract.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;cmake/package/verification/external_provider/lifecycle_test.cpp;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
+msgstr "tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py;tools/testing/test_sdk_factory_strong.py;tools/configure/test_factory_includes.py;tools/configure/test_provider_manifest.py;tools/configure/test_provider_authoring.py;tools/testing/test_selected_provider_contract.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;cmake/package/verification/external_provider/lifecycle_test.cpp;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
+
+msgid "canonical_source_and_independent_coverage_verified"
+msgstr "canonical_source_and_independent_coverage_verified"
+
+msgid "cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tests/contracts/external_provider_lifecycle/README.md;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/testing/test_reproduction_boundary.py"
+msgstr "cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tests/contracts/external_provider_lifecycle/README.md;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/testing/test_reproduction_boundary.py"
+
+msgid "ordinary_full_index_gate_passed"
+msgstr "ordinary_full_index_gate_passed"
+
+msgid "scripts/ci/tdd_gate.py;tools/dev/process.py;scripts/ci/style_gate.py;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
+msgstr "scripts/ci/tdd_gate.py;tools/dev/process.py;scripts/ci/style_gate.py;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py"
+
+msgid "bilingual_source_check_passed_strict_html_pending"
+msgstr "bilingual_source_check_passed_strict_html_pending"
+
+msgid "docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po"
+msgstr "docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po"

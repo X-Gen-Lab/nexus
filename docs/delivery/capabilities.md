@@ -131,6 +131,10 @@ SDK 包完整性、具体 consumer 执行和完整矩阵是不同范围。具体
 非 publishable 开发包明确显示开发范围；少量 consumer 的通过不升级成完整
 `installed_sdk` 或软件候选。完整包存在也不能证明 consumer 实际使用了 Nexus。
 
+The SDK resolver includes `.nexus-source-sdk.json` in the complete IR `inputs`. Its `configuration_sha256` therefore differs from a checkout resolution of the same logical assembly. Preserve that manifest input: equality of selected devices is narrower than equality of the complete configuration and its provenance.
+
+A direct API check using the SDK's own resolved IR can report `trust=semantic_verified` while a checkout CLI query of that SDK record reports `configuration_mismatch`. Semantic validation and configuration matching are separate observations. Evidence-to-source association through the CLI at a Gitless SDK root is not currently implemented; the direct API result does not establish equivalent end-to-end CLI evidence association.
+
 HIL 关联复用原有 admission、raw 和 measurement 校验，保留 station、PCB、芯片、
 配置、镜像和具体测试范围。软件参考 fixture、工具准备和 synthetic 结果都不能
 变成实板通过。没有真实原件时，物理执行继续保持未执行或未评估。

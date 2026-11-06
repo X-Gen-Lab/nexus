@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/developer-experience-execution.csv)。
-源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`0aa1206f02edd06971c51ea1c12814666990395d11fb80941c07eb51e61b7dc6`。
+源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6e4029d6a37792fb38f98f579a2d72c51d9c4c2ce34a1f05f9ecfb91171dc9b9`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1160,10 +1160,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF01 |
 | `task` | P0: Correct strong factory authoring and SDK guidance |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | factory_guidance_focused_passed_strict_docs_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/package/README.md;docs/reference/configuration/assembly.md |
+| `implementation_paths` | cmake/package/README.md;docs/reference/configuration/assembly.md;tools/configure/test_factory_includes.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Strong header is always generated; capabilities is independent; no invented authoring switch. |
 | `owner` | codex |
@@ -1175,10 +1175,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF02 |
 | `task` | P1: Use strong references in primary public SDK consumers |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_sdk_strong_consumers_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/package/verify_consumers.py |
+| `implementation_paths` | cmake/package/verify_consumers.py;tools/testing/test_sdk_factory_strong.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual installed and relocated C11/C++17 primary consumers use strong references; intentional raw getter regressions remain. |
 | `owner` | codex |
@@ -1190,8 +1190,8 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF03 |
 | `task` | P1: Validate nominal reference errors in actual consumer contexts |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_sdk_nominal_type_contract_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tests/contracts/test_source_sdk.py;tools/testing/test_sdk_factory_strong.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1205,10 +1205,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF04 |
 | `task` | P1: Explain exact generated factory accessors |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | accessor_projection_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/factory.py;tools/configure/experience.py |
+| `implementation_paths` | tools/configure/factory.py;tools/configure/experience.py;tools/configure/test_factory_includes.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Include return type REF constant and getter derive from sole factory projection including hyphen word and enhanced endpoint selections. |
 | `owner` | codex |
@@ -1220,10 +1220,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF05 |
 | `task` | P0: Bind project creation and build instructions to one platform source |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | selected_platform_create_consume_and_rollback_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/dev/projects.py |
+| `implementation_paths` | tools/dev/projects.py;tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Explicit source or SDK selects actual resolver and compatibility contract; exact subsequent build arguments match; expected lock and observed identity stay separate; no fallback. |
 | `owner` | codex |
@@ -1235,10 +1235,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | CF06 |
 | `task` | P1: Exercise complete pinned project creation and consumption |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | pinned_project_current_sdk_consumption_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/testing/test_dev_projects.py;X-Gen-Lab/nexus-examples/scripts/test_starter_templates.py |
+| `implementation_paths` | tools/dev/projects.py;tools/testing/test_project_consumption.py;tools/testing/test_dev_projects.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Pinned manifest through create then selected SDK actual build and Native execution; spaces relocation and rollback covered; private template bytes stay private. |
 | `owner` | codex |
@@ -1250,10 +1250,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP01 |
 | `task` | P1: Inspect provider manifest before trusted code loading |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | static_manifest_contract_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/integration_package.py;tools/configure/soc-package.schema.json |
+| `implementation_paths` | tools/configure/integration_package.py;tools/configure/soc-package.schema.json;tools/configure/providers/descriptor.py;tools/configure/test_provider_manifest.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Read-only immutable manifest contract checks fields paths versions and hashes without provider import; editor schema derives from same contract. |
 | `owner` | codex |
@@ -1265,10 +1265,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP02 |
 | `task` | P1: Explicitly check and refresh declared package input hashes |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | explicit_atomic_input_refresh_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/integration_package.py |
+| `implementation_paths` | tools/configure/integration_package.py;tools/configure/test_provider_manifest.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Only declared explicit inputs may refresh atomically; stale paths are diagnosed; missing symlink traversal duplicate and escape inputs reject without scanning or automatic upgrades. |
 | `owner` | codex |
@@ -1280,10 +1280,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP03 |
 | `task` | P1: Enable external package Board-first discovery and init |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | external_board_first_authoring_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/experience.py |
+| `implementation_paths` | tools/configure/experience.py;tools/configure/test_provider_authoring.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Explicit soc-package supports route-first queries and relative-path TOML creation using the existing resolver; no central registration or hidden clock/backend defaults. |
 | `owner` | codex |
@@ -1295,10 +1295,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP04 |
 | `task` | P1: Diagnose selected provider CMake contract early |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | selected_provider_cmake_contract_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/platform/Provider.cmake;CMakeLists.txt |
+| `implementation_paths` | CMakeLists.txt;cmake/platform/Provider.cmake;tools/testing/test_selected_provider_contract.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Selected target startup system and private dependencies have clear configure errors; builtin and external reuse one CMake graph and target policy. |
 | `owner` | codex |
@@ -1310,10 +1310,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP05 |
 | `task` | P1: Ship one canonical C provider lifecycle starter |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | canonical_c_provider_source_and_installed_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/package/verification/external_provider |
+| `implementation_paths` | cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tools/testing/test_provider_sdk_starter.py;tools/configure/test_external_package.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | SDK exports one copyable C11 provider with complete facts configuration CMake and retained cleanup; source tests consume the same original. |
 | `owner` | codex |
@@ -1325,10 +1325,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP06 |
 | `task` | P1: Project SDK external fixture closure from verified manifest |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | manifest_fixture_closure_and_sdk_host_inputs_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py |
+| `implementation_paths` | cmake/package/package_source_sdk.py;cmake/package/verify_consumers.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_source_sdk.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Required files copy and comparison share verified package inputs; CMake owns compile selection; independent missing-file and rehashed package tests remain. |
 | `owner` | codex |
@@ -1340,10 +1340,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP07 |
 | `task` | P1: Execute source and relocated installed provider consumers |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_source_and_installed_provider_consumers_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | cmake/package/verification/external_provider;tools/release/transport.py;tools/configure/test_external_package.py |
+| `implementation_paths` | cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verify_consumers.py;tools/release/transport.py;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;.github/workflows/test_release.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Canonical Native lifecycle runs in source and installed SDK; reviewed MCU ARM consumers link; rollback withdrawal recovery and header boundaries checked without physical claims. |
 | `owner` | codex |
@@ -1355,10 +1355,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP08 |
 | `task` | P1: Document one builtin or external provider onboarding path |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | provider_onboarding_source_checked_strict_docs_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md |
+| `implementation_paths` | docs/guides/provider-porting.md;cmake/package/verification/external_provider/README.md;docs/tutorials/source-sdk.md;tools/release/README.md;docs/status/software-verification.md |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Commands progress from starter through manifest init CMake SDK and tests; external users need no builtin map edits; trusted host-code boundary explicit. |
 | `owner` | codex |
@@ -1370,10 +1370,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EP09 |
 | `task` | P2: Remove unrelated builtin behavior from external final generator identity |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | selected_external_identity_and_sdk_closure_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure/dependencies.py;tools/configure/providers/descriptor.py |
+| `implementation_paths` | tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/integration_package.py;tools/configure/test_provider_manifest.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Unselected builtin changes do not invalidate external final identity; common map selected package and public tool changes still invalidate; initial snapshot and complete SDK verification remain. |
 | `owner` | codex |
@@ -1385,10 +1385,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV01 |
 | `task` | P1: Expose exact assembly-level execution leaves in existing records |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | exact_assembly_execution_leaves_associated |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/maintenance/capabilities.py;docs/delivery/developer-experience-results.json |
+| `implementation_paths` | tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/testing/test_support_index.py;docs/delivery/developer-experience-results.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Concrete model image and consumer records bind source resolved dependencies artifacts and raw reports; missing historical identity is never inherited or invented. |
 | `owner` | codex |
@@ -1400,10 +1400,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV02 |
 | `task` | P1: Associate independently verified stage evidence |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | independent_stage_scope_validation_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/maintenance/capabilities.py |
+| `implementation_paths` | tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/evidence/native_proof.py;tools/testing/test_support_stages.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Model ARM SDK and HIL use existing validators; one scope cannot promote another or manufacture a complete plan from partial runs. |
 | `owner` | codex |
@@ -1415,10 +1415,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV03 |
 | `task` | P0: Revalidate actual scope execution semantics |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | strict_scope_and_explicit_read_only_legacy_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/evidence/proof.py;tools/evidence/candidate.py |
+| `implementation_paths` | tools/evidence/proof.py;tools/evidence/native_proof.py;tools/evidence/candidate.py;tools/evidence/legacy_sdk.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_reproduction_consumer.py;tools/testing/test_reproduction_boundary.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | New sealing rejects arbitrary success empty filtered skipped interrupted or wrong-checker scopes; frozen legacy evidence has an explicit read-only replay boundary. |
 | `owner` | codex |
@@ -1430,10 +1430,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV04 |
 | `task` | P1: Separate SDK package integrity consumer execution and full matrix |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | sdk_package_selected_consumer_and_full_plan_separated |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/evidence/proof.py;tools/maintenance/capabilities.py |
+| `implementation_paths` | tools/evidence/proof.py;tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/release/transport.py;tools/testing/test_support_sdk_consumption.py;.github/workflows/test_release.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Each state is independently visible; exact consumer and full plan are verified; selected images never qualify every maintained mode. |
 | `owner` | codex |
@@ -1445,10 +1445,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV05 |
 | `task` | P0: Expose declaration identity execution and semantic trust separately |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | assertion_identity_execution_and_trust_separated |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/maintenance/capabilities.py |
+| `implementation_paths` | tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/proof.py;tools/testing/test_support_stages.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Changing reported text or rehashing an envelope cannot improve trust; original status remains a statement distinct from validated execution scope. |
 | `owner` | codex |
@@ -1460,10 +1460,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV06 |
 | `task` | P1: Explain tool environment and evidence mismatch dimensions |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | scope_mismatch_and_admission_tool_relations_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/maintenance/capabilities.py;tools/evidence/candidate.py |
+| `implementation_paths` | tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/identity.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Source config dependencies tools SDK artifacts and missing originals have explicit relations; current unobserved tools are not claimed verified. |
 | `owner` | codex |
@@ -1475,10 +1475,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV07 |
 | `task` | P1: Associate precise hardware evidence through existing HIL validators |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | hil_association_tools_verified_physical_not_executed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/maintenance/capabilities.py;tools/hil/admit.py;tools/hil/measure.py |
+| `implementation_paths` | tools/maintenance/support.py;tools/maintenance/capabilities.py;tools/evidence/proof.py;tools/hil/admit.py;tools/hil/measure.py;tools/testing/test_support_stages.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Station PCB chip fixture image workload and measurement scope retain freshness rules; software fixtures never become physical execution; absent physical raw stays not_executed. |
 | `owner` | codex |
@@ -1490,10 +1490,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV08 |
 | `task` | P1: Provide one readable development support command |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | read_only_support_command_and_sdk_inventory_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/dev/dev.py;tools/maintenance/capabilities.py |
+| `implementation_paths` | tools/dev/dev.py;tools/maintenance/capabilities.py;tools/maintenance/support.py;tools/configure/configure.py;tools/configure/integration_package.py;tools/evidence/identity.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | One read-only command shares human and JSON projections with per-stage source scope trust relation and next missing evidence; no implicit build network or equipment use. |
 | `owner` | codex |
@@ -1505,10 +1505,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | EV09 |
 | `task` | P1: Prevent cross-selection evidence contamination end to end |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | exact_selection_and_real_sdk_contamination_rejection_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/testing/test_support_evidence.py;tools/testing/test_support_index.py |
+| `implementation_paths` | tools/testing/test_support_evidence.py;tools/testing/test_support_index.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/evidence/proof.py;tools/evidence/identity.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Real validator composition rejects cross Board route backend clock cache security controller source SDK ELF and consumer mismatches; unchanged existing regressions remain. |
 | `owner` | codex |
@@ -1520,10 +1520,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | MX01 |
 | `task` | P1: Measure onboarding phases with exact cold and warm inputs |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_onboarding_phases_measured |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/dev/timings.py;tools/configure/configure.py |
+| `implementation_paths` | tools/dev/timings.py;tools/dev/process.py;tools/configure/configure.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Record actual resolver manifest generation configure build test and report durations with exact inputs; observations are not qualification. |
 | `owner` | codex |
@@ -1535,10 +1535,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | MX02 |
 | `task` | P2: Compare actual raw and strong factory image costs |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_raw_strong_elf_costs_measured |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/measurement;tools/configure/factory.py |
+| `implementation_paths` | tools/measurement/resources.py;tools/measurement/elf.py;tools/configure/factory.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Same assembly compiler and optimization compare ELF map and symbol costs; no added persistent RAM; Flash and Og/O0 differences disclosed. |
 | `owner` | codex |
@@ -1550,10 +1550,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | MX03 |
 | `task` | P2: Measure actual instance Board and provider integration edit surfaces |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | integration_edit_surfaces_measured |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/configure;docs/delivery/developer-experience-results.json |
+| `implementation_paths` | tools/configure/integration_package.py;tools/configure/dependencies.py;tools/configure/experience.py;tools/configure/factory.py;docs/delivery/developer-experience-results.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Report changed files public versus private behavior and repeated decisions for explicit integration cases; code size does not substitute for correctness. |
 | `owner` | codex |
@@ -1565,10 +1565,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | MX04 |
 | `task` | P2: Measure empty single and multiple static instance costs |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | current_static_instance_costs_and_pruning_measured |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/measurement;tests/contracts/native_assembly |
+| `implementation_paths` | tools/measurement/resources.py;tools/measurement/elf.py;tests/contracts/native_assembly/multi.toml;tests/contracts/native_assembly/multi_board/board.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Exact selected-instance cohorts report loaded Flash readonly data static RAM MSP and heap; unused-provider pruning checked without invented performance results. |
 | `owner` | codex |
@@ -1580,10 +1580,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | DX01 |
 | `task` | P1: Retain real TDD order for changed behavior |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | red_green_handoffs_reviewed_with_declared_historical_gap |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/testing;tests/contracts;tests/google |
+| `implementation_paths` | tools/testing/test_dev_projects.py;tools/testing/test_project_consumption.py;tools/testing/test_sdk_factory_strong.py;tools/configure/test_factory_includes.py;tools/configure/test_provider_manifest.py;tools/configure/test_provider_authoring.py;tools/testing/test_selected_provider_contract.py;tools/testing/test_provider_sdk_starter.py;tests/contracts/test_evidence_scope_proof.py;tests/contracts/test_evidence_candidate.py;tests/contracts/test_evidence_legacy_sdk.py;tools/testing/test_support_stages.py;tools/testing/test_support_sdk_consumption.py;cmake/package/verification/external_provider/lifecycle_test.cpp;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Each changed behavior or defect has contemporaneous meaningful RED then GREEN; equivalent refactors preserve GREEN and no manufactured historical failures. |
 | `owner` | codex |
@@ -1595,10 +1595,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | DX02 |
 | `task` | P1: Keep independent coverage while avoiding duplicate fixtures |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | canonical_source_and_independent_coverage_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | tools/testing;tests/contracts;cmake/package/verification |
+| `implementation_paths` | cmake/package/verification/external_provider/CMakeLists.txt;cmake/package/verification/external_provider/README.md;cmake/package/verification/external_provider/assembly.toml;cmake/package/verification/external_provider/board/board.json;cmake/package/verification/external_provider/consumer.c;cmake/package/verification/external_provider/lifecycle_test.cpp;cmake/package/verification/external_provider/provider/configure/__init__.py;cmake/package/verification/external_provider/provider/configure/bindings.py;cmake/package/verification/external_provider/provider/configure/contract.py;cmake/package/verification/external_provider/provider/configure/emission.py;cmake/package/verification/external_provider/provider/include/nexus_reference/lifecycle_probe.h;cmake/package/verification/external_provider/provider/nexus-soc.json;cmake/package/verification/external_provider/provider/soc/CMakeLists.txt;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.c;cmake/package/verification/external_provider/provider/soc/lifecycle_adapter.h;cmake/package/verification/external_provider/provider/soc/routes.json;cmake/package/verification/external_provider/provider/soc/soc.json;tests/contracts/external_provider_lifecycle/README.md;tools/configure/test_external_package.py;tools/testing/test_provider_sdk_starter.py;tools/testing/test_support_sdk_consumption.py;tests/contracts/test_evidence_scope_proof.py;tools/testing/test_reproduction_boundary.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | One canonical reference feeds appropriate Python and real C tests; independent negative oracles remain; no repeated unchanged tool domain per Native mode. |
 | `owner` | codex |
@@ -1610,10 +1610,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | DX03 |
 | `task` | P1: Complete bounded checks and ordinary full-index commit gate |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | ordinary_full_index_gate_passed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | scripts/ci/tdd_gate.py;tools/dev/process.py |
+| `implementation_paths` | scripts/ci/tdd_gate.py;tools/dev/process.py;scripts/ci/style_gate.py;tools/testing/test_reproduction_boundary.py;.github/workflows/test_release.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Focused failures stop early; final source freeze ordinary hooks full tools and Google execute fresh with bounded jobs and no skipped reports or hook bypass. |
 | `owner` | codex |
@@ -1625,10 +1625,10 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | DX04 |
 | `task` | P1: Synchronize existing bilingual contracts navigation and diagrams |
-| `implementation_status` | planned |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | bilingual_source_check_passed_strict_html_pending |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/assets/diagrams/factory-instances.dot |
+| `implementation_paths` | docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Existing pages and diagrams describe exact current contracts in both locales; commands pass validation; no parallel status authority or inherited firmware qualification. |
 | `owner` | codex |
