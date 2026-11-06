@@ -95,11 +95,51 @@ class ToolRunnerTests(unittest.TestCase):
             self.assertFalse(report.exists())
 
     def test_actual_execution_reports_nonzero_count(self):
-        fixture = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
+        observed = []
+        fixture = unittest.TestSuite([
+            unittest.FunctionTestCase(lambda: observed.append("first")),
+            unittest.FunctionTestCase(lambda: observed.append("second"))])
         record = self.run_fixture(fixture)
-        self.assertEqual(record["executed"], 1)
-        self.assertEqual(record["discovered"], 1)
+        self.assertEqual(observed, ["first", "second"])
+        self.assertEqual(record["executed"], 2)
+        self.assertEqual(record["discovered"], 2)
         self.assertEqual(record["status"], "passed")
+
+    def assert_first_failure_stops_later_case(self, kind):
+        with tempfile.TemporaryDirectory() as name:
+            directory = Path(name)
+            sentinel = directory / "later-case-ran"
+            module = directory / ("test_failfast_" + directory.name + ".py")
+            first = ("self.fail('first real failure')" if kind == "failure"
+                     else "raise RuntimeError('first real error')")
+            module.write_text(
+                "from pathlib import Path\nimport unittest\n"
+                "class ActualPlan(unittest.TestCase):\n"
+                "    def test_00_first(self):\n"
+                f"        {first}\n"
+                "    def test_01_later(self):\n"
+                f"        Path({str(sentinel)!r}).write_text('executed')\n")
+            trace = io.StringIO()
+            try:
+                with redirect_stderr(trace), self.assertRaises(ValueError) as caught:
+                    run_tool_tests.execute_directory(directory, "failure-fixture")
+            finally:
+                sys.modules.pop(module.stem, None)
+                if str(directory) in sys.path:
+                    sys.path.remove(str(directory))
+            self.assertFalse(sentinel.exists())
+            self.assertIn("first real " + kind, trace.getvalue())
+            record = json.loads(str(caught.exception).split(": ", 1)[1])
+            self.assertEqual(record["discovered"], 2)
+            self.assertEqual(record["executed"], 1)
+            self.assertEqual(record["failures"], int(kind == "failure"))
+            self.assertEqual(record["errors"], int(kind == "error"))
+
+    def test_first_actual_failure_keeps_trace_and_stops_later_case(self):
+        self.assert_first_failure_stops_later_case("failure")
+
+    def test_first_actual_error_keeps_trace_and_stops_later_case(self):
+        self.assert_first_failure_stops_later_case("error")
 
     def test_empty_discovery_is_not_success(self):
         with self.assertRaises(ValueError):

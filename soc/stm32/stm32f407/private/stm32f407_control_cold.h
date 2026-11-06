@@ -20,6 +20,7 @@ typedef struct {
     uint8_t gpio_index;
     uint8_t line;
     uint8_t priority;
+    uint8_t pull;
 } nx_stm32_exti_config_t;
 
 /** \brief Exact TIM3 channel one counts and declared PA6 inactive level. */
@@ -65,7 +66,11 @@ nx_stm32_exti_prepare(nx_stm32_exti_state_t* port,
     if (port == NULL || config == NULL || config->gpio == NULL ||
         config->storage == NULL || config->capacity == 0U ||
         config->capacity > 4096U || config->gpio_index > 8U ||
-        (config->line != 0U && config->line != 5U && config->line != 6U) ||
+        config->line > 15U || config->pull > 2U ||
+        config->gpio !=
+            (GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE +
+                                       (uintptr_t)config->gpio_index *
+                                           UINT32_C(0x400)) ||
         config->priority > 15U || config->edge < NX_EXTI_RISING ||
         config->edge > NX_EXTI_BOTH)
         return NX_ERROR_INVALID;
@@ -74,11 +79,20 @@ nx_stm32_exti_prepare(nx_stm32_exti_state_t* port,
     uint32_t bit = 1U << config->line;
     if (((EXTI->IMR | EXTI->EMR | EXTI->PR) & bit) != 0U)
         return NX_ERROR_BUSY;
+    IRQn_Type irq = config->line < 5U
+                        ? (IRQn_Type)((int)EXTI0_IRQn + (int)config->line)
+                        : (config->line < 10U ? EXTI9_5_IRQn : EXTI15_10_IRQn);
+    uint32_t vector_mask =
+        config->line < 5U ? bit : (config->line < 10U ? 0x3E0U : 0xFC00U);
+    if (NVIC_GetActive(irq) != 0U ||
+        ((EXTI->IMR & vector_mask) != 0U && NVIC_GetEnableIRQ(irq) != 0U &&
+         NVIC_GetPriority(irq) != config->priority))
+        return NX_ERROR_BUSY;
     if ((RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN) == 0U)
         return NX_ERROR_STATE;
     port->cold_owned = true;
-    nx_result_t status =
-        nx_stm32_pin_configure(config->gpio, config->line, 0U, 0U, 0U, false);
+    nx_result_t status = nx_stm32_pin_configure(config->gpio, config->line, 0U,
+                                                0U, config->pull, false);
     if (status != NX_SUCCESS)
         return status;
     port->registers = EXTI;
@@ -90,7 +104,6 @@ nx_stm32_exti_prepare(nx_stm32_exti_state_t* port,
     status = nx_stm32_exti_initialize(port, SYSCFG, config->gpio_index);
     if (status != NX_SUCCESS)
         return status;
-    IRQn_Type irq = config->line == 0U ? EXTI0_IRQn : EXTI9_5_IRQn;
     /* A newly armed line or selected peer now owns any pending hint. */
     nx_arch_dsb();
     nx_arch_isb();

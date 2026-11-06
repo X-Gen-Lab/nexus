@@ -1,0 +1,83 @@
+schema = 2
+board = "stm32f407zg_qiming_core"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[uart.console]
+binding = "uart1"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 16
+
+[uart.console.irq]
+priority = 5
+
+[uart.serial2]
+binding = "uart2"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.serial2.rx]
+format = "bytes"
+capacity = 16
+
+[uart.serial2.irq]
+priority = 5
+
+[uart.serial3]
+binding = "uart3"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.serial3.rx]
+format = "bytes"
+capacity = 16
+
+[uart.serial3.irq]
+priority = 5
+
+[uart.serial4]
+binding = "uart4"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.serial4.rx]
+format = "bytes"
+capacity = 16
+
+[uart.serial4.irq]
+priority = 5
+
+[uart.serial5]
+binding = "uart5"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.serial5.rx]
+format = "bytes"
+capacity = 16
+
+[uart.serial5.irq]
+priority = 5
+
+[uart.serial6]
+binding = "uart6"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.serial6.rx]
+format = "bytes"
+capacity = 16
+
+[uart.serial6.irq]
+priority = 5

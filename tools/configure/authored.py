@@ -6,7 +6,8 @@ from types import MappingProxyType
 
 from tools.configure.ir import Record, freeze
 from tools.configure.contracts import (
-    CONTROLLER_CONTRACTS, CONTROLLER_KINDS, ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS)
+    CONTROLLER_CONTRACTS, CONTROLLER_KINDS, ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS,
+    EXTERNAL_ENDPOINT_FIELDS, EXTERNAL_ENDPOINT_KINDS)
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,7 @@ class AuthoredAssembly(Record):
     power: Mapping | None = None
     i2s2: Mapping | None = None
     soc_package: str | None = None
+    hardware: Mapping | None = None
 
     @classmethod
     def create(cls, values):
@@ -47,12 +49,12 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
                  "flash_load_limit_bytes", "image_prefix_bytes",
                  "image_suffix_bytes", "regions", "mpu"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
+TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2", "hardware"}
 
 
 
 def normalize(data, path, root, fail, obj, integer, text):
-    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | set(EXTERNAL_ENDPOINT_KINDS) | {"spi_device", "i2c_device", "usb_endpoint"},
         "assembly TOML")
     integer(data["schema"], 2, 2, "assembly schema")
     if ("board" in data) == ("board_package" in data):
@@ -96,6 +98,17 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
             controllers.append(selection)
     devices = []
+    for kind in EXTERNAL_ENDPOINT_KINDS:
+        instances = data.get(kind, {})
+        if not isinstance(instances, dict):
+            fail(f"{kind}: expected endpoint tables")
+        for name, definition in instances.items():
+            required = EXTERNAL_ENDPOINT_FIELDS | (
+                {"mode"} if kind == "memory_window" else set())
+            obj(definition, required, (), f"{kind}.{name}")
+            devices.append({**definition, "id": name,
+                            "driver": kind + "-endpoint",
+                            "authored_kind": kind})
     for kind in ("spi", "i2c"):
         instances = data.get(kind + "_device", {})
         if not isinstance(instances, dict):
@@ -122,7 +135,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("soc_package", "abi", "optimization", "components", "os", "factory", "can_domain", "power"):
+    for field in ("soc_package", "abi", "optimization", "components", "os", "factory", "can_domain", "power", "hardware"):
         if field in data:
             result[field] = data[field]
     if "i2s2" in data:
@@ -151,6 +164,17 @@ def editor_schema():
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
+        if "pull" in fields:
+            properties["pull"]["enum"] = ["none", "up", "down"]
+        if "output_type" in fields:
+            properties["output_type"]["enum"] = ["push-pull", "open-drain"]
+        block_bounds = {"bus_width": {"type": "integer", "enum": [1, 4]},
+                        "max_blocks": {"type": "integer", "minimum": 1,
+                                       "maximum": 32},
+                        "poll_budget": {"type": "integer", "minimum": 1,
+                                        "maximum": 1000000},
+                        "stop_timeout_us": {"type": "integer", "minimum": 1,
+                                            "maximum": 2**32 - 1}}
         numeric = {"baud", "capacity", "priority", "main_stack_bytes", "libc_heap_bytes",
                    "static_ram_limit_bytes", "flash_load_limit_bytes", "max_hz",
                    "event_capacity", "period_ticks", "duty_ticks", "tick_hz",
@@ -164,6 +188,8 @@ def editor_schema():
                    "upper", "image_prefix_bytes", "image_suffix_bytes"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
+        for name in fields & block_bounds.keys():
+            properties[name] = block_bounds[name]
         for name in fields & {"image_prefix_bytes", "image_suffix_bytes"}:
             properties[name]["maximum"] = 2**32 - 1
         for name in fields & {"channels", "sample_times"}:
@@ -188,12 +214,14 @@ def editor_schema():
         uart_formats.fifo_editor_schema(properties, fields, record)
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
-    schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+    schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | set(EXTERNAL_ENDPOINT_KINDS) | {"spi_device", "i2c_device", "usb_endpoint"},
                     TOP_REQUIRED)
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["title"] = "Nexus authored assembly schema 2"
     properties = schema["properties"]
     properties["schema"] = {"const": 2}
+    properties["hardware"] = {"type": "object",
+                              "additionalProperties": {"type": "string"}}
     properties["backend"]["enum"] = ["native", "baremetal", "freertos", "threadx"]
     properties["optimization"]["enum"] = ["O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"]
     properties["power"] = record({"mode", "controllers"}, {"mode", "controllers"})
@@ -235,6 +263,9 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "rtc":
+            from tools.configure import rtc
+            rtc.editor_schema(properties[kind]["additionalProperties"])
         if kind == "lptim":
             timer_advanced.lptim_editor_schema(
                 properties[kind]["additionalProperties"])
@@ -252,6 +283,25 @@ def editor_schema():
                 properties[kind]["additionalProperties"])
     for kind, fields in ENDPOINT_FIELDS.items():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
+    for kind in EXTERNAL_ENDPOINT_KINDS:
+        fields = EXTERNAL_ENDPOINT_FIELDS | (
+            {"mode"} if kind == "memory_window" else set())
+        endpoint = record(fields, fields)
+        if kind == "memory_window":
+            endpoint["properties"]["mode"] = {
+                "enum": ["cpu-window", "startup-memory"]}
+        for field in ("read_timing", "write_timing"):
+            endpoint["properties"][field] = {
+                "type": "object", "additionalProperties": False,
+                "required": ["address_setup", "address_hold", "data_setup", "bus_turn"],
+                "properties": {name: {"type": "integer", "minimum": low,
+                                      "maximum": high}
+                               for name, low, high in (
+                                   ("address_setup", 0, 15),
+                                   ("address_hold", 1, 15),
+                                   ("data_setup", 1, 255),
+                                   ("bus_turn", 0, 15))}}
+        properties[kind] = {"type": "object", "additionalProperties": endpoint}
     endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})
     endpoint_schema["properties"]["direction"] = {"enum": ["in", "out"]}
     endpoint_schema["properties"]["transfer"] = {

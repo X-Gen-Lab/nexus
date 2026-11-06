@@ -47,7 +47,8 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         self.assertTrue(uart_dma[0]["fixtures"])
         spi = next(row for row in rows if row["family"] == "stm32f407"
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
-        self.assertEqual(spi["boards"], [])
+        self.assertEqual(set(spi["boards"]), {
+            "stm32f407zg-qiming-core", "stm32f407zg-qiming-v41"})
 
     def test_selected_shared_ip_exports_keep_the_actual_driver_path(self):
         rows = capabilities.collect(ROOT)

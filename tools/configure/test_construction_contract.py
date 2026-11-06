@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
-from tools.configure.calls import DirectCall
+from tools.configure.calls import DirectCall, Symbol
 from tools.configure.providers import common, descriptor, maintained
 
 
@@ -143,6 +143,27 @@ class ConstructionContractTests(unittest.TestCase):
         for value in (None, 0, 1, "false"):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 replace(original, retain_on_failed_init=value)
+
+    def test_selected_pre_c_owner_uses_only_a_typed_static_initializer(self):
+        result = self.resolve("tools/configure/assemblies/native-gpio.toml")
+        original = self.construction(result, result.controllers[0])
+        self.assertIsNone(original.initial_state)
+        self.assertFalse(original.pre_c_effects)
+        marker = Symbol("NX_TEST_PERMANENT_STATE")
+        selected = replace(original, initial_state=marker, pre_c_effects=True)
+        self.assertIs(selected.initial_state, marker)
+        provider = maintained(result.soc_family)
+        with patch.object(provider, "constructor", return_value=selected):
+            source = bindings.emit(result)[1]
+        self.assertIn("s_nx_port_led0 = NX_TEST_PERMANENT_STATE;", source)
+        self.assertIn("result.remaining_effects |= 1u;", source)
+        self.assertIn("NX_SUCCESS, NX_SUCCESS, 1u", source)
+        for invalid in ("{ .boot_owned = true }", {}, 1, True):
+            with self.subTest(initial=invalid), self.assertRaises(ValueError):
+                replace(original, initial_state=invalid)
+        for invalid in (None, 0, 1, "false"):
+            with self.subTest(effects=invalid), self.assertRaises(ValueError):
+                replace(original, pre_c_effects=invalid)
 
     def test_admission_calls_are_typed_immutable_and_copied(self):
         result = self.resolve("tools/configure/assemblies/native-gpio.toml")

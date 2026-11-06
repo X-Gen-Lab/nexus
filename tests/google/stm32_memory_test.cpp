@@ -189,3 +189,57 @@ TEST(CcmDmaContract, CpuPlacementNeverGrantsDeviceReadOrWrite) {
     }
 }
 } /* namespace */
+
+TEST(MemoryPlan, ValidatesAllRegionsWithoutCopyingOrZeroing) {
+    const nx_stm32_memory_region_t regions[] = {
+        {0x20000000U, 0x20020000U, 0x08010000U, 0x20000000U, 0x20000008U,
+         0x20000010U, 0x20000018U, 0x20000020U, 0x20000028U},
+        {0x10000000U, 0x10010000U, 0x08010008U, 0x10000000U, 0x10000008U,
+         0x10000010U, 0x10000018U, 0x10000020U, 0x10000028U},
+        {0x68000000U, 0x68100000U, 0x08010010U, 0x68000000U, 0x68000008U,
+         0x68000010U, 0x68000018U, 0x68000020U, 0x68000028U}};
+    EXPECT_TRUE(nx_stm32_memory_plan_valid(
+        regions, 3U, 0x08000000U, 0x08100000U, 0x2001f000U, 0x20020000U));
+}
+TEST(MemoryPlan, RejectsInvalidLateRegionBeforeAnyDestinationAccess) {
+    nx_stm32_memory_region_t regions[] = {
+        {0x20000000U, 0x20020000U, 0x08010000U, 0x20000000U, 0x20000008U,
+         0x20000010U, 0x20000018U, 0x20000020U, 0x20000028U},
+        {0x68000000U, 0x68100000U, 0x08010008U, 0x68000000U, 0x68000008U,
+         0x68000010U, 0x68100004U, 0x68100004U, 0x68100004U}};
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(
+        regions, 2U, 0x08000000U, 0x08100000U, 0x2001f000U, 0x20020000U));
+}
+TEST(MemoryPlan, RejectsOverlappingRegionsAndStackSectionOverlap) {
+    nx_stm32_memory_region_t region = {0x20000000U, 0x20020000U, 0x08010000U,
+                                       0x20000000U, 0x20000008U, 0x20000010U,
+                                       0x20000018U, 0x20000020U, 0x20000028U};
+    const nx_stm32_memory_region_t pair[] = {region, region};
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(pair, 2U, 0x08000000U, 0x08100000U,
+                                            0x2001f000U, 0x20020000U));
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(
+        &region, 1U, 0x08000000U, 0x08100000U, 0x20000010U, 0x20000018U));
+    region.noinit_start = 0x2001f000U;
+    region.noinit_end = 0x2001f004U;
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(
+        &region, 1U, 0x08000000U, 0x08100000U, 0x2001f000U, 0x20020000U));
+}
+TEST(MemoryPlan, RejectsMalformedControlCountsAndProtectedSpan) {
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(nullptr, 1U, 0x08000000U,
+                                            0x08100000U, 0U, 0U));
+    nx_stm32_memory_region_t region{};
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(&region, 0U, 0x08000000U,
+                                            0x08100000U, 0U, 0U));
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(&region, SIZE_MAX, 0x08000000U,
+                                            0x08100000U, 0U, 0U));
+    EXPECT_FALSE(nx_stm32_memory_plan_valid(
+        &region, 1U, 0x08000000U, 0x08100000U, 0x20020000U, 0x2001f000U));
+}
+
+TEST(MemoryPlan, EmptySectionsDoNotConsumeProtectedStackBytes) {
+    const nx_stm32_memory_region_t region = {
+        0x20000000U, 0x20020000U, 0x08010000U, 0x2001f004U, 0x2001f004U,
+        0x2001f008U, 0x2001f008U, 0x2001f00cU, 0x2001f00cU};
+    EXPECT_TRUE(nx_stm32_memory_plan_valid(
+        &region, 1U, 0x08000000U, 0x08100000U, 0x2001f000U, 0x20020000U));
+}

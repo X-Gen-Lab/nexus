@@ -1,7 +1,8 @@
 """Resolve optional exact RAM domains and render one allocation-free linker ABI.
 
-Physical memory facts remain authoritative in the SoC package. Selection adds
-only placement and per-domain budgets; it never changes bus-master reachability.
+Internal physical memory facts remain authoritative in the SoC package. A
+reviewed selected external bank retains its own immutable backing reference.
+Placement and per-domain budgets never add bus-master reachability.
 """
 
 
@@ -89,6 +90,63 @@ def resource_budget_projection(resolved):
                    budget.get("image_prefix_bytes", 0) -
                    budget.get("image_suffix_bytes", 0)), limits,
         budget["main_stack_bytes"], budget.get("libc_heap_bytes", 0))
+
+
+def validate_external_projection(resolved):
+    """Check sealed selected backing without extending physical chip facts.
+
+    This reads the resolver's one-way audit projection. It does not re-resolve
+    configuration, infer a PCB route or qualify external memory electrically.
+    """
+    external = resolved.get("external_memory", [])
+    selected = [region for region in resolved.get("memory", [])
+                if region.get("id") == "addsram"]
+    if not external:
+        if resolved.get("soc_family") == "stm32f407" and selected:
+            raise ValueError("F407 addsram requires explicit external startup backing")
+        return
+    error = "Invalid external SRAM startup projection"
+    if (resolved.get("soc_family") != "stm32f407" or
+            resolved.get("part") != "STM32F407ZGT6" or
+            resolved.get("backend") != "baremetal" or
+            resolved.get("optimization", "Os") not in {"O0", "Og", "O2", "Os", "O3"} or
+            not isinstance(external, list) or len(external) != 1 or
+            set(external[0]) != {"id", "endpoint"} or
+            external[0]["id"] != "addsram"):
+        raise ValueError(error)
+    endpoint = external[0]["endpoint"]
+    if (not isinstance(endpoint, dict) or
+            endpoint.get("driver") != "memory_window-endpoint" or
+            endpoint.get("mode") != "startup-memory" or
+            endpoint.get("address") != 0x68000000 or
+            endpoint.get("bytes") != 0x100000 or
+            [child for child in resolved.get("devices", [])
+             if child.get("driver") == "memory_window-endpoint" and
+             child.get("mode") == "startup-memory"] != [endpoint]):
+        raise ValueError(error)
+    parents = [item for item in resolved.get("controllers", [])
+               if item.get("id") == endpoint.get("controller")]
+    if (len(parents) != 1 or parents[0].get("kind") != "external_bus" or
+            parents[0].get("controller") != "FSMC" or
+            parents[0].get("mode") != "async16"):
+        raise ValueError(error)
+    if (selected != [{"id": "addsram", "origin": 0x68000000,
+                      "size": 0x100000, "dma": False, "linker": True}] or
+            selected[0].get("dma") is not False or
+            selected[0].get("linker") is not True):
+        raise ValueError(error)
+    flash, layout = resolved.get("flash", {}), resolved.get("layout", {})
+    budget = resolved.get("memory_budgets", {})
+    choice = budget.get("regions", {}).get("addsram", {})
+    limit = choice.get("limit_bytes")
+    if (flash.get("origin") != 0x08000000 or flash.get("size") != 0x100000 or
+            layout.get("origin") != flash["origin"] or
+            layout.get("size") != flash["size"] or
+            budget.get("image_prefix_bytes", 0) or
+            budget.get("image_suffix_bytes", 0) or budget.get("mpu") or
+            type(limit) is not int or not 4 <= limit <= 0x100000 or limit % 4 or
+            budget.get("main_stack_bytes", 0) < 512):
+        raise ValueError(error)
 
 
 def selections(result):
@@ -325,6 +383,8 @@ _Min_Stack_Size = {stack};
 _Min_Heap_Size = {heap};
 __nx_msp_start = _estack - _Min_Stack_Size;
 __nx_msp_end = _estack;
+__nx_primary_region_start = ORIGIN(RAM);
+__nx_primary_region_end = ORIGIN(RAM) + LENGTH(RAM);
 __nx_resolved_sha256_0 = 0x{result.configuration_sha256[0:8]};
 __nx_resolved_sha256_1 = 0x{result.configuration_sha256[8:16]};
 __nx_resolved_sha256_2 = 0x{result.configuration_sha256[16:24]};

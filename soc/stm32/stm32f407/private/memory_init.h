@@ -1,12 +1,13 @@
 /**
  * \file            memory_init.h
- * \brief           Pre-RAM STM32F407 CPU-only CCM initialization
+ * \brief           Pre-RAM STM32F407 selected memory initialization
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F407_MEMORY_INIT_H
 #define NEXUS_STM32F407_MEMORY_INIT_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 /** \brief Reset-owned bounds outside CCM; no mutable global is required. */
@@ -23,6 +24,26 @@ typedef struct {
 } nx_stm32_memory_region_t;
 
 /**
+ * \brief           Validate the whole selected reset plan without mutations.
+ * \param[in]       regions: Complete immutable contiguous region descriptors.
+ * \param[in]       count: One to three physical regions, not overlapping.
+ * \param[in]       flash_start: Physical internal Flash lower bound.
+ * \param[in]       flash_end: Exclusive word-aligned physical Flash bound.
+ * \param[in]       protected_start: First byte of internal reset stack, or 0.
+ * \param[in]       protected_end: Exclusive stack bound, or 0 with start 0.
+ * \return          True only when every source, destination and control span
+ *                  is valid before any clock/pad/destination write.
+ * \note            Reset-safe pure integer validation; no globals, libc, heap
+ *                  or already initialized RAM. The descriptor table cannot
+ *                  alias any selected physical output region. DATA, BSS and
+ *                  NOINIT must exclude the protected internal-MSP reservation.
+ */
+bool nx_stm32_memory_plan_valid(const nx_stm32_memory_region_t* regions,
+                                size_t count, uintptr_t flash_start,
+                                uintptr_t flash_end, uintptr_t protected_start,
+                                uintptr_t protected_end);
+
+/**
  * \brief           Check all bounds before copying data or clearing BSS.
  * \param[in]       region: Immutable descriptor in Flash or current main SRAM
  *                  stack, outside every output range; never initialized RAM.
@@ -30,13 +51,13 @@ typedef struct {
  * \param[in]       flash_end: Exclusive word-aligned physical Flash end.
  * \return          True after initialization, false without mutation for an
  *                  invalid alignment, order, bound or descriptor/source alias.
- * \note            Reset-only, after CCM clock enable/readback and before main
- *                  data/BSS, constructors, platform start or enabled IRQs.
- *                  Uses no heap, libc, mutable global or already initialized
- *                  object. Main MSP remains in SRAM. CCM is CPU-only data and
- *                  is never instruction or DMA memory. NOINIT and padding are
- *                  untouched; initialize NOINIT before use. This software
- *                  exclusion does not establish physical reset/power retention.
+ * \note            Reset-only, after selected bus/clock readiness and before
+ *                  main data/BSS, constructors, platform start or enabled IRQs.
+ *                  Uses no heap, libc, mutable global or initialized object.
+ *                  Main MSP remains internal. Placement never grants execution
+ *                  or DMA access; physical domain restrictions still apply.
+ *                  NOINIT and padding are untouched; initialize before use.
+ *                  This does not establish physical reset/power retention.
  */
 bool nx_stm32_memory_initialize(const nx_stm32_memory_region_t* region,
                                 uintptr_t flash_start, uintptr_t flash_end);

@@ -2,9 +2,10 @@
 """Verify selected STM32F4 LL/HAL sources with their official CMSIS pairing.
 
 STM32CubeF4 v1.28.3 pins both reviewed components. The graph closes inline LL,
-ETH definitions and explicitly selected UART/DMA/RCC C with their transitive
-headers and notice. GPIO/Flash headers supply RCC declarations only; their C,
-global HAL initialization, SysTick and full LL implementations are not selected.
+ETH definitions and explicitly selected UART/DMA/RCC C, stateless FSMC/SDIO
+LL C and RTC/PWR inline operations with their transitive headers and notice.
+GPIO/Flash headers supply RCC declarations only; their C, global HAL
+initialization and SysTick are not selected.
 Source admission does not qualify a transport or create mutable Handles.
 """
 from __future__ import annotations
@@ -45,6 +46,9 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_hal_flash.h", "Inc/stm32f4xx_hal_flash_ex.h",
     "Inc/stm32f4xx_hal_flash_ramfunc.h", "Src/stm32f4xx_hal_uart.c",
     "Src/stm32f4xx_hal_dma.c", "Src/stm32f4xx_hal_rcc.c",
+    "Inc/stm32f4xx_ll_fsmc.h", "Src/stm32f4xx_ll_fsmc.c",
+    "Inc/stm32f4xx_ll_sdmmc.h", "Src/stm32f4xx_ll_sdmmc.c",
+    "Inc/stm32f4xx_ll_rtc.h", "Inc/stm32f4xx_ll_pwr.h",
 })
 PAIRING = {
     "repository": "https://github.com/STMicroelectronics/STM32CubeF4.git",
@@ -65,7 +69,7 @@ def contract(lock):
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "v1.8.5" or
             lock["selected_api"] != (
-                "stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx") or
+                "stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx") or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F4 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:

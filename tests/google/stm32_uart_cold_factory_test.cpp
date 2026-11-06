@@ -129,6 +129,13 @@ class UartColdFactory : public testing::Test {
         RCC->AHB1ENR = original_ahb1;
         RCC->APB1ENR = original_apb1;
         USART1->SR = USART_SR_TC | USART_SR_TXE;
+#ifdef NX_COLD_MULTI
+        USART2->SR = USART_SR_TC | USART_SR_TXE;
+        USART3->SR = USART_SR_TC | USART_SR_TXE;
+        UART4->SR = USART_SR_TC | USART_SR_TXE;
+        UART5->SR = USART_SR_TC | USART_SR_TXE;
+        USART6->SR = USART_SR_TC | USART_SR_TXE;
+#endif
         GPIOA->MODER = 3U;
         GPIOA->AFR[0] = 0xFU;
         for (IRQn_Type irq : vectors)
@@ -276,6 +283,250 @@ TEST_F(UartColdFactory, EmptyReceiptDoesNotEraseUnownedColdStorage) {
     EXPECT_EQ(0, std::memcmp(&state, &before, sizeof(before)));
     EXPECT_EQ(0U, writes);
 }
+
+#if !NX_COLD_RX && !NX_COLD_TX && !defined(NX_COLD_WORDS) &&                   \
+    !defined(NX_COLD_BLOCKS)
+namespace {
+struct ReviewedByteUart {
+    USART_TypeDef* registers;
+    GPIO_TypeDef* tx_gpio;
+    GPIO_TypeDef* rx_gpio;
+    IRQn_Type irq;
+    uint32_t clock_hz;
+    uint32_t gate;
+    uint8_t tx_port;
+    uint8_t tx_pin;
+    uint8_t rx_port;
+    uint8_t rx_pin;
+    uint8_t alternate;
+    bool apb2;
+};
+const std::array<ReviewedByteUart, 6> byte_uarts{{
+    {USART1, GPIOA, GPIOA, USART1_IRQn, 84000000U, RCC_APB2ENR_USART1EN, 0U, 9U,
+     0U, 10U, 7U, true},
+    {USART2, GPIOA, GPIOA, USART2_IRQn, 42000000U, RCC_APB1ENR_USART2EN, 0U, 2U,
+     0U, 3U, 7U, false},
+    {USART3, GPIOB, GPIOB, USART3_IRQn, 42000000U, RCC_APB1ENR_USART3EN, 1U,
+     10U, 1U, 11U, 7U, false},
+    {UART4, GPIOA, GPIOA, UART4_IRQn, 42000000U, RCC_APB1ENR_UART4EN, 0U, 0U,
+     0U, 1U, 8U, false},
+    {UART5, GPIOC, GPIOD, UART5_IRQn, 42000000U, RCC_APB1ENR_UART5EN, 2U, 12U,
+     3U, 2U, 8U, false},
+    {USART6, GPIOC, GPIOC, USART6_IRQn, 84000000U, RCC_APB2ENR_USART6EN, 2U, 6U,
+     2U, 7U, 8U, true},
+}};
+struct ByteColdOwner {
+    uint16_t saved[2]{};
+    uint8_t bytes[8]{};
+    nx_stm32_platform_pin_config_t pins[2]{};
+    IRQn_Type vector[1]{};
+    nx_stm32_uart_state_t state{};
+    nx_stm32_uart_cold_receipt_t receipt{};
+    nx_stm32_uart_cold_config_t config{};
+    explicit ByteColdOwner(const ReviewedByteUart& hw) {
+        pins[0] = {hw.tx_gpio, &saved[0], hw.tx_port, hw.tx_pin};
+        pins[1] = {hw.rx_gpio, &saved[1], hw.rx_port, hw.rx_pin};
+        vector[0] = hw.irq;
+        config.registers = hw.registers;
+        config.pins = pins;
+        config.vectors = vector;
+        config.vector_count = 1U;
+        config.rx_storage = bytes;
+        config.rx_capacity = sizeof(bytes);
+        config.clock_hz = hw.clock_hz;
+        config.baud = 115200U;
+        config.profile = NX_UART_RX_BYTES;
+        config.priority = 5U;
+    }
+};
+} /* namespace */
+
+TEST_F(UartColdFactory,
+       EveryReviewedByteControllerAcquiresAndRestoresItsOwnBank) {
+    for (const auto& hw : byte_uarts) {
+        SCOPED_TRACE(static_cast<int>(hw.irq));
+        ByteColdOwner owner(hw);
+        const uint32_t selected_gpio = (1U << hw.tx_port) | (1U << hw.rx_port);
+        RCC->AHB1ENR = original_ahb1 | selected_gpio;
+        hw.registers->SR = USART_SR_TC | USART_SR_TXE;
+        const uint32_t before1 = RCC->APB1ENR;
+        const uint32_t before2 = RCC->APB2ENR;
+        const uint16_t before_tx = nx_stm32_pin_capture(hw.tx_gpio, hw.tx_pin);
+        const uint16_t before_rx = nx_stm32_pin_capture(hw.rx_gpio, hw.rx_pin);
+        NVIC->IPR[static_cast<unsigned>(hw.irq)] = 0xB0U;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                                  &owner.state, &owner.config, &owner.receipt));
+        EXPECT_NE(0U, hw.registers->CR1 & USART_CR1_UE);
+        EXPECT_NE(0U, (hw.apb2 ? RCC->APB2ENR : RCC->APB1ENR) & hw.gate);
+        EXPECT_EQ(hw.clock_hz / 115200U +
+                      (hw.clock_hz % 115200U >= 57600U ? 1U : 0U),
+                  hw.registers->BRR);
+        EXPECT_TRUE(Enabled(hw.irq));
+        EXPECT_EQ(hw.alternate,
+                  (hw.tx_gpio->AFR[hw.tx_pin / 8U] >> ((hw.tx_pin % 8U) * 4U)) &
+                      15U);
+        EXPECT_EQ(hw.alternate,
+                  (hw.rx_gpio->AFR[hw.rx_pin / 8U] >> ((hw.rx_pin % 8U) * 4U)) &
+                      15U);
+        hw.registers->DR = static_cast<uint32_t>(hw.tx_pin);
+        hw.registers->SR = USART_SR_RXNE;
+        nx_stm32_uart_irq(&owner.state);
+        hw.registers->SR = USART_SR_TC | USART_SR_TXE;
+        uint8_t received = 0U;
+        size_t count = 0U;
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_uart_ops.read_bytes(
+                                  &owner.state, &received, 1U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(hw.tx_pin, received);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                                  &owner.state, &owner.config, &owner.receipt));
+        EXPECT_EQ(before1, RCC->APB1ENR);
+        EXPECT_EQ(before2, RCC->APB2ENR);
+        EXPECT_EQ(before_tx, nx_stm32_pin_capture(hw.tx_gpio, hw.tx_pin));
+        EXPECT_EQ(before_rx, nx_stm32_pin_capture(hw.rx_gpio, hw.rx_pin));
+        EXPECT_FALSE(Enabled(hw.irq));
+        EXPECT_EQ(0xB0U, NVIC->IPR[static_cast<unsigned>(hw.irq)]);
+    }
+}
+
+TEST_F(UartColdFactory, AdditionalByteControllersDoNotRequireAnUnrelatedGpioA) {
+    ByteColdOwner owner(byte_uarts[2]);
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN;
+    USART3->SR = USART_SR_TC | USART_SR_TXE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                              &owner.state, &owner.config, &owner.receipt));
+    EXPECT_EQ(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                              &owner.state, &owner.config, &owner.receipt));
+}
+
+TEST_F(UartColdFactory,
+       AdditionalControllerRejectsWrongClockVectorAndPadsWithoutWrites) {
+    for (unsigned malformed = 0U; malformed < 5U; ++malformed) {
+        ByteColdOwner owner(byte_uarts[2]);
+        RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN;
+        switch (malformed) {
+            case 0U:
+                owner.config.clock_hz = 84000000U;
+                break;
+            case 1U:
+                owner.vector[0] = USART2_IRQn;
+                break;
+            case 2U:
+                owner.pins[0].pin = 9U;
+                break;
+            case 3U:
+                owner.pins[1].port_index = 0U;
+                break;
+            default:
+                owner.pins[1].snapshot = owner.pins[0].snapshot;
+                break;
+        }
+        const auto before = writes;
+        EXPECT_EQ(NX_ERROR_INVALID,
+                  nx_stm32_uart_cold_acquire(&owner.config, &owner.receipt));
+        EXPECT_EQ(before, writes);
+        EXPECT_EQ(0U, owner.receipt.effects);
+        EXPECT_EQ(0U, owner.receipt.clock_added);
+    }
+}
+
+TEST_F(UartColdFactory,
+       SeparateControllersKeepReceiveAndGateOwnershipIndependent) {
+    ByteColdOwner first(byte_uarts[2]);
+    ByteColdOwner second(byte_uarts[5]);
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
+    USART3->SR = USART6->SR = USART_SR_TC | USART_SR_TXE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                              &first.state, &first.config, &first.receipt));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                              &second.state, &second.config, &second.receipt));
+    USART3->DR = 0x31U;
+    USART3->SR = USART_SR_RXNE;
+    nx_stm32_uart_irq(&first.state);
+    USART3->SR = USART_SR_TC | USART_SR_TXE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                              &second.state, &second.config, &second.receipt));
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_USART3EN);
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_USART6EN);
+    EXPECT_TRUE(Enabled(USART3_IRQn));
+    uint8_t received = 0U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_uart_ops.read_bytes(&first.state, &received,
+                                                       1U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(0x31U, received);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                              &first.state, &first.config, &first.receipt));
+}
+
+TEST_F(UartColdFactory, RefusedAdditionalVectorWithdrawalRetainsBothPortPads) {
+    ByteColdOwner owner(byte_uarts[4]);
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN;
+    UART5->SR = USART_SR_TC | USART_SR_TXE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                              &owner.state, &owner.config, &owner.receipt));
+    refused = &NVIC->ICER[static_cast<unsigned>(UART5_IRQn) / 32U];
+    held_bits = 1U << (static_cast<unsigned>(UART5_IRQn) % 32U);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_uart_byte_cold_close(
+                                 &owner.state, &owner.config, &owner.receipt));
+    EXPECT_NE(0U, owner.receipt.effects);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_UART5EN);
+    EXPECT_EQ(2U, (GPIOC->MODER >> 24U) & 3U);
+    EXPECT_EQ(2U, (GPIOD->MODER >> 4U) & 3U);
+    refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                              &owner.state, &owner.config, &owner.receipt));
+    EXPECT_EQ(0U, owner.receipt.effects);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_UART5EN);
+}
+#ifdef NX_COLD_MULTI
+TEST_F(UartColdFactory,
+       SixGeneratedFacesShareOperationsAndKeepDistinctReceivers) {
+    const std::array<USART_TypeDef*, 6> registers{USART1, USART2, USART3,
+                                                  UART4,  UART5,  USART6};
+    const std::array<IRQn_Type, 6> irqs{USART1_IRQn, USART2_IRQn, USART3_IRQn,
+                                        UART4_IRQn,  UART5_IRQn,  USART6_IRQn};
+    const std::array<nx_uart_id_t, 6> ids{
+        NX_UART_ID_CONSOLE, NX_UART_ID_SERIAL2, NX_UART_ID_SERIAL3,
+        NX_UART_ID_SERIAL4, NX_UART_ID_SERIAL5, NX_UART_ID_SERIAL6};
+    std::array<const nx_uart_port_t*, 6> faces{};
+    for (size_t i = 0U; i < faces.size(); ++i) {
+        faces[i] = nx_factory_uart(ids[i]);
+        ASSERT_NE(nullptr, faces[i]);
+        EXPECT_EQ(faces[0]->ops, faces[i]->ops);
+        EXPECT_EQ(0U, registers[i]->CR1 & USART_CR1_UE);
+        for (size_t j = 0U; j < i; ++j)
+            EXPECT_NE(faces[j]->context, faces[i]->context);
+    }
+    EXPECT_EQ(0U, writes);
+    Start();
+    for (size_t i = 0U; i < faces.size(); ++i) {
+        auto* state = static_cast<nx_stm32_uart_state_t*>(faces[i]->context);
+        EXPECT_EQ(registers[i], state->registers);
+        EXPECT_EQ(irqs[i], state->irq);
+        registers[i]->DR = static_cast<uint32_t>(0x30U + i);
+        registers[i]->SR = USART_SR_RXNE;
+        nx_stm32_uart_irq(state);
+        registers[i]->SR = USART_SR_TC | USART_SR_TXE;
+    }
+    for (size_t i = 0U; i < faces.size(); ++i) {
+        uint8_t received = 0U;
+        size_t count = 0U;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_uart_port_read_bytes(faces[i], &received, 1U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(0x30U + i, received);
+    }
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    for (IRQn_Type irq : irqs)
+        EXPECT_FALSE(Enabled(irq));
+    EXPECT_EQ(original_apb1, RCC->APB1ENR);
+    EXPECT_EQ(0U, RCC->APB2ENR & (RCC_APB2ENR_USART1EN | RCC_APB2ENR_USART6EN));
+    EXPECT_EQ(original_ahb1, RCC->AHB1ENR);
+}
+#endif
+#endif
 
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;

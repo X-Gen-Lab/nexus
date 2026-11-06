@@ -339,4 +339,5 @@ const nx_exti_ops_t nx_gd32f303_exti_ops = {
     .read = read_events,
     .stop = stop,
     .attach_wake = attach_wake,
+    .level = NULL,
 };

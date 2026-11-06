@@ -609,7 +609,8 @@
         }
       ],
       "modes": [
-        "dma-tx"
+        "dma-tx",
+        "irq-byte-event"
       ],
       "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
       "dma": [
@@ -743,6 +744,1163 @@
       "resources": [
         "clock:ETHMACPTP"
       ]
+    },
+    {
+      "id": "gpio-pf6",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF6",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pf7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF7",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pf8",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF8",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pf9",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pf10",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pf11",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF11",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg6",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg8",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg13",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg14",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pg15",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pc0",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pc13",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pd6",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pd7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pa5",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pb0",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "gpio-pb1",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "spi1-pb3-pb4-pb5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB3",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PB4",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PB5",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll",
+        "dma"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board.",
+      "dma": [
+        "DMA2:stream3:channel3",
+        "DMA2:stream0:channel3"
+      ]
+    },
+    {
+      "id": "i2c1-pb8-pb9",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB9",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board.",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream0:channel1",
+          "DMA1:stream6:channel1"
+        ]
+      }
+    },
+    {
+      "id": "can1-pb8-pb9",
+      "controller": "CAN1",
+      "kind": "can",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "can_rx",
+          "af": 9
+        },
+        {
+          "pin": "PB9",
+          "function": "can_tx",
+          "af": 9
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 exact LQFP144 pinout and alternate functions; RM0090 GPIO/SPI/I2C/CAN descriptions. Silicon pad selection only; PCB electrical conditions belong to the selected Board."
+    },
+    {
+      "id": "usart3-pb10-pb11",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "USART3",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PB11",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+    },
+    {
+      "id": "uart4-pa0-pa1",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "UART4",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "tx",
+          "af": 8
+        },
+        {
+          "pin": "PA1",
+          "function": "rx",
+          "af": 8
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+    },
+    {
+      "id": "uart5-pc12-pd2",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "UART5",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PC12",
+          "function": "tx",
+          "af": 8
+        },
+        {
+          "pin": "PD2",
+          "function": "rx",
+          "af": 8
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+    },
+    {
+      "id": "usart6-pc6-pc7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "USART6",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "tx",
+          "af": 8
+        },
+        {
+          "pin": "PC7",
+          "function": "rx",
+          "af": 8
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+    },
+    {
+      "id": "gpio-input-pb2",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB2",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "exti6-pf6",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI6",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PF6",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "exti7-pf7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI7",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PF7",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "exti8-pf8",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI8",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PF8",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "exti9-pf9",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI9",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "exti11-pf11",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI11",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PF11",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 pads and RM0090 GPIO/SYSCFG/EXTI routing; uploaded Qiming schematic switch/PEN nets. Input-only route, no physical timing qualification."
+    },
+    {
+      "id": "sdio-pc8-pd2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SDIO",
+      "kind": "block",
+      "pins": [
+        {
+          "pin": "PC8",
+          "function": "D0",
+          "af": 12
+        },
+        {
+          "pin": "PC9",
+          "function": "D1",
+          "af": 12
+        },
+        {
+          "pin": "PC10",
+          "function": "D2",
+          "af": 12
+        },
+        {
+          "pin": "PC11",
+          "function": "D3",
+          "af": 12
+        },
+        {
+          "pin": "PC12",
+          "function": "CK",
+          "af": 12
+        },
+        {
+          "pin": "PD2",
+          "function": "CMD",
+          "af": 12
+        }
+      ],
+      "modes": [
+        "sdio-poll"
+      ],
+      "source": "DS8626 STM32F405xx/407xx alternate-function mapping; RM0090 SDIO 48MHz PLLQ clock, 400kHz identification and finite CPU polling; complete six-pad socket reserved even in one-bit mode; no IRQ, DMA or card-detect claim"
+    },
+    {
+      "id": "rtc-lse-pc14-pc15",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "RTC",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "adopt-retained",
+        "provision-empty"
+      ],
+      "resources": [
+        "pin:PC14",
+        "pin:PC15",
+        "clock:LSE",
+        "clock:RTC",
+        "domain:backup",
+        "alarm:RTC_A"
+      ],
+      "source": "RM0090 Rev22 chapter26 and DS8626 PC14/OSC32_IN, PC15/OSC32_OUT: explicit LSE32768 crystal, BCD24h BYPSHAD PRER127/255 and polling Alarm A. C owns oscillator admission; claims never authorize GPIO pad writes. ADOPT requires externally prepared retained calendar provenance; PROVISION requires exact empty backup and explicit initial calendar. No physical retention or HIL claim."
+    },
+    {
+      "id": "fsmc-async16",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "FSMC",
+      "kind": "external_bus",
+      "pins": [],
+      "modes": [
+        "async16"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 AF12 mapping and RM0090 asynchronous 16-bit FSMC NORSRAM; exact board wiring cited by selected Board provenance, not physical qualification"
+    },
+    {
+      "id": "fsmc-ne3-is62wv51216",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "FSMC",
+      "kind": "memory_window",
+      "pins": [
+        {
+          "pin": "PD0",
+          "function": "FSMC_D2",
+          "af": 12
+        },
+        {
+          "pin": "PD1",
+          "function": "FSMC_D3",
+          "af": 12
+        },
+        {
+          "pin": "PD4",
+          "function": "FSMC_NOE",
+          "af": 12
+        },
+        {
+          "pin": "PD5",
+          "function": "FSMC_NWE",
+          "af": 12
+        },
+        {
+          "pin": "PD8",
+          "function": "FSMC_D13",
+          "af": 12
+        },
+        {
+          "pin": "PD9",
+          "function": "FSMC_D14",
+          "af": 12
+        },
+        {
+          "pin": "PD10",
+          "function": "FSMC_D15",
+          "af": 12
+        },
+        {
+          "pin": "PD11",
+          "function": "FSMC_A16",
+          "af": 12
+        },
+        {
+          "pin": "PD12",
+          "function": "FSMC_A17",
+          "af": 12
+        },
+        {
+          "pin": "PD13",
+          "function": "FSMC_A18",
+          "af": 12
+        },
+        {
+          "pin": "PD14",
+          "function": "FSMC_D0",
+          "af": 12
+        },
+        {
+          "pin": "PD15",
+          "function": "FSMC_D1",
+          "af": 12
+        },
+        {
+          "pin": "PE0",
+          "function": "FSMC_NBL0",
+          "af": 12
+        },
+        {
+          "pin": "PE1",
+          "function": "FSMC_NBL1",
+          "af": 12
+        },
+        {
+          "pin": "PE7",
+          "function": "FSMC_D4",
+          "af": 12
+        },
+        {
+          "pin": "PE8",
+          "function": "FSMC_D5",
+          "af": 12
+        },
+        {
+          "pin": "PE9",
+          "function": "FSMC_D6",
+          "af": 12
+        },
+        {
+          "pin": "PE10",
+          "function": "FSMC_D7",
+          "af": 12
+        },
+        {
+          "pin": "PE11",
+          "function": "FSMC_D8",
+          "af": 12
+        },
+        {
+          "pin": "PE12",
+          "function": "FSMC_D9",
+          "af": 12
+        },
+        {
+          "pin": "PE13",
+          "function": "FSMC_D10",
+          "af": 12
+        },
+        {
+          "pin": "PE14",
+          "function": "FSMC_D11",
+          "af": 12
+        },
+        {
+          "pin": "PE15",
+          "function": "FSMC_D12",
+          "af": 12
+        },
+        {
+          "pin": "PF0",
+          "function": "FSMC_A0",
+          "af": 12
+        },
+        {
+          "pin": "PF1",
+          "function": "FSMC_A1",
+          "af": 12
+        },
+        {
+          "pin": "PF2",
+          "function": "FSMC_A2",
+          "af": 12
+        },
+        {
+          "pin": "PF3",
+          "function": "FSMC_A3",
+          "af": 12
+        },
+        {
+          "pin": "PF4",
+          "function": "FSMC_A4",
+          "af": 12
+        },
+        {
+          "pin": "PF5",
+          "function": "FSMC_A5",
+          "af": 12
+        },
+        {
+          "pin": "PF12",
+          "function": "FSMC_A6",
+          "af": 12
+        },
+        {
+          "pin": "PF13",
+          "function": "FSMC_A7",
+          "af": 12
+        },
+        {
+          "pin": "PF14",
+          "function": "FSMC_A8",
+          "af": 12
+        },
+        {
+          "pin": "PF15",
+          "function": "FSMC_A9",
+          "af": 12
+        },
+        {
+          "pin": "PG0",
+          "function": "FSMC_A10",
+          "af": 12
+        },
+        {
+          "pin": "PG1",
+          "function": "FSMC_A11",
+          "af": 12
+        },
+        {
+          "pin": "PG2",
+          "function": "FSMC_A12",
+          "af": 12
+        },
+        {
+          "pin": "PG3",
+          "function": "FSMC_A13",
+          "af": 12
+        },
+        {
+          "pin": "PG4",
+          "function": "FSMC_A14",
+          "af": 12
+        },
+        {
+          "pin": "PG5",
+          "function": "FSMC_A15",
+          "af": 12
+        },
+        {
+          "pin": "PG10",
+          "function": "FSMC_NE3",
+          "af": 12
+        }
+      ],
+      "modes": [
+        "cpu-window",
+        "startup-memory"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 AF12 mapping and RM0090 asynchronous 16-bit FSMC NORSRAM; exact board wiring cited by selected Board provenance, not physical qualification"
+    },
+    {
+      "id": "fsmc-ne4-ili9341",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "FSMC",
+      "kind": "parallel16",
+      "pins": [
+        {
+          "pin": "PD0",
+          "function": "FSMC_D2",
+          "af": 12
+        },
+        {
+          "pin": "PD1",
+          "function": "FSMC_D3",
+          "af": 12
+        },
+        {
+          "pin": "PD4",
+          "function": "FSMC_NOE",
+          "af": 12
+        },
+        {
+          "pin": "PD5",
+          "function": "FSMC_NWE",
+          "af": 12
+        },
+        {
+          "pin": "PD8",
+          "function": "FSMC_D13",
+          "af": 12
+        },
+        {
+          "pin": "PD9",
+          "function": "FSMC_D14",
+          "af": 12
+        },
+        {
+          "pin": "PD10",
+          "function": "FSMC_D15",
+          "af": 12
+        },
+        {
+          "pin": "PD14",
+          "function": "FSMC_D0",
+          "af": 12
+        },
+        {
+          "pin": "PD15",
+          "function": "FSMC_D1",
+          "af": 12
+        },
+        {
+          "pin": "PE7",
+          "function": "FSMC_D4",
+          "af": 12
+        },
+        {
+          "pin": "PE8",
+          "function": "FSMC_D5",
+          "af": 12
+        },
+        {
+          "pin": "PE9",
+          "function": "FSMC_D6",
+          "af": 12
+        },
+        {
+          "pin": "PE10",
+          "function": "FSMC_D7",
+          "af": 12
+        },
+        {
+          "pin": "PE11",
+          "function": "FSMC_D8",
+          "af": 12
+        },
+        {
+          "pin": "PE12",
+          "function": "FSMC_D9",
+          "af": 12
+        },
+        {
+          "pin": "PE13",
+          "function": "FSMC_D10",
+          "af": 12
+        },
+        {
+          "pin": "PE14",
+          "function": "FSMC_D11",
+          "af": 12
+        },
+        {
+          "pin": "PE15",
+          "function": "FSMC_D12",
+          "af": 12
+        },
+        {
+          "pin": "PG2",
+          "function": "FSMC_A12",
+          "af": 12
+        },
+        {
+          "pin": "PG12",
+          "function": "FSMC_NE4",
+          "af": 12
+        }
+      ],
+      "modes": [
+        "8080-16"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 AF12 mapping and RM0090 asynchronous 16-bit FSMC NORSRAM; exact board wiring cited by selected Board provenance, not physical qualification"
+    },
+    {
+      "id": "gpio-pd0",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 PD0 GPIO; conflicts with selected FSMC D2"
+    },
+    {
+      "id": "gpio-pa15",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 GPIO/EXTI mapping; uploaded V4.1 schematic p1/p3 reviewed separately, no fitted module qualification"
+    },
+    {
+      "id": "gpio-pe2",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 GPIO/EXTI mapping; uploaded V4.1 schematic p1/p3 reviewed separately, no fitted module qualification"
+    },
+    {
+      "id": "exti2-pe2",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI2",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PE2",
+          "function": "EXTI2",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS8626 STM32F407ZG LQFP144 GPIO/EXTI mapping; uploaded V4.1 schematic p1/p3 reviewed separately, no fitted module qualification"
     }
   ]
 }

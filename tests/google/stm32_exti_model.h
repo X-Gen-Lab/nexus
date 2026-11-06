@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32_EXTI_MODEL_H
 #define NX_STM32_EXTI_MODEL_H
+#define nx_arch_is_privileged nx_stm32_exti_model_privileged
 #include "nexus/arch/arch.h"
 #include "stm32f407xx.h"
 #ifdef __cplusplus

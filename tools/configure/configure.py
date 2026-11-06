@@ -34,7 +34,7 @@ from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
     EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, freeze, thaw)
-from tools.configure import resource_graph, trigger_graph, dma_topology
+from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
@@ -360,7 +360,8 @@ def validate_soc(soc, part, provider=None):
             provider.mode_implementation(controller["kind"], mode)
         # Primary kind names the existing default public interface. Reviewed
         # personalities share this physical controller and its resource claim.
-        interfaces = obj(controller.get("interfaces", {}), (), KINDS,
+        from tools.configure.contracts import FACT_INTERFACE_KINDS
+        interfaces = obj(controller.get("interfaces", {}), (), FACT_INTERFACE_KINDS,
                          name + ".interfaces")
         if controller["kind"] in interfaces:
             fail("Controller interfaces cannot repeat its primary kind")
@@ -484,22 +485,29 @@ def validate_board_context(board):
             text(value, "provenance")
         else:
             obj(value, {"scope"}, {"url", "repository", "tree", "led_header_blob",
-                "led_source_blob", "clock_source_blob", "uart_source_blob"}, "provenance")
-            if not ("url" in value or "repository" in value):
-                fail("Provenance requires URL or repository")
+                "led_source_blob", "clock_source_blob", "uart_source_blob",
+                "file", "sha256", "pages", "components", "nets"}, "provenance")
+            document = board_hardware.validate_provenance(value)
+            if not ("url" in value or "repository" in value or document):
+                fail("Provenance requires URL, repository or document identity")
             for key, field in value.items():
+                if key in {"pages", "components", "nets"}:
+                    continue
                 text(field, "provenance " + key)
                 if key == "tree" or key.endswith("_blob"):
                     if not re.fullmatch(r"[0-9a-f]{40}", field):
                         fail("Provenance Git identity must be exact SHA-1")
+    return board_hardware.options(board)
 
 
-def resolve_bindings(board, routes, part):
+def resolve_bindings(board, routes, part, hardware=None):
     """Validate Board electrical bindings and materialize safe masks."""
     bindings = {}
     for binding in sequence(board["bindings"], "Board bindings"):
         obj(binding, {"id", "controller", "route"},
-            {"initial", "mask", "supply_mv", "pin_states"}, "binding")
+            {"initial", "mask", "supply_mv", "pin_states", "requires",
+             "electrical"}, "binding")
+        board_hardware.validate_binding(binding, hardware)
         identity(binding["id"], "binding id")
         if binding["id"] in bindings:
             fail(f"Duplicate Board binding: {binding['id']}")
@@ -523,6 +531,9 @@ def resolve_bindings(board, routes, part):
             fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
         if route["kind"] == "gpio":
             binding = {**binding, "mask": actual_mask}
+        electrical = gpio_electrical.validate_binding(binding, route, actual_mask)
+        if electrical is not None:
+            binding = {**binding, "electrical": electrical}
         from tools.configure import pin_states
         resolved_states = pin_states.validate_binding(binding, route["kind"], actual_mask)
         if resolved_states is not None:
@@ -706,8 +717,14 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
         fail("Static RAM budget exceeds physical linker domain")
     if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
         fail("Flash budget exceeds exact physical density")
+    external = getattr(provider, "EXTERNAL_MEMORY", None)
+    deferred = (external.defer_budget(assembly, budgets, part)
+                if external is not None else ())
+    placement_budgets = ({**budgets, "regions": {
+        name: value for name, value in budgets.get("regions", {}).items()
+        if name not in deferred}} if deferred else budgets)
     selected_memory = memory_regions.select(
-        variant["memory"], budgets, provider.PARTS[part].optional_memory,
+        variant["memory"], placement_budgets, provider.PARTS[part].optional_memory,
         obj=obj, integer=integer, fail=fail)
     memory_budget = MemoryBudgetIR(
         budgets["main_stack_bytes"], budgets.get("libc_heap_bytes", 0),
@@ -829,6 +846,7 @@ class _FactResolution:
     references: Mapping | None
     inputs: tuple[Path, ...]
     provider_context: integration_package.ProviderContext
+    hardware: board_hardware.BoardHardwareIR | None
 
     @property
     def family(self):
@@ -856,7 +874,7 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
                 {"schema_version", "id", "soc", "soc_family", "source_revision",
                  "physical_pcb_revision", "clocks", "bindings",
                  "reserved_resources", "unknowns", "provenance"},
-                {"inputs"}, "Board")
+                {"inputs", "hardware_options"}, "Board")
     integer(board["schema_version"], 1, 1, "Board schema")
     identity(board["id"], "Board id")
     family = identity(board["soc_family"], "SoC family")
@@ -886,8 +904,9 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
     obj(routes_doc, {"schema_version", "routes"}, (), "routes")
     integer(routes_doc["schema_version"], 1, 1, "routes schema")
     routes = resolve_routes(routes_doc, soc, part, provider)
-    validate_board_context(board)
-    bindings = resolve_bindings(board, routes, part)
+    hardware = board_hardware.select(validate_board_context(board),
+                                     assembly.hardware)
+    bindings = resolve_bindings(board, routes, part, hardware)
     inputs = [board_path, soc_path, routes_path, *context.inputs]
     if reference_path is not None:
         inputs.append(reference_path)
@@ -897,7 +916,7 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
         board=freeze(board), soc=freeze(soc), routes=freeze(routes),
         bindings=freeze(bindings), provider=provider,
         references=freeze(references), inputs=tuple(inputs),
-        provider_context=context)
+        provider_context=context, hardware=hardware)
 
 
 @dataclass(frozen=True)
@@ -916,7 +935,7 @@ class _DeviceGraphResolution:
 def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                           provider, clock, clock_plan, kernel_profile,
                           irq_profile, memory, i2s2_role, read,
-                          snapshots) -> _DeviceGraphResolution:
+                          snapshots, board_conditions=None) -> _DeviceGraphResolution:
     """Validate coupled device choices, then publish one immutable graph.
 
     USB FIFO placement, SPI sequence faces and ADC trigger identities depend on
@@ -964,6 +983,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             binding = bindings.get(selection["binding"])
             if binding is None:
                 fail(f"Unknown Board binding: {selection['binding']}")
+            board_hardware.require_binding(binding, board_conditions)
             route = routes[binding["route"]]
             hardware = soc["controllers"][route["controller"]]
             authored_kind = selection.pop("authored_kind", route["kind"])
@@ -973,6 +993,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if mode not in route["modes"]:
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
+            if route["kind"] == "rtc":
+                from tools.configure import rtc
+                rtc.validate_board(selection, board)
             validate_selection(selection, route, provider, ram["size"])
             resolved_pin_states = None
             if mode == "named-states":
@@ -995,7 +1018,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             shared_pwm = (provider.PWM_SHARED is not None and
                           provider.PWM_SHARED.selected(
                               {"kind": route["kind"], "mode": mode}))
-            if route["kind"] != "gpio" and not shared_pwm:
+            if route["kind"] == "external_bus":
+                claim("ip:" + route["controller"] + "/control", name, mode,
+                      route["id"])
+            elif route["kind"] != "gpio" and not shared_pwm:
                 claim("controller:" + route["controller"], name, mode, route["id"])
             for pin in route["pins"]:
                 claim("pin:" + pin["pin"], name, mode, route["id"])
@@ -1070,11 +1096,23 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             device_ids.append(identity(device["id"], "device ID"))
             c_identity(device["id"])
             controller = next((item for item in selected if item["id"] == device["controller"]), None)
-            if controller is None or controller["kind"] not in {"spi", "i2c", "usb_device"}:
+            if controller is None or controller["kind"] not in {"spi", "i2c", "usb_device", "external_bus"}:
                 fail("Device references no selected SPI/I2C/USB controller")
             authored_kind = device.pop("authored_kind", controller["kind"])
+            if controller["kind"] == "external_bus":
+                extension = getattr(provider, "EXTERNAL_BUS", None)
+                if extension is None:
+                    fail("Selected provider has no external-bus endpoint contract")
+                extension.resolve_endpoint(
+                    device, controller, authored_kind=authored_kind,
+                    bindings=bindings, routes=routes, claim=claim,
+                    board_conditions=board_conditions)
+                continue
             if authored_kind != controller["kind"]:
                 fail("Authored device kind differs from controller binding kind")
+            if "cs_binding" in device and device["cs_binding"] in bindings:
+                board_hardware.require_binding(
+                    bindings[device["cs_binding"]], board_conditions)
             if controller["kind"] == "usb_device":
                 validated = usb_device.endpoint(device)
                 device.clear()
@@ -1089,10 +1127,17 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     usb_device.complete_plan(selected, endpoint_selections, claim)
     for controller in selected:
         children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
+        if controller["kind"] == "external_bus":
+            provider.EXTERNAL_BUS.complete_controller(
+                controller, children, claim=claim, bindings=bindings, routes=routes)
         enhanced_endpoints.complete_controller(controller, children, provider)
     if gpio_user:
         provider.validate_user_io_context(assembly, part, selected=selected)
-    resources = resource_graph.resolve(claim_list, shared=pwm_sharing)
+    aliases = {"controller:" + item["controller"]:
+               "ip:" + item["controller"] + "/control"
+               for item in selected if item["kind"] == "external_bus"}
+    resources = resource_graph.resolve(claim_list, shared=pwm_sharing,
+                                       aliases=aliases)
     triggers = trigger_graph.resolve_fixed(selected, routes)
     adc.complete_triggers(selected, triggers)
     dma_plan = dma_topology.resolve_selected(selected, provider)
@@ -1182,7 +1227,13 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         assembly, root=root, soc=soc, board=board, routes=routes,
         bindings=bindings, provider=provider, clock=clock, clock_plan=clock_plan,
         kernel_profile=kernel_profile, irq_profile=irq_profile,
-        memory=selected_memory, i2s2_role=i2s2_role, read=read, snapshots=snapshots)
+        memory=selected_memory, i2s2_role=i2s2_role, read=read,
+        snapshots=snapshots, board_conditions=facts.hardware)
+    external_memory_policy = getattr(provider, "EXTERNAL_MEMORY", None)
+    external_memory = (external_memory_policy.resolve(
+        selected_memory.budget, device_graph.devices,
+        assembly=assembly, variant=variant)
+        if external_memory_policy is not None else ())
     inputs = [assembly_path, *facts.inputs, policy_path]
     inputs.extend(device_graph.inputs)
     selected_layout = _resolve_flash_layout(
@@ -1225,7 +1276,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         physical_qualified=False,
         fact_references=freeze(references),
         pwm_shared_owners=device_graph.pwm_shared_owners,
-        i2s2=i2s2_role, provider_context=facts.provider_context)
+        i2s2=i2s2_role, provider_context=facts.provider_context,
+        hardware=facts.hardware, external_memory=external_memory)
     resolved = resolved.with_integrations()
     if assembly.power is not None:
         from tools.configure import runtime_power

@@ -106,6 +106,16 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 uint64_t nx_stm32_system_now(nx_stm32_system_t* system);
 
 /**
+ * \brief Adapt the selected system clock without confusing zero with failure.
+ * \param[in,out] context: Exact stable selected g_nx_stm32_system address.
+ * \return Monotonic microseconds, including valid zero; UINT64_MAX for an
+ *         unbound/stopped/failed epoch before or during the snapshot.
+ * \note Same execution and lifetime contract as nx_stm32_system_now. No
+ *       callback starts or repairs the clock, nor substitutes a new epoch.
+ */
+uint64_t nx_stm32_system_clock_read(void* context);
+
+/**
  * \brief           Handle the reserved TIM2 overflow interrupt.
  *
  * \param[in,out]   system: Static context bound to the vector.

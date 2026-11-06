@@ -2,6 +2,7 @@
 from .contract import (
     CLASSIC_CAN_MAILBOXES,
     UART_FORMATS,
+    UART_TX_VALIDATORS,
     STREAM_GEOMETRY,
     PARTS,
     PUBLIC_FORMATS,

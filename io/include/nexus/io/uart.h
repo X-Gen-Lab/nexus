@@ -54,6 +54,18 @@ typedef struct {
 } nx_uart_tx_request_t;
 
 /**
+ * \brief           Exact transport's side-effect-free TX admission validator.
+ * \param[in]       context: The immutable transport face's exact context.
+ * \param[in]       request: Live READY or QUEUED descriptor, never retained.
+ * \return          Same rejectable checks used by the transport submit/start.
+ * \note            Reads clock/hardware facts but never writes GPIO/MMIO,
+ *                  admits, starts or retains a reference. One executor owns
+ *                  adapter and transport; no external direct TX is permitted.
+ */
+typedef nx_result_t (*nx_uart_tx_validate_fn)(
+    void* context, const nx_uart_tx_request_t* request);
+
+/**
  * \brief           Shared read-only methods using one provider state.
  *
  * \note            Methods follow each public operation's ownership contract.

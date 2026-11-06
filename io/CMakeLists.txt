@@ -43,6 +43,11 @@ nexus_io_domain(i2c ALIAS IOI2C
     DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(flash ALIAS IOFlash
     SOURCES src/api/flash.c src/mechanisms/flash_region.c)
+nexus_io_domain(block ALIAS IOBlock SOURCES src/api/block.c)
+nexus_io_domain(external_bus ALIAS IOExternalBus SOURCES src/api/external_bus.c)
+nexus_io_domain(parallel16 ALIAS IOParallel16 SOURCES src/api/parallel16.c)
+nexus_io_domain(memory_window ALIAS IOMemoryWindow
+    SOURCES src/api/memory_window.c)
 nexus_io_domain(watchdog ALIAS IOWatchdog SOURCES src/api/watchdog.c)
 nexus_io_domain(exti ALIAS IOEXTI SOURCES src/api/exti.c DEPENDS nexus_io_wake)
 nexus_io_domain(pwm ALIAS IOTimer SOURCES src/api/timer.c)
@@ -88,7 +93,8 @@ if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
     set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc can
         usb_device eth eth_frames timer_capture advanced_pwm pwm_group encoder
-        pwm_adc can_fd adc_group rtc lptim entropy)
+        pwm_adc can_fd adc_group rtc lptim entropy block external_bus
+        parallel16 memory_window)
 endif()
 foreach(domain IN LISTS _nexus_io_domains)
     if(NOT TARGET nexus_io_${domain})

@@ -2,8 +2,10 @@
 from .contract import (
     CLASSIC_CAN_MAILBOXES,
     UART_FORMATS,
+    UART_TX_VALIDATORS,
     STREAM_GEOMETRY,
     PARTS,
+    PIN_ELECTRICAL,
     PUBLIC_FORMATS,
     ADC_CHANNEL_SEQUENCES,
     ADC_GROUP,
@@ -57,8 +59,10 @@ from .emission import (includes, instance_declarations, implementation, operatio
 from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
 from .preflight import PREFLIGHT_CALL, selected_preflight
 from . import gpio as GPIO_PHASE
+from . import sram as EXTERNAL_MEMORY
 from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
                        SECONDARY_FACTS)
 from .i2s2 import resolve_i2s2
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION
+from . import fsmc as EXTERNAL_BUS

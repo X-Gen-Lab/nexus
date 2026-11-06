@@ -62,7 +62,10 @@ def emit_bundle(result, output):
              *memory_regions.selection_lines(result),
              f'set(NEXUS_CONFIG_SHA256 "{result.configuration_sha256}")',
              f'set(NEXUS_OPTIMIZATION "{result.optimization}")',
-             'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item.kind for item in result.controllers})) + '")',
+             'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted(
+                 {item.kind for item in result.controllers} |
+                 {item.driver.removesuffix("-endpoint") for item in result.devices
+                  if item.kind == "external_bus"})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
     # Canonical source directories also serve multi-family host models. These
     # paths carry no translation-unit graph or additional support decisions.

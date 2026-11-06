@@ -56,8 +56,25 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields
     if contract is None or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
+    electrical = {"pull", "output_type"} & selection.keys()
+    if electrical:
+        if (kind not in {"gpio", "exti"} or
+                not getattr(provider, "PIN_ELECTRICAL", False) or
+                selection["mode"] == "named-states"):
+            fail("Selected provider does not maintain these electrical options")
+        for field, choices in (("pull", {"none", "up", "down"}),
+                               ("output_type", {"push-pull", "open-drain"})):
+            if field in selection and (
+                    type(selection[field]) is not str or
+                    selection[field] not in choices):
+                fail(f"Unsupported {kind} {field}")
+        if "output_type" in selection and selection["mode"] != "output":
+            fail("GPIO output_type requires output mode")
     if kind == "lptim":
         timer_advanced.validate_lptim_selection(selection)
+    if kind == "rtc":
+        from tools.configure import rtc
+        rtc.validate_selection(selection)
     if kind in {"timer_capture", "advanced_pwm"}:
         from tools.configure import timer_advanced
         timer_advanced.validate_selection(selection, route, provider)
@@ -139,7 +156,10 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
     result = {
         **selection, "controller": route["controller"],
         "kind": route["kind"], "route": route["id"],
-        "pins": route["pins"], "initial": binding.get("initial", 0),
+        "pins": route["pins"],
+        "initial": (selection["initial"]
+                    if route["kind"] == "rtc" and "initial" in selection
+                    else binding.get("initial", 0)),
         "mask": binding.get("mask", 0),
         **({"pin_state_resolution": pin_states}
            if pin_states is not None else {}),
@@ -153,4 +173,6 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         selection, route, clock_profile=clock_profile))
     if route["kind"] == "can_fd":
         result["message_ram_words"] = hardware["message_ram_words"]
+    from tools.configure import gpio_electrical
+    gpio_electrical.require_selection(result, binding)
     return result

@@ -264,9 +264,44 @@ static nx_result_t stm32_exti_attach_wake(void* context,
     return result;
 }
 
+/** \brief Check one result byte against the lifetime of a retained object. */
+static bool exti_level_aliases(const bool* output, const void* object,
+                               size_t size) {
+    const uintptr_t value = (uintptr_t)output;
+    const uintptr_t first = (uintptr_t)object;
+    return value >= first && value - first < size;
+}
+
+/** \brief Sample the owned pad without consuming a latched or pending edge. */
+static nx_result_t stm32_exti_level(const void* context, bool* high) {
+    const nx_stm32_exti_state_t* port = context;
+    if (port == NULL || high == NULL)
+        return NX_ERROR_INVALID;
+    if (!nx_arch_is_privileged())
+        return NX_ERROR_CONTEXT;
+    if (!port->initialized)
+        return NX_ERROR_STATE;
+    if (port->gpio == NULL || port->registers == NULL || port->line > 15U ||
+        port->storage == NULL || port->capacity == 0U ||
+        port->capacity > SIZE_MAX / sizeof(*port->storage) ||
+        exti_level_aliases(high, port, sizeof(*port)) ||
+        exti_level_aliases(high, port->gpio, sizeof(*port->gpio)) ||
+        exti_level_aliases(high, port->registers, sizeof(*port->registers)) ||
+        exti_level_aliases(high, port->storage,
+                           port->capacity * sizeof(*port->storage)) ||
+        (port->wake != NULL &&
+         exti_level_aliases(high, port->wake, sizeof(*port->wake))))
+        return NX_ERROR_INVALID;
+    const bool observed =
+        (NX_STM32_EXTI_READ(&port->gpio->IDR) & (1U << port->line)) != 0U;
+    *high = observed;
+    return NX_SUCCESS;
+}
+
 /** \brief One shared immutable method table for this execution mode. */
 const nx_exti_ops_t nx_stm32_exti_ops = {
     .read = nx_stm32_exti_read,
     .stop = nx_stm32_exti_stop,
     .attach_wake = stm32_exti_attach_wake,
+    .level = stm32_exti_level,
 };

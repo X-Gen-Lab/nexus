@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "board": "stm32f407zg-qiming-v41",
+  "part": "STM32F407ZGT6",
+  "transport": "swd",
+  "probe_interfaces": [
+    "stlink",
+    "cmsis-dap",
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "scope": "software_reference",
+  "pending_qualification": [
+    {
+      "id": "physical_board_review",
+      "fixture": "Inspect independent MCU Board, physical PCB revision, STM32F407ZGT6 marking, UID, HSE8/LSE32.768k crystals, power entry and SWD probe. Schematic document identity does not establish installed parts. No station is connected. V4.1 schematic SHA256 64215f6849c4f5b2f76b4ce23241b814cd66be14a4d652f89da1c53e3aa6abe5 pages1-3. Inspect W25Q128/64-Mbit annotation conflict, transceiver actual part/supply, PHY oscillator and inconsistent MDIO net label; do not infer actual module population.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "declared_fitting_jumpers",
+      "fixture": "Bind exact resolved configuration digest and independently inspect every selected Board hardware option, module marking, DNP population, connector and jumper position. Retain photographs/continuity/waveform inputs as station-owned hashed artifacts; unselected options remain unknown.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "clock_uart_gpio",
+      "fixture": "Measure cold boot, HSE/PLL168 timebase, USART1 PA9/PA10 115200 8N1, active-low LEDs and pull-up keys. Review shared USB power entries and actual voltages before equipment operation.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "display_touch",
+      "fixture": "Confirm ILI9341 16-bit NE4/PG12 RS=A12/PG2, PF10 active-high backlight and MCU-shared NRST. Capture FSMC command/data and XPT2046 PA5/PB1/PB2/PB0 software SPI plus PF11 PENIRQ, final power state, current pin predicate, stop/recovery and electrical timing. No independent LCD reset or hardware-SPI route is inferred.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "external_memory",
+      "fixture": "Inspect exact fitted IS62WV51216 SRAM grade and W25 variant/capacity before selection; capture NE3 timing, byte lanes, boundaries, independent LCD bank, failed startup and retained ownership. Direct CPU window is distinct from boot-backed memory or DMA reachability. Product erase regions and data are externally owned.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "peripheral_conflict_review",
+      "fixture": "Inspect P21 USB FS/CAN1, P15 RS485/CAN2 and P5 Ethernet/WiFi choices. Ethernet MDIO and normal RS485 TX share PA2; SDIO/camera/UART5 and USART6/camera/audio share pads. Software selection does not perform rewiring.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "sdio_card",
+      "fixture": "Observe actual card identity and independent 48MHz SDIO source, 400kHz identification, 1/4-bit CPU polling, CSD geometry, read/write prefixes, command/data faults, removal and final ready/stop. Socket card-detect is unconnected. No DMA, filesystem policy or card hot-swap recovery is inferred.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "audio_camera_selection",
+      "fixture": "Record actual audio/camera module/controller markings and complete connector personality before any selected-mode fixture. User confirmed only ILI9341/XPT2046; WM8978, VS1053 and OV2640 support is not established by header names.",
+      "budget": null,
+      "unit": "count"
+    }
+  ]
+}

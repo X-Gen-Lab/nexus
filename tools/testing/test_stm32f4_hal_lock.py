@@ -72,10 +72,24 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result["commit"], official.COMMIT)
         self.assertEqual(result["cmsis_commit"], official.CMSIS_COMMIT)
-        self.assertEqual(result["verified_files"], 28)
+        self.assertEqual(result["verified_files"], 34)
         self.assertEqual(result["license"], "BSD-3-Clause")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
+
+    def test_selected_board_units_close_the_exact_vendor_byte_graph(self):
+        required = {
+            "Inc/stm32f4xx_ll_fsmc.h", "Src/stm32f4xx_ll_fsmc.c",
+            "Inc/stm32f4xx_ll_sdmmc.h", "Src/stm32f4xx_ll_sdmmc.c",
+            "Inc/stm32f4xx_ll_rtc.h", "Inc/stm32f4xx_ll_pwr.h"}
+        self.assertTrue(required.issubset(self.lock["files"]),
+                        "Selected FSMC, SDIO and RTC compile inputs must be sealed")
+        for name in sorted(required):
+            with self.subTest(name=name):
+                changed = json.loads(json.dumps(self.lock))
+                changed["files"].pop(name)
+                with self.assertRaisesRegex(ValueError, "reviewed graph"):
+                    official.contract(changed)
 
     def test_real_official_checkout_and_cli_are_read_only(self):
         self.git_patch.stop()
@@ -83,7 +97,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         cmsis = ROOT / "vendors/st/cmsis_device_f4"
         lock = ROOT / "dependencies/stm32f4-hal.lock.json"
         result = official.verify(source, lock, cmsis)
-        self.assertEqual(result["verified_files"], 28)
+        self.assertEqual(result["verified_files"], 34)
         executed = subprocess.run([
             sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f4_hal_lock.py"),
             "--source", str(source), "--lock", str(lock),

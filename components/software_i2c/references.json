@@ -1,0 +1,18 @@
+{
+  "sources": [
+    {
+      "url": "https://www.nxp.com/docs/en/user-guide/UM10204.pdf",
+      "publisher": "NXP",
+      "sha256": "dc91f00f65584e06ef36e26c93bf9d91a95fb3c8a1830a9223e53caf678b36af",
+      "bytes": 750958
+    },
+    {
+      "url": "https://www.laskakit.cz/user/related_files/oc_sccb_specification.pdf",
+      "publisher": "OmniVision manufacturer-authored specification mirrored by distributor",
+      "sha256": "8ea1dcfc6fd4a4c0de6a4836ff651cec00885e172e0f1c9b955649de3743bcee",
+      "bytes": 301064
+    }
+  ],
+  "reviewed_scope": "Strict synchronous GPIO I2C and separate SCCB register8/data8; not physical fitting or sensor initialization",
+  "physical_status": "not_executed"
+}

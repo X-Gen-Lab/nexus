@@ -41,26 +41,9 @@ foreach(physical_family stm32 gd32)
             # Generated exports return a const Nexus pointer or immutable label
             # text, followed by the factory name and '('. Arguments may continue
             # on a new line. Reject any other export spelling instead of missing it.
-            file(READ "${physical_bundle}/nexus_factory.h" physical_factory_header)
-            set(physical_factory_pattern
-                "const (nx_[a-z0-9_]+_t|char)[*] (nx_factory_[a-z0-9_]+)[(]")
-            string(REGEX MATCHALL "${physical_factory_pattern}"
-                physical_factory_declarations "${physical_factory_header}")
-            string(REGEX MATCHALL "nx_factory_[A-Za-z0-9_]+[ \t\r\n]*[(]"
-                physical_factory_references "${physical_factory_header}")
-            list(LENGTH physical_factory_declarations physical_factory_count)
-            list(LENGTH physical_factory_references physical_factory_reference_count)
-            if(physical_factory_count EQUAL 0 OR
-                    NOT physical_factory_count EQUAL physical_factory_reference_count)
-                message(FATAL_ERROR "Unexpected generated factory export declarations")
-            endif()
-            set(physical_factory_symbols)
-            foreach(declaration IN LISTS physical_factory_declarations)
-                string(REGEX MATCH "${physical_factory_pattern}"
-                    physical_factory_match "${declaration}")
-                list(APPEND physical_factory_symbols "${CMAKE_MATCH_2}")
-            endforeach()
-            list(REMOVE_DUPLICATES physical_factory_symbols)
+            include("${CMAKE_CURRENT_LIST_DIR}/factory_symbols.cmake")
+            nexus_google_factory_symbols(physical_factory_symbols
+                "${physical_bundle}/nexus_factory.h")
             foreach(symbol IN LISTS physical_factory_symbols)
                 string(REGEX REPLACE "^nx_" "nx_empty_" renamed "${symbol}")
                 target_compile_definitions(${physical_object} PRIVATE "${symbol}=${renamed}")

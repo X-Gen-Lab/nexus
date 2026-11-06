@@ -1,0 +1,25 @@
+{
+  "source": {
+    "url": "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8700-SEEPROM-AT24C01C-02C-Datasheet.pdf",
+    "document": "Atmel-8700H-SEEPROM-AT24C01C-02C-Datasheet_122016",
+    "title": "AT24C01C and AT24C02C I2C-Compatible Serial EEPROM",
+    "sha256": "b7f820134d5a7a16d2c40ab65780e4ef2b9f11e54f6bfcc9dab6a677556fff65",
+    "bytes": 1026082,
+    "sections": [
+      "3 memory organization",
+      "5 write cycle time",
+      "7 device addressing",
+      "8 byte/page write and acknowledge polling",
+      "9 current-address, random and sequential reads"
+    ]
+  },
+  "reviewed_scope": {
+    "device": "AT24C02C software reference; schematic AT24C02 fitting unverified",
+    "seven_bit_address": 80,
+    "bytes": 256,
+    "page_bytes": 8,
+    "readiness": "settled one-byte current-address read; only NACK after an issued page is retried",
+    "write_protection": "caller must verify WP low; no data-readback or atomicity inference",
+    "physical_status": "not_executed"
+  }
+}

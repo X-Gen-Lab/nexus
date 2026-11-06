@@ -10,7 +10,7 @@ PREFLIGHT_CALL = 'nx_stm32_system_preflight(&g_nx_stm32_system)'
 
 def _clock(controller):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
-    if controller.startswith(('USART', 'SPI', 'I2C')):
+    if controller.startswith(('USART', 'UART', 'SPI', 'I2C')):
         bus = hardware.maintained('stm32f407', controller).apb
     elif re.fullmatch('TIM[1349]', controller):
         bus = 2 if controller in {'TIM1', 'TIM9'} else 1
@@ -38,6 +38,8 @@ def admission_declarations(result, pins, pin_count):
             clocks.add((register, ' | '.join((prefix + name + 'EN' for name in names))))
         elif item.kind == 'usb_device':
             clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_OTGFSEN'))
+        elif item.kind == 'block':
+            clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SDIOEN'))
         elif item.kind in {'eth', 'eth_frames'}:
             clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN | RCC_AHB1ENR_ETHMACRXEN'))
             if item.kind == 'eth_frames':
@@ -85,7 +87,8 @@ def admission_declarations(result, pins, pin_count):
 def selected_preflight(result, *, dma_conditions=None):
     """Connect the reviewed immutable facts to the concrete C observer."""
     del dma_conditions
-    if not result.controllers or not any(item.pins for item in result.controllers):
+    from tools.configure.gpio_phase import selected_pins
+    if not selected_pins(result):
         return []
     return ['    result.primary = nx_stm32_platform_selected_preflight(&s_nx_platform_config);',
             '    if (result.primary != NX_SUCCESS) { return result; }']

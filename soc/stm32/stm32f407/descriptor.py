@@ -13,6 +13,12 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f407/sram_boot.c",
+        "soc/stm32/stm32f407/private/stm32f407_sram_boot.h",
+        "soc/stm32/stm32f407/private/stm32f407_fsmc_profile.h",
+        "soc/stm32/stm32f407/drivers/fsmc_boot.c",
+        "soc/stm32/stm32f407/drivers/rtc.c",
+        "soc/stm32/stm32f407/private/stm32f407_rtc.h",
         "soc/stm32/stm32f407/private/stm32f407_i2c_port.h",
         "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
         "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h",
@@ -40,6 +46,10 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f407/private/stm32f407_eth_frames.h",
     ),
     configuration_helpers=(
+        "soc/stm32/stm32f407/configure/sram.py",
+        "soc/stm32/stm32f407/configure/fsmc.py",
+        "soc/stm32/stm32f407/configure/block.py",
+        "soc/stm32/stm32f407/configure/rtc.py",
         "soc/stm32/stm32f407/configure/integration.py",
         "soc/stm32/stm32f407/configure/i2s2.py",
         "soc/stm32/stm32f407/configure/hardware.py",

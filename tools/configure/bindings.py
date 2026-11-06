@@ -62,7 +62,8 @@ def emit(result):
     for kind in sorted({enhanced_endpoints.class_name(item)
                         for item in result.devices} &
                        {"spi_transaction_device", "i2c_long_device",
-                        "spi_dma_transaction_device"}):
+                        "spi_dma_transaction_device", "memory_window",
+                        "parallel16"}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
@@ -154,6 +155,7 @@ def emit(result):
     shared_members = {member.id: owner for owner in result.pwm_shared_owners
                       for member in owner.members}
     physical_constructed = set()
+    pre_c_effects = False
     if shared_members:
         pwm_shared = provider.PWM_SHARED
     for selection_index, item in enumerate(selections):
@@ -166,7 +168,10 @@ def emit(result):
             physical = pwm_shared.state_symbol(owner)
             if physical not in physical_constructed:
                 construction = pwm_shared.constructor(owner)
-                source.append(f'static {construction.state_type} {physical};')
+                pre_c_effects |= construction.pre_c_effects
+                initial = (" = " + construction.initial_state.render()
+                           if construction.initial_state is not None else "")
+                source.append(f'static {construction.state_type} {physical}{initial};')
                 source.extend(construction.definitions)
                 for sequence in construction.initialize_sequences:
                     source.extend(sequence.render())
@@ -182,7 +187,10 @@ def emit(result):
             continue
         construction = provider.constructor(item, result, result.board_bindings,
                                             result.routes, result.devices)
-        source += [f'static {construction.state_type} s_nx_port_{name};']
+        pre_c_effects |= construction.pre_c_effects
+        initial = (" = " + construction.initial_state.render()
+                   if construction.initial_state is not None else "")
+        source += [f'static {construction.state_type} s_nx_port_{name}{initial};']
         source.extend(construction.face_definitions)
         face_context = construction.face_context or f"&s_nx_port_{name}"
         source += [
@@ -268,12 +276,21 @@ def emit(result):
                    '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
                    '    return NX_SUCCESS;', '}']
     source += ['/** \\brief Start explicit hardware only; rollback retains error facts. */',
-               'nx_platform_start_result_t nx_platform_start(void) {',
-               '    return nx_platform_start_impl(NULL);', '}',
+               'nx_platform_start_result_t nx_platform_start(void) {']
+    if pre_c_effects:
+        source += ['    nx_platform_start_result_t result = nx_platform_start_impl(NULL);',
+                   '    if (result.primary != NX_SUCCESS) { result.remaining_effects |= 1u; }',
+                   '    return result;']
+    else:
+        source.append('    return nx_platform_start_impl(NULL);')
+    source += ['}',
                '/** \\brief Add caller-owned metadata to the same startup path. */',
                'nx_platform_start_result_t nx_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
                '    nx_platform_diagnostic_reset(diagnostic);',
-               '    nx_platform_start_result_t result = nx_platform_start_impl(diagnostic);',
+               '    nx_platform_start_result_t result = nx_platform_start_impl(diagnostic);']
+    if pre_c_effects:
+        source.append('    if (result.primary != NX_SUCCESS) { result.remaining_effects |= 1u; }')
+    source += [
                '    if (diagnostic != NULL && result.primary == NX_SUCCESS) {',
                '        nx_platform_diagnostic_reset(diagnostic);',
                '    } else if (diagnostic != NULL && result.cleanup != NX_SUCCESS &&',
@@ -283,7 +300,8 @@ def emit(result):
                '    }', '    return result;', '}',
                '/** \\brief One shared startup implementation, without stored observers. */',
                'static nx_platform_start_result_t nx_platform_start_impl(nx_platform_diagnostic_t* diagnostic) {',
-               '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };',
+               '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, ' +
+               ('1u' if pre_c_effects else '0u') + ' };',
                '    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);',
                f'    if ({context_guard}) {{',
                '        result.primary = NX_ERROR_CONTEXT; return result; }',
@@ -325,6 +343,8 @@ def emit(result):
                    '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }', f'    s_nx_platform_initialized = {index + 1}u;']
+    if pre_c_effects:
+        source.append('    result.remaining_effects = 0u;')
     source += ['    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
                '    return result;', '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']

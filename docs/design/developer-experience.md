@@ -193,3 +193,195 @@ No physical station is connected for this iteration. H1–H6 remain
 IRQ/critical-section latency; continuous DMA/Cache; Flash/watchdog/shutdown;
 and final physical support sealing. Prepared plans preserve unknown PCB facts,
 station identity and numeric acceptance limits for later real execution.
+
+## Exact Qiming Board integration
+
+QB01–QB32 extend the same execution ledger for the supplied STM32F407ZGT6 core
+schematic and high-configuration V4.1 schematic. The earlier 107 rows retain
+their original identities and exits. This is a complete work breakdown, not a
+claim that every new driver or physical exit has passed. Read each row's
+implementation, software and hardware columns separately.
+
+Both drawings contain their own MCU, power and clocks. They describe independent
+Boards; a plug-compatible core/carrier relationship has not been established.
+`stm32f407zg-qiming-core` and `stm32f407zg-qiming-v41` therefore have separate
+packages. The original `stm32f407zg-qiming-v31` identity remains unchanged. PDF
+revision and document date are source identities; physical PCB revision stays
+unknown until inspected.
+
+The user confirmed ILI9341 and XPT2046, with a 16-bit display and matching touch
+connector. The core drawing marks SRAM, NOR and the backup battery unpopulated.
+The V4.1 drawing contains a conflicting W25Q128/64-Mbit annotation. A declared
+device choice must be checked against the selected device identity and geometry;
+the implementation must not silently choose a different part. The exact audio
+and camera modules still require selection before their physical support is
+claimed.
+
+### Configuration and runtime responsibilities
+
+The [existing static architecture](../explanation/platform-architecture.md)
+remains the runtime boundary. One authored TOML selects exact SoC, Board and
+reviewed hardware choices. Immutable typed IR generates only static data,
+storage, faces, factory accessors and fixed call ordering. Hardware admission,
+register operations, waiting, rollback and withdrawal remain C11. CMake owns
+selected source dependencies; no runtime registry, object pool, mandatory worker
+or additional per-byte forwarding layer is introduced.
+
+Board `hardware_options` declares allowed choices without defaults. A binding's
+`requires` conditions must match explicit TOML `[hardware]` selections. Missing
+population or jumper choices cannot be repaired by the resolver. These are
+reviewed declarations, not physical inspection evidence. Electrical requirements
+such as input pull-up, inactive CS, RS485 direction and backlight polarity must
+also be validated and executed; a text `unknowns` entry cannot perform admission.
+
+| Layer | Owned responsibility | Boundary |
+| --- | --- | --- |
+| Arch and Core | CPU execution, barriers, time and request lifetime | No PCB pin or product policy |
+| SoC and private provider | Controller facts, routes, clocks, IRQ/DMA and C lifecycle | Official Handles and register types stay private |
+| Board | Exact wiring, optional fitting, jumpers and electrical conditions | Configuration does not establish physical fitting |
+| Typed I/O | Device-class operations and ownership contracts | Factory lookup has no allocation or startup effects |
+| Optional components | AT24/W25, display, raw touch and selected protocol mechanisms | No product calibration, framebuffer policy or hidden task |
+| External composition | Tasks, buffers, scheduler, budgets and recovery policy | Examples and private application evidence stay external |
+
+### Shared buses, startup and complete withdrawal
+
+UART integration uses reviewed controller/pad/IRQ/APB facts instead of inferring
+every port from USART1. All six serial instances need actual selected-mode
+validation. Adding a controller must not advertise DMA or alternate pins that
+have not been implemented. GPIO electrical fields and EXTI line/vector ownership
+must agree with generated configuration and the real provider.
+
+FSMC has one shared bus owner and independent bank configuration. SRAM uses
+NE3 and the display uses NE4; their common pads and gate cannot be independently
+restored by two providers. The following describes software ownership, not
+physical memory or timing qualification:
+
+```text
+Reset / internal Flash + internal MSP
+  -> selected startup-memory BootPlan and exact shared NE3 descriptor
+  -> C bootstrap before external DATA/BSS; persistent ownership
+
+Platform GPIO lease
+  -> runtime-only AF12 pads, or optional NE4 pads outside the boot-owned set
+  -> one FSMC bus owner: shared gate and exact selected pad union
+       -> NE3 cpu-window: direct CPU lease; join users before release
+       -> NE3 startup-memory: readonly geometry; no whole-bank runtime lease
+       -> NE4 LCD: settled 16-bit command/data operations
+```
+
+External `.data` or `.bss` requires internal Flash/MSP bootstrap, FSMC admission
+and bank initialization before C runtime first accesses those regions. A
+post-start memory window does not establish that support. A bank backing live
+globals or stack cannot be withdrawn by ordinary Platform stop. Its retained
+effect must prevent clock/pad withdrawal until reset or an explicit valid
+quiescence contract. CPU reachability and each DMA master's reachability are
+reviewed independently; CCM stays excluded from peripheral DMA.
+
+`cpu-window` and `startup-memory` are explicit alternatives. Startup memory uses
+the existing ADDSRAM placement attributes and a separate immutable external
+memory record, without changing the chip's internal RAM facts. Its permanent
+receipt exists before `Platform.start()`: factory lookup, early startup refusal
+or failed runtime adoption cannot report a clean global stop. The selected reset
+path requires internal MSP of at least 512 bytes and currently admits the five
+non-LTO optimization profiles. Freestanding ARM analysis bounds their reset call
+chains by 304 bytes; this is static software evidence, not a measured stack peak.
+LTO, warm handoff, offset images, external code/stack/heap and DMA access remain
+outside this startup profile.
+
+ILI9341 transfers use the actual 16-bit bus and command/data address selection.
+The shared MCU NRST connection is not an independent display reset GPIO.
+XPT2046 uses PA5/PB1/PB2/PB0 and PF11; that combination is not a hardware SPI
+route. Its optional software SPI port must bound transactions and timing without
+long global interrupt masking. A failed idle-pin withdrawal ends CPU buffer
+access but retains bus recovery responsibility; it cannot report successful CS
+release. Raw touch does not include product calibration or filtering policy.
+
+### Mode-specific device contracts
+
+| Device or path | Required contract | Explicit limit |
+| --- | --- | --- |
+| AT24C02 | 256-byte geometry, eight-byte pages and bounded write-cycle progress | No product storage layout or device scan |
+| W25 NOR | Expected JEDEC identity, selected geometry and complete program/erase outcome | Core unpopulated part stays disabled |
+| SRAM and ILI9341 | Separate bank timing and memory/8080 contracts | No assumed SDRAM, LTDC or DMA2D on F407 |
+| XPT2046 | Complete 12-bit command sequence, raw samples and final PENIRQ power state | An IRQ is a hint; the current pin predicate is authoritative |
+| SDIO card | Synchronous CPU-polling block I/O, command/data errors and complete withdrawal | The drawn socket has no connected card-detect GPIO; no DMA mode is claimed |
+| WM8978 or VS1053 | Selected connector personality, clocks and complete transfer lifecycle | A finite I2S slave TX reference is not complete audio |
+| OV2640 capture | Exact sensor setup, XCLK, SCCB, frame boundaries and bounded buffers | No unselected module or measured frame-rate claim |
+
+The official locked STM32F4 HAL/LL is preferred where the complete selected mode
+satisfies the Nexus contract. It does not start global HAL initialization or
+replace the existing time domain with SysTick. Private callbacks, vendor waits,
+error drain and source withdrawal still require explicit review. F407 has no
+data cache; an H7 cache contract must not be copied into this Board profile.
+
+The selected SDIO implementation is synchronous CPU polling. Platform startup
+prepares the socket; explicit activation identifies a card and publishes its
+512-byte sector geometry. Every return ends CPU payload access, while uncertain
+card programming can independently keep the controller, pins and gate owned.
+DMA, IRQ, hot-swap, physical card detection and a filesystem are not provided by
+this mode. RTC likewise separates explicit retained-calendar adoption from
+empty-backup provisioning with an authored initial date; provisioning never
+invents a default calendar or resets the backup domain.
+
+Public RS485 composition obtains the transport with `nx_factory_uart_ref()` and
+its existing TX admission callback with `nx_factory_uart_tx_validator_ref()`,
+using the same exact `nx_uart_ref_t`. The getter is a pure lookup: it neither
+changes instance state nor adds vtable fields, and unreviewed modes or IDs return
+NULL. The caller pairs that callback with the same UART context and supplies the
+DE GPIO and setup/hold budget to the existing RS485 adapter through public
+headers. This pairing is a caller precondition, not runtime authentication.
+The actual C11 ARM consumer retains the selected UART/GPIO providers and adapter;
+it does not establish physical bus timing. RS232 acceptance and the drawn
+MAX485/MAX232 supplies or actual substitute parts still require verification.
+
+The sensor wire profiles are explicit software references. DS18B20 support
+requires external VDD and a pull-up; parasite power and a strong pull-up are not
+inferred. Infrared decoding separates strict edge sources from an explicitly
+selected IRQ-observation reference. The latter preserves source flags and marks
+its result sampled/uncertain; it cannot attest complete hardware edge capture.
+The actual remote protocol and fitted audio/camera modules remain unconfirmed.
+
+### Legal combinations and evidence
+
+Complete Board support is a set of reviewed configurations, not one assembly
+with every peripheral enabled. V4.1 Ethernet MDIO and the standard RS485 route
+share PA2. USB FS/CAN1, CAN2/audio, SDIO/camera/UART5 and UART6/camera/audio also
+have real pad conflicts. A software choice cannot replace physical rewiring.
+Different DMA channel numbers do not permit simultaneous use of one DMA Stream.
+The selected profile must reserve clocks, vectors, timers and memory domains as
+well as pins.
+
+RGB565 QVGA uses 153600 bytes per frame, already exceeding 128 KiB main SRAM.
+RGB565 VGA double buffering uses 1228800 bytes, exceeding the drawn 1 MiB SRAM.
+Memory format, frame rate, buffer count and bus bandwidth therefore belong in
+the explicit composition budget. The separate 64 KiB CCM is CPU-only for these
+DMA paths. Measured linked costs, throughput and electrical timing remain
+separate evidence scopes.
+
+Implementation proceeds through exact facts and minimal startup, electrical and
+controller admission, reusable device components, FSMC/SDIO/media modes, then
+legal external examples and frozen integration. Each behavioral change retains
+genuine RED before implementation, GREEN and independent review. Final ARM,
+installed SDK, resource and bilingual checks bind their exact source and
+configuration; a focused model pass does not close the whole Board exit.
+
+The initial FSMC C draft preceded a runnable behavioral RED test. The original
+draft and failed harness attempts are retained; later genuine failure-path
+regressions and GREEN executions keep their actual chronology. This exception
+does not meet the project's strict TDD ordering requirement for that draft.
+QB30 must retain the exception and its independent-review responsibility rather
+than reconstructing an earlier RED or claiming full process compliance.
+
+The initial `SystemInit` SRAM-hook draft has a second ordering exception: its
+first host fixture had a mapping conflict, so the later before-image comparison
+is retrospective. The early compiler-generated `memset` failure also lacks an
+exact contemporary source snapshot. Later genuine defect regressions and the
+five accepted freestanding ARM captures retain their own exact source and
+execution identities; they do not repair those earlier evidence gaps.
+
+HIL admission must bind physical PCB, part population, jumpers, connector path
+and the selected hardware/configuration digest. V4.1 transceiver supply/part
+markings, PHY oscillator frequency and the inconsistent MDIO net label require
+inspection. Prepared station tooling does not turn disconnected hardware into a
+passed result. Original schematic files are not automatically redistributed by
+adding their identities to the public Board facts.

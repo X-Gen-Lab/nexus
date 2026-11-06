@@ -1,0 +1,27 @@
+# Transport resources only; external owner must bind the RS485 adapter.
+# GPIO initial low establishes receive direction; UART TX alone is not RS485.
+schema=2
+board_package=".."
+backend="baremetal"
+clock="hse8-pll168"
+optimization="Os"
+[hardware]
+p15="rs485"
+[memory]
+main_stack_bytes=2048
+libc_heap_bytes=0
+static_ram_limit_bytes=32768
+flash_load_limit_bytes=65536
+[gpio.direction]
+binding="rs485-de"
+mode="output"
+[uart.serial2]
+binding="uart2"
+mode="irq-byte-event"
+baud=115200
+[uart.serial2.rx]
+format="events"
+capacity=64
+[uart.serial2.irq]
+priority=5
+calls_os=false

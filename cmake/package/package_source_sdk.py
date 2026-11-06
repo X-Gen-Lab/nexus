@@ -478,6 +478,42 @@ REQUIRED_FILES += (
     "soc/gd32/gd32f470/private/gd32f470_spi_dma.h",
     "soc/gd32/gd32f470/private/gd32f470_uart_stream.h",
     "soc/gd32/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32/gd32f470/private/usb_conf.h")
+# Exact Board packages and optional device mechanisms ship with their CMake
+# and private integration closure; a rehashed omission is still incomplete.
+REQUIRED_FILES += tuple(
+    "boards/" + board + "/" + name
+    for board in ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41")
+    for name in ("board.json", "README.md", "assemblies/minimal.toml",
+                 "assemblies/touch-nor.toml"))
+REQUIRED_FILES += ("boards/stm32f407zg_qiming_v41/assemblies/sdio.toml",)
+REQUIRED_FILES += tuple(
+    "components/" + component + "/" + name
+    for component in ("at24c02", "w25", "ili9341", "xpt2046",
+                      "software_spi", "software_i2c", "infrared",
+                      "onewire", "ds18b20")
+    for name in ("CMakeLists.txt", "src/" + component + ".c",
+                 "include/nexus/components/" + component + ".h"))
+REQUIRED_FILES += (
+    "components/software_i2c/include/nexus/components/software_sccb.h",
+    "components/software_i2c/README.md",
+    "components/software_i2c/references.json",
+    "components/onewire/src/crc8.c",
+    "components/at24c02/references.json",
+    "io/include/nexus/io/block.h", "io/src/api/block.c",
+    "cmake/platform/STM32FSMC.cmake", "cmake/platform/STM32SDIO.cmake")
+REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h"
+                        for name in ("external_bus", "parallel16",
+                                     "memory_window"))
+REQUIRED_FILES += tuple("io/src/api/" + name + ".c"
+                        for name in ("external_bus", "parallel16",
+                                     "memory_window"))
+REQUIRED_FILES += tuple(
+    "soc/stm32/stm32f407/" + name
+    for name in ("drivers/fsmc.c", "drivers/rtc.c", "drivers/sdio.c",
+                 "private/stm32f407_fsmc.h", "private/stm32f407_rtc.h",
+                 "private/stm32f407_sdio.h",
+                 "private/fsmc_hal/stm32f4xx_hal_conf.h",
+                 "private/sdio_hal/stm32f4xx_hal_conf.h"))
 REQUIRED_FILES += (
     "components/amp_ipc/CMakeLists.txt",
     "components/amp_ipc/src/amp_ipc.c",

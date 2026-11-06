@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 35cd4ff6919aa231e303d0afb773f02b5e497a8cc6cefa0e02e349b35624de7c\n"
+"X-Nexus-Source-SHA256: 285ef43c170271faeafb29f904cb1a2c7f4f8760f72bc1c53fd8bd375597d7a8\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -1486,14 +1486,6 @@ msgid "`soc/stm32/stm32f407/drivers/adc_continuous.c`"
 msgstr "`soc/stm32/stm32f407/drivers/adc_continuous.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`can1-pa11-pa12`"
-msgstr "`can1-pa11-pa12`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`stm32f407zg-qiming-v31`"
-msgstr "`stm32f407zg-qiming-v31`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/can_assembly/stm32-both.toml`, "
 "`tests/contracts/can_assembly/stm32-first.toml`, "
@@ -1568,14 +1560,6 @@ msgid "EXTI6"
 msgstr "EXTI6"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`exti6-pa6`"
-msgstr "`exti6-pa6`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
-msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/stm32_assembly/ve-flash.toml`, "
 "`tests/contracts/stm32_assembly/zg-flash.toml`"
@@ -1586,9 +1570,6 @@ msgstr ""
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/flash.c`"
 msgstr "`soc/stm32/stm32f407/drivers/flash.c`"
-
-msgid "`gpio-pa0`"
-msgstr "`gpio-pa0`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -1611,14 +1592,6 @@ msgstr ""
 "`tests/contracts/declared_io_assembly/ve-duplex.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`gpio-pb2`"
-msgstr "`gpio-pb2`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`stm32f407ve-sky-qingchun`"
-msgstr "`stm32f407ve-sky-qingchun`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
 "`tests/contracts/declared_io_assembly/f407-output.toml`, "
 "`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
@@ -1635,10 +1608,6 @@ msgstr ""
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "GPIOE"
 msgstr "GPIOE"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`gpio-pe3`, `gpio-pe4`"
-msgstr "`gpio-pe3`, `gpio-pe4`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid ""
@@ -1938,28 +1907,6 @@ msgstr ""
 "`tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, "
 "`tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg.toml`, "
-"`tests/contracts/stm32_assembly/ve-dma.toml`, "
-"`tests/contracts/stm32_assembly/zg-dma.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, "
-"`tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
-msgstr ""
-"`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg.toml`, "
-"`tests/contracts/stm32_assembly/ve-dma.toml`, "
-"`tests/contracts/stm32_assembly/zg-dma.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, "
-"`tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
-
 msgid "`soc/stm32/stm32f407/drivers/uart_hal.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_hal.c`"
 
@@ -1976,30 +1923,6 @@ msgstr ""
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart_stream.c`"
 msgstr "`soc/stm32/stm32f407/drivers/uart_stream.c`"
-
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, "
-"`tools/configure/assemblies/qiming-baremetal-uart.toml`, "
-"`tools/configure/assemblies/qiming-baremetal.toml`, "
-"`tools/configure/assemblies/qiming-freertos-uart.toml`, "
-"`tools/configure/assemblies/qiming-freertos.toml`, "
-"`tools/configure/assemblies/sky-baremetal-uart.toml`, "
-"`tools/configure/assemblies/sky-baremetal.toml`, "
-"`tools/configure/assemblies/sky-freertos-uart.toml`, "
-"`tools/configure/assemblies/sky-freertos.toml`"
-msgstr ""
-"`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, "
-"`tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, "
-"`tools/configure/assemblies/qiming-baremetal-uart.toml`, "
-"`tools/configure/assemblies/qiming-baremetal.toml`, "
-"`tools/configure/assemblies/qiming-freertos-uart.toml`, "
-"`tools/configure/assemblies/qiming-freertos.toml`, "
-"`tools/configure/assemblies/sky-baremetal-uart.toml`, "
-"`tools/configure/assemblies/sky-baremetal.toml`, "
-"`tools/configure/assemblies/sky-freertos-uart.toml`, "
-"`tools/configure/assemblies/sky-freertos.toml`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f407/drivers/uart.c`"
@@ -3232,3 +3155,231 @@ msgstr "SDK resolver 将 `.nexus-source-sdk.json` 纳入完整 IR 的 `inputs`�
 
 msgid "A direct API check using the SDK's own resolved IR can report `trust=semantic_verified` while a checkout CLI query of that SDK record reports `configuration_mismatch`. Semantic validation and configuration matching are separate observations. Evidence-to-source association through the CLI at a Gitless SDK root is not currently implemented; the direct API result does not establish equivalent end-to-end CLI evidence association."
 msgstr "使用 SDK 自身 resolved IR 的直接 API 核验可以报告 `trust=semantic_verified`，而 checkout CLI 查询该 SDK 记录时报告 `configuration_mismatch`。范围语义核验与配置匹配是独立观察。当前尚未实现从无 Git 元数据的 SDK 根目录通过 CLI 将证据关联到源码；直接 API 结果不建立等价的端到端 CLI 证据关联。"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "8080-16"
+msgstr "8080-16"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "EXTI11"
+msgstr "EXTI11"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "EXTI2"
+msgstr "EXTI2"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "EXTI7"
+msgstr "EXTI7"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "EXTI8"
+msgstr "EXTI8"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "EXTI9"
+msgstr "EXTI9"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "FSMC"
+msgstr "FSMC"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "RTC"
+msgstr "RTC"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "SDIO"
+msgstr "SDIO"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "USART6"
+msgstr "USART6"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`can1-pa11-pa12`, `can1-pb8-pb9`"
+msgstr "`can1-pa11-pa12`, `can1-pb8-pb9`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti11-pf11`"
+msgstr "`exti11-pf11`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti2-pe2`"
+msgstr "`exti2-pe2`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti6-pa6`, `exti6-pf6`"
+msgstr "`exti6-pa6`, `exti6-pf6`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti7-pf7`"
+msgstr "`exti7-pf7`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti8-pf8`"
+msgstr "`exti8-pf8`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`exti9-pf9`"
+msgstr "`exti9-pf9`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`fsmc-async16`"
+msgstr "`fsmc-async16`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`fsmc-ne3-is62wv51216`"
+msgstr "`fsmc-ne3-is62wv51216`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`fsmc-ne4-ili9341`"
+msgstr "`fsmc-ne4-ili9341`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-input-pb2`, `gpio-pb2`"
+msgstr "`gpio-input-pb2`, `gpio-pb2`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pa0`, `gpio-pa15`"
+msgstr "`gpio-pa0`, `gpio-pa15`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pa0`, `gpio-pa15`, `gpio-pa5`"
+msgstr "`gpio-pa0`, `gpio-pa15`, `gpio-pa5`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pb0`, `gpio-pb1`, `gpio-pb2`"
+msgstr "`gpio-pb0`, `gpio-pb1`, `gpio-pb2`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pc0`, `gpio-pc13`"
+msgstr "`gpio-pc0`, `gpio-pc13`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pd0`, `gpio-pd6`, `gpio-pd7`"
+msgstr "`gpio-pd0`, `gpio-pd6`, `gpio-pd7`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pe2`, `gpio-pe3`, `gpio-pe4`"
+msgstr "`gpio-pe2`, `gpio-pe3`, `gpio-pe4`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pf10`"
+msgstr "`gpio-pf10`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pf11`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
+msgstr "`gpio-pf11`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
+msgstr "`gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`i2c1-pb6-pb7`, `i2c1-pb8-pb9`"
+msgstr "`i2c1-pb6-pb7`, `i2c1-pb8-pb9`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`rtc-lse-pc14-pc15`"
+msgstr "`rtc-lse-pc14-pc15`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`sdio-pc8-pd2`"
+msgstr "`sdio-pc8-pd2`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`soc/stm32/stm32f407/drivers/sdio.c`"
+msgstr "`soc/stm32/stm32f407/drivers/sdio.c`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
+msgstr "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+msgstr "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+msgstr "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+msgstr "`stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`stm32f407zg-qiming-v41`"
+msgstr "`stm32f407zg-qiming-v41`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
+msgstr "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
+msgstr "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`"
+msgstr "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`"
+msgstr "`tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`uart4-pa0-pa1`"
+msgstr "`uart4-pa0-pa1`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "`usart6-pc6-pc7`"
+msgstr "`usart6-pc6-pc7`"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "adopt-retained"
+msgstr "adopt-retained"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "async16"
+msgstr "async16"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "block"
+msgstr "block"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "cpu-window"
+msgstr "cpu-window"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "external_bus"
+msgstr "external_bus"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "memory_window"
+msgstr "memory_window"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "parallel16"
+msgstr "parallel16"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "provision-empty"
+msgstr "provision-empty"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "sdio-poll"
+msgstr "sdio-poll"
+
+# Reviewed literal configuration/source identity; preserve spelling in both languages.
+msgid "startup-memory"
+msgstr "startup-memory"

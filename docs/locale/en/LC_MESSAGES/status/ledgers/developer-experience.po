@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: df5ec6de2ca8cfc5ec381a6e5fe04488fd579c255d9876ce7169e9673e935da0\n"
+"X-Nexus-Source-SHA256: cf11a5c8f136f5c73a17e863de8fb4c18d2ec187b0065504696c9a7c06915c1b\n"
 
 msgid "开发体验执行台账"
 msgstr "Developer experience execution ledger"
@@ -34,11 +34,6 @@ msgstr ""
 "**Original exit fields** are only fields actually present in the original "
 "CSV. Tasks, qualification prerequisites and contract links also retain their"
 " original wording; they cannot be used to invent an execution."
-
-msgid "本表包含 107 条原记录，仅表示来源行数。"
-msgstr ""
-"This table contains 107 original records; this is only the number "
-"of source rows."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:32
@@ -2695,5 +2690,428 @@ msgstr "provider_onboarding_commands_and_strict_docs_verified"
 msgid "strict_bilingual_docs_and_diagrams_verified"
 msgstr "strict_bilingual_docs_and_diagrams_verified"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。"
-msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original identifiers, order and fields come from {download}`the original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`."
+msgid "本表包含 139 条原记录，仅表示来源行数。"
+msgstr "This table contains 139 original records; this is only the number of source rows."
+
+msgid "QB01"
+msgstr "QB01"
+
+msgid "P0: Freeze schematic identity and reviewed differences"
+msgstr "P0: Freeze schematic identity and reviewed differences"
+
+msgid "schematic_and_source_reviewed_no_new_runtime_execution"
+msgstr "schematic_and_source_reviewed_no_new_runtime_execution"
+
+msgid "boards"
+msgstr "boards"
+
+msgid "Record both PDF hashes and page/component/net references; schematic facts never establish fitted hardware or PCB inspection."
+msgstr "Record both PDF hashes and page/component/net references; schematic facts never establish fitted hardware or PCB inspection."
+
+msgid "QB02"
+msgstr "QB02"
+
+msgid "P0: Introduce two independent exact Qiming Board packages"
+msgstr "P0: Introduce two independent exact Qiming Board packages"
+
+msgid "in_progress"
+msgstr "in_progress"
+
+msgid "Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected."
+msgstr "Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected."
+
+msgid "QB03"
+msgstr "QB03"
+
+msgid "P0: Model population jumper and electrical selections"
+msgstr "P0: Model population jumper and electrical selections"
+
+msgid "Depends on QB01. No invented defaults; absent or unknown devices and unmet jumper conditions reject selected bindings; declarations do not establish physical proof."
+msgstr "Depends on QB01. No invented defaults; absent or unknown devices and unmet jumper conditions reject selected bindings; declarations do not establish physical proof."
+
+msgid "QB04"
+msgstr "QB04"
+
+msgid "P0: Bind hardware selections and PDF provenance into typed configuration"
+msgstr "P0: Bind hardware selections and PDF provenance into typed configuration"
+
+msgid "Depends on QB02;QB03. Unknown keys and choices reject; immutable selections survive explain and source SDK consumption; one configuration authority and static emission remain."
+msgstr "Depends on QB02;QB03. Unknown keys and choices reject; immutable selections survive explain and source SDK consumption; one configuration authority and static emission remain."
+
+msgid "QB05"
+msgstr "QB05"
+
+msgid "P0: Implement actual GPIO routes and electrical modes"
+msgstr "P0: Implement actual GPIO routes and electrical modes"
+
+msgid "Depends on QB04. Exact package ports and pins support input pulls and output drive; inactive levels precede output mode; failed setup and stop preserve ownership."
+msgstr "Depends on QB04. Exact package ports and pins support input pulls and output drive; inactive levels precede output mode; failed setup and stop preserve ownership."
+
+msgid "QB06"
+msgstr "QB06"
+
+msgid "P0: Extend EXTI lines and real vector ownership"
+msgstr "P0: Extend EXTI lines and real vector ownership"
+
+msgid "Depends on QB05. Selected lines including PF11 use the correct vector; shared owners stop independently; event overflow and rejected initialization remain observable."
+msgstr "Depends on QB05. Selected lines including PF11 use the correct vector; shared owners stop independently; event overflow and rejected initialization remain observable."
+
+msgid "QB07"
+msgstr "QB07"
+
+msgid "P0: Review six UART instances and selected transport modes"
+msgstr "P0: Review six UART instances and selected transport modes"
+
+msgid "Depends on QB04. USART1/2/3/6 and UART4/5 have exact clock IRQ gate and pad admission; existing modes remain; no unimplemented DMA mode is advertised."
+msgstr "Depends on QB04. USART1/2/3/6 and UART4/5 have exact clock IRQ gate and pad admission; existing modes remain; no unimplemented DMA mode is advertised."
+
+msgid "QB08"
+msgstr "QB08"
+
+msgid "P0: Add actual SPI and I2C routes without capability drift"
+msgstr "P0: Add actual SPI and I2C routes without capability drift"
+
+msgid "Depends on QB04. SPI1 PB3/PB4/PB5 and reviewed I2C1 alternatives match real C admission; preserve SWD and reject conflicting complete JTAG ownership."
+msgstr "Depends on QB04. SPI1 PB3/PB4/PB5 and reviewed I2C1 alternatives match real C admission; preserve SWD and reject conflicting complete JTAG ownership."
+
+msgid "QB09"
+msgstr "QB09"
+
+msgid "P0: Deliver safe minimal Board startup and shutdown"
+msgstr "P0: Deliver safe minimal Board startup and shutdown"
+
+msgid "Depends on QB05;QB07. Correct two-versus-three LEDs and two-versus-four keys; UART electrical route and CS DE backlight levels are explicit; complete cleanup is proved or retained."
+msgstr "Depends on QB05;QB07. Correct two-versus-three LEDs and two-versus-four keys; UART electrical route and CS DE backlight levels are explicit; complete cleanup is proved or retained."
+
+msgid "QB10"
+msgstr "QB10"
+
+msgid "P1: Add an AT24C02 device component"
+msgstr "P1: Add an AT24C02 device component"
+
+msgid "Depends on QB08. Address 0x50 geometry page boundaries write-cycle ACK progress and failures execute against the actual device transport; product storage layout stays external."
+msgstr "Depends on QB08. Address 0x50 geometry page boundaries write-cycle ACK progress and failures execute against the actual device transport; product storage layout stays external."
+
+msgid "QB11"
+msgstr "QB11"
+
+msgid "P1: Add a selected W25 SPI NOR component"
+msgstr "P1: Add a selected W25 SPI NOR component"
+
+msgid "Depends on QB08;QB03. Expected JEDEC identity and geometry are checked; finite program erase busy and error paths preserve ownership; core unpopulated NOR stays disabled."
+msgstr "Depends on QB08;QB03. Expected JEDEC identity and geometry are checked; finite program erase busy and error paths preserve ownership; core unpopulated NOR stays disabled."
+
+msgid "QB12"
+msgstr "QB12"
+
+msgid "P1: Bind both Boards actual CAN routes and electrical conditions"
+msgstr "P1: Bind both Boards actual CAN routes and electrical conditions"
+
+msgid "Depends on QB04;QB09. Core CAN1 PB8/PB9 and high-configuration PA11/PA12 are distinct; CAN2 jumper and shared-filter ownership are reviewed; no transceiver or termination is invented."
+msgstr "Depends on QB04;QB09. Core CAN1 PB8/PB9 and high-configuration PA11/PA12 are distinct; CAN2 jumper and shared-filter ownership are reviewed; no transceiver or termination is invented."
+
+msgid "QB13"
+msgstr "QB13"
+
+msgid "P1: Compose exact RS232 and RS485 paths"
+msgstr "P1: Compose exact RS232 and RS485 paths"
+
+msgid "Depends on QB07;QB09;QB03. Declared transceiver supply and P15/PG6 direction are checked; true wire-tail and cleanup execute; standard PA2 Ethernet/RS485 conflict rejects."
+msgstr "Depends on QB07;QB09;QB03. Declared transceiver supply and P15/PG6 direction are checked; true wire-tail and cleanup execute; standard PA2 Ethernet/RS485 conflict rejects."
+
+msgid "QB14"
+msgstr "QB14"
+
+msgid "P1: Bind actual USB full-speed paths"
+msgstr "P1: Bind actual USB full-speed paths"
+
+msgid "Depends on QB03;QB09. P21 USB/CAN selection and VBUS/ID facts remain explicit; OTG_HS internal FS and external ULPI HS are not confused; host support is not inferred."
+msgstr "Depends on QB03;QB09. P21 USB/CAN selection and VBUS/ID facts remain explicit; OTG_HS internal FS and external ULPI HS are not confused; host support is not inferred."
+
+msgid "QB15"
+msgstr "QB15"
+
+msgid "P1: Compose V4.1 MAC DP83848 and network transport"
+msgstr "P1: Compose V4.1 MAC DP83848 and network transport"
+
+msgid "Depends on QB03;QB04;QB09. Exact PHY identity address reference clock P5 and receive-valid variant are reviewed; application network policy stays external; unknown wiring is not repaired silently."
+msgstr "Depends on QB03;QB04;QB09. Exact PHY identity address reference clock P5 and receive-valid variant are reviewed; application network policy stays external; unknown wiring is not repaired silently."
+
+msgid "QB16"
+msgstr "QB16"
+
+msgid "P1: Integrate F407 RTC LSE and backup-domain lifecycle"
+msgstr "P1: Integrate F407 RTC LSE and backup-domain lifecycle"
+
+msgid "Depends on QB04;QB09. Calendar and time-domain boundaries execute; LSE failure and retained backup state are explicit; no battery fitting or measured retention is inferred."
+msgstr "Depends on QB04;QB09. Calendar and time-domain boundaries execute; LSE failure and retained backup state are explicit; no battery fitting or measured retention is inferred."
+
+msgid "QB17"
+msgstr "QB17"
+
+msgid "P2: Implement one shared FSMC owner with independent banks"
+msgstr "P2: Implement one shared FSMC owner with independent banks"
+
+msgid "Depends on QB04;QB05. Shared pads and gate have one owner; NE3 SRAM and NE4 LCD own distinct windows and timing; rollback and close never restore another live bank."
+msgstr "Depends on QB04;QB05. Shared pads and gate have one owner; NE3 SRAM and NE4 LCD own distinct windows and timing; rollback and close never restore another live bank."
+
+msgid "QB18"
+msgstr "QB18"
+
+msgid "P2: Implement SRAM windows and optional pre-runtime initialization"
+msgstr "P2: Implement SRAM windows and optional pre-runtime initialization"
+
+msgid "Depends on QB17;QB03. Internal bootstrap initializes selected FSMC before external data/bss; CPU and DMA reachability are separate; boot-backed memory prevents unsafe withdrawal."
+msgstr "Depends on QB17;QB03. Internal bootstrap initializes selected FSMC before external data/bss; CPU and DMA reachability are separate; boot-backed memory prevents unsafe withdrawal."
+
+msgid "QB19"
+msgstr "QB19"
+
+msgid "P2: Integrate the confirmed ILI9341 16-bit display"
+msgstr "P2: Integrate the confirmed ILI9341 16-bit display"
+
+msgid "Depends on QB17;QB18. Actual command/data address shift and controller identity are checked; 240x320 RGB565 rectangle and error paths execute; shared NRST is not an invented reset GPIO."
+msgstr "Depends on QB17;QB18. Actual command/data address shift and controller identity are checked; 240x320 RGB565 rectangle and error paths execute; shared NRST is not an invented reset GPIO."
+
+msgid "QB20"
+msgstr "QB20"
+
+msgid "P2: Integrate confirmed XPT2046 through bounded software SPI"
+msgstr "P2: Integrate confirmed XPT2046 through bounded software SPI"
+
+msgid "Depends on QB05;QB06. PA5/PB1/PB2/PB0/PF11 route and mode are explicit; raw 12-bit sampling and final PENIRQ power state execute; uncertain pin cleanup retains bus ownership."
+msgstr "Depends on QB05;QB06. PA5/PB1/PB2/PB0/PF11 route and mode are explicit; raw 12-bit sampling and final PENIRQ power state execute; uncertain pin cleanup retains bus ownership."
+
+msgid "QB21"
+msgstr "QB21"
+
+msgid "P2: Implement block I/O and F407 SDIO host ownership"
+msgstr "P2: Implement block I/O and F407 SDIO host ownership"
+
+msgid "Depends on QB04. PC8-PC12/PD2 command and data paths handle CRC timeout cancellation and removal; no unconnected card-detect GPIO is invented; buffers end only after detach."
+msgstr "Depends on QB04. PC8-PC12/PD2 command and data paths handle CRC timeout cancellation and removal; no unconnected card-detect GPIO is invented; buffers end only after detach."
+
+msgid "QB22"
+msgstr "QB22"
+
+msgid "P2: Integrate SD card protocol and optional filesystem port"
+msgstr "P2: Integrate SD card protocol and optional filesystem port"
+
+msgid "Depends on QB21. Selected card geometry and bounded block reads/writes execute; optional filesystem policy stays distinct; product directories and persistence remain external."
+msgstr "Depends on QB21. Selected card geometry and bounded block reads/writes execute; optional filesystem policy stays distinct; product directories and persistence remain external."
+
+msgid "QB23"
+msgstr "QB23"
+
+msgid "P2: Implement bounded software two-wire and SCCB ports"
+msgstr "P2: Implement bounded software two-wire and SCCB ports"
+
+msgid "Depends on QB05. Actual PC0/PC13 and PD6/PD7 paths use release/read semantics with explicit timing and ACK/SCCB differences; no hidden task or long global IRQ mask."
+msgstr "Depends on QB05. Actual PC0/PC13 and PD6/PD7 paths use release/read semantics with explicit timing and ACK/SCCB differences; no hidden task or long global IRQ mask."
+
+msgid "QB24"
+msgstr "QB24"
+
+msgid "P2: Integrate selected WM8978 audio and complete I2S mode"
+msgstr "P2: Integrate selected WM8978 audio and complete I2S mode"
+
+msgid "Depends on QB23;QB04. Actual module must be selected; PB12/PB13/PC2/PC3/PC6 clock sample-rate RX/TX DMA and full withdrawal execute; finite slave TX is not full audio qualification."
+msgstr "Depends on QB23;QB04. Actual module must be selected; PB12/PB13/PC2/PC3/PC6 clock sample-rate RX/TX DMA and full withdrawal execute; finite slave TX is not full audio qualification."
+
+msgid "QB25"
+msgstr "QB25"
+
+msgid "P2: Integrate the alternative selected VS1053 module"
+msgstr "P2: Integrate the alternative selected VS1053 module"
+
+msgid "Depends on QB07;QB08. Actual module must be selected; SPI2 alternate route dual CS DREQ and reset execute; WM8978 and VS1053 cannot own the same connector simultaneously."
+msgstr "Depends on QB07;QB08. Actual module must be selected; SPI2 alternate route dual CS DREQ and reset execute; WM8978 and VS1053 cannot own the same connector simultaneously."
+
+msgid "QB26"
+msgstr "QB26"
+
+msgid "P2: Integrate DCMI and an exact OV2640 capture configuration"
+msgstr "P2: Integrate DCMI and an exact OV2640 capture configuration"
+
+msgid "Depends on QB18;QB23;QB04. Actual module format and rate are fixed; XCLK SCCB frame boundaries malformed frames and DMA withdrawal execute with declared static memory and bandwidth budgets."
+msgstr "Depends on QB18;QB23;QB04. Actual module format and rate are fixed; XCLK SCCB frame boundaries malformed frames and DMA withdrawal execute with declared static memory and bandwidth budgets."
+
+msgid "QB27"
+msgstr "QB27"
+
+msgid "P2: Integrate selected DS18B20 and HS0038 devices"
+msgstr "P2: Integrate selected DS18B20 and HS0038 devices"
+
+msgid "Depends on QB05. OneWire only pulls low or releases and declares any strong-pullup requirement; infrared timing overflow and selected protocol execute without product calibration policy."
+msgstr "Depends on QB05. OneWire only pulls low or releases and declares any strong-pullup requirement; infrared timing overflow and selected protocol execute without product calibration policy."
+
+msgid "QB28"
+msgstr "QB28"
+
+msgid "P0: Validate clock DMA IRQ and memory combination budgets"
+msgstr "P0: Validate clock DMA IRQ and memory combination budgets"
+
+msgid "Depends on QB04. Physical DMA Stream exclusivity cannot be bypassed by different channel numbers; TIM2 stays reserved; audio/video buffer reach and bandwidth are explicit."
+msgstr "Depends on QB04. Physical DMA Stream exclusivity cannot be bypassed by different channel numbers; TIM2 stays reserved; audio/video buffer reach and bandwidth are explicit."
+
+msgid "QB29"
+msgstr "QB29"
+
+msgid "P2: Deliver legal combinations and external application examples"
+msgstr "P2: Deliver legal combinations and external application examples"
+
+msgid "Depends on QB09;QB10;QB11;QB12;QB13;QB14;QB15;QB16;QB18;QB19;QB20;QB22;QB24;QB25;QB26;QB27;QB28. Minimal serial CAN network storage HMI and selected media profiles consume public interfaces; impossible standard wiring rejects; private application evidence stays private."
+msgstr "Depends on QB09;QB10;QB11;QB12;QB13;QB14;QB15;QB16;QB18;QB19;QB20;QB22;QB24;QB25;QB26;QB27;QB28. Minimal serial CAN network storage HMI and selected media profiles consume public interfaces; impossible standard wiring rejects; private application evidence stays private."
+
+msgid "QB30"
+msgstr "QB30"
+
+msgid "P0: Execute genuine TDD and final source-bound software matrix"
+msgstr "P0: Execute genuine TDD and final source-bound software matrix"
+
+msgid "Depends on QB01. Meaningful original RED precedes new behavior then GREEN; actual ARM and installed SDK images and resource costs bind exact inputs; no existence-only or stale-pass substitution."
+msgstr "Depends on QB01. Meaningful original RED precedes new behavior then GREEN; actual ARM and installed SDK images and resource costs bind exact inputs; no existence-only or stale-pass substitution."
+
+msgid "QB31"
+msgstr "QB31"
+
+msgid "P2: Deliver bilingual Board guidance and evidence navigation"
+msgstr "P2: Deliver bilingual Board guidance and evidence navigation"
+
+msgid "Depends on QB02;QB29;QB30. One existing ledger records exact mode source schematic and declared population identities with actual software results and unexecuted physical scope; both locales stay reviewed."
+msgstr "Depends on QB02;QB29;QB30. One existing ledger records exact mode source schematic and declared population identities with actual software results and unexecuted physical scope; both locales stay reviewed."
+
+msgid "QB32"
+msgstr "QB32"
+
+msgid "P3: Prepare and execute exact Board HIL admission"
+msgstr "P3: Prepare and execute exact Board HIL admission"
+
+msgid "Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed."
+msgstr "Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed."
+
+msgid "focused_passed_full_gate_pending"
+msgstr "focused_passed_full_gate_pending"
+
+msgid "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+msgstr "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+
+msgid "tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+msgstr "tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+
+msgid "tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py"
+msgstr "tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py"
+
+msgid "soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py"
+msgstr "soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py"
+
+msgid "io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h"
+msgstr "io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h"
+
+msgid "soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly"
+msgstr "soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly"
+
+msgid "soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c"
+msgstr "soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c"
+
+msgid "components/at24c02;tests/google/at24c02_test.cpp"
+msgstr "components/at24c02;tests/google/at24c02_test.cpp"
+
+msgid "components/w25;tests/google/w25_test.cpp"
+msgstr "components/w25;tests/google/w25_test.cpp"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py"
+
+msgid "partial"
+msgstr "partial"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c"
+
+msgid "blocked"
+msgstr "blocked"
+
+msgid "v41_phy_facts_unverified_no_admitted_ethernet_route"
+msgstr "v41_phy_facts_unverified_no_admitted_ethernet_route"
+
+msgid "boards/stm32f407zg_qiming_v41/board.json;components/dp83848"
+msgstr "boards/stm32f407zg_qiming_v41/board.json;components/dp83848"
+
+msgid "soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml"
+msgstr "soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml"
+
+msgid "io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py"
+msgstr "io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py"
+
+msgid "soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
+msgstr "soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
+
+msgid "components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml"
+msgstr "components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml"
+
+msgid "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
+msgstr "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
+
+msgid "focused_polling_passed_dma_irq_cancel_hot_swap_not_provided"
+msgstr "focused_polling_passed_dma_irq_cancel_hot_swap_not_provided"
+
+msgid "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
+msgstr "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
+
+msgid "soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly"
+msgstr "soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly"
+
+msgid "components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+msgstr "components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+
+msgid "module_selection_and_complete_driver_pending"
+msgstr "module_selection_and_complete_driver_pending"
+
+msgid "boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+msgstr "boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+
+msgid "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
+msgstr "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
+
+msgid "focused_resource_guards_passed_audio_video_admission_pending"
+msgstr "focused_resource_guards_passed_audio_video_admission_pending"
+
+msgid "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
+msgstr "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
+
+msgid "focused_public_profiles_and_arm_consumers_passed_private_companion_pending"
+msgstr "focused_public_profiles_and_arm_consumers_passed_private_companion_pending"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
+msgstr "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
+
+msgid "focused_passed_full_gate_pending_tdd_exceptions_open"
+msgstr "focused_passed_full_gate_pending_tdd_exceptions_open"
+
+msgid "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
+msgstr "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
+
+msgid "focused_bilingual_review_pending_strict_build_not_executed"
+msgstr "focused_bilingual_review_pending_strict_build_not_executed"
+
+msgid "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
+msgstr "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
+
+msgid "focused_hil_preparation_46_tests_passed_physical_not_executed"
+msgstr "focused_hil_preparation_46_tests_passed_physical_not_executed"
+
+msgid "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
+msgstr "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6a97f04fe93d95210e269624e5716e10431a36ccc25753013c426a235c3bb45b`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `6a97f04fe93d95210e269624e5716e10431a36ccc25753013c426a235c3bb45b`."
+
+msgid "focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending"
+msgstr "focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending"
+
+msgid "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"
+msgstr "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"

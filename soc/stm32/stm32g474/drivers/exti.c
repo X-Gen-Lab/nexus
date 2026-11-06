@@ -311,6 +311,7 @@ const nx_exti_ops_t nx_stm32g474_exti_ops = {
     .read = read_events,
     .stop = stop,
     .attach_wake = attach_wake,
+    .level = NULL,
 };
 
 /** \brief Static construction cannot replace a retained event-ring epoch. */

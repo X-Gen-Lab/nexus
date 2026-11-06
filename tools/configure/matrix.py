@@ -17,7 +17,7 @@ if __package__ in (None, ""):
 
 from tools.configure.providers.descriptor import source_directory
 from tools.configure import authored, configure, factory, selected_contracts
-from tools.configure.contracts import COMPONENTS
+from tools.configure.contracts import COMPONENTS, FACT_INTERFACE_KINDS
 from tools.configure.providers import descriptor, maintained
 from tools.configure.providers.common import mode_traits
 
@@ -112,7 +112,7 @@ def check_contracts(root=configure.ROOT):
             interfaces = [(controller["kind"], controller["modes"])]
             interfaces += sorted(controller.get("interfaces", {}).items())
             for kind, modes in interfaces:
-                if kind not in kinds:
+                if kind not in FACT_INTERFACE_KINDS or kind not in properties:
                     raise ValueError("Provider kind has no authored/factory contract: " + kind)
                 for mode in modes:
                     provider.mode_implementation(kind, mode)

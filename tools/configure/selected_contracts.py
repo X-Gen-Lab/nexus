@@ -115,6 +115,8 @@ def endpoint_class(item):
     """Never substitute an enhanced endpoint for a legacy public type."""
     if item.driver in ENDPOINT_DRIVERS:
         return ENDPOINT_DRIVERS[item.driver][1]
+    if item.kind == "external_bus":
+        return item.driver.removesuffix("-endpoint")
     return ("usb_endpoint" if item.kind == "usb_device"
             else item.kind + "_device")
 
@@ -215,11 +217,28 @@ def describe(item, endpoint=None, *, public_class=None):
                                  endpoint.kind != item.kind):
         fail("Selected endpoint differs from its actual controller")
     kind = item.kind
+    nominal_kind, nominal_mode = kind, item.mode
+    if kind == "external_bus" and endpoint is not None:
+        nominal_kind = selected
+        nominal_mode = (endpoint.options.mode if selected == "memory_window"
+                        else "8080-16")
+        shape = mode_traits(nominal_kind, nominal_mode)
     limits = {}
     if kind == "rtc":
         limits.update(unit="occurrences", max_transfer_units=1)
     elif kind == "lptim":
         limits.update(unit="ticks", max_transfer_units=65536)
+    elif kind == "block":
+        limits.update(unit="blocks", unit_bytes=512, buffer_alignment=4,
+                      max_transfer_units=item.options.max_blocks)
+    elif kind == "external_bus" and endpoint is not None:
+        if selected == "parallel16":
+            limits.update(unit="words", unit_bytes=2, buffer_alignment=2,
+                          max_transfer_units=76800, word_bits=(16,))
+        else:
+            limits.update(unit="bytes", unit_bytes=1,
+                          max_transfer_units=(endpoint.options.bytes
+                              if endpoint.options.mode == "cpu-window" else None))
     if kind in {"uart", "spi", "i2c", "can", "can_fd", "eth", "eth_frames",
                 "usb_device"}:
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))
@@ -268,6 +287,11 @@ def describe(item, endpoint=None, *, public_class=None):
     if selected_limits is not None:
         limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
+    if kind == "external_bus" and selected == "memory_window":
+        formatted["fields"] = dict(
+            window_address=endpoint.options.address,
+            window_bytes=endpoint.options.bytes,
+            startup_backing=endpoint.options.mode == "startup-memory")
     if endpoint is not None and kind == "spi":
         formatted["fields"] = {
             **formatted["fields"],
@@ -313,8 +337,8 @@ def describe(item, endpoint=None, *, public_class=None):
                             for path in item.dma}))
     return SelectedContract(
         id=endpoint.id if endpoint is not None else item.id,
-        provider=item.provider, controller=item.controller, kind=kind,
-        mode=item.mode, public_class=selected, model=provider.MODEL,
+        provider=item.provider, controller=item.controller, kind=nominal_kind,
+        mode=nominal_mode, public_class=selected, model=provider.MODEL,
         features=("POLLING",) if selected == "mdio" else
         _features(shape, provider.MODEL), dma_engines=engines,
         **formatted, **limits)

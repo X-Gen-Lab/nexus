@@ -27,12 +27,14 @@ F4_HAL_HEADERS = {
     'Inc/stm32f4xx_hal.h'}
 F4_HAL_SOURCES = {f'Src/stm32f4xx_hal_{unit}.c'
                   for unit in ('uart', 'dma', 'rcc')}
+F4_LL_SOURCES = {'Src/stm32f4xx_ll_fsmc.c', 'Src/stm32f4xx_ll_sdmmc.c'}
 F4_REQUIRED_FILES = {
     'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
-    *F4_HAL_SOURCES, *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
+    *F4_HAL_SOURCES, *F4_LL_SOURCES,
+    *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
                       ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c',
-                       'bus', 'rcc', 'rng'))}
-F4_SELECTED_API = 'stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx'
+                       'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr'))}
+F4_SELECTED_API = 'stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx'
 
 ADDITIONS = {
     'h7': {
@@ -163,7 +165,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             f1.contract(selected)
 
-    def test_f4_selected_transport_closes_exact_headers_and_only_three_sources(self):
+    def test_f4_closes_exact_headers_and_five_reviewed_sources(self):
         from tools.maintenance import stm32f4_hal_lock as f4
         additions = {
             'Inc/stm32f4xx_hal_eth.h': {
@@ -186,6 +188,10 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             candidate['files'][name] = {
                 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         expected = F4_REQUIRED_FILES
+        self.assertEqual(len(expected), 34)
+        self.assertEqual({name for name in expected if name.endswith('.c')},
+                         F4_HAL_SOURCES | F4_LL_SOURCES)
+        self.assertEqual(original['selected_api'], F4_SELECTED_API)
         self.assertEqual(f4.REVIEWED_FILES, expected)
         self.assertEqual(f4.contract(candidate), expected)
         for name in expected:
@@ -194,11 +200,12 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             del reduced['files'][name]
             with self.subTest(missing=name), self.assertRaises(ValueError):
                 f4.contract(reduced)
-        unsafe = copy.deepcopy(candidate)
-        unsafe['files']['Src/stm32f4xx_hal_eth.c'] = {
-            'bytes': 1, 'sha256': '0' * 64}
-        with self.assertRaises(ValueError):
-            f4.contract(unsafe)
+        for unit in ('eth', 'sd', 'nand', 'nor', 'sram', 'rtc', 'pwr'):
+            name = f'Src/stm32f4xx_hal_{unit}.c'
+            unsafe = copy.deepcopy(candidate)
+            unsafe['files'][name] = {'bytes': 1, 'sha256': '0' * 64}
+            with self.subTest(extra=name), self.assertRaises(ValueError):
+                f4.contract(unsafe)
         with tempfile.TemporaryDirectory() as temporary:
             lock = Path(temporary) / 'f4.lock.json'
             lock.write_text(json.dumps(candidate))

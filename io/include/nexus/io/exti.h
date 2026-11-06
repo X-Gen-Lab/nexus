@@ -51,6 +51,7 @@ typedef struct {
     nx_result_t (*stop)(void* context);
     nx_result_t (*attach_wake)(void* context, const nx_irq_wake_t* wake,
                                uint8_t syscall_ceiling);
+    nx_result_t (*level)(const void* context, bool* high);
 } nx_exti_ops_t;
 /**
  * \brief           Immutable interface pointing to caller-owned state.
@@ -79,6 +80,21 @@ struct nx_exti_port {
 nx_result_t nx_exti_port_read(const nx_exti_port_t* port,
                               nx_exti_event_t* events, size_t capacity,
                               size_t* count);
+/**
+ * \brief           Observe this line's raw electrical level without events.
+ * \param[in]       port: Initialized exact line; serialized against
+ * stop/rebind. \param[out]      high: Caller-owned sample, unchanged on error,
+ * never retained. \return          Success or INVALID, STATE, CONTEXT or
+ * UNSUPPORTED. \note            Bounded task/IRQ observation, no waiting or
+ * callback. High is the physical input value, independent of edge or active
+ *                  polarity. No event is consumed and no pending bit cleared.
+ *                  Output must be disjoint from faces, operations, provider
+ *                  storage and MMIO. Direct hardware providers may require
+ *                  privilege. Failed stop retains the pad until proven cleanup;
+ *                  successful stop ends level access. A missing optional
+ *                  method does not synthesize a level from the event queue.
+ */
+nx_result_t nx_exti_port_level(const nx_exti_port_t* port, bool* high);
 /**
  * \brief           Disable the line source, clear pending and drain its
  *                  handler.

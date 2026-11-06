@@ -66,6 +66,21 @@ class MaintainedMatrixTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "alternate execution"):
                 matrix.check_contracts()
 
+    def test_endpoint_personality_is_checked_without_becoming_a_controller(self):
+        contract = matrix.check_contracts()
+        self.assertNotIn("parallel16", contract["kinds"])
+        self.assertNotIn("memory_window", contract["kinds"])
+        original = matrix.mode_traits
+
+        def without_parallel(kind, mode):
+            if kind == "parallel16":
+                raise ValueError("endpoint execution contract is missing")
+            return original(kind, mode)
+
+        with patch.object(matrix, "mode_traits", side_effect=without_parallel):
+            with self.assertRaisesRegex(ValueError, "endpoint execution"):
+                matrix.check_contracts()
+
     def test_explicit_references_resolve_without_claiming_physical_support(self):
         result = matrix.resolve_catalogue()
         self.assertEqual(result["physical_status"], "not_executed")

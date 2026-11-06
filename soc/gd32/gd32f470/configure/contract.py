@@ -1,6 +1,7 @@
 """Maintained gd32f470 capability and static assembly contract."""
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.uart_formats import UartFormatPolicy
+from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
@@ -14,6 +15,12 @@ PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
 CLASSIC_CAN_MAILBOXES = 3
 
 UART_FORMATS = UartFormatPolicy(words=("USART0",), irq_probe=True, byte_frames=True)
+
+# No DMA/stream/word admission is inferred from the ordinary byte owner.
+UART_TX_VALIDATORS = MappingProxyType({
+    ("gd32f470", "irq-byte-event", "uart"):
+        Symbol("nx_gd32_uart_tx_validate"),
+})
 
 STREAM_GEOMETRY = StreamGeometry(2, 1, 65535)
 

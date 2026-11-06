@@ -116,6 +116,132 @@ TEST_F(ControlFactory, ExactStaticFactoryStartsStopsAndRestarts) {
     Start();
 }
 
+#ifdef NX_CONTROL_EXTI
+TEST_F(ControlFactory, EveryGPIOEXTILineUsesItsActualNVICVector) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    for (uint8_t line = 0U; line < 16U; ++line) {
+        nx_exti_event_t events[2]{};
+        nx_stm32_exti_state_t state{};
+        const nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                            5U,    line,   5U, 0U};
+        const IRQn_Type irq =
+            line < 5U ? static_cast<IRQn_Type>(EXTI0_IRQn + line)
+                      : (line < 10U ? EXTI9_5_IRQn : EXTI15_10_IRQn);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&state, &config))
+            << "EXTI line " << static_cast<unsigned>(line);
+        EXPECT_EQ(5U, NVIC_GetPriority(irq));
+        EXPECT_NE(0U, NVIC_GetEnableIRQ(irq));
+        EXPECT_EQ(5U, (SYSCFG->EXTICR[line / 4U] >> ((line % 4U) * 4U)) & 15U);
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+        EXPECT_EQ(0U, NVIC_GetEnableIRQ(irq));
+    }
+}
+
+TEST_F(ControlFactory, TouchLineElevenAndPeerRetainSharedVectorUntilLastClose) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    nx_exti_event_t first_events[2]{};
+    nx_exti_event_t second_events[2]{};
+    nx_stm32_exti_state_t first{};
+    nx_stm32_exti_state_t second{};
+    const nx_stm32_exti_config_t first_config{
+        GPIOF, first_events, 2U, NX_EXTI_FALLING, 5U, 11U, 5U, 0U};
+    const nx_stm32_exti_config_t second_config{
+        GPIOG, second_events, 2U, NX_EXTI_BOTH, 6U, 12U, 5U, 0U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&first, &first_config));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&second, &second_config));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&first));
+    EXPECT_NE(0U, NVIC_GetEnableIRQ(EXTI15_10_IRQn));
+    EXPECT_NE(0U, EXTI->IMR & (1U << 12U));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&second));
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(EXTI15_10_IRQn));
+}
+
+TEST_F(ControlFactory, EXTIRejectsMismatchedGPIOIdentityBeforeAnyEffect) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    const nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                        0U,    5U,     5U, 0U};
+    const auto* bytes = static_cast<const uint8_t*>(mmio);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_FALSE(state.cold_owned);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(0, std::memcmp(before.data(), bytes, before.size()));
+}
+
+TEST_F(ControlFactory, EXTIInputPullAndInvalidChoiceRespectThePinBoundary) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                  5U,    11U,    5U, 3U};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_FALSE(state.cold_owned);
+    const uint32_t before = UINT32_C(0x76543210) & ~(3U << 22U);
+    GPIOF->PUPDR = before;
+    config.pull = 1U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_EQ(before | (1U << 22U), GPIOF->PUPDR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+}
+
+TEST_F(ControlFactory, EXTIDoesNotRewriteAnEnabledPeersDifferentPriority) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    const unsigned irq = static_cast<unsigned>(EXTI15_10_IRQn);
+    NVIC->IPR[irq] = 7U;
+    NVIC->ISER[irq / 32U] = 1U << (irq % 32U);
+    EXTI->IMR = 1U << 12U;
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    const nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                        5U,    11U,    5U, 0U};
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_FALSE(state.cold_owned);
+    EXPECT_EQ(7U, NVIC_GetPriority(EXTI15_10_IRQn));
+    EXPECT_EQ(1U << 12U, EXTI->IMR);
+    EXPECT_EQ(0U, GPIOF->MODER);
+}
+
+TEST_F(ControlFactory, TouchVectorEnableFailureRetainsTheCleanupOwner) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    refused_enable = static_cast<int>(EXTI15_10_IRQn);
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    const nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                        5U,    11U,    5U, 0U};
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_TRUE(state.initialized);
+    EXPECT_TRUE(state.cold_owned);
+    EXPECT_EQ(events, state.storage);
+    refused_enable = -1;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+    EXPECT_FALSE(state.cold_owned);
+}
+
+TEST_F(ControlFactory, ActiveTouchPublisherPreventsColdAdmissionAndFinalClose) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    const unsigned irq = static_cast<unsigned>(EXTI15_10_IRQn);
+    const uint32_t bit = 1U << (irq % 32U);
+    NVIC->IABR[irq / 32U] = bit;
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    const nx_stm32_exti_config_t config{GPIOF, events, 2U, NX_EXTI_FALLING,
+                                        5U,    11U,    5U, 0U};
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_FALSE(state.cold_owned);
+    NVIC->IABR[irq / 32U] = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&state, &config));
+    NVIC->IABR[irq / 32U] = bit;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_exti_close(&state));
+    EXPECT_TRUE(state.initialized);
+    EXPECT_TRUE(state.cold_owned);
+    EXPECT_EQ(events, state.storage);
+    NVIC->IABR[irq / 32U] = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+}
+#endif
+
 TEST_F(ControlFactory, RejectedForeignControllerCannotBeStoppedOrReleased) {
     *Gate() |= Mask();
 #ifdef NX_CONTROL_PWM
@@ -141,7 +267,7 @@ TEST_F(ControlFactory, RejectedForeignControllerCannotBeStoppedOrReleased) {
     state.initialized = true;
     EXTI->IMR = EXTI->RTSR = EXTI->FTSR = 1U << 5U;
     const nx_stm32_exti_config_t config = {GPIOA, events, 2U, NX_EXTI_BOTH,
-                                           0U,    5U,     5U};
+                                           0U,    5U,     5U, 0U};
 #else
     const uint8_t channels[] = {0U};
     const uint8_t sample_times[] = {2U};

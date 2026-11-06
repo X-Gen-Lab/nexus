@@ -88,3 +88,35 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
         nexus_use_cmsis_host_model(${cold_uart_vendor})
     endif()
 endforeach()
+
+# One actual six-instance factory proves byte faces retain separate contexts.
+set(qiming_uart_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-qiming-six-uarts")
+execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+    --source-root "${NEXUS_SOURCE_DIR}"
+    --assembly "${NEXUS_SOURCE_DIR}/tests/contracts/qiming_uart_assembly/six-irq-uarts.toml"
+    --output "${qiming_uart_bundle}"
+    RESULT_VARIABLE qiming_uart_generated
+    OUTPUT_VARIABLE qiming_uart_output ERROR_VARIABLE qiming_uart_error)
+if(NOT qiming_uart_generated EQUAL 0)
+    message(FATAL_ERROR "Qiming UART factory rejected: ${qiming_uart_output}${qiming_uart_error}")
+endif()
+nexus_google_configuration_inputs("${qiming_uart_bundle}")
+nexus_google_test(nexus_stm32_qiming_multi_uart_cold_factory_test STM32F4_LL
+    SOURCES stm32_uart_cold_factory_test.cpp "${qiming_uart_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c"
+    LIBRARIES Nexus::IO
+    INCLUDES "${qiming_uart_bundle}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
+        "${NEXUS_SOURCE_DIR}/arch/include"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+target_include_directories(nexus_stm32_qiming_multi_uart_cold_factory_test
+    SYSTEM PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+target_compile_definitions(nexus_stm32_qiming_multi_uart_cold_factory_test PRIVATE
+    STM32F407xx NX_COLD_RX=0 NX_COLD_TX=0 NX_COLD_MULTI
+    _init=nx_uart_cold_fixture_init _fini=nx_uart_cold_fixture_fini)
+target_compile_options(nexus_stm32_qiming_multi_uart_cold_factory_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_cold_factory_model.h")
