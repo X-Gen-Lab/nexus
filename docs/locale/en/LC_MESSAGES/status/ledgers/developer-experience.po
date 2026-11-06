@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cf11a5c8f136f5c73a17e863de8fb4c18d2ec187b0065504696c9a7c06915c1b\n"
+"X-Nexus-Source-SHA256: 5e4b74c005dd4f4f4938fcfdec316af430d1a529bbcefa54802469565bd8f334\n"
 
 msgid "开发体验执行台账"
 msgstr "Developer experience execution ledger"
@@ -2714,9 +2714,6 @@ msgstr "QB02"
 msgid "P0: Introduce two independent exact Qiming Board packages"
 msgstr "P0: Introduce two independent exact Qiming Board packages"
 
-msgid "in_progress"
-msgstr "in_progress"
-
 msgid "Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected."
 msgstr "Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected."
 
@@ -2990,9 +2987,6 @@ msgstr "P3: Prepare and execute exact Board HIL admission"
 msgid "Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed."
 msgstr "Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed."
 
-msgid "focused_passed_full_gate_pending"
-msgstr "focused_passed_full_gate_pending"
-
 msgid "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
 msgstr "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
 
@@ -3056,9 +3050,6 @@ msgstr "components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-tou
 msgid "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
 msgstr "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
 
-msgid "focused_polling_passed_dma_irq_cancel_hot_swap_not_provided"
-msgstr "focused_polling_passed_dma_irq_cancel_hot_swap_not_provided"
-
 msgid "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
 msgstr "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
 
@@ -3077,41 +3068,56 @@ msgstr "boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/a
 msgid "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
 msgstr "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
 
-msgid "focused_resource_guards_passed_audio_video_admission_pending"
-msgstr "focused_resource_guards_passed_audio_video_admission_pending"
-
 msgid "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
 msgstr "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
-
-msgid "focused_public_profiles_and_arm_consumers_passed_private_companion_pending"
-msgstr "focused_public_profiles_and_arm_consumers_passed_private_companion_pending"
 
 msgid "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
 msgstr "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
 
-msgid "focused_passed_full_gate_pending_tdd_exceptions_open"
-msgstr "focused_passed_full_gate_pending_tdd_exceptions_open"
-
 msgid "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
 msgstr "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
-
-msgid "focused_bilingual_review_pending_strict_build_not_executed"
-msgstr "focused_bilingual_review_pending_strict_build_not_executed"
 
 msgid "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
 msgstr "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
 
-msgid "focused_hil_preparation_46_tests_passed_physical_not_executed"
-msgstr "focused_hil_preparation_46_tests_passed_physical_not_executed"
-
 msgid "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
 msgstr "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6a97f04fe93d95210e269624e5716e10431a36ccc25753013c426a235c3bb45b`。"
-msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `6a97f04fe93d95210e269624e5716e10431a36ccc25753013c426a235c3bb45b`."
-
-msgid "focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending"
-msgstr "focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending"
-
 msgid "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"
 msgstr "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A"
+msgstr "software_matrix_verified_source_A"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed"
+msgstr "software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending"
+msgstr "software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap"
+msgstr "software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_resource_guards_audio_video_admission_pending"
+msgstr "software_matrix_verified_source_A_resource_guards_audio_video_admission_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_rs232_and_electrical_verification_pending"
+msgstr "software_matrix_verified_source_A_rs232_and_electrical_verification_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open"
+msgstr "software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "strict_en_zh_passed_source_B2"
+msgstr "strict_en_zh_passed_source_B2"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/developer-experience-execution.csv>`. Source: `docs/design/developer-experience-execution.csv`; SHA-256: `ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`."

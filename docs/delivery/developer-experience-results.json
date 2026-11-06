@@ -7854,20 +7854,45 @@
       },
       "gates": {
         "ordinary_complete_index": {
-          "status": "pending",
-          "qualification_inherited": false
+          "status": "passed",
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/commit-integration/commit-a-result.json",
+            "sha256": "35354f2c750aeb9d172dc6a2f4414b7cc47239cf2d69429ced4e18afaff942ae",
+            "bytes": 730,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
         },
         "installed_source_sdk": {
-          "status": "pending",
-          "qualification_inherited": false
+          "status": "passed",
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/verification/verification.json",
+            "sha256": "3de6358b5ad76948c3bb8e965d658ecf52b3269008e6b795d4a93e8d6f553aa4",
+            "bytes": 558786,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
         },
         "strict_bilingual_html_api": {
-          "status": "pending",
-          "qualification_inherited": false
+          "status": "passed",
+          "source_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-docs-b2/documentation-build.json",
+            "sha256": "32f98e04b814a6d70e579ee9590d69cb9b47053236f39c1718dd581dc87dc951",
+            "bytes": 59186,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
         },
         "offline_dual_build": {
-          "status": "pending",
-          "qualification_inherited": false
+          "status": "not_executed",
+          "qualification_inherited": false,
+          "reason": "Not performed in this batch; no completion inferred from SDK relocation/consumers."
         }
       },
       "process_disclosures": {
@@ -7895,17 +7920,59 @@
         "prepared_scope": "Two exact software_reference fixtures with null physical budgets. Population, PCB, jumpers, clocks, transceiver supply/PHY wiring and actual modules need independent station observation."
       },
       "remaining_limits": [
-        "Public RS485 composition has focused software/ARM evidence; RS232 and physical MAX485/MAX232 electrical verification remain pending.",
+        "Physical Boards are not connected; physical fitting, waveforms, IRQ/DMA latency, throughput, power and HIL remain not_executed.",
+        "RS485 has exact public installed ARM composition evidence; RS232 and physical MAX485/MAX232 electrical verification remain pending.",
         "V4.1 Ethernet PHY/reference-clock/MDIO facts are unverified; no V4.1 Ethernet route is admitted.",
-        "Audio/camera model selection and complete codecs/DCMI remain pending.",
-        "SDIO mode provides no DMA, IRQ, cancellation, hot-swap detection or filesystem.",
-        "Private companion examples, final complete-index/SDK/bilingual/offline gates remain separately pending; use original CSV exits."
+        "Audio/camera model selection and complete codecs/DCMI remain pending; resource conflict guards do not admit those modules.",
+        "Selected SDIO is synchronous CPU polling only; DMA, IRQ completion, asynchronous cancellation, hot-swap detection and filesystem are not provided.",
+        "Minimal private new-Board examples are verified; complete private media/network task exits remain open.",
+        "Two strict-TDD chronology exceptions and the early memset source-snapshot gap remain disclosed. Later software passes do not repair them.",
+        "Offline dual build was not executed. This batch establishes scoped software references and clean Source SDK closure, not a software candidate or release.",
+        "Archive/final report references are locally verified, not durably published. Retired original ELF paths require the recorded archive/member restore map."
       ],
       "evidence_retention": {
         "status": "local_originals_retained_not_published",
         "public_archive": null,
         "private_examples_published": false,
-        "scope": "Local paths locate original receipts/snapshots. They are not durable public download claims. A future actually verified archive/member locator may be appended without relabelling old identities. Vendor/user PDFs and private application bytes are excluded."
+        "scope": "Local paths locate original receipts/snapshots. They are not durable public download claims. A future actually verified archive/member locator may be appended without relabelling old identities. Vendor/user PDFs and private application bytes are excluded.",
+        "final_local_verification": {
+          "status": "local_verified_archive_and_report_references_not_publicly_persisted",
+          "focused_archive": {
+            "path": "/workspace/nexus/build/qiming-board-20261107/evidence-store/185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f.tar.gz",
+            "sha256": "185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f",
+            "size": 389407310
+          },
+          "archive_manifest_sha256": "10d91b1cc2e2335dd14c4fb92f18520c09916cea5111d7dc659a5a539ab24517",
+          "member_files": 19726,
+          "member_uncompressed_bytes": 903456177,
+          "archive_metadata": {
+            "local_original": "/workspace/nexus/build/qiming-board-20261107/evidence-store/185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f.json",
+            "sha256": "0805cb3441d7fda38651dbe31ee94c44fcb6bb27b864d1655befc3b565e52c69",
+            "bytes": 521,
+            "scope": "Verified local focused archive; compressed file size differs from uncompressed member bytes",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "retired_elf_original_paths": 293,
+          "retirement_record": {
+            "local_original": "/workspace/nexus/build/qiming-board-20261107/focused-archive-control/archived-elf-retirement-handoff.json",
+            "sha256": "87e53af554b1ac88af57c4d78e98a1ad882aa96a7b1c0df51d62981005f6861a",
+            "bytes": 2146,
+            "scope": "293 frozen ELF paths retired; exact archive/member/SHA restoration retains original bytes",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "restoration_mapping": "/workspace/nexus/build/qiming-board-20261107/focused-archive-control/archived-elf-retirement.jsonl",
+          "old_missing_cache_identities": 18,
+          "old_missing_bytes_reconstructed": false,
+          "older_nine_component_archives_exact": 17,
+          "older_nine_component_archives_total": 18,
+          "older_component_identity_record_retained": "closures_after_initial_observation preserves the exact archive index and original hash scope",
+          "current_source_logs_xml_receipts_arm_objects_preserved": true,
+          "all_historical_raw_paths_still_exist": false,
+          "tail_final_a_sdk_docs_report_archive": null,
+          "tail_scope": "Final A/SDK/B2 reports are local verified references, not yet included in a final tail archive. No public download or durable external persistence is claimed.",
+          "public_durable_availability": false,
+          "private_payload_published": false
+        }
       },
       "publishable_candidate": false,
       "closures_after_initial_observation": {
@@ -7948,7 +8015,332 @@
           "LCD-only display-touch is independent of unpopulated SRAM; original41-pad combination is preserved as display-touch-sram; both exact Boards have actual ARM links for both profiles"
         ],
         "historical_cache_limit": "One earlier GD470 XPT static archive cache was replaced during final component rebuild;17of18 prior archives retain exact original bytes, as the preservation index records. Original command/hash remains; no old bytes were reconstructed. Current XPT firmware compilation and final source-bound validation remain separate."
-      }
+      },
+      "final_software_results": {
+        "observed_utc": "2026-11-06T22:05:37.803898+00:00",
+        "scope": "Verified finite software-reference profiles only. Native execution, clean installed Source SDK, documentation compilation and private example metadata retain separate source identities; no physical qualification, whole-platform optimum, software candidate or release is established.",
+        "software_source_A": {
+          "commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "tree": "19829a466bb286703e3a6d555f58ba1b33e4fb80",
+          "normal_complete_index_hooks": "passed",
+          "source_clean_for_publishable_sdk_preparation": true,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/commit-integration/commit-a-result.json",
+            "sha256": "35354f2c750aeb9d172dc6a2f4414b7cc47239cf2d69429ced4e18afaff942ae",
+            "bytes": 730,
+            "scope": "Normal complete staged-index hooks that produced A; original failures and retry history remain intact",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
+        },
+        "native_and_tools": {
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "google_cases": 8004,
+          "google_executables": 447,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "tool_cases": 4269,
+          "tool_suites": [
+            {
+              "suite": "testing",
+              "discovered": 2211,
+              "executed": 2211,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "configure",
+              "discovered": 1378,
+              "executed": 1378,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "ci",
+              "discovered": 511,
+              "executed": 511,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "workflows",
+              "discovered": 169,
+              "executed": 169,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            }
+          ],
+          "record": {
+            "local_original": "/workspace/nexus/build/native-debug/tdd/execution.json",
+            "sha256": "5f9f29e5c7155e8b71790a4be4ba0b910f990eb464fa3b2c518a8fbba70fa891",
+            "bytes": 1411256,
+            "scope": "Fresh complete actual host execution; not physical execution or historical TDD-order proof",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "bounded_io_properties": {
+            "executed_properties": 233,
+            "unproven_scopes": [
+              {
+                "scope": "physical",
+                "reason": "No connected boards: UART/SPI/I2C/CAN/USB/Ethernet buses, ADC/timer/PWM waveforms, electrical effects, IRQ WCET, cache interactions and HIL fault timing are not executed."
+              },
+              {
+                "scope": "continuous duplex combinations",
+                "reason": "Finite duplex TX/RX independence and continuous RX rotate/drain are covered separately; every simultaneous TX cancellation/RX wrap ordering is not exhaustive."
+              },
+              {
+                "scope": "non-streaming IO",
+                "reason": "GPIO/EXTI/basic PWM/watchdog/Flash have independent maintained suites. The selected CAN/USB/Ethernet/timer rows here do not claim every lifecycle, controller, packet type or alternative mode."
+              },
+              {
+                "scope": "IRQ-byte-event TX per MCU",
+                "reason": "Byte/event IRQ receive and base UART tests exist; not every byte-ring profile and secondary-controller cancellation history is represented here."
+              },
+              {
+                "scope": "configuration legality",
+                "reason": "Strict mode/resource conflict and authored-limit tests execute through existing configure suite; this Google catalogue does not infer Python case execution from source names or expand reviewed Board routes."
+              },
+              {
+                "scope": "formal interleavings",
+                "reason": "Selected bounded register fault windows and Native histories are examples, not proof against every timing, ABA bank wrap or concurrent unsupported caller."
+              },
+              {
+                "scope": "test framework",
+                "reason": "Only ordinary reviewed TEST/TEST_F bodies are indexed; parameterized/typed/death-only aggregate properties need explicit review rather than automatic name inference."
+              },
+              {
+                "scope": "external product outputs",
+                "reason": "Advanced-output readback is a modeled platform mechanism. No tested GPIO value establishes real product safety, transceiver/PHY wiring, a physical break path, a reset policy or a safety certification."
+              }
+            ],
+            "formal_proof": false,
+            "record": {
+              "local_original": "/workspace/nexus/build/native-debug/tdd/io-property-report.json",
+              "sha256": "3cbadec72bb965734d2a278d507993e7e2f61e3a26976f82a1f3693114b9415e",
+              "bytes": 24302380,
+              "scope": "233 bounded properties and eight unproven scopes; original independent source/configuration/catalogue hashes remain authoritative",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          }
+        },
+        "installed_source_sdk": {
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "source_tree": "19829a466bb286703e3a6d555f58ba1b33e4fb80",
+          "status": "passed",
+          "publishable_clean_source_closure": true,
+          "software_candidate": false,
+          "immutable_prefix": "/dev/shm/nexus-qiming-sdk-a/installed SDK",
+          "package_boundary": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/package-boundary.json",
+            "sha256": "f4d2b7128ab2975bf6cfc3e392d6860e346db73e32764418f93d0c679b033704",
+            "bytes": 417,
+            "scope": "Immutable clean A SDK preparation/relocation boundary",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "manifest_sha256": "95d530cb943c5451a1f28787134cc743f83ea2e0950a6e900cafb5927123a0df",
+          "consumers": 65,
+          "commands": 274,
+          "selected_images": 37,
+          "service_images": 15,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/verification/verification.json",
+            "sha256": "3de6358b5ad76948c3bb8e965d658ecf52b3269008e6b795d4a93e8d6f553aa4",
+            "bytes": 558786,
+            "scope": "Actual complete relocated consumer matrix; original per-assembly source/configuration/artifact digest scopes are retained",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "additional_qiming_consumers": {
+            "cases": [
+              {
+                "case": "core-lcd",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-lcd",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-lcd-sram",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-sdio",
+                "status": "passed",
+                "source_main_sha256": "7e675cffe935f8a52f1e1a704a2610c37863062a84a059b644fdfc57d6a84063",
+                "retained_component_exports": null
+              },
+              {
+                "case": "v41-rs485",
+                "status": "passed",
+                "source_main_sha256": "87ce974ced0555d9ed0a942d1a087501c478eaa93f756fb7e5344ed367fe9e21",
+                "retained_component_exports": null
+              }
+            ],
+            "case_count": 5,
+            "scope": "Two exact Boards LCD-only, V4.1 LCD+SRAM, V4.1 polling SDIO and V4.1 public RS485; nine components/46 public exports retained in each first-three ARM image; linking only, not physical execution or product resource peaks",
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-sdk-a/qiming-consumers/results.json",
+              "sha256": "3995d02453bd103a21f33d4d70524b371bb7cfbd39fea72aaf8e30a6001762fa",
+              "bytes": 252687,
+              "scope": "Five additional exact installed ARM public consumers; do not combine their per-assembly configuration hashes",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          },
+          "additional_closure": {
+            "cases": [
+              {
+                "case": "gd470-nine-components",
+                "status": "passed",
+                "artifact_count": 9
+              },
+              {
+                "case": "boot-sram-ccm",
+                "status": "passed",
+                "artifact_count": 4
+              }
+            ],
+            "scope": "GD470 nine component archives and F407 startup SRAM/CCM installed ARM closure; no new Board/family hardware qualification",
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-sdk-a/additional-closure/results.json",
+              "sha256": "a4fc9c36961a8e02b950239d7a186a3018d83a557355eaea607273720fa4550d",
+              "bytes": 7236,
+              "scope": "Additional actual installed SDK ARM artifact/source closure",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          }
+        },
+        "documentation_source_B2": {
+          "commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "tree": "b36bb281f7baa2c67d3c396ca65e05a5f7e93878",
+          "source_clean": true,
+          "status": "passed",
+          "languages": [
+            "en",
+            "zh_CN"
+          ],
+          "scope": "Fresh locked complete-site Doxygen, gettext and English/Chinese HTML. B/B2 change only documentation inputs/catalogs relative to A; firmware remains bound to A.",
+          "build_record": {
+            "local_original": "/dev/shm/nexus-qiming-docs-b2/documentation-build.json",
+            "sha256": "32f98e04b814a6d70e579ee9590d69cb9b47053236f39c1718dd581dc87dc951",
+            "bytes": 59186,
+            "scope": "Actual strict complete documentation build from clean B2",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "immutable_package": {
+            "archive": "/dev/shm/nexus-qiming-docs-b2-package/qiming-software-reference-23f3fef1.tar.gz",
+            "archive_sha256": "b421fd009f172665788812dff385ba9e309c51e66178148986d371973adb3372",
+            "manifest_sha256": "4b3ab0a5ae76a305ff1d78582b0581361c44622d4dbb9a016f7489cf01c01e33",
+            "payload_files": 2889,
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-implementation-20261107/docs-strict-b2/package-result.json",
+              "sha256": "62fc82356f6f695d395412bc8b564bdd0d6fcf6d944dba5f49be136aa530d01a",
+              "bytes": 635,
+              "scope": "Actual verified immutable B2 documentation package; not a firmware release or physical qualification",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          },
+          "earlier_B_translation_failure": {
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-implementation-20261107/docs-strict-b/result.json",
+              "sha256": "a50446ce6991f9f7b6c1886118634913e6f2a22407736641e6753088ddb15927",
+              "bytes": 690,
+              "scope": "Original complete B strict failure retained; source-map lacked three new io/README include-expanded messages",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            },
+            "correction_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+            "history_preserved": true
+          }
+        },
+        "private_examples_metadata": {
+          "repository": "X-Gen-Lab/nexus-examples",
+          "visibility": "private",
+          "commit": "ca1d5af75b0a9ea27a351cbf07176fc7067a1e42",
+          "tree": "1a25baa0bff095610d6321537ca5a9f99afe4476",
+          "normal_hooks": "passed",
+          "pushed": true,
+          "reviewed": true,
+          "python_tests": 91,
+          "ctests": 29,
+          "google_executables_included_in_ctests": 19,
+          "google_cases": 218,
+          "count_boundary": "The 19 GoogleTest executables / 218 cases are included within 29 CTests; these quantities must not be added.",
+          "source_and_installed_exact_board_arm_consumers": 4,
+          "source_dependency_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "pr": "https://github.com/X-Gen-Lab/nexus-examples/pull/26",
+          "publication_boundary": "Only limited commit/status/visibility metadata is public; no private source, raw evidence or private local filesystem path is exposed."
+        },
+        "recording_C": {
+          "based_on_documentation_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "scope": "Later documentation-only results recording, separate from clean software A and strict documentation B2. Its own identity is obtained from Git history, not an embedded self-referential hash.",
+          "whole_site_strict_for_recording_commit": "not_executed_at_recording",
+          "not_predicted": true
+        },
+        "identity_boundary": "A report-file SHA-256 authenticates that report only. Original reports retain distinct source, per-assembly configuration, binary and archive identities; no digest is relabelled as another scope.",
+        "offline_dual_build": {
+          "status": "not_executed",
+          "reason": "No independent offline dual-build execution was performed. SDK relocation/consumers do not establish that result."
+        },
+        "software_candidate": false,
+        "release_published": false,
+        "physical_status": "not_executed",
+        "public_draft_pr": "https://github.com/X-Gen-Lab/nexus/pull/51"
+      },
+      "initial_gate_states": {
+        "ordinary_complete_index": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "installed_source_sdk": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "strict_bilingual_html_api": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "offline_dual_build": {
+          "status": "pending",
+          "qualification_inherited": false
+        }
+      },
+      "remaining_limits_at_initial_observation": [
+        "Public RS485 composition has focused software/ARM evidence; RS232 and physical MAX485/MAX232 electrical verification remain pending.",
+        "V4.1 Ethernet PHY/reference-clock/MDIO facts are unverified; no V4.1 Ethernet route is admitted.",
+        "Audio/camera model selection and complete codecs/DCMI remain pending.",
+        "SDIO mode provides no DMA, IRQ, cancellation, hot-swap detection or filesystem.",
+        "Private companion examples, final complete-index/SDK/bilingual/offline gates remain separately pending; use original CSV exits."
+      ]
     }
   },
   "evidence_members": {

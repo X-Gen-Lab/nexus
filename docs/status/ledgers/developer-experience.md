@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/developer-experience-execution.csv)。
-源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`6a97f04fe93d95210e269624e5716e10431a36ccc25753013c426a235c3bb45b`。
+源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -1656,7 +1656,7 @@ source_language: zh_CN
 | `task_id` | QB02 |
 | `task` | P0: Introduce two independent exact Qiming Board packages |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1671,7 +1671,7 @@ source_language: zh_CN
 | `task_id` | QB03 |
 | `task` | P0: Model population jumper and electrical selections |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1686,7 +1686,7 @@ source_language: zh_CN
 | `task_id` | QB04 |
 | `task` | P0: Bind hardware selections and PDF provenance into typed configuration |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1701,7 +1701,7 @@ source_language: zh_CN
 | `task_id` | QB05 |
 | `task` | P0: Implement actual GPIO routes and electrical modes |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1716,7 +1716,7 @@ source_language: zh_CN
 | `task_id` | QB06 |
 | `task` | P0: Extend EXTI lines and real vector ownership |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1731,7 +1731,7 @@ source_language: zh_CN
 | `task_id` | QB07 |
 | `task` | P0: Review six UART instances and selected transport modes |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1746,7 +1746,7 @@ source_language: zh_CN
 | `task_id` | QB08 |
 | `task` | P0: Add actual SPI and I2C routes without capability drift |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1761,7 +1761,7 @@ source_language: zh_CN
 | `task_id` | QB09 |
 | `task` | P0: Deliver safe minimal Board startup and shutdown |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1776,7 +1776,7 @@ source_language: zh_CN
 | `task_id` | QB10 |
 | `task` | P1: Add an AT24C02 device component |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/at24c02;tests/google/at24c02_test.cpp |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1791,7 +1791,7 @@ source_language: zh_CN
 | `task_id` | QB11 |
 | `task` | P1: Add a selected W25 SPI NOR component |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/w25;tests/google/w25_test.cpp |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1806,7 +1806,7 @@ source_language: zh_CN
 | `task_id` | QB12 |
 | `task` | P1: Bind both Boards actual CAN routes and electrical conditions |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1821,7 +1821,7 @@ source_language: zh_CN
 | `task_id` | QB13 |
 | `task` | P1: Compose exact RS232 and RS485 paths |
 | `implementation_status` | partial |
-| `software_status` | focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending |
+| `software_status` | software_matrix_verified_source_A_rs232_and_electrical_verification_pending |
 | `hardware_status` | not_executed |
 | `implementation_paths` | tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1836,7 +1836,7 @@ source_language: zh_CN
 | `task_id` | QB14 |
 | `task` | P1: Bind actual USB full-speed paths |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1866,7 +1866,7 @@ source_language: zh_CN
 | `task_id` | QB16 |
 | `task` | P1: Integrate F407 RTC LSE and backup-domain lifecycle |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1881,7 +1881,7 @@ source_language: zh_CN
 | `task_id` | QB17 |
 | `task` | P2: Implement one shared FSMC owner with independent banks |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1896,7 +1896,7 @@ source_language: zh_CN
 | `task_id` | QB18 |
 | `task` | P2: Implement SRAM windows and optional pre-runtime initialization |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1911,7 +1911,7 @@ source_language: zh_CN
 | `task_id` | QB19 |
 | `task` | P2: Integrate the confirmed ILI9341 16-bit display |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1926,7 +1926,7 @@ source_language: zh_CN
 | `task_id` | QB20 |
 | `task` | P2: Integrate confirmed XPT2046 through bounded software SPI |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1941,7 +1941,7 @@ source_language: zh_CN
 | `task_id` | QB21 |
 | `task` | P2: Implement block I/O and F407 SDIO host ownership |
 | `implementation_status` | partial |
-| `software_status` | focused_polling_passed_dma_irq_cancel_hot_swap_not_provided |
+| `software_status` | software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap |
 | `hardware_status` | not_executed |
 | `implementation_paths` | io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1956,7 +1956,7 @@ source_language: zh_CN
 | `task_id` | QB22 |
 | `task` | P2: Integrate SD card protocol and optional filesystem port |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1971,7 +1971,7 @@ source_language: zh_CN
 | `task_id` | QB23 |
 | `task` | P2: Implement bounded software two-wire and SCCB ports |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2031,7 +2031,7 @@ source_language: zh_CN
 | `task_id` | QB27 |
 | `task` | P2: Integrate selected DS18B20 and HS0038 devices |
 | `implementation_status` | implemented |
-| `software_status` | focused_passed_full_gate_pending |
+| `software_status` | software_matrix_verified_source_A |
 | `hardware_status` | not_executed |
 | `implementation_paths` | components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2046,7 +2046,7 @@ source_language: zh_CN
 | `task_id` | QB28 |
 | `task` | P0: Validate clock DMA IRQ and memory combination budgets |
 | `implementation_status` | partial |
-| `software_status` | focused_resource_guards_passed_audio_video_admission_pending |
+| `software_status` | software_matrix_verified_source_A_resource_guards_audio_video_admission_pending |
 | `hardware_status` | not_executed |
 | `implementation_paths` | tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2061,7 +2061,7 @@ source_language: zh_CN
 | `task_id` | QB29 |
 | `task` | P2: Deliver legal combinations and external application examples |
 | `implementation_status` | partial |
-| `software_status` | focused_public_profiles_and_arm_consumers_passed_private_companion_pending |
+| `software_status` | software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending |
 | `hardware_status` | not_executed |
 | `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2076,7 +2076,7 @@ source_language: zh_CN
 | `task_id` | QB30 |
 | `task` | P0: Execute genuine TDD and final source-bound software matrix |
 | `implementation_status` | partial |
-| `software_status` | focused_passed_full_gate_pending_tdd_exceptions_open |
+| `software_status` | software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2090,8 +2090,8 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | QB31 |
 | `task` | P2: Deliver bilingual Board guidance and evidence navigation |
-| `implementation_status` | in_progress |
-| `software_status` | focused_bilingual_review_pending_strict_build_not_executed |
+| `implementation_status` | implemented |
+| `software_status` | strict_en_zh_passed_source_B2 |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -2106,7 +2106,7 @@ source_language: zh_CN
 | `task_id` | QB32 |
 | `task` | P3: Prepare and execute exact Board HIL admission |
 | `implementation_status` | partial |
-| `software_status` | focused_hil_preparation_46_tests_passed_physical_not_executed |
+| `software_status` | software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed |
 | `hardware_status` | not_executed |
 | `implementation_paths` | tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
