@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 236de56b79c06a0783f6990ddc4d6980e3d7db82afa1313ee5b9652e3fa62eae\n"
+"X-Nexus-Source-SHA256: a943be8fac92c9b4fa6e4bbad79078d01f23e39183028957ce94e067071b7ee1\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -5083,24 +5083,12 @@ msgid "Set an idle calendar and advance its nonwrapping setting domain."
 msgstr "设置空闲日历，并推进不回绕的设置域。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
-msgid ""
-"Rejection changes no state. No implicit backup reset, synchronization, Core-"
-"time adjustment or authorization to overwrite retained hardware."
-msgstr "拒绝不改变状态。不隐式执行备份复位、同步、Core 时间调整，也不授予覆盖保留硬件的权限。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "[in] Same single serialized privileged task owner."
 msgstr "[in] 同一个唯一串行特权任务 owner。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "[in] Separate raw value, copied on successful validation."
 msgstr "[in] 独立的原始值，通过验证后复制。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
-msgid ""
-"SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or "
-"UNSUPPORTED."
-msgstr "SUCCESS、存在借用时的 BUSY、关闭时的 STATE、INVALID、EXHAUSTED 或 UNSUPPORTED。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "Borrow and arm one future alarm; no queue, allocation or worker."
@@ -5381,13 +5369,6 @@ msgstr "[in] 绝对 deadline；包含在适配器队列中的驻留时间。"
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
 msgid "[out] Complete bytes; reset to zero before execution."
 msgstr "[out] 完整字节数；执行前清零。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
-msgid ""
-"Success, BUSY/INVALID/TIMEOUT/IO. Return releases all buffers and CS after "
-"drain; polling is CPU-active, not IRQ/DMA async."
-msgstr ""
-"成功或 BUSY/INVALID/TIMEOUT/IO。排空后返回并归还全部缓冲区及 CS；轮询由 CPU 主动执行，不是 IRQ/DMA 异步。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
 msgid "Recover an idle SPI controller after its retained fault."
@@ -8002,3 +7983,491 @@ msgstr ""
 "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible "
 "事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU "
 "调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Actual ownership phase, UNAVAILABLE for a missing method"
+msgstr "实际所有权阶段；缺少方法时返回 UNAVAILABLE"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Actual state, or UNAVAILABLE for an invalid/missing state method."
+msgstr "实际状态；状态方法无效或缺失时返回 UNAVAILABLE。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Admission rejection changes no state. No implicit backup reset, synchronization, Core-time adjustment or authorization to overwrite retained hardware."
+msgstr "准入拒绝不改变任何状态。不隐式复位备份域、同步、调整 Core 时间，也不授权覆盖保留的硬件状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "All endpoint consumers and CPU users must join first. Timeout never revokes a derived pointer. Cold Platform release restores the shared pad lease only afterward."
+msgstr "必须先汇合所有端点消费者和 CPU 使用者。超时不撤销派生指针。之后才由 Platform 冷态释放恢复共享引脚租约。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Availability never substitutes for physical card-detect evidence."
+msgstr "可用状态不能代替物理卡检测证据。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Borrow one complete admitted CPU memory window."
+msgstr "借用一个完整且已准入的 CPU 内存窗口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded task/IRQ observation, no waiting or callback. High is the physical input value, independent of edge or active polarity. No event is consumed and no pending bit cleared. Output must be disjoint from faces, operations, provider storage and MMIO. Direct hardware providers may require privilege. Failed stop retains the pad until proven cleanup; successful stop ends level access. A missing optional method does not synthesize a level from the event queue."
+msgstr "有界任务/IRQ 观察，不等待或回调。High 表示物理输入值，与边沿或有效极性无关。不消费事件或清除 pending 位。输出必须与接口、方法表、provider 存储和 MMIO 分离。直接硬件 provider 可能要求特权。停机失败时保留引脚，直至确认清理完成；停机成功后结束电平访问。缺少可选方法时，不从事件队列合成电平。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "CPU accessibility is not physical retention or timing qualification. No heap pool or automatic SRAM test exists."
+msgstr "CPU 可访问性不等于物理保持或时序资格。不提供堆池或自动 SRAM 测试。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Confirmed whole-block prefix; failed block bytes are unspecified."
+msgstr "已确认的完整块前缀；失败块中的字节未指定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Do not copy a live lease or alter fields. owner is opaque provider identity, not a public device pointer. CPU accesses use address directly without per-load dispatch. This first profile permits CPU data read/write only; it does not grant DMA, executable, allocator or C-runtime startup backing. Join all derived pointer users before release. A timeout or lost pointer never proves that those users have stopped."
+msgstr "不得复制有效租约或修改字段。owner 是不透明的 provider 身份，不是公共设备指针。CPU 直接使用 address 访问，每次加载不经分派。首个配置只允许 CPU 数据读写，不授予 DMA、执行、分配器或 C 运行时启动支撑能力。释放前必须汇合所有派生指针使用者。超时或指针丢失不证明这些使用者已经停止。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Dummy-read/command sequencing belongs to the device protocol. This endpoint never interprets a controller ID."
+msgstr "空读与命令顺序属于设备协议。此端点不解释控制器 ID。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Every return ends buffer access. It does not revoke the bank lease or prove physical panel state. Consumer and bus lifecycle must join before shared infrastructure withdrawal."
+msgstr "每次返回都结束缓冲区访问，但不撤销 Bank 租约或证明物理面板状态。撤出共享基础设施前必须汇合消费者和总线生命周期。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact bank geometry; explicit CPU-window lease only in the runtime profile"
+msgstr "精确 Bank 几何；仅运行时配置提供显式 CPU 窗口租约"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact caller-owned CPU memory-window leases."
+msgstr "由调用方持有的精确 CPU 内存窗口租约。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit media and external-controller faces"
+msgstr "显式介质与外部控制器接口"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit shared external-controller lifecycle face."
+msgstr "显式共享外部控制器生命周期接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicitly discover one card after infrastructure cold preparation."
+msgstr "在基础设施冷态准备完成后显式发现一张卡。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Factory lookup and Platform startup never discover or replace media. Geometry is unavailable before activation. A different card requires explicit stop and activation; errors never silently reprobe a socket."
+msgstr "Factory 查找和 Platform 启动不发现或更换介质。激活前几何不可用。更换卡需要显式停机再激活；发生错误时不静默重新探测卡座。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Factory lookup returns an existing face without starting hardware or acquiring a bank. A controller face cannot substitute for an endpoint. A CPU-window lease permits direct loads/stores after acquisition and requires all derived pointer users to join before exact release. Startup backing is a separately selected, reset-time memory plan: its backing ownership already exists before Platform start and lasts while static objects exist. It rejects a whole-bank runtime loan and ordinary Platform stop. Neither profile grants DMA, executable memory, an allocator or physical retention evidence. See the [I/O ownership design](../../design/io-evolution.md) and the selected Board's explicit memory profile."
+msgstr "Factory 查找返回既有接口，不启动硬件或取得 Bank。控制器接口不能代替端点。CPU 窗口租约取得后允许直接读写，精确归还前必须汇合所有派生指针使用者。启动支撑是单独选择的复位期内存方案：其支撑内存的所有权在 Platform 启动前已经存在，并在静态对象存续期间持续有效。该方案拒绝整 Bank 运行时借用和普通 Platform 停机。两类方案均不授予 DMA、可执行内存、分配器或物理数据保持证据。参见 [I/O 所有权设计](../../design/io-evolution.md)及所选 Board 的显式内存配置。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "For public RS485 composition, use the same exact typed UART reference for `nx_factory_uart_ref()` and `nx_factory_uart_tx_validator_ref()`. The validator getter only returns the existing selected callback; it adds no mutable state or method table and returns NULL for unreviewed modes or IDs. Callback symbols may be shared; pairing with that transport's context and exclusive executor remains a caller precondition. The caller still owns DE, setup/hold timing and joined shutdown. The {ref}`RS485 I/O contract <uart__rs485_8h>` defines that ownership; lookup does not verify transceiver supply, RS485 bus wiring or physical turnaround."
+msgstr "组合公共 RS485 接口时，`nx_factory_uart_ref()` 与 `nx_factory_uart_tx_validator_ref()` 必须使用完全相同的强类型 UART 引用。validator getter 仅返回既有的选定回调，不增加可变状态或方法表；未审阅的模式或 ID 返回 NULL。回调符号可能共享；将其与该传输的 context 和独占执行者正确配对仍是调用方的前置条件。调用方仍负责 DE、建立/保持时序及汇合后的停机。{ref}`RS485 I/O 合同 <uart__rs485_8h>`定义这些所有权；查找不验证收发器供电、RS485 总线接线或物理收发转换时序。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Geometry valid until session stop/reinitialization, or NULL."
+msgstr "几何有效至会话停机或重新初始化；也可能返回 NULL。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "IRQ timestamps and sampled GPIO levels are observations. The F407 EXTI provider marks them COALESCED; that source cannot satisfy the strict NEC source policy. The explicit NEC IRQ-observation reference preserves source flags and publishes sampled/uncertain quality. Protocol inverse checks never establish edge capture completeness or physical timing. See the [infrared source-quality contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)."
+msgstr "IRQ 时间戳和采样 GPIO 电平属于观察。F407 EXTI provider 将其标记为 COALESCED；该来源无法满足严格 NEC 来源策略。显式 NEC IRQ 观察参考模式保留来源标志，并发布采样/不确定质量。协议反码检查不证明边沿捕获完整性或物理时序。参见[红外来源质量合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable controller face, distinct from every child bank endpoint."
+msgstr "不可变控制器接口，与每个子 Bank 端点区分。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable face; lookup does not acquire, clear or test memory."
+msgstr "不可变接口；查找不取得、清除或测试内存。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable face; lookup never starts clocks or accesses media."
+msgstr "不可变接口；查找不启动时钟或访问介质。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable methods for one exact selected memory bank."
+msgstr "单个精确选定内存 Bank 的不可变方法。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Media geometry remains immutable during one initialized session."
+msgstr "一个已初始化会话内的介质几何保持不可变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No data pointer remains borrowed after return in this synchronous profile. Media/controller uncertainty may independently retain their owner, pins and gates and make stop refuse. No DMA is implied."
+msgstr "在此同步配置中，返回后不保留任何数据指针借用。介质或控制器状态不确定可独立保留其所有者、引脚和时钟门责任，并使停机拒绝。不隐含 DMA 能力。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No preparation, device discovery or bank acquisition is implicit. PREPARED is not physical clock or timing proof."
+msgstr "不隐式准备、发现设备或取得 Bank。PREPARED 不证明物理时钟或时序。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe protocol readiness without replaying a prior failed write."
+msgstr "观察协议就绪状态，不重放先前失败的写入。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe the owner state without asserting physical card presence."
+msgstr "观察所有者状态，不断言物理卡存在。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe the selected bus owner's software phase."
+msgstr "观察所选总线所有者的软件阶段。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe this line's raw electrical level without events."
+msgstr "不消费事件，观察此线路的原始电气电平。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One media session with geometry, explicit activation and whole-block progress"
+msgstr "具有几何、显式激活和完整块进度的单个介质会话"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One readonly method table; callbacks receive the actual bus owner."
+msgstr "单个只读方法表；回调接收实际总线所有者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One settled 16-bit command/data endpoint; no payload survives return"
+msgstr "单个 16 位命令/数据端点；同步返回后不再访问载荷"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One shared external controller; distinct from its child bank endpoints"
+msgstr "单个共享外部控制器；与其子 Bank 端点区分"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Partial device effects can survive a failure. No reset, command replay, worker, DMA or GPIO control is implied."
+msgstr "失败后可能保留部分设备效果。不隐含复位、命令重放、工作线程、DMA 或 GPIO 控制。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Public header"
+msgstr "公共头文件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Query admitted media geometry without starting an operation."
+msgstr "查询已准入的介质几何，不启动操作。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Quiesce a session; a timeout never authorizes clock/pad withdrawal."
+msgstr "使会话静止；超时不授权撤出时钟或引脚。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read one settled data-register word sequence."
+msgstr "读取一段已完成的数据寄存器字序列。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read selected bank geometry without acquiring a loan."
+msgstr "读取选定 Bank 几何，不取得借用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read whole sectors synchronously with a finite absolute deadline."
+msgstr "在有限绝对截止时间内同步读取完整扇区。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Readonly physical geometry, never permission to use bytes."
+msgstr "只读物理几何，不授予字节使用权限。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Release the original loan after all direct users joined."
+msgstr "所有直接使用者汇合后归还原始借用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Return ends CPU buffer access but not uncertain media programming; UNCERTAIN retains controller responsibility. No atomicity, power-loss recovery or durability beyond the selected protocol is promised."
+msgstr "返回结束 CPU 缓冲区访问，但不结束尚未确定的介质编程；UNCERTAIN 保留控制器责任。不承诺原子性、掉电恢复或超出所选协议的持久性。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after complete withdrawal, BUSY while a bank loan remains, or exact error retaining unfinished responsibility"
+msgstr "完整撤出后返回 SUCCESS；Bank 借用仍存在时返回 BUSY，或返回保留未完成责任的精确错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only for count words; failed-prefix bytes outside transferred are unspecified. Parameter rejection preserves transferred and performs no access."
+msgstr "只有完成 count 个字才返回 SUCCESS；transferred 以外失败前缀中的字节未指定。参数拒绝保留 transferred 且不执行访问。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only for count words; provider error may report a shorter prefix. Parameter rejection preserves output."
+msgstr "只有完成 count 个字才返回 SUCCESS；provider 错误可报告较短前缀。参数拒绝保留输出。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or exact stale/foreign/release rejection; failed release retains the original responsibility"
+msgstr "SUCCESS 或精确的过期、外来或归还拒绝；归还失败保留原始责任"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS with exact address/bytes/epoch, or rejection with lease and hardware unchanged"
+msgstr "SUCCESS 并提供精确 address/bytes/epoch；或拒绝且租约与硬件不变"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS with readonly facts, STATE before facts exist, UNSUPPORTED for a missing method or exact provider failure."
+msgstr "SUCCESS 并提供只读事实；事实尚不存在时返回 STATE，缺少方法时返回 UNSUPPORTED，或返回精确 provider 失败。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or UNSUPPORTED. A physical provider can return IO/TIMEOUT after acquiring hardware; its explicit recovery contract then retains ownership and may prohibit further reads until recovery."
+msgstr "SUCCESS；存在借用时返回 BUSY，已关闭时返回 STATE，也可能返回 INVALID、EXHAUSTED 或 UNSUPPORTED。物理 provider 取得硬件后可返回 IO/TIMEOUT；其显式恢复合同随后保留所有权，并可在恢复前禁止继续读取。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, UNSUPPORTED or provider failure"
+msgstr "SUCCESS、INVALID、UNSUPPORTED 或 provider 失败"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Selected identity and boundary"
+msgstr "选定身份与边界"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Send one complete command-register word."
+msgstr "发送一个完整命令寄存器字。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Settled 16-bit command and data endpoint."
+msgstr "同步 16 位命令与数据端点。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared immutable methods for one 16-bit parallel endpoint."
+msgstr "单个 16 位并行端点的共享不可变方法。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared readonly methods for one serialized execution owner."
+msgstr "单个串行执行所有者的共享只读方法。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Software ownership phase; it never proves physical device fitting."
+msgstr "软件所有权阶段，不证明物理器件实装。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Stable exclusive direct-access loan; zero before acquire."
+msgstr "稳定的独占直接访问借用；取得前清零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Stable readonly face; lookup acquires no bus or bank lease."
+msgstr "稳定只读接口；查找不取得总线或 Bank 租约。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Status and confirmed whole-block prefix; current failed block may have changed. REJECTED parameters have zero hardware effects."
+msgstr "状态与已确认的完整块前缀；当前失败块可能已经改变。REJECTED 参数不产生硬件效果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Status and whole blocks confirmed after card programming readiness. A failed current block may already have modified media."
+msgstr "状态与卡编程就绪后确认的完整块。当前失败块可能已修改介质。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success after actual publisher/media withdrawal, or failure with provider cleanup responsibility retained. Platform cold close owns subsequent pad and gate restoration."
+msgstr "实际发布方/介质撤出后成功；失败则保留 provider 清理责任。Platform 冷态关闭负责随后恢复引脚和时钟门。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success after exact card identification and geometry admission; failure retains any unproved controller/session cleanup owner."
+msgstr "精确卡身份和几何准入后成功；失败保留任何尚未证明完成的控制器/会话清理责任。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success only after proved host/media readiness; failure retains uncertainty and never upgrades a prior transfer outcome."
+msgstr "只有证明主机/介质就绪后才成功；失败保留不确定状态，绝不提升先前传输结果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success or INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "Success 或 INVALID、STATE、CONTEXT、UNSUPPORTED。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU access to the supplied buffers; polling is CPU-active, not IRQ/DMA async. SUCCESS requires complete wire drain and CS withdrawal. A provider that cannot withdraw GPIO CS/clock latches its owner fault, rejects further work and retains pin recovery responsibility until explicit recover/stop succeeds; it never retains payload pointers or reports that failure as successful release."
+msgstr "Success、BUSY/INVALID/TIMEOUT/IO。每次返回都结束对所提供缓冲区的 CPU 访问；轮询占用 CPU，不是 IRQ/DMA 异步。SUCCESS 要求完整线端排空与 CS 撤出。无法撤出 GPIO CS/时钟的 provider 锁存所有者故障、拒绝后续工作，并保留引脚恢复责任，直至显式 recover/stop 成功；不保留载荷指针，也不将此失败报告为释放成功。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Synchronous sector I/O with explicit partial progress."
+msgstr "具有显式部分进度的同步扇区 I/O。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "The F407 `sdio-poll` reference requires explicit media activation, uses 512-byte sectors, one- or four-bit width and a maximum 12 MHz card clock. CPU polling releases caller buffers on every synchronous return; unresolved card/controller completion still retains the session, pins and gate. Stop succeeds only after complete withdrawal. DMA, IRQ completion, asynchronous cancellation, connected card-detect and hot-swap are not provided by this selected mode."
+msgstr "F407 `sdio-poll` 参考模式要求显式激活介质，使用 512 字节扇区、1 位或 4 位总线及最高 12 MHz 卡时钟。CPU 轮询在每次同步返回时释放调用方缓冲区访问；尚未确认的卡或控制器完成仍保留会话、引脚和时钟门责任。仅完整撤出后停机才成功。此选定模式不提供 DMA、IRQ 完成、异步取消、已接线的卡检测或热插拔。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "The provider enforces identity and orders prior CPU access before later bank withdrawal. It cannot detect a caller violating the join precondition by reusing a raw pointer."
+msgstr "provider 强制身份匹配，并将先前 CPU 访问排序在随后 Bank 撤出之前。它无法检测调用方通过复用原始指针违反汇合前置条件的行为。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "This performs no memory test or implied initialization. startup_backing never grants an exclusive whole-bank loan."
+msgstr "不执行内存测试或隐式初始化。startup_backing 不授予独占整 Bank 借用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Withdraw selected banks and only the acquired bus effects."
+msgstr "撤出所选 Bank 以及仅已取得的总线效果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Words are native halfwords; the selected physical route fixes command/data addresses and electrical bus timing. Methods use one serialized task executor and one finite absolute clock domain. No span survives a return, including failure. SUCCESS requires the whole requested word prefix."
+msgstr "字是本机半字；所选物理路线固定命令/数据地址和电气总线时序。方法使用单个串行任务执行者和单个有限绝对时钟域。每次返回都不保留任何区间，包括失败。SUCCESS 要求完成请求的全部字前缀。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Write one settled data-register word sequence."
+msgstr "写入一段已完成的数据寄存器字序列。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Write sectors; memory completion alone never proves media ready."
+msgstr "写入扇区；内存访问完成本身不证明介质就绪。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Accessible bytes, at least blocks times block_bytes."
+msgstr "[in] 可访问字节数，至少为 blocks 乘以 block_bytes。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Accessible source bytes, at least the selected extent."
+msgstr "[in] 可访问源字节数，至少覆盖所选范围。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Aligned immutable caller storage until this call returns."
+msgstr "[in] 对齐且不可变的调用方存储，持续有效至本次调用返回。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Aligned immutable span, disjoint from known controls"
+msgstr "[in] 对齐的不可变区间，与已知控制对象分离"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact same bank identity that granted the loan"
+msgstr "[in] 授予借用的完全相同 Bank 身份"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Generation captured on the original acquisition"
+msgstr "[in] 原始取得时捕获的代次"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Initialized exact line; serialized against stop/rebind."
+msgstr "[in] 已初始化的精确线路；与 stop/rebind 串行执行。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Initialized exact media session, serialized by its owner."
+msgstr "[in] 已初始化的精确介质会话，由其所有者串行执行。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Live exact bank under its serialized owner"
+msgstr "[in] 由串行所有者管理的有效精确 Bank"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Live selected bank under one serialized task owner"
+msgstr "[in] 单个串行任务所有者管理的有效选定 Bank"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical sector index, checked before command writes."
+msgstr "[in] 逻辑扇区索引，在命令写入前检查。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical sector index, never a byte address."
+msgstr "[in] 逻辑扇区索引，不是字节地址。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Native command word, not a byte-count address"
+msgstr "[in] 本机命令字，不是按字节计数的地址"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite absolute deadline for the sequence"
+msgstr "[in] 整段序列共用的单个有限绝对截止时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded count accepted by the selected provider."
+msgstr "[in] 所选 provider 接受的正数有界计数。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded count; no erase or product policy."
+msgstr "[in] 正数有界计数；不包含擦除或产品策略。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive selected word count"
+msgstr "[in] 选定的正数字数"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive word count within the selected mode bound"
+msgstr "[in] 所选模式边界内的正数字数"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same exclusive controller owner, storage still alive"
+msgstr "[in] 同一独占控制器所有者，存储仍有效"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same live bank and task executor"
+msgstr "[in] 同一有效 Bank 和任务执行者"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Selected face under the same serialized owner."
+msgstr "[in] 同一串行所有者管理的选定接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable face under the same serialized task executor"
+msgstr "[in] 同一串行任务执行者管理的稳定接口"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable selected face under its serialized owner."
+msgstr "[in] 由串行所有者管理的稳定选定接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero stable disjoint caller storage"
+msgstr "[inout] 新鲜、清零、稳定且分离的调用方存储"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Original stable lease storage, never a copied token"
+msgstr "[inout] 原始稳定租约存储，不能使用复制的令牌"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same initialized media session and serialized owner."
+msgstr "[inout] 同一已初始化介质会话和串行所有者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same owner, live through a refused stop/retry."
+msgstr "[inout] 同一所有者，在停机拒绝和重试期间持续有效。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same serialized Thread owner; no existing live session."
+msgstr "[inout] 同一串行 Thread 所有者；不存在既有有效会话。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Single Thread owner with an admitted writable session."
+msgstr "[inout] 单个 Thread 所有者，具有已准入的可写会话。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Single privileged Thread owner; no ISR or reentrancy."
+msgstr "[inout] 单个特权 Thread 所有者；禁止 ISR 或重入。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Aligned caller storage, disjoint from provider/MMIO."
+msgstr "[out] 对齐的调用方存储，与 provider/MMIO 分离。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Aligned writable storage, disjoint from controls"
+msgstr "[out] 对齐的可写存储，与控制对象分离"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Caller-owned sample, unchanged on error, never retained."
+msgstr "[out] 调用方持有的样本，错误时不变，且不保留引用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Distinct aligned caller output, preserved on input rejection; provider errors may leave it unchanged."
+msgstr "[out] 分离且对齐的调用方输出，输入拒绝时保持不变；provider 错误可能保留其原值。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Distinct exact completed word prefix"
+msgstr "[out] 分离的精确已完成字前缀"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`block.h`"
+msgstr "`block.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`external_bus.h`"
+msgstr "`external_bus.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`memory_window.h`"
+msgstr "`memory_window.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`parallel16.h`"
+msgstr "`parallel16.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "block.h"
+msgstr "block.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "external_bus.h"
+msgstr "external_bus.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "memory_window.h"
+msgstr "memory_window.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "parallel16.h"
+msgstr "parallel16.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "startup_backing marks memory with live startup objects. A whole-bank runtime loan is unsupported for that profile. Geometry does not authorize DMA, probing or allocation."
+msgstr "startup_backing 标识具有有效启动对象的内存。此配置不支持整 Bank 运行时借用。几何不授权 DMA、探测或分配。"
