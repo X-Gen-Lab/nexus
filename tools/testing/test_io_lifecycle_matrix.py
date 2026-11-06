@@ -231,8 +231,9 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
-    def shared_ip_driver(self, owner, *, alias=False):
-        source = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.c"
+    def shared_ip_driver(self, owner, *, alias=False,
+                         source_name="drivers/i2c/i2c_v1_async/i2c_v1_async.c"):
+        source = self.root / source_name
         source.parent.mkdir(parents=True)
         self.production.rename(source)
         name = source.relative_to(self.root).as_posix()
@@ -267,6 +268,38 @@ class IOLifecycleMatrixTests(unittest.TestCase):
 
     def test_shared_ip_driver_alias_cannot_borrow_the_native_owner(self):
         self.shared_ip_driver("nexus_io_native", alias=True)
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def assert_reviewed_shared_engine(self, source, owner):
+        self.shared_ip_driver(owner, source_name=source)
+        matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+        self.write_execution()
+        self.assertEqual(self.run_audit()["properties"][0]["status"],
+                         "executed-bounded")
+
+    def test_classic_can_shared_engine_keeps_its_reviewed_native_owner(self):
+        self.assert_reviewed_shared_engine(
+            "drivers/can/classic_can/can_controller.c", "nexus_can_native_engine")
+
+    def test_fs_usb_shared_engine_keeps_its_reviewed_native_owner(self):
+        self.assert_reviewed_shared_engine(
+            "drivers/usb/fs_device_pio/usb_device_controller.c",
+            "nexus_usb_native_engine")
+
+    def test_legacy_mac_shared_engine_keeps_its_reviewed_native_owner(self):
+        self.assert_reviewed_shared_engine(
+            "drivers/ethernet/legacy_mac/eth_mac.c", "nexus_eth_native_engine")
+
+    def test_reviewed_engine_cannot_borrow_a_different_shared_owner(self):
+        self.shared_ip_driver(
+            "nexus_usb_native_engine",
+            source_name="drivers/can/classic_can/can_controller.c")
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_unknown_ip_cannot_borrow_a_reviewed_shared_engine_owner(self):
+        self.shared_ip_driver("nexus_can_native_engine")
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 

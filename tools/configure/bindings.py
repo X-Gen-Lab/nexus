@@ -72,6 +72,8 @@ def emit(result):
                '/** \\brief Startup-only; no scheduler or product worker is created.',
                ' * \\return Primary/cleanup errors and retained effects. On error',
                ' * all ports remain unusable; preserve contexts until cleanup.',
+               ' * Unprovable cold rollback may mask IRQs and enter the platform',
+               ' * fault observer, then park; it never returns an ownerless error.',
                ' */', 'nx_platform_start_result_t nx_platform_start(void);',
                '/** \\brief Stop after direct writers/IRQ consumers quiesce.',
                ' * \\return SUCCESS after drain and release. BUSY or IO retains',
@@ -166,6 +168,8 @@ def emit(result):
                 construction = pwm_shared.constructor(owner)
                 source.append(f'static {construction.state_type} {physical};')
                 source.extend(construction.definitions)
+                for sequence in construction.initialize_sequences:
+                    source.extend(sequence.render())
                 admission.extend((selection_index, call.render())
                                  for call in construction.admission)
                 initialize.append(construction.initialize.render())
@@ -188,6 +192,8 @@ def emit(result):
         source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
+        for sequence in construction.initialize_sequences:
+            source.extend(sequence.render())
         admission.extend((selection_index, call.render())
                          for call in construction.admission)
         header.extend(construction.exports)

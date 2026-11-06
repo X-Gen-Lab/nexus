@@ -27,51 +27,7 @@ enum {
     CAN_FILTER0 = 0x240U
 };
 #define CAN_IRQ_MASK 0x00008F7FU
-#ifndef NX_CAN_IRQ_PRIORITY
-#define NX_CAN_IRQ_PRIORITY(controller, vector)                                \
-    ((uint8_t)(*(volatile uint8_t*)(UINT32_C(0xE000E400) +                     \
-                                    (uint16_t)(controller)                     \
-                                        ->sources[(vector)]                    \
-                                        .irq_number) >>                        \
-               (8U - (controller)->irq_policy.priority_bits)))
-#endif
-#ifndef NX_CAN_IRQ_GROUP
-#define NX_CAN_IRQ_GROUP(controller)                                           \
-    ((uint8_t)((*(volatile uint32_t*)UINT32_C(0xE000ED0C) >> 8U) & 7U))
-#endif
-#ifndef NX_CAN_IRQ_CONFIGURE
-#define NX_CAN_IRQ_CONFIGURE(controller, vector)                               \
-    (*(volatile uint8_t*)(UINT32_C(0xE000E400) + (uint16_t)(controller)        \
-                                                     ->sources[(vector)]       \
-                                                     .irq_number) =            \
-         (uint8_t)((controller)->sources[(vector)].priority                    \
-                   << (8U - (controller)->irq_policy.priority_bits)))
-#endif
-#ifndef NX_CAN_IRQ_SET
-/** \brief Write the exact selected NVIC bit and clear its pending fact. */
-static void irq_set(nx_can_controller_t* controller, unsigned vector,
-                    bool enabled) {
-    unsigned irq = (unsigned)controller->sources[vector].irq_number;
-    uintptr_t offset = (uintptr_t)(irq / 32U) * 4U;
-    *(volatile uint32_t*)(UINT32_C(0xE000E280) + offset) = 1U << (irq % 32U);
-    *(volatile uint32_t*)((enabled ? UINT32_C(0xE000E100)
-                                   : UINT32_C(0xE000E180)) +
-                          offset) = 1U << (irq % 32U);
-}
-#define NX_CAN_IRQ_SET(controller, vector, enabled)                            \
-    irq_set((controller), (vector), (enabled))
-#endif
-#ifndef NX_CAN_IRQ_ENABLED
-#define NX_CAN_IRQ_ENABLED(controller, vector)                                 \
-    ((*(volatile uint32_t*)(UINT32_C(0xE000E100) +                             \
-                            (uintptr_t)((uint16_t)(controller)                 \
-                                            ->sources[(vector)]                \
-                                            .irq_number /                      \
-                                        32U) *                                 \
-                                4U) &                                          \
-      (1U << ((uint16_t)(controller)->sources[(vector)].irq_number % 32U))) != \
-     0U)
-#endif
+#include "cortex_m_port.h"
 
 /** \brief Task controls must not rely on masked or unprivileged progress. */
 static bool task_context(void) {
@@ -644,7 +600,15 @@ static nx_result_t submit(void* context, nx_can_tx_request_t* request) {
     }
     unsigned mailbox = 3U;
     uint32_t status = NX_CAN_READ(controller->registers, CAN_TX_STATUS);
-    for (unsigned i = 0; i < 3U; ++i) {
+    /* Some reviewed silicon cannot transmit the maximum extended identifier
+     * from mailboxes 1/2. Busy mailbox0 rejects without borrowing or rerouting.
+     */
+    unsigned mailbox_count = controller->max_extended_id_mailbox0 &&
+                                     request->frame.format == NX_CAN_EXTENDED &&
+                                     request->frame.id == UINT32_C(0x1FFFFFFF)
+                                 ? 1U
+                                 : 3U;
+    for (unsigned i = 0; i < mailbox_count; ++i) {
         if (controller->slots[i].request == NULL &&
             (status & (1U << (26U + i))) != 0U &&
             (status & (1U << (i * 8U))) == 0U) {

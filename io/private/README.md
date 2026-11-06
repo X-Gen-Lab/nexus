@@ -1,20 +1,20 @@
-# Private controller engines
+# Private I/O mechanisms
 
 These headers and implementation templates are private contracts between typed
 I/O mechanisms and selected SoC providers. They never enter a product's public
 include path. Public faces contain immutable operations and an instance context;
 mutable state and vendor register types remain private.
 
-The shared CAN, USB FS device, raw Ethernet and timer engines implement the
-maintained controller ownership protocol. A SoC wrapper supplies exact register
-and clock facts, IRQ/DMA bindings and checked silicon semantics. Textual provider
-templates bind direct operations macros to concrete readonly tables; they do not
-create a runtime mode registry or a forwarding layer.
+Reviewed CAN, USB FS device, Ethernet, timer, FIFO and pin-state hardware
+implementations live in `drivers/<kind>/<reviewed-ip>/`. A SoC wrapper supplies
+exact register and clock facts, IRQ/DMA bindings and checked silicon semantics.
+Private build-time header dependencies do not select sources or add runtime
+dispatch. The selected SoC CMake target still owns every compiled engine.
 
-Use `drivers/` for a reviewed shared register algorithm such as I2C V1. `io/src/api/` owns public checked dispatch, `io/src/mechanisms/` owns reusable
-I/O rules, and `io/src/controllers/` owns shared controller engines. Use this
-directory for private structures, external hardware boundaries or direct provider
-templates. Native models live in `soc/native/drivers/`; MCU wrappers live under
+`io/src/api/` owns public checked dispatch and `io/src/mechanisms/` owns reusable
+I/O rules. This directory keeps hardware-independent validation, sequence-owner
+identity and bounded calendar arithmetic. Native models live in
+`soc/native/drivers/`; MCU wrappers live under
 `soc/<vendor>/<family>/drivers/`. Identical names do not establish identical
 hardware semantics.
 

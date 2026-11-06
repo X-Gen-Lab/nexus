@@ -78,16 +78,16 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         list(APPEND gd_sdk_units fwdgt)
     elseif(kind STREQUAL "eth")
         list(APPEND gd_sources
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/eth_mac.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../drivers/ethernet/legacy_mac/eth_mac.c")
     elseif(kind STREQUAL "eth_frames")
         list(APPEND gd_sources
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/eth_frames_mac.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../drivers/ethernet/legacy_mac/eth_frames_mac.c")
     elseif(kind STREQUAL "usb_device")
         list(APPEND gd_sources usb_clock.c
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/usb_device_controller.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../drivers/usb/fs_device_pio/usb_device_controller.c")
     elseif(kind STREQUAL "can")
         list(APPEND gd_sources drivers/can_layout.c
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/src/controllers/can_controller.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../drivers/can/classic_can/can_controller.c")
     elseif(kind STREQUAL "adc")
         list(APPEND gd_sdk_units adc)
         if("trigger-dma" IN_LIST modes
@@ -121,6 +121,7 @@ target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../common"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/private")
+target_link_libraries(nexus_soc_gd32f470 PRIVATE Nexus::DriverPrivateHeaders)
 target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
     "${gd_device}/Include"
     "${gd_peripheral}/Include"

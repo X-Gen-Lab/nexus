@@ -6,13 +6,28 @@ contracts. The [derived capability matrix](../docs/delivery/capabilities.md)
 identifies actual provider modes and reviewed routes. An interface header alone
 does not provide every operation on every chip or authorize PCB wiring.
 
+Physical Platform builds compile the selected controller domains and authored
+component dependencies from the CMake source contracts. Timestamp and diagnostic
+helpers remain available even for an empty assembly. Native models and CPU-only
+Runtime retain the complete public contract for caller-defined providers. Public
+headers remain available in every profile; unselected physical device operations
+do not become a second implicit provider. Compilation selection and final ELF
+garbage collection are measured separately.
+
+Public component targets declare their own I/O domain dependencies. For example,
+`Nexus::TMP117I2C` links `Nexus::IOI2C`, so an external owner may supply an endpoint
+without inventing a physical controller in the assembly. Domain archives are
+excluded until selected or linked, and shared mechanisms compile once. Optional
+targets can still appear in `compile_commands.json`; selected Ninja command
+closures and fresh builds establish which sources actually compile.
+
 | Source group | Responsibility |
 | --- | --- |
 | `include/nexus/io/` | Stable public Nexus types and operation/ownership contracts |
 | `src/api/` | Checked dispatch through the selected immutable face |
 | `src/mechanisms/` | Shared stream, DMA drain, wake, transaction and observation rules |
-| `src/controllers/` | Shared CAN, USB and Ethernet controller engines selected by SoC targets |
-| `private/` | Private engine structures, hardware boundaries and direct provider templates |
+| `private/` | Hardware-independent validation, sequence identity and calendar helpers |
+| `../drivers/` | Reviewed hardware IP engines and templates selected by SoC targets |
 | `../soc/native/drivers/` | Independent host models implementing the same public faces |
 | `../soc/<vendor>/<family>/drivers/` | Exact MCU provider and mode implementations |
 

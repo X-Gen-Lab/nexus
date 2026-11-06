@@ -117,7 +117,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         directory = "cmake/package/verification/io_evolution/"
         required = {
             "io/include/nexus/io/pin_state.h", "io/src/api/pin_state.c",
-            "io/private/pin_state_impl.h", "tools/configure/pin_states.py",
+            "drivers/gpio/owned_pin_state/pin_state_impl.h", "tools/configure/pin_states.py",
             "soc/stm32/stm32g474/drivers/pin_state.c",
             "soc/stm32/stm32g474/private/stm32g474_pin_state.h",
             canonical, directory + "boards/g474-pin-states/board.json",

@@ -6,7 +6,7 @@ faces and shared operation tables. Neither source-line counts nor selected
 controller counts establish linked cost.
 
 Shared operation tables remain identifiable after source grouping under
-`io/src/controllers/` and `io/src/mechanisms/`. The audit derives exact symbols
+`drivers/` and `io/src/mechanisms/`. The audit derives exact symbols
 from maintained source initializers and checks their actual loaded readonly ELF
 storage separately from instance faces. Vendor or similarly named tables do
 not become accepted interfaces merely through a name prefix.
@@ -15,7 +15,7 @@ not become accepted interfaces merely through a name prefix.
 RAM、MSP 与 heap。`interfaces.py` 单独检查只读接口对象和共享操作表。源码行数或
 选中控制器的数量不能证明最终镜像成本。
 
-共享操作表移动到 `io/src/controllers/` 或 `io/src/mechanisms/` 后仍须正确计量。
+共享操作表移动到 `drivers/` 或 `io/src/mechanisms/` 后仍须正确计量。
 审计从维护源码的真实初始化器获得精确符号，检查 ELF 中实际加载的只读存储，
 与各实例接口分别计量。厂商目录或任意相似名称的表不会仅凭前缀被认定为公共接口。
 

@@ -27,6 +27,12 @@ SDK walk 均实际通过，私有原件保持私有。E 已正常 nonforce push 
 文档或 QA 提交转移。下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在
 原交付台账。
 
+Drivers／I/O／SoC 的后续实现、勘误修复、目录归属、构建依赖和定向验证，统一从
+[本轮记录](platform-delivery-completion-results.json)中的
+`source_version_records_20261105.drivers_io_soc_20261105` 进入。各项结果只覆盖记录的
+源码、配置和实际执行范围；该记录不继承 P2 候选资格。实板项目与需要另选硬件目标的
+扩展分别保留条件，物理 HIL 仍为 `not_executed`。
+
 文档系统的后续整理见 [架构与交付规划](../design/documentation-system.md)。
 对应文档工具、正文和图册已实现，实际文档验收与固件资格分别记录；当前资料总入口为
 [文档入口](../README.md)。

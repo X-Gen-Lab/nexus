@@ -10,8 +10,11 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus/io/frame_stream.h"
 }
+#include <array>
+#include <chrono>
 #include <cstring>
 #include <gtest/gtest.h>
+#include <string>
 
 namespace {
 nx_frame_audio_format_t pcm() {
@@ -483,5 +486,64 @@ TEST(FrameBinding, IndependentInstancesHaveIndependentPayloadAndUnderruns) {
     nx_dma_drain_facts_t proof = {8U, 0U, true, true, true};
     EXPECT_EQ(nx_frame_dma_release(&af, &bl, &proof), NX_ERROR_STATE);
     EXPECT_EQ(nx_frame_dma_release(&bf, &bl, &proof), NX_SUCCESS);
+}
+
+TEST(FrameStreamCost, ReportsSuccessfulHostWorkAcrossPoolSizes) {
+    constexpr size_t rounds = 128U;
+    RecordProperty("timing_scope", "host acquire/view/drain-release");
+    RecordProperty("physical_timing", "not_measured");
+    RecordProperty("clock_overhead", "included_uncalibrated");
+    RecordProperty("rounds", static_cast<int>(rounds));
+    for (size_t count : {3U, 8U, 32U}) {
+        std::array<std::array<uint8_t, 64>, 32> storage{};
+        std::array<nx_stream_slot_t, 32> slots{};
+        for (size_t i = 0U; i < count; ++i) {
+            slots[i].data = storage[i].data();
+            slots[i].capacity = storage[i].size();
+        }
+        nx_stream_t stream{};
+        ASSERT_EQ(nx_stream_initialize(&stream, slots.data(), count),
+                  NX_SUCCESS);
+        const nx_frame_plane_t plane{0U, 8U, 8U, 8U};
+        nx_frame_layout_t layout{};
+        ASSERT_EQ(nx_frame_layout_planar(&plane, 1U, &layout), NX_SUCCESS);
+        nx_frame_stream_t framed{};
+        ASSERT_EQ(nx_frame_stream_initialize(&framed, &stream, &layout),
+                  NX_SUCCESS);
+        const nx_dma_drain_facts_t drain{64U, 0U, true, true, true};
+        std::chrono::nanoseconds elapsed{};
+        size_t completed = 0U;
+        for (size_t round = 0U; round < rounds; ++round) {
+            for (size_t i = 0U; i < count; ++i) {
+                nx_stream_fill_t fill{};
+                ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+                ASSERT_EQ(nx_frame_stream_publish(&framed, &fill, 0U),
+                          NX_SUCCESS);
+            }
+            const auto before = std::chrono::steady_clock::now();
+            for (size_t i = 0U; i < count; ++i) {
+                nx_frame_dma_loan_t loan{};
+                nx_frame_dma_view_t view{};
+                if (nx_frame_stream_acquire(&framed, &loan) != NX_SUCCESS ||
+                    nx_frame_dma_view(&loan, 0U, 0U, 0U, 8U, 8U, &view) !=
+                        NX_SUCCESS ||
+                    view.data != storage[i].data() ||
+                    nx_frame_dma_release(&framed, &loan, &drain) != NX_SUCCESS)
+                    break;
+                ++completed;
+            }
+            elapsed += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - before);
+            ASSERT_EQ(completed, (round + 1U) * count);
+            ASSERT_EQ(stream.outstanding, 0U);
+        }
+        const std::string suffix = std::to_string(count);
+        RecordProperty("pool_blocks_" + suffix, static_cast<int>(count));
+        RecordProperty("successful_frames_" + suffix,
+                       static_cast<int>(completed));
+        RecordProperty("host_nanoseconds_" + suffix,
+                       std::to_string(elapsed.count()));
+        ASSERT_EQ(nx_stream_stop(&stream), NX_SUCCESS);
+    }
 }
 } /* namespace */

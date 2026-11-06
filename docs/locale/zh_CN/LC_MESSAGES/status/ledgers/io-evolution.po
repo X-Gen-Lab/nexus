@@ -7,21 +7,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2cd9b171dbb489eaff86150f68813ddf78f2a90f25347999cebee628134d661b\n"
+"X-Nexus-Source-SHA256: 3091004ba049e7d1e5823ec29d4f36bb516d51b393206c2680e110b13978772d\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
 msgstr "I/O 增量实施台账"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:11
-msgid ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
-"execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。"
-msgstr ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
-"execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。"
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`7c7e3c5464f4560fa92d4926ce5a7520e2171a6ba78d208e6c0d0285ef260d25`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`7c7e3c5464f4560fa92d4926ce5a7520e2171a6ba78d208e6c0d0285ef260d25`。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:15
 msgid ""
@@ -429,13 +422,8 @@ msgstr "IO-15"
 msgid "Bounded FIFO IRQ service and concurrent stream load"
 msgstr "有界 FIFO IRQ service 与并发 stream 负载"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
-"fifo.md"
-msgstr ""
-"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
-"fifo.md"
+msgid "drivers/uart/usart_fifo/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md"
+msgstr "drivers/uart/usart_fifo/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Bounded batch and IRQ latency observations on exact providers"
@@ -575,13 +563,8 @@ msgstr "timestamps"
 msgid "Timestamp source domain epoch frequency and uncertainty"
 msgstr "时间戳来源、domain、epoch、频率与不确定度"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
-"frames.md"
-msgstr ""
-"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
-"frames.md"
+msgid "io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;drivers/ethernet/legacy_mac/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md"
+msgstr "io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;drivers/ethernet/legacy_mac/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
@@ -671,11 +654,8 @@ msgstr "providers"
 msgid "Reuse reviewed peripheral IP generations and official HAL/LL"
 msgstr "复用受审外设 IP 代际及官方 HAL/LL"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
-msgstr ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
+msgid "soc/common;drivers/uart/usart_fifo/uart_fifo_impl.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;tools/configure/selected_contracts.py"
+msgstr "soc/common;drivers/uart/usart_fifo/uart_fifo_impl.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;tools/configure/selected_contracts.py"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Private implementation sharing with exact per-family facts"
@@ -904,13 +884,8 @@ msgstr "ethernet"
 msgid "VLAN scatter gather frame loans and hardware timestamps"
 msgstr "VLAN、SG frame loan 与硬件时间戳"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
-"frames.md"
-msgstr ""
-"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
-"frames.md"
+msgid "io/include/nexus/io/ethernet_frames.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md"
+msgstr "io/include/nexus/io/ethernet_frames.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Actual hardware descriptor ownership and truthful global abort"
@@ -929,11 +904,8 @@ msgstr "usb"
 msgid "Optional class adapters and exact PHY endpoint capabilities"
 msgstr "可选 class adapter 与精确 PHY/endpoint 能力"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
-msgstr ""
-"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
+msgid "drivers/usb/fs_device_pio/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
+msgstr "drivers/usb/fs_device_pio/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Control reset ACK ZLP and device mode before additional USB modes"

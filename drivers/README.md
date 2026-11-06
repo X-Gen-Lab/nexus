@@ -15,6 +15,22 @@ registry, allocation, queue or worker.
 | `adc/legacy_adc/` | Legacy single-shot ADC |
 | `timer/legacy_pwm/` | Legacy fixed PWM |
 | `flash/legacy_flash/` | Legacy halfword Flash programming |
+| `can/classic_can/` | Reviewed classic mailboxes and shared filter domain |
+| `usb/fs_device_pio/` | Reviewed FS device PIO endpoint and FIFO sequencing |
+| `ethernet/legacy_mac/` | Normal and selected enhanced chained descriptors |
+| `timer/advanced_timer/` | Capture and complementary PWM/break templates |
+| `uart/usart_fifo/` | Bounded byte FIFO and selected RTS/CTS templates |
+| `gpio/owned_pin_state/` | Owned-mask two-state GPIO transitions |
+
+`Nexus::DriverPrivateHeaders` supplies only private build-time include paths.
+Consumers link it privately; it contains no firmware source, object or state.
+The exact SoC target remains the sole source selector. Public checked dispatch,
+frame validation, sequence ownership and calendar arithmetic remain in `io/`.
+The classic CAN `cortex_m_port.h` keeps its byte-priority and word-NVIC accesses
+private. Native models override the same macros before inclusion; the extraction
+does not add a public Arch interface or change interrupt ordering.
+H743 and U575 share the four-byte immutable `uart_fifo_profile.h` value layout.
+SoC aliases retain their exact entry-point types without another runtime link.
 
 The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303.
 The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair

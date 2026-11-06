@@ -69,7 +69,7 @@ function(nexus_add_mcuboot_control)
         "${component}/src/flash_map_backend.c")
     nexus_apply_target_policy(nexus_mcuboot_flash)
     target_include_directories(nexus_mcuboot_flash PUBLIC "${component}/port")
-    target_link_libraries(nexus_mcuboot_flash PUBLIC Nexus::IO
+    target_link_libraries(nexus_mcuboot_flash PUBLIC Nexus::IOFlash
         PRIVATE nexus_build_options nexus_owned_warnings)
     add_library(nexus_mcuboot_port INTERFACE)
     target_link_libraries(nexus_mcuboot_port INTERFACE nexus_mcuboot_flash)

@@ -20,9 +20,10 @@ OPERATIONS = {"normal": "NX_CAN_NORMAL", "loopback": "NX_CAN_LOOPBACK",
 
 @dataclass(frozen=True)
 class CanPolicy:
-    """Exact status-vector spelling for the reviewed CAN domain."""
+    """Exact vector spelling and reviewed transmit ordering for one provider."""
 
     error_suffix: str
+    fifo_order_supported: bool = True
 
 
 def _integration(result, prefix):
@@ -77,6 +78,8 @@ def validate_selection(selection, provider, ram_size):
     integer(selection["poll_limit"], 1, context="CAN cold poll limit")
     if type(selection["fifo_order"]) is not bool:
         fail("CAN fifo_order must be boolean")
+    if selection["fifo_order"] and not provider.CAN_INTEGRATION.fifo_order_supported:
+        fail("CAN fifo_order is unsupported by this exact provider")
     timing = selection["timing"]
     fields(timing, TIMING_FIELDS, "timing")
     prescaler = integer(timing["prescaler"], 1, 1024, "CAN prescaler")

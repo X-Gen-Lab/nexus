@@ -46,6 +46,10 @@ nx_gd32_can_prepare(nx_can_controller_t* port,
         config->pins == NULL || config->capacity == 0U || config->index > 1U ||
         config->priority > 15U)
         return NX_ERROR_INVALID;
+    /* Rev1.6 2.13.1 forbids this mode before any pin, clock or domain effect.
+     */
+    if (config->fifo_order)
+        return NX_ERROR_UNSUPPORTED;
     if (port->snapshot.started || port->publishers != 0U || *pin_leases != 0U)
         return NX_ERROR_BUSY;
     for (size_t i = 0U; i < 3U; ++i) {

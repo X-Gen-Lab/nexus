@@ -28,7 +28,7 @@ foreach(eth_frames_family stm32 gd32)
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/gpio.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/ethernet_frames.c"
-            "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
+            "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_frames_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}"

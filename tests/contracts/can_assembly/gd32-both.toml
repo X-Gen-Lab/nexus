@@ -20,7 +20,7 @@ event_capacity=8
 bitrate=500000
 drain_timeout_us=1000
 poll_limit=128
-fifo_order=true
+fifo_order=false
 timing={prescaler=5,segment1=16,segment2=3,sjw=2}
 [can.bus0.irq]
 priority=5
@@ -33,7 +33,7 @@ event_capacity=8
 bitrate=500000
 drain_timeout_us=1000
 poll_limit=128
-fifo_order=true
+fifo_order=false
 timing={prescaler=5,segment1=16,segment2=3,sjw=2}
 [can.bus1.irq]
 priority=5

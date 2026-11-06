@@ -65,6 +65,7 @@ if(f1_adc)
     list(APPEND f1_sources
         "${NEXUS_SOURCE_DIR}/drivers/adc/legacy_adc/legacy_adc.c")
 endif()
+
 if(f1_pwm)
     list(APPEND f1_sources
         "${NEXUS_SOURCE_DIR}/drivers/timer/legacy_pwm/legacy_pwm.c")
@@ -102,3 +103,8 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
 set(NEXUS_SYSTEM_VENDOR_INCLUDES
     "${f1_device}/Include" "${f1_core}" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32F103xB PARENT_SCOPE)
+
+# The selected SPI provider dispatches its owned CS through the GPIO API.
+if(f1_spi)
+    target_link_libraries(nexus_soc_stm32f103 PRIVATE Nexus::IOGPIO)
+endif()

@@ -61,6 +61,40 @@ class TDDToolPreflightTests(unittest.TestCase):
                          ["testing", "configure", "ci", "workflows"])
         self.assertFalse(any("candidate" in command for command in commands))
 
+    def test_compiled_io_provenance_precedes_complete_tool_suites(self):
+        events = []
+
+        def preflight(*arguments, **keywords):
+            events.append("compiled-provenance")
+            return self.fixture.preflight(*arguments, **keywords)
+
+        def execute(command, environment, log):
+            if "--suite" in command:
+                events.append("tool-suite")
+            return self.fixture.execute(command, environment, log)
+
+        status, output, _, _ = self.fixture.run_gate(
+            preflight=preflight, execute=execute)
+        self.assertEqual(status, 0, output)
+        self.assertEqual(events, ["compiled-provenance"] + ["tool-suite"] * 4)
+
+    def test_compiled_io_provenance_failure_stops_before_tool_suites(self):
+        commands = []
+
+        def execute(command, environment, log):
+            commands.append(command)
+            return self.fixture.execute(command, environment, log)
+
+        status, output, capture, audit = self.fixture.run_gate(
+            preflight=ValueError("provider compiled for another target"),
+            execute=execute)
+        self.assertEqual(status, 1, output)
+        self.assertIn("provider compiled for another target", output)
+        self.assertFalse(any("--suite" in command for command in commands))
+        capture.assert_not_called()
+        audit.assert_not_called()
+        self.assertFalse((self.fixture.build / "tdd/execution.json").exists())
+
     def assert_failed_compile_preflight(self, action):
         commands = []
         directory = self.fixture.build / "tdd"

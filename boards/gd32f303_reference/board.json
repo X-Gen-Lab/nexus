@@ -81,7 +81,8 @@
     "No specific PCB, connector, LED or debugger wiring is asserted.",
     "No physical HIL executed; IRC8 tolerance and UART electrical behavior unqualified.",
     "External oscillators, supply, boot straps, reset and pull resistors require external Board evidence.",
-    "Exact GPIOA PA4/PA5, USART0 IRQ-byte, SPI0 finitepoll+PA4CS and internal FWDGT software mechanisms only; other controllers/modes unsupported.",
+    "Only the exact controllers, routes and modes declared in GD32F303RCT6 soc.json are maintained; GPIO, UART IRQ or finite channel DMA, SPI polling, I2C IRQ, ADC, PWM, Flash, EXTI and FWDGT remain software references, not PCB qualification.",
+    "Bindings sharing PA0, PA5 or PA6 are alternatives; the resolver rejects conflicting selected instances instead of claiming simultaneous Board access.",
     "PB6/PB7 I2C is a bare-silicon software route; external pullups, voltage, bus capacitance and endpoint wiring have not been inspected.",
     "PA0 ADC and PA6 PWM are package software references; analog reference, decoupling, external loads and actual routes remain uninspected. Flash writes require valid2.7..3.6V and an explicit external region; no product reservation."
   ],

@@ -108,6 +108,8 @@ if(g4_sources)
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2"
         "${NEXUS_SOURCE_DIR}/soc/stm32/common"
         "${NEXUS_SOURCE_DIR}/io/private")
+    target_link_libraries(nexus_soc_stm32g474 PRIVATE
+        Nexus::DriverPrivateHeaders)
     if(g4_adc_modes OR g4_pwm_adc_modes OR g4_can_fd_modes OR
             g4_adc_group_modes OR g4_i2c_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
@@ -143,3 +145,8 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${g4_binding_private} PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${g4_device}/Include" "${g4_cmsis}"
     PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32G474xx PARENT_SCOPE)
+
+# The selected SPI provider dispatches its owned CS through the GPIO API.
+if(g4_spi_modes)
+    target_link_libraries(nexus_soc_stm32g474 PRIVATE Nexus::IOGPIO)
+endif()

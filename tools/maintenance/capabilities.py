@@ -93,7 +93,8 @@ def os_selection(typed, data):
         "runtime_stack_peak": "not_measured", "restrictions": restrictions}
 
 
-def selection(assembly, root=ROOT, *, candidate_path=None):
+def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
+              record_pointer=None):
     """Describe one validated selection; execution has a separate authority.
 
     Family declarations cannot establish a selected Board/backend/clock tuple.
@@ -105,9 +106,12 @@ def selection(assembly, root=ROOT, *, candidate_path=None):
     from tools.configure.resource_graph import json_value
     from tools.evidence import identity
 
+    if (results_index is None) != (record_pointer is None):
+        raise ValueError("results index and record pointer must be supplied together")
     root = Path(root).resolve()
+    associate = candidate_path is not None or results_index is not None
     source = (identity.observe_git_source(root)
-              if candidate_path is not None else None)
+              if associate else None)
     typed = configure.resolve_ir(Path(assembly), root)
     data = typed.to_dict()
     contracts = selected_contracts.for_configuration(typed)
@@ -165,10 +169,97 @@ def selection(assembly, root=ROOT, *, candidate_path=None):
                               if item != "Physical qualification not executed"]]}
     if candidate_path is not None:
         _associate_candidate(result, data, source, Path(candidate_path))
+    if results_index is not None:
+        _associate_index(result, data, source, Path(results_index), record_pointer)
+    if associate:
         if identity.observe_git_source(root) != source:
             from tools.evidence.common import EvidenceError
             raise EvidenceError("source changed during support query")
     return result
+
+
+def _index_record(document, pointer):
+    """Select one explicit RFC6901 record without inheriting ancestor claims."""
+    from tools.evidence.common import EvidenceError
+
+    if (not isinstance(pointer, str) or len(pointer) > 2048 or
+            (pointer and not pointer.startswith("/")) or
+            pointer.count("/") > 32):
+        raise EvidenceError("bounded JSON record pointer required")
+    value = document
+    for part in pointer.split("/")[1:] if pointer else ():
+        if re.search(r"~(?![01])", part):
+            raise EvidenceError("invalid JSON record pointer escape")
+        key = part.replace("~1", "/").replace("~0", "~")
+        if isinstance(value, dict) and key in value:
+            value = value[key]
+        elif (isinstance(value, list) and re.fullmatch(r"0|[1-9][0-9]*", key)
+              and len(key) <= 8 and int(key) < len(value)):
+            value = value[int(key)]
+        else:
+            raise EvidenceError("JSON record pointer does not select an existing record")
+    if not isinstance(value, dict):
+        raise EvidenceError("JSON record pointer must select an object")
+    return value
+
+
+def _associate_index(result, resolved, source, path, pointer):
+    """Expose an existing result record, never reinterpret it as raw execution."""
+    from tools.evidence.common import (EvidenceError, file_identity, load_json,
+                                       regular_file, sha256_value)
+
+    if regular_file(path).stat().st_size > 4 * 1024 * 1024:
+        raise EvidenceError("JSON document exceeds its bounded input size")
+    index = file_identity(path)
+    record = _index_record(load_json(path), pointer)
+    reference = record.get("source", {})
+    if not isinstance(reference, dict):
+        raise EvidenceError("indexed source identity must be an object")
+    for key in ("commit", "tree"):
+        if key in reference and (not isinstance(reference[key], str) or
+                re.fullmatch(r"[0-9a-f]{40}", reference[key]) is None):
+            raise EvidenceError("indexed source requires exact Git object identities")
+    if "dirty" in reference and type(reference["dirty"]) is not bool:
+        raise EvidenceError("indexed source dirty state must be boolean")
+    if "submodules" in reference and (not isinstance(reference["submodules"], list) or
+            any(not isinstance(item, str) for item in reference["submodules"])):
+        raise EvidenceError("indexed source dependencies must be explicit Git observations")
+    source_keys = ("commit", "tree", "dirty", "submodules")
+    complete = all(key in reference for key in source_keys)
+    code_match = all(reference.get(key) == source[key] for key in ("commit", "tree"))
+    source_match = (complete and source["dirty"] is False and
+                    reference["dirty"] is False and
+                    all(item.startswith(" ") for item in source["submodules"]) and
+                    all(source[key] == reference[key] for key in source_keys))
+    projection = record.get("resolved")
+    if projection is not None and not isinstance(projection, dict):
+        raise EvidenceError("indexed resolved configuration must be an object")
+    digest = record.get("configuration_sha256")
+    if digest is None and projection is not None:
+        digest = projection.get("configuration_sha256")
+    if digest is not None:
+        sha256_value(digest)
+    config_match = (digest == resolved["configuration_sha256"] and
+                    (projection is None or projection == resolved))
+    config_relation = ("not_recorded" if digest is None else
+                       "mismatch" if not config_match else
+                       "exact_resolved" if projection is not None else "exact_digest")
+    relation = ("configuration_mismatch" if config_relation == "mismatch" else
+                "insufficient_identity" if not complete or digest is None else
+                "exact_source_and_configuration" if source_match else "historical_source")
+    if file_identity(path) != index:
+        raise EvidenceError("results index changed during support query")
+    result["current_source"] = source
+    result["indexed_evidence"] = {
+        "index": index, "record_pointer": pointer, "record": record,
+        "relation": relation, "source_match": source_match,
+        "code_identity_match": code_match, "configuration_match": config_match,
+        "configuration_relation": config_relation,
+        "verification": "indexed_observation_only"}
+    result["limitations"].append(
+        "Indexed observations expose their recorded identity and scope only; "
+        "raw execution receipts are not verified and validation status is unchanged. "
+        "Missing source or configuration identity is never inherited from ancestors.")
 
 
 def _associate_candidate(result, resolved, source, candidate_path):
@@ -390,14 +481,25 @@ def main(arguments=None):
     parser.add_argument("--candidate", type=Path,
                         help="verify and associate an existing sealed "
                              "candidate.json with --assembly")
+    parser.add_argument("--results-index", type=Path,
+                        help="read an existing delivery results index with --assembly")
+    parser.add_argument("--record", dest="record_pointer",
+                        help="explicit JSON pointer to one indexed observation; "
+                             "does not establish execution qualification")
     parser.add_argument("--root", type=Path, default=ROOT)
     args = parser.parse_args(arguments)
     if args.candidate is not None and args.assembly is None:
         parser.error("--candidate requires --assembly")
+    if args.results_index is not None or args.record_pointer is not None:
+        if (args.assembly is None or args.results_index is None or
+                args.record_pointer is None):
+            parser.error("--results-index and --record require each other and --assembly")
     try:
         if args.assembly is not None:
             print(json.dumps(selection(args.assembly, args.root,
-                                       candidate_path=args.candidate), indent=2,
+                                       candidate_path=args.candidate,
+                                       results_index=args.results_index,
+                                       record_pointer=args.record_pointer), indent=2,
                              sort_keys=True))
             return 0
         examples = documentation.check(args.root)

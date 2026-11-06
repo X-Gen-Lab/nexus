@@ -1,6 +1,6 @@
 # D2 proposed initial real runtime RED against unchanged raw production.
 nexus_google_test(nexus_ethernet_raw_errata_test SOURCES ethernet_raw_errata_test.cpp
-    "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
 target_compile_options(nexus_ethernet_raw_errata_test PRIVATE
@@ -9,7 +9,7 @@ target_compile_options(nexus_ethernet_raw_errata_test PRIVATE
 foreach(eth_family stm32 gd32)
     set(eth_target "nexus_${eth_family}_ethernet_raw_errata_test")
     nexus_google_test(${eth_target} SOURCES ethernet_raw_errata_test.cpp
-        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
     target_compile_options(${eth_target} PRIVATE

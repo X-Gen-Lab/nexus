@@ -6,7 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "can_controller.h"
+#include "can_validation.h"
 
 /** \brief Validate the complete classic frame without retaining its address. */
 bool nx_can_frame_valid(const nx_can_frame_t* frame) {

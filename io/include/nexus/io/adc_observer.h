@@ -69,8 +69,10 @@ nx_result_t nx_adc_observer_bind(nx_adc_observer_t* observer,
  * \brief           Provider-only record before matching release-publication.
  * \param[in,out]   observer: Bound exact producer-owned control.
  * \param[in]       fill: Still FILLING, with a proved detached memory target.
- * \param[in]       observed_at: Software observation in the same clock domain.
- * \return          Success or STATE/EXHAUSTED without wrapping identities.
+ * \param[in]       observed_at: Finite software observation in the same clock
+ *                  domain; NX_DEADLINE_NEVER is not an observed time.
+ * \return          Success or INVALID/STATE/EXHAUSTED without wrapping
+ *                  identities or changing a rejected record.
  */
 nx_result_t nx_adc_observer_record(nx_adc_observer_t* observer,
                                    const nx_stream_fill_t* fill,

@@ -26,5 +26,5 @@ target_include_directories(nexus_stm32u575_retained_time SYSTEM PRIVATE
 nexus_use_cmsis_core(nexus_stm32u575_retained_time)
 target_compile_definitions(nexus_stm32u575_retained_time PRIVATE STM32U575xx)
 target_link_libraries(nexus_stm32u575_retained_time PUBLIC Nexus::Core
-    PRIVATE Nexus::IO Nexus::Arch nexus_build_options nexus_owned_warnings)
+    PRIVATE Nexus::IORTC Nexus::Arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::U575RetainedTime ALIAS nexus_stm32u575_retained_time)

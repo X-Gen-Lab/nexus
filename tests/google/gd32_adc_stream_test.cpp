@@ -209,7 +209,7 @@ TEST_F(GD32ADCStream, InvalidDomainAndRateRejectBeforeLoanOrEffects) {
     EXPECT_EQ(DMA_CH0CTL(DMA1), 0U);
     EXPECT_EQ(TIMER_CTL0(TIMER2) & TIMER_CTL0_CEN, 0U);
     regions[1].permissions = NX_DMA_MEMORY_WRITE;
-    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 500000),
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000000),
               NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 999),
               NX_ERROR_UNSUPPORTED);
@@ -310,6 +310,39 @@ TEST_F(GD32ADCStream, DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss) {
     EXPECT_EQ(block.flags,
               NX_STREAM_BOUNDARY_TRIGGER | NX_STREAM_BOUNDARY_LOSS);
     EXPECT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
+}
+
+TEST_F(GD32ADCStream, DmaClockExcludesTheLowAdcApbRatioErratum) {
+    EXPECT_EQ(ADC_SYNCCTL & ADC_SYNCCTL_ADCCK, ADC_ADCCK_HCLK_DIV6);
+    EXPECT_EQ(ADC_CTL1(ADC0) & ADC_CTL1_ADCON, 0U);
+    nx_gd32_adc_state_t polling = {};
+    uint32_t common = ADC_SYNCCTL;
+    EXPECT_EQ(nx_gd32_adc_initialize(&polling, channels, 2U, 3300U,
+                                     g_gd32_model_now + 100U),
+              NX_ERROR_BUSY);
+    EXPECT_FALSE(polling.initialized);
+    EXPECT_EQ(ADC_SYNCCTL, common);
+}
+
+TEST_F(GD32ADCStream, ExactClockRatioBoundsCompleteScanAndTimerPeriods) {
+    uint16_t prescaler = 0U, reload = 0U;
+    ASSERT_EQ(
+        nx_gd32_adc_stream_timing(1U, nullptr, 1000000U, &prescaler, &reload),
+        NX_SUCCESS);
+    EXPECT_EQ(prescaler, 0U);
+    EXPECT_EQ(reload, 99U);
+    EXPECT_EQ(
+        nx_gd32_adc_stream_timing(2U, nullptr, 500000U, &prescaler, &reload),
+        NX_SUCCESS);
+    EXPECT_EQ(
+        nx_gd32_adc_stream_timing(2U, nullptr, 1000000U, &prescaler, &reload),
+        NX_ERROR_UNSUPPORTED);
+    uint8_t slow[16];
+    std::memset(slow, 7, sizeof(slow));
+    EXPECT_EQ(nx_gd32_adc_stream_timing(16U, slow, 4000U, &prescaler, &reload),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_gd32_adc_stream_timing(16U, slow, 5000U, &prescaler, &reload),
+              NX_ERROR_UNSUPPORTED);
 }
 
 TEST_F(GD32ADCStream, StabilityClockStartsAfterPowerStoreHasCompleted) {
@@ -538,8 +571,9 @@ TEST_F(GD32ADCContinuous, SequenceFactsReportSelectedCyclesAndNominalClocks) {
     EXPECT_EQ(facts.channels, channels);
     EXPECT_EQ(facts.channel_count, 2U);
     EXPECT_EQ(facts.scan_cycles, 54U);
-    EXPECT_EQ(facts.adc_clock_hz, 12500000U);
+    EXPECT_EQ(facts.adc_clock_hz, 33333333U);
     EXPECT_EQ(facts.timer_clock_hz, 100000000U);
+    EXPECT_EQ(ADC_SYNCCTL & ADC_SYNCCTL_ADCCK, ADC_ADCCK_HCLK_DIV6);
     EXPECT_EQ(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
 }
 

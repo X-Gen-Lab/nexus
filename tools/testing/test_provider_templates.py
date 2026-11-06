@@ -43,7 +43,7 @@ class ProviderTemplateTests(unittest.TestCase):
                     self.assertEqual(provider["source"], file_identity(
                         ROOT / source_directory(family) / "drivers" / (name + ".c")))
                     self.assertEqual(provider["template_source"], file_identity(
-                        ROOT / "io/private" / template))
+                        ROOT / "drivers/timer/advanced_timer" / template))
 
     def test_direct_projection_keeps_actual_translation_unit_identity(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -53,6 +53,40 @@ class ProviderTemplateTests(unittest.TestCase):
             self.assertEqual(actual["source"], file_identity(source))
             self.assertEqual(actual["template_source"], file_identity(header))
             self.assertEqual(actual["fields"], {"start": "real_start", "stop": "real_stop"})
+
+    def test_reviewed_driver_template_keeps_translation_unit_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, source, header = self.tree(directory)
+            driver = root / "drivers/probe/reviewed_ip/probe_impl.h"
+            driver.parent.mkdir(parents=True)
+            header.rename(driver)
+            _, _, providers, _ = source_contracts(root)
+            actual = providers["nx_reviewed_probe_ops"]
+            self.assertEqual(actual["source"], file_identity(source))
+            self.assertEqual(actual["template_source"], file_identity(driver))
+            self.assertEqual(actual["fields"],
+                             {"start": "real_start", "stop": "real_stop"})
+
+    def test_reviewed_driver_template_rejects_another_ip_shadow(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, header = self.tree(directory)
+            for ip in ("reviewed_ip", "another_ip"):
+                driver = root / "drivers/probe" / ip / header.name
+                driver.parent.mkdir(parents=True)
+                driver.write_text(TEMPLATE)
+            header.unlink()
+            with self.assertRaisesRegex(EvidenceError, "ambiguous"):
+                source_contracts(root)
+
+    def test_reviewed_driver_template_rejects_local_shadow(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, source, header = self.tree(directory)
+            driver = root / "drivers/probe/reviewed_ip/probe_impl.h"
+            driver.parent.mkdir(parents=True)
+            header.rename(driver)
+            (source.parent / header.name).write_text(TEMPLATE)
+            with self.assertRaisesRegex(EvidenceError, "ambiguous"):
+                source_contracts(root)
 
     def test_conditional_wrapper_binding_is_not_guessed(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -156,7 +190,9 @@ class PrivateValueHeaderCompileTests(unittest.TestCase):
                      "-Werror"]
         arguments += (["-E", "-dM", str(probe)] if preprocess else
                       ["-c", str(probe), "-o", str(output)])
-        for directory in (ROOT / "io/private", ROOT / "io/include",
+        for directory in (ROOT / "drivers/gpio/owned_pin_state",
+                          ROOT / "drivers/timer/advanced_timer",
+                          ROOT / "io/private", ROOT / "io/include",
                           ROOT / "core/include", ROOT / "arch/include"):
             arguments += ["-I", str(directory)]
         result = subprocess.run(arguments, capture_output=True, text=True,
@@ -319,7 +355,9 @@ class ProviderTemplateCompileTests(unittest.TestCase):
         probe = self.area / (family + "_" + stem + ".c")
         probe.write_text(source)
         output = probe.with_suffix(".o")
-        includes = [self.area, self.template_directory or ROOT / "io/private",
+        templates = tuple((ROOT / "drivers").glob("*/*/" + template))
+        self.assertEqual(len(templates), 1)
+        includes = [self.area, self.template_directory or templates[0].parent,
                     ROOT / source_directory(family) / "private",
                     ROOT / "io/private", ROOT / "soc/common",
                     ROOT / "core/include", ROOT / "io/include",

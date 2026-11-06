@@ -5,7 +5,7 @@ foreach(eth_frames_family common stm32 gd32)
     set(eth_frames_target "nexus_${eth_frames_family}_ethernet_frames_test")
     nexus_google_test(${eth_frames_target}
         SOURCES ethernet_frames_mac_test.cpp
-            "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
+            "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
     target_compile_options(${eth_frames_target} PRIVATE
@@ -44,7 +44,7 @@ endforeach()
 nexus_google_test(nexus_ethernet_frames_native_test
     SOURCES ethernet_frames_native_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/native/drivers/ethernet_frames.c"
-        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
+        "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_frames_mac.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")

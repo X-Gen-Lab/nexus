@@ -444,8 +444,8 @@ static nx_result_t sequence_info(const void* context,
                                      .sample_cycles = cycles,
                                      .channel_count = base->adc.channel_count,
                                      .sample_code_count = 8U,
-                                     .adc_clock_hz = 12500000U,
-                                     .timer_clock_hz = 100000000U,
+                                     .adc_clock_hz = NX_GD32_ADC_DMA_CLOCK_HZ,
+                                     .timer_clock_hz = NX_GD32_ADC_DMA_TIMER_HZ,
                                      .scan_cycles = scan,
                                      .conversion_cycles = 12U};
     return NX_SUCCESS;

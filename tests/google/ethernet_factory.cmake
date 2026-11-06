@@ -21,7 +21,7 @@ foreach(eth_family stm32 gd32)
     nexus_google_test(${eth_target} SOURCES ethernet_factory_test.cpp
         "${eth_bundle}/bindings.c"
         "${NEXUS_SOC_SOURCE_${eth_soc}}/drivers/ethernet.c"
-        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/drivers/ethernet/legacy_mac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/soc/native/drivers"

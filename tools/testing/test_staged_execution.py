@@ -69,6 +69,7 @@ class StagedExecutionTests(unittest.TestCase):
         output = io.StringIO()
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "execute", side_effect=execute), \
+                patch.object(io_lifecycle_matrix, "capture"), \
                 patch.object(io_lifecycle_matrix, "capture_complete"), \
                 patch.object(io_lifecycle_matrix, "audit", return_value={}), \
                 patch.dict("os.environ", {}, clear=True), \

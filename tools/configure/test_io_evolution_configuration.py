@@ -89,8 +89,9 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
             (DirectCall("nx_spi_port_stop", (Symbol(f"nx_binding_{name}"),)),
              close), True)
         adapted = enhanced_endpoints.dma_construction(item, raw, "stm32")
-        self.assertIn("nx_result_t status = " + initialize.render() + ";",
-                      "\n".join(adapted.definitions))
+        self.assertEqual(adapted.initialize_sequences[-1].calls[0], initialize)
+        self.assertIn("status = " + initialize.render() + ";",
+                      "\n".join(adapted.initialize_sequences[-1].render()))
         self.assertEqual(adapted.initialize,
                          DirectCall(f"prepare_sequence_{name}"))
         self.assertEqual(adapted.stop,
@@ -103,13 +104,13 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         item = next(value for value in result.controllers
                     if value.interface_kind == "spi_dma_transaction")
         name = item.id.replace("-", "_")
-        declaration = f"static nx_result_t prepare_{name}(void) {{ return NX_SUCCESS; }}"
+        declaration = f"static nx_result_t prepare_{name}(void);"
         raw = Construction("nx_engine_t", (declaration,),
                            DirectCall(f"prepare_{name}"), (), True)
         adapted = enhanced_endpoints.dma_construction(item, raw, "stm32")
         self.assertEqual(adapted.definitions[0], declaration)
-        self.assertIn(f"nx_result_t status = prepare_{name}();",
-                      "\n".join(adapted.definitions))
+        self.assertIn(f"status = prepare_{name}();",
+                      "\n".join(adapted.initialize_sequences[-1].render()))
 
     def test_dma_owner_binding_uses_exact_physical_provider_membership(self):
         for family, prefix in (("f407", "stm32"), ("gd470", "gd32")):

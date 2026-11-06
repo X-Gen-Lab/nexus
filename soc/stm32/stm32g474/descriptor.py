@@ -30,7 +30,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32g474/private/stm32g474_pin_state.h",
         "io/include/nexus/io/pin_state.h",
         "io/src/api/pin_state.c",
-        "io/private/pin_state_impl.h",
+        "drivers/gpio/owned_pin_state/pin_state_impl.h",
         "soc/stm32/stm32g474/drivers/exti.c",
         "soc/stm32/stm32g474/drivers/spi.c",
         "soc/stm32/stm32g474/drivers/watchdog.c",

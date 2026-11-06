@@ -107,6 +107,8 @@ if(h7_sources)
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2"
         "${NEXUS_SOURCE_DIR}/io/private")
+    target_link_libraries(nexus_soc_stm32h743 PRIVATE
+        Nexus::DriverPrivateHeaders)
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32h743)
@@ -147,3 +149,8 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${h7_device}/Include" "${h7_cmsis}"
     PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32H743xx PARENT_SCOPE)
+
+# The selected SPI provider dispatches its owned CS through the GPIO API.
+if(h7_spi_modes)
+    target_link_libraries(nexus_soc_stm32h743 PRIVATE Nexus::IOGPIO)
+endif()

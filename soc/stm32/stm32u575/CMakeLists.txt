@@ -78,6 +78,8 @@ if(u5_sources)
     target_include_directories(nexus_soc_stm32u575 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${NEXUS_SOURCE_DIR}/io/private")
+    target_link_libraries(nexus_soc_stm32u575 PRIVATE
+        Nexus::DriverPrivateHeaders)
     target_include_directories(nexus_soc_stm32u575 SYSTEM PRIVATE
         "${u5_device}/Include")
     nexus_use_cmsis_core(nexus_soc_stm32u575)
@@ -116,3 +118,8 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${u5_device}/Include" "${u5_cmsis}"
     PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS ${u5_system_definitions} PARENT_SCOPE)
+
+# The selected SPI provider dispatches its owned CS through the GPIO API.
+if(u5_spi_modes)
+    target_link_libraries(nexus_soc_stm32u575 PRIVATE Nexus::IOGPIO)
+endif()

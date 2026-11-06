@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_GD32F470_ETH_H
 #define NEXUS_GD32F470_ETH_H
-#include "../../../../io/private/eth_mac.h"
+#include "../../../../drivers/ethernet/legacy_mac/eth_mac.h"
 #include "gd32f4xx.h"
 #ifdef __cplusplus
 extern "C" {

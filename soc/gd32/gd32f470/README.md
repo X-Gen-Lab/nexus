@@ -32,7 +32,7 @@ Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立�
 | Watchdog | 真正 FWDGT enable/feed/reset cause；硬件 option 已启用可识别；enable 不可撤销，无产品健康策略 |
 | EXTI | 唯一 line、有界 queue、共享 vector 只遍历生成的选中 line；同 vector priority 必须一致；当前受审 route 仅 PE3/EXTI3，分派不扩大 Board 接线支持；overflow 可见，无 debounce/callback |
 | PWM | 固定 TIMER2 CH0、PSC/ARR、CCR shadow；0/100% 明确，拒绝修改共享 period；停止先输出 inactive low；capture 和 advanced PWM 使用独立受审 controller/mode |
-| ADC | ADC0 12-bit；polling 模式使用 480-cycle sample time；独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；独立 continuous DMA 双缓冲模式，消费者借用期间不覆写 |
+| ADC | ADC0 12-bit；polling 为 12.5 MHz／480-cycle sample time，EOC 后显式短等待；DMA 为 HCLK/6，独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；continuous 双缓冲不覆写消费者借用块 |
 | CAN | CAN0/1 Classic CAN IRQ、三邮箱与共享 filter domain；无 CAN FD |
 | USB | USBFS device PIO endpoints、独立 48 MHz owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、caller descriptor 与 RX loan；产品网络协议外置 |
@@ -83,7 +83,7 @@ capture/restore helper；这不要求创建公开 GPIO 接口实例或额外 GPI
 执行冷启动或恢复仍持有的引脚。
 
 有限 ADC `trigger-dma` 使用正常 DMA 而非覆盖消费者的循环缓冲。固定 ADC 时钟为
-12.5 MHz，每个通道需要 15 个采样周期和 12 个转换周期；请求频率同时受
+HCLK200/6 MHz，每个通道需要 15 个采样周期和 12 个转换周期；请求频率同时受
 完整 scan 时间和 100 MHz TIMER2 的精确 PSC/ARR 整数分频约束。块容量必须
 是完整 scan 字节数的倍数，且最多 65535 个 uint16_t 样本；启动前逐个检查
 所有块的 DMA 可写域和两字节对齐。TIMER2 与 PWM 独占冲突由配置拒绝。
@@ -137,3 +137,67 @@ SoC route 不代表默认板上已资格化的 connector 或外部器件。
 生产 `.c` 的独立链接模型，并由 ARM 构建与 ELF 资源门禁覆盖编译／链接。
 模型与 ELF 不证明物理 IRQ、clock 精度、波形、复位、Flash 掉电、ADC 精度或
 长期负载。当前未连接实板；所有物理资格明确未执行。
+
+## 官方库复用与逐模式资料复核
+
+2026-11-05 重新取得官方 Device limitations Rev1.6，PDF 的 257376 字节与
+SHA-256 均匹配 [`references.json`](references.json)。以下为当前所选软件范围的
+审查结果。芯片顶部 marking／revision 未观察，不能把文档适用性、模型或链接结果
+标为整个系列的物理资格。
+
+`CMakeLists.txt` 依据所选模式编译原始官方 SPL 单元。RCU／FMC／TIMER 用于基础
+时钟与时间源，GPIO／USART／SPI／I2C／FWDGT／ADC 由具体模式按需选择；所有 SDK
+类型、寄存器定义和 vendor compile definitions 保持私有。Flash 实际调用
+`fmc_halfword_program()` 与 F470 的 `fmc_page_erase()`。IRQ、DMA、错误清除、
+请求借用和最终撤离由单个 Nexus transport owner 管理；不因增加 SPL leaf 调用
+引入第二个活跃驱动。CAN／USB／ENET 的共享机制必须经过精确 SDK ABI、路由与
+所选模式核对，不能从 STM32 的相似寄存器继承整机资格。
+
+| Errata 节 | 所选模式的处置和剩余边界 |
+|---|---|
+| 2.1／2.2 | 当前固定 HXTAL 运行／浅睡眠不进入 standby，也不操作 LXTAL；这些限制不因存在 sleep helper 自动取得支持。 |
+| 2.3.1 | revision A 的 IO compensation 无效且官方无 workaround。不能把补偿或理想边沿速度列为所有 revision 的保证。 |
+| 2.3.2 | VBUS 关闭时 PA9／PB13 不耐 5 V；USART0 PA9 与 USB VBUS 是不同选路，需按实际外部电压和所选 pin owner 验收。 |
+| 2.4.1／2.4.2 | 所选 12-bit LSB 避开 6-bit MSB 故障，并按修正后的 12-bit LSB 布局取值；不扩大为其他 resolution／alignment 支持。 |
+| 2.4.3 | CPU polling 保留 APB2/8=12.5 MHz，在 EOC 后等待两个 1 µs 单调 tick，再读 RDATA；计数量化后至少经过 1 µs，超过所需 160 ns。等待超时或时钟冻结不发布当前 sample。DMA 在校准前选择并读回 HCLK/6=33⅓ MHz，大于 APB2/4=25 MHz 且低于 40 MHz 上限，从时钟条件排除该故障，不依赖 CPU guard 或猜测 DMA 延迟。 |
+| 2.7.1 | shadow 更新只在 counter 上升沿生效，官方无 workaround；不承诺任意时刻立即改变 PWM 边沿。实际输出更新时间和安全电平需要波形验收。 |
+| 2.7.2 | 所选重复计数模式不使用受影响的 single-pulse 组合；不可据此推导单脉冲模式支持。 |
+| 2.8 | 所选 USART 不使用 mute／mute wakeup；正常 IDLE 接收不能等同 mute wakeup。 |
+| 2.9.1 | I2C_FCTL 可配置范围仅 GD32F470；此接入不授权相邻 F425／F427。 |
+| 2.13.1／2.13.2 | CAN 的 FIFO-order abort 连带取消与 identifier-order 最大扩展 ID 分配是两个独立限制；精确合同见 [Classic CAN](../../../docs/design/classic-can.md)。不隐式重放，不从其他厂商结果推断 GD32。 |
+| 2.14.1／2.14.2 | 所选 RMII 排除 MII 接收故障；raw 和 enhanced C engine 初始化以读回证明清除 IPFCO（SDK bit10），link 变更也不启用它，保留软件 checksum，避开硬件 checksum=0x0000 丢帧条件。 |
+| 2.14.3 | MAC inter-frame gap 比 IEEE 算法更长且官方无 workaround；100 Mbit/s link rate 不是同等有效吞吐或完整 IEEE 时序资格。 |
+| 2.5／2.6／2.10-2.12 | DAC、RTC calibration、I2S、SDIO 和 EXMC 不属于当前所选 provider 范围。 |
+| 2.15.1 | Arm 776924 涉及 FPU、lazy context 和极短 ISR。所审梁山派裸机 UART ELF 的全部可返回 handler 路径均超过两个非 return 指令，短 wrapper 已跟入实际 callee；不返回的默认循环另记。其他模式、外部 ISR 与实际 FP 上下文仍需独立核对；不关闭或假装关闭 FreeRTOS 的 lazy FP。 |
+
+CPU polling 的 EOC guard 不分配额外 state，不新增 worker 或运行时选择层；每个
+sample 增加显式短等待，只影响所选 polling 模式，不能把它计作 DMA 的 CPU 成本。
+独立硬件模型覆盖 EOC 已置位而 RDATA 尚未稳定、deadline 到期与冻结时钟三种路径；
+这种软件证据仍不测量真实 ADC clock、analog accuracy 或 DMA 采样质量。
+
+DMA 的精确时钟关系来自 UM Rev3.3 §14.4.2／§14.7.14：HCLK/6 与
+TIMER2=HCLK/2 每个 ADC cycle 对应三个 timer tick。准入直接比较完整 scan
+周期和整数 timer period，不使用舍入后的 Hz 推导边界；sequence query 的
+`33333333 Hz` 仅为向下取整的名义报告。稳定和逐块校准仍在该时钟下重新执行。
+SDK divider 写入必须读回吻合，否则在 power-on／calibration 前回滚；已活动的
+ADC0／1／2 或 polling owner 使另一种模式拒绝取得共享域。
+
+冷构造的 rollback 先证明 ADC 已完全停止，再恢复 shared configuration 和所选
+pin mode／pull；这些读回都完成后才撤 ADC 与新增 GPIO clocks。任一 cleanup
+被拒时，不返回一个无人负责的错误：保留构造调用帧和剩余 effects，屏蔽 IRQ，
+调用既有 `PLATFORM/IO` fault observer；observer 返回也继续明确 park，不能恢复
+调用者或重用资源。常驻 state 不增加。普通 stop 已有持久 owner，因此 ADC
+disable／gate withdrawal 失败返回 `IO` 并保留 initialized owner，调用者只能在
+保持存储和外部 join 后显式重试，成功之前不能释放配置或恢复消费者。
+
+DS Rev2.2 §4.13 Tables4-28／4-29 的适用条件为 VDDA 和 VREFP
+2.6..3.6 V、VREFP≤VDDA，ADC clock 最大 40 MHz，startup 最长 1 µs。
+配置、冷构造和 C initializer 均拒绝范围外的 `reference_mv`；这个声明不测量
+实际 VDDA，也不能代替供电和参考连接。采样周期仍由所选 code 决定；例如
+40 MHz 表中的 code1／15-cycle 源阻抗上限为 9.1 kΩ，不能在更快的时钟下沿用
+旧 12.5 MHz 的输入 settling 假设。外部 Board 必须根据所选周期审查阻抗、VDDA
+去耦、温度和精度，实板验收仍未执行。
+
+来源索引继续保留 `applicability_only`／`not_observed`／`not_fully_audited`。
+精确软件执行结果归入现有交付台账；全芯片 errata、实际 revision、电气与 HIL
+仍需各自证据，不把资料表作为新的配置或资格权威。

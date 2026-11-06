@@ -84,6 +84,7 @@ nx_result_t nx_stm32_can_initialize(nx_can_controller_t* controller) {
     }
     controller->registers = address;
     controller->clock_hz = 42000000U;
+    controller->max_extended_id_mailbox0 = false;
     const int16_t vectors[2][4] = {
         {CAN1_TX_IRQn, CAN1_RX0_IRQn, CAN1_RX1_IRQn, CAN1_SCE_IRQn},
         {CAN2_TX_IRQn, CAN2_RX0_IRQn, CAN2_RX1_IRQn, CAN2_SCE_IRQn}};

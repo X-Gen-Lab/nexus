@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`7c7e3c5464f4560fa92d4926ce5a7520e2171a6ba78d208e6c0d0285ef260d25`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -261,7 +261,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | uart |
 | `task` | Bounded FIFO IRQ service and concurrent stream load |
-| `implementation_paths` | io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md |
+| `implementation_paths` | drivers/uart/usart_fifo/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md |
 | `exit_condition` | Bounded batch and IRQ latency observations on exact providers |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -357,7 +357,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | timestamps |
 | `task` | Timestamp source domain epoch frequency and uncertainty |
-| `implementation_paths` | io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md |
+| `implementation_paths` | io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;drivers/ethernet/legacy_mac/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md |
 | `exit_condition` | Reject incompatible domains and distinguish observation from event time |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -421,7 +421,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | providers |
 | `task` | Reuse reviewed peripheral IP generations and official HAL/LL |
-| `implementation_paths` | soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py |
+| `implementation_paths` | soc/common;drivers/uart/usart_fifo/uart_fifo_impl.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;tools/configure/selected_contracts.py |
 | `exit_condition` | Private implementation sharing with exact per-family facts |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -565,7 +565,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | ethernet |
 | `task` | VLAN scatter gather frame loans and hardware timestamps |
-| `implementation_paths` | io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md |
+| `implementation_paths` | io/include/nexus/io/ethernet_frames.h;drivers/ethernet/legacy_mac/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md |
 | `exit_condition` | Actual hardware descriptor ownership and truthful global abort |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -581,7 +581,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | usb |
 | `task` | Optional class adapters and exact PHY endpoint capabilities |
-| `implementation_paths` | io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components |
+| `implementation_paths` | drivers/usb/fs_device_pio/usb_device_controller.c;soc/native/drivers/usb_device.c;components |
 | `exit_condition` | Control reset ACK ZLP and device mode before additional USB modes |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |

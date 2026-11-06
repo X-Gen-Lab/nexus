@@ -161,6 +161,8 @@ def main(arguments=None):
         matrix_report.unlink(missing_ok=True)
         matrix_snapshot = output / "io-property-inputs.json"
         matrix_snapshot.unlink(missing_ok=True)
+        preflight_snapshot = output / "io-property-preflight.json"
+        preflight_snapshot.unlink(missing_ok=True)
         python = sys.executable
         # The complete tool domains compile Native and ARM fixtures. Diagnose
         # their existing locked prerequisites before executing those suites.
@@ -173,6 +175,12 @@ def main(arguments=None):
         execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
                  "--target", "nexus_google_contracts"], env,
                 output / "preflight-build.txt")
+        # Catch stale catalogue/compiled ownership before long tool suites.
+        # The final complete capture still observes fresh post-suite inputs.
+        from scripts.ci import io_lifecycle_matrix
+        catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
+        io_lifecycle_matrix.capture(
+            ROOT, build, catalogue, preflight_snapshot, complete=False)
         tool_results = []
         for suite in TOOL_SUITES:
             tool_report = output / f"tools-{suite}.json"
@@ -191,8 +199,6 @@ def main(arguments=None):
                 or len(manifest["executables"]) != len(set(manifest["executables"]))):
             raise ValueError("Missing or duplicate GoogleTest executable plan")
         # The catalogue consumes this runner's evidence, not another execution.
-        from scripts.ci import io_lifecycle_matrix
-        catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
         io_lifecycle_matrix.capture_complete(
             ROOT, build, catalogue, matrix_snapshot, execute, env)
         results = []

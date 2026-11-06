@@ -3,7 +3,7 @@ from dataclasses import replace
 
 from tools.configure import selected_contracts
 from tools.configure.contracts import ENDPOINT_FIELDS
-from tools.configure.calls import Address, DirectCall
+from tools.configure.calls import Address, DirectCall, InitializeSequence
 from tools.configure.providers import maintained, for_selection
 from tools.configure.providers.common import fail, integer
 
@@ -70,13 +70,12 @@ def dma_construction(item, construction, prefix):
     name = item.id.replace("-", "_")
     sequence = f"s_nx_sequence_{name}"
     backend = f"nx_{provider.PREFIX}_spi_dma_sequence_backend"
-    definitions = list(construction.definitions)
-    definitions += [f"static nx_result_t prepare_sequence_{name}(void) {{",
-                    f"    nx_result_t status = {construction.initialize.render()};",
-                    "    if (status != NX_SUCCESS) { return status; }",
-                    f"    return nx_spi_dma_sequence_initialize(&{sequence},",
-                    f"        &{backend}, &s_nx_port_{name});", "}"]
-    return replace(construction, definitions=tuple(definitions),
+    prepare = InitializeSequence(f"prepare_sequence_{name}", (
+        construction.initialize,
+        DirectCall("nx_spi_dma_sequence_initialize", (
+            Address(sequence), Address(backend), Address(f"s_nx_port_{name}")))))
+    return replace(construction,
+                   initialize_sequences=construction.initialize_sequences + (prepare,),
                    admission=construction.admission + (DirectCall(
                        "nx_spi_dma_sequence_preflight", (
                            Address(sequence), Address(backend),

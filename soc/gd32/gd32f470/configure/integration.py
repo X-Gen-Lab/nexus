@@ -4,7 +4,8 @@ from tools.configure.can import CanPolicy
 from tools.configure.timer_advanced import TimerBinding, TimerPolicy
 from tools.configure.usb_device import UsbDevicePolicy
 
-CAN_INTEGRATION = CanPolicy(error_suffix="EWMC")
+# GD32F4xx Errata 2.13.1 requires identifier priority, never transmit FIFO order.
+CAN_INTEGRATION = CanPolicy(error_suffix="EWMC", fifo_order_supported=False)
 
 
 USB_DEVICE = UsbDevicePolicy(

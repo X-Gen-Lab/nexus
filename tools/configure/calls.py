@@ -90,3 +90,33 @@ class DirectCall:
             else:
                 arguments.append(str(value) + "u")
         return self.function + "(" + ", ".join(arguments) + ")"
+
+
+@dataclass(frozen=True)
+class InitializeSequence:
+    """Fixed lifecycle call order with a standard NX_SUCCESS short circuit.
+
+    This emits assembly glue only. Every hardware step remains a named direct
+    call to concrete C; callers cannot supply a statement or predicate.
+    """
+
+    function: str
+    calls: tuple[DirectCall, ...]
+
+    def __post_init__(self):
+        _name(self.function, _IDENTIFIER, "Initialization sequence")
+        if not isinstance(self.calls, (tuple, list)) or not self.calls:
+            raise ValueError("Initialization sequence requires ordered direct calls")
+        calls = tuple(self.calls)
+        if any(not isinstance(call, DirectCall) for call in calls):
+            raise ValueError("Initialization sequence requires explicit direct calls")
+        object.__setattr__(self, "calls", calls)
+
+    def render(self):
+        result = [f"static nx_result_t {self.function}(void) {{"]
+        if len(self.calls) > 1:
+            result.append("    nx_result_t status;")
+        for call in self.calls[:-1]:
+            result += ["    status = " + call.render() + ";",
+                       "    if (status != NX_SUCCESS) { return status; }"]
+        return result + ["    return " + self.calls[-1].render() + ";", "}"]

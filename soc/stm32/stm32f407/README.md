@@ -39,6 +39,17 @@ global HAL startup, HAL SysTick or all-module support is introduced. See
 [official driver integration](../../../docs/design/official-stm32-provider.md)
 for ownership, time, cancellation, comparison and delivery requirements.
 
+`SystemInit` enables CP10/CP11; this hard-float platform does not disable lazy
+floating-point context saving. The selected FreeRTOS CM4F port explicitly enables
+ASPEN/LSPEN. ES0182 Rev19 section2.1.2 (Arm776924) therefore remains an integration
+constraint on every listed F407 cut: an interrupting handler must execute more
+than two instructions in addition to exception return when the affected
+VDIV/VSQRT conditions are possible. Follow generated tail branches into their
+actual callees; unreachable padding or literal words do not count. Applications
+must apply the same rule to external handlers and recheck the emitted image
+after compiler, optimization or handler changes. The platform does not change
+FPCCR behind the kernel ABI. See the [short-ISR contract](../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint).
+
 | Provider | Maintained execution and limits |
 |---|---|
 | GPIO | One-port 16-bit authorization mask; atomic BSRR set/reset; serialized toggle; initial level precedes mode |

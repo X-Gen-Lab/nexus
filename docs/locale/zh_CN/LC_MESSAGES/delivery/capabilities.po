@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b92dc43a361cab892426406e5f07a07f6c62c9d839315a43da5006d48ee05d43\n"
+"X-Nexus-Source-SHA256: b7cc630ca1d2139fd35695fa06f6c8c48776aa16ef40a6203326ba97e9c39f34\n"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -227,6 +227,12 @@ msgid ""
 msgstr ""
 "任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的 family／mode "
 "行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确 配置通过不等于所有 Board、backend、时钟或模式通过。"
+
+msgid "专项执行记录可通过同一查询显式导航，无需将它包装成软件候选："
+msgstr "专项执行记录可通过同一查询显式导航，无需将它包装成软件候选："
+
+msgid "`--record` 使用 JSON Pointer，必须指向具体记录；工具保留索引文件哈希和原记录。 `indexed_evidence` 分别报告源码与配置匹配，缺少完整源码或配置身份时保持 `insufficient_identity`；记录提供 resolved 时另行比对完整投影，仅提供配置哈希时 明确标记摘要匹配。上例的 Core／Arch／OS 专项没有完整装配身份， 因此不能证明该 UART 模式通过。此导航不改变任何 `validation`、候选或物理状态； 它与 `--candidate` 的原候选验证各自独立，也不从父记录继承执行范围。"
+msgstr "`--record` 使用 JSON Pointer，必须指向具体记录；工具保留索引文件哈希和原记录。 `indexed_evidence` 分别报告源码与配置匹配，缺少完整源码或配置身份时保持 `insufficient_identity`；记录提供 resolved 时另行比对完整投影，仅提供配置哈希时 明确标记摘要匹配。上例的 Core／Arch／OS 专项没有完整装配身份， 因此不能证明该 UART 模式通过。此导航不改变任何 `validation`、候选或物理状态； 它与 `--candidate` 的原候选验证各自独立，也不从父记录继承执行范围。"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "SoC"
@@ -638,9 +644,8 @@ msgstr ""
 "`tests/contracts/can_assembly/gd32-both.toml`, "
 "`tests/contracts/can_assembly/gd32-first.toml`"
 
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`io/src/controllers/can_controller.c`"
-msgstr "`io/src/controllers/can_controller.c`"
+msgid "`drivers/can/classic_can/can_controller.c`"
+msgstr "`drivers/can/classic_can/can_controller.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "CAN1"
@@ -678,9 +683,8 @@ msgstr ""
 "`tests/contracts/ethernet_assembly/gd32-freertos.toml`, "
 "`tests/contracts/ethernet_assembly/gd32.toml`"
 
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`io/src/controllers/eth_mac.c`"
-msgstr "`io/src/controllers/eth_mac.c`"
+msgid "`drivers/ethernet/legacy_mac/eth_mac.c`"
+msgstr "`drivers/ethernet/legacy_mac/eth_mac.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "eth_frames"
@@ -698,9 +702,8 @@ msgstr "`rmii-frames-a-c-g`"
 msgid "`cmake/package/verification/io_evolution/gd470-eth-frames.toml`"
 msgstr "`cmake/package/verification/io_evolution/gd470-eth-frames.toml`"
 
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`io/src/controllers/eth_frames_mac.c`"
-msgstr "`io/src/controllers/eth_frames_mac.c`"
+msgid "`drivers/ethernet/legacy_mac/eth_frames_mac.c`"
+msgstr "`drivers/ethernet/legacy_mac/eth_frames_mac.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "EXTI3"
@@ -1190,9 +1193,8 @@ msgstr ""
 "`tests/contracts/usb_assembly/gd32-interrupt.toml`, "
 "`tests/contracts/usb_assembly/gd32.toml`"
 
-#: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
-msgid "`io/src/controllers/usb_device_controller.c`"
-msgstr "`io/src/controllers/usb_device_controller.c`"
+msgid "`drivers/usb/fs_device_pio/usb_device_controller.c`"
+msgstr "`drivers/usb/fs_device_pio/usb_device_controller.c`"
 
 #: ../../../../workspace/nexus/docs/delivery/capabilities.md:0
 msgid "stm32f103"

@@ -325,6 +325,32 @@ qualification. Missing production proof remains an open exit. The
 authority; per-profile execution, source identities, SDK checks and remaining
 software-candidate obligations belong in delivery evidence.
 
+### Execute the existing software checks
+
+The maintained [normal ARM build-gate module](../../tools/testing/test_h743_ram_build_gate.py)
+builds `hsi32-fixed-cache-off`, `hsi64-fixed-cache-off` and
+`hsi64-pll384-cache-off` as baremetal through the real firmware graph, plus an
+unselected control. Each selected image must retain the actual readonly public
+Flash ops table with its `geometry`, `read`, `program` and `erase` methods.
+The module also checks the RAM layout, CPU bridge, explicit operand closure,
+return gate and whole-image resource observation. Corrupted real ELF inputs
+must reject; the unselected image must omit the RAM pod and its audit/stack-usage
+cost.
+
+Run that complete module with the prepared CMake, Ninja and locked ARM tools on
+`PATH`:
+
+```sh
+python -B -m unittest tools.testing.test_h743_ram_build_gate
+```
+
+Its disposable normal builds establish the checks actually executed for the
+current working source. They do not produce an installed-SDK software candidate.
+Retain the invocation receipt and actual result; the frozen-source qualification
+plan separately owns clean SDK consumption, source/tool identities and candidate
+artifacts. A pass in one layer never substitutes for another row in the exit
+table above.
+
 The implementation is split between [cold preparation and admission](../../soc/stm32/stm32h743/drivers/flash_ram_owner.c),
 the [CPU bridge and assembly return gate](../../soc/stm32/stm32h743/drivers/flash_ram_enter.S),
 [RAM vector publication](../../soc/stm32/stm32h743/drivers/flash_ram_transaction.c),

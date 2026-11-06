@@ -7,6 +7,32 @@ from tools.configure.providers.common import Construction
 
 
 class StaticCallTests(unittest.TestCase):
+    def test_initialize_sequence_is_typed_frozen_and_short_circuits_in_order(self):
+        from tools.configure.calls import InitializeSequence
+        calls = [DirectCall("nx_engine_prepare", (Address("state"),)),
+                 DirectCall("nx_outer_prepare", (Address("outer"),))]
+        sequence = InitializeSequence("prepare_outer", calls)
+        calls.clear()
+        self.assertEqual(sequence.calls, (
+            DirectCall("nx_engine_prepare", (Address("state"),)),
+            DirectCall("nx_outer_prepare", (Address("outer"),))))
+        source = "\n".join(sequence.render())
+        self.assertLess(source.index("nx_engine_prepare("),
+                        source.index("if (status != NX_SUCCESS)"))
+        self.assertLess(source.index("if (status != NX_SUCCESS)"),
+                        source.index("return nx_outer_prepare("))
+        with self.assertRaises(FrozenInstanceError):
+            sequence.function = "another"
+
+    def test_initialize_sequence_rejects_arbitrary_code_and_unordered_calls(self):
+        from tools.configure.calls import InitializeSequence
+        for calls in ([], "nx_prepare()", {DirectCall("nx_prepare")},
+                      ("nx_prepare()",), (DirectCall("nx_prepare"), "RCC->CR=0")):
+            with self.subTest(calls=calls), self.assertRaises(ValueError):
+                InitializeSequence("prepare_outer", calls)
+        with self.assertRaises(ValueError):
+            InitializeSequence("return", (DirectCall("nx_prepare"),))
+
     def test_direct_typed_arguments_preserve_selected_call(self):
         call = DirectCall("nx_prepare", (Address("s_port.tx"),
             Symbol("s_storage"), 64, True, False, None))

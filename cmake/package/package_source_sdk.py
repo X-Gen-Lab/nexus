@@ -132,6 +132,7 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f407/Entropy.cmake',
     'soc/stm32/stm32f407/entropy_instance.c',
     'soc/stm32/stm32f407/drivers/entropy.c',
+    'soc/stm32/stm32f407/memory_init.c',
     'soc/stm32/stm32f407/include/nexus/soc/stm32f407_entropy.h',
     'soc/stm32/stm32f407/private/stm32f407_entropy.h',
     'cmake/package/verification/common_services/native.toml',
@@ -297,11 +298,17 @@ REQUIRED_FILES += (
                    "tools/configure/assemblies/g474-pin-states.toml",
                    "tools/configure/assemblies/h743-high-peripherals.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)
-REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
+REQUIRED_FILES += ("drivers/uart/usart_fifo/uart_fifo_impl.h",)
+REQUIRED_FILES += ("drivers/uart/usart_fifo/uart_fifo_profile.h",)
+REQUIRED_FILES += (
+    "io/private/stream_profile_storage.h",
+    "io/src/mechanisms/adc_stream_profile.c",
+    "io/src/mechanisms/stream_profile_storage.c",
+)
 REQUIRED_FILES += (
     "io/include/nexus/io/ethernet_frames.h",
-    "io/private/eth_frames_mac.h", "io/private/eth_frames_validation.h",
-    "io/src/api/ethernet_frames.c", "io/src/controllers/eth_frames_mac.c",
+    "drivers/ethernet/legacy_mac/eth_frames_mac.h", "io/private/eth_frames_validation.h",
+    "io/src/api/ethernet_frames.c", "drivers/ethernet/legacy_mac/eth_frames_mac.c",
     "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
     "soc/native/drivers/ethernet_frames_access.h")
 REQUIRED_FILES += (
@@ -422,17 +429,27 @@ REQUIRED_FILES += tuple("io/src/api/" + name + ".c" for name in (
     "adc", "advanced_pwm", "can", "can_fd", "encoder", "ethernet", "exti",
     "flash", "gpio", "i2c", "mdio", "pwm_adc", "pwm_group", "spi", "uart_word",
     "timer", "timer_capture", "uart", "usb_device", "watchdog"))
-REQUIRED_FILES += tuple("io/src/controllers/" + name + ".c" for name in (
-    "can_controller", "eth_mac", "usb_device_controller"))
+REQUIRED_FILES += (
+    "drivers/CMakeLists.txt",
+    "drivers/can/classic_can/can_controller.c",
+    "drivers/ethernet/legacy_mac/eth_mac.c",
+    "drivers/usb/fs_device_pio/usb_device_controller.c")
 REQUIRED_FILES += tuple("io/src/mechanisms/" + name + ".c" for name in (
     "adc_format", "adc_observer", "cycle_probe", "dma", "flash_region",
     "i2c_bus_clear", "i2c_long", "observation", "spi_transaction",
     "spi_dma_transaction", "spi_dma_sequence", "spi_dma_owner_binding",
     "stream", "stream_budget", "stream_profile", "uart_rs485", "wake"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
-    "advanced_pwm_impl", "can_controller", "can_fd_impl", "eth_mac",
-    "spi_dma_sequence", "spi_dma_sequence_owner",
-    "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
+    "can_fd_impl", "can_validation", "eth_validation", "spi_dma_sequence",
+    "spi_dma_sequence_owner"))
+REQUIRED_FILES += (
+    "drivers/can/classic_can/can_controller.h",
+    "drivers/can/classic_can/cortex_m_port.h",
+    "drivers/ethernet/legacy_mac/eth_mac.h",
+    "drivers/timer/advanced_timer/advanced_pwm_impl.h",
+    "drivers/timer/advanced_timer/timer_advanced_controller.h",
+    "drivers/timer/advanced_timer/timer_capture_impl.h",
+    "drivers/usb/fs_device_pio/usb_device_controller.h")
 REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".c" for name in (
     "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
     "spi_async", "spi_dma_transaction", "stream", "time", "timer", "uart", "uart_word",

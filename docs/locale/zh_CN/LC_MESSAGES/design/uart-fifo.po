@@ -1,6 +1,6 @@
 # Reviewed Chinese translation of the current UART FIFO contract.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2284af0af70f273629bf378ae2c91d8cc85e11b801e5639a59d49f6019a0a423\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bd9d662687b5ad8c1448428c4540ef8d28a1c349064570c082b47bbf0d5d4d23\n"
 
 msgid "Bounded UART hardware FIFO bytes"
 msgstr "有界的 UART 硬件 FIFO 字节收发"
@@ -251,63 +251,6 @@ msgstr "完整停止先关闭准入并排空已接受的 TX 与唤醒发布者�
 msgid "Span checks reject aliases between requests, payloads, RX output/count, the ring, selected owner/profile, active loans and controlled MMIO including the known NVIC/system window. Wrapping spans and invalid output alignment reject before writes. The caller still supplies live, accessible, correctly typed storage and observes its lifetime obligations."
 msgstr "跨度检查拒绝请求、payload、RX 输出/count、环、选中所有者/配置、活跃借用与 已控制 MMIO 之间的别名，包括已知 NVIC/系统窗口。环绕跨度与不合法输出对齐 在写入前拒绝。调用方仍须提供有效、可访问、类型正确的存储并遵守生命周期。"
 
-msgid "Assess cost and evidence separately"
-msgstr "分别评估成本与证据"
-
-msgid "Only the selected owner adds a const-profile link to the ordinary UART prefix; the profile contains four one-byte encodings/budgets. Ordinary byte state, public operations and ordinary initialization remain unchanged. Exact object alignment, Flash retention and instruction cost come from the selected ARM ELF, not field-size estimates."
-msgstr "仅选中所有者在普通 UART 前缀上增加 const 配置链接；配置包含四个单字节编码/ 预算。普通字节状态、公共方法与普通初始化保持不变。对象精确对齐、Flash 保留 与指令成本须来自选中 ARM ELF，不能从字段大小估算。"
-
-msgid "The IRQ bound counts RDR reads and TDR writes independently. Status reads, source changes, barriers and wake delivery also cost CPU time. External models check accesses and prove that a drained threshold batch does not rewrite unchanged masks. Counts are not measured cycles, WCET or guaranteed throughput. A separately admitted cycle probe only observes its declared platform; U575's unreviewed DWT capability remains disabled."
-msgstr "IRQ 预算独立统计 RDR 读取与 TDR 写入。状态读取、来源变更、屏障和唤醒派发也 消耗 CPU。外部模型检查这些访问，并证明排空的阈值批次不重写未改变掩码。 计数不是实测周期、WCET 或吞吐量保证。另行获准的周期探针只能观察其声明平台； U575 未经审查的 DWT 能力保持关闭。"
-
-msgid "From the repository root with pinned tools and dependencies prepared:"
-msgstr "在已准备锁定工具与依赖的仓库根目录执行："
-
-msgid "Successful normal builds must produce the ELF/BIN/map, linked-resource and provider-retention reports, with one selected face and its actual FIFO table. These commands do not flash hardware or start UART traffic. Product protocol and traffic generation remain external."
-msgstr "成功的正常构建须产生 ELF/BIN/map、链接资源和 provider-retention 报告，包含一个 选中接口及其真实 FIFO 表。这些命令不烧录硬件或启动 UART 流量。产品协议与流量 产生仍由外部负责。"
-
-msgid "Current development validation passed 90 real-provider GoogleTest/GoogleMock cases, 45 per family, and 18 normal-TOML/generated-factory cases, 9 per family: 108 cases with no failures or skips. Models use the pinned official LL threshold functions and separate FIFO, RDR and shifter state. Both canonical configurations also passed normal ARM configure/build, resource budgets and retention checks for one face, one operations table and seven method slots per image."
-msgstr "当前开发验证通过90项真实 provider GoogleTest/GoogleMock，每系列45项，以及18项正常 TOML/生成工厂用例，每系列9项：共108项，无失败或跳过。模型使用锁定的官方 LL 阈值函数，分别表示 FIFO、RDR 和移位器状态。两个规范配置也均通过正常 ARM 配置/构建、资源预算，以及每镜像一个接口、一张方法表和七个方法槽的保留检查。"
-
-msgid "The separate RTSCTS development validation passed 76 real-provider cases, 38 per family, and 22 normal-TOML/generated-factory cases, 11 per family, with no failures or skips. Both exact four-pad normal configurations also passed ARM configure/build. These results establish software behavior and linking for the stated reference selections, not peer response, physical handoff, timing or a clean reproducible candidate. The existing flow-none arithmetic comparison below is not a measured cost comparison for the new RTSCTS selection."
-msgstr "独立的 RTSCTS 开发验证通过了 76 项真实 provider 用例，每个系列 38 项，以及 22 项正常 TOML／生成 factory 用例，每个系列 11 项，均无失败或跳过。两个精确四引脚正常配置也通过了 ARM 配置／构建。这些结果只建立所述参考选择的软件行为和链接证据，不证明对端响应、物理交接、时序或干净且可复现的软件候选。下文既有的无流控算术比较，不是新 RTSCTS 选择的实测成本比较。"
-
-msgid "For these two exact `Os` FIFO fixtures, narrowing only bounded intermediate arithmetic removed the linked software division helpers. H743 BIN/loaded Flash changed from 9216 to 8372 bytes, saving 844 bytes; U575 changed from 8948 to 8016 bytes, saving 932 bytes. Each image's allocated/reserved RAM stayed 2296 bytes, including its 2048-byte main-stack reservation. Absolute deadlines remain 64-bit. These are measured artifact sizes for this selected arithmetic comparison, not a zero-cost FIFO claim, a comparison with ordinary IRQ-byte mode, measured cycles or WCET. They do not establish a clean reproducible software candidate."
-msgstr "对于这两个精确的 `Os` FIFO 夹具，仅缩窄有界中间运算就移除了链接的软件除法辅助函数。H743 BIN/载入 Flash 从9216变为8372字节，节省844字节；U575 从8948变为8016字节，节省932字节。每个镜像的已分配/预留 RAM 保持2296字节，包含2048字节主栈预留。绝对 deadline 仍为64位。这些是该选中算术对比的实际制品大小，不表示 FIFO 零成本、与普通 IRQ 字节模式的比较、实测周期或 WCET，也不建立干净且可复现的软件候选。"
-
-msgid "Physical HIL is `not_executed`. Neither model nor link results establish oscillator accuracy, peer compatibility, U575 noise immunity, physical latency or silicon erratum qualification. RM0433 Rev9 section 48.5.4/table 402 and RM0456 Rev7 section 66.5.5/table 674 define the reviewed FIFO shapes; other chips and modes need their own exact review."
-msgstr "物理 HIL 为 `not_executed`。模型或链接结果均不证明振荡器精度、对端兼容性、U575 抗噪声、物理时延或硅片勘误资格。RM0433 Rev9 第48.5.4节/表402和 RM0456 Rev7 第66.5.5节/表674定义已审查 FIFO 形态；其他芯片和模式需要分别精确审查。"
-
-#: docs/design/uart-fifo.md:313
-msgid ""
-"See the [public UART contract](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), "
-"[shared private algorithm](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h), [H743 "
-"specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/drivers/uart_fifo.c), [U575 "
-"specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS "
-"specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS "
-"specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/drivers/uart_rtscts.c), [finite U575 DMA "
-"selection](u575-uart-gpdma.md) and [current qualification "
-"boundaries](../delivery/qualification.md)."
-msgstr ""
-"另见[公共 UART 契约](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/uart.h), [共享私有算法](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h), "
-"[H743 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/drivers/uart_fifo.c), [U575 "
-"特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS "
-"特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS "
-"特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/drivers/uart_rtscts.c), [U575 有限 DMA "
-"选择](u575-uart-gpdma.md)及[当前资格边界](../delivery/qualification.md)."
-
 msgid ""
 "Run finite concurrent acquisition"
 msgstr ""
@@ -364,3 +307,33 @@ msgstr ""
 "session、计数、长度及源文件身份。四列 IRQ CSV 仅产生未验证的候选区间，不输出 `samples.irq_latency`；独立 "
 "assertion 来源、dispatch 关联、完整采集窗口和校准仍须审查，并满足既有 SOC-55 准入。raw DWT 区间和 "
 "wrapper 时长不能补出未观测的 IRQ 到达延迟。任何 parser、模型或链接检查都不建立实板执行证据。"
+
+msgid "Assess cost and evidence separately"
+msgstr "分别评估成本与证据"
+
+msgid "Only the selected owner adds a const-profile link to the ordinary UART prefix; the profile contains four one-byte encodings/budgets. Ordinary byte state, public operations and ordinary initialization remain unchanged. Exact object alignment, Flash retention and instruction cost come from the selected ARM ELF, not field-size estimates."
+msgstr "仅选中所有者在普通 UART 前缀上增加 const 配置链接；配置包含四个单字节编码/ 预算。普通字节状态、公共方法与普通初始化保持不变。对象精确对齐、Flash 保留 与指令成本须来自选中 ARM ELF，不能从字段大小估算。"
+
+msgid "The IRQ bound counts RDR reads and TDR writes independently. Status reads, source changes, barriers and wake delivery also cost CPU time. External models check accesses and prove that a drained threshold batch does not rewrite unchanged masks. Counts are not measured cycles, WCET or guaranteed throughput. A separately admitted cycle probe only observes its declared platform; U575's unreviewed DWT capability remains disabled."
+msgstr "IRQ 预算独立统计 RDR 读取与 TDR 写入。状态读取、来源变更、屏障和唤醒派发也 消耗 CPU。外部模型检查这些访问，并证明排空的阈值批次不重写未改变掩码。 计数不是实测周期、WCET 或吞吐量保证。另行获准的周期探针只能观察其声明平台； U575 未经审查的 DWT 能力保持关闭。"
+
+msgid "From the repository root with pinned tools and dependencies prepared:"
+msgstr "在已准备锁定工具与依赖的仓库根目录执行："
+
+msgid "Successful normal builds must produce the ELF/BIN/map, linked-resource and provider-retention reports, with one selected face and its actual FIFO table. These commands do not flash hardware or start UART traffic. Product protocol and traffic generation remain external."
+msgstr "成功的正常构建须产生 ELF/BIN/map、链接资源和 provider-retention 报告，包含一个 选中接口及其真实 FIFO 表。这些命令不烧录硬件或启动 UART 流量。产品协议与流量 产生仍由外部负责。"
+
+msgid "Current development validation passed 90 real-provider GoogleTest/GoogleMock cases, 45 per family, and 18 normal-TOML/generated-factory cases, 9 per family: 108 cases with no failures or skips. Models use the pinned official LL threshold functions and separate FIFO, RDR and shifter state. Both canonical configurations also passed normal ARM configure/build, resource budgets and retention checks for one face, one operations table and seven method slots per image."
+msgstr "当前开发验证通过90项真实 provider GoogleTest/GoogleMock，每系列45项，以及18项正常 TOML/生成工厂用例，每系列9项：共108项，无失败或跳过。模型使用锁定的官方 LL 阈值函数，分别表示 FIFO、RDR 和移位器状态。两个规范配置也均通过正常 ARM 配置/构建、资源预算，以及每镜像一个接口、一张方法表和七个方法槽的保留检查。"
+
+msgid "The separate RTSCTS development validation passed 76 real-provider cases, 38 per family, and 22 normal-TOML/generated-factory cases, 11 per family, with no failures or skips. Both exact four-pad normal configurations also passed ARM configure/build. These results establish software behavior and linking for the stated reference selections, not peer response, physical handoff, timing or a clean reproducible candidate. The existing flow-none arithmetic comparison below is not a measured cost comparison for the new RTSCTS selection."
+msgstr "独立的 RTSCTS 开发验证通过了 76 项真实 provider 用例，每个系列 38 项，以及 22 项正常 TOML／生成 factory 用例，每个系列 11 项，均无失败或跳过。两个精确四引脚正常配置也通过了 ARM 配置／构建。这些结果只建立所述参考选择的软件行为和链接证据，不证明对端响应、物理交接、时序或干净且可复现的软件候选。下文既有的无流控算术比较，不是新 RTSCTS 选择的实测成本比较。"
+
+msgid "For these two exact `Os` FIFO fixtures, narrowing only bounded intermediate arithmetic removed the linked software division helpers. H743 BIN/loaded Flash changed from 9216 to 8372 bytes, saving 844 bytes; U575 changed from 8948 to 8016 bytes, saving 932 bytes. Each image's allocated/reserved RAM stayed 2296 bytes, including its 2048-byte main-stack reservation. Absolute deadlines remain 64-bit. These are measured artifact sizes for this selected arithmetic comparison, not a zero-cost FIFO claim, a comparison with ordinary IRQ-byte mode, measured cycles or WCET. They do not establish a clean reproducible software candidate."
+msgstr "对于这两个精确的 `Os` FIFO 夹具，仅缩窄有界中间运算就移除了链接的软件除法辅助函数。H743 BIN/载入 Flash 从9216变为8372字节，节省844字节；U575 从8948变为8016字节，节省932字节。每个镜像的已分配/预留 RAM 保持2296字节，包含2048字节主栈预留。绝对 deadline 仍为64位。这些是该选中算术对比的实际制品大小，不表示 FIFO 零成本、与普通 IRQ 字节模式的比较、实测周期或 WCET，也不建立干净且可复现的软件候选。"
+
+msgid "Physical HIL is `not_executed`. Neither model nor link results establish oscillator accuracy, peer compatibility, U575 noise immunity, physical latency or silicon erratum qualification. RM0433 Rev9 section 48.5.4/table 402 and RM0456 Rev7 section 66.5.5/table 674 define the reviewed FIFO shapes; other chips and modes need their own exact review."
+msgstr "物理 HIL 为 `not_executed`。模型或链接结果均不证明振荡器精度、对端兼容性、U575 抗噪声、物理时延或硅片勘误资格。RM0433 Rev9 第48.5.4节/表402和 RM0456 Rev7 第66.5.5节/表674定义已审查 FIFO 形态；其他芯片和模式需要分别精确审查。"
+
+msgid "See the [public UART contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), [shared private algorithm](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/usart_fifo/uart_fifo_impl.h), [H743 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/drivers/uart_fifo.c), [U575 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/uart_rtscts.c), [finite U575 DMA selection](u575-uart-gpdma.md) and [current qualification boundaries](../delivery/qualification.md)."
+msgstr "另见[公共 UART 契约](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), [共享私有算法](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/usart_fifo/uart_fifo_impl.h), [H743 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/drivers/uart_fifo.c), [U575 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/uart_rtscts.c), [U575 有限 DMA 选择](u575-uart-gpdma.md)及[当前资格边界](../delivery/qualification.md)."

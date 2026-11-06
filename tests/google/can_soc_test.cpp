@@ -33,6 +33,7 @@ class CanSoc : public testing::Test {
     nx_can_event_t events[8] = {};
     const nx_can_port_t port = {&nx_classic_can_ops, &controller};
     nx_can_tx_request_t request = {};
+    nx_can_tx_request_t second_request = {};
     nx_can_frame_t frame = {
         0x1234567U, NX_CAN_EXTENDED, NX_CAN_DATA, 8U, {1, 2, 3, 4, 5, 6, 7, 8}};
     nx_native_can_registers_t* hardware = nullptr;
@@ -43,6 +44,18 @@ class CanSoc : public testing::Test {
 #else
         return nx_gd32_can_initialize(state);
 #endif
+    }
+    nx_result_t SelectController(unsigned index) {
+        nx_result_t result = nx_can_port_stop(&port);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+        controller.index = static_cast<uint8_t>(index);
+        controller.registers = 0U;
+        hardware = reinterpret_cast<nx_native_can_registers_t*>(domain.primary +
+                                                                index * 0x400U);
+        hardware->registers[2] = 7U << 26U;
+        return Initialize(&controller);
     }
     void SetUp() override {
         mapping =
@@ -77,6 +90,7 @@ class CanSoc : public testing::Test {
             controller.sources[i].priority = 5U;
         }
         nx_request_initialize(&request.base);
+        nx_request_initialize(&second_request.base);
         ASSERT_EQ(nx_can_tx_prepare(&request, &frame, 200U), NX_SUCCESS);
         ASSERT_EQ(Initialize(&controller), NX_SUCCESS);
     }
@@ -134,6 +148,89 @@ TEST_F(CanSoc, MailboxPackingAndSdkCompletionProveActualWireSuccess) {
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
     EXPECT_EQ(request.base.transferred, 8U);
+}
+TEST_F(CanSoc, MaximumExtendedIdentifierRespectsExactFamilyMailboxRestriction) {
+    for (unsigned index = 0U; index < 2U; ++index) {
+        ASSERT_EQ(SelectController(index), NX_SUCCESS);
+        ASSERT_EQ(nx_can_tx_prepare(&request, &frame, 200U), NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_submit(&port, &request), NX_SUCCESS);
+        nx_can_frame_t maximum = frame;
+        maximum.id = 0x1FFFFFFFU;
+        ASSERT_EQ(nx_can_tx_prepare(&second_request, &maximum, 200U),
+                  NX_SUCCESS);
+#ifdef NX_CAN_SOC_STM32
+        ASSERT_EQ(nx_can_port_submit(&port, &second_request), NX_SUCCESS);
+        EXPECT_EQ(controller.slots[1].request, &second_request);
+#else
+        unsigned char hardware_before[sizeof(*hardware)];
+        unsigned char request_before[sizeof(second_request)];
+        std::memcpy(hardware_before, hardware, sizeof(hardware_before));
+        std::memcpy(request_before, &second_request, sizeof(request_before));
+        EXPECT_EQ(nx_can_port_submit(&port, &second_request), NX_ERROR_BUSY);
+        EXPECT_EQ(
+            std::memcmp(hardware_before, hardware, sizeof(hardware_before)), 0);
+        EXPECT_EQ(std::memcmp(request_before, &second_request,
+                              sizeof(request_before)),
+                  0);
+        EXPECT_EQ(nx_request_state(&second_request.base), NX_REQUEST_READY);
+        EXPECT_EQ(controller.snapshot.pending, 1U);
+        EXPECT_EQ(controller.slots[1].request, nullptr);
+        EXPECT_EQ(controller.slots[2].request, nullptr);
+#endif
+        ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
+    }
+}
+TEST_F(CanSoc, MaximumExtendedIdentifierUsesMailboxZeroWithoutReducingPeers) {
+    for (unsigned index = 0U; index < 2U; ++index) {
+        ASSERT_EQ(SelectController(index), NX_SUCCESS);
+        nx_can_frame_t maximum = frame;
+        maximum.id = 0x1FFFFFFFU;
+        ASSERT_EQ(nx_can_tx_prepare(&request, &maximum, 200U), NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_submit(&port, &request), NX_SUCCESS);
+        EXPECT_EQ(controller.slots[0].request, &request);
+        EXPECT_EQ(hardware->registers[0x180U / 4U], 0xFFFFFFFDU);
+        ASSERT_EQ(nx_can_tx_prepare(&second_request, &frame, 200U), NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_submit(&port, &second_request), NX_SUCCESS);
+        EXPECT_EQ(controller.slots[1].request, &second_request);
+        ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
+    }
+}
+TEST_F(CanSoc, MaximumExtendedRemoteIdentifierUsesTheSamePhysicalRestriction) {
+    for (unsigned index = 0U; index < 2U; ++index) {
+        ASSERT_EQ(SelectController(index), NX_SUCCESS);
+        ASSERT_EQ(nx_can_tx_prepare(&request, &frame, 200U), NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_submit(&port, &request), NX_SUCCESS);
+        nx_can_frame_t maximum = frame;
+        maximum.id = 0x1FFFFFFFU;
+        maximum.kind = NX_CAN_REMOTE;
+        ASSERT_EQ(nx_can_tx_prepare(&second_request, &maximum, 200U),
+                  NX_SUCCESS);
+#ifdef NX_CAN_SOC_STM32
+        ASSERT_EQ(nx_can_port_submit(&port, &second_request), NX_SUCCESS);
+        EXPECT_EQ(controller.slots[1].request, &second_request);
+#else
+        EXPECT_EQ(nx_can_port_submit(&port, &second_request), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_request_state(&second_request.base), NX_REQUEST_READY);
+        EXPECT_EQ(controller.snapshot.pending, 1U);
+#endif
+        ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
+    }
+}
+TEST_F(CanSoc, FifoOrderAdmissionMatchesReviewedFamilyAbortGuarantees) {
+    ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
+    controller.fifo_order = true;
+#ifdef NX_CAN_SOC_STM32
+    ASSERT_EQ(Initialize(&controller), NX_SUCCESS);
+    EXPECT_NE(hardware->registers[0] & 4U, 0U);
+#else
+    unsigned char hardware_before[sizeof(*hardware)];
+    std::memcpy(hardware_before, hardware, sizeof(hardware_before));
+    EXPECT_EQ(Initialize(&controller), NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(std::memcmp(hardware_before, hardware, sizeof(hardware_before)),
+              0);
+    EXPECT_EQ(domain.active_mask, 0U);
+    EXPECT_FALSE(controller.snapshot.started);
+#endif
 }
 TEST_F(CanSoc, UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion) {
     hardware->hold_abort = true;

@@ -2798,7 +2798,7 @@
       "case": "ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -2827,7 +2827,7 @@
       "case": "ClassicCan.TxokAndCompletionDetachBeforeSettlement",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -2862,7 +2862,7 @@
       "case": "ClassicCan.CancellationWaitsForActualAbortAcknowledgement",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -2903,7 +2903,7 @@
       "case": "ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -2937,7 +2937,7 @@
       "case": "ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -2967,7 +2967,7 @@
       "case": "ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -3000,7 +3000,7 @@
       "case": "ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -3029,7 +3029,7 @@
       "case": "ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
@@ -3069,7 +3069,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3107,7 +3107,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3139,7 +3139,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3168,7 +3168,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3202,7 +3202,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3235,7 +3235,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3267,7 +3267,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3301,7 +3301,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3339,7 +3339,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3371,7 +3371,7 @@
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3400,7 +3400,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3434,7 +3434,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3467,7 +3467,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3499,7 +3499,7 @@
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/can.c",
-        "io/src/controllers/can_controller.c",
+        "drivers/can/classic_can/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3532,7 +3532,7 @@
       "case": "UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3569,7 +3569,7 @@
       "case": "UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3603,7 +3603,7 @@
       "case": "UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3642,7 +3642,7 @@
       "case": "UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3678,7 +3678,7 @@
       "case": "UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3707,7 +3707,7 @@
       "case": "UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3739,7 +3739,7 @@
       "case": "UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3772,7 +3772,7 @@
       "case": "UsbDevice.StaleCompletionCannotFinishANewRequestEpoch",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
@@ -3803,7 +3803,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3831,7 +3831,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3861,7 +3861,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3896,7 +3896,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3929,7 +3929,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3968,7 +3968,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4002,7 +4002,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4036,7 +4036,7 @@
       "production_sources": [
         "soc/stm32/stm32f407/drivers/usb_device.c",
         "soc/stm32/stm32f407/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4069,7 +4069,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4097,7 +4097,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4127,7 +4127,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4162,7 +4162,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4195,7 +4195,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4234,7 +4234,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4268,7 +4268,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4302,7 +4302,7 @@
       "production_sources": [
         "soc/gd32/gd32f470/drivers/usb_device.c",
         "soc/gd32/gd32f470/usb_clock.c",
-        "io/src/controllers/usb_device_controller.c",
+        "drivers/usb/fs_device_pio/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4334,7 +4334,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4369,7 +4369,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4403,7 +4403,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4439,7 +4439,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4466,7 +4466,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4500,7 +4500,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4531,7 +4531,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4562,7 +4562,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4590,7 +4590,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4621,7 +4621,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4650,7 +4650,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4683,7 +4683,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4713,7 +4713,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4741,7 +4741,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/stm32/stm32f407/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4783,7 +4783,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4818,7 +4818,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4852,7 +4852,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4888,7 +4888,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4915,7 +4915,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4949,7 +4949,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4980,7 +4980,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5011,7 +5011,7 @@
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5039,7 +5039,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5070,7 +5070,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5099,7 +5099,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5132,7 +5132,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5162,7 +5162,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5190,7 +5190,7 @@
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
         "soc/gd32/gd32f470/drivers/ethernet.c",
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5231,7 +5231,7 @@
       "case": "EthernetNative.ExplicitIngressCannotOverwriteAnAcquiredLoan",
       "test_source": "tests/google/ethernet_native_test.cpp",
       "production_sources": [
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "soc/native/drivers/ethernet.c",
         "core/src/request.c"
       ],
@@ -5264,7 +5264,7 @@
       "case": "EthernetNative.EpochSurvivesStopAndPreventsReleaseOfReusedStorage",
       "test_source": "tests/google/ethernet_native_test.cpp",
       "production_sources": [
-        "io/src/controllers/eth_mac.c",
+        "drivers/ethernet/legacy_mac/eth_mac.c",
         "soc/native/drivers/ethernet.c",
         "core/src/request.c"
       ],

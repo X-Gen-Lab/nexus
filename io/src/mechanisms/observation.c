@@ -33,6 +33,9 @@ nx_result_t nx_io_timestamp_elapsed(const nx_io_timestamp_t* first,
                                     const nx_io_timestamp_t* last,
                                     nx_io_timestamp_delta_t* out) {
     if (first == NULL || last == NULL || out == NULL ||
+        (uintptr_t)first % _Alignof(nx_io_timestamp_t) != 0U ||
+        (uintptr_t)last % _Alignof(nx_io_timestamp_t) != 0U ||
+        (uintptr_t)out % _Alignof(nx_io_timestamp_delta_t) != 0U ||
         overlaps(first, sizeof(*first), out, sizeof(*out)) ||
         overlaps(last, sizeof(*last), out, sizeof(*out)) ||
         !valid_timestamp(first) || !valid_timestamp(last)) {

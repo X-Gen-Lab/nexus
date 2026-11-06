@@ -5,12 +5,66 @@ The source-reviewed reference uses the internal IRC8 at 8 MHz. It does not
 assert any PCB, LED, external crystal, connector or UART adapter wiring.
 Physical HIL remains **not executed**.
 
-The current provider implements static GPIOA PA4/PA5 input/output and USART0 PA9 TX /
-PA10 RX IRQ bytes. GPIO uses the actual legacy CTL0/CTL1 four-bit fields; it does
+The provider's exact maintained controllers and modes are declared in
+[`soc.json`](soc.json); Board bindings are selected independently. GPIOA PA4/PA5
+and USART0 PA9 TX / PA10 RX IRQ bytes form the basic fixture. GPIO uses the actual
+legacy CTL0/CTL1 four-bit fields; it does
 not reuse GD32F470's incompatible two-bit GPIO/AF layout. USART0 uses its default
 AFIO route, 8N1, oversample16, priority5 and a caller-sized byte ring. Shared
 readonly typed operations tables receive separate private state. Factory lookup
 only returns existing interfaces and never initializes hardware or allocates.
+
+## Official library and selected source review
+
+The locked Firmware Library 3.0.3 import contains exact HD startup and register
+headers. It does **not** contain or link the official peripheral C library.
+`CMakeLists.txt` selects Nexus C providers and reviewed shared engines for the
+authored mode; no runtime library selection or vendor types enter the public API.
+The original official download and nested archive identities are retained in
+[`source.lock.json`](../../../vendors/gigadevice/gd32f30x/source.lock.json).
+
+The 2026-11-05 review independently extracted the original library using those
+two SHA-256 identities. Official `adc_calibration_enable()` waits indefinitely
+for RSTCLB and CLB; `dma_channel_disable()` writes CHEN without proving withdrawal;
+USART and I2C functions are register primitives rather than complete Nexus
+request, deadline, receive and cancellation transports. Their existence does not
+close an accepted loan or replace bounded calibration and source withdrawal.
+Narrow official leaf reuse remains possible after its complete selected mode is
+reviewed; it does not justify adding a second live transport owner. The original
+library was reviewed as a source reference, not silently added to the dependency.
+
+| Selected mechanism | Exact implementation and source-review boundary |
+|---|---|
+| Startup / clock / time | Official HD vector table; CPU-only `SystemInit`; fixed IRC8; concrete C TIMER1/TIMER4 owner, with hardware carry propagation still requiring HIL. |
+| GPIO / EXTI | Legacy four-bit mode fields, exact masks and independent EXTI0/1 vectors; no F470 alternate-function layout or connector claim. |
+| USART0 IRQ bytes | Concrete C provider, STAT0/DATA error sequence, actual TC and explicit source withdrawal. |
+| USART0 finite DMA | Reviewed channel engine with SDK ABI assertions; TX channel3, optional RX channel4, 48 KiB SRAM domain; no stream/FIFO or gap-free RX inference. |
+| I2C0 IRQ messages | Reviewed V1 engine plus exact PB6/PB7 lease; 80 kHz, IRQ0, no kernel IRQ notification, slave, SMBus or DMA. |
+| SPI0 polling | Concrete finite C transport and explicit PA4 CS; no attached slave or DMA mode. |
+| ADC0 / PWM / Flash | Reviewed legacy engines with exact GD wrapper assertions; ADC PA0 only, PWM PA6 only, physical bank0 geometry and explicit voltage declaration. |
+| FWDGT | Concrete key, reload and status operations; irreversible enable and uncharacterized physical IRC40k bounds remain explicit. |
+
+The errata PDF Rev1.4 was fetched again and matched against the bytes and SHA-256
+in [`references.json`](references.json). This review covers every errata group
+against the selected software scope. It does not observe a silicon revision or
+qualify external circuitry, oscillator tolerance or a physical workaround.
+
+| Errata sections | Selected-source disposition |
+|---|---|
+| 2.1 / 2.2 | Standby, deep-sleep, LXTAL and debug-hold combinations are outside the fixed IRC8 profile. |
+| 2.3.1 | PA9 is not 5 V tolerant with VBUS disabled. The USART route requires compatible external voltage; no physical Board voltage has been observed. |
+| 2.4.1 / 2.4.2 | ADC waits 2 ms nominal after enable before calibration and uses APB/2; external VDDA capacitance/bead and actual delay remain hardware obligations. |
+| 2.6.1 | Selected PWM and reserved timebase do not enable capture/compare DMA writes to shadowed compare registers. Timer DMA remains unsupported. |
+| 2.7.1 / 2.7.3 | TEN precedes DMA CHEN; the exact wrapper and engine retain admission and withdrawal checks. |
+| 2.7.2 / 2.7.4-2.7.7 | Mute, hardware flow control and mute wakeup are not selected modes; IDLE finite RX is not mute wakeup. |
+| 2.8.1 | Priority-zero bounded master receive windows; kernel ISR notifications are rejected. Physical priority and bus timing remain unmeasured. |
+| 2.8.2 / 2.8.3 | I2C slave and SMBus are not admitted. |
+| 2.5 / 2.9-2.13 | DAC, I2S, SDIO, EXMC, CAN and ENET have no maintained provider for this exact part. SDK headers do not enable them. |
+| 2.14.1 | Arm 776924 concerns enabled FPU, lazy context and very short ISRs. The reviewed baremetal-io ELF has at least three non-return instructions on every returning installed-handler path, following wrappers into callees; default non-return loops are separate. Other modes and external IRQs retain that instruction constraint; no F103 result or physical FP qualification is inherited. |
+
+The source index intentionally keeps `applicability_only`, `not_observed` and
+`not_fully_audited`. Per-mode software evidence belongs to the existing delivery
+record; a reviewed reference table is not a whole-chip or production certificate.
 
 ## Clock and time ownership
 
