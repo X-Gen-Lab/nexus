@@ -38,6 +38,18 @@ include it and use the class-specific `NX_*_REF_*` constants with
 `nx_factory_*_ref()` getters. These wrappers return the same static faces and
 add no global storage, hardware access or configuration key.
 
+The four external starter templates and the primary public SDK consumers use
+these strong references by default. `configure.py explain --assembly <input>`
+shows the exact include, return type, reference constant and getter derived from
+the same factory projection. Physical controller names do not determine the
+public interface: word UART and enhanced bus endpoints may have distinct faces.
+
+The wrapper introduces no persistent storage. Its final instruction cost is a
+compiler and optimization observation, not a promise implied by `inline`.
+Compare actual equivalent ELF images, including debugging profiles, before
+claiming zero additional code. Lookup remains separate from platform start and
+ordinary I/O dispatch.
+
 Default scalar IDs remain assembly-local `uint16_t` aliases; C does not reject
 mixing two such aliases. Nominal structure references let the compiler reject
 that class mismatch. They do not authenticate an external value or make an

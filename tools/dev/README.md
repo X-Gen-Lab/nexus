@@ -112,8 +112,30 @@ are rejected. The output must be a new directory outside that checkout.
 ```sh
 python tools/dev/dev.py create --templates ../nexus-examples \
   --revision <exact-40-character-examples-commit> \
-  --template native --output ../my-controller
+  --template native --source /absolute/path/to/nexus --output ../my-controller
 ```
+
+Use `--sdk-prefix /absolute/path/to/verified-prefix` instead of `--source` for an
+installed SDK. The two selectors are mutually exclusive; omission selects the
+coordinator's current platform root. An installed prefix, including one selected
+as a source tree, is verified by its own SDK verifier before its own resolver
+executes. The project origin distinguishes the template's expected lock from
+the selected source and the actual interpreter/resolver/input identities.
+
+Creation prints shell-quoted configure/build and Native test commands for that
+same selection. `--json` instead returns their argument arrays in the origin
+record. It does not execute those commands. The selected CPU determines the ARM
+toolchain requirement; a Native external provider is not classified by family
+name. Before origin publication, copied files and directories must still match
+the declared template payload. Failure removes only the newly owned directory.
+
+`python tools/dev/dev.py support --assembly <input>` gives a human-readable
+selection and evidence summary; `--json` returns the same projection. Explicit
+`--results-index`, `--record` and `--verify-record` inspect typed references in
+that exact leaf. Candidate, package, specific consumer, complete matrix and
+physical execution remain separate scopes. These queries launch no build,
+test, network request or equipment action; external provider Python remains
+trusted configuration code, not a sandboxed data file.
 
 The maintained template IDs are `native`, `qiming`, `sky` and `liangshan`.
 The command verifies the selected commit, manifest, tracked regular files and

@@ -1,11 +1,13 @@
 """Compile selected factory headers without unrelated public I/O headers."""
 from pathlib import Path
+from dataclasses import FrozenInstanceError
 import re
 import subprocess
 import tempfile
 import unittest
 
-from tools.configure import configure, factory
+from tools.configure import configure, experience, factory
+from tools.configure.tests.assembly_fixture import render_toml
 
 
 class FactoryIncludeTests(unittest.TestCase):
@@ -124,6 +126,78 @@ class FactoryIncludeTests(unittest.TestCase):
                   "consumers/h743-spi-dma.c")
         result = self.compile("cc", "c11", source.read_text())
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def accessor_fixture(self, fixture, identifier, renamed):
+        path = configure.ROOT / fixture
+        data = configure.load_assembly(path).to_dict()
+        data["board_package"] = str(path.parent / data["board_package"])
+        for item in data["controllers"] + data["devices"]:
+            if item["id"] == identifier:
+                item["id"] = renamed
+            if item.get("controller") == identifier:
+                item["controller"] = renamed
+        assembly = self.root / "accessor.toml"
+        assembly.write_text(render_toml(data))
+        configure.configure(assembly, self.output)
+        return configure.resolve_ir(assembly)
+
+    def test_accessor_projection_keeps_selected_nominal_identity_immutable(self):
+        self.generate("native-gpio.toml")
+        result = configure.resolve_ir(
+            configure.ROOT / "tools/configure/assemblies/native-gpio.toml")
+        accessors = factory.accessors(result)
+        self.assertIsInstance(accessors, tuple)
+        self.assertEqual(len(accessors), 1)
+        accessor = accessors[0]
+        self.assertEqual(accessor.id, "led0")
+        self.assertEqual(accessor.class_name, "gpio")
+        self.assertEqual(accessor.shape, "port")
+        self.assertEqual(accessor.include, "nexus_factory_strong.h")
+        self.assertEqual(accessor.reference, "NX_GPIO_REF_LED0")
+        self.assertEqual(accessor.getter, "nx_factory_gpio_ref")
+        self.assertEqual(accessor.return_type, "const nx_gpio_port_t*")
+        with self.assertRaises(FrozenInstanceError):
+            accessor.reference = "NX_UART_REF_LED0"
+        empty = configure.resolve_ir(
+            configure.ROOT / "tools/configure/assemblies/native-empty.toml")
+        self.assertEqual(factory.accessors(empty), ())
+
+    def test_explain_accessors_compile_for_words_enhanced_and_hyphenated_ids(self):
+        fixtures = (
+            ("native-uart9n1.toml", "uart0", "serial-link", "uart_word",
+             "nx_uart_word_port_t"),
+            ("f407-spi-transaction.toml", "sensor0", "sensor-link",
+             "spi_transaction_device", "nx_spi_transaction_endpoint_t"),
+            ("g474-i2c-long-timing.toml", "sensor_registers", "sensor-registers",
+             "i2c_long_device", "nx_i2c_long_endpoint_t"),
+            ("native-spi-dma-transaction.toml", "device_a", "device-link",
+             "spi_dma_transaction_device", "nx_spi_dma_transaction_endpoint_t"),
+        )
+        for fixture, identifier, renamed, class_name, face in fixtures:
+            with self.subTest(fixture=fixture):
+                result = self.accessor_fixture(
+                    "tests/contracts/io_evolution_assembly/" + fixture,
+                    identifier, renamed)
+                reference = ("NX_" + class_name.upper() + "_REF_" +
+                             renamed.replace("-", "_").upper())
+                getter = "nx_factory_" + class_name + "_ref"
+                call = getter + "(" + reference + ")"
+                contents = ('#include "nexus_factory_strong.h"\n'
+                            f'const {face}* lookup(void) {{\n'
+                            f'    return {call};\n}}\n')
+                for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
+                    compiled = self.compile(compiler, standard, contents)
+                    self.assertEqual(compiled.returncode, 0, compiled.stderr)
+                summary = experience.describe(result)
+                self.assertIn('#include "nexus_factory_strong.h"', summary)
+                self.assertIn(f"{class_name}.{renamed}: const {face}*", summary)
+                self.assertIn(call, summary)
+                accessor = next(item for item in factory.accessors(result)
+                                if item.id == renamed)
+                self.assertEqual(accessor.class_name, class_name)
+                self.assertEqual(accessor.return_type, f"const {face}*")
+                self.assertEqual(accessor.reference, reference)
+                self.assertEqual(accessor.getter, getter)
 
     def test_forward_faces_coexist_with_complete_headers_in_both_orders(self):
         self.generate("native-empty.toml")

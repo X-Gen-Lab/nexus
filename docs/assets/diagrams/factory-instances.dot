@@ -1,5 +1,5 @@
 // FIG-04 reference: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: tools/configure/factory.py; native_factory_test.cpp.
 // Relations and qualification limits are documented in README.md.
 digraph FactoryInstances {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -13,10 +13,10 @@ digraph FactoryInstances {
 
     graph [label="FIG-04 静态实例与共享多态表
 示例结构：两个同类实例 + controller / endpoint 分离\nFIG-04 Static instances and shared ops\nreference layout; controller != endpoint"];
-    caller [label="应用：assembly-local typed ID\napplication: assembly-local typed ID", fillcolor="#f8fafc"];
+    caller [label="应用：装配内强类型引用\napplication: assembly-local nominal reference", fillcolor="#f8fafc"];
     factory [label="typed factory
-有界 switch → 既有 const face
-非法 ID → NULL；不初始化、不分配\nbounded lookup of an existing readonly face\ninvalid ID -> NULL; no allocation or startup"];
+strong ref → 有界 getter → 既有 const face
+非法 ID → NULL；不初始化、不分配\nnominal ref -> bounded getter -> existing readonly face\ninvalid ID -> NULL; no allocation or startup"];
     subgraph clusterUart {
         label="按配置选入的 UART 实例\nUART instances selected by assembly"; color="#64748b";
         faceA [label="const UART face A

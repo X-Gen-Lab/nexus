@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5ee53c638e641bb0b0367b892062999c7d4fef512654fddece710e6893458c99\n"
+"X-Nexus-Source-SHA256: c90b330b170ab78038f82dbae73a89fc2a9e8a83d79a27ae3c06252b3059e6db\n"
 
 msgid "Typed factory, static instances and polymorphic faces"
 msgstr "类型化 factory、静态实例与多态接口面"
@@ -51,6 +51,122 @@ msgid ""
 msgstr ""
 "一份 schema-2 TOML 选择实例名、绑定、模式和精确容量。严格解析器产生类型化 IR；生成器发布只读接口面、共享 ops "
 "引用、独立私有上下文、固定 IRQ 接线和紧凑获取函数。Native 装配同样取得独立模型状态；测试单例不是生产实例生成机制。"
+
+#: docs/explanation/factory.md:29
+msgid ""
+"`nexus_factory.h` is generated for each Platform assembly, so its IDs are "
+"not a universal header or persistent numbering scheme. Default IDs are "
+"compact `uint16_t` aliases with named constants. COUNT, invalid and "
+"unselected entries return NULL. A chip capability record does not grant "
+"Board routing or physical qualification."
+msgstr ""
+"`nexus_factory.h` 针对每份 Platform 装配生成，因此其中的 ID 不是通用头或持久编号方案。默认 ID 是带具名常量的紧凑 "
+"`uint16_t` 别名。COUNT、非法值和未选中的条目均返回 NULL。芯片能力记录不授予 Board 路由或实物资格。"
+
+#: docs/explanation/factory.md:34
+msgid "Choose strong references for new products"
+msgstr "新产品优先使用强类型引用"
+
+#: docs/explanation/factory.md:36
+msgid ""
+"Every Platform assembly emits `nexus_factory_strong.h`. New products should "
+"include it and use the class-specific `NX_*_REF_*` constants with "
+"`nx_factory_*_ref()` getters. These wrappers return the same static faces "
+"and add no global storage, hardware access or configuration key."
+msgstr ""
+"每份 Platform 装配都会生成 `nexus_factory_strong.h`。新产品应包含该头文件，并将类别专用的 `NX_*_REF_*` "
+"常量传给 `nx_factory_*_ref()` getter。这些包装返回相同的静态接口面，不增加全局存储、硬件访问或配置键。"
+
+msgid ""
+"The four external starter templates and the primary public SDK "
+"consumers use these strong references by default. `configure.py "
+"explain --assembly <input>` shows the exact include, return type, "
+"reference constant and getter derived from the same factory "
+"projection. Physical controller names do not determine the public "
+"interface: word UART and enhanced bus endpoints may have distinct "
+"faces."
+msgstr ""
+"四个外部 starter 模板和主要公共 SDK 消费工程默认使用这些强类型引用。`configure.py explain "
+"--assembly <input>` 展示从同一 factory 投影派生的准确 include、返回类型、引用常量和 "
+"getter。物理控制器名称不能决定公共接口：按字传输的 UART 和增强总线端点可能具有不同的接口面。"
+
+msgid ""
+"The wrapper introduces no persistent storage. Its final instruction "
+"cost is a compiler and optimization observation, not a promise "
+"implied by `inline`. Compare actual equivalent ELF images, "
+"including debugging profiles, before claiming zero additional code. "
+"Lookup remains separate from platform start and ordinary I/O "
+"dispatch."
+msgstr ""
+"包装器不引入常驻存储。最终指令成本取决于实际编译器和优化配置下的观察，`inline` "
+"本身不构成承诺。声称不增加代码前，应比较实际等价的 ELF 镜像，包括调试配置。查找仍与平台启动和常规 I/O 分派分开。"
+
+#: docs/explanation/factory.md:41
+msgid ""
+"Default scalar IDs remain assembly-local `uint16_t` aliases; C does not "
+"reject mixing two such aliases. Nominal structure references let the "
+"compiler reject that class mismatch. They do not authenticate an external "
+"value or make an instance active. Optional capability records are separately"
+" selected by `factory.capabilities`."
+msgstr ""
+"默认标量 ID 仍是装配局部的 `uint16_t` 别名，C "
+"不会拒绝混用两个这样的别名。具有独立结构类型的引用可让编译器拒绝类别不匹配，但不认证外部数值，也不使实例进入活动状态。可选能力记录另外通过 "
+"`factory.capabilities` 选择。"
+
+#: docs/explanation/factory.md:47
+msgid ""
+"The factory header includes complete public APIs only for selected interface"
+" classes and preserves forward declarations for unselected getters. Include "
+"a specific public I/O header explicitly when code needs that API or its "
+"complete face layout; an empty getter still returns NULL."
+msgstr ""
+"factory 头文件只为选中的接口类别包含完整公共 API，并为未选中的 getter 保留前置声明。代码需要特定 API "
+"或完整接口面布局时，应显式包含对应公共 I/O 头；空 getter 仍返回 NULL。"
+
+msgid "Map lifecycle diagnostics to the assembly"
+msgstr "将生命周期诊断映射回装配"
+
+msgid "Generated `nexus_bindings.h` names every resolved controller position with `NX_PLATFORM_CONTROLLER_INDEX_<kind>_<assemblyID>` and provides `NX_PLATFORM_CONTROLLER_INDEX_COUNT`. Names use generated C symbols, for example `NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A`. These are the zero-based controller ordinals reported by diagnosed start/stop, not typed factory IDs, persistent numbers or a wire ABI. `SIZE_MAX` still means no controller in a diagnostic."
+msgstr "生成的 `nexus_bindings.h` 使用 `NX_PLATFORM_CONTROLLER_INDEX_<kind>_<assemblyID>` 命名每个已解析 controller 位置，并提供 `NX_PLATFORM_CONTROLLER_INDEX_COUNT`。名称使用生成的 C 符号，例如 `NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A`。它们是 diagnosed start/stop 报告的零基 controller 序号，不是 typed factory ID、持久编号或 wire ABI。诊断中 `SIZE_MAX` 仍表示没有 controller。"
+
+msgid "When `factory.capabilities` is enabled, `nx_factory_controller_capability()` uses that `size_t` ordinal to return the controller's existing immutable capability object. It does not allocate a copy or introduce another metadata table. `nx_factory_controller_label()` uses the same ordinal and an exact field:"
+msgstr "启用 `factory.capabilities` 后，`nx_factory_controller_capability()` 使用这个 `size_t` 序号返回 controller 既有的不可变 capability 对象。它不分配副本或引入另一张元数据表。`nx_factory_controller_label()` 使用相同序号和精确字段："
+
+msgid "Field"
+msgstr "字段"
+
+msgid "Returned immutable fact"
+msgstr "返回的不可变事实"
+
+msgid "`NX_FACTORY_CONTROLLER_ID`"
+msgstr "`NX_FACTORY_CONTROLLER_ID`"
+
+msgid "Authored assembly instance ID"
+msgstr "装配中填写的实例 ID"
+
+msgid "`NX_FACTORY_CONTROLLER_KIND`"
+msgstr "`NX_FACTORY_CONTROLLER_KIND`"
+
+msgid "Selected controller kind"
+msgstr "选定的 controller 类别"
+
+msgid "`NX_FACTORY_CONTROLLER_HARDWARE`"
+msgstr "`NX_FACTORY_CONTROLLER_HARDWARE`"
+
+msgid "Selected concrete hardware controller"
+msgstr "选定的具体硬件 controller"
+
+msgid "`NX_FACTORY_CONTROLLER_MODE`"
+msgstr "`NX_FACTORY_CONTROLLER_MODE`"
+
+msgid "Selected semantic mode"
+msgstr "选定的语义 mode"
+
+msgid "An invalid ordinal, including COUNT, returns NULL. Label lookup also returns NULL for an invalid field or `NX_FACTORY_CONTROLLER_FIELD_COUNT`. Text is static and belongs to this assembly. Neither lookup accesses hardware, clocks, locks or mutable lifecycle state; both may inspect immutable facts before start and after stop without granting readiness, resource ownership or execution permission."
+msgstr "无效序号（包括 COUNT）返回 NULL。标签查询遇到无效字段或 `NX_FACTORY_CONTROLLER_FIELD_COUNT` 也返回 NULL。文字为静态内容，属于当前装配。两个查询均不访问硬件、clock、锁或可变生命周期状态；可在 start 前和 stop 后读取不可变事实，不授予 ready、资源所有权或执行权限。"
+
+msgid "The default-disabled option emits no diagnostic text or runtime lookup objects. Named ordinal constants alone occupy no runtime storage. See the actual [factory emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py), [binding emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py), [configuration regressions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/test_factory_diagnostics.py) and [generated Native factory tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/native_factory_test.cpp). These source/test locations are review entry points, not downloadable execution receipts or new-source software qualification."
+msgstr "默认关闭该选项时，不生成诊断文字或运行时查询对象。具名序号常量本身不占运行时存储。参见实际[factory emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[binding emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[配置回归](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/test_factory_diagnostics.py)及[生成 Native factory 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/native_factory_test.cpp)。这些源码/测试位置是审查入口，不是可下载的执行 receipt 或新源码软件资格。"
 
 msgid "What a call does"
 msgstr "一次调用执行什么"
@@ -129,95 +245,3 @@ msgstr ""
 "[异步教程](../tutorials/async-io.md)运行完整生成 factory 可执行文件，验证冷态查找、共享 ops "
 "下的独立上下文、总线/端点身份、无效 ID、停止/重启和隔离保留。这些接口的权威是[接入合同](../design/integration-"
 "contracts.md)及生成/公开头文件；本页解释设计，不重复函数声明。"
-
-#: docs/explanation/factory.md:29
-msgid ""
-"`nexus_factory.h` is generated for each Platform assembly, so its IDs are "
-"not a universal header or persistent numbering scheme. Default IDs are "
-"compact `uint16_t` aliases with named constants. COUNT, invalid and "
-"unselected entries return NULL. A chip capability record does not grant "
-"Board routing or physical qualification."
-msgstr ""
-"`nexus_factory.h` 针对每份 Platform 装配生成，因此其中的 ID 不是通用头或持久编号方案。默认 ID 是带具名常量的紧凑 "
-"`uint16_t` 别名。COUNT、非法值和未选中的条目均返回 NULL。芯片能力记录不授予 Board 路由或实物资格。"
-
-#: docs/explanation/factory.md:34
-msgid "Choose strong references for new products"
-msgstr "新产品优先使用强类型引用"
-
-#: docs/explanation/factory.md:36
-msgid ""
-"Every Platform assembly emits `nexus_factory_strong.h`. New products should "
-"include it and use the class-specific `NX_*_REF_*` constants with "
-"`nx_factory_*_ref()` getters. These wrappers return the same static faces "
-"and add no global storage, hardware access or configuration key."
-msgstr ""
-"每份 Platform 装配都会生成 `nexus_factory_strong.h`。新产品应包含该头文件，并将类别专用的 `NX_*_REF_*` "
-"常量传给 `nx_factory_*_ref()` getter。这些包装返回相同的静态接口面，不增加全局存储、硬件访问或配置键。"
-
-#: docs/explanation/factory.md:41
-msgid ""
-"Default scalar IDs remain assembly-local `uint16_t` aliases; C does not "
-"reject mixing two such aliases. Nominal structure references let the "
-"compiler reject that class mismatch. They do not authenticate an external "
-"value or make an instance active. Optional capability records are separately"
-" selected by `factory.capabilities`."
-msgstr ""
-"默认标量 ID 仍是装配局部的 `uint16_t` 别名，C "
-"不会拒绝混用两个这样的别名。具有独立结构类型的引用可让编译器拒绝类别不匹配，但不认证外部数值，也不使实例进入活动状态。可选能力记录另外通过 "
-"`factory.capabilities` 选择。"
-
-#: docs/explanation/factory.md:47
-msgid ""
-"The factory header includes complete public APIs only for selected interface"
-" classes and preserves forward declarations for unselected getters. Include "
-"a specific public I/O header explicitly when code needs that API or its "
-"complete face layout; an empty getter still returns NULL."
-msgstr ""
-"factory 头文件只为选中的接口类别包含完整公共 API，并为未选中的 getter 保留前置声明。代码需要特定 API "
-"或完整接口面布局时，应显式包含对应公共 I/O 头；空 getter 仍返回 NULL。"
-
-msgid "Map lifecycle diagnostics to the assembly"
-msgstr "将生命周期诊断映射回装配"
-
-msgid "Generated `nexus_bindings.h` names every resolved controller position with `NX_PLATFORM_CONTROLLER_INDEX_<kind>_<assemblyID>` and provides `NX_PLATFORM_CONTROLLER_INDEX_COUNT`. Names use generated C symbols, for example `NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A`. These are the zero-based controller ordinals reported by diagnosed start/stop, not typed factory IDs, persistent numbers or a wire ABI. `SIZE_MAX` still means no controller in a diagnostic."
-msgstr "生成的 `nexus_bindings.h` 使用 `NX_PLATFORM_CONTROLLER_INDEX_<kind>_<assemblyID>` 命名每个已解析 controller 位置，并提供 `NX_PLATFORM_CONTROLLER_INDEX_COUNT`。名称使用生成的 C 符号，例如 `NX_PLATFORM_CONTROLLER_INDEX_UART_LINK_A`。它们是 diagnosed start/stop 报告的零基 controller 序号，不是 typed factory ID、持久编号或 wire ABI。诊断中 `SIZE_MAX` 仍表示没有 controller。"
-
-msgid "When `factory.capabilities` is enabled, `nx_factory_controller_capability()` uses that `size_t` ordinal to return the controller's existing immutable capability object. It does not allocate a copy or introduce another metadata table. `nx_factory_controller_label()` uses the same ordinal and an exact field:"
-msgstr "启用 `factory.capabilities` 后，`nx_factory_controller_capability()` 使用这个 `size_t` 序号返回 controller 既有的不可变 capability 对象。它不分配副本或引入另一张元数据表。`nx_factory_controller_label()` 使用相同序号和精确字段："
-
-msgid "Field"
-msgstr "字段"
-
-msgid "Returned immutable fact"
-msgstr "返回的不可变事实"
-
-msgid "`NX_FACTORY_CONTROLLER_ID`"
-msgstr "`NX_FACTORY_CONTROLLER_ID`"
-
-msgid "Authored assembly instance ID"
-msgstr "装配中填写的实例 ID"
-
-msgid "`NX_FACTORY_CONTROLLER_KIND`"
-msgstr "`NX_FACTORY_CONTROLLER_KIND`"
-
-msgid "Selected controller kind"
-msgstr "选定的 controller 类别"
-
-msgid "`NX_FACTORY_CONTROLLER_HARDWARE`"
-msgstr "`NX_FACTORY_CONTROLLER_HARDWARE`"
-
-msgid "Selected concrete hardware controller"
-msgstr "选定的具体硬件 controller"
-
-msgid "`NX_FACTORY_CONTROLLER_MODE`"
-msgstr "`NX_FACTORY_CONTROLLER_MODE`"
-
-msgid "Selected semantic mode"
-msgstr "选定的语义 mode"
-
-msgid "An invalid ordinal, including COUNT, returns NULL. Label lookup also returns NULL for an invalid field or `NX_FACTORY_CONTROLLER_FIELD_COUNT`. Text is static and belongs to this assembly. Neither lookup accesses hardware, clocks, locks or mutable lifecycle state; both may inspect immutable facts before start and after stop without granting readiness, resource ownership or execution permission."
-msgstr "无效序号（包括 COUNT）返回 NULL。标签查询遇到无效字段或 `NX_FACTORY_CONTROLLER_FIELD_COUNT` 也返回 NULL。文字为静态内容，属于当前装配。两个查询均不访问硬件、clock、锁或可变生命周期状态；可在 start 前和 stop 后读取不可变事实，不授予 ready、资源所有权或执行权限。"
-
-msgid "The default-disabled option emits no diagnostic text or runtime lookup objects. Named ordinal constants alone occupy no runtime storage. See the actual [factory emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py), [binding emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py), [configuration regressions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/test_factory_diagnostics.py) and [generated Native factory tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/native_factory_test.cpp). These source/test locations are review entry points, not downloadable execution receipts or new-source software qualification."
-msgstr "默认关闭该选项时，不生成诊断文字或运行时查询对象。具名序号常量本身不占运行时存储。参见实际[factory emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/factory.py)、[binding emitter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/bindings.py)、[配置回归](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/test_factory_diagnostics.py)及[生成 Native factory 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/native_factory_test.cpp)。这些源码/测试位置是审查入口，不是可下载的执行 receipt 或新源码软件资格。"

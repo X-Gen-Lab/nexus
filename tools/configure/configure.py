@@ -19,6 +19,9 @@ import subprocess
 import sys
 import tomllib
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 # Direct CLI execution binds only this checkout or relocated SDK.
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))

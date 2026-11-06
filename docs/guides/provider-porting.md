@@ -6,332 +6,186 @@ source_language: en
 ---
 
 (docs-guides-provider-porting)=
-# Add a SoC, provider or reusable component
+# Add a provider through a built-in or external package
 
-Use this guide to add a maintained implementation with explicit resources and
-measurable costs. A new family or mode requires behavior, configuration and build
-integration together. Similar STM32/GD32 peripheral names do not prove register
-compatibility.
+Use this guide to connect a concrete C11 implementation to the static factory,
+configuration resolver and source SDK. Choose one source owner below, then follow
+the same lifecycle and verification contract. A similar peripheral name does not
+establish compatible registers, a Board route or physical qualification.
 
-## Keep the layer boundary narrow
+Read the [integration contract](../design/integration-contracts.md),
+[provider construction contract](../design/official-stm32-provider.md#build-time-provider-contract)
+and [selected assembly checks](../design/provider-assemblies.md) first.
 
-| Owner | Required responsibility |
+| Owner | Responsibility |
 | --- | --- |
-| Arch | Exact CPU primitives, feature facts and ABI; no PCB or device registry |
-| SoC | Full part, memory, clocks, IRQ/DMA routes, reset/startup and private provider |
-| Board | Source-reviewed wiring, oscillators, safe levels and actual unknowns |
-| I/O provider | Public operation contract, private state, admission and final drain |
-| Component | Caller-owned storage, bounded algorithm and explicit narrow ports |
-| External product | Roles, tasks, queue depth, recovery, Flash reservations and release |
+| Arch | Exact CPU primitives, features and ABI |
+| SoC/provider | Full part, memory, clocks, IRQ/DMA, startup and private C state |
+| Board | Reviewed wiring, oscillators, safe levels and explicit unknowns |
+| Component | Caller-owned storage, bounded algorithms and narrow typed ports |
+| External product | Tasks, queues, roles, Flash reservations and recovery policy |
 
-Read the [architecture](../explanation/platform-architecture.md),
-[integration contract](../design/integration-contracts.md) and
-[provider assembly contract](../design/provider-assemblies.md).
-
-## Choose the source owner
+## Choose one integration path
 
 ![Current decision for shared register algorithms and exact SoC integration](../assets/diagrams/driver-source-ownership.svg)
 
-FIG-31 classifies private controller work. Arrows are maintenance decisions, not
-runtime calls. Sharing requires evidence for every selecting chip's register
-layout, flags, ordering and reset compatibility, plus explicit handling of its
-errata. Similar names or a successful compile do not establish that evidence.
-Keep an unreviewed or incompatible protocol in its exact SoC implementation.
+FIG-31 shows maintenance decisions, not runtime calls. A shared driver requires
+reviewed register layout, flags, reset ordering and errata for every selecting
+chip. The exact SoC owns routes and admission even when it reuses that driver.
 
-| Change | Source owner and required check |
-| --- | --- |
-| Public I/O contract or portable I/O rule | `io/`; preserve the public ownership and failure contract |
-| Reusable register-protocol algorithm | `drivers/<kind>/<ip>/`; each SoC wrapper establishes the actual silicon contract |
-| Part, memory, clock, reset, pin, IRQ or DMA integration | Exact `soc/<vendor>/<family>/`; facts, configuration policy and private C retain distinct jobs |
-| Private SoC collaboration helper | Narrowest reviewed SoC scope; `soc/common/uart_control.h` is cross-vendor, while STM32 identity access is vendor-specific |
-| External device, protocol or product policy | Existing component ports or the external product, according to the [integration contract](../design/integration-contracts.md) |
+### Built-in implementation
 
-The SoC target selects shared sources through explicit CMake entries and private
-includes. The driver directory does not choose routes, clock profiles or an ABI,
-and its presence does not add a maintained mode. Never introduce a runtime
-forwarder merely to match a source directory. A selected private compile-time
-port may bind reviewed official operations inside that shared translation unit; a
-macro in a separately compiled wrapper cannot change it. Preserve operation
-width, read side effects, command atomicity and withdrawal ordering; the
-[bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments)
-is a current example, not a blanket HAL replacement.
+1. Select an existing exact `soc/<vendor>/<family>/` or add a reviewed family
+   descriptor with that canonical `source_directory`. Keep public family IDs
+   independent of directory names. Add exact `soc.json` and `routes.json` facts;
+   Board facts remain separate. Preserve unknown electrical and PCB information.
+   Register the data-only descriptor in the existing explicit maintained map;
+   an external package does not edit that map.
+2. Define admitted full part numbers and modes in the family's `configure/contract.py`.
+   `bindings.py` supplies typed `Construction` values; `emission.py` supplies static
+   declarations and explicit typed lifecycle calls. The leaf contract must not
+   import the top-level resolver or emitter. Declare configuration helpers in the
+   descriptor so reconfiguration and SDK closure include them.
+3. Add concrete C sources and private dependencies to the family's explicit CMake
+   target. Export the selected target and the required startup/system inputs.
+   Configure must reject a missing, imported or incorrectly typed provider target,
+   invalid private include roots and missing MCU lifecycle inputs before building.
+4. Add the exact authored TOML fixture to the maintained assembly catalogue and
+   the applicable SDK consumer plan. Execute the behavior and build checks below.
 
-## Implement in a reviewable sequence
+Use the shared CPU resolver for ABI and feature selection. Do not duplicate CPU
+flags or infer optional features from a family name. A descriptor lookup must
+remain a data-only operation and must not import another family's implementation.
 
-1. Prepare the [fixed source and recursive dependencies](source-checkout.md).
-   Define the new behavior, supported modes, public ownership obligations and
-   rejection boundaries before changing its production implementation.
-2. For new behavior or fixes, add and execute a meaningful RED
-   GoogleTest/GoogleMock contract against the current production path. Retain the
-   actual command, nonzero execution and expected failing assertion. Equivalent
-   refactors retain actual old-GREEN source/binary snapshots and applicable
-   regressions plus real-default operation probes, without fabricated RED. Test
-   MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only
-   error is not the expected behavioral RED result.
-3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
-   shared CPU resolver; do not duplicate CPU flags or infer optional features.
-   For an in-tree family, place MCU implementations under `soc/<vendor>/<family>/` and declare that
-   canonical `source_directory` in the maintained family descriptor. Public
-   family identifiers stay independent of the directory. CPU implementation
-   sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed
-   cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after
-   checking each participating silicon contract. Cross-vendor SoC collaboration
-   stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`.
-4. For an in-tree family, add a data-only `descriptor.py` at the SoC package root (Native uses
-   `soc/native/descriptor.py`), outside its `configure/` package. Add its exact
-   module to the central explicit map in `tools/configure/providers/descriptor.py`;
-   reuse the frozen `FamilyDescriptor`, without an eager parallel registry.
-   Place its production configuration package in
-   `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and
-   its configuration tests in `tools/configure/tests/providers/<family>/`.
-   Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
-   Return an explicit frozen `Construction` record, including the private state
-   type and failed-init cleanup responsibility. Initialize and stop actions use
-   `DirectCall` values under the [constructor contract](../design/official-stm32-provider.md#build-time-provider-contract);
-   raw C expressions are not accepted in those fields. Do not require family-name
-   inference in common generation. Unsupported modes reject; there is no runtime
-   registration or plugin discovery.
-5. Add explicit CMake targets and private SDK dependencies. Update declared
-   resolver reconfiguration inputs and the Source SDK required-file closure.
-6. Implement the smallest correct production change. Define an immutable public
-   face with shared readonly ops and independent context.
-   Reuse public Nexus types; keep vendor structures and concrete storage private.
-   Review official HAL/LL reuse before duplicating a vendor state machine. Apply
-   [the official-driver boundary](../design/official-stm32-provider.md) to time,
-   callbacks, cancellation, private dependencies and mode-specific comparison.
-7. Execute GREEN against the real provider. Verify rejection
-   without residual effects, accepted borrow, cancel/deadline, failed drain,
-   quarantine, stop/restart and instance isolation where the mode needs them.
-8. Refactor while keeping contracts passing. Link exact ARM fixtures and verify
-   actual resources, handler retention, vector bytes and unselected-driver pruning. Validate an
-   independent relocated SDK consumer and record physical work as not executed.
+### External implementation
 
-For a component, pass explicit bus, GPIO, time and optional OS ports. Do not create
-workers, probe devices, invent application roles or supply a maximum object pool.
-Flash drivers expose physical geometry; persistence and update policy remain external.
+Start with the complete
+[canonical external provider starter](../../cmake/package/verification/external_provider/README.md).
+It is exported at `share/nexus/src/cmake/package/verification/external_provider`
+in a source SDK. Checkout contracts and SDK consumers copy those same files;
+there is no separate test implementation to keep synchronized.
 
-Within each SoC's `configure/` package, `contract.py` owns mode capabilities,
-ABI/limits and family admission policy. Sibling modules import that contract
-directly; `__init__.py` explicitly exports it with constructors and emitters.
-The leaf `providers/common.py` owns validation helpers and immutable
-`Construction`; leaf contracts and common helpers do not import the top-level
-resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
-policy, `ir.py` owns named immutable decisions and their one-way JSON projection,
-and `matrix.py` orchestrates support catalogues.
-The descriptor's `configuration_modules` property combines the fixed package,
-`contract.py`, `bindings.py` and `emission.py` paths with explicitly declared
-`configuration_helpers` and the selected local descriptor file. These sources
-belong to reconfiguration inputs and the Source SDK source closure. Keep family records, order and public selections
-stable when relocating metadata. A single `descriptor.maintained()` lookup must not import
-another family or configure behavior; explicit enumeration and snapshot/SDK
-inventory may intentionally load all data-only descriptors.
+From an external work directory, with a verified SDK already available:
 
-The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h`
-templates allow one specialization per translation unit. Required named exports,
-register, clock, IRQ and data bindings reject at compilation when missing.
-The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control
-requires its hardware flow binding. Wrapper-owned bindings, including ops names
-and post-include clock-readiness use, remain available after inclusion. Explicit
-caller read/write ports survive; cleanup removes only template-owned helper and
-default macros. Review each specialization's actual compilation, exported table
-and runtime contract; a template guard does not establish hardware timing.
+```sh
+cp -R "/path/to/sdk/share/nexus/src/cmake/package/verification/external_provider" \
+  "provider workspace"
+cd "provider workspace"
+cmake -S . -B build -G Ninja \
+  -DNexus_DIR=/path/to/sdk/lib/cmake/Nexus
+cmake --build build --target external_lifecycle_consumer --parallel 1
+./build/bin/external_lifecycle_consumer
+```
 
-`tools/configure/contracts.py` owns immutable controller-category fields, factory
-kind order and public header mappings. Authoring, selection and factory consume
-that same metadata; exact SoC capabilities remain in the family contract. Reviewed
-fact selection, memory budgets, Flash layout and source dependencies have frozen
-named stage results. One frozen device-graph result completes controller,
-endpoint, USB FIFO, SPI face, ADC trigger, resource and DMA decisions before final
-assembly. Its local validation builders may still use dictionaries; the stage
-boundary does not claim that every normalizer is a separate typed stage.
+A zero exit verifies the starter's Native software model: two independent GPIO
+contexts, shared readonly ops, pure factory lookup, a second-prepare failure,
+rollback of the first instance, withdrawn I/O and repeated recovery. It does not
+establish a new MCU, PCB route or HIL result. Paths with spaces are supported.
+The project uses an explicit SDK; it never searches for a checkout fallback.
 
-## External SoC/provider package contract
+1. Keep the authored assembly's `soc_package` and `board_package` explicit and
+   relative to that TOML. The package family must match Board facts and cannot
+   shadow a built-in family. Replace the starter's model facts only with reviewed
+   facts for the actual selected implementation.
+2. Maintain `nexus-soc.json` with schema/interface version 1, package identity,
+   `source_directory`, `configuration_directory` and declared `inputs`. The
+   [schema](../../tools/configure/soc-package.schema.json) provides editor hints;
+   runtime validation remains authoritative. Every source, CMake input, private
+   header and configuration helper consumed from the package must be declared.
+3. Implement the package's explicit CMake target and configuration modules under
+   the same construction contract as a built-in provider. Package CMake and
+   Python are explicitly selected trusted host code. They define no firmware
+   interpreter, discovery service or second build graph.
+4. After reviewing changed source, refresh existing declared hashes and check the
+   package with the SDK's tool. Run these commands from the copied starter root:
 
-This section documents the explicit package contract introduced by IT-P01–IT-P08
-in the
-[current iteration](../delivery/next-iterations.md). Consult the
-[original task records](../status/ledgers/platform-delivery-completion.md) for
-implementation and executed acceptance. The contract itself does not establish
-an available chip, Board route, installed-SDK result or physical qualification.
-This addition does not change the published `v0.2.1` archive; use the development
-source containing the package implementation until a corresponding SDK is verified.
+   ```sh
+   python /path/to/sdk/share/nexus/src/tools/configure/integration_package.py \
+     refresh-inputs --package provider
+   python /path/to/sdk/share/nexus/src/tools/configure/integration_package.py \
+     check --package provider --json
+   python /path/to/sdk/share/nexus/src/tools/configure/configure.py \
+     provider-check --assembly assembly.toml
+   ```
 
-The assembly explicitly selects `soc_package` relative to its own TOML file.
-The existing `board_package` selects Board facts separately. No package scan,
-automatic download or mutable global registry chooses an implementation.
-An external family cannot replace an existing in-tree family identity.
+   Refresh updates only already declared paths; add a new input deliberately
+   before refreshing. It preserves the package version and rejects missing files.
+   Check reads metadata and digests without executing provider code. Provider
+   checking resolves and validates the selected implementation. Unsupported modes,
+   unknown fields, duplicate keys, escaped paths, symlinks, stale digests and
+   unsupported interface versions reject without falling back to another family.
+5. Rebuild the copied project against both the checkout and the installed SDK.
+   Move the SDK prefix to a path containing spaces and build a fresh consumer
+   there. SDK fixture requirements, copying and identity comparisons expand the
+   same verified manifest; unrelated package files are not discovered as inputs.
 
-| Package input | Contract |
-| --- | --- |
-| `nexus-soc.json` | Strict manifest with `schema_version`, `interface_version`, `id`, `version`, `family` and `vendor` |
-| `source_directory` | Package-relative SoC source directory containing `soc.json`, `routes.json` and `CMakeLists.txt` |
-| `configuration_directory` | Package-relative explicit configuration entry containing `__init__.py` and the selected provider modules |
-| `inputs` | Relative regular-file paths mapped to SHA-256; cover the selected facts, configuration code and build inputs, including required entry files |
+`interface_version` gates compatibility. The package's `version` identifies its
+reviewed source; it does not express a consumer semver request. Declare external
+vendor source and locks explicitly in `inputs`. `soc.source_lock` belongs to
+Nexus-managed dependencies and does not validate an arbitrary external checkout.
+Declared Python imports use verified source bytes; undeclared helpers and stale
+bytecode cannot supply configuration behavior. SDK packaging does not import the
+provider merely to enumerate its files.
 
-Manifest schema and interface version 1 define this first contract. Paths and
-hashes are admission inputs; they do not define targets or replace CMake's source
-dependency graph. Reject unknown fields, duplicate identities, escaped paths,
-disallowed links, missing files, unsupported interface versions and changed bytes
-rather than falling back to
-an in-tree family. Configuration rejection must leave no partial usable bundle.
+### Keep facts and admission policy distinct
 
-`interface_version` is the compatibility gate. `version` is the package's audit
-identity, not an expected-semver constraint requested by the consumer. Declare
-package-owned vendor source and locks in `inputs`; the existing `soc.source_lock`
-refers to Nexus-managed dependencies and does not automatically validate arbitrary
-external Git repositories.
+SoC and Board JSON describe hardware facts; the provider contract admits exact
+parts and modes. The resolver constructs the sole immutable decision rather
+than treating a fact file as an executable selection policy. Part density,
+package pins, clock domains, IRQ/DMA reachability and mode-specific resource
+ownership must agree before generation. Unknown wiring or silicon revisions
+remain explicit and cannot be repaired by choosing a different mode.
 
-Package configuration and CMake are explicitly selected trusted host code, not
-data executed by the firmware. Resolve their identity once into the immutable
-package context, then carry it through facts, selected contracts, resource
-validation, static generation, capabilities and build selection. Queries must
-not resolve one package while firmware compilation selects another.
+`ConfigurationIR.physical_part` and `ControllerIR.integration` reference existing
+physical facts and selected resource, clock, IRQ and DMA plans. Reuse those
+objects; do not create another routing or register interpretation in the factory.
+Vendor types and register behavior remain private C implementation details.
 
-Declared Python modules within `configuration_directory` are loaded eagerly from
-their hash-checked source. Later relative imports reuse those declared loaded
-modules; undeclared filesystem fallback and bytecode caches are not package
-inputs. Absolute package paths may contain spaces; CMake-special characters are
-rejected explicitly rather than passed into generated build syntax.
+## Implement and verify the lifecycle
 
-The selected SoC target privately connects its SDK, startup, system and linker
-inputs. Public I/O retains Nexus types and static faces. Ordinary builds retain
-one `Nexus::Config`; an installed Source SDK consumer supplies its external
-package explicitly and must not fall back to a development checkout. Relocation,
-offline consumption, interface-version rejection and independent package fixtures
-are
-software exits; actual PCB, DMA, clocks and electrical behavior need HIL.
+Write and execute the meaningful failing contract before changing production
+behavior. Keep the actual RED command, nonzero result and contemporaneous source
+and binary. Python tool behavior uses stdlib unittest; new C API/provider contracts
+use host GoogleTest/GoogleMock against the real C algorithm through hardware
+ports. Missing tools and compile errors are not behavioral RED evidence.
 
-`_FactResolution` views the selected readonly SoC variant for the exact Board part;
-it does not store a second part or variant decision. Common field validators consume
-`Mapping` and explicit `list`/`tuple` containers directly; JSON input retains the
-same strict field, type and domain checks. Providers consume those immutable
-containers directly.
+The generated factory returns existing static readonly faces by compact typed ID.
+It must not allocate, initialize hardware, acquire locks or discover devices.
+Instances share readonly operation tables and retain independent private context.
+Callbacks receive that context. Controller and endpoint IDs remain distinct.
 
-## Keep facts and admission policy distinct
+Keep hardware admission, register access, waits, pin/clock/IRQ/DMA acquisition,
+rollback, stop and recovery in concrete C11 adapters. Host Python validates facts
+and emits static declarations, exact storage and explicit typed calls. Review the
+[official driver boundary](../design/official-stm32-provider.md) before duplicating
+HAL/LL/SPL behavior. Do not add a runtime register script, name registry, maximum
+object pool, hidden worker or mandatory OS lock.
 
-The exact `soc.json` variant supplies physical Flash origin, size, erase blocks
-and RAM domains. Each family's `contract.PARTS` explicitly admits its full part
-numbers through the frozen `PartPolicy`: the package and optional memory-domain
-allowlist are software policy, not duplicate size tables. Unknown parts, a
-different package or optional domains inconsistent with the physical facts reject.
+The C prepare path must validate foreign ownership before effects. The close path
+must validate its receipt before changing an existing provider; an empty alien
+receipt leaves unowned state unchanged. Preserve every unfinished resource claim
+after partial preparation until readback proves return. Exercise partial receipts,
+stop after public shutdown, repeated failure/recovery and instance isolation.
 
-Validation covers every maintained variant in the fact package, including parts
-not selected by the current assembly. Each variant uses the same package, Flash
-geometry, memory overlap, DMA reachability and `PartPolicy` checks. Selection
-returns the existing selected facts; it does not repair a malformed unselected
-part or copy another part's geometry.
+For asynchronous modes, rejected admission retains no references or effects.
+Accepted requests and buffers remain borrowed until acquire-observed SETTLED.
+Cancel or deadline expiry does not revoke that borrow. Failed drain retains
+QUARANTINED storage and explicit recovery responsibility. Remove IRQ, hardware and
+queue references before release-publication of completion.
 
-Trace an added part or mode through these maintained inputs before adding its
-constructor:
+Keep vendor headers, handles and mutable storage private to their targets. Inspect
+actual public consumer compile commands and include probes, not only target
+property names. The optional host framework requires C++17; production firmware
+remains C11 and never links GoogleTest or its runtime.
 
-| Input or projection | Maintainer's check |
-| --- | --- |
-| `soc.json` variant and `routes.json` | Exact physical geometry, bonded pads, route provenance and finite mode allowlist |
-| Family `PARTS` and `PartPolicy` | Explicit full part, reviewed package and optional placement domains |
-| `normalize_clock` and `clock_plan` | The exact family implements the selected profile and any reviewed domain relationships |
-| `i2c_timing_clock` | `I2cTimingClock` carries selected kernel and peripheral clock bounds and whether explicit timing is required; electrical assumptions remain authored |
-| Selected limits, format and silicon policy | Metadata belongs to the exact selected owner; missing review remains explicit and does not admit a mode |
-| `PhysicalPartIR` | Views the same frozen part, package, Flash and memory facts; it adds no JSON or configuration-identity field |
-| `ControllerIntegrationIR` | Reuses canonical resource claims, DMA lanes, IRQ options/profile, clocks, pins and the exact SoC hardware binding |
-| Family `UART_FORMATS`, `STREAM_GEOMETRY` and `ENDPOINT_POLICY` | Explicit reviewed formats, stream geometry and endpoint capability; a vendor alias or name prefix does not select a policy |
-| Generated static C and private provider | Consume validated values and retain independent SDK/register assertions and runtime failure checks |
+Execute GREEN, then refactor while retaining the contracts. Build the exact
+existing STM32 and GD32 selections with the ARM toolchain, check ELF resources,
+selected handlers and unselected-driver pruning, and run relocated SDK consumers.
+Compare the same empty image with the added mode, reporting Flash LOAD, footprint
+and each RAM domain separately. Native models establish modeled software behavior;
+ARM builds establish their compile/link boundary. Real PCB, clock, DMA, cache and
+electrical acceptance require physical station execution.
 
-F407 Flash generation illustrates the boundary: its selected sector array and
-readonly geometry come from validated `result.flash.erase_blocks`, origin and
-size. The C SDK assertion still checks the physical base, and independent
-register-model tests retain the reference geometry. Removing duplicate production
-tables does not make configuration a substitute for hardware validation.
-
-All seven maintained MCU families obtain generated readonly Flash geometry from
-the validated facts through `memory.flash_geometry`. Six retain their existing
-global geometry symbols; F407 emits selected static geometry. Native remains a
-host model. The exact source and independently maintained test oracle still need
-the applicable provider and linked-image checks.
-
-`ConfigurationIR.physical_part` views the existing frozen Flash and memory
-objects. `ControllerIR.integration` composes canonical `ResourcePlanIR` claims,
-`DmaTopologyIR` lanes, IRQ options/profile, clock plan/inputs and selected pins.
-It references a family `ControllerBinding` where that family declares one. Its
-`clock_hz` is only the paired nominal APB input; a missing value is not guessed,
-and reviewed frequency bounds come from `clock_plan`. Fixed reviewed SDK
-addresses, masks and Native model facts remain explicit leaf data; they do not
-independently select a route, owner or clock. The maintained-constructor
-consumption audit checks these selected records and capability projections; it
-does not create a new route resolver or establish final integrated qualification.
-
-Family policy hooks remain declared configuration inputs. H743's reviewed clock
-domain relationships and selected Flash linker fragments live in its `configure/`
-package; generic tools still own parsing, typed IR, resource arbitration and
-atomic publication. A hook must not create a second source graph or silently
-choose a different part, route or profile.
-
-The paired F407/GD470 controller bindings, DMA vector maps and concrete secondary
-controller hooks live with their SoC. Common code keeps resource leases, fixed
-IRQ wiring and drain ordering while consuming the selected typed integration.
-Coupled personalities and named pin states likewise require explicit provider
-policy. Cross-Board/backend qualification remains in its existing OS contract;
-moving family mechanisms does not broaden those admitted combinations.
-
-The read-only [work-package view](../../tools/maintenance/README.md) connects
-exact maintained modes to resolver fixtures, selected ops sources and reviewed
-lifecycle properties. Its entries are navigation, not executed tests or new
-support declarations. Run actual applicable gates separately.
-
-## Keep hardware behavior in C
-
-Firmware mechanisms use C11, with necessary assembly for startup and CPU context.
-Python runs on the development host: it validates authored inputs, resolves
-resources and emits static C/H declarations, instances, typed factory getters,
-fixed IRQ entry connections and explicit typed calls. The MCU executes compiled
-firmware and contains no Python interpreter.
-
-Maintain register reads and writes, hardware admission, waits, pin/clock/IRQ/DMA
-acquisition, rollback, stop and recovery in concrete C adapters. Generated
-definitions may retain constant register addresses and immutable resource data;
-a fixed IRQ trampoline may directly call its selected handler. Do not move these
-algorithms into a runtime action interpreter or add a registry, hidden worker or
-mandatory lock. Test the production C algorithm through hardware ports using
-GoogleTest/GoogleMock; Python unittest verifies configuration and static wiring.
-
-The reviewed Native and seven MCU-family increments include their maintained
-cold paths. Shared enhanced-SPI admission uses read-only C checks before resource
-acquisition or failed-init markers; H743 resume checks admission before reopening
-its runtime domain and acquiring its lease. Dead hardware emitters and unused default MMIO macros have
-been removed. Audit the whole start/failure/stop/resume path, including shared
-owners and optional retained components. A `DirectCall` in one constructor does
-not prove whole-family or whole-source completion. Exact implementation and
-execution scopes remain in the
-[delivery-completion ledger](../design/platform-delivery-completion.csv).
-
-Write readonly mode-specific configuration and exactly sized mutable storage.
-The C prepare function validates context and foreign ownership before effects;
-the C close function proves its receipt before touching an existing provider.
-An empty receipt must leave unowned state unchanged. After partial preparation,
-close must retain every unfinished pin, clock, IRQ or DMA claim until readback
-proves return. Test both an alien empty receipt and a genuine partial receipt;
-also test cleanup after the caller has already stopped the public peripheral.
-Avoid duplicate persistent pin snapshots or a maximum-sized union of all modes.
-
-Keep schema fields and numerical policy in host validation. Keep runtime MMIO
-reads, clock checks, publisher joins, waits and recovery in C. Declare each new
-configuration helper and private C/header input in the existing family
-descriptor and explicit CMake target. A successful host model does not replace
-an actual ARM link, relocated SDK consumer or physical station run.
-
-H743 fixed-run power references the selected logical controller ID in
-`power.controllers`; the ID need not be `bus4`. Renaming the controller requires
-updating both endpoint and power references. This preserves the exact single
-SPI4 finite-DMA, baremetal, HSI64/cache-off contract; changing a logical name does
-not admit another physical controller, clock profile or backend.
-
-## Review performance and ownership
-
-Measure the selected empty image and the same fixture after enabling the new mode.
-Report Flash LOAD, Flash footprint, each RAM domain and reserved task/IO storage
-separately. Hot IRQ work should directly access its fixed provider; an interface
-lookup is a cold action. Keep bounded admission and stream metadata operations
-independent of queue length where their contracts require it.
-
-A passing host register model proves its modeled software scope. New CPU, Cache,
-FPU/MVE, security or low-power behavior needs its own actual execution boundary;
-[platform support](../reference/platforms/support.md) does not infer it from a name.
+Application examples remain in the external private examples repository. Keep
+product roles, tasks, private partitions and recovery policy there; the public
+starter contains only reusable integration mechanisms and software tests.

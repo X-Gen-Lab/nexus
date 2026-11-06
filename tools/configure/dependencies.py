@@ -34,7 +34,7 @@ SDK = (
 )
 
 
-def source_names(mode, family, *, sdk=False):
+def source_names(mode, family, *, sdk=False, external=False):
     """Return declared generator inputs for freshness and SDK admission."""
     if mode not in {"platform", "runtime"}:
         raise ValueError("Unknown configuration-code dependency scope")
@@ -47,7 +47,8 @@ def source_names(mode, family, *, sdk=False):
     else:
         from tools.configure.providers import descriptor
         names.extend("tools/configure/" + name + ".py" for name in PLATFORM)
-        providers = (descriptor.families() if family is None else
+        providers = (() if external else
+                     descriptor.families() if family is None else
                      (descriptor.maintained(family),))
         for provider in providers:
             names.extend(provider.configuration_modules)
@@ -75,21 +76,21 @@ def snapshot(*, mode, family=None, sdk=False):
 
 def selected(paths, identity, *, family, context=None):
     """Retain the pre-resolution bytes of the selected family, never rehash."""
-    names = source_names("platform", None if context is not None and
-                        context.external else family,
-                   sdk="cmake/package/package_source_sdk.py" in paths)
+    names = source_names("platform", family,
+                         sdk="cmake/package/package_source_sdk.py" in paths,
+                         external=context is not None and context.external)
     records = {record["path"]: record for record in identity["files"]}
     if not set(names).issubset(records):
         raise ValueError("Configuration code dependency closure changed during resolution")
     selected_paths = {name: paths[name] for name in names}
     selected_records = [records[name] for name in names]
     if context is not None and context.external:
-        for path in context.inputs:
+        for path, digest in context.input_digests:
             if path.suffix == ".py":
                 name = "soc-package/" + path.relative_to(context.directory).as_posix()
                 selected_paths[name] = str(path)
                 selected_records.append({"path": name,
-                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+                    "sha256": digest})
     return selected_paths, _identity("platform", selected_records)
 
 

@@ -148,12 +148,12 @@ class SDKProfilePolicyTests(unittest.TestCase):
             self.assertEqual(calls, [])
 
     def test_v15_appends_five_images_without_changing_v14_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, 'nexus-sdk-consumers-v15')
+        self.assertEqual(transport.CONSUMER_POLICY, 'nexus-sdk-consumers-v16')
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:59], separators=(',', ':')).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(), V14_LAYOUT_SHA256)
-        self.assertEqual((len(layout), len(transport.IMAGES)), (64, 67))
-        self.assertEqual(tuple(item.name for item in transport.SERVICE_CONSUMERS[-5:]),
+        self.assertEqual((len(layout), len(transport.IMAGES)), (65, 68))
+        self.assertEqual(tuple(item.name for item in transport.SERVICE_CONSUMERS[-6:-1]),
                          NEW_NAMES)
 
     def test_mcuboot_all_eighty_locked_sources_are_required(self):

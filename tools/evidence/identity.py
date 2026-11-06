@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import stat
 import subprocess
+import sys
 
 from tools.evidence.common import (EvidenceError, digest, file_identity, load_json,
                                    stream_digest)
@@ -199,4 +200,13 @@ def _source_sdk_validator():
 
 def verify_sdk_package(root: Path) -> dict:
     """Reuse the single package verifier without a competing SDK engine."""
-    return _source_sdk_validator().verify(root)
+    bytecode = sys.dont_write_bytecode
+    import_path = sys.path[:]
+    try:
+        # Verification imports checked SDK helpers. Their bytecode must never
+        # enter the immutable package, even in an ordinary Python invocation.
+        sys.dont_write_bytecode = True
+        return _source_sdk_validator().verify(root)
+    finally:
+        sys.dont_write_bytecode = bytecode
+        sys.path[:] = import_path

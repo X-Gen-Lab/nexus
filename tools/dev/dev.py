@@ -11,6 +11,9 @@ import sys
 import time
 import uuid
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
@@ -223,10 +226,15 @@ def main(argv=None):
                                           "check", "doctor", "prepare",
                                           "qualify", "candidate", "cache", "docs",
                                           "create", "flash", "debug", "monitor",
-                                          "timings", "plan", "artifacts"))
+                                          "timings", "plan", "artifacts", "support"))
     parser.add_argument("--preset")
     args, native = parser.parse_known_args(argv)
     try:
+        if args.action == "support":
+            if args.preset is not None:
+                raise ValueError("support requires an exact --assembly; --preset is not evidence")
+            from tools.maintenance import capabilities
+            return capabilities.main(native, support_command=True)
         if args.action == "artifacts":
             if args.preset is not None:
                 raise ValueError("artifacts requires actual --provenance; "

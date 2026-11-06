@@ -152,8 +152,6 @@
     "核对在线身份": "Check online identity",
     "取得、浏览和验真": "Retrieve, browse and verify",
     "FIG-04 静态实例与共享多态表\n示例结构：两个同类实例 + controller / endpoint 分离\\nFIG-04 Static instances and shared ops\\nreference layout; controller != endpoint": "FIG-04 Static instances and shared ops\nReference layout: two same-kind instances; controller != endpoint",
-    "应用：assembly-local typed ID\\napplication: assembly-local typed ID": "application: assembly-local typed ID",
-    "typed factory\n有界 switch → 既有 const face\n非法 ID → NULL；不初始化、不分配\\nbounded lookup of an existing readonly face\\ninvalid ID -> NULL; no allocation or startup": "Typed factory\nBounded switch lookup of an existing readonly face\nInvalid ID -> NULL; no allocation, initialization or hardware start",
     "按配置选入的 UART 实例\\nUART instances selected by assembly": "UART instances selected by assembly",
     "const UART face A\nops* + context*": "const UART face A\nops* + context*",
     "const UART face B\nops* + context*": "const UART face B\nops* + context*",
@@ -923,7 +921,9 @@
     "Local Mosquitto\\nTLS and MQTT endpoint": "Local Mosquitto\nTLS and MQTT endpoint",
     "TCP A\\nsoftware Ethernet frame ports": "TCP A\nsoftware Ethernet frame ports",
     "TCP B\\nhost socket bytes": "TCP B\nhost socket bytes",
-    "One end-to-end TLS session\\nrelay does not terminate TLS": "One end-to-end TLS session\nrelay does not terminate TLS"
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "One end-to-end TLS session\nrelay does not terminate TLS",
+    "应用：装配内强类型引用\\napplication: assembly-local nominal reference": "Application: assembly-local nominal reference",
+    "typed factory\nstrong ref → 有界 getter → 既有 const face\n非法 ID → NULL；不初始化、不分配\\nnominal ref -> bounded getter -> existing readonly face\\ninvalid ID -> NULL; no allocation or startup": "Typed factory\nNominal ref -> bounded getter -> existing readonly face\nInvalid ID -> NULL; no allocation or startup"
   },
   "zh_CN": {
     "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用": "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用",
@@ -1077,8 +1077,6 @@
     "核对在线身份": "核对在线身份",
     "取得、浏览和验真": "取得、浏览和验真",
     "FIG-04 静态实例与共享多态表\n示例结构：两个同类实例 + controller / endpoint 分离\\nFIG-04 Static instances and shared ops\\nreference layout; controller != endpoint": "FIG-04 静态实例与共享多态表\n参考结构：两个同类实例；controller 与 endpoint 分离",
-    "应用：assembly-local typed ID\\napplication: assembly-local typed ID": "应用：assembly-local typed ID",
-    "typed factory\n有界 switch → 既有 const face\n非法 ID → NULL；不初始化、不分配\\nbounded lookup of an existing readonly face\\ninvalid ID -> NULL; no allocation or startup": "typed factory\n有界 switch → 既有 const face\n非法 ID → NULL；不初始化、不分配",
     "按配置选入的 UART 实例\\nUART instances selected by assembly": "按配置选入的 UART 实例",
     "const UART face A\nops* + context*": "只读 UART face A\nops* + context*",
     "const UART face B\nops* + context*": "只读 UART face B\nops* + context*",
@@ -1848,6 +1846,8 @@
     "Local Mosquitto\\nTLS and MQTT endpoint": "本地 Mosquitto\nTLS 与 MQTT 端点",
     "TCP A\\nsoftware Ethernet frame ports": "TCP A\n软件以太网帧接口",
     "TCP B\\nhost socket bytes": "TCP B\n主机 socket 字节",
-    "One end-to-end TLS session\\nrelay does not terminate TLS": "一条端到端 TLS 会话\n中继不终止 TLS"
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "一条端到端 TLS 会话\n中继不终止 TLS",
+    "应用：装配内强类型引用\\napplication: assembly-local nominal reference": "应用：装配内强类型引用",
+    "typed factory\nstrong ref → 有界 getter → 既有 const face\n非法 ID → NULL；不初始化、不分配\\nnominal ref -> bounded getter -> existing readonly face\\ninvalid ID -> NULL; no allocation or startup": "类型化 factory\n强类型引用 → 有界 getter → 既有只读 face\n非法 ID → NULL；不分配、不启动"
   }
 }

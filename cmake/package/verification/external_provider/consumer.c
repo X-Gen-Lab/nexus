@@ -6,16 +6,22 @@
  * \date            2026-11-02
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#if __has_include("lifecycle_adapter.h") ||                                    \
+                  __has_include("provider.h") ||                               \
+                                __has_include("stm32f4xx.h") ||                \
+                                              __has_include("gd32f4xx.h")
+#error Private provider or vendor headers leaked into the public consumer
+#endif
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include "nexus_reference/lifecycle_probe.h"
 
 /** \brief Exercise stable public faces and actual C rollback without casts. */
 static int lifecycle_cycle(void) {
     nx_reference_reset();
-    const nx_gpio_port_t* alpha = nx_factory_gpio(NX_GPIO_ID_ALPHA);
-    const nx_gpio_port_t* beta = nx_factory_gpio(NX_GPIO_ID_BETA);
+    const nx_gpio_port_t* alpha = nx_factory_gpio_ref(NX_GPIO_REF_ALPHA);
+    const nx_gpio_port_t* beta = nx_factory_gpio_ref(NX_GPIO_REF_BETA);
     if (alpha == NULL || beta == NULL || alpha == beta ||
         alpha->context == beta->context || alpha->ops != beta->ops ||
         nx_reference_event_count() != 0U ||
@@ -54,8 +60,8 @@ static int lifecycle_cycle(void) {
     }
     nx_reference_fail_prepare(0U);
     if (nx_platform_start().primary != NX_SUCCESS ||
-        nx_factory_gpio(NX_GPIO_ID_ALPHA) != alpha ||
-        nx_factory_gpio(NX_GPIO_ID_BETA) != beta ||
+        nx_factory_gpio_ref(NX_GPIO_REF_ALPHA) != alpha ||
+        nx_factory_gpio_ref(NX_GPIO_REF_BETA) != beta ||
         nx_gpio_port_write(alpha, 1U, 0U) != NX_SUCCESS ||
         nx_gpio_port_write(beta, 8U, 0U) != NX_SUCCESS ||
         nx_platform_stop() != NX_SUCCESS || nx_reference_event_count() != 7U) {

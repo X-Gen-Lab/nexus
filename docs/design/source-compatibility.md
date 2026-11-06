@@ -27,6 +27,12 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 使尚未实现的 schema 获得支持。SDK manifest 增加一个被 file-map 覆盖的源码文件，
 不等于修改 manifest 格式。
 
+软件候选另有封存格式版本。新封存使用第 2 版，保留各 scope 的实际原件并重新
+核验范围语义；这不改变 factory epoch 或 TOML schema。第 1 版冻结候选只能通过
+显式 `--legacy-replay` 做历史声明与字节闭包的只读重放，不能重新建立当前范围
+资格，也不执行归档中的 Python。核验时观察的工具身份不补造执行时工具身份；
+原始记录没有建立的执行输入认证仍需明确保留。
+
 类型化源码接口第 2 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、
 factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。
 `resolved.json` 仍是第 1 版单向输出，用于审计和独立产物检查，不是可信配置入口。
@@ -89,12 +95,12 @@ resolver 选择规则；如果 authority 的表达形式改变，检查会明确
 实际 commit。源码锁继续约束官方来源、许可和内容；锁中的 commit 必须与 Gitlink
 相等，不能覆盖它。更换托管地址不意味着升级库或改变 CMake 依赖图。
 
-目录包含 14 个顶层 Git 子模块和 FreeRTOS 的两个嵌套子模块。13 个顶层运行时依赖
+目录明确枚举顶层 Git 子模块及其嵌套子模块。所选提交的运行时依赖
 及其递归闭包参与源码 SDK；GoogleTest/GoogleMock 只供主机测试使用。嵌套模块的
 section name 和相对路径分别核对，不能假设两者相同。GD32 官方归档继续按已审
 子树、逐文件锁和原许可管理，不伪装成官方 Git 仓库的 fork。
 
-`X-Gen-Lab` 托管目录中全部 16 个官方 Git 依赖的 fork；`fetch_url` 与
+`X-Gen-Lab` 托管目录中声明的官方 Git 依赖 fork；`fetch_url` 与
 `.gitmodules` 指向已验证的组织仓库。获取地址使用目录中的实际仓库名，不从磁盘
 路径或上游 URL 推导名称。官方 `upstream_url` 保留来源与版本观察职责，Gitlink
 继续选择准确 commit。每个 Nexus 提交只认可一个明确获取地址，不使用全局

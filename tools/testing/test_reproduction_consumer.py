@@ -290,6 +290,34 @@ class ConsumerInputTests(unittest.TestCase):
                 with self.assertRaises(EvidenceError):
                     proof.validate_reproduction({}, manifest, {}, resolver, live=False)
 
+    def test_old_docker_boundary_requires_explicit_read_only_legacy_replay(self):
+        evidence, manifest = self.proof_fixture()
+        spec_path = Path(evidence["spec"]["path"])
+        spec = json.loads(spec_path.read_text())
+        spec["schema_version"] = 1
+        spec.pop("consumer")
+        spec["commands"][0][2] = "{source}"
+        atomic_json(spec_path, spec)
+        evidence["spec"] = file_identity(spec_path)
+        image = json.loads(Path(evidence["environment"]["path"]).read_text())["image_config_id"]
+        for index, run in enumerate(evidence["runs"]):
+            for number, (execution, command) in enumerate(zip(run["commands"], spec["commands"])):
+                execution["argv"] = reproduce.container_argv(spec, run, command,
+                    image, container_name=f"nexus-legacy-unit-{index}-{number}",
+                    docker="unit-fixture-docker", legacy=True)
+        def resolver(identity):
+            return (proof.verify_sdk_file(identity) if identity.get("role") == "sdk_file"
+                    else verify_file_identity(identity))
+        with patch.object(proof, "proof_document", return_value=(None, evidence)):
+            with self.assertRaisesRegex(EvidenceError, "complete offline boundary"):
+                proof.validate_reproduction({}, manifest, {}, resolver, live=False)
+            proof.validate_reproduction({}, manifest, {}, resolver,
+                                        live=False, legacy_replay=True)
+            evidence["storage_preflight"] = {}
+            with self.assertRaisesRegex(EvidenceError, "complete offline boundary"):
+                proof.validate_reproduction({}, manifest, {}, resolver,
+                                            live=False, legacy_replay=True)
+
 
 if __name__ == "__main__":
     unittest.main()

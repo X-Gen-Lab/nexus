@@ -41,7 +41,7 @@ Before running the resolver, prepare the
 | `optimization` | Maintained optimization/debug/LTO profile; no arbitrary compiler override |
 | `[memory]` | Byte budgets plus optional executable-image prefix/suffix reservations |
 | `layout` | Optional schema-1 physical Flash-owner JSON path relative to the assembly; exactly one image |
-| `[factory]` | Explicit optional strong IDs and capability metadata |
+| `[factory]` | Optional capability metadata; only `capabilities` is accepted |
 | Kind instance table | Stable authored name, reviewed binding, mode and bounded options |
 | SPI/I2C device table | Separate endpoint identity tied to an existing controller |
 | `[abi]` | Assert reviewed CPU architecture/FPU/float ABI; cannot invent chip features |
@@ -54,6 +54,14 @@ implement the route. The resolver never silently changes pins, modes or clock.
 See the [configuration and ownership guide](../../guides/developer-workflow.md)
 for Board-first queries, validated profiles, human summaries and effective diffs.
 `explain` defaults to human-readable output; automation must select `--json`.
+
+Every generated bundle contains `nexus_factory_strong.h`. Application code can
+include it and use nominal references such as `NX_UART_REF_UART0` with
+`nx_factory_uart_ref`; no `[factory]` selection enables that header.
+`factory.strong` is not a supported field and rejects as unknown. The optional
+`capabilities = true` selection emits immutable mode metadata separately from
+the interface faces. Factory getters return existing static objects and do not
+start hardware.
 
 ## Physical Flash and the selected image
 

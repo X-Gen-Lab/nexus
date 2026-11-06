@@ -167,7 +167,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         '#ifdef NEXUS_EFFECTIVE_CONFIG\n#error SDK leaked into unrelated parent target\n#endif\n'
         'int main(void) { return 0; }\n')
     code = ('#include "nexus_bindings.h"\n'
-            '#include "nexus_factory.h"\n'
+            '#include "nexus_factory_strong.h"\n'
             '#include "nexus_config.h"\n'
             '#ifndef NEXUS_PLATFORM_VERSION\n'
             '#error "Missing source interface version"\n'
@@ -180,7 +180,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#if __has_include("stm32f407_provider.h") || __has_include("gd32f470_provider.h")\n'
             '#error Concrete provider leaked into product source\n#endif\n'
             'int main(void) {\n'
-            ' if (nx_factory_gpio(NX_GPIO_ID_COUNT) != 0) return 7;\n'
+            ' if (nx_factory_gpio_ref(NX_GPIO_REF_COUNT) != 0) return 7;\n'
             ' nx_platform_start_result_t result = nx_platform_start();\n'
             ' if (result.primary != NX_SUCCESS) return 1;\n'
             ' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')
@@ -276,7 +276,7 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '[uart.console.rx]\nformat = "bytes"\ncapacity = 64\n'
         '[uart.console.irq]\npriority = 5\ncalls_os = false\n')
     code = (
-        '#include "nexus_bindings.h"\n#include "nexus_factory.h"\n'
+        '#include "nexus_bindings.h"\n#include "nexus_factory_strong.h"\n'
         '#if __has_include("stm32h7xx.h") || __has_include("stm32u5xx.h") || '
         '__has_include("stm32f1xx.h") || __has_include("gd32f30x.h") || '
         '__has_include("stm32g4xx.h")\n'
@@ -316,8 +316,9 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         'int main(void) {\n'
         '    nx_platform_start_result_t start = nx_platform_start();\n'
         '    if (start.primary != NX_SUCCESS) return (int)start.primary;\n'
-        '    const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED);\n'
-        '    const nx_uart_port_t* console = nx_factory_uart(NX_UART_ID_CONSOLE);\n'
+        '    const nx_gpio_port_t* led = nx_factory_gpio_ref(NX_GPIO_REF_LED);\n'
+        '    const nx_uart_port_t* console = '
+        'nx_factory_uart_ref(NX_UART_REF_CONSOLE);\n'
         '    nx_request_initialize(&request.base);\n'
         f'    (void)nx_gpio_port_write(led, 1U << {pin}U, 0U);\n'
         '    (void)nx_uart_tx_prepare(&request, data, sizeof(data),\n'
@@ -425,10 +426,94 @@ def service_sources(sdk, specification):
     return {"main.c": verification / "services.c"}
 
 
+def external_package_sources(fixture):
+    """Select authored Board/assembly plus verified package inputs only."""
+    from tools.configure import integration_package
+
+    fixture = Path(fixture).resolve()
+    manifest = integration_package.load_manifest(fixture / "provider")
+    paths = [regular_file(fixture / "assembly.toml"),
+             regular_file(fixture / "board/board.json"), *manifest.inputs]
+    return {path.relative_to(fixture).as_posix(): path for path in paths}
+
+
+def prepare_external_provider_consumer(prefix, directory, run_checked, *,
+                                       expected_revision, fixture=False):
+    """Copy the canonical C11 starter into a separate consumer-owned project."""
+    sdk = Path(prefix) / "share/nexus/src"
+    canonical = sdk / "cmake/package/verification/external_provider"
+    source = Path(directory) / "external provider source"
+    build = Path(directory) / "external provider build"
+    source.mkdir()
+    paths = external_package_sources(canonical)
+    paths.update({name: regular_file(canonical / name) for name in
+                  ("CMakeLists.txt", "README.md", "consumer.c",
+                   "lifecycle_test.cpp")})
+    for name, path in paths.items():
+        target = source / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    run_checked(["git", "init", "--quiet", str(source)])
+    command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
+               "-DCMAKE_BUILD_TYPE=Release",
+               "-DNexus_DIR=" + str(Path(prefix) / "lib/cmake/Nexus"),
+               "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
+    if fixture:
+        command.append("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
+    return source, build, command
+
+
+def check_external_provider_consumer(sdk, source, build, run_checked):
+    """Execute the same C lifecycle model and audit actual public includes."""
+    if (build / "resolved-sdk.txt").read_text() != str(sdk):
+        raise ValueError("External lifecycle selected another source SDK")
+    canonical = Path(sdk) / "cmake/package/verification/external_provider"
+    paths = external_package_sources(canonical)
+    paths.update({name: regular_file(canonical / name) for name in
+                  ("CMakeLists.txt", "README.md", "consumer.c",
+                   "lifecycle_test.cpp")})
+    for name, path in paths.items():
+        if regular_file(source / name).read_bytes() != path.read_bytes():
+            raise ValueError("External provider differs from canonical SDK "
+                             "input: " + name)
+    entries = json.loads((build / "compile_commands.json").read_text())
+    public = [entry for entry in entries
+              if Path(entry["file"]).resolve() == source / "consumer.c"]
+    private = (source / "provider/soc", source / "provider/configure")
+    if len(public) != 1 or private_compile_inputs(public[0], sdk, private):
+        raise ValueError("Private provider input leaked into lifecycle consumer")
+    adapter = source / "provider/soc/lifecycle_adapter.c"
+    if sum(Path(entry["file"]).resolve() == adapter for entry in entries) != 1:
+        raise ValueError("External lifecycle adapter has no unique compile row")
+    image = build / "bin/external_lifecycle_consumer"
+    inputs = {"source/" + name: source / name for name in paths}
+    inputs.update({"canonical/" + name: path for name, path in paths.items()})
+    inputs.update(elf=image, compile_commands=build / "compile_commands.json",
+                  sdk_manifest=Path(sdk) / ".nexus-source-sdk.json")
+    before = {name: file_identity(path) for name, path in inputs.items()}
+    execution = run_checked([str(image)])
+    if execution.returncode:
+        raise ValueError("External provider C lifecycle failed")
+    if before != {name: file_identity(path) for name, path in inputs.items()}:
+        raise ValueError("External provider observation inputs changed "
+                         "during execution")
+    return {"kind": "external-provider-host-model", "status": "passed",
+            "name": "external provider", "domain": "external-provider",
+            "physical_status": "not_executed", "elf": before["elf"],
+            "canonical_source": before["canonical/consumer.c"],
+            "public_source": before["source/consumer.c"],
+            "package_manifest": before["source/provider/nexus-soc.json"],
+            "runtime_executed": True, "inputs": before}
+
+
 def prepare_service_consumer(prefix, directory, specification, run_checked, *,
                              expected_revision, fixture=False):
     """Copy an installed public scenario; external packages stay consumer-owned."""
     specification = service_profile(specification)
+    if specification.scenario == "external_provider":
+        return prepare_external_provider_consumer(
+            prefix, directory, run_checked, expected_revision=expected_revision,
+            fixture=fixture)
     sdk = Path(prefix) / "share/nexus/src"
     verification = sdk / "cmake/package/verification" / specification.scenario
     assembly = regular_file(verification / specification.assembly)
@@ -440,11 +525,8 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
     if specification.domain == "external-package":
-        for path in sorted(assembly.parent.rglob("*")):
-            if path.is_dir():
-                continue
-            regular_file(path)
-            target = source / path.relative_to(assembly.parent)
+        for name, path in external_package_sources(assembly.parent).items():
+            target = source / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(path, target)
     else:
@@ -958,6 +1040,8 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
 def check_service_image(sdk, source, build, specification, run_checked):
     """Check one exact scenario, real runtime or ARM resources, and retention."""
     specification = service_profile(specification)
+    if specification.scenario == "external_provider":
+        return check_external_provider_consumer(sdk, source, build, run_checked)
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Service consumer resolved another source SDK")
     verification = sdk / "cmake/package/verification" / specification.scenario
@@ -981,14 +1065,11 @@ def check_service_image(sdk, source, build, specification, run_checked):
     else:
         inputs["public_source"] = source / "main.c"
     if specification.domain == "external-package":
-        for path in sorted(canonical.parent.rglob("*")):
-            if path.is_dir():
-                continue
-            regular_file(path)
-            copied = source / path.relative_to(canonical.parent)
+        for name, path in external_package_sources(canonical.parent).items():
+            copied = source / name
             if copied.read_bytes() != path.read_bytes():
                 raise ValueError("External service package differs from SDK")
-            inputs["external/" + path.relative_to(canonical.parent).as_posix()] = copied
+            inputs["external/" + name] = copied
     config = Path((build / "resolved-config.txt").read_text())
     if config != build / "nexus-sdk/generated":
         raise ValueError("Service configuration directory is not canonical")
@@ -1197,8 +1278,11 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
             prefix, output, specification, run_checked,
             expected_revision=identity["source_revision"])
         run_checked(command)
+        target = ("external_lifecycle_consumer"
+                  if specification.scenario == "external_provider"
+                  else "installed_services")
         run_checked(["cmake", "--build", str(build), "--parallel", "1",
-                     "--target", "installed_services"])
+                     "--target", target])
         return check_service_image(sdk, source, build, specification, run_checked)
     elif kind == "selected":
         name, assembly, smoke = specification

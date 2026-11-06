@@ -7,8 +7,12 @@ import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
+import shlex
 import shutil
+import stat
 import subprocess
+import sys
+import tempfile
 
 from tools.evidence.common import (
     fields, file_identity, load_json, parse_json, sha256_value,
@@ -68,7 +72,131 @@ def _pinned_file(root, revision, relative, *, remaining=None):
     return data
 
 
-def create(templates, revision, template, output, *, source_root=ROOT):
+def _execute(arguments, directory):
+    """Run the selected source's own entry point without imported host modules."""
+    try:
+        result = subprocess.run(arguments, cwd=directory, capture_output=True,
+                                text=True, timeout=120, check=False)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise ValueError("Selected platform command could not complete") from error
+    if result.returncode:
+        raise ValueError("Selected platform rejected the project: " +
+                         (result.stderr.strip() or result.stdout.strip()))
+    return result
+
+
+def _unchanged(records):
+    for record in records:
+        if file_identity(_path(record["path"])) != record:
+            raise ValueError("Selected platform source changed during creation")
+
+
+def _selection(source_root, sdk_prefix, interpreter):
+    if source_root is not None and sdk_prefix is not None:
+        raise ValueError("Platform source and SDK prefix are mutually exclusive")
+    prefix = _path(sdk_prefix) if sdk_prefix is not None else None
+    source = (_path(prefix / "share/nexus/src") if prefix is not None else
+              _path(ROOT if source_root is None else source_root))
+    if not source.is_dir():
+        raise ValueError("Selected platform source directory is missing")
+    selected = {"kind": "sdk" if prefix is not None else "source",
+                "source_root": str(source)}
+    snapshot = [file_identity(source / "dependencies/platform-compatibility.json"),
+                file_identity(source / "tools/configure/configure.py")]
+    if prefix is not None or (source / ".nexus-source-sdk.json").is_file():
+        manifest = source / ".nexus-source-sdk.json"
+        verifier = source / "cmake/package/package_source_sdk.py"
+        snapshot.extend((file_identity(manifest), file_identity(verifier)))
+        if prefix is not None:
+            snapshot.append(file_identity(
+                prefix / "lib/cmake/Nexus/NexusConfig.cmake"))
+            selected["sdk_prefix"] = str(prefix)
+        arguments = [str(interpreter), "-I", "-B", str(verifier),
+                     "--verify", str(source)]
+        completed = _execute(arguments, source)
+        summary, identity = parse_json(completed.stdout.encode()), load_json(manifest)
+        if (summary.get("publishable") is not True or
+                identity.get("publishable") is not True or
+                identity.get("source_dirty") is not False):
+            raise ValueError("Development SDK fixtures are not publishable; "
+                             "select a publishable SDK prefix")
+        if summary.get("source_revision") != identity.get("source_revision"):
+            raise ValueError("Selected SDK verification identity changed")
+        selected.update({"source_revision": identity["source_revision"],
+                         "source_tree": identity["source_tree"],
+                         "manifest": file_identity(manifest),
+                         "verification": {"argv": arguments,
+                                          "verifier": file_identity(verifier)}})
+    elif (source / ".git").exists():
+        selected.update({
+            "source_revision": _git(source, "rev-parse", "HEAD").decode().strip(),
+            "source_tree": _git(source, "rev-parse", "HEAD^{tree}").decode().strip(),
+            "source_dirty": bool(_git(source, "status", "--porcelain")),
+        })
+    _unchanged(snapshot)
+    return source, selected, snapshot
+
+
+def _commands(output, source, selected, resolved):
+    build = output / "build"
+    configure = ["cmake", "-S", str(output), "-B", str(build), "-G", "Ninja",
+                 "-DCMAKE_BUILD_TYPE=Debug", "-DNEXUS_BUILD_TESTS=OFF",
+                 "-DNEXUS_BUILD_WORKLOAD=OFF"]
+    configure.append("-DNEXUS_SOURCE=" + str(source) if selected["kind"] == "source"
+                     else "-DNexus_DIR=" + str(Path(selected["sdk_prefix"]) /
+                                              "lib/cmake/Nexus"))
+    native = resolved["cpu"]["arch"] == "native"
+    if not native:
+        toolchain = _path(source / "cmake/toolchains/arm-gcc.cmake")
+        file_identity(toolchain)
+        configure.append("-DCMAKE_TOOLCHAIN_FILE=" + str(toolchain))
+    commands = {"configure": configure,
+                "build": ["cmake", "--build", str(build), "--parallel", "1"]}
+    if native:
+        commands["test"] = ["ctest", "--test-dir", str(build),
+                            "--output-on-failure", "--no-tests=error"]
+    return commands
+
+
+def _verify_copy(output, payload):
+    """Publish origin hashes only for the exact copied regular-file tree."""
+    directories = {str(parent) for name in payload
+                   for parent in PurePosixPath(name).parents if str(parent) != "."}
+    found = set()
+    pending = [output]
+    while pending:
+        for path in pending.pop().iterdir():
+            name = path.relative_to(output).as_posix()
+            if path.is_symlink():
+                raise ValueError("Copied project contains a symlink")
+            if path.is_dir():
+                if name not in directories:
+                    raise ValueError("Copied project contains an unknown directory")
+                pending.append(path)
+            elif path.is_file() and name in payload:
+                if (path.stat().st_size != len(payload[name]) or
+                        path.read_bytes() != payload[name]):
+                    raise ValueError("Copied project payload changed during creation")
+                found.add(name)
+            else:
+                raise ValueError("Copied project contains an unknown or nonregular file")
+    if found != payload.keys():
+        raise ValueError("Copied project payload is incomplete")
+
+
+def _owned_output(output, identity):
+    """Observe the original directory without following replacement links."""
+    try:
+        _path(output)
+        current = output.lstat()
+    except (OSError, ValueError):
+        return False
+    return (stat.S_ISDIR(current.st_mode) and
+            (current.st_dev, current.st_ino) == identity)
+
+
+def create(templates, revision, template, output, *, source_root=None,
+           sdk_prefix=None):
     """Validate first; rollback only the directory exclusively created here."""
     root, output = _path(templates), _path(output)
     if (not isinstance(revision, str)
@@ -96,8 +224,12 @@ def create(templates, revision, template, output, *, source_root=ROOT):
     selected = manifest["templates"].get(template)
     fields(selected, {"files", "platform"})
     fields(selected["platform"], {"interface_epoch", "assembly_schema"})
+    interpreter = Path(sys.executable).resolve()
+    interpreter_identity = file_identity(interpreter)
+    source_root, selected_platform, source_snapshot = _selection(
+        source_root, sdk_prefix, interpreter)
     compatibility = load_json(
-        Path(source_root) / "dependencies/platform-compatibility.json")
+        source_root / "dependencies/platform-compatibility.json")
     expected = {
         "interface_epoch": compatibility["factory_abi_epoch"],
         "assembly_schema": compatibility["schemas"]["assembly_authoring"],
@@ -139,40 +271,76 @@ def create(templates, revision, template, output, *, source_root=ROOT):
         "expected_platform": {"commit": lock["commit"], "tree": lock["tree"]},
         "platform_lock_sha256": hashlib.sha256(lock_data).hexdigest(),
         "platform_interface": expected, "files": files,
+        "selected_platform": selected_platform,
         "qualification": False,
     }
     # mkdir is exclusive, including when another process creates output late.
     # Validate the actual relocated assembly before returning an origin record.
     output.mkdir()
+    created = output.lstat()
+    output_identity = created.st_dev, created.st_ino
     try:
+        if not _owned_output(output, output_identity):
+            raise ValueError("Created project root was replaced or its path changed")
         for name, data in payload.items():
             path = output / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
-        from tools.configure.configure import resolve_ir
-        input_paths = {}
-        source_root = _path(source_root)
-        resolved = resolve_ir(output / "assembly.toml", source_root,
-                              input_paths=input_paths)
-        for value in input_paths.values():
-            input_path = _path(value)
-            if not (input_path.is_relative_to(source_root)
-                    or input_path.is_relative_to(output)):
-                raise ValueError("Template depends on inputs outside the "
-                                 "copied project and selected platform")
-        result["validation"] = {
-            "scope": "current resolver and declared inputs only",
-            "source_root": str(source_root),
-            "configuration_sha256": resolved.configuration_sha256,
-            "inputs": [file_identity(input_paths[item["path"]])
-                       for item in resolved.inputs],
-            "resolver": file_identity(source_root /
-                                      "tools/configure/configure.py"),
-        }
+        with tempfile.TemporaryDirectory(prefix="nexus project validation ") as temporary:
+            bundle = Path(temporary) / "bundle"
+            resolver = source_root / "tools/configure/configure.py"
+            arguments = [str(interpreter), "-I", "-B", str(resolver), "generate",
+                         "--assembly", str(output / "assembly.toml"),
+                         "--output", str(bundle), "--source-root", str(source_root)]
+            _execute(arguments, source_root)
+            resolved = load_json(bundle / "resolved.json")
+            input_paths = load_json(bundle / "input_paths.json")
+            inputs = []
+            for value in input_paths.values():
+                input_path = _path(value)
+                if not (input_path.is_relative_to(source_root)
+                        or input_path.is_relative_to(output)):
+                    raise ValueError("Template depends on inputs outside the "
+                                     "copied project and selected platform")
+            for item in resolved["inputs"]:
+                record = file_identity(_path(input_paths[item["path"]]))
+                if record["sha256"] != item["sha256"]:
+                    raise ValueError("Selected platform input changed during creation")
+                inputs.append(record)
+            sha256_value(resolved["configuration_sha256"])
+            result["validation"] = {
+                "scope": "current resolver and declared inputs only",
+                "source_root": str(source_root), "argv": arguments,
+                "configuration_sha256": resolved["configuration_sha256"],
+                "inputs": inputs, "resolver": file_identity(resolver),
+                "interpreter": interpreter_identity,
+            }
+            generator = bundle / "generator-identity.json"
+            if generator.is_file():
+                result["validation"]["generator"] = load_json(generator)
+            result["commands"] = _commands(
+                output, source_root, selected_platform, resolved)
+        _unchanged([*source_snapshot, interpreter_identity])
+        if (_git(root, "rev-parse", "HEAD").decode().strip() != revision or
+                (root / "templates/manifest.json").read_bytes() != raw or
+                (root / "dependencies/nexus.lock.json").read_bytes() != lock_data or
+                any(_path(root / "templates" / template / name).read_bytes() != data
+                    for name, data in payload.items())):
+            raise ValueError("Selected template source changed during creation")
+        if not _owned_output(output, output_identity):
+            raise ValueError("Created project root was replaced or its path changed")
+        _verify_copy(output, payload)
+        if not _owned_output(output, output_identity):
+            raise ValueError("Created project root was replaced or its path changed")
         (output / ".nexus-template.json").write_text(
             json.dumps(result, indent=2, sort_keys=True) + "\n")
     except BaseException:
-        shutil.rmtree(output)
+        if _owned_output(output, output_identity):
+            try:
+                shutil.rmtree(output)
+            except OSError:
+                # Cleanup failure must not replace the original rejection.
+                pass
         raise
     return result
 
@@ -183,10 +351,20 @@ def main(argv=None):
     parser.add_argument("--revision", required=True)
     parser.add_argument("--template", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    sources = parser.add_mutually_exclusive_group()
+    sources.add_argument("--source", type=Path)
+    sources.add_argument("--sdk-prefix", type=Path)
+    parser.add_argument("--json", action="store_true")
     arguments = parser.parse_args(argv)
     result = create(arguments.templates, arguments.revision,
-                    arguments.template, arguments.output)
+                    arguments.template, arguments.output,
+                    source_root=arguments.source, sdk_prefix=arguments.sdk_prefix)
+    if arguments.json:
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
     print("Created " + str(arguments.output) + " from "
           + result["examples_commit"]
           + "; build and run to validate consumption")
+    for name, command in result["commands"].items():
+        print(name.capitalize() + ": " + shlex.join(command))
     return 0

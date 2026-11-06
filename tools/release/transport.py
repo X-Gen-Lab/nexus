@@ -22,7 +22,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v15"
+CONSUMER_POLICY = "nexus-sdk-consumers-v16"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -180,6 +180,8 @@ SERVICE_CONSUMERS = (
                     True, "mcuboot_control"),
     ServiceConsumer("f407 mcuboot boot", "assembly.toml", "arm-boot", True,
                     "mcuboot_boot"),
+    ServiceConsumer("external provider", "assembly.toml", "external-provider",
+                    False, "external_provider"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 
@@ -210,8 +212,9 @@ def consumer_layout():
               selected_domain(specification) == "arm-provider")
              for specification in SELECTED_CONSUMERS
              for name in (specification[0],)]
-    rows += [(item.name, ("installed_services",), item.arm)
-             for item in SERVICE_CONSUMERS]
+    rows += [(item.name, ("external_lifecycle_consumer",)
+              if item.scenario == "external_provider" else ("installed_services",),
+              item.arm) for item in SERVICE_CONSUMERS]
     return tuple((name + " source", name + " build",
                   tuple(name + " build/bin/" + target + (".elf" if arm else "")
                         for target in targets))

@@ -14,6 +14,9 @@ from pathlib import Path
 import re
 import sys
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure import bindings, configure, documentation  # noqa: E402
@@ -94,7 +97,10 @@ def os_selection(typed, data):
 
 
 def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
-              record_pointer=None):
+              record_pointer=None, manifest_path=None, qualification_paths=None,
+              source_sdk_path=None, sdk_consumers_path=None,
+              hil_admission_path=None, hil_raw_path=None,
+              hil_measurements_path=None, verify_record=False, legacy_replay=False):
     """Describe one validated selection; execution has a separate authority.
 
     Family declarations cannot establish a selected Board/backend/clock tuple.
@@ -109,7 +115,15 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
     if (results_index is None) != (record_pointer is None):
         raise ValueError("results index and record pointer must be supplied together")
     root = Path(root).resolve()
-    associate = candidate_path is not None or results_index is not None
+    references = {key: value for key, value in {
+        "manifest": manifest_path, "qualifications": qualification_paths,
+        "source_sdk": source_sdk_path, "sdk_consumers": sdk_consumers_path,
+        "hil_admission": hil_admission_path, "hil_raw": hil_raw_path,
+        "hil_measurements": hil_measurements_path}.items() if value is not None}
+    associate = (candidate_path is not None or results_index is not None or
+                 bool(references))
+    if verify_record and results_index is None:
+        raise ValueError("record verification requires an explicit index and record")
     source = (identity.observe_git_source(root)
               if associate else None)
     typed = configure.resolve_ir(Path(assembly), root)
@@ -141,7 +155,8 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
         endpoints.append({"id": item.id, "controller": item.controller,
                           "contract": json_value(vars(contract))})
     validation = dict.fromkeys(("host_models", "arm_image", "installed_sdk",
-                                "software_candidate", "physical_hil"),
+                                "software_candidate", "physical_hil", "hil_tooling",
+                                "resource_budget", "reproducibility"),
                                "not_assessed")
     validation["configuration"] = "validated"
     if typed.cpu_profile.arch == "native":
@@ -168,9 +183,28 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
                             *[item for item in data.get("limitations", [])
                               if item != "Physical qualification not executed"]]}
     if candidate_path is not None:
-        _associate_candidate(result, data, source, Path(candidate_path))
+        _associate_candidate(result, data, source, Path(candidate_path),
+                             legacy_replay=legacy_replay)
     if results_index is not None:
         _associate_index(result, data, source, Path(results_index), record_pointer)
+        links = result["indexed_evidence"]["record"].get("support_evidence")
+        if verify_record and links is not None:
+            from tools.maintenance.support import LINKS
+            from tools.evidence.common import fields
+            fields(links, set(), LINKS)
+            if references.keys() & links.keys():
+                raise ValueError("explicit evidence duplicates a selected record reference")
+            references.update(links)
+    from tools.maintenance import support
+    if references:
+        support.associate(result, data, source, references, legacy_replay=legacy_replay)
+    else:
+        result["next_missing_evidence"] = [scope for scope in support.SCOPES
+            if validation.get(support.VALIDATION[scope]) != "passed"]
+        if validation["software_candidate"] != "passed":
+            result["next_missing_evidence"].append("software_candidate")
+        if validation["physical_hil"] != "not_applicable":
+            result["next_missing_evidence"].append("physical_hil")
     if associate:
         if identity.observe_git_source(root) != source:
             from tools.evidence.common import EvidenceError
@@ -262,11 +296,12 @@ def _associate_index(result, resolved, source, path, pointer):
         "Missing source or configuration identity is never inherited from ancestors.")
 
 
-def _associate_candidate(result, resolved, source, candidate_path):
+def _associate_candidate(result, resolved, source, candidate_path, *, legacy_replay=False):
     """Only an exact verified source/configuration can support this selection."""
     from tools.evidence import candidate
 
-    reference = candidate.verified_projection(candidate_path)
+    reference = (candidate.verified_projection(candidate_path, legacy_replay=True)
+                 if legacy_replay else candidate.verified_projection(candidate_path))
     source_keys = ("commit", "tree", "dirty", "submodules")
     clean_dependencies = all(line.startswith(" ")
                              for line in source["submodules"])
@@ -285,10 +320,14 @@ def _associate_candidate(result, resolved, source, candidate_path):
         "configuration_match": configuration_match,
         "reference": {key: value for key, value in reference.items()
                       if key != "resolved"}}
-    if source_match and configuration_match:
+    legacy = reference.get("sealed_schema_version") == 1
+    if source_match and configuration_match and not legacy:
         for name in ("host_models", "arm_image", "installed_sdk",
-                     "software_candidate"):
+                     "software_candidate", "hil_tooling", "resource_budget",
+                     "reproducibility"):
             result["validation"][name] = "passed"
+    if legacy:
+        result["evidence"]["relation"] = "legacy_read_only"
     result["limitations"].append(
         "Evidence association verifies an existing candidate; it executes no "
         "new checks and does not assess physical HIL or qualify other selections.")
@@ -470,7 +509,7 @@ def check_block(document, expected):
         raise ValueError("Stale capability document; use --write to update")
 
 
-def main(arguments=None):
+def main(arguments=None, *, support_command=False):
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--check", action="store_true")
@@ -486,8 +525,31 @@ def main(arguments=None):
     parser.add_argument("--record", dest="record_pointer",
                         help="explicit JSON pointer to one indexed observation; "
                              "does not establish execution qualification")
+    parser.add_argument("--verify-record", action="store_true",
+                        help="verify typed evidence references on the selected leaf")
+    parser.add_argument("--legacy-replay", action="store_true",
+                        help="read a frozen schema 1 candidate without current qualification")
+    parser.add_argument("--manifest", dest="manifest_path", type=Path,
+                        help="existing source/configuration/artifact manifest; partial scopes allowed")
+    parser.add_argument("--qualification", dest="qualification_paths", action="append", type=Path,
+                        help="original qualification report; repeat for separate scopes")
+    for option in ("source-sdk", "sdk-consumers", "hil-admission", "hil-raw", "hil-measurements"):
+        parser.add_argument("--" + option, dest=option.replace("-", "_") + "_path", type=Path)
+    parser.add_argument("--json", action="store_true", help="print the same read-only query as JSON")
     parser.add_argument("--root", type=Path, default=ROOT)
     args = parser.parse_args(arguments)
+    evidence_options = ("manifest_path", "qualification_paths", "source_sdk_path",
+                        "sdk_consumers_path", "hil_admission_path", "hil_raw_path",
+                        "hil_measurements_path")
+    if support_command and (args.assembly is None or args.write or args.check):
+        parser.error("support requires --assembly and is a read-only query")
+    if (any(getattr(args, name) is not None for name in evidence_options) or
+            args.verify_record) and args.assembly is None:
+        parser.error("evidence queries require --assembly")
+    if args.verify_record and args.results_index is None:
+        parser.error("--verify-record requires --results-index and --record")
+    if (args.hil_raw_path is not None or args.hil_measurements_path is not None) and args.hil_admission_path is None:
+        parser.error("physical raw evidence requires --hil-admission")
     if args.candidate is not None and args.assembly is None:
         parser.error("--candidate requires --assembly")
     if args.results_index is not None or args.record_pointer is not None:
@@ -496,11 +558,20 @@ def main(arguments=None):
             parser.error("--results-index and --record require each other and --assembly")
     try:
         if args.assembly is not None:
-            print(json.dumps(selection(args.assembly, args.root,
+            result = selection(args.assembly, args.root,
                                        candidate_path=args.candidate,
                                        results_index=args.results_index,
-                                       record_pointer=args.record_pointer), indent=2,
-                             sort_keys=True))
+                                       record_pointer=args.record_pointer,
+                                       verify_record=args.verify_record,
+                                       legacy_replay=args.legacy_replay,
+                                       **{name: getattr(args, name) for name in evidence_options})
+            if support_command:
+                from tools.maintenance import support
+                result["query_environment"] = support.environment()
+            if support_command and not args.json:
+                print(support.human(result))
+            else:
+                print(json.dumps(result, indent=2, sort_keys=True))
             return 0
         examples = documentation.check(args.root)
         expected = render(collect(args.root))

@@ -7,97 +7,74 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4e1836232a549cf8cbca5e28f0a89ba33f82325dd827519b01c80599f1935849\n"
+"X-Nexus-Source-SHA256: 9cb9b063941531f894acbbaae3561ab8b53cb671560b222f12f0a56b7933a740\n"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:9
-msgid "Add a SoC, provider or reusable component"
-msgstr "接入 SoC、提供者或通用组件"
+msgid "Add a provider through a built-in or external package"
+msgstr "通过内置包或外置包接入 provider"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:11
 msgid ""
-"Use this guide to add a maintained implementation with explicit resources "
-"and measurable costs. A new family or mode requires behavior, configuration "
-"and build integration together. Similar STM32/GD32 peripheral names do not "
-"prove register compatibility."
+"Use this guide to connect a concrete C11 implementation to the "
+"static factory, configuration resolver and source SDK. Choose one "
+"source owner below, then follow the same lifecycle and verification "
+"contract. A similar peripheral name does not establish compatible "
+"registers, a Board route or physical qualification."
 msgstr ""
-"使用本指南增加具有明确资源和可测成本的维护实现。新芯片家族或模式需要同时完成行为、配置和构建集成。STM32／GD32 "
-"的外设名称相似，不能证明寄存器兼容。"
+"本指南帮助你将具体 C11 实现接入静态 factory、配置解析器和源码 "
+"SDK。先选择下述一种源码归属，再遵循共同的生命周期与验证合同。外设名称相似并不能证明寄存器兼容、Board 路线成立或已取得物理资格。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:16
-msgid "Keep the layer boundary narrow"
-msgstr "保持清晰而窄的分层边界"
+msgid ""
+"Read the [integration contract](../design/integration-contracts.md),"
+" [provider construction contract](../design/official-stm32-provider."
+"md#build-time-provider-contract) and [selected assembly "
+"checks](../design/provider-assemblies.md) first."
+msgstr ""
+"请先阅读[接入契约](../design/integration-contracts.md)、[provider "
+"构造合同](../design/official-stm32-provider.md#build-time-provider-contr"
+"act)和[选定装配检查](../design/provider-assemblies.md)。"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid "Owner"
 msgstr "所有者"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Required responsibility"
-msgstr "必需责任"
+msgid "Responsibility"
+msgstr "职责"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid "Arch"
 msgstr "Arch"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Exact CPU primitives, feature facts and ABI; no PCB or device registry"
-msgstr "精确 CPU 原语、特性事实和 ABI；不拥有 PCB 或设备注册表"
+msgid "Exact CPU primitives, features and ABI"
+msgstr "精确 CPU 原语、特性与 ABI"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "SoC"
-msgstr "SoC"
+msgid "SoC/provider"
+msgstr "SoC/provider"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Full part, memory, clocks, IRQ/DMA routes, reset/startup and private "
-"provider"
-msgstr "完整型号、内存、时钟、IRQ／DMA 路由、复位／启动和私有提供者"
+msgid "Full part, memory, clocks, IRQ/DMA, startup and private C state"
+msgstr "完整料号、内存、时钟、IRQ/DMA、启动和私有 C 状态"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid "Board"
 msgstr "Board"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Source-reviewed wiring, oscillators, safe levels and actual unknowns"
-msgstr "经来源审查的接线、晶振、安全电平，以及真实未知项"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "I/O provider"
-msgstr "I/O 提供者"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Public operation contract, private state, admission and final drain"
-msgstr "公共操作合同、私有状态、准入判定和最终排空"
+msgid "Reviewed wiring, oscillators, safe levels and explicit unknowns"
+msgstr "已审接线、振荡器、安全电平和明确的未知项"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid "Component"
 msgstr "组件"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Caller-owned storage, bounded algorithm and explicit narrow ports"
-msgstr "调用者拥有的存储、有界算法和显式窄端口"
+msgid "Caller-owned storage, bounded algorithms and narrow typed ports"
+msgstr "调用者拥有的存储、有界算法和窄类型端口"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid "External product"
 msgstr "外部产品"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Roles, tasks, queue depth, recovery, Flash reservations and release"
-msgstr "角色、任务、队列深度、恢复、Flash 预留和发行"
+msgid "Tasks, queues, roles, Flash reservations and recovery policy"
+msgstr "任务、队列、角色、Flash 预留与恢复策略"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:27
-msgid ""
-"Read the [architecture](../explanation/platform-architecture.md), "
-"[integration contract](../design/integration-contracts.md) and [provider "
-"assembly contract](../design/provider-assemblies.md)."
-msgstr ""
-"阅读[架构说明](../explanation/platform-"
-"architecture.md)、[接入合同](../design/integration-"
-"contracts.md)和[提供者装配合同](../design/provider-assemblies.md)。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:31
-msgid "Choose the source owner"
-msgstr "确定源码归属"
+msgid "Choose one integration path"
+msgstr "选择一条接入路径"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:33
 msgid ""
@@ -111,562 +88,309 @@ msgid ""
 "Current decision for shared register algorithms and exact SoC integration"
 msgstr "共享寄存器算法与精确 SoC 集成的当前判定"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:35
 msgid ""
-"FIG-31 classifies private controller work. Arrows are maintenance decisions,"
-" not runtime calls. Sharing requires evidence for every selecting chip's "
-"register layout, flags, ordering and reset compatibility, plus explicit "
-"handling of its errata. Similar names or a successful compile do not "
-"establish that evidence. Keep an unreviewed or incompatible protocol in its "
-"exact SoC implementation."
+"FIG-31 shows maintenance decisions, not runtime calls. A shared "
+"driver requires reviewed register layout, flags, reset ordering and "
+"errata for every selecting chip. The exact SoC owns routes and "
+"admission even when it reuses that driver."
 msgstr ""
-"FIG-31 "
-"对私有控制器工作作归属判定。箭头表示维护决策，不是运行时调用。共享需要每个选入芯片的寄存器布局、位含义、访问顺序及复位兼容性证据，并显式处理其勘误。名称相似或编译成功不能建立这些证据。尚未复核或不兼容的协议保留在精确"
-" SoC 实现中。"
+"FIG-31 表示维护决策，不表示运行时调用。共享驱动要求逐一审核每个选用芯片的寄存器布局、标志位、复位顺序与勘误。即使复用该驱动，精确"
+" SoC 仍负责路线与准入。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Change"
-msgstr "变更"
+msgid "Built-in implementation"
+msgstr "内置实现"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Source owner and required check"
-msgstr "源码归属与必需检查"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Public I/O contract or portable I/O rule"
-msgstr "公共 I/O 合同或可移植 I/O 规则"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`io/`; preserve the public ownership and failure contract"
-msgstr "`io/`；保持公共所有权与失败合同"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Reusable register-protocol algorithm"
-msgstr "可复用寄存器协议算法"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid ""
-"`drivers/<kind>/<ip>/`; each SoC wrapper establishes the actual silicon "
-"contract"
-msgstr "`drivers/<kind>/<ip>/`；每个 SoC wrapper 确认实际硅片合同"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Part, memory, clock, reset, pin, IRQ or DMA integration"
-msgstr "料号、内存、时钟、复位、引脚、IRQ 或 DMA 集成"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Exact `soc/<vendor>/<family>/`; facts, configuration policy and private C "
-"retain distinct jobs"
-msgstr "精确 `soc/<vendor>/<family>/`；事实、配置策略与私有 C 保持各自职责"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Private SoC collaboration helper"
-msgstr "私有 SoC 协作辅助代码"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Narrowest reviewed SoC scope; `soc/common/uart_control.h` is cross-vendor, "
-"while STM32 identity access is vendor-specific"
+"Select an existing exact `soc/<vendor>/<family>/` or add a reviewed "
+"family descriptor with that canonical `source_directory`. Keep "
+"public family IDs independent of directory names. Add exact "
+"`soc.json` and `routes.json` facts; Board facts remain separate. "
+"Preserve unknown electrical and PCB information. Register the "
+"data-only descriptor in the existing explicit maintained map; an "
+"external package does not edit that map."
 msgstr ""
-"最窄的已复核 SoC 范围；`soc/common/uart_control.h` 跨厂家共享，STM32 identity 访问则属于厂家特定范围"
+"选择现有的精确 `soc/<vendor>/<family>/`，或新增已审系列描述符并声明该规范 "
+"`source_directory`。公共系列 ID 应独立于目录名。补充精确的 `soc.json` 和 `routes.json` "
+"事实；Board 事实仍单独维护。保留电气与 PCB 信息中的未知项。将只含数据的描述符登记到现有的显式维护映射；外置包不修改该映射。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "External device, protocol or product policy"
-msgstr "外部器件、协议或产品策略"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
 msgid ""
-"Existing component ports or the external product, according to the "
-"[integration contract](../design/integration-contracts.md)"
-msgstr "按[接入合同](../design/integration-contracts.md)放入既有组件端口或外部产品"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:54
-msgid "Implement in a reviewable sequence"
-msgstr "按可评审的顺序实现"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:56
-msgid ""
-"Prepare the [fixed source and recursive dependencies](source-checkout.md). "
-"Define the new behavior, supported modes, public ownership obligations and "
-"rejection boundaries before changing its production implementation."
-msgstr "准备[固定源码与递归依赖](source-checkout.md)。改变生产实现前，先定义新行为、支持模式、公共所有权义务和拒绝边界。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:84
-msgid ""
-"Add explicit CMake targets and private SDK dependencies. Update declared "
-"resolver reconfiguration inputs and the Source SDK required-file closure."
-msgstr "增加显式 CMake 目标与私有 SDK 依赖。更新解析器声明的重新配置输入，以及 Source SDK 的必需文件闭包。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:86
-msgid ""
-"Implement the smallest correct production change. Define an immutable public"
-" face with shared readonly ops and independent context. Reuse public Nexus "
-"types; keep vendor structures and concrete storage private. Review official "
-"HAL/LL reuse before duplicating a vendor state machine. Apply [the official-"
-"driver boundary](../design/official-stm32-provider.md) to time, callbacks, "
-"cancellation, private dependencies and mode-specific comparison."
+"Define admitted full part numbers and modes in the family's "
+"`configure/contract.py`. `bindings.py` supplies typed "
+"`Construction` values; `emission.py` supplies static declarations "
+"and explicit typed lifecycle calls. The leaf contract must not "
+"import the top-level resolver or emitter. Declare configuration "
+"helpers in the descriptor so reconfiguration and SDK closure "
+"include them."
 msgstr ""
-"实施最小正确生产变更。定义不可变公共 face，共享只读 ops，并使用独立 context。复用 Nexus "
-"公共类型，厂商结构与具体存储保持私有。复制厂商状态机前，先审查官方 HAL/LL "
-"复用。时间、回调、取消、私有依赖与逐模式比较遵守[官方驱动边界](../design/official-stm32-provider.md)。"
+"在系列的 `configure/contract.py` 中定义准入的完整料号与模式。`bindings.py` 提供类型化的 "
+"`Construction` 值；`emission.py` "
+"提供静态声明与显式类型化生命周期调用。叶级合同不得导入顶层解析器或生成器。在描述符中声明配置辅助模块，使重新配置和 SDK "
+"闭包包含这些模块。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:92
 msgid ""
-"Execute GREEN against the real provider. Verify rejection without residual "
-"effects, accepted borrow, cancel/deadline, failed drain, quarantine, "
-"stop/restart and instance isolation where the mode needs them."
-msgstr "对真实提供者执行 GREEN。按模式需要验证无残留效果的拒绝、接受后的借用、取消／截止时间、排空失败、隔离保留、停止／重启和实例隔离。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:95
-msgid ""
-"Refactor while keeping contracts passing. Link exact ARM fixtures and verify"
-" actual resources, handler retention, vector bytes and unselected-driver "
-"pruning. Validate an independent relocated SDK consumer and record physical "
-"work as not executed."
+"Add concrete C sources and private dependencies to the family's "
+"explicit CMake target. Export the selected target and the required "
+"startup/system inputs. Configure must reject a missing, imported or "
+"incorrectly typed provider target, invalid private include roots "
+"and missing MCU lifecycle inputs before building."
 msgstr ""
-"保持合同通过再重构。链接精确 ARM 夹具，验证实际资源、处理函数保留、向量表字节和未选择驱动裁剪。验证独立搬移后的 SDK "
-"消费工程，并将实板工作记录为未执行。"
+"将具体 C 源码和私有依赖加入该系列的显式 CMake target。导出选定 target 以及必需的 startup/system "
+"输入。配置阶段必须在构建前拒绝缺失、imported 或类型不正确的 provider target、无效的私有 include "
+"根目录，以及缺失的 MCU 生命周期输入。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:99
 msgid ""
-"For a component, pass explicit bus, GPIO, time and optional OS ports. Do not"
-" create workers, probe devices, invent application roles or supply a maximum"
-" object pool. Flash drivers expose physical geometry; persistence and update"
-" policy remain external."
-msgstr ""
-"组件通过显式总线、GPIO、时间和可选 OS 端口工作。不得创建执行任务、探测设备、虚构应用角色或提供最大对象池。Flash "
-"驱动暴露物理几何；持久化和升级策略仍在外部。"
+"Add the exact authored TOML fixture to the maintained assembly "
+"catalogue and the applicable SDK consumer plan. Execute the "
+"behavior and build checks below."
+msgstr "将精确的 authored TOML fixture 加入维护的装配目录和适用的 SDK 消费者计划。执行下述行为与构建检查。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:114
 msgid ""
-"`tools/configure/contracts.py` owns immutable controller-category fields, "
-"factory kind order and public header mappings. Authoring, selection and "
-"factory consume that same metadata; exact SoC capabilities remain in the "
-"family contract. Reviewed fact selection, memory budgets, Flash layout and "
-"source dependencies have frozen named stage results. One frozen device-graph"
-" result completes controller, endpoint, USB FIFO, SPI face, ADC trigger, "
-"resource and DMA decisions before final assembly. Its local validation "
-"builders may still use dictionaries; the stage boundary does not claim that "
-"every normalizer is a separate typed stage."
+"Use the shared CPU resolver for ABI and feature selection. Do not "
+"duplicate CPU flags or infer optional features from a family name. "
+"A descriptor lookup must remain a data-only operation and must not "
+"import another family's implementation."
 msgstr ""
-"`tools/configure/contracts.py` 负责不可变的控制器类别字段、factory 类别顺序和公共头文件映射。编写、选择与 "
-"factory 消费同一份元数据；精确 SoC 能力仍归家族合同负责。已审查的事实选择、内存预算、Flash "
-"布局和源码依赖具有冻结的具名阶段结果。一个冻结的设备图结果在最终装配之前完成控制器、端点、USB FIFO、SPI face、ADC "
-"trigger、资源和 DMA 决策。它的局部校验构建过程仍可使用字典；这个阶段边界不代表每个 normalizer 都已拆成独立的类型化阶段。"
+"复用公共 CPU 解析器选择 ABI 和特性。不要重复维护 CPU "
+"标志，也不要从系列名推断可选特性。描述符查找必须保持为只读取数据的操作，不得导入其他系列的实现。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:123
+msgid "External implementation"
+msgstr "外置实现"
+
 msgid ""
-"`_FactResolution` views the selected readonly SoC variant for the exact "
-"Board part; it does not store a second part or variant decision. Common "
-"field validators consume `Mapping` and explicit `list`/`tuple` containers "
-"directly; JSON input retains the same strict field, type and domain checks. "
-"Providers consume those immutable containers directly."
+"Start with the complete [canonical external provider "
+"starter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION"
+"-SOURCE/cmake/package/verification/external_provider/README.md). It "
+"is exported at `share/nexus/src/cmake/package/verification/external_"
+"provider` in a source SDK. Checkout contracts and SDK consumers "
+"copy those same files; there is no separate test implementation to "
+"keep synchronized."
 msgstr ""
-"`_FactResolution` 按 Board 的完整料号引用该 SoC 中选定的只读 variant 视图；不另存一份料号或 variant "
-"决策。公共字段校验器直接接收 `Mapping` 和明确的 `list`／`tuple` 容器；JSON "
-"输入保持相同的严格字段、类型及取值域检查。Provider 直接消费这些不可变容器。"
+"从完整的[规范外置 provider 起步包](https://github.com/X-Gen-Lab/nexus/blob/NEXU"
+"S-DOCUMENTATION-SOURCE/cmake/package/verification/external_provider/"
+"README.md)开始。源码 SDK 将其导出到 `share/nexus/src/cmake/package/verificatio"
+"n/external_provider`。源码树合同测试与 SDK 消费者复制同一份文件；无需另行同步一份测试实现。"
+
+msgid "From an external work directory, with a verified SDK already available:"
+msgstr "在外部工作目录中操作，并事先准备好已验证的 SDK："
+
+msgid ""
+"A zero exit verifies the starter's Native software model: two "
+"independent GPIO contexts, shared readonly ops, pure factory "
+"lookup, a second-prepare failure, rollback of the first instance, "
+"withdrawn I/O and repeated recovery. It does not establish a new "
+"MCU, PCB route or HIL result. Paths with spaces are supported. The "
+"project uses an explicit SDK; it never searches for a checkout "
+"fallback."
+msgstr ""
+"退出码为零表示起步包的 Native 软件模型检查通过：两个独立 GPIO context、共享只读 ops、纯 factory "
+"查询、第二次 prepare 失败、第一实例回滚、I/O 撤回和重复恢复。这不建立新 MCU、PCB 路线或 HIL "
+"结果。路径可以包含空格。工程显式使用 SDK，绝不搜索源码树作为回退。"
+
+msgid ""
+"Keep the authored assembly's `soc_package` and `board_package` "
+"explicit and relative to that TOML. The package family must match "
+"Board facts and cannot shadow a built-in family. Replace the "
+"starter's model facts only with reviewed facts for the actual "
+"selected implementation."
+msgstr ""
+"在 authored 装配中显式保留 `soc_package` 和 `board_package`，路径相对于该 "
+"TOML。包的系列必须与 Board 事实一致，且不得覆盖内置系列。只有在具备实际选定实现的已审事实后，才能替换起步包的模型事实。"
+
+msgid ""
+"Maintain `nexus-soc.json` with schema/interface version 1, package "
+"identity, `source_directory`, `configuration_directory` and "
+"declared `inputs`. The [schema](https://github.com/X-Gen-Lab/nexus/b"
+"lob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/soc-package.schema.js"
+"on) provides editor hints; runtime validation remains "
+"authoritative. Every source, CMake input, private header and "
+"configuration helper consumed from the package must be declared."
+msgstr ""
+"维护 `nexus-soc.json`，声明 schema/interface 版本 "
+"1、包身份、`source_directory`、`configuration_directory` 和 "
+"`inputs`。[schema](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCU"
+"MENTATION-SOURCE/tools/configure/soc-package.schema.json)提供编辑器提示；运行时"
+"验证仍是权威。从包中消费的每份源码、CMake 输入、私有头文件和配置辅助模块都必须显式声明。"
+
+msgid ""
+"Implement the package's explicit CMake target and configuration "
+"modules under the same construction contract as a built-in "
+"provider. Package CMake and Python are explicitly selected trusted "
+"host code. They define no firmware interpreter, discovery service "
+"or second build graph."
+msgstr ""
+"按照与内置 provider 相同的构造合同，实现包的显式 CMake target 和配置模块。包的 CMake 与 Python "
+"是显式选定的受信主机代码；它们不定义固件解释器、发现服务或第二份构建图。"
+
+msgid ""
+"After reviewing changed source, refresh existing declared hashes "
+"and check the package with the SDK's tool. Run these commands from "
+"the copied starter root:"
+msgstr "审核变更源码后，使用 SDK 工具刷新现有声明的摘要并检查包。从复制后的起步包根目录运行以下命令："
+
+msgid ""
+"Refresh updates only already declared paths; add a new input "
+"deliberately before refreshing. It preserves the package version "
+"and rejects missing files. Check reads metadata and digests without "
+"executing provider code. Provider checking resolves and validates "
+"the selected implementation. Unsupported modes, unknown fields, "
+"duplicate keys, escaped paths, symlinks, stale digests and "
+"unsupported interface versions reject without falling back to "
+"another family."
+msgstr ""
+"刷新只更新已经声明的路径；新增输入必须先显式声明再刷新。它保留包版本，并拒绝缺失文件。检查只读取元数据与摘要，不执行 provider "
+"代码。provider 检查会解析并验证选定实现。不支持的模式、未知字段、重复键、越界路径、符号链接、过期摘要和不支持的接口版本都会被拒"
+"绝，不会回退到其他系列。"
+
+msgid ""
+"Rebuild the copied project against both the checkout and the "
+"installed SDK. Move the SDK prefix to a path containing spaces and "
+"build a fresh consumer there. SDK fixture requirements, copying and "
+"identity comparisons expand the same verified manifest; unrelated "
+"package files are not discovered as inputs."
+msgstr ""
+"分别使用源码树和已安装 SDK 重新构建复制后的工程。将 SDK 前缀移动到含空格的路径，并在那里构建全新消费者。SDK "
+"fixture 必需文件、复制和身份比较都从同一份已验证 manifest 展开；不将无关包文件自动发现为输入。"
+
+msgid ""
+"`interface_version` gates compatibility. The package's `version` "
+"identifies its reviewed source; it does not express a consumer "
+"semver request. Declare external vendor source and locks explicitly "
+"in `inputs`. `soc.source_lock` belongs to Nexus-managed "
+"dependencies and does not validate an arbitrary external checkout. "
+"Declared Python imports use verified source bytes; undeclared "
+"helpers and stale bytecode cannot supply configuration behavior. "
+"SDK packaging does not import the provider merely to enumerate its "
+"files."
+msgstr ""
+"`interface_version` 控制兼容性准入。包的 `version` 标识已审源码，不表示消费者提出的 semver "
+"版本要求。在 `inputs` 中显式声明外部 vendor 源码与锁。`soc.source_lock` 属于 Nexus "
+"管理的依赖，不验证任意外部源码树。已声明 Python 模块的导入使用已验证源码字节；未声明的辅助模块和过期字节码不能提供配置行为。SD"
+"K 打包不会仅为枚举文件而导入 provider。"
 
 #: ../../../../workspace/nexus/docs/guides/provider-porting.md:129
 msgid "Keep facts and admission policy distinct"
 msgstr "区分事实与准入策略"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:131
 msgid ""
-"The exact `soc.json` variant supplies physical Flash origin, size, erase "
-"blocks and RAM domains. Each family's `contract.PARTS` explicitly admits its"
-" full part numbers through the frozen `PartPolicy`: the package and optional"
-" memory-domain allowlist are software policy, not duplicate size tables. "
-"Unknown parts, a different package or optional domains inconsistent with the"
-" physical facts reject."
+"SoC and Board JSON describe hardware facts; the provider contract "
+"admits exact parts and modes. The resolver constructs the sole "
+"immutable decision rather than treating a fact file as an "
+"executable selection policy. Part density, package pins, clock "
+"domains, IRQ/DMA reachability and mode-specific resource ownership "
+"must agree before generation. Unknown wiring or silicon revisions "
+"remain explicit and cannot be repaired by choosing a different mode."
 msgstr ""
-"精确 `soc.json` variant 提供物理 Flash 起始地址、大小、擦除块和 RAM 域。每个家族的 `contract.PARTS` "
-"通过冻结的 `PartPolicy` 显式准入完整料号：封装与可选内存域 allowlist "
-"是软件策略，不是重复的容量表。未知料号、不同封装或与物理事实不一致的可选域均拒绝。"
+"SoC 与 Board JSON 描述硬件事实；provider "
+"合同准入精确料号与模式。解析器构造唯一的不可变决策，不将事实文件当作可执行选择策略。生成前必须确认芯片容量、封装引脚、时钟域、IRQ/D"
+"MA 可达性和模式相关资源所有权相互一致。未知接线或硅修订必须明确保留，不能通过选择其他模式来修补。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:137
 msgid ""
-"Validation covers every maintained variant in the fact package, including "
-"parts not selected by the current assembly. Each variant uses the same "
-"package, Flash geometry, memory overlap, DMA reachability and `PartPolicy` "
-"checks. Selection returns the existing selected facts; it does not repair a "
-"malformed unselected part or copy another part's geometry."
+"`ConfigurationIR.physical_part` and `ControllerIR.integration` "
+"reference existing physical facts and selected resource, clock, IRQ "
+"and DMA plans. Reuse those objects; do not create another routing "
+"or register interpretation in the factory. Vendor types and "
+"register behavior remain private C implementation details."
 msgstr ""
-"校验覆盖事实包中的每个维护变体，包括当前装配未选中的料号。每个变体采用相同的封装、Flash 几何、内存重叠、DMA 可达性和 `PartPolicy`"
-" 检查。选择过程返回已有的所选事实；不会修复错误的未选料号，也不会复制另一料号的几何。"
+"`ConfigurationIR.physical_part` 和 `ControllerIR.integration` "
+"引用既有物理事实以及选定的资源、时钟、IRQ 和 DMA 计划。复用这些对象；不要在 factory "
+"中另建一套路由或寄存器解释。vendor 类型与寄存器行为仍属于私有 C 实现细节。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:143
+msgid "Implement and verify the lifecycle"
+msgstr "实现并验证生命周期"
+
 msgid ""
-"Trace an added part or mode through these maintained inputs before adding "
-"its constructor:"
-msgstr "添加构造器前，沿以下维护中的输入核对新增料号或模式："
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Input or projection"
-msgstr "输入或投影"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Maintainer's check"
-msgstr "维护者检查"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`soc.json` variant and `routes.json`"
-msgstr "`soc.json` variant 与 `routes.json`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Exact physical geometry, bonded pads, route provenance and finite mode "
-"allowlist"
-msgstr "精确物理几何、引出 pad、路由来源和有限模式 allowlist"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Family `PARTS` and `PartPolicy`"
-msgstr "家族 `PARTS` 与 `PartPolicy`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Explicit full part, reviewed package and optional placement domains"
-msgstr "显式完整料号、已复核封装与可选放置域"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`normalize_clock` and `clock_plan`"
-msgstr "`normalize_clock` 与 `clock_plan`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"The exact family implements the selected profile and any reviewed domain "
-"relationships"
-msgstr "精确家族实现所选 profile 及经复核的时钟域关系"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`i2c_timing_clock`"
-msgstr "`i2c_timing_clock`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"`I2cTimingClock` carries selected kernel and peripheral clock bounds and "
-"whether explicit timing is required; electrical assumptions remain authored"
-msgstr "`I2cTimingClock` 携带所选内核与外设时钟边界，以及是否要求显式 timing；电气假设仍由装配编写者提供"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Selected limits, format and silicon policy"
-msgstr "所选限制、格式和硅片策略"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Metadata belongs to the exact selected owner; missing review remains "
-"explicit and does not admit a mode"
-msgstr "元数据属于精确选定 owner；缺失复核保持明确，不因此准入模式"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`PhysicalPartIR`"
-msgstr "`PhysicalPartIR`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Views the same frozen part, package, Flash and memory facts; it adds no JSON"
-" or configuration-identity field"
-msgstr "查看同一组冻结的料号、封装、Flash 与内存事实；不增加 JSON 或配置身份字段"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "`ControllerIntegrationIR`"
-msgstr "`ControllerIntegrationIR`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Reuses canonical resource claims, DMA lanes, IRQ options/profile, clocks, "
-"pins and the exact SoC hardware binding"
-msgstr "复用规范资源 claim、DMA lane、IRQ 选项／profile、时钟、引脚及精确 SoC 硬件绑定"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Family `UART_FORMATS`, `STREAM_GEOMETRY` and `ENDPOINT_POLICY`"
-msgstr "家族 `UART_FORMATS`、`STREAM_GEOMETRY` 与 `ENDPOINT_POLICY`"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Explicit reviewed formats, stream geometry and endpoint capability; a vendor"
-" alias or name prefix does not select a policy"
-msgstr "显式经复核的格式、stream geometry 与 endpoint 能力；厂家别名或名称前缀不选择策略"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid "Generated static C and private provider"
-msgstr "生成的静态 C 与私有 provider"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:0
-msgid ""
-"Consume validated values and retain independent SDK/register assertions and "
-"runtime failure checks"
-msgstr "消费已校验数值，并保留独立 SDK／寄存器断言与运行时失败检查"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:158
-msgid ""
-"F407 Flash generation illustrates the boundary: its selected sector array "
-"and readonly geometry come from validated `result.flash.erase_blocks`, "
-"origin and size. The C SDK assertion still checks the physical base, and "
-"independent register-model tests retain the reference geometry. Removing "
-"duplicate production tables does not make configuration a substitute for "
-"hardware validation."
+"Write and execute the meaningful failing contract before changing "
+"production behavior. Keep the actual RED command, nonzero result "
+"and contemporaneous source and binary. Python tool behavior uses "
+"stdlib unittest; new C API/provider contracts use host "
+"GoogleTest/GoogleMock against the real C algorithm through hardware "
+"ports. Missing tools and compile errors are not behavioral RED "
+"evidence."
 msgstr ""
-"F407 Flash 生成展示了该边界：所选 sector 数组与只读 geometry 来自已校验的 "
-"`result.flash.erase_blocks`、起始地址和大小。C SDK "
-"断言仍核对物理基址，独立寄存器模型测试保留参考几何。删除重复生产表不会让配置取代硬件校验。"
+"改变生产行为前，先编写并执行有意义的失败合同。保留实际 RED 命令、非零结果以及执行当时的源码和二进制。Python "
+"工具行为使用标准库 unittest；新的 C API/provider 合同通过硬件端口，使用主机 "
+"GoogleTest/GoogleMock 测试真实 C 算法。缺少工具和编译错误不构成行为 RED 证据。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:164
 msgid ""
-"All seven maintained MCU families obtain generated readonly Flash geometry "
-"from the validated facts through `memory.flash_geometry`. Six retain their "
-"existing global geometry symbols; F407 emits selected static geometry. "
-"Native remains a host model. The exact source and independently maintained "
-"test oracle still need the applicable provider and linked-image checks."
+"The generated factory returns existing static readonly faces by "
+"compact typed ID. It must not allocate, initialize hardware, "
+"acquire locks or discover devices. Instances share readonly "
+"operation tables and retain independent private context. Callbacks "
+"receive that context. Controller and endpoint IDs remain distinct."
 msgstr ""
-"维护中的七个 MCU 家族都通过 `memory.flash_geometry`，从已校验事实生成只读 Flash "
-"geometry。六个家族保留既有全局 geometry symbol；F407 生成所选静态 geometry。Native "
-"仍是主机模型。精确源码与独立维护的测试 oracle 仍须执行适用的 provider 和最终链接映像检查。"
+"生成的 factory 通过紧凑类型 ID 返回既有静态只读 "
+"face。它不得分配存储、初始化硬件、获取锁或发现器件。实例共享只读操作表，并保留各自独立的私有 context。回调接收该 "
+"context。控制器 ID 与端点 ID 保持区分。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:170
 msgid ""
-"`ConfigurationIR.physical_part` views the existing frozen Flash and memory "
-"objects. `ControllerIR.integration` composes canonical `ResourcePlanIR` "
-"claims, `DmaTopologyIR` lanes, IRQ options/profile, clock plan/inputs and "
-"selected pins. It references a family `ControllerBinding` where that family "
-"declares one. Its `clock_hz` is only the paired nominal APB input; a missing"
-" value is not guessed, and reviewed frequency bounds come from `clock_plan`."
-" Fixed reviewed SDK addresses, masks and Native model facts remain explicit "
-"leaf data; they do not independently select a route, owner or clock. The "
-"maintained-constructor consumption audit checks these selected records and "
-"capability projections; it does not create a new route resolver or establish"
-" final integrated qualification."
+"Keep hardware admission, register access, waits, pin/clock/IRQ/DMA "
+"acquisition, rollback, stop and recovery in concrete C11 adapters. "
+"Host Python validates facts and emits static declarations, exact "
+"storage and explicit typed calls. Review the [official driver "
+"boundary](../design/official-stm32-provider.md) before duplicating "
+"HAL/LL/SPL behavior. Do not add a runtime register script, name "
+"registry, maximum object pool, hidden worker or mandatory OS lock."
 msgstr ""
-"`ConfigurationIR.physical_part` 引用已有的冻结 Flash "
-"和内存对象。`ControllerIR.integration` 组合权威 `ResourcePlanIR` "
-"资源申领记录、`DmaTopologyIR` 通道、IRQ 选项／配置、时钟计划／输入和选定引脚。家族声明了 `ControllerBinding` "
-"时，它会引用该记录。它的 `clock_hz` 仅表示配对的标称 APB 输入；缺失值不会猜测，已审查的频率边界来自 "
-"`clock_plan`。固定且经过审查的 SDK 地址、掩码与 Native 模型事实仍是显式叶子数据；它们不独立选择路由、owner "
-"或时钟。维护中构造器的消费审计检查这些选定记录与能力投影；它不引入新的路由 resolver，也不建立最终集成资格。"
+"将硬件准入、寄存器访问、等待、引脚/时钟/IRQ/DMA 获取、回滚、停止与恢复保留在具体 C11 适配器中。主机 Python "
+"验证事实，并生成静态声明、精确存储和显式类型化调用。重复实现 HAL/LL/SPL "
+"行为前，先审核[官方驱动边界](../design/official-stm32-provider.md)。不要加入运行时寄存器脚本、名"
+"称注册表、最大对象池、隐藏 worker 或强制 OS 锁。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:181
 msgid ""
-"Family policy hooks remain declared configuration inputs. H743's reviewed "
-"clock domain relationships and selected Flash linker fragments live in its "
-"`configure/` package; generic tools still own parsing, typed IR, resource "
-"arbitration and atomic publication. A hook must not create a second source "
-"graph or silently choose a different part, route or profile."
+"The C prepare path must validate foreign ownership before effects. "
+"The close path must validate its receipt before changing an "
+"existing provider; an empty alien receipt leaves unowned state "
+"unchanged. Preserve every unfinished resource claim after partial "
+"preparation until readback proves return. Exercise partial "
+"receipts, stop after public shutdown, repeated failure/recovery and "
+"instance isolation."
 msgstr ""
-"家族策略 hook 仍是声明的配置输入。H743 经复核的时钟域关系与所选 Flash linker fragment 位于其 `configure/`"
-" 包；通用工具仍拥有解析、typed IR、资源仲裁与原子发布。hook 不得创建第二份源码图，也不得静默选择不同料号、路由或 profile。"
+"C prepare 路径必须在产生副作用前检查外部所有权。close 路径必须先验证其凭据，才能改变既有 "
+"provider；外来的空凭据应使未持有的状态保持不变。部分准备后，应保留所有尚未归还的资源声明，直到读回证明归还完成。测试部分凭据、公"
+"共接口已关闭后的再次停止、重复失败/恢复和实例隔离。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:187
 msgid ""
-"The paired F407/GD470 controller bindings, DMA vector maps and concrete "
-"secondary controller hooks live with their SoC. Common code keeps resource "
-"leases, fixed IRQ wiring and drain ordering while consuming the selected "
-"typed integration. Coupled personalities and named pin states likewise "
-"require explicit provider policy. Cross-Board/backend qualification remains "
-"in its existing OS contract; moving family mechanisms does not broaden those"
-" admitted combinations."
+"For asynchronous modes, rejected admission retains no references or "
+"effects. Accepted requests and buffers remain borrowed until "
+"acquire-observed SETTLED. Cancel or deadline expiry does not revoke "
+"that borrow. Failed drain retains QUARANTINED storage and explicit "
+"recovery responsibility. Remove IRQ, hardware and queue references "
+"before release-publication of completion."
 msgstr ""
-"成对 F407／GD470 控制器的 binding、DMA vector map 与具体 secondary controller hook 位于各自"
-" SoC。公共代码消费所选 typed integration，并保留资源 lease、固定 IRQ wiring 和 drain 顺序。耦合 "
-"personality 与命名引脚状态同样要求显式 provider 策略。跨 Board／backend 资格仍属于既有 OS "
-"合同；搬移家族机制不会扩大已准入组合。"
+"异步模式下，准入被拒绝后不得保留引用或副作用。已接受的请求与缓冲区持续处于借用状态，直到调用者以 acquire 语义观察到 "
+"SETTLED。取消或 deadline 到期不撤销借用。排空失败时保留 QUARANTINED 存储和明确的恢复责任。以 "
+"release 语义发布完成前，先移除 IRQ、硬件与队列引用。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:194
 msgid ""
-"The read-only [work-package view](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/README.md) "
-"connects exact maintained modes to resolver fixtures, selected ops sources "
-"and reviewed lifecycle properties. Its entries are navigation, not executed "
-"tests or new support declarations. Run actual applicable gates separately."
+"Keep vendor headers, handles and mutable storage private to their "
+"targets. Inspect actual public consumer compile commands and "
+"include probes, not only target property names. The optional host "
+"framework requires C++17; production firmware remains C11 and never "
+"links GoogleTest or its runtime."
 msgstr ""
-"只读[工作包视图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/maintenance/README.md)将精确维护模式关联到 resolver 夹具、所选 ops "
-"源码与已审生命周期性质。视图条目用于导航，不是已执行测试或新增支持声明。实际适用门禁需要另行运行。"
+"vendor 头文件、Handle 和可变存储必须保持在各自 target 的私有范围内。检查公共消费者的实际编译命令与 "
+"include 探针，不能只看 target 属性名。可选主机框架需要 C++17；生产固件仍使用 C11，绝不链接 "
+"GoogleTest 或其运行时。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:199
-msgid "Keep hardware behavior in C"
-msgstr "硬件行为使用 C 实现"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:201
 msgid ""
-"Firmware mechanisms use C11, with necessary assembly for startup and CPU "
-"context. Python runs on the development host: it validates authored inputs, "
-"resolves resources and emits static C/H declarations, instances, typed "
-"factory getters, fixed IRQ entry connections and explicit typed calls. The "
-"MCU executes compiled firmware and contains no Python interpreter."
+"Execute GREEN, then refactor while retaining the contracts. Build "
+"the exact existing STM32 and GD32 selections with the ARM "
+"toolchain, check ELF resources, selected handlers and "
+"unselected-driver pruning, and run relocated SDK consumers. Compare "
+"the same empty image with the added mode, reporting Flash LOAD, "
+"footprint and each RAM domain separately. Native models establish "
+"modeled software behavior; ARM builds establish their compile/link "
+"boundary. Real PCB, clock, DMA, cache and electrical acceptance "
+"require physical station execution."
 msgstr ""
-"固件机制使用 C11，启动和 CPU 上下文等位置保留必要的汇编。Python 在开发主机上运行：校验手写输入、解析资源，生成静态 C/H "
-"声明、实例、typed factory getter、固定 IRQ 入口连接及明确的类型化调用。MCU 执行编译后的固件，不包含 Python 解释器。"
+"执行 GREEN 后，在保留合同通过的前提下重构。用 ARM 工具链构建现有的精确 STM32 与 GD32 选择，检查 ELF "
+"资源、选定处理函数的保留和未选驱动的裁剪，并运行迁移后的 SDK 消费者。对比同一空镜像与增加该模式后的镜像，分别报告 Flash "
+"LOAD、Flash footprint 和各 RAM 域。Native 模型建立所建模的软件行为证据；ARM "
+"构建建立对应编译/链接边界。真实 PCB、时钟、DMA、cache 与电气验收需要物理 station 实际执行。"
 
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:207
 msgid ""
-"Maintain register reads and writes, hardware admission, waits, "
-"pin/clock/IRQ/DMA acquisition, rollback, stop and recovery in concrete C "
-"adapters. Generated definitions may retain constant register addresses and "
-"immutable resource data; a fixed IRQ trampoline may directly call its "
-"selected handler. Do not move these algorithms into a runtime action "
-"interpreter or add a registry, hidden worker or mandatory lock. Test the "
-"production C algorithm through hardware ports using GoogleTest/GoogleMock; "
-"Python unittest verifies configuration and static wiring."
-msgstr ""
-"寄存器读写、硬件准入、等待、pin/clock/IRQ/DMA 取得、回滚、停止和恢复应直接维护在具体 C adapter "
-"中。生成的定义可以保留常量寄存器地址和不可变资源数据；固定 IRQ 薄入口可以直接调用所选 "
-"handler。不得将这些算法搬进运行时动作解释器，也不得增加 registry、隐藏 worker 或强制锁。通过硬件端口使用 "
-"GoogleTest/GoogleMock 测试生产 C 算法；Python unittest 验证配置和静态连接。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:215
-msgid ""
-"The reviewed Native and seven MCU-family increments include their maintained"
-" cold paths. Shared enhanced-SPI admission uses read-only C checks before "
-"resource acquisition or failed-init markers; H743 resume checks admission "
-"before reopening its runtime domain and acquiring its lease. Dead hardware "
-"emitters and unused default MMIO macros have been removed. Audit the whole "
-"start/failure/stop/resume path, including shared owners and optional "
-"retained components. A `DirectCall` in one constructor does not prove whole-"
-"family or whole-source completion. Exact implementation and execution scopes"
-" remain in the {download}`delivery-completion ledger <../design/platform-"
-"delivery-completion.csv>`."
-msgstr ""
-"已审查的 Native 和七个 MCU 家族增量包含维护范围内的冷态路径。共享增强 SPI 准入在取得资源或设置启动失败标记之前执行只读 C "
-"检查；H743 恢复在重新开放运行时域并取得租约之前检查准入。无用的硬件生成器和未使用的默认 MMIO "
-"宏已删除。审查完整的启动／失败／停止／恢复路径，包括共享 owner 和可选保留组件。某个构造器中的一次 `DirectCall` "
-"不能证明整个家族或全源码已经完成。精确实现与执行范围继续记录在{download}`交付完善台账 <../design/platform-"
-"delivery-completion.csv>`中。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:225
-msgid ""
-"Write readonly mode-specific configuration and exactly sized mutable "
-"storage. The C prepare function validates context and foreign ownership "
-"before effects; the C close function proves its receipt before touching an "
-"existing provider. An empty receipt must leave unowned state unchanged. "
-"After partial preparation, close must retain every unfinished pin, clock, "
-"IRQ or DMA claim until readback proves return. Test both an alien empty "
-"receipt and a genuine partial receipt; also test cleanup after the caller "
-"has already stopped the public peripheral. Avoid duplicate persistent pin "
-"snapshots or a maximum-sized union of all modes."
-msgstr ""
-"编写按模式区分的只读配置和精确大小的可变存储。C prepare 函数在产生效果前校验上下文与外部所有权；C close 函数在接触已有 "
-"provider 前验证自身收据。空收据必须保持未取得的状态不变。部分准备后，close 必须保留每个尚未完成的引脚、时钟、IRQ 或 DMA "
-"权利，直到读回证明已经归还。既要测试外来空收据，也要测试真实的部分取得收据；还要测试调用者已停止公开外设后的清理。避免重复的持久引脚快照或容纳所有模式最大状态的联合体。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:234
-msgid ""
-"Keep schema fields and numerical policy in host validation. Keep runtime "
-"MMIO reads, clock checks, publisher joins, waits and recovery in C. Declare "
-"each new configuration helper and private C/header input in the existing "
-"family descriptor and explicit CMake target. A successful host model does "
-"not replace an actual ARM link, relocated SDK consumer or physical station "
-"run."
-msgstr ""
-"将 schema 字段和数值策略留在主机校验中。将运行态 MMIO 读取、时钟检查、发布者汇合、等待与恢复留在 C 中。在既有家族 descriptor"
-" 和显式 CMake target 中声明每个新增配置辅助模块及私有 C／头文件输入。主机模型成功不能替代实际 ARM 链接、迁址 SDK "
-"消费者或物理工位执行。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:240
-msgid ""
-"H743 fixed-run power references the selected logical controller ID in "
-"`power.controllers`; the ID need not be `bus4`. Renaming the controller "
-"requires updating both endpoint and power references. This preserves the "
-"exact single SPI4 finite-DMA, baremetal, HSI64/cache-off contract; changing "
-"a logical name does not admit another physical controller, clock profile or "
-"backend."
-msgstr ""
-"H743 fixed-run power 通过 `power.controllers` 引用选中的逻辑控制器 ID，ID 无须命名为 "
-"`bus4`。修改控制器名称时须同步修改端点和 power 引用。这仍严格限定为单个 SPI4 finite-"
-"DMA、baremetal、HSI64/cache-off；改变逻辑名称不会准入另一物理控制器、时钟配置或后端。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:246
-msgid "Review performance and ownership"
-msgstr "审查性能与所有权"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:248
-msgid ""
-"Measure the selected empty image and the same fixture after enabling the new"
-" mode. Report Flash LOAD, Flash footprint, each RAM domain and reserved "
-"task/IO storage separately. Hot IRQ work should directly access its fixed "
-"provider; an interface lookup is a cold action. Keep bounded admission and "
-"stream metadata operations independent of queue length where their contracts"
-" require it."
-msgstr ""
-"测量所选空镜像和同一夹具启用新模式后的镜像。分别报告 Flash LOAD、Flash 占用范围、各 RAM 域和预留任务／I/O 存储。高频 IRQ "
-"应直接访问固定提供者；接口查找属于冷路径。在合同要求时，准入判定和流元数据操作保持有界，并且不随队列长度增长。"
-
-#: ../../../../workspace/nexus/docs/guides/provider-porting.md:254
-msgid ""
-"A passing host register model proves its modeled software scope. New CPU, "
-"Cache, FPU/MVE, security or low-power behavior needs its own actual "
-"execution boundary; [platform support](../reference/platforms/support.md) "
-"does not infer it from a name."
-msgstr ""
-"通过的主机寄存器模型只证明其建模的软件范围。新增 "
-"CPU、缓存、FPU／MVE、安全或低功耗行为必须建立自己的实际执行边界；[平台支持](../reference/platforms/support.md)不能仅凭名称推导它们。"
-
-msgid "Within each SoC's `configure/` package, `contract.py` owns mode capabilities, ABI/limits and family admission policy. Sibling modules import that contract directly; `__init__.py` explicitly exports it with constructors and emitters. The leaf `providers/common.py` owns validation helpers and immutable `Construction`; leaf contracts and common helpers do not import the top-level resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ policy, `ir.py` owns named immutable decisions and their one-way JSON projection, and `matrix.py` orchestrates support catalogues. The descriptor's `configuration_modules` property combines the fixed package, `contract.py`, `bindings.py` and `emission.py` paths with explicitly declared `configuration_helpers` and the selected local descriptor file. These sources belong to reconfiguration inputs and the Source SDK source closure. Keep family records, order and public selections stable when relocating metadata. A single `descriptor.maintained()` lookup must not import another family or configure behavior; explicit enumeration and snapshot/SDK inventory may intentionally load all data-only descriptors."
-msgstr "每个 SoC 的 `configure/` 包中，`contract.py` 拥有模式能力、ABI／限制与系列准入策略。相邻模块直接导入该合同；`__init__.py` 将其与构造器、emitter 显式导出。叶模块 `providers/common.py` 拥有校验辅助函数与不可变 `Construction`；叶合同及公共辅助模块不导入顶层 resolver 或 emitter。`selection.py` 检查跨域选项、时钟和 IRQ 策略；`ir.py` 拥有具名不可变决策及其单向 JSON 投影；`matrix.py` 编排支持目录。descriptor 的 `configuration_modules` 属性将固定 package、`contract.py`、`bindings.py`、`emission.py` 路径与显式声明的 `configuration_helpers` 及所选本地 descriptor 文件合并。这些源码属于重新配置输入和 Source SDK 源码闭包。迁移元数据时保留 family record、顺序和公共选择。单次 `descriptor.maintained()` 查找不得导入另一 family 或 configure 行为；显式枚举及 snapshot/SDK 清单可以按要求加载全部纯数据 descriptor。"
-
-msgid "The private `timer_capture_impl.h`, `advanced_pwm_impl.h` and `uart_fifo_impl.h` templates allow one specialization per translation unit. Required named exports, register, clock, IRQ and data bindings reject at compilation when missing. The FIFO template accepts depth 1..16 and RTS/CTS selection 0 or 1; selecting flow control requires its hardware flow binding. Wrapper-owned bindings, including ops names and post-include clock-readiness use, remain available after inclusion. Explicit caller read/write ports survive; cleanup removes only template-owned helper and default macros. Review each specialization's actual compilation, exported table and runtime contract; a template guard does not establish hardware timing."
-msgstr "私有 `timer_capture_impl.h`、`advanced_pwm_impl.h` 和 `uart_fifo_impl.h` 模板允许每个 translation unit 只有一个 specialization。所需的具名导出、寄存器、clock、IRQ 和数据绑定缺失时在编译期拒绝。FIFO 模板接受深度 1..16，RTS/CTS 选择为 0 或 1；选择流控时要求相应硬件 flow binding。wrapper 拥有的 binding，包括 ops 名称及 include 之后的 clock-readiness 使用，保留可用。调用方显式定义的 read/write port 保留；清理只移除模板拥有的 helper 和默认宏。逐个审查 specialization 的实际编译、导出表和运行时合同；模板 guard 不建立硬件时序资格。"
-
-msgid "The SoC target selects shared sources through explicit CMake entries and private includes. The driver directory does not choose routes, clock profiles or an ABI, and its presence does not add a maintained mode. Never introduce a runtime forwarder merely to match a source directory. A selected private compile-time port may bind reviewed official operations inside that shared translation unit; a macro in a separately compiled wrapper cannot change it. Preserve operation width, read side effects, command atomicity and withdrawal ordering; the [bounded official-operation scope](../design/official-stm32-provider.md#bounded-official-operation-increments) is a current example, not a blanket HAL replacement."
-msgstr "SoC target 通过显式 CMake 条目和私有 include 选择共享源码。driver 目录不选择路由、时钟 profile 或 ABI，目录存在也不增加维护中的模式。不得只为匹配源码目录而引入运行时转发层。选定的私有编译期 port 可以在该共享编译单元内部绑定已审查的官方操作；单独编译的 wrapper 中的宏不能改变它。保留操作宽度、读取副作用、命令原子性和撤离顺序；[有界官方操作范围](../design/official-stm32-provider.md#bounded-official-operation-increments)是当前实例，不是全面替换为 HAL 的承诺。"
-
-msgid "For new behavior or fixes, add and execute a meaningful RED GoogleTest/GoogleMock contract against the current production path. Retain the actual command, nonzero execution and expected failing assertion. Equivalent refactors retain actual old-GREEN source/binary snapshots and applicable regressions plus real-default operation probes, without fabricated RED. Test MMIO/CPU/dependency ports through mocks; Python resolver behavior uses stdlib unittest. A missing tool or compile-only error is not the expected behavioral RED result."
-msgstr "对新行为或修复，为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。等价重构保留实际 old-GREEN 源码／二进制快照、适用回归及真实默认操作探针，不伪造 RED。通过 mock 测试 MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。"
-
-msgid "Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the shared CPU resolver; do not duplicate CPU flags or infer optional features. For an in-tree family, place MCU implementations under `soc/<vendor>/<family>/` and declare that canonical `source_directory` in the maintained family descriptor. Public family identifiers stay independent of the directory. CPU implementation sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after checking each participating silicon contract. Cross-vendor SoC collaboration stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`."
-msgstr "添加精确 `soc.json`/`routes.json` facts 与来源说明。使用共享 CPU resolver，不重复 CPU flags 或推断可选特性。对于仓库内 family，MCU 实现放在 `soc/<vendor>/<family>/`，并在维护的 family descriptor 声明规范 `source_directory`。公共 family 标识独立于目录。CPU 实现源码归属对应 ISA，例如 `arch/arm/cortex_m/`；只有核对每个参与芯片合同后，经审查的跨厂商寄存器算法才放到 `drivers/<kind>/<ip>/`。跨厂商 SoC 协作留在 `soc/common/`；STM32 身份辅助留在 `soc/stm32/common/`。"
-
-msgid "For an in-tree family, add a data-only `descriptor.py` at the SoC package root (Native uses `soc/native/descriptor.py`), outside its `configure/` package. Add its exact module to the central explicit map in `tools/configure/providers/descriptor.py`; reuse the frozen `FamilyDescriptor`, without an eager parallel registry. Place its production configuration package in `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and its configuration tests in `tools/configure/tests/providers/<family>/`. Define supported modes, numerical limits, constructors, rollback and IRQ wiring. Return an explicit frozen `Construction` record, including the private state type and failed-init cleanup responsibility. Initialize and stop actions use `DirectCall` values under the [constructor contract](../design/official-stm32-provider.md#build-time-provider-contract); raw C expressions are not accepted in those fields. Do not require family-name inference in common generation. Unsupported modes reject; there is no runtime registration or plugin discovery."
-msgstr "对于仓库内 family，在 SoC 包根目录添加仅含数据的 `descriptor.py`（Native 使用 `soc/native/descriptor.py`），放在 `configure/` 包之外。在 `tools/configure/providers/descriptor.py` 的中央显式映射加入精确模块，复用冻结的 `FamilyDescriptor`，不建立急切加载的并行注册表。生产配置包放在 `soc/<vendor>/<family>/configure/`（Native 使用 `soc/native/configure/`），配置测试放在 `tools/configure/tests/providers/<family>/`。定义支持模式、数值限制、构造、回滚和 IRQ 连接。返回显式冻结的 `Construction` 记录，包含私有状态类型和初始化失败后的清理责任。初始化和停止动作使用[构造合同](../design/official-stm32-provider.md#build-time-provider-contract)中的 `DirectCall`，这些字段不接受原始 C 表达式。公共生成器不应推断 family 名称。不支持的模式拒绝，不提供运行时注册或插件发现。"
-
-msgid "External SoC/provider package contract"
-msgstr "外置 SoC/provider 包契约"
-
-msgid "This section documents the explicit package contract introduced by IT-P01–IT-P08 in the [current iteration](../delivery/next-iterations.md). Consult the [original task records](../status/ledgers/platform-delivery-completion.md) for implementation and executed acceptance. The contract itself does not establish an available chip, Board route, installed-SDK result or physical qualification. This addition does not change the published `v0.2.1` archive; use the development source containing the package implementation until a corresponding SDK is verified."
-msgstr "本节说明[当前迭代](../delivery/next-iterations.md)中 IT-P01–IT-P08 引入的显式包契约。实现与实际验收见[原任务记录](../status/ledgers/platform-delivery-completion.md)。契约本身不建立可用芯片、Board 路由、安装版 SDK 结果或物理资格。新增内容不改变已发布的 `v0.2.1` 归档；对应 SDK 取得实际验证前，使用包含包实现的开发源码。"
-
-msgid "The assembly explicitly selects `soc_package` relative to its own TOML file. The existing `board_package` selects Board facts separately. No package scan, automatic download or mutable global registry chooses an implementation. An external family cannot replace an existing in-tree family identity."
-msgstr "装配通过相对其 TOML 文件的 `soc_package` 显式选择包。既有 `board_package` 独立选择 Board facts。不通过包扫描、自动下载或可变全局注册表选择实现。外置 family 不得替换已有仓库内 family 身份。"
-
-msgid "Package input"
-msgstr "包输入"
-
-msgid "Contract"
-msgstr "合同"
-
-msgid "`nexus-soc.json`"
-msgstr "`nexus-soc.json`"
-
-msgid "Strict manifest with `schema_version`, `interface_version`, `id`, `version`, `family` and `vendor`"
-msgstr "严格清单，包含 `schema_version`、`interface_version`、`id`、`version`、`family` 和 `vendor`"
-
-msgid "`source_directory`"
-msgstr "`source_directory`"
-
-msgid "Package-relative SoC source directory containing `soc.json`, `routes.json` and `CMakeLists.txt`"
-msgstr "相对包根目录的 SoC 源码目录，包含 `soc.json`、`routes.json` 和 `CMakeLists.txt`"
-
-msgid "`configuration_directory`"
-msgstr "`configuration_directory`"
-
-msgid "Package-relative explicit configuration entry containing `__init__.py` and the selected provider modules"
-msgstr "相对包根目录的显式配置入口，包含 `__init__.py` 和选定 provider 模块"
-
-msgid "`inputs`"
-msgstr "`inputs`"
-
-msgid "Relative regular-file paths mapped to SHA-256; cover the selected facts, configuration code and build inputs, including required entry files"
-msgstr "相对普通文件路径到 SHA-256 的映射，覆盖选定 facts、配置代码和构建输入，包括必需入口文件"
-
-msgid "Manifest schema and interface version 1 define this first contract. Paths and hashes are admission inputs; they do not define targets or replace CMake's source dependency graph. Reject unknown fields, duplicate identities, escaped paths, disallowed links, missing files, unsupported interface versions and changed bytes rather than falling back to an in-tree family. Configuration rejection must leave no partial usable bundle."
-msgstr "第一版契约的 manifest schema 和 interface version 均为 1。路径和摘要用于准入，不定义目标，也不替代 CMake 源依赖图。未知字段、重复身份、路径越界、不允许的链接、缺文件、不支持的接口版本或字节变化必须拒绝，不回退到仓库内 family。配置拒绝后不得留下部分可用 bundle。"
-
-msgid "`interface_version` is the compatibility gate. `version` is the package's audit identity, not an expected-semver constraint requested by the consumer. Declare package-owned vendor source and locks in `inputs`; the existing `soc.source_lock` refers to Nexus-managed dependencies and does not automatically validate arbitrary external Git repositories."
-msgstr "`interface_version` 是兼容准入门槛。`version` 是包的审计身份，不是 consumer 请求的 expected-semver 约束。包自有的 vendor 源码和锁须声明到 `inputs`；现有 `soc.source_lock` 指向 Nexus 管理的依赖，不自动验证任意外部 Git 仓库。"
-
-msgid "Package configuration and CMake are explicitly selected trusted host code, not data executed by the firmware. Resolve their identity once into the immutable package context, then carry it through facts, selected contracts, resource validation, static generation, capabilities and build selection. Queries must not resolve one package while firmware compilation selects another."
-msgstr "包的配置代码和 CMake 是显式选择的受信任主机代码，不是固件执行的数据。将其身份一次解析为不可变 package context，贯穿 facts、selected contracts、资源校验、静态生成、能力查询和构建选择。查询不得解析一个包，而固件编译选择另一个包。"
-
-msgid "Declared Python modules within `configuration_directory` are loaded eagerly from their hash-checked source. Later relative imports reuse those declared loaded modules; undeclared filesystem fallback and bytecode caches are not package inputs. Absolute package paths may contain spaces; CMake-special characters are rejected explicitly rather than passed into generated build syntax."
-msgstr "`configuration_directory` 内声明的 Python 模块经摘要校验后，从源码急切加载。后续相对 import 复用已声明且已加载的模块；不把未声明的文件系统回退或 bytecode cache 作为包输入。绝对包路径可含空格；CMake 特殊字符会明确拒绝，不会传入生成的构建语法。"
-
-msgid "The selected SoC target privately connects its SDK, startup, system and linker inputs. Public I/O retains Nexus types and static faces. Ordinary builds retain one `Nexus::Config`; an installed Source SDK consumer supplies its external package explicitly and must not fall back to a development checkout. Relocation, offline consumption, interface-version rejection and independent package fixtures are software exits; actual PCB, DMA, clocks and electrical behavior need HIL."
-msgstr "选定 SoC 目标私有连接 SDK、startup、system 和 linker 输入。公共 I/O 保留 Nexus 类型和静态 face。普通构建保留一个 `Nexus::Config`；安装版 Source SDK consumer 显式提供外置包，不得回落开发 checkout。路径搬移、断网消费、接口版本拒绝和独立包夹具属于软件退出；真实 PCB、DMA、clock 和电气行为需要 HIL。"
+"Application examples remain in the external private examples "
+"repository. Keep product roles, tasks, private partitions and "
+"recovery policy there; the public starter contains only reusable "
+"integration mechanisms and software tests."
+msgstr "应用示例保留在外部私有示例仓库。产品角色、任务、私有分区与恢复策略仍由该仓库维护；公共起步包只包含可复用接入机制和软件测试。"

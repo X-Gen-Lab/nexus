@@ -16,6 +16,7 @@ from tools.evidence.common import EvidenceError, atomic_json, file_identity, loa
 from tools.evidence.identity import git_source
 from tools.evidence.qualification import create_qualification
 from tools.evidence.reproduce import run_logged
+from tools.dev.process import run
 from tools.measurement.elf import Elf32, binary_from_elf
 from tests.contracts.test_evidence_support import link_fixture
 
@@ -174,6 +175,60 @@ class CandidateGateTests(unittest.TestCase):
         packed.write_bytes(packed.read_bytes() + b"tampered")
         with self.assertRaises(EvidenceError):
             verify(destination / "candidate.json")
+
+    def test_new_seal_declares_strict_scope_proof_version(self):
+        path, _, _ = self.projection_fixture()
+        self.assertEqual(load_json(path)["schema_version"], 2)
+        self.assertIn("scope_inputs", load_json(path))
+
+    def test_historical_seal_requires_explicit_read_only_legacy_replay(self):
+        path, _, _ = self.projection_fixture()
+        original = load_json(path)
+        original["schema_version"] = 1
+        original.pop("scope_inputs", None)
+        atomic_json(path, original)
+        with patch.object(candidate_tools, "validate_scope_proof",
+                          return_value=([], None)):
+            with self.assertRaisesRegex(EvidenceError, "legacy.*replay"):
+                verify(path)
+            self.assertEqual(verify(path, legacy_replay=True), original)
+            projected = candidate_tools.verified_projection(path, legacy_replay=True)
+            self.assertEqual(projected["sealed_schema_version"], 1)
+            self.assertEqual(projected["verification"], "legacy_declared_byte_closure_only")
+            self.assertEqual(projected["current_scope_qualification"], "not_reestablished")
+
+    def test_legacy_replay_preserves_original_receipt_reference_semantics(self):
+        manifest, _, _ = self.prepared()
+        result = run([sys.executable, "-c", "print('original receipt output')"],
+                     cwd=self.root, env={}, log=self.root / "attempt.log",
+                     stage="legacy-fixture")
+        receipt = load_json(result.receipt_path)
+        identity = manifest["qualifications"][0]
+        report_path = Path(identity["path"])
+        report = load_json(report_path)
+        report["evidence"] = [file_identity(result.receipt_path)]
+        atomic_json(report_path, report)
+        manifest["qualifications"][0] = file_identity(report_path)
+        path = self.root / "manifest.json"
+        atomic_json(path, manifest)
+        destination = self.root / "sealed-legacy"
+        with patch.object(candidate_tools, "verify_environment", return_value={}), \
+                patch.object(candidate_tools, "validate_scope_proof", return_value=([], None)):
+            sealed = seal(path, destination)
+        # Schema 1 retained the original receipt bytes, whose stream identities
+        # used `bytes`; the historical collector did not promote those paths.
+        streams = {receipt[name]["sha256"] for name in ("stdout", "stderr")}
+        for item in sealed["payloads"]:
+            if item["sha256"] in streams:
+                (destination / item["path"]).unlink()
+        sealed["payloads"] = [item for item in sealed["payloads"]
+                              if item["sha256"] not in streams]
+        sealed["schema_version"] = 1
+        sealed.pop("scope_inputs")
+        atomic_json(destination / "candidate.json", sealed)
+        with patch.object(candidate_tools, "validate_scope_proof", return_value=([], None)):
+            verified = verify(destination / "candidate.json", legacy_replay=True)
+        self.assertEqual(verified, sealed)
 
     def test_nested_execution_artifact_is_sealed_and_required_on_verify(self):
         manifest, _, _ = self.prepared()
