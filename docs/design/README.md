@@ -50,7 +50,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
 | [高级 timer](timer-advanced.md) | capture 事件、complementary PWM/deadtime/break；共享资源与实际安全边界 |
 | [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO 与 copied UART TX；可信 principal/copy/session authority；U575 同步参考 transport 另见双域合同 |
-| [I3C controller 核心](i3c-controller.md) | 单活动有限 SDR/DAA/CCC 与复制 IBI/hot-join；H563 仅编译参考，无物理 provider |
+| [I3C controller 核心](i3c-controller.md) | 单活动有限 SDR/DAA/CCC 与复制事件；H563 私有有界轮询参考，板级准备与整总线证明由外部提供 |
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |

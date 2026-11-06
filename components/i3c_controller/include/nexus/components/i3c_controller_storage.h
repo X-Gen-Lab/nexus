@@ -75,7 +75,9 @@ typedef struct {
  *
  *                  begin and assign are infallible commands. pump reports
  *                  later hardware failures and services at most the supplied
- *                  batch capacities plus one IBI and one hot-join latch. No
+ *                  payload batch capacities, one fixed eight-byte DAA identity,
+ *                  one IBI and one hot-join latch. Identity metadata does not
+ *                  contribute to transmitted/received payload counts. No
  *                  command or span is retained. No application code is called.
  *                  withdraw requests abort. quiescent SUCCESS proves actual
  *                  wire/FIFO/IRQ quiescence and all port observers detached.
@@ -83,7 +85,9 @@ typedef struct {
  *                  reset additionally proves EVERY target dynamic address
  *                  invalidated. FIFO flush or controller reset alone cannot
  *                  report SUCCESS. BUSY/IO/UNSUPPORTED proof retains loans and
- *                  ownership. release follows successful final quiescence.
+ *                  ownership. release is infallible after successful final
+ *                  quiescence; it must not silently refuse ownership transfer
+ *                  or repeat a fallible proof while the core publishes join.
  *                  The port context and supplied storage outlive observers.
  */
 typedef struct {

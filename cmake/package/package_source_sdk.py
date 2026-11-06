@@ -31,7 +31,8 @@ try:
     )
     from tools.maintenance import (
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
-        stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
+        stm32g4_hal_lock, stm32h5_device_lock, stm32h5_hal_lock,
+        stm32h7_hal_lock, stm32u5_hal_lock,
         stm32g4_lock, threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
         coremqtt_lock, mcuboot_lock,
     )
@@ -60,7 +61,7 @@ CMSIS_CORE_REQUIRED_HEADERS = (
     "m-profile/armv7m_mpu.h", "m-profile/armv8m_mpu.h",
     "m-profile/armv7m_cachel1.h", "m-profile/cmsis_gcc_m.h", "tz_context.h")
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
-                    stm32h7_hal_lock, stm32u5_hal_lock)
+                    stm32h5_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
     'cmake/package/verification/loaned_rx/application.c',
     'cmake/package/verification/loaned_rx/application.h',
@@ -578,6 +579,26 @@ for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)
     REQUIRED_FILES += tuple(_review["directory"] + "/" + name
                             for name in sorted(_review["files"]))
+REQUIRED_FILES += (stm32h5_device_lock.LOCK_NAME,
+                   "tools/maintenance/stm32h5_device_lock.py")
+REQUIRED_FILES += tuple(stm32h5_device_lock.DIRECTORY + "/" + name
+                        for name in sorted(stm32h5_device_lock.FILES))
+REQUIRED_FILES += (
+    "components/soc/stm32/stm32h563_i3c/CMakeLists.txt",
+    "components/soc/stm32/stm32h563_i3c/private/stm32h563_i3c_port.h",
+    "components/soc/stm32/stm32h563_i3c/src/stm32h563_i3c_port.c",
+    "components/soc/stm32/stm32h743_w25q128/CMakeLists.txt",
+    "components/soc/stm32/stm32h743_w25q128/README.md",
+    "components/soc/stm32/stm32h743_w25q128/private/hal_platform.h",
+    "components/soc/stm32/stm32h743_w25q128/private/stm32h7xx_hal_conf.h",
+    "soc/stm32/stm32h743/drivers/w25q128_mapped.c",
+    "soc/stm32/stm32h743/private/stm32h743_w25q128.h",
+    "components/soc/stm32/stm32h747_amp/CMakeLists.txt",
+    "components/soc/stm32/stm32h747_amp/README.md",
+    "components/soc/stm32/stm32h747_amp/include/nexus/components/stm32h747_amp.h",
+    "components/soc/stm32/stm32h747_amp/private/hardware.h",
+    "components/soc/stm32/stm32h747_amp/src/stm32h747_amp.c",
+    "components/soc/stm32/stm32h747_amp/src/hardware.c")
 # Reuse the generator closure; SDK-only entry points remain explicit above.
 for _mode in ("platform", "runtime"):
     REQUIRED_FILES += tuple(configuration_dependencies.source_names(
@@ -764,6 +785,12 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("G4 committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
+    elif dependency == stm32h5_device_lock.DIRECTORY:
+        raw, _ = snapshot(root / stm32h5_device_lock.LOCK_NAME)
+        names = stm32h5_device_lock.contract(parse_json(raw))
+        if not names.issubset(entries):
+            raise SDKError("H563 committed device source graph is incomplete")
+        entries = {name: entries[name] for name in names}
     elif dependency in {official.DIRECTORY for official in OFFICIAL_DRIVERS}:
         official = next(official for official in OFFICIAL_DRIVERS
                         if official.DIRECTORY == dependency)
@@ -774,6 +801,7 @@ def dependency_entries(root, dependency):
                            + dependency)
         entries = {name: entries[name] for name in names}
     else:
+        selected_names = set()
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
             if dependency != review["directory"]:
                 continue
@@ -782,8 +810,9 @@ def dependency_entries(root, dependency):
             names = cmsis_device_lock.contract(lock)
             if lock["selected_part"] != part or not names.issubset(entries):
                 raise SDKError("Reviewed device committed source graph is incomplete")
-            entries = {name: entries[name] for name in names}
-            break
+            selected_names.update(names)
+        if selected_names:
+            entries = {name: entries[name] for name in selected_names}
     return entries
 
 
@@ -997,13 +1026,17 @@ def prepare(source, output, development_fixture=False):
                          source / "dependencies/mcuboot.lock.json")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
+    stm32h5_device_lock.verify(source / stm32h5_device_lock.DIRECTORY,
+                               source / stm32h5_device_lock.LOCK_NAME)
     for official in OFFICIAL_DRIVERS:
         official.verify(source / official.DIRECTORY,
                         source / official.LOCK_NAME,
                         source / official.CMSIS_DIRECTORY)
-    for review in cmsis_device_lock.REVIEWED_DEVICES.values():
-        cmsis_device_lock.verify(source / review["directory"],
-                                 source / review["lock_name"])
+    for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+        observed = cmsis_device_lock.verify(source / review["directory"],
+                                            source / review["lock_name"])
+        if observed["selected_part"] != part:
+            raise SDKError("Reviewed device lock selector differs from its path")
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
     imports = [reviewed_import(source / directory, source)
@@ -1182,6 +1215,11 @@ def verify(root):
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
                        root / "dependencies/stm32g4.lock.json",
                        packaged_commit=g4["commit"])
+    h5 = next(record for record in records
+              if record["path"] == stm32h5_device_lock.DIRECTORY)
+    stm32h5_device_lock.verify(root / stm32h5_device_lock.DIRECTORY,
+                               root / stm32h5_device_lock.LOCK_NAME,
+                               packaged_commit=h5["commit"])
     for official in OFFICIAL_DRIVERS:
         driver = next(record for record in records
                       if record["path"] == official.DIRECTORY)
@@ -1192,14 +1230,16 @@ def verify(root):
                         root / official.CMSIS_DIRECTORY,
                         packaged_commit=driver["commit"],
                         packaged_cmsis_commit=cmsis["commit"])
-    for review in cmsis_device_lock.REVIEWED_DEVICES.values():
+    for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
         matching = [record for record in records
                     if record["path"] == review["directory"]]
         if len(matching) != 1:
             raise SDKError("Source SDK lacks its exact reviewed device dependency")
-        cmsis_device_lock.verify(root / review["directory"],
-                                 root / review["lock_name"],
-                                 packaged_commit=matching[0]["commit"])
+        observed = cmsis_device_lock.verify(
+            root / review["directory"], root / review["lock_name"],
+            packaged_commit=matching[0]["commit"])
+        if observed["selected_part"] != part:
+            raise SDKError("Reviewed device lock selector differs from its path")
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
     from verify_vendor_source import verify as verify_vendor_import

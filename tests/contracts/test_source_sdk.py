@@ -2391,6 +2391,31 @@ class SourceSDKTests(unittest.TestCase):
                     identity.write_bytes(old_identity)
 
     @_isolated_sdk_prefix
+    def test_rehashed_device_lock_cannot_substitute_another_reviewed_selector(self):
+        baseline = self.verify()
+        self.assertEqual(baseline.returncode, 0, baseline.stderr)
+        marker = self.sdk / source_sdk.MANIFEST
+        original_marker = marker.read_bytes()
+        lock = self.sdk / "dependencies/stm32h747.lock.json"
+        original_lock = lock.read_bytes()
+        try:
+            lock.write_bytes((self.sdk / "dependencies/stm32h7.lock.json")
+                             .read_bytes())
+            identity = json.loads(original_marker)
+            identity["files_sha256"]["dependencies/stm32h747.lock.json"] = (
+                source_sdk.digest(lock.read_bytes()))
+            identity["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                identity["files_sha256"], sort_keys=True,
+                separators=(",", ":")).encode())
+            marker.write_text(json.dumps(identity))
+            rejected = self.verify()
+            self.assertNotEqual(rejected.returncode, 0,
+                                "A rehashed H743 lock replaced the H747 review")
+        finally:
+            lock.write_bytes(original_lock)
+            marker.write_bytes(original_marker)
+
+    @_isolated_sdk_prefix
     def test_rehashed_modern_device_source_notice_lock_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()

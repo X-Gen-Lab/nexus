@@ -41,7 +41,37 @@ ADDITIONS = {
             'sha256': '2703dc6fcbc59f324cc5e1c39dbf68774c9d68665649fbf1ed92cea72ee1270a'},
         'Inc/stm32h7xx_ll_usart.h': {
             'bytes': 175243,
-            'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'}},
+            'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'},
+        'Inc/stm32h7xx_ll_hsem.h': {
+            'bytes': 34217,
+            'sha256': '7e2cc95c8dcd6b326801026d0398a46b903c94e4c3befd650a227e9a351606c2'},
+        'Inc/stm32h7xx_ll_bus.h': {
+            'bytes': 325702,
+            'sha256': '0eb42ffbba51192ec0efd6463759a5fda060637ff4d694274df16b4763c882a5'},
+        'Inc/stm32h7xx_hal.h': {
+            'bytes': 67326,
+            'sha256': '97aeb9e9e0c3acde0c91d025e89c7972b9ad13ab3cb735d40ad852dc395f6980'},
+        'Inc/stm32h7xx_hal_def.h': {
+            'bytes': 7972,
+            'sha256': 'f7e6ad2cff1b770393ad76961fbb220bef0a52593e9035746e7961137061ebfc'},
+        'Inc/stm32h7xx_hal_qspi.h': {
+            'bytes': 37405,
+            'sha256': 'ed55223d786dfba78b8fb9e30c64898558c3c7044f2fdc689069decceb528648'},
+        'Inc/stm32h7xx_hal_mdma.h': {
+            'bytes': 47211,
+            'sha256': '580b7f7d97482fe435f5c3c4086f017a090ba186201db2af7c68567094e868e8'},
+        'Inc/stm32h7xx_ll_delayblock.h': {
+            'bytes': 2133,
+            'sha256': 'af9cfe4b9f1f2b55a27f59b8a965e967adbb7ababba38a2f85e897698575d8f9'},
+        'Inc/Legacy/stm32_hal_legacy.h': {
+            'bytes': 241600,
+            'sha256': '37a057e32410712dbe30a3ec74a6cc838f767ae1c616f1b767687bede5dff68a'},
+        'Src/stm32h7xx_hal_qspi.c': {
+            'bytes': 90497,
+            'sha256': 'cd8e278936fe6c09d59949b6b05b3a2e52c5f3ae3d33ab7f7729ea33690845fc'},
+        'Src/stm32h7xx_hal_mdma.c': {
+            'bytes': 62926,
+            'sha256': '674d7a273d208509e2941cb88d9419f549cbdfd35d4aa81b2da135bf1c1a30ad'}},
     'u5': {
         'Inc/stm32u5xx_ll_iwdg.h': {
             'bytes': 13653,
@@ -99,7 +129,7 @@ def proposed_lock(family):
     selected['files'].update(copy.deepcopy(ADDITIONS[family]))
     selected['selected_api'] = {
         'g4': 'stm32g474-ll-inline-i2c-fdcan-definitions',
-        'h7': 'stm32h743-ll-inline-i2c',
+        'h7': 'stm32h743-ll-inline-i2c-hsem-hal-qspi-reference',
         'u5': 'stm32u575-ll-inline-gpio-hal-write-multiple'}[family]
     return selected
 
@@ -336,7 +366,8 @@ class OfficialHeaderClosureTests(unittest.TestCase):
     def test_scope_is_exact_and_does_not_widen_other_families(self):
         for family, scope in (('g4', 'stm32g474-ll-inline-i2c-fdcan-definitions'),
                               ('u5', 'stm32u575-ll-inline-gpio-hal-write-multiple'),
-                              ('h7', 'stm32h743-ll-inline-i2c')):
+                              ('h7',
+                               'stm32h743-ll-inline-i2c-hsem-hal-qspi-reference')):
             with self.subTest(family=family):
                 profile = PROFILES[family]
                 lock = proposed_lock(family) if family in ADDITIONS else json.loads(

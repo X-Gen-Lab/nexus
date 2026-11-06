@@ -6062,5 +6062,839 @@
         ]
       }
     }
+  },
+  "source_version_records_20261106": {
+    "reference_platforms_20261106": {
+      "kind": "bounded-reference-platform-software-increment",
+      "baseline_revision": "6707a110634a9846eb13c8c8976abd123a4c7e8c",
+      "source_binding": {
+        "code_revision": "89872fcecb63eaf20f65a38996e2bab6602a6863",
+        "code_tree": "224fa5511aaafe473fad0d4a457187a7e7f5a00c",
+        "qualified_scope": "Bounded source increment: ordinary complete-index contracts, five changed production C files in 20 actual analyzer contexts, six changed-path sanitizer programs, and four clean installed-SDK ARM consumer images. No full delivery-plan, reproducibility, Board, HIL or product-release qualification."
+      },
+      "organization_dependencies": {
+        "cmsis_device_h5": {
+          "fetch_url": "https://github.com/X-Gen-Lab/cmsis-device-h5.git",
+          "commit": "884b8dc78e41cbfca008363342b17f4a9e8641f7"
+        },
+        "stm32h5_hal": {
+          "fetch_url": "https://github.com/X-Gen-Lab/stm32h5xx-hal-driver.git",
+          "commit": "56e28dbebd720e3df2866dfaf438b525e9e8af04"
+        },
+        "pairing": "Official STM32CubeH5 v1.7.0 gitlinks; CMSIS Core 6.4 reused; organization nexus/pins/<commit> tags verified",
+        "retention_tag_readback": {
+          "path": "build/reference-platforms-20261106/h5-sdk/organization-retention-tags.json",
+          "bytes": 1377,
+          "sha256": "954da24b6b2bc18a0f0c3a25d4ffecf5a645553d7dede3f8d509f821e7721561"
+        }
+      },
+      "implemented_reference_scopes": {
+        "H563_I3C": "Caller-owned C11 polled SDR, explicit DAA/narrow CCC, copied IBI/hot-join and retained drain; trusted external cold/target-reset resources required; no full H563 SoC/Board/factory.",
+        "H743_W25Q128": "EF4018 single-line CPU_READ, bounded HAL PIO, page/sector verification, two MPU regions for whole-alias denial and read-only/XN mapping; both caches off; actual H743 Platform clock owner required. No Quad/DMA/XIP.",
+        "H747_AMP": "Existing AMPIPC ABI with private cold full-layout admission, observed noncache MPU and real HSEM leaves; M7 D-cache off; external paired boot and persistent epoch authority required. Reset join UNSUPPORTED; no production boot/peer launch or RTOS pair.",
+        "shared_feedback": "Failed mapped-storage final unmap permanently closes new reader/writer admission while retaining exact cleanup loan; no new hot-success state/forwarding."
+      },
+      "physical_status": "not_executed",
+      "product_release": false,
+      "validation": {
+        "ordinary_complete_index_gate": {
+          "status": "passed",
+          "binding": "Executed by ordinary pre-commit hooks against the unchanged staged tree that became code_tree; code commit completed successfully without bypass.",
+          "commit_log": {
+            "path": "build/reference-platforms-20261106/normal-commit.log",
+            "bytes": 3956,
+            "sha256": "cacd04a8e47950bfe32130dd2ee204da01bba4641857b3b39048bc012962c5a6"
+          },
+          "google_programs": 427,
+          "google_cases": 7535,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "tool_suites": [
+            {
+              "suite": "testing",
+              "discovered": 2139,
+              "executed": 2139,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "configure",
+              "discovered": 1244,
+              "executed": 1244,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "ci",
+              "discovered": 511,
+              "executed": 511,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "workflows",
+              "discovered": 167,
+              "executed": 167,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            }
+          ],
+          "execution": {
+            "path": "build/native-debug/tdd/execution.json",
+            "bytes": 1331521,
+            "sha256": "f88ae2c94e7f0bf9cad0b5283c67126589725045938669c665ab026507ea7c3e"
+          },
+          "io_property_mapping": {
+            "executed_bounded": 233,
+            "unproven": 8,
+            "formal_proof": false,
+            "physical_status": "not_executed",
+            "report": {
+              "path": "build/native-debug/tdd/io-property-report.json",
+              "bytes": 23652187,
+              "sha256": "13be8f3674102e34649b6e3b6259588e48a446bf9c402a25a3a6bff6c793720b"
+            }
+          },
+          "portable_package": {
+            "archive": {
+              "path": "/dev/shm/nexus-reference-evidence-store-20261106/9255af1e2761c8bfbdfc925ab401da2798c5b66772e4ec98291d27343a065d36.tar.gz",
+              "sha256": "9255af1e2761c8bfbdfc925ab401da2798c5b66772e4ec98291d27343a065d36",
+              "size": 11437219
+            },
+            "bytes": 211562050,
+            "files": 12542,
+            "kind": "portable_evidence",
+            "manifest_sha256": "4fdcf7dd53772f385c3b5784d072621ea2d68cd38e6da3ab0bb78e27cda40f8c",
+            "product_promotion": false,
+            "schema_version": 1,
+            "signature_status": "unsigned"
+          },
+          "workspace_archive_navigation": {
+            "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/9255af1e2761c8bfbdfc925ab401da2798c5b66772e4ec98291d27343a065d36.tar.gz",
+            "sha256": "9255af1e2761c8bfbdfc925ab401da2798c5b66772e4ec98291d27343a065d36",
+            "size": 11437219
+          },
+          "workspace_copy_verification": {
+            "path": "build/reference-platforms-20261106/ordinary-gate-evidence-copy-verified.json",
+            "bytes": 155,
+            "sha256": "2cfe8d95854e5839951dfa6443edd393b45eb8a4e4974739019b536fc45a27d0"
+          }
+        },
+        "clean_source_sdk": {
+          "status": "passed",
+          "scope": "One clean publishable installed-source package, physically relocated to a prefix containing spaces; selected four actual ARM link consumers only. No complete 64-chain matrix, network-disabled duplicate builds, runtime execution or physical qualification.",
+          "summary": {
+            "files": 4080,
+            "kind": "nexus_source_sdk_summary",
+            "publishable": true,
+            "sdk_kind": "nexus-installed-source-sdk",
+            "snapshot_sha256": "a45b960855421ed945f70748731d302b25a18fb2a8e78c2803495e361f28f013",
+            "source_revision": "89872fcecb63eaf20f65a38996e2bab6602a6863"
+          },
+          "manifest": {
+            "path": "/tmp/nexus-reference-source-sdk-89872fcecb63/relocated SDK with spaces/share/nexus/src/.nexus-source-sdk.json",
+            "bytes": 512168,
+            "sha256": "e57647df55803c5922b31a2c990de902358a53a07a30b3a12dff9074c1740d67"
+          },
+          "source_tree": "224fa5511aaafe473fad0d4a457187a7e7f5a00c",
+          "relocation": {
+            "path": "build/reference-platforms-20261106/clean-sdk-relocation.json",
+            "bytes": 478,
+            "sha256": "70672539fc941a307bc7a57c4e96c72d492bc58033fbc17e72aca3d001e80571"
+          },
+          "three_consumer_report": {
+            "path": "build/reference-platforms-20261106/clean-sdk-consumers-3/receipt.json",
+            "bytes": 18621,
+            "sha256": "a8719dd4670e3bb5a13ae3983adc3ecf3a10a7a62fedcf138a856c0904646e92"
+          },
+          "h743_consumer_report": {
+            "path": "build/reference-platforms-20261106/clean-sdk-consumer-h743/receipt.json",
+            "bytes": 100610,
+            "sha256": "ef679aecb336fbc82e642e8656816ebb15a77c6b35095c3e7023b5d54a0e2527"
+          },
+          "images": {
+            "h563": {
+              "text": 5784,
+              "data": 0,
+              "bss": 208,
+              "scope": "Whole no-GC link-only reference; no startup or SoC assembly claim.",
+              "artifacts": {
+                "compile_commands.json": {
+                  "bytes": 191783,
+                  "sha256": "34571a4f78d73d2a330408d92ecbf180d5d9f4659e0a9ab4b278945f1fecff60"
+                },
+                "physical-inputs.json": {
+                  "bytes": 218113,
+                  "sha256": "0f569e697a13a6fd80b0c96d57819ee2d7f6ff9c82717388f6a206c09efc8b66"
+                },
+                "reference.bin": {
+                  "bytes": 5784,
+                  "sha256": "86a4535ff02e6109fda9afd9c9a67b2553518546a868b1b37f36b6090a5e49e3"
+                },
+                "reference.elf": {
+                  "bytes": 13936,
+                  "sha256": "8d11ede6491af4f866dd134429fe11070bb6a4f252431e34040a67e692c8f11f"
+                },
+                "reference.map": {
+                  "bytes": 21189,
+                  "sha256": "3b0f881fd56715d087cf194bfd515aeb9007394b0585a5b8163a0ae0271bd419"
+                }
+              }
+            },
+            "h747_cm7": {
+              "text": 5560,
+              "data": 0,
+              "bss": 6248,
+              "scope": "Whole no-GC external-boot reference; BSS includes 4096-byte shared reservation and 2048-byte stack.",
+              "artifacts": {
+                "compile_commands.json": {
+                  "bytes": 22943,
+                  "sha256": "cf5b5c57809d0b3ca2f825ac23c91bb792d3bcad7dd4c9e42592ab169a96667d"
+                },
+                "physical-inputs.json": {
+                  "bytes": 53676,
+                  "sha256": "0f180a0646668a8cbd3e63581ddd81ea177b29909d938f5dbbf82f1dc3ccddb7"
+                },
+                "public-abi-probe.c": {
+                  "bytes": 925,
+                  "sha256": "22ebe01c22651d5ed204fc22b4b45e67a09e1bc2e70f54d41259875cbca7ae9d"
+                },
+                "public-abi-probe.d": {
+                  "bytes": 1963,
+                  "sha256": "4f2cc873e2090ca45682d2e3a3041098b4f274501ed79aa1d85f9f756263e57c"
+                },
+                "public-abi-probe.o": {
+                  "bytes": 948,
+                  "sha256": "45b99b86072e870d80309db032870e9570d9ff351070fd77b9c4bb97b7c45062"
+                },
+                "reference.bin": {
+                  "bytes": 5560,
+                  "sha256": "2f142d3e35d4bb3327889a80f837b2fe73eeb5a04717bc797e1ec9c23b4cc9ed"
+                },
+                "reference.elf": {
+                  "bytes": 22236,
+                  "sha256": "73a3f398a8e1b2bdde65b4c3457aa5d4ea930645af5005565dd4bc21f8589d94"
+                },
+                "reference.map": {
+                  "bytes": 31247,
+                  "sha256": "b5622142036fc1b28cea8ed9b54250394d991b23bac34ec14e9b920b636d70d6"
+                }
+              }
+            },
+            "h747_cm4": {
+              "text": 5556,
+              "data": 0,
+              "bss": 6248,
+              "scope": "Whole no-GC external-boot reference; no peer boot or hardware execution.",
+              "artifacts": {
+                "compile_commands.json": {
+                  "bytes": 22986,
+                  "sha256": "f44e656f4a0792003d13447c844563e3cd56bf3bc2b7444be127bd0b8e0e4d0f"
+                },
+                "physical-inputs.json": {
+                  "bytes": 52852,
+                  "sha256": "839db49d81ec7d5e47450bf751944339570a702199bf929e153680d0a8ec3639"
+                },
+                "public-abi-probe.c": {
+                  "bytes": 925,
+                  "sha256": "22ebe01c22651d5ed204fc22b4b45e67a09e1bc2e70f54d41259875cbca7ae9d"
+                },
+                "public-abi-probe.d": {
+                  "bytes": 1963,
+                  "sha256": "553d2176142e80cddc40ed0743a6015cfc4dacff4e5d31a9ff181687e98ef5b8"
+                },
+                "public-abi-probe.o": {
+                  "bytes": 948,
+                  "sha256": "ef4a6f79e274c142b2b2d2f7d0a69bba9f39d2802ce417336ee1b6ac336d74d3"
+                },
+                "reference.bin": {
+                  "bytes": 5556,
+                  "sha256": "621aff41cbea5bf4e2f057c46db056e47d2e436a41e4747a21198f1380b5cb5d"
+                },
+                "reference.elf": {
+                  "bytes": 22236,
+                  "sha256": "fbd288ec63eb8c5a97da3c0252763be933c7cec560906584adc235c06b95ca05"
+                },
+                "reference.map": {
+                  "bytes": 31247,
+                  "sha256": "f19da684784bf2f16acda96192c88f88447d1d1c5eb1d457a200e1d83b5c70f5"
+                }
+              }
+            },
+            "h743": {
+              "flash_loaded_bytes": 19912,
+              "ram_reserved_bytes": 2552,
+              "msp_included_bytes": 2048,
+              "heap_bytes": 0,
+              "scope": "Whole no-GC existing H743 Platform consumer; no driver delta or measured performance claim.",
+              "artifacts": [
+                {
+                  "path": "artifacts/h743_w25q128_consumer.bin",
+                  "sha256": "93b464ba906969f002f288b8b826b7715f1b88fa45894f0da4662d65323968b8",
+                  "bytes": 19912
+                },
+                {
+                  "path": "artifacts/h743_w25q128_consumer.elf",
+                  "sha256": "fca8d281fe1c4a753c80c3344599d7532391dd157cc473e6d53e464d656dd4b6",
+                  "bytes": 43728
+                },
+                {
+                  "path": "artifacts/h743_w25q128_consumer.map",
+                  "sha256": "cc777e0a628eced8c8e8ef82a1daa2978078f9d06c8036bac009972a6b0fec93",
+                  "bytes": 75534
+                },
+                {
+                  "path": "artifacts/h743_w25q128_consumer.resources.json",
+                  "sha256": "e8c3f472dd343b65d952d5308efdc689d66c4af8431032158003d0ba619b1b8e",
+                  "bytes": 5189
+                }
+              ]
+            }
+          },
+          "boundary_checks": "Actual C/ASM commands and physical header dependencies, public/private isolation, retained API symbols, effective no-GC, no heap or C++ runtime, H747 paired wire ABI and shared NOLOAD checks passed. SDK before/after verification passed in both receipts.",
+          "portable_package": {
+            "archive": {
+              "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/38de226a7c9ee0b2485cadac7e4df4601e022920dd2d54f4d9f42eb094fc6b0b.tar.gz",
+              "sha256": "38de226a7c9ee0b2485cadac7e4df4601e022920dd2d54f4d9f42eb094fc6b0b",
+              "size": 14825638
+            },
+            "bytes": 100068719,
+            "files": 4083,
+            "kind": "portable_evidence",
+            "manifest_sha256": "8732ba1d374a0d9cae36a3b49339675f6d348906cd35f5d18499c094fbaa6b97",
+            "product_promotion": false,
+            "schema_version": 1,
+            "signature_status": "unsigned"
+          }
+        },
+        "strict_bilingual_documentation": {
+          "status": "passed",
+          "scope": "Strict documentation build and local immutable archive only. The exact clean B documentation input includes the new software record. This later metadata update is not an HTML rebuild or new firmware/Board/HIL qualification.",
+          "documentation_revision": "d1fab73ec7843c1ece8bd5502a072151fa584ccd",
+          "documentation_tree": "725c2840d788da5ebd81d118d619b33f7a0a1d66",
+          "source_clean_before_and_after": true,
+          "source_identity_unchanged": true,
+          "languages": [
+            "en",
+            "zh_CN"
+          ],
+          "source_pages": 132,
+          "actual_html_files": {
+            "en": 228,
+            "zh_CN": 228
+          },
+          "translation_states": 264,
+          "source_errors": 0,
+          "translation_errors": 0,
+          "sphinx_build_warnings": 0,
+          "dependency_deprecation_observations": {
+            "count": 3,
+            "message": "Pinned Breathe emits RemovedInSphinx80Warning; retained in raw stderr, no suppression."
+          },
+          "summary": {
+            "path": "build/reference-platforms-20261106/docs/clean-d1fab73ec784/summary.json",
+            "bytes": 5907,
+            "sha256": "d8cdd2cf78c34ced38f2e73cef3a92d71f9588b2902458d3c5c36934acced086"
+          },
+          "build_manifest": {
+            "path": "/tmp/nexus-reference-docs-20261106/strict-d1fab73ec784/documentation-build.json",
+            "bytes": 59316,
+            "sha256": "6343ffbb82ee7e9e5d4266a7790025812a10a3bf038039c72c8f1bf4e75f1089"
+          },
+          "command_receipts": [
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/doxygen.attempts/1793908695634690858-2e55e008d803494aa0fbc4dd49bbbbb6/receipt.json",
+              "bytes": 1450,
+              "sha256": "ead3ce8a63d6f7b935cbc8e2f283912310fb7de7a67312d5cabae3f8f67ba9e5"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/gettext.attempts/1793908696352071467-1ebc9fd02cac453a825b885d67517851/receipt.json",
+              "bytes": 1732,
+              "sha256": "d1b602efe391fd219adeda368e67786e7aaf2ff2dc669ca5fbd46bb79aed3767"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/html-en.attempts/1793908724720856411-88ac765c78d548ebbe43df28c2141143/receipt.json",
+              "bytes": 1726,
+              "sha256": "8d3ee104b8b77a806e4ac7de9130f373d1bb58a7a4f9fbed7b2958390f23a25f"
+            },
+            {
+              "path": "/tmp/nexus-reference-docs-20261106/documentation-attempts/cc8ce83fcad24f9199bdc2d75be362aa/html-zh_CN.attempts/1793908774372585952-a33f2007c4be47798275e154dc8e2f32/receipt.json",
+              "bytes": 1741,
+              "sha256": "97ecf5203553d4604401425d1ac7718624ed59f520edfa0ed2bb0302200a963b"
+            }
+          ],
+          "portable_package": {
+            "archive": {
+              "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/e4d41333a9d3633cc19fa4ba856f0aaf40f107aa14d87c3a1db8bbaf669cf3b7.tar.gz",
+              "sha256": "e4d41333a9d3633cc19fa4ba856f0aaf40f107aa14d87c3a1db8bbaf669cf3b7",
+              "size": 59718120
+            },
+            "bytes": 387572149,
+            "files": 13260,
+            "kind": "portable_evidence",
+            "manifest_sha256": "f29f4a3baf7cfa0da7d633d7be0d996bb2d4b72082ed90b874980465af56d41c",
+            "product_promotion": false,
+            "schema_version": 1,
+            "signature_status": "unsigned"
+          },
+          "publication_status": "not_published_for_this_increment",
+          "firmware_qualification_inherited": false
+        },
+        "bounded_static_analysis": {
+          "status": "passed",
+          "scope": "Five production C files across all 20 distinct actual compile contexts: Debug six, ASAN six, H563 ARM two, H747 CM7 ARM two, H747 CM4 ARM two, H743 ARM two. No whole-repository, all-profile, or physical execution claim.",
+          "counts": {
+            "unique_production_sources": 5,
+            "distinct_compile_contexts": 20,
+            "analyzer_context_attempts": 40,
+            "tidy_passed": 20,
+            "tidy_failed": 0,
+            "cppcheck_passed": 20,
+            "cppcheck_failed": 0
+          },
+          "inputs_stable": true,
+          "arm_libc_projection": {
+            "method": "Analyzer-only thin wrapper supplies the exact implicit newlib include directory observed from each selected actual ARM GCC compiler command; retained original compile databases, ABI flags and enabled diagnostics unchanged. Full query/argv/header identities are in the source-bound static report and portable software archive.",
+            "applies_only_to": [
+              "h563-arm-reference",
+              "h743-arm-reference"
+            ]
+          },
+          "report": {
+            "path": "build/reference-platforms-20261106/static-analysis/final-cohort/analysis-summary.json",
+            "bytes": 119864,
+            "sha256": "734d1171ca6d62323de87eda2fe4b46222d6dacd7272733333853e6c98f6c007"
+          }
+        },
+        "asan_ubsan": {
+          "status": "passed",
+          "programs": 6,
+          "cases": 112,
+          "skipped": 0,
+          "scope": "Six complete changed-path programs in the maintained Native sanitizer configuration, including the final H563 condition merge; a separate fresh H563 delta receipt is retained. Not the full sanitizer profile.",
+          "report": {
+            "path": "build/reference-platforms-20261106/sanitizers-final/execution.json",
+            "bytes": 21075,
+            "sha256": "cb1ee38b0995795b6de990b00f586182103279daff217e318dfca56d1be8f715"
+          },
+          "h563_final_delta": {
+            "path": "build/reference-platforms-20261106/branch-clone-green/h563-20261105T185804165147Z/result.json",
+            "bytes": 23530,
+            "sha256": "1f7ba5da86ab47bd67caadcb4e11de1be84885c00798e05fd2f23d0ad42513e1"
+          }
+        },
+        "independent_inspection": {
+          "scope": "Source and bilingual semantics inspection; no substitute for execution or hardware qualification",
+          "report": {
+            "path": "build/reference-platforms-20261106/independent-review-20261106.json",
+            "bytes": 17405,
+            "sha256": "0dfeb048f954bd2b870e4db7af39a24fb733ba044b5453b3c80fa5a83d070cda"
+          }
+        },
+        "focused_development": {
+          "reference_google_cases": [
+            31,
+            32,
+            29
+          ],
+          "mapped_storage_cases": 20,
+          "flash_fault_scenarios": 59,
+          "physical_execution": "not_executed"
+        },
+        "dependency_inventory": {
+          "status": "passed",
+          "scope": "Read-only current selected source and notice closure; no latest-version selection or upgrade approval.",
+          "entries": 43,
+          "report": {
+            "path": "build/reference-platforms-20261106/clean-dependency-inventory.json",
+            "bytes": 279844,
+            "sha256": "f3f041a87397fd0a05a2246fe65f859b6a72e34387b5b57dbdb4cf1b26018d39"
+          }
+        },
+        "two_fresh_network_disabled_builds": "not_executed_for_this_increment",
+        "full_delivery_plan_invocation": "not_executed_for_this_increment"
+      },
+      "original_work_package_assessment": {
+        "authority": "source_version_records_20261105.drivers_io_soc_20261105.next_software_references",
+        "summary": {
+          "assessment_status_counts": {
+            "deferred_hil": 1,
+            "not_delivered": 5,
+            "partial": 14,
+            "reference_slice_verified": 6
+          },
+          "development_arm_images": 4,
+          "focused_reference_google_cases": [
+            31,
+            32,
+            29
+          ],
+          "focused_reference_google_cases_total": 92,
+          "new_soc_board_support_added": false,
+          "original_work_packages": 26,
+          "original_work_packages_claimed_complete": 0,
+          "physical_status": "not_executed"
+        },
+        "work_packages": [
+          {
+            "original_id": "H563-01",
+            "original_group": "X04",
+            "original_definition_sha256": "7e9f1cfe7251385dc1c7c2aa3a35155806cc0e5b0fb301d00c5dbf803e7ffbf1",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Organization H5 forks, exact CubeH5 v1.7.0 device/HAL child commits, original notices, selected source closures and C11/C++17 official declaration/source probes are present. The header selector is STM32H563xx, not a complete orderable SKU.",
+            "remaining_original_exit": [
+              "Complete the original exact silicon/order suffix/revision, RM0481/errata and target-device worksheet. Exact H563 clock, memory/security, IRQ/electrical route and Board review are not delivered; unknown facts remain unknown."
+            ]
+          },
+          {
+            "original_id": "H563-02",
+            "original_group": "X04",
+            "original_definition_sha256": "a6269d64827fcf86f9759da776edec7b57d4a239c69b428fe353483e43e3591c",
+            "status": "not_delivered",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "A Cortex-M33 Runtime-based H563 private-port link fixture and private official SDK integration exist as prerequisites. This is deliberately link-only, without an H563 SoC startup or physical initialization.",
+            "remaining_original_exit": [
+              "The original exact H563 SoC package, memory/vector/startup, reset/clock/IRQ profile and their cold failure models remain unimplemented. The generic Runtime ELF is not evidence that this exit was achieved."
+            ]
+          },
+          {
+            "original_id": "H563-03",
+            "original_group": "X04",
+            "original_definition_sha256": "673a04fe34d764af71b4bab52c585e901a7a64388ea3c904be74ad1806809427",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "One C11 synchronous LL polling owner implements all nine existing port leaves. Payload work is at most8 bytes, DAA metadata at most one8-byte identity and copied IBI at most4 bytes. HAL blocking/span-retention mismatch and explicit trusted preparation/quiescence/reset boundaries are documented.",
+            "remaining_original_exit": [
+              "The original complete physical prepare/start/withdraw/stop/recovery and operation-to-proof integration is not delivered: clock/pin/ES0565 preparation and all-target invalidation are trusted external leaves, not implemented H563 algorithms. Preserve unavailable-proof rejection rather than call those external guarantees completed."
+            ]
+          },
+          {
+            "original_id": "H563-04",
+            "original_group": "X04",
+            "original_definition_sha256": "a683005ae1c2a7f2707fc2a6712617f4190d7b304aae0f6998bb66f5c48e0eef",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The actual private C11 LL transport has focused host execution for bounded finite TX/RX, FIFO tails,16-bit counts,1/7/8/9/65535 boundaries, errors and instance separation, plus a real ARM link. It retains no pump span and adds no allocator, queue or worker.",
+            "remaining_original_exit": [
+              "The original full SoC cold setup/rollback and exact prepared clock/pin/IRQ/security/errata implementation are still external requirements. Focused31-case execution and the generic Runtime link do not complete H563-02 or qualify every physical transfer boundary."
+            ]
+          },
+          {
+            "original_id": "H563-05",
+            "original_group": "X04",
+            "original_definition_sha256": "a8b3aa6236f3873e3027a6cef4f59bab3d1757a5828058f0f86c3216b7319f55",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The selected port integrates explicit DAA, direct/broadcast CCC, copied IBI/hot-join, error-before-confirmation and ACK-before-next-identity ordering. Four physical IBI slots are enforced; a fifth IBI-capable target fails explicitly. Core-confirmed identities and tentative-address retention are preserved.",
+            "remaining_original_exit": [
+              "Complete the original end-to-end selected-provider validation with the actual target-device identities and confirmed protocol/errata worksheet. No full H563 configuration/factory or physical IBI/hot-join/DAA result follows from this bounded model slice."
+            ]
+          },
+          {
+            "original_id": "H563-06",
+            "original_group": "X04",
+            "original_definition_sha256": "7342992d081d6f1b310ecba75c7d11cbeb09417f69743a8bee81f559740863c1",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Cancellation/error/deadline recovery uses the existing core. Event admission closes with readback before quiescence, a final successful proof is consumed by infallible release, ERR/FC snapshots prevent false completion, and failed flush/reset retains state and addresses.",
+            "remaining_original_exit": [
+              "The original warm-reset/all-powered-target address invalidation and real wire/IRQ/observer stop procedures remain trusted external proofs, not delivered hardware algorithms. Complete exact-target reset/restart and final-resource proof review; physical execution is not_executed."
+            ]
+          },
+          {
+            "original_id": "H563-07",
+            "original_group": "X04",
+            "original_definition_sha256": "b33b3c0bb977a35f401f3f82d84e462df54191cd050fe850d8735e0687c39078",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "An explicit optional CMake leaf, organization-pinned dependency/source-SDK closure and public-main/private-composition ARM boundary exist. Endpoint identity remains owned by the current core; no implicit DAA or runtime registry was introduced.",
+            "remaining_original_exit": [
+              "No H563 SoC descriptor/typed TOML resolver/resource-claim or typed-factory controller integration is delivered. Clean relocated Source SDK consumer execution is still pending; source packaging code and a development checkout link are not that exit."
+            ]
+          },
+          {
+            "original_id": "H563-08",
+            "original_group": "X04",
+            "original_definition_sha256": "cdebb78239ea4979791999ccbef7b95071663ae5dc8602b727a195686d94e766",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Focused31-case production-port models, one retained C11 ARM image, public/private include isolation, bounded work contracts and bilingual I3C/API/FIG-26 updates are available in development scope.",
+            "remaining_original_exit": [
+              "Original complete-index acceptance, clean installed SDK consumers and strict final bilingual builds are pending. The requested0/1/2/4-instance equal-config cost matrix and worst selected service work measurement are not completed. Exact H563 startup/clock/SDA/DAA/IBI/reset HIL fixture execution and physical exit remain open."
+            ]
+          },
+          {
+            "original_id": "Q01",
+            "original_group": "X05",
+            "original_definition_sha256": "be9ee79053d0ae16acf6255337c736dfa602777d03068664a6c5500638c41311",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The restricted reference records the official W25Q128JV RevM source and selected EF4018 single-line geometry/status facts; unsupported identity/protection/SUS modes reject without status/QE writes. Board wiring and full suffix remain explicitly unknown.",
+            "remaining_original_exit": [
+              "Complete the original H743 RM/datasheet/errata and exact external-device worksheet, including SFDP and voltage/package/revision admission. Fixed JEDEC/profile facts do not establish unknown Board/electrical facts or distinguish every same-ID part/revision."
+            ]
+          },
+          {
+            "original_id": "Q02",
+            "original_group": "X05",
+            "original_definition_sha256": "ec6057f00a1baeae8916a820c16373078d15a6054513720932cd447aab8bd700",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The existing H7 pin now admits the reviewed QSPI/MDMA supplier source closure with private HAL configuration/handles, an optional target and an actual public-main/private-composition ARM link. The zero-timeout-only private HAL tick bridge adds no SysTick owner.",
+            "remaining_original_exit": [
+              "Clean Source SDK consumption and original unselected-image qualification are pending. Preserve two explicit differences from the original wording: MDMA C is linked solely to satisfy official QSPI IRQ abort references, with no DMA mode; the private HAL tick returns0 only under audited Timeout0 calls, rather than supplying the original general monotonic HAL_GetTick contract. Do not silently rewrite this exit as completed."
+            ]
+          },
+          {
+            "original_id": "Q03",
+            "original_group": "X05",
+            "original_definition_sha256": "9251fd6db9984564213333675adea651de1bdaa739db62c6abf534a3b732f0e0",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "C11 preparation validates a cold exclusive controller, installs a checked two-region MPU guard, preserves selected chip status, and performs bounded discovery/readback. Failed effects retain private ownership for explicit cleanup; zero-effect accepted-start errors now have a drainable NULL-input cohort.",
+            "remaining_original_exit": [
+              "Full clock/pin/reset/IRQ leases and actual board electrical/power preparation are supplied externally, not implemented here. The original immediate restored-effects prepare/start wording is not claimed: this reference deliberately retains failed cold effects and uses accepted-cohort drain. Global cold MPU policy before/after the lease remains externally owned."
+            ]
+          },
+          {
+            "original_id": "Q04",
+            "original_group": "X05",
+            "original_definition_sha256": "7c0412e93e5e87930db8785beb787690b253715ab79338abbe6e2f655943cd33",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The task-owned C11 protocol implements fixed JEDEC/status,16-byte indirect read/verification, WREN/WRDI, page-boundary program,4KiB erase and WIP/WEL drain. Actual supplier IT waits are Timeout0-only; work is bounded by256TX/16RX bytes. Exact remaining counts and TE/error priority precede response parsing; progress is a verified prefix.",
+            "remaining_original_exit": [
+              "Original SFDP command/admission work is not delivered; only the fixed EF4018 profile is covered. Final complete-index and clean SDK integration remain pending; software byte budgets do not establish physical WCET, wire timing or Flash durability."
+            ]
+          },
+          {
+            "original_id": "Q05",
+            "original_group": "X05",
+            "original_definition_sha256": "31aeefc0db3f0abd278da0cb7aba10f73cd054e07e8653f8100aabb591c0d2ba",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The actual cache-off CPU_READ slice uses an owned256MiB no-access/XN guard and a higher16MiB read-only/XN/noncache region. RASR disable/readback precedes BASE moves; unmap closes/fences access before abort. Unprovable map rollback parks; failed unmap retains cleanup and closes new generic-owner admission.",
+            "remaining_original_exit": [
+              "Do not close the original broad Q05 from this slice. Cached line ownership/maintenance and matching remap/alias/speculation behavior are not physically qualified; I-cache and D-cache remain off. Final exact installed integration is pending, and physical program/erase/remap correctness still requires the selected hardware exit. XIP/DMA remain separately unsupported."
+            ]
+          },
+          {
+            "original_id": "Q06",
+            "original_group": "X05",
+            "original_definition_sha256": "5112eecd6da4cfad026ae52a2263ae5fc37ea90e07b069e38d1e1b43ca9ee7e0",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The existing owner/tickets now exercise the physical-reference cancel/deadline/stop path. Issued program/erase pulses remain retained through WIP/WEL cleanup; next mutations stop, HAL/input references detach before settlement, and map loans are never revoked. Focused error/refusal tests and a59-scenario observed fault sweep retain failed cleanup.",
+            "remaining_original_exit": [
+              "Original full-provider and exact device integration proof is limited to the selected single-line/cache-off software reference. Final clean-source gates/SDK and actual wire/device/IRQ stop and power behavior are not yet qualified; model drain receipts must not be promoted into physical facts."
+            ]
+          },
+          {
+            "original_id": "Q07",
+            "original_group": "X05",
+            "original_definition_sha256": "9e790ff3b4dbba56854f3610b9bb55bcf90886dbd5fd607a3ddbaea5ae0dc8d1",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The optional H743 component expresses its MappedStorage/Arch/private-HAL dependencies and uses the existing instance-bound owner. Geometry and two MPU slots are explicit C reference inputs; the actual ARM public main excludes vendor/private headers.",
+            "remaining_original_exit": [
+              "Typed assembly/factory integration for the exact external Flash, Board routes, clocks, memory/MPU-region claims and budgets is not delivered. No resolver currently rejects every original external-device conflict before emission; no generic serial-memory factory is claimed."
+            ]
+          },
+          {
+            "original_id": "Q08",
+            "original_group": "X05",
+            "original_definition_sha256": "acf9496326ae8f34cb16d3e58d59f818c36c3c3cd9757ceb755be3ce2c47a5ea",
+            "status": "not_delivered",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "No mapped DMA_READ or indirect MDMA mode is added. Supplier MDMA object presence is only a link dependency of official QSPI functions and grants no DMA capability.",
+            "remaining_original_exit": [
+              "The entire original DMA-master reachability/power/cache, publisher/consumer join and equal-config cost exit remains open. CPU_READ-only PIO is the delivered baseline."
+            ]
+          },
+          {
+            "original_id": "Q09",
+            "original_group": "X05",
+            "original_definition_sha256": "3d51405d1a3c3b47dabb1344fdd07d07bfb778bdfbe3d48a41e914195e91e3b6",
+            "status": "not_delivered",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "No XIP reader capability is added; even the allowed CPU_READ window is execute-never.",
+            "remaining_original_exit": [
+              "The entire original XIP execution, exception/vector/return/literal/rodata/veneer/callback/deferred-work closure and cache/MPU/linker/physical exit remains open. An XN CPU-read reference is not an XIP implementation."
+            ]
+          },
+          {
+            "original_id": "Q10",
+            "original_group": "X05",
+            "original_definition_sha256": "91046658bdd67ebc8edb78c2bca6358dfe460e3809ada5396b965e575154a07e",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The narrow supported-profile boundary, source/manual/probe references, focused model/link receipts and bilingual contract updates use the existing documentation/delivery structure. Physical execution is explicitly not_executed.",
+            "remaining_original_exit": [
+              "Final bound source/config/tool/ELF record, clean SDK, complete normal/static and strict documentation checks are pending. Exact-board HIL manifests, scratch-sector reservation and dry-run/station execution for waveform/persistence/page edges/erase/remap/cancel/stop/recover are not completed by this increment; XIP/DMA/power-loss exits stay separate."
+            ]
+          },
+          {
+            "original_id": "H747-01",
+            "original_group": "X06",
+            "original_definition_sha256": "be8940a9110ac9b291c662ee41a08250324ea899a62016fa302e15f4ea6301c3",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Pinned H7 source closures separately admit the STM32H747xx selector. Official RM0399 memory facts were read; HSEM core IDs/IRQs and SRAM4 reachability/attributes constrain the reference without inheriting H743 startup.",
+            "remaining_original_exit": [
+              "The original complete orderable suffix/package/revision and Board/clock/reset/DMA/Flash/errata/vendor-boot worksheet is not complete. Header-selector and SRAM/HSEM facts do not establish a full H747 SoC profile."
+            ]
+          },
+          {
+            "original_id": "H747-02",
+            "original_group": "X06",
+            "original_definition_sha256": "99e86a1c2caedecdf68801a13528e976e5eaf7d2daac0236dc6ed9cb2a70f116",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Two independent C11 CM7/CM4 link-only images use the correct separate core/FPU ABI, vendor vector, local stack/RAM/Flash placement and identical4KiB shared NOLOAD reservation. The pair receipt records both artifacts; actual public/wire ABI checks are prepared and per-core link checks executed.",
+            "remaining_original_exit": [
+              "The original complete per-core startup/boot and checked pair-manifest/resolver remain unimplemented. The fixture external SystemInit context is deliberately empty and non-executable as a boot recipe. Clean installed pair consumption and full negative pair allocation/ABI/core-selection acceptance remain pending."
+            ]
+          },
+          {
+            "original_id": "H747-03",
+            "original_group": "X06",
+            "original_definition_sha256": "0f647569c9a9901f4535ddba64644b589175e0090aa4987fe5a9e0b876aeddc6",
+            "status": "not_delivered",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The attachment intentionally consumes an externally established paired boot and performs no global RCC/supply/Flash initialization, peer launch or peer reset.",
+            "remaining_original_exit": [
+              "The entire original M7 global startup/peer-release and M4 local startup implementation, ownership partition/conflict resolver and partial-startup/local-stop failure proof remain open. An empty link-only SystemInit does not satisfy that exit."
+            ]
+          },
+          {
+            "original_id": "H747-04",
+            "original_group": "X06",
+            "original_definition_sha256": "6790f1e31d392bc55db14a4f8f4952f0b694adae5fd1d8cd5f0c10cf09db121e",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The selected port requires a trusted per-lane/role persistent epoch-admission callback, rejects failed/reused authority decisions, retains payload on changed epoch, and returns UNSUPPORTED for peer-reset join. Normal message/ACK/close/join is exercised through the real common core.",
+            "remaining_original_exit": [
+              "No persistent/provisioned counter, wear/power-loss/exhaustion implementation or exact CPU/DMA/IRQ/observer stop authority is supplied. Model callbacks are not production persistence. The original authoritative epoch and reset-domain proof design remains incomplete."
+            ]
+          },
+          {
+            "original_id": "H747-05",
+            "original_group": "X06",
+            "original_definition_sha256": "31dda16f196e5c83fcc7c97da8a4c36775062b4ad1eed61fc6fc863c1852a380",
+            "status": "reference_slice_verified",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "The selected attachment implements bounded official-LL HSEM claim/release and doorbell pulses, coherent aligned32-bit controls with barriers, checked exact noncache shared MPU admission and complete-layout cold binding. The focused real bridge/MMIO tests total29; two independent ARM images link. No peer reset proof is fabricated.",
+            "remaining_original_exit": [
+              "The original authored two-lane pair assembly, one real shared-initialization boot owner and full per-core notification/IRQ/resource partition are not delivered. Current focused transfer exercise is one unidirectional lane; external paired boot and static HSEM/MPU leases remain required. Physical ordering/notification behavior is not_executed."
+            ]
+          },
+          {
+            "original_id": "H747-06",
+            "original_group": "X06",
+            "original_definition_sha256": "122faa7f0aa99dbee38e5233d00a80d13804c902dd5e5c2a6e883d76077e4896",
+            "status": "partial",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "An allocation-free baremetal C11 pair link baseline exists as an external-boot reference. No scheduler is started or implicitly selected.",
+            "remaining_original_exit": [
+              "The original executable boot baseline, independently qualified per-core RTOS/tick/ISR/FPU context and external ping-pong/debug/paired-flash workflow are not delivered. Clean installed Source SDK pair validation is pending; test fixtures are not product examples."
+            ]
+          },
+          {
+            "original_id": "H747-07",
+            "original_group": "X06",
+            "original_definition_sha256": "05113315c41b3508d8bce449ce6fc95ac36c42dabfe764c85f7e6e0da5a092cf",
+            "status": "deferred_hil",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "Source/link evidence and explicit unknown chip/PCB/boot/reset inputs are available to prepare a future station. No physical dual-core or paired reset test has run.",
+            "remaining_original_exit": [
+              "Prepare and dry-run the original exact paired HIL manifest/SWD/core-attach/dump/trace workflow, then execute the complete original physical exit with both ELF/config identities and the stated fault matrix. No latency/throughput/load/stack/IRQ measurement or physical no-overwrite/stop proof is claimed."
+            ]
+          },
+          {
+            "original_id": "H747-08",
+            "original_group": "X06",
+            "original_definition_sha256": "74e4de3537e53454e13b4ed83c87b6191a9099a6604490eda49eaec862faa3d8",
+            "status": "not_delivered",
+            "original_exit_assessed_complete": false,
+            "delivered_slice": "No cached-payload, DMA-assisted or selective peripheral-ownership performance mode is added; the first M7 mode explicitly refuses enabled D-cache.",
+            "remaining_original_exit": [
+              "The entire original measured equal-config gain, full-line ownership and matched hardware throughput/latency/cache-fault exit remains open. No bottleneck measurement justifies enabling an advanced mode in this increment; regression/SDK/docs final gates are also still pending."
+            ]
+          }
+        ],
+        "snapshot_role": "Development assessment before final whole-index and installed-SDK gates. Original definitions and remaining full exits are retained verbatim; historical pending validation phrases describe this snapshot only. Current validation is recorded above.",
+        "development_snapshot": {
+          "path": "build/reference-platforms-20261106/work-package-assessment.json",
+          "bytes": 51266,
+          "sha256": "b2197a3a534ed8afca4de0206f2282ba00c8826ab578fc370b973f5424ec401e"
+        }
+      },
+      "not_delivered": [
+        "H563 full SoC cold clock/pin/IRQ/TrustZone facts and typed Board/factory publication",
+        "H747 production paired boot/peer release, real persistent epoch provisioning, reset-stop proof and per-core RTOS integration",
+        "W25Q128 exact PCB routes, factory resource composition, cache/DMA/XIP modes and physical durability/timing",
+        "Physical HIL for the new references; latency/throughput/power/stack measurements; no new general support or certification claim"
+      ],
+      "evidence_packages": {
+        "h743": {
+          "archive": {
+            "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/af9e91b4873ee6cde58bf3b3c1c404291ba4790fe68e67ffe774506d7474bf88.tar.gz",
+            "sha256": "af9e91b4873ee6cde58bf3b3c1c404291ba4790fe68e67ffe774506d7474bf88",
+            "size": 26619430
+          },
+          "bytes": 50093283,
+          "files": 235,
+          "kind": "portable_evidence",
+          "manifest_sha256": "0f49b9eb54a14ea4f724f1e26362d0bbd8bb57f96e82d5fa671a9b35869971a3",
+          "product_promotion": false,
+          "schema_version": 1,
+          "signature_status": "unsigned"
+        },
+        "software_snapshot": {
+          "archive": {
+            "path": "/dev/shm/nexus-reference-evidence-store-20261106/999c8c77834c255485bf79e2343563b2c28c2a45124319faef3bf0af632c795f.tar.gz",
+            "sha256": "999c8c77834c255485bf79e2343563b2c28c2a45124319faef3bf0af632c795f",
+            "size": 94772260
+          },
+          "bytes": 199348138,
+          "files": 9297,
+          "kind": "portable_evidence",
+          "manifest_sha256": "3013727476cc7a148522cd994a0c00526fac9bbe8663cf8635ac8814f1b186ce",
+          "product_promotion": false,
+          "schema_version": 1,
+          "signature_status": "unsigned"
+        },
+        "software_workspace_archive_navigation": {
+          "path": "/workspace/nexus/build/reference-platforms-20261106/evidence-store/999c8c77834c255485bf79e2343563b2c28c2a45124319faef3bf0af632c795f.tar.gz",
+          "sha256": "999c8c77834c255485bf79e2343563b2c28c2a45124319faef3bf0af632c795f",
+          "size": 94772260
+        },
+        "software_workspace_copy_verification": {
+          "path": "build/reference-platforms-20261106/software-evidence-copy-verified.json",
+          "bytes": 154,
+          "sha256": "ac86cab85697482f76854fff4ba7b96467051242ca1fedecbec41275210d805b"
+        },
+        "persistence_status": "local_verified_archives_only; external durable persistence not established"
+      },
+      "recorded_utc": "2026-11-05T19:57:20.696137+00:00"
+    }
   }
 }

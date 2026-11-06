@@ -68,6 +68,8 @@ class ComponentSelectionTests(unittest.TestCase):
         includes = [ROOT / layer / "include"
                     for layer in ("core", "io", "arch")]
         includes.append(ROOT / "components/clock_domain/include")
+        # H747 exports Nexus::AMPIPC as a public dependency.
+        includes.append(ROOT / "components/amp_ipc/include")
         headers = []
         for package in sorted(path for path in packages.iterdir()
                               if path.is_dir()):

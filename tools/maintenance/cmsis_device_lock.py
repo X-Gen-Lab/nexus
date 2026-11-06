@@ -50,6 +50,19 @@ REVIEWED_DEVICES = {
             "Source/Templates/system_stm32h7xx.c",
         }),
     },
+    # Vendor header selector for the external paired-boot compile reference.
+    # This does not identify an ordering suffix, PCB or supported SoC provider.
+    "STM32H747xx": {
+        "origin": "https://github.com/STMicroelectronics/cmsis-device-h7.git",
+        "commit": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+        "directory": "vendors/st/cmsis_device_h7",
+        "lock_name": "dependencies/stm32h747.lock.json",
+        "files": frozenset({
+            "Include/stm32h747xx.h", "Include/stm32h7xx.h",
+            "Include/system_stm32h7xx.h", "LICENSE.md",
+            "Source/Templates/gcc/startup_stm32h747xx.s",
+        }),
+    },
     "STM32U575ZIT6Q": {
         "origin": "https://github.com/STMicroelectronics/cmsis-device-u5.git",
         "commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",

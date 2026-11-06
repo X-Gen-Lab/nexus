@@ -414,10 +414,39 @@ TEST_F(MappedStorage, FailedLastUnmapRetainsExactLoanAndExcludesWriters) {
     EXPECT_EQ(nx_mapped_storage_release(&port, &dma), NX_ERROR_IO);
     prepare();
     EXPECT_EQ(nx_mapped_storage_submit(&port, &request, &ticket),
-              NX_ERROR_BUSY);
+              NX_ERROR_STATE);
     EXPECT_EQ(nx_mapped_storage_stop(&port), NX_ERROR_BUSY);
     EXPECT_EQ(nx_mapped_storage_release(&port, &dma), NX_SUCCESS);
     EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(MappedStorage, FailedUnmapClosesAdmissionBeforeExplicitStop) {
+    testing::StrictMock<Backend> backend;
+    ASSERT_EQ(nx_mapped_storage_owner_init(&owner, slots, 2,
+                                           backend.bind(bytes.data(), 64),
+                                           {clock, &now}),
+              NX_SUCCESS);
+    EXPECT_CALL(backend, map()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(backend, unmap())
+        .WillOnce(Return(NX_ERROR_IO))
+        .WillOnce(Return(NX_SUCCESS));
+    nx_mapped_storage_loan_t loan{}, rejected{};
+    ASSERT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &loan),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_mapped_storage_release(&port, &loan), NX_ERROR_IO);
+    EXPECT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 8, 4,
+                                        &rejected),
+              NX_ERROR_STATE);
+    if (rejected.instance != nullptr) {
+        EXPECT_EQ(nx_mapped_storage_release(&port, &rejected), NX_SUCCESS);
+    }
+    prepare();
+    EXPECT_EQ(nx_mapped_storage_submit(&port, &request, &ticket),
+              NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(nx_mapped_storage_release(&port, &loan), NX_SUCCESS);
     EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
 }
 

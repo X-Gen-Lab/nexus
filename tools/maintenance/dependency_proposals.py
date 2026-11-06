@@ -28,7 +28,8 @@ from tools.maintenance.source_catalogue import (  # noqa: E402
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
-    stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
+    stm32g4_hal_lock, stm32h5_device_lock, stm32h5_hal_lock,
+    stm32h7_hal_lock, stm32u5_hal_lock,
     stm32g4_lock, threadx_lock, googletest_lock, lwip_lock, mbedtls_lock,
     coremqtt_lock, mcuboot_lock,
 )
@@ -50,6 +51,7 @@ WORKLOADS = {
 OFFICIAL_DRIVERS = {name: module for name, module in (
     ("stm32f1_hal", stm32f1_hal_lock), ("stm32f4_hal", stm32f4_hal_lock),
     ("stm32g4_hal", stm32g4_hal_lock), ("stm32h7_hal", stm32h7_hal_lock),
+    ("stm32h5_hal", stm32h5_hal_lock),
     ("stm32u5_hal", stm32u5_hal_lock))}
 
 
@@ -170,9 +172,32 @@ def inventory(root=ROOT):
                                 root / official.CMSIS_DIRECTORY)
             elif name == "stm32g4_cmsis":
                 stm32g4_lock.verify(checkout, lock_path)
+            elif name == "stm32h5_cmsis":
+                stm32h5_device_lock.verify(checkout, lock_path)
             elif any(review["directory"] == path for review in
                      cmsis_device_lock.REVIEWED_DEVICES.values()):
-                cmsis_device_lock.verify(checkout, lock_path)
+                # One Gitlink can carry several separately reviewed selectors.
+                # Keep each review's identity and original source closure; a
+                # primary lock cannot silently replace a secondary reference.
+                for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+                    if review["directory"] != path:
+                        continue
+                    selected_path = root / review["lock_name"]
+                    if selected_path == lock_path:
+                        selected, selected_identity = locked, lock_identity
+                    else:
+                        selected_bytes, selected_identity = snapshot(selected_path)
+                        selected = parse_json(selected_bytes)
+                    cmsis_device_lock.contract(selected)
+                    if selected["selected_part"] != part:
+                        raise ValueError("Reviewed device selector identity changed")
+                    if selected["commit"] != entry[2]:
+                        raise ValueError("Reviewed device lock differs from committed Gitlink")
+                    cmsis_device_lock.verify(checkout, selected_path)
+                    if selected_path != lock_path:
+                        references.append(selected_identity)
+                        references.extend(identity(checkout / filename)
+                                          for filename in sorted(selected["files"]))
             else:
                 raise ValueError("Source lock validator requires catalogue review")
             if locked["commit"] != entry[2]:

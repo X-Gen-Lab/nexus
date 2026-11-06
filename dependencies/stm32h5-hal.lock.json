@@ -1,0 +1,69 @@
+{
+  "commit": "56e28dbebd720e3df2866dfaf438b525e9e8af04",
+  "files": {
+    "Inc/Legacy/stm32_hal_legacy.h": {
+      "bytes": 242146,
+      "sha256": "ae2c716ae3097e6b34ac92eeb0feeaa01c992628da1a2d3adf12710352004288"
+    },
+    "Inc/stm32h5xx_hal.h": {
+      "bytes": 47312,
+      "sha256": "e47084bae8c5204ac69e18887e60268f8f1f1012a9e4d9cceb3d0c2dff130ff4"
+    },
+    "Inc/stm32h5xx_hal_def.h": {
+      "bytes": 7972,
+      "sha256": "10427f53aa484f62d2269b8431b9eeb25001a63ea0de9e3e10fea8d8bb84c30f"
+    },
+    "Inc/stm32h5xx_hal_i3c.h": {
+      "bytes": 82477,
+      "sha256": "989dce939b6690348242787ee1536f23157e42cb212b32e2cb5dad724ec55dcf"
+    },
+    "Inc/stm32h5xx_ll_bus.h": {
+      "bytes": 138868,
+      "sha256": "bdd2971f58e377079f61aa8b75593c9a1acb20d6d9ae471dcace69e3a22da1ad"
+    },
+    "Inc/stm32h5xx_ll_gpio.h": {
+      "bytes": 45642,
+      "sha256": "ef378a3054a5d8e0c658288f2e94fddcbc45dd0eed2c3ff2e5135aa117244512"
+    },
+    "Inc/stm32h5xx_ll_i3c.h": {
+      "bytes": 171925,
+      "sha256": "18adb3968698102ed0dab4f1ea03f6c36f8ffc371680576b6671a12dbeea5926"
+    },
+    "Inc/stm32h5xx_ll_pwr.h": {
+      "bytes": 77297,
+      "sha256": "947ea1c1ae1dae6cc67a1df32c8240034c158e0cd9fe33c419d43437ddb83b3f"
+    },
+    "Inc/stm32h5xx_ll_rcc.h": {
+      "bytes": 297555,
+      "sha256": "8ea6d6b21353b994cd8098c3cc368303620ae5d3d2ade641b1925d2404345483"
+    },
+    "Inc/stm32h5xx_ll_system.h": {
+      "bytes": 73266,
+      "sha256": "5d8e54ec010e170455c80de52ef0e352bc458c260cdf1ac6f155ef343c7afafd"
+    },
+    "LICENSE.md": {
+      "bytes": 1484,
+      "sha256": "3ef135517604c828e7e2ac60daa5d34ce90a258dd0dfbec140651ac173b45ced"
+    },
+    "Src/stm32h5xx_hal_i3c.c": {
+      "bytes": 375753,
+      "sha256": "ad40edc76e873b3c77207b270405c42b6fb0f05c55e9c1a2d109f797b7fd8ceb"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "884b8dc78e41cbfca008363342b17f4a9e8641f7",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis-device-h5.git",
+    "commit": "4e039436d8561003a1d88b78a1520f3f81eadd24",
+    "release": "v1.7.0",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeH5.git"
+  },
+  "release": "STM32CubeH5-v1.7.0-pinned-driver",
+  "repository": "https://github.com/STMicroelectronics/stm32h5xx_hal_driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32h563-hal-ll-i3c-compile-reference"
+}

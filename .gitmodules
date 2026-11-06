@@ -63,3 +63,11 @@
 [submodule "ext/mcuboot"]
 	path = ext/mcuboot
 	url = https://github.com/X-Gen-Lab/mcuboot.git
+
+[submodule "vendors/st/cmsis_device_h5"]
+	path = vendors/st/cmsis_device_h5
+	url = https://github.com/X-Gen-Lab/cmsis-device-h5.git
+
+[submodule "vendors/st/stm32h5_hal"]
+	path = vendors/st/stm32h5_hal
+	url = https://github.com/X-Gen-Lab/stm32h5xx-hal-driver.git

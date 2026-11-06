@@ -33,6 +33,13 @@ Drivers／I/O／SoC 的后续实现、勘误修复、目录归属、构建依赖
 源码、配置和实际执行范围；该记录不继承 P2 候选资格。实板项目与需要另选硬件目标的
 扩展分别保留条件，物理 HIL 仍为 `not_executed`。
 
+新增 H563 I3C、H743/W25Q128JV 映射存储和 H747 成对启动 AMP 的有界软件参考，
+从[同一交付结果](platform-delivery-completion-results.json)中的
+`source_version_records_20261106.reference_platforms_20261106` 进入，与上一轮
+`90088b4f` 源码记录分别绑定。三项参考不新增 SoC、Board 或 HIL 支持；原 26 项
+工作包的完整退出条件保持不变。Factory、启动、RTOS、cache、DMA、XIP 和 HIL 的
+剩余条件按该记录逐项保留，不以这些有界实现代替全部退出。
+
 文档系统的后续整理见 [架构与交付规划](../design/documentation-system.md)。
 对应文档工具、正文和图册已实现，实际文档验收与固件资格分别记录；当前资料总入口为
 [文档入口](../README.md)。

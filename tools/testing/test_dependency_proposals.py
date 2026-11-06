@@ -9,7 +9,8 @@ import subprocess
 from tools.maintenance import dependency_proposals as proposals
 from tools.maintenance import (cmsis_device_lock, lwip_lock, mbedtls_lock, coremqtt_lock,
                                mcuboot_lock,
-                               source_catalogue, stm32f1_hal_lock, stm32f4_hal_lock)
+                               source_catalogue, stm32f1_hal_lock, stm32f4_hal_lock,
+                               stm32h5_device_lock, stm32h5_hal_lock)
 from tools.maintenance.stm32_ll_lock import PROFILES
 import os
 
@@ -295,7 +296,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
                     review = {"commit": (official.COMMIT
                                           if item.path == official.DIRECTORY
                                           else official.CMSIS_COMMIT)}
-            for official in PROFILES.values():
+            for official in (*PROFILES.values(), stm32h5_hal_lock.PROFILE):
                 if item.path in {official.directory, official.cmsis_directory}:
                     review = {"commit": (official.commit
                         if item.path == official.directory else official.cmsis_commit)}
@@ -324,6 +325,10 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 if item.source_lock is not None:
                     self.write(self.root / item.source_lock,
                                (ROOT / item.source_lock).read_bytes())
+                for device in cmsis_device_lock.REVIEWED_DEVICES.values():
+                    if device["directory"] == item.path:
+                        self.write(self.root / device["lock_name"],
+                                   (ROOT / device["lock_name"]).read_bytes())
                 continue
             checkout.mkdir(parents=True)
             self.git(checkout, "init", "--quiet")
@@ -538,12 +543,56 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 self.assertEqual(record["upstream_url"], review["origin"])
                 observed = {Path(item["path"]).relative_to(self.root).as_posix()
                             for item in record["identities"]}
-                expected = {".gitmodules", review["lock_name"]}
-                expected.update(review["directory"] + "/" + name
-                                for name in review["files"])
+                expected = {".gitmodules"}
+                for selected in cmsis_device_lock.REVIEWED_DEVICES.values():
+                    if selected["directory"] == review["directory"]:
+                        expected.add(selected["lock_name"])
+                        expected.update(selected["directory"] + "/" + name
+                                        for name in selected["files"])
                 self.assertEqual(observed, expected)
         self.assertFalse(result["source_dirty"])
         self.assertFalse(result["software_qualified"])
+
+    def test_h5_inventory_observes_both_exact_official_source_closures(self):
+        result = proposals.inventory(self.root)
+        for source, names in ((stm32h5_device_lock, stm32h5_device_lock.FILES),
+                              (stm32h5_hal_lock,
+                               stm32h5_hal_lock.PROFILE.selected_files)):
+            with self.subTest(directory=source.DIRECTORY):
+                record = next(item for item in result["dependencies"]
+                              if item.get("path") == source.DIRECTORY)
+                expected = {".gitmodules", source.LOCK_NAME}
+                expected.update(source.DIRECTORY + "/" + name
+                                for name in names)
+                self.assertEqual({Path(item["path"]).relative_to(
+                    self.root).as_posix() for item in record["identities"]},
+                    expected)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["software_qualified"])
+
+    def test_missing_secondary_h747_review_cannot_disappear_from_inventory(self):
+        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
+        lock = self.root / "dependencies/stm32h747.lock.json"
+        lock.unlink()
+        with self.assertRaises((OSError, ValueError)):
+            proposals.inventory(self.root)
+
+    def test_secondary_h747_review_commit_must_match_actual_h7_gitlink(self):
+        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
+        lock = self.root / "dependencies/stm32h747.lock.json"
+        value = json.loads(lock.read_bytes())
+        value["commit"] = "0" * 40
+        lock.write_text(json.dumps(value) + "\n")
+        with self.assertRaisesRegex(ValueError, "reviewed|Reviewed|Gitlink"):
+            proposals.inventory(self.root)
+
+    def test_secondary_h747_identity_cannot_substitute_primary_h743_review(self):
+        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
+        lock = self.root / "dependencies/stm32h747.lock.json"
+        lock.write_bytes((self.root /
+                          "dependencies/stm32h7.lock.json").read_bytes())
+        with self.assertRaisesRegex(ValueError, "selector|identity"):
+            proposals.inventory(self.root)
 
     def test_reviewed_device_inventory_rejects_rehashed_omission_and_foreign_origin(self):
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():

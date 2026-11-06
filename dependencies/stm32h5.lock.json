@@ -1,0 +1,37 @@
+{
+  "commit": "884b8dc78e41cbfca008363342b17f4a9e8641f7",
+  "files": {
+    "Include/stm32h563xx.h": {
+      "bytes": 1898013,
+      "sha256": "563aeb7a90e100821f740efedc564ff0a5d992469c43b8ed3f2b612b8878626b"
+    },
+    "Include/stm32h5xx.h": {
+      "bytes": 8866,
+      "sha256": "8bdb8bd3453157a016916f65b296219123afaa2226c4628d2277eec7f3a1f387"
+    },
+    "Include/system_stm32h5xx.h": {
+      "bytes": 2630,
+      "sha256": "fb2eba7737ecba74a70531da970c20728d35d30eaa0aaee503d96fca61b62fbc"
+    },
+    "LICENSE.md": {
+      "bytes": 11347,
+      "sha256": "fdb37bec600bb3784d8c5fffdddf225f9d4ee8cc225320a01394f5da01e7efc1"
+    },
+    "Source/Templates/gcc/startup_stm32h563xx.s": {
+      "bytes": 17733,
+      "sha256": "772eb72de92668e7e8d19b13f3d2f9229a8386e4f7d4474bc72b7cfdcd3a5d56"
+    },
+    "Source/Templates/system_stm32h5xx.c": {
+      "bytes": 15834,
+      "sha256": "540f9699097fabe2b7acfbf394f73b17b99a3696c10b1207eae75723b3ee1753"
+    }
+  },
+  "kind": "nexus-reviewed-device-source",
+  "license": {
+    "expression": "Apache-2.0",
+    "path": "LICENSE.md"
+  },
+  "repository": "https://github.com/STMicroelectronics/cmsis-device-h5.git",
+  "schema_version": 1,
+  "selected_part": "STM32H563xx"
+}
