@@ -1,5 +1,5 @@
 // FIG-04 reference: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: tools/configure/factory.py; native_factory_test.cpp.
 // Relations and qualification limits are documented in README.md.
 digraph FactoryInstances {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -12,8 +12,8 @@ digraph FactoryInstances {
           fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
 
     graph [label="FIG-04 Static instances and shared ops\nReference layout: two same-kind instances; controller != endpoint"];
-    caller [label="application: assembly-local typed ID", fillcolor="#f8fafc"];
-    factory [label="Typed factory\nBounded switch lookup of an existing readonly face\nInvalid ID -> NULL; no allocation, initialization or hardware start"];
+    caller [label="Application: assembly-local nominal reference", fillcolor="#f8fafc"];
+    factory [label="Typed factory\nNominal ref -> bounded getter -> existing readonly face\nInvalid ID -> NULL; no allocation or startup"];
     subgraph clusterUart {
         label="UART instances selected by assembly"; color="#64748b";
         faceA [label="const UART face A\nops* + context*"];

@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import sys
 
-from tools.configure import selected_contracts
+from tools.configure import factory, selected_contracts
 from tools.configure.providers import maintained
 from tools.configure.providers.common import mode_traits, route_dma
 from tools.configure.resource_graph import json_value, normalize_resource
@@ -87,6 +87,16 @@ def describe(result):
     for item in data["devices"]:
         lines.append(f"  {item['id']}: {item['controller']} / {item['driver']}")
     if not data["devices"]:
+        lines.append("  none selected")
+    lines.extend(("", "Factory access (assembly-local nominal identities):"))
+    accessors = (factory.accessors(result)
+                 if hasattr(result, "controllers") else ())
+    for include in sorted({item.include for item in accessors}):
+        lines.append(f'  #include "{include}"')
+    for item in accessors:
+        lines.append(f"  {item.class_name}.{item.id}: {item.return_type}")
+        lines.append(f"    {item.getter}({item.reference})")
+    if not accessors:
         lines.append("  none selected")
     lines.extend(("", "Resource owners:"))
     for claim in data["claims"]:
@@ -237,7 +247,8 @@ def differences(before, after):
             "impacts": difference_impacts(before, after, changes)}
 
 
-def board_catalogue(gate, root, *, board=None, board_package=None):
+def board_catalogue(gate, root, *, board=None, board_package=None,
+                    soc_package=None):
     """Read reviewed routes without inventing a backend, clock or assembly."""
     root = root.resolve()
     gate.sdk.verify(root)
@@ -258,14 +269,20 @@ def board_catalogue(gate, root, *, board=None, board_package=None):
     gate.identity(board_data["id"], "Board id")
     gate.validate_board_context(board_data)
     family = gate.identity(board_data["soc_family"], "SoC family")
-    provider = gate.maintained(family)
+    context = gate.integration_package.select(
+        str(soc_package) if soc_package is not None else None,
+        family=family, root=root, assembly_directory=Path.cwd())
+    provider = context.provider
     part = gate.identity(board_data["soc"], "exact part")
-    soc_dir = root / gate.descriptor.maintained(family).source_directory
-    if (soc_dir.is_symlink() or
-            not soc_dir.resolve().is_relative_to(root / "soc")):
+    soc_dir = context.source_directory
+    if (not context.external and (soc_dir.is_symlink() or
+            not soc_dir.resolve().is_relative_to(root / "soc"))):
         gate.fail("SoC package escapes owned source")
     soc = read(gate.contained_file(soc_dir, "soc.json"))
-    gate.validate_soc(soc, part)
+    if context.external and "source_lock" in soc:
+        gate.fail("External SDK sources must be bound by package inputs; "
+                  "Nexus source_lock belongs to internal integrations")
+    gate.validate_soc(soc, part, provider)
     if soc["id"] != family:
         gate.fail("Board SoC family differs from the package identity")
     routes_doc = gate.obj(read(gate.contained_file(soc_dir, "routes.json")),
@@ -274,7 +291,16 @@ def board_catalogue(gate, root, *, board=None, board_package=None):
     routes = gate.resolve_routes(routes_doc, soc, part, provider)
     bindings = gate.resolve_bindings(board_data, routes, part)
     reservations = gate.reserved_claims(soc, board_data, provider)
-    return {"board": board_data["id"], "part": part, "soc_family": family,
+    inputs = [*snapshots, *context.inputs]
+    for name in gate.sequence(board_data.get("inputs", []), "declared Board inputs"):
+        inputs.append(gate.contained_file(directory, name))
+    if "references" in soc:
+        reference = gate.contained_file(soc_dir, soc["references"])
+        gate.fact_references.validate(read(reference), soc["variants"])
+        inputs.append(reference)
+    gate.bind_input_identities(inputs, root, snapshots, None, context)
+    return {"_provider_context": context, "cpu": soc["cpu"],
+            "board": board_data["id"], "part": part, "soc_family": family,
             "board_bindings": bindings, "routes": routes,
             "claims": reservations,
             "controller_facts": soc["controllers"],
@@ -282,7 +308,7 @@ def board_catalogue(gate, root, *, board=None, board_package=None):
             "physical_pcb_revision": board_data["physical_pcb_revision"],
             "board_clocks": board_data["clocks"],
             "physical_qualified": False,
-            "fact_sources": [str(path) for path in snapshots]}
+            "fact_sources": sorted(str(path) for path in set(inputs))}
 
 
 def binding_facts(gate, result, root):
@@ -412,8 +438,12 @@ def init_contents(gate, args):
         board_line = "board_package = " + quoted(Path(relative).as_posix())
     else:
         board_line = "board = " + quoted(args.board)
-    lines = ["schema = 2", board_line,
-             "backend = " + quoted(args.backend),
+    lines = ["schema = 2", board_line]
+    if args.soc_package is not None:
+        package = gate.integration_package.directory(args.soc_package)
+        relative = os.path.relpath(package, args.output.parent.resolve())
+        lines.append("soc_package = " + quoted(Path(relative).as_posix()))
+    lines += ["backend = " + quoted(args.backend),
              "clock = " + quoted(args.clock),
              "", "[memory]", "main_stack_bytes = 2048", "libc_heap_bytes = 0"]
     if args.profile != "empty":
@@ -454,6 +484,7 @@ def run(gate, argv=None):
     if command in {"init", "list-bindings"}:
         parser.add_argument("--board")
         parser.add_argument("--board-package", type=Path)
+        parser.add_argument("--soc-package", type=Path)
     if command == "list-bindings":
         parser.add_argument("--kind", choices=sorted(gate.KINDS))
     if command == "init":
@@ -503,6 +534,9 @@ def run(gate, argv=None):
             result = gate.configure(args.assembly, args.output,
                                     args.source_root)
         elif command == "list-bindings":
+            if args.assembly is not None and args.soc_package is not None:
+                gate.fail("--assembly owns soc_package; --soc-package requires "
+                          "a Board-first query")
             if sum(item is not None for item in (
                     args.assembly, args.board, args.board_package)) != 1:
                 gate.fail("Select exactly one --assembly, --board "
@@ -513,7 +547,8 @@ def run(gate, argv=None):
                 context = directory / "board.json"
             result = (resolve(args.assembly) if args.assembly is not None else
                       board_catalogue(gate, args.source_root, board=args.board,
-                                      board_package=args.board_package))
+                                      board_package=args.board_package,
+                                      soc_package=args.soc_package))
             if args.assembly is not None:
                 result = binding_facts(gate, result, args.source_root)
         else:

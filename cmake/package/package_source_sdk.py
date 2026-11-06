@@ -38,6 +38,7 @@ try:
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
+    from tools.configure import integration_package
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -140,16 +141,6 @@ REQUIRED_FILES = (
     'cmake/package/verification/common_services/f407.toml',
     'cmake/package/verification/common_services/gd470.toml',
     'cmake/package/verification/common_services/services.c',
-    'cmake/package/verification/common_services/external/assembly.toml',
-    'cmake/package/verification/common_services/external/board/board.json',
-    'cmake/package/verification/common_services/external/provider/nexus-soc.json',
-    'cmake/package/verification/common_services/external/provider/soc/soc.json',
-    'cmake/package/verification/common_services/external/provider/soc/routes.json',
-    'cmake/package/verification/common_services/external/provider/soc/CMakeLists.txt',
-    'cmake/package/verification/common_services/external/provider/configure/__init__.py',
-    'cmake/package/verification/common_services/external/provider/configure/contract.py',
-    'cmake/package/verification/common_services/external/provider/configure/bindings.py',
-    'cmake/package/verification/common_services/external/provider/configure/emission.py',
     'tools/maintenance/lwip_lock.py',
     'dependencies/lwip.lock.json',
     'ext/lwip/NEXUS_CURATED_SOURCE.md',
@@ -548,6 +539,23 @@ REQUIRED_FILES += (
     "tools/measurement/resources.py", "tools/measurement/retention.py",
     "tools/measurement/elf.py", "tools/evidence/common.py",
     "tools/evidence/identity.py")
+# Public support and candidate entry points retain their imported validators.
+# These are host source inputs, not test cases or a second source build graph.
+REQUIRED_FILES += (
+    "tools/maintenance/capabilities.py", "tools/maintenance/support.py",
+    "tools/evidence/candidate.py", "tools/evidence/proof.py",
+    "tools/evidence/native_proof.py", "tools/evidence/legacy_sdk.py",
+    "tools/evidence/consumer.py", "tools/evidence/container.py",
+    "tools/evidence/inputs.py", "tools/evidence/qualification.py",
+    "tools/evidence/reproduce.py", "tools/evidence/storage.py",
+    "tools/configure/documentation.py",
+    "tools/hil/admit.py", "tools/hil/h743_duplex.py",
+    "tools/hil/measure.py", "tools/hil/power.py", "tools/hil/prepare.py",
+    "tools/hil/selected_modes.py", "tools/hil/threadx.py",
+    "tools/hil/workloads.py",
+    "scripts/ci/io_lifecycle_matrix.py", "scripts/ci/native_contracts.py",
+    "scripts/ci/tdd_gate.py", "scripts/validation/junit.py",
+    "tools/testing/run_tool_tests.py")
 REQUIRED_FILES += tuple("components/bus_owner/src/" + name + ".c" for name in (
     "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
 REQUIRED_FILES += tuple("components/bus_owner/include/nexus/components/" + name
@@ -619,6 +627,43 @@ REQUIRED_FILES += tuple("os/freertos/mpu/patches/" + name + ".patch"
                             "v7-veneers", "v8-baseline-veneers",
                             "v8-mainline-veneers", "gpio-numbers",
                             "gpio-veneers"))
+EXTERNAL_PACKAGE_FIXTURES = (
+    ("cmake/package/verification/common_services/external",
+     ("assembly.toml", "board/board.json")),
+    ("cmake/package/verification/external_provider",
+     ("CMakeLists.txt", "README.md", "assembly.toml", "consumer.c",
+      "lifecycle_test.cpp", "board/board.json")),
+)
+
+
+def external_fixture_files(root):
+    """Project trusted fixture inputs without executing provider host code."""
+    root = Path(root).resolve()
+    names = []
+    for relative, authored in EXTERNAL_PACKAGE_FIXTURES:
+        fixture = root / relative
+        names.extend(relative + "/" + name for name in authored)
+        try:
+            manifest = integration_package.load_manifest(fixture / "provider",
+                                                         root=root)
+        except ValueError as error:
+            raise SDKError("External SDK fixture rejected: " +
+                           str(error)) from error
+        names.extend(path.relative_to(root).as_posix()
+                     for path in manifest.inputs)
+    return tuple(dict.fromkeys(names))
+
+
+def required_files(root):
+    """Combine platform requirements with each verified package projection."""
+    return tuple(dict.fromkeys((*REQUIRED_FILES, *external_fixture_files(root))))
+
+
+REQUIRED_FILES += ("cmake/platform/Provider.cmake",
+                   "tools/configure/soc-package.schema.json")
+REQUIRED_FILES += tuple(relative + "/" + name
+                        for relative, authored in EXTERNAL_PACKAGE_FIXTURES
+                        for name in (*authored, "provider/nexus-soc.json"))
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -816,7 +861,10 @@ def dependency_entries(root, dependency):
     return entries
 
 
-def selected(name):
+def selected(name, *, root=SOURCE_ROOT):
+    if any(name.startswith(relative + "/")
+           for relative, _ in EXTERNAL_PACKAGE_FIXTURES):
+        return name in external_fixture_files(root)
     # Only reviewed public smoke programs and their canonical software-reference
     # inputs belong in this namespace, including the explicit Native time pair.
     # Arbitrary host tests and private products do not.
@@ -843,12 +891,12 @@ def snapshot_files(source, entries, development_fixture=False):
     development overlay; publishable payloads retain committed-blob identity.
     """
     names = {name for name, (_, kind, _) in entries.items()
-             if kind == "blob" and selected(name)}
+             if kind == "blob" and selected(name, root=source)}
     if development_fixture:
         names.update(name.decode() for name in git(
             source, "ls-files", "--cached", "--others", "--exclude-standard",
             "-z", parent_index=True).split(b"\0")
-                     if name and selected(name.decode()))
+                     if name and selected(name.decode(), root=source))
     return names
 
 
@@ -1068,7 +1116,7 @@ def prepare(source, output, development_fixture=False):
                     raise SDKError("Dependencies require regular tracked files")
                 relative = dep + "/" + name
                 files[relative] = copy_file(source, sdk, relative, blobs[name], mode == "100755")
-        for name in REQUIRED_FILES:
+        for name in required_files(source):
             if name not in files:
                 raise SDKError(f"Source SDK is incomplete: {name}")
         verify_preparation_snapshot(source, revision, index)
@@ -1261,6 +1309,10 @@ def verify(root):
                          if path.is_file() or path.is_symlink()}
         if actual_import != expected:
             raise SDKError("Source SDK contains files outside the reviewed import")
+    for name in required_files(root):
+        if name not in files:
+            raise SDKError("Installed source SDK is missing required "
+                           "sources/licenses: " + name)
     # An external verifier can take time. Reject late rewrites, same-content
     # replacements, chmod and file-set changes rather than returning an old
     # proof for the current SDK. Every hash and filesystem identity is retained.

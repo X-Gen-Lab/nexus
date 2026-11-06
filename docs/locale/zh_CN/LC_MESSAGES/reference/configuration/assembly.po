@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 63de53256092af1769d4f3e9c64de0d1f1b014641b9e52a12fdc70483ffa1384\n"
+"X-Nexus-Source-SHA256: b87b11387a2c5b5c271498e81d04d8fbdaf02e49ed26faa0986b7ca39865bfce\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
@@ -116,13 +116,25 @@ msgstr "维护中的优化/调试/LTO 配置；不接受任意编译器覆盖"
 msgid "`[memory]`"
 msgstr "`[memory]`"
 
+#: docs/reference/configuration/assembly.md:29
+msgid "Byte budgets plus optional executable-image prefix/suffix reservations"
+msgstr "字节预算，以及可选的执行镜像前缀与尾部保留量"
+
+msgid "`layout`"
+msgstr "`layout`"
+
+#: docs/reference/configuration/assembly.md:29
+msgid ""
+"Optional schema-1 physical Flash-owner JSON path relative to the assembly; "
+"exactly one image"
+msgstr "可选的 schema-1 物理 Flash 擦除区 JSON 路径，相对装配定位；恰好一个 image 区"
+
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`[factory]`"
 msgstr "`[factory]`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
-msgid "Explicit optional strong IDs and capability metadata"
-msgstr "显式可选强类型 ID 和能力元数据"
+msgid "Optional capability metadata; only `capabilities` is accepted"
+msgstr "可选能力元数据；仅接受 `capabilities`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Kind instance table"
@@ -170,67 +182,24 @@ msgstr ""
 "[配置与所有权指南](../../guides/developer-workflow.md)说明从 Board 查询、经验证的 "
 "profile、人读摘要及有效差异。`explain` 默认输出人读内容；自动化必须选择 `--json`。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:49
-msgid "Inspect and generate"
-msgstr "检查并生成"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:51
-msgid "Run from the repository root, using a new output you own:"
-msgstr "从仓库根目录执行，使用自己拥有的新输出："
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:60
 msgid ""
-"`check` and `explain` do not generate output. `generate` publishes one "
-"atomic owned bundle; failure invalidates its owned output without replacing "
-"unrelated data. Inspect `resolved.json`, input identities, generated "
-"`nexus_config.h`, bindings, factory, linker memory and budgets. Changing "
-"declared inputs requires a fresh resolution; separate Board/backend "
-"combinations use separate build roots."
+"Every generated bundle contains `nexus_factory_strong.h`. "
+"Application code can include it and use nominal references such as "
+"`NX_UART_REF_UART0` with `nx_factory_uart_ref`; no `[factory]` "
+"selection enables that header. `factory.strong` is not a supported "
+"field and rejects as unknown. The optional `capabilities = true` "
+"selection emits immutable mode metadata separately from the "
+"interface faces. Factory getters return existing static objects and "
+"do not start hardware."
 msgstr ""
-"`check` 与 `explain` 不生成输出。`generate` 发布一个原子自有 bundle；失败使其自有输出失效，不替换无关数据。检查 "
-"`resolved.json`、输入身份、生成的 "
-"`nexus_config.h`、绑定、factory、链接器内存和预算。声明输入变化要求重新解析；不同 Board/backend "
-"组合使用独立构建根目录。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:66
-msgid ""
-"CPU-only Runtime has a separate authored runtime TOML using the shared CPU "
-"resolver. It emits Core/Arch/optional OS policy, no "
-"SoC/Board/startup/factory. Do not use it to claim a full device platform. "
-"The [build contract](../../design/build-system.md), [integration "
-"contract](../../design/integration-contracts.md) and production field "
-"model/schema own detailed accepted fields; editor completion does not "
-"establish hardware capability."
-msgstr ""
-"CPU-only Runtime 使用独立人工编写的 runtime TOML 和共享 CPU 解析器。它只生成 Core/Arch/可选 OS "
-"策略，不生成 SoC/Board/startup/factory。不得据此声明完整设备平台。[构建合同](../../design/build-"
-"system.md)、[接入合同](../../design/integration-contracts.md)和生产字段模型／schema "
-"拥有详细合法字段；编辑器补全不建立硬件能力。"
-
-msgid "`layout`"
-msgstr "`layout`"
+"每个生成 bundle 都包含 `nexus_factory_strong.h`。应用代码可以包含该头文件，并将 "
+"`NX_UART_REF_UART0` 这类具有独立类型的引用传给 `nx_factory_uart_ref`；无需通过 "
+"`[factory]` 选择启用该头文件。`factory.strong` 不是受支持字段，会因未知字段而被拒绝。可选的 "
+"`capabilities = true` 选择会生成不可变的模式元数据，与接口面分开。factory getter "
+"返回既有静态对象，不启动硬件。"
 
 msgid "Physical Flash and the selected image"
 msgstr "物理 Flash 与所选镜像"
-
-msgid "A `layout` JSON file has `schema_version = 1` and `regions`. Each region has an `id`, integer `origin`, positive `size` and `kind` (`image` or `data`). Exactly one region is an image. IDs must be unique; all regions must be nonoverlapping, within physical Flash, and start/end on its exact erase boundaries. This is an auxiliary layout input; schema-1 JSON assemblies remain rejected."
-msgstr "`layout` JSON 文件包含 `schema_version = 1` 和 `regions`。各 region 具有 `id`、整数 `origin`、正数 `size` 和 `kind`（`image` 或 `data`）。只能有一个 image region。ID 必须唯一；全部 region 必须互不重叠、位于物理 Flash 内，并从其精确擦除边界开始、结束。这是辅助 layout 输入；schema-1 JSON 装配仍然拒绝。"
-
-msgid "For example, this complete layout file selects the final 384 KiB of Sky STM32F407VET6 Flash. Select it with the assembly's `layout` path. The decimal origin is `0x08020000`; the omitted first 128 KiB is not another selected image and is not protected from writes by this layout."
-msgstr "例如，这个完整 layout 文件选择天空星 STM32F407VET6 Flash 的最后 384 KiB。通过装配的 `layout` 路径选择它。十进制 origin 对应 `0x08020000`；省略的前 128 KiB 不是另一个所选镜像，也不会因本 layout 而获得写保护。"
-
-msgid "An offset executable still needs a product-owned boot path that reaches its vendor reset entry with valid initial machine state. Linking, vector checks and BIN identity do not execute that path. This mechanism does not provide image authentication, activation, A/B rollback, Flash permissions or a general running image handoff. Baremetal or FreeRTOS links prove their build scope only. In particular, the existing F407 handoff retains PRIMASK=1 and startup does not unmask it; no FreeRTOS handoff qualification follows from an offset link."
-msgstr "偏移可执行文件仍需要产品拥有的启动路径，在有效初始机器状态下进入其 vendor reset entry。链接、向量检查和 BIN 身份不会执行这条路径。该机制不提供镜像认证、激活、A/B 回滚、Flash 权限或通用运行态镜像交接。裸机或 FreeRTOS 链接只证明各自构建范围。尤其是现有 F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移链接不能建立 FreeRTOS handoff 资格。"
-
-#: docs/reference/configuration/assembly.md:29
-msgid "Byte budgets plus optional executable-image prefix/suffix reservations"
-msgstr "字节预算，以及可选的执行镜像前缀与尾部保留量"
-
-#: docs/reference/configuration/assembly.md:29
-msgid ""
-"Optional schema-1 physical Flash-owner JSON path relative to the assembly; "
-"exactly one image"
-msgstr "可选的 schema-1 物理 Flash 擦除区 JSON 路径，相对装配定位；恰好一个 image 区"
 
 #: docs/reference/configuration/assembly.md:60
 msgid ""
@@ -243,6 +212,9 @@ msgid ""
 msgstr ""
 "解析输出中的 `flash` 描述完整物理器件，包括精确的擦除与编程几何。`layout` 选择包含可执行镜像的物理擦除区。未编写 `layout` "
 "时，该区域为完整物理 Flash。可写区域和恢复仍由产品负责；此选择不提供 Flash 访问控制或写保护。"
+
+msgid "A `layout` JSON file has `schema_version = 1` and `regions`. Each region has an `id`, integer `origin`, positive `size` and `kind` (`image` or `data`). Exactly one region is an image. IDs must be unique; all regions must be nonoverlapping, within physical Flash, and start/end on its exact erase boundaries. This is an auxiliary layout input; schema-1 JSON assemblies remain rejected."
+msgstr "`layout` JSON 文件包含 `schema_version = 1` 和 `regions`。各 region 具有 `id`、整数 `origin`、正数 `size` 和 `kind`（`image` 或 `data`）。只能有一个 image region。ID 必须唯一；全部 region 必须互不重叠、位于物理 Flash 内，并从其精确擦除边界开始、结束。这是辅助 layout 输入；schema-1 JSON 装配仍然拒绝。"
 
 #: docs/reference/configuration/assembly.md:72
 msgid "Executable prefix and suffix"
@@ -325,6 +297,9 @@ msgstr ""
 "provider "
 "包不会因填写这些字段而获得前缀或尾部支持。精确对齐要求和真实厂商向量符号由维护中的配置合同决定；人工输入或产物元数据不能给其他启动实现授予该能力。"
 
+msgid "For example, this complete layout file selects the final 384 KiB of Sky STM32F407VET6 Flash. Select it with the assembly's `layout` path. The decimal origin is `0x08020000`; the omitted first 128 KiB is not another selected image and is not protected from writes by this layout."
+msgstr "例如，这个完整 layout 文件选择天空星 STM32F407VET6 Flash 的最后 384 KiB。通过装配的 `layout` 路径选择它。十进制 origin 对应 `0x08020000`；省略的前 128 KiB 不是另一个所选镜像，也不会因本 layout 而获得写保护。"
+
 #: docs/reference/configuration/assembly.md:134
 msgid ""
 "For an offset image or nonzero reservations, generated linker checks require"
@@ -386,3 +361,43 @@ msgid ""
 msgstr ""
 "前缀保留量不会生成镜像头。尾部保留量不会生成 trailer、激活标记或回滚记录。元数据格式、密钥、Flash "
 "权限与恢复策略均由产品提供。平台不会构建引导器，也不负责认证、安装、激活或引导此镜像。"
+
+msgid "An offset executable still needs a product-owned boot path that reaches its vendor reset entry with valid initial machine state. Linking, vector checks and BIN identity do not execute that path. This mechanism does not provide image authentication, activation, A/B rollback, Flash permissions or a general running image handoff. Baremetal or FreeRTOS links prove their build scope only. In particular, the existing F407 handoff retains PRIMASK=1 and startup does not unmask it; no FreeRTOS handoff qualification follows from an offset link."
+msgstr "偏移可执行文件仍需要产品拥有的启动路径，在有效初始机器状态下进入其 vendor reset entry。链接、向量检查和 BIN 身份不会执行这条路径。该机制不提供镜像认证、激活、A/B 回滚、Flash 权限或通用运行态镜像交接。裸机或 FreeRTOS 链接只证明各自构建范围。尤其是现有 F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移链接不能建立 FreeRTOS handoff 资格。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:49
+msgid "Inspect and generate"
+msgstr "检查并生成"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:51
+msgid "Run from the repository root, using a new output you own:"
+msgstr "从仓库根目录执行，使用自己拥有的新输出："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:60
+msgid ""
+"`check` and `explain` do not generate output. `generate` publishes one "
+"atomic owned bundle; failure invalidates its owned output without replacing "
+"unrelated data. Inspect `resolved.json`, input identities, generated "
+"`nexus_config.h`, bindings, factory, linker memory and budgets. Changing "
+"declared inputs requires a fresh resolution; separate Board/backend "
+"combinations use separate build roots."
+msgstr ""
+"`check` 与 `explain` 不生成输出。`generate` 发布一个原子自有 bundle；失败使其自有输出失效，不替换无关数据。检查 "
+"`resolved.json`、输入身份、生成的 "
+"`nexus_config.h`、绑定、factory、链接器内存和预算。声明输入变化要求重新解析；不同 Board/backend "
+"组合使用独立构建根目录。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:66
+msgid ""
+"CPU-only Runtime has a separate authored runtime TOML using the shared CPU "
+"resolver. It emits Core/Arch/optional OS policy, no "
+"SoC/Board/startup/factory. Do not use it to claim a full device platform. "
+"The [build contract](../../design/build-system.md), [integration "
+"contract](../../design/integration-contracts.md) and production field "
+"model/schema own detailed accepted fields; editor completion does not "
+"establish hardware capability."
+msgstr ""
+"CPU-only Runtime 使用独立人工编写的 runtime TOML 和共享 CPU 解析器。它只生成 Core/Arch/可选 OS "
+"策略，不生成 SoC/Board/startup/factory。不得据此声明完整设备平台。[构建合同](../../design/build-"
+"system.md)、[接入合同](../../design/integration-contracts.md)和生产字段模型／schema "
+"拥有详细合法字段；编辑器补全不建立硬件能力。"

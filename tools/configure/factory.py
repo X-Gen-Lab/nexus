@@ -1,5 +1,6 @@
 """Generate pure, typed static lookup without registration or construction."""
 
+from dataclasses import dataclass
 import json
 
 from tools.configure.ir import ConfigurationIR
@@ -90,6 +91,33 @@ def classes(result):
 def controller_class(item):
     """Physical UART resource and nominal word face remain distinct facts."""
     return selected_contracts.controller_class(item)
+
+
+@dataclass(frozen=True)
+class FactoryAccessor:
+    """Selected source-level access, derived from the static factory classes."""
+
+    id: str
+    class_name: str
+    shape: str
+    include: str
+    reference: str
+    getter: str
+    return_type: str
+
+
+def accessors(result):
+    """Project selected nominal getters without another identity authority."""
+    return tuple(
+        FactoryAccessor(
+            id=item.id, class_name=name, shape=shape,
+            include="nexus_factory_strong.h",
+            reference="NX_" + name.upper() + "_REF_" + symbol(item.id).upper(),
+            getter="nx_factory_" + name + "_ref",
+            return_type="const " + interface_type(name, shape) + "*",
+        )
+        for name, shape, instances in classes(result) for item in instances
+    )
 
 
 def emit(result):

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 42f3ecd628097d8cade5cfdeb8dd561428f53347dc0a2f1ff62410e179a9a3b0\n"
+"X-Nexus-Source-SHA256: 236f4c801e622797033c3936a928f171121b295805c8d5ee3533527814f7f420\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:1
 msgid "当前设计与实施台账"
@@ -57,16 +57,16 @@ msgstr ""
 "instance integration, lifecycle, resource cost, official reuse and execution"
 " efficiency"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
-msgid "{download}`75 项执行台账 <developer-experience-execution.csv>`"
+msgid "{download}`开发体验执行台账 <developer-experience-execution.csv>`"
 msgstr ""
-"{download}`75-task execution ledger <developer-experience-execution.csv>`"
+"{download}`Developer experience execution ledger "
+"<developer-experience-execution.csv>`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
-msgid "63 项软件工作、6 项集成交付及6 项实板退出；实现与实际验证分列"
+msgid "保留原 75 项退出条件，追加 CF／EP／EV／MX／DX 的 32 项配置接入任务；实现与实际验证分列"
 msgstr ""
-"63 software items, six integration exits and six physical exits; "
-"implementation and actual verification remain separate"
+"Preserves the original 75 exit conditions and adds 32 "
+"CF／EP／EV／MX／DX configuration integration tasks; implementation and "
+"actual verification are recorded separately"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/README.md:0
 msgid "[文档系统架构与交付规划](documentation-system.md)"

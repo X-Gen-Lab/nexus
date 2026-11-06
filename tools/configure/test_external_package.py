@@ -16,7 +16,7 @@ from tools.configure import configure, experience, onboarding, selected_contract
 
 ROOT = configure.ROOT
 LIFECYCLE_REFERENCE = (ROOT /
-    "tests/contracts/external_provider_lifecycle")
+    "cmake/package/verification/external_provider")
 
 
 class ExternalPackageTests(unittest.TestCase):

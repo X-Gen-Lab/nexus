@@ -35,13 +35,7 @@ python cmake/package/package_source_sdk.py \
     --verify "$NEXUS_SDK_PREFIX/share/nexus/src"
 python tools/dev/dev.py create --templates "$NEXUS_EXAMPLES_DIR" \
     --revision "$NEXUS_EXAMPLES_REVISION" --template native \
-    --output /tmp/my-nexus-product
-cmake -S /tmp/my-nexus-product -B /tmp/my-nexus-product-build -G Ninja \
-    -DNexus_DIR="$NEXUS_SDK_PREFIX/lib/cmake/Nexus" \
-    -DNEXUS_EXPECTED_SOURCE_REVISION="$NEXUS_EXPECTED_REVISION"
-cmake --build /tmp/my-nexus-product-build --parallel 2
-ctest --test-dir /tmp/my-nexus-product-build \
-    --output-on-failure --no-tests=error
+    --sdk-prefix "$NEXUS_SDK_PREFIX" --output /tmp/my-nexus-product
 ```
 
 Creation reads committed template blobs and their SHA-256 manifest without
@@ -49,7 +43,16 @@ network access. It rejects a different Git HEAD, changed template bytes, a
 symlink or an existing destination. It resolves the copied assembly before
 success; failure removes only its newly created destination. Inspect
 `.nexus-template.json`: `expected_platform` is the template's lock expectation;
-`validation` records the resolver and input bytes actually checked.
+`selected_platform` records the selected source or installed SDK, and `validation`
+records the interpreter, resolver and input bytes actually checked. An installed
+SDK is checked by its own verifier before its own resolver executes. Creation
+does not substitute the coordinator checkout's resolver for that selected code.
+
+Copy and run the printed configure, build and Native test commands. They already
+contain the selected SDK path and expected revision, including safe quoting for
+paths with spaces. `--json` instead returns the same command argument arrays in
+the origin record. Creation validates and generates configuration; those later
+commands still have to run before a build or test can be claimed.
 
 The generated product contains `CMakeLists.txt`, `assembly.toml`, `main.c` and
 `README.md`. A successful Native test prints
@@ -58,15 +61,15 @@ is a software model, not a host serial port. The example uses strong factory
 references, provides request storage, observes settlement and stops the platform.
 A timeout is an error, not permission to release outstanding storage.
 
-For a development checkout, replace both installed-SDK CMake arguments with
-`-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout and
-does not qualify an SDK. Select `qiming`, `sky` or `liangshan` for the maintained
-MCU template. SDK consumers add
-`-DCMAKE_TOOLCHAIN_FILE="$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake"`;
-checkout consumers instead select
-`-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-gcc.cmake`.
-Use the locked ARM compiler. An MCU link is software evidence; board bring-up
-and electrical verification remain separate.
+For a development checkout, select `--source /absolute/path/to/nexus` instead of
+`--sdk-prefix`. The emitted configure command selects that same checkout through
+`NEXUS_SOURCE`; it does not qualify an installed SDK. The two source selectors
+are mutually exclusive. Without either selector, creation uses its current
+checkout explicitly. Select `qiming`, `sky` or `liangshan` for a maintained MCU
+template. The emitted MCU configure command includes the selected platform's
+ARM toolchain file; Native selections do not receive an ARM toolchain. Use the
+locked ARM compiler. An MCU link is software evidence; board bring-up and
+electrical verification remain separate.
 
 If creation rejects configuration, read the reported file, key and constraint.
 Check the selected SDK/interface and fixed template revision first. A template

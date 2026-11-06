@@ -70,20 +70,28 @@ class ReproductionBoundaryTests(unittest.TestCase):
                     docker="unit-fixture-docker", legacy=legacy)
         return evidence, manifest, spec
 
-    def validate(self, evidence, manifest):
+    def validate(self, evidence, manifest, *, legacy_replay=False):
         def resolver(identity):
             return (proof.verify_sdk_file(identity) if identity.get("role") == "sdk_file"
                     else verify_file_identity(identity))
         with patch.object(proof, "proof_document", return_value=(None, evidence)):
             # Structural archived evidence only; no SDK/hardware qualification.
-            proof.validate_reproduction({}, manifest, {}, resolver, live=False)
+            proof.validate_reproduction({}, manifest, {}, resolver, live=False,
+                                        legacy_replay=legacy_replay)
 
     def test_current_full_boundary_and_exact_legacy_schema_one_are_accepted(self):
-        for values in ({}, {"version": 1},
-                       {"version": 1, "preflight": False, "legacy": True}):
+        for values, legacy_replay in (({}, False), ({"version": 1}, False),
+                ({"version": 1, "preflight": False, "legacy": True}, True)):
             with self.subTest(values=values):
                 evidence, manifest, _ = self.evidence(**values)
-                self.validate(evidence, manifest)
+                self.validate(evidence, manifest, legacy_replay=legacy_replay)
+
+    def test_old_schema_one_boundary_requires_explicit_legacy_replay(self):
+        evidence, manifest, _ = self.evidence(
+            version=1, preflight=False, legacy=True)
+        with self.assertRaisesRegex(EvidenceError, "complete offline boundary"):
+            self.validate(evidence, manifest)
+        self.validate(evidence, manifest, legacy_replay=True)
 
     def test_shared_builder_retains_full_producer_argv(self):
         self.assertTrue(hasattr(reproduce, "container_argv"),
@@ -139,8 +147,11 @@ class ReproductionBoundaryTests(unittest.TestCase):
                        {"preflight": False, "legacy": True}):
             with self.subTest(values=values):
                 evidence, manifest, _ = self.evidence(**values)
-                with self.assertRaises(EvidenceError):
-                    self.validate(evidence, manifest)
+                for legacy_replay in (False, True):
+                    with self.subTest(legacy_replay=legacy_replay), \
+                            self.assertRaises(EvidenceError):
+                        self.validate(evidence, manifest,
+                                      legacy_replay=legacy_replay)
 
     def test_malformed_short_argv_and_unbounded_container_name_fail_closed(self):
         for value in ([], ["docker"], ["env", "--name"], ["x"] * 200):

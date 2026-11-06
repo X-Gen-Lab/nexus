@@ -28,13 +28,13 @@ class SDKSecurePolicyTests(unittest.TestCase):
         specification.loader.exec_module(cls.consumers)
 
     def test_current_policy_preserves_the_complete_v12_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v16")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:54], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(), V12_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 64)
-        self.assertEqual(len(transport.IMAGES), 67)
-        self.assertEqual(len(transport.FIXTURES), 64)
+        self.assertEqual(len(layout), 65)
+        self.assertEqual(len(transport.IMAGES), 68)
+        self.assertEqual(len(transport.FIXTURES), 65)
 
     def test_secure_profiles_have_explicit_reviewed_execution_domains(self):
         profiles = transport.SERVICE_CONSUMERS[4:6]

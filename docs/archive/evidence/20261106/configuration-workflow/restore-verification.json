@@ -1,0 +1,7 @@
+{
+  "archive_sha256": "69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6",
+  "bytes": 341166923,
+  "destination": "/dev/shm/nexus-config-workflow-20261106/public-restore-check",
+  "files": 17820,
+  "status": "verified"
+}

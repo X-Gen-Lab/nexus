@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 56d28444de578e453f503fdecdeb241d6769c8ea1f0c8173e1cbe7baf0722e58\n"
+"X-Nexus-Source-SHA256: 3b84b850bc274f327a7359470a2d0c1636f31c1ebff96d4d4db501929cbc3b04\n"
 
 #: ../../../../workspace/nexus/docs/status/software-verification.md:9
 msgid "软件验证、源码身份与证据"
@@ -575,12 +575,6 @@ msgstr "恢复后的 F407 联网开发参考已链接：全部 217 个实际 C �
 msgid "私有示例的旧基线 `2e932bbc`（PR 24）固定 SDK `7fd36f8a`，其普通门禁为 86 个 Python 用例、23 项 CTest、13 个 Google 程序和 146 个用例。后续已接受 私有开发提交 `ff86eb49` 固定公共 SDK `6c3a380a`；其普通门禁为 89 个 Python 用例、28 项 CTest、18 个 Google 程序和 204 个用例，source 与 installed 各执行 五个真实 broker 场景，均零失败或跳过。该私有范围与公共 `eb4aba66`／v15 分开。 早期 peer 11、main 4、broker 5 和 24 个文件 style 检查保留原源码范围，不与 新执行相加。公开平台仅记录聚合与提交／PR 元数据，私有源码、payload 路径、 receipt 和归档保持私有；当时 PR 24 仍为 draft。"
 msgstr "私有示例的旧基线 `2e932bbc`（PR 24）固定 SDK `7fd36f8a`，其普通门禁为 86 个 Python 用例、23 项 CTest、13 个 Google 程序和 146 个用例。后续已接受 私有开发提交 `ff86eb49` 固定公共 SDK `6c3a380a`；其普通门禁为 89 个 Python 用例、28 项 CTest、18 个 Google 程序和 204 个用例，source 与 installed 各执行 五个真实 broker 场景，均零失败或跳过。该私有范围与公共 `eb4aba66`／v15 分开。 早期 peer 11、main 4、broker 5 和 24 个文件 style 检查保留原源码范围，不与 新执行相加。公开平台仅记录聚合与提交／PR 元数据，私有源码、payload 路径、 receipt 和归档保持私有；当时 PR 24 仍为 draft。"
 
-msgid "当前开发源码的 SDK v15 计划要求"
-msgstr "当前开发源码的 SDK v15 计划要求"
-
-msgid "维护源码的 `nexus-sdk-consumers-v15` 在 v14 的 59 个精确 consumer root 之上 追加以下五个 root，要求 64 个独立 root、67 个镜像。选择由 [同一计划权威](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/transport.py)定义；计数是计划结构，不是执行 receipt。已发布 `v0.2.1` 的 v11 与已接受 `6c3a380a` 的 v14 保持原身份。"
-msgstr "维护源码的 `nexus-sdk-consumers-v15` 在 v14 的 59 个精确 consumer root 之上 追加以下五个 root，要求 64 个独立 root、67 个镜像。选择由 [同一计划权威](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/transport.py)定义；计数是计划结构，不是执行 receipt。已发布 `v0.2.1` 的 v11 与已接受 `6c3a380a` 的 v14 保持原身份。"
-
 msgid "`f407 loaned rx`"
 msgstr "`f407 loaned rx`"
 
@@ -649,3 +643,18 @@ msgstr "本节 `eb4aba66` 历史记录当时没有完整计划、fresh 离线复
 
 msgid "后续 D 的独立双语审查／严格文档包／恢复、真实部署读回和最终 FF 仍须分别绑定 实际文档源码。服务端规则的原 403、Release 上传的原 401 均保留。物理 42 项仍为 `not_executed`；Flash／ECC event-owner／sticky 边界、七组 vendor-leaf 提案和 GD303 引用审查不因本轮软件通过而关闭。完整数据与取得边界见 {download}`同一结果索引 <../delivery/platform-delivery-completion-results.json>`的 `source_version_records_20261103.final_public_source_P2_ab532250`。"
 msgstr "后续 D 的独立双语审查／严格文档包／恢复、真实部署读回和最终 FF 仍须分别绑定 实际文档源码。服务端规则的原 403、Release 上传的原 401 均保留。物理 42 项仍为 `not_executed`；Flash／ECC event-owner／sticky 边界、七组 vendor-leaf 提案和 GD303 引用审查不因本轮软件通过而关闭。完整数据与取得边界见 {download}`同一结果索引 <../delivery/platform-delivery-completion-results.json>`的 `source_version_records_20261103.final_public_source_P2_ab532250`。"
+
+msgid "当前开发源码的 SDK 消费计划"
+msgstr "当前开发源码的 SDK 消费计划"
+
+msgid "维护源码的 `nexus-sdk-consumers-v16` 保留 v15 的全部精确选择，增加标准 Native 外置 provider 生命周期工程，要求 65 个独立 root、68 个镜像。选择由 [同一计划权威](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/transport.py)定义；计数是计划结构，不是执行 receipt。已发布 `v0.2.1` 的 v11 与已接受 `6c3a380a` 的 v14 保持原身份。"
+msgstr "维护源码的 `nexus-sdk-consumers-v16` 保留 v15 的全部精确选择，增加标准 Native 外置 provider 生命周期工程，要求 65 个独立 root、68 个镜像。选择由 [同一计划权威](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/release/transport.py)定义；计数是计划结构，不是执行 receipt。已发布 `v0.2.1` 的 v11 与已接受 `6c3a380a` 的 v14 保持原身份。"
+
+msgid "新工程来自 [唯一的 C11 接入示例](../guides/provider-porting.md)，实际执行静态 实例的取得、启停、失败回滚和保留后的清理。它不建立新 MCU／PCB 或物理资格。 完整的当前计划执行结果必须绑定自己的 clean 源码和原始 report；旧版本的执行 不自动覆盖新增工程。"
+msgstr "新工程来自 [唯一的 C11 接入示例](../guides/provider-porting.md)，实际执行静态 实例的取得、启停、失败回滚和保留后的清理。它不建立新 MCU／PCB 或物理资格。 完整的当前计划执行结果必须绑定自己的 clean 源码和原始 report；旧版本的执行 不自动覆盖新增工程。"
+
+msgid "v15 的五个已有 profile"
+msgstr "v15 的五个已有 profile"
+
+msgid "本轮 CF／EP／EV／MX／DX 32 项沿用{download}`原执行 CSV <../design/developer-experience-execution.csv>`与其[可读台账](ledgers/developer-experience.md)，实际结果从{download}`现有结果索引 <../delivery/developer-experience-results.json>`的 `observations.configuration_workflow_20261106` 进入。代码门禁、SDK 消费、测量和严格双语文档分别绑定各自实际执行的源码、输入与原始收条；规划数量、历史计数和其他版本的成功均不作为本轮结果。软件资格与物理 HIL 仍按精确记录分别判断。"
+msgstr "本轮 CF／EP／EV／MX／DX 32 项沿用{download}`原执行 CSV <../design/developer-experience-execution.csv>`与其[可读台账](ledgers/developer-experience.md)，实际结果从{download}`现有结果索引 <../delivery/developer-experience-results.json>`的 `observations.configuration_workflow_20261106` 进入。代码门禁、SDK 消费、测量和严格双语文档分别绑定各自实际执行的源码、输入与原始收条；规划数量、历史计数和其他版本的成功均不作为本轮结果。软件资格与物理 HIL 仍按精确记录分别判断。"

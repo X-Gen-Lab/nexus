@@ -98,11 +98,11 @@ class SDKDeviceImagePolicyTests(unittest.TestCase):
         return sdk, source, build, config, profile, calls, execute
 
     def test_current_extends_exact_v13_plan_without_reclassifying_old_images(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v15")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v16")
         layout = transport.consumer_layout()
         encoded = json.dumps(layout[:56], separators=(",", ":")).encode()
         self.assertEqual(hashlib.sha256(encoded).hexdigest(), V13_LAYOUT_SHA256)
-        self.assertEqual((len(layout), len(transport.IMAGES)), (64, 67))
+        self.assertEqual((len(layout), len(transport.IMAGES)), (65, 68))
         self.assertEqual([item.name for item in transport.SERVICE_CONSUMERS[6:9]],
                          ["native tmp117", "f407 tmp117", "f407 image window"])
 

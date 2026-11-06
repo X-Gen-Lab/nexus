@@ -69,6 +69,8 @@ else()
         "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
     set(nexus_provider "nexus_soc_${NEXUS_SOC_FAMILY}")
 endif()
+include("${NEXUS_SOURCE_DIR}/cmake/platform/Provider.cmake")
+nexus_validate_selected_provider("${nexus_provider}")
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
 target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
     PRIVATE "${NEXUS_SOURCE_DIR}/io/private")

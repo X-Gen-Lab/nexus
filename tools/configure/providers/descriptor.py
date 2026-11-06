@@ -81,6 +81,11 @@ def maintained(family):
     return result
 
 
+def family_names():
+    """Project explicit built-in identities without importing local metadata."""
+    return tuple(_DESCRIPTOR_MODULES)
+
+
 def families():
     """Preserve the explicit stable family order without another registry."""
     return tuple(maintained(family) for family in _DESCRIPTOR_MODULES)

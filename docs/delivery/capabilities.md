@@ -28,6 +28,13 @@ python tools/maintenance/capabilities.py --write
 
 ## 查询实际选择与验收阶段
 
+日常入口可用 `dev.py support`。默认输出人读摘要，`--json` 输出同一份机器投影：
+
+```sh
+python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml
+python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --json
+```
+
 全局表适合寻找已有路线；产品是否可用要回到精确装配。从固定源码或 SDK 根目录
 执行以下只读查询，选择自己的 TOML。命令正常退出时输出 JSON，不更新下方矩阵：
 
@@ -102,6 +109,39 @@ python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/q
 明确标记摘要匹配。上例的 Core／Arch／OS 专项没有完整装配身份，
 因此不能证明该 UART 模式通过。此导航不改变任何 `validation`、候选或物理状态；
 它与 `--candidate` 的原候选验证各自独立，也不从父记录继承执行范围。
+
+## 核验具体阶段的原件
+
+索引中的具体叶记录可以声明 `support_evidence`，引用该记录自己的 manifest、
+qualification、SDK、consumer 或 HIL 原件。追加 `--verify-record` 才核验这些
+引用；未追加时继续只做索引导航。工具不从父记录继承身份，也不猜测附近文件。
+
+```sh
+python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --results-index /path/to/results.json --record /selected_assembly --verify-record
+```
+
+`staged_evidence` 分别显示原始声明、字节身份、执行收条及范围语义核验结果。
+缺原件、实际执行失败、记录损坏、配置不匹配和历史源码分别解释；
+`next_missing_evidence` 给出该选择尚缺的证据。单项通过只影响对应阶段，不能
+拼接成未执行的完整计划。查询本身不启动编译、测试、联网或设备操作；所选外置
+provider 的 Python 仍属于受信配置代码，摘要校验不是执行沙箱。
+
+SDK 包完整性、具体 consumer 执行和完整矩阵是不同范围。具体 consumer 同时
+绑定其 canonical policy 身份与有序 plan 身份，不能只靠可能重排的序号。
+非 publishable 开发包明确显示开发范围；少量 consumer 的通过不升级成完整
+`installed_sdk` 或软件候选。完整包存在也不能证明 consumer 实际使用了 Nexus。
+
+The SDK resolver includes `.nexus-source-sdk.json` in the complete IR `inputs`. Its `configuration_sha256` therefore differs from a checkout resolution of the same logical assembly. Preserve that manifest input: equality of selected devices is narrower than equality of the complete configuration and its provenance.
+
+A direct API check using the SDK's own resolved IR can report `trust=semantic_verified` while a checkout CLI query of that SDK record reports `configuration_mismatch`. Semantic validation and configuration matching are separate observations. Evidence-to-source association through the CLI at a Gitless SDK root is not currently implemented; the direct API result does not establish equivalent end-to-end CLI evidence association.
+
+HIL 关联复用原有 admission、raw 和 measurement 校验，保留 station、PCB、芯片、
+配置、镜像和具体测试范围。软件参考 fixture、工具准备和 synthetic 结果都不能
+变成实板通过。没有真实原件时，物理执行继续保持未执行或未评估。
+
+当前候选的范围语义核验与原版本候选的只读重放分开。`--legacy-replay` 仅用于
+显式读取历史声明和字节闭包，不重新建立当前阶段资格。工具在核验时观察到的
+输入身份也不等于已记录的执行时身份；未建立的执行输入认证必须明确保留。
 
 <!-- nexus-capabilities:start -->
 | SoC | Controller | Kind | Mode | Reviewed SoC routes | Declared reference Boards | Resolver fixtures | Selected production source |

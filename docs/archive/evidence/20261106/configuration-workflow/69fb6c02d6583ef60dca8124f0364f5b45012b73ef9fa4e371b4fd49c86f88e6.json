@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/workspace/nexus/build/configuration-workflow-20261106/public-evidence-store/69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6.tar.gz",
+    "sha256": "69fb6c02d6583ef60dca8124f0364f5b45012b73ef9fa4e371b4fd49c86f88e6",
+    "size": 62419977
+  },
+  "bytes": 341166923,
+  "files": 17820,
+  "kind": "portable_evidence",
+  "manifest_sha256": "3770fcfad6103161f0bd5337542da24efe2b73146151c9be972ddb3234dccb23",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

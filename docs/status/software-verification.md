@@ -12,6 +12,8 @@ source_language: zh_CN
 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map 字节，不能只看 passed。
 资格规则由 [资格合同](../delivery/qualification.md)维护。
 
+本轮 CF／EP／EV／MX／DX 32 项沿用[原执行 CSV](../design/developer-experience-execution.csv)与其[可读台账](ledgers/developer-experience.md)，实际结果从[现有结果索引](../delivery/developer-experience-results.json)的 `observations.configuration_workflow_20261106` 进入。代码门禁、SDK 消费、测量和严格双语文档分别绑定各自实际执行的源码、输入与原始收条；规划数量、历史计数和其他版本的成功均不作为本轮结果。软件资格与物理 HIL 仍按精确记录分别判断。
+
 (p2-unsigned-software-ab532250)=
 ## 当前 P2 无签名软件交付与独立 QA 后续
 
@@ -149,12 +151,19 @@ receipt 和归档保持私有；当时 PR 24 仍为 draft。
 新增功能、配置或依赖必须取得自己的实际回归、SDK 和候选记录；导航整理本身
 不关闭软件、物理或服务端规则退出。
 
-## 当前开发源码的 SDK v15 计划要求
+## 当前开发源码的 SDK 消费计划
 
-维护源码的 `nexus-sdk-consumers-v15` 在 v14 的 59 个精确 consumer root 之上
-追加以下五个 root，要求 64 个独立 root、67 个镜像。选择由
+维护源码的 `nexus-sdk-consumers-v16` 保留 v15 的全部精确选择，增加标准 Native
+外置 provider 生命周期工程，要求 65 个独立 root、68 个镜像。选择由
 [同一计划权威](../../tools/release/transport.py)定义；计数是计划结构，不是执行
 receipt。已发布 `v0.2.1` 的 v11 与已接受 `6c3a380a` 的 v14 保持原身份。
+
+新工程来自 [唯一的 C11 接入示例](../guides/provider-porting.md)，实际执行静态
+实例的取得、启停、失败回滚和保留后的清理。它不建立新 MCU／PCB 或物理资格。
+完整的当前计划执行结果必须绑定自己的 clean 源码和原始 report；旧版本的执行
+不自动覆盖新增工程。
+
+### v15 的五个已有 profile
 
 | 新增 profile | 计划消费范围与界限 |
 | --- | --- |

@@ -20,33 +20,58 @@ from tools.evidence.identity import resolved_identity, verify_source
 from tools.evidence.container import verify as verify_environment
 from tools.measurement.elf import Elf32, binary_from_elf, image_window
 from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
-from tools.evidence.proof import validate_scope_proof, verify_sdk_file
+from tools.evidence.proof import (validate_scope_proof, verify_execution_stream,
+                                verify_admission_tool, verify_sdk_file)
+
+
+def verify_payload(identity):
+    """Apply the declared payload role without treating empty logs as proof."""
+    if identity.get("role") == "sdk_file":
+        return verify_sdk_file(identity)
+    if identity.get("role") == "execution_stream":
+        return verify_execution_stream(identity)
+    if identity.get("role") == "admission_tool":
+        return verify_admission_tool(identity)
+    return verify_file_identity(identity)
 
 
 def collect_identities(value, *, identity_verifier=verify_file_identity,
-                       allow_unbound=False) -> list[dict]:
+                       allow_unbound=False,
+                       include_execution_streams=True) -> list[dict]:
     """Preserve every referenced raw/artifact byte, not only summary JSON."""
     found = []
     if isinstance(value, dict):
+        if set(value) == {"path", "sha256", "bytes"}:
+            if not include_execution_streams:
+                return []
+            identity = {"path": value["path"], "sha256": value["sha256"],
+                        "size": value["bytes"], "role": "execution_stream"}
+            (verify_payload if identity_verifier is verify_file_identity else
+             identity_verifier)(identity)
+            return [identity]
         if {"path", "sha256", "size"}.issubset(value):
             # An unbound fixture slot declares no file; its containing bytes are sealed.
             if allow_unbound and set(value) == {"path", "sha256", "size"} and all(
                     value[key] is None for key in ("path", "sha256", "size")):
                 return []
-            identity_verifier(value)
+            (verify_payload if identity_verifier is verify_file_identity else
+             identity_verifier)(value)
             found.append(value)
         else:
             for child in value.values():
                 found.extend(collect_identities(child, identity_verifier=identity_verifier,
-                                                allow_unbound=allow_unbound))
+                    allow_unbound=allow_unbound,
+                    include_execution_streams=include_execution_streams))
     elif isinstance(value, list):
         for child in value:
             found.extend(collect_identities(child, identity_verifier=identity_verifier,
-                                            allow_unbound=allow_unbound))
+                allow_unbound=allow_unbound,
+                include_execution_streams=include_execution_streams))
     return found
 
 
-def collect_evidence_closure(identities: list[dict], *, resolver=None) -> list[dict]:
+def collect_evidence_closure(identities: list[dict], *, resolver=None,
+                             include_execution_streams=True) -> list[dict]:
     """Follow bounded JSON file references so raw nested reports remain reviewable."""
     pending = list(identities)
     result = []
@@ -57,11 +82,10 @@ def collect_evidence_closure(identities: list[dict], *, resolver=None) -> list[d
         if key in seen:
             continue
         seen.add(key)
-        path = (resolver(identity) if resolver is not None else
-                verify_sdk_file(identity) if identity.get("role") == "sdk_file"
-                else verify_file_identity(identity))
+        path = resolver(identity) if resolver is not None else verify_payload(identity)
         result.append(identity)
-        if identity.get("role") == "sdk_file" or path.stat().st_size > 4 * 1024 * 1024:
+        if (identity.get("role") in ("sdk_file", "execution_stream", "admission_tool") or
+                path.stat().st_size > 4 * 1024 * 1024):
             continue
         if not path.read_bytes().lstrip().startswith(b"{"):
             continue
@@ -74,7 +98,8 @@ def collect_evidence_closure(identities: list[dict], *, resolver=None) -> list[d
         unbound_station = (isinstance(value, dict) and value.get("kind") == "hil_station"
                            and "station_id" in value and value["station_id"] is None)
         pending.extend(collect_identities(value, identity_verifier=resolver or verify_file_identity,
-                                          allow_unbound=unbound_station))
+            allow_unbound=unbound_station,
+            include_execution_streams=include_execution_streams))
     return result
 
 
@@ -117,7 +142,8 @@ def validate_qualification(report: dict, manifest: dict, resolved: dict,
     referenced(report)
 
 
-def validate_manifest(manifest: dict, *, sdk_packages_out=None) -> tuple[dict, list[dict]]:
+def validate_manifest(manifest: dict, *, sdk_packages_out=None,
+                      scope_inputs_out=None) -> tuple[dict, list[dict]]:
     fields(manifest, {"schema_version", "candidate_id", "source", "dependencies",
         "environment", "configuration", "artifacts", "qualifications"})
     if type(manifest["schema_version"]) is not int or manifest["schema_version"] != 1:
@@ -160,6 +186,8 @@ def validate_manifest(manifest: dict, *, sdk_packages_out=None) -> tuple[dict, l
         identities.extend(collect_identities(report))
         extra, sdk = validate_scope_proof(report, manifest, resolved)
         identities.extend(extra)
+        if scope_inputs_out is not None:
+            scope_inputs_out.extend(extra)
         if sdk is not None and sdk_packages_out is not None:
             sdk_packages_out.append(sdk)
     return resolved, collect_evidence_closure(identities)
@@ -168,7 +196,9 @@ def validate_manifest(manifest: dict, *, sdk_packages_out=None) -> tuple[dict, l
 def seal(manifest_path: Path, output: Path) -> dict:
     manifest = load_json(manifest_path)
     sdk_packages = []
-    resolved, identities = validate_manifest(manifest, sdk_packages_out=sdk_packages)
+    scope_inputs = []
+    resolved, identities = validate_manifest(manifest, sdk_packages_out=sdk_packages,
+                                            scope_inputs_out=scope_inputs)
     identities.append(file_identity(manifest_path))
     if output.exists():
         raise EvidenceError("candidate destination must be new; never overwrite a seal")
@@ -179,8 +209,7 @@ def seal(manifest_path: Path, output: Path) -> dict:
         payloads.mkdir()
         records = {}
         for identity in identities:
-            source = (verify_sdk_file(identity) if identity.get("role") == "sdk_file"
-                      else verify_file_identity(identity))
+            source = verify_payload(identity)
             sha = identity["sha256"]
             if sha in records:
                 continue
@@ -193,17 +222,20 @@ def seal(manifest_path: Path, output: Path) -> dict:
             records[sha] = {"path": "payloads/" + sha, "sha256": sha,
                             "size": identity["size"]}
         verify_source(manifest["source"], clean=True)
-        sealed = {"schema_version": 1, "kind": "sealed_software_candidate",
+        sealed = {"schema_version": 2, "kind": "sealed_software_candidate",
             "candidate_id": manifest["candidate_id"], "status": "software_qualified",
             "source": manifest["source"], "configuration_sha256": resolved["configuration_sha256"],
             "input_manifest_sha256": digest(manifest_path),
             "artifacts": {role: records[identity["sha256"]] for role, identity in
                           manifest["artifacts"].items()},
             "payloads": list(records.values()), "sdk_packages": sdk_packages,
+            "scope_inputs": scope_inputs,
             "qualified_scopes": sorted(REQUIRED_SCOPES),
             "physical_status": "not_executed", "product_promotion": "not_performed",
             "signature_status": "unsigned",
-            "limitations": ["software candidate only", "no physical, product, trust or LTS qualification"]}
+            "limitations": ["software candidate only", "no physical, product, trust or LTS qualification",
+                "tool identities are observed at scope admission, not at original process launch",
+                "execution-time input identity, independent source authentication and hermetic execution are not established"]}
         atomic_json(temporary / "candidate.json", sealed)
         temporary.replace(output)
         return sealed
@@ -212,15 +244,22 @@ def seal(manifest_path: Path, output: Path) -> dict:
             shutil.rmtree(temporary)
 
 
-def verify(candidate_path: Path) -> dict:
+def verify(candidate_path: Path, *, legacy_replay=False) -> dict:
     """Verify immutable packed bytes without silently rebuilding or editing them."""
     candidate = load_json(candidate_path, max_bytes=32 * 1024 * 1024)
     fields(candidate, {"schema_version", "kind", "candidate_id", "status", "source",
         "configuration_sha256", "input_manifest_sha256", "artifacts", "payloads",
         "qualified_scopes", "sdk_packages", "physical_status", "product_promotion", "signature_status",
-        "limitations"})
+        "limitations"}, {"scope_inputs"})
+    version = candidate["schema_version"]
+    if version == 1 and not legacy_replay:
+        raise EvidenceError("historical candidate requires explicit legacy replay")
+    if version == 1 and "scope_inputs" in candidate:
+        raise EvidenceError("legacy candidate cannot declare current scope inputs")
+    if version == 2 and not isinstance(candidate.get("scope_inputs"), list):
+        raise EvidenceError("strict candidate requires retained scope input identities")
     identifier(candidate["candidate_id"], "candidate id")
-    if (type(candidate["schema_version"]) is not int or candidate["schema_version"] != 1 or
+    if (type(version) is not int or version not in (1, 2) or
             candidate["kind"] != "sealed_software_candidate"
             or candidate["status"] != "software_qualified" or
             not isinstance(candidate["qualified_scopes"], list) or
@@ -238,7 +277,11 @@ def verify(candidate_path: Path) -> dict:
             raise EvidenceError("noncanonical candidate payload path")
         path = root / identity["path"]
         if identity["size"] == 0:
-            verify_sdk_file({**identity, "path": str(path), "role": "sdk_file"})
+            path = regular_file(path, nonempty=False)
+            with path.open("rb") as stream:
+                sha = stream_digest(stream)
+            if path.stat().st_size != 0 or sha != identity["sha256"]:
+                raise EvidenceError("empty candidate payload identity changed")
         else:
             verify_file_identity({**identity, "path": str(path)})
         if identity["sha256"] in identities:
@@ -250,6 +293,12 @@ def verify(candidate_path: Path) -> dict:
     if manifest["source"] != candidate["source"] or manifest["source"]["dirty"]:
         raise EvidenceError("sealed candidate source mismatch or dirty source")
     def packed(identity):
+        fields(identity, {"path", "sha256", "size"},
+               {"role", "invoked", "tool_kind", "observation"})
+        if (type(identity["size"]) is not int or identity["size"] < 0 or
+                (identity["size"] == 0 and identity.get("role") not in
+                 ("sdk_file", "execution_stream"))):
+            raise EvidenceError("invalid referenced payload role or size")
         path = identities.get(identity["sha256"])
         if path is None or path.stat().st_size != identity["size"]:
             raise EvidenceError("missing referenced raw/artifact payload")
@@ -277,17 +326,23 @@ def verify(candidate_path: Path) -> dict:
         report = load_json(packed(identity))
         validate_qualification(report, manifest, resolved, identity_verifier=packed)
         validate_scope_proof(report, manifest, resolved, resolver=packed,
-                             sdk_packages=candidate["sdk_packages"])
+                             sdk_packages=candidate["sdk_packages"],
+                             proof_inputs=candidate.get("scope_inputs"),
+                             legacy_replay=version == 1)
         if report["scope"] in scopes:
             raise EvidenceError("duplicate sealed qualification")
         scopes.add(report["scope"])
     if scopes != REQUIRED_SCOPES:
         raise EvidenceError("sealed software qualification missing")
-    collect_evidence_closure(collect_identities(manifest, identity_verifier=packed), resolver=packed)
+    collect_evidence_closure(collect_identities(manifest, identity_verifier=packed,
+        include_execution_streams=version != 1), resolver=packed,
+        include_execution_streams=version != 1)
+    for identity in candidate.get("scope_inputs", []):
+        packed(identity)
     return candidate
 
 
-def verified_projection(candidate_path: Path) -> dict:
+def verified_projection(candidate_path: Path, *, legacy_replay=False) -> dict:
     """Project an existing verified seal; never execute or confer new scopes.
 
     Navigation consumers share the complete candidate verifier. The manifest
@@ -297,7 +352,8 @@ def verified_projection(candidate_path: Path) -> dict:
     """
     candidate_path = Path(candidate_path).absolute()
     before = file_identity(candidate_path)
-    sealed = verify(candidate_path)
+    sealed = (verify(candidate_path, legacy_replay=True) if legacy_replay else
+              verify(candidate_path))
     payloads = {item["sha256"]: item for item in sealed["payloads"]}
 
     def packed_identity(sha):
@@ -325,6 +381,16 @@ def verified_projection(candidate_path: Path) -> dict:
         raise EvidenceError("candidate changed during projection verification")
     return {"schema_version": 1,
             "kind": "verified_software_candidate_reference",
+            "sealed_schema_version": sealed["schema_version"],
+            "verification": ("legacy_declared_byte_closure_only" if sealed["schema_version"] == 1
+                             else "strict_scope_proof"),
+            "current_scope_qualification": ("not_reestablished" if sealed["schema_version"] == 1
+                                             else "scope_proof_verified"),
+            "tool_identity_scope": ("not_recorded" if sealed["schema_version"] == 1
+                                    else "admission_observed"),
+            "execution_time_input_identity": "not_established",
+            "independent_source_authentication": "not_established",
+            "hermetic_execution": "not_established",
             "candidate": before, "candidate_id": sealed["candidate_id"],
             "source": sealed["source"],
             "configuration_sha256": sealed["configuration_sha256"],
@@ -341,16 +407,20 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--candidate", type=Path)
+    parser.add_argument("--legacy-replay", action="store_true",
+                        help="Read-only replay of a frozen schema 1 candidate")
     args = parser.parse_args()
     try:
         if args.operation == "seal":
+            if args.legacy_replay:
+                parser.error("legacy replay is read-only; it cannot seal a candidate")
             if args.manifest is None or args.output is None:
                 parser.error("seal requires --manifest and --output")
             report = seal(args.manifest, args.output)
         else:
             if args.candidate is None:
                 parser.error("verify requires --candidate")
-            report = verify(args.candidate)
+            report = verify(args.candidate, legacy_replay=args.legacy_replay)
         print("Same-artifact software candidate: " + report["status"])
         return 0
     except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:

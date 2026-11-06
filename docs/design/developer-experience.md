@@ -10,12 +10,20 @@ source_language: en
 
 This iteration keeps the static factory and shared polymorphic interfaces while
 reducing unnecessary product and maintenance work. The
-[75-task execution ledger](developer-experience-execution.csv) is the task-status
+[execution ledger](developer-experience-execution.csv) is the task-status
 authority; its [readable view](../status/ledgers/developer-experience.md) preserves
 the same fields: W1–W9 contain 63 software work items, I-01–I-06 track integration, and
 H1–H6 require connected equipment. Implementation, software execution and physical
 execution are separate columns. A software mechanism does not close a physical
 exit condition.
+
+The subsequent configuration-workflow increment appends CF01-CF06, EP01-EP09,
+EV01-EV09, MX01-MX04 and DX01-DX04 to that same ledger. Its 32 exits cover strong
+factory defaults, one selected project source, external-provider onboarding,
+stage-specific evidence, measured costs and bilingual delivery. The original 75
+rows and their hardware exits retain their definitions and source identities.
+Implementation, focused checks, final source-bound checks and physical execution
+remain distinct; a new tool entry does not close an unrelated platform exit.
 
 The subsequent [delivery-completion ledger](platform-delivery-completion.csv)
 and its [readable view](../status/ledgers/platform-delivery-completion.md) remain

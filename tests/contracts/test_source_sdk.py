@@ -4,6 +4,7 @@ from functools import wraps
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -453,7 +454,6 @@ class SourceSDKSelectionTests(unittest.TestCase):
                       source_sdk.REQUIRED_FILES)
 
     def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
-        import hashlib
         required = (
             "tools/release/transport.py",
             "tools/configure/experience.py",
@@ -474,6 +474,46 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "tools/configure/assemblies/u575-mpu-gpio-write.toml",
             "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
         )
+        self.assert_rehashed_required_omissions(required)
+
+    def test_public_host_entry_closure_rejects_rehashed_omissions(self):
+        # This independent file oracle follows public support/create/candidate
+        # imports; it does not take its expected names from the packager.
+        required = (
+            "tools/dev/projects.py",
+            "tools/maintenance/capabilities.py",
+            "tools/maintenance/support.py",
+            "tools/evidence/candidate.py",
+            "tools/evidence/proof.py",
+            "tools/evidence/native_proof.py",
+            "tools/evidence/legacy_sdk.py",
+            "tools/evidence/consumer.py",
+            "tools/evidence/container.py",
+            "tools/evidence/inputs.py",
+            "tools/evidence/qualification.py",
+            "tools/evidence/reproduce.py",
+            "tools/evidence/storage.py",
+            "tools/configure/documentation.py",
+            "tools/hil/admit.py",
+            "tools/hil/h743_duplex.py",
+            "tools/hil/measure.py",
+            "tools/hil/power.py",
+            "tools/hil/prepare.py",
+            "tools/hil/selected_modes.py",
+            "tools/hil/threadx.py",
+            "tools/hil/workloads.py",
+            "scripts/ci/io_lifecycle_matrix.py",
+            "scripts/ci/native_contracts.py",
+            "scripts/ci/tdd_gate.py",
+            "scripts/validation/junit.py",
+            "tools/testing/run_tool_tests.py",
+        )
+        self.assert_rehashed_required_omissions(required)
+
+    def assert_rehashed_required_omissions(self, required):
+        """An otherwise identical outer map cannot omit a mandatory member."""
+        import hashlib
+
         self.assertIn(required[0], source_sdk.REQUIRED_FILES)
         with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:
             root = Path(value) / "prefix/share/nexus/src"
@@ -1540,6 +1580,82 @@ class SourceSDKTests(unittest.TestCase):
         self.assertGreater(len(compile_commands), 0)
         for entry in compile_commands:
             self.assertNotIn(str(ROOT) + "/", entry.get("command", ""))
+
+    def test_nominal_ids_reject_cross_class_endpoint_and_raw_ids_in_consumers(self):
+        source, build, command = consumer_gate.prepare_consumer(
+            self.prefix, self.directory, "nominal identity", self.run_ok,
+            fixture=True)
+        assembly = source / "assembly.toml"
+        assembly.write_text(
+            'schema=2\nbackend="native"\nclock="model"\n'
+            f'board_package="{self.sdk}/boards/native_reference"\n'
+            '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
+            '[gpio.led0]\nbinding="led0"\nmode="output"\n'
+            '[spi.bus0]\nbinding="spi0"\nmode="short-poll"\n'
+            'max_hz=1000000\n[spi_device.sensor0]\ncontroller="bus0"\n'
+            'driver="spi-endpoint"\nmode=0\nmax_hz=1000000\n')
+        command = [argument for argument in command
+                   if not argument.startswith("-DNEXUS_ASSEMBLY_FILE=")]
+        command.append("-DNEXUS_ASSEMBLY_FILE=" + str(assembly))
+        with (source / "CMakeLists.txt").open("a") as stream:
+            stream.write(
+                'set_target_properties(installed_cpp PROPERTIES '
+                'CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)\n'
+                'nexus_target_warnings(installed_c STRICT)\n'
+                'nexus_target_warnings(installed_cpp STRICT)\n')
+        code = (
+            '#include "nexus_bindings.h"\n'
+            '#include "nexus_factory_strong.h"\n'
+            'int main(void) {\n'
+            '    if (nx_factory_gpio_ref(NX_GPIO_REF_LED0) == 0 ||\n'
+            '        nx_factory_spi_ref(NX_SPI_REF_BUS0) == 0 ||\n'
+            '        nx_factory_spi_device_ref(NX_SPI_DEVICE_REF_SENSOR0) == 0)\n'
+            '        return 3;\n'
+            '    nx_platform_start_result_t start = nx_platform_start();\n'
+            '    if (start.primary != NX_SUCCESS) return 1;\n'
+            '    return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')
+        for filename in ("main.c", "main.cpp"):
+            (source / filename).write_text(code)
+        self.run_ok(command)
+        self.run_ok(["cmake", "--build", str(build), "--target", "installed_c",
+                     "installed_cpp", "--parallel", "1"])
+        for application in ("installed_c", "installed_cpp"):
+            self.run_ok([str(build / "bin" / application)])
+        entries = json.loads((build / "compile_commands.json").read_text())
+        expressions = {
+            "valid": "nx_factory_gpio_ref(NX_GPIO_REF_LED0)",
+            "cross-class": "nx_factory_gpio_ref(NX_SPI_REF_BUS0)",
+            "controller-as-endpoint":
+                "nx_factory_spi_device_ref(NX_SPI_REF_BUS0)",
+            "endpoint-as-controller":
+                "nx_factory_spi_ref(NX_SPI_DEVICE_REF_SENSOR0)",
+            "raw-id": "nx_factory_gpio_ref(NX_GPIO_ID_LED0)",
+        }
+        for filename, standard in (("main.c", "-std=c11"),
+                                   ("main.cpp", "-std=c++17")):
+            entry, = [item for item in entries
+                      if Path(item["file"]) == source / filename]
+            context = entry.get("arguments") or shlex.split(entry["command"])
+            self.assertIn(standard, context)
+            self.assertFalse(consumer_gate.private_compile_inputs(entry, self.sdk))
+            for label, expression in expressions.items():
+                with self.subTest(language=filename, expression=label):
+                    probe = source / (label + Path(filename).suffix)
+                    probe.write_text('#include "nexus_factory_strong.h"\n'
+                                     'const void* nominal_lookup(void);\n'
+                                     'const void* nominal_lookup(void) {\n'
+                                     '    return ' + expression + ';\n}\n')
+                    arguments = list(context)
+                    arguments[arguments.index("-o") + 1] = str(
+                        source / (probe.name + ".o"))
+                    arguments[arguments.index(str(source / filename))] = str(probe)
+                    result = self.run_process(arguments, cwd=entry["directory"])
+                    if label == "valid":
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                    else:
+                        self.assertNotEqual(result.returncode, 0, expression)
+                        self.assertNotIn("No such file", result.stderr)
+                        self.assertIn("nx_", result.stderr)
 
     def test_relocated_sdk_exports_policy_version_and_rejects_other_versions(self):
         version = load_policy(self.sdk)["semantic_version"]
@@ -2664,6 +2780,43 @@ class SourceSDKTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("missing top-level dependency Gitlink", result.stderr)
         self.assertFalse((self.directory / "must not export empty SDK").exists())
+
+
+    def test_canonical_external_provider_runs_with_relocated_sdk(self):
+        """Execute the shipped C11 lifecycle through an independent project."""
+        workspace = self.directory / "canonical external lifecycle"
+        workspace.mkdir()
+        source, build, command = consumer_gate.prepare_external_provider_consumer(
+            self.prefix, workspace, self.run_ok,
+            expected_revision=self.identity["source_revision"], fixture=True)
+        self.run_ok(command)
+        self.run_ok(["cmake", "--build", str(build), "--target",
+                     "external_lifecycle_consumer", "--parallel", "1"])
+        observed = consumer_gate.check_external_provider_consumer(
+            self.sdk, source, build, self.run_ok)
+        self.assertEqual(observed["status"], "passed")
+        self.assertEqual(observed["physical_status"], "not_executed")
+        self.assertEqual(observed["canonical_source"]["sha256"],
+                         observed["public_source"]["sha256"])
+        self.assertFalse(self.identity["publishable"])
+
+    @_isolated_sdk_prefix
+    def test_declared_external_adapter_omission_rejects_after_sdk_rehash(self):
+        """An outer payload map cannot withdraw a declared package member."""
+        import hashlib
+
+        name = ("cmake/package/verification/external_provider/"
+                "provider/soc/lifecycle_adapter.c")
+        self.assertIn(name, self.identity["files_sha256"])
+        (self.sdk / name).unlink()
+        del self.identity["files_sha256"][name]
+        encoded = json.dumps(self.identity["files_sha256"], sort_keys=True,
+                             separators=(",", ":")).encode()
+        self.identity["snapshot_sha256"] = hashlib.sha256(encoded).hexdigest()
+        (self.sdk / source_sdk.MANIFEST).write_text(json.dumps(self.identity))
+        result = self.verify()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertRegex(result.stderr, "regular file|missing|required")
 
 
 if __name__ == "__main__":

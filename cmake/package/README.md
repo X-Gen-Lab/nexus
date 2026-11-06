@@ -54,14 +54,21 @@ Native models use a host compiler and omit the ARM toolchain argument.
 or OS targets expose their own includes and dependencies. `nexus_add_firmware`
 links explicit sources, selected components, startup, generated bindings and the
 resolved linker input. It does not create `main`, tasks or a scheduler. Consumers
-start hardware with `nx_platform_start`. Generated `nexus_factory.h` supplies
-compact typed IDs and pure static getters such as
-`nx_factory_gpio(NX_GPIO_ID_LED0)`. A getter neither initializes hardware nor
-allocates memory. The returned readonly face dispatches through one shared
-provider operations table to its own mutable context. Generated
+start hardware with `nx_platform_start`. Application code includes generated
+`nexus_factory_strong.h` and uses nominal references and pure static getters such
+as `nx_factory_gpio_ref(NX_GPIO_REF_LED0)`. C11 and C++17 reject references from
+another class, controller references passed to endpoint getters and raw scalar
+IDs. A getter neither initializes hardware nor allocates memory. The returned
+readonly face dispatches through one shared provider operations table to its own
+mutable context. Generated
 `nx_binding_<id>` and `nx_device_<id>` symbols remain fixed typed aliases.
-Backend and application startup
-order remains explicit in consumer code.
+Backend and application startup order remains explicit in consumer code.
+
+Every generated bundle contains the strong header; no `[factory]` table is
+needed. Its only field is the optional boolean `capabilities`; set it to `true`
+to emit metadata. `factory.strong` is unknown and rejects. The scalar IDs and
+getters in `nexus_factory.h` remain available for existing consumers. Both headers
+return the same static objects without an additional runtime layer.
 
 Every MCU firmware produces ELF, BIN, map and a checked resource report. The ELF
 contains the configuration digest and the real startup vector. The selected CPU
@@ -125,11 +132,12 @@ the installed source SDK explicitly excludes those contract targets.
 
 ## Device and executable-window consumers
 
-Consumer policy `nexus-sdk-consumers-v15` preserves the complete v14 prefix and
-adds five independent C11 consumers: F407/GD470 loaned RX, Native/F407 MCUboot
-Control and a separate F407 full boot image. The full plan contains 64 source/build
-roots and 67 linked images. A plan
-entry records required execution; these counts alone do not establish a pass.
+The current versioned plan in `tools/release/transport.py` includes the canonical
+Native external-provider lifecycle consumer alongside the device and image
+scenarios below. Every exact source/build root and linked image is required;
+plan structure alone does not establish a pass. The preceding device extension
+introduced five independent C11 consumers: F407/GD470 loaned RX, Native/F407
+MCUboot Control and a separate F407 full boot image.
 
 The TMP117 compositions explicitly link `Nexus::TMP117I2C`, own a settled software
 I2C endpoint and use all six public component functions. Native executes one
@@ -173,10 +181,11 @@ use remains unassessed. The full current plan must execute before qualification.
 
 ### 中文
 
-消费策略 `nexus-sdk-consumers-v15` 精确保留 v14 全部前缀，增加五个独立 C11
-工程：F407／GD470 借用 RX、Native／F407 MCUboot Control，以及单独的 F407
-完整引导镜像。全量计划为 64 个源码／构建根目录、67 个链接镜像；这些数量定义
-必须执行的范围，本身不代表验收通过。
+当前版本化消费计划由 `tools/release/transport.py` 唯一维护，在下述设备与镜像
+场景之外包括标准 Native 外置 provider 生命周期工程。每个精确的源码／构建
+根目录和链接镜像都必须执行；计划结构本身不代表验收通过。此前的设备扩展
+引入五个独立 C11 工程：F407／GD470 借用 RX、Native／F407 MCUboot Control，
+以及单独的 F407 完整引导镜像。
 
 TMP117 组合显式链接 `Nexus::TMP117I2C`，调用者持有完全结清的软件 I2C endpoint，
 并使用六个公共组件函数。Native 实际执行有界的正向采样与清理；F407 使用同一软件
