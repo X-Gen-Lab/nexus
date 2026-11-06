@@ -5,7 +5,12 @@
  */
 #ifndef NEXUS_ARCH_PRIVATE_CACHE_CONTROL_H
 #define NEXUS_ARCH_PRIVATE_CACHE_CONTROL_H
+#include "registers.h"
 #include <stdint.h>
+/* The naked leaf uses immediate halves rather than a C load or stack slot. */
+_Static_assert(NX_ARCH_REG_DCCISW == (uintptr_t)0xe000ef74U &&
+                   NX_ARCH_REG_CCR == (uintptr_t)0xe000ed14U,
+               "M7 naked leaf immediates must match reviewed register facts");
 #ifdef NEXUS_ARCH_MECHANISM_MODEL
 #include "arch_cache_control_model.h"
 static inline uint32_t nx_arch_cache_clean_disable_leaf(uint32_t last_set,

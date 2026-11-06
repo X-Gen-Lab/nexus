@@ -15,6 +15,62 @@ ASSEMBLIES = ROOT / "tools/configure/assemblies"
 
 
 class ExactSupportSelectionTests(unittest.TestCase):
+    def test_os_profile_projects_exact_kernel_abi_tick_and_stack_policy(self):
+        result = capabilities.selection(
+            ASSEMBLIES / "qiming-freertos-uart.toml", ROOT)
+        selected = result["os"]
+        self.assertEqual(selected["backend"], "freertos")
+        self.assertEqual(selected["kernel"], [{
+            "path": "ext/freertos",
+            "commit": "062e1e0d8b176ae73d257ac928766b33bea17b6f"}])
+        self.assertEqual(selected["port"], "GCC/ARM_CM4F")
+        self.assertEqual(selected["tick"],
+                         {"source": "systick", "hz": 1000,
+                          "reload": 167999, "tickless": False})
+        self.assertEqual(selected["abi"]["cpu"]["float_abi"], "hard")
+        self.assertIn("-fshort-enums", selected["abi"]["compile_options"])
+        self.assertEqual(selected["storage"]["minimum_task_stack_words"], 20)
+        self.assertEqual(selected["storage"]["stack_alignment_bytes"], 8)
+        self.assertTrue(selected["capabilities"]["direct_notification"])
+        self.assertIsNone(selected["storage"]["system_call_stack_words"])
+        self.assertEqual(selected["execution"], "not_assessed")
+        self.assertEqual(selected["runtime_stack_peak"], "not_measured")
+        self.assertEqual(selected["linked_costs"], "not_measured")
+        self.assertFalse(result["physical_qualified"])
+
+    def test_os_minimal_policy_does_not_advertise_disabled_direct_notify(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            assembly = Path(temporary) / "minimal.toml"
+            assembly.write_text(
+                (ASSEMBLIES / "qiming-freertos-uart.toml").read_text()
+                + '\n[os]\nprofile = "minimal"\n')
+            result = capabilities.selection(assembly, ROOT)
+        selected = result["os"]
+        self.assertEqual(selected["profile"]["profile"], "minimal")
+        self.assertFalse(selected["capabilities"]["direct_notification"])
+        self.assertTrue(selected["capabilities"]["joinable_task"])
+        self.assertTrue(selected["capabilities"]["permanent_task"])
+        self.assertIn("Task/control/stack storage remains live until successful join.",
+                      selected["restrictions"])
+
+    def test_non_kernel_queries_do_not_invent_a_kernel_or_stack_size(self):
+        for name, backend in (("native-uart.toml", "native"),
+                              ("qiming-baremetal-uart.toml", "baremetal")):
+            with self.subTest(backend=backend):
+                result = capabilities.selection(ASSEMBLIES / name, ROOT)
+                selected = result["os"]
+                self.assertEqual(selected["backend"], backend)
+                self.assertEqual(selected["kernel"], [])
+                self.assertIsNone(selected["profile"])
+                self.assertIsNone(selected["port"])
+                self.assertIsNone(selected["tick"])
+                self.assertIsNone(
+                    selected["storage"]["minimum_task_stack_words"])
+                self.assertFalse(selected["capabilities"]["direct_notification"])
+                self.assertFalse(selected["capabilities"]["permanent_task"])
+                self.assertEqual(selected["capabilities"]["joinable_task"],
+                                 backend == "native")
+
     def test_high_clock_reports_only_its_selected_revision_expectation(self):
         result = capabilities.selection(ROOT / (
             "cmake/package/verification/io_evolution/h743-high-empty.toml"),

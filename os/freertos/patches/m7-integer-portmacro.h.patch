@@ -1,0 +1,96 @@
+--- upstream/portmacro.h
++++ reviewed/portmacro.h
+@@ -1,3 +1,6 @@
++/* Nexus build-derived ARM_CM7 integer port: pinned CM3 context;
++ * errata 837070 BASEPRI raises preserve incoming PRIMASK.
++ * Original FreeRTOS copyright and MIT license remain below. */
+ /*
+  * FreeRTOS Kernel V11.1.0
+  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+@@ -211,15 +214,18 @@
+ 
+ portFORCE_INLINE static void vPortRaiseBASEPRI( void )
+ {
+-    uint32_t ulNewBASEPRI;
+-
++    uint32_t ulNewBASEPRI, ulIncomingPRIMASK;
+     __asm volatile
+     (
+-        "   mov %0, %1                                              \n" \
+-        "   msr basepri, %0                                         \n" \
+-        "   isb                                                     \n" \
+-        "   dsb                                                     \n" \
+-        : "=r" ( ulNewBASEPRI ) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
++        "mrs %1, primask\n"
++        "cpsid i\n"
++        "mov %0, %2\n"
++        "msr basepri, %0\n"
++        "dsb\n"
++        "isb\n"
++        "msr primask, %1\n"
++        : "=&r" ( ulNewBASEPRI ), "=&r" ( ulIncomingPRIMASK )
++        : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
+     );
+ }
+ 
+@@ -227,30 +233,45 @@
+ 
+ portFORCE_INLINE static uint32_t ulPortRaiseBASEPRI( void )
+ {
+-    uint32_t ulOriginalBASEPRI, ulNewBASEPRI;
+-
++    uint32_t ulOriginalBASEPRI, ulNewBASEPRI, ulIncomingPRIMASK;
+     __asm volatile
+     (
+-        "   mrs %0, basepri                                         \n" \
+-        "   mov %1, %2                                              \n" \
+-        "   msr basepri, %1                                         \n" \
+-        "   isb                                                     \n" \
+-        "   dsb                                                     \n" \
+-        : "=r" ( ulOriginalBASEPRI ), "=r" ( ulNewBASEPRI ) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
++        "mrs %0, basepri\n"
++        "mrs %2, primask\n"
++        "cpsid i\n"
++        "mov %1, %3\n"
++        "msr basepri, %1\n"
++        "dsb\n"
++        "isb\n"
++        "msr primask, %2\n"
++        : "=&r" ( ulOriginalBASEPRI ), "=&r" ( ulNewBASEPRI ),
++          "=&r" ( ulIncomingPRIMASK )
++        : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
+     );
+-
+-    /* This return will not be reached but is necessary to prevent compiler
+-     * warnings. */
+     return ulOriginalBASEPRI;
+ }
+ /*-----------------------------------------------------------*/
+ 
+ portFORCE_INLINE static void vPortSetBASEPRI( uint32_t ulNewMaskValue )
+ {
+-    __asm volatile
+-    (
+-        "   msr basepri, %0 " ::"r" ( ulNewMaskValue ) : "memory"
+-    );
++    if( ulNewMaskValue == 0 )
++    {
++        __asm volatile( "msr basepri, %0" :: "r" ( ulNewMaskValue ) : "memory" );
++    }
++    else
++    {
++        uint32_t ulIncomingPRIMASK;
++        __asm volatile
++        (
++            "mrs %0, primask\n"
++            "cpsid i\n"
++            "msr basepri, %1\n"
++            "dsb\n"
++            "isb\n"
++            "msr primask, %0\n"
++            : "=&r" ( ulIncomingPRIMASK ) : "r" ( ulNewMaskValue ) : "memory"
++        );
++    }
+ }
+ /*-----------------------------------------------------------*/
+ 

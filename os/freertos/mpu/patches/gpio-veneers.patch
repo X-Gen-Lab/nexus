@@ -1,0 +1,35 @@
+--- reviewed/veneers.c
++++ reviewed/gpio.c
+@@ -43,6 +43,8 @@
+ 
+ #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+ /*-----------------------------------------------------------*/
++
++#include "nexus/core/status.h"
+ 
+ #if configENABLE_MPU == 1 && configUSE_MPU_WRAPPERS_V1 == 0
+         void MPU_vTaskDelay( const TickType_t xTicksToDelay ) __attribute__( ( naked ) ) FREERTOS_SYSTEM_CALL;
+@@ -90,4 +92,23 @@
+             : : "i" ( SYSTEM_CALL_xTaskGetTickCount ) : "memory"
+         );
+     }
++
++/* Accepted calls return through the real port's protected exit path directly
++ * to the saved caller LR. A refused SVC returns here without entering the
++ * implementation; return CONTEXT rather than a caller-controlled r0 value. */
++nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
++                          uint32_t reset_mask)
++    __attribute__((naked)) FREERTOS_SYSTEM_CALL;
++
++nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
++                          uint32_t reset_mask) {
++    __asm volatile(
++        ".syntax unified\n"
++        "svc %0\n"
++        "movs r0, %1\n"
++        "bx lr\n"
++        :
++        : "i"(SYSTEM_CALL_NexusGpioWrite), "i"(NX_ERROR_CONTEXT)
++        : "memory");
++}
+ #endif

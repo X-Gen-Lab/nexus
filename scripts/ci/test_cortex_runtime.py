@@ -68,6 +68,17 @@ class RuntimeAuditTests(unittest.TestCase):
         self.assertIn(str(root / 'os/freertos/mpu/prepare_port.py'),
                       {item['path'] for item in identities})
 
+    def test_source_manifest_binds_owned_patch_loader_and_patch_bytes(self):
+        root = Path(__file__).resolve().parents[2]
+        paths = {item['path'] for item in gate.source_inputs(root)}
+        required = {str(root / 'os/reviewed_patch.py')}
+        for directory in ('os/freertos/patches', 'os/freertos/mpu/patches',
+                          'os/threadx/patches'):
+            patches = set((root / directory).glob('*.patch'))
+            self.assertTrue(patches, directory)
+            required.update(str(path) for path in patches)
+        self.assertFalse(required - paths, sorted(required - paths))
+
     def test_matrix_resolves_every_backend_without_board_identity(self):
         matrix = gate.matrix()
         self.assertEqual(len(matrix), 104)
@@ -86,7 +97,8 @@ class RuntimeAuditTests(unittest.TestCase):
         complete = '\n'.join('00000000 T ' + name for name in
                              gate.required_symbols('freertos'))
         gate.check_retention(complete, 'freertos')
-        for missing in ('nx_request_result', 'nx_arch_sau_write',
+        for missing in ('nx_request_result', 'nx_deadline_finite_after',
+                        'nx_arch_sau_write',
                         'PendSV_Handler', 'vTaskStartScheduler'):
             with self.assertRaisesRegex(ValueError, 'retained symbols'):
                 gate.check_retention(complete.replace(missing, 'wrong'),

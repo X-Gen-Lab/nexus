@@ -449,6 +449,67 @@ TEST_F(FreeRTOSContextTest, RejectsMisalignedStackBeforeKernelMutation) {
     EXPECT_EQ(task.finished, nullptr);
 }
 
+TEST_F(FreeRTOSContextTest, TaskStackCannotOverwriteItsOwnControl) {
+    auto* overlapping = reinterpret_cast<StackType_t*>(&task);
+    EXPECT_EQ(nx_freertos_task_start(&task, "overlap", overlapping,
+                                     NEXUS_OS_MIN_STACK_WORDS, 1, entry, &item),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(task.handle, nullptr);
+    EXPECT_EQ(task.finished, nullptr);
+    EXPECT_EQ(task.entry, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, PermanentStackCannotOverwriteItsOwnControl) {
+    nx_freertos_permanent_task_t permanent{};
+    auto* overlapping = reinterpret_cast<StackType_t*>(&permanent);
+    EXPECT_EQ(nx_freertos_permanent_task_start(
+                  &permanent, "overlap", overlapping, NEXUS_OS_MIN_STACK_WORDS,
+                  1, entry, &item),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(permanent.handle, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, QueuePayloadCannotOverwriteItsOwnControl) {
+    auto* overlapping = reinterpret_cast<uint8_t*>(&queue);
+    EXPECT_EQ(nx_freertos_queue_init(&queue, overlapping, sizeof queue, 2,
+                                     sizeof item),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(queue.handle, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, QueuePayloadSpanCannotWrapTheAddressSpace) {
+    auto* wrapping = reinterpret_cast<uint8_t*>(UINTPTR_MAX - 1U);
+    EXPECT_EQ(nx_freertos_queue_init(&queue, wrapping, 16, 2, sizeof item),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(queue.handle, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, ClosablePayloadCannotOverwriteWaiterRegistry) {
+    nx_freertos_closable_queue_t closable{};
+    auto* overlapping = reinterpret_cast<uint8_t*>(&closable.send_waiters);
+    EXPECT_EQ(nx_freertos_closable_queue_init(&closable, overlapping,
+                                              sizeof closable.send_waiters, 1,
+                                              1, 1),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(closable.queue.handle, nullptr);
+    EXPECT_EQ(closable.send_waiters, nullptr);
+    EXPECT_EQ(closable.maximum_waiters, 0U);
+}
+
+TEST_F(FreeRTOSContextTest, AdjacentQueueControlAndPayloadRemainValid) {
+    struct {
+        nx_freertos_queue_t control;
+        uint8_t payload[16];
+    } adjacent{};
+    EXPECT_CALL(calls,
+                create_queue(2, sizeof item, adjacent.payload,
+                             &adjacent.control.control, queueQUEUE_TYPE_BASE))
+        .WillOnce(Return(queue_handle));
+    EXPECT_EQ(nx_freertos_queue_init(&adjacent.control, adjacent.payload,
+                                     sizeof adjacent.payload, 2, sizeof item),
+              NX_SUCCESS);
+}
+
 TEST_F(FreeRTOSContextTest, SuccessfulJoinDeletesBeforeReclaimPermission) {
     task.handle = task_handle;
     task.finished = latch;

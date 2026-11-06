@@ -417,14 +417,6 @@ msgid "Create one task from its exact caller-owned stack and TCB."
 msgstr "使用调用者提供的准确栈和 TCB 创建一个任务。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
-msgid ""
-"Task/startup context. No hidden worker or maximum pool. Entry must return in"
-" privileged Thread mode, with manual interrupt masks restored and the "
-"scheduler resumed after any temporary suspension."
-msgstr ""
-"任务／启动上下文。没有隐藏执行任务或池容量上限。入口返回时必须处于特权 Thread 模式，已恢复手动设置的中断屏蔽，并在任何临时挂起后恢复调度器。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized unused control storage"
 msgstr "[out] 已清零且尚未使用的控制存储"
 
@@ -1420,16 +1412,8 @@ msgid "Initialize a notification in unused caller storage."
 msgstr "在调用者尚未使用的存储中初始化通知。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "Task context; POSIX signal handlers are unsupported."
-msgstr "任务上下文；不支持 POSIX 信号处理函数。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Storage kept alive through all publishers"
 msgstr "[out] 存储须比所有发布者存活更久"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or an initialization error"
-msgstr "NX_SUCCESS 或初始化错误"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Bind a single-waiter latched notification port."
@@ -1446,26 +1430,12 @@ msgid "Destroy after external publisher quiescence."
 msgstr "外部发布者静止后再销毁。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Stop and join publishers first. The check cannot authorize a future call to "
-"race destruction. No storage access is allowed afterward."
-msgstr "先停止并 join 发布者。本项检查不能授权未来调用与销毁竞态执行。此后不允许访问存储。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Live storage with no future publishers"
 msgstr "[inout] 存活存储，之后不再有发布者"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or BUSY when a waiter is still registered"
-msgstr "NX_SUCCESS，或仍有等待者登记时的 BUSY"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Initialize an explicit bounded byte-copy queue."
 msgstr "初始化显式、有界的字节复制队列。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "Task context; caller keeps buffer until successful destroy."
-msgstr "任务上下文；调用者保留缓冲区，直到成功 destroy。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Unused caller storage"
@@ -1482,10 +1452,6 @@ msgstr "[in] 条目数量，大于零"
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Bytes per item, greater than zero"
 msgstr "[in] 每条目字节数，大于零"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or invalid/initialization error"
-msgstr "NX_SUCCESS 或无效参数／初始化错误"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Copy one item to the queue."
@@ -1546,18 +1512,8 @@ msgid "[inout] Closed queue, no future users"
 msgstr "[inout] 已关闭队列，之后不再有使用者"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or BUSY if users/items remain"
-msgstr "NX_SUCCESS，或仍有使用者／条目时的 BUSY"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Start a task using the supplied host stack."
 msgstr "使用供给的主机栈启动任务。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Task context. No default task, pool or hidden stack exists. POSIX library "
-"bookkeeping is host-runtime allocation, not MCU RAM evidence."
-msgstr "任务上下文。没有默认任务、池或隐藏栈。POSIX 库的内部管理分配属于主机运行时，不能作为 MCU RAM 证据。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[out] Zero-initialized unused caller handle"
@@ -1580,23 +1536,8 @@ msgid "[in] Entry context, kept alive until join"
 msgstr "[in] 入口上下文，保留直到 join"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid "NX_SUCCESS or invalid/start error"
-msgstr "NX_SUCCESS 或无效参数／启动错误"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Join after requesting cooperative application stop."
 msgstr "请求应用协作停止之后执行 join。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"May block until entry returns. No forced cancellation. Caller may release "
-"context, handle and stack only after success. One external owner serializes "
-"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
-" are unsupported. Stop/join publishers before destroying their notification "
-"or queue storage."
-msgstr ""
-"可能阻塞直到入口返回。不提供强制取消。调用者仅在成功后才可释放上下文、句柄和栈。一个外部所有者串行执行 start/join；不支持多个同时 join "
-"的调用者，也不支持外部 pthread_cancel/detach。销毁通知或队列存储前，先停止并 join 发布者。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Started task; caller must not be the joined task"
@@ -1636,15 +1577,6 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "Explicit task handle; stack storage is supplied at start."
 msgstr "显式任务句柄；启动时供给栈存储。"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
-msgid ""
-"Start/join are serialized by one external lifecycle owner; there is one "
-"joiner. An entry may attempt a self-join, which returns BUSY. External "
-"cancellation and detachment are unsupported."
-msgstr ""
-"由一个外部生命周期所有者串行执行 start/join；仅有一个 join 调用者。入口可以尝试自 join，此时返回 BUSY。不支持外部取消或 "
-"detach。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:96
 msgid "secure_context.h"
@@ -2387,3 +2319,45 @@ msgstr "一个调用者拥有的权威 ready source。"
 
 msgid "ready runs in the waiting caller's context and must be bounded. Observe real state with its required synchronization; do not service a controller or mutate this source array. Context may be NULL if the predicate permits it. Source configuration and context remain valid throughout selection."
 msgstr "ready 在等待调用者的上下文执行，必须有界。按状态要求的同步规则观察真实状态，不 service 控制器或修改 source 数组。若谓词允许，context 可为 NULL。整个选择期间，source 配置和 context 必须保持有效。"
+
+msgid "Task/startup context. No hidden worker or maximum pool. Stack and task control must not overlap; known span wrap and overlap reject before any kernel object is created. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+msgstr "任务／启动上下文。不提供隐藏 worker 或最大池。栈与任务控制不得重叠；在创建任何内核对象之前拒绝已知范围的地址回绕及重叠。entry 必须在特权 Thread mode 返回，手动中断 mask 已恢复，临时挂起的 scheduler 已恢复运行。"
+
+msgid "The used depth times item_size payload must not overlap queue control. Span wrap rejects before kernel mutation."
+msgstr "实际使用的 depth 乘 item_size 大小的 payload 不得与队列控制重叠。范围地址回绕在内核状态改变之前拒绝。"
+
+msgid "Task context; POSIX signal handlers are unsupported. BUSY retains resources: keep storage and retry destroy only. Other failures leave no resources; initialization may retry."
+msgstr "任务上下文；不支持 POSIX signal handler。BUSY 保留资源：保持存储，只重试 destroy。其他失败不遗留资源，可重试初始化。"
+
+msgid "NX_SUCCESS, BUSY or an initialization error"
+msgstr "NX_SUCCESS、BUSY 或初始化错误"
+
+msgid "Stop and join publishers first. The check cannot authorize a future call to race destruction. After success, no storage access is allowed. A partial destroy disables new ports; retain storage and retry destroy without reinitialization."
+msgstr "先停止并 join publisher。检查不能授权未来调用与销毁并发。成功后不得再访问存储。部分 destroy 禁用新 port；保留存储，不重新初始化，只重试 destroy。"
+
+msgid "NX_SUCCESS or BUSY while a waiter/resource remains"
+msgstr "NX_SUCCESS；waiter／资源仍保留时返回 BUSY"
+
+msgid "NX_SUCCESS or invalid/initialization error; BUSY retains resources for a subsequent destroy"
+msgstr "NX_SUCCESS 或参数／初始化错误；BUSY 保留资源，供后续 destroy"
+
+msgid "A partial destroy closes all public operations. Retain storage and retry destroy; do not reinitialize it yet."
+msgstr "部分 destroy 关闭所有公共操作。保留存储并重试 destroy，暂不得重新初始化。"
+
+msgid "NX_SUCCESS or BUSY if users/items/resources remain"
+msgstr "NX_SUCCESS；user／item／资源仍保留时返回 BUSY"
+
+msgid "NX_SUCCESS or invalid/start error; EXHAUSTED when POSIX cannot create another task"
+msgstr "NX_SUCCESS 或参数／启动错误；POSIX 无法再创建任务时返回 EXHAUSTED"
+
+msgid "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage. Inactive private pointer values do not retain a borrow."
+msgstr "可能阻塞至 entry 返回。不强制取消。只有成功后调用者才可释放 context、handle 和栈。由唯一外部 owner 串行执行 start／join；不支持多个并发 joiner 或外部 pthread_cancel／detach。销毁通知或队列存储前，先停止并 join 其 publisher。非活动私有指针值不保留借用。"
+
+msgid "Task context; caller keeps buffer until successful destroy. Used depth times item_size bytes must not overlap the complete queue control; wrapping spans reject at admission. After initialization BUSY, only destroy is allowed. Other failures leave no resources and permit initialization again."
+msgstr "任务上下文；调用者保留 buffer 直至成功 destroy。实际使用的 depth 乘 item_size 字节不得与完整队列控制对象重叠；范围地址回绕在准入时拒绝。初始化返回 BUSY 后，只允许 destroy。其他失败不遗留资源，并允许再次初始化。"
+
+msgid "Task context. No default task, pool or hidden stack exists. Stack and complete task control must not overlap; wrapping spans reject before POSIX task creation. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence. Failure retains no entry/context borrow."
+msgstr "任务上下文。没有默认任务、池或隐藏栈。栈与完整任务控制对象不得重叠；范围地址回绕在创建 POSIX 任务之前拒绝。POSIX 库内部管理分配属于主机运行时分配，不是 MCU RAM 证据。失败不保留 entry／context 借用。"
+
+msgid "Zero-initialize before the first start; successful join permits reuse. Start/join have one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
+msgstr "首次 start 之前零初始化；成功 join 后可复用。start／join 由唯一外部生命周期 owner 负责；只有一个 joiner。entry 可尝试 self-join，此时返回 BUSY。不支持外部取消或 detach。"

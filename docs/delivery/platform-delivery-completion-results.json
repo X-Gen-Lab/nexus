@@ -2617,5 +2617,694 @@
       "physical_hil": "not_executed",
       "new_software_candidate": "not_created"
     }
+  },
+  "source_version_records_20261104": {
+    "core_arch_os_20261104": {
+      "kind": "bounded_core_arch_os_software_iteration",
+      "date": "2026-11-04",
+      "source": {
+        "commit": "23ba8a9f31c59428f4e2257b88b748422939d6ad",
+        "tree": "528f21bfc2ecfec61fb7b8992f01f9bba0995619",
+        "branch": "iteration/core-arch-os-20261104",
+        "normal_commit_index_tree": "528f21bfc2ecfec61fb7b8992f01f9bba0995619"
+      },
+      "status": "30_selected_software_tasks_implemented_and_checked_3_conditional_hardware_tasks_not_executed",
+      "scope": "Discussion IDs C01-C09/A01-A09/O01-O12/H01-H03 are a review cross-reference, not a replacement task authority or closure of wider historical exits. Existing correct mechanisms are retained and verified rather than reimplemented.",
+      "task_authorities": [
+        "docs/design/platform-delivery-completion.csv",
+        "docs/design/os-execution.csv",
+        "docs/design/next-generation-execution.csv"
+      ],
+      "publishable_candidate": false,
+      "physical_hil": "not_executed",
+      "normal_commit": {
+        "status": "passed",
+        "google_programs": 422,
+        "google_cases": 7400,
+        "tool_cases": 3986,
+        "tool_domains": [
+          {
+            "suite": "testing",
+            "discovered": 2078,
+            "executed": 2078,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          {
+            "suite": "configure",
+            "discovered": 1230,
+            "executed": 1230,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          {
+            "suite": "ci",
+            "discovered": 511,
+            "executed": 511,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          {
+            "suite": "workflows",
+            "discovered": 167,
+            "executed": 167,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          }
+        ],
+        "skipped": 0,
+        "failures": 0,
+        "io_bounded_properties": 233,
+        "io_unproven_scopes": 8
+      },
+      "checks": {
+        "arch_cpu_abi_profiles": 52,
+        "cmsis_layout_profiles": 9,
+        "unchanged_old_new_object_pairs": 231,
+        "runtime_links": 104,
+        "os_profile_positive_links": 12,
+        "os_profile_expected_rejections": 2,
+        "mpu_positive_links": 12,
+        "mpu_expected_rejections": 1,
+        "split_link_variants": 31,
+        "board_reference_links": 4,
+        "static": {
+          "affected_native_sources": 9,
+          "original_compile_entries": 47,
+          "distinct_contexts": 44,
+          "clang_tidy_passed": 44,
+          "cppcheck_passed": 44,
+          "whole_repository_scan": false
+        },
+        "sanitizers": {
+          "native_asan_ubsan": {
+            "programs": 17,
+            "cases": 861,
+            "skipped": 0,
+            "failed": 0
+          },
+          "native_tsan": {
+            "programs": 17,
+            "cases": 861,
+            "skipped": 0,
+            "failed": 0
+          },
+          "scope": "Complete selected-program execution, not all 422 programs in each sanitizer preset."
+        },
+        "resources": {
+          "os_profiles": 8,
+          "core_probe_elfs": 32,
+          "commands": 189,
+          "instance_counts": [
+            0,
+            1,
+            2,
+            4
+          ],
+          "wait_candidate_counts": [
+            1,
+            4,
+            16
+          ],
+          "physical_cycles": "not_measured",
+          "queue_grid": "derived_budget"
+        },
+        "source_sdk": {
+          "source_revision": "23ba8a9f31c59428f4e2257b88b748422939d6ad",
+          "source_tree": "528f21bfc2ecfec61fb7b8992f01f9bba0995619",
+          "publishable_source_snapshot": true,
+          "source_dirty_at_preparation": false,
+          "formal_targeted_images": 8,
+          "fixture_cases": 15,
+          "fixture_skipped": 0,
+          "scope": "8 actual clean-source relocated consumers and 15 separate development-fixture contracts; not the full 67-image consumer plan.",
+          "snapshot_sha256": "7d0f1cc0d2137ae0e65c42f7f7537f900e581420b9c98a4ca9bc4217b87d26ff",
+          "manifest_sha256": "2c72c69840f05cf80c1d549fb03e1e950887b272debc3fbc01090cd3ea23171d"
+        },
+        "documentation": {
+          "pages": 132,
+          "language_states": 264,
+          "scope": "Strict source-stable staged-source EN/ZH build; its index tree equals this code commit tree. No package/publication qualification.",
+          "index_tree": "528f21bfc2ecfec61fb7b8992f01f9bba0995619"
+        },
+        "hil_preparation": {
+          "unbound_configurations": 5,
+          "equipment_operated": false
+        }
+      },
+      "review_plan_coverage": {
+        "C01": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Request state, reuse, repeated settlement and slot exhaustion",
+          "implementation_paths": [
+            "core/src/request.c",
+            "tests/google/core_lifecycle_test.cpp"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "core_focused"
+          ]
+        },
+        "C02": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Final provider access, control and observer join, stable-slot release",
+          "implementation_paths": [
+            "core/README.md",
+            "tests/google/io_owner_diagnostic_pipeline_test.cpp",
+            "tests/google/freertos_owner_endurance_test.cpp"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "core_focused"
+          ]
+        },
+        "C03": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Strict counter observation interval, domain withdrawal and failure retention",
+          "implementation_paths": [
+            "core/include/nexus/core/time.h",
+            "core/README.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "core_focused"
+          ]
+        },
+        "C04": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Optional finite deadline construction, sentinel/overflow rejection and unchanged failure output",
+          "implementation_paths": [
+            "core/src/time.c",
+            "tests/contracts/cortex_runtime/main.c"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "runtime",
+            "source_sdk"
+          ]
+        },
+        "C05": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Known clock and OS storage overlap/wrap reject before mutation; hot-path provenance remains explicit",
+          "implementation_paths": [
+            "core/src/time.c",
+            "core/include/nexus/core/request.h",
+            "os/native/native.c",
+            "os/freertos/freertos.c"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "static",
+            "sanitizers"
+          ]
+        },
+        "C06": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Optional observer and compiled caller-owned minimal fault snapshot recipe",
+          "implementation_paths": [
+            "core/README.md",
+            "core/src/request_observer.c",
+            "core/src/fault.c"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "core_focused"
+          ]
+        },
+        "C07": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Quiescent stack observation, paint/MSP reserve and DATA/BSS/NOINIT usage",
+          "implementation_paths": [
+            "core/README.md",
+            "core/src/stack_observation.c",
+            "core/include/nexus/core/memory.h"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "memory_placement",
+            "board_links"
+          ]
+        },
+        "C08": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Explicit observed revision zero, policy/workaround provenance and read-only support query",
+          "implementation_paths": [
+            "tests/google/silicon_admission_test.cpp",
+            "core/README.md",
+            "tools/maintenance/capabilities.py"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "core_focused"
+          ]
+        },
+        "C09": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Actual target-ABI Core object and zero/one/two/four-instance ELF costs",
+          "implementation_paths": [
+            "scripts/ci/os_resources.py",
+            "tests/contracts/os_resources/core_arch_probe.c"
+          ],
+          "evidence_refs": [
+            "resources"
+          ]
+        },
+        "A01": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "CPU/compiler/ABI, runtime, SoC/Board and physical qualification stay distinct",
+          "implementation_paths": [
+            "arch/README.md",
+            "docs/design/arch-contracts.md",
+            "scripts/ci/arch_compile.py"
+          ],
+          "evidence_refs": [
+            "arch_compile",
+            "runtime"
+          ]
+        },
+        "A02": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Nine production atomic APIs have actual per-function instruction/dependency probes",
+          "implementation_paths": [
+            "scripts/ci/arch_compile.py",
+            "tests/contracts/arch_atomic_probe.c"
+          ],
+          "evidence_refs": [
+            "arch_compile"
+          ]
+        },
+        "A03": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Per-function IRQ/context/barrier checks reject cross-function false positives",
+          "implementation_paths": [
+            "scripts/ci/arch_compile.py",
+            "scripts/ci/test_arch_compile.py"
+          ],
+          "evidence_refs": [
+            "arch_compile"
+          ]
+        },
+        "A04": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Fourteen reviewed C/ASM diffs replace Python firmware strings; 22 derived outputs byte-identical",
+          "implementation_paths": [
+            "os/reviewed_patch.py",
+            "os/freertos/patches/",
+            "os/freertos/mpu/patches/",
+            "os/threadx/patches/"
+          ],
+          "evidence_refs": [
+            "kernel_overlays",
+            "runtime",
+            "mpu",
+            "source_sdk"
+          ]
+        },
+        "A05": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Single private register facts and independent locked CMSIS layout assertions",
+          "implementation_paths": [
+            "arch/arm/cortex_m/private/registers.h",
+            "tests/contracts/arch_cmsis_layout_probe.c"
+          ],
+          "evidence_refs": [
+            "arch_compile",
+            "arch_equivalence",
+            "source_sdk"
+          ]
+        },
+        "A06": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "MPU/SAU validated writes and barriers do not imply readback or physical isolation",
+          "implementation_paths": [
+            "arch/include/nexus/arch/mpu.h",
+            "arch/include/nexus/arch/security.h",
+            "docs/design/arch-contracts.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "documentation"
+          ]
+        },
+        "A07": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Transient NS permission observation and trusted bounded-copy gateway retain narrow scope",
+          "implementation_paths": [
+            "arch/include/nexus/arch/nonsecure.h",
+            "docs/design/u575-trustzone-contract.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "runtime",
+            "split"
+          ]
+        },
+        "A08": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Shallow sleep keeps final checks, incoming masks and caller-owned continuous timer",
+          "implementation_paths": [
+            "arch/arm/cortex_m/nx_arch_sleep.c",
+            "os/freertos/lowpower.c",
+            "docs/design/os-contracts.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers"
+          ]
+        },
+        "A09": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Static instruction shapes, cache work units and exclusive-retry limits; no cycle claim",
+          "implementation_paths": [
+            "scripts/ci/arch_compile.py",
+            "tools/measurement/README.md"
+          ],
+          "evidence_refs": [
+            "arch_compile",
+            "resources"
+          ]
+        },
+        "O01": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "TLS self-join rejects before reading parent-published fields in early child execution",
+          "implementation_paths": [
+            "os/native/native.c",
+            "tests/google/os_wait_test.cpp"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers",
+            "native_tdd"
+          ]
+        },
+        "O02": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "POSIX creation errors and partial destroy preserve exact remaining resource ownership",
+          "implementation_paths": [
+            "os/native/native.c",
+            "os/native/include/nexus/os/native.h"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers",
+            "native_tdd"
+          ]
+        },
+        "O03": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Native/FreeRTOS control/stack/payload overlap/wrap reject before mutation; adjacency works",
+          "implementation_paths": [
+            "os/native/native.c",
+            "os/freertos/freertos.c",
+            "tests/google/freertos_context_test.cpp"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers",
+            "native_tdd",
+            "kernel_overlays"
+          ]
+        },
+        "O04": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Real N=1/4/16 select counts and caller-cursor fairness, with no hidden scheduling",
+          "implementation_paths": [
+            "scripts/ci/os_resources.py",
+            "tests/contracts/os_resources/operation_probe.c",
+            "docs/design/os-contracts.md"
+          ],
+          "evidence_refs": [
+            "resources"
+          ]
+        },
+        "O05": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Shutdown milestones retain progress, observer/control joins and publisher quiescence",
+          "implementation_paths": [
+            "docs/design/os-contracts.md",
+            "core/README.md",
+            "tests/google/freertos_owner_endurance_test.cpp"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers"
+          ]
+        },
+        "O06": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Actual queue control costs and derived depth/item/waiter budgets distinguish copy/scheduler/IRQ work",
+          "implementation_paths": [
+            "scripts/ci/os_resources.py",
+            "tools/measurement/README.md"
+          ],
+          "evidence_refs": [
+            "resources"
+          ]
+        },
+        "O07": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Explicit notify/task choices and real permanent-return-to-port-fault execution",
+          "implementation_paths": [
+            "tests/google/freertos_permanent_return_test.cpp",
+            "docs/design/os-contracts.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "sanitizers",
+            "resources"
+          ]
+        },
+        "O08": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Tick/continuous clock/alarm phase and ownership; running kernel retains its clock",
+          "implementation_paths": [
+            "os/freertos/lowpower.c",
+            "os/freertos/timebase_lowpower.c",
+            "docs/design/os-contracts.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "board_links",
+            "profiles"
+          ]
+        },
+        "O09": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Exact maintained MPU/split CPU/ABI/port/link/storage scope rejects unsupported combinations",
+          "implementation_paths": [
+            "scripts/ci/os_mpu.py",
+            "scripts/ci/os_secure_runtime.py",
+            "tools/maintenance/capabilities.py"
+          ],
+          "evidence_refs": [
+            "mpu",
+            "split",
+            "normal_commit"
+          ]
+        },
+        "O10": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Reviewed host/MCU derivations retain upstream identities, licenses and separate boundaries",
+          "implementation_paths": [
+            "os/threadx/prepare_linux.py",
+            "os/threadx/Kernel.cmake",
+            "os/threadx/patches/"
+          ],
+          "evidence_refs": [
+            "kernel_overlays",
+            "normal_commit",
+            "source_sdk"
+          ]
+        },
+        "O11": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Real fixed-record copy/mask/drop counts keep diagnostics optional and loss counters saturating",
+          "implementation_paths": [
+            "scripts/ci/os_resources.py",
+            "tests/contracts/os_resources/operation_probe.c"
+          ],
+          "evidence_refs": [
+            "resources",
+            "normal_commit"
+          ]
+        },
+        "O12": {
+          "software_status": "selected_software_exit_met",
+          "delivery": "Support projection and existing index link exact kernel/port/ABI/tick/storage, SDK and executions",
+          "implementation_paths": [
+            "tools/maintenance/capabilities.py",
+            "docs/delivery/platform-delivery-completion-results.json",
+            "docs/delivery/README.md"
+          ],
+          "evidence_refs": [
+            "normal_commit",
+            "source_sdk",
+            "documentation"
+          ]
+        },
+        "H01": {
+          "software_preparation": "existing_unbound_tools_prepared",
+          "hardware_status": "not_executed",
+          "scope": "F407ZG/F407VE/F470 physical startup, Tick, IRQ wake, lifecycle and stacks",
+          "reason": "No equipment connected; user selected software and HIL tooling delivery first."
+        },
+        "H02": {
+          "software_preparation": "existing_unbound_tools_prepared",
+          "hardware_status": "not_executed",
+          "scope": "H743 physical M7/FP/cache/DMA withdrawal, recovery and timing",
+          "reason": "No equipment connected; user selected software and HIL tooling delivery first."
+        },
+        "H03": {
+          "software_preparation": "existing_unbound_tools_prepared",
+          "hardware_status": "not_executed",
+          "scope": "U575 physical attribution/MPU/security contexts, gateways, stacks and wake",
+          "reason": "No equipment connected; user selected software and HIL tooling delivery first."
+        }
+      },
+      "evidence": {
+        "normal_commit": {
+          "local_path": "/workspace/nexus/build/native-debug/tdd/execution.json",
+          "bytes": 1308456,
+          "sha256": "6a54bc505dad785802f77188a8a4bbe2e0a8ee67959cc24ea75e73a711b0fc22",
+          "scope": "Fresh ordinary complete-index Google and four-domain execution.",
+          "remote_payload_published": false
+        },
+        "normal_commit_receipt": {
+          "local_path": "/workspace/nexus/build/iteration-core-arch-os-20261104/ordinary-commit.log",
+          "bytes": 2041,
+          "sha256": "ee06138b39c6103455a2fe428a3a2996391680d0c5bc69aca91f7dd2da8dd6de",
+          "scope": "All five ordinary hooks, actual exit zero and code commit.",
+          "remote_payload_published": false
+        },
+        "core_focused": {
+          "local_path": "/tmp/nexus-core-20261104/maintained/results.json",
+          "bytes": 135,
+          "sha256": "014d253f1873ef83ea268a8478ca9662ea966a1923f9cc42353a2b88184ee557",
+          "scope": "Core/silicon/stack checks and compiled fault recipe.",
+          "remote_payload_published": false
+        },
+        "native_tdd": {
+          "local_path": "/tmp/nexus-os-native-20261104/storage-green/receipt.json",
+          "bytes": 444,
+          "sha256": "43885283b6ff61686f433435efe876bd9a3ed9ddc3418f9d39a4e9d5b983fd14",
+          "scope": "Final Native 40-case regression; genuine prior RED snapshots retained in siblings.",
+          "remote_payload_published": false
+        },
+        "kernel_overlays": {
+          "local_path": "/dev/shm/nexus-os-kernels-20261104/overlay-after.json",
+          "bytes": 2079,
+          "sha256": "053633ae640a842e01eb3d8bd42a0f3dad156fbe9e49faaf8819fac652f4cff3",
+          "scope": "20 equivalent FreeRTOS outputs; two equivalent ThreadX outputs retained independently.",
+          "remote_payload_published": false
+        },
+        "arch_compile": {
+          "local_path": "/workspace/nexus/build/iteration-core-arch-os-20261104/arch-compiler-final/report.json",
+          "bytes": 1903541,
+          "sha256": "34e9cc523a6f7b28e5f9297d38e19716e4bb945191137a86cab796f8acb9f349",
+          "scope": "52 CPU/ABI variants and nine independent CMSIS layouts.",
+          "remote_payload_published": false
+        },
+        "arch_equivalence": {
+          "local_path": "/workspace/nexus/build/iteration-core-arch-os-20261104/arch-register-equivalence/report.json",
+          "bytes": 913836,
+          "sha256": "c823f243f300dce59ce8f5d88d318f7ef48ebac17cb2c28156242e1edc326242",
+          "scope": "231 actual old/new object byte comparisons.",
+          "remote_payload_published": false
+        },
+        "runtime": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/integration-final/cortex_runtime/report.json",
+          "bytes": 12659544,
+          "sha256": "db152f4133e8d00b11271bf89281c739011c0582f8108e7c1c6ccefdeaaac671",
+          "scope": "Final source-stable generic Core/Arch/OS links.",
+          "remote_payload_published": false
+        },
+        "profiles": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/integration-final/os_profiles/report.json",
+          "bytes": 1824236,
+          "sha256": "b751038db0968a4faef2f414bf96533f4a5b6999760dbe516a31998fa99fae53",
+          "scope": "Actual links and precise missing-hook rejections.",
+          "remote_payload_published": false
+        },
+        "mpu": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/integration-final/os_mpu/mpu-matrix.json",
+          "bytes": 182046,
+          "sha256": "3b8a4e07b75ed2621e6d651e3fb5b339254eec3cec1ee594d8478af8d66e27d9",
+          "scope": "Actual MPU links and missing-idle rejection.",
+          "remote_payload_published": false
+        },
+        "split": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/integration-final/os_secure_runtime/secure-matrix.json",
+          "bytes": 8446584,
+          "sha256": "02a867159943c7579945a4aa49cc10266ce01fd3e2c2c2e40e91b7123dc5c407",
+          "scope": "Actual Secure/NS links, no physical isolation claim.",
+          "remote_payload_published": false
+        },
+        "board_links": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/boards-final/commands.json",
+          "bytes": 3581,
+          "sha256": "987c41a0bbed37b668b41c45def3a4ce1504e49bcc97e3426f06663052a7c569",
+          "scope": "Four fresh source-board configuration/builds with actual resources checks.",
+          "remote_payload_published": false
+        },
+        "static": {
+          "local_path": "/tmp/nexus-core-arch-os-static-final-20261104/result.json",
+          "bytes": 1145,
+          "sha256": "dd7d55bc4ea7271c39a0f050dc480afb4c1f03da9d6731ca8c03b15477aa22bd",
+          "scope": "44 actual semantic contexts per analyzer and stable inputs.",
+          "remote_payload_published": false
+        },
+        "sanitizers": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/sanitizers/summary.json",
+          "bytes": 4789,
+          "sha256": "d5aaaedfa1383b63f13ada2b1114e19c346518d70135142677bbc8ecc3a48ab3",
+          "scope": "Actual instrumentation, fresh no-skip reports and source/tree identity.",
+          "remote_payload_published": false
+        },
+        "resources": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/resources-final/report.json",
+          "bytes": 1619366,
+          "sha256": "8958459431a344376004a6d3f4abff55c7cd2393ebf24465a6eae59207cfa583",
+          "scope": "Final 8 OS/32 Core ELF, real boundary counts and derived budgets.",
+          "remote_payload_published": false
+        },
+        "source_sdk": {
+          "local_path": "/tmp/nexus-core-arch-os-sdk-20261104/summary.json",
+          "bytes": 2803,
+          "sha256": "9aa8060b7578141a26525a100757c87b7cc98eb618690818750fc2b47812e74e",
+          "scope": "Clean package, real relocation, eight consumers and omission control.",
+          "remote_payload_published": false
+        },
+        "documentation": {
+          "local_path": "/tmp/nexus-core-arch-os-docs-20261104/strict-r2-handoff.json",
+          "bytes": 8120,
+          "sha256": "0cc958f9d4b4eec17ecde45b5e66a8c6d3450691bd7e5aab4c97868fce2386f6",
+          "scope": "Actual Doxygen/gettext/EN/ZH and independent translations.",
+          "remote_payload_published": false
+        },
+        "memory_placement": {
+          "local_path": "/tmp/nexus-core-arch-os-20261104/hil-preparation/memory-placement.log",
+          "bytes": 103,
+          "sha256": "6f828f5b3bcfe3d6f3399c24dddeae589663c36d4d860d9b1ca7f0d2d8b31661",
+          "scope": "Five placement compile/ELF tests, not physical reset or retention.",
+          "remote_payload_published": false
+        }
+      }
+    }
   }
 }

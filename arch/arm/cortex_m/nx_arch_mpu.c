@@ -14,13 +14,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/arch/mpu.h"
 #include "private/mechanisms.h"
-
-#define NX_MPU_TYPE ((uintptr_t)0xe000ed90U)
-#define NX_MPU_CTRL (NX_MPU_TYPE + 4U)
-#define NX_MPU_RNR  (NX_MPU_TYPE + 8U)
-#define NX_MPU_RBAR (NX_MPU_TYPE + 12U)
-#define NX_MPU_ATTR (NX_MPU_TYPE + 16U)
-#define NX_MPU_MAIR (NX_MPU_TYPE + 48U)
+#include "private/registers.h"
 
 /** \brief Reject undefined/implementation-defined v7 memory encodings. */
 static bool nx_arch_mpu_v7_attributes_valid(uint32_t tex, uint32_t cb) {
@@ -88,25 +82,25 @@ static nx_arch_result_t nx_arch_mpu_program(uint32_t index, uint32_t base,
     if (!nx_arch_mpu_context_valid()) {
         return NX_ARCH_CONTEXT;
     }
-    uint32_t count = (nx_arch_hw_mmio_read(NX_MPU_TYPE) >> 8U) & 255U;
+    uint32_t count = (nx_arch_hw_mmio_read(NX_ARCH_REG_MPU_TYPE) >> 8U) & 255U;
     if (count == 0U) {
         return NX_ARCH_UNSUPPORTED;
     }
     if (index >= count) {
         return NX_ARCH_INVALID;
     }
-    if ((nx_arch_hw_mmio_read(NX_MPU_CTRL) & 1U) != 0U) {
+    if ((nx_arch_hw_mmio_read(NX_ARCH_REG_MPU_CTRL) & 1U) != 0U) {
         return NX_ARCH_CONTEXT;
     }
-    uint32_t incoming_region = nx_arch_hw_mmio_read(NX_MPU_RNR);
+    uint32_t incoming_region = nx_arch_hw_mmio_read(NX_ARCH_REG_MPU_RNR);
     nx_arch_dmb();
-    nx_arch_hw_mmio_write(NX_MPU_RNR, index);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_MPU_RNR, index);
     /* CTRL remains disabled throughout; no partially changed region can
      * become active. RBAR.VALID is zero on v7, so only this RNR is selected. */
-    nx_arch_hw_mmio_write(NX_MPU_ATTR, 0U);
-    nx_arch_hw_mmio_write(NX_MPU_RBAR, base);
-    nx_arch_hw_mmio_write(NX_MPU_ATTR, attributes);
-    nx_arch_hw_mmio_write(NX_MPU_RNR, incoming_region);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_MPU_ATTR, 0U);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_MPU_RBAR, base);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_MPU_ATTR, attributes);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_MPU_RNR, incoming_region);
     nx_arch_dsb();
     nx_arch_isb();
     return NX_ARCH_OK;
@@ -165,13 +159,13 @@ nx_arch_result_t nx_arch_mpu_v8_attribute_set(uint32_t index,
     if (!nx_arch_mpu_context_valid()) {
         return NX_ARCH_CONTEXT;
     }
-    if (((nx_arch_hw_mmio_read(NX_MPU_TYPE) >> 8U) & 255U) == 0U) {
+    if (((nx_arch_hw_mmio_read(NX_ARCH_REG_MPU_TYPE) >> 8U) & 255U) == 0U) {
         return NX_ARCH_UNSUPPORTED;
     }
-    if ((nx_arch_hw_mmio_read(NX_MPU_CTRL) & 1U) != 0U) {
+    if ((nx_arch_hw_mmio_read(NX_ARCH_REG_MPU_CTRL) & 1U) != 0U) {
         return NX_ARCH_CONTEXT;
     }
-    uintptr_t address = NX_MPU_MAIR + ((uintptr_t)index / 4U) * 4U;
+    uintptr_t address = NX_ARCH_REG_MPU_MAIR + ((uintptr_t)index / 4U) * 4U;
     uint32_t shift = (index % 4U) * 8U;
     uint32_t incoming = nx_arch_hw_mmio_read(address);
     uint32_t updated = (incoming & ~(255U << shift)) | (attribute << shift);

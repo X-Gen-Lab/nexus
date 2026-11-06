@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
-"""Derive reviewed MPU-v7 ports with privileged-only peripheral defaults.
+"""Apply reviewed MPU port patches after checking exact upstream identities.
 
-The pinned vendor tree stays unchanged. Reject vendor drift before emitting any
-source; a new kernel version requires an explicit review of this transformation.
+All firmware behavior is authored in explicit C/ASM diffs. Host Python selects
+reviewed inputs, validates identities and publishes the derived build sources.
 """
 import argparse
 import hashlib
-import re
+import importlib.util
 from pathlib import Path
+
+SPEC = importlib.util.spec_from_file_location(
+    "nexus_reviewed_patch", Path(__file__).resolve().parents[2] / "reviewed_patch.py")
+PATCH = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(PATCH)
+PATCH_ROOT = Path(__file__).with_name("patches")
 
 HASHES = {
     "ARM_CM3_MPU": "db5c79a7e3a28be646fab96729ac6620d5154392c6dd2e9d0debabe8690911e7",
     "ARM_CM4_MPU": "6df67233a5a97a6539c205e73b59507b697142afffed426d2efd0111a7fc9b20",
 }
 ORIGINAL = "portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) |"
-REPLACEMENT = "portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_PRIVILEGED_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) |"
-
-
 
 PORT_V8_HASH = "0896f3232a773b553d8eb57a6fed8838a0c555386fdbb28bef791161339b6c65"
 HASHES.update({name: PORT_V8_HASH for name in (
@@ -27,113 +30,6 @@ ASSEMBLY_HASHES = {
     **{name: "524ffdb5144274bd0636431b787a933057e748373e5bcdce217d5a166e2ebbe9" for name in (
         "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure", "ARM_CM85_NTZ/non_secure")},
 }
-
-
-def port_name(source: Path) -> str:
-    name = source.parent.name
-    return source.parent.parent.name + "/non_secure" if name == "non_secure" else name
-
-
-def checked_text(source: Path, hashes: dict) -> str:
-    content = source.read_bytes()
-    if hashlib.sha256(content).hexdigest() != hashes.get(port_name(source)):
-        raise ValueError("unreviewed or changed pinned MPU source")
-    return content.decode("utf-8")
-
-
-def unique_replace(text: str, original: str, replacement: str) -> str:
-    if text.count(original) != 1:
-        raise ValueError("reviewed MPU transformation site changed or duplicated")
-    return text.replace(original, replacement)
-
-
-def startup_label(text: str) -> str:
-    pattern = r'( *"[^"\n]*svc %0[^"\n]*" /\* System call to start (?:the )?first task\. \*/\n)'
-    matches = list(re.finditer(pattern, text))
-    if len(matches) != 1:
-        raise ValueError("reviewed bootstrap SVC instruction is not unique")
-    return text[:matches[0].end()] + (
-        '        " .global __nexus_mpu_start_svc_return \\n"\n'
-        '        " __nexus_mpu_start_svc_return: \\n"\n') + text[matches[0].end():]
-
-
-def special_argument(text: str, name: str) -> str:
-    pattern = r'("[ \t]*)b ' + name + r'([ \t]*\\n")'
-    matches = list(re.finditer(pattern, text))
-    if len(matches) != 1:
-        raise ValueError("reviewed special-SVC assembly branch is not unique")
-    old = matches[0].group()
-    return text.replace(old, '" mov r1, lr \\n"\n            ' + old)
-
-
-def check_gpio_port(source: Path, gpio_write: bool) -> None:
-    """The scalar GPIO extension has one reviewed real port ABI only."""
-    if gpio_write and port_name(source) != "ARM_CM33_NTZ/non_secure":
-        raise ValueError("GPIO syscall requires exact ARM_CM33_NTZ port")
-
-
-def prepare(source: Path, output: Path, *, gpio_write: bool = False) -> None:
-    """Derive complete real MPU ports with exact grants and one boot lease."""
-    check_gpio_port(source, gpio_write)
-    text = checked_text(source, HASHES)
-    version7 = port_name(source) in {"ARM_CM3_MPU", "ARM_CM4_MPU"}
-    dispatcher = "vSVCHandler_C" if version7 else "vPortSVCHandler_C"
-    parameter = "pulParam" if version7 else "pulCallerStackAddress"
-    text = unique_replace(text, '#include "task.h"', '#include "task.h"\n#include "guard.h"\n'
-                          'static PRIVILEGED_DATA nx_freertos_mpu_start_t xNexusMpuStart;')
-    declaration = re.compile(dispatcher + r'\( uint32_t \* (\w+) \)')
-    if len(list(declaration.finditer(text))) != 2:
-        raise ValueError("reviewed special-SVC C declarations changed")
-    text = declaration.sub(lambda match: dispatcher + "( uint32_t * " + match[1] +
-                           ", uint32_t ulNexusExceptionReturn )", text)
-    text = unique_replace(text, "case portSVC_START_SCHEDULER:",
-                          "case portSVC_START_SCHEDULER:\n"
-                          "            if( nx_freertos_mpu_start_consume(&xNexusMpuStart, " +
-                          parameter + ", ulNexusExceptionReturn) == pdFALSE ) { return; }")
-    start = re.compile(r"BaseType_t xPortStartScheduler\( void \)(?: /\*[^\n]*\*/)?\n\{")
-    matches = list(start.finditer(text))
-    if len(matches) != 1:
-        raise ValueError("reviewed scheduler entry site changed")
-    text = start.sub(lambda match: match.group() + "\n    if( nx_freertos_mpu_start_arm(&xNexusMpuStart) == pdFALSE ) { return pdFALSE; }", text)
-    if version7:
-        text = special_argument(text, dispatcher)
-        text = startup_label(text)
-        # Region 4 becomes a second exact RX window. Unmapped peripherals use
-        # the pinned privileged background; no broad user Flash/MMIO exists.
-        text = unique_replace(text, "= ( portPERIPHERALS_START_ADDRESS ) |",
-                              "= ( ( uint32_t ) __nexus_syscall_flash_start__ ) |")
-        flash_attributes = ("( portMPU_REGION_CACHEABLE_BUFFERABLE ) |" if
-                            port_name(source) == "ARM_CM3_MPU" else
-                            "( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |")
-        text = unique_replace(text, ORIGINAL,
-                              "portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_ONLY ) |\n"
-                              "                                       " + flash_attributes)
-        text = unique_replace(text, "portPERIPHERALS_END_ADDRESS - portPERIPHERALS_START_ADDRESS",
-                              "( uint32_t ) __nexus_syscall_flash_end__ - ( uint32_t ) __nexus_syscall_flash_start__")
-        for declaration in (
-                "        extern uint32_t * __FLASH_segment_start__;\n",
-                "        extern uint32_t * __FLASH_segment_end__;\n",
-                "        extern uint32_t __FLASH_segment_start__[];\n",
-                "        extern uint32_t __FLASH_segment_end__[];\n"):
-            text = unique_replace(text, declaration, "")
-        text = text.replace("( uint32_t ) __FLASH_segment_start__", "( uint32_t ) __nexus_user_flash_start__")
-        text = text.replace("( uint32_t ) __FLASH_segment_end__", "( uint32_t ) __nexus_user_flash_end__")
-        text = unique_replace(text, "/* By default allow everything to access the general peripherals.  The\n         * system peripherals and registers are protected. */",
-                              "/* Nexus: exact read-only executable SVC window. Privileged MMIO\n         * uses the enabled background map; users have no peripheral grant. */")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(text, encoding="utf-8")
-
-
-def prepare_assembly(source: Path, output: Path, *,
-                     gpio_write: bool = False) -> None:
-    """Preserve real v8 context assembly; attach special-SVC LR and origin."""
-    check_gpio_port(source, gpio_write)
-    text = checked_text(source, ASSEMBLY_HASHES)
-    text = special_argument(text, "vPortSVCHandler_C")
-    text = startup_label(text)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(text, encoding="utf-8")
-
 
 
 VENEER_HASHES = {
@@ -149,85 +45,86 @@ VENEER_HASHES = {
 NUMBERS_HASH = "6701d2eac55e478e90d62ff2947b0d2c7f5157f3b344bcfec47ac80186c57816"
 
 
+def port_name(source: Path) -> str:
+    """Identify only the exact maintained upstream port location."""
+    name = source.parent.name
+    return source.parent.parent.name + "/non_secure" if name == "non_secure" else name
+
+
+def checked_text(source: Path, hashes: dict) -> str:
+    """Reject unknown upstream bytes before touching any output."""
+    content = source.read_bytes()
+    if hashlib.sha256(content).hexdigest() != hashes.get(port_name(source)):
+        raise ValueError("unreviewed or changed pinned MPU source")
+    return content.decode("utf-8")
+
+
+def unique_replace(text: str, original: str, replacement: str) -> str:
+    """Retain the model harness's exact ISA-boundary substitution helper."""
+    if text.count(original) != 1:
+        raise ValueError("reviewed MPU transformation site changed or duplicated")
+    return text.replace(original, replacement)
+
+
+def check_gpio_port(source: Path, gpio_write: bool) -> None:
+    """The scalar GPIO extension has one reviewed real port ABI only."""
+    if gpio_write and port_name(source) != "ARM_CM33_NTZ/non_secure":
+        raise ValueError("GPIO syscall requires exact ARM_CM33_NTZ port")
+
+
+def publish(output: Path, text: str) -> None:
+    """Only complete, validated transformations reach the build output."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(output.name + ".tmp")
+    temporary.write_text(text, encoding="utf-8")
+    temporary.replace(output)
+
+
+def prepare(source: Path, output: Path, *, gpio_write: bool = False) -> None:
+    """Keep exact grants and the real port's single-use bootstrap lease."""
+    check_gpio_port(source, gpio_write)
+    text = checked_text(source, HASHES)
+    name = port_name(source)
+    patch = (name.lower() + "-port.patch" if name in
+             {"ARM_CM3_MPU", "ARM_CM4_MPU"} else "v8-port.patch")
+    publish(output, PATCH.apply_reviewed_patch(text, PATCH_ROOT / patch))
+
+
+def prepare_assembly(source: Path, output: Path, *,
+                     gpio_write: bool = False) -> None:
+    """Preserve context assembly and attach special-SVC LR/origin explicitly."""
+    check_gpio_port(source, gpio_write)
+    text = checked_text(source, ASSEMBLY_HASHES)
+    patch = ("v8-baseline-assembly.patch" if port_name(source) ==
+             "ARM_CM23_NTZ/non_secure" else "v8-mainline-assembly.patch")
+    publish(output, PATCH.apply_reviewed_patch(text, PATCH_ROOT / patch))
+
+
 def prepare_numbers(source: Path, output: Path, *,
                     gpio_write: bool = False) -> None:
-    """Keep all pinned numbers; explicitly select one additional slot."""
+    """Keep all pinned numbers; select only the reviewed extra GPIO slot."""
     content = source.read_bytes()
     if hashlib.sha256(content).hexdigest() != NUMBERS_HASH:
         raise ValueError("unreviewed or changed pinned syscall numbers")
     text = content.decode("utf-8")
-    pattern = r"^#define (SYSTEM_CALL_\w+)\s+(\d+)\s*$"
-    original = dict(re.findall(pattern, text, re.MULTILINE))
-    if len(original) != 70 or set(map(int, original.values())) != set(range(70)):
-        raise ValueError("pinned syscall numbers no longer cover exact ABI")
     if gpio_write:
-        text = unique_replace(
-            text,
-            "#define NUM_SYSTEM_CALLS                                   70  "
-            "/* Total number of system calls. */",
-            "#define NUM_SYSTEM_CALLS                                   71  "
-            "/* Total number of system calls. */")
-        text = unique_replace(
-            text, "#endif /* MPU_SYSCALL_NUMBERS_H */",
-            "#define SYSTEM_CALL_NexusGpioWrite                          70\n\n"
-            "#endif /* MPU_SYSCALL_NUMBERS_H */")
-        selected = dict(re.findall(pattern, text, re.MULTILINE))
-        if selected.pop("SYSTEM_CALL_NexusGpioWrite", None) != "70" or \
-                selected != original:
-            raise ValueError("GPIO extension changed an original syscall number")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(text, encoding="utf-8")
-
-
-GPIO_VENEER = '''
-/* Accepted calls return through the real port's protected exit path directly
- * to the saved caller LR. A refused SVC returns here without entering the
- * implementation; return CONTEXT rather than a caller-controlled r0 value. */
-nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
-                          uint32_t reset_mask)
-    __attribute__((naked)) FREERTOS_SYSTEM_CALL;
-
-nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
-                          uint32_t reset_mask) {
-    __asm volatile(
-        ".syntax unified\\n"
-        "svc %0\\n"
-        "movs r0, %1\\n"
-        "bx lr\\n"
-        :
-        : "i"(SYSTEM_CALL_NexusGpioWrite), "i"(NX_ERROR_CONTEXT)
-        : "memory");
-}
-'''
+        text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / "gpio-numbers.patch")
+    publish(output, text)
 
 
 def prepare_veneers(source: Path, output: Path, *,
                     gpio_write: bool = False) -> None:
-    """Retain the exact pinned two SVC veneer bodies, no unreviewed services."""
+    """Retain the two pinned SVC bodies with no unreviewed service exports."""
     check_gpio_port(source, gpio_write)
-    port = source.parent.name
-    if port == "non_secure":
-        port = source.parent.parent.name + "/non_secure"
-    content = source.read_bytes()
-    if hashlib.sha256(content).hexdigest() != VENEER_HASHES.get(port):
-        raise ValueError("unreviewed or changed pinned MPU veneers")
-    text = content.decode("utf-8")
-    prefix = text[:text.index("#if (")]
+    text = checked_text(source, VENEER_HASHES)
+    name = port_name(source)
+    profile = ("v7" if name in {"ARM_CM3_MPU", "ARM_CM4_MPU"} else
+               "v8-baseline" if name == "ARM_CM23_NTZ/non_secure" else
+               "v8-mainline")
+    text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / (profile + "-veneers.patch"))
     if gpio_write:
-        prefix += '#include "nexus/core/status.h"\n\n'
-    retained = []
-    for name in ("MPU_vTaskDelay", "MPU_xTaskGetTickCount"):
-        pattern = (r"^[ \t]*(?:void|TickType_t) " + name +
-                   r"\([^;]+?;\n.*?^[ \t]*}\n")
-        matches = list(re.finditer(pattern, text, re.MULTILINE | re.DOTALL))
-        if len(matches) != 1 or '"     svc %0' not in matches[0].group():
-            raise ValueError("MPU narrow veneer body is not unique")
-        retained.append(matches[0].group())
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(prefix + "#if configENABLE_MPU == 1 && configUSE_MPU_WRAPPERS_V1 == 0\n" +
-                      "\n".join(retained) +
-                      (GPIO_VENEER if gpio_write else "") + "#endif\n",
-                      encoding="utf-8")
+        text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / "gpio-veneers.patch")
+    publish(output, text)
 
 
 def main() -> int:

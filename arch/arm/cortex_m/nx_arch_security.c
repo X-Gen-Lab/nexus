@@ -14,6 +14,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/arch/security.h"
 #include "private/mechanisms.h"
+#include "private/registers.h"
 
 nx_arch_features_t nx_arch_features(void) {
     const nx_arch_features_t features = {
@@ -47,36 +48,31 @@ nx_arch_result_t nx_arch_sau_encode(const nx_arch_sau_region_t* region,
 /* CMSIS core_cm23/33/55/85: SAU CTRL/TYPE/RNR/RBAR/RLAR at SCS+0xdd0.
  * The compiler and reviewed profile both require Secure state. There is no
  * NonSecure alias or write to global security attribution policy here. */
-#define NX_SAU_CONTROL ((uintptr_t)0xe000edd0u)
-#define NX_SAU_TYPE    (NX_SAU_CONTROL + 4u)
-#define NX_SAU_RNR     (NX_SAU_CONTROL + 8u)
-#define NX_SAU_RBAR    (NX_SAU_CONTROL + 12u)
-#define NX_SAU_RLAR    (NX_SAU_CONTROL + 16u)
 
 static nx_arch_result_t sau_validate(uint32_t index) {
     if (!nx_arch_is_privileged() || nx_arch_exception_number() != 0 ||
         (nx_arch_irq_masks().primask & 1u) == 0) {
         return NX_ARCH_CONTEXT;
     }
-    if (index >= (nx_arch_hw_mmio_read(NX_SAU_TYPE) & 255u)) {
+    if (index >= (nx_arch_hw_mmio_read(NX_ARCH_REG_SAU_TYPE) & 255u)) {
         return NX_ARCH_INVALID;
     }
-    if ((nx_arch_hw_mmio_read(NX_SAU_CONTROL) & 1u) != 0) {
+    if ((nx_arch_hw_mmio_read(NX_ARCH_REG_SAU_CTRL) & 1u) != 0) {
         return NX_ARCH_CONTEXT;
     }
     return NX_ARCH_OK;
 }
 
 static uint32_t sau_select(uint32_t index) {
-    uint32_t previous = nx_arch_hw_mmio_read(NX_SAU_RNR);
+    uint32_t previous = nx_arch_hw_mmio_read(NX_ARCH_REG_SAU_RNR);
     nx_arch_dmb();
-    nx_arch_hw_mmio_write(NX_SAU_RNR, index);
-    nx_arch_hw_mmio_write(NX_SAU_RLAR, 0);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_SAU_RNR, index);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_SAU_RLAR, 0);
     return previous;
 }
 
 static void sau_complete(uint32_t previous) {
-    nx_arch_hw_mmio_write(NX_SAU_RNR, previous);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_SAU_RNR, previous);
     nx_arch_dsb();
     nx_arch_isb();
 }
@@ -95,8 +91,8 @@ nx_arch_result_t nx_arch_sau_write(uint32_t index,
         return result;
     }
     uint32_t previous = sau_select(index);
-    nx_arch_hw_mmio_write(NX_SAU_RBAR, words.rbar);
-    nx_arch_hw_mmio_write(NX_SAU_RLAR, words.rlar);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_SAU_RBAR, words.rbar);
+    nx_arch_hw_mmio_write(NX_ARCH_REG_SAU_RLAR, words.rlar);
     sau_complete(previous);
     return NX_ARCH_OK;
 #else

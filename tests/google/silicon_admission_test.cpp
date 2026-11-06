@@ -112,6 +112,17 @@ TEST_F(SiliconAdmission, UnobservedRevisionCannotMatchNumericalZero) {
     EXPECT_FALSE(output.admitted);
 }
 
+TEST_F(SiliconAdmission, ObservedNumericalZeroIsAnExactReviewedRevision) {
+    rules[0].revision_id = 0U;
+    observed.revision_id = 0U;
+    observed.revision_known = true;
+    expect_read();
+    ASSERT_EQ(nx_silicon_preflight(&source, &policy, &output), NX_SUCCESS);
+    EXPECT_TRUE(output.admitted);
+    EXPECT_EQ(output.identity.revision_id, 0U);
+    EXPECT_EQ(output.revision, NX_SILICON_REVISION_REVIEWED);
+}
+
 TEST_F(SiliconAdmission, SourceFailurePreservesOutputWithoutPartialIdentity) {
     EXPECT_CALL(hardware, Read(testing::_))
         .WillOnce(testing::DoAll(testing::SetArgPointee<0>(observed),

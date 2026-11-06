@@ -23,6 +23,76 @@ START = "<!-- nexus-capabilities:start -->"
 END = "<!-- nexus-capabilities:end -->"
 
 
+def os_selection(typed, data):
+    """Project the resolved backend policy; do not infer execution or costs."""
+    backend = typed.backend
+    policy = data.get("kernel_profile")
+    kernel_path = {"freertos": "ext/freertos", "threadx": "ext/threadx"}.get(
+        backend)
+    dependencies = [dict(item) for item in data["source_dependencies"]
+                    if item["path"] == kernel_path]
+    if kernel_path is not None and len(dependencies) != 1:
+        raise ValueError("Selected OS requires its exact resolved kernel source")
+    if backend in {"freertos", "threadx"} and not isinstance(policy, dict):
+        raise ValueError("Selected OS requires its resolved kernel policy")
+    freertos = backend == "freertos"
+    scheduled = backend != "baremetal"
+    protected = freertos and policy["memory_protection"]
+    split = freertos and policy["security_model"] == "split"
+    restrictions = [
+        "Configuration selection is not executed SDK, linked-cost or HIL evidence.",
+        "Backend task/queue storage is not a universal binary ABI.",
+        "Products own workers, stack budgets, fairness and shutdown progress."]
+    if scheduled:
+        restrictions.append(
+            "Task/control/stack storage remains live until successful join.")
+    if backend == "native":
+        restrictions.append("POSIX host execution establishes no MCU IRQ or timing.")
+    elif backend == "baremetal":
+        restrictions.append("No scheduler, task or kernel queue is selected.")
+    else:
+        restrictions.append(
+            "Privileged unmasked Thread execution; ISR APIs require the selected ceiling.")
+    if backend == "threadx":
+        restrictions.append("ThreadX physical scope is Cortex-M4; no tickless port is maintained.")
+    if protected:
+        restrictions.append(
+            "Restricted tasks own protected metadata, stack and reviewed user regions.")
+    if split:
+        restrictions.append(
+            "Split mode needs a separately linked matching Secure companion "
+            "and caller-owned contexts.")
+    if freertos:
+        restrictions.append(
+            "Permanent task storage stays live for its complete nonreturning lifetime.")
+    return {
+        "backend": backend, "kernel": dependencies, "profile": policy,
+        "port": policy["kernel_port"] if policy else None,
+        "abi": {"cpu": data["cpu"], "enum_abi": typed.enum_abi,
+                "compile_options": list(typed.cpu_profile.compile_options)},
+        "tick": ({"source": policy["tick_source"], "hz": policy["tick_hz"],
+                  "reload": policy["tick_reload"],
+                  "tickless": policy.get("tickless", False)} if policy else None),
+        "capabilities": {
+            "wait_select": True, "joinable_task": scheduled,
+            "raw_queue": scheduled, "closable_queue": scheduled,
+            "direct_notification": freertos and policy["task_notifications"],
+            "permanent_task": freertos, "memory_protection": protected,
+            "split_security": split,
+            "trace": freertos and policy["trace"],
+            "runtime_stats": freertos and policy["runtime_stats"]},
+        "storage": {
+            "owner": "caller",
+            "minimum_task_stack_words": policy.get("min_stack_words") if policy else None,
+            "minimum_task_stack_bytes": policy.get("min_stack_bytes") if policy else None,
+            "stack_alignment_bytes": policy.get("stack_alignment_bytes") if policy else None,
+            "idle_stack_words": policy.get("idle_stack_words") if policy else None,
+            "system_call_stack_words": policy["system_call_stack_words"] if protected else None,
+            "secure_idle_stack_bytes": policy["secure_idle_stack_bytes"] if split else None},
+        "execution": "not_assessed", "linked_costs": "not_measured",
+        "runtime_stack_peak": "not_measured", "restrictions": restrictions}
+
+
 def selection(assembly, root=ROOT, *, candidate_path=None):
     """Describe one validated selection; execution has a separate authority.
 
@@ -78,6 +148,7 @@ def selection(assembly, root=ROOT, *, candidate_path=None):
                            "backend", "clock_profile", "cpu", "irq",
                            "optimization", "physical_pcb_revision")},
             "configuration_sha256": data["configuration_sha256"],
+            "os": os_selection(typed, data),
             "silicon_admission": silicon[None],
             "controllers": controllers, "endpoints": endpoints,
             "companion_interfaces": [json_value(vars(item))

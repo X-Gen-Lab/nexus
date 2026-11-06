@@ -10,3 +10,5 @@ docs/archive/evidence/**/*.tar.gz -text -whitespace
 # Review bytes are exact; unified patch context prefixes can precede tabs.
 dependencies/reviews/freertos/upstream.gitmodules -text
 dependencies/reviews/freertos/transport.patch -text whitespace=-space-before-tab
+# Owned kernel diffs retain exact upstream whitespace for strict application.
+os/**/patches/*.patch -text -whitespace

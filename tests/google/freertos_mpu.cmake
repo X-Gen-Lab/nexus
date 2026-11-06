@@ -41,6 +41,10 @@ function(nexus_freertos_mpu_port_model name version port secure)
     set(source "${NEXUS_SOURCE_DIR}/ext/freertos/portable/GCC/${port}/port.c")
     set(model "${CMAKE_CURRENT_BINARY_DIR}/${name}/port-model.c")
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${source}"
+        "${NEXUS_SOURCE_DIR}/os/reviewed_patch.py"
+        "${NEXUS_SOURCE_DIR}/os/freertos/mpu/patches/arm_cm3_mpu-port.patch"
+        "${NEXUS_SOURCE_DIR}/os/freertos/mpu/patches/arm_cm4_mpu-port.patch"
+        "${NEXUS_SOURCE_DIR}/os/freertos/mpu/patches/v8-port.patch"
         "${NEXUS_SOURCE_DIR}/os/freertos/mpu/prepare_port.py"
         "${NEXUS_SOURCE_DIR}/tests/google/mpu_port_model.py")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B

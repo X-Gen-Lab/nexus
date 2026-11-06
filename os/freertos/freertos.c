@@ -247,6 +247,19 @@ static void task_entry(void* argument) {
     }
 }
 
+/** \brief Reject wrapping or overlapping known caller storage intervals. */
+static bool storage_disjoint(const void* control, size_t control_bytes,
+                             const void* storage, size_t storage_bytes) {
+    uintptr_t control_begin = (uintptr_t)control;
+    uintptr_t storage_begin = (uintptr_t)storage;
+    if (control_bytes > UINTPTR_MAX - control_begin ||
+        storage_bytes > UINTPTR_MAX - storage_begin) {
+        return false;
+    }
+    return control_begin + control_bytes <= storage_begin ||
+           storage_begin + storage_bytes <= control_begin;
+}
+
 /** \brief Validate capacity before the kernel writes its initial frame. */
 static bool task_storage_valid(const char* name, const StackType_t* stack,
                                size_t stack_words, UBaseType_t priority,
@@ -273,6 +286,8 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
     }
     if (task == NULL || (uintptr_t)task % _Alignof(nx_freertos_task_t) != 0 ||
         !task_storage_valid(name, stack, stack_words, priority, entry) ||
+        !storage_disjoint(task, sizeof *task, stack,
+                          stack_words * sizeof *stack) ||
         task->handle != NULL || task->finished != NULL) {
         return NX_ERROR_INVALID;
     }
@@ -358,9 +373,13 @@ nx_result_t nx_freertos_queue_init(nx_freertos_queue_t* queue, uint8_t* storage,
     if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
-    if (queue == NULL || storage == NULL || depth == 0 || item_size == 0 ||
+    if (queue == NULL ||
+        (uintptr_t)queue % _Alignof(nx_freertos_queue_t) != 0 ||
+        storage == NULL || depth == 0 || item_size == 0 ||
         depth > storage_bytes / item_size || depth > UINT32_MAX ||
-        item_size > UINT32_MAX || queue->handle != NULL) {
+        item_size > UINT32_MAX ||
+        !storage_disjoint(queue, sizeof *queue, storage, depth * item_size) ||
+        queue->handle != NULL) {
         return NX_ERROR_INVALID;
     }
     queue->users = 0;
@@ -603,6 +622,8 @@ nx_freertos_permanent_task_start(nx_freertos_permanent_task_t* task,
     if (task == NULL ||
         (uintptr_t)task % _Alignof(nx_freertos_permanent_task_t) != 0 ||
         !task_storage_valid(name, stack, stack_words, priority, entry) ||
+        !storage_disjoint(task, sizeof *task, stack,
+                          stack_words * sizeof *stack) ||
         task->handle != NULL) {
         return NX_ERROR_INVALID;
     }
@@ -652,7 +673,11 @@ nx_result_t nx_freertos_closable_queue_init(nx_freertos_closable_queue_t* queue,
     if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
-    if (queue == NULL || maximum_waiters == 0 || maximum_waiters > UINT32_MAX) {
+    if (queue == NULL ||
+        (uintptr_t)queue % _Alignof(nx_freertos_closable_queue_t) != 0 ||
+        maximum_waiters == 0 || maximum_waiters > UINT32_MAX ||
+        item_size == 0 || depth > storage_bytes / item_size ||
+        !storage_disjoint(queue, sizeof *queue, storage, depth * item_size)) {
         return NX_ERROR_INVALID;
     }
     nx_result_t result = nx_freertos_queue_init(

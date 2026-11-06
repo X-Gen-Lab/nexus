@@ -36,7 +36,8 @@ CORE_SYMBOLS = frozenset({
     'nx_request_transition', 'nx_request_state', 'nx_request_settle',
     'nx_request_result', 'nx_request_slot_bind', 'nx_request_slot_lookup',
     'nx_request_slot_release', 'nx_clock32_initialize', 'nx_clock32_observe',
-    'nx_deadline_after', 'nx_deadline_expired', 'nx_wait_until',
+    'nx_deadline_after', 'nx_deadline_finite_after', 'nx_deadline_expired',
+    'nx_wait_until',
 })
 FREERTOS_SYMBOLS = frozenset({
     'nx_freertos_isr_allowed', 'nx_freertos_notify_init',
@@ -86,6 +87,10 @@ def source_inputs(root: Path) -> list[dict]:
         paths.update(path for path in (root / layer).rglob('*')
                      if path.is_file() and (path.suffix in {'.c', '.h', '.cmake'}
                                             or path.name == 'CMakeLists.txt'))
+    # Reviewed derived ports consume owned patch bytes as production inputs.
+    # Freezing only the Python entry would miss an overlay changed mid-matrix.
+    paths.add(root / 'os/reviewed_patch.py')
+    paths.update((root / 'os').rglob('*.patch'))
     paths.update(root / name for name in (
         'tools/configure/cpu.py', 'tools/configure/runtime.py',
         'tools/configure/ir.py', 'tools/configure/kernel.py',

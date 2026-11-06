@@ -8,6 +8,7 @@
  */
 #ifndef NEXUS_ARCH_SLEEP_PRIVATE_H
 #define NEXUS_ARCH_SLEEP_PRIVATE_H
+#include "registers.h"
 #include <stdint.h>
 #if defined(NEXUS_ARCH_SLEEP_MODEL)
 #include "arch_sleep_model.h"
@@ -19,7 +20,7 @@ static inline void nx_arch_sleep_instruction(void) {
 }
 #elif defined(__arm__) || defined(__thumb__)
 static inline uint32_t nx_arch_sleep_control(void) {
-    return *(volatile const uint32_t*)0xe000ed10u;
+    return *(volatile const uint32_t*)NX_ARCH_REG_SCR;
 }
 static inline void nx_arch_sleep_instruction(void) {
     __asm__ volatile("wfi" ::: "memory");

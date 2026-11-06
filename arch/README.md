@@ -117,7 +117,23 @@ The pinned official CMSIS-Core v6.4.0 headers
 `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`,
 `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`,
 `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed
-register-layout references. The shared private Core source does not
+register-layout references. The shared private `registers.h` holds the used
+current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c`
+independently compares those facts and used MPU/SAU/cache fields with official
+headers for all nine CPU profiles. The compile gate verifies the clean pinned
+Core and actual include origins; the production target keeps its Nexus-only
+dependency boundary. The shared private Core source does not
 change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU
 contracts, and does not establish new processor/profile or physical support. Actual IRQ latency,
 privilege transitions, DMA/cache coherency and CPU timing require HIL.
+
+`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI
+variants with the actual GNU ARM compiler at O2. Separate real production
+`atomic.h` probes retain all nine public operations. Function-level audits bind
+saved masks, restore barriers, publication access and exclusive RMW to each
+operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK
+port. Machine instruction counts describe static code shapes. They neither
+bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang
+qualification, SoC startup, Board wiring and physical behavior remain separate
+evidence scopes. MPU/SAU programming success means validated writes followed by
+barriers; these mechanisms do not verify readback or an enabled policy.

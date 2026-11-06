@@ -21,6 +21,7 @@
 #include "nexus/arch/security.h"
 #include "nexus/arch/sleep.h"
 #include "nexus/core/request.h"
+#include "nexus/core/time.h"
 #include "nexus/os/baremetal.h"
 #include "nexus_config.h"
 #if NEXUS_CPU_HAS_MVE
@@ -161,6 +162,10 @@ void _start(void) {
     result_sink += (uint32_t)nx_clock32_observe(&clock, 1u, &now);
     result_sink +=
         (uint32_t)nx_deadline_expired(nx_deadline_after(now, 1u), now);
+    nx_time_us_t finite_deadline = 0;
+    result_sink +=
+        (uint32_t)nx_deadline_finite_after(now, 1u, &finite_deadline);
+    result_sink += (uint32_t)finite_deadline;
     nx_atomic_u32_store_release(&atomic_word, 1u);
     result_sink += nx_atomic_u32_load_acquire(&atomic_word);
     result_sink += nx_atomic_u32_fetch_add_acq_rel(&atomic_word, 1u);

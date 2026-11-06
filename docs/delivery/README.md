@@ -15,8 +15,15 @@
 `706ee80` 已通过普通完整索引门禁及完整 Python174 复扫，38 条 finding（含
 2 error）全部唯一对应原已审处置，七条旧 finding 消失且无新增。私有 E `f59debf1` 固定 P2，
 17 presets／116 命令、source／installed 各五个真实 C broker 场景、三个 recipes 及公共
-SDK walk 均实际通过，私有原件保持私有。E 已正常 nonforce push 并精确读回 `f59debf1`，
-仓库保持 private、private main 未更新；后续 D／部署／FF 仍待各自实际结果。历史 `7590b2d4` 及上述预览保持原身份，资格不随
+SDK walk 均实际通过，私有原件保持私有。E 已正常 nonforce push 并精确读回 `f59debf1`。
+后续已完成公共与私有 main 的 nonforce FF，分别固定 `e47887d3` 和 `f59debf1`；
+仓库仍保持各自公开／私有边界。D 的严格双语构建、文档包实际恢复及 Pages 发布已完成，
+新站点逐项取得 2971 次 HTTP 观察；这不是全站每个历史文件的远端验证。
+[最终实际收条](https://github.com/X-Gen-Lab/nexus/blob/ceab79e62fc445bce6b3246104ceb365d9bfe82a/docs-final-receipts-e47887d3-20261104/post-deploy.json)
+保留精确输入、发布和读回身份，历史台账中的 pending 快照仍保留原时点。
+本轮 Core／Arch／OS 已完成记录范围内的有界软件实现与实际检查，源码身份、各项结果及
+可恢复证据见 [core_arch_os_20261104 记录](platform-delivery-completion-results.json)。
+该记录不构成新的完整 159 阶段软件候选资格；物理 HIL 仍未执行，P2 的软件资格不会自动转移。历史 `7590b2d4` 及上述预览保持原身份，资格不随
 文档或 QA 提交转移。下一轮工作按[迭代入口](next-iterations.md)推进，状态只维护在
 原交付台账。
 

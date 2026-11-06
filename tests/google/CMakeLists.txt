@@ -107,6 +107,8 @@ nexus_google_test(nexus_silicon_admission_test
     SOURCES silicon_admission_test.cpp
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/common")
+nexus_google_test(nexus_core_lifecycle_test SOURCES core_lifecycle_test.cpp
+    LIBRARIES Nexus::Core)
 nexus_google_test(nexus_spi_dma_transaction_test
     SOURCES spi_dma_transaction_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch

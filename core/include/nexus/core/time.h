@@ -82,6 +82,27 @@ bool nx_deadline_expired(nx_time_us_t deadline, nx_time_us_t now);
  */
 nx_time_us_t nx_deadline_after(nx_time_us_t now, uint64_t duration_us);
 /**
+ * \brief           Construct a finite deadline without selecting infinite wait.
+ *
+ * \param[in]       now: Current finite time in the consumer's clock domain.
+ *
+ * \param[in]       duration_us: Relative duration in microseconds; zero is
+ * valid.
+ *
+ * \param[out]      deadline: Finite result, unchanged on failure.
+ *
+ * \return          SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED
+ *                  when the sum reaches NX_DEADLINE_NEVER or would overflow.
+ *
+ * \note            Bounded task/IRQ arithmetic, without reads of a clock,
+ *                  allocation or retained references. Clock readiness and
+ *                  domain lifetime remain the caller's responsibility. Use
+ *                  nx_deadline_after only when saturation to an infinite wait
+ *                  is intentional.
+ */
+nx_result_t nx_deadline_finite_after(nx_time_us_t now, uint64_t duration_us,
+                                     nx_time_us_t* deadline);
+/**
  * \brief           Initialize counter extension and its clock domain.
  *
  * \param[out]      clock: Caller-owned extension state.
@@ -105,14 +126,17 @@ nx_result_t nx_clock32_initialize(nx_clock32_t* clock, uint32_t counter,
  *
  * \param[in]       counter: Current counter snapshot.
  *
- * \param[out]      time_us: Extended elapsed microseconds.
+ * \param[out]      time_us: Distinct extended elapsed microseconds.
  *
- * \return          NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED.
+ * \return          SUCCESS, INVALID for NULL/overlapping output, STATE for an
+ *                  uninitialized clock, or EXHAUSTED. Failure changes neither
+ *                  extension state nor output.
  *
- * \note            Observe at least once per 2^32 ticks, even when idle.
+ * \note            Observe strictly before 2^32 ticks elapse, even when idle.
  *                  Multiple missed wraps cannot be detected from two
- *                  snapshots. Counter must continue through waits; frequency
- *                  cannot change.
+ *                  snapshots, nor can one complete wrap at equal snapshots.
+ *                  Counter must continue through waits; frequency cannot
+ *                  change. No concurrent initialize/reset or observation.
  */
 nx_result_t nx_clock32_observe(nx_clock32_t* clock, uint32_t counter,
                                nx_time_us_t* time_us);

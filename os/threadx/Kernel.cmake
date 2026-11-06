@@ -65,8 +65,13 @@ return sem_clockwait(&semaphore, CLOCK_MONOTONIC, &deadline); }"
         endif()
         set(overlay_directory "${CMAKE_CURRENT_BINARY_DIR}/${target}-port")
         file(MAKE_DIRECTORY "${overlay_directory}")
+        get_filename_component(reviewed_patch
+            "${owned_root}/../reviewed_patch.py" ABSOLUTE)
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${owned_root}/prepare_linux.py")
+            "${owned_root}/prepare_linux.py"
+            "${reviewed_patch}"
+            "${owned_root}/patches/linux-lowlevel.patch"
+            "${owned_root}/patches/linux-scheduler.patch")
         foreach(kind lowlevel scheduler)
             if(kind STREQUAL "lowlevel")
                 set(filename "tx_initialize_low_level.c")
