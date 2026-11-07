@@ -31,7 +31,7 @@ msgid "Core 提供调用者持有存储的 C11 请求准入、完成状态、稳
 msgstr "Core 提供调用者持有存储的 C11 请求准入、完成状态、稳定控制身份、单调绝对 截止时间和可选观察。公共头在 `include/nexus/core/`，实现在 `src/`。 它不依赖设备、Arch、OS 或厂商 SDK，没有堆、全局注册表或隐藏执行线程。 I/O 具体实现、责任者和等待适配在这些基础合同上组合具体行为。"
 
 msgid "![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)"
-msgstr "![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：Core 请求状态与借用](/assets/diagrams/request-lifecycle.svg)"
 
 msgid "FIG-06：Core 请求状态与借用"
 msgstr "FIG-06：Core 请求状态与借用"
@@ -208,7 +208,7 @@ msgid "Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在 `i
 msgstr "Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在 `include/nexus/arch/`，Arm Cortex-M 实现在 `arm/cortex_m/`，宿主实现在 `native/`。CPU 事实在构建期选择唯一基础实现，没有运行时 CPU factory。 新架构需要受审实现和编译器合同，不能仅登记名称就宣称支持。"
 
 msgid "![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)"
-msgstr "![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)"
+msgstr "![FIG-13：Cortex-M 能力分层](/assets/diagrams/cortex-m-capabilities.svg)"
 
 msgid "FIG-13：Cortex-M 能力分层"
 msgstr "FIG-13：Cortex-M 能力分层"
@@ -346,13 +346,13 @@ msgid "I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现�
 msgstr "I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操作、借用与退出 合同。公共类型不含厂商 Handle 或寄存器布局。实际模式和受审路线以 [能力矩阵](/delivery/capabilities.md)为准；公共头存在不代表每颗芯片实现 全部操作，也不授权未知 PCB 接线。"
 
 msgid "![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)"
-msgstr "![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)"
+msgstr "![FIG-04：factory 与静态实例](/assets/diagrams/factory-instances.svg)"
 
 msgid "FIG-04：factory 与静态实例"
 msgstr "FIG-04：factory 与静态实例"
 
 msgid "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
-msgstr "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
+msgstr "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
 
 msgid "目录和构建边界"
 msgstr "目录和构建边界"
@@ -469,7 +469,7 @@ msgid "OS 层提供公共等待／唤醒合同和后端专用静态对象 API。
 msgstr "OS 层提供公共等待／唤醒合同和后端专用静态对象 API。裸机没有调度器，Native 使用 POSIX 线程，FreeRTOS 使用调用者明确选择的 TCB、栈和队列存储。 没有通用最大对象池、隐藏产品工作线程、默认定时器后台任务，也不让设备依赖 OS。"
 
 msgid "![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)"
-msgstr "![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)"
+msgstr "![FIG-08：等待、唤醒与外部退出](/assets/diagrams/wait-wake-shutdown.svg)"
 
 msgid "FIG-08：等待、唤醒与外部退出"
 msgstr "FIG-08：等待、唤醒与外部退出"
@@ -589,7 +589,7 @@ msgid "架构与阅读入口"
 msgstr "架构与阅读入口"
 
 msgid "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
-msgstr "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
+msgstr "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
 
 msgid "类别"
 msgstr "类别"
@@ -781,7 +781,7 @@ msgid "实际硬件算法直接由本 family 的 C 代码持有。启动、clock
 msgstr "实际硬件算法直接由本 family 的 C 代码持有。启动、clock、timebase、memory 和 power 也留在本层。可复用 IP 算法进入 [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)，但每个 wrapper 仍须检查真实厂商布局、bit、clock、IRQ／DMA 和 errata；外设同名不证明硬件等价。"
 
 msgid "![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31：共享 IP 与精确 SoC 源码归属](/assets/diagrams/driver-source-ownership.svg)"
 
 msgid "FIG-31：共享 IP 与精确 SoC 源码归属"
 msgstr "FIG-31：共享 IP 与精确 SoC 源码归属"
@@ -1045,7 +1045,7 @@ msgid "架构与接入顺序"
 msgstr "架构与接入顺序"
 
 msgid "![FIG-03：Board 事实进入严格配置和静态生成链](../docs/assets/diagrams/configuration-generation.svg)"
-msgstr "![FIG-03：Board 事实进入严格配置和静态生成链](../docs/assets/diagrams/configuration-generation.svg)"
+msgstr "![FIG-03：Board 事实进入严格配置和静态生成链](/assets/diagrams/configuration-generation.svg)"
 
 msgid "FIG-03：Board 事实进入严格配置和静态生成链"
 msgstr "FIG-03：Board 事实进入严格配置和静态生成链"

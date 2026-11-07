@@ -31,7 +31,7 @@ msgid "Core 提供调用者持有存储的 C11 请求准入、完成状态、稳
 msgstr "Core provides C11 request admission, completion state, stable control identities, monotonic absolute deadlines and optional observation in caller-owned storage. Public headers are in `include/nexus/core/`, with implementations in `src/`. It depends on no devices, Arch, OS or vendor SDK and has no heap, global registry or hidden execution thread. Concrete I/O implementations, owners and wait adapters compose their behavior on these foundational contracts."
 
 msgid "![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)"
-msgstr "![FIG-06: Core request state and borrowing](../docs/assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06: Core request state and borrowing](/assets/diagrams/request-lifecycle.svg)"
 
 msgid "FIG-06：Core 请求状态与借用"
 msgstr "FIG-06: Core request state and borrowing"
@@ -208,7 +208,7 @@ msgid "Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在 `i
 msgstr "Arch supplies CPU-local mechanisms to I/O, SoC and OS adapters. Public headers are in `include/nexus/arch/`, Arm Cortex-M implementation in `arm/cortex_m/` and host implementation in `native/`. CPU facts select one base implementation at build time; there is no runtime CPU factory. A new architecture needs a reviewed implementation and compiler contract; registering its name alone cannot establish support."
 
 msgid "![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)"
-msgstr "![FIG-13: Cortex-M capability layers](../docs/assets/diagrams/cortex-m-capabilities.svg)"
+msgstr "![FIG-13: Cortex-M capability layers](/assets/diagrams/cortex-m-capabilities.svg)"
 
 msgid "FIG-13：Cortex-M 能力分层"
 msgstr "FIG-13: Cortex-M capability layers"
@@ -346,13 +346,13 @@ msgid "I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现�
 msgstr "I/O provides public C11 types for applications and components, and operation, borrowing and exit contracts for concrete SoC implementations. Public types contain no vendor Handles or register layouts. Actual modes and reviewed routes follow the [capability matrix](/delivery/capabilities.md). Public headers do not imply that every chip implements every operation or authorize unknown PCB wiring."
 
 msgid "![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)"
-msgstr "![FIG-04: factory and static instances](../docs/assets/diagrams/factory-instances.svg)"
+msgstr "![FIG-04: factory and static instances](/assets/diagrams/factory-instances.svg)"
 
 msgid "FIG-04：factory 与静态实例"
 msgstr "FIG-04: factory and static instances"
 
 msgid "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
-msgstr "This figure is an exact reference assembly that distinguishes existing interface objects, shared method tables and independent contexts. Lookup does not start hardware. See [FIG-16](../docs/assets/diagrams/io-evolution.svg) for current generic assembly and execution, and the [figure atlas](/assets/diagrams/README.md) for scope and legend."
+msgstr "This figure is an exact reference assembly that distinguishes existing interface objects, shared method tables and independent contexts. Lookup does not start hardware. See [FIG-16](/assets/diagrams/io-evolution.svg) for current generic assembly and execution, and the [figure atlas](/assets/diagrams/README.md) for scope and legend."
 
 msgid "目录和构建边界"
 msgstr "Directory and build boundaries"
@@ -469,7 +469,7 @@ msgid "OS 层提供公共等待／唤醒合同和后端专用静态对象 API。
 msgstr "The OS layer provides public wait/wake contracts and backend-specific static-object APIs. Bare metal has no scheduler, Native uses POSIX threads, and FreeRTOS uses caller-selected TCB, stack and queue storage. There is no universal maximum-object pool, hidden product worker or default timer daemon, and devices do not depend on an OS."
 
 msgid "![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)"
-msgstr "![FIG-08: waiting, wake and external shutdown](../docs/assets/diagrams/wait-wake-shutdown.svg)"
+msgstr "![FIG-08: waiting, wake and external shutdown](/assets/diagrams/wait-wake-shutdown.svg)"
 
 msgid "FIG-08：等待、唤醒与外部退出"
 msgstr "FIG-08: waiting, wake and external shutdown"
@@ -589,7 +589,7 @@ msgid "架构与阅读入口"
 msgstr "Architecture and reading entry points"
 
 msgid "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
-msgstr "Components reach concrete providers through public ports; factory only queries existing static interfaces and performs no initialization. [FIG-04: static instances and interfaces](../docs/assets/diagrams/factory-instances.svg) shows shared read-only method tables, independent contexts and controller/endpoint identities. It does not imply every component creates a factory category."
+msgstr "Components reach concrete providers through public ports; factory only queries existing static interfaces and performs no initialization. [FIG-04: static instances and interfaces](/assets/diagrams/factory-instances.svg) shows shared read-only method tables, independent contexts and controller/endpoint identities. It does not imply every component creates a factory category."
 
 msgid "类别"
 msgstr "Category"
@@ -781,7 +781,7 @@ msgid "实际硬件算法直接由本 family 的 C 代码持有。启动、clock
 msgstr "The family’s C code directly owns actual hardware algorithms. Startup, clocks, timebase, memory and power also remain in this layer. Reusable IP algorithms go in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md), but each wrapper must still check actual vendor layout, bits, clocks, IRQ/DMA and errata. Matching peripheral names do not prove hardware equivalence."
 
 msgid "![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "![FIG-31: shared IP and exact SoC source ownership](../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: shared IP and exact SoC source ownership](/assets/diagrams/driver-source-ownership.svg)"
 
 msgid "FIG-31：共享 IP 与精确 SoC 源码归属"
 msgstr "FIG-31: shared IP and exact SoC source ownership"
@@ -1045,7 +1045,7 @@ msgid "架构与接入顺序"
 msgstr "Architecture and integration order"
 
 msgid "![FIG-03：Board 事实进入严格配置和静态生成链](../docs/assets/diagrams/configuration-generation.svg)"
-msgstr "![FIG-03: Board facts enter strict configuration and static generation](../docs/assets/diagrams/configuration-generation.svg)"
+msgstr "![FIG-03: Board facts enter strict configuration and static generation](/assets/diagrams/configuration-generation.svg)"
 
 msgid "FIG-03：Board 事实进入严格配置和静态生成链"
 msgstr "FIG-03: Board facts enter strict configuration and static generation"
