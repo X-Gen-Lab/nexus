@@ -214,6 +214,13 @@ class ReviewedMountTests(unittest.TestCase):
         specification.loader.exec_module(module)
         return module
 
+    @staticmethod
+    def selected_sdk_sources(_profile=None):
+        # Exercise the generic mount observer with this synthetic reviewed
+        # selection; production F4 supplier selection has independent tests.
+        return {item.path: item for item in catalogue.ALL_DEPENDENCIES
+                if item.scope == "runtime"}
+
     def inventory_metadata(self, root):
         import shutil
         source = Path(__file__).resolve().parents[2]
@@ -245,7 +252,8 @@ class ReviewedMountTests(unittest.TestCase):
         root, entries = self.prepared_root()
         self.inventory_metadata(root)
         sdk = self.sdk_module()
-        with patch.object(sdk, "REQUIRED_DEPENDENCIES", (entries[0].path,)):
+        with patch.object(sdk, "runtime_dependency_closure",
+                          side_effect=self.selected_sdk_sources):
             records = sdk.dependency_records(root, sdk.tree_entries(root))
         self.assertEqual({record["path"] for record in records},
                          {item.path for item in entries})
@@ -276,7 +284,8 @@ class ReviewedMountTests(unittest.TestCase):
         sdk = self.sdk_module()
         with patch.object(catalogue, "ALL_DEPENDENCIES", selected), patch.object(
                 proposals, "ALL_DEPENDENCIES", selected), patch.object(
-                sdk, "REQUIRED_DEPENDENCIES", (entries[0].path,)):
+                sdk, "runtime_dependency_closure",
+                side_effect=self.selected_sdk_sources):
             self.assertEqual(dependencies.prepare(root, "native")["status"], "verified")
             sdk.dependency_records(root, sdk.tree_entries(root))
             proposals.inventory(root)
@@ -330,7 +339,8 @@ class ReviewedMountTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "alias"):
             dependencies.prepare(root, "native")
         sdk = self.sdk_module()
-        with patch.object(sdk, "REQUIRED_DEPENDENCIES", (entries[0].path,)):
+        with patch.object(sdk, "runtime_dependency_closure",
+                          side_effect=self.selected_sdk_sources):
             with self.assertRaisesRegex(ValueError, "alias"):
                 sdk.dependency_records(root, sdk.tree_entries(root))
         with patch.object(proposals, "ALL_DEPENDENCIES", entries):
@@ -343,7 +353,8 @@ class ReviewedMountTests(unittest.TestCase):
         self.git(root, "update-index", "--add", "--cacheinfo", "160000",
                  self.pin, "ext/undeclared")
         self.commit(root, "undeclared source link")
-        with patch.object(sdk, "REQUIRED_DEPENDENCIES", (entries[0].path,)):
+        with patch.object(sdk, "runtime_dependency_closure",
+                          side_effect=self.selected_sdk_sources):
             with self.subTest(case="extra unknown link"):
                 with self.assertRaises(ValueError):
                     sdk.dependency_records(root, sdk.tree_entries(root))
@@ -355,7 +366,8 @@ class ReviewedMountTests(unittest.TestCase):
         self.git(root, "add", ".gitmodules")
         self.commit(root, "declared host link missing from owning tree")
         with patch.object(catalogue, "ALL_DEPENDENCIES", (*entries, host)):
-            with patch.object(sdk, "REQUIRED_DEPENDENCIES", (entries[0].path,)):
+            with patch.object(sdk, "runtime_dependency_closure",
+                              side_effect=self.selected_sdk_sources):
                 with self.subTest(case="missing known host link"):
                     with self.assertRaises(ValueError):
                         sdk.dependency_records(root, sdk.tree_entries(root))

@@ -1,4 +1,5 @@
 """Explicit GPIO electrical intent reaches the selected F407 cold contract."""
+from tools.configure.tests.native_fixture import native_fixture
 import dataclasses
 import json
 from pathlib import Path
@@ -7,7 +8,7 @@ import unittest
 
 from tools.configure import bindings, configure as gate, experience
 from tools.configure.ir import freeze
-from soc.stm32.stm32f407.configure.bindings import shared_irq_definitions
+from tools.configure.stm32f4.bindings import shared_irq_definitions
 
 
 class F407GpioElectricalTests(unittest.TestCase):
@@ -18,7 +19,9 @@ class F407GpioElectricalTests(unittest.TestCase):
 
     def assembly(self, *, kind="gpio", mode="input", options="", native=False):
         board_name = "native_reference" if native else "stm32f407_qiming_v31"
-        board = gate.load(gate.ROOT / "boards" / board_name / "board.json")
+        board_path = (gate.ROOT / "tests/support/native/board/board.json"
+                      if native else gate.ROOT / "boards" / board_name / "board.json")
+        board = gate.load(board_path)
         board["id"] = "electrical-contract-software-fixture"
         board["source_revision"] = "silicon-contract-only"
         board["provenance"] = []
@@ -52,7 +55,7 @@ class F407GpioElectricalTests(unittest.TestCase):
     def test_input_pull_up_and_down_are_immutable_and_reach_c(self):
         for pull, value in (("up", 1), ("down", 2)):
             with self.subTest(pull=pull):
-                result = gate.resolve_ir(self.assembly(options=f'pull="{pull}"\n'))
+                result = gate.resolve_ir(self.assembly(options=f'pull="{pull}"\n'), test_support=native_fixture(self.assembly(options=f'pull="{pull}"\n')))
                 item, = result.controllers
                 self.assertEqual(item.options.pull, pull)
                 with self.assertRaises(dataclasses.FrozenInstanceError):
@@ -63,7 +66,8 @@ class F407GpioElectricalTests(unittest.TestCase):
 
     def test_open_drain_output_reaches_c_without_runtime_storage(self):
         result = gate.resolve_ir(self.assembly(
-            mode="output", options='pull="up"\noutput_type="open-drain"\n'))
+            mode="output", options='pull="up"\noutput_type="open-drain"\n'), test_support=native_fixture(self.assembly(
+            mode="output", options='pull="up"\noutput_type="open-drain"\n')))
         item, = result.controllers
         self.assertEqual(item.options.output_type, "open-drain")
         source = bindings.emit(result)[1]
@@ -73,7 +77,7 @@ class F407GpioElectricalTests(unittest.TestCase):
         self.assertNotIn("LL_GPIO_", source)
 
     def test_ordinary_existing_gpio_keeps_explicit_old_electrical_defaults(self):
-        result = gate.resolve_ir(self.assembly(mode="output"))
+        result = gate.resolve_ir(self.assembly(mode="output"), test_support=native_fixture(self.assembly(mode="output")))
         item, = result.controllers
         self.assertEqual((item.options.pull, item.options.output_type),
                          ("none", "push-pull"))
@@ -87,24 +91,26 @@ class F407GpioElectricalTests(unittest.TestCase):
                         'output_type="open-drain"\n'):
             with self.subTest(options=options):
                 with self.assertRaises(gate.ConfigurationError):
-                    gate.resolve_ir(self.assembly(options=options))
+                    gate.resolve_ir(self.assembly(options=options), test_support=native_fixture(self.assembly(options=options)))
 
     def test_unmaintained_provider_cannot_silently_ignore_pull(self):
-        gate.resolve_ir(self.assembly(native=True, mode="output"))
+        gate.resolve_ir(self.assembly(native=True, mode="output"), test_support=native_fixture(self.assembly(native=True, mode="output")))
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "does not maintain these electrical"):
             gate.resolve_ir(self.assembly(native=True, mode="output",
-                                          options='pull="up"\n'))
+                                          options='pull="up"\n'), test_support=native_fixture(self.assembly(native=True, mode="output",
+                                          options='pull="up"\n')))
 
     def test_exti_pull_is_passed_to_its_own_cold_pin_contract(self):
         result = gate.resolve_ir(self.assembly(
-            kind="exti", mode="edge-event", options='pull="up"\n'))
+            kind="exti", mode="edge-event", options='pull="up"\n'), test_support=native_fixture(self.assembly(
+            kind="exti", mode="edge-event", options='pull="up"\n')))
         item, = result.controllers
         self.assertEqual(item.options.pull, "up")
         self.assertIn(".pull = 1u", bindings.emit(result)[1])
 
     def test_each_exti_vector_group_has_one_exact_dispatcher(self):
-        result = gate.resolve_ir(self.assembly(kind="exti", mode="edge-event"))
+        result = gate.resolve_ir(self.assembly(kind="exti", mode="edge-event"), test_support=native_fixture(self.assembly(kind="exti", mode="edge-event")))
         original, = result.controllers
         selected = []
         for line in (0, 3, 6, 9, 11, 15):
@@ -128,7 +134,8 @@ class F407GpioElectricalTests(unittest.TestCase):
 
     def test_matching_board_input_pull_constraint_is_immutable(self):
         result = gate.resolve_ir(self.constrained(
-            {"mode": "input", "pull": "up"}, options='pull="up"\n'))
+            {"mode": "input", "pull": "up"}, options='pull="up"\n'), test_support=native_fixture(self.constrained(
+            {"mode": "input", "pull": "up"}, options='pull="up"\n')))
         constraint = result.board_bindings["selected"]["electrical"]
         self.assertEqual(constraint.mode, "input")
         self.assertEqual(constraint.pull, "up")
@@ -141,13 +148,17 @@ class F407GpioElectricalTests(unittest.TestCase):
             with self.subTest(options=options):
                 with self.assertRaises(gate.ConfigurationError):
                     gate.resolve_ir(self.constrained(
-                        {"mode": "input", "pull": "up"}, options=options))
+                        {"mode": "input", "pull": "up"}, options=options), test_support=native_fixture(self.constrained(
+                        {"mode": "input", "pull": "up"}, options=options)))
 
     def test_matching_board_output_release_and_initial_constraints(self):
         result = gate.resolve_ir(self.constrained(
             {"mode": "output", "pull": "up",
              "output_type": "open-drain", "initial": 8},
-            mode="output", options='pull="up"\noutput_type="open-drain"\n'))
+            mode="output", options='pull="up"\noutput_type="open-drain"\n'), test_support=native_fixture(self.constrained(
+            {"mode": "output", "pull": "up",
+             "output_type": "open-drain", "initial": 8},
+            mode="output", options='pull="up"\noutput_type="open-drain"\n')))
         self.assertEqual(result.controllers[0].options.initial, 8)
         self.assertEqual(result.controllers[0].options.output_type, "open-drain")
 
@@ -155,7 +166,9 @@ class F407GpioElectricalTests(unittest.TestCase):
         with self.assertRaises(gate.ConfigurationError):
             gate.resolve_ir(self.constrained(
                 {"mode": "output", "output_type": "open-drain"},
-                mode="output"))
+                mode="output"), test_support=native_fixture(self.constrained(
+                {"mode": "output", "output_type": "open-drain"},
+                mode="output")))
 
     def test_board_constraint_rejects_nonapplicable_or_conflicting_facts(self):
         for electrical in ({"mode": "input", "output_type": "push-pull"},
@@ -167,17 +180,21 @@ class F407GpioElectricalTests(unittest.TestCase):
                            {"pull": "up"}, {"mode": "input", "typo": 1}):
             with self.subTest(electrical=electrical):
                 with self.assertRaises(gate.ConfigurationError):
-                    gate.resolve_ir(self.constrained(electrical))
+                    gate.resolve_ir(self.constrained(electrical), test_support=native_fixture(self.constrained(electrical)))
 
     def test_exti_board_pull_constraint_reaches_selected_cold_config(self):
         result = gate.resolve_ir(self.constrained(
             {"mode": "edge-event", "pull": "up"}, kind="exti",
-            mode="edge-event", options='pull="up"\n'))
+            mode="edge-event", options='pull="up"\n'), test_support=native_fixture(self.constrained(
+            {"mode": "edge-event", "pull": "up"}, kind="exti",
+            mode="edge-event", options='pull="up"\n')))
         self.assertIn(".pull = 1u", bindings.emit(result)[1])
         with self.assertRaises(gate.ConfigurationError):
             gate.resolve_ir(self.constrained(
                 {"mode": "edge-event", "pull": "up"}, kind="exti",
-                mode="edge-event"))
+                mode="edge-event"), test_support=native_fixture(self.constrained(
+                {"mode": "edge-event", "pull": "up"}, kind="exti",
+                mode="edge-event")))
 
     def test_board_first_query_projects_required_electrical_facts_as_json(self):
         self.constrained({"mode": "input", "pull": "up"},

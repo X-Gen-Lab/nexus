@@ -1,4 +1,5 @@
 """Generated instance identities remain distinct from private role storage."""
+from tools.configure.tests.native_fixture import native_fixture
 import json
 from pathlib import Path
 import re
@@ -23,7 +24,7 @@ class BindingIdentityTests(unittest.TestCase):
 
     def fixture(self, filename):
         path = gate.ROOT / filename
-        data = gate.load_assembly(path).to_dict()
+        data = gate.load_assembly(path, test_support=native_fixture(path)).to_dict()
         source = path.parent / data["board_package"] / "board.json"
         shutil.copyfile(source, self.board / "board.json")
         data["board_package"] = str(self.board)
@@ -34,7 +35,7 @@ class BindingIdentityTests(unittest.TestCase):
 
     def source(self, data):
         self.write(data)
-        result = gate.resolve_ir(self.assembly)
+        result = gate.resolve_ir(self.assembly, test_support=native_fixture(self.assembly))
         return bindings.emit(result)[1]
 
     def assert_unique_storage(self, source):
@@ -58,16 +59,15 @@ class BindingIdentityTests(unittest.TestCase):
                                     "mode": "output"})
 
     def test_platform_state_names_remain_legal_instance_ids(self):
-        for filename in ("tools/configure/assemblies/qiming-baremetal.toml",
-                         "tools/configure/assemblies/liangshan-baremetal.toml"):
+        for filename in ('tools/configure/assemblies/qiming-baremetal.toml',):
             with self.subTest(fixture=filename):
                 data = self.fixture(filename)
                 data["controllers"][0]["id"] = "started"
                 data["controllers"][1]["id"] = "initialized"
                 source = self.source(data)
                 self.assert_unique_storage(source)
-                self.assertRegex(source, r"static nx_(stm32|gd32)_gpio_state_t s_nx_port_started;")
-                self.assertRegex(source, r"static nx_(stm32|gd32)_uart_state_t s_nx_port_initialized;")
+                self.assertRegex(source, r"static nx_stm32_gpio_state_t s_nx_port_started;")
+                self.assertRegex(source, r"static nx_stm32_uart_state_t s_nx_port_initialized;")
                 self.assertIn("static bool s_nx_platform_started;", source)
                 self.assertIn("static size_t s_nx_platform_initialized;",
                               source)
@@ -110,15 +110,15 @@ class BindingIdentityTests(unittest.TestCase):
         data["controllers"][0]["id"] = "started"
         self.write(data)
         output = self.root / "bundle"
-        gate.configure(self.assembly, output)
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         first = {path.name: path.read_bytes() for path in output.iterdir()}
-        gate.configure(self.assembly, output)
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         second = {path.name: path.read_bytes() for path in output.iterdir()}
         self.assertEqual(first, second)
         self.assert_unique_storage((output / "bindings.c").read_text())
         with patch.object(gate, "generate", side_effect=RuntimeError("emit")):
             with self.assertRaisesRegex(RuntimeError, "emit"):
-                gate.configure(self.assembly, output)
+                gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         self.assertFalse(output.exists())
         self.assertEqual(list(self.root.glob(".nexus-config-*")), [])
 

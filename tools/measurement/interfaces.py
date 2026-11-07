@@ -29,7 +29,7 @@ def shared_operation_symbols(root=None):
     from tools.measurement.retention import source_contracts
     root = Path(root or Path(__file__).resolve().parents[2]).resolve()
     _, _, providers, _ = source_contracts(root)
-    directories = {root / "drivers", root / "io/src"}
+    directories = {root / "soc/stm32/stm32f4/drivers/ip", root / "io/src"}
     return frozenset(name for name, provider in providers.items()
                      if any(Path(provider["source"]["path"]).is_relative_to(path)
                             for path in directories))

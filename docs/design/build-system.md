@@ -47,7 +47,7 @@ independent review apply to this maintenance work.
 
 The following support matrix records observed host tools and declared locks.
 The final clean-source software gates and eight exact offline candidates are
-recorded in the [execution record](../delivery/build-system-verification.md).
+recorded in the [execution record](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/build-system-verification.md).
 Host observations retain their own scope; source qualification uses the recorded
 code commit and never follows a later documentation HEAD automatically.
 
@@ -113,7 +113,7 @@ recipe inputs therefore remain separate acceptance states.
 The execution ledger keeps all 48 requested requirements and exit conditions
 unchanged. Its updated paths bind the implementation, original RED/GREEN
 records and the final-source software gates in the
-[execution record](../delivery/build-system-verification.md) and
+[execution record](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/build-system-verification.md) and
 [result index](../delivery/build-system-results.json). Historical measurements
 retain their source and exact selections instead of inheriting a later HEAD.
 

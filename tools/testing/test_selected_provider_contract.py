@@ -30,6 +30,7 @@ class SelectedProviderContractTests(unittest.TestCase):
             shutil.which("cmake"), "-S", str(ROOT), "-B",
             str(self.root / (package.name + "-build")), "-G", "Ninja",
             "-DPython3_EXECUTABLE=" + sys.executable,
+            "-DNEXUS_TEST_SUPPORT=ON",
             "-DNEXUS_ASSEMBLY_FILE=" + str(assembly),
             "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF"],
             capture_output=True, text=True, timeout=90)

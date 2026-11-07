@@ -1,7 +1,7 @@
 # Real generated C keeps the permanent SRAM owner before runtime construction.
 set(boot_platform_bundle "${CMAKE_CURRENT_BINARY_DIR}/qiming-boot-platform")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
     --source-root "${NEXUS_SOURCE_DIR}"
     --assembly "${NEXUS_SOURCE_DIR}/boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
     --output "${boot_platform_bundle}"
@@ -28,13 +28,14 @@ nexus_google_test(nexus_qiming_boot_platform_test STM32F4_LL
     SOURCES qiming_boot_platform_test.cpp
         "${boot_platform_bundle}/bindings.c"
         "${boot_platform_bundle}/host-linker-symbols.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/fsmc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/fsmc_boot.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fsmc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fsmc_boot.c"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_ll_fsmc.c"
     LIBRARIES Nexus::IO
     INCLUDES "${boot_platform_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private/fsmc_hal"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/fsmc_hal"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(nexus_qiming_boot_platform_test SYSTEM PRIVATE

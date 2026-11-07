@@ -7,20 +7,10 @@ source_language: en
 
 # Architecture explanations
 
-Understand boundaries, static assembly and retained storage before changing a provider. The linked design contracts remain authoritative.
-
-The [I/O evolution design](../design/io-evolution.md) explains resource plans,
-optional traits and enhanced data contracts; its execution ledger keeps current
-and pending work separate.
-
-The [H743 Flash RAM design](../design/h743-flash-ram.md) explains the selected
-V/cache-off maintenance boundary: a private CPU bridge, RAM vector owner,
-temporary MPU protection and real drain before return. The source is integrated;
-the target diagrams retain open production-ELF and complete software exits.
-
-The [RTC/LPTIM explanation](rtc-lptim.md) separates raw calendar, finite counter and Core deadline domains. It covers current Native typed assembly, ownership, drain and explicit lifecycle; physical RTC/LPTIM and low-power support remain separate targets.
-
-The [GPIO pin-state explanation](gpio-pin-states.md) separates explicit GPIO images from factory identity, cold pad/gate ownership and checked cleanup. Its current G474 reference does not provide wake, retention or hardware low-power qualification.
+Understand static assembly, execution and retained ownership before changing a
+provider. Current production MCU support is limited to the F4 package; Native
+belongs to explicit host-test support. Historical chip-specific implementation
+records remain tied to their original source revision.
 
 ```{toctree}
 :maxdepth: 2
@@ -29,6 +19,5 @@ platform-architecture
 factory
 ownership
 rtc-lptim
-gpio-pin-states
 source-map
 ```

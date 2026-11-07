@@ -12,12 +12,12 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
-HELPER = ROOT / "soc/stm32/stm32f407/Entropy.cmake"
+HELPER = ROOT / "soc/stm32/stm32f4/Entropy.cmake"
 PLATFORM_ROOT = ROOT
 
 
 class EntropyTargetTests(unittest.TestCase):
-    def configure(self, body, family="stm32f407"):
+    def configure(self, body, family="stm32f4"):
         with tempfile.TemporaryDirectory(prefix="entropy target ") as value:
             directory = Path(value)
             source = directory / "source"
@@ -29,6 +29,8 @@ class EntropyTargetTests(unittest.TestCase):
                 "add_library(Nexus::Platform ALIAS platform)\n"
                 f'set_property(TARGET platform PROPERTY NEXUS_SOC_FAMILY '
                 f'"{family}")\n'
+                'set_property(TARGET platform PROPERTY NEXUS_STM32_DEVICE '
+                '"STM32F407xx")\n'
                 f'set_property(TARGET platform PROPERTY NEXUS_SOURCE_DIR '
                 f'"{PLATFORM_ROOT}")\n'
                 "foreach(name nexus_io nexus_arch nexus_build_options "
@@ -62,7 +64,7 @@ class EntropyTargetTests(unittest.TestCase):
             source.mkdir()
             assembly = (PLATFORM_ROOT / "tools/configure/assemblies"
                         / "qiming-baremetal-empty.toml")
-            include_dir = ROOT / "soc/stm32/stm32f407/include"
+            include_dir = ROOT / "soc/stm32/stm32f4/include"
             (source / "CMakeLists.txt").write_text(
                 "cmake_minimum_required(VERSION 3.31)\n"
                 "project(empty_entropy_platform C ASM)\n"
@@ -71,8 +73,10 @@ class EntropyTargetTests(unittest.TestCase):
                 "set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL \"\")\n"
                 f'add_subdirectory("{PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)\n'
                 f'include("{HELPER}")\n'
-                "get_target_property(kind nexus_soc_stm32f407 TYPE)\n"
-                "if(NOT kind STREQUAL \"INTERFACE_LIBRARY\")\n"
+                "get_target_property(configuration Nexus::Platform NEXUS_CONFIG_DIR)\n"
+                'file(READ "${configuration}/resolved.json" resolved)\n'
+                'string(JSON controller_count LENGTH "${resolved}" controllers)\n'
+                "if(NOT controller_count EQUAL 0)\n"
                 '  message(FATAL_ERROR "Fixture unexpectedly selects I/O")\n'
                 "endif()\n"
                 "nexus_add_stm32f407_entropy(entropy)\n"

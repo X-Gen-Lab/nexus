@@ -1,14 +1,10 @@
 # Exact enhanced SPI selections reuse the maintained physical factory model graph.
-foreach(sequence_family stm32 gd32)
-    if(sequence_family STREQUAL "stm32")
-        set(sequence_stem f407)
-    else()
-        set(sequence_stem gd470)
-    endif()
+foreach(sequence_family stm32)
+    set(sequence_stem f407)
     set(sequence_input "${NEXUS_SOURCE_DIR}/tests/contracts/io_evolution_assembly/${sequence_stem}-spi-dma-transaction.toml")
     set(sequence_bundle "${CMAKE_CURRENT_BINARY_DIR}/spi-sequence-factory-${sequence_family}")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
         --source-root "${NEXUS_SOURCE_DIR}" --assembly "${sequence_input}"
         --output "${sequence_bundle}" RESULT_VARIABLE sequence_generated
         OUTPUT_VARIABLE sequence_output ERROR_VARIABLE sequence_error)
@@ -41,10 +37,6 @@ foreach(sequence_family stm32 gd32)
             list(APPEND sequence_owned_includes "${directory}")
         endif()
     endforeach()
-    if(sequence_family STREQUAL "gd32")
-        list(APPEND sequence_sources
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/i2c.c")
-    endif()
     list(REMOVE_DUPLICATES sequence_sources)
     set(sequence_target "nexus_${sequence_family}_spi_sequence_factory_test")
     nexus_google_test(${sequence_target}
@@ -56,28 +48,5 @@ foreach(sequence_family stm32 gd32)
         ${sequence_system} ${sequence_vendor_includes})
     target_compile_definitions(${sequence_target} PRIVATE ${sequence_definitions})
     target_compile_options(${sequence_target} PRIVATE ${sequence_options})
-    if(sequence_family STREQUAL "stm32")
-        target_link_options(${sequence_target} PRIVATE "-Wl,--gc-sections")
-    endif()
-    if(sequence_family STREQUAL "gd32")
-        # The retained polling participant now uses actual SPL primitives.
-        # Only its unrelated reset remains the fixture's external hardware
-        # model; rename that unused SDK entry in this private object alone.
-        set(sequence_i2c_vendor "${sequence_target}_i2c_vendor")
-        add_library(${sequence_i2c_vendor} OBJECT
-            "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c")
-        target_include_directories(${sequence_i2c_vendor} PRIVATE
-            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
-        target_include_directories(${sequence_i2c_vendor} SYSTEM PRIVATE
-            ${sequence_system} ${sequence_vendor_includes})
-        target_compile_definitions(${sequence_i2c_vendor} PRIVATE
-            GD32F470 HXTAL_VALUE=25000000
-            i2c_deinit=nx_sequence_official_i2c_deinit)
-        target_compile_features(${sequence_i2c_vendor} PRIVATE c_std_11)
-        target_compile_options(${sequence_i2c_vendor} PRIVATE
-            -Wno-int-to-pointer-cast)
-        target_sources(${sequence_target} PRIVATE
-            $<TARGET_OBJECTS:${sequence_i2c_vendor}>)
-    endif()
+    target_link_options(${sequence_target} PRIVATE "-Wl,--gc-sections")
 endforeach()

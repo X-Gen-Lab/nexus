@@ -38,7 +38,7 @@ neither it nor software RNG health checks qualify physical min-entropy or HIL.
 
 ### stm32f407_entropy.h
 
-```{doxygenfile} soc/stm32/stm32f407/include/nexus/soc/stm32f407_entropy.h
+```{doxygenfile} soc/stm32/stm32f4/include/nexus/soc/stm32f407_entropy.h
 :project: nexus
 ```
 
@@ -98,81 +98,11 @@ neither it nor software RNG health checks qualify physical min-entropy or HIL.
 :project: nexus
 ```
 
-(stm32h747__amp_8h)=
-
-## Selected H747 paired-boot attachment
-
-The H747 attachment requires an externally established paired boot, persistent
-boot-epoch authority and a complete noncacheable shared reservation. The initial
-M7 reference keeps D-Cache off. It does not start a peer, supply a Board or prove
-peer-reset recovery. See the [AMP ownership and shutdown
-contract](../../design/io-extension-boundaries.md) before retaining shared storage.
-
-```{doxygenfile} stm32h747_amp.h
-:project: nexus
-```
-
 (stm32f407__handoff_8h)=
 
 ## stm32f407_handoff.h
 
 ```{doxygenfile} stm32f407_handoff.h
-:project: nexus
-```
-
-(frame__dma2d_8h)=
-
-## frame_dma2d.h
-
-```{doxygenfile} frame_dma2d.h
-:project: nexus
-```
-
-(stm32u575__retained__time_8h)=
-
-## stm32u575_retained_time.h
-
-```{doxygenfile} stm32u575_retained_time.h
-:project: nexus
-```
-
-(stm32u575__lpdma__copy_8h)=
-
-## stm32u575_lpdma_copy.h
-
-```{doxygenfile} stm32u575_lpdma_copy.h
-:project: nexus
-```
-
-(stm32u575__lpdma__lptim1_8h)=
-
-## stm32u575_lpdma_lptim1.h
-
-```{doxygenfile} stm32u575_lpdma_lptim1.h
-:project: nexus
-```
-
-(stm32u575__stop2_8h)=
-
-## stm32u575_stop2.h
-
-```{doxygenfile} stm32u575_stop2.h
-:project: nexus
-```
-
-(stm32u575__stop2__copy_8h)=
-
-## stm32u575_stop2_copy.h
-
-```{doxygenfile} stm32u575_stop2_copy.h
-:project: nexus
-```
-
-(stm32u575__stop2__lptim1_8h)=
-
-## stm32u575_stop2_lptim1.h
-
-```{doxygenfile} stm32u575_stop2_lptim1.h
 :project: nexus
 ```
 

@@ -46,7 +46,7 @@ class F407I2s2RoleTests(unittest.TestCase):
                             "pins": ["PA0"]})
 
     def resolve(self, choice=None, **changes):
-        options = dict(family="stm32f407", part="STM32F407VET6",
+        options = dict(family='stm32f4', part="STM32F407VET6",
                        backend="baremetal", clock_profile="hse8-pll168")
         options.update(changes)
         return role.resolve(choice, **options)

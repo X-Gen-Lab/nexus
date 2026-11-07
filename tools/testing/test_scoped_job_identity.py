@@ -59,7 +59,7 @@ class SelectedIdentityTests(unittest.TestCase):
         (self.root / '.gitmodules').write_text(''.join(declarations))
         (self.root / 'board').mkdir()
         (self.root / 'board/board.json').write_text(
-            '{"soc_family":"stm32f407"}')
+            '{"soc_family":"stm32f4"}')
         self.assembly = self.root / 'assembly.toml'
         self.assembly.write_text('schema = 2\nboard_package = "board"\n'
                                  'backend = "baremetal"\n')
@@ -218,7 +218,7 @@ class SelectedIdentityTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             self.capture(output=self.root / 'build/other-identity')
 
-    def test_nested_selected_closure_is_required_and_recorded(self):
+    def test_builtin_freertos_port_keeps_unselected_ports_out_of_its_closure(self):
         self.assembly.write_text(self.assembly.read_text().replace(
             'baremetal', 'freertos'))
         self.commit_source()
@@ -227,14 +227,15 @@ class SelectedIdentityTests(unittest.TestCase):
         self.write_configuration()
         self.git(self.root / 'ext/freertos', 'submodule', 'deinit', '-f', '--',
                  relative_path(children('ext/freertos')[0]))
-        with self.assertRaises(EvidenceError):
-            self.capture()
-        self.initialize('ext/freertos')
         record = self.capture()
         paths = {item['path'] for item in
                  record['dependency_scope']['recursive_submodules']}
         for child in children('ext/freertos'):
-            self.assertIn(child.path, paths)
+            self.assertNotIn(child.path, paths)
+        self.assertIn('ext/freertos', paths)
+        self.git(self.root, 'submodule', 'deinit', '-f', '--', 'ext/freertos')
+        with self.assertRaises(EvidenceError):
+            self.capture()
 
     def test_failure_observation_never_claims_bad_scope_verified(self):
         self.receipt['scope'] = 'unknown'
@@ -243,10 +244,14 @@ class SelectedIdentityTests(unittest.TestCase):
         self.assertFalse(record['selected_dependencies_complete'])
         self.assertEqual(record['dependency_scope']['validation'], 'invalid')
 
-    def test_native_requires_every_declared_recursive_source(self):
+    def test_native_requires_its_explicit_active_and_host_configuration_sources(self):
         (self.root / 'board/board.json').write_text('{"soc_family":"native"}')
         self.assembly.write_text(self.assembly.read_text().replace(
             'baremetal', 'native'))
+        presets = self.root / 'CMakePresets.json'
+        document = json.loads(presets.read_text())
+        document['configurePresets'][0]['cacheVariables']['NEXUS_TEST_SUPPORT'] = True
+        presets.write_text(json.dumps(document))
         self.commit_source()
         with self.assertRaises(EvidenceError):
             prepare_preset(self.root, 'fixture')
@@ -254,14 +259,21 @@ class SelectedIdentityTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, 'ext/googletest'):
             prepare_preset(self.root, 'fixture')
         self.initialize('ext/googletest')
+        with self.assertRaisesRegex(EvidenceError, 'ext/(tomlc99|cjson)'):
+            prepare_preset(self.root, 'fixture')
+        self.initialize(*(item.path for item in
+                          source_catalogue.host_configuration_sources()))
         self.refresh_receipt()
         self.write_configuration()
         record = self.capture()
-        self.assertTrue(record['dependencies_complete'])
+        self.assertFalse(record['dependencies_complete'])
         self.assertTrue(record['selected_dependencies_complete'])
         self.assertEqual(record['dependency_scope']['scope'], 'native')
-        self.assertGreater(len(record['dependency_scope']['recursive_submodules']),
-                           len(ALL_SOURCE_DEPENDENCIES))
+        selected = {entry['path'] for entry in
+                    record['dependency_scope']['recursive_submodules']}
+        self.assertIn('ext/tomlc99', selected)
+        self.assertIn('ext/cjson', selected)
+        self.assertNotIn('vendors/st/cmsis_device_u5', selected)
 
     def test_valid_baremetal_receipt_cannot_bind_freertos_preset_configuration(self):
         (self.root / 'other.toml').write_text(

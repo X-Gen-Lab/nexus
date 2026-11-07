@@ -118,13 +118,17 @@ stage 与完整 executable manifest；仅表示以前观察且当前输入相符
 ```sh
 python tools/dev/dev.py create --templates ../nexus-examples \
   --revision <exact-40-character-examples-commit> \
-  --template native --source /absolute/path/to/nexus --output ../my-controller
+  --template native --source /absolute/path/to/nexus --output ../my-controller \
+  --test-support
 ```
 
 安装版用 `--sdk-prefix /absolute/path/to/verified-prefix`，与 `--source` 互斥；省略
 则选 coordinator 当前 root。安装 prefix 即使用作 source tree，也先由其 SDK verifier
 核对，再运行自己的 resolver。project origin 区分 expected lock、实际 source 与
 interpreter／resolver／input 身份。
+
+Native 仅用于测试模型，须显式传 `--test-support`；该选择同时传给配置验证和
+生成的 CMake 命令。STM32F4 产品工程不需要此选项。
 
 create 打印同一选择的 shell-quoted configure／build 和 Native test 命令，`--json`
 在 origin 中给 argv array，不执行。ARM toolchain 按选定 CPU 判断，不凭 family 名

@@ -7,6 +7,7 @@ COMPONENTS = frozenset({
     "owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "spi-dma-owner",
     "uart-owner", "bmp280", "bmp280-spi", "log", "storage",
     "flash-storage", "modbus-rtu", "settings",
+    "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
 })
 
 

@@ -19,11 +19,23 @@ They do not establish current support or qualification.
 
 ## Architecture and configuration
 
+- The production SoC scope is STM32F4, under `soc/stm32/stm32f4`.
+  Exact parts select reviewed device, memory, clock and route facts; a family
+  directory or official HAL module does not establish part/mode support.
+  Keep all existing `vendors/`, gitlinks, source locks and license records.
+  Unselected inventory dependencies never enter default preparation, validation,
+  compilation or SDK payloads. Never remove them during platform pruning.
+- Board and SoC packages contain C11, necessary startup assembly and declarative
+  facts, with no Python modules. Host configuration code belongs in `tools/`.
+  F4 implementations and reviewed IP code belong in the F4 package; no extra
+  top-level MCU driver registry or runtime forwarding layer is required.
+  Native models belong in `tests/support/native` and require explicit test
+  support; they are not a second production SoC.
 - Keep the default C11 path statically assembled and allocation-free: Core,
   Arch, SoC, typed I/O, optional OS/owner adapters, optional common components.
 - Maintain firmware hardware algorithms directly in C11 (with necessary Arch
   assembly): register access/readback, admission, waiting, peripheral lifecycle,
-  rollback and recovery. Host Python validates configuration and generates static
+  rollback and recovery. Central host tools validate and generate static
   configuration, storage, faces, factory and fixed connections. Generated thin
   IRQ entries and explicit typed call ordering are permitted. Do not maintain
   hardware algorithms as generated C strings or introduce a runtime register
@@ -182,7 +194,7 @@ claiming that formatting and comments passed.
 
 Run the maintained host/model and tool boundary suites. Changes to interrupt,
 lifecycle, persistence or concurrency need meaningful failure-path regressions.
-Compile common components for both MCU families. Native models establish software
+Compile common components for maintained F4 parts. Native models establish software
 behavior, ARM ELF checks establish linking/resources, and physical station results
 establish hardware behavior. Never inherit old test counts or hardware status.
 

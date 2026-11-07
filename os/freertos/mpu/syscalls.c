@@ -12,20 +12,9 @@
 #include "nexus/arch/arch.h"
 #include "nexus/os/freertos_user.h"
 #include "task.h"
-#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
-#include "private.h"
-#if NUM_SYSTEM_CALLS != 71 || SYSTEM_CALL_NexusGpioWrite != 70
-#error "Selected GPIO service requires the exact derived syscall ABI"
-#endif
-nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set,
-                               uint32_t reset) FREERTOS_SYSTEM_CALL;
-nx_result_t MPU_NexusGpioWriteImpl(uint32_t device, uint32_t set,
-                                   uint32_t reset) PRIVILEGED_FUNCTION;
 
-nx_result_t MPU_NexusGpioWriteImpl(uint32_t device, uint32_t set,
-                                   uint32_t reset) {
-    return nx_freertos_mpu_gpio_write(device, set, reset);
-}
+#if NUM_SYSTEM_CALLS != 70
+#error "Narrow user services require the exact pinned 70-slot syscall ABI"
 #endif
 
 #if configUSE_MPU_WRAPPERS_V1 != 0 || configENABLE_MPU != 1
@@ -62,9 +51,6 @@ TickType_t MPU_xTaskGetTickCountImpl(void) {
 PRIVILEGED_DATA UBaseType_t uxSystemCallImplementations[NUM_SYSTEM_CALLS] = {
     [SYSTEM_CALL_vTaskDelay] = (UBaseType_t)MPU_vTaskDelayImpl,
     [SYSTEM_CALL_xTaskGetTickCount] = (UBaseType_t)MPU_xTaskGetTickCountImpl,
-#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
-    [SYSTEM_CALL_NexusGpioWrite] = (UBaseType_t)MPU_NexusGpioWriteImpl,
-#endif
 };
 
 void nx_freertos_user_delay(uint32_t ticks) {
@@ -74,10 +60,3 @@ void nx_freertos_user_delay(uint32_t ticks) {
 uint32_t nx_freertos_user_ticks(void) {
     return (uint32_t)MPU_xTaskGetTickCount();
 }
-
-#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
-nx_result_t nx_freertos_user_gpio_write(uint32_t device, uint32_t set_mask,
-                                        uint32_t reset_mask) {
-    return MPU_NexusGpioWrite(device, set_mask, reset_mask);
-}
-#endif

@@ -1,4 +1,5 @@
 """Check developer admission failures and exact provider generation paths."""
+from tools.configure.tests.native_fixture import with_native_support
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -16,8 +17,8 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         for name in ('dependencies/platform-compatibility.json',
-                     'soc/native/soc.json', 'soc/native/routes.json',
-                     'boards/native_reference/board.json'):
+                     'tests/support/native/soc.json', 'tests/support/native/routes.json',
+                     'tests/support/native/board/board.json'):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(configure.ROOT / name, target)
@@ -32,7 +33,7 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         with redirect_stdout(out), redirect_stderr(err):
             try:
                 status = configure.main(
-                    [*args, '--source-root', str(self.root)])
+                    with_native_support([*args, '--source-root', str(self.root), '--test-support']))
             except SystemExit as error:
                 status = error.code
         return status, out.getvalue(), err.getvalue()
@@ -66,7 +67,7 @@ class ConfigurationAdmissionTests(unittest.TestCase):
     def test_private_board_symlink_parent_cannot_be_normalized_away(self):
         real = self.root / 'private'
         real.mkdir()
-        shutil.copyfile(self.root / 'boards/native_reference/board.json',
+        shutil.copyfile(self.root / 'tests/support/native/board/board.json',
                         real / 'board.json')
         (self.root / 'alias').symlink_to(real, target_is_directory=True)
         self.assembly.write_text(self.base.replace('board = "native_reference"',
@@ -92,8 +93,8 @@ class ConfigurationAdmissionTests(unittest.TestCase):
 
     def test_missing_selected_provider_entry_has_an_exact_cli_diagnostic(self):
         missing = ModuleNotFoundError(
-            "No module named 'soc.native.configure'",
-            name='soc.native.configure')
+            "No module named 'tests.support.native.configure'",
+            name='tests.support.native.configure')
         with patch('tools.configure.providers.import_module',
                         side_effect=missing):
             status, out, err = self.command(
@@ -104,9 +105,9 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         diagnostic = json.loads(err)
         self.assertEqual(diagnostic['code'], 'provider_module_missing')
         self.assertEqual(diagnostic['family'], 'native')
-        self.assertEqual(diagnostic['module'], 'soc.native.configure')
+        self.assertEqual(diagnostic['module'], 'tests.support.native.configure')
         self.assertEqual(diagnostic['source'],
-                         'soc/native/configure/__init__.py')
+                         'tests/support/native/configure/__init__.py')
 
     def test_provider_internal_import_error_is_not_an_unmaintained_family(self):
         for error in (ModuleNotFoundError(

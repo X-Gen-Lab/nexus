@@ -1,4 +1,5 @@
 """Physical erase ownership and executable image reservations stay distinct."""
+from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 
 from dataclasses import FrozenInstanceError
 import json
@@ -20,7 +21,7 @@ class ImageReservationTests(unittest.TestCase):
 
     def select(self, prefix=512, suffix=1024, *, explicit=True,
                assembly="sky-baremetal-empty.toml", limit=None):
-        source = configure.ROOT / "tools/configure/assemblies" / assembly
+        source = canonical_assembly(configure.ROOT, assembly)
         text = source.read_text(encoding="utf-8")
         assembly_data = tomllib.loads(text)
         if "board_package" in assembly_data:
@@ -43,7 +44,7 @@ class ImageReservationTests(unittest.TestCase):
             text = "layout = " + json.dumps(str(path)) + "\n" + text
         path = self.root / "assembly.toml"
         path.write_text(text, encoding="utf-8")
-        return configure.resolve_ir(path)
+        return configure.resolve_ir(path, test_support=native_fixture(path))
 
     def test_typed_owner_keeps_nonuniform_geometry_and_derived_window(self):
         result = self.select()
@@ -66,7 +67,8 @@ class ImageReservationTests(unittest.TestCase):
 
     def test_default_zero_reservations_keep_physical_and_link_semantics(self):
         original = configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/sky-baremetal-empty.toml")
+            "tools/configure/assemblies/sky-baremetal-empty.toml", test_support=native_fixture(configure.ROOT /
+            "tools/configure/assemblies/sky-baremetal-empty.toml"))
         selected = self.select(0, 0, explicit=False, limit=65536)
         self.assertEqual(selected.to_dict()["layout"], original.to_dict()["flash"])
         self.assertEqual(selected.image_origin, selected.flash["origin"])
@@ -102,10 +104,6 @@ class ImageReservationTests(unittest.TestCase):
         self.assertIn("image vectors require reviewed alignment", memory.linker(result))
         self.assertEqual(image_window(result.to_dict())["size"], result.image_size)
 
-    def test_reviewed_gd470_startup_uses_its_exact_alignment(self):
-        result = self.select(512, 1024, assembly="liangshan-baremetal-empty.toml")
-        self.assertEqual(result.image_origin, 0x08020200)
-        self.assertEqual(image_window(result.to_dict())["vector_alignment"], 512)
 
     def test_prefix_requires_f407_complete_vector_alignment(self):
         with self.assertRaisesRegex(configure.ConfigurationError, "alignment"):
@@ -135,9 +133,7 @@ class ImageReservationTests(unittest.TestCase):
         self.assertEqual(memory.resource_budget(result)["flash_loaded_max"], 129536)
 
     def test_unreviewed_startups_cannot_gain_prefix_or_trailer_support(self):
-        cases = ("native-empty.toml", "stm32-f103-baremetal.toml",
-                 "nucleo-h743-baremetal-empty.toml",
-                 "nucleo-u575-baremetal-empty.toml")
+        cases = ('native-empty.toml',)
         for assembly in cases:
             for prefix, suffix in ((512, 0), (0, 1024)):
                 with self.subTest(assembly=assembly, prefix=prefix):

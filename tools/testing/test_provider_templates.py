@@ -26,16 +26,16 @@ class ProviderTemplateTests(unittest.TestCase):
     def tree(self, directory, wrapper=WRAPPER, template=TEMPLATE):
         root = Path(directory)
         public = root / "io/include/nexus/io/probe.h"
-        source = root / "soc/reviewed/drivers/probe.c"
+        source = root / "soc/stm32/stm32f4/drivers/probe.c"
         header = root / "io/private/probe_impl.h"
         for path, contents in ((public, PUBLIC), (source, wrapper), (header, template)):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(contents)
         return root, source, header
 
-    def test_actual_timer_tables_are_projected_from_both_families(self):
+    def test_actual_f4_timer_tables_are_projected_from_family_sources(self):
         _, _, providers, _ = source_contracts(ROOT)
-        for family, stem in (("stm32f407", "stm32"), ("gd32f470", "gd32")):
+        for family, stem in (("stm32f4", "stm32"),):
             for name, template in (("timer_capture", "timer_capture_impl.h"),
                                    ("advanced_pwm", "advanced_pwm_impl.h")):
                 with self.subTest(family=family, name=name):
@@ -43,7 +43,7 @@ class ProviderTemplateTests(unittest.TestCase):
                     self.assertEqual(provider["source"], file_identity(
                         ROOT / source_directory(family) / "drivers" / (name + ".c")))
                     self.assertEqual(provider["template_source"], file_identity(
-                        ROOT / "drivers/timer/advanced_timer" / template))
+                        ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer" / template))
 
     def test_direct_projection_keeps_actual_translation_unit_identity(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -57,7 +57,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_reviewed_driver_template_keeps_translation_unit_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root, source, header = self.tree(directory)
-            driver = root / "drivers/probe/reviewed_ip/probe_impl.h"
+            driver = root / "soc/stm32/stm32f4/drivers/ip/reviewed_ip/probe_impl.h"
             driver.parent.mkdir(parents=True)
             header.rename(driver)
             _, _, providers, _ = source_contracts(root)
@@ -71,7 +71,7 @@ class ProviderTemplateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root, _, header = self.tree(directory)
             for ip in ("reviewed_ip", "another_ip"):
-                driver = root / "drivers/probe" / ip / header.name
+                driver = root / "soc/stm32/stm32f4/drivers/ip" / ip / header.name
                 driver.parent.mkdir(parents=True)
                 driver.write_text(TEMPLATE)
             header.unlink()
@@ -81,7 +81,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_reviewed_driver_template_rejects_local_shadow(self):
         with tempfile.TemporaryDirectory() as directory:
             root, source, header = self.tree(directory)
-            driver = root / "drivers/probe/reviewed_ip/probe_impl.h"
+            driver = root / "soc/stm32/stm32f4/drivers/ip/reviewed_ip/probe_impl.h"
             driver.parent.mkdir(parents=True)
             header.rename(driver)
             (source.parent / header.name).write_text(TEMPLATE)
@@ -160,7 +160,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_shared_driver_header_cannot_shadow_a_private_template(self):
         with tempfile.TemporaryDirectory() as directory:
             root, _, _ = self.tree(directory)
-            shadow = root / "drivers/probe/other_ip/probe_impl.h"
+            shadow = root / "soc/stm32/stm32f4/drivers/ip/other_ip/probe_impl.h"
             shadow.parent.mkdir(parents=True)
             shadow.write_text(TEMPLATE)
             with self.assertRaisesRegex(EvidenceError, "ambiguous"):
@@ -190,8 +190,7 @@ class PrivateValueHeaderCompileTests(unittest.TestCase):
                      "-Werror"]
         arguments += (["-E", "-dM", str(probe)] if preprocess else
                       ["-c", str(probe), "-o", str(output)])
-        for directory in (ROOT / "drivers/gpio/owned_pin_state",
-                          ROOT / "drivers/timer/advanced_timer",
+        for directory in (ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer",
                           ROOT / "io/private", ROOT / "io/include",
                           ROOT / "core/include", ROOT / "arch/include"):
             arguments += ["-I", str(directory)]
@@ -199,74 +198,12 @@ class PrivateValueHeaderCompileTests(unittest.TestCase):
                                 timeout=30)
         return result, output
 
-    def pin_implementation(self, bindings="", checks=""):
-        return (bindings + "#define NX_PIN_STATE_IMPLEMENTATION\n"
-                '#include "pin_state_impl.h"\n'
-                "#ifndef NX_PIN_STATE_IMPLEMENTATION\n"
-                "#error caller implementation selector was consumed\n"
-                "#endif\n" + checks)
 
-    def test_pin_declarations_need_no_bindings_and_are_idempotent(self):
-        source = ('#include "pin_state_impl.h"\n' * 2 +
-                  "#if defined(NX_PIN_READ) || defined(NX_PIN_WRITE)\n"
-                  "#error declaration-only include introduced register ports\n"
-                  "#endif\n"
-                  "nx_pin_state_plan_t plan;\n"
-                  "nx_pin_state_control_t control;\n")
-        for language in ("c", "c++"):
-            with self.subTest(language=language):
-                result, _ = self.compile(source, language=language)
-                self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_pin_default_ports_do_not_escape_the_implementation(self):
-        checks = ("#if defined(NX_PIN_READ) || defined(NX_PIN_WRITE)\n"
-                  "#error private default register ports escaped\n#endif\n")
-        result, _ = self.compile(self.pin_implementation(checks=checks))
-        self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_pin_caller_read_survives_without_leaking_default_write(self):
-        bindings = "#define NX_PIN_READ(reg) 17U\n"
-        checks = ("#ifdef NX_PIN_WRITE\n"
-                  "#error private default write port escaped\n#endif\n"
-                  "#ifndef NX_PIN_READ\n#error caller read port was consumed\n"
-                  "#endif\n"
-                  '_Static_assert(NX_PIN_READ(0) == 17U, '
-                  '"caller read changed");\n')
-        result, _ = self.compile(self.pin_implementation(bindings, checks))
-        self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_pin_caller_write_survives_without_leaking_default_read(self):
-        bindings = "#define NX_PIN_WRITE(reg, value) 29U\n"
-        checks = ("#ifdef NX_PIN_READ\n"
-                  "#error private default read port escaped\n#endif\n"
-                  "#ifndef NX_PIN_WRITE\n"
-                  "#error caller write port was consumed\n"
-                  "#endif\n"
-                  '_Static_assert(NX_PIN_WRITE(0, 0) == 29U, '
-                  '"caller write changed");\n')
-        result, _ = self.compile(self.pin_implementation(bindings, checks))
-        self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_pin_preserves_both_caller_ports_and_empty_selector(self):
-        bindings = ("#define NX_PIN_READ(reg) 17U\n"
-                    "#define NX_PIN_WRITE(reg, value) 29U\n")
-        checks = ("#if !defined(NX_PIN_READ) || !defined(NX_PIN_WRITE)\n"
-                  "#error caller register ports were consumed\n#endif\n"
-                  '_Static_assert(NX_PIN_READ(0) == 17U, '
-                  '"caller read changed");\n'
-                  '_Static_assert(NX_PIN_WRITE(0, 0) == 29U, '
-                  '"caller write changed");\n')
-        result, _ = self.compile(self.pin_implementation(bindings, checks))
-        self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_pin_private_helper_macros_do_not_escape(self):
-        result, _ = self.compile(self.pin_implementation(), preprocess=True)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        macros = {line.split()[1].split("(")[0]
-                  for line in result.stdout.splitlines()
-                  if line.startswith("#define NX_PIN_")}
-        self.assertEqual(macros, {"NX_PIN_STATE_IMPL_H",
-                                  "NX_PIN_STATE_IMPLEMENTATION"})
 
     def test_can_fd_declarations_are_idempotent_without_specialization(self):
         source = ('#include "can_fd_impl.h"\n' * 2 +
@@ -299,24 +236,10 @@ class ProviderTemplateCompileTests(unittest.TestCase):
 
     template_directory = None
     selections = (
-        ("stm32f407", "timer_capture", "cortex-m4", "STM32F407xx", "f4",
+        ("stm32f4", "timer_capture", "cortex-m4", "STM32F407xx", "f4",
          "NX_CAPTURE", "nx_stm32_timer_capture", "timer_capture_impl.h"),
-        ("stm32g474", "timer_capture", "cortex-m4", "STM32G474xx", "g4",
-         "NX_CAPTURE", "nx_stm32g474_timer_capture", "timer_capture_impl.h"),
-        ("gd32f470", "timer_capture", "cortex-m4", "GD32F470", None,
-         "NX_CAPTURE", "nx_gd32_timer_capture", "timer_capture_impl.h"),
-        ("stm32f407", "advanced_pwm", "cortex-m4", "STM32F407xx", "f4",
+        ("stm32f4", "advanced_pwm", "cortex-m4", "STM32F407xx", "f4",
          "NX_ADV", "nx_stm32_advanced_pwm", "advanced_pwm_impl.h"),
-        ("gd32f470", "advanced_pwm", "cortex-m4", "GD32F470", None,
-         "NX_ADV", "nx_gd32_advanced_pwm", "advanced_pwm_impl.h"),
-        ("stm32h743", "uart_fifo", "cortex-m7", "STM32H743xx", "h7",
-         "NX_UART_FIFO", "nx_stm32h743_uart_fifo", "uart_fifo_impl.h"),
-        ("stm32u575", "uart_fifo", "cortex-m33", "STM32U575xx", "u5",
-         "NX_UART_FIFO", "nx_stm32u575_uart_fifo", "uart_fifo_impl.h"),
-        ("stm32h743", "uart_rtscts", "cortex-m7", "STM32H743xx", "h7",
-         "NX_UART_FIFO", "nx_stm32h743_uart_rtscts", "uart_fifo_impl.h"),
-        ("stm32u575", "uart_rtscts", "cortex-m33", "STM32U575xx", "u5",
-         "NX_UART_FIFO", "nx_stm32u575_uart_rtscts", "uart_fifo_impl.h"),
     )
 
     def setUp(self):
@@ -355,11 +278,11 @@ class ProviderTemplateCompileTests(unittest.TestCase):
         probe = self.area / (family + "_" + stem + ".c")
         probe.write_text(source)
         output = probe.with_suffix(".o")
-        templates = tuple((ROOT / "drivers").glob("*/*/" + template))
+        templates = tuple((ROOT / "soc/stm32/stm32f4/drivers/ip").glob("*/" + template))
         self.assertEqual(len(templates), 1)
         includes = [self.area, self.template_directory or templates[0].parent,
                     ROOT / source_directory(family) / "private",
-                    ROOT / "io/private", ROOT / "soc/common",
+                    ROOT / "io/private",
                     ROOT / "core/include", ROOT / "io/include",
                     ROOT / "arch/include",
                     ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include"]
@@ -419,9 +342,8 @@ class ProviderTemplateCompileTests(unittest.TestCase):
                               result.stderr)
 
     def test_template_helpers_do_not_escape_the_include(self):
-        selections = ((self.selections[1], "NX_CAPTURE_COUNTER_MAX"),
-                      (self.selections[3], "NX_TIMER_WRITE"),
-                      (self.selections[6], "FIFO_TX_CR1"))
+        selections = ((self.selections[0], "NX_CAPTURE_COUNTER_MAX"),
+                      (self.selections[1], "NX_TIMER_WRITE"))
         for selection, helper in selections:
             with self.subTest(family=selection[0], helper=helper):
                 check = ("#ifdef " + helper +
@@ -431,17 +353,7 @@ class ProviderTemplateCompileTests(unittest.TestCase):
                 result, _ = self.compile(selection, append=check)
                 self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_zero_fifo_depth_is_not_a_usable_specialization(self):
-        result, _ = self.compile(self.selections[5],
-                                 replace=("NX_UART_FIFO_DEPTH", "0U"))
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Unsupported FIFO depth", result.stderr)
 
-    def test_unknown_flow_selector_is_not_implicitly_enabled(self):
-        result, _ = self.compile(self.selections[8],
-                                 replace=("NX_UART_FIFO_RTSCTS", "2"))
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Unsupported FIFO flow selector", result.stderr)
 
 
 if __name__ == "__main__":

@@ -146,8 +146,8 @@ into this page. These literal inputs are the same templates exercised by the tes
 ```{literalinclude} ../../cmake/package/verify_consumers.py
 :language: python
 :start-at: def prepare_consumer(
-:end-before: def prepare_modern_consumer(
-:caption: Maintained Native/F407/F470 consumer preparation; template code is not a shell command.
+:end-before: def prepare_service_consumer(
+:caption: Maintained explicit host-test/F4 consumer preparation; template code is not a shell command.
 ```
 
 ## Maintainer: prepare a publishable prefix

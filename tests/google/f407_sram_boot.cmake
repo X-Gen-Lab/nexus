@@ -5,14 +5,14 @@ file(WRITE "${sram_model}/nexus_config.h"
     "#define NEXUS_MEMORY_CCM 0\n#define NEXUS_MEMORY_ADDSRAM 1\n")
 nexus_google_test(nexus_f407_sram_boot_test STM32F4_LL
     SOURCES f407_sram_boot_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/sram_boot.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/memory_init.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sram_boot.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/memory_init.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_ll_fsmc.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private/fsmc_hal"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/fsmc_hal"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/components/ili9341/include"
         "${NEXUS_SOURCE_DIR}/tests/google")

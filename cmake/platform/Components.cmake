@@ -17,6 +17,11 @@ function(_nexus_component_bindings output)
         "settings=Nexus::Settings"
         "flash-storage=Nexus::FlashStorage"
         "modbus-rtu=Nexus::ModbusRTU"
+        "network=Nexus::LwIP"
+        "network-loaned-rx=Nexus::LwIPLoanedRX"
+        "tls=Nexus::TLS"
+        "mqtt=Nexus::CoreMQTT"
+        "mcuboot=Nexus::MCUBootControl"
         PARENT_SCOPE)
 endfunction()
 
@@ -46,6 +51,15 @@ function(nexus_resolve_components output)
         endforeach()
         if(NOT target)
             message(FATAL_ERROR "No owned target for component ${component}")
+        endif()
+        if(component MATCHES "^network")
+            nexus_add_lwip()
+        elseif(component STREQUAL "tls")
+            nexus_add_tls()
+        elseif(component STREQUAL "mqtt")
+            nexus_add_coremqtt()
+        elseif(component STREQUAL "mcuboot")
+            nexus_add_mcuboot_control()
         endif()
         if(NOT TARGET "${target}")
             message(FATAL_ERROR

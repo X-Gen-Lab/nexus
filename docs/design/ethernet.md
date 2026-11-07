@@ -4,6 +4,10 @@ This optional mechanism keeps network protocols, tasks, MAC-address policy,
 negotiation policy, PHY power/reset circuitry and product recovery outside Nexus.
 Lookup returns immutable Ethernet and MDIO faces; it never starts hardware.
 The default platform does not instantiate descriptors, buffers, a PHY or a worker.
+The production owner is `soc/stm32/stm32f4/`; this mode currently targets the exact
+STM32F407ZGT6 package and reviewed RMII software routes. Family organization does
+not establish support for every STM32F4 device. Native is an explicitly enabled
+host model under `tests/support/native/`, not a production SoC.
 
 The first mode is RMII, normal four-word chained descriptors, contiguous untagged
 Ethernet II frames, 14–1514 bytes excluding FCS. Length-coded IEEE 802.3,
@@ -23,15 +27,14 @@ spans, array/control/payload separation and independent buffers before DMA reset
 or OWN publication. TX payloads need four-byte alignment and may not overlap a
 request, any provider/control/descriptor/RX storage or another borrowed request.
 Read-only TX payload sharing is allowed while every corresponding borrow lives.
-Current STM32/GD32 bindings accept their reviewed main SRAM only: respectively
-128/192 KiB at 0x20000000. STM CCM and GD TCM are excluded; GD additional SRAM
-is not yet admitted by this Ethernet binding. CPU reachability or a SPI DMA
-selector does not establish Ethernet reachability.
+The current F407 binding accepts reviewed main SRAM only: 128 KiB at 0x20000000.
+CCM is excluded. CPU reachability or a SPI DMA selector does not establish
+Ethernet reachability.
 
 A TX request is borrowed only after all validation and atomic admission. Buffer,
 length and chained pointer are written before DMB and OWN. Normal completion
 requires a CPU-owned last/first single-frame descriptor with its DMA-written TX
-status. Both manuals state the last descriptor receives MAC transmit status
+status. RM0090 specifies that the last descriptor receives MAC transmit status
 before ownership returns. The buffer/control reference is cleared, DSB executes,
 the provider slot is detached and only then SETTLED is release-published. Success
 reports the submitted bytes transmitted by the MAC, not delivery to a peer
@@ -72,7 +75,7 @@ apply link-down first, then observe both DMA processes and MAC/FIFO state idle
 before applying the new up fact. Until then BUSY preserves the old mode; an
 unchanged up fact is idempotent. Restarting drained TX in the same mode does not
 require discarding live RX. This follows the independent process and MAC enable
-semantics in RM0090 §33.6.1/§33.8 and GD32F4xx manual §27.3.3/§27.4.1.
+semantics in RM0090 §33.6.1/§33.8.
 Link-down and fatal DMA/underflow errors close admission
 and report IO without replay. Task service advances absolute request and drain
 deadlines. Cancel/timeout alone never revoke request or payload ownership.
@@ -99,8 +102,8 @@ a reset/IRQ-enable failure is never replaced with successful cleanup fiction.
 Clause22 MDIO is a narrow, separate face using the same explicitly owned MAC
 clock. Addresses/registers are 0..31. Operations run only in privileged task
 context with masks clear, never wait in IRQ/PRIMASK and require a finite absolute
-monotonic deadline. The divider comes from actual HCLK: the two supported bindings
-use 168/200 MHz and HCLK/102, below 2.5 MHz. BUSY rejects without another command.
+monotonic deadline. The divider comes from actual HCLK: the maintained F407
+profile uses 168 MHz and HCLK/102, below 2.5 MHz. BUSY rejects without another command.
 Timeout leaves the real hardware state intact and does not publish a late read
 value; a timed-out write may already have applied and must not be blindly replayed.
 
@@ -117,12 +120,11 @@ or inconsistent fixed mode is not converted to successful link.
 
 ## Reviewed sources and qualification limits
 
-Production layout/mask assertions use the locked STM CMSIS device and GD32
-standard peripheral headers. Mechanism review uses ST RM0090 Rev22, Ethernet
-normal descriptors, TxDMA default flow, DMA process-state/FIFO controls; GD32F4xx
-User Manual Rev3.3 chapter27, normal descriptors and station-management clock
-range. Both first four descriptor words and all registers used by the common
-mechanism match these proofs; enhanced descriptor/PTP mode remains disabled.
+Production layout/mask assertions use the locked ST CMSIS device headers in
+`vendors/st/cmsis_device_f4/`. Mechanism review uses ST RM0090 Rev22, Ethernet
+normal descriptors, TxDMA default flow and DMA process-state/FIFO controls.
+The first four descriptor words and all registers used by this mechanism match
+those definitions; enhanced descriptor/PTP mode remains disabled in the raw face.
 
 DP83848 register truth comes from TI SNLS266E (March2015), Tables6-9/10/11/12/13/18
 and https://www.ti.com/lit/ds/symlink/dp83848c.pdf. The documented TI model/revision
@@ -134,19 +136,26 @@ The Qiming F407ZG optional RMII source profile is reviewed separately: manual
 printed31/physical33 and fixed BSP blob a35e981e8a549e1dbaf84bb4522b2f150bc5d51c
 show DP83848 address1, an external 50 MHz oscillator and P5/WiFi jumpers; pins
 PA1/2/7, PC1/4/5, PG11/13/14 AF11. PG routes do not authorize the VE100 package.
-PHY reset GPIO is unproved. Sky and Liangshan have no reviewed PHY route. Current
-Board bindings must stay disabled until configuration integration admits an
-explicit reviewed route; model code is not a fabricated PCB binding.
+PHY reset GPIO is unproved. The canonical ARM fixture uses the explicit software
+pin contract in `tests/contracts/ethernet_assembly/stm32-zg-board/`; it does not
+qualify an assembled PCB. Sky, the ZG core board and Qiming V4.1 do not inherit
+this V3.1 PHY route. In particular, V4.1 oscillator, PHY address and connector
+ambiguities remain recorded Board unknowns. Products must admit their own reviewed
+route and electrical handoff before enabling hardware.
 
-GoogleTest/GoogleMock tests execute the actual common algorithm, both SDK-checked
-bindings and explicit Native ingress/egress/MDIO hardware, including W1C and stuck
+The F4 binding is `soc/stm32/stm32f4/drivers/ethernet.c`; its MAC engine is in
+`soc/stm32/stm32f4/drivers/ip/legacy_mac/`. GoogleTest/GoogleMock tests execute
+that mechanism, the SDK-checked F407 binding and explicit Native
+ingress/egress/MDIO models in `tests/support/native/drivers/`, including W1C and stuck
 reset/engine/OWN/FIFO/IRQ sources. Native hardware uses caller PHY register files,
 synthetic FCS storage and explicit descriptor-completion injection; it never
 invents PHY identity, link, real CRC or remote delivery. Host software, strict ARM
 compilation, linked image resources and physical/HIL are separate evidence. The
 first three establish only their recorded scope. Physical PHY/link/electrical,
 actual PCB jumpers, loss under traffic, latency, throughput and EMC are not
-executed in this environment.
+executed in this environment. Historical reports that also covered retired
+families retain their original source identities and bytes; their totals are not
+current F4 acceptance results.
 
 Independent review regressions protect the known immutable wake-target span
 against descriptors, RX DMA buffers, request metadata and writable API outputs.

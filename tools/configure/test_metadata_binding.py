@@ -15,8 +15,8 @@ class MetadataBindingTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        for name in (metadata.POLICY, "soc/native/soc.json", "soc/native/routes.json",
-                     "boards/native_reference/board.json"):
+        for name in (metadata.POLICY, "tests/support/native/soc.json", "tests/support/native/routes.json",
+                     "tests/support/native/board/board.json"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, target)
@@ -28,7 +28,7 @@ class MetadataBindingTests(unittest.TestCase):
         self.assembly.write_text('schema=2\nboard="native_reference"\n'
                                  'backend="native"\nclock="model"\n'
                                  '[memory]\nmain_stack_bytes=2048\n')
-        facts = json.loads((self.root / "soc/native/soc.json").read_text())
+        facts = json.loads((self.root / "tests/support/native/soc.json").read_text())
         self.cpu_facts = self.root / "cpu.json"
         self.cpu_facts.write_text(json.dumps({"schema_version": 1,
             "cpu": facts["cpu"], "irq": facts["irq"], "clock_hz": 1000000}))
@@ -44,12 +44,12 @@ class MetadataBindingTests(unittest.TestCase):
     def test_owner_observer_is_an_explicit_optional_component(self):
         self.assembly.write_text(self.assembly.read_text().replace(
             '[memory]', 'components=["owner-observer"]\n[memory]'))
-        result = gate.resolve_ir(self.assembly, self.root)
+        result = gate.resolve_ir(self.assembly, self.root, test_support=True)
         self.assertEqual(result.components, ("owner-observer",))
 
     def test_assembly_header_and_input_closure_bind_policy(self):
         output = self.root / "platform"
-        result = gate.configure(self.assembly, output, self.root)
+        result = gate.configure(self.assembly, output, self.root, test_support=True)
         identity = next(record for record in result["inputs"]
                         if record["path"] == metadata.POLICY)
         self.assertEqual(identity["sha256"], hashlib.sha256(
@@ -60,19 +60,19 @@ class MetadataBindingTests(unittest.TestCase):
         self.assertEqual(factory.FACTORY_ABI_EPOCH, 1)
 
     def test_assembly_policy_change_invalidates_configuration_identity(self):
-        before = gate.resolve_ir(self.assembly, self.root).configuration_sha256
+        before = gate.resolve_ir(self.assembly, self.root, test_support=True).configuration_sha256
         self.change_policy(semantic_version=self.other_version)
-        result = gate.configure(self.assembly, self.root / "changed", self.root)
+        result = gate.configure(self.assembly, self.root / "changed", self.root, test_support=True)
         self.assertNotEqual(before, result["configuration_sha256"])
         self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.other_version}"',
                       (self.root / "changed/nexus_config.h").read_text())
 
     def test_unsupported_factory_epoch_rejects_owned_assembly_bundle(self):
         output = self.root / "platform"
-        gate.configure(self.assembly, output, self.root)
+        gate.configure(self.assembly, output, self.root, test_support=True)
         self.change_policy(factory_abi_epoch=2)
         with self.assertRaisesRegex(ValueError, "factory epoch"):
-            gate.configure(self.assembly, output, self.root)
+            gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertFalse(output.exists())
 
     def test_owned_output_marker_cannot_authorize_policy_input_deletion(self):
@@ -80,7 +80,7 @@ class MetadataBindingTests(unittest.TestCase):
         original = self.policy_path.read_bytes()
         (directory / ".nexus-config-bundle").write_text("old bundle")
         with self.assertRaises(ValueError):
-            gate.configure(self.assembly, directory, self.root)
+            gate.configure(self.assembly, directory, self.root, test_support=True)
         self.assertTrue(self.policy_path.is_file())
         self.assertEqual(self.policy_path.read_bytes(), original)
 
@@ -118,7 +118,7 @@ class MetadataBindingTests(unittest.TestCase):
 
         with patch.object(gate, "generate", changing):
             with self.assertRaisesRegex(ValueError, "changed"):
-                gate.configure(self.assembly, output, self.root)
+                gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertFalse(output.exists())
 
     def test_runtime_policy_change_during_emission_is_rejected(self):

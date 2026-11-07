@@ -154,13 +154,10 @@ def require_jobs(document):
         "Native contracts": ("native-debug", "native-release", "native-asan", "native-tsan"),
         "ARM link and budgets": (
             "stm32-qiming-baremetal", "stm32-qiming-freertos",
-            "stm32-sky-baremetal", "stm32-sky-freertos",
-            "gd32-liangshan-baremetal", "gd32-liangshan-freertos"),
+            "stm32-sky-baremetal", "stm32-sky-freertos"),
         "Provider assembly audits": (
-            "stm32_assembly", "gd32_assembly", "can_assembly", "usb_assembly",
-            "ethernet_assembly", "timer_assembly", "g474_assembly", "h743_assembly",
-            "u575_assembly", "multi_controller_assembly", "mainstream_assembly",
-            "pin_state_fixture")}
+            "stm32_assembly", "can_assembly", "usb_assembly",
+            "ethernet_assembly", "timer_assembly", "multi_controller_assembly")}
     for label, selections in matrices.items():
         expected = {f"{label} ({selection})" for selection in selections}
         observed = {name for name in names if name.startswith(label + " (")}

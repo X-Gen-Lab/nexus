@@ -8,7 +8,7 @@ import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.evidence.identity import canonical_digest
-from tools.hil.admit import (SOFTWARE_REFERENCE_TARGETS, validate_fixture,
+from tools.hil.admit import (SOFTWARE_REFERENCE_BOARD_TARGETS, validate_fixture,
                              validate_raw, validate_station)
 from tools.hil.prepare import preparation_plan
 from tools.testing import test_hil_workloads
@@ -34,12 +34,12 @@ class HilFixtureSchemaTests(unittest.TestCase):
                               self.schema["properties"]["part"]["enum"])
 
     def test_exact_reference_schema_matches_runtime_admission_authority(self):
-        alternatives = self.schema["$defs"]["software_reference_target"]["oneOf"]
+        alternatives = self.schema["$defs"]["software_reference_board_target"]["oneOf"]
         targets = [(item["properties"]["board"]["const"],
                     item["properties"]["part"]["const"])
                    for item in alternatives]
         self.assertEqual(len(targets), len(set(targets)))
-        self.assertEqual(set(targets), set(SOFTWARE_REFERENCE_TARGETS))
+        self.assertEqual(set(targets), set(SOFTWARE_REFERENCE_BOARD_TARGETS))
 
 
 class HilPlatformExtensionTests(unittest.TestCase):
@@ -61,7 +61,7 @@ class HilPlatformExtensionTests(unittest.TestCase):
 
     def test_current_protocol_inventory_has_no_invented_observations(self):
         report = self.fixture.plan()
-        self.assertEqual(len(report["cases"]), 30)
+        self.assertEqual(len(report["cases"]), 23)
         for item in report["cases"]:
             self.assertEqual(item["status"], "not_executed")
             self.assertTrue(all(value is None
@@ -123,21 +123,6 @@ class HilPlatformExtensionTests(unittest.TestCase):
                              "retained_loans", "terminal_progress"},
                              set(case["raw_observations"]))
 
-    def test_reference_g4_fixture_prepares_without_a_physical_station(self):
-        path = Path("tools/hil/fixtures/stm32g474re_hse24_reference.json")
-        fixture = json.loads(path.read_text())
-        resolved = copy.deepcopy(self.fixture.resolved)
-        resolved.update(board=fixture["board"], part=fixture["part"])
-        resolved["controllers"] = [{
-            "id": "console", "kind": "uart", "controller": "LPUART1",
-            "mode": "irq-byte-event", "baud": 115200,
-            "pins": [{"function": "tx", "pin": "PA2"},
-                     {"function": "rx", "pin": "PA3"}]}]
-        report = self.module.workload_plan(fixture, resolved)
-        self.assertEqual(fixture["scope"], "software_reference")
-        self.assertEqual(report["physical_status"], "not_executed")
-        self.assertEqual(report["status"], "prepared_unbound")
-        self.assertNotIn("station_id", report)
 
     def test_template_cannot_pretend_to_be_reviewed_or_supply_numeric_budgets(self):
         template_path = Path("tools/hil/templates/workload.json")
@@ -150,18 +135,7 @@ class HilPlatformExtensionTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             self.fixture.validate(template)
 
-    def test_reference_fixture_cannot_self_promote_by_deleting_scope(self):
-        path = Path("tools/hil/fixtures/stm32g474re_hse24_reference.json")
-        fixture = json.loads(path.read_text())
-        fixture.pop("scope")
-        with self.assertRaises(EvidenceError):
-            validate_fixture(fixture)
 
-    def test_reference_fixture_cannot_admit_a_physical_station(self):
-        path = Path("tools/hil/fixtures/stm32g474re_hse24_reference.json")
-        fixture = json.loads(path.read_text())
-        with self.assertRaises(EvidenceError):
-            validate_station({}, fixture)
 
     def test_new_protocols_require_positive_amount_of_real_work(self):
         for kind, mode in (("can", "classic-irq"), ("eth", "raw-rmii"),
@@ -193,10 +167,8 @@ class HilPlatformExtensionTests(unittest.TestCase):
 
 class HilReferenceAdmissionTests(unittest.TestCase):
     REFERENCES = (
-        ("stm32g474re_hse24_reference", "stm32g474re-hse24-reference",
-         "STM32G474RET6"),
-        ("stm32h743_nucleo_zi2", "stm32h743-nucleo-zi2", "STM32H743ZIT6"),
-        ("stm32u575_nucleo_zi_q", "stm32u575-nucleo-zi-q", "STM32U575ZIT6Q"),
+        ("stm32f407zg_qiming_core", "stm32f407zg-qiming-core", "STM32F407ZGT6"),
+        ("stm32f407zg_qiming_v41", "stm32f407zg-qiming-v41", "STM32F407ZGT6"),
     )
 
     def references(self):
@@ -248,11 +220,6 @@ class HilReferenceAdmissionTests(unittest.TestCase):
             with self.subTest(board=board), self.assertRaises(EvidenceError):
                 validate_fixture(fixture)
 
-    def test_reference_part_cannot_be_relabelled_as_another_board(self):
-        for _, _, part, fixture in self.references():
-            fixture["board"] = "source-relabelled-board"
-            with self.subTest(part=part), self.assertRaises(EvidenceError):
-                validate_fixture(fixture)
 
     def test_direct_station_validation_cannot_bypass_reference_scope(self):
         with tempfile.TemporaryDirectory() as directory:

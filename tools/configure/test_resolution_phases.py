@@ -12,16 +12,16 @@ from tools.configure.providers import maintained
 
 class ResolutionPhaseTests(unittest.TestCase):
     def setUp(self):
-        self.provider = maintained('native')
-        self.soc = gate.load(gate.ROOT / 'soc/native/soc.json')
+        self.provider = maintained('native', test_support=True)
+        self.soc = gate.load(gate.ROOT / 'tests/support/native/soc.json')
         self.variant = self.soc['variants']['NATIVE_MODEL']
         self.assembly = gate.load_assembly(gate.ROOT /
-            'tools/configure/assemblies/native-empty.toml')
+            'tests/support/native/assemblies/native-empty.toml', test_support=True)
 
     def memory(self, assembly=None):
         return gate._resolve_memory(
             self.assembly if assembly is None else assembly, self.variant,
-            self.provider, 'NATIVE_MODEL', None)
+            self.provider, 'NATIVE_MODEL')
 
     def test_memory_result_keeps_typed_budget_and_frozen_physical_leaves(self):
         selected = self.memory()
@@ -31,7 +31,7 @@ class ResolutionPhaseTests(unittest.TestCase):
                          next(region['id'] for region in self.variant['memory']
                               if region['linker']))
         with self.assertRaises(FrozenInstanceError):
-            selected.gpio_user = True
+            selected.regions = ()
         with self.assertRaises(TypeError):
             selected.default_ram['size'] = 0
 
@@ -83,8 +83,8 @@ class ResolutionPhaseTests(unittest.TestCase):
         self.assertEqual(selected.inputs, ())
 
     def test_dependency_phase_passes_exact_git_pins_and_kernel_selection(self):
-        soc = gate.load(gate.ROOT / 'soc/stm32/stm32f407/soc.json')
-        provider = maintained('stm32f407')
+        soc = gate.load(gate.ROOT / 'soc/stm32/stm32f4/soc.json')
+        provider = maintained('stm32f4')
         calls = []
 
         def resolve(relative, expected=None):
@@ -92,7 +92,7 @@ class ResolutionPhaseTests(unittest.TestCase):
             return {'path': relative, 'commit': expected or 'kernel-pin'}
 
         selected = gate._resolve_source_dependencies(
-            soc, provider, 'stm32f407', gate.ROOT, 'freertos', gate.load,
+            soc, provider, 'stm32f4', gate.ROOT, 'freertos', gate.load,
             resolve)
         pins = soc['source_lock']
         self.assertEqual(calls[-1], ('ext/freertos', None))

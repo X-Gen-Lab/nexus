@@ -117,7 +117,6 @@ class KernelProfileIR(Record):
     kernel_policy: str
     kernel_port: str
     memory_protection: bool
-    user_io: str
     system_call_stack_words: int
     security_model: str
     secure_idle_stack_bytes: int
@@ -140,7 +139,7 @@ class KernelProfileIR(Record):
         return cls(*(record[name] for name in (
             "profile", "tick_source", "tick_hz", "tick_reload", "max_priorities",
             "syscall_priority", "kernel_policy", "kernel_port",
-            "memory_protection", "user_io", "system_call_stack_words", "security_model",
+            "memory_protection", "system_call_stack_words", "security_model",
             "secure_idle_stack_bytes",
             "idle_stack_words",
             "max_task_name_len", "mutexes", "counting_semaphores",
@@ -942,15 +941,6 @@ class MemoryRegionBudgetIR:
 
 
 @dataclass(frozen=True)
-class MpuMemoryReservationsIR:
-    privileged_flash_bytes: int
-    user_flash_bytes: int
-    syscall_flash_bytes: int
-    privileged_ram_bytes: int
-    user_ram_bytes: int
-
-
-@dataclass(frozen=True)
 class FlashRegionIR(Record):
     """Selected physical erase owner; image reservations do not change it."""
     origin: int
@@ -974,7 +964,6 @@ class MemoryBudgetIR:
     static_ram_limit_bytes: int | None
     flash_load_limit_bytes: int | None
     regions: tuple[MemoryRegionBudgetIR, ...] = ()
-    mpu: MpuMemoryReservationsIR | None = None
     image_prefix_bytes: int = 0
     image_suffix_bytes: int = 0
 
@@ -988,8 +977,6 @@ class MemoryBudgetIR:
         if self.regions:
             result["regions"] = {item.id: {"limit_bytes": item.limit_bytes}
                                  for item in self.regions}
-        if self.mpu is not None:
-            result["mpu"] = thaw(self.mpu)
         for name in ("image_prefix_bytes", "image_suffix_bytes"):
             if getattr(self, name):
                 result[name] = getattr(self, name)
@@ -1030,6 +1017,18 @@ class ClockPlanIR:
 
 
 @dataclass(frozen=True)
+class VendorDeviceIR:
+    """Exact vendor compile and startup selection from physical part facts."""
+
+    macro: str
+    startup: str
+
+    @classmethod
+    def from_validated(cls, value):
+        return cls(value["macro"], value["startup"])
+
+
+@dataclass(frozen=True)
 class PhysicalPartIR:
     """Views of validated physical facts; no second geometry authority."""
 
@@ -1037,6 +1036,7 @@ class PhysicalPartIR:
     package: str
     flash: Mapping
     memory: tuple[Mapping, ...]
+    device: VendorDeviceIR | None = None
 
 
 @dataclass(frozen=True)

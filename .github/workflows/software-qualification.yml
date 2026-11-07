@@ -150,9 +150,13 @@ jobs:
           exec > >(tee "$Q/sdk.raw") 2>&1
           P="$RUNNER_TEMP/nexus-source-sdk"
           .venv/bin/python tools/dev/dependencies.py prepare --scope sdk \
+            --host-support --backend threadx \
+            --component network --component tls --component mqtt --component mcuboot \
             --allow-network --report "$Q/sdk-dependencies.json"
           .venv/bin/python cmake/package/package_source_sdk.py \
-            --source "$GITHUB_WORKSPACE" --output "$P"
+            --source "$GITHUB_WORKSPACE" --output "$P" \
+            --host-support --backend threadx \
+            --component network --component tls --component mqtt --component mcuboot
           .venv/bin/python cmake/package/package_source_sdk.py \
             --verify "$P/share/nexus/src"
           .venv/bin/python cmake/package/verify_consumers.py --prefix "$P" \

@@ -49,6 +49,34 @@ def consumer_module():
 
 
 class SDKWorkflowExecutionTests(unittest.TestCase):
+    def test_full_consumers_package_an_explicit_dependency_profile(self):
+        commands = []
+        for name in ("release.yml", "software-qualification.yml"):
+            document = yaml.load((ROOT / ".github/workflows" / name).read_text(),
+                                 Loader=yaml.BaseLoader)
+            for job in document["jobs"].values():
+                for step in job.get("steps", []):
+                    text = step.get("run", "").replace("\\\n", " ")
+                    commands.extend(line for line in text.splitlines()
+                                    if ("package_source_sdk.py" in line
+                                        and "--source" in line) or
+                                    "dependencies.py prepare --scope sdk" in line)
+        plan = json.loads((ROOT / "tools/dev/plans/software.json").read_text())
+        commands.extend(shlex.join(stage["args"]) for stage in plan["stages"]
+                        if stage["checker"] == "source_sdk")
+        self.assertEqual(len(commands), 5)
+        for command in commands:
+            with self.subTest(command=command):
+                arguments = shlex.split(command)
+                self.assertIn("--host-support", arguments)
+                self.assertEqual(arguments[arguments.index("--backend") + 1],
+                                 "threadx")
+                components = [arguments[index + 1]
+                              for index, value in enumerate(arguments)
+                              if value == "--component"]
+                self.assertEqual(set(components),
+                                 {"network", "tls", "mqtt", "mcuboot"})
+
     def test_actual_workflow_prepares_outside_checkout_then_stages_verified_bytes(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory)
@@ -64,7 +92,10 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
             (source / "cmake/package/package_source_sdk.py").write_text(
                 "import argparse,json\nfrom pathlib import Path\n"
                 "p=argparse.ArgumentParser();p.add_argument('--source');"
-                "p.add_argument('--output');p.add_argument('--verify');a=p.parse_args()\n"
+                "p.add_argument('--output');p.add_argument('--verify');"
+                "p.add_argument('--host-support',action='store_true');"
+                "p.add_argument('--backend');"
+                "p.add_argument('--component',action='append');a=p.parse_args()\n"
                 "if a.output:\n"
                 " s=Path(a.source).resolve();o=Path(a.output).resolve()\n"
                 " if o.is_relative_to(s):raise SystemExit('SDK output inside checkout')\n"
@@ -301,6 +332,18 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
 
 class ConsumerTransportTests(unittest.TestCase):
+    def test_current_consumer_plan_uses_f4_and_explicit_host_support(self):
+        from tools.release import transport
+        self.assertEqual({row[0] for row in transport.BASE_CONSUMERS},
+                         {'native', 'stm32'})
+        self.assertEqual(transport.MODERN_CONSUMERS, ())
+        for label, _, _ in transport.SELECTED_CONSUMERS:
+            with self.subTest(consumer=label):
+                self.assertTrue(label.startswith(('f407 ', 'native time ')))
+        for item in transport.SERVICE_CONSUMERS:
+            with self.subTest(consumer=item.name):
+                self.assertTrue(item.name.startswith(('f407 ', 'native ')))
+
     def test_f407_i2s2_has_one_current_public_owner_consumer(self):
         from tools.release import transport
         row = ("f407 i2s2 slave tx", "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
@@ -328,210 +371,17 @@ class ConsumerTransportTests(unittest.TestCase):
             self.assertIn("stm32f407_i2s2_slave_tx.h", (source / "private_headers.c").read_text())
             self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(sdk / row[1]), command)
 
-    def test_complete_previous_v9_matrix_is_not_a_current_v10_fallback(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for suffix in ("source", "build"):
-            shutil.rmtree(raw / ("selected f407 i2s2 slave tx " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 49)
-        self.assertEqual(sum((raw / image).is_file() for image in transport.IMAGES), 52)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_mpu_gpio_retains_identity_and_public_template_in_current_policy(self):
-        from tools.release import transport
-        row = ("u575 mpu gpio", "tools/configure/assemblies/u575-mpu-gpio-write.toml",
-               "u575-mpu-gpio")
-        self.assertEqual(transport.SELECTED_CONSUMERS[-2], row)
-        self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
-        self.assertIn("selected u575 mpu gpio source/.git", transport.FIXTURES)
-        self.assertIn("selected u575 mpu gpio build/bin/installed_selected.elf",
-                      transport.IMAGES)
-        module = consumer_module()
-        with tempfile.TemporaryDirectory() as directory:
-            base = Path(directory)
-            sdk = base / "prefix/share/nexus/src"
-            for relative in (row[1], "cmake/package/verification/io_evolution/consumers/" + row[2] + ".c"):
-                target = sdk / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / relative, target)
-            write_policy(sdk)
-            source, _, command = module.prepare_selected_consumer(
-                base / "prefix", base, row[0], row[1], row[2], lambda argv: None,
-                expected_revision=COMMIT)
-            self.assertEqual((source / "main.c").read_bytes(),
-                (ROOT / "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c").read_bytes())
-            self.assertIn("LIBRARIES Nexus::U575MpuGpio)",
-                          (source / "CMakeLists.txt").read_text())
-            self.assertIn("stm32u575_gpio_mpu.h", (source / "private_headers.c").read_text())
-            self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(sdk / row[1]), command)
 
-    def test_complete_previous_v8_matrix_is_not_current_mpu_gpio_fallback(self):
-        from tools.release import transport
-        self.assertIn("selected u575 mpu gpio source/.git", transport.FIXTURES)
-        base, raw = self.previous_v11_fixture()
-        for label in ("u575 mpu gpio", "f407 i2s2 slave tx"):
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / ("selected " + label + " " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 48)
-        self.assertEqual(sum((raw / image).is_file() for image in transport.IMAGES), 51)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_rehashed_transport_missing_mpu_gpio_image_is_rejected(self):
-        from tools.release import transport
-        image = "selected u575 mpu gpio build/bin/installed_selected.elf"
-        self.assertIn(image, transport.IMAGES)
-        base, raw = self.fixture()
-        output = base / "transport"
-        transport.pack(raw, output, COMMIT)
-        original = output / transport.ARCHIVE
-        rewritten = base / "without-mpu-gpio.tar.gz"
-        with tarfile.open(original) as source:
-            with tarfile.open(rewritten, "w:gz") as archive:
-                for member in source:
-                    if member.name != image:
-                        archive.addfile(member, source.extractfile(member)
-                                        if member.isfile() else None)
-        rewritten.replace(original)
-        manifest_path = output / transport.MANIFEST
-        manifest = json.loads(manifest_path.read_text())
-        del manifest["files"][image]
-        manifest["archive"] = transport.byte_identity(original)
-        manifest_path.write_text(json.dumps(manifest))
-        with self.assertRaisesRegex(ValueError, "Exact current consumer roots and images"):
-            transport.verify(output, COMMIT)
 
-    def test_lpdma_copy_identity_survives_current_policy(self):
-        from tools.release import transport
-        row = ("u575 lpdma copy",
-               "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
-               "u575-lpdma-copy")
-        self.assertIn(row, transport.SELECTED_CONSUMERS)
-        self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
-        self.assertIn("selected u575 lpdma copy source/.git", transport.FIXTURES)
-        self.assertIn("selected u575 lpdma copy build/bin/installed_selected.elf",
-                      transport.IMAGES)
 
-    def test_lptim1_lpbam_retains_its_exact_consumer_identity(self):
-        from tools.release import transport
-        row = ("u575 lptim1 lpbam",
-               "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
-               "u575-lptim1-lpbam")
-        self.assertEqual(transport.SELECTED_CONSUMERS[-3], row)
-        self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
-        self.assertEqual(consumer_module().SELECTED_CONSUMERS[-3], row)
-        self.assertIn("selected u575 lptim1 lpbam source/.git",
-                      transport.FIXTURES)
-        self.assertIn("selected u575 lptim1 lpbam "
-                      "build/bin/installed_selected.elf", transport.IMAGES)
 
-    def test_lptim1_selected_template_preserves_public_c11_source(self):
-        module = consumer_module()
-        with tempfile.TemporaryDirectory() as directory:
-            base = Path(directory)
-            prefix = base / "prefix"
-            sdk = prefix / "share/nexus/src"
-            assembly = "tools/configure/assemblies/" \
-                       "u575-lptim1-lpbam-stop2.toml"
-            smoke = "cmake/package/verification/io_evolution/consumers/" \
-                    "u575-lptim1-lpbam.c"
-            for relative in (assembly, smoke):
-                destination = sdk / relative
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / relative, destination)
-            write_policy(sdk)
-            source, _, command = module.prepare_selected_consumer(
-                prefix, base, "u575 lptim1 lpbam", assembly,
-                "u575-lptim1-lpbam", lambda argv: subprocess.run(
-                    argv, check=True, capture_output=True),
-                expected_revision=COMMIT)
-            self.assertEqual((source / "main.c").read_bytes(),
-                             (ROOT / smoke).read_bytes())
-            cmake = (source / "CMakeLists.txt").read_text()
-            self.assertIn("set(CMAKE_C_STANDARD 11)", cmake)
-            self.assertIn("Nexus::U575Stop2Lptim1", cmake)
-            self.assertIn("stm32u575_lpdma_lptim1_internal.h",
-                          (source / "private_headers.c").read_text())
-            # Preparing an actual template returns a configure command;
-            # this transport boundary test never executes that command.
-            self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(sdk / assembly),
-                          command)
 
-    def test_missing_lptim1_raw_consumer_root_is_rejected(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        shutil.rmtree(raw / "selected u575 lptim1 lpbam source")
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_rehashed_transport_missing_lptim1_image_is_rejected(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        output = base / "transport"
-        transport.pack(raw, output, COMMIT)
-        image = "selected u575 lptim1 lpbam " \
-                "build/bin/installed_selected.elf"
-        original = output / transport.ARCHIVE
-        rewritten = base / "without-lptim1.tar.gz"
-        removed = False
-        with tarfile.open(original) as source:
-            with tarfile.open(rewritten, "w:gz") as archive:
-                for member in source:
-                    if member.name == image:
-                        removed = True
-                        continue
-                    archive.addfile(member, source.extractfile(member)
-                                    if member.isfile() else None)
-        self.assertTrue(removed)
-        rewritten.replace(original)
-        manifest_path = output / transport.MANIFEST
-        manifest = json.loads(manifest_path.read_text())
-        del manifest["files"][image]
-        manifest["archive"] = transport.byte_identity(original)
-        manifest_path.write_text(json.dumps(manifest))
-        with self.assertRaisesRegex(ValueError,
-                                    "Exact current consumer roots and images"):
-            transport.verify(output, COMMIT)
 
-    def test_complete_previous_v7_matrix_is_not_a_current_v10_fallback(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for label in ("u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / ("selected " + label + " " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 47)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 50)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_h743_duplex_modes_have_exact_independent_consumer_identities(self):
-        from tools.release import transport
-        expected = {
-            ("h743 uart duplex continuous",
-             "tools/configure/assemblies/h743-uart-duplex-continuous.toml",
-             "h743-uart-duplex-continuous"),
-            ("h743 uart duplex continuous cache on",
-             "tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml",
-             "h743-uart-duplex-continuous"),
-        }
-        self.assertTrue(expected.issubset(set(transport.SELECTED_CONSUMERS)),
-                        expected - set(transport.SELECTED_CONSUMERS))
-        for name, _, _ in expected:
-            self.assertIn("selected " + name + " source/.git",
-                          transport.FIXTURES)
-            self.assertIn("selected " + name +
-                          " build/bin/installed_selected.elf", transport.IMAGES)
 
-    def previous_v11_fixture(self):
-        """Keep historical root-set tests on their original fifty-root input."""
-        from tools.release.transport import SERVICE_CONSUMERS
-        base, raw = self.fixture()
-        for profile in SERVICE_CONSUMERS:
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / (profile.name + " " + suffix))
-        return base, raw
 
     def fixture(self):
         prepare_consumer = consumer_module().prepare_consumer
@@ -555,9 +405,7 @@ class ConsumerTransportTests(unittest.TestCase):
         # Inventoried auxiliary outputs are not additional executable images.
         for name in ("stm32 build/bin/installed_c.bin",
                      "stm32 build/bin/installed_c.map",
-                     "stm32 build/bin/installed_c.resources.json",
-                     "selected h743 high build/bin/installed_selected.h743-flash-ram.compiler.raw",
-                     "selected h743 high build/bin/installed_selected.h743-flash-ram.json"):
+                     "stm32 build/bin/installed_c.resources.json"):
             (raw / name).write_bytes(b"auxiliary fixture; not SDK evidence\n")
         (raw / "command-00.log").write_bytes(b"actual consumer output\n")
         (raw / "verification.json").write_text(json.dumps({
@@ -622,93 +470,21 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v16")
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v16")
-        self.assertEqual(len(list(raw.rglob(".git"))), 65)
-        self.assertEqual(len(manifest["consumer_roots"]), 65)
-        self.assertEqual(len(manifest["consumer_images"]), 68)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v17")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v17")
+        self.assertEqual(len(list(raw.rglob(".git"))), len(transport.FIXTURES))
+        self.assertEqual(len(manifest["consumer_roots"]), len(transport.FIXTURES))
+        self.assertEqual(len(manifest["consumer_images"]), len(transport.IMAGES))
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
         transport.verify(base / "transport", COMMIT)
 
-    def test_external_lifecycle_has_one_exact_host_consumer_and_target(self):
-        from tools.release import transport
-        expected = transport.ServiceConsumer(
-            "external provider", "assembly.toml", "external-provider", False,
-            "external_provider")
-        self.assertEqual([item for item in transport.SERVICE_CONSUMERS
-                          if item.scenario == "external_provider"], [expected])
-        self.assertEqual([item for item in transport.consumer_plan()
-                          if item[0] == "services"
-                          and item[1].name == "external provider"],
-                         [("services", expected)])
-        self.assertEqual([item for item in transport.consumer_layout()
-                          if item[0] == "external provider source"],
-                         [("external provider source", "external provider build",
-                           ("external provider build/bin/"
-                            "external_lifecycle_consumer",))])
-        self.assertIn("external provider source/.git", transport.FIXTURES)
-        self.assertEqual(sorted(image for image in transport.IMAGES
-                                if image.startswith("external provider build/")),
-                         ["external provider build/bin/"
-                          "external_lifecycle_consumer"])
 
-    def test_complete_previous_v11_matrix_is_not_current_services_fallback(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        self.assertEqual(len(list(raw.rglob(".git"))), 50)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 53)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_complete_previous_v12_matrix_cannot_claim_secure_consumption(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        for profile in transport.SERVICE_CONSUMERS[4:]:
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / (profile.name + " " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 54)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 57)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_complete_previous_v13_matrix_cannot_claim_device_image_consumption(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        for profile in transport.SERVICE_CONSUMERS[6:]:
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / (profile.name + " " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 56)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 59)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_complete_v14_matrix_cannot_claim_selected_rx_or_mcuboot(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        for profile in transport.SERVICE_CONSUMERS[9:]:
-            for suffix in ("source", "build"):
-                shutil.rmtree(raw / (profile.name + " " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 59)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 62)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_complete_previous_v15_matrix_cannot_claim_external_lifecycle(self):
-        from tools.release import transport
-        base, raw = self.fixture()
-        for suffix in ("source", "build"):
-            shutil.rmtree(raw / ("external provider " + suffix))
-        self.assertEqual(len(list(raw.rglob(".git"))), 64)
-        self.assertEqual(sum((raw / image).is_file()
-                             for image in transport.IMAGES), 67)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
     def test_each_current_root_and_image_is_required(self):
         from tools.release import transport
@@ -735,7 +511,7 @@ class ConsumerTransportTests(unittest.TestCase):
                     (raw / "stm32 build/bin/unreviewed.elf").write_bytes(
                         b"\x7fELF unreviewed fixture")
                 else:
-                    original = raw / "selected g474 shared pwm source"
+                    original = raw / "selected f407 frames source"
                     if change == "replace":
                         original.rename(raw / "unreviewed source")
                     else:
@@ -751,15 +527,6 @@ class ConsumerTransportTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Exact current"):
                     transport.pack(raw, base / "transport", COMMIT)
 
-    def test_old_thirteen_roots_are_not_a_current_fallback(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
-            shutil.rmtree(raw / ("selected " + name + " source"))
-            shutil.rmtree(raw / ("selected " + name + " build"))
-        self.assertEqual(len(list(raw.rglob(".git"))), 13)
-        with self.assertRaisesRegex(ValueError, "Exact current"):
-            transport.pack(raw, base / "transport", COMMIT)
 
     def test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan(self):
         from tools.release import transport
@@ -917,90 +684,10 @@ class ConsumerTransportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Expanded transport archive"):
                 transport.verify_gzip(compressed)
 
-    def test_missing_each_new_consumer_fixture_is_rejected(self):
-        from tools.release import transport
-        for family in ("f103", "gd303", "g474"):
-            for backend in ("baremetal", "freertos"):
-                with self.subTest(family=family, backend=backend):
-                    base, raw = self.fixture()
-                    shutil.rmtree(raw / (family + " " + backend + " source"))
-                    with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-                        transport.pack(raw, base / "transport", COMMIT)
 
-    def test_legacy_seven_consumer_set_is_not_a_current_transport_fallback(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for family in ("f103", "gd303", "g474"):
-            for backend in ("baremetal", "freertos"):
-                shutil.rmtree(raw / (family + " " + backend + " source"))
-        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
-            shutil.rmtree(raw / ("selected " + name + " source"))
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_previous_thirty_one_roots_cannot_replace_the_current_plan(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for label in ("h743 spi dma", "h743 spi dma uart tx",
-                      "h743 spi dma uart rx",
-                      "h743 runtime clock", "g474 pin states",
-                      "h743 spi dma cache on", "u575 uart chain",
-                      "u575 lptim run",
-                      "h743 uart continuous", "h743 uart continuous cache on",
-                      "h743 uart duplex continuous",
-                      "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
-                      "u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
-            shutil.rmtree(raw / ("selected " + label + " source"))
-            shutil.rmtree(raw / ("selected " + label + " build"))
-        self.assertEqual(len(list(raw.rglob(".git"))), 31)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_previous_thirty_six_roots_cannot_replace_the_current_plan(self):
-        from tools.release import transport
-        base, raw = self.previous_v11_fixture()
-        for label in ("h743 spi dma cache on", "u575 uart chain",
-                      "u575 lptim run",
-                      "h743 uart continuous", "h743 uart continuous cache on",
-                      "h743 uart duplex continuous",
-                      "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
-                      "u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
-            shutil.rmtree(raw / ("selected " + label + " source"))
-            shutil.rmtree(raw / ("selected " + label + " build"))
-        self.assertEqual(len(list(raw.rglob(".git"))), 36)
-        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
-            transport.pack(raw, base / "transport", COMMIT)
 
-    def test_complete_current_plan_with_previous_v10_or_v15_policy_is_rejected(self):
-        from tools.release import transport
-        canonical = ("h743 high",
-                     "tools/configure/assemblies/h743-high-peripherals.toml",
-                     "h743-high")
-        self.assertEqual(transport.SELECTED_CONSUMERS.count(canonical), 1)
-        self.assertNotIn((canonical[0], "cmake/package/verification/"
-                          "io_evolution/h743-high-peripherals.toml",
-                          canonical[2]), transport.SELECTED_CONSUMERS)
-        base, raw = self.fixture()
-        packed = base / "transport"
-        manifest = transport.pack(raw, packed, COMMIT)
-        self.assertIn("external provider source/.git",
-                      manifest["consumer_roots"])
-        self.assertIn("external provider build/bin/external_lifecycle_consumer",
-                      manifest["consumer_images"])
-        transport.verify(packed, COMMIT)
-        archive = packed / transport.ARCHIVE
-        original_archive = archive.read_bytes()
-        for policy in ("nexus-sdk-consumers-v10", "nexus-sdk-consumers-v15"):
-            with self.subTest(policy=policy):
-                manifest["consumer_policy"] = policy
-                (packed / transport.MANIFEST).write_text(json.dumps(manifest))
-                with self.assertRaisesRegex(ValueError, "current consumer policy"):
-                    transport.verify(packed, COMMIT)
-                self.assertEqual(archive.read_bytes(), original_archive,
-                                 "Old policy rejection must preserve the complete "
-                                 "raw bytes")
 
     def test_schema_two_previous_policy_is_not_a_current_fallback(self):
         from tools.release import transport
@@ -1451,8 +1138,8 @@ class ReleaseAdmissionTests(unittest.TestCase):
         require_jobs(valid)
         for name in ("Build Docs", "Native contracts (native-tsan)",
                      "ARM link and budgets (stm32-sky-baremetal)",
-                     "Provider assembly audits (h743_assembly)",
-                     "Provider assembly audits (mainstream_assembly)"):
+                     "Provider assembly audits (stm32_assembly)",
+                     "Provider assembly audits (multi_controller_assembly)"):
             jobs = [job for job in valid["jobs"] if job["name"] != name]
             with self.subTest(name=name), self.assertRaises(ValueError):
                 require_jobs({"total_count": len(jobs), "jobs": jobs})
@@ -1466,11 +1153,11 @@ class ReleaseAdmissionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             require_jobs(valid)
 
-    def test_include_only_pin_state_provider_has_strict_admission(self):
+    def test_retained_f4_provider_has_strict_admission(self):
         from tools.release.delivery import require_jobs
         valid = self.jobs_record()
         names = [job["name"] for job in valid["jobs"]]
-        for fixture in ("pin_state_fixture", "h743_assembly", "u575_assembly"):
+        for fixture in ("stm32_assembly", "can_assembly", "usb_assembly"):
             with self.subTest(fixture=fixture):
                 self.assertEqual(names.count(
                     f"Provider assembly audits ({fixture})"), 1)
@@ -1478,7 +1165,7 @@ class ReleaseAdmissionTests(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 record = self.jobs_record()
                 pin_state = next(job for job in record["jobs"] if job["name"] ==
-                                 "Provider assembly audits (pin_state_fixture)")
+                                 "Provider assembly audits (can_assembly)")
                 reason = "matrix identities differ"
                 if mutation == "missing":
                     record["jobs"].remove(pin_state)

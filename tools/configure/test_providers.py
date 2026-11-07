@@ -1,4 +1,6 @@
 """Maintained provider boundaries and immutable mode decisions."""
+from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError, replace
 import json
@@ -7,6 +9,7 @@ import subprocess
 import tempfile
 import unittest
 
+from tools.configure.providers import descriptor, maintained
 from tools.configure import bindings
 from tools.configure import configure as gate
 from tools.configure import selection as selection_rules
@@ -14,33 +17,31 @@ from tools.configure import selection as selection_rules
 
 class ProviderContractTests(unittest.TestCase):
     def test_unselected_mode_cannot_invent_a_software_capability(self):
-        for family in ("native", "stm32f407", "gd32f470", "stm32g474"):
+        for family in ("native", "stm32f4"):
             with self.subTest(family=family):
-                soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
+                soc = load_soc_facts(gate.ROOT / descriptor.maintained(family, test_support=(family == "native")).source_directory / "soc.json")
                 part = next(iter(soc["variants"]))
                 controller = next(item for item in soc["controllers"].values()
                                   if item["kind"] == "gpio")
                 controller["modes"].append("invented-unselected-mode")
                 with self.assertRaisesRegex(ValueError, "provider mode|mode"):
-                    gate.validate_soc(soc, part)
+                    gate.validate_soc(soc, part, maintained(family, test_support=(family == "native")))
 
     def test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile(self):
-        for family, part, profile in (
-                ('stm32f407', 'STM32F407ZGT6', 'hse8-pll168'),
-                ('gd32f470', 'GD32F470ZGT6', 'hxtal25-pll200')):
+        for family, part, profile in (('stm32f4', 'STM32F407ZGT6', 'hse8-pll168'),):
             for field, value in (('core_hz', 1), ('apb1_hz', 1),
                                  ('apb2_hz', 1), ('apb1_hz', False),
                                  ('apb2_hz', 100000000.0),
                                  ('profile_alias', 'unimplemented-clock')):
                 with self.subTest(family=family, field=field, value=value):
-                    soc = gate.load(gate.ROOT / f'{source_directory(family)}/soc.json')
+                    soc = load_soc_facts(gate.ROOT / f'{source_directory(family)}/soc.json')
                     if field == 'profile_alias':
                         soc['clock_profiles'][value] = dict(
                             soc['clock_profiles'][profile])
                     else:
                         soc['clock_profiles'][profile][field] = value
                     with self.assertRaisesRegex(ValueError, 'Clock'):
-                        gate.validate_soc(soc, part)
+                        gate.validate_soc(soc, part, maintained(family, test_support=(family == "native")))
 
     def test_physical_key_normalization_has_no_silicon_topology(self):
         self.assertEqual(
@@ -51,8 +52,8 @@ class ProviderContractTests(unittest.TestCase):
 
     def test_selected_provider_owns_dma_range_and_selector_checks(self):
         from tools.configure.providers import maintained
-        for family in ("stm32f407", "gd32f470"):
-            provider = maintained(family)
+        for family in ("stm32f4",):
+            provider = maintained(family, test_support=(family == "native"))
             provider.validate_dma_resource("dma:DMA1:stream7:channel7")
             for invalid in ("dma:DMA3:stream7", "dma:DMA1:stream8",
                             "dma:DMA1:stream0:channel8"):
@@ -60,26 +61,19 @@ class ProviderContractTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "topology"):
                         provider.validate_dma_resource(invalid)
         with self.assertRaisesRegex(ValueError, "topology"):
-            maintained("native").validate_dma_resource("dma:DMA1:stream0")
+            maintained("native", test_support=("native" == "native")).validate_dma_resource("dma:DMA1:stream0")
 
-    def test_physical_dma_controller_names_follow_each_vendor(self):
+    def test_physical_dma_controller_names_follow_f4_topology(self):
         from tools.configure.providers import maintained
-        gd = maintained("gd32f470")
-        self.assertEqual(gd.validate_dma_resource("dma:DMA0:stream6:channel1"),
-                         (0, 6, 1))
-        self.assertEqual(gd.dma_irq("DMA0:stream6:channel1"),
-                         "irq:DMA0_Channel6")
-        with self.assertRaisesRegex(ValueError, "topology"):
-            gd.validate_dma_resource("dma:DMA2:stream0:channel0")
-        stm = maintained("stm32f407")
+        stm = maintained("stm32f4", test_support=("stm32f4" == "native"))
         stm.validate_dma_resource("dma:DMA2:stream7:channel4")
         with self.assertRaisesRegex(ValueError, "topology"):
             stm.validate_dma_resource("dma:DMA0:stream0:channel0")
 
     def test_adc_scan_and_single_shot_have_distinct_channel_contracts(self):
         from tools.configure.providers import common, maintained
-        for family in ("stm32f407", "gd32f470"):
-            provider = maintained(family)
+        for family in ("stm32f4",):
+            provider = maintained(family, test_support=(family == "native"))
             for mode, channels in (("low-rate-scan", [0]),
                                    ("single-shot", [0, 1])):
                 selection = {"id": "adc", "binding": "adc", "mode": mode,
@@ -99,11 +93,11 @@ class ProviderContractTests(unittest.TestCase):
                      "channels": [1, 0], "sample_times": [7, 7],
                      "reference_mv": 3300, "timeout_ms": 100}
         route = {"kind": "adc", "pins": [{"pin": "PA1"}, {"pin": "PA0"}]}
-        for family in ("stm32f407", "gd32f470"):
+        for family in ("stm32f4",):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError, "channel sequence"):
                     selection_rules.validate_selection(selection, route,
-                                              maintained(family), 131072)
+                                              maintained(family, test_support=(family == "native")), 131072)
 
     def test_mode_traits_are_explicit_immutable_and_directional(self):
         from tools.configure.providers import common
@@ -129,7 +123,7 @@ class ProviderContractTests(unittest.TestCase):
             common.mode_traits("uart", "dma-unimplemented")
 
     def test_unknown_family_cannot_inherit_cortex_m4_abi(self):
-        soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "Unmaintained SoC integration descriptor"):
@@ -137,37 +131,35 @@ class ProviderContractTests(unittest.TestCase):
 
     def test_unknown_emitter_cannot_fall_back_to_native(self):
         result = gate.resolve_ir(gate.ROOT /
-                              "tools/configure/assemblies/native-empty.toml")
+                              "tests/support/native/assemblies/native-empty.toml", test_support=True)
         result = replace(result, soc_family="unmaintained")
         with self.assertRaisesRegex(ValueError, "Selected provider context differs"):
             bindings.emit(result)
 
     def test_family_contract_has_explicit_abi_and_irq_identity(self):
         from tools.configure.providers import maintained
-        for family, arch, vector in (("native", "native", None),
-                                     ("stm32f407", "cortex-m4", "Stream"),
-                                     ("gd32f470", "cortex-m4", "Channel")):
+        for family, arch, vector in (("native", "native", None), ("stm32f4", "cortex-m4", "Stream"),):
             with self.subTest(family=family):
-                provider = maintained(family)
+                provider = maintained(family, test_support=(family == "native"))
                 self.assertEqual(provider.CPU_ABI["arch"], arch)
                 self.assertEqual(provider.DMA_VECTOR, vector)
                 with self.assertRaises(TypeError):
                     provider.CPU_ABI["arch"] = "other"
         with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
-            maintained("future")
+            maintained("future", test_support=("future" == "native"))
 
     def test_facts_cannot_advertise_an_unimplemented_mode(self):
         from tools.configure.providers import maintained
-        for family in ("native", "stm32f407", "gd32f470"):
+        for family in ("native", "stm32f4"):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError,
                                             "Unmaintained provider mode"):
-                    maintained(family).validate_selection(
+                    maintained(family, test_support=(family == "native")).validate_selection(
                         {"mode": "experimental"}, {"kind": "gpio"})
 
     def test_uart_decision_is_named_and_immutable(self):
         ir = gate.resolve_ir(gate.ROOT /
-                             "tools/configure/assemblies/native-uart.toml")
+                             "tests/support/native/assemblies/native-uart.toml", test_support=True)
         uart, = ir.controllers
         self.assertEqual(uart.options.baud, uart.to_dict()["baud"])
         self.assertEqual(uart.options.rx_profile, uart.to_dict()["rx_profile"])
@@ -178,14 +170,12 @@ class ProviderContractTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             uart.options.irq.priority = 0
         self.assertEqual(ir.to_dict(), gate.resolve_ir(gate.ROOT /
-                         "tools/configure/assemblies/native-uart.toml").to_dict())
+                         "tests/support/native/assemblies/native-uart.toml", test_support=True).to_dict())
 
     def test_adc_and_pwm_decisions_preserve_json_projection(self):
-        for path, kind in (("stm32_assembly/ve-adc-scan.toml", "adc"),
-                           ("gd32_assembly/adc-scan.toml", "adc"),
-                           ("stm32_assembly/ve-pwm.toml", "pwm")):
+        for path, kind in (("stm32_assembly/ve-adc-scan.toml", "adc"), ("stm32_assembly/ve-pwm.toml", "pwm"),):
             with self.subTest(fixture=path):
-                ir = gate.resolve_ir(gate.ROOT / "tests/contracts" / path)
+                ir = gate.resolve_ir(gate.ROOT / "tests/contracts" / path, test_support=native_fixture(gate.ROOT / "tests/contracts" / path))
                 item, = (item for item in ir.controllers if item.kind == kind)
                 if kind == "adc":
                     self.assertEqual(item.options.channels,
@@ -200,34 +190,34 @@ class ProviderContractTests(unittest.TestCase):
                     else:
                         item.options.period_ticks = 1
                 self.assertEqual(ir.to_dict(), gate.resolve_ir(
-                    gate.ROOT / "tests/contracts" / path).to_dict())
+                    gate.ROOT / "tests/contracts" / path, test_support=native_fixture(gate.ROOT / "tests/contracts" / path)).to_dict())
 
     def test_rejected_family_invalidates_previous_bundle(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             package = root / "board"
             package.mkdir()
-            board = gate.load(gate.ROOT / "boards/native_reference/board.json")
+            board = gate.load(gate.ROOT / "tests/support/native/board/board.json")
             (package / "board.json").write_text(json.dumps(board))
             assembly = root / "assembly.toml"
             assembly.write_text('schema=2\nboard_package="board"\n'
                                 'backend="native"\nclock="model"\n'
                                 '[memory]\nmain_stack_bytes=2048\n')
             output = root / "bundle"
-            gate.configure(assembly, output)
+            gate.configure(assembly, output, test_support=native_fixture(assembly))
             board["soc_family"] = "unmaintained"
             (package / "board.json").write_text(json.dumps(board))
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "Unmaintained SoC integration descriptor"):
-                gate.configure(assembly, output)
+                gate.configure(assembly, output, test_support=native_fixture(assembly))
             self.assertFalse(output.exists())
 
     def test_cpu_facts_are_exported_to_the_build_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "bundle"
             gate.configure(gate.ROOT /
-                           "tools/configure/assemblies/native-empty.toml",
-                           output)
+                           "tests/support/native/assemblies/native-empty.toml",
+                           output, test_support=True)
             selection = (output / "selection.cmake").read_text()
             self.assertIn('set(NEXUS_CPU_ARCH "native")', selection)
             self.assertIn('set(NEXUS_CPU_FPU "none")', selection)

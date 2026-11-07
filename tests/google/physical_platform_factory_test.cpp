@@ -10,13 +10,7 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_PHYSICAL_FACTORY_STM32
 #include "stm32f407_provider.h"
-#else
-#include "gd32f470_provider.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#endif
 nx_platform_start_result_t nx_empty_platform_start(void);
 nx_result_t nx_empty_platform_stop(void);
 nx_platform_start_result_t
@@ -24,7 +18,7 @@ nx_empty_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic);
 nx_result_t
 nx_empty_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);
 /** \brief Both SDK fixtures use the same host-only NVIC register storage. */
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -49,13 +43,8 @@ static unsigned s_writes;
 static bool s_refuse_selected_gpio_mode;
 static constexpr size_t MMIO_BYTES = 0x80000U;
 static constexpr uintptr_t MMIO_BASE = UINT32_C(0x40000000);
-#ifdef NX_PHYSICAL_FACTORY_STM32
 static constexpr unsigned SELECTED_GPIO = 4U;
 static constexpr unsigned SELECTED_PIN = 3U;
-#else
-static constexpr unsigned SELECTED_GPIO = 3U;
-static constexpr unsigned SELECTED_PIN = 7U;
-#endif
 /** \brief Inspect the same physical GPIO layout through both official SDKs. */
 static volatile uint32_t& selected_gpio(unsigned offset) {
     return *reinterpret_cast<volatile uint32_t*>(
@@ -63,11 +52,7 @@ static volatile uint32_t& selected_gpio(unsigned offset) {
 }
 /** \brief GPIO gate is shared; its prior owners survive every phase. */
 static volatile uint32_t& selected_gpio_gate(void) {
-#ifdef NX_PHYSICAL_FACTORY_STM32
     return RCC->AHB1ENR;
-#else
-    return RCU_AHB1EN;
-#endif
 }
 
 extern "C" bool nx_physical_factory_is_privileged(void) {
@@ -79,7 +64,6 @@ extern "C" void nx_physical_factory_write(volatile uint32_t* reg,
     if (!s_refuse_selected_gpio_mode || reg != &selected_gpio(0U))
         *reg = value;
 }
-#ifdef NX_PHYSICAL_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
@@ -99,22 +83,6 @@ extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
     ++s_stops;
     return s_system->Stop();
 }
-#else
-extern "C" {
-SCB_Type g_gd32_model_scb;
-}
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return s_system->Preflight();
-}
-extern "C" int nx_gd32_soc_start(void) {
-    ++s_starts;
-    return s_system->Start();
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    ++s_stops;
-    return s_system->Stop();
-}
-#endif
 
 /** \brief Compare real mapped register bytes; no modeled lifecycle surrogate.
  */
@@ -142,7 +110,7 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
                           : nx_empty_platform_stop_diagnosed(diagnostic);
     }
     void SetUp() override {
-        g_gd32_model_nvic = {};
+        g_f4_model_nvic = {};
         void* admitted =
             mmap(reinterpret_cast<void*>(MMIO_BASE), MMIO_BYTES,
                  PROT_READ | PROT_WRITE,
@@ -163,10 +131,8 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
         ON_CALL(system, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(system, Start()).WillByDefault(Return(0));
         ON_CALL(system, Stop()).WillByDefault(Return(0));
-#ifdef NX_PHYSICAL_FACTORY_STM32
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
-#endif
         ASSERT_FALSE(nx_arch_irq_is_masked());
         ASSERT_EQ(stop(), NX_SUCCESS);
     }
@@ -270,11 +236,7 @@ TEST_P(PhysicalPlatformFactory, PrivilegedOwnerCanRestartActualSelectedGraph) {
     if (GetParam()) {
         const nx_gpio_port_t* port = nx_factory_gpio(NX_GPIO_ID_OUTPUT);
         ASSERT_NE(port, nullptr);
-#ifdef NX_PHYSICAL_FACTORY_STM32
         EXPECT_EQ(nx_gpio_port_write(port, 8U, 0U), NX_SUCCESS);
-#else
-        EXPECT_EQ(nx_gpio_port_write(port, 128U, 0U), NX_SUCCESS);
-#endif
     }
     EXPECT_EQ(stop(), NX_SUCCESS);
     EXPECT_EQ(start().primary, NX_SUCCESS);

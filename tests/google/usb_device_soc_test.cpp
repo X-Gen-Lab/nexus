@@ -9,43 +9,21 @@
 extern "C" {
 #include "nexus/io/native/model.h"
 #include "nexus/io/usb_activation.h"
-#include "usb_device.h"
-#ifdef NX_USB_GD_MODEL
-#include "gd32f470_usb_device.h"
-#include "gd32f4xx_rcu.h"
-#else
 #include "stm32f407_usb_device.h"
 #include "stm32f407xx.h"
-#endif
+#include "usb_device.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
-#ifdef NX_USB_GD_MODEL
-using ClockState = nx_gd32_usb_clock_state_t;
-#define CLOCK_START nx_gd32_usb_clock_start
-#define CLOCK_STOP  nx_gd32_usb_clock_stop
-#define DEVICE_INIT nx_gd32_usb_device_initialize
-#define IRQ_COUNT   91U
-#else
 using ClockState = nx_stm32_usb_clock_state_t;
 #define CLOCK_START nx_stm32_usb_clock_start
 #define CLOCK_STOP  nx_stm32_usb_clock_stop
 #define DEVICE_INIT nx_stm32_usb_device_initialize
 #define IRQ_COUNT   82U
-#endif
 extern "C" void nx_usb_clock_model_write(volatile uint32_t* address,
                                          uint32_t value) {
     *address = value;
-#ifdef NX_USB_GD_MODEL
-    if (address == &RCU_CTL) {
-        if ((value & RCU_CTL_PLLSAIEN) != 0U) {
-            RCU_CTL |= RCU_CTL_PLLSAISTB;
-        } else {
-            RCU_CTL &= ~static_cast<uint32_t>(RCU_CTL_PLLSAISTB);
-        }
-    }
-#endif
 }
 extern "C" void nx_usb_clock_model_poll(void) {
 }
@@ -89,14 +67,8 @@ class UsbSoc : public testing::Test {
         hardware = static_cast<nx_native_usb_hardware_t*>(mapped);
         hardware->registers[0x10U / 4U] = 1U << 31U;
         ASSERT_EQ(nx_native_clock_configure(true, 100), NX_SUCCESS);
-#ifdef NX_USB_GD_MODEL
-        RCU_PLL = 25U | (400U << 6U) | RCU_PLLSRC_HXTAL | (9U << 24U);
-        RCU_CTL =
-            RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB | RCU_CTL_PLLEN | RCU_CTL_PLLSTB;
-#else
         RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
-#endif
         ASSERT_EQ(CLOCK_START(&clock, true, 200), NX_SUCCESS);
         controller.endpoints = endpoints;
         controller.endpoint_count = 4;

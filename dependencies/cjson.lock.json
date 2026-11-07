@@ -1,0 +1,26 @@
+{
+  "commit": "c859b25da02955fef659d658b8f324b5cde87be3",
+  "fetch_repository": "https://github.com/X-Gen-Lab/cJSON.git",
+  "files": {
+    "LICENSE": {
+      "bytes": 1084,
+      "sha256": "a36dda207c36db5818729c54e7ad4e8b0c6fba847491ba64f372c1a2037b6d5c"
+    },
+    "cJSON.c": {
+      "bytes": 80399,
+      "sha256": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d"
+    },
+    "cJSON.h": {
+      "bytes": 16394,
+      "sha256": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee"
+    }
+  },
+  "kind": "nexus-host-config-parser",
+  "license": {
+    "expression": "MIT",
+    "path": "LICENSE"
+  },
+  "release": "v1.7.19",
+  "repository": "https://github.com/DaveGamble/cJSON.git",
+  "schema_version": 1
+}

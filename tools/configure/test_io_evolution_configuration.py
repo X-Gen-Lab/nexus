@@ -1,4 +1,5 @@
 """Enhanced endpoints remain typed through real authored static assembly."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 import re
@@ -37,11 +38,11 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
             lines[start + 1:end] = ['driver = "' + driver + '"', *section]
         contents = "\n".join(lines) + "\n"
         if merge_spi_controllers:
-            contents = contents.replace('controller = "bus_spi_b"',
-                                        'controller = "bus_spi_a"')
+            contents = contents.replace('controller = "secondary_spi"',
+                                        'controller = "primary_spi"')
         assembly = self.root / "enhanced.toml"
         assembly.write_text(contents)
-        return configure.resolve_ir(assembly)
+        return configure.resolve_ir(assembly, test_support=native_fixture(assembly))
 
     def test_native_spi_transaction_has_distinct_typed_options_and_factory(self):
         result = self.resolve("native_assembly/multi.toml",
@@ -73,12 +74,13 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         contents = 'components = ["spi-dma-owner"]\n' + contents
         selected = self.root / "owner.toml"
         selected.write_text(contents)
-        result = configure.resolve_ir(selected)
+        result = configure.resolve_ir(selected, test_support=native_fixture(selected))
         self.assertIn("spi-dma-owner", result.components)
 
     def test_sequence_wraps_selected_direct_engine_call_and_typed_stop(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml")
+            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml", test_support=native_fixture(configure.ROOT /
+            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml"))
         item = next(value for value in result.controllers
                     if value.interface_kind == "spi_dma_transaction")
         name = item.id.replace("-", "_")
@@ -100,7 +102,8 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
 
     def test_sequence_does_not_rename_a_declared_engine_prepare(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml")
+            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml", test_support=native_fixture(configure.ROOT /
+            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml"))
         item = next(value for value in result.controllers
                     if value.interface_kind == "spi_dma_transaction")
         name = item.id.replace("-", "_")
@@ -113,12 +116,12 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                       "\n".join(adapted.initialize_sequences[-1].render()))
 
     def test_dma_owner_binding_uses_exact_physical_provider_membership(self):
-        for family, prefix in (("f407", "stm32"), ("gd470", "gd32")):
+        for family, prefix in (('f407', 'stm32'),):
             with self.subTest(family=family):
                 path = configure.ROOT / (
                     "tests/contracts/io_evolution_assembly/" + family +
                     "-spi-dma-transaction.toml")
-                result = configure.resolve_ir(path)
+                result = configure.resolve_ir(path, test_support=native_fixture(path))
                 header, getters = factory.emit(result)
                 self.assertIn("const nx_spi_dma_owner_binding_t*", header)
                 self.assertIn("nx_factory_spi_dma_owner_binding(", header)
@@ -130,7 +133,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
     def test_native_async_assembly_uses_independent_real_model_contexts(self):
         path = configure.ROOT / (
             "tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml")
-        result = configure.resolve_ir(path)
+        result = configure.resolve_ir(path, test_support=native_fixture(path))
         self.assertEqual(len(result.controllers), 2)
         self.assertEqual(len(result.devices), 3)
         _, source = bindings.emit(result)
@@ -161,12 +164,10 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
             path.write_text(contents.replace(before, after))
             with self.subTest(after=after), self.assertRaisesRegex(
                     ValueError, "model|async|enhanced|transaction"):
-                configure.resolve_ir(path)
+                configure.resolve_ir(path, test_support=native_fixture(path))
 
     def test_reviewed_f407_and_f470_polling_routes_emit_enhanced_faces(self):
-        for fixture, operations in (
-                ("stm32_assembly/zg-spi.toml", "nx_stm32_spi_transaction_ops"),
-                ("gd32_assembly/spi.toml", "nx_gd32_spi_transaction_ops")):
+        for fixture, operations in (('stm32_assembly/zg-spi.toml', 'nx_stm32_spi_transaction_ops'),):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture, "spi-transaction", "spi")
                 header, source = bindings.emit(result)
@@ -174,12 +175,11 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                 self.assertIn(operations, source)
 
     def test_transaction_face_requires_exact_family_not_a_vendor_prefix(self):
-        for family, prefix, fixture in (
-                ("stm32f407", "stm32", "f407-spi-transaction.toml"),
-                ("gd32f470", "gd32", "gd470-spi-transaction.toml")):
+        for family, prefix, fixture in (('stm32f4', 'stm32', 'f407-spi-transaction.toml'),):
             with self.subTest(family=family):
                 result = configure.resolve_ir(configure.ROOT /
-                    "tests/contracts/io_evolution_assembly" / fixture)
+                    "tests/contracts/io_evolution_assembly" / fixture, test_support=native_fixture(configure.ROOT /
+                    "tests/contracts/io_evolution_assembly" / fixture))
                 endpoint = result.devices[0]
                 with self.assertRaises(ValueError):
                     enhanced_endpoints.face(endpoint, "state", "unused", prefix)
@@ -192,30 +192,10 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "transaction.*poll|poll.*transaction"):
             self.resolve("stm32_assembly/zg-dma.toml", "spi-transaction", "spi")
 
-    def test_unimplemented_g474_transaction_provider_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "transaction.*provider|provider.*transaction"):
-            self.resolve("g474_assembly/spi.toml", "spi-transaction", "spi")
 
-    def test_long_i2c_is_distinct_typed_endpoint_on_three_v2_families(self):
-        for fixture in ("g474_assembly/acquisition.toml",
-                        "h743_assembly/peripherals.toml",
-                        "u575_assembly/peripherals.toml"):
-            with self.subTest(fixture=fixture):
-                result = self.resolve(fixture, "i2c-long-endpoint", "i2c")
-                child = next(item for item in result.devices
-                             if item.driver == "i2c-long-endpoint")
-                self.assertEqual(type(child.options).__name__,
-                                 "I2cLongEndpointOptions")
-                header, _ = factory.emit(result)
-                self.assertIn("nx_factory_i2c_long_device", header)
-                self.assertIn("const nx_i2c_long_endpoint_t*", header)
-                _, source = bindings.emit(result)
-                self.assertIn("nx_i2c_v2_long_endpoint_ops", source)
-                self.assertNotIn("(const nx_i2c_endpoint_t*)", source)
 
     def test_long_i2c_rejects_v1_even_when_pins_are_reviewed(self):
-        for fixture in ("stm32_assembly/zg-i2c.toml",
-                        "gd32_assembly/i2c.toml"):
+        for fixture in ('stm32_assembly/zg-i2c.toml',):
             with self.subTest(fixture=fixture):
                 with self.assertRaisesRegex(ValueError,
                                             "(?i)long.*provider|provider.*long"):
@@ -223,7 +203,8 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
 
     def test_default_endpoints_retain_legacy_types(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/native_assembly/multi.toml")
+            "tests/contracts/native_assembly/multi.toml", test_support=native_fixture(configure.ROOT /
+            "tests/contracts/native_assembly/multi.toml"))
         self.assertTrue(all(type(item.options).__name__ in
                             {"SpiEndpointOptions", "I2cEndpointOptions"}
                             for item in result.devices))
@@ -232,8 +213,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         self.assertNotIn("nx_factory_i2c_long_device(", header)
 
     def test_dma_transaction_has_distinct_port_and_endpoint_contexts(self):
-        for fixture, prefix in (("stm32_assembly/zg-dma.toml", "stm32"),
-                                ("gd32_assembly/dma.toml", "gd32")):
+        for fixture, prefix in (('stm32_assembly/zg-dma.toml', 'stm32'),):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture, "spi-dma-transaction", "spi")
                 port = next(item for item in result.controllers
@@ -263,18 +243,13 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
 
     def test_dma_sequence_cannot_expose_a_legacy_endpoint_on_same_controller(self):
         with self.assertRaisesRegex(ValueError, "mixed|every|all"):
-            self.resolve("gd32_assembly/dma.toml",
-                         "spi-dma-transaction", "spi",
-                         merge_spi_controllers=True)
+            self.resolve(
+                "multi_controller_assembly/stm32-zg.toml",
+                "spi-dma-transaction", "spi",
+                merge_spi_controllers=True)
 
     def test_enhanced_traits_report_words_and_per_message_limits(self):
-        for fixture, driver, kind, expected in (
-                ("stm32_assembly/zg-spi.toml", "spi-transaction", "spi",
-                 "nx_factory_spi_transaction_device_traits_t"),
-                ("stm32_assembly/zg-dma.toml", "spi-dma-transaction", "spi",
-                 "nx_factory_spi_dma_transaction_device_traits_t"),
-                ("g474_assembly/acquisition.toml", "i2c-long-endpoint", "i2c",
-                 "nx_factory_i2c_long_device_traits_t")):
+        for fixture, driver, kind, expected in (('stm32_assembly/zg-spi.toml', 'spi-transaction', 'spi', 'nx_factory_spi_transaction_device_traits_t'), ('stm32_assembly/zg-dma.toml', 'spi-dma-transaction', 'spi', 'nx_factory_spi_dma_transaction_device_traits_t')):
             with self.subTest(driver=driver):
                 result = self.resolve(fixture, driver, kind)
                 selected = replace(result, factory=replace(result.factory,
@@ -300,7 +275,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         self.assertNotIn("<< 16U", record)
         path = self.root / "enhanced.toml"
         path.write_text(path.read_text().replace("model_bytes = 64", "", 1))
-        _, source = factory.emit(configure.resolve_ir(path))
+        _, source = factory.emit(configure.resolve_ir(path, test_support=native_fixture(path)))
         record = re.search(
             r"s_nx_traits_spi_transaction_device_sensor_spi_a = \{\n([^\n]+)",
             source)[1]

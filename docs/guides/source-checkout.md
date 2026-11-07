@@ -75,7 +75,7 @@ banner or `documentation-build.json` and use that validated commit explicitly.
 Fetching the exact source commit avoids downloading unrelated artifact branches.
 The `documentation-assets` branch holds large historical evidence archives; it
 is not a source dependency. Retrieve only an archive identified by the
-[software evidence entry](../status/software-verification.md) when you need its
+[software evidence entry](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) when you need its
 original raw evidence. A verified Source SDK is another supported consumption
 path; it does not require the source repository's artifact history.
 
@@ -97,4 +97,4 @@ Each tutorial starts from the repository root established above. Keep independen
 consumer and package outputs outside the source checkout when instructed. Retain
 manifests, source identities and required reports before deleting only directories
 you created. A clean checkout supplies input identity; actual execution and
-[qualification evidence](../status/software-verification.md) remain separate.
+[qualification evidence](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) remain separate.

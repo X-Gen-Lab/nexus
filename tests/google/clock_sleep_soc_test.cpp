@@ -9,19 +9,6 @@
 #include "clock_domain_impl.h"
 #include "clock_sleep_soc_model.h"
 #include "nexus/arch/sleep.h"
-#ifdef NX_CLOCK_GD_MODEL
-#include "gd32f470_sleep.h"
-#include "gd32f4xx_fmc.h"
-#include "gd32f4xx_rcu.h"
-#define SOC_SLEEP    nx_gd32f470_sleep
-#define PLL          RCU_PLL
-#define CONTROL      RCU_CTL
-#define CONFIG       RCU_CFG0
-#define WAIT_STATE   FMC_WS
-#define SOURCE_READY RCU_CTL_HXTALSTB
-#define SLEEP_CLOCK  RCU_APB1SPEN
-#define TIMER_SLEEP  RCU_APB1SPEN_TIMER1SPEN
-#else
 #include "stm32f407_sleep.h"
 #include "stm32f407xx.h"
 #define SOC_SLEEP    nx_stm32f407_sleep
@@ -32,7 +19,6 @@
 #define SOURCE_READY RCC_CR_HSERDY
 #define SLEEP_CLOCK  RCC->APB1LPENR
 #define TIMER_SLEEP  RCC_APB1LPENR_TIM2LPEN
-#endif
 #include <array>
 #include <cstring>
 #include <gtest/gtest.h>
@@ -92,20 +78,11 @@ class ClockSleep : public ::testing::Test {
         on_mask = nullptr;
         live_sequence = &sequence;
         live_domain = &domain;
-#ifdef NX_CLOCK_GD_MODEL
-        CONTROL =
-            RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB | RCU_CTL_PLLEN | RCU_CTL_PLLSTB;
-        PLL = 25U | (400U << 6U) | RCU_PLLSRC_HXTAL | (9U << 24U);
-        CONFIG = RCU_CKSYSSRC_PLLP | RCU_SCSS_PLLP | RCU_APB1_CKAHB_DIV4 |
-                 RCU_APB2_CKAHB_DIV2;
-        WAIT_STATE = WS_WSCNT_7;
-#else
         CONTROL = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
         PLL = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         CONFIG = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
                  RCC_CFGR_PPRE2_DIV2;
         WAIT_STATE = FLASH_ACR_LATENCY_5WS;
-#endif
         SLEEP_CLOCK = TIMER_SLEEP;
         ASSERT_EQ(nx_clock_domain_construct(&domain, 2), NX_SUCCESS);
         ASSERT_EQ(nx_clock_domain_close(&domain, &barrier), NX_SUCCESS);
@@ -293,21 +270,10 @@ TEST_F(ClockSleep, NullOrUnalignedWakeRejectsWithoutObservation) {
 }
 
 TEST_F(ClockSleep, SpreadSpectrumCannotClaimAFixedDeadlineClock) {
-#ifdef NX_CLOCK_GD_MODEL
-    RCU_PLLSSCTL = RCU_PLLSSCTL_SSCGON;
-#else
     RCC->SSCGR = RCC_SSCGR_SSCGEN;
-#endif
     EXPECT_EQ(Sleep(), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(waits, 0U);
 }
-#ifdef NX_CLOCK_GD_MODEL
-TEST_F(ClockSleep, ChangedTimerPrescaleCannotRetainDeadlineDomain) {
-    RCU_CFG1 = RCU_CFG1_TIMERSEL;
-    EXPECT_EQ(Sleep(), NX_ERROR_UNSUPPORTED);
-    EXPECT_EQ(waits, 0U);
-}
-#endif
 TEST_F(ClockSleep, ActiveTokenOutputCannotOverwriteAClockBorrow) {
     ASSERT_EQ(nx_clock_domain_reopen(barrier), NX_SUCCESS);
     ASSERT_EQ(nx_clock_domain_acquire(&domain, &token), NX_SUCCESS);

@@ -216,7 +216,7 @@ def _checkout_identity(source, expected_commit, expected_origin):
         raise ValueError("FreeRTOS dependency checkout is dirty")
 
 
-def _children(root, source, selected_commit):
+def _children(root, source, selected_commit, *, require_checkouts=True):
     for child in catalogue.children(DIRECTORY):
         relative = catalogue.relative_path(child)
         row = _text(source, "ls-tree", selected_commit, "--", relative)
@@ -224,7 +224,8 @@ def _children(root, source, selected_commit):
                              re.escape(relative), row)
         if match is None:
             raise ValueError("FreeRTOS nested gitlink missing from tree")
-        _checkout_identity(root / child.path, match[1], child.fetch_url)
+        if require_checkouts:
+            _checkout_identity(root / child.path, match[1], child.fetch_url)
 
 
 def provisional_migration_revisions(root, selected_commit):
@@ -260,13 +261,18 @@ def migration_revisions(root, selected_commit):
     return frozenset({selected_commit, review["lock"]["upstream_base"]})
 
 
-def verify(root, *, selected_commit=None, require_git=True, parent_index=True):
+def verify(root, *, selected_commit=None, require_git=True, parent_index=True,
+           require_children=True):
     """Admit Git source or review bytes inside an already trusted SDK.
 
     Staged commit gates honor the active parent index. Clean preparation passes
     parent_index=False to ignore a caller-supplied GIT_INDEX_FILE.
+    A built-in port can audit all declared nested Gitlinks without preparing
+    third-party ports. Full inventory checks require their checkouts by default.
     """
     root = Path(root).absolute()
+    if type(require_children) is not bool:
+        raise ValueError("FreeRTOS child checkout policy requires a boolean")
     if require_git:
         selected_commit = _selected(root, selected_commit,
                                     parent_index=parent_index)
@@ -289,7 +295,8 @@ def verify(root, *, selected_commit=None, require_git=True, parent_index=True):
         committed = _git(source, "show", selected_commit + ":.gitmodules")
         if committed != module_bytes:
             raise ValueError("FreeRTOS declaration differs from Git blob")
-        _children(root, source, selected_commit)
+        _children(root, source, selected_commit,
+                  require_checkouts=require_children)
         _checkout_identity(source, selected_commit, expected_origin)
         _selected(root, selected_commit, parent_index=parent_index)
     _unchanged(observations)

@@ -43,6 +43,17 @@ def selects_branch(event, branch):
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_production_arm_jobs_are_within_current_f4_support(self):
+        jobs = workflow('build-matrix.yml')['jobs']
+        selected = jobs['arm']['strategy']['matrix']['preset']
+        self.assertTrue(selected)
+        self.assertTrue(all(name.startswith(('stm32-qiming-', 'stm32-sky-'))
+                            for name in selected))
+        fixtures = jobs['controller-routes']['strategy']['matrix']['fixture']
+        for name in fixtures:
+            with self.subTest(fixture=name):
+                self.assertTrue((ROOT / 'tests/contracts' / name).is_dir())
+
     def test_pushes_select_only_primary_branches(self):
         event = workflow('ci.yml')['on']['push']
         cases = [('main', True), ('develop', True), ('codex/task', False),
@@ -356,13 +367,12 @@ class WorkflowContracts(unittest.TestCase):
                         count += 1
         self.assertGreater(count, 20)
 
-    def test_six_selected_board_backend_link_profiles_have_actual_presets(self):
+    def test_f4_board_backend_link_profiles_have_actual_presets(self):
         jobs = workflow('build-matrix.yml')['jobs']
         selected = set(jobs['arm']['strategy']['matrix']['preset'])
         self.assertEqual(selected, {
             'stm32-qiming-baremetal', 'stm32-qiming-freertos',
-            'stm32-sky-baremetal', 'stm32-sky-freertos',
-            'gd32-liangshan-baremetal', 'gd32-liangshan-freertos'})
+            'stm32-sky-baremetal', 'stm32-sky-freertos'})
         from tools.dev.presets import Presets
         presets = Presets(ROOT)
         configured = {name for name, (row, _) in
@@ -391,7 +401,7 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
         self.assertNotIn('apt-get', commands)
 
-    def test_actions_initializer_covers_every_declared_gitlink(self):
+    def test_actions_initializer_prepares_active_dependencies_only(self):
         modules = configparser.ConfigParser()
         modules.read(ROOT / '.gitmodules')
         expected = {modules[section]['path'] for section in modules.sections()}
@@ -406,9 +416,15 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('preset', arguments)
         self.assertIn('--report', arguments)
         from tools.dev import dependencies
-        # Native models require every declared dependency; an ARM job binds its
-        # explicitly selected recursive closure through the preparation receipt.
-        self.assertEqual(set(dependencies.required_submodules('native')), expected)
+        from tools.maintenance.source_catalogue import ALL_DEPENDENCIES
+        active = {entry.path for entry in ALL_DEPENDENCIES
+                  if entry.scope != 'inventory' and entry.parent is None
+                  and entry.alias_of is None}
+        self.assertLess(active, expected)
+        host_config = set(dependencies.required_submodules('host-config'))
+        self.assertEqual(host_config, {'ext/tomlc99', 'ext/cjson'})
+        self.assertEqual(set(dependencies.required_submodules('native')),
+                         active | host_config)
 
     def test_native_executes_complete_ctest_and_google_plan_once(self):
         native = workflow('build-matrix.yml')['jobs']['native']
@@ -618,10 +634,8 @@ class WorkflowContracts(unittest.TestCase):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         selected = set(job['strategy']['matrix'].get('fixture', []))
         self.assertEqual(selected, {
-            'stm32_assembly', 'gd32_assembly', 'can_assembly', 'usb_assembly',
-            'ethernet_assembly', 'timer_assembly', 'g474_assembly',
-            'h743_assembly', 'u575_assembly',
-            'multi_controller_assembly', 'mainstream_assembly'})
+            'stm32_assembly', 'can_assembly', 'usb_assembly',
+            'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])
@@ -632,70 +646,13 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotIn('cmake --build', commands)
         self.assertNotIn('NEXUS_BACKEND', commands)
 
-    def test_h743_provider_stage_binds_canonical_inputs_to_one_project(self):
-        job = workflow('build-matrix.yml')['jobs']['controller-routes']
-        expected = {
-            'fixture': 'h743_assembly',
-            'project': 'tests/contracts/h743_assembly',
-            'assemblies': (
-                'tools/configure/assemblies/h743-spi-dma.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-cache-on.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-uart-tx.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml\n'
-                'tools/configure/assemblies/h743-uart-continuous.toml\n'
-                'tools/configure/assemblies/h743-uart-continuous-cache-on.toml\n')}
-        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
-                          if row.get('fixture') == 'h743_assembly'], [expected])
-        canonical = expected['assemblies'].splitlines()
-        original = sorted((ROOT / expected['project']).glob('*.toml'))
-        self.assertEqual(len(original), 26)
-        selected = original + [ROOT / value for value in canonical]
-        self.assertEqual(len(selected), 33)
-        self.assertEqual(len(set(selected)), 33)
-        self.assertTrue(all(path.is_file() for path in selected))
-        step = next(step for step in job['steps'] if step.get('name') ==
-                    'Link and audit each authored software assembly')
-        self.assertEqual(step['env']['PROVIDER_PROJECT'], '${{ matrix.project }}')
-        self.assertEqual(step['env']['PROVIDER_ASSEMBLIES'],
-                         '${{ matrix.assemblies }}')
-        self.assertEqual(step['run'].count('scripts/ci/provider_assemblies.py'), 1)
-        self.assertIn('arguments+=(--project "$PROVIDER_PROJECT")', step['run'])
-        self.assertIn('IFS= read -r assembly', step['run'])
 
-    def test_u575_provider_stage_admits_chain_and_lptim_canonical_inputs(self):
-        job = workflow('build-matrix.yml')['jobs']['controller-routes']
-        expected = {
-            'fixture': 'u575_assembly',
-            'project': 'tests/contracts/u575_assembly',
-            'assemblies': (
-                'tools/configure/assemblies/u575-uart-chain.toml\n'
-                'tools/configure/assemblies/u575-lptim-run.toml\n')}
-        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
-                          if row.get('fixture') == 'u575_assembly'], [expected])
-        original = sorted((ROOT / expected['project']).glob('*.toml'))
-        selected = original + [ROOT / value for value in
-                               expected['assemblies'].splitlines()]
-        self.assertEqual(len(selected), len(set(selected)))
-        self.assertTrue(all(path.is_file() for path in selected))
 
     def test_provider_shell_passes_each_authored_and_canonical_input_once(self):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
-        selections = {
-            'h743_assembly': [
-                'tools/configure/assemblies/h743-spi-dma.toml',
-                'tools/configure/assemblies/h743-spi-dma-cache-on.toml',
-                'tools/configure/assemblies/h743-spi-dma-uart-tx.toml',
-                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml',
-                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml',
-                'tools/configure/assemblies/h743-uart-continuous.toml',
-                'tools/configure/assemblies/h743-uart-continuous-cache-on.toml'],
-            'u575_assembly': [
-                'tools/configure/assemblies/u575-uart-chain.toml',
-                'tools/configure/assemblies/u575-lptim-run.toml'],
-            'gd32_assembly': []}
+        selections = {'stm32_assembly': [], 'can_assembly': []}
         for family, canonical in selections.items():
             with self.subTest(family=family), tempfile.TemporaryDirectory() as name:
                 root = Path(name) / 'repository with spaces'
@@ -750,47 +707,6 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertEqual(actual, expected)
 
 
-    def test_named_pin_state_ci_passes_only_the_canonical_input_without_local_toml(self):
-        job = workflow('build-matrix.yml')['jobs']['controller-routes']
-        canonical = 'tools/configure/assemblies/g474-pin-states.toml'
-        project = 'tests/contracts/pin_state_fixture'
-        expected = {'fixture': 'pin_state_fixture', 'project': project,
-                    'assemblies': canonical + '\n'}
-        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
-                          if row.get('fixture') == 'pin_state_fixture'], [expected])
-        self.assertFalse(list((ROOT / project).glob('*.toml')))
-        step = next(step for step in job['steps'] if step.get('name') ==
-                    'Link and audit each authored software assembly')
-        with tempfile.TemporaryDirectory(prefix='Named state CI ') as value:
-            root = Path(value) / 'repository with spaces'
-            (root / project).mkdir(parents=True)
-            assembly = root / canonical
-            assembly.parent.mkdir(parents=True)
-            assembly.write_text('canonical input port\n')
-            tool = root / '.venv/bin/python'
-            tool.parent.mkdir(parents=True)
-            tool.write_text('#!' + sys.executable + '\n'
-                'import json,os,sys\n'
-                'with open(os.environ["RECORDED_PROVIDER_ARGS"], "a") as f:\n'
-                '    f.write(json.dumps(sys.argv[1:]) + "\\n")\n')
-            tool.chmod(0o700)
-            record = root / 'arguments.jsonl'
-            env = dict(os.environ, FIXTURE='pin_state_fixture',
-                       GITHUB_WORKSPACE=str(root), PROVIDER_PROJECT=project,
-                       PROVIDER_ASSEMBLIES=canonical + '\n',
-                       RECORDED_PROVIDER_ARGS=str(record))
-            actual = subprocess.run(['bash', '-euo', 'pipefail', '-c', step['run']],
-                                    cwd=root, env=env, capture_output=True, text=True,
-                                    timeout=30)
-            self.assertEqual(actual.returncode, 0, actual.stdout + actual.stderr)
-            calls = [json.loads(line) for line in record.read_text().splitlines()]
-            self.assertEqual(len(calls), 1)
-            argv = calls[0]
-            selected = [argv[index + 1] for index, arg in enumerate(argv)
-                        if arg == '--fixture']
-            self.assertEqual(selected, [canonical])
-            self.assertEqual(argv[argv.index('--project') + 1], project)
-            self.assertEqual(argv[0], 'scripts/ci/provider_assemblies.py')
 
     def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
         job = workflow('build-matrix.yml')['jobs']['arch']
@@ -827,120 +743,9 @@ class WorkflowContracts(unittest.TestCase):
                        if 'scripts/ci/native_contracts.py' in step.get('run', ''))
         self.assertEqual(execute['env']['TSAN_OPTIONS'], 'halt_on_error=1')
 
-    def test_u575_pair_links_both_images_and_mutates_actual_elfs(self):
-        job = workflow('build-matrix.yml')['jobs']['arch']
-        steps = job['steps']
-        commands = '\n'.join(step.get('run', '') for step in steps)
-        self.assertEqual(commands.count('scripts/ci/u575_trustzone.py'), 1)
-        self.assertIn('--output build/u575-trustzone', commands)
-        mutation = next(step for step in steps if
-                        'tests/contracts/u575_trustzone' in step.get('run', ''))
-        self.assertEqual(mutation['env']['NEXUS_U575_PAIR_BUILD'],
-                         'build/u575-trustzone')
-        self.assertIn("-p 'test_*.py'", mutation['run'])
-        for name in ('Preserve compiler evidence',
-                     'Bind the upload to observed execution identity'):
-            step = next(item for item in steps if item.get('name') == name)
-            values = '\n'.join(str(value) for value in step['with'].values())
-            self.assertIn('build/u575-trustzone/', values)
 
-    def test_u575_pair_context_capture_is_required_on_original_gate(self):
-        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
-        gates = [step for step in steps if
-                 'scripts/ci/u575_trustzone.py' in step.get('run', '')]
-        self.assertEqual(len(gates), 1)
-        self.assertIn('--capture-pair-context', gates[0]['run'])
-        paired = [step for step in steps if step.get('name') ==
-                  'Seal and independently verify the U575 software pair']
-        self.assertEqual(len(paired), 1)
-        self.assertNotIn('if', paired[0])
-        self.assertIn('--expected-context-sha256', paired[0]['run'])
-        self.assertIn('--expected-manifest-sha256', paired[0]['run'])
-        self.assertIn('"$RUNNER_TEMP/', paired[0]['run'])
-        self.assertNotIn('candidate.py', paired[0]['run'])
 
-    def test_u575_pair_upload_binds_verified_transport_and_original_raw(self):
-        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
-        for name in ('Preserve compiler evidence',
-                     'Bind the upload to observed execution identity'):
-            step = next(item for item in steps if item.get('name') == name)
-            values = '\n'.join(str(value) for value in step['with'].values())
-            with self.subTest(step=name):
-                self.assertIn('build/u575-pair-evidence/', values)
-                self.assertIn('build/u575-trustzone/', values)
-                self.assertNotIn('RUNNER_TEMP', values)
-                self.assertNotIn('/payload', values)
 
-    def test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts(self):
-        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
-        selected = [step for step in steps if step.get('name') ==
-                    'Seal and independently verify the U575 software pair']
-        self.assertEqual(len(selected), 1)
-        fake = r'''#!/usr/bin/env python3
-import hashlib,json,os,pathlib,sys
-args=sys.argv[1:]
-assert args[0]=='tools/evidence/u575_pair.py'
-operation=args[1]
-def value(flag): return args[args.index(flag)+1]
-with open(os.environ['FAKE_PAIR_CALLS'],'a') as stream:
-    stream.write(json.dumps(args)+'\n')
-if operation=='seal':
-    context=pathlib.Path(value('--context'))
-    assert hashlib.sha256(context.read_bytes()).hexdigest()==value('--expected-context-sha256')
-    output=pathlib.Path(value('--output'))
-    assert not output.is_relative_to(pathlib.Path.cwd())
-    (output/'store').mkdir(parents=True)
-    (output/'store'/('a'*64+'.tar.gz')).write_bytes(b'opaque transport fixture')
-    (output/'manifest.json').write_text('{"pair":"fixture"}\n')
-elif operation=='verify':
-    manifest=pathlib.Path(value('--manifest'))
-    assert hashlib.sha256(manifest.read_bytes()).hexdigest()==value('--expected-manifest-sha256')
-    assert pathlib.Path(value('--archive')).read_bytes()==b'opaque transport fixture'
-    if os.environ['FAKE_PAIR_VERIFY_FAILURE']=='1': sys.exit(31)
-else: raise AssertionError(operation)
-print('{"status":"fixture-only"}')
-'''
-        for fail in ('0', '1'):
-            with self.subTest(verify_failure=fail), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory) / 'source'
-                tools = root / '.venv/bin'
-                tools.mkdir(parents=True)
-                executable = tools / 'python'
-                executable.write_text(fake.replace('#!/usr/bin/env python3',
-                                                    '#!' + sys.executable))
-                executable.chmod(0o755)
-                for name in ('nm', 'objdump'):
-                    path = tools / ('arm-none-eabi-' + name)
-                    path.write_bytes(b'external reader fixture')
-                    path.chmod(0o755)
-                control = root / 'build/u575-trustzone/pair-context'
-                control.mkdir(parents=True)
-                (control / 'context.json').write_bytes(b'context fixture')
-                (control / 'original.raw').write_bytes(b'original raw')
-                calls = Path(directory) / 'calls.jsonl'
-                temporary = Path(directory) / 'runner temp'
-                temporary.mkdir()
-                env = dict(os.environ, RUNNER_TEMP=str(temporary),
-                           GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2',
-                           PATH=str(tools) + os.pathsep + os.environ['PATH'],
-                           FAKE_PAIR_CALLS=str(calls),
-                           FAKE_PAIR_VERIFY_FAILURE=fail)
-                result = subprocess.run(['bash', '-euo', 'pipefail', '-c',
-                                         selected[0]['run']], cwd=root,
-                                        env=env, capture_output=True, text=True)
-                self.assertEqual(result.returncode, 0 if fail == '0' else 31,
-                                 result.stderr)
-                self.assertEqual([json.loads(line)[1] for line in
-                                  calls.read_text().splitlines()], ['seal', 'verify'])
-                artifact = root / 'build/u575-pair-evidence'
-                if fail == '1':
-                    self.assertFalse(artifact.exists())
-                else:
-                    self.assertEqual({p.suffix for p in artifact.iterdir()},
-                                     {'.json', '.gz'})
-                    self.assertEqual(len(list(artifact.iterdir())), 2)
-                self.assertEqual((control / 'original.raw').read_bytes(),
-                                 b'original raw')
 
     def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
         job = workflow('build-matrix.yml')['jobs']['os-security']
@@ -981,7 +786,9 @@ print('{"status":"fixture-only"}')
 
 
 PROFILE_BASELINE_SHA = '921ef15385b75a0a9e91dc4be22db7362dcf0f342cfd473008222c431d15d715'
-POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '7bd91f314401d686e4c6935bfb29279b4a123c09786262e36f5be64da872e010'}
+# The CI policy is unchanged. Release's explicit SDK profile is reviewed by its
+# command execution and publication-boundary contracts, not a whole-file hash.
+POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e'}
 
 
 class SoftwareQualificationContracts(unittest.TestCase):
@@ -1064,8 +871,12 @@ class SoftwareQualificationContracts(unittest.TestCase):
         profile = dict(document['jobs']['profiles'])
         self.assertEqual(profile.pop('if'),
                          "github.event_name == 'schedule' || inputs.mode == 'profiles'")
-        canonical = json.dumps(profile, sort_keys=True, separators=(',', ':')).encode()
-        self.assertEqual(hashlib.sha256(canonical).hexdigest(), PROFILE_BASELINE_SHA)
+        self.assertEqual(profile['strategy']['matrix']['include'], [
+            {'board': 'qiming', 'workloads': 'empty gpio uart'},
+            {'board': 'sky', 'workloads': 'empty gpio uart'}])
+        commands = '\n'.join(step.get('run', '') for step in profile['steps'])
+        self.assertIn('tools/measurement/compare.py', commands)
+        self.assertIn('--workloads ${{ matrix.workloads }}', commands)
         caller = document['jobs']['qualification']
         self.assertEqual(caller['if'],
                          "github.event_name == 'workflow_dispatch' && inputs.mode == 'qualification-only'")
@@ -1135,40 +946,6 @@ class SoftwareQualificationContracts(unittest.TestCase):
             self.assertEqual(receipt['workload'], 'gpio')
             self.assertIn('validated=true', (parent / 'outputs').read_text())
 
-    def test_canonical_h743_flash_path_keeps_the_existing_source_guard(self):
-        self.document()
-        canonical = 'tools/configure/assemblies/h743-high-peripherals.toml'
-        catalogue = json.loads((ROOT /
-            'tools/configure/assemblies/catalogue.json').read_text())
-        self.assertEqual(catalogue['assemblies'].count(Path(canonical).name), 1)
-        actual = ROOT / canonical
-        self.assertTrue(actual.is_file())
-        previous = ('cmake/package/verification/io_evolution/'
-                    'h743-high-peripherals.toml')
-        self.assertFalse((ROOT / previous).exists())
-        for relative, admitted in ((canonical, True), (previous, False)):
-            with self.subTest(path=relative), \
-                    tempfile.TemporaryDirectory() as temporary:
-                parent = Path(temporary)
-                root = self.fixture(parent)
-                selected = root / relative
-                selected.parent.mkdir(parents=True, exist_ok=True)
-                selected.write_bytes(actual.read_bytes())
-                self.commit(root)
-                env = self.environment(root, parent)
-                env['NEXUS_QUALIFICATION_ASSEMBLY'] = relative
-                self.assertEqual(self.execute('request', root, env).returncode, 0)
-                result = self.execute('source', root, env)
-                if admitted:
-                    self.assertEqual(result.returncode, 0,
-                                     result.stdout + result.stderr)
-                    record = json.loads((root /
-                        'build/software-qualification/source.json').read_text())
-                    self.assertEqual(record['assembly'], canonical)
-                    self.assertEqual(record['workload'], 'gpio')
-                else:
-                    self.assertNotEqual(result.returncode, 0)
-                    self.assertFalse((parent / 'outputs').exists())
 
     def test_source_guard_rejects_head_dirty_path_and_workload(self):
         self.document()

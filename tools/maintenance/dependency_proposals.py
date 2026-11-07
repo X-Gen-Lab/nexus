@@ -7,6 +7,7 @@ this tool cannot turn a JSON passed marker into qualification or merge authority
 """
 from __future__ import annotations
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -80,6 +81,46 @@ def verify_reference(record):
     return actual
 
 
+def _host_parser_sources(root, dependency, locked, selected_commit):
+    """Bind build-host parsers to their exact reviewed files and Git blobs."""
+    fields(locked, {"schema_version", "kind", "commit", "repository",
+                    "fetch_repository", "release", "license", "files"},
+           "Host parser lock")
+    if (type(locked["schema_version"]) is not int or
+            locked["schema_version"] != 1 or
+            locked["kind"] != "nexus-host-config-parser" or
+            locked["commit"] != selected_commit or
+            locked["repository"] != dependency.upstream_url or
+            locked["fetch_repository"] != dependency.fetch_url or
+            not isinstance(locked["release"], str) or not locked["release"] or
+            locked["license"] != {"expression": "MIT", "path": dependency.notice}):
+        raise ValueError("Host parser provenance differs from selected source")
+    required = ({"LICENSE", "toml.c", "toml.h"}
+                if dependency.identifier == "tomlc99" else
+                {"LICENSE", "cJSON.c", "cJSON.h"})
+    if not isinstance(locked["files"], dict) or set(locked["files"]) != required:
+        raise ValueError("Host parser requires its complete source closure")
+    checkout = root / dependency.path
+    observed = []
+    for name in sorted(required):
+        expected = locked["files"][name]
+        fields(expected, {"bytes", "sha256"}, "Host parser file")
+        if (type(expected["bytes"]) is not int or expected["bytes"] <= 0 or
+                not isinstance(expected["sha256"], str) or
+                not re.fullmatch(r"[0-9a-f]{64}", expected["sha256"])):
+            raise ValueError("Host parser requires exact file identities")
+        data, actual = snapshot(checkout / name)
+        if (actual["size"] != expected["bytes"] or
+                actual["sha256"] != expected["sha256"]):
+            raise ValueError("Host parser source bytes differ from reviewed lock")
+        blob = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+        if git(checkout, "ls-tree", "HEAD", "--", name) != (
+                "100644 blob " + blob + "\t" + name):
+            raise ValueError("Host parser source bytes differ from committed blob")
+        observed.append(actual)
+    return observed
+
+
 def inventory(root=ROOT):
     """Observe actual checkout pins and bytes without contacting an upstream."""
     root = Path(root).absolute()
@@ -147,7 +188,11 @@ def inventory(root=ROOT):
             lock_path = root / dependency.source_lock
             lock_bytes, lock_identity = snapshot(lock_path)
             locked = parse_json(lock_bytes)
-            if name == "googletest":
+            host_parser_identities = None
+            if name in {"tomlc99", "cjson"}:
+                host_parser_identities = _host_parser_sources(
+                    root, dependency, locked, entry[2])
+            elif name == "googletest":
                 googletest_lock.verify(checkout, lock_path)
                 upstream_revision = locked["upstream_commit"]
             elif name == "lwip":
@@ -203,7 +248,9 @@ def inventory(root=ROOT):
             if locked["commit"] != entry[2]:
                 raise ValueError("Source lock differs from committed source Gitlink: " + path)
             references.append(lock_identity)
-            if name != "googletest":
+            if host_parser_identities is not None:
+                references.extend(host_parser_identities)
+            elif name != "googletest":
                 references.extend(identity(checkout / filename)
                                   for filename in sorted(locked["files"]))
         records.append({"id": name, "revision": entry[2], "kind": "git_source",

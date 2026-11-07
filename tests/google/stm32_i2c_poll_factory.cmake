@@ -1,7 +1,7 @@
 # Actual polling factory: exact F407ZG fixture, concrete C owner and MMIO leaves.
 set(f407_poll_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-i2c-poll-factory")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
     --source-root "${NEXUS_SOURCE_DIR}" --assembly
     "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-i2c.toml"
     --output "${f407_poll_bundle}" RESULT_VARIABLE f407_poll_generated
@@ -22,14 +22,16 @@ foreach(f407_poll_navigation input_paths.json configuration_code_paths.json)
 endforeach()
 nexus_google_test(nexus_stm32_i2c_poll_factory_test STM32F4_LL
     SOURCES stm32_i2c_poll_factory_test.cpp "${f407_poll_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
     LIBRARIES Nexus::IO
     INCLUDES "${f407_poll_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
-        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_poll_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

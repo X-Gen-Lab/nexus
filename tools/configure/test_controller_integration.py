@@ -1,4 +1,5 @@
 """Selected controller integration reuses the canonical immutable plans."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 import unittest
 
@@ -10,14 +11,15 @@ from tools.configure.providers.common import owned_claims
 class ControllerIntegrationTests(unittest.TestCase):
     def test_primary_spi_rejects_foreign_or_reordered_selected_dma(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/stm32_assembly/ve-dma.toml")
+            "tests/contracts/stm32_assembly/ve-dma.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/stm32_assembly/ve-dma.toml"))
         item = next(item for item in result.controllers
                     if item.controller == "SPI1")
         lanes = item.integration.dma
         invalid = (tuple(reversed(lanes)),
                    (replace(lanes[0], owner="foreign"), lanes[1]),
                    (replace(lanes[0], controller="SPI2"), lanes[1]))
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         for selected in invalid:
             with self.subTest(lanes=selected):
                 changed = replace(item, integration=replace(
@@ -28,7 +30,8 @@ class ControllerIntegrationTests(unittest.TestCase):
 
     def test_cold_resource_projection_reads_the_canonical_plan(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/stm32_assembly/ve-exti.toml")
+            "tests/contracts/stm32_assembly/ve-exti.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/stm32_assembly/ve-exti.toml"))
         owners = {item.id for item in result.controllers}
         selected = tuple(owned_claims(result, owners))
         self.assertTrue(selected)
@@ -38,7 +41,8 @@ class ControllerIntegrationTests(unittest.TestCase):
 
     def test_selected_pair_keeps_resource_dma_and_irq_owners(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/multi_controller_assembly/stm32-zg.toml")
+            "tests/contracts/multi_controller_assembly/stm32-zg.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/multi_controller_assembly/stm32-zg.toml"))
         for item in result.controllers:
             with self.subTest(controller=item.id):
                 selected = getattr(item, "integration", None)
@@ -67,7 +71,8 @@ class ControllerIntegrationTests(unittest.TestCase):
 
     def test_shared_exti_vector_remains_owned_by_both_selected_lines(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/stm32_assembly/ve-exti.toml")
+            "tests/contracts/stm32_assembly/ve-exti.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/stm32_assembly/ve-exti.toml"))
         shared = next(claim for claim in result.resource_plan.claims
                       if claim.key == "irq:EXTI9_5")
         owners = set(shared.owner.split(";"))
@@ -80,7 +85,8 @@ class ControllerIntegrationTests(unittest.TestCase):
 
     def test_physical_part_and_selected_pins_reuse_frozen_values(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/stm32_assembly/ve-flash.toml")
+            "tests/contracts/stm32_assembly/ve-flash.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/stm32_assembly/ve-flash.toml"))
         part = getattr(result, "physical_part", None)
         self.assertIsNotNone(part)
         self.assertEqual(part.part, "STM32F407VET6")

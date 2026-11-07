@@ -1,150 +1,88 @@
 # Nexus 嵌入式通用平台
 
-Nexus 面向工业 MCU 开发，以 C11 提供可复用的 CPU 原语、芯片集成、类型化 I/O、
-可选 OS 适配和通用组件。平台采用静态实例、typed factory 与共享只读方法表；
-应用取得接口后，直接使用该接口访问独立的实例上下文。
+Nexus 为工业 MCU 提供 C11 通用机制：Core、Arch、类型化 I/O、静态 factory、可选 OS
+适配和器件组件。产品任务、业务协议、私有 PCB、Flash 分区与恢复策略由外部工程维护。
 
-本仓库维护通用机制。产品任务、业务协议、私有 PCB、Flash 分区、调度与恢复策略由
-[独立示例仓库](https://github.com/X-Gen-Lab/nexus-examples)或产品仓库维护。
-示例仓库为私有仓库，需要独立访问权限。
+当前生产 SoC 入口收敛为 `soc/stm32/stm32f4/`，已迁入的具体实现仍限定
+**STM32F407VET6／STM32F407ZGT6**。系列目录和官方 HAL 的存在不表示全部 F4
+型号、外设模式或开发板已经适配。实际边界见[支持范围](docs/reference/platforms/support.md)。
+所有现有 `vendors/`、子模块、锁定资料与许可证保留；未选择的 SDK 不属于当前生产
+支持，也不应进入所选工程的准备、校验或编译闭包。
 
-当前源码版本号为 **0.2.1**，用于开发和 Source SDK 预览。已发布版本的固定源码和
-产物以 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)为准；
-既有 `v0.2.0` 标签保留原始预览身份。版本号、文档发布或链接成功均不建立实板资格。
-接入前阅读[更新日志](CHANGELOG_CN.md)和[精确支持范围](docs/reference/platforms/support.md)。
+源码版本号为 **0.2.1**，发布身份以 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)
+为准。本次重构不重标已有标签、软件候选或硬件证据。当前重构源码仍需完成各自验收，
+MCU 实板 HIL 保持 `not_executed`。
 
-本页的相对导航以完整源码仓库为上下文。安装后的 Source SDK 保留选定实现与工具，
-不包含完整 `docs/`、`tests/` 或更新日志；阅读 SDK 对应文档时，以
-`.nexus-source-sdk.json` 记录的 source commit 打开[原仓库](https://github.com/X-Gen-Lab/nexus)
-的同一 revision，再阅读本页。完整离线文档使用独立文档包，不能把源 SDK 当作文档包。
+## 架构与源码入口
 
-## 从架构进入源码
+![FIG-01：平台职责与外部产品边界](docs/assets/diagrams/platform-architecture.svg)
 
-![FIG-01：当前平台分层与外部产品边界](docs/assets/diagrams/platform-architecture.svg)
+图表达通用职责；本轮具体 MCU 实现只有 F4 包。运行时不按图逐层转发，应用取得
+接口后通过 `ops(context, ...)` 进入选定实现。图例见[图册](docs/assets/diagrams/README.md)。
 
-图中的产品工程位于平台之外，OS 与组件为可选依赖。它描述模块关系，不表示每次 I/O
-都经过图中所有模块；各边含义和适用范围见[图册](docs/assets/diagrams/README.md)。
+| 位置 | 责任 |
+|---|---|
+| [Core](core/README.md) | 结果、单调 deadline、请求与存储借用 |
+| [Arch](arch/README.md) | CPU 原语、中断保存恢复及明确选入的能力 |
+| [STM32F4](soc/stm32/stm32f4/README.md) | 启动、时钟、资源、HAL／LL 适配与私有控制器状态 |
+| [Board](boards/README.md) | 精确料号、晶振、PCB 接线、电气条件及未知项 |
+| [I/O](io/README.md) | 公共接口、检查分派和硬件无关机制 |
+| [OS](os/README.md) | 可选裸机、FreeRTOS、ThreadX 与主机测试后端 |
+| [组件](components/README.md) | 通过窄端口访问设备的协议与可选机制 |
+| [工具](tools/README.md)／[CMake](cmake/README.md) | 配置、构建、测试与交付 |
+| [测试](tests/README.md) | 真实生产 C、工具边界、ARM 链接与独立 HIL 范围 |
 
-| 目录 | 负责什么 | 从哪里继续阅读 |
-|---|---|---|
-| `core/` | 结果、绝对单调 deadline、请求借用、稳定控制身份 | [Core](core/README.md) |
-| `arch/` | CPU 上下文、保存与恢复中断状态、原子端口及 Cache／MPU／SAU | [Arch](arch/README.md) |
-| `soc/` | 精确芯片的启动、时钟、内存、IRQ／DMA 与私有 provider | [SoC](soc/README.md) |
-| `drivers/` | 经逐芯片复核的共享硬件 IP 算法，由 SoC target 私有选编 | [Drivers](drivers/README.md) |
-| `boards/` | 已审接线、晶振、初始电平、硬件选择与未知事实 | [Board](boards/README.md) |
-| `io/` | 公共接口对象、检查分派、事务、流和 DMA 排空机制 | [I/O](io/README.md) |
-| `os/` | 公共等待合同及裸机、Native、FreeRTOS、ThreadX 的明确适配范围 | [OS](os/README.md) |
-| `components/` | 器件协议、共享资源 owner、存储、网络等可选组合 | [组件](components/README.md) |
-| `tools/`、`cmake/` | 配置生成、构建、Source SDK、资源检查和交付工具 | [工具](tools/README.md)、[构建](cmake/README.md) |
-| `tests/` | Native、生产寄存器模型、ARM 链接及工具边界检查 | [测试](tests/README.md) |
+原顶层共享硬件 IP 已归入 F4 包，文件位置不增加运行时中间层。Native 位于
+`tests/support/native/`，仅在显式测试 scope 下使用，不是另一个生产 SoC。
 
-MCU 集成按 `soc/stm32/`、`soc/gd32/` 分组；Arm 实现在 `arch/arm/cortex_m/`，
-主机设备模型在 `soc/native/drivers/`。这些目录表达源码所有权，不增加固件转发层。
-公共头文件、CMake target 和配置中的 family 身份各有独立稳定边界。
-
-## 配置、实例与运行分别做什么
+## 配置、生成与运行
 
 ```text
-一份 schema-2 TOML + SoC／Board 事实
-    → 严格资源校验 → 不可变 typed IR → 原子生成 bundle
-    → CMake 选编 → ELF／BIN／map 与资源检查
+schema-2 TOML + SoC／Board JSON
+    → 严格校验与资源计划 → 不可变 typed IR → 原子 bundle
+    → CMake 选择源码 → ELF／BIN／map
 
-运行：factory 查询已有接口 → 公共 API → ops(context, ...) → 选定 provider
+运行：typed factory → 已有只读 face → ops(context) → F4 实现
 ```
 
-TOML 选择精确 Board、时钟、后端、实例、模式和预算；JSON 维护芯片与板级事实。
-CMake 是源码依赖图的权威。Kconfig、cache 宏和 `resolved.json` 不构成另一套装配入口。
-Python 只在主机上校验和生成静态连接；固件硬件准入、读写、readback、停止和恢复由 C
-实现。当前生成流程见[配置工具](tools/configure/README.md)。
+factory 不分配、不初始化、不探测硬件；新工程使用 `nexus_factory_strong.h`。
+CMake 拥有唯一源码和链接图。当前配置工具仍集中在 `tools/configure/` 使用主机
+Python；Host C11 工具与剩余生成生命周期的 C 收敛属于后续工作，不能把移动文件
+称为已经完成语言和行为迁移。
 
-factory 不分配、不初始化硬件、不加锁、不探测设备。新工程默认使用
-`nexus_factory_strong.h`，通过按类别区分的结构引用取得接口；普通整数 ID 仅在当前
-assembly 内有效，不用于持久化或通信协议。对象关系见[factory 合同](docs/explanation/factory.md)。
+基础固件保持静态定容和无默认堆。平台不启动 scheduler，也不创建产品 worker；
+应用提供任务、缓冲区、执行者、service 进度与停机策略。
 
-平台启动建立所选基础设施，不启动 scheduler、不生成产品 worker。应用提供任务、
-缓冲区、队列容量、执行者和 service 进度。直接接口采用其声明的串行执行合同，
-需要多任务排队时显式选择 owner 适配器。
+## 构建与验证
 
-## 使用前必须理解的生命周期
-
-- REJECTED 不保留请求或缓冲区；ACCEPTED 后持续借用，直到调用者 acquire 观察 SETTLED。
-- cancel、timeout 和排空失败不授权复用存储；QUARANTINED 继续保留借用与恢复责任。
-- IRQ／notification 是重查状态的提示。DMA 完成、线上完成和最终 SETTLED 分别观察。
-- SETTLED 结束 provider 访问；回收 adapter、slot、通知和观察者还需要关闭准入与 join。
-- 启动 SRAM、已启 watchdog 和部分 RTC 状态可能保留不可普通回滚的责任。
-
-完整顺序见[所有权](docs/explanation/ownership.md)、[异步 I/O 教程](docs/tutorials/async-io.md)
-和[OS 停机指南](docs/guides/os-shutdown.md)。基础 C11 路径没有默认堆、注册表、
-隐藏驱动任务或最大对象池；可选网络／密码组件另有明确 arena、池和执行域限制。
-
-## 第一次构建：Native 软件验证
-
-以下命令在仓库根目录执行，需要联网准备固定依赖、Python 3.11 及维护的宿主
-C／C++、CMake、Ninja 工具。GoogleTest／GoogleMock 仅用于主机测试，固件保持 C11。
-首次准备与日常离线构建是不同步骤：
+以下命令从完整仓库根执行，先准备锁定工具与依赖。首次准备可联网，日常构建不隐式
+下载未选 SDK：
 
 ```sh
-python tools/dev/dev.py prepare --scope native --allow-network
-python scripts/setup/install_dev_tools.py
-.venv/bin/python -m pip install -r dependencies/environment-tools.txt
-python tools/dev/dev.py doctor
+python tools/dev/dev.py prepare --scope preset --preset stm32-qiming-baremetal --allow-network
+python tools/dev/dev.py configure --preset stm32-qiming-baremetal
+python tools/dev/dev.py build --preset stm32-qiming-baremetal --parallel 4
+```
+
+主机测试使用声明了 `NEXUS_TEST_SUPPORT=ON` 的 Native preset：
+
+```sh
 python tools/dev/dev.py configure --preset native-debug
 python tools/dev/dev.py build --preset native-debug --parallel 4
 python tools/dev/dev.py test --preset native-debug
 ```
 
-安装脚本建立正常 pre-commit／commit-msg 门禁。Windows 使用对应的
-`.venv/Scripts/python.exe`；完整工具前提、固定版本与失败诊断见
-[开发工作流](docs/guides/developer-workflow.md)和[源码取得](docs/guides/source-checkout.md)。
-检查命令退出码及本次新生成的报告，不能把旧报告当作此次成功。
+GoogleTest／GoogleMock 只进入主机测试，固件保持 C11／必要汇编。安装、格式、注释、
+TDD 和提交门禁见[工程手册](docs/design/engineering-handbook.md)。检查本次命令退出码和
+新报告；模型、ARM 链接、SDK 消费与实板结果分别验收。
 
-该路径运行主机行为合同，不会刷写开发板。MCU 构建另需锁定 ARM GNU 工具链、
-精确 assembly 和已准备的依赖。当前最小 ARM／CPU runtime 的冷态依赖准备与
-network 配置仍有[已记录的范围缺口 #52](https://github.com/X-Gen-Lab/nexus/issues/52)；
-完整依赖已准备的本地验证不等于此冷态路径已经修复。
+## 所有权与交付边界
 
-## 应用开发与设备接入
+ACCEPTED 后持续借用请求和 buffer，直到 acquire 观察 SETTLED；cancel、timeout 和
+QUARANTINED 不授权复用存储。DMA 完成、线上完成和引用排空分别观察；adapter、
+通知与观察者还需独立 join。权威合同见[所有权](docs/explanation/ownership.md)。
 
-| 目标 | 入口 |
-|---|---|
-| 从 Source SDK 建立外部工程 | [SDK 教程](docs/tutorials/source-sdk.md) |
-| 理解完整装配字段 | [assembly 参考](docs/reference/configuration/assembly.md) |
-| 查询可用路线与解释冲突 | [配置工具](tools/configure/README.md) |
-| 接入新的 Board | [板卡接入指南](docs/guides/board-porting.md) |
-| 接入 provider／新芯片 | [provider 接入指南](docs/guides/provider-porting.md) |
-| 维护器件与通用机制 | [组件分类](components/README.md) |
-| 只复用 CPU／Core／OS | [Cortex-M runtime](docs/delivery/cortex-m.md) |
-| 阅读完整架构 | [平台解释](docs/explanation/platform-architecture.md)、[源码合同](docs/explanation/source-map.md) |
-
-Source SDK 是可移位的源码快照，消费者重新选择配置和工具链进行编译。
-普通工程使用 `Nexus::Platform` 与 `nexus_add_firmware()`；安装入口可使用
-`find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)`。源码接口 epoch 为 `1`，
-authored assembly schema 为 `2`；版本权威为 `dependencies/platform-compatibility.json`。
-SDK manifest 校验精确源码、递归依赖、许可证及实际文件，不是二进制兼容承诺。
-
-## 当前支持与验证边界
-
-内置 MCU family 为 STM32F103／F407／G474／H743／U575、GD32F303／F470，
-每个 family 只维护其合同列出的精确型号和模式。启明 F407ZG 核心板／V4.1、
-旧 V3.1、天空星 F407VE、梁山派 GD32F470 等 Board 包分别声明来源和硬件选择，
-不能从文件存在推导实物、电气或全部外设已验证。
-
-CPU 软件 profile 覆盖 M0／M0+／M3／M4／M7／M23／M33／M55／M85 九种 Cortex-M 内核，
-不会自动生成 SoC、Board、向量表或设备 factory。ThreadX 另有明确的 Native／M4
-范围；芯片扩展组件也不等于新增完整 SoC。能力以[派生矩阵](docs/delivery/capabilities.md)
-和[当前交付](docs/delivery/README.md)为准。
-
-**当前 MCU 实板 HIL 为 `not_executed`。** Native／模型、ARM 链接、Source SDK、
-软件候选与实板验收分别建立证据。文档、版本号和历史测试不能建立当前物理时序、
-电气安全、签名产品发布或 LTS 承诺，详见[资格说明](docs/reference/platforms/qualification.md)。
-
-## 维护与文档
-
-代码格式、80 列、四空格和反斜杠 Doxygen 风格保持现有仓库约定。新行为采用
-GoogleTest／GoogleMock 或对应工具域的 TDD，保留真实失败、完整索引与正常 hooks。
-日常规则见[开发规范](docs/development/workflow.md)，文档采用
-[内容与图示标准](docs/design/documentation-standards.md)。
-
-[文档首页](docs/index.md)提供任务导航及中英文站点正文；源码旁 README 以中文维护，
-站点翻译使用同源 gettext catalog。设计合同、API 与执行台账各自保持唯一权威。
-[历史资料](docs/archive/README.md)保留原始身份，不建立当前支持或资格。
+[Source SDK](docs/tutorials/source-sdk.md) 是按选择导出的可移位源码，不是全部 MCU
+通用二进制。仓库相对文档以完整 checkout 为上下文；SDK 文档按 manifest 的 source
+commit 阅读，精确 host-support payload 不代表打包全部测试。
+[示例仓库](https://github.com/X-Gen-Lab/nexus-examples)为私有仓库，需要独立权限。

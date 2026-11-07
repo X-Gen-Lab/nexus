@@ -9,7 +9,6 @@
 extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_I2C_PAIR_STM32
 #include "stm32f407_i2c_async.h"
 void I2C1_EV_IRQHandler(void);
 void I2C2_EV_IRQHandler(void);
@@ -17,16 +16,6 @@ void I2C1_ER_IRQHandler(void);
 void I2C2_ER_IRQHandler(void);
 void DMA1_Stream0_IRQHandler(void);
 void DMA1_Stream2_IRQHandler(void);
-#else
-#include "gd32f470_i2c_async.h"
-#include "gd32f4xx_gpio.h"
-void I2C0_EV_IRQHandler(void);
-void I2C1_EV_IRQHandler(void);
-void I2C0_ER_IRQHandler(void);
-void I2C1_ER_IRQHandler(void);
-void DMA0_Channel0_IRQHandler(void);
-void DMA0_Channel2_IRQHandler(void);
-#endif
 }
 #include <array>
 #include <cstdlib>
@@ -36,7 +25,6 @@ void DMA0_Channel2_IRQHandler(void);
 #include <sys/mman.h>
 #include <vector>
 
-#ifdef NX_I2C_PAIR_STM32
 #define GATE        RCC->APB1ENR
 #define DMA_GATE    RCC->AHB1ENR
 #define PIN_MODE    GPIOB->MODER
@@ -51,29 +39,13 @@ void DMA0_Channel2_IRQHandler(void);
 #define FIRST_RX    DMA1_Stream0_IRQHandler
 #define SECOND_RX   DMA1_Stream2_IRQHandler
 #define MHZ         42U
-#else
-#define GATE        RCU_APB1EN
-#define DMA_GATE    RCU_AHB1EN
-#define PIN_MODE    GPIO_CTL(GPIOB)
-#define PIN_TYPE    GPIO_OMODE(GPIOB)
-#define PIN_AF_LOW  GPIO_AFSEL0(GPIOB)
-#define PIN_AF_HIGH GPIO_AFSEL1(GPIOB)
-#define LINES       GPIO_ISTAT(GPIOB)
-#define FIRST_EV    I2C0_EV_IRQHandler
-#define SECOND_EV   I2C1_EV_IRQHandler
-#define FIRST_ER    I2C0_ER_IRQHandler
-#define SECOND_ER   I2C1_ER_IRQHandler
-#define FIRST_RX    DMA0_Channel0_IRQHandler
-#define SECOND_RX   DMA0_Channel2_IRQHandler
-#define MHZ         50U
-#endif
 
 extern "C" {
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+NVIC_Type g_f4_model_nvic;
+SCB_Type g_f4_model_scb;
+SysTick_Type g_f4_model_systick;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 }
 namespace {
 class ClockPort {
@@ -130,11 +102,11 @@ class I2CPairFactory : public testing::Test {
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(sram, reinterpret_cast<void*>(uintptr_t{0x20000000U}));
-        g_gd32_model_nvic = {};
-        g_gd32_model_scb = {};
-        g_gd32_model_systick = {};
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_nvic = {};
+        g_f4_model_scb = {};
+        g_f4_model_systick = {};
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         model_privileged = true;
         now = 100U;
         refused_irq = -1;
@@ -147,9 +119,7 @@ class I2CPairFactory : public testing::Test {
         ON_CALL(clocks, Start()).WillByDefault(testing::Return(0));
         ON_CALL(clocks, Stop()).WillByDefault(testing::Return(0));
         LINES = 0xFFFFU;
-#ifdef NX_I2C_PAIR_STM32
         g_nx_stm32_system.rcc = RCC;
-#endif
         ports[0] = nx_binding_primary_i2c;
         ports[1] = nx_binding_secondary_i2c;
         endpoints[0] = nx_device_primary_sensor;
@@ -161,8 +131,8 @@ class I2CPairFactory : public testing::Test {
         }
     }
     void TearDown() override {
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         model_privileged = true;
         refused_irq = -1;
         held_engine = nullptr;
@@ -304,7 +274,7 @@ TEST_F(I2CPairFactory,
        UnprivilegedColdStartRejectsBeforeEitherControllerLease) {
     const auto* first = static_cast<const uint8_t*>(mmio);
     const std::vector<uint8_t> before(first, first + 0x80000U);
-    const auto nvic = g_gd32_model_nvic;
+    const auto nvic = g_f4_model_nvic;
     EXPECT_CALL(clocks, Preflight()).Times(0);
     EXPECT_CALL(clocks, Start()).Times(0);
     model_privileged = false;
@@ -315,7 +285,7 @@ TEST_F(I2CPairFactory,
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_stop());
     EXPECT_EQ(0U, writes);
     EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
-    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_f4_model_nvic, sizeof(nvic)));
     for (unsigned i = 0U; i < 2U; ++i) {
         EXPECT_FALSE(states[i]->initialized);
         EXPECT_EQ(nullptr, states[i]->active);
@@ -331,7 +301,7 @@ TEST_F(I2CPairFactory,
     }
     const auto* first = static_cast<const uint8_t*>(mmio);
     const std::vector<uint8_t> before(first, first + 0x80000U);
-    const auto nvic = g_gd32_model_nvic;
+    const auto nvic = g_f4_model_nvic;
     const auto writes_before = writes;
     model_privileged = false;
     for (unsigned i = 0U; i < 2U; ++i) {
@@ -348,7 +318,7 @@ TEST_F(I2CPairFactory,
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_stop());
     EXPECT_EQ(writes_before, writes);
     EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
-    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_f4_model_nvic, sizeof(nvic)));
 }
 
 TEST_F(I2CPairFactory, BothControllersUseExactPinsClockAndPublisherTuples) {
@@ -539,12 +509,12 @@ TEST_F(I2CPairFactory, RefusedInterruptWithdrawalRetainsPlatformClockAndPins) {
 }
 
 TEST_F(I2CPairFactory, IsrAndMaskedColdStartRejectBeforeAnyLease) {
-    g_gd32_model_isr = true;
+    g_f4_model_isr = true;
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_start().primary);
-    g_gd32_model_isr = false;
-    g_gd32_model_mask = 1U;
+    g_f4_model_isr = false;
+    g_f4_model_mask = 1U;
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_start().primary);
-    g_gd32_model_mask = 0U;
+    g_f4_model_mask = 0U;
     EXPECT_EQ(0U, GATE);
     EXPECT_EQ(0U, writes);
     EXPECT_CALL(clocks, Start()).Times(0);
@@ -647,11 +617,11 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
 }
 /** \brief Inject configurable handler context without replacing lifecycle. */
 extern "C" bool nx_i2c_pair_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 /** \brief Inject the incoming admission mask only. */
 extern "C" bool nx_i2c_pair_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 /** \brief Expose configurable CPU privilege to real platform and I2C admission.
  */
@@ -739,7 +709,6 @@ extern "C" void nx_i2c_v1_model_disable(volatile uint32_t* control,
                                         uint32_t bits) {
     *control &= control == held_engine ? ~(bits & ~1U) : ~bits;
 }
-#ifdef NX_I2C_PAIR_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
@@ -762,25 +731,3 @@ extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
 extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
     return clock_port->Stop();
 }
-#else
-/** \brief Reject an unrequested reset from the external vendor dependency. */
-extern "C" void rcu_periph_reset_enable(rcu_periph_reset_enum) {
-    ADD_FAILURE() << "Paired I2C startup must not reset unrelated GPIO";
-}
-/** \brief No selected paired-controller operation authorizes a GPIO reset. */
-extern "C" void rcu_periph_reset_disable(rcu_periph_reset_enum) {
-    ADD_FAILURE() << "No paired I2C GPIO reset was acquired";
-}
-/** \brief Reject before any generated pin or controller acquisition. */
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return clock_port->Preflight();
-}
-/** \brief Observe the separately tested clock subsystem startup boundary. */
-extern "C" int nx_gd32_soc_start(void) {
-    return clock_port->Start();
-}
-/** \brief Observe cleanup ordering at the system boundary only. */
-extern "C" int nx_gd32_soc_stop(void) {
-    return clock_port->Stop();
-}
-#endif

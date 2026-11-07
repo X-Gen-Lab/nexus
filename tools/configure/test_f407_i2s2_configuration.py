@@ -1,4 +1,5 @@
 """Normal authored F407 I2S2 resolution owns one finite SPI2 personality."""
+from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 
 import dataclasses
 import hashlib
@@ -45,7 +46,7 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
 
     def assembly(self, name="sky-baremetal-empty.toml", *, selected=True,
                  backend=None, clock=None, extra="", fixture=None):
-        source = (ROOT / "tools/configure/assemblies" / name
+        source = (canonical_assembly(ROOT, name)
                   if fixture is None else fixture)
         contents = source.read_text(encoding="utf-8")
         # Preserve a real external Board package when moving its authored
@@ -72,12 +73,12 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
 
     def resolve(self, assembly):
         inputs = {}
-        result = configure.resolve_ir(assembly, ROOT, input_paths=inputs)
+        result = configure.resolve_ir(assembly, ROOT, input_paths=inputs, test_support=native_fixture(assembly))
         record_inputs(inputs)
         return result
 
     def generate(self, assembly, output):
-        result = configure.configure(assembly, output, ROOT)
+        result = configure.configure(assembly, output, ROOT, test_support=native_fixture(assembly))
         record_inputs(json.loads((output / "input_paths.json").read_text()))
         return result
 
@@ -181,11 +182,6 @@ class F407I2s2ConfigurationTests(unittest.TestCase):
             self.resolve(self.assembly(fixture=fixture))
 
     def test_unreviewed_part_backend_and_clock_are_rejected(self):
-        foreign = self.assembly(name="nucleo-u575-baremetal-empty.toml",
-                                selected=False)
-        self.assertEqual(self.resolve(foreign).part, "STM32U575ZIT6Q")
-        with self.assertRaisesRegex(ValueError, "I2S2"):
-            self.resolve(self.assembly(name="nucleo-u575-baremetal-empty.toml"))
         with self.assertRaisesRegex(ValueError, "I2S2"):
             self.resolve(self.assembly(name="sky-freertos-empty.toml"))
         with self.assertRaisesRegex(ValueError, r"(?i)clock"):

@@ -208,10 +208,10 @@ The hardware sequence follows RM0090 Rev22 sections 28.4.6–28.4.8 and
 10.3.13–10.3.14, with DS8626 electrical requirements and the pinned ES0182
 scope. The SPI-only BSY erratum workaround is not substituted for the I2S
 shutdown sequence. Source identities are maintained in
-[the F407 reference manifest](../../soc/stm32/stm32f407/references.json).
+[the F407 reference manifest](../../soc/stm32/stm32f4/references.json).
 
 See the [public contract](../../components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h),
-[real provider](../../soc/stm32/stm32f407/drivers/i2s2_slave_tx.c),
-[selected System lifecycle](../../soc/stm32/stm32f407/private/stm32f407_system.h),
+[real provider](../../soc/stm32/stm32f4/drivers/i2s2_slave_tx.c),
+[selected System lifecycle](../../soc/stm32/stm32f4/private/stm32f407_system.h),
 [frame ownership contract](../../io/include/nexus/io/frame_stream.h) and
 [qualification boundaries](../delivery/qualification.md).

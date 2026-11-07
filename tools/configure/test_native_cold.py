@@ -1,13 +1,14 @@
 """Native cold assembly emits immutable connections and direct C calls."""
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure
-from soc.native.configure import bindings
+from tests.support.native.configure import bindings
 
 
 class NativeColdConstructionTests(unittest.TestCase):
     def constructions(self, relative):
-        result = configure.resolve_ir(configure.ROOT / relative)
+        result = configure.resolve_ir(configure.ROOT / relative, test_support=native_fixture(configure.ROOT / relative))
         return [(item, bindings.constructor(
             item, result, result.board_bindings, result.routes, result.devices))
             for item in result.controllers]

@@ -7,9 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "spi_dma_sequence.h"
-#if defined(NX_SPI_TRANSACTION_STM32)
 #include "nexus/io/native/model.h"
+#include "spi_dma_sequence.h"
 #include "stm32f407_dma.h"
 extern const nx_spi_dma_sequence_backend_t nx_stm32_spi_dma_sequence_backend;
 nx_stm32_system_t g_nx_stm32_system;
@@ -28,28 +27,6 @@ GPIO_TypeDef g_nx_stm32_gpioa_model;
 #define TXEMPTY      SPI_SR_TXE
 #define BUSY         SPI_SR_BSY
 #define CS           GPIOC->BSRR
-#else
-#include "gd32f470_spi_dma.h"
-#include "gd32f4xx.h"
-extern const nx_spi_dma_sequence_backend_t nx_gd32_spi_dma_sequence_backend;
-extern uint64_t g_gd32_model_now;
-extern bool g_gd32_model_isr;
-extern uint32_t g_gd32_model_mask;
-#define DMA_STATE    nx_gd32_spi_dma_state_t
-#define DEVICE_STATE nx_gd32_spi_dma_endpoint_state_t
-#define BACKEND      nx_gd32_spi_dma_sequence_backend
-#define IRQ          nx_gd32_spi_dma_irq
-#define RXCR         DMA_CH3CTL(DMA1)
-#define TXCR         DMA_CH4CTL(DMA1)
-#define RXCOUNT      DMA_CH3CNT(DMA1)
-#define TXCOUNT      DMA_CH4CNT(DMA1)
-#define WIRE_CONTROL SPI_CTL0(SPI4)
-#define DMA_REQUESTS SPI_CTL1(SPI4)
-#define STATUS       SPI_STAT(SPI4)
-#define TXEMPTY      SPI_STAT_TBE
-#define BUSY         SPI_STAT_TRANS
-#define CS           GPIO_BOP(GPIOC)
-#endif
 }
 #include <gtest/gtest.h>
 #if defined(NX_SPI_DMA_OWNER_TEST)
@@ -58,7 +35,6 @@ extern uint32_t g_gd32_model_mask;
 #include "spi_dma_sequence_owner.h"
 #include <gmock/gmock.h>
 extern "C" {
-#if defined(NX_SPI_TRANSACTION_STM32)
 bool nx_stm32_spi_dma_owner_contains(const nx_spi_dma_transaction_endpoint_t*,
                                      const nx_spi_dma_transaction_port_t*);
 nx_result_t
@@ -66,15 +42,6 @@ nx_stm32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t*,
                                    const nx_irq_wake_t*, uint8_t);
 #define OWNER_CONTAINS nx_stm32_spi_dma_owner_contains
 #define OWNER_ATTACH   nx_stm32_spi_dma_owner_attach_wake
-#else
-bool nx_gd32_spi_dma_owner_contains(const nx_spi_dma_transaction_endpoint_t*,
-                                    const nx_spi_dma_transaction_port_t*);
-nx_result_t
-nx_gd32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t*,
-                                  const nx_irq_wake_t*, uint8_t);
-#define OWNER_CONTAINS nx_gd32_spi_dma_owner_contains
-#define OWNER_ATTACH   nx_gd32_spi_dma_owner_attach_wake
-#endif
 }
 #endif
 #include <sys/mman.h>
@@ -99,9 +66,7 @@ class SPIDMAProviderSequence : public testing::Test {
     nx_dma_memory_region_t regions[2]{};
     nx_spi_dma_segment_t segments[2]{{tx, rx, 1U, 0U},
                                      {tx + 1U, rx + 1U, 1U, 0U}};
-#if defined(NX_SPI_TRANSACTION_STM32)
     nx_stm32_gpio_state_t cs{GPIOC, 1U, true, true};
-#endif
     void* mapping = MAP_FAILED;
     void SetUp() override {
         mapping = mmap(
@@ -115,7 +80,6 @@ class SPIDMAProviderSequence : public testing::Test {
         regions[1] = {(uintptr_t)rx, sizeof(rx), NX_DMA_MEMORY_WRITE};
         state.regions = regions;
         state.region_count = 2U;
-#if defined(NX_SPI_TRANSACTION_STM32)
         g_nx_stm32_gpioa_model = {};
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.spi.registers = SPI1;
@@ -127,15 +91,6 @@ class SPIDMAProviderSequence : public testing::Test {
         child.endpoint = {&state.spi, &cs, 1U, 1000000U, 0U};
         child.dma = &state;
         ASSERT_EQ(nx_stm32_spi_dma_initialize(&state), NX_SUCCESS);
-#else
-        g_gd32_model_nvic = {};
-        g_gd32_model_now = 1U;
-        g_gd32_model_isr = false;
-        g_gd32_model_mask = 0U;
-        ASSERT_EQ(nx_gd32_spi_dma_initialize(&state, &child, GPIOC, 1U,
-                                             1000000U, 0U, 6U),
-                  NX_SUCCESS);
-#endif
         STATUS = TXEMPTY;
         sequence.backend = &BACKEND;
         sequence.context = &state;
@@ -159,19 +114,12 @@ class SPIDMAProviderSequence : public testing::Test {
         if (mapping != MAP_FAILED) {
             EXPECT_EQ(munmap(mapping, 0x80000U), 0);
         }
-#if defined(NX_SPI_TRANSACTION_STM32)
         EXPECT_EQ(nx_native_clock_configure(false, 0U), NX_SUCCESS);
-#endif
     }
     void Complete() {
         RXCOUNT = 0U;
         TXCOUNT = 0U;
-#if defined(NX_SPI_TRANSACTION_STM32)
         DMA2->LISR |= 0x20U | (0x20U << 22U);
-#else
-        DMA_INTF0(DMA1) |= 0x20U << 22U;
-        DMA_INTF1(DMA1) |= 0x20U;
-#endif
         IRQ(&state, true);
         IRQ(&state, false);
     }
@@ -179,9 +127,6 @@ class SPIDMAProviderSequence : public testing::Test {
 TEST_F(SPIDMAProviderSequence, ColdStopCannotTouchAnUnacquiredController) {
     DMA_STATE cold = state;
     cold.initialized = false;
-#if !defined(NX_SPI_TRANSACTION_STM32)
-    cold.spi.initialized = false;
-#endif
     nx_spi_dma_sequence_state_t prebound{};
     prebound.backend = &BACKEND;
     prebound.context = &cold;
@@ -189,15 +134,9 @@ TEST_F(SPIDMAProviderSequence, ColdStopCannotTouchAnUnacquiredController) {
                                                   &prebound};
     RXCR = 0x1FU;
     TXCR = 0x1FU;
-#if defined(NX_SPI_TRANSACTION_STM32)
     WIRE_CONTROL = SPI_CR1_SPE | SPI_CR1_MSTR;
     DMA_REQUESTS = SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
     const nx_spi_port_t peer{&nx_stm32_spi_dma_ops, &state};
-#else
-    WIRE_CONTROL = SPI_CTL0_SPIEN | SPI_CTL0_MSTMOD;
-    DMA_REQUESTS = SPI_CTL1_DMATEN | SPI_CTL1_DMAREN;
-    const nx_spi_port_t peer{&nx_gd32_spi_dma_ops, &state};
-#endif
     uint32_t control = WIRE_CONTROL;
     uint32_t requests = DMA_REQUESTS;
     EXPECT_EQ(nx_spi_dma_transaction_stop(&cold_port), NX_SUCCESS);
@@ -266,11 +205,7 @@ TEST_F(SPIDMAProviderSequence,
         nx_spi_dma_transaction_prepare(&request, segments, 2U, 16U, deadline),
         NX_SUCCESS);
     ASSERT_EQ(nx_spi_dma_transaction_submit(&endpoint, &request), NX_SUCCESS);
-#if defined(NX_SPI_TRANSACTION_STM32)
     ASSERT_EQ(nx_native_clock_advance(2000U), NX_SUCCESS);
-#else
-    g_gd32_model_now += 2000U;
-#endif
     STATUS = TXEMPTY;
     busy_on_detach = true;
     nx_spi_dma_transaction_service(&port);
@@ -342,11 +277,7 @@ TEST_F(SPIDMAProviderSequence,
         EXPECT_EQ(nx_request_state(&phase.base), NX_REQUEST_READY);
         EXPECT_EQ(state.active, nullptr);
         EXPECT_EQ(CS, 0xA5A55A5AU);
-#if defined(NX_SPI_TRANSACTION_STM32)
         EXPECT_FALSE(nx_arch_irq_is_masked());
-#else
-        EXPECT_EQ(g_gd32_model_mask, 0U);
-#endif
     };
     /* Provider lifecycle wins even when physical DMA is still busy. */
     state.stopping = true;
@@ -480,19 +411,8 @@ TEST_F(SPIDMAProviderOwner, WakePolicyRejectionPreservesPreviousLiveSink) {
     ASSERT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &wake, 5U),
               NX_SUCCESS);
     const nx_irq_wake_t denied{nullptr, [](void*) { return NX_SUCCESS; }, true};
-#if defined(NX_SPI_TRANSACTION_STM32)
     EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 6U),
               NX_ERROR_PERMISSION);
-#else
-    NVIC_SetPriority(DMA1_Channel3_IRQn, 3U);
-    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 5U),
-              NX_ERROR_PERMISSION);
-    NVIC_SetPriority(DMA1_Channel3_IRQn, 6U);
-    NVIC_SetPriority(DMA1_Channel4_IRQn, 4U);
-    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 5U),
-              NX_ERROR_PERMISSION);
-    NVIC_SetPriority(DMA1_Channel4_IRQn, 6U);
-#endif
     EXPECT_EQ(state.wake, &wake);
     EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, nullptr, 0U),
               NX_SUCCESS);
@@ -546,11 +466,6 @@ extern "C" void nx_spi_multi_reset(volatile uint32_t* reset, uint32_t mask,
         *reset &= ~mask;
     }
 }
-#if !defined(NX_SPI_TRANSACTION_STM32)
-/** \brief SPI-only fixture selects no UART publisher. */
-extern "C" void USART0_IRQHandler(void) {
-}
-#endif
 
 /** \brief A final bus beat can make SPI busy as DMA EN finally clears. */
 extern "C" uint32_t nx_spi_dma_sequence_model_read(volatile uint32_t* control) {

@@ -1,16 +1,9 @@
 # Actual generated paired-controller objects; only external hardware is modeled.
-foreach(i2c_pair_family stm32 gd32)
+foreach(i2c_pair_family stm32)
     set(i2c_pair_official)
-    if(i2c_pair_family STREQUAL "stm32")
-        set(i2c_pair_official STM32F4_LL)
-    endif()
-    if(i2c_pair_family STREQUAL "stm32")
-        set(i2c_pair_label "stm32-zg")
-        set(i2c_pair_soc "stm32f407")
-    else()
-        set(i2c_pair_label "gd32")
-        set(i2c_pair_soc "gd32f470")
-    endif()
+    set(i2c_pair_official STM32F4_LL)
+    set(i2c_pair_label "stm32-zg")
+    set(i2c_pair_soc "stm32f4")
     foreach(i2c_pair_mode dma irq)
         set(i2c_pair_variant "i2c-pair")
         set(i2c_pair_target "nexus_${i2c_pair_family}_i2c_pair_factory_test")
@@ -22,7 +15,7 @@ foreach(i2c_pair_family stm32 gd32)
             "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${i2c_pair_label}-${i2c_pair_variant}.toml")
         set(i2c_pair_bundle "${CMAKE_CURRENT_BINARY_DIR}/i2c-pair-${i2c_pair_family}-${i2c_pair_mode}")
         execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
             --source-root "${NEXUS_SOURCE_DIR}" --assembly "${i2c_pair_input}"
             --output "${i2c_pair_bundle}" RESULT_VARIABLE i2c_pair_generated
             OUTPUT_VARIABLE i2c_pair_output ERROR_VARIABLE i2c_pair_error)
@@ -33,16 +26,17 @@ foreach(i2c_pair_family stm32 gd32)
         nexus_google_test(${i2c_pair_target} ${i2c_pair_official}
             SOURCES i2c_pair_factory_test.cpp
             "${i2c_pair_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async/i2c_v1_async.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_cold.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_lifecycle.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/system_lifecycle.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"
-                "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-                "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async"
-                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
-                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/private")
+                "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+                                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/private")
         if(i2c_pair_mode STREQUAL "irq")
             target_compile_definitions(${i2c_pair_target} PRIVATE NX_I2C_PAIR_IRQ)
         endif()
@@ -50,46 +44,11 @@ foreach(i2c_pair_family stm32 gd32)
             "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_pair_factory_model.h")
         target_compile_definitions(${i2c_pair_target} PRIVATE
             _init=nx_i2c_pair_fixture_init _fini=nx_i2c_pair_fixture_fini)
-        if(i2c_pair_family STREQUAL "stm32")
-            target_sources(${i2c_pair_target} PRIVATE
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/i2c_cold.c")
-            target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
-                "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-            target_compile_definitions(${i2c_pair_target} PRIVATE
-                STM32F407xx NX_I2C_PAIR_STM32)
-        else()
-            target_sources(${i2c_pair_target} PRIVATE
-                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/i2c_cold.c")
-            set(i2c_pair_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
-            target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
-                "${i2c_pair_gd}/CMSIS/GD/GD32F4xx/Include"
-                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Include")
-            target_sources(${i2c_pair_target} PRIVATE
-                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c")
-            # Execute the real SDK clock primitive while retaining the
-            # fixture's independently modeled peripheral reset effects.
-            set(i2c_pair_rcu "${i2c_pair_target}_rcu_vendor")
-            add_library(${i2c_pair_rcu} OBJECT
-                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c")
-            target_include_directories(${i2c_pair_rcu} PRIVATE
-                "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
-            target_include_directories(${i2c_pair_rcu} SYSTEM PRIVATE
-                "${i2c_pair_gd}/CMSIS/GD/GD32F4xx/Include"
-                "${i2c_pair_gd}/GD32F4xx_standard_peripheral/Include")
-            target_compile_definitions(${i2c_pair_rcu} PRIVATE
-                GD32F470 HXTAL_VALUE=25000000
-                rcu_periph_reset_enable=nx_pair_official_reset_enable
-                rcu_periph_reset_disable=nx_pair_official_reset_disable)
-            target_compile_features(${i2c_pair_rcu} PRIVATE c_std_11)
-            target_compile_options(${i2c_pair_rcu} PRIVATE
-                -Wno-int-to-pointer-cast)
-            target_sources(${i2c_pair_target} PRIVATE
-                $<TARGET_OBJECTS:${i2c_pair_rcu}>)
-            target_compile_definitions(${i2c_pair_target} PRIVATE
-                GD32F470 HXTAL_VALUE=25000000)
-            target_compile_options(${i2c_pair_target} PRIVATE
-                "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
-        endif()
+        target_sources(${i2c_pair_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c")
+        target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        target_compile_definitions(${i2c_pair_target} PRIVATE
+            STM32F407xx NX_I2C_PAIR_STM32)
     endforeach()
 endforeach()

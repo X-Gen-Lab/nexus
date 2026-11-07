@@ -1,4 +1,5 @@
 """Explicit placed SRAM binds one boot-owned child without altering chip RAM."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import copy
 import json
@@ -42,7 +43,7 @@ class F407SramStartupTests(unittest.TestCase):
     def resolve(self, text=None):
         path = self.directory / "assembly.toml"
         path.write_text(self.text() if text is None else text)
-        return gate.resolve_ir(path)
+        return gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_both_boards_bind_a_separate_immutable_selected_external_region(self):
         for board in BOARDS:
@@ -68,7 +69,8 @@ class F407SramStartupTests(unittest.TestCase):
         for board in BOARDS:
             with self.subTest(board=board):
                 result = gate.resolve_ir(gate.ROOT / "boards" / board /
-                                         "assemblies/sram-startup.toml")
+                                         "assemblies/sram-startup.toml", test_support=native_fixture(gate.ROOT / "boards" / board /
+                                         "assemblies/sram-startup.toml"))
                 selected, = result.external_memory
                 self.assertEqual("startup-memory", selected.endpoint.options.mode)
                 self.assertEqual(4096,

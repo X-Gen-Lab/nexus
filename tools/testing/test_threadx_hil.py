@@ -1,4 +1,5 @@
 """Synthetic ThreadX acquisition contracts never establish physical results."""
+from tools.configure.tests.native_fixture import native_fixture
 
 import copy
 from pathlib import Path
@@ -22,7 +23,7 @@ def resolved_threadx(board="stm32f407zg-qiming-v31", mask="basepri"):
     profile = cpu.resolve(facts, interrupts, "threadx")
     policy = kernel.resolve({"interrupt_mask": mask}, profile, 168000000)
     return {"board": board, "part": "STM32F407ZGT6",
-            "soc_family": "stm32f407", "backend": "threadx", "cpu": facts,
+            "soc_family": "stm32f4", "backend": "threadx", "cpu": facts,
             "irq": interrupts, "clock": {"core_hz": 168000000},
             "cpu_profile": kernel.bind(profile, policy).to_dict(),
             "kernel_profile": policy.to_dict()}
@@ -297,7 +298,7 @@ class ThreadXHilTests(unittest.TestCase):
                 with self.subTest(task=task), self.assertRaises(EvidenceError):
                     sample.validate()
 
-    def test_real_toml_selects_own_threadx_workloads_on_all_three_boards(self):
+    def test_real_toml_selects_own_threadx_workloads_on_both_f4_boards(self):
         from tools.configure import configure as gate
         protocol = workload_fixture.HilWorkloadTests()
         protocol.setUp()
@@ -306,9 +307,7 @@ class ThreadXHilTests(unittest.TestCase):
                 ("stm32f407_qiming_v31", "hse8-pll168", "uart1",
                  "stm32f407_qiming_v31"),
                 ("stm32f407ve_sky_qingchun", "hse8-pll168", "uart1",
-                 "stm32f407ve_sky_qingchun"),
-                ("gd32f470_liangshan", "hxtal25-pll200", "console",
-                 "gd32f470_liangshan")):
+                 "stm32f407ve_sky_qingchun")):
             path = protocol.root / (board + ".toml")
             path.write_text(
                 f'schema=2\nboard="{board}"\nbackend="threadx"\n'
@@ -326,7 +325,7 @@ class ThreadXHilTests(unittest.TestCase):
                                  {"kind": "vendor-source-import",
                                   "path": Path(name).parent.as_posix(),
                                   "lock_sha256": "1" * 64}):
-                protocol.resolved = gate.resolve_ir(path).to_dict()
+                protocol.resolved = gate.resolve_ir(path, test_support=native_fixture(path)).to_dict()
             protocol.fixture = gate.load(
                 gate.ROOT / "tools/hil/fixtures" / (fixture + ".json"))
             report = protocol.plan()

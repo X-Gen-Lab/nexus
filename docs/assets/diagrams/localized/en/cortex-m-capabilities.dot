@@ -1,5 +1,5 @@
 // FIG-13 current: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: arch/arm/cortex_m; cmake/platform/Runtime.cmake; soc/stm32/stm32f4.
 // Relations and qualification limits are documented in README.md.
 digraph CortexMCapabilities {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -16,7 +16,7 @@ digraph CortexMCapabilities {
     resolver [label="Strict CpuProfileIR\nLegal capability combinations, ABI and exact kernel port"];
     primitives [label="Arch / Core primitives\nMasks, atomics, barriers, explicit cache / MPU / SAU\nCold cache control is maintained for M7 only"];
     runtime [label="Nexus::Runtime\nCore + Arch + typed I/O faces + baremetal / FreeRTOS\nNo SoC / Board / startup / linker / factory"];
-    platform [label="Nexus::Platform: actual SoC + Board assembly\nF407/F470 initial platforms; limited G474/H743/U575 reference slices\nDevice ops / IRQ / clock / DMA and resources require separate integration"];
+    platform [label="Nexus::Platform: current F4 + Board assembly\nF407VE / F407ZG migrated; other F4 parts need validation\nDevice ops / IRQ / clock / DMA and resources are separate"];
     owner [label="External product / boot owner\nTasks, mappings, secure boot, private layout and recovery"];
     software [label="Independent software scope\nHost/model execution and actual ARM/runtime variant compilation"];
     physical [label="Actual CPU / SoC / PCB station\nContext retention, cache/DMA, MPU/SAU, latency\nWithout hardware: not_executed", fillcolor="#fff7ed"];

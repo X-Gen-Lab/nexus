@@ -1,4 +1,5 @@
 """Polling Flash owns its completion vector without enabling an IRQ mode."""
+from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.providers.descriptor import source_directory
 import json
 from pathlib import Path
@@ -11,10 +12,7 @@ from tools.configure import bindings, configure as gate, factory
 from tools.configure.providers.common import ConfigurationError, mode_traits
 
 ROOT = Path(__file__).resolve().parents[2]
-CASES = (
-    ("stm32", "stm32f407", "FLASH", "FLASH_IRQn"),
-    ("gd32", "gd32f470", "FMC", "FMC_IRQn"),
-)
+CASES = (('stm32', 'stm32f4', 'FLASH', 'FLASH_IRQn'),)
 
 
 class FlashPollingIrqTests(unittest.TestCase):
@@ -46,7 +44,7 @@ class FlashPollingIrqTests(unittest.TestCase):
     def test_selected_physical_controller_owns_named_completion_irq(self):
         for label, _, controller, vector in CASES:
             with self.subTest(family=label):
-                result = gate.resolve_ir(self.assembly(label), ROOT)
+                result = gate.resolve_ir(self.assembly(label), ROOT, test_support=native_fixture(self.assembly(label)))
                 self.assertEqual(
                     [("physical", controller, "poll-word")],
                     [(item.id, item.controller, item.mode)
@@ -62,11 +60,7 @@ class FlashPollingIrqTests(unittest.TestCase):
                                  gate.normalize_resource("irq:" + vector))
 
     def test_facts_bind_each_exact_cmsis_name_to_vector_four(self):
-        headers = {
-            "stm32": "vendors/st/cmsis_device_f4/Include/stm32f407xx.h",
-            "gd32": ("vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/"
-                     "GD32F4xx/Include/gd32f4xx.h"),
-        }
+        headers = {'stm32': 'vendors/st/cmsis_device_f4/Include/stm32f407xx.h'}
         for label, family, controller, vector in CASES:
             with self.subTest(family=family):
                 facts = json.loads((ROOT / source_directory(family) /
@@ -89,14 +83,14 @@ class FlashPollingIrqTests(unittest.TestCase):
                     with self.assertRaisesRegex(
                             ConfigurationError,
                             "Resource conflict irq:" + controller):
-                        gate.configure(assembly, output, ROOT)
+                        gate.configure(assembly, output, ROOT, test_support=native_fixture(assembly))
                     self.assertFalse(output.exists())
 
     def test_unselected_flash_does_not_claim_its_completion_irq(self):
         for label, _, controller, _ in CASES:
             with self.subTest(family=label):
                 result = gate.resolve_ir(
-                    self.assembly(label, selected=False), ROOT)
+                    self.assembly(label, selected=False), ROOT, test_support=native_fixture(self.assembly(label, selected=False)))
                 self.assertFalse(result.controllers)
                 self.assertNotIn("irq:" + controller,
                                  {item.key for item in result.claims})
@@ -107,7 +101,9 @@ class FlashPollingIrqTests(unittest.TestCase):
                 with self.subTest(family=label, suffix=suffix):
                     result = gate.resolve_ir(self.assembly(
                         label, selected=False,
-                        reserved="irq:" + controller + suffix), ROOT)
+                        reserved="irq:" + controller + suffix), ROOT, test_support=native_fixture(self.assembly(
+                        label, selected=False,
+                        reserved="irq:" + controller + suffix)))
                     self.assertFalse(result.controllers)
                     claims = [item for item in result.claims
                               if item.key == "irq:" + controller]
@@ -118,7 +114,7 @@ class FlashPollingIrqTests(unittest.TestCase):
         self.assertFalse(mode_traits("flash", "poll-word").irq)
         for label, _, controller, _ in CASES:
             with self.subTest(family=label):
-                result = gate.resolve_ir(self.assembly(label), ROOT)
+                result = gate.resolve_ir(self.assembly(label), ROOT, test_support=native_fixture(self.assembly(label)))
                 _, source = bindings.emit(result)
                 self.assertNotRegex(
                     source, rf"\bvoid\s+{controller}_IRQHandler\s*\(")
@@ -134,7 +130,7 @@ class FlashPollingIrqTests(unittest.TestCase):
                     path.write_text(self.assembly(label).read_text(
                         encoding="utf-8") + field + "\n", encoding="utf-8")
                     with self.assertRaises(ConfigurationError):
-                        gate.resolve_ir(path, ROOT)
+                        gate.resolve_ir(path, ROOT, test_support=native_fixture(path))
 
 
 if __name__ == "__main__":

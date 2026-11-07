@@ -21,15 +21,15 @@ class OSAcceptanceTests(unittest.TestCase):
         self.protocol = test_hil_workloads.HilWorkloadTests()
         self.protocol.setUp()
         self.addCleanup(self.protocol.doCleanups)
-        self.resolved = {"board": "fixture_board", "part": "fixture_part",
+        self.resolved = {"board": "fixture_board", "part": "STM32F407ZGT6",
                          "backend": "freertos"}
-        self.protocol.fixture.update(board="fixture_board", part="fixture_part")
-        self.protocol.resolved.update(board="fixture_board", part="fixture_part")
+        self.protocol.fixture.update(board="fixture_board", part="STM32F407ZGT6")
+        self.protocol.resolved.update(board="fixture_board", part="STM32F407ZGT6")
         self.protocol.resolved["cpu"] = {"arch": "cortex-m4", "fpu": "none",
                                         "mve": "none"}
         self.admission = {"kind": "hil_admission", "status": "ready",
                           "station_id": "fixture", "board": "fixture_board",
-                          "part": "fixture_part", "chip_uid": "fixture_uid",
+                          "part": "STM32F407ZGT6", "chip_uid": "fixture_uid",
                           "budgets": {
                               "os_irq_latency": {"maximum": 100, "unit": "us"},
                               "os_deadline_lateness": {"maximum": 100, "unit": "us"},
@@ -72,7 +72,7 @@ class OSAcceptanceTests(unittest.TestCase):
                        "started_utc": (self.now - timedelta(seconds=2)).isoformat(),
                        "finished_utc": (self.now - timedelta(seconds=1)).isoformat(),
                        "station_id": "fixture", "board": "fixture_board",
-                       "part": "fixture_part", "chip_uid": "fixture_uid",
+                       "part": "STM32F407ZGT6", "chip_uid": "fixture_uid",
                        "admission_sha256": canonical_digest(self.admission),
                        "elf_sha256": self.admission["elf"]["sha256"],
                        "resolved_sha256": self.admission["resolved"]["sha256"],

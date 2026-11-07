@@ -33,7 +33,7 @@ class I3CSourceSDKTests(unittest.TestCase):
         self.assertTrue(all(sdk.selected(name) for name in required))
 
     def test_installed_native_and_arm_consumers_retain_public_core_call(self):
-        choices = ((False, "stm32"), (True, "stm32"), (True, "gd32"))
+        choices = ((False, "stm32"), (True, "stm32"))
         for arm, chip in choices:
             with self.subTest(arm=arm, chip=chip):
                 self.check_consumer(arm, chip)

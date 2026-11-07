@@ -138,11 +138,15 @@ jobs:
       - name: Prepare the complete locked source SDK dependency closure
         run: >-
           .venv/bin/python tools/dev/dependencies.py prepare --scope sdk
+          --host-support --backend threadx
+          --component network --component tls --component mqtt --component mcuboot
           --allow-network --report build/sdk-dependencies.json
       - name: Package only the clean checked-out source and locked dependencies
         run: >-
           .venv/bin/python cmake/package/package_source_sdk.py
           --source "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/nexus-source-sdk"
+          --host-support --backend threadx
+          --component network --component tls --component mqtt --component mcuboot
       - name: Verify the installed source and exported CMake package byte identities
         run: >-
           .venv/bin/python cmake/package/package_source_sdk.py

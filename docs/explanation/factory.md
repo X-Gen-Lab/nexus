@@ -118,9 +118,12 @@ changes mode or silently acquires execution ownership.
 
 This complete maintained assembly selects independent Native instances:
 
-```{literalinclude} ../../tests/contracts/native_assembly/multi.toml
-:language: toml
-:caption: Maintained generated factory fixture; its software Board is not a physical PCB.
+The complete [host-model assembly](../../tests/contracts/native_assembly/multi.toml)
+is a test fixture, not a production Board. Resolve it explicitly:
+
+```sh
+python tools/configure/configure.py check --test-support \
+  --assembly tests/contracts/native_assembly/multi.toml
 ```
 
 The [async tutorial](../tutorials/async-io.md) runs the complete generated factory

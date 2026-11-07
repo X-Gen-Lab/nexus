@@ -300,7 +300,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 if item.path in {official.directory, official.cmsis_directory}:
                     review = {"commit": (official.commit
                         if item.path == official.directory else official.cmsis_commit)}
-            if item.identifier in ("googletest", "mcuboot"):
+            if item.identifier in ("googletest", "mcuboot", "tomlc99", "cjson"):
                 review = {"commit": json.loads(
                     (ROOT / item.source_lock).read_text())["commit"]}
             if item.identifier == "lwip":
@@ -379,6 +379,46 @@ class DependencyInventoryGitTests(unittest.TestCase):
     def commit(self, path, message):
         self.git(path, "-c", "user.name=Dependency test", "-c",
                  "user.email=dependency-test@local.invalid", "commit", "--quiet", "-m", message)
+
+    def test_host_parser_inventory_records_its_locked_host_source_closure(self):
+        inventory = proposals.inventory(self.root)
+        for parser in source_catalogue.host_configuration_sources():
+            with self.subTest(parser=parser.identifier):
+                record = next(item for item in inventory["dependencies"]
+                              if item["id"] == parser.identifier)
+                lock = json.loads((self.root / parser.source_lock).read_text())
+                self.assertEqual(record["revision"], lock["commit"])
+                self.assertEqual(record["upstream_url"], parser.upstream_url)
+                observed = {Path(item["path"]) for item in record["identities"]}
+                self.assertTrue({self.root / parser.path / name
+                                 for name in lock["files"]} <= observed)
+                self.assertIn(self.root / parser.source_lock, observed)
+
+    def test_host_parser_rehashed_omission_and_hidden_source_change_reject(self):
+        parser = source_catalogue.dependency("tomlc99")
+        lock_path = self.root / parser.source_lock
+        original_lock = lock_path.read_bytes()
+        lock = json.loads(original_lock)
+        lock["files"].pop("toml.c")
+        lock_path.write_text(json.dumps(lock))
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
+        lock_path.write_bytes(original_lock)
+        checkout = self.root / parser.path
+        source = checkout / "toml.c"
+        original_source = source.read_bytes()
+        self.git(checkout, "update-index", "--skip-worktree", "toml.c")
+        source.write_bytes(original_source + b"\n/* hidden changed bytes */\n")
+        self.assertEqual(self.git(checkout, "status", "--porcelain"), "")
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
+        lock = json.loads(original_lock)
+        lock["files"]["toml.c"] = {
+            "bytes": source.stat().st_size,
+            "sha256": hashlib.sha256(source.read_bytes()).hexdigest()}
+        lock_path.write_text(json.dumps(lock))
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
 
     def test_googletest_inventory_records_gitlink_and_upstream_license(self):
         result = proposals.inventory(self.root)

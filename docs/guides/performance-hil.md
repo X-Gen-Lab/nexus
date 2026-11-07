@@ -30,11 +30,9 @@ state scope. A speed claim needs units, clock, input size, load, sampling method
 and uncertainty. DWT 32-bit snapshots require a bounded wrap interval; host arrival
 timestamps do not establish MCU cycles or IRQ latency.
 
-![H743 exact memory and Cache ownership reference](../assets/diagrams/h743-memory-cache.svg)
-
-FIG-09 is an exact H743 reference. Cache-enabled TX requires complete 32-byte
-line ownership and AXI SRAM reachability; DMA completion, wire completion and
-borrow settlement are separate. It does not authorize RX DMA or TCM placement.
+For current F4 DMA, verify selected SRAM reachability and exclude CCM. DMA
+completion, peripheral wire completion and borrow settlement remain separate.
+No cache contract is inferred from a retired chip reference.
 
 ## Compare costs without changing the question
 
@@ -58,29 +56,21 @@ the largest observed latency is not WCET. Unexecuted measurements remain
 
 ## Prepare without operating equipment
 
-First configure and build the selected maintained assembly. For the Liangshan
+First configure and build the selected maintained assembly. For the Qiming
 baremetal reference, these repository-root commands consume its actual output:
 
 ```sh
-python tools/dev/dev.py configure --preset gd32-liangshan-baremetal
-python tools/dev/dev.py build --preset gd32-liangshan-baremetal --parallel 4
-python tools/hil/prepare.py     --fixture tools/hil/fixtures/gd32f470_liangshan.json     --resolved build/gd32-liangshan-baremetal/generated/resolved.json     --report /tmp/nexus-hil-preparation.json
-python tools/hil/measure.py plan     --fixture tools/hil/fixtures/gd32f470_liangshan.json     --resolved build/gd32-liangshan-baremetal/generated/resolved.json     --report /tmp/nexus-hil-measurement-plan.json
+python tools/dev/dev.py configure --preset stm32-qiming-baremetal
+python tools/dev/dev.py build --preset stm32-qiming-baremetal --parallel 4
+python tools/hil/prepare.py     --fixture tools/hil/fixtures/stm32f407_qiming_v31.json     --resolved build/stm32-qiming-baremetal/generated/resolved.json     --report /tmp/nexus-hil-preparation.json
+python tools/hil/measure.py plan     --fixture tools/hil/fixtures/stm32f407_qiming_v31.json     --resolved build/stm32-qiming-baremetal/generated/resolved.json     --report /tmp/nexus-hil-measurement-plan.json
 ```
 
 The locked ARM compiler must be on `PATH`. Check the part, pins, selected modes
 and `not_executed` cases in reports. Preparation does not open serial, flash or
 power equipment. Numeric limits and instruments remain unbound until reviewed.
-G474/H743/U575 software-reference fixtures deliberately reject physical station
-admission; a future physical fixture needs separately reviewed tooling integration.
-
-The [selected-mode HIL contracts](../design/selected-mode-hil.md) add exact
-preparation for H743 Cache-enabled SPI4 DMA, continuous USART3 RX with IRQ TX,
-and separately selected finite TX-DMA/continuous RX duplex, plus U575 finite
-USART1 hardware-chain TX and LPTIM2 RUN one-shots. Select their maintained
-assemblies and keep independent mode, wire, memory and lifecycle observations.
-These protocols retain the software-reference fixture boundary above; a valid
-plan or synthetic parser test does not supply a physical station result.
+A new physical fixture requires separately reviewed wiring, station admission
+and tooling. Retired chip-specific protocols do not enter the current F4 plan.
 
 ThreadX preparation uses [independent acquisition contracts](../../tools/hil/threadx.md)
 for tasks, IRQ wake, context, stack, deadlines, lifecycle and fail-stop. Select

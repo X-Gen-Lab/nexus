@@ -19,7 +19,7 @@ from tools.measurement import resources, retention
 
 
 BINDINGS = """static const nx_gpio_port_t s_nx_face_bus = {
-    &nx_gd32_gpio_ops, &s_nx_port_bus
+    &nx_stm32_gpio_ops, &s_nx_port_bus
 };
 """
 IMAGE = """
@@ -30,17 +30,17 @@ __attribute__((section(".isr_vector"), used))
 const void* const vectors[] = {&__nx_msp_end, Reset_Handler};
 volatile u32 initialized = 0x12345678;
 volatile u32 zeroed[4];
-int nx_gd32_gpio_write(void) { return 1; }
-int nx_gd32_gpio_read(void) { return 2; }
-int nx_gd32_gpio_toggle(void) { return 3; }
+int nx_stm32_gpio_write(void) { return 1; }
+int nx_stm32_gpio_read(void) { return 2; }
+int nx_stm32_gpio_toggle(void) { return 3; }
 typedef struct { int (*write)(void); int (*read)(void); int (*toggle)(void); }
     nx_gpio_ops_t;
 typedef struct { const nx_gpio_ops_t* ops; void* context; } nx_gpio_port_t;
-const nx_gpio_ops_t nx_gd32_gpio_ops = {
-    nx_gd32_gpio_write, nx_gd32_gpio_read, nx_gd32_gpio_toggle};
+const nx_gpio_ops_t nx_stm32_gpio_ops = {
+    nx_stm32_gpio_write, nx_stm32_gpio_read, nx_stm32_gpio_toggle};
 static u32 s_nx_port_bus;
 __attribute__((used)) static const nx_gpio_port_t s_nx_face_bus = {
-    &nx_gd32_gpio_ops, &s_nx_port_bus};
+    &nx_stm32_gpio_ops, &s_nx_port_bus};
 void Reset_Handler(void) { zeroed[0] = initialized; for (;;) {} }
 """
 

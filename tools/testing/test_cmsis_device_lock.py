@@ -1,9 +1,8 @@
-"""Reviewed H7/U5 sources require stable official or complete SDK identity."""
+"""Retained CMSIS inventory keeps source identity and verifier contracts."""
 from __future__ import annotations
 from dataclasses import replace
 import copy
 import io
-import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -433,16 +432,10 @@ class STM32F1LockTests(DeviceLockContracts, unittest.TestCase):
 class STM32H7LockTests(DeviceLockContracts, unittest.TestCase):
     family = "h7"
 
-    def test_axi_boot_reference_is_in_verified_and_packaged_closure(self):
+    def test_axi_boot_reference_remains_in_reviewed_inventory_lock(self):
         name = "Source/Templates/system_stm32h7xx.c"
         self.assertIn(name, self.lock["files"])
         self.assertIn(name, cmsis_device_lock.contract(self.lock))
-        path = ROOT / "cmake/package/package_source_sdk.py"
-        spec = importlib.util.spec_from_file_location("boot_reference_sdk", path)
-        package_source_sdk = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(package_source_sdk)
-        self.assertIn("vendors/st/cmsis_device_h7/" + name,
-                      package_source_sdk.REQUIRED_FILES)
 
 
 class STM32U5LockTests(DeviceLockContracts, unittest.TestCase):
@@ -460,18 +453,6 @@ class STM32H747ReferenceLockTests(unittest.TestCase):
         self.assertEqual(cmsis_device_lock.contract(lock), expected)
         self.assertNotIn("Include/stm32h747xx.h",
             cmsis_device_lock.REVIEWED_DEVICES["STM32H743ZIT6"]["files"])
-
-    def test_source_sdk_preserves_both_reviewed_device_closures(self):
-        specification = importlib.util.spec_from_file_location(
-            "h747_reference_sdk", ROOT / "cmake/package/package_source_sdk.py")
-        sdk = importlib.util.module_from_spec(specification)
-        specification.loader.exec_module(sdk)
-        names = sdk.dependency_entries(ROOT, "vendors/st/cmsis_device_h7")
-        self.assertIn("Include/stm32h743xx.h", names)
-        self.assertIn("Include/stm32h747xx.h", names)
-        self.assertIn("Source/Templates/gcc/startup_stm32h747xx.s", names)
-        self.assertNotIn("Include/stm32h750xx.h", names)
-
 
 if __name__ == "__main__":
     unittest.main()

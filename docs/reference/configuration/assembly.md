@@ -26,9 +26,9 @@ Before running the resolver, prepare the
 
 ## Complete maintained input
 
-```{literalinclude} ../../../tools/configure/assemblies/native-uart.toml
+```{literalinclude} ../../../tools/configure/assemblies/qiming-baremetal-uart.toml
 :language: toml
-:caption: Complete Native UART assembly, parsed by the production resolver.
+:caption: Complete F407ZG UART assembly, parsed by the production resolver.
 ```
 
 | Selection | Meaning and rejection boundary |
@@ -112,8 +112,8 @@ stay inside that owner without address overflow. An explicit
 budget uses that size. Reserved prefix/suffix bytes do not count as actual ELF
 LOAD bytes and do not change the physical Flash API.
 
-The reviewed offset and nonzero-reservation profiles are STM32F407VET6,
-STM32F407ZGT6 and GD32F470ZGT6. They require complete physical erase geometry and
+The reviewed offset and nonzero-reservation profiles are STM32F407VET6 and
+STM32F407ZGT6. They require complete physical erase geometry and
 a 512-byte-aligned executable vector base, including when the physical owner
 starts at the reset address. Other SoCs and external provider packages gain no
 prefix/suffix support from these fields. The maintained profile owns that exact
@@ -183,10 +183,10 @@ unmask it; no FreeRTOS handoff qualification follows from an offset link.
 Run from the repository root, using a new output you own:
 
 ```sh
-python tools/configure/configure.py list-bindings     --assembly tools/configure/assemblies/native-uart.toml
-python tools/configure/configure.py check     --assembly tools/configure/assemblies/native-uart.toml
-python tools/configure/configure.py explain     --assembly tools/configure/assemblies/native-uart.toml
-python tools/configure/configure.py generate     --assembly tools/configure/assemblies/native-uart.toml     --output /tmp/nexus-native-config
+python tools/configure/configure.py list-bindings     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
+python tools/configure/configure.py check     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
+python tools/configure/configure.py explain     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
+python tools/configure/configure.py generate     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml     --output /tmp/nexus-native-config
 ```
 
 `check` and `explain` do not generate output. `generate` publishes one atomic owned

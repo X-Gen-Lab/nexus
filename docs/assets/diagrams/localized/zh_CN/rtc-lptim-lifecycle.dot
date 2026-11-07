@@ -53,7 +53,7 @@ digraph rtcLptimLifecycle {
     source -> held [label="hold 期间请求源可以继续推进\nLPTIM 结果取最终撤源时的 tick", constraint=false];
     subgraph clusterTarget {
         label="当前构建：普通类型化配置与静态装配"; style=rounded; color="#64748b";
-    toml [label="普通 [rtc.name]／[lptim.name]\nNative RTC0/1 与 LPTIM0/1，无引脚／IRQ", fillcolor="#f8fafc"];
+    toml [label="普通 [rtc.name]／[lptim.name]\nNative RTC0/1 与 LPTIM0/1，无引脚／IRQ\nNEXUS_TEST_SUPPORT=ON / --test-support", fillcolor="#f8fafc"];
     ir [label="现有 ControllerIR -> provider 路径\n不引入第二套配置权威", fillcolor="#f8fafc"];
     platform [label="生成的 nx_platform_start/stop\n外部显式生命周期，没有调度器"];
     generated [label="生成被选择的静态状态／接口面\n以及纯类型化 factory 查找", fillcolor="#f8fafc"];
@@ -67,8 +67,8 @@ digraph rtcLptimLifecycle {
     platform -> reopen [label="后续准备：对已构造 owner 调用私有 start", constraint=false];
     platform -> stop [label="公共 port stop；保留失败清理责任", constraint=false];
     subgraph clusterHardwareTarget {
-        label="目标：物理适配，未实现且未执行"; style=dashed; color="#64748b";
-    hardware [label="H743／U575 RTC + LPTIM\n时钟／备份复位／IRQ／STOP／VBAT\n没有硬件或 HIL 验证资格", fillcolor="#f8fafc"];
+        label="目标：此异步 RTC/LPTIM 合同的物理集成"; style=dashed; color="#64748b";
+    hardware [label="物理异步 RTC/LPTIM provider\nclock / backup reset / IRQ / STOP / VBAT\nNative 不授予硬件或 HIL 资格", fillcolor="#f8fafc"];
     }
     hardware -> face [label="未来 provider 必须满足公共合同", style=dashed, constraint=false];
 }

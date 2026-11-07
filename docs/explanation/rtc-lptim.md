@@ -75,8 +75,12 @@ The final permitted reopen can move `UINT64_MAX - 1` to `UINT64_MAX`; after a la
 
 The maintained pair fixture below is a complete Native assembly. Ordinary `[rtc.name]` and `[lptim.name]` sections resolve through the existing immutable `ControllerIR -> provider -> factory` path. `calendar-alarm` has no date or timezone option; `counter16-oneshot` requires an explicit positive `uint32_t` `tick_hz`. Unknown policy/IRQ fields and duplicate controller claims are rejected rather than repaired.
 
-```{literalinclude} ../../cmake/package/verification/io_evolution/native-time-pair.toml
-:language: toml
+The complete [RTC/LPTIM host assembly](../../cmake/package/verification/io_evolution/native-time-pair.toml)
+requires explicit test support; it is not a physical MCU configuration:
+
+```sh
+python tools/configure/configure.py check --test-support \
+  --assembly cmake/package/verification/io_evolution/native-time-pair.toml
 ```
 
 Native host-model facts expose RTC0/RTC1 and LPTIM0/LPTIM1 without pins or IRQ routes. Two software RTC instances exercise isolation; they do not assert two physical RTC peripherals. The generator emits only selected static state, readonly faces and pure typed lookup. The selected shared deadline adapter reads `nx_time_now_us()` without advancing any RTC/LPTIM source. An empty assembly emits no selected RTC/LPTIM state or that adapter.
@@ -99,4 +103,4 @@ Phase3 development evidence binds the frozen dirty-source tuple identified by so
 
 No H743/U575 RTC or LPTIM provider, ARM RTC/LPTIM execution, backup-domain reset/ownership, oscillator selection/calibration, STOP-mode wake, VBAT persistence, hardware retention or physical HIL result is established here. Future adaptation must prove its exact SoC/Board/clock/IRQ/security and retained-storage contracts; a chip datasheet capability or this public API alone does not provide that proof.
 
-Related mechanisms: [request ownership](ownership.md), [typed factory](factory.md), [Native provider source](../../soc/native/drivers/rtc_lptim.c) and the [I/O evolution contract](../design/io-evolution.md). Product schedules, protocol state, persistence policy and private board wiring stay in external repositories.
+Related mechanisms: [request ownership](ownership.md), [typed factory](factory.md), [Native provider source](../../tests/support/native/drivers/rtc_lptim.c) and the [I/O evolution contract](../design/io-evolution.md). Product schedules, protocol state, persistence policy and private board wiring stay in external repositories.

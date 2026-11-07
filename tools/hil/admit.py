@@ -20,12 +20,13 @@ from tools.measurement.resources import measure
 
 
 # Physical promotion requires a reviewed tooling change, not fixture editing.
-SOFTWARE_REFERENCE_TARGETS = (
-    ("stm32g474re-hse24-reference", "STM32G474RET6"),
-    ("stm32h743-nucleo-zi2", "STM32H743ZIT6"),
-    ("stm32h743zi-hsi-reference", "STM32H743ZIT6"),
-    ("stm32u575-nucleo-zi-q", "STM32U575ZIT6Q"),
-    ("stm32u575zi-lptim-reference", "STM32U575ZIT6Q"),
+SOFTWARE_REFERENCE_TARGETS = ()
+
+MAINTAINED_BOARD_TARGETS = (
+    ("stm32f407zg-qiming-v31", "STM32F407ZGT6"),
+    ("stm32f407ve-sky-qingchun", "STM32F407VET6"),
+    ("stm32f407zg-qiming-core", "STM32F407ZGT6"),
+    ("stm32f407zg-qiming-v41", "STM32F407ZGT6"),
 )
 
 # These Boards share a part with the older reviewed V3.1 fixture. Lock their
@@ -56,6 +57,11 @@ def validate_fixture(fixture: dict) -> None:
         require(fixture["scope"] == "software_reference",
                 "unknown preparation fixture scope")
     target = fixture["board"], fixture["part"]
+    require(target[1] in {part for _, part in MAINTAINED_BOARD_TARGETS},
+            "maintained STM32F4 part identity required")
+    if any(target[0] == board for board, _ in MAINTAINED_BOARD_TARGETS):
+        require(target in MAINTAINED_BOARD_TARGETS,
+                "maintained STM32F4 Board/part identity required")
     if any(target[0] == board for board, _ in SOFTWARE_REFERENCE_BOARD_TARGETS):
         require(target in SOFTWARE_REFERENCE_BOARD_TARGETS,
                 "software-reference Board/part identity cannot be relabelled")

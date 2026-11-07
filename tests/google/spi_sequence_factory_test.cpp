@@ -12,20 +12,11 @@ extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include "spi_dma_sequence.h"
-#ifdef NX_MULTI_FACTORY_STM32
 #include "stm32f407_dma.h"
 #define GPIO_GATE    RCC->AHB1ENR
 #define SPI_GATE     RCC->APB2ENR
 #define SPI_GATE_BIT RCC_APB2ENR_SPI1EN
-#else
-#include "gd32f470_spi_dma.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#define GPIO_GATE    RCU_AHB1EN
-#define SPI_GATE     RCU_APB2EN
-#define SPI_GATE_BIT RCU_APB2EN_SPI4EN
-#endif
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 #include <cstring>
 #include <gtest/gtest.h>
@@ -98,9 +89,6 @@ extern "C" bool nx_multi_factory_is_privileged(void) {
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return now;
 }
-extern "C" uint64_t nx_gd32_now_us(void) {
-    return now;
-}
 extern "C" void nx_multi_factory_irq_enable(int irq) {
     nx_multi_factory_write(&NVIC->ISER[static_cast<unsigned>(irq) / 32U],
                            1U << (static_cast<unsigned>(irq) % 32U));
@@ -134,13 +122,11 @@ extern "C" void nx_multi_factory_dma_disable(volatile uint32_t* control,
 extern "C" void nx_multi_factory_spi_reset(volatile uint32_t* reg,
                                            uint32_t mask, bool active) {
     *reg = active ? *reg | mask : *reg & ~mask;
-#ifdef NX_MULTI_FACTORY_STM32
     if (active) {
         SPI_TypeDef* spi = reg == &RCC->APB2RSTR ? SPI1 : SPI2;
         spi->CR1 = spi->CR2 = 0U;
         spi->SR = SPI_SR_TXE;
     }
-#endif
 }
 /** \brief Model only the I2C DATA/address command side effects. */
 extern "C" uint8_t nx_multi_factory_i2c_read(void* context) {
@@ -158,7 +144,6 @@ extern "C" void nx_multi_factory_i2c_address(void* context) {
     auto* state = static_cast<nx_i2c_v1_state_t*>(context);
     state->registers[5] &= ~(1U << 1U);
 }
-#ifdef NX_MULTI_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 /* The hardware model supplies the same fixed HCLK observed by real RCC C. */
@@ -225,48 +210,6 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
                                               uint8_t pull, bool drain) {
     return nx_multi_actual_pin_configure(port, pin, mode, af, pull, drain);
 }
-#else
-extern "C" {
-nx_result_t nx_multi_actual_gpio_clock_enable(unsigned);
-uint16_t nx_multi_actual_pin_capture(uint32_t, unsigned);
-void nx_multi_actual_pin_restore(uint32_t, unsigned, uint16_t);
-nx_result_t nx_multi_actual_pin_configure(uint32_t, unsigned, uint8_t, uint8_t,
-                                          uint8_t, bool);
-}
-/** \brief Model the unrelated I2C participant's external reset leaf. */
-extern "C" void i2c_deinit(uint32_t peripheral) {
-    ++writes;
-    std::memset(reinterpret_cast<void*>(static_cast<uintptr_t>(peripheral)), 0,
-                0x28U);
-}
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return NX_SUCCESS;
-}
-extern "C" int nx_gd32_soc_start(void) {
-    ++starts;
-    return 0;
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    return 0;
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned bank) {
-    return nx_multi_actual_gpio_clock_enable(bank);
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
-    observe_gpio_commands();
-    return nx_multi_actual_pin_capture(port, pin);
-}
-extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
-                                    uint16_t saved) {
-    nx_multi_actual_pin_restore(port, pin, saved);
-    observe_gpio_commands();
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
-                                             uint8_t mode, uint8_t af,
-                                             uint8_t pull, bool drain) {
-    return nx_multi_actual_pin_configure(port, pin, mode, af, pull, drain);
-}
-#endif
 
 namespace {
 class SPISequenceFactory : public testing::Test {
@@ -296,18 +239,12 @@ class SPISequenceFactory : public testing::Test {
         *sequence = {};
         sequence->backend = backend;
         sequence->context = context;
-        g_gd32_model_nvic = {};
-#ifdef NX_MULTI_FACTORY_STM32
+        g_f4_model_nvic = {};
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
         SPI1->SR = SPI2->SR = SPI_SR_TXE;
         GPIOB->IDR = 0xffffU;
-#else
-        RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
-        SPI_STAT(SPI4) = SPI_STAT(SPI0) = SPI_STAT_TBE;
-        GPIO_ISTAT(GPIOB) = 0xffffU;
-#endif
     }
     void TearDown() override {
         refuse_spi_gate = false;

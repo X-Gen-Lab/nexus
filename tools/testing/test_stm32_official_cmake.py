@@ -24,7 +24,8 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             'project(official_ll_fixture C)\n'
             f'set(Python3_EXECUTABLE "{sys.executable}")\n'
             f'include("{module_root}/cmake/platform/STM32Official.cmake")\n'
-            'add_library(provider STATIC empty.c)\n' + statement)
+            'add_library(provider STATIC empty.c)\n'
+            'target_compile_definitions(provider PRIVATE STM32F407xx)\n' + statement)
         return subprocess.run([
             shutil.which("cmake"), "-S", str(self.root), "-B",
             str(self.root / "build"), "-G", "Ninja"],
@@ -62,63 +63,7 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("official", result.stdout + result.stderr)
 
-    def test_h5_reference_verifies_locked_sources_without_selecting_hal_runtime(self):
-        from tools.maintenance import stm32h5_hal_lock as h5
-        result = self.configure(
-            'nexus_stm32_official(provider h5)\n'
-            'get_target_property(private provider INCLUDE_DIRECTORIES)\n'
-            'get_target_property(public provider INTERFACE_INCLUDE_DIRECTORIES)\n'
-            'get_target_property(sources provider SOURCES)\n'
-            'get_target_property(pin provider NEXUS_STM32_OFFICIAL_REVISION)\n'
-            'get_property(inputs DIRECTORY PROPERTY CMAKE_CONFIGURE_DEPENDS)\n'
-            'file(WRITE "${CMAKE_BINARY_DIR}/properties" '
-            '"${private}\\n${public}\\n${sources}\\n${pin}\\n${inputs}\\n")\n')
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        lines = (self.root / "build/properties").read_text().splitlines()
-        self.assertEqual(lines[:4], [str(ROOT / h5.DIRECTORY / "Inc"),
-                                     "public-NOTFOUND", "empty.c",
-                                     h5.PROFILE.commit])
-        observed = set(lines[4].split(";"))
-        self.assertFalse({str(ROOT / h5.DIRECTORY / name)
-                          for name in h5.PROFILE.selected_files} - observed)
 
-    def test_f103_all_locked_driver_inputs_retrigger_source_verification(self):
-        from tools.maintenance import stm32f1_hal_lock as f1
-        generated = self.root / "generated"
-        generated.mkdir()
-        (generated / "resolved.json").write_text(json.dumps({
-            "controllers": [{"kind": "i2c", "mode": "irq-messages"}],
-        }))
-        source = ROOT / "soc/stm32/stm32f103"
-        (self.root / "CMakeLists.txt").write_text(f'''\
-cmake_minimum_required(VERSION 3.31)
-project(f103_locked_inputs LANGUAGES C ASM)
-set(Python3_EXECUTABLE "{sys.executable}")
-set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
-set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
-add_library(nexus_io INTERFACE)
-add_library(nexus_arch INTERFACE)
-add_library(Nexus::Arch ALIAS nexus_arch)
-add_library(nexus_build_options INTERFACE)
-add_library(nexus_owned_warnings INTERFACE)
-add_subdirectory("{source.as_posix()}" soc)
-get_property(inputs DIRECTORY "{source.as_posix()}"
-    PROPERTY CMAKE_CONFIGURE_DEPENDS)
-list(JOIN inputs "\\n" lines)
-file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
-''')
-        result = subprocess.run([
-            shutil.which("cmake"), "-S", str(self.root), "-B",
-            str(self.root / "build"), "-G", "Ninja"],
-            capture_output=True, text=True, timeout=60)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        observed = set((self.root / "build/source-inputs.txt")
-                       .read_text().splitlines())
-        expected = {str(ROOT / f1.DIRECTORY / name)
-                    for name in f1.REVIEWED_FILES}
-        self.assertFalse(expected - observed,
-                         "Locked driver inputs do not retrigger verification: " +
-                         repr(sorted(expected - observed)))
 
     def test_explicit_uart_hal_closes_only_private_vendor_transport(self):
         result = self.configure(
@@ -133,7 +78,7 @@ file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
             '"${private}\\n${public}\\n${sources}\\n${vendor}\\n${options}\\n${kind}\\n")\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         lines = (self.root / "build/hal-properties").read_text().splitlines()
-        self.assertIn(str(ROOT / "soc/stm32/stm32f407/private/hal"),
+        self.assertIn(str(ROOT / "soc/stm32/stm32f4/private/hal"),
                       lines[0].split(";"))
         self.assertEqual(lines[1], "public-NOTFOUND")
         self.assertEqual(lines[3].split(";"), [
@@ -142,7 +87,7 @@ file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
                          "stm32f4xx_hal_rcc.c")])
         self.assertIn("$<TARGET_OBJECTS:provider_stm32f407_hal>", lines[2])
         self.assertIn("-include" + str(
-            ROOT / "soc/stm32/stm32f407/private/stm32f407_hal_profile.h"),
+            ROOT / "soc/stm32/stm32f4/private/stm32f407_hal_profile.h"),
             lines[4].split(";"))
         self.assertEqual(lines[5], "OBJECT_LIBRARY")
 
@@ -174,7 +119,7 @@ file(WRITE "${{CMAKE_BINARY_DIR}}/source-inputs.txt" "${{lines}}\\n")
                     {"stm32f4xx_hal_uart.c", "stm32f4xx_hal_dma.c",
                      "stm32f4xx_hal_rcc.c"} if mode == "dma-tx" else set())
                 drivers = {Path(entry["file"]).name for entry in commands
-                           if "/soc/stm32/stm32f407/drivers/" in entry["file"]}
+                           if "/soc/stm32/stm32f4/drivers/" in entry["file"]}
                 self.assertEqual("uart_hal.c" in drivers, mode == "dma-tx")
                 self.assertNotIn("uart_dma.c", drivers)
                 for entry in vendor:

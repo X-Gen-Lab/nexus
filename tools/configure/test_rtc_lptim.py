@@ -1,4 +1,5 @@
 """Ordinary typed controllers assemble only the explicit Native time models."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -25,7 +26,7 @@ class NativeTimeAssemblyTests(unittest.TestCase):
 
     def resolve(self, text=None):
         self.assembly.write_text(self.pair if text is None else text)
-        return gate.resolve_ir(self.assembly)
+        return gate.resolve_ir(self.assembly, test_support=native_fixture(self.assembly))
 
     def test_pair_uses_existing_immutable_controller_ir_and_claims(self):
         result = self.resolve()
@@ -108,14 +109,14 @@ class NativeTimeAssemblyTests(unittest.TestCase):
     def test_bundle_is_deterministic_and_binds_host_facts_and_cold_sources(self):
         self.assembly.write_text(self.pair)
         output = self.directory / "bundle"
-        gate.configure(self.assembly, output)
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         first = {p.name: p.read_bytes() for p in output.iterdir()}
-        gate.configure(self.assembly, output)
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         self.assertEqual(first, {p.name: p.read_bytes() for p in output.iterdir()})
         self.assertIn("RTC0", (output / "resolved.json").read_text())
         paths = json.loads((output / "input_paths.json").read_text())
-        self.assertIn(str(gate.ROOT / "soc/native/soc.json"), paths.values())
-        self.assertIn(str(gate.ROOT / "boards/native_reference/board.json"), paths.values())
+        self.assertIn(str(gate.ROOT / "tests/support/native/soc.json"), paths.values())
+        self.assertIn(str(gate.ROOT / "tests/support/native/board/board.json"), paths.values())
 
     def test_editor_schema_matches_its_authoritative_generator(self):
         schema = authored.editor_schema()
@@ -151,7 +152,7 @@ class NativeTimeAssemblyTests(unittest.TestCase):
             self.resolve(self.pair.replace('binding = "rtc0"', 'binding = "lptim0"'))
 
     def test_physical_providers_do_not_inherit_host_modes(self):
-        for family in ["stm32h743", "stm32u575", "stm32f407", "gd32f470"]:
+        for family in ['stm32f4']:
             for kind, mode in [("rtc", "calendar-alarm"),
                                ("lptim", "counter16-oneshot")]:
                 with self.subTest(family=family, kind=kind):
@@ -161,11 +162,11 @@ class NativeTimeAssemblyTests(unittest.TestCase):
     def test_wrong_mode_is_rejected_without_replacing_an_existing_bundle(self):
         self.assembly.write_text(self.pair)
         output = self.directory / "bundle"
-        gate.configure(self.assembly, output)
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         self.assembly.write_text(self.pair.replace('mode = "calendar-alarm"',
                                                   'mode = "irq-alarm"'))
         with self.assertRaisesRegex(gate.ConfigurationError, "Unsupported mode"):
-            gate.configure(self.assembly, output)
+            gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
         self.assertFalse(output.exists())
 
 

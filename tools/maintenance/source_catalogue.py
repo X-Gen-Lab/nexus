@@ -18,7 +18,7 @@ class SourceDependency:
     path: str
     upstream_url: str
     fetch_url: str
-    scope: Literal["runtime", "host-test"]
+    scope: Literal["runtime", "host-test", "inventory"]
     notice: str
     source_lock: str | None = None
     parent: str | None = None
@@ -30,11 +30,11 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32f1_cmsis", "vendors/st/cmsis_device_f1",
         "https://github.com/STMicroelectronics/cmsis-device-f1.git",
         "https://github.com/X-Gen-Lab/cmsis-device-f1.git",
-        "runtime", "License.md", "dependencies/stm32f1.lock.json"),
+        "inventory", "License.md", "dependencies/stm32f1.lock.json"),
     SourceDependency("stm32f1_hal", "vendors/st/stm32f1_hal",
         "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
         "https://github.com/X-Gen-Lab/stm32f1xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32f1-hal.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32f1-hal.lock.json"),
     SourceDependency("freertos", "ext/freertos",
         "https://github.com/FreeRTOS/FreeRTOS-Kernel.git",
         "https://github.com/X-Gen-Lab/FreeRTOS-Kernel.git",
@@ -58,39 +58,47 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32g4_cmsis", "vendors/st/cmsis_device_g4",
         "https://github.com/STMicroelectronics/cmsis-device-g4.git",
         "https://github.com/X-Gen-Lab/cmsis-device-g4.git",
-        "runtime", "LICENSE.md", "dependencies/stm32g4.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32g4.lock.json"),
     SourceDependency("stm32h7_cmsis", "vendors/st/cmsis_device_h7",
         "https://github.com/STMicroelectronics/cmsis-device-h7.git",
         "https://github.com/X-Gen-Lab/cmsis-device-h7.git",
-        "runtime", "LICENSE.md", "dependencies/stm32h7.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32h7.lock.json"),
     SourceDependency("stm32h5_cmsis", "vendors/st/cmsis_device_h5",
         "https://github.com/STMicroelectronics/cmsis-device-h5.git",
         "https://github.com/X-Gen-Lab/cmsis-device-h5.git",
-        "runtime", "LICENSE.md", "dependencies/stm32h5.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32h5.lock.json"),
     SourceDependency("stm32u5_cmsis", "vendors/st/cmsis_device_u5",
         "https://github.com/STMicroelectronics/cmsis-device-u5.git",
         "https://github.com/X-Gen-Lab/cmsis-device-u5.git",
-        "runtime", "LICENSE.md", "dependencies/stm32u5.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32u5.lock.json"),
     SourceDependency("stm32g4_hal", "vendors/st/stm32g4_hal",
         "https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git",
         "https://github.com/X-Gen-Lab/stm32g4xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32g4-hal.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32g4-hal.lock.json"),
     SourceDependency("stm32h7_hal", "vendors/st/stm32h7_hal",
         "https://github.com/STMicroelectronics/stm32h7xx_hal_driver.git",
         "https://github.com/X-Gen-Lab/stm32h7xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32h7-hal.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32h7-hal.lock.json"),
     SourceDependency("stm32h5_hal", "vendors/st/stm32h5_hal",
         "https://github.com/STMicroelectronics/stm32h5xx_hal_driver.git",
         "https://github.com/X-Gen-Lab/stm32h5xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32h5-hal.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32h5-hal.lock.json"),
     SourceDependency("stm32u5_hal", "vendors/st/stm32u5_hal",
         "https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git",
         "https://github.com/X-Gen-Lab/stm32u5xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32u5-hal.lock.json"),
+        "inventory", "LICENSE.md", "dependencies/stm32u5-hal.lock.json"),
     SourceDependency("googletest", "ext/googletest",
         "https://github.com/google/googletest.git",
         "https://github.com/X-Gen-Lab/googletest.git",
         "host-test", "LICENSE", "dependencies/googletest.lock.json"),
+    SourceDependency("tomlc99", "ext/tomlc99",
+        "https://github.com/cktan/tomlc99.git",
+        "https://github.com/X-Gen-Lab/tomlc99.git",
+        "inventory", "LICENSE", "dependencies/tomlc99.lock.json"),
+    SourceDependency("cjson", "ext/cjson",
+        "https://github.com/DaveGamble/cJSON.git",
+        "https://github.com/X-Gen-Lab/cJSON.git",
+        "inventory", "LICENSE", "dependencies/cjson.lock.json"),
     SourceDependency("lwip", "ext/lwip",
         "https://github.com/lwip-tcpip/lwip.git",
         "https://github.com/X-Gen-Lab/lwip.git",
@@ -189,7 +197,7 @@ def validate_catalogue(entries):
             _relative(item.source_lock)
         if item.submodule_name is not None:
             _relative(item.submodule_name)
-        if item.scope not in {"runtime", "host-test"}:
+        if item.scope not in {"runtime", "host-test", "inventory"}:
             raise ValueError("Unsupported source dependency scope")
         for url in (item.upstream_url, item.fetch_url):
             _url(url)
@@ -259,6 +267,40 @@ SOURCE_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                             if item.scope == "runtime")
 HOST_TEST_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                                if item.scope == "host-test")
+
+
+def host_configuration_sources():
+    """Select build-host parser sources without making them MCU dependencies."""
+    return tuple(dependency(name) for name in ("tomlc99", "cjson"))
+
+
+def runtime_selection(family, *, backend, components=(), test_support=False):
+    """Select reviewed sources without preparing dormant catalogue inventory.
+
+    This is a dependency identity selection, not a second C source graph.
+    CMake continues to own translation units and transitive target links.
+    """
+    from tools.configure.contracts import COMPONENTS
+    if family != "stm32f4" or backend not in {
+            "baremetal", "freertos", "threadx"}:
+        raise ValueError("Unsupported production family/backend dependency selection")
+    if (not isinstance(components, (tuple, list)) or
+            any(not isinstance(value, str) for value in components) or
+            len(set(components)) != len(components) or
+            not set(components).issubset(COMPONENTS | {
+                "network", "network-loaned-rx", "tls", "mqtt", "mcuboot"})):
+        raise ValueError("Unsupported component dependency selection")
+    identifiers = {"cmsis_core", "stm32f4_cmsis", "stm32f4_hal"}
+    if backend != "baremetal":
+        identifiers.add(backend)
+    suppliers = {"network": "lwip", "network-loaned-rx": "lwip",
+                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot"}
+    identifiers.update(suppliers[value] for value in components
+                       if value in suppliers)
+    if test_support:
+        identifiers.add("googletest")
+    return tuple(item for item in ALL_SOURCE_DEPENDENCIES
+                 if item.identifier in identifiers)
 
 
 def declared_modules(data, parent=None, *, upstream=False):

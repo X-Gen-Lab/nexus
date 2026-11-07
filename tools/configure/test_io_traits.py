@@ -1,5 +1,6 @@
 """Selected metadata stays distinct from silicon and timing qualification."""
-from dataclasses import FrozenInstanceError
+from tools.configure.tests.native_fixture import native_fixture
+from dataclasses import FrozenInstanceError, replace
 import unittest
 
 from tools.configure import io_traits
@@ -7,25 +8,31 @@ from tools.configure import configure, factory
 from tools.configure.ir import ControllerIR
 
 
-def controller(kind, mode, provider="stm32f407", **options):
+def controller(kind, mode, provider='stm32f4', **options):
     values = {"id": "selected", "kind": kind, "controller": "SELECTED",
               "binding": "selected", "mode": mode,
               "pins": (), "route": "metadata-unit-fixture",
               "mask": 0, "initial": 0, **options}
-    return ControllerIR.create(values, provider)
+    item = ControllerIR.create(values, provider)
+    if provider == "native":
+        fixture = configure.resolve_ir(configure.ROOT /
+            "tests/support/native/assemblies/native-empty.toml",
+            test_support=True)
+        item = replace(item, provider_context=fixture.provider_context)
+    return item
 
 
 class SelectedTraitsTests(unittest.TestCase):
     def test_uart_records_requested_format_and_rearm_gap(self):
-        item = controller("uart", "rx-dma-idle", "stm32h743", baud=115200,
+        item = controller("uart", "rx-dma-idle", "stm32f4", baud=115200,
                           rx_profile="blocks", irq_priority=6)
         selected = io_traits.describe(item)
         self.assertEqual(selected.fields["data_bits"], 8)
         self.assertEqual(selected.fields["requested_baud"], 115200)
         self.assertEqual(selected.fields["stop_half_bits"], 2)
         self.assertEqual(selected.continuity, "rearm_gap")
-        self.assertEqual(selected.dma_policy, "domain_cache_line")
-        self.assertEqual(selected.cache_line_bytes, 32)
+        self.assertEqual(selected.dma_policy, "provider_domain")
+        self.assertEqual(selected.cache_line_bytes, 0)
         with self.assertRaises(TypeError):
             selected.fields["data_bits"] = 9
         with self.assertRaises(FrozenInstanceError):
@@ -151,21 +158,8 @@ class RevisionAdmissionTests(unittest.TestCase):
 class ResolvedTraitsTests(unittest.TestCase):
     def resolve(self, fixture):
         path = configure.ROOT / "tests/contracts" / fixture
-        return configure.resolve_ir(path)
+        return configure.resolve_ir(path, test_support=native_fixture(path))
 
-    def test_current_h743_factory_exposes_the_reviewed_selected_mode(self):
-        result = self.resolve("h743_assembly/rx-cache.toml")
-        console = next(item for item in result.controllers
-                       if item.kind == "uart")
-        selected = io_traits.describe(console)
-        self.assertEqual(result.soc_family, "stm32h743")
-        self.assertEqual(console.mode, "rx-dma-idle")
-        self.assertEqual(selected.continuity, "rearm_gap")
-        header, source = factory.emit(result)
-        self.assertIn("nx_factory_uart_traits_t", header)
-        self.assertIn("NX_IO_CONTINUITY_REARM_GAP", source)
-        self.assertIn("NX_IO_DMA_POLICY_DOMAIN_CACHE_LINE", source)
-        self.assertNotIn("NX_IO_CONTINUITY_DOUBLE_BUFFER", source)
 
     def test_current_can_and_ethernet_keep_distinct_abort_scope(self):
         for fixture, kind, scope in (
@@ -183,7 +177,7 @@ class ResolvedTraitsTests(unittest.TestCase):
 
     def test_disabled_capabilities_generate_no_traits_or_dependencies(self):
         result = configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies/native-uart.toml")
+            configure.ROOT / "tests/support/native/assemblies/native-uart.toml", test_support=True)
         self.assertFalse(result.factory.capabilities)
         header, source = factory.emit(result)
         self.assertNotIn("nx_factory_uart_traits", header)

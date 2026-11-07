@@ -1,4 +1,5 @@
 """Compile selected factory headers without unrelated public I/O headers."""
+from tools.configure.tests.native_fixture import canonical_assembly
 from pathlib import Path
 from dataclasses import FrozenInstanceError
 import re
@@ -18,12 +19,12 @@ class FactoryIncludeTests(unittest.TestCase):
         self.output = self.root / "generated"
 
     def generate(self, fixture, policy=""):
-        assembly = configure.ROOT / "tools/configure/assemblies" / fixture
+        assembly = canonical_assembly(configure.ROOT, fixture)
         if policy:
             contents = assembly.read_text()
             assembly = self.root / "assembly.toml"
             assembly.write_text(contents + policy)
-        configure.configure(assembly, self.output)
+        configure.configure(assembly, self.output, test_support=True)
 
     def compile(self, compiler, standard, contents, *, dependency=False):
         source = self.root / ("consumer.c" if compiler == "cc" else "consumer.cpp")
@@ -62,11 +63,11 @@ class FactoryIncludeTests(unittest.TestCase):
 
     def test_mixed_selected_interfaces_compile_with_nominal_references(self):
         assembly = self.root / "assembly.toml"
-        fixtures = configure.ROOT / "tools/configure/assemblies"
+        fixtures = configure.ROOT / "tests/support/native/assemblies"
         gpio = (fixtures / "native-gpio.toml").read_text()
         uart = (fixtures / "native-uart.toml").read_text()
         assembly.write_text(gpio + "\n" + uart[uart.index("[uart."):])
-        configure.configure(assembly, self.output)
+        configure.configure(assembly, self.output, test_support=True)
         self.assertEqual(self.public_dependencies(),
                          {"fwd.h", "gpio.h", "uart.h", "stream.h", "wake.h"})
         contents = ('#include "nexus_factory_strong.h"\n'
@@ -87,8 +88,8 @@ class FactoryIncludeTests(unittest.TestCase):
 
     def test_empty_getters_execute_without_complete_interface_definitions(self):
         self.generate("native-empty.toml")
-        assembly = configure.ROOT / "tools/configure/assemblies/native-empty.toml"
-        _, getters = factory.emit(configure.resolve_ir(assembly))
+        assembly = configure.ROOT / "tests/support/native/assemblies/native-empty.toml"
+        _, getters = factory.emit(configure.resolve_ir(assembly, test_support=True))
         contents = ('#include "nexus_factory_strong.h"\n#include <assert.h>\n'
                     + getters + '\nint main(void) {\n'
                     'assert(nx_factory_gpio(NX_GPIO_ID_COUNT) == NULL);\n'
@@ -113,7 +114,7 @@ class FactoryIncludeTests(unittest.TestCase):
 
     def test_shared_arm_retain_fixtures_compile_with_empty_selection(self):
         self.generate("native-empty.toml")
-        for name in ("io_evolution_assembly", "stm32_assembly", "gd32_assembly"):
+        for name in ('io_evolution_assembly', 'stm32_assembly'):
             with self.subTest(fixture=name):
                 source = (configure.ROOT / "tests/contracts" / name /
                           "controller_main.c")
@@ -121,15 +122,21 @@ class FactoryIncludeTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_optional_uart_sdk_consumer_compiles_with_spi_only_assembly(self):
-        self.generate("h743-spi-dma.toml")
-        source = (configure.ROOT / "cmake/package/verification/io_evolution/"
-                  "consumers/h743-spi-dma.c")
-        result = self.compile("cc", "c11", source.read_text())
+        self.generate("native-spi.toml")
+        source = ('#include "nexus/io/uart.h"\n'
+                  '#include "nexus_factory.h"\n'
+                  'const nx_spi_port_t* spi(void) {\n'
+                  '    return nx_factory_spi(NX_SPI_ID_SPI0);\n}\n'
+                  'const nx_uart_port_t* optional_uart(void) {\n'
+                  '    for (nx_uart_id_t id = 0U; id != NX_UART_ID_COUNT; ++id) {\n'
+                  '        return nx_factory_uart(id);\n'
+                  '    }\n    return NULL;\n}\n')
+        result = self.compile("cc", "c11", source)
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def accessor_fixture(self, fixture, identifier, renamed):
         path = configure.ROOT / fixture
-        data = configure.load_assembly(path).to_dict()
+        data = configure.load_assembly(path, test_support=True).to_dict()
         data["board_package"] = str(path.parent / data["board_package"])
         for item in data["controllers"] + data["devices"]:
             if item["id"] == identifier:
@@ -138,13 +145,13 @@ class FactoryIncludeTests(unittest.TestCase):
                 item["controller"] = renamed
         assembly = self.root / "accessor.toml"
         assembly.write_text(render_toml(data))
-        configure.configure(assembly, self.output)
-        return configure.resolve_ir(assembly)
+        configure.configure(assembly, self.output, test_support=True)
+        return configure.resolve_ir(assembly, test_support=True)
 
     def test_accessor_projection_keeps_selected_nominal_identity_immutable(self):
         self.generate("native-gpio.toml")
         result = configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies/native-gpio.toml")
+            configure.ROOT / "tests/support/native/assemblies/native-gpio.toml", test_support=True)
         accessors = factory.accessors(result)
         self.assertIsInstance(accessors, tuple)
         self.assertEqual(len(accessors), 1)
@@ -159,20 +166,11 @@ class FactoryIncludeTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             accessor.reference = "NX_UART_REF_LED0"
         empty = configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies/native-empty.toml")
+            configure.ROOT / "tests/support/native/assemblies/native-empty.toml", test_support=True)
         self.assertEqual(factory.accessors(empty), ())
 
     def test_explain_accessors_compile_for_words_enhanced_and_hyphenated_ids(self):
-        fixtures = (
-            ("native-uart9n1.toml", "uart0", "serial-link", "uart_word",
-             "nx_uart_word_port_t"),
-            ("f407-spi-transaction.toml", "sensor0", "sensor-link",
-             "spi_transaction_device", "nx_spi_transaction_endpoint_t"),
-            ("g474-i2c-long-timing.toml", "sensor_registers", "sensor-registers",
-             "i2c_long_device", "nx_i2c_long_endpoint_t"),
-            ("native-spi-dma-transaction.toml", "device_a", "device-link",
-             "spi_dma_transaction_device", "nx_spi_dma_transaction_endpoint_t"),
-        )
+        fixtures = (('native-uart9n1.toml', 'uart0', 'serial-link', 'uart_word', 'nx_uart_word_port_t'), ('f407-spi-transaction.toml', 'sensor0', 'sensor-link', 'spi_transaction_device', 'nx_spi_transaction_endpoint_t'), ('native-spi-dma-transaction.toml', 'device_a', 'device-link', 'spi_dma_transaction_device', 'nx_spi_dma_transaction_endpoint_t'))
         for fixture, identifier, renamed, class_name, face in fixtures:
             with self.subTest(fixture=fixture):
                 result = self.accessor_fixture(

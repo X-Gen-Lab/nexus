@@ -67,12 +67,19 @@ def emit_bundle(result, output):
                  {item.driver.removesuffix("-endpoint") for item in result.devices
                   if item.kind == "external_bus"})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
-    # Canonical source directories also serve multi-family host models. These
+    device = result.physical_part.device
+    if device is not None:
+        cmake += [f'set(NEXUS_STM32_DEVICE "{device.macro}")',
+                  f'set(NEXUS_STM32_STARTUP "{device.startup}")']
+    # Canonical source directories also serve selected host models. These
     # paths carry no translation-unit graph or additional support decisions.
+    sources = descriptor.families()
+    if selected.family not in {item.family for item in sources}:
+        sources += (selected,)
     cmake += [f'set(NEXUS_SOC_SOURCE_{item.family} "${{NEXUS_SOURCE_DIR}}/' +
-              item.source_directory + '")' for item in descriptor.families()]
+              item.source_directory + '")' for item in sources]
     cmake += ['set(NEXUS_SOC_SOURCE_VARIABLES "' + ';'.join(
-        'NEXUS_SOC_SOURCE_' + item.family for item in descriptor.families()) + '")']
+        'NEXUS_SOC_SOURCE_' + item.family for item in sources) + '")']
     cmake.extend(i2s2.selection_lines(result.i2s2))
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")

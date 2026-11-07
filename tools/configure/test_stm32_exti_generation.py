@@ -4,6 +4,7 @@ The actual generated stm32_control_factory_test exercises priority/enable refusa
 shared pending hints and public event dispatch. Configuration tests own static
 identity, policy data, call ordering and retention rather than emitted algorithms.
 """
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import bindings, configure as gate
@@ -13,7 +14,8 @@ from tools.configure.providers import maintained
 class Stm32ExtiGenerationTests(unittest.TestCase):
     def result(self):
         return gate.resolve_ir(gate.ROOT /
-                               "tests/contracts/stm32_assembly/ve-exti.toml")
+                               "tests/contracts/stm32_assembly/ve-exti.toml", test_support=native_fixture(gate.ROOT /
+                               "tests/contracts/stm32_assembly/ve-exti.toml"))
 
     def source(self):
         return bindings.emit(self.result())[1]

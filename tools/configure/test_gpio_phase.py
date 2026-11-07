@@ -1,4 +1,5 @@
 """Cold GPIO ownership covers selected pads with one retained snapshot each."""
+from tools.configure.tests.native_fixture import native_fixture
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -14,10 +15,10 @@ from tools.configure.providers import maintained
 
 class ColdPinStorageTests(unittest.TestCase):
     def resolve(self, relative):
-        return gate.resolve_ir(gate.ROOT / relative)
+        return gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
 
     def test_five_controllers_reuse_their_existing_exact_pin_storage(self):
-        for label in ("stm32-ve", "stm32-zg", "gd32"):
+        for label in ('stm32-ve', 'stm32-zg'):
             with self.subTest(label=label):
                 result = self.resolve(
                     "tests/contracts/multi_controller_assembly/" + label
@@ -32,10 +33,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 self.assertNotIn("uint16_t*", source)
 
     def test_gpio_and_legacy_uart_keep_only_selected_pin_snapshots(self):
-        for relative in (
-                "tools/configure/assemblies/qiming-baremetal.toml",
-                "tools/configure/assemblies/liangshan-baremetal.toml",
-                "tests/contracts/g474_assembly/io.toml"):
+        for relative in ('tools/configure/assemblies/qiming-baremetal.toml',):
             with self.subTest(relative=relative):
                 result = self.resolve(relative)
                 source = bindings.emit(result)[1]
@@ -46,13 +44,7 @@ class ColdPinStorageTests(unittest.TestCase):
                                  len(gpio_phase.selected_pins(result)))
 
     def test_can_usb_ethernet_and_timer_reuse_their_persistent_leases(self):
-        for relative in (
-                "can_assembly/stm32-both.toml", "can_assembly/gd32-both.toml",
-                "usb_assembly/stm32-ve.toml", "usb_assembly/stm32-zg.toml",
-                "usb_assembly/gd32.toml",
-                "ethernet_assembly/stm32-zg.toml", "ethernet_assembly/gd32.toml",
-                "timer_assembly/stm32-ve.toml", "timer_assembly/stm32-zg.toml",
-                "timer_assembly/gd32.toml"):
+        for relative in ('can_assembly/stm32-both.toml', 'usb_assembly/stm32-ve.toml', 'usb_assembly/stm32-zg.toml', 'ethernet_assembly/stm32-zg.toml', 'timer_assembly/stm32-ve.toml', 'timer_assembly/stm32-zg.toml'):
             with self.subTest(relative=relative):
                 result = self.resolve("tests/contracts/" + relative)
                 source = bindings.emit(result)[1]
@@ -64,7 +56,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 self.assertNotIn("s_nx_platform_pin_state", source)
 
     def test_endpoint_cs_is_in_the_cold_lease_without_a_second_claim_source(self):
-        for label, hidden in (("stm32-ve", "PE3"), ("gd32", "PB0")):
+        for label, hidden in (('stm32-ve', 'PE3'),):
             with self.subTest(label=label):
                 result = self.resolve(
                     "tests/contracts/multi_controller_assembly/" + label
@@ -75,10 +67,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 self.assertIn(hidden, gpio_phase.selected_pins(result))
 
     def test_empty_graph_emits_no_pin_state_or_mmio_helpers(self):
-        for relative in (
-                "tools/configure/assemblies/qiming-baremetal-empty.toml",
-                "tools/configure/assemblies/liangshan-baremetal-empty.toml",
-                "tests/contracts/g474_assembly/empty.toml"):
+        for relative in ('tools/configure/assemblies/qiming-baremetal-empty.toml',):
             with self.subTest(relative=relative):
                 result = self.resolve(relative)
                 self.assertEqual(gpio_phase.selected_pins(result), ())
@@ -106,7 +95,7 @@ class ColdPinStorageTests(unittest.TestCase):
             with self.subTest(identity=identity), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 data = gate.load_assembly(
-                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml").to_dict()
+                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml", test_support=native_fixture(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml")).to_dict()
                 board_path = Path(data["board_package"]) / "board.json"
                 board = json.loads(board_path.read_text())
                 if custom_reservation:
@@ -118,7 +107,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 data["controllers"][0]["id"] = identity
                 assembly = root / "assembly.toml"
                 assembly.write_text(render_toml(data))
-                result = gate.resolve_ir(assembly)
+                result = gate.resolve_ir(assembly, test_support=native_fixture(assembly))
                 self.assertNotIn("PA13", gpio_phase.selected_pins(result))
                 self.assertNotIn("PA14", gpio_phase.selected_pins(result))
                 self.assertEqual(len(gpio_phase.selected_pins(result)), 3)

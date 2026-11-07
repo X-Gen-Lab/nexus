@@ -153,10 +153,9 @@ if operation == 'serial':
                 "context": context_id,
                 "observations": observations, "traces": traces}
 
-    def test_catalog_retains_generic_items_and_exact_selected_modes(self):
+    def test_catalog_retains_current_generic_f4_obligations(self):
         self.assertEqual(set(soc_acceptance.CASES),
-                         {f"SOC-{i}" for i in range(37, 56)} |
-                         set(soc_acceptance.selected_modes.SCENARIOS))
+                         {f"SOC-{i}" for i in range(37, 56)})
         for case in soc_acceptance.CASES.values():
             for key in ("hardware", "stimulus", "observations", "assertions", "metrics", "safety"):
                 self.assertTrue(case[key])
@@ -167,7 +166,7 @@ if operation == 'serial':
         process.assert_not_called()
         self.assertEqual(result["status"], "prepared_unbound")
         self.assertEqual(result["physical_status"], "not_executed")
-        self.assertEqual(len(result["cases"]), 24)
+        self.assertEqual(len(result["cases"]), 19)
         self.assertTrue(all(case["status"] == "not_executed" for case in result["cases"]))
 
     def test_unselected_peripheral_is_not_promoted(self):

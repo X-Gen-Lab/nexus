@@ -1,5 +1,4 @@
 """Installed loaned-RX and MCUboot profiles preserve narrow API boundaries."""
-import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -14,8 +13,7 @@ from tools.configure import configure
 from tools.evidence.common import file_identity
 
 ROOT = Path(__file__).resolve().parents[2]
-V14_LAYOUT_SHA256 = 'd213a4a8a2b11202b73a526cd0d26c1dd710833661d59ff144e86f754953e40c'
-NEW_NAMES = ('f407 loaned rx', 'gd470 loaned rx', 'native mcuboot control',
+NEW_NAMES = ('f407 loaned rx', 'native mcuboot control',
              'f407 mcuboot control', 'f407 mcuboot boot')
 
 
@@ -59,7 +57,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
         (build / 'resolved-config.txt').write_text(str(config))
         (config / 'bindings.c').write_text('/* explicit process fixture */\n')
         family = ('gd32f470' if name == 'gd470 loaned rx' else
-                  'stm32f407' if profile.arm else 'native')
+                  'stm32f4' if profile.arm else 'native')
         resolved = {'enum_abi': 'short-enums' if profile.arm else 'native-int',
                     'soc_family': family,
                     'backend': 'baremetal' if profile.arm else 'native',
@@ -109,7 +107,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
 
     def test_loaned_checker_requires_selected_factory_and_public_gpio(self):
         required = {'nx_factory_gpio', 'nx_gpio_port_read'}
-        for name in NEW_NAMES[:2]:
+        for name in NEW_NAMES[:1]:
             for missing in sorted(required):
                 with self.subTest(name=name, missing=missing):
                     with tempfile.TemporaryDirectory() as tmp:
@@ -147,15 +145,6 @@ class SDKProfilePolicyTests(unittest.TestCase):
                     sdk, source, build, profile, execute)
             self.assertEqual(calls, [])
 
-    def test_v15_appends_five_images_without_changing_v14_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, 'nexus-sdk-consumers-v16')
-        layout = transport.consumer_layout()
-        encoded = json.dumps(layout[:59], separators=(',', ':')).encode()
-        self.assertEqual(hashlib.sha256(encoded).hexdigest(), V14_LAYOUT_SHA256)
-        self.assertEqual((len(layout), len(transport.IMAGES)), (65, 68))
-        self.assertEqual(tuple(item.name for item in transport.SERVICE_CONSUMERS[-6:-1]),
-                         NEW_NAMES)
-
     def test_mcuboot_all_eighty_locked_sources_are_required(self):
         lock = json.loads((ROOT / 'dependencies/mcuboot.lock.json').read_text())
         self.assertEqual(len(lock['files']), 80)
@@ -166,13 +155,15 @@ class SDKProfilePolicyTests(unittest.TestCase):
                          'components/mcuboot/include/nexus/components/mcuboot_control.h',
                          'components/mcuboot/port/flash_map_backend/flash_map_backend.h',
                          'components/mcuboot/private/upstream_profile.cmake'})
-        self.assertLessEqual(expected, set(self.packager.REQUIRED_FILES))
+        self.assertLessEqual(expected, set(self.packager.required_files(ROOT, self.packager.source_profile(
+            components=('network', 'mcuboot')))))
 
     def test_all_311_selected_lwip_sources_remain_required(self):
         lock = json.loads((ROOT / 'dependencies/lwip.lock.json').read_text())
         self.assertEqual(len(lock['files']), 311)
         expected = {'ext/lwip/' + name for name in lock['files']}
-        self.assertFalse(expected - set(self.packager.REQUIRED_FILES),
+        self.assertFalse(expected - set(self.packager.required_files(ROOT, self.packager.source_profile(
+            components=('network', 'mcuboot')))),
                          'Every locked lwIP source/notice must be mandatory')
 
     def test_dependency_export_selects_exact_locked_mcuboot_closure(self):
@@ -191,11 +182,14 @@ class SDKProfilePolicyTests(unittest.TestCase):
                      profile.assembly, *sources.values()]
             for path in paths:
                 self.assertIn(path.relative_to(ROOT).as_posix(),
-                              self.packager.REQUIRED_FILES)
+                              self.packager.required_files(ROOT,
+                                  self.packager.source_profile(
+                                      components=('network', 'mcuboot'),
+                                      host_support=True)))
                 self.assertTrue(path.is_file())
 
     def test_loaned_preparation_keeps_storage_outside_generic_application(self):
-        for name in NEW_NAMES[:2]:
+        for name in NEW_NAMES[:1]:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
                 _, source, _, command, profile = self.prepared(Path(tmp), name)
                 cmake = (source / 'CMakeLists.txt').read_text()
@@ -211,7 +205,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
     def test_native_control_resolves_the_public_nor_model(self):
         assembly = (ROOT / 'cmake/package/verification/mcuboot_control' /
                     'native.toml')
-        resolved = configure.resolve_ir(assembly, root=ROOT)
+        resolved = configure.resolve_ir(assembly, root=ROOT, test_support=True)
         self.assertEqual(resolved.soc_family, 'native')
         self.assertEqual(len(resolved.controllers), 1)
         flash = resolved.controllers[0]
@@ -220,7 +214,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
                          ('physical', 'flash', 'flash0', 'FLASH0', 'poll-byte'))
 
     def test_control_preparation_selects_generic_and_explicit_port(self):
-        for name in NEW_NAMES[2:4]:
+        for name in NEW_NAMES[1:3]:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
                 _, source, _, _, _ = self.prepared(Path(tmp), name)
                 cmake = (source / 'CMakeLists.txt').read_text()
@@ -234,7 +228,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
 
     def test_full_boot_selects_separate_storage_and_one_layout(self):
         with tempfile.TemporaryDirectory() as tmp:
-            _, source, _, _, _ = self.prepared(Path(tmp), NEW_NAMES[4])
+            _, source, _, _, _ = self.prepared(Path(tmp), 'f407 mcuboot boot')
             cmake = (source / 'CMakeLists.txt').read_text()
             self.assertIn('nexus_add_mcuboot_boot()', cmake)
             self.assertIn('Nexus::MCUBootBootStorage', cmake)
@@ -260,7 +254,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
                        'arguments': ['cc', *flags, leaked, '-c',
                                      '/consumer/application.c']}
                 resolved = {'enum_abi': 'short-enums' if profile.arm else
-                            'native-int', 'soc_family': 'stm32f407',
+                            'native-int', 'soc_family': 'stm32f4',
                             'cpu': {'arch': 'cortex-m4', 'float_abi': 'hard',
                                     'fpu': 'fpv4-sp-d16'}}
                 with self.assertRaisesRegex(ValueError, 'private'):
@@ -274,7 +268,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
             self.assertIn('no physical', scope)
             self.assertIn('no measured stack', scope)
         self.assertIn('no image authentication', self.consumers.service_scope(
-            self.profile(NEW_NAMES[4])).lower())
+            self.profile('f407 mcuboot boot')).lower())
 
 
 if __name__ == '__main__':

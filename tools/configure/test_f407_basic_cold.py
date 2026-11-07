@@ -1,4 +1,5 @@
 """F407 basic cold constructors emit static facts and typed C calls."""
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure as gate
@@ -15,10 +16,10 @@ class F407BasicColdTests(unittest.TestCase):
                 ("tests/contracts/stm32_assembly/ve-watchdog.toml", "watchdog",
                  "nx_stm32_watchdog_prepare")):
             with self.subTest(kind=kind):
-                result = gate.resolve_ir(gate.ROOT / relative)
+                result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
                 item = next(item for item in result.controllers
                             if item.kind == kind)
-                construction = maintained("stm32f407").constructor(
+                construction = maintained("stm32f4").constructor(
                     item, result, result.board_bindings, result.routes,
                     result.devices)
                 self.assertEqual(function, construction.initialize.function)

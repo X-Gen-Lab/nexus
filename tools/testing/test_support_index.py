@@ -1,4 +1,5 @@
 """Indexed observations remain navigation, never new execution qualification."""
+from tools.configure.tests.native_fixture import native_fixture, with_native_support
 
 import copy
 from contextlib import redirect_stderr, redirect_stdout
@@ -26,7 +27,7 @@ class SelectedIndexTests(unittest.TestCase):
         self.index = Path(self.workspace.name) / "results.json"
         self.source = {"root": str(ROOT), "commit": "1" * 40,
                        "tree": "2" * 40, "dirty": False, "submodules": []}
-        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT).to_dict()
+        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY)).to_dict()
         self.record = {"source": copy.deepcopy(self.source), "status": "passed",
                        "configuration_sha256": self.resolved["configuration_sha256"],
                        "resolved": copy.deepcopy(self.resolved),
@@ -38,7 +39,7 @@ class SelectedIndexTests(unittest.TestCase):
         with patch.object(identity, "observe_git_source",
                           side_effect=observations or [self.source, self.source]):
             return capabilities.selection(ASSEMBLY, ROOT,
-                results_index=self.index, record_pointer=pointer)
+                results_index=self.index, record_pointer=pointer, test_support=native_fixture(ASSEMBLY))
 
     def test_exact_indexed_observation_preserves_bytes_and_never_promotes_validation(self):
         result = self.query()
@@ -112,7 +113,7 @@ class SelectedIndexTests(unittest.TestCase):
         self.index.write_text(json.dumps({"group/a": {"~mode": self.record}}))
         with patch.object(identity, "observe_git_source", return_value=self.source):
             result = capabilities.selection(ASSEMBLY, ROOT, results_index=self.index,
-                                           record_pointer="/group~1a/~0mode")
+                                           record_pointer="/group~1a/~0mode", test_support=native_fixture(ASSEMBLY))
         self.assertEqual(result["indexed_evidence"]["record"], self.record)
         for pointer in ("iterations/selected", "/iterations/missing", "/iterations/~2bad",
                         "/iterations/selected/status"):
@@ -157,14 +158,14 @@ class SelectedIndexTests(unittest.TestCase):
                       side_effect=AssertionError("oversized input was hashed")), \
                 self.assertRaisesRegex(EvidenceError, "bounded input size"):
             capabilities.selection(ASSEMBLY, ROOT, results_index=self.index,
-                                   record_pointer="/iterations")
+                                   record_pointer="/iterations", test_support=native_fixture(ASSEMBLY))
 
     def test_index_is_read_with_duplicate_key_and_size_guards(self):
         self.index.write_text('{"iterations": {}, "iterations": {}}')
         with patch.object(identity, "observe_git_source", return_value=self.source), \
                 self.assertRaisesRegex(EvidenceError, "duplicate JSON"):
             capabilities.selection(ASSEMBLY, ROOT, results_index=self.index,
-                                   record_pointer="/iterations")
+                                   record_pointer="/iterations", test_support=native_fixture(ASSEMBLY))
 
     def test_cli_requires_assembly_and_pointer_with_index(self):
         for args in (["--results-index", str(self.index), "--record", "/selected"],
@@ -172,14 +173,14 @@ class SelectedIndexTests(unittest.TestCase):
                      ["--assembly", str(ASSEMBLY), "--record", "/selected"]):
             with self.subTest(args=args), redirect_stderr(io.StringIO()), \
                     self.assertRaises(SystemExit) as raised:
-                capabilities.main(args)
+                capabilities.main(with_native_support(args))
             self.assertEqual(raised.exception.code, 2)
         self.query()
         stream = io.StringIO()
         with patch.object(identity, "observe_git_source", return_value=self.source), \
                 redirect_stdout(stream):
-            code = capabilities.main(["--assembly", str(ASSEMBLY),
-                "--results-index", str(self.index), "--record", "/iterations/selected"])
+            code = capabilities.main(with_native_support(["--assembly", str(ASSEMBLY),
+                "--results-index", str(self.index), "--record", "/iterations/selected"]))
         self.assertEqual(code, 0)
         self.assertIn("indexed_evidence", json.loads(stream.getvalue()))
 

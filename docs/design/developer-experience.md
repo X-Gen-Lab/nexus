@@ -8,49 +8,10 @@ source_language: en
 (design-developer-experience)=
 # Developer experience and provider iteration
 
-This iteration keeps the static factory and shared polymorphic interfaces while
-reducing unnecessary product and maintenance work. The
-[execution ledger](developer-experience-execution.csv) is the task-status
-authority; its [readable view](../status/ledgers/developer-experience.md) preserves
-the same fields: W1–W9 contain 63 software work items, I-01–I-06 track integration, and
-H1–H6 require connected equipment. Implementation, software execution and physical
-execution are separate columns. A software mechanism does not close a physical
-exit condition.
-
-The subsequent configuration-workflow increment appends CF01-CF06, EP01-EP09,
-EV01-EV09, MX01-MX04 and DX01-DX04 to that same ledger. Its 32 exits cover strong
-factory defaults, one selected project source, external-provider onboarding,
-stage-specific evidence, measured costs and bilingual delivery. The original 75
-rows and their hardware exits retain their definitions and source identities.
-Implementation, focused checks, final source-bound checks and physical execution
-remain distinct; a new tool entry does not close an unrelated platform exit.
-
-The subsequent [delivery-completion ledger](platform-delivery-completion.csv)
-and its [readable view](../status/ledgers/platform-delivery-completion.md) remain
-one follow-up authority. It preserves N01–N14 and appends the accepted A01–J04
-work breakdown, including X01–X05: complete maintained-mode cold lifecycle,
-configuration contracts, public consumption, execution efficiency, delivery,
-HIL and environment recovery. These tasks preserve the original 75-task ledger
-and its fixed P/E evidence. Each row keeps its full exit condition; a migrated
-peripheral or prepared instrument does not close a whole-family or physical task.
-Hardware execution and a formal software candidate have separate exits; neither
-inherits an earlier iteration's status.
-
-The implementation order is coverage and baselines, C lifecycle and configuration
-contracts, family and cross-controller migration, public recipes, then frozen
-integration. Tool efficiency, delivery reports and environment recovery can
-proceed in parallel. Physical execution follows actual station admission.
-The current architecture diagram still applies: these tasks refine existing
-mechanisms without adding a runtime layer. Actual status remains in the same CSV;
-the work breakdown is not another support matrix or a project-wide percentage.
-
-The [follow-up development index](../delivery/platform-delivery-completion-results.json)
-retains its original development observations without relabeling old P/E results.
-The subsequent {ref}`sealed cold-lifecycle baseline <sealed-cold-lifecycle-baseline>`
-records the final source, complete gates, fixed examples consumption, offline
-reproduction and post-merge association. Read the later source-bound observation
-before interpreting an older pending field; a prepared plan or successful
-configuration query alone cannot close an exit.
+Current iteration uses one F4 production support package, static typed factory
+and explicit ownership. Historical work-package ledgers retain original identities
+at the [fixed prior source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design),
+without becoming current completion percentages or support catalogues.
 
 ## Boundaries that stay explicit
 
@@ -74,35 +35,15 @@ A friendlier command does not create a second configuration or build authority.
 
 ## Source ownership and migration
 
-The H743 DMA2D component lives at
-`components/soc/stm32/stm32h743_frame_dma2d`. Its public include
-`nexus/components/frame_dma2d.h` and CMake target stay stable. This is a private
-source ownership correction, not new multimedia or hardware support. Historical
-records keep the paths belonging to their recorded revisions.
+Private MCU IP belongs inside `soc/stm32/stm32f4/`. Board and SoC inputs are
+readonly facts; centralized host generation remains separate from firmware C.
+Native fixtures require explicit test support. See the [source map](../explanation/source-map.md)
+and [official-library contract](official-stm32-provider.md) for current boundaries.
 
-`explain` now prints a human summary by default; automation must use `--json`.
-The optional owner observation gains admission facts and changes its public
-sidecar layout, so source consumers recompile. New helpers do not add mandatory
-state to every provider, allocate a global registry or release borrowed storage.
-The [product workflow](../guides/developer-workflow.md) documents these changes.
-
-Official library reuse is evaluated per exact operation. A library name alone
-does not determine timing or ownership. The F4 HAL reference is finite USART1 TX
-with DMA2 Stream7; it is not a production backend or a migration of every mode.
-For HAL v1.8.5, DMA transfer-error IRQ cleanup uses a bounded
-`SystemCoreClock / 9600` enable-bit loop. Tick waits occur in separate DMA Init,
-Abort and PollForTransfer paths. Do not describe every normal finite TX or
-interrupt-driven abort as a `HAL_GetTick` wait. The
-[official provider contract](official-stm32-provider.md) retains callback,
-deadline, single-owner and full-drain obligations.
-
-The current decision retains the single production LL/provider engine and GD32
-SPL operation reuse. Actual HAL software behavior, current production ELF costs
-and non-equivalent ARM handle layouts are recorded separately. The reference
-does not implement complete NVIC preemption/vector withdrawal, IRQ wake,
-concurrent RX, cold-start rollback or full platform stop. Promoting it and
-comparing equivalent complete images are later work; no HAL-versus-LL resource
-ranking or production replacement is claimed.
+`explain` prints a human summary by default; automation uses `--json`. Friendlier
+tools do not add a second configuration authority, hidden executor, global device
+registry or permission to release borrowed storage. Source-bound software results
+and physical execution retain separate exits.
 
 ## Close work with observations
 

@@ -1,7 +1,9 @@
 # USB FS device 包所有权与接入边界
 
-公共接口是 `nexus/io/usb_device.h`。当前纵切片提供 Native、STM32F407 和
-GD32F470 的 internal-PHY full-speed device PIO 机制及实际 SDK 绑定。维护范围是
+公共接口是 `nexus/io/usb_device.h`。生产实现归属 `soc/stm32/stm32f4/`，
+当前精确适配 STM32F407VET6／ZGT6 的 internal-PHY full-speed device PIO。
+目录按 STM32F4 家族组织，不表示该系列全部器件已完成接入。Native 位于
+`tests/support/native/`，仅作为显式启用的主机测试模型。维护范围是
 EP0 control、显式选择的 EP1–EP3 bulk IN/OUT 与 interrupt IN、
 SETUP/reset/suspend/resume 事实、STALL、SET_ADDRESS、取消与退出。
 DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的 active／mask 由
@@ -21,7 +23,7 @@ owner。实例共享只读方法表，没有全局可变 registry、endpoint 最
 或必选 OS。未选实例不产生状态，MCU 热路径用 direct volatile MMIO。模型编译只
 替换外部 MMIO/NVIC 叶端口，MCU 不携带模型函数表或运行时模拟分支。
 
-两款 SoC 的 USBFS 基址都是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO，
+STM32F407 的 OTG_FS 基址是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO，
 单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。
 EP0 固定 64-byte MPS；bulk MPS 只能是 8/16/32/64。interrupt 仅选入 EP1–EP3
 IN，MPS 为 1–64 B，允许 10 B 等非二次幂长度；interrupt OUT 和 ISO 未接入。
@@ -32,22 +34,18 @@ validate／retain 和 MMIO 之前拒绝。
 | SoC | 实际 48 MHz 来源 | 接入行为 |
 |---|---|---|
 | STM32F407 | HSE 8 MHz / M8 × N336 / Q7 | 验证现有 PLL/ready，只管理 USBFS gate |
-| GD32F470 | HXTAL 25 MHz / M25 × PLLSAI N192 / P4 | 独占闲置 PLLSAI 与 CK48 mux 后有界启动 |
 
-GD32 原 200 MHz 主 PLL 的 Q9 输出不是 48 MHz，不能直接用于 USB。GD32 clock owner
-拒绝新活跃 USBHS/TRNG/SDIO/TLI 消费者，保留旁邻字段并从未修改 SYSCLK。clock owner
-有 IDLE/CLEANUP/READY 与精确 consumer count；失败回滚缺少读回证明时仍保留 CLEANUP
-责任。DCD 先 validate/retain，退出完成后 release consumer，最后由外部 owner stop
-时钟。pin/electrical/VBUS 和所有 clock-gated 隐藏消费者必须由外部资源 owner 先
-授权并静止，不能仅凭 gate 为零推断系统独占。
+clock owner 管理精确 consumer count；失败回滚缺少读回证明时仍保留清理责任。
+DCD 先 validate/retain，退出完成后 release consumer，最后由外部 owner stop
+时钟。pin/electrical/VBUS 和所有共享时钟消费者必须由外部资源 owner 先授权并
+静止，不能仅凭 gate 为零推断系统独占。其他晶振或 PLL 配置需要独立时钟合同，
+不能凭声明 `48 MHz` 直接复用当前配置。
 
-既有 ARM GCC 14.3 的实际 sizeof probe 为：controller 144 B、每个 endpoint 40 B、
-每个 event 40 B、request 56 B，STM/GD clock state 分别 8/16 B。生产单元的 ARM
-objects 无全局 `.data`/`.bss`；完整 ELF 的未选 GC/资源变化由实际装配构建另行证明。
-这些既有 DCD 尺寸不包含可选 ROM profile、EP0 adapter 或调用者的 outer request；
-新增组件的 Flash／RAM 成本需以同源 ARM ELF 与实际 ABI 分别确认。私有 endpoint
-用 `uint8_t transfer` 替换原单字节 `bulk`，没有新增 interval、调度或队列字段；
-字段宽度保持一字节，不以 host sizeof 或历史 probe 代替新镜像的 ARM 成本测量。
+controller、endpoint、事件环与 request 按所选实例静态分配；可选 ROM profile、
+EP0 adapter 和 outer request 分别计入其 owner 的资源预算。私有 endpoint 的
+`uint8_t transfer` 只保存类型，不增加 interval、调度或队列字段。结构尺寸、
+未选 section GC 与完整 Flash／RAM 成本须由同源配置的 ARM ELF／map 建立，
+不以 host sizeof 或旧版本 probe 代替当前镜像测量。
 
 ## 选定 ROM profile 与描述符
 
@@ -109,16 +107,15 @@ bulk／interrupt endpoint 使用 DATA0 命令。reset／clear-halt 必须核对 
 SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset
 使旧 control loan 进入排空，不能仅改 epoch 就撤销借用。reset 与 queued SETUP
 在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；reset 在旧 loan 排空和 FIFO flush 后，
-还须显式屏蔽并清除两系列选定非零方向的 active，读回成功才清 `reset_pending`。
+还须显式屏蔽并清除选定非零方向的 active，读回成功才清 `reset_pending`。
 失败保留 reset 屏障和 clock，由 service 或完整 stop 继续恢复。新 admission 仍须
 满足 endpoint 的实际启用条件。SET_ADDRESS 验证
 当前标准 SETUP 的各字段，先 staged，只有对应 status-IN 实际 XFRC 后写 DCFG
 地址。地址读回失败关闭 controller。
 
-STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实；
-GD 自动清 EPACT 尚无已核实依据。公共生产路径在 loan 排空后主动清两系列非零
-active／mask，形成统一的平台后置条件，不把它归因为 GD 的自动硬件行为。GD
-回归须保留硬件 active，再证明公共代码实际清除。完成 reset 后仍需以新当前 epoch
+STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实。
+生产路径仍在 loan 排空后显式清除非零 active／mask 并核对读回，不仅依赖 reset
+事件来证明平台后置条件。完成 reset 后仍需以新当前 epoch
 显式 enable；reset／clear-halt／submit 均不自动激活。对 inactive 非零 endpoint，
 submit 返回 STATE，prepared request 保持 READY，没有新 request／buffer 借用或
 FIFO 写入。EP0 control 保留既有合同；DATA0 恢复、reset 事件或 controller 未
@@ -324,32 +321,25 @@ FIFO，已撤回的 PIO 执行者不再拥有 caller buffer；下一次 cold cor
 拒绝 BUSY。wake 必须同时支持 service/cancel 的 task 上下文和真正 IRQ 上下文，
 绑定读取实际 priority/group 验证 syscall ceiling，不修改全局 grouping。
 
-## 证据与尚未建立的资格
+## 实现位置与验收边界
 
-既有 DCD 开发证据在 `tools/testing/evidence/usb-device-iteration/manifest.json`，
-绑定原 Native 43、STM32 7、GD32 7 个 Google cases 以及 ASan/UBSan 同 57 cases、
-零 skip 的执行；
-两家实际 SDK 的六个 production ARM 单元通过 strict C11 编译。对应 clock owner 的
-27 个独立 cases 保留在 `usb-clock-iteration`，不重复计入 DCD 57。历史模型的
-错误 TXFE/EP0/PID 假设和失败日志保留，最新源与旧报告的身份不混用。
-这些历史计数不覆盖新增 profile、descriptor helper、EP0 packetizer 或 interrupt IN。
-新增量的开发证据分别记录 ROM profile、descriptor、control 与软件 epoch 的真实回归、
-对齐反例 RED→修正后的 focused GREEN，以及精确 ARM 装配的编译与链接。
-每份结果只描述对应源码与命令；用例明细及失败尝试见该批原始回执。
-focused GREEN 与 ARM 链接不建立 clean SDK 或完整 Native
-候选资格；SDK consumer、资源、双语文档与普通完整提交门禁仍须分别验证。
+F4 绑定在 `soc/stm32/stm32f4/drivers/usb_device.c`；PIO 控制器机制在
+`soc/stm32/stm32f4/drivers/ip/fs_device_pio/`。厂商寄存器布局与位定义来自锁定的
+`vendors/st/cmsis_device_f4/`，芯片资料身份由该家族的 `references.json` 固定。
+Native 外部 MMIO 模型位于 `tests/support/native/drivers/usb_device*`，只在测试
+配置中启用，不作为生产 SoC。公共组件与 F4 绑定分别由 `tests/google/usb_*`
+测试和精确 ARM 装配验证；用例数与资源结论以当前提交的真实执行报告为准。
 
-资料是锁定 ST CMSIS header 的 FS 寄存器事实，以及 GD32F4xx User Manual Rev3.3
-§28.7.3（DIEPxCTL printed p988–990、DIEPxINTF p994–995、DIEPxLEN p998）
-和 §4.3.24/26 的 PLLSAI/CK48。Rev3.3 的 chapter 28 是 USBFS，chapter 29 是
-USBHS；这里只修正当前引用，历史证据保留原始字节。
-GD 手册 SHA256 是 `c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13`。
-完整出处身份绑定在 manifest。
+历史跨系列开发报告只描述其记录的固定源码、配置和工具身份，不代表本轮保留的
+平台范围，也不覆盖后续 profile、descriptor、EP0 或 activation 修改。原始报告
+保持原字节；旧计数不能作为当前候选的完成证明。当前提交仍须分别通过公共合同、
+F4 寄存器模型、ARM 链接、资源预算、SDK consumer 与完整本地门禁。
 
-IO-35 的完整退出仍开放；有限 interrupt IN 与显式 activation 不提供 notification
-策略、完整 Chapter 9／class stack、外部配置事务或物理 reset 恢复资格。它们不建立
-clean software candidate、产品
-release 或物理资格。三块 PCB 的 USB role、
-VBUS sensing/power/backfeed、pull-up/ESD、电气跳帽、pin lease 与共享引脚冲突尚需
-独立 reviewed Board 装配；本批没有配置这些引脚。枚举、主机重试、reset/拔线、
-传输错误、PHY 三周期 flush 时序和实际 ISR/WCET/HIL 均未执行，不继承旧例程测试。
+当前精确芯片范围为 F407VE／ZG，板卡范围是启明 V3.1、ZG 核心板、V4.1 和
+天空星青春版；这不表示四板均已取得每项 USB 电气资格。板级必须逐项确认
+USB role、VBUS sensing/power/backfeed、pull-up/ESD、跳帽及共享引脚约束。
+软件装配可以选择 PA11／PA12，pin claim 不证明实际接线或角色正确。
+
+有限 interrupt IN、显式 activation 和 EP0 组件仍不提供完整 Chapter 9／class
+stack 或外部配置事务。完整 IO-35 退出资格、物理枚举、主机重试、reset／拔线、
+PHY flush 时序、IRQ／WCET 与 HIL 必须另行验收；本环境没有连接实板，均未执行。

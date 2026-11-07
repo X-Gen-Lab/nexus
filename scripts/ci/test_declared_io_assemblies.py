@@ -11,36 +11,8 @@ from tools.maintenance import capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/contracts/declared_io_assembly"
-GROUPS = {
-    "f103", "f407", "f407-input", "f407-output", "g474-input",
-    "g474-output", "gd303", "gd470", "gd470-input", "h743", "u575",
-    "ve-word-adc-can", "ve-rx-idle", "ve-rx-continuous", "ve-duplex",
-    "ve-duplex-continuous",
-}
-HISTORICAL_MODES = {
-    "STM32F103RBT6": {("GPIOA", "input")},
-    "STM32F407ZGT6": {
-        ("EXTI0", "edge-event"), ("GPIOA", "input"), ("GPIOA", "output"),
-        ("GPIOB", "input"), ("GPIOE", "input"), ("GPIOG", "input"),
-        ("GPIOG", "output"),
-    },
-    "STM32G474RET6": {
-        ("GPIOA", "input"), ("GPIOB", "input"), ("GPIOC", "output"),
-        ("GPIOD", "input"), ("GPIOD", "output"),
-    },
-    "GD32F303RCT6": {("EXTI0", "edge-event"), ("GPIOA", "input")},
-    "GD32F470ZGT6": {
-        ("GPIOB", "input"), ("GPIOB", "output"), ("GPIOD", "input"),
-    },
-    "STM32H743ZIT6": {
-        ("EXTI1", "edge-event"), ("GPIOB", "input"), ("GPIOE", "output"),
-    },
-    "STM32U575ZIT6Q": {
-        ("EXTI0", "edge-event"), ("GPIOA", "output"), ("GPIOB", "output"),
-        ("GPIOD", "output"), ("GPIOE", "output"), ("GPIOF", "output"),
-        ("GPIOG", "output"), ("GPIOH", "output"),
-    },
-}
+GROUPS = {'f407', 've-duplex', 'f407-input', 've-duplex-continuous', 've-word-adc-can', 'f407-output', 've-rx-idle', 've-rx-continuous'}
+HISTORICAL_MODES = {'STM32F407ZGT6': {('GPIOE', 'input'), ('GPIOB', 'input'), ('GPIOG', 'output'), ('EXTI0', 'edge-event'), ('GPIOA', 'input'), ('GPIOA', 'output'), ('GPIOG', 'input')}}
 VE_MODES = {
     ("ADC1", "trigger-dma-continuous"), ("CAN1", "classic-irq"),
     ("CAN2", "classic-irq"), ("EXTI0", "edge-event"), ("GPIOA", "input"),
@@ -76,7 +48,7 @@ class DeclaredModeIngress(unittest.TestCase):
         expected = {(part, controller, mode)
                     for part, modes in HISTORICAL_MODES.items()
                     for controller, mode in modes}
-        self.assertEqual(len(expected), 29)
+        self.assertEqual(len(expected), 7)
         expected |= {("STM32F407VET6", controller, mode)
                      for controller, mode in VE_MODES}
         expected.add(("STM32F407ZGT6", "GPIOB", "output"))
@@ -134,10 +106,10 @@ class DeclaredModeIngress(unittest.TestCase):
 
     def test_reserved_and_package_absent_routes_stay_unselectable(self):
         cases = [
-            ("stm32f407", "STM32F407VET6", "GPIOG", "gpio", mode)
+            ("stm32f4", "STM32F407VET6", "GPIOG", "gpio", mode)
             for mode in ("input", "output")
         ] + [
-            ("stm32f407", "STM32F407VET6", "ETH", kind, mode)
+            ("stm32f4", "STM32F407VET6", "ETH", kind, mode)
             for kind, mode in (("eth", "raw-rmii"),
                                ("eth_frames", "rmii-vlan-sg-ptp"))
         ]
@@ -158,30 +130,6 @@ class DeclaredModeIngress(unittest.TestCase):
                                        "route": route}]}
                 with self.assertRaisesRegex(ValueError, "no reviewed exact-part route"):
                     configure.resolve_bindings(board, routes, part)
-        reference = ROOT / "boards/stm32g474re_hse24_reference/board.json"
-        for controller, route, mask in (("GPIOF", "gpio-pf0", 1),
-                                         ("GPIOG", "gpio-pg10", 1024)):
-            for mode in ("input", "output"):
-                with self.subTest(controller=controller, mode=mode), \
-                        tempfile.TemporaryDirectory() as directory:
-                    base = Path(directory)
-                    package = base / "board"
-                    package.mkdir()
-                    board = json.loads(reference.read_text())
-                    board["bindings"] = [{"id": "blocked",
-                                          "controller": controller,
-                                          "route": route, "mask": mask,
-                                          "initial": 0}]
-                    (package / "board.json").write_text(json.dumps(board))
-                    assembly = base / "assembly.toml"
-                    assembly.write_text(
-                        'schema=2\nboard_package="board"\n'
-                        'backend="baremetal"\nclock="hse24-pll170"\n'
-                        '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
-                        '[gpio.blocked]\nbinding="blocked"\n'
-                        f'mode="{mode}"\n')
-                    with self.assertRaisesRegex(ValueError, "Resource conflict"):
-                        configure.resolve_ir(assembly, ROOT)
 
 
 if __name__ == "__main__":

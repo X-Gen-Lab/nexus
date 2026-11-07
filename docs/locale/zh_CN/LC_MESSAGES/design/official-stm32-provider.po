@@ -1,4 +1,4 @@
-# Page translations; exact canonical source identity and review state below.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,966 +7,259 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4363e10966cd77a89430c97fb2224a030f78e938be09d6dc6a4defb4ef6ac721\n"
+"X-Nexus-Source-SHA256: 3e797d59d8195073623f0b27d52d755d5dfa0e4a330c9174f44322dd4ee7298f\n"
 
-msgid "Official drivers and provider iteration"
-msgstr "官方驱动与 provider 迭代"
+#: docs/design/official-stm32-provider.md:9
+msgid "Official STM32F4 drivers and Nexus contracts"
+msgstr "官方 STM32F4 驱动与 Nexus 合同"
 
+#: docs/design/official-stm32-provider.md:11
 msgid ""
-"Use this contract when changing a SoC provider or integrating an official "
-"driver. Nexus keeps static assembly, typed factories and public C11 I/O "
-"contracts. Official HAL/LL code is private implementation input. This page "
-"defines the integration boundary and work-package exits; it does not qualify"
-" every external library, maintained mode, source revision or physical board."
+"Current production integration is `soc/stm32/stm32f4/`, with concrete "
+"F407VE/ZG implementations. Reuse the locked official F4 HAL/LL and CMSIS "
+"Device sources; keep vendor types and Handles private. Another F4 macro or "
+"SDK directory does not establish a maintained mode, Board route or physical "
+"result."
 msgstr ""
-"修改 SoC provider 或接入官方驱动时使用本合同。Nexus 保留静态装配、typed factory 和公共 C11 I/O 合同。官方 "
-"HAL/LL 代码是私有实现输入。本页规定接入边界与工作包退出条件，不代表全部外部库、维护模式、源码版本或实板都已取得资格。"
+"当前生产集成为 `soc/stm32/stm32f4/`，具体实现限于 F407VE/ZG。复用锁定的官方 F4 HAL/LL 和 CMSIS "
+"Device 源码；厂商类型和 Handle 保持私有。其他 F4 宏或 SDK 目录不能证明已具备受维护模式、Board 路线或物理结果。"
 
-msgid ""
-"![Current platform responsibilities and external product "
-"boundary](../assets/diagrams/platform-architecture.svg)"
-msgstr "![当前平台责任与外部产品边界](../assets/diagrams/platform-architecture.svg)"
+#: docs/design/official-stm32-provider.md:16
+msgid "Responsibility boundary"
+msgstr "职责边界"
 
-msgid "Current platform responsibilities and external product boundary"
-msgstr "当前平台责任与外部产品边界"
-
-msgid ""
-"FIG-01 remains the current responsibility diagram. Reusing official code "
-"changes the private SoC implementation, not the public dependency direction."
-" FIG-03 in [the architecture explanation](../explanation/platform-"
-"architecture.md) shows the existing build-time generation path. Neither "
-"diagram implies a new runtime registry, HAL manager, default worker or "
-"mandatory OS layer."
-msgstr ""
-"FIG-01 继续表达当前责任边界。复用官方代码改变 SoC "
-"私有实现，不改变公共依赖方向。[架构说明](../explanation/platform-architecture.md)中的 FIG-03 "
-"展示现有构建期生成路径。这两张图均不表示新增运行时注册表、HAL 管理器、默认工作者或强制 OS 层。"
-
-msgid "Vendor-first target and current implementation"
-msgstr "官方库优先目标与当前实现"
-
-msgid "Official hardware libraries are the default input for further provider work. Reuse reviewed HAL transport when it satisfies the complete selected mode; otherwise bind suitable LL or SPL primitives to the required bounded mechanism. Nexus retains admission, borrowed storage, deadlines, result publication and resource responsibility. Direct register helpers remain justified exceptions for an exact SDK gap, erratum, atomic operation or demonstrated budget."
-msgstr "官方硬件库是后续 provider 工作的默认输入。已审查 HAL transport 满足完整所选模式时予以复用；否则将合适的 LL 或 SPL 原语静态绑定到所需有界机制。Nexus 保留准入、借用存储、deadline、结果发布和资源责任。直接寄存器 helper 仅作为精确 SDK 缺口、erratum、原子操作或实测预算的有理由例外。"
-
-msgid "The selected F407 UART `dma-tx` provider uses official HAL finite TX with a disjoint LL IRQ receiver under one private owner. Other F407 UART modes retain their existing engines; G4, H7 and U5 retain their reviewed LL integrations. GD32F470 compiles selected official SPL C units. Source selection, model tests, ARM links and physical execution remain separate evidence. An include, primitive call or finite-TX fixture alone does not establish a complete transport or family qualification."
-msgstr "所选 F407 UART `dma-tx` provider 在一个私有 owner 内使用官方 HAL 有限 TX 和分离的 LL IRQ 接收器。其他 F407 UART 模式保留既有引擎；G4、H7 和 U5 保留已审查的 LL 集成。GD32F470 编译所选官方 SPL C 单元。源码选择、模型测试、ARM 链接和物理执行仍是分别取得的证据。仅 include、原语调用或有限 TX 夹具不能建立完整 transport 或系列资格。"
-
-msgid "The {download}`existing delivery-completion ledger <platform-delivery-completion.csv>` appends V-A01 through V-L08, V-P01 through V-P06 and V-X01 through V-X04 while preserving the older rows and frozen results. Each new row starts with its real implementation, software and physical status; a plan has no execution evidence. The [derived ledger view](../status/ledgers/platform-delivery-completion.md) uses the same renderer. No second support or completion database is introduced."
-msgstr "{download}`现有交付完善台账 <platform-delivery-completion.csv>`追加 V-A01 至 V-L08、V-P01 至 V-P06 及 V-X01 至 V-X04，保留旧记录和冻结结果。各新记录分别保留真实实现、软件和物理状态；计划没有执行证据。[派生台账视图](../status/ledgers/platform-delivery-completion.md)继续使用同一 renderer，不引入第二套支持或完成状态数据库。"
-
-msgid "Boundary"
-msgstr "边界"
-
-msgid "Required responsibility"
-msgstr "必需责任"
-
-msgid "Official transport"
-msgstr "官方 transport"
-
-msgid "Own the selected peripheral transfer, IRQ/DMA and vendor state machine"
-msgstr "拥有所选外设传输、IRQ/DMA 和 vendor 状态机"
-
-msgid "LL/SPL primitive"
-msgstr "LL/SPL 原语"
-
-msgid "Encode reviewed hardware operations without claiming a complete transport"
-msgstr "封装已审查硬件操作，不据此宣称完整 transport"
-
-msgid "Nexus adapter"
-msgstr "Nexus adapter"
-
-msgid "Bridge admission, borrow, absolute deadline, errors, callbacks, drain and final settlement"
-msgstr "桥接准入、借用、绝对 deadline、错误、callback、排空和最终结清"
-
-msgid "Exact SoC"
-msgstr "精确 SoC"
-
-msgid "Bind SDK pairing, clock/reset, IRQ/DMA route, memory/Cache and silicon restrictions"
-msgstr "绑定 SDK 配对、clock/reset、IRQ/DMA 路由、memory/Cache 和芯片限制"
-
-msgid "Board/product"
-msgstr "Board/产品"
-
-msgid "Supply reviewed wiring, electrical state, execution, storage, partitions and recovery policy"
-msgstr "提供已审查接线、电气状态、执行、存储、分区及恢复策略"
-
-msgid "Static assembly"
-msgstr "静态装配"
-
-msgid "Construct existing contexts/faces and fixed IRQ connections; select one implementation before execution"
-msgstr "构造已有 context/face 和固定 IRQ 连接；在执行前选择一个实现"
-
-msgid "A private Handle can live in static provider storage. A public face still calls its selected immutable ops with that instance context. No universal HAL manager, name registry, default worker or extra forwarding-only layer is required. One live controller behavior domain has one hardware transport owner. Selecting HAL transport replaces the corresponding independent register transport; Handle readiness and Nexus request lifetime remain different contracts."
-msgstr "私有 Handle 可以位于静态 provider 存储中。公共 face 继续使用实例 context 调用所选不可变 ops。无需通用 HAL manager、名字注册表、默认 worker 或仅转发的额外层。一个活动控制器行为域只有一个硬件 transport owner。选入 HAL transport 后替换对应的独立寄存器 transport；Handle 就绪和 Nexus 请求生命周期仍是不同合同。"
-
-msgid "Complete maintained scope"
-msgstr "完整维护范围"
-
-msgid "The iteration covers the existing exact selections for STM32F103, STM32F407, STM32G474, STM32H743, STM32U575, GD32F303 and GD32F470. The three launch Boards are Qiming F407ZGT6, Sky F407VET6 and Liangshan GD32F470ZGT6. Current Sky bindings cover LED, UART, Flash and IWDG; additional electrical routes need review before physical execution."
-msgstr "本轮覆盖 STM32F103、STM32F407、STM32G474、STM32H743、STM32U575、GD32F303 和 GD32F470 的既有精确选择。三块首发 Board 是启明 F407ZGT6、天空星 F407VET6 和梁山派 GD32F470ZGT6。天空星当前 binding 覆盖 LED、UART、Flash 和 IWDG；新增电气路由在物理执行前需要审查。"
-
-msgid "The 71-entry assembly catalogue is one input, not the complete closure. Derive navigation from the existing capability/provider/source catalogues, provider fixtures, installed-SDK consumers, selected components and external examples. The maintained `tools/maintenance/work_packages.py` joins existing authorities; it does not execute tests or grant support. A mode needs its exact part/density, Board/revision, route, backend/kernel policy, clock, format, IRQ/DMA, memory/Cache/security/power profile and SDK pin reviewed together. CPU-only Arch coverage and the independent ThreadX subset do not expand this SoC matrix."
-msgstr "含 71 项的装配 catalogue 是一个输入，不是完整闭包。导航由现有 capability/provider/source catalogue、provider 夹具、已安装 SDK consumer、所选组件及外部示例派生。维护中的 `tools/maintenance/work_packages.py` 联查既有权威，不执行测试或授予支持。一个模式需要共同审查精确料号/density、Board/revision、route、backend/kernel policy、clock、format、IRQ/DMA、memory/Cache/security/power profile 和 SDK pin。CPU-only Arch 覆盖与独立 ThreadX 子集不扩大该 SoC 矩阵。"
-
-msgid "The frozen source review at `89485943` preserves all 217 declared identities, including its 33 unselected identities and 19 Native MODEL rows. Separate source annexes now review those 33 declarations, seven components and seven system owners. The fresh `5e82bab6` matrix selects 29 identities in 11 ARM images and rejects four reserved G474 selections; it does not execute those images or change the original inventory. Authorized private examples still need a separate annex."
-msgstr "冻结在 `89485943` 的源码审查保留全部 217 个已声明身份，其中包括当时未选入夹具的 33 个身份和 19 个 Native MODEL 行。独立源码附录现已审查这 33 项声明、七个组件和七个 system owner。全新 `5e82bab6` 矩阵在 11 个 ARM 镜像中选入 29 个身份，并拒绝四项被保留资源约束的 G474 选择；它没有执行这些镜像，也不改变原清单。已授权的私有示例仍需独立附录。"
-
-msgid "F103/GD303 errata, F407/GD470 stream DMA, G474 DMAMUX and trigger coupling, H743 Cache/domains/wire completion, and U575 GPDMA/retention/TrustZone retain separate checks. A finite HAL UART result cannot qualify FIFO, continuous, chained, duplex or cross-domain operation."
-msgstr "F103/GD303 errata、F407/GD470 stream DMA、G474 DMAMUX 与触发耦合、H743 Cache/域/线上完成以及 U575 GPDMA/保留/TrustZone 分别验证。有限 HAL UART 结果不能授予 FIFO、连续、链式、双向或跨域操作资格。"
-
-msgid "Additional software-reference sources"
-msgstr "新增的软件参考源码"
-
-msgid ""
-"H563 I3C, H743/W25Q128JV mapped storage and H747 paired-boot AMP are "
-"explicit software references alongside the seven maintained MCU SoC "
-"provider families. They do not create a new supported Board, imply "
-"general H5/H7 family coverage or inherit a physical result from header "
-"compilation."
-msgstr ""
-"H563 I3C、H743/W25Q128JV 映射存储和 H747 成对启动 AMP，是与七个已维护 MCU SoC provider "
-"家族并列记录的明确软件参考。它们不新增已支持 Board，不意味着通用 H5/H7 系列覆盖，也不从头文件编译继承实板结果。"
-
-msgid ""
-"H563 source verification uses the exact CMSIS-device/HAL children of "
-"STM32CubeH5 v1.7.0, retained in the organization forks and locked by "
-"[`stm32h5.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/dependencies/stm32h5.lock.json) and "
-"[`stm32h5-hal.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/dependencies/stm32h5-hal.lock.json). The selected "
-"HAL child includes the Cube-selected ETH correction after its own release"
-" tag; the Cube pair, not that tag alone, owns compatibility. Existing "
-"CMSIS Core 6 remains shared. H563 uses one bounded LL polling owner "
-"because HAL polling waits and interrupt-span retention do not match the "
-"existing I3C pump contract."
-msgstr ""
-"H563 源码验证采用 STM32CubeH5 v1.7.0 的精确 CMSIS-device/HAL 子版本，通过组织 fork 保留，并由 "
-"[`stm32h5.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/dependencies/stm32h5.lock.json) 与 "
-"[`stm32h5-hal.lock.json`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/dependencies/stm32h5-hal.lock.json) 锁定。选定 HAL "
-"子版本包含其发布标签之后、由 Cube 选定的 ETH 修正；兼容性由 Cube 配对决定，不能只看该标签。既有 CMSIS Core 6 "
-"继续共享。H563 使用单一有界 LL 轮询 owner，因为 HAL 轮询等待与中断区间保留不符合既有 I3C pump 合同。"
-
-msgid ""
-"H743 and H747 reuse the already pinned H7 dependency commit. The SDK "
-"carries the union of separately reviewed H743/H747 device source closures"
-" under one Gitlink; each source lock retains its own selector, exact "
-"files and notice. This payload union does not select both startup files "
-"in firmware or change the H743 device macro. QSPI/HSEM input availability"
-" is distinct from transfer, boot and recovery correctness. See the [I3C "
-"contract](i3c-controller.md) and the [selected storage/AMP boundaries"
-"](io-extension-boundaries.md) for their narrower memory, progress and "
-"failure responsibilities."
-msgstr ""
-"H743 与 H747 复用已锁定的 H7 依赖提交。SDK 在同一 Gitlink 下携带分别审查的 H743/H747 "
-"器件源码闭包的并集；各源码锁保留自己的选择符、精确文件和许可声明。此 payload 并集不会在固件中同时选择两个启动文件，也不会改变 H743 "
-"器件宏。QSPI/HSEM 输入可用性与传输、启动和恢复正确性分别验证。更窄的内存、推进和失败责任见 [I3C 合同](i3c-"
-"controller.md)及[选定存储/AMP 边界](io-extension-boundaries.md)。"
-
-msgid "Exact STM32 errata review worksheet"
-msgstr "精确 STM32 勘误审查工作表"
-
-msgid "Use the exact document revision and selected mode when reviewing a change. The entries below locate existing controls and open evidence; they are not a second support ledger or a complete errata audit. Where a reference index exists, its `applicability_only` status remains authoritative; physical qualification remains `not_executed`. Inspect the document's revision table before applying a workaround to another cut. Do not replace an unavailable silicon observation with the authored part name."
-msgstr "审查变更时使用精确的文档修订版和所选模式。下表定位现有控制措施和待补证据，不构成第二套支持台账或完整勘误审计。若已有参考索引，其 `applicability_only` 状态仍是权威；物理资格仍为 `not_executed`。将规避措施应用于其他硅修订版前，先检查文档的修订版表。不得用装配中填写的料号替代尚未取得的芯片观察。"
-
-msgid "Exact selection and source"
-msgstr "精确选择与来源"
-
-msgid "Existing control to preserve"
-msgstr "需要保留的现有控制措施"
-
-msgid "Review and acceptance boundary"
-msgstr "审查与验收边界"
-
-msgid "F103RBT6, ES096 Rev15 2.2.2"
-msgstr "F103RBT6，ES096 Rev15 2.2.2"
-
-msgid "Normal firmware uses the Flash-size word, never unavailable DBGMCU reads, for density admission; `debug_freeze=true` rejects before watchdog activation"
-msgstr "普通固件通过 Flash 容量字进行容量准入，不读取不可用的 DBGMCU；`debug_freeze=true` 在启用看门狗前被拒绝"
-
-msgid "A debugger's IDCODE observation and physical marking require independent station evidence; zero is not an observed revision A"
-msgstr "调试器取得的 IDCODE 和实物丝印需要独立工站证据；零值不代表已观察到修订版 A"
-
-msgid "F103 USART2/I2C1/Flash, ES096 Rev15 2.3.9, 2.8.1/2/5 and 2.2.11"
-msgstr "F103 USART2/I2C1/Flash，ES096 Rev15 2.3.9、2.8.1/2/5 和 2.2.11"
-
-msgid "Exclusive TE+RE pads; nominal80kHz I2C with priority-zero service and protected receive windows; control read/barrier before delayed-BSY polling"
-msgstr "TE+RE 引脚独占；标称 80 kHz I2C 使用优先级零服务并保护接收窗口；在轮询延迟置位的 BSY 前先读取控制寄存器并执行屏障"
-
-msgid "Review the complete selected mode, IRQ-mask budget and same-bank Flash stall against the65.536ms TIM2 service interval; no physical bus-clear or RTOS tick catch-up is implied"
-msgstr "对照 65.536 ms 的 TIM2 服务间隔审查完整所选模式、IRQ 屏蔽预算和同 bank Flash 停顿；不由此推定实物总线清理或 RTOS tick 补偿"
-
-msgid "F407 VE/ZG, ES0182 Rev19 Tables1–3"
-msgstr "F407 VE/ZG，ES0182 Rev19 表 1–3"
-
-msgid "Exact source identity and maintained provider contracts are retained in the [F407 reference index](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/references.json)"
-msgstr "精确源码身份和维护中的 provider 合同保留在 [F407 参考索引](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/references.json)中"
-
-msgid "The reference index records applicability, not complete per-mode workarounds; review each selected UART/SPI/I2C/ADC/DMA mode against its actual cut before physical qualification"
-msgstr "参考索引记录适用性，不代表每个模式的规避措施均已完整落实；物理资格验收前，按实际硅修订版审查每个所选 UART/SPI/I2C/ADC/DMA 模式"
-
-msgid "G474RET6 ADC/DMA/I2C/Flash, ES0430 Rev9 2.7.8–11, 2.3.1, 2.4.4, 2.15.1/2 and 2.2.2"
-msgstr "G474RET6 ADC/DMA/I2C/Flash，ES0430 Rev9 2.7.8–11、2.3.1、2.4.4、2.15.1/2 和 2.2.2"
-
-msgid "Selected ADC priming and aperture limits; specific DMA flag ACK; no DMAMUX synchronization fallback; HSI16 I2C; Flash data-cache disable/reset/restore"
-msgstr "所选 ADC 预备转换和采样窗口限制；对特定 DMA 标志进行确认；不回退到 DMAMUX 同步；HSI16 I2C；Flash 数据缓存禁用、复位与恢复"
-
-msgid "The [reference index](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/references.json) and each separate ADC/group/PWM-ADC contract bound the selection; older single-shot restrictions do not describe every later group mode"
-msgstr "[参考索引](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/references.json)和各自独立的 ADC/group/PWM-ADC 合同约束具体选择；早期单次采样限制不能概括后来所有 group 模式"
-
-msgid "H743 reset, ES0392 Rev15 2.2.10 and RM0433 Rev9 6.4.1"
-msgstr "H743 复位，ES0392 Rev15 2.2.10 和 RM0433 Rev9 6.4.1"
-
-msgid "MMIO-only power entry before RAM writes; old-cut AXI READ_ISS_OVERRIDE is checked before stack use"
-msgstr "写 RAM 前仅通过 MMIO 完成电源入口；使用栈前检查旧硅修订版的 AXI READ_ISS_OVERRIDE"
-
-msgid "Actual ARM entry bytes must retain both cut paths; static closure does not establish old-cut SRAM reliability"
-msgstr "实际 ARM 入口字节必须保留两种硅修订版路径；静态闭包不能证明旧硅修订版 SRAM 的可靠性"
-
-msgid "H743 SPI4, ES0392 Rev15 2.22.5/6"
-msgstr "H743 SPI4，ES0392 Rev15 2.22.5/6"
-
-msgid "Disabled-CRC CRCSIZE and the selected final-SCK quiet interval remain in the actual provider"
-msgstr "实际 provider 保留 CRC 禁用时的 CRCSIZE 设置和所选末次 SCK 后静默间隔"
-
-msgid "Preserve each mode's V-cut/trim, clock, FIFO, DMA and Cache restrictions; GPIO route inventory does not qualify a physical endpoint"
-msgstr "保留每个模式对 V 硅修订版、trim、时钟、FIFO、DMA 和 Cache 的限制；GPIO 路线清单不代表实物端点已取得资格"
-
-msgid "H743 Flash, RM0433 Rev9 and ES0392 Rev15 2.1.2"
-msgstr "H743 Flash，RM0433 Rev9 和 ES0392 Rev15 2.1.2"
-
-msgid "V-only, Cache-off cold RAM preparation, actual both-bank drain, private vectors/stack and checked MPU return gate"
-msgstr "仅 V 硅修订版、Cache 关闭时进行冷态 RAM 准备；实际排空两个 bank，使用私有向量和栈，并检查 MPU 返回门"
-
-msgid "Apply the [RAM maintenance exits](h743-flash-ram.md); public-face retention, explicit-operand closure, installed SDK and physical busy-bank behavior are independent observations"
-msgstr "遵循 [RAM 维护退出条件](h743-flash-ram.md)；公共接口保留、显式操作数闭包、安装版 SDK 和实物忙 bank 行为各自需要独立观察"
-
-msgid "U575 USART1, ES0499 Rev12 2.21.1/2"
-msgstr "U575 USART1，ES0499 Rev12 2.21.1/2"
-
-msgid "Finite single-block and chain TX retain DMAT from before UE through whole stop; ordinary/FIFO RX keeps its separate bounded handling"
-msgstr "有限单块和链式 TX 从 UE 置位前直到完整停止始终保留 DMAT；普通/FIFO RX 维持各自有界处理"
-
-msgid "The receive glitch has no software workaround on W/U; a quiet line or external filter is an electrical premise. Chain mode does not qualify general linked lists or RX DMA"
-msgstr "W/U 硅修订版的接收毛刺没有软件规避措施；线路静默或外部滤波属于电气前提。链式模式不代表通用链表或 RX DMA 已取得资格"
-
-msgid "U575 RTC/Stop2, ES0499 Rev12 2.2.1/3/16 and 2.19.3"
-msgstr "U575 RTC/Stop2，ES0499 Rev12 2.2.1/3/16 和 2.19.3"
-
-msgid "Externally prepared LSE/BYPSHAD calendar, repeated complete tuples and retained clock generations"
-msgstr "由外部准备 LSE/BYPSHAD 日历，重复观察完整元组并保留时钟代次"
-
-msgid "Inspect actual cut, PC13 activity, LSE population/drive and retained power; model success cannot establish oscillator continuity or wake accuracy"
-msgstr "检查实际硅修订版、PC13 活动、LSE 装配与驱动及保留电源；模型通过不能证明振荡器连续性或唤醒精度"
-
-msgid "U575 LPTIM1 LPBAM, ES0499 Rev12 2.17.1–3"
-msgstr "U575 LPTIM1 LPBAM，ES0499 Rev12 2.17.1–3"
-
-msgid "One fixed tuple; fresh write-OK proof before DIER withdrawal; selected reset shutdown and RCR0/LSE-to-PCLK premises"
-msgstr "单个固定元组；撤回 DIER 前取得新的写入确认；使用所选复位停机路径，并保留 RCR0 与 LSE 到 PCLK 的前提"
-
-msgid "[The selected contract](u575-lptim1-lpbam.md) excludes a general autonomous scheduler; waveform, residency, retention and current need physical execution"
-msgstr "[所选合同](u575-lptim1-lpbam.md)不包含通用自主调度器；波形、驻留、保留和电流需要实物执行"
-
-msgid "For each changed row, keep the exact source/specification link, affected configuration, production-C failure regression, ARM/link observation and any external station premise in the existing work-package evidence. Missing revision, electrical or instrument inputs remain explicit. Merely including an official header or invoking a vendor workaround does not close those inputs."
-msgstr "每个变更条目都要在既有工作包证据中保留精确源码或规范链接、受影响配置、生产 C 失败回归、ARM/链接观察及外部工站前提。缺失的硅修订版、电气或仪器输入必须明确保留。仅包含官方头文件或调用厂商规避措施，不能补齐这些输入。"
-
-# Fixed-clock admission; exact source and translation independently reviewed.
-msgid "Fixed clock admission"
-msgstr "固定时钟准入"
-
-msgid "The reviewed software-trim gates run in cold preflight. An unexpected adjustment in a gated profile is rejected before the startup transaction writes hardware or acquires resources. Factory calibration remains independent and unchanged; admission does not retune an oscillator. These checks add no work to the normal I/O call path and establish no measured clock accuracy or physical timing qualification."
-msgstr "已审查的软件调整值检查在冷态预检中执行。受检查的配置出现异常调整值时，启动事务会在写硬件或取得资源之前拒绝准入。芯片出厂校准值保持独立且不变；准入过程不会重新调节振荡器。这些检查不会增加正常 I/O 调用路径的工作，也不构成时钟精度实测或物理时序资格。"
-
-msgid "F103 HSI8 and GD303 IRC8 require adjustment 16 in `RCC_CR.HSITRIM` and `RCU_CTL.IRC8MADJ`, respectively. H743's exact-revision-V HSI admission requires `RCC_HSICFGR.HSITRIM=64`; older fixed nominal profiles retain their existing revision-specific boundary. U575's selected MSIS4 range requires `RCC_ICSCR2.MSITRIM1=16`; its separate I2C1 HSI16 gate continues to require `RCC_ICSCR3.HSITRIM=16`. The U575 selection follows the pinned official HAL/CMSIS range-to-trim mapping and reset definitions."
-msgstr "F103 的 HSI8 和 GD303 的 IRC8 分别要求 `RCC_CR.HSITRIM` 与 `RCU_CTL.IRC8MADJ` 的调整值为 16。H743 精确 revision V 的 HSI 准入要求 `RCC_HSICFGR.HSITRIM=64`；更早版本的固定名义配置保留原有的 revision 边界。U575 已选的 MSIS4 档位要求 `RCC_ICSCR2.MSITRIM1=16`；其独立的 I2C1 HSI16 准入检查继续要求 `RCC_ICSCR3.HSITRIM=16`。U575 的选择依据锁定官方 HAL/CMSIS 的档位与调整字段映射及复位定义。"
-
-msgid "F407 HSE8/PLL168, GD470 HXTAL25/PLL200 and G474 HSE24/PLL170 retain their external primary clocks. Their internal-clock admission checks are `RCC_CR.HSITRIM=16`, `RCU_CTL.IRC16MADJ=16` and `RCC_ICSCR.HSITRIM=64`, respectively. They constrain the nominal bootstrap and fallback clocks; G474 also uses HSI16 for the selected I2C1 kernel. The G474 default of 64 follows RM0440 Rev9, section 7.4.2, and the pinned HAL definition; the LL comment stating 16 is stale."
-msgstr "F407 的 HSE8/PLL168、GD470 的 HXTAL25/PLL200 和 G474 的 HSE24/PLL170 继续使用外部主时钟。三者的内部时钟准入检查分别为 `RCC_CR.HSITRIM=16`、`RCU_CTL.IRC16MADJ=16` 和 `RCC_ICSCR.HSITRIM=64`。这些检查约束名义启动与回退时钟；G474 已选的 I2C1 内核也使用 HSI16。G474 的默认值 64 依据 RM0440 Rev9 第 7.4.2 节和锁定的 HAL 定义；LL 注释中的 16 已过时。"
-
-msgid "Cortex-M4F short-ISR constraint"
-msgstr "Cortex-M4F 短 ISR 约束"
-
-msgid "Arm776924 is explicitly listed by F407 ES0182 Rev19 section2.1.2, GD303 device limitations Rev1.4 section2.14.1 and GD470 device limitations Rev1.6 section2.15.1. F407's applicability table marks every listed cut affected. These references must not be extended to a different CPU or chip from its name alone."
-msgstr "F407 ES0182 Rev19 2.1.2 节、GD303 器件限制 Rev1.4 2.14.1 节和 GD470 器件限制 Rev1.6 2.15.1 节均明确列出 Arm776924。F407 适用性表将表内全部硅修订版标为受影响。不得仅凭 CPU 或芯片名称将这些参考结论扩展到其他目标。"
-
-msgid "The failure requires an enabled FPU and lazy context saving, an interrupted `VDIV` or `VSQRT` whose destination is s0–s15, a handler without floating-point instructions, and exception return within fourteen cycles of the interrupted instruction. The manufacturers' sufficient instruction-count workaround is **more than two executed instructions in every ISR, excluding exception return**. External stack-memory wait states are an alternative source condition, not a premise supplied by these internal-SRAM platform profiles."
-msgstr "触发故障需要同时满足：FPU 和延迟上下文保存已启用；目标寄存器为 s0–s15 的 `VDIV` 或 `VSQRT` 被中断；处理程序没有浮点指令；并且在被中断指令之后的十四个周期内发生异常返回。厂商提供的充分指令数规避措施是：**每个 ISR 实际执行超过两条指令，不计异常返回指令**。外部栈内存的等待状态是来源文档给出的另一种条件；本平台采用内部 SRAM 的配置不提供该前提。"
-
-msgid "GD303, GD470 and F407 startup enables CP10/CP11. Their selected FreeRTOS CM4F port explicitly enables ASPEN/LSPEN. An integer-only current workload therefore does not make the platform FPU-disabled or exclude floating-point application code. Do not silently clear LSPEN in startup: the kernel re-enables it and its context/stack ABI requires a separately reviewed decision."
-msgstr "GD303、GD470 和 F407 的启动代码启用 CP10/CP11，其选定 FreeRTOS CM4F 端口明确启用 ASPEN/LSPEN。因此，当前负载仅执行整数指令，并不代表平台关闭了 FPU，也不能排除应用中的浮点代码。不得在启动代码中悄悄清除 LSPEN：内核会再次启用它，而且上下文与栈 ABI 要求对此另作独立审查。"
-
-msgid "Review the actual installed vector table and reachable instruction prefixes in each emitted configuration. A thin `ldr` plus tail branch needs its callee examined; unreachable `nop` alignment and literal-pool words are not executed work. A default nonreturning fault loop is distinct from an empty returning handler. Apply the same rule to external handlers, spurious/disabled-state fast paths, aliases and compiler/LTO changes. Source line counts and nominal clock frequency cannot prove this condition."
-msgstr "审查每份生成配置实际安装的向量表与可达指令前缀。仅有 `ldr` 加尾跳转的薄处理程序还需要检查被调用方；不可达的 `nop` 对齐填充和字面量池数据不属于已执行工作。默认的不返回故障循环与空的可返回处理程序不同。外部处理程序、伪中断或禁用状态的快速路径、别名及编译器/LTO 变更同样适用此规则。源码行数和标称时钟频率不能证明满足这个条件。"
-
-msgid "Selected-image software review belongs with its actual ELF, resolved input, compiler commands and disassembly. It proves only those installed paths, not every declared mode or a connected device result. A new or replacement external ISR that can return within the excluded short prefix remains an open integration condition until its emitted path or another exact workaround is reviewed."
-msgstr "所选镜像的软件审查必须对应其实际 ELF、resolved 输入、编译命令和反汇编。审查只证明这些已安装路径，不证明所有声明模式或已连接设备的结果。新增或替换的外部 ISR 若仍可能沿上述未满足规避条件的短指令路径返回，就继续保留为集成待办，直到审查其实际生成路径或另一项精确规避措施。"
-
-msgid "Production promotion gates"
-msgstr "生产推广门槛"
-
-msgid "The selected F407 `dma-tx` implementation preserves the complete mode, including IRQ RX bytes/events, frame/error/loss ordering, timestamps, wake and storage. HAL owns finite TX DMA, the UART TC completion sequence and transmit abort; the private provider owns their integration with the disjoint LL receiver and Nexus lifetime. The older serialized finite-TX reference remains evaluation evidence for its narrower contract, not the production mode's qualification. Other modes require their own complete evaluation before replacement."
-msgstr "所选 F407 `dma-tx` 实现保留完整模式，包括 IRQ RX byte/event、frame/error/loss 顺序、时间戳、wake 和存储。HAL 拥有有限 TX DMA、UART TC 完成顺序和 TX abort；私有 provider 负责它们与分离的 LL 接收器及 Nexus 生命周期的集成。较早的串行有限 TX reference 仍只为其较窄合同提供评估证据，不是生产模式的资格。其他模式替换前须分别完成完整评估。"
-
-msgid "The serialized reference's `hal_depth` IRQ guard is not an MCU preemption design. Production must establish allowed HAL nesting, short guards, pending-fact handling and real IRQ service ordering. Do not mask all interrupts around vendor calls that may wait. An abort callback can run synchronously in task context; bridges record bounded facts and use notification permitted in the actual context. Product callbacks and final settlement do not run arbitrarily inside vendor callback stacks."
-msgstr "串行参考的 `hal_depth` IRQ guard 不是 MCU 抢占设计。生产实现必须明确允许的 HAL 嵌套、短 guard、pending-fact 处理和真实 IRQ 服务顺序。不得在可能等待的 vendor 调用周围屏蔽全部中断。abort callback 可以在 task 上下文同步执行；桥接记录有界事实，并使用实际上下文允许的通知。产品 callback 和最终结清不能任意在 vendor callback 调用栈内执行。"
-
-msgid "A Handle-only callback does not carry a request epoch. Before Handle reuse, prove withdrawal of the previous hardware, IRQ and callback references; stamping the current epoch onto a late callback is not proof of association. Establish admission before a vendor call can retain references, and treat a startup error after admission as accepted work requiring explicit withdrawal."
-msgstr "仅携带 Handle 的 callback 没有请求 epoch。复用 Handle 前必须证明上一次硬件、IRQ 和 callback 引用已撤离；将当前 epoch 填入迟到 callback 不能证明其关联。在 vendor 调用可能保留引用前建立 admission；admission 后的启动错误属于已接受工作，需要明确撤离。"
-
-msgid "Review every reachable vendor wait, including bootstrap/runtime progression, millisecond quantization, 32-bit tick wrap and low-power suspension. Initial UART work keeps the existing system-clock and OS startup choices. Selected HAL modules do not authorize default SysTick acquisition or interrupt-policy changes. UART/SPI `uint16_t Size` parameters must match the selected public `size_t` contract without truncation, hidden splitting or implicit bounce storage."
-msgstr "审核每条可达 vendor 等待，包括 bootstrap/runtime 推进、毫秒量化、32 位 tick 回绕和低功耗暂停。首批 UART 工作保留既有系统时钟和 OS 启动选择。所选 HAL 模块不授权默认获取 SysTick 或更改中断策略。UART/SPI 的 `uint16_t Size` 参数必须匹配所选公共 `size_t` 合同，不能截断、隐藏分块或隐式提供 bounce 存储。"
-
-msgid "SPI evaluation preserves the whole CS interval, dummy/discard, fixed DMA addresses and counts. GPIO needs one combined set/reset command; selected U5 GPIO commands now use private `HAL_GPIO_WriteMultipleStatePin` with the admitted GPIO source closure. Separate set/reset calls cannot substitute. DMA disable still needs actual readback and withdrawal proof before returning borrowed storage."
-msgstr "SPI 评价保留完整 CS 区间、dummy/discard、固定 DMA 地址及计数。GPIO 需要一条合并的 set/reset 命令；所选 U5 GPIO 命令现通过私有 `HAL_GPIO_WriteMultipleStatePin` 和已准入的 GPIO 源码闭包实现，不能用分开的 set/reset 调用代替。DMA disable 仍需实际 readback 和撤离证明，才能归还借用存储。"
-
-msgid "Inspect each completion stack: F4 SPI DMA may wait for TXE/BSY; H7/U5 EOT hardware close must preserve the selected quiet interval before disabling the shifter. U575 HAL also contains its Device-gated persistent-DMAT workaround. These API fits do not prove callback, deadline or loan withdrawal; review ordinary LL/SPL setters separately from justified command/snapshot exceptions."
-msgstr "逐一检查完成调用栈：F4 SPI DMA 可能等待 TXE/BSY；H7/U5 的 EOT 硬件关闭流程必须先保留所选静默间隔，再禁用移位器。U575 HAL 也已包含由 Device 条件宏控制的 persistent-DMAT workaround。这些 API 的适用点不能证明回调、deadline 或借用引用已排空；应将普通 LL/SPL setter 与有理由保留的命令／快照例外分别审查。"
-
-msgid "Ordered implementation and acceptance"
-msgstr "实施顺序与验收"
-
-msgid "Phase"
-msgstr "阶段"
-
-msgid "Ledger work"
-msgstr "台账工作"
-
-msgid "Exit"
-msgstr "退出条件"
-
-msgid "G0"
-msgstr "G0"
-
-msgid "V-A: exact scope and contract"
-msgstr "V-A：精确范围与合同"
-
-msgid "Every maintained selection has a bounded migration decision and baseline"
-msgstr "每个维护选择具有有界迁移决策和基线"
-
-msgid "G1"
-msgstr "G1"
-
-msgid "V-B/V-C/V-D: dependencies and integration"
-msgstr "V-B/V-C/V-D：依赖与集成"
-
-msgid "Private SDK build, static contexts, resource responsibility, time and IRQ contracts are established"
-msgstr "建立私有 SDK 构建、静态 context、资源责任、时间及 IRQ 合同"
-
-msgid "G2"
-msgstr "G2"
-
-msgid "V-E and first GD32 work"
-msgstr "V-E 与首批 GD32 工作"
-
-msgid "Complete F407 UART behavior and selected GD32 official primitives execute their real regressions"
-msgstr "完整 F407 UART 行为和所选 GD32 官方原语实际执行其回归"
-
-msgid "G3"
-msgstr "G3"
-
-msgid "V-F/V-G/V-H/V-I"
-msgstr "V-F/V-G/V-H/V-I"
-
-msgid "Each applicable peripheral/family has a reviewed implementation and comparable cost; unused replaced production paths are removed"
-msgstr "每个适用外设/家族具有已审查实现和可比较成本；移除已替换且不再使用的生产路径"
-
-msgid "G4"
-msgstr "G4"
-
-msgid "V-J/V-K"
-msgstr "V-J/V-K"
-
-msgid "Test contexts, relocated SDK consumers, external examples and both documentation languages agree"
-msgstr "测试上下文、可重定位 SDK consumer、外部示例和两种文档语言一致"
-
-msgid "G5"
-msgstr "G5"
-
-msgid "V-L"
-msgstr "V-L"
-
-msgid "Clean source P, examples E, dependencies, configuration and original artifacts are associated without inheriting old qualification"
-msgstr "干净源码 P、示例 E、依赖、配置和原始产物关联，不继承旧资格"
-
-msgid "G6"
-msgstr "G6"
-
-msgid "V-P/V-X"
-msgstr "V-P/V-X"
-
-msgid "Connected physical execution and actual external environment/publication exits are observed separately"
-msgstr "分别观测已连接设备的物理执行与真实外部环境/发布退出"
-
-msgid "Keep developer tests focused, execute the ordinary complete-index gate for each functional increment, and run the complete qualification plan for the frozen source. New behavior and fixes require actual RED then GREEN. Pure equivalent refactors use the applicable regressions and output checks without fabricated RED failures. Firmware remains C11; GoogleTest/GoogleMock remains host-only. Preserve original attempts and compare complete providers, not only Handle sizes. Without connected equipment, physical rows remain `not_executed`."
-msgstr "开发测试保持聚焦，每个功能增量执行普通完整 index 门禁，冻结源码执行完整资格计划。新行为与修复要求实际 RED 后 GREEN。纯等价重构使用适用回归和输出检查，不制造 RED 失败。固件保持 C11；GoogleTest/GoogleMock 仅用于 host。保留原始执行，比较完整 provider，不只比较 Handle 大小。未连接设备时，物理记录保持 `not_executed`。"
-
-msgid "Implementation boundary"
-msgstr "实现边界"
-
-msgid "The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at `b6f0ed3829f3829eb358a2e7417d80bba1a42db7`. Its CMSIS Device pairing comes from STM32CubeF4 v1.28.3. The machine authority is [the official-driver lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json), checked against the selected Git dependency and imported SDK bytes. The selected API is `stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`. Its 28-file closure retains the earlier LL/ETH definitions and license, and adds the reviewed HAL headers plus UART, DMA and RCC C units. GPIO/Flash declarations are required by RCC compilation; their C implementations, PWR and global `stm32f4xx_hal.c` are not selected. This lock is not a declaration that all HAL modules are supported or validated."
-msgstr "已审查的 F4 依赖是 STM32 HAL Driver v1.8.5，提交为 `b6f0ed3829f3829eb358a2e7417d80bba1a42db7`。其 CMSIS Device 配对来自 STM32CubeF4 v1.28.3。机器权威是[官方驱动 lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32f4-hal.lock.json)，对照所选 Git 依赖和导入 SDK 字节校验。所选 API 为 `stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx`。其 28 文件闭包保留原 LL/ETH 定义和许可证，并增加已审查 HAL 头文件及 UART、DMA、RCC C 单元。RCC 编译需要 GPIO/Flash 声明；不选入其 C 实现、PWR 或全局 `stm32f4xx_hal.c`。这个 lock 不声明所有 HAL 模块均受支持或已验证。"
-
-# CMSIS6 actual-POT delta; independent review pending.
-msgid "CMSIS Device pairing is separate from the shared Arm CMSIS-Core source. The Core migration pins official v6.4.0 for the seven maintained STM32/GD32 family entries while keeping their Device/startup, HAL/LL and imported vendor bytes. The internal `nexus_cmsis_core` target supplies CPU headers; it does not change public Nexus types, Arch context/ownership contracts or the selected peripheral state machine. [Vendor versions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md) distinguishes the release, Core version macros, literal pack metadata and license identities. Actual include closure, firmware links and installed-SDK consumption require current-source evidence; a common Core pin does not transfer F4 qualification to G4, H7, U5 or GD32."
-msgstr "CMSIS Device 配对与共享的 Arm CMSIS-Core 来源分别维护。Core 迁移为七个维护中的 STM32/GD32 family 入口锁定官方 v6.4.0，同时保持各自的 Device/startup、HAL/LL 和供应商导入字节。内部 `nexus_cmsis_core` 目标提供 CPU 头，不改变公共 Nexus 类型、Arch 上下文／所有权合同或已选外设状态机。[供应商版本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/vendors/VERSIONS.md)分别记录发布版本、Core 版本宏、原始 pack 元数据和许可证身份。实际 include 闭包、固件链接和安装后 SDK 消费都需要当前源码的执行证据；使用同一 Core pin 不会把 F4 的资格转移给 G4、H7、U5 或 GD32。"
-
-msgid "The earlier development overlay added H743 `hal_driver_h7` to the family descriptor and SoC source-lock projection, matching its existing pinned LL build input. Private capture, advanced-PWM and UART-FIFO templates retain specialization contracts; pin-state has optional implementation/default-macro scoping, while CAN FD remains an ordinary guarded declaration. Separate U575 SPI byte ports now take the selected controller and directly call private LL functions, with no runtime forwarding. These changes do not rewrite the frozen source review."
-msgstr "此前的开发 overlay 已在 H743 family descriptor 与 SoC source-lock 投影中加入 `hal_driver_h7`，与既有已锁定 LL 构建输入一致。私有 capture、advanced-PWM 与 UART-FIFO 模板继续遵守各自的 specialization 合同；pin-state 提供可选 implementation 与默认宏作用域，而 CAN FD 仍是普通的、有 include guard 保护的声明。独立的 U575 SPI byte port 现在接收所选 controller 并直接调用私有 LL 函数，没有运行时转发。这些改动不重写已冻结源码审查的结论。"
-
-msgid "Bounded official-operation increments"
-msgstr "有界官方操作增量"
-
-#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:218
-msgid ""
-"The current development source uses locked LL setters for U575 PWM "
-"PSC/ARR/CNT/CCR1, word RDR/TDR operations carrying UART byte values, UART "
-"TC-only clears, and RTC write-protection keys and Alarm A clear commands. "
-"Existing barriers, exact readbacks, IRQ/error order, clock admission, "
-"timed phases and loan withdrawal remain in the same providers. H743 SPI "
-"polling and DMA cleanup use controller-valued LL byte ports; masked "
-"CSTART/CSUSP, quiet tail, Cache ownership and DMA/IRQ joins remain "
-"unchanged."
-msgstr ""
-"当前开发源码对 U575 PWM 的 PSC/ARR/CNT/CCR1 使用已锁定 LL setter，对 UART RDR/TDR "
-"使用承载字节值的字访问，并对 UART TC 单独清除、RTC 写保护密钥和 Alarm A 清除命令使用已锁定 LL 操作。既有屏障、精确 "
-"readback、IRQ／错误顺序、时钟准入、定时阶段和借用撤离仍由原 provider 负责。H743 SPI 轮询及 DMA 清理使用接收 "
-"controller 的 LL byte port；CSTART／CSUSP 的掩码处理、quiet tail、Cache 所有权及 DMA／IRQ"
-" join 保持不变。"
-
-msgid "U575 GPIO now sends four existing command sites through the actual HAL GPIO C unit: public write, initialization preload, stop and serial TX idle. Its private 15-file lock admits that unit and required headers; no HAL initialization or tick is invoked. Disjoint authorized masks remain one BSRR command, and empty public writes retain success without invoking HAL's nonempty-mask assertion."
-msgstr "U575 GPIO 现将四个既有命令位置交给实际 HAL GPIO C 单元：公共 write、初始化预装载、stop 和串口 TX 空闲电平。其私有 15 文件锁准入该单元及必需头文件；不会调用 HAL 初始化或 tick。已授权且不相交的掩码仍由一条 BSRR 命令处理；公共空掩码 write 仍返回成功，并避免调用 HAL 的非空掩码断言。"
-
-msgid "H743 USART3 IRQ-byte RDR/TDR access uses locked LL word operations, including the IRQ-byte companions of selected DMA modes. The provider retains saved-status ordering, RX error/loss, TC completion and complete withdrawal. U575 watchdog key, configuration and refresh commands use the locked LL IWDG header, including watchdog-only assemblies without a GPIO source. Irreversible ownership precedes activation; synchronization, exact readback, failed-update bounds and recovery responsibility remain in the same C provider."
-msgstr "H743 USART3 的 IRQ-byte RDR/TDR 访问使用锁定的 LL 字操作，也包括选定 DMA 模式的 IRQ-byte 配套路径。provider 保留已保存状态的处理顺序、RX 错误／丢失、TC 完成和完整撤回。U575 看门狗的密钥、配置和刷新命令使用锁定的 LL IWDG 头，也适用于不引入 GPIO 源文件的 watchdog-only 装配。不可撤销的所有权先于激活记录；同步、精确读回、更新失败后的边界和恢复责任仍由同一 C provider 维护。"
-
-#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:239
-msgid ""
-"Review the selected target and its private include graph, not only the C "
-"file that exports an ops table. Every H743 UART selection compiles shared "
-"`uart.c`, so its byte IRQ changes also require review in DMA/FIFO "
-"compositions; that does not convert the separate data engines. The private"
-" I2C port headers bind the shared V1/V2 algorithms to the selected locked "
-"LL operations and belong in the current source review even when a frozen "
-"file inventory predates those headers."
-msgstr ""
-"评审所选构建目标及其私有 include 图，而不只评审导出 ops 表的 C 文件。每个 H743 UART 选择都会编译共享的 "
-"`uart.c`，因此，其字节 IRQ 变化在 DMA／FIFO 组合中也需要评审；这并不意味着独立的数据引擎已转换。私有 I2C port "
-"头文件将共享 V1／V2 算法绑定到所选的已锁定 LL 操作；即使冻结的文件清单形成于这些头文件之前，当前源码评审也需要包含它们。"
-
-#: ../../../../workspace/nexus/docs/design/official-stm32-provider.md:246
-msgid ""
-"Keep three decisions separate for each mode: the selected hardware owner, "
-"the exact ordinary operations already delegated to official code, and the "
-"remaining command/snapshot exceptions or leaf candidates. A preserved IRQ "
-"snapshot, atomic mask or quiet interval does not justify unrelated "
-"handwritten configuration. Source review and unchanged file hashes do not "
-"replace the current compiler, model, installed-SDK, resource or physical "
-"evidence."
-msgstr ""
-"对每个模式，分别判断三件事：所选硬件 owner、已委托给官方代码的精确常规操作，以及剩余的命令／快照例外或叶操作候选。保留 IRQ "
-"快照、原子掩码或静默间隔，并不能成为无关手写配置的理由。源码评审和未变化的文件哈希，不能替代当前的编译器验证、模型、已安装 SDK、资源或物理证据。"
-
-msgid "GD32F470 CAN and Ethernet verify 20 and 25 reviewed SDK register offsets in isolated C11 compile-contract units. Each includes the real SDK before locally expanding register macros as integer addresses. Runtime providers retain their mask and IRQ checks and ordinary SDK register access. The contract units emit no firmware code or data; no compiler-specific constant folding or scanner exception is needed. Raw and enhanced Ethernet select the same MAC/DMA/VLAN/PTP offset contract. Source compilation, linked-image costs and physical behavior remain separate verification scopes."
-msgstr "GD32F470 CAN 和 Ethernet 在独立 C11 编译合同单元中核对 20 项和 25 项已复核的 SDK 寄存器偏移。每个单元先包含真实 SDK，再仅在本文件内将寄存器宏展开为整数地址。运行时 provider 保留位掩码、IRQ 检查和普通 SDK 寄存器访问。这些合同单元不生成固件代码或数据，无需编译器特定常量折叠或扫描器例外。Raw 与 enhanced Ethernet 选择同一份 MAC/DMA/VLAN/PTP 偏移合同。源码编译、链接镜像成本和物理行为仍属于分别执行的验证范围。"
-
-msgid "Five SoC-private compile-time I2C ports bind F103/F407 receive and G474/H743/U575 receive/transmit to locked LL operations in the existing shared engines. They add no runtime forwarder, vendor Handle, state or generated hardware algorithm. Factory faces, public ABI, lifecycle and mode selection are unchanged. Actual old-GREEN baselines and real-default probes remain development evidence; final clean-source gates, complete SDK consumption and qualification are pending."
-msgstr "五个 SoC 私有的编译期 I2C port 在既有共享引擎中，将 F103/F407 receive 及 G474/H743/U575 receive/transmit 绑定到已锁定 LL 操作。它们不增加运行时转发层、vendor Handle、状态或生成的硬件算法。factory face、公共 ABI、生命周期和模式选择不变。实际 old-GREEN 基线及真实默认操作探针仍属于开发证据；最终 clean-source 门禁、完整 SDK 消费和资格尚待完成。"
-
-msgid "F407 uses official LL operations inside its existing provider state machines, with one selected HAL transport for UART `dma-tx`. That transport retains request admission, absolute deadlines, wire completion, cancellation, drain and quarantine. It does not replace F407 IRQ-word, IRQ-block, RX-DMA or duplex providers. G4, H7 and U5 do not inherit F4 support or dependency qualification. GD32 remains a separate provider."
-msgstr "F407 在既有 provider 状态机内部使用官方 LL 操作，并为 UART `dma-tx` 选择一个 HAL transport。该 transport 保留请求准入、绝对 deadline、线上完成、取消、drain 和 quarantine。它不替换 F407 IRQ-word、IRQ-block、RX-DMA 或 duplex provider。G4、H7 和 U5 不继承 F4 支持或依赖资格。GD32 仍是独立 provider。"
-
+#: docs/design/official-stm32-provider.md:0
 msgid "Owner"
 msgstr "责任方"
 
+#: docs/design/official-stm32-provider.md:0
 msgid "Responsibility"
 msgstr "责任"
 
-msgid "Official HAL/LL/CMSIS"
-msgstr "官方 HAL/LL/CMSIS"
+#: docs/design/official-stm32-provider.md:0
+msgid "Official HAL/LL"
+msgstr "官方 HAL/LL"
 
-msgid "Reviewed hardware operations and selected vendor algorithms"
-msgstr "已审查的硬件操作与所选厂商算法"
+#: docs/design/official-stm32-provider.md:0
+msgid "Selected hardware operations and peripheral state handling"
+msgstr "所选硬件操作与外设状态处理"
 
-msgid "Family provider"
-msgstr "家族 provider"
+#: docs/design/official-stm32-provider.md:0
+msgid "F4 C implementation"
+msgstr "F4 C 实现"
 
-msgid "Exact peripheral behavior, private state, IRQ and error bridge"
-msgstr "精确外设行为、私有状态、IRQ 与错误桥接"
+#: docs/design/official-stm32-provider.md:0
+msgid ""
+"Resource admission, static binding, deadlines, borrows, callbacks, drain and "
+"lifecycle"
+msgstr "资源接纳、静态绑定、deadline、借用、回调、排空和生命周期"
 
-msgid "Common I/O"
+#: docs/design/official-stm32-provider.md:0
+msgid "F4 facts"
+msgstr "F4 事实"
+
+#: docs/design/official-stm32-provider.md:0
+msgid "Exact part, device macro, memory, startup, IRQ/DMA and reviewed routes"
+msgstr "精确料号、设备宏、内存、启动、IRQ/DMA 与经审阅的路线"
+
+#: docs/design/official-stm32-provider.md:0
+msgid "Board"
+msgstr "Board"
+
+#: docs/design/official-stm32-provider.md:0
+msgid "Actual wiring, oscillators, initial levels and electrical conditions"
+msgstr "实际接线、晶振、初始电平与电气条件"
+
+#: docs/design/official-stm32-provider.md:0
+msgid "Public I/O"
 msgstr "公共 I/O"
 
-msgid ""
-"Admission, public results, borrowed storage and final publication contracts"
-msgstr "准入、公共结果、借用存储与最终发布合同"
+#: docs/design/official-stm32-provider.md:0
+msgid "Stable Nexus types, checked dispatch and hardware-independent contracts"
+msgstr "稳定的 Nexus 类型、经检查的分派与硬件无关合同"
 
-msgid "Generated Platform"
-msgstr "生成的 Platform"
-
-msgid "Static context/face construction and explicit C-call ordering for resource acquisition, startup and reverse cleanup"
-msgstr "静态 context/face 构造，以及资源取得、启动和逆序清理的显式 C 调用编排"
-
+#: docs/design/official-stm32-provider.md:0
 msgid "External product"
 msgstr "外部产品"
 
-msgid "Execution progress, workers, budgets, partitions and recovery policy"
-msgstr "执行进度、工作者、预算、分区与恢复策略"
+#: docs/design/official-stm32-provider.md:0
+msgid "Tasks, execution progress, private regions and recovery policy"
+msgstr "任务、执行推进、私有区域与恢复策略"
 
+#: docs/design/official-stm32-provider.md:27
 msgid ""
-"Only one state machine may own a live peripheral operation. An adapter must "
-"not run a HAL transfer engine and a second independent register engine over "
-"the same interrupt flags or DMA channel. Mixed LL/register operations "
-"require explicit ordering and ownership. Vendor types, mutable handles and "
-"headers stay out of public interfaces. Factory lookup returns an existing "
-"face without initializing hardware or allocating storage."
+"One live hardware behavior domain has one transport owner. HAL and a private "
+"state machine must not independently drive the same transfer, DMA or "
+"interrupt sources. A hybrid mode needs explicit ownership boundaries, not two"
+" competing executors. Direct access requires a specific SDK gap, erratum, "
+"atomic ordering contract or demonstrated resource budget."
 msgstr ""
-"一个正在进行的外设操作只能由一个状态机拥有。适配器不得让 HAL 传输引擎与另一套独立寄存器引擎同时处理相同中断标志或 DMA 通道。混合 "
-"LL/寄存器操作必须明确顺序与所有权。厂商类型、可变 Handle 和头文件不得进入公共接口。factory 查找返回已有 "
-"face，不初始化硬件或分配存储。"
+"一个活动硬件行为域只有一个传输所有者。HAL 与私有状态机不得独立驱动同一传输、DMA "
+"或中断源。混合模式需要明确所有权边界，不能有两个竞争执行器。直接访问必须有明确的 SDK 缺口、勘误、原子顺序合同或经证实的资源预算依据。"
 
-msgid "Selected F407 HAL UART transport"
-msgstr "所选 F407 HAL UART transport"
-
-msgid "The same authored `dma-tx` mode selects a static private owner, immutable cold configuration, one `UART_HandleTypeDef`, one `DMA_HandleTypeDef` and a shared readonly Nexus ops table. The factory still returns the existing Nexus face; neither vendor types nor callback registration become a public interface. The private callback ABI sets `USE_HAL_UART_REGISTER_CALLBACKS=1` consistently for the adapter and selected official C units. TX completion/error/transmit-abort/MSP and TX half-transfer callbacks are explicitly bound per Handle, without a global product callback override or runtime controller registry."
-msgstr "同一个用户编写的 `dma-tx` 模式选择静态私有 owner、不可变冷态配置、一个 `UART_HandleTypeDef`、一个 `DMA_HandleTypeDef` 和共享 readonly Nexus ops 表。factory 仍返回既有 Nexus face；vendor 类型和 callback 注册都不成为公共接口。私有 callback ABI 在 adapter 和所选官方 C 单元中一致设置 `USE_HAL_UART_REGISTER_CALLBACKS=1`。TX completion/error/transmit-abort/MSP 及 TX half-transfer callback 逐 Handle 显式绑定，不提供全局产品 callback 覆盖或运行时控制器 registry。"
-
-msgid "One provider owns both UART behavior domains. The LL receiver consumes RX status/data once, then temporarily masks RXNE/parity/error enables while `HAL_UART_IRQHandler` observes TX facts. HAL receive state remains idle, RX buffer/size/count and `hdmarx` remain empty, and DMAR stays clear. This prevents HAL error/abort paths from claiming the IRQ receiver. An unexpected receive domain or Handle/route identity change closes admission and retains quarantine; it does not adopt or abort a foreign DMA owner."
-msgstr "一个 provider 拥有 UART 的两个行为域。LL 接收器只消费一次 RX status/data，随后在 `HAL_UART_IRQHandler` 观察 TX 事实期间暂时屏蔽 RXNE/parity/error enable。HAL receive state 保持 idle，RX buffer/size/count 与 `hdmarx` 保持空，DMAR 保持清零。这样 HAL error/abort 路径不会认领 IRQ 接收器。意外的接收域或 Handle/route 身份变化会关闭准入并保留 quarantine；它不会接管或 abort 其他 DMA owner。"
-
-msgid "Admission establishes the request and payload borrow before a HAL call can retain them or invoke a synchronous callback. Callbacks latch bounded facts; task service alone withdraws transfer pointers and publishes final settlement. DMA completion still differs from UART TC and from full reference withdrawal. Cancel, timeout and deinitialization failures retain the request or cold lease until the same owner proves actual drain. Stop checks peripheral enables, DMA addresses/counts and pending/active IRQ references before releasing pins or clocks. A Handle is reused only after this withdrawal; official `HAL_DMA_Init` restores the reusable idle state where required, without assigning READY by hand."
-msgstr "准入在 HAL 调用可能保留引用或同步 callback 之前建立 request 和 payload 借用。callback 锁存有界事实；只有 task service 才撤回传输指针并发布最终 settlement。DMA 完成仍不同于 UART TC，也不同于全部引用撤回。取消、timeout 和 deinitialization 失败保留 request 或冷态 lease，直到同一个 owner 证明实际 drain。stop 在释放引脚或时钟前检查外设 enable、DMA 地址/计数及 pending/active IRQ 引用。只有这次撤回之后才能复用 Handle；需要时由官方 `HAL_DMA_Init` 恢复可复用 idle state，不手动赋值 READY。"
-
-msgid "The production IRQ gate saves the incoming CPU mask for short state changes. If a relevant UART/DMA IRQ preempts a task HAL call, it disables only that selected vector, leaves its hardware fact pending and restores the vector when the retained HAL stack exits. It does not spin or let a level IRQ tail-chain indefinitely inside that task call. Every `HAL_DMA_IRQHandler` entry requires EN readback clear, including an IRQ with only HT or no observed error: an error can arrive after a flag snapshot. While EN remains set, an HT-only event is acknowledged and HTIE disabled with official primitives; its registered private no-op callback is not invoked and no transfer state advances. Observed errors or inconsistent terminal facts withdraw DMAT and request disable once. Refused disable masks that DMA vector and quarantines the borrow; task service retries and dispatches HAL only after EN is clear. This excludes the pinned handler's `SystemCoreClock/9600` wait (17,500 iterations at 168 MHz) from the selected IRQ path. This is a bounded-path design, not measured interrupt latency or WCET."
-msgstr "生产 IRQ gate 为短状态变更保存调用前 CPU mask。相关 UART/DMA IRQ 抢占 task HAL 调用时，只禁用该选定 vector，保留其硬件 pending 事实，并在保留的 HAL 调用栈退出后恢复 vector。它不会自旋，也不会让 level IRQ 在该 task 调用中无限 tail-chain。每次进入 `HAL_DMA_IRQHandler` 都要求 EN 回读清零，包括只有 HT 或未观察到错误的 IRQ：错误可能在 flag 快照之后到达。EN 仍为置位时，只有 HT 的事件通过官方原语确认并禁用 HTIE；不调用已注册的私有 no-op callback，也不推进传输状态。观察到错误或不一致终态事实时，撤回 DMAT 并请求 disable 一次。disable 拒绝则屏蔽该 DMA vector 并 quarantine 借用；task service 重试，并仅在 EN 清零后分派 HAL。这样所选 IRQ 路径不会执行所锁定 handler 的 `SystemCoreClock/9600` 等待（168 MHz 时为 17,500 次迭代）。这是有界路径设计，不是已测中断延迟或 WCET。"
-
-msgid "The target-private compile profile replaces CMSIS exclusive-retry RMW macros with one saved-mask word update. This profile requires a single CPU owner of the aligned UART control words and no NMI, fault/panic logger or other writer. It preserves the incoming mask and leaves vendor source unchanged. The same profile uses nearest OVER16 BRR rounding with overflow-safe quotient/remainder; cold validation rejects zero baud or an out-of-field divisor before UART enable. It does not grant dynamic clock or arbitrary format support."
-msgstr "目标私有编译 profile 将 CMSIS exclusive-retry RMW 宏替换为一次保存 mask 的 word 更新。此 profile 要求对齐的 UART 控制 word 只有一个 CPU owner，且没有 NMI、fault/panic logger 或其他 writer。它保留调用前 mask，不修改 vendor 源码。同一 profile 使用最接近的 OVER16 BRR 舍入，以不会溢出的商/余数计算；冷态校验在 UART enable 之前拒绝零 baud 或超出字段范围的 divisor。它不授予动态时钟或任意格式支持。"
-
-msgid "Only the selected HAL UART/DMA/RCC source units enter the provider's private build. `HAL_Init`, `HAL_InitTick` and a HAL SysTick handler are not selected. `HAL_GetTick` reads `uint32_t` milliseconds modulo `2^32` from the existing live TIM2 epoch; bootstrap retains its separate finite polling limits. `SystemCoreClock` follows the last confirmed 16 MHz HSI or 168 MHz PLL observation, including partial startup and cleanup failures. Official RCC frequency getters use the selected prescaler tables rather than a fabricated constant clock."
-msgstr "只有所选 HAL UART/DMA/RCC 源单元进入 provider 私有构建。不选入 `HAL_Init`、`HAL_InitTick` 或 HAL SysTick handler。`HAL_GetTick` 从既有活动 TIM2 epoch 读取以 `uint32_t` 按 `2^32` 回绕的毫秒数；bootstrap 保留独立的有限轮询上限。`SystemCoreClock` 跟随最后确认的 16 MHz HSI 或 168 MHz PLL 观测，包括部分 startup 和 cleanup 失败。官方 RCC frequency getter 使用所选 prescaler 表，而不是虚构常量时钟。"
-
-msgid "The actual adapter/official-source model and clock tests establish their recorded software scope. Generated factory execution, selected ARM/SDK links, stack/cycle comparisons and the complete current-source gate remain separate exits. Physical IRQ latency, wire timing and long-load HIL are not executed without connected equipment. Do not infer a resource improvement from vendor reuse or a passing model."
-msgstr "实际 adapter/官方源码模型和时钟测试建立其已记录的软件范围。生成 factory 的执行、所选 ARM/SDK 链接、栈/周期比较及完整当前源码 gate 仍是分别验收的退出条件。没有连接设备时，不执行物理 IRQ latency、wire timing 和长期负载 HIL。不能从复用 vendor 代码或模型通过推断资源改善。"
-
-msgid "A paired development ARM firmware measurement uses the same F407ZG baremetal `uart_rx_compact_assembly/f407-dma-tx.toml`, UART workload and `NX_UART_ID_UART1`, GCC 14.3 M4F hard-float, `-Os`, no LTO and compiler cache off. Both builds add measurement-only `-ffile-prefix-map=<each-source-root>=.` so different absolute source-root spellings in retained `__FILE__` diagnostics do not bias Flash cost. Their resolved configuration bytes are identical. The normalized pair is:"
-msgstr "成对的开发 ARM 固件测量使用同一个 F407ZG 裸机 `uart_rx_compact_assembly/f407-dma-tx.toml`、UART workload 和 `NX_UART_ID_UART1`，以及 GCC 14.3 M4F hard-float、`-Os`、无 LTO、关闭编译缓存。两个构建都增加仅用于测量的 `-ffile-prefix-map=<each-source-root>=.`，避免保留的 `__FILE__` 诊断中不同绝对源码根路径的拼写影响 Flash 成本。二者解析配置字节相同。归一化成对结果如下："
-
-msgid "Measurement (bytes)"
-msgstr "测量项（字节）"
-
-msgid "Old LL (`9c0460b9`)"
-msgstr "旧 LL（`9c0460b9`）"
-
-msgid "Selected HAL"
-msgstr "所选 HAL"
-
-msgid "Change"
-msgstr "变化"
-
-msgid "Flash LOAD / footprint"
-msgstr "Flash LOAD / footprint"
-
-msgid "12,592"
-msgstr "12,592"
-
-msgid "18,188"
-msgstr "18,188"
-
-msgid "+5,596"
-msgstr "+5,596"
-
-msgid "Static RAM"
-msgstr "静态 RAM"
-
-msgid "248"
-msgstr "248"
-
-msgid "456"
-msgstr "456"
-
-msgid "+208"
-msgstr "+208"
-
-msgid "MSP reservation"
-msgstr "MSP 预留"
-
-msgid "2,048"
-msgstr "2,048"
-
-msgid "0"
-msgstr "0"
-
-msgid "Libc heap reservation"
-msgstr "Libc heap 预留"
-
-msgid "The ordinary new build without that measurement-only option loads 18,200 Flash bytes and uses 456 static RAM bytes. Both the ordinary build and normalized pair fit this fixture's 64 KiB Flash and 32 KiB static RAM budgets; MSP remains a separate 2,048-byte reservation and heap remains zero. This compares the complete increment, including clock metadata and shared RX changes, not isolated HAL overhead. The engineering decision favors reviewed official finite-TX reuse for this F407 mode at the explicit cost; it is not a memory/performance win or a mandate to use HAL for every family."
-msgstr "不带该测量专用选项的普通新构建加载 18,200 字节 Flash，使用 456 字节静态 RAM。普通构建和归一化成对构建均满足此夹具的 64 KiB Flash 和 32 KiB 静态 RAM 预算；MSP 仍单独预留 2,048 字节，heap 仍为零。这里比较的是包括时钟元数据和共享 RX 变化的完整增量，不是单独 HAL 开销。工程决策是在明确成本下，为此 F407 模式优先复用已审查官方有限 TX；这不是内存/性能优势，也不要求每个系列都使用 HAL。"
-
-msgid "The observed final ordinary ELF retains no `HAL_Init`, `HAL_InitTick`, `HAL_IncTick`, `HAL_RCC_ClockConfig` or `HAL_RCC_OscConfig`, and contains no exclusive instructions. These are observations of this image, not all possible callers. Stack high-water, execution cycles and physical behavior remain unmeasured. Final-source or other-configuration costs require their own ELF/map/resources."
-msgstr "所观测最终普通 ELF 不保留 `HAL_Init`、`HAL_InitTick`、`HAL_IncTick`、`HAL_RCC_ClockConfig` 或 `HAL_RCC_OscConfig`，也没有 exclusive 指令。这些只描述该镜像，不适用于所有可能调用者。栈 high-water、执行周期和物理行为仍未测量。最终源码或其他配置的成本须分别取得 ELF/map/resources。"
-
+#: docs/design/official-stm32-provider.md:33
 msgid "Build-time provider contract"
 msgstr "构建期 provider 合同"
 
-msgid "Each constructor returns the frozen `Construction` record from [provider common contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/common.py). It names `state_type`, `definitions`, `initialize`, `stop`, `retain_on_failed_init`, `exports` and `pin_snapshots`. The common emitter consumes these decisions rather than reconstructing state types or failed-init responsibility from a family name. `initialize` is an immutable `DirectCall`; `stop` is a tuple of these calls. Arguments are explicit static `Symbol` or `Address` values, uint32 constants, booleans, NULL, or nested direct calls such as absolute-deadline construction. Free-form expressions, casts, assignments and function-pointer/member-call expressions reject. `definitions`, `exports` and `face_definitions` remain C source strings for declarations, static configuration, storage, faces and fixed forwarding. Concrete C adapters own hardware algorithms. The real C compiler establishes symbol and parameter types. This is a narrow Python generation contract, not a complete C AST; these Python records introduce no additional runtime metadata or dispatch into the MCU image."
-msgstr "每个 constructor 从 [provider 公共合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/common.py)返回冻结的 `Construction` record。它列出 `state_type`、`definitions`、`initialize`、`stop`、`retain_on_failed_init`、`exports` 与 `pin_snapshots`。公共 emitter 消费这些决策，不从 family 名称重建状态类型或 failed-init 责任。`initialize` 是不可变 `DirectCall`；`stop` 是此类调用的 tuple。参数为显式静态 `Symbol` 或 `Address` 值、uint32 常量、boolean、NULL，或绝对 deadline 构造等嵌套直接调用。拒绝自由表达式、cast、assignment 和 function-pointer/member-call expression。`definitions`、`exports` 与 `face_definitions` 仍以 C 源码字符串承载声明、静态配置、存储、face 与固定转发。具体 C adapter 拥有硬件算法。实际 C 编译器确定符号和参数类型。这是窄 Python 生成合同，不是完整 C AST；这些 Python record 不向 MCU 镜像引入额外运行时 metadata 或 dispatch。"
-
+#: docs/design/official-stm32-provider.md:35
 msgid ""
-"The family owns numerical limits, supported modes, exact routes and "
-"construction semantics. The resolver owns strict fields, immutable inputs "
-"and resource conflicts. CMake owns source selection and target dependencies."
-" Preserve these separate authorities: generation must not create a second "
-"source build graph, and a syntactically valid configuration must not imply "
-"unimplemented hardware."
+"One schema-2 TOML selects a complete assembly. Reviewed JSON facts resolve "
+"into immutable named IR; the generator creates exact storage, configuration, "
+"interface faces, typed factory identities and fixed connections. CMake owns "
+"the actual source and link graph. Do not duplicate source lists in a "
+"manifest."
 msgstr ""
-"家族负责数值限制、支持模式、精确路线与构造语义；resolver 负责严格字段、不可变输入和资源冲突；CMake "
-"负责源码选择和目标依赖。必须保留这些独立权威：生成器不得创建第二份源码构建图，配置语法正确也不能表示尚未实现的硬件已经可用。"
+"一个 schema-2 TOML 选择完整 assembly。经审阅的 JSON 事实解析为不可变具名 IR；生成器创建精确存储、配置、接口面、类型化 "
+"factory 身份与固定连接。CMake 负责真实的源码及链接图。不得在 manifest 中重复维护源码列表。"
 
-msgid "Selected immutable I2C V2 configuration"
-msgstr "选定 I2C V2 的不可变配置"
-
-msgid "The selected G474, H743 and U575 polling I2C V2 providers separate the private `nx_i2c_v2_config_t` from `nx_i2c_v2_state_t`. The generated readonly configuration holds register/reset addresses, the reset mask, timing, finite polling budget and the explicitly selected BERR and one-byte RX reload quirks. Zero-initialized runtime storage keeps a configuration pointer and `initialized`, `retained`, `active` and `fault` state. Public faces, shared ops and factory lookup stay the same. This split is not a measured Flash or RAM saving."
-msgstr "选定 G474、H743 与 U575 轮询 I2C V2 provider 将私有 `nx_i2c_v2_config_t` 与 `nx_i2c_v2_state_t` 分开。生成的只读配置保存寄存器／复位地址、复位掩码、timing、有限轮询预算，以及显式选择的 BERR 和单字节 RX reload 勘误选项。零初始化的运行时存储保留配置指针和 `initialized`、`retained`、`active`、`fault` 状态。公共 face、共享 ops 和 factory 查找保持不变。该拆分不等于已经测得 Flash 或 RAM 节省。"
-
-msgid "The private `nx_i2c_v2_bind` runs under the serialized privileged task owner with interrupts unmasked. It validates the configuration and rejects overlap with runtime or hardware storage. An initialized, retained or active owner rejects rebinding without mutation; successful binding itself has no hardware effects. The immutable configuration must live as long as its runtime owner; successful stop releases hardware ownership but preserves the binding. Do not reset a live owner merely to replace its configuration."
-msgstr "私有 `nx_i2c_v2_bind` 在串行化的特权 Task owner 下执行，且要求中断未屏蔽。它校验配置，并拒绝与运行时或硬件存储重叠。已 initialized、retained 或 active 的 owner 在不修改状态的前提下拒绝重新绑定；成功绑定本身没有硬件效果。不可变配置必须与运行时 owner 同寿命；成功 stop 释放硬件所有权，但保留绑定。不得只为替换配置而重置仍在使用的 owner。"
-
-msgid "Concrete G474/H743 `i2c_prepare` entries bind first, then prepare pins and initialize the engine. U575's separate mutable clock owner rejects a retained clock before binding, and acquires the selected clock before engine initialization. Its `i2c_close` stops the engine first; it releases the clock only after that stop succeeds. Failed drain retains the relevant runtime and clock responsibility for explicit cleanup or retry."
-msgstr "具体 G474／H743 `i2c_prepare` 入口先绑定，再准备引脚并初始化引擎。U575 独立的可变 clock owner 在绑定前拒绝 retained clock，并在引擎初始化前取得所选时钟。其 `i2c_close` 先停止引擎；只有该 stop 成功后才释放时钟。排空失败保留相关运行时与时钟责任，供显式清理或重试。"
-
-msgid "The family emitter now supplies static configuration and calls these concrete C entries. The existing `Construction` record and generated Platform still order C calls for resource phases, controller starts and reverse cleanup. Other maintained peripheral modes use their own family static bindings and concrete C preparation; this does not move every platform lifecycle into a new common abstraction."
-msgstr "family emitter 现在提供静态配置并调用这些具体 C 入口。现有 `Construction` record 与生成的 Platform 仍对资源阶段、controller 启动和逆序清理的 C 调用进行编排。其他维护的外设模式采用各自 family 静态绑定与具体 C preparation；这不把所有平台生命周期迁入新的公共抽象。"
-
-msgid "See the [private shared contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h) and the [U575 integration](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c) for exact parameters and failure ordering. The {download}`refactor ledger <soc-ip-layout-execution.csv>` separates focused software evidence, final linked cost comparison and physical execution."
-msgstr "精确参数与失败顺序见[私有共享合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/i2c/i2c_v2/i2c_v2.h)及 [U575 集成](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/i2c.c)。{download}`重构台账 <soc-ip-layout-execution.csv>`分别记录聚焦软件证据、最终链接成本比较和物理执行。"
-
-msgid "Selected immutable UART DMA configuration"
-msgstr "选定 UART DMA 的不可变配置"
-
-msgid "The selected F103 and GD303 UART DMA modes use `nx_uart_v1_dma_config_t` for register/channel addresses, DMA memory domains, IRQ withdrawal and wake-validation callbacks, byte-ring or duplex receive storage, capacity, baud, IRQ policy and channel shifts. The selected profile identifies the active storage union member. `nx_uart_v1_dma_state_t` retains the configuration pointer, deadlines, active request and wake references, ring cursors, publication state and lifecycle flags. Duplex embeds its own mutable receive extension; byte mode does not reserve one. Configuration and its referenced resources have the runtime owner's lifetime. Successful stop preserves the binding, and zero-initialized runtime binds only during cold admission."
-msgstr "选定 F103 与 GD303 UART DMA 模式使用 `nx_uart_v1_dma_config_t` 保存寄存器／channel 地址、DMA 内存域、IRQ 撤下与 wake 校验 callback、字节 ring 或 duplex receive 存储、容量、波特率、IRQ 策略和 channel shift。所选 profile 标识存储 union 的有效成员。`nx_uart_v1_dma_state_t` 保留配置指针、deadline、active request 与 wake 引用、ring 游标、发布状态和生命周期标志。Duplex 内嵌自身可变 receive 扩展；字节模式不预留该扩展。配置及其引用资源与运行时 owner 同寿命。成功 stop 保留绑定，零初始化运行时仅在冷态准入期间绑定。"
-
-msgid "Each family's concrete `uart_dma_prepare` and `uart_duplex_prepare` requires a serialized privileged task with interrupts unmasked. After null/profile checks, it checks the existing cold owner before preparing exact pins and calling the initializer. Retained hardware, active requests, wake publishers and duplex RX loans prevent rebinding; the candidate receive extension is checked even before a configuration is bound. Failed withdrawal retains the same configuration and outstanding loans for ordinary stop or retry. The shared readonly ops, public faces and direct IRQ symbols remain unchanged; no hot-path dispatch layer is added."
-msgstr "每个家族的具体 `uart_dma_prepare` 与 `uart_duplex_prepare` 要求串行化特权 Task，且中断未屏蔽。在 null／profile 检查后，先检查既有冷态 owner，再准备精确引脚并调用 initializer。Retained hardware、active request、wake publisher 与 duplex RX loan 阻止重新绑定；即使尚未绑定配置，也会检查候选 receive 扩展。撤下失败保留同一配置及未归还 loan，供普通 stop 或重试。共享只读 ops、公共 face 与直接 IRQ symbol 保持不变；不增加热路径 dispatch 层。"
-
-msgid "The family's frozen `LegacyTransportProfile` supplies exact wiring to the existing emitter without family-name fallback. For these UART modes the selected `Construction.initialize` calls concrete C preparation; generation supplies static configuration, faces and IRQ forwarding. Concrete C adapters now own AHB DMA gates, pin resources and retained cleanup. The generated Platform keeps explicit phase ordering and typed C calls. Legacy I2C V1 and the other maintained peripheral cold paths follow the same C hardware-algorithm boundary."
-msgstr "各家族冻结的 `LegacyTransportProfile` 向现有 emitter 提供精确接线，不使用 family-name fallback。对这些 UART 模式，所选 `Construction.initialize` 调用具体 C preparation；生成器提供静态配置、face 与 IRQ 转发。具体 C adapter 现在拥有 AHB DMA gate、pin resource 与保留清理。生成的 Platform 保留显式阶段顺序与 typed C 调用。Legacy I2C V1 及其他维护外设的冷态路径遵守相同的 C 硬件算法边界。"
-
-msgid "See the [UART private contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h) for the exact storage, callback and lifetime requirements. Host tests exercise the actual SoC wrapper, shared engine and GPIO model; generated factory validation and final ARM resource measurements remain separate evidence scopes."
-msgstr "精确存储、callback 与寿命要求见 [UART 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h)。主机测试执行实际 SoC wrapper、共享 engine 与 GPIO model；生成 factory 校验和最终 ARM 资源测量仍是独立证据范围。"
-
-msgid "Selected legacy cold integration"
-msgstr "选定 legacy 冷态集成"
-
-msgid "F103 and GD303 keep concrete ADC, PWM and Flash `prepare` entries in their respective `drivers/devices.c`. These privileged task entries require interrupts unmasked and reject the relevant live, retained or faulted owner before replacing its resource binding. The exact C adapter owns register addresses, fixed pin and gate relationships, system-clock state and chip-specific cold checks. Family generation still validates the selected Board/mode and supplies its chosen values. The existing shared `nx_legacy_*_close` paths retain stop and drain responsibility."
-msgstr "F103 与 GD303 在各自 `drivers/devices.c` 保留具体 ADC、PWM 和 Flash `prepare` 入口。这些特权 Task 入口要求中断未屏蔽，并在替换资源绑定前拒绝相关 live、retained 或 faulted owner。精确 C adapter 拥有寄存器地址、固定引脚与 gate 关系、system-clock 状态和芯片特定冷态检查。家族生成仍校验所选 Board／模式并提供选定数值。既有共享 `nx_legacy_*_close` 路径保留 stop 与 drain 责任。"
-
+#: docs/design/official-stm32-provider.md:40
 msgid ""
-"The ADC and PWM owners now reference their own readonly hardware "
-"descriptions, `nx_legacy_adc_config_t` and `nx_legacy_pwm_config_t`, "
-"supplied by each exact SoC. Register addresses, gates and fixed pad "
-"facts move out of mutable owner storage. ADC reference voltage and PWM "
-"tick/period/duty/inactive level remain selected owner state; they are "
-"not promoted into shared hardware facts. Configuration must outlive the "
-"owner and cannot overlap its state or API output storage. This does not "
-"turn these drivers into the I2C V2 type; Flash keeps its separate "
-"private contract. Actual linked costs depend on the exact selected "
-"image."
+"Each image chooses one exact CMSIS device macro and matching startup. Compile"
+" only selected HAL modules and required dependencies, with a consistent "
+"private configuration and callback ABI. Do not enable every module or modify "
+"vendor files. All other inventoried vendor sources remain retained and "
+"unselected."
 msgstr ""
-"ADC 和 PWM owner 现在引用各精确 SoC 提供的只读硬件描述 `nx_legacy_adc_config_t` 与 "
-"`nx_legacy_pwm_config_t`。寄存器地址、gate 和固定 pad 事实移出可变 owner 存储。ADC 参考电压及 "
-"PWM tick／period／duty／inactive level 仍为选定 owner 状态，不提升为共享硬件事实。配置生命周期必须覆盖 "
-"owner，且不能与其 state 或 API 输出存储重叠。这不会把驱动变成 I2C V2 类型；Flash "
-"保留独立私有合同。实际链接成本取决于精确选定镜像。"
+"每个镜像选择一个精确 CMSIS 设备宏及匹配的启动文件。仅编译所选 HAL 模块和必需依赖，并保持一致的私有配置与回调 "
+"ABI。不得启用全部模块或修改厂商文件。其余已盘点厂商源码继续保留且不被选用。"
 
+#: docs/design/official-stm32-provider.md:45
 msgid ""
-"Selected U575 USART1 `dma-tx` and `dma-chain-tx` use static cold "
-"configuration and concrete C preparation. Their C adapters own "
-"admission, binding and pin preparation before existing finite/chain "
-"initialization. Selected F407 SPI polling/DMA and paired-controller DMA,"
-" plus GD470 SPI0/SPI4 polling and finite full-duplex DMA, move "
-"prepare/close behavior into concrete C while preserving the same "
-"Platform snapshot slots and retained cleanup responsibility. GD470 also "
-"moves its conditional EXTI close into C. The hot transfer engines, "
-"public faces and direct IRQ ownership are unchanged."
+"Current host generation remains centralized Python. Board and SoC trees no "
+"longer contain executable Python plugins. Moving remaining generated "
+"lifecycle control into handwritten C and introducing Host C11 tooling are "
+"pending work; translating strings into `fprintf()` would not fix the "
+"responsibility boundary."
 msgstr ""
-"选定 U575 USART1 `dma-tx` 与 `dma-chain-tx` 使用静态冷态配置和具体 C prepare。C 适配器在既有 "
-"finite/chain 初始化前负责准入、绑定与引脚准备。选定 F407 SPI 轮询／DMA、成对控制器 DMA，以及 GD470 "
-"SPI0/SPI4 轮询和有限全双工 DMA，将 prepare/close 行为移入具体 C，同时保留原 Platform snapshot "
-"槽及失败后保留的清理责任。GD470 的条件 EXTI close 也迁入 C。热路径传输引擎、公共 face 和直接 IRQ 所有权不变。"
+"当前主机生成仍使用集中维护的 Python。Board 和 SoC 树已不含可执行 Python 插件。将剩余生成式生命周期控制移入手写 C，并引入 "
+"Host C11 工具，仍是待完成工作；把字符串改写成 `fprintf()` 不能解决职责边界问题。"
 
-msgid "The maintained Native, F103, F407, G474, H743, U575, GD303 and GD470 selections now keep hardware algorithms in C11, including selected GPIO, IRQ UART, ADC, PWM, EXTI, preflight, shared resources and retained cleanup. Host Python supplies static configuration, storage, faces and fixed typed calls; the generated Platform still owns explicit startup and reverse-cleanup ordering. Review the actual selected C path rather than inferring support from a call field or directory. The {ref}`sealed cold-lifecycle baseline <sealed-cold-lifecycle-baseline>` records the exact final source and software evidence; physical timing remains unexecuted."
-msgstr "维护的 Native、F103、F407、G474、H743、U575、GD303 与 GD470 选择现在均把硬件算法保留在 C11，包括选定 GPIO、IRQ UART、ADC、PWM、EXTI、preflight、共享资源与保留清理。主机 Python 提供静态配置、存储、face 与固定 typed 调用；生成的 Platform 仍拥有显式启动和逆序清理编排。应审查实际选定的 C 路径，不从 call field 或目录推导支持。{ref}`封存的冷态生命周期基线 <sealed-cold-lifecycle-baseline>`记录精确最终源码与软件证据；物理时序仍未执行。"
+#: docs/design/official-stm32-provider.md:50
+msgid "Selected F407 HAL UART transport"
+msgstr "所选 F407 HAL UART transport"
 
-msgid "Conditions for full HAL transport"
-msgstr "完整 HAL transport 的接入条件"
-
+#: docs/design/official-stm32-provider.md:52
 msgid ""
-"Before accepting a Handle-based mode, establish a progressing time source "
-"for every HAL wait it can reach. Review bootstrap clock waits, "
-"`HAL_GetTick`, tick reinitialization and interrupt-priority grouping. Do not"
-" let default HAL startup silently acquire SysTick or change OS policy. "
-"Public operations consume one absolute monotonic deadline, including queue "
-"and preparation time."
+"The current finite `dma-tx` selection combines official HAL TX with a "
+"disjoint LL IRQ byte/event receiver under one private static owner. Handles, "
+"DMA state and callbacks stay private. Other UART modes retain their explicit "
+"engines; this selection does not establish whole-library or all-mode HAL "
+"replacement."
 msgstr ""
-"接受基于 Handle 的模式前，为其可能进入的每个 HAL 等待建立能够推进的时源。审查 bootstrap "
-"时钟等待、`HAL_GetTick`、tick 重新初始化和中断优先级分组。不得让默认 HAL 启动静默取得 SysTick 或改变 OS "
-"策略。公共操作使用同一个绝对单调 deadline，包含排队和准备时间。"
+"当前有限 `dma-tx` 选择，在同一个私有静态所有者下组合官方 HAL TX 与职责不重叠的 LL IRQ 字节/事件接收。Handle、DMA "
+"状态及回调保持私有。其他 UART 模式保留各自明确的引擎；此选择不代表已完成整个库或全部模式的 HAL 替换。"
 
+#: docs/design/official-stm32-provider.md:57
 msgid ""
-"Establish request identity and borrowed references before enabling hardware "
-"or calling an API that can invoke a callback synchronously. Callback bridges"
-" publish bounded facts and optional wake hints; they do not execute "
-"arbitrary product callbacks. Check the complete HAL call stack before "
-"publishing settlement or allowing reentrant submission. A HAL lock is not a "
-"task mutex or a controller ownership policy."
+"DMA completion is distinct from UART wire TC. A callback, successful abort "
+"call or timeout does not authorize reuse of a request or buffer. Detach "
+"actual DMA, IRQ and callback references, prove required peripheral drain, "
+"then publish SETTLED as the provider's final request access. Failed "
+"withdrawal retains the same storage and recovery responsibility."
 msgstr ""
-"启用硬件或调用可能同步触发回调的 API 前，先建立 request "
-"身份与借用引用。回调桥只发布有界事实和可选唤醒提示，不执行任意产品回调。发布结清或允许重入提交前，必须检查完整 HAL 调用栈。HAL lock "
-"不是任务互斥锁，也不能代替控制器所有权策略。"
+"DMA 完成与 UART 线路 TC 分别表示不同事实。回调、成功的 abort 调用或超时，都不允许复用请求或缓冲区。必须移除真实 DMA、IRQ "
+"和回调引用，证明所需外设已排空，再将 SETTLED 发布为 provider 对请求的最后一次访问。退出失败时保留同一存储和恢复责任。"
 
+#: docs/design/official-stm32-provider.md:63
 msgid ""
-"![Reference finite-DMA completion and failure "
-"responsibilities](../assets/diagrams/dma-completion.svg)"
-msgstr "![有限 DMA 完成与失败责任参考](../assets/diagrams/dma-completion.svg)"
-
-msgid "Reference finite-DMA completion and failure responsibilities"
-msgstr "有限 DMA 完成与失败责任参考"
-
-msgid ""
-"FIG-07 is the existing F407 finite-DMA reference. DMA completion, wire "
-"completion, HAL internal readiness and Nexus settlement remain different "
-"facts. Preserve the [public ownership "
-"contract](../explanation/ownership.md): abort or timeout starts withdrawal; "
-"it does not return storage. Detach every required hardware, IRQ and queue "
-"reference before the provider's final release-publication of `SETTLED`. "
-"Failed drain retains `QUARANTINED` storage and an explicit recovery "
-"obligation. Circular DMA must never overwrite a consumer-owned block to "
-"emulate progress."
+"Do not unconditionally call `HAL_Init()`: default SysTick setup and NVIC "
+"grouping must respect Platform and RTOS ownership. Use the maintained time "
+"domain and validate any kernel ISR ceiling before entering a kernel API."
 msgstr ""
-"FIG-07 是既有 F407 有限 DMA 参考。DMA 完成、线上完成、HAL 内部就绪与 Nexus "
-"结清仍是不同事实。保留[公共所有权合同](../explanation/ownership.md)：abort 或 timeout "
-"启动撤回，不归还存储。provider 最终以 release 发布 `SETTLED` 前，先撤回全部必要硬件、IRQ 与队列引用。排空失败保留 "
-"`QUARANTINED` 存储和明确恢复责任。循环 DMA 不得覆盖消费者持有的块来模拟进展。"
+"不得无条件调用 `HAL_Init()`：默认 SysTick 设置与 NVIC 分组必须遵守 Platform 和 RTOS "
+"所有权。使用受维护的时间域，并在进入内核 API 前验证对应的内核 ISR 优先级上限。"
 
-msgid "Caller-owned lifecycle diagnostics"
-msgstr "调用方存储的生命周期诊断"
+#: docs/design/official-stm32-provider.md:67
+msgid "Replace a mode and verify it"
+msgstr "替换并验证一个模式"
 
+#: docs/design/official-stm32-provider.md:69
 msgid ""
-"Generated headers expose `nx_platform_diagnostic_t` and the optional "
-"`nx_platform_start_diagnosed` / `nx_platform_stop_diagnosed` entries. The "
-"original start/stop entry points remain available. A null diagnostic pointer"
-" uses the original behavior; a nonnull pointer supplies caller-owned cold-"
-"path output and is never retained. It adds no static registry, labels or "
-"default instance RAM. Cold code/stack cost still belongs in the linked-image"
-" comparison."
+"Start from a complete selected mode and its tests. Preserve RX duties, "
+"instance isolation, cancellation, deadlines, partial-start cleanup, late IRQ "
+"and failed drain. Switch the complete behavior domain to its chosen "
+"implementation before removing the old path; a successful TX fixture alone is"
+" insufficient."
 msgstr ""
-"生成的头提供 `nx_platform_diagnostic_t` 和可选 `nx_platform_start_diagnosed` / "
-"`nx_platform_stop_diagnosed` 入口，原 start/stop "
-"入口继续可用。空诊断指针使用原行为；非空指针提供调用方拥有的冷路径输出，不会被保留。它不增加静态注册表、标签或默认实例 "
-"RAM。冷路径代码和栈成本仍需要纳入实际链接镜像比较。"
+"从一个完整所选模式及其测试开始。保留 RX 责任、实例隔离、取消、deadline、部分启动后的清理、迟到 IRQ "
+"和排空失败处理。先将完整行为域切换到选定实现，再移除旧路径；仅通过 TX fixture 不足以完成替换。"
 
+#: docs/design/official-stm32-provider.md:74
 msgid ""
-"`phase` and `cleanup_phase` distinguish `NONE`, `CONTEXT`, `SYSTEM`, "
-"`RESOURCES` and `CONTROLLER`. A controller phase carries its zero-based "
-"index in `resolved.json.controllers`; it is not a per-kind factory ID. "
-"`SIZE_MAX` means no controller. Successful calls clear the diagnostic. A "
-"failed start records the primary location and, if cleanup fails, a separate "
-"cleanup location. Existing primary result, cleanup result and remaining "
-"effects remain authoritative; diagnostics neither perform recovery nor "
-"establish that a retained borrow ended."
+"Compare actual ELF/map and hot paths under the same toolchain and "
+"configuration. Directory consolidation itself does not reduce dispatch or "
+"guarantee smaller code. See [current support](../delivery/support.md), "
+"[ownership](../explanation/ownership.md) and the [provider "
+"guide](../guides/provider-porting.md). Physical HIL is not executed."
 msgstr ""
-"`phase` 与 `cleanup_phase` 区分 `NONE`、`CONTEXT`、`SYSTEM`、`RESOURCES` 和 "
-"`CONTROLLER`。controller 阶段携带其在 `resolved.json.controllers` 中的零基索引，不是各 kind 的"
-" factory ID。`SIZE_MAX` 表示没有 "
-"controller。调用成功清空诊断；启动失败记录主要位置，清理失败时另记录清理位置。既有主要结果、清理结果与剩余效果继续是权威；诊断不执行恢复，也不证明保留的借用已经结束。"
+"在相同工具链和配置下比较真实 ELF/map "
+"与热路径。目录归并本身不会减少分派或保证代码更小。参阅[当前支持](../delivery/support.md)、[所有权](../explanation/ownership.md)和"
+" [provider 指南](../guides/provider-porting.md)。物理 HIL 尚未执行。"
 
-msgid "Work-package exits and existing authorities"
-msgstr "工作包退出条件与既有权威"
+#: docs/design/official-stm32-provider.md:80
+msgid "Cortex-M4F short-ISR constraint"
+msgstr "Cortex-M4F 短 ISR 约束"
 
+#: docs/design/official-stm32-provider.md:82
 msgid ""
-"The following table assigns exits to the iteration work packages. It is a "
-"design checklist, not a second support or completion database. Current "
-"support continues to come from [the derived capability "
-"matrix](../delivery/capabilities.md), exact provider facts and reviewed "
-"fixtures. Existing ledgers retain original IDs, statuses and evidence; do "
-"not relabel historical results as new-source execution."
+"F407 ES0182 Rev19 section2.1.2 explicitly lists Arm776924 for every listed "
+"cut. The exact chip errata, emitted instructions and selected FPU context "
+"remain integration obligations; another CPU name does not grant the same "
+"workaround."
 msgstr ""
-"下表为迭代工作包规定退出条件，是设计检查表，不是第二份支持或完成数据库。当前支持继续来自[派生能力矩阵](../delivery/capabilities.md)、精确"
-" provider facts 和已审查夹具。既有台账保留原始 ID、状态与证据，不得把历史结果重标为新源码执行。"
+"F407 ES0182 Rev19 section2.1.2 明确列出 Arm776924，适用于其中列明的全部芯片修订。精确芯片勘误、实际生成指令和所选"
+" FPU 上下文仍是接入责任；其他 CPU 名称不能直接授权使用相同规避方法。"
 
-msgid "Work package"
-msgstr "工作包"
-
-msgid "Exit and maintained authority"
-msgstr "退出条件与维护权威"
-
-msgid "Configuration and provider contract"
-msgstr "配置与 provider 合同"
-
+#: docs/design/official-stm32-provider.md:86
 msgid ""
-"Explicit construction and failed-init responsibility; deterministic "
-"generation and rejection tests; [integration contract](integration-"
-"contracts.md)"
-msgstr "明确构造与初始化失败责任；确定性生成及拒绝测试；[接入合同](integration-contracts.md)"
-
-msgid "Official driver reuse"
-msgstr "官方驱动复用"
-
-msgid ""
-"Locked source/license/pairing, private build and SDK closure, mode-specific "
-"real-driver tests; [source compatibility](source-compatibility.md)"
-msgstr "锁定来源、许可证与配对，私有构建和 SDK 闭包，逐模式真实驱动测试；[源码兼容性](source-compatibility.md)"
-
-msgid "Hardware/resource description"
-msgstr "硬件与资源描述"
-
-msgid ""
-"Exact pins, IRQ, DMA, clocks and memory; no invented Board wiring or silent "
-"fallback; [SoC ledger](soc-refinement.md)"
+"The failure requires an enabled FPU and lazy context saving, an interrupted "
+"`VDIV` or `VSQRT` whose destination is s0–s15, a handler without floating-"
+"point instructions, and exception return within fourteen cycles of the "
+"interrupted instruction. The manufacturers' sufficient instruction-count "
+"workaround is **more than two executed instructions in every ISR, excluding "
+"exception return**. External stack-memory wait states are an alternative "
+"source condition, not a premise supplied by these internal-SRAM platform "
+"profiles."
 msgstr ""
-"精确 pins、IRQ、DMA、clock 与 memory；不虚构 Board 接线，不静默回退；[SoC 台账](soc-"
-"refinement.md)"
+"触发故障需要同时满足：FPU 和延迟上下文保存已启用；目标寄存器为 s0–s15 的 `VDIV` 或 `VSQRT` "
+"被中断；处理程序没有浮点指令；并且在被中断指令之后的十四个周期内发生异常返回。厂商提供的充分指令数规避措施是：**每个 ISR "
+"实际执行超过两条指令，不计异常返回指令**。外部栈内存的等待状态是来源文档给出的另一种条件；本平台采用内部 SRAM 的配置不提供该前提。"
 
-msgid "Lifecycle and diagnostics"
-msgstr "生命周期与诊断"
-
+#: docs/design/official-stm32-provider.md:94
 msgid ""
-"Every partial effect either withdrawn or retained; caller-owned cold "
-"diagnostics never revoke a borrow; [lifecycle matrix](io-lifecycle-"
-"matrix.md)"
-msgstr "部分效果要么撤回，要么继续保留；调用方存储的冷路径诊断不撤销借用；[生命周期矩阵](io-lifecycle-matrix.md)"
-
-msgid "I/O ownership"
-msgstr "I/O 所有权"
-
-msgid ""
-"Real acceptance, cancel, late IRQ, overflow, instance isolation and drain "
-"regressions; [I/O recovery contract](io-observation-recovery.md)"
-msgstr "真实接受、取消、晚到 IRQ、溢出、实例隔离与排空回归；[I/O 恢复合同](io-observation-recovery.md)"
-
-msgid "Arch, OS and components"
-msgstr "Arch、OS 与组件"
-
-msgid ""
-"Exact backend/CPU scope, unchanged masks, explicit execution and "
-"wait/observer shutdown; [OS contract](os-contracts.md)"
+"F407 startup enables CP10/CP11. Its selected FreeRTOS CM4F port explicitly "
+"enables ASPEN/LSPEN. An integer-only current workload therefore does not make"
+" the platform FPU-disabled or exclude floating-point application code. Do not"
+" silently clear LSPEN in startup: the kernel re-enables it and its "
+"context/stack ABI requires a separately reviewed decision."
 msgstr ""
-"精确 backend/CPU 范围、不改变输入 mask、显式执行与 wait/observer 退出；[OS 合同](os-contracts.md)"
+"F407 启动开启 CP10／CP11，所选 FreeRTOS CM4F port 明确开启 "
+"ASPEN／LSPEN。因此当前负载只使用整数，并不表示平台禁用 FPU，也不排除应用浮点代码。不得在启动中悄然清除 "
+"LSPEN：内核会再次开启它，其上下文／栈 ABI 需要单独审查决策。"
 
-msgid "Performance and resources"
-msgstr "性能与资源"
-
+#: docs/design/official-stm32-provider.md:100
 msgid ""
-"Same configuration/toolchain/workload comparison, actual ELF/RAM/stack "
-"reports; [execution budgets](soc-execution-budgets.md)"
-msgstr "同配置、工具链和负载比较，真实 ELF/RAM/stack 报告；[执行预算](soc-execution-budgets.md)"
-
-msgid "Test plan and HIL"
-msgstr "测试计划与 HIL"
-
-msgid ""
-"Reviewed applicability plus fresh executed results; software and physical "
-"status separate; [qualification](../delivery/qualification.md)"
-msgstr "审查适用范围并取得新鲜执行结果，软件与物理状态分别记录；[资格合同](../delivery/qualification.md)"
-
-msgid "External consumption and documentation"
-msgstr "外部消费与文档"
-
-msgid ""
-"Relocated Source SDK consumer, external examples and complete reviewed "
-"English/Chinese pages; {download}`build ledger <build-system-execution.csv>`"
-" and {download}`documentation ledger <documentation-system-execution.csv>`"
+"Review the actual installed vector table and reachable instruction prefixes "
+"in each emitted configuration. A thin `ldr` plus tail branch needs its callee"
+" examined; unreachable `nop` alignment and literal-pool words are not "
+"executed work. A default nonreturning fault loop is distinct from an empty "
+"returning handler. Apply the same rule to external handlers, "
+"spurious/disabled-state fast paths, aliases and compiler/LTO changes. Source "
+"line counts and nominal clock frequency cannot prove this condition."
 msgstr ""
-"搬移后的 Source SDK consumer、外部示例以及完整已审英文与中文页面；{download}`构建台账 <build-system-"
-"execution.csv>`和{download}`文档台账 <documentation-system-execution.csv>`"
+"审查每份生成配置实际安装的向量表与可达指令前缀。仅有 `ldr` 加尾跳转的薄处理程序还需要检查被调用方；不可达的 `nop` "
+"对齐填充和字面量池数据不属于已执行工作。默认的不返回故障循环与空的可返回处理程序不同。外部处理程序、伪中断或禁用状态的快速路径、别名及编译器/LTO "
+"变更同样适用此规则。源码行数和标称时钟频率不能证明满足这个条件。"
 
+#: docs/design/official-stm32-provider.md:108
 msgid ""
-"The read-only work-package view joins existing provider, capability, SDK-"
-"required source and reviewed lifecycle-test authorities. It retains exact "
-"scopes and shows unmapped properties instead of inventing aliases. It does "
-"not execute tests, verify a complete installed SDK or establish "
-"software/physical qualification. See [maintenance "
-"tools](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/maintenance/README.md) for the actual command and output "
-"limits."
+"Selected-image software review belongs with its actual ELF, resolved input, "
+"compiler commands and disassembly. It proves only those installed paths, not "
+"every declared mode or a connected device result. A new or replacement "
+"external ISR that can return within the excluded short prefix remains an open"
+" integration condition until its emitted path or another exact workaround is "
+"reviewed."
 msgstr ""
-"只读工作包视图关联既有 provider、能力、SDK "
-"必需源码和已审生命周期测试权威。它保留精确范围，展示未映射属性，不虚构别名。它不执行测试、不验证完整已安装 "
-"SDK，也不建立软件或物理资格。实际命令与输出限制见[维护工具](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/README.md)。"
-
-msgid "Comparison and replacement"
-msgstr "比较与替换"
-
-msgid ""
-"Compare official and existing implementations with the same chip, clock, "
-"memory, route, mode, capacity, OS, compiler, optimization and workload. "
-"Record Flash LOAD and footprint separately, per-domain static RAM, caller-"
-"owned storage, stack reservation versus measured peak, IRQ/service behavior "
-"and cleanup failures. Operation counts and host timings are not physical "
-"cycles, latency or WCET."
-msgstr ""
-"比较官方与既有实现时，固定芯片、clock、memory、route、mode、capacity、OS、compiler、optimization 和 "
-"workload。分别记录 Flash LOAD 与 footprint、各域静态 RAM、调用方存储、预留栈与实测峰值、IRQ/service "
-"行为和清理失败。操作次数与主机耗时不是物理 cycles、latency 或 WCET。"
-
-msgid "The [SPI cost fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/io_storage_cost/spi_endpoints/README.md) links 0/1/2/4 endpoints against the unchanged `89485943` Source SDK: development LOAD/footprint is 3,048/7,880/7,940/8,064 B, with static SRAM 72/176/208/280 B, plus 2,048 B MSP and zero heap. Nonzero images consume public controller topology; the four-way image uses three CS banks, so its delta is not a linear endpoint cost. These link observations do not establish timing, HIL or new-source qualification."
-msgstr "[SPI 成本夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/io_storage_cost/spi_endpoints/README.md)使用未改变的 `89485943` Source SDK 链接 0/1/2/4 个 endpoint：开发测量的 LOAD 与 footprint 均为 3,048/7,880/7,940/8,064 B，静态 SRAM 为 72/176/208/280 B，另有 2,048 B MSP，heap 为零。非零配置消费公共 controller 拓扑；四 endpoint 镜像使用三个 CS bank，因此其增量不能作为线性的单 endpoint 成本。这些链接观察不建立时序、HIL 或新源码资格。"
-
-msgid "The I2C leaf comparison retains direct V1 TX because the pinned LL helper adds a DR read-modify-write, and retains V2 full CR2/ICR commands where vendor helpers use read-modify-write. F103/F407 ADDR clear remains two ordered direct reads: isolated ARM probes measured 6 B direct versus 18 B LL and 8 B extra stack. GD470 hot byte/ADDR leaves retain direct operations after the narrow SPL call/callee comparison; GD303 has no selected I2C SPL C unit. These isolated translation-unit results are not whole-provider resource, stack-peak, timing or hardware qualification."
-msgstr "I2C 叶操作比较保留 V1 TX 的直接访问，因为已锁定 LL helper 会增加对 DR 的读改写；V2 完整 CR2/ICR 命令也在 vendor helper 使用读改写时保留直接访问。F103/F407 的 ADDR 清除仍使用两次有序的直接读取：独立 ARM 探针测得直接实现为 6 B，LL 为 18 B，且额外使用 8 B 栈。GD470 的高频 byte/ADDR 叶操作在窄范围 SPL 调用及被调用函数比较后保留直接访问；GD303 未选入 I2C SPL C 单元。这些独立编译单元结果不建立整个 provider 的资源、栈峰值、时序或硬件资格。"
-
-msgid ""
-"Retain an old implementation only while it provides a needed comparison or "
-"an unreplaced maintained mode. Select one normal production implementation "
-"after its contract and costs are accepted; remove unused switches and "
-"duplicate state. A dedicated LL/register path is justified by a demonstrated"
-" semantic gap or measured budget, not by a general assertion that vendor "
-"code is slow."
-msgstr ""
-"只有仍需对照或存在未替代维护模式时才保留旧实现。合同与成本验收后，选定一个正常生产实现，删除无用开关和重复状态。专用 "
-"LL/寄存器路径需要已证明的语义差距或实测预算依据，不能只笼统声称厂商代码慢。"
-
-msgid "Validation and delivery boundary"
-msgstr "验证与交付边界"
-
-msgid ""
-"New behavior follows RED, GREEN and refactor with the normal commit/CI "
-"gates. Host C tests use GoogleTest/GoogleMock; tool tests use stdlib "
-"unittest. Mock an external port when checking the adapter contract, then "
-"separately execute real official code with the adapter. ARM links establish "
-"selected image/resource properties. Real equipment is required for IRQ "
-"timing, DMA/Cache coherence, electrical behavior and long-load conclusions."
-msgstr ""
-"新增行为按 RED、GREEN、refactor 实施，并通过正常 commit/CI 门禁。主机 C 测试使用 "
-"GoogleTest/GoogleMock，工具测试使用 stdlib unittest。适配合同测试可以 mock "
-"外部端口，然后还要单独执行真实官方代码与适配器。ARM 链接证明所选镜像与资源性质；IRQ 时序、DMA/Cache "
-"一致性、电气行为和长期负载结论需要真实设备。"
-
-msgid ""
-"A software candidate still requires clean source, exact "
-"dependency/configuration identity, independent SDK consumption and two fresh"
-" network-disabled builds of the same artifacts. No iteration checklist or "
-"derived work-package report grants that status. Existing release tags/assets"
-" and original evidence remain immutable. Without connected boards, HIL stays"
-" `not_executed`; do not call a software-only iteration a product release or "
-"safety qualification."
-msgstr ""
-"软件候选仍要求 clean source、精确依赖和配置身份、独立 SDK "
-"消费，以及同产物的两次全新断网构建。迭代检查表或派生工作包报告均不授予这一状态。既有 release "
-"tag、附件和原始证据保持不可变。没有连接实板时，HIL 保持 `not_executed`，不得把纯软件迭代称为产品发布或安全资格。"
-
-msgid "Selected F407VE/ZG and GD470 offset images now have reviewed configuration, startup, vector/linker and ELF-to-BIN boundaries; the [assembly reference](../reference/configuration/assembly.md#physical-flash-and-the-selected-image) distinguishes their image window from complete physical Flash. This is not boot authentication, Flash access control or running-image handoff qualification. The F407 handoff retains PRIMASK=1 and startup does not unmask it; an offset FreeRTOS link cannot establish a valid FreeRTOS handoff."
-msgstr "所选 F407VE/ZG 和 GD470 偏移镜像已有已审查的配置、startup、向量/linker 及 ELF-to-BIN 边界；[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)区分镜像窗口和完整物理 Flash。这不是启动认证、Flash 访问控制或运行态镜像交接资格。F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移 FreeRTOS 链接不能建立有效 FreeRTOS handoff。"
-
-msgid ""
-"Bootloader handoff, dynamic reclocking, deep STOP, broader H743 DMA and "
-"generic U575 cross-domain I/O retain their separate unimplemented or partial"
-" exits in the [SoC refinement ledger](soc-refinement.md). Official drivers "
-"do not automatically supply the platform contracts for these features."
-msgstr ""
-"Bootloader 交接、动态变频、deep STOP、更广的 H743 DMA 和通用 U575 跨域 I/O，继续保留[SoC "
-"完善台账](soc-refinement.md)中各自未实现或部分实现的退出条件。官方驱动不会自动提供这些功能需要的平台合同。"
+"所选镜像的软件审查必须对应其实际 ELF、resolved "
+"输入、编译命令和反汇编。审查只证明这些已安装路径，不证明所有声明模式或已连接设备的结果。新增或替换的外部 ISR "
+"若仍可能沿上述未满足规避条件的短指令路径返回，就继续保留为集成待办，直到审查其实际生成路径或另一项精确规避措施。"

@@ -9,13 +9,8 @@
 #include "i2c_v1_async.h"
 #if defined(NX_I2C_TEST_STM32)
 #include "stm32f407_i2c_async.h"
-#elif defined(NX_I2C_TEST_GD32)
-extern "C" {
-#include "gd32f470_i2c_async.h"
-NVIC_Type g_gd32_model_nvic;
-}
 #endif
-#if defined(NX_I2C_TEST_STM32) || defined(NX_I2C_TEST_GD32)
+#if defined(NX_I2C_TEST_STM32)
 #include <sys/mman.h>
 #endif
 #include "nexus/arch/arch.h"
@@ -66,8 +61,6 @@ class I2CAsyncRegisters : public testing::Test {
     nx_result_t Initialize() {
 #if defined(NX_I2C_TEST_STM32)
         return nx_stm32_i2c_async_initialize(&state, 5U);
-#elif defined(NX_I2C_TEST_GD32)
-        return nx_gd32_i2c_async_initialize(&state, 5U);
 #else
         return nx_i2c_v1_initialize(&state);
 #endif
@@ -81,7 +74,7 @@ class I2CAsyncRegisters : public testing::Test {
         output.clear();
         address_windows.clear();
         address_dma_windows.clear();
-#if defined(NX_I2C_TEST_STM32) || defined(NX_I2C_TEST_GD32)
+#if defined(NX_I2C_TEST_STM32)
         mapping =
             mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000U,
                  PROT_READ | PROT_WRITE,
@@ -97,7 +90,7 @@ class I2CAsyncRegisters : public testing::Test {
         state.line_inputs = &GPIO_ISTAT(GPIOB);
         GPIO_ISTAT(GPIOB) = state.line_mask;
         state.peripheral_mhz = 50U;
-        g_gd32_model_nvic = {};
+        g_f4_model_nvic = {};
 #endif
 #else
         state.line_inputs = &lines;
@@ -121,7 +114,7 @@ class I2CAsyncRegisters : public testing::Test {
             nx_i2c_port_service(&bus);
         }
         EXPECT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
-#if defined(NX_I2C_TEST_STM32) || defined(NX_I2C_TEST_GD32)
+#if defined(NX_I2C_TEST_STM32)
         if (mapping != MAP_FAILED) {
             EXPECT_EQ(munmap(mapping, 0x80000U), 0);
         }
@@ -181,7 +174,7 @@ TEST_F(I2CAsyncRegisters, UnprivilegedCallsRejectBeforeBorrowOrRegisters) {
     EXPECT_TRUE(state.initialized);
 }
 
-#if !defined(NX_I2C_TEST_STM32) && !defined(NX_I2C_TEST_GD32)
+#if !defined(NX_I2C_TEST_STM32)
 TEST_F(I2CAsyncRegisters, EightMhzUsesErrataSafeEightyKhzProfile) {
     ASSERT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
     state.peripheral_mhz = 8U;
@@ -388,8 +381,6 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
         dma.region_count = 1U;
 #if defined(NX_I2C_TEST_STM32)
         dma = NX_STM32_I2C1_DMA(&region, 1U);
-#elif defined(NX_I2C_TEST_GD32)
-        dma = NX_GD32_I2C0_DMA(&region, 1U);
 #endif
         state.dma = &dma;
         ASSERT_EQ(Initialize(), NX_SUCCESS);
@@ -636,7 +627,7 @@ TEST_F(I2CDmaRegisters, PeripheralErrorDuringStopDrainCannotPublishSuccess) {
     EXPECT_EQ(request.base.transferred, 3U);
 }
 
-#if defined(NX_I2C_TEST_STM32) || defined(NX_I2C_TEST_GD32)
+#if defined(NX_I2C_TEST_STM32)
 TEST_F(I2CDmaRegisters, ColdRouteTamperingRejectsBeforeRegistersOrPublishers) {
     ASSERT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
     dma.rx.control = &engines[1][0];
@@ -644,21 +635,6 @@ TEST_F(I2CDmaRegisters, ColdRouteTamperingRejectsBeforeRegistersOrPublishers) {
     EXPECT_EQ(Initialize(), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(state.initialized, false);
     EXPECT_EQ(std::vector<uint32_t>(registers, registers + 9U), before);
-}
-#endif
-
-#if defined(NX_I2C_TEST_GD32)
-TEST_F(I2CDmaRegisters, UnsafeDmaPublisherPreventsKernelWakeBinding) {
-    testing::StrictMock<WakeObserver> observer;
-    const nx_irq_wake_t wake = {&observer, WakeObserver::Callback, true};
-    NVIC_SetPriority(DMA0_Channel6_IRQn, 4U);
-    EXPECT_EQ(nx_i2c_port_attach_wake(&bus, &wake, 5U), NX_ERROR_PERMISSION);
-    EXPECT_EQ(state.wake, nullptr);
-    NVIC_SetPriority(DMA0_Channel6_IRQn, 5U);
-    EXPECT_EQ(nx_i2c_port_attach_wake(&bus, &wake, 5U), NX_SUCCESS);
-    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
-    EXPECT_EQ(NVIC->ISER[0] & ((1U << 11U) | (1U << 17U) | (1U << 31U)), 0U);
-    EXPECT_EQ(NVIC->ISER[1] & 1U, 0U);
 }
 #endif
 

@@ -1,0 +1,173 @@
+# Reviewed against the exact current canonical source and gettext messages.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 93fd10703541a2d6f078de742f3f64d21c6b50f0a007b471a61e0ca877754103\n"
+
+#: docs/reference/platforms/support.md:9
+msgid "读取精确平台支持"
+msgstr "Read exact platform support"
+
+#: docs/reference/platforms/support.md:11
+msgid ""
+"当前生产系列入口是 STM32F4，已迁入的实现限定 STM32F407VET6 与 STM32F407ZGT6。 同系列名称、官方 SDK "
+"文件或器件宏存在，不代表其他 F4 型号已经适配。"
+msgstr ""
+"The current production series entry point is STM32F4. Migrated "
+"implementations are limited to STM32F407VET6 and STM32F407ZGT6. A series "
+"name, official SDK file or device macro does not imply other F4 parts are "
+"integrated."
+
+#: docs/reference/platforms/support.md:0
+msgid "维度"
+msgstr "Dimension"
+
+#: docs/reference/platforms/support.md:0
+msgid "当前含义"
+msgstr "Current meaning"
+
+#: docs/reference/platforms/support.md:0
+msgid "芯片事实"
+msgstr "Chip facts"
+
+#: docs/reference/platforms/support.md:0
+msgid "精确料号、封装、Flash／RAM 和允许路线"
+msgstr "Exact part number, package, Flash/RAM and allowed routes"
+
+#: docs/reference/platforms/support.md:0
+msgid "实现与模式"
+msgstr "Implementation and mode"
+
+#: docs/reference/platforms/support.md:0
+msgid "F4 provider 明确维护的有限模式"
+msgstr "Limited set of modes explicitly maintained by the F4 provider"
+
+#: docs/reference/platforms/support.md:0
+msgid "Board"
+msgstr "Board"
+
+#: docs/reference/platforms/support.md:0
+msgid "四个独立 F407 包中已审查的连接与条件"
+msgstr "Reviewed connections and conditions in four independent F407 packages"
+
+#: docs/reference/platforms/support.md:0
+msgid "软件验证"
+msgstr "Software verification"
+
+#: docs/reference/platforms/support.md:0
+msgid "精确源码、配置、工具和本次实际执行"
+msgstr ""
+"Exact source, configuration, tools and actual execution for this iteration"
+
+#: docs/reference/platforms/support.md:0
+msgid "物理验证"
+msgstr "Physical verification"
+
+#: docs/reference/platforms/support.md:0
+msgid "同一镜像、PCB、station 和真实观测"
+msgstr "The same image, PCB, station and actual observations"
+
+#: docs/reference/platforms/support.md:22
+msgid ""
+"模式限制见[详细支持](../../delivery/support.md)，路线、夹具和生产源码关联见 "
+"[派生矩阵](../../delivery/capabilities.md)，目录见[源码图](../../explanation/source-"
+"map.md)。"
+msgstr ""
+"See [detailed support](../../delivery/support.md) for mode limits, the "
+"[derived matrix](../../delivery/capabilities.md) for routes, fixtures and "
+"production-source associations, and the [source "
+"map](../../explanation/source-map.md) for directories."
+
+#: docs/reference/platforms/support.md:25
+msgid "当前可选择范围"
+msgstr "Current selection scope"
+
+#: docs/reference/platforms/support.md:27
+msgid "启明 F407ZG V3.1、独立核心板和 V4.1 保留不同来源与装配身份。"
+msgstr ""
+"Qiming F407ZG V3.1, standalone core board and V4.1 retain separate sources "
+"and assembly identities."
+
+#: docs/reference/platforms/support.md:28
+msgid "天空星 F407VE 青春版使用其独立封装和 PCB 事实。"
+msgstr "Sky F407VE youth edition uses its own package and PCB facts."
+
+#: docs/reference/platforms/support.md:29
+msgid "裸机、FreeRTOS 和明确维护的 ThreadX M4 子集分别选择；启动不进入内核。"
+msgstr ""
+"Select baremetal, FreeRTOS and the explicitly maintained ThreadX M4 subset "
+"independently; Platform startup does not enter a kernel."
+
+#: docs/reference/platforms/support.md:30
+msgid ""
+"Native 只属于 `tests/support/native/`，需要 `test_support=True`、CLI `--test-"
+"support` 或声明了 `NEXUS_TEST_SUPPORT=ON` 的测试 preset。"
+msgstr ""
+"Native belongs only to `tests/support/native/` and requires "
+"`test_support=True`, CLI `--test-support` or a test preset declaring "
+"`NEXUS_TEST_SUPPORT=ON`."
+
+#: docs/reference/platforms/support.md:32
+msgid "Core／Arch 的 CPU 软件能力与具体 SoC 集成分开，不从 CPU 名称推导芯片支持。"
+msgstr ""
+"Core/Arch CPU software capabilities remain separate from concrete SoC "
+"integration; CPU names do not imply chip support."
+
+#: docs/reference/platforms/support.md:34
+msgid ""
+"所有 `vendors/` 保留，未使用 SDK 的存在不扩大生产支持。旧 F103、G474、H743、 U575 和 GD32 "
+"等接入退出当前生产选择；原证据按 [固定旧源码](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) 读取，不将旧通过值转移到重构源码。"
+msgstr ""
+"All `vendors/` sources are retained. Unused SDKs do not expand production "
+"support. Earlier F103, G474, H743, U575 and GD32 integrations leave current "
+"production selection. Read original evidence against the [fixed prior "
+"source](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old passes do not "
+"transfer to refactored source."
+
+#: docs/reference/platforms/support.md:39
+msgid "使用前检查"
+msgstr "Checks before use"
+
+#: docs/reference/platforms/support.md:41
+msgid "固定完整料号、Board、振荡源和必要跳线条件。"
+msgstr ""
+"Fix the full part number, Board, oscillator source and required jumper "
+"conditions."
+
+#: docs/reference/platforms/support.md:42
+msgid "查看对应控制器、route、mode 和资源冲突。"
+msgstr "Inspect the controller, route, mode and resource conflicts."
+
+#: docs/reference/platforms/support.md:43
+msgid "解析实际 TOML；未知字段、未维护模式与冲突必须拒绝。"
+msgstr ""
+"Resolve the actual TOML; unknown fields, unmaintained modes and conflicts "
+"must reject."
+
+#: docs/reference/platforms/support.md:44
+msgid "核对同一源码与配置的模型、ARM、SDK 或候选记录。"
+msgstr ""
+"Verify model, ARM, SDK or candidate records for the same source and "
+"configuration."
+
+#: docs/reference/platforms/support.md:45
+msgid "需要物理行为结论时，核对实际 station 原件。"
+msgstr "For physical conclusions, verify actual station originals."
+
+#: docs/reference/platforms/support.md:47
+msgid ""
+"异步 ACCEPTED 后持续借用到 acquire 观察 SETTLED；timeout、cancel 与排空失败 不授权复用存储。物理 HIL 当前为"
+" `not_executed`，未知 PCB 修订仍保持未知。 完整资格边界见[资格参考](qualification.md)。"
+msgstr ""
+"After asynchronous ACCEPTED, borrowing continues until acquire observes "
+"SETTLED. Timeout, cancel and failed drain do not authorize storage reuse. "
+"Physical HIL is currently `not_executed`, and unknown PCB revisions remain "
+"unknown. See the [qualification reference](qualification.md) for complete "
+"boundaries."

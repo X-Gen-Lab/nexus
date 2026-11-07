@@ -3,6 +3,7 @@
 Exact family/part and the selected variant share one fact owner. Consumed input
 paths remain with that selection, and Board physical unknowns stay explicit.
 """
+from tools.configure.tests.native_fixture import native_fixture
 
 from dataclasses import fields, FrozenInstanceError
 from pathlib import Path
@@ -15,7 +16,7 @@ from tools.configure import configure
 class FactStageTests(unittest.TestCase):
     def acquire(self, relative="tools/configure/assemblies/qiming-baremetal.toml"):
         path = configure.ROOT / relative
-        assembly = configure.load_assembly(path)
+        assembly = configure.load_assembly(path, test_support=native_fixture(path))
         reads = {}
 
         def read(source):
@@ -30,7 +31,7 @@ class FactStageTests(unittest.TestCase):
     def test_identity_has_one_fact_owner_and_selected_variant_view(self):
         selected, _ = self.acquire()
         self.assertEqual(selected.part, "STM32F407ZGT6")
-        self.assertEqual(selected.family, "stm32f407")
+        self.assertEqual(selected.family, 'stm32f4')
         self.assertIs(selected.variant, selected.soc["variants"][selected.part])
         stored = {field.name for field in fields(selected)}
         self.assertFalse({"part", "family", "variant"} & stored)
@@ -55,7 +56,8 @@ class FactStageTests(unittest.TestCase):
         stage = configure._resolve_facts
         with patch.object(configure, "_resolve_facts", wraps=stage) as observed:
             result = configure.resolve_ir(configure.ROOT /
-                "tools/configure/assemblies/qiming-baremetal.toml")
+                "tools/configure/assemblies/qiming-baremetal.toml", test_support=native_fixture(configure.ROOT /
+                "tools/configure/assemblies/qiming-baremetal.toml"))
         self.assertEqual(observed.call_count, 1)
         self.assertIsNone(result.physical_pcb_revision)
         self.assertFalse(result.physical_qualified)

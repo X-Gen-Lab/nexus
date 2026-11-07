@@ -1,4 +1,4 @@
-# Authored translation; independently semantically reviewed.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -10,19 +10,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: be73674e5f6ac36aa9d0b6f320ab676866fe71874502e491abb4cae2194f40e6\n"
+"X-Nexus-Source-SHA256: 0018d79d3affb3a00ee50844d304a6f187c1598158becd97d6bbb887412f6715\n"
 
-msgid "Status and evidence"
-msgstr "Status and evidence"
+#: docs/status/index.md:8
+msgid "Current scope and recorded evidence"
+msgstr "Current scope and recorded evidence"
 
+#: docs/status/index.md:10
 msgid ""
-"Use these maintained records to locate implementation, software verification"
-" and physical work. Their recorded source IDs and configurations remain "
-"unchanged; this website build creates documentation evidence only."
+"Current production MCU support is the F4 package. Read exact support and "
+"current execution separately: source presence and a historical result do not "
+"qualify a new revision. Physical HIL remains not executed."
 msgstr ""
-"Use these maintained records to locate implementation, software verification"
-" and physical work. Their recorded source IDs and configurations remain "
-"unchanged; this website build creates documentation evidence only."
+"Current production MCU support is the F4 package. Read exact support and "
+"current execution separately: source presence and a historical result do not "
+"qualify a new revision. Physical HIL remains not executed."
 
-msgid "Start with the {ref}`0.2.1 software preview <sdk-preview-v021>`, the {ref}`sealed candidate baseline <sealed-cold-lifecycle-baseline>` and [iteration entry points](roadmap.md). These describe separate delivery scopes; a newer version does not inherit an older candidate's qualification."
-msgstr "Start with the {ref}`0.2.1 software preview <sdk-preview-v021>`, the {ref}`sealed candidate baseline <sealed-cold-lifecycle-baseline>` and [iteration entry points](roadmap.md). These describe separate delivery scopes; a newer version does not inherit an older candidate's qualification."
+#: docs/status/index.md:23
+msgid ""
+"Original release, software and documentation records remain available through"
+" [the fixed pre-refactor source](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status). They "
+"are historical evidence, not current-site implementation claims."
+msgstr ""
+"Original release, software and documentation records remain available through"
+" [the fixed pre-refactor source](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status). They "
+"are historical evidence, not current-site implementation claims."

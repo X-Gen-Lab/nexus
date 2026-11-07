@@ -9,9 +9,8 @@ FIELDS = frozenset({"tick_source", "tick_hz", "max_priorities",
                     "interrupt_mask", "syscall_priority"})
 PLATFORMS = MappingProxyType({
     "native-reference": "native",
-    "stm32f407zg-qiming-v31": "stm32f407",
-    "stm32f407ve-sky-qingchun": "stm32f407",
-    "gd32f470zg-liangshan": "gd32f470",
+    "stm32f407zg-qiming-v31": "stm32f4",
+    "stm32f407ve-sky-qingchun": "stm32f4",
 })
 
 

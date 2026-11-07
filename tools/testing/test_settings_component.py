@@ -1,4 +1,5 @@
 """Build an authored Settings consumer through the owned component graph."""
+from tools.configure.tests.native_fixture import native_fixture
 
 from pathlib import Path
 import shutil
@@ -17,11 +18,11 @@ class SettingsComponentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="settings consumer ") as name:
             source = Path(name)
             assembly = source / "assembly.toml"
-            template = (ROOT / "tools/configure/assemblies/native-empty.toml")
+            template = (ROOT / "tests/support/native/assemblies/native-empty.toml")
             assembly.write_text(template.read_text(encoding="utf-8").replace(
                 "schema = 2\n", 'schema = 2\ncomponents = ["settings"]\n'),
                 encoding="utf-8")
-            resolved = configure.resolve_ir(assembly)
+            resolved = configure.resolve_ir(assembly, test_support=native_fixture(assembly))
             self.assertEqual(resolved.components, ("settings",))
             (source / "main.c").write_text(
                 '#include "nexus/components/settings.h"\n'
@@ -30,6 +31,7 @@ class SettingsComponentTests(unittest.TestCase):
             (source / "CMakeLists.txt").write_text(
                 'cmake_minimum_required(VERSION 3.31)\n'
                 'project(settings_consumer C)\n'
+                'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Test model" FORCE)\n'
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly.as_posix()}")\n'
                 f'add_subdirectory("{ROOT.as_posix()}" nexus)\n'
                 'nexus_add_firmware(settings_consumer SOURCES main.c)\n',

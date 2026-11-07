@@ -17,7 +17,7 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         self.source = self.root / "wrapper.c"
 
     def test_real_four_timer_tables_are_derived_from_the_selected_source(self):
-        for family, prefix in (("stm32f407", "stm32"), ("gd32f470", "gd32")):
+        for family, prefix in (('stm32f4', 'stm32'),):
             for kind in ("timer_capture", "advanced_pwm"):
                 with self.subTest(family=family, kind=kind):
                     source = configure.ROOT / f"{source_directory(family)}/drivers/{kind}.c"
@@ -71,11 +71,8 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         rows = capabilities.collect(configure.ROOT)
         selected = [row for row in rows if row["kind"] in {"timer_capture", "advanced_pwm"}]
         expected = {
-            ("stm32f407", "TIM4", "timer_capture", "edge-capture"),
-            ("stm32f407", "TIM1", "advanced_pwm", "complementary-pwm"),
-            ("gd32f470", "TIMER3", "timer_capture", "edge-capture"),
-            ("gd32f470", "TIMER0", "advanced_pwm", "complementary-pwm"),
-            ("stm32g474", "TIM5", "timer_capture", "edge-capture"),
+            ('stm32f4', "TIM4", "timer_capture", "edge-capture"),
+            ('stm32f4', "TIM1", "advanced_pwm", "complementary-pwm"),
         }
         self.assertEqual({(row["family"], row["controller"], row["kind"],
                            row["mode"]) for row in selected}, expected)

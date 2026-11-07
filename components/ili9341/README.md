@@ -30,7 +30,7 @@ transport，背光与电源策略仍在外部。
 ## 选定 F407 集成范围
 
 以下是精确 F407 FSMC 参考，不是通用组件要求。完整平台／接线入口见
-[F407 SoC](../../soc/stm32/stm32f407/README.md)与
+[F407 SoC](../../soc/stm32/stm32f4/README.md)与
 [启明 V4.1 Board](../../boards/stm32f407zg_qiming_v41/README.md)。
 
 私有 owner 维护运行期 NE3 一 MiB SRAM window 与 NE4 command／data port，使用

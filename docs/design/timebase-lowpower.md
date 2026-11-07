@@ -1,7 +1,7 @@
 # Reviewed shallow tickless timebase
 
 `[os].lowpower_port = "timebase"` selects a maintained private FreeRTOS
-binding for STM32F407 and GD32F470. The default is `"custom"`: existing
+binding for STM32F407. The default is `"custom"`: existing
 application-provided ports and the weak NULL fallback keep their behavior.
 Selection also requires `tickless = true`, SysTick, a single privileged
 security domain and no MPU profile. CPU-only Runtime configurations reject this
@@ -14,7 +14,6 @@ configure a wake pin or make board electrical claims.
 | SoC | Clock / timer | Private compare | Existing shared owner |
 | --- | --- | --- | --- |
 | STM32F407 | HSE8 / PLL168, TIM2 PSC83 | CC1, CCR1 | TIM2 update / 64-bit epoch |
-| GD32F470 | HXTAL25 / PLL200, TIMER1 PSC99 | CH0, CH0CV | TIMER1 update / 64-bit epoch |
 
 The timer is already exclusively reserved by the platform timebase. No output
 channel is connected to a pin. The getter only inspects the established profile:
@@ -81,18 +80,16 @@ layout is 16 bytes; the read-only register binding and port face are 52 and
 24 bytes. These are structure layouts, not a linked image cost claim. The
 existing timebase, default request/stream state and OS objects gain no fields.
 Default source selection omits the common mechanism, SoC binding and selected
-IRQ branches. Four actual production CMake ARM graphs verify zero default new
-mechanism TUs/symbols, versus two selected TUs and a strong getter. In the same
-empty assembly retaining kernel startup, no-LTO Os/GNUArm14.3.1, selection adds
-1532 bytes of Flash / 16 bytes RAM on STM32 and 1516 bytes Flash / 16 bytes RAM
-on GD32. These are development fixture deltas, not application or hardware costs.
+IRQ branches. Actual current-source images must verify unused-mode elimination and selected
+resource cost. Historical cross-family measurements retain their original
+source and do not qualify this refactor.
 
 The GoogleTest / GoogleMock suites execute production common C, actual SDK
 register layouts, real SoC timebase IRQ and shutdown code. Tests cover pending
 arrival, reversed time, late compare, counter wrap, failed disable/restore,
 first-reload consumption, second-pause rejection and shared IRQ flag races.
-The two chip suites use external CPU, clock-bootstrap and register semantics
-models; they are software evidence.
+The F4 suite uses external CPU, clock-bootstrap and register semantics
+models; these are software tests.
 
 Physical HIL has not run. Acceptance still requires the real boards and probes:
 verify shallow-Sleep clock continuity, NVIC wake, actual capture/restore windows,

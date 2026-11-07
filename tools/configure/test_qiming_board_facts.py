@@ -1,4 +1,5 @@
 """Exact uploaded Qiming boards select real pads without fitted-part defaults."""
+from tools.configure.tests.native_fixture import native_fixture
 import json
 from pathlib import Path
 import tempfile
@@ -33,7 +34,7 @@ class QimingBoardFactsTests(unittest.TestCase):
 
     def resolve(self, board, sections="", hardware=None):
         try:
-            return gate.resolve_ir(self.authored(board, sections, hardware))
+            return gate.resolve_ir(self.authored(board, sections, hardware), test_support=native_fixture(self.authored(board, sections, hardware)))
         except gate.ConfigurationError as error:
             self.fail(f"Reviewed Qiming selection is unavailable: {error}")
 
@@ -54,7 +55,13 @@ class QimingBoardFactsTests(unittest.TestCase):
             'max_hz = 1000000\n'
             '[spi_device.memory]\ncontroller = "memory_bus"\n'
             'driver = "spi-endpoint"\ncs_binding = "nor-cs"\n'
-            'mode = 0\nmax_hz = 1000000\n', hardware))
+            'mode = 0\nmax_hz = 1000000\n', hardware), test_support=native_fixture(self.authored(
+            board,
+            '[spi.memory_bus]\nbinding = "spi1"\nmode = "short-poll"\n'
+            'max_hz = 1000000\n'
+            '[spi_device.memory]\ncontroller = "memory_bus"\n'
+            'driver = "spi-endpoint"\ncs_binding = "nor-cs"\n'
+            'mode = 0\nmax_hz = 1000000\n', hardware)))
 
     def test_v41_auxiliary_wire_gpio_uses_actual_open_drain_pads(self):
         names = ("camera-scl", "camera-sda", "audio-scl", "audio-sda",
@@ -80,7 +87,7 @@ class QimingBoardFactsTests(unittest.TestCase):
                           "debug_port": "swd"}):
             with self.subTest(hardware=hardware):
                 with self.assertRaises(ValueError):
-                    gate.resolve_ir(self.authored(HIGH, sections, hardware))
+                    gate.resolve_ir(self.authored(HIGH, sections, hardware), test_support=native_fixture(self.authored(HIGH, sections, hardware)))
 
     def test_v41_beeper_and_infrared_are_gpio_and_real_exti2(self):
         sections = (self.gpio(("beeper",)) +
@@ -123,7 +130,7 @@ class QimingBoardFactsTests(unittest.TestCase):
             with self.subTest(binding=name):
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "binding"):
-                    gate.resolve_ir(self.authored(CORE, self.gpio((name,))))
+                    gate.resolve_ir(self.authored(CORE, self.gpio((name,))), test_support=native_fixture(self.authored(CORE, self.gpio((name,)))))
 
     def test_core_keys_select_input_and_explicit_internal_pullups(self):
         selected = self.resolve(
@@ -141,7 +148,7 @@ class QimingBoardFactsTests(unittest.TestCase):
         self.assertEqual([item.pins[0]["pin"] for item in
                           selected.controllers], ["PF9", "PF8", "PF7", "PF6"])
         with self.assertRaisesRegex(gate.ConfigurationError, "binding"):
-            gate.resolve_ir(self.authored(HIGH, self.gpio(("key4",), "input")))
+            gate.resolve_ir(self.authored(HIGH, self.gpio(("key4",), "input")), test_support=native_fixture(self.authored(HIGH, self.gpio(("key4",), "input"))))
 
     def test_both_actual_usart1_paths_generate_the_existing_irq_provider(self):
         sections = ('[uart.console]\nbinding = "uart1"\nmode = "irq"\n'
@@ -187,7 +194,7 @@ class QimingBoardFactsTests(unittest.TestCase):
         for board in (CORE, HIGH):
             with self.subTest(board=board):
                 with self.assertRaisesRegex(gate.ConfigurationError, "mode"):
-                    gate.resolve_ir(self.authored(board, self.gpio(("key0",))))
+                    gate.resolve_ir(self.authored(board, self.gpio(("key0",))), test_support=native_fixture(self.authored(board, self.gpio(("key0",)))))
 
     def test_unpulled_or_pulled_down_keys_are_rejected_instead_of_silently_repaired(self):
         for board in (CORE, HIGH):
@@ -196,7 +203,8 @@ class QimingBoardFactsTests(unittest.TestCase):
                     with self.assertRaisesRegex(gate.ConfigurationError,
                                                 "electrical|pull"):
                         gate.resolve_ir(self.authored(
-                            board, self.gpio(("key0",), "input", pull)))
+                            board, self.gpio(("key0",), "input", pull)), test_support=native_fixture(self.authored(
+                            board, self.gpio(("key0",), "input", pull))))
 
     def test_selected_xpt2046_uses_mixed_gpio_without_inventing_a_hardware_spi(self):
         sections = (self.gpio(("touch-clk", "touch-mosi", "touch-cs")) +
@@ -257,13 +265,15 @@ class QimingBoardFactsTests(unittest.TestCase):
                                             "Resource conflict pin:PF11"):
                     gate.resolve_ir(self.authored(
                         board, self.gpio(("touch-pen",), "input", "up") +
-                        edge, hardware))
+                        edge, hardware), test_support=native_fixture(self.authored(
+                        board, self.gpio(("touch-pen",), "input", "up") +
+                        edge, hardware)))
 
     def test_nor_and_touch_share_gpiob_without_a_fabricated_second_spi(self):
         for board in (CORE, HIGH):
             with self.subTest(board=board):
                 path = gate.ROOT / "boards" / board / "assemblies/touch-nor.toml"
-                selected = gate.resolve_ir(path)
+                selected = gate.resolve_ir(path, test_support=native_fixture(path))
                 self.assertEqual([item.controller for item in
                                   selected.controllers if item.kind == "spi"],
                                  ["SPI1"])
@@ -351,7 +361,7 @@ class QimingBoardFactsTests(unittest.TestCase):
         path.write_text(path.read_text().replace(
             f'board = "{CORE}"', f'board_package = "{directory}"'))
         with self.assertRaisesRegex(gate.ConfigurationError, "route"):
-            gate.resolve_ir(path)
+            gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_existing_v31_keeps_its_original_led_and_unknown_physical_status(self):
         selected = self.resolve("stm32f407_qiming_v31",

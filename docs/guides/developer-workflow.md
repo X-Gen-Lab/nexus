@@ -241,9 +241,8 @@ For streams, a consumer releases each acquired block explicitly. Slow consumers
 can cause loss or stop on backpressure according to the selected mode; providers
 must not overwrite outstanding loans. Stop may return BUSY until loans and
 hardware references drain. Restart uses a new valid lifecycle after complete
-stop; clearing counters is not recovery. The H743 continuous-mode exercise is a
-separate exact ARM configuration, not a claim that the three launch boards have
-identical continuous-mode wiring.
+stop; clearing counters is not recovery. Select each F407 Board, route and
+continuous mode independently; one assembly does not authorize another Board.
 
 ## Diagnose facts without changing ownership
 

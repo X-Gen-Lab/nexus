@@ -93,7 +93,7 @@ class StaticCallTests(unittest.TestCase):
         from tools.configure.dependencies import source_names
         for mode in ("platform", "runtime"):
             self.assertIn("tools/configure/calls.py",
-                          source_names(mode, "stm32f407", sdk=True))
+                          source_names(mode, 'stm32f4', sdk=True))
 
     def test_construction_rejects_legacy_initializer_and_stop_fragments(self):
         for initialize, stop in (

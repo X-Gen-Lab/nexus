@@ -1,4 +1,5 @@
 """Authored UART frames and word interfaces keep their real public types."""
+from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 from dataclasses import replace
 from pathlib import Path
 import re
@@ -15,8 +16,7 @@ class UARTFormatConfiguration(unittest.TestCase):
         self.root = Path(self.temporary.name)
 
     def resolve(self, fixture, frame, words=False):
-        contents = (configure.ROOT / "tools/configure/assemblies" /
-                    fixture).read_text()
+        contents = (canonical_assembly(configure.ROOT, fixture)).read_text()
         name = re.search(r"(?m)^\[uart\.([^].]+)\]$", contents)[1]
         if words:
             contents = contents.replace('mode = "irq"',
@@ -26,10 +26,10 @@ class UARTFormatConfiguration(unittest.TestCase):
         contents += f"\n[uart.{name}.frame]\n" + frame + "\n"
         path = self.root / "assembly.toml"
         path.write_text(contents)
-        return configure.resolve_ir(path)
+        return configure.resolve_ir(path, test_support=native_fixture(path))
 
     def test_selected_word_vector_probe_has_one_sidecar_and_real_build_fact(self):
-        for family, vector in (("f407", "USART1"), ("gd470", "USART0")):
+        for family, vector in (('f407', 'USART1'),):
             with self.subTest(family=family):
                 contents = (configure.ROOT / (
                     "tests/contracts/io_evolution_assembly/" + family +
@@ -37,7 +37,7 @@ class UARTFormatConfiguration(unittest.TestCase):
                 path = self.root / "probe.toml"
                 path.write_text(contents.replace("priority = 5",
                                                 "priority = 5\nprobe = true"))
-                result = configure.resolve_ir(path)
+                result = configure.resolve_ir(path, test_support=native_fixture(path))
                 self.assertTrue(result.controllers[0].options.irq.probe)
                 _, source = bindings.emit(result)
                 declaration = "NX_IO_IRQ_PROBE_DECLARE(" + vector + ")"
@@ -49,7 +49,7 @@ class UARTFormatConfiguration(unittest.TestCase):
                 self.assertIn("nx_factory_uart_word_irq_probe(", header)
                 self.assertIn("&nx_io_irq_probe_" + vector, getters)
                 output = self.root / family
-                configure.configure(path, output)
+                configure.configure(path, output, test_support=native_fixture(path))
                 self.assertIn("#define NX_IO_CYCLE_PROBES 1",
                               (output / "nexus_config.h").read_text())
                 self.assertIn("set(NEXUS_IO_CYCLE_PROBES ON)",
@@ -58,7 +58,7 @@ class UARTFormatConfiguration(unittest.TestCase):
     def test_unselected_word_vector_adds_no_probe_state_or_lookup(self):
         path = configure.ROOT / (
             "tests/contracts/io_evolution_assembly/f407-uart9n1.toml")
-        result = configure.resolve_ir(path)
+        result = configure.resolve_ir(path, test_support=native_fixture(path))
         self.assertFalse(result.controllers[0].options.irq.probe)
         self.assertNotIn("NX_IO_IRQ_PROBE_", bindings.emit(result)[1])
         self.assertNotIn("nx_factory_uart_word_irq_probe(", factory.emit(result)[0])
@@ -69,7 +69,7 @@ class UARTFormatConfiguration(unittest.TestCase):
         path = self.root / "probe-order.toml"
         path.write_text(contents.replace("priority = 5",
                                         "priority = 5\nprobe = true"))
-        result = configure.resolve_ir(path)
+        result = configure.resolve_ir(path, test_support=native_fixture(path))
         config_include = '#include "nexus_config.h"'
         header, _ = factory.emit(result)
         self.assertIn(config_include, header)
@@ -79,7 +79,7 @@ class UARTFormatConfiguration(unittest.TestCase):
         self.assertLess(source.index(config_include),
                         source.index('#include "nexus_factory.h"'))
         output = self.root / "ordered"
-        configure.configure(path, output)
+        configure.configure(path, output, test_support=native_fixture(path))
         config = (output / "nexus_config.h").read_text()
         self.assertIn("#if defined(NX_IO_CYCLE_PROBES)", config)
         self.assertIn("#error", config)
@@ -94,18 +94,17 @@ class UARTFormatConfiguration(unittest.TestCase):
                 destination.write_text(path.read_text().replace(
                     "priority = 5", "priority = 5\nprobe = " + value))
                 with self.subTest(family=family, value=value), self.assertRaises(ValueError):
-                    configure.resolve_ir(destination)
+                    configure.resolve_ir(destination, test_support=native_fixture(destination))
         contents = (configure.ROOT / (
             "tests/contracts/io_evolution_assembly/native-uart9n1.toml")).read_text()
         path = self.root / "native-probe.toml"
         path.write_text(contents.replace("priority = 5", "priority = 5\nprobe = true"))
         with self.assertRaisesRegex(ValueError, "probe.*reviewed|reviewed.*probe"):
-            configure.resolve_ir(path)
+            configure.resolve_ir(path, test_support=native_fixture(path))
 
     def test_reviewed_irq_frames_emit_configuration_and_masked_irq_entry(self):
         frame = 'data_bits=7\nparity="even"\nstop_bits=2\nflow="none"'
-        for fixture, prefix in (("qiming-baremetal-uart.toml", "stm32"),
-                                ("liangshan-baremetal-uart.toml", "gd32")):
+        for fixture, prefix in (('qiming-baremetal-uart.toml', 'stm32'),):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture, frame)
                 item = next(item for item in result.controllers
@@ -123,9 +122,7 @@ class UARTFormatConfiguration(unittest.TestCase):
 
     def test_nine_bit_uses_independent_word_state_and_factory(self):
         frame = 'data_bits=9\nparity="none"\nstop_bits=1\nflow="none"'
-        for fixture, prefix in (("native-uart.toml", "native"),
-                                ("qiming-baremetal-uart.toml", "stm32"),
-                                ("liangshan-baremetal-uart.toml", "gd32")):
+        for fixture, prefix in (('native-uart.toml', 'native'), ('qiming-baremetal-uart.toml', 'stm32')):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture, frame, words=True)
                 header, source = factory.emit(result)
@@ -182,8 +179,7 @@ class UARTFormatConfiguration(unittest.TestCase):
 
     def test_failed_formatted_constructor_retains_effects_for_cleanup(self):
         frame = 'data_bits=7\nparity="even"\nstop_bits=2\nflow="none"'
-        for fixture in ("qiming-baremetal-uart.toml",
-                        "liangshan-baremetal-uart.toml"):
+        for fixture in ('qiming-baremetal-uart.toml',):
             with self.subTest(fixture=fixture):
                 result = self.resolve(fixture, frame)
                 item = next(item for item in result.controllers
@@ -194,7 +190,7 @@ class UARTFormatConfiguration(unittest.TestCase):
                     item, result, result.board_bindings, result.routes,
                     result.devices)
                 self.assertTrue(construction.retain_on_failed_init)
-                prefix = "stm32" if result.soc_family == "stm32f407" else "gd32"
+                prefix = "stm32" if result.soc_family == 'stm32f4' else "gd32"
                 prepare = f"nx_{prefix}_uart_byte_cold_prepare"
                 self.assertIn(f"nx_{prefix}_uart_byte_cold_close", source)
                 start = source.index(

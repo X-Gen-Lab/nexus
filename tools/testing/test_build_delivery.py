@@ -326,14 +326,16 @@ class BuildDeliveryTests(unittest.TestCase):
 
     def test_scope_selects_real_native_model_dependencies(self):
         selected = dependencies.required_submodules("native")
-        self.assertIn("vendors/st/cmsis_device_u5", selected)
+        self.assertIn("vendors/st/cmsis_device_f4", selected)
         self.assertIn("ext/freertos", selected)
-        selected = dependencies.required_submodules("arm", "stm32h743", "baremetal")
+        self.assertNotIn("vendors/st/cmsis_device_u5", selected)
+        selected = dependencies.required_submodules("arm", "stm32f4", "baremetal")
         self.assertEqual(selected, ("vendors/arm/CMSIS_6",
-                                    "vendors/st/cmsis_device_h7",
-                                    "vendors/st/stm32h7_hal"))
-        with self.assertRaises(EvidenceError):
-            dependencies.required_submodules("arm", "unknown", "baremetal")
+                                    "vendors/st/cmsis_device_f4",
+                                    "vendors/st/stm32f4_hal"))
+        for family in ("unknown", "stm32h743", "stm32f407"):
+            with self.subTest(family=family), self.assertRaises(EvidenceError):
+                dependencies.required_submodules("arm", family, "baremetal")
 
     def test_native_requires_google_source_without_exporting_it_to_firmware(self):
         self.assertIn("ext/googletest",
@@ -354,7 +356,8 @@ class BuildDeliveryTests(unittest.TestCase):
         declaration = "".join(
             '[submodule "' + item.path + '"]\n path = ' + item.path +
             '\n url = ' + item.fetch_url + '\n'
-            for item in source_catalogue.SOURCE_DEPENDENCIES)
+            for item in source_catalogue.ALL_SOURCE_DEPENDENCIES
+            if item.identifier != "googletest")
         google_url = source_catalogue.dependency("googletest").fetch_url
         google = ('[submodule "ext/googletest"]\n path = ext/googletest\n'
                   ' url = ' + google_url + '\n')
@@ -368,15 +371,18 @@ class BuildDeliveryTests(unittest.TestCase):
             source_catalogue.declared_modules((declaration + google.replace(
                 google_url, "https://github.com/unreviewed/googletest.git")).encode())
 
-    def test_f407_scoped_prepare_includes_actual_official_ll_dependency(self):
+    def test_f4_scoped_prepare_includes_actual_official_ll_dependency(self):
         expected = ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                     "vendors/st/stm32f4_hal")
         for backend in ("baremetal", "freertos", "threadx"):
             with self.subTest(backend=backend):
-                selected = dependencies.required_submodules("arm", "stm32f407",
+                selected = dependencies.required_submodules("arm", "stm32f4",
                                                             backend)
-                self.assertEqual(selected, expected + (
-                    () if backend == "baremetal" else ("ext/" + backend,)))
+                expected_sources = set(expected)
+                if backend != "baremetal":
+                    expected_sources.add("ext/" + backend)
+                self.assertEqual(set(selected), expected_sources)
+                self.assertEqual(len(selected), len(expected_sources))
 
     def test_wheel_vendor_metadata_is_not_another_top_level_distribution(self):
         wheel = self.wheel()

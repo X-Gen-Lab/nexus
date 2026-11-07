@@ -6,23 +6,10 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#if defined(NX_UART_FORMAT_STM32)
 extern "C" {
 #include "stm32f407_uart_word.h"
 }
 #include "nexus/io/native/model.h"
-#else
-extern "C" {
-#include "gd32f470_uart_word.h"
-#include "gd32f4xx.h"
-extern uint64_t g_gd32_model_now;
-extern uint32_t g_gd32_model_mask;
-extern bool g_gd32_model_isr;
-void USART0_IRQHandler(void) {
-}
-}
-#include <sys/mman.h>
-#endif
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
@@ -55,11 +42,6 @@ void reset_ports() {
     reject_irq_priority = reject_clock_off = false;
     model_irq_enabled = false;
     model_irq_priority = 0U;
-#if !defined(NX_UART_FORMAT_STM32)
-    /* Each fixture maps a fresh peripheral device; its external NVIC model
-     * must be reset as part of the same simulated device power cycle. */
-    std::memset(NVIC, 0, sizeof(*NVIC));
-#endif
 }
 } /* namespace */
 
@@ -68,7 +50,6 @@ class UartFormatProvider : public testing::Test {
     uint16_t rx[4] = {};
     uint16_t payload[2] = {0x1FFU, 0x100U};
     nx_uart_word_tx_request_t request = {};
-#if defined(NX_UART_FORMAT_STM32)
     using ByteState = nx_stm32_uart_state_t;
     nx_result_t initialize_bytes(ByteState* bytes, uint8_t* storage) {
         bytes->registers = &registers;
@@ -84,19 +65,6 @@ class UartFormatProvider : public testing::Test {
     nx_uart_port_t bytes_face(ByteState* bytes) {
         return {&nx_stm32_uart_ops, bytes};
     }
-#else
-    using ByteState = nx_gd32_uart_state_t;
-    nx_result_t initialize_bytes(ByteState* bytes, uint8_t* storage) {
-        return nx_gd32_uart_initialize_format_at(
-            bytes, &nx_gd32_usart0_controller, 115200U, NX_UART_RX_BYTES,
-            storage, 4U, 5U,
-            {8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2, NX_UART_FLOW_CTS});
-    }
-    nx_uart_port_t bytes_face(ByteState* bytes) {
-        return {&nx_gd32_uart_ops, bytes};
-    }
-#endif
-#if defined(NX_UART_FORMAT_STM32)
     alignas(size_t) USART_TypeDef registers = {};
     nx_stm32_uart_word_state_t state = {};
     nx_uart_word_port_t port = {&nx_stm32_uart_word_ops, &state};
@@ -126,45 +94,6 @@ class UartFormatProvider : public testing::Test {
     static constexpr uint32_t empty = USART_SR_TXE;
     static constexpr uint32_t complete = USART_SR_TC;
     static constexpr uint32_t ready = USART_SR_RXNE;
-#else
-    void* mapping = MAP_FAILED;
-    nx_gd32_uart_word_state_t state = {};
-    nx_uart_word_port_t port = {&nx_gd32_uart_word_ops, &state};
-    void SetUp() override {
-        reset_ports();
-        mapping =
-            mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000,
-                 PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
-        g_gd32_model_now = 10U;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
-        ASSERT_EQ(nx_gd32_uart_word_initialize(
-                      &state, &nx_gd32_usart0_controller, 115200U, rx, 4U, 5U),
-                  NX_SUCCESS);
-        nx_request_initialize(&request.base);
-    }
-    void TearDown() override {
-        reset_ports();
-        if (mapping != MAP_FAILED) {
-            EXPECT_EQ(munmap(mapping, 0x80000), 0);
-        }
-    }
-    void irq(uint32_t flags) {
-        USART_STAT0(USART0) = flags;
-        nx_gd32_uart_word_irq(&state);
-    }
-    uint32_t data() {
-        return USART_DATA(USART0);
-    }
-    void advance(nx_time_us_t duration) {
-        g_gd32_model_now += duration;
-    }
-    static constexpr uint32_t empty = USART_STAT0_TBE;
-    static constexpr uint32_t complete = USART_STAT0_TC;
-    static constexpr uint32_t ready = USART_STAT0_RBNE;
-#endif
 };
 
 TEST_F(UartFormatProvider, WritesAllNineBitsAndWaitsForDistinctWireTc) {
@@ -201,11 +130,7 @@ TEST_F(UartFormatProvider, CancellationDoesNotReleaseTheInflightWord) {
 }
 
 TEST_F(UartFormatProvider, RxPreservesNinthBitWithoutByteFaceStorage) {
-#if defined(NX_UART_FORMAT_STM32)
     registers.DR = 0x1AAU;
-#else
-    USART_DATA(USART0) = 0x1AAU;
-#endif
     irq(ready);
     uint16_t value = 0U;
     size_t count = 0U;
@@ -252,7 +177,6 @@ TEST_F(UartFormatProvider, DeadlineQuarantinesUnprovedDrainUntilLateWireTc) {
     EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
 }
 
-#if defined(NX_UART_FORMAT_STM32)
 TEST(UartByteFormat, F407SupportsEightDataBitsWithParityWithoutGrowingState) {
     reset_ports();
     USART_TypeDef registers = {};
@@ -287,50 +211,7 @@ TEST(UartByteFormat, F407SupportsEightDataBitsWithParityWithoutGrowingState) {
     nx_stm32_uart_format_irq(&state);
     EXPECT_EQ(rx[0], 0x7AU);
 }
-#else
-TEST_F(UartFormatProvider, GdByteFormatSurvivesCancellationReset) {
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-    nx_gd32_uart_state_t bytes = {};
-    uint8_t byte_rx[4] = {};
-    ASSERT_EQ(nx_gd32_uart_initialize_at(&bytes, &nx_gd32_usart0_controller,
-                                         115200U, NX_UART_RX_BYTES, byte_rx, 4U,
-                                         5U),
-              NX_SUCCESS);
-    const nx_uart_format_t format = {8U, NX_UART_PARITY_ODD, NX_UART_STOP_2,
-                                     NX_UART_FLOW_CTS};
-    ASSERT_EQ(nx_gd32_uart_format_configure(&bytes, format), NX_SUCCESS);
-    uint8_t byte = 0x55U;
-    nx_uart_tx_request_t tx = {};
-    nx_request_initialize(&tx.base);
-    ASSERT_EQ(nx_uart_tx_prepare(&tx, &byte, 1U, 1000U), NX_SUCCESS);
-    const nx_uart_port_t byte_port = {&nx_gd32_uart_ops, &bytes};
-    ASSERT_EQ(nx_uart_port_submit(&byte_port, &tx), NX_SUCCESS);
-    ASSERT_EQ(nx_uart_port_cancel(&byte_port, &tx), NX_SUCCESS);
-    nx_uart_port_service(&byte_port);
-    EXPECT_EQ(nx_request_state(&tx.base), NX_REQUEST_SETTLED);
-    EXPECT_EQ(USART_CTL0(USART0) &
-                  (USART_CTL0_WL | USART_CTL0_PCEN | USART_CTL0_PM),
-              USART_CTL0_WL | USART_CTL0_PCEN | USART_CTL0_PM);
-    EXPECT_EQ(USART_CTL1(USART0) & USART_CTL1_STB, 2U << 12U);
-    EXPECT_NE(USART_CTL2(USART0) & USART_CTL2_CTSEN, 0U);
-    size_t count = 0U;
-    uint8_t output = 0U;
-    EXPECT_EQ(nx_uart_port_read_bytes(&byte_port, &output, 1U, &count),
-              NX_ERROR_OVERFLOW);
-    ASSERT_EQ(nx_gd32_uart_format_configure(
-                  &bytes,
-                  {7U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE}),
-              NX_SUCCESS);
-    USART_DATA(USART0) = 0xFAU;
-    USART_STAT0(USART0) = USART_STAT0_RBNE;
-    nx_gd32_uart_format_irq(&bytes);
-    ASSERT_EQ(nx_uart_port_read_bytes(&byte_port, &output, 1U, &count),
-              NX_SUCCESS);
-    EXPECT_EQ(output, 0x7AU);
-}
-#endif
 
-#if defined(NX_UART_FORMAT_STM32)
 TEST(UartColdFormat, F407FirstEnableAlreadyHasTheSelectedWireFormat) {
     reset_ports();
     USART_TypeDef registers = {};
@@ -374,46 +255,9 @@ TEST(UartColdFormat, F407RejectsUnsupportedFormatBeforeAnyHardwareEffects) {
     EXPECT_EQ(registers.BRR, 0U);
     EXPECT_EQ(cold_enables, 0U);
 }
-#else
-TEST_F(UartFormatProvider, GdFirstEnableAlreadyHasTheSelectedWireFormat) {
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-    nx_gd32_uart_state_t bytes = {};
-    uint8_t byte_rx[4] = {};
-    cold_enables = 0U;
-    observe_cold_enable = true;
-    EXPECT_EQ(nx_gd32_uart_initialize_format_at(
-                  &bytes, &nx_gd32_usart0_controller, 115200U, NX_UART_RX_BYTES,
-                  byte_rx, 4U, 5U,
-                  {8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2, NX_UART_FLOW_CTS}),
-              NX_SUCCESS);
-    observe_cold_enable = false;
-    EXPECT_EQ(cold_enables, 1U);
-    EXPECT_TRUE(bytes.initialized);
-}
-
-TEST_F(UartFormatProvider, GdRejectsUnsupportedFormatBeforeClockOrIrqEffects) {
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-    nx_gd32_uart_state_t bytes = {};
-    uint8_t byte_rx[4] = {};
-    uint32_t before_clock = RCU_REG_VAL(nx_gd32_usart0_controller.clock);
-    unsigned vector = USART0_IRQn;
-    uint32_t before_irq = NVIC->ISER[vector / 32U];
-    cold_enables = 0U;
-    EXPECT_EQ(nx_gd32_uart_initialize_format_at(
-                  &bytes, &nx_gd32_usart0_controller, 115200U, NX_UART_RX_BYTES,
-                  byte_rx, 4U, 5U,
-                  {9U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE}),
-              NX_ERROR_UNSUPPORTED);
-    EXPECT_FALSE(bytes.initialized);
-    EXPECT_EQ(RCU_REG_VAL(nx_gd32_usart0_controller.clock), before_clock);
-    EXPECT_EQ(NVIC->ISER[vector / 32U], before_irq);
-    EXPECT_EQ(cold_enables, 0U);
-}
-#endif
 
 /** \brief This model boundary observes and performs the actual UE/UEN write. */
 extern "C" void nx_uart_format_model_enable(uintptr_t base, uint32_t control) {
-#if defined(NX_UART_FORMAT_STM32)
     auto* registers = reinterpret_cast<USART_TypeDef*>(base);
     if (observe_cold_enable) {
         EXPECT_EQ(registers->CR1 & USART_CR1_UE, 0U);
@@ -425,35 +269,13 @@ extern "C" void nx_uart_format_model_enable(uintptr_t base, uint32_t control) {
         ++cold_enables;
     }
     nx_uart_format_model_write(&registers->CR1, control);
-#else
-    uint32_t registers = static_cast<uint32_t>(base);
-    if (observe_cold_enable) {
-        EXPECT_EQ(USART_CTL0(registers) & USART_CTL0_UEN, 0U);
-        EXPECT_EQ(control & (USART_CTL0_WL | USART_CTL0_PCEN | USART_CTL0_PM),
-                  USART_CTL0_WL | USART_CTL0_PCEN);
-        EXPECT_EQ(USART_CTL1(registers) & USART_CTL1_STB, 2U << 12U);
-        EXPECT_EQ(USART_CTL2(registers) & (USART_CTL2_RTSEN | USART_CTL2_CTSEN),
-                  USART_CTL2_CTSEN);
-        ++cold_enables;
-    }
-    nx_uart_format_model_write(&USART_CTL0(registers), control);
-#endif
 }
 
 TEST_F(UartFormatProvider, ReadRejectsActualUartControlRegisters) {
-#if defined(NX_UART_FORMAT_STM32)
     registers.DR = 0x1AAU;
-#else
-    USART_DATA(USART0) = 0x1AAU;
-#endif
     irq(ready);
-#if defined(NX_UART_FORMAT_STM32)
     auto* control = &registers.CR1;
     auto* aligned_count = &registers.CR2;
-#else
-    auto* control = &USART_CTL0(USART0);
-    auto* aligned_count = &USART_CTL1(USART0);
-#endif
     uint32_t before = *control;
     size_t count = 123U;
     EXPECT_EQ(nx_uart_word_port_read(
@@ -473,7 +295,6 @@ TEST_F(UartFormatProvider, ReadRejectsActualUartControlRegisters) {
 TEST_F(UartFormatProvider, ColdReceiveStorageCannotBeUartRegisters) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     decltype(state) other{};
-#if defined(NX_UART_FORMAT_STM32)
     other.registers = &registers;
     other.irq = USART1_IRQn;
     EXPECT_EQ(
@@ -482,14 +303,6 @@ TEST_F(UartFormatProvider, ColdReceiveStorageCannotBeUartRegisters) {
             reinterpret_cast<uint16_t*>(const_cast<uint32_t*>(&registers.CR1)),
             1U),
         NX_ERROR_INVALID);
-#else
-    EXPECT_EQ(nx_gd32_uart_word_initialize(
-                  &other, &nx_gd32_usart0_controller, 115200U,
-                  reinterpret_cast<uint16_t*>(
-                      const_cast<uint32_t*>(&USART_CTL0(USART0))),
-                  1U, 5U),
-              NX_ERROR_INVALID);
-#endif
     if (other.initialized) {
         auto cleanup = port;
         cleanup.context = &other;
@@ -501,53 +314,18 @@ TEST_F(UartFormatProvider, StoppedOldOwnerCannotDisableTheNextInstance) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     decltype(state) other{};
     uint16_t other_rx[2] = {};
-#if defined(NX_UART_FORMAT_STM32)
     other.registers = &registers;
     other.irq = USART1_IRQn;
     ASSERT_EQ(
         nx_stm32_uart_word_initialize(&other, 84000000U, 115200U, other_rx, 2U),
         NX_SUCCESS);
     uint32_t before = registers.CR1;
-#else
-    ASSERT_EQ(nx_gd32_uart_word_initialize(&other, &nx_gd32_usart0_controller,
-                                           115200U, other_rx, 2U, 5U),
-              NX_SUCCESS);
-    uint32_t before = USART_CTL0(USART0);
-#endif
     EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-#if defined(NX_UART_FORMAT_STM32)
     EXPECT_EQ(registers.CR1, before);
-#else
-    EXPECT_EQ(USART_CTL0(USART0), before);
-#endif
     auto cleanup = port;
     cleanup.context = &other;
     EXPECT_EQ(nx_uart_word_port_stop(&cleanup), NX_SUCCESS);
 }
-
-#if !defined(NX_UART_FORMAT_STM32)
-TEST_F(UartFormatProvider, WordColdConstructorDiscardsEarlierOwnersUnreadRx) {
-    USART_DATA(USART0) = 0x1ABU;
-    USART_STAT0(USART0) = USART_STAT0_RBNE;
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-
-    nx_gd32_uart_word_state_t next = {};
-    uint16_t next_rx[2] = {};
-    ASSERT_EQ(nx_gd32_uart_word_initialize(&next, &nx_gd32_usart0_controller,
-                                           115200U, next_rx, 2U, 5U),
-              NX_SUCCESS);
-    const nx_uart_word_port_t next_port = {&nx_gd32_uart_word_ops, &next};
-    nx_gd32_uart_word_irq(&next);
-
-    uint16_t received = 0U;
-    size_t count = 99U;
-    EXPECT_EQ(nx_uart_word_port_read(&next_port, &received, 1U, &count),
-              NX_ERROR_EMPTY);
-    EXPECT_EQ(count, 0U);
-    EXPECT_EQ(received, 0U);
-    EXPECT_EQ(nx_uart_word_port_stop(&next_port), NX_SUCCESS);
-}
-#endif
 
 TEST_F(UartFormatProvider, NeverOwnedColdStopIsIdempotentWithoutMmioAccess) {
     EXPECT_EXIT(
@@ -561,13 +339,8 @@ TEST_F(UartFormatProvider, NeverOwnedColdStopIsIdempotentWithoutMmioAccess) {
 }
 
 TEST_F(UartFormatProvider, TransmitCannotBorrowMutableUartDataRegisters) {
-#if defined(NX_UART_FORMAT_STM32)
     registers.DR = 0x1ABU;
     auto* data = &registers.DR;
-#else
-    USART_DATA(USART0) = 0x1ABU;
-    auto* data = &USART_DATA(USART0);
-#endif
     ASSERT_EQ(nx_uart_word_tx_prepare(&request,
                                       reinterpret_cast<const uint16_t*>(
                                           const_cast<const uint32_t*>(data)),
@@ -583,11 +356,7 @@ TEST_F(UartFormatProvider, TransmitCannotBorrowMutableUartDataRegisters) {
 
 TEST_F(UartFormatProvider, DrainBudgetCoversTwoElevenBitWords) {
     state.baud = 9600U;
-#if defined(NX_UART_FORMAT_STM32)
     registers.BRR = 8750U;
-#else
-    USART_BAUD(USART0) = 10417U;
-#endif
     ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 2U, NX_DEADLINE_NEVER),
               NX_SUCCESS);
     ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
@@ -616,7 +385,6 @@ extern "C" void nx_uart_format_model_write(volatile uint32_t* address,
  * ports. */
 extern "C" uint32_t nx_uart_format_model_irq(unsigned command, int irq,
                                              uint32_t value) {
-#if defined(NX_UART_FORMAT_STM32)
     (void)irq;
     switch (command) {
         case 0U:
@@ -642,51 +410,12 @@ extern "C" uint32_t nx_uart_format_model_irq(unsigned command, int irq,
         default:
             break;
     }
-#else
-    IRQn_Type vector = static_cast<IRQn_Type>(irq);
-    switch (command) {
-        case 0U:
-            if (!reject_irq_enable)
-                NVIC_EnableIRQ(vector);
-            break;
-        case 1U:
-            if (!reject_irq_disable)
-                NVIC_DisableIRQ(vector);
-            break;
-        case 2U:
-            if (!held_irq_pending)
-                NVIC_ClearPendingIRQ(vector);
-            break;
-        case 3U:
-            if (!reject_irq_priority)
-                NVIC_SetPriority(vector, value);
-            break;
-        case 4U:
-            return NVIC_GetEnableIRQ(vector);
-        case 5U:
-            return held_irq_pending ? 1U : NVIC_GetPendingIRQ(vector);
-        case 6U:
-            return held_irq_active ? 1U : NVIC_GetActive(vector);
-        case 7U:
-            return NVIC_GetPriority(vector);
-        default:
-            break;
-    }
-#endif
     return 0U;
 }
 /** \brief Clock disable can fail independently of USART and NVIC withdrawal. */
 extern "C" void nx_uart_format_model_clock(bool enabled, uint32_t clock) {
-#if defined(NX_UART_FORMAT_STM32)
     (void)enabled;
     (void)clock;
-#else
-    if (enabled) {
-        rcu_periph_clock_enable(static_cast<rcu_periph_enum>(clock));
-    } else if (!reject_clock_off) {
-        rcu_periph_clock_disable(static_cast<rcu_periph_enum>(clock));
-    }
-#endif
 }
 
 TEST_F(UartFormatProvider, SettlementWaitsForTxInterruptWithdrawalReadback) {
@@ -696,15 +425,9 @@ TEST_F(UartFormatProvider, SettlementWaitsForTxInterruptWithdrawalReadback) {
     irq(empty);
     irq(empty);
     irq(complete);
-#if defined(NX_UART_FORMAT_STM32)
     registers.CR1 |= USART_CR1_TCIE;
     refused_write = &registers.CR1;
     held_set = USART_CR1_TCIE;
-#else
-    USART_CTL0(USART0) |= USART_CTL0_TCIE;
-    refused_write = &USART_CTL0(USART0);
-    held_set = USART_CTL0_TCIE;
-#endif
     nx_uart_word_port_service(&port);
     EXPECT_EQ(state.active, &request);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
@@ -735,18 +458,10 @@ TEST_F(UartFormatProvider, StopRetainsLeaseWhileIrqIsPendingOrActive) {
 
 TEST_F(UartFormatProvider, ColdInitRejectsRefusedUsartEnable) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-#if defined(NX_UART_FORMAT_STM32)
     refused_write = &registers.CR1;
     held_clear = USART_CR1_UE;
     EXPECT_EQ(nx_stm32_uart_word_initialize(&state, 84000000U, 115200U, rx, 4U),
               NX_ERROR_IO);
-#else
-    refused_write = &USART_CTL0(USART0);
-    held_clear = USART_CTL0_UEN;
-    EXPECT_EQ(nx_gd32_uart_word_initialize(&state, &nx_gd32_usart0_controller,
-                                           115200U, rx, 4U, 5U),
-              NX_ERROR_IO);
-#endif
     refused_write = nullptr;
     EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
 }
@@ -754,60 +469,21 @@ TEST_F(UartFormatProvider, ColdInitRejectsRefusedUsartEnable) {
 TEST_F(UartFormatProvider, ColdInitRejectsRefusedNvicEnableOrPriority) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     reject_irq_enable = true;
-#if defined(NX_UART_FORMAT_STM32)
     EXPECT_EQ(nx_stm32_uart_word_initialize(&state, 84000000U, 115200U, rx, 4U),
               NX_ERROR_IO);
-#else
-    EXPECT_EQ(nx_gd32_uart_word_initialize(&state, &nx_gd32_usart0_controller,
-                                           115200U, rx, 4U, 5U),
-              NX_ERROR_IO);
-#endif
     reject_irq_enable = false;
     EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     reject_irq_priority = true;
-#if defined(NX_UART_FORMAT_STM32)
     model_irq_priority = 0U;
     EXPECT_EQ(nx_stm32_uart_word_initialize(&state, 84000000U, 115200U, rx, 4U),
               NX_ERROR_IO);
-#else
-    NVIC_SetPriority(USART0_IRQn, 0U);
-    EXPECT_EQ(nx_gd32_uart_word_initialize(&state, &nx_gd32_usart0_controller,
-                                           115200U, rx, 4U, 5U),
-              NX_ERROR_IO);
-#endif
     reject_irq_priority = false;
     EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
 }
 
-#if !defined(NX_UART_FORMAT_STM32)
-TEST_F(UartFormatProvider, StopRetainsLeaseWhenTheOwnedClockRefusesDisable) {
-    reject_clock_off = true;
-    EXPECT_EQ(nx_uart_word_port_stop(&port), NX_ERROR_BUSY);
-    EXPECT_TRUE(state.initialized);
-    reject_clock_off = false;
-    EXPECT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-}
-
-TEST_F(UartFormatProvider, RxStorageCannotBorrowImmutableControllerFacts) {
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-    decltype(state) other{};
-    auto* storage = reinterpret_cast<uint16_t*>(
-        const_cast<nx_gd32_uart_controller_t*>(&nx_gd32_usart0_controller));
-    EXPECT_EQ(nx_gd32_uart_word_initialize(&other, &nx_gd32_usart0_controller,
-                                           115200U, storage, 1U, 5U),
-              NX_ERROR_INVALID);
-    if (other.initialized) {
-        auto cleanup = port;
-        cleanup.context = &other;
-        EXPECT_EQ(nx_uart_word_port_stop(&cleanup), NX_SUCCESS);
-    }
-}
-#endif
-
 TEST_F(UartFormatProvider, FrameChangeConfirmsUeWithdrawalBeforeFormatWrites) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     uint8_t byte_rx[4] = {};
-#if defined(NX_UART_FORMAT_STM32)
     nx_stm32_uart_state_t bytes = {};
     bytes.registers = &registers;
     bytes.baud = 115200U;
@@ -828,26 +504,6 @@ TEST_F(UartFormatProvider, FrameChangeConfirmsUeWithdrawalBeforeFormatWrites) {
     EXPECT_EQ(registers.CR2, before2);
     EXPECT_EQ(registers.CR3, before3);
     const nx_uart_port_t byte_port = {&nx_stm32_uart_ops, &bytes};
-#else
-    nx_gd32_uart_state_t bytes = {};
-    ASSERT_EQ(nx_gd32_uart_initialize_at(&bytes, &nx_gd32_usart0_controller,
-                                         115200U, NX_UART_RX_BYTES, byte_rx, 4U,
-                                         5U),
-              NX_SUCCESS);
-    uint32_t before1 = USART_CTL0(USART0);
-    uint32_t before2 = USART_CTL1(USART0);
-    uint32_t before3 = USART_CTL2(USART0);
-    refused_write = &USART_CTL0(USART0);
-    held_set = USART_CTL0_UEN;
-    EXPECT_EQ(nx_gd32_uart_format_configure(
-                  &bytes,
-                  {8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2, NX_UART_FLOW_CTS}),
-              NX_ERROR_IO);
-    EXPECT_EQ(USART_CTL0(USART0), before1);
-    EXPECT_EQ(USART_CTL1(USART0), before2);
-    EXPECT_EQ(USART_CTL2(USART0), before3);
-    const nx_uart_port_t byte_port = {&nx_gd32_uart_ops, &bytes};
-#endif
     refused_write = nullptr;
     EXPECT_EQ(nx_uart_port_stop(&byte_port), NX_SUCCESS);
 }
@@ -855,7 +511,6 @@ TEST_F(UartFormatProvider, FrameChangeConfirmsUeWithdrawalBeforeFormatWrites) {
 TEST_F(UartFormatProvider, FailedFrameRollbackClosesFurtherAdmission) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
     uint8_t byte_rx[4] = {};
-#if defined(NX_UART_FORMAT_STM32)
     nx_stm32_uart_state_t bytes = {};
     bytes.registers = &registers;
     bytes.baud = 115200U;
@@ -873,23 +528,6 @@ TEST_F(UartFormatProvider, FailedFrameRollbackClosesFurtherAdmission) {
               NX_ERROR_IO);
     EXPECT_TRUE(bytes.closing);
     const nx_uart_port_t byte_port = {&nx_stm32_uart_ops, &bytes};
-#else
-    nx_gd32_uart_state_t bytes = {};
-    ASSERT_EQ(nx_gd32_uart_initialize_at(&bytes, &nx_gd32_usart0_controller,
-                                         115200U, NX_UART_RX_BYTES, byte_rx, 4U,
-                                         5U),
-              NX_SUCCESS);
-    refused_write = &USART_CTL1(USART0);
-    held_clear = USART_CTL1_STB;
-    refused_write_second = &USART_CTL0(USART0);
-    held_clear_second = USART_CTL0_UEN;
-    EXPECT_EQ(nx_gd32_uart_format_configure(
-                  &bytes,
-                  {8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2, NX_UART_FLOW_NONE}),
-              NX_ERROR_IO);
-    EXPECT_TRUE(bytes.stopping);
-    const nx_uart_port_t byte_port = {&nx_gd32_uart_ops, &bytes};
-#endif
     EXPECT_TRUE(bytes.initialized);
     uint8_t payload_byte = 0x55U;
     nx_uart_tx_request_t tx = {};
@@ -911,24 +549,15 @@ TEST_F(UartFormatProvider, RefusedTxeWithdrawalNeverReadsPastBorrowedWords) {
     ASSERT_EQ(nx_uart_word_tx_prepare(&request, backing, 2U, 1000U),
               NX_SUCCESS);
     ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
-#if defined(NX_UART_FORMAT_STM32)
     refused_write = &registers.CR1;
     held_set = USART_CR1_TXEIE;
-#else
-    refused_write = &USART_CTL0(USART0);
-    held_set = USART_CTL0_TBEIE;
-#endif
     irq(empty);
     irq(empty);
     irq(empty);
     EXPECT_EQ(state.position, 2U);
     EXPECT_EQ(data(), 0x102U);
     refused_write = nullptr;
-#if defined(NX_UART_FORMAT_STM32)
     registers.CR1 &= ~static_cast<uint32_t>(USART_CR1_TXEIE);
-#else
-    USART_CTL0(USART0) &= ~static_cast<uint32_t>(USART_CTL0_TBEIE);
-#endif
     irq(complete);
     nx_uart_word_port_service(&port);
 }
@@ -938,22 +567,13 @@ TEST_F(UartFormatProvider, CancelCannotLoadMoreWordsWhenTxeDisableIsRefused) {
               NX_SUCCESS);
     ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
     irq(empty);
-#if defined(NX_UART_FORMAT_STM32)
     refused_write = &registers.CR1;
     held_set = USART_CR1_TXEIE;
-#else
-    refused_write = &USART_CTL0(USART0);
-    held_set = USART_CTL0_TBEIE;
-#endif
     ASSERT_EQ(nx_uart_word_port_cancel(&port, &request), NX_SUCCESS);
     irq(empty);
     EXPECT_EQ(state.position, 1U);
     refused_write = nullptr;
-#if defined(NX_UART_FORMAT_STM32)
     registers.CR1 &= ~static_cast<uint32_t>(USART_CR1_TXEIE);
-#else
-    USART_CTL0(USART0) &= ~static_cast<uint32_t>(USART_CTL0_TBEIE);
-#endif
     irq(complete);
     nx_uart_word_port_service(&port);
 }
@@ -968,19 +588,11 @@ TEST_F(UartFormatProvider, FormattedColdConstructorRequiresCompleteNvicProof) {
         reject_irq_priority = fault == 1U;
         held_irq_pending = fault == 2U;
         held_irq_active = fault == 3U;
-#if defined(NX_UART_FORMAT_STM32)
         model_irq_priority = 0U;
-#else
-        NVIC_SetPriority(USART0_IRQn, 0U);
-#endif
         nx_result_t result = initialize_bytes(&bytes, storage);
         EXPECT_NE(result, NX_SUCCESS);
         if (result != NX_SUCCESS && bytes.initialized) {
-#if defined(NX_UART_FORMAT_STM32)
             EXPECT_TRUE(bytes.closing);
-#else
-            EXPECT_TRUE(bytes.stopping);
-#endif
         }
         reject_irq_enable = reject_irq_priority = false;
         held_irq_pending = held_irq_active = false;
@@ -1009,21 +621,6 @@ TEST_F(UartFormatProvider, FormattedByteStopRetainsUnprovedIrqOwnership) {
         EXPECT_EQ(nx_uart_port_stop(&byte_port), NX_SUCCESS);
     }
 }
-#if !defined(NX_UART_FORMAT_STM32)
-TEST_F(UartFormatProvider, FormattedByteStopRetainsTheUnreleasedClockLease) {
-    ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
-    ByteState bytes = {};
-    uint8_t storage[4] = {};
-    ASSERT_EQ(initialize_bytes(&bytes, storage), NX_SUCCESS);
-    auto byte_port = bytes_face(&bytes);
-    reject_clock_off = true;
-    EXPECT_EQ(nx_uart_port_stop(&byte_port), NX_ERROR_BUSY);
-    EXPECT_TRUE(bytes.initialized);
-    EXPECT_EQ(bytes.controller, &nx_gd32_usart0_controller);
-    reject_clock_off = false;
-    EXPECT_EQ(nx_uart_port_stop(&byte_port), NX_SUCCESS);
-}
-#endif
 
 TEST_F(UartFormatProvider, ByteTxeRefusalNeverReadsPastTheBorrowedLength) {
     ASSERT_EQ(nx_uart_word_port_stop(&port), NX_SUCCESS);
@@ -1036,7 +633,6 @@ TEST_F(UartFormatProvider, ByteTxeRefusalNeverReadsPastTheBorrowedLength) {
     nx_request_initialize(&tx.base);
     ASSERT_EQ(nx_uart_tx_prepare(&tx, backing, 2U, 1000U), NX_SUCCESS);
     ASSERT_EQ(nx_uart_port_submit(&byte_port, &tx), NX_SUCCESS);
-#if defined(NX_UART_FORMAT_STM32)
     refused_write = &registers.CR1;
     held_set = USART_CR1_TXEIE;
     for (unsigned index = 0U; index != 3U; ++index) {
@@ -1044,24 +640,10 @@ TEST_F(UartFormatProvider, ByteTxeRefusalNeverReadsPastTheBorrowedLength) {
         nx_stm32_uart_format_irq(&bytes);
     }
     EXPECT_EQ(registers.DR, 0x22U);
-#else
-    refused_write = &USART_CTL0(USART0);
-    held_set = USART_CTL0_TBEIE;
-    for (unsigned index = 0U; index != 3U; ++index) {
-        USART_STAT0(USART0) = USART_STAT0_TBE;
-        nx_gd32_uart_format_irq(&bytes);
-    }
-    EXPECT_EQ(USART_DATA(USART0), 0x22U);
-#endif
     EXPECT_EQ(bytes.tx_position, 2U);
     refused_write = nullptr;
-#if defined(NX_UART_FORMAT_STM32)
     registers.CR1 &= ~static_cast<uint32_t>(USART_CR1_TXEIE);
     const_cast<uint32_t&>(registers.SR) = USART_SR_TC;
-#else
-    USART_CTL0(USART0) &= ~static_cast<uint32_t>(USART_CTL0_TBEIE);
-    USART_STAT0(USART0) = USART_STAT0_TC;
-#endif
     EXPECT_EQ(nx_uart_port_cancel(&byte_port, &tx), NX_SUCCESS);
     nx_uart_port_service(&byte_port);
     EXPECT_EQ(nx_uart_port_stop(&byte_port), NX_SUCCESS);

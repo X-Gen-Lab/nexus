@@ -6,8 +6,8 @@ root = Path(sys.argv[1]).resolve()
 output = Path(sys.argv[2])
 sys.path.insert(0, str(root))
 from tools.configure.configure import resolve_ir  # noqa: E402
-from soc.stm32.stm32f407.configure import emission  # noqa: E402
-from soc.stm32.stm32f407.configure.bindings import (  # noqa: E402
+from tools.configure.stm32f4 import emission  # noqa: E402
+from tools.configure.stm32f4.bindings import (  # noqa: E402
     constructor, shared_irq_definitions,
 )
 

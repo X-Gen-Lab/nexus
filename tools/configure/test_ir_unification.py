@@ -1,4 +1,5 @@
 """One typed decision owns both generation and the exported JSON projection."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import fields, replace
 from collections.abc import Mapping
 from pathlib import Path
@@ -12,11 +13,11 @@ from tools.configure.ir import ConfigurationIR
 class UnifiedIrTests(unittest.TestCase):
     def resolve(self):
         return configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/native.toml")
+            "tests/support/native/assemblies/native.toml", test_support=True)
 
     def test_resolver_returns_one_typed_authority(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/native.toml")
+            "tests/support/native/assemblies/native.toml", test_support=True)
         self.assertIsInstance(result, ConfigurationIR)
         self.assertFalse(hasattr(configure, "resolve"))
 
@@ -40,7 +41,8 @@ class UnifiedIrTests(unittest.TestCase):
 
     def test_selected_claims_and_option_projection_have_one_owner(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/qiming-baremetal.toml")
+            "tools/configure/assemblies/qiming-baremetal.toml", test_support=native_fixture(configure.ROOT /
+            "tools/configure/assemblies/qiming-baremetal.toml"))
         self.assertNotIsInstance(result.claims[0], Mapping)
         uart = next(item for item in result.controllers if item.kind == "uart")
         changed = replace(uart, options=replace(uart.options, baud=57600))
@@ -49,15 +51,11 @@ class UnifiedIrTests(unittest.TestCase):
         self.assertEqual(changed.integration.resources, uart.integration.resources)
 
     def test_non_gpio_routes_preserve_their_declared_mask_and_safe_level(self):
-        h743 = configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/h743-high-peripherals.toml")
-        pwm = next(item for item in h743.controllers if item.kind == "pwm")
+        result = configure.resolve_ir(configure.ROOT /
+            "tests/contracts/stm32_assembly/zg-pwm.toml")
+        pwm = next(item for item in result.controllers if item.kind == "pwm")
         self.assertEqual(pwm.mask, 64)
-        gd470 = configure.resolve_ir(configure.ROOT /
-            "tools/configure/assemblies/liangshan-baremetal-spi.toml")
-        spi = next(item for item in gd470.controllers if item.kind == "spi")
-        self.assertEqual(spi.initial, 1)
-        self.assertEqual(spi.to_dict()["initial"], 1)
+        self.assertEqual(pwm.to_dict()["mask"], 64)
 
     def test_emitters_reject_exported_mapping_instead_of_reinterpreting_it(self):
         projected = self.resolve().to_dict()
@@ -73,7 +71,7 @@ class UnifiedIrTests(unittest.TestCase):
             path = Path(name) / "assembly.json"
             path.write_text("{}", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "TOML"):
-                configure.load_assembly(path)
+                configure.load_assembly(path, test_support=native_fixture(path))
 
 
 if __name__ == "__main__":

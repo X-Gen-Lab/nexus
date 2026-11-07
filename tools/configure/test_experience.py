@@ -1,4 +1,5 @@
 """Exercise developer decisions through the real configuration command."""
+from tools.configure.tests.native_fixture import native_fixture, with_native_support
 
 from contextlib import redirect_stderr, redirect_stdout
 import io
@@ -19,8 +20,8 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
-                     "soc/native/soc.json", "soc/native/routes.json",
-                     "boards/native_reference/board.json"):
+                     "tests/support/native/soc.json", "tests/support/native/routes.json",
+                     "tests/support/native/board/board.json"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(configure.ROOT / name, target)
@@ -34,8 +35,8 @@ class ConfigurationExperienceTests(unittest.TestCase):
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
             try:
-                status = configure.main([
-                    *arguments, "--source-root", str(source_root or self.root)])
+                status = configure.main(with_native_support([
+                    *arguments, "--source-root", str(source_root or self.root)]))
             except SystemExit as error:
                 status = error.code
         return status, output.getvalue(), errors.getvalue()
@@ -54,7 +55,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
         status, output, _ = self.command(
             "explain", "--assembly", str(self.assembly), "--json")
         self.assertEqual(status, 0)
-        expected = configure.resolve_ir(self.assembly, self.root).to_dict()
+        expected = configure.resolve_ir(self.assembly, self.root, test_support=True).to_dict()
         self.assertEqual(json.loads(output), expected)
 
     def test_board_bindings_do_not_require_an_authored_application(self):
@@ -108,7 +109,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
                 self.assertNotEqual(status, 0)
 
     def test_board_fact_error_identifies_its_file_and_key(self):
-        board = self.root / "boards/native_reference/board.json"
+        board = self.root / "tests/support/native/board/board.json"
         facts = json.loads(board.read_text())
         facts["unknowns"] = "not a list of reviewed unknowns"
         board.write_text(json.dumps(facts))
@@ -153,7 +154,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
                      "--binding", "uart0", "--output", str(output))
         status, _, errors = self.command(*arguments)
         self.assertEqual(status, 0, errors)
-        result = configure.resolve_ir(output, self.root)
+        result = configure.resolve_ir(output, self.root, test_support=True)
         self.assertEqual(len(result.controllers), 1)
         self.assertEqual(result.controllers[0].kind, "uart")
         self.assertEqual(result.controllers[0].options.baud, 115200)
@@ -173,7 +174,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
     def test_private_board_init_stays_relative_after_product_relocation(self):
         product = self.root / "product"
         package = product / "hardware" / "private-board"
-        shutil.copytree(self.root / "boards/native_reference", package)
+        shutil.copytree(self.root / "tests/support/native/board", package)
         output = product / "assembly.toml"
         status, _, errors = self.command(
             "init", "--board-package", str(package), "--backend", "native",
@@ -185,14 +186,14 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertEqual(document["board_package"], "hardware/private-board")
         moved = self.root / "relocated product"
         product.rename(moved)
-        resolved = configure.resolve_ir(moved / "assembly.toml", self.root)
+        resolved = configure.resolve_ir(moved / "assembly.toml", self.root, test_support=True)
         self.assertEqual(resolved.controllers[0].controller, "UART0")
 
     def test_private_board_init_rejects_two_selectors_before_writing(self):
         output = self.root / "ambiguous.toml"
         status, _, errors = self.command(
             "init", "--board", "native_reference", "--board-package",
-            str(self.root / "boards/native_reference"), "--backend", "native",
+            str(self.root / "tests/support/native/board"), "--backend", "native",
             "--clock", "model", "--output", str(output))
         self.assertNotEqual(status, 0)
         self.assertIn("exactly one", errors)
@@ -218,7 +219,8 @@ class ConfigurationExperienceTests(unittest.TestCase):
 
     def test_polling_mode_does_not_claim_its_alternative_dma_route(self):
         status, output, errors = self.command(
-            "list-bindings", "--board", "gd32f470_liangshan",
+            "list-bindings", "--board-package",
+            str(configure.ROOT / "tests/contracts/stm32_assembly/ve_board"),
             "--kind", "spi", "--json", source_root=configure.ROOT)
         self.assertEqual(status, 0, errors)
         row = json.loads(output)["bindings"][0]
@@ -228,15 +230,15 @@ class ConfigurationExperienceTests(unittest.TestCase):
                              for key in mode["resource_keys"]))
 
     def test_bound_soc_view_rejects_changed_facts(self):
-        resolved = configure.resolve_ir(self.assembly, self.root)
-        path = self.root / "soc/native/soc.json"
+        resolved = configure.resolve_ir(self.assembly, self.root, test_support=True)
+        path = self.root / "tests/support/native/soc.json"
         path.write_text(path.read_text() + "\n")
         with self.assertRaisesRegex(configure.ConfigurationError,
                                     "differ from the resolved input"):
             experience.binding_facts(configure, resolved, self.root)
 
     def test_factory_order_impact_uses_selected_public_class(self):
-        path = self.root / "boards/native_reference/board.json"
+        path = self.root / "tests/support/native/board/board.json"
         board = json.loads(path.read_text())
         board["bindings"].append({"id": "uart1", "controller": "UART1",
                                   "route": "uart1"})
@@ -261,11 +263,11 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertEqual(item["after"], ["second", "first"])
 
     def test_board_first_owns_silicon_and_board_reservations(self):
-        path = self.root / "boards/native_reference/board.json"
+        path = self.root / "tests/support/native/board/board.json"
         board = json.loads(path.read_text())
         board["reserved_resources"] = ["PA1", "controller:UART0"]
         path.write_text(json.dumps(board))
-        path = self.root / "soc/native/soc.json"
+        path = self.root / "tests/support/native/soc.json"
         soc = json.loads(path.read_text())
         soc["reserved_resources"] = ["controller:UART0"]
         path.write_text(json.dumps(soc))
@@ -321,11 +323,11 @@ class ConfigurationExperienceTests(unittest.TestCase):
             with self.subTest(exception=type(signal).__name__):
                 with patch.object(configure, "resolve_ir", side_effect=signal):
                     with self.assertRaises(type(signal)) as raised:
-                        configure.main([
+                        configure.main(with_native_support([
                             "init", "--board", "native_reference",
                             "--backend", "native", "--clock", "model",
                             "--output", str(output),
-                            "--source-root", str(self.root)])
+                            "--source-root", str(self.root)]))
                 self.assertIs(raised.exception, signal)
                 self.assertFalse(output.exists())
                 self.assertEqual(foreign.read_text(),
@@ -393,7 +395,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertIn("measure", storage["obligation"])
 
     def test_diff_keeps_instance_order_as_an_explicit_change(self):
-        before = configure.resolve_ir(self.assembly, self.root).to_dict()
+        before = configure.resolve_ir(self.assembly, self.root, test_support=True).to_dict()
         before["controllers"] = [{"id": "first"}, {"id": "second"}]
         after = dict(before, controllers=list(reversed(before["controllers"])))
         changes = experience.differences(before, after)["changes"]
@@ -419,7 +421,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertIn(str(other), errors)
 
     def test_diff_distinguishes_missing_from_explicit_null(self):
-        before = configure.resolve_ir(self.assembly, self.root).to_dict()
+        before = configure.resolve_ir(self.assembly, self.root, test_support=True).to_dict()
         after = dict(before, runtime_power=None)
         changes = experience.differences(before, after)["changes"]
         self.assertEqual(len(changes), 1)
@@ -428,10 +430,10 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertTrue(changes[0]["after_present"])
 
     def test_mcu_explanation_cannot_infer_a_station_result(self):
-        data = configure.resolve_ir(self.assembly, self.root).to_dict()
+        data = configure.resolve_ir(self.assembly, self.root, test_support=native_fixture(self.assembly)).to_dict()
         # Presentation cannot turn a model's or a caller's qualification flag
         # into physical evidence for a different chip.
-        data["soc_family"] = "stm32f407"
+        data["soc_family"] = 'stm32f4'
         data["part"] = "STM32F407VET6"
         data["physical_qualified"] = True
         self.assertIn("not_established_by_configuration",

@@ -8,7 +8,7 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
     endif()
     set(cold_uart_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-uart-cold-${cold_uart_mode}")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
         --source-root "${NEXUS_SOURCE_DIR}" --assembly "${cold_uart_input}"
         --output "${cold_uart_bundle}" RESULT_VARIABLE cold_uart_generated
         OUTPUT_VARIABLE cold_uart_output ERROR_VARIABLE cold_uart_error)
@@ -17,32 +17,34 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
     endif()
     nexus_google_configuration_inputs("${cold_uart_bundle}")
     set(cold_uart_sources
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
     set(cold_uart_rx 0)
     set(cold_uart_tx 0)
     set(cold_uart_hal FALSE)
     if(cold_uart_mode MATCHES "^(rx-dma|dma-duplex)")
         set(cold_uart_rx 1)
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_receive.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_receive.c")
     endif()
     if(cold_uart_mode MATCHES "^(dma-tx|dma-duplex)")
         set(cold_uart_tx 1)
         if(cold_uart_mode STREQUAL "dma-tx")
             set(cold_uart_hal TRUE)
-            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_hal.c")
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hal.c")
         else()
-            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_dma.c")
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c")
         endif()
     endif()
     if(cold_uart_mode MATCHES "^dma-duplex")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_duplex.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_duplex.c")
     elseif(cold_uart_mode STREQUAL "irq-words")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_word.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_word.c")
     elseif(cold_uart_mode STREQUAL "irq-blocks")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_stream.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_stream.c")
     endif()
     string(REPLACE "-" "_" cold_uart_label "${cold_uart_mode}")
     set(cold_uart_target "nexus_stm32_uart_${cold_uart_label}_cold_factory_test")
@@ -51,11 +53,11 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
             ${cold_uart_sources}
         LIBRARIES Nexus::IO
         INCLUDES "${cold_uart_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
             "${NEXUS_SOURCE_DIR}/arch/include")
     if(NOT cold_uart_hal)
         target_include_directories(${cold_uart_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     endif()
     target_include_directories(${cold_uart_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
@@ -92,7 +94,7 @@ endforeach()
 # One actual six-instance factory proves byte faces retain separate contexts.
 set(qiming_uart_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-qiming-six-uarts")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
     --source-root "${NEXUS_SOURCE_DIR}"
     --assembly "${NEXUS_SOURCE_DIR}/tests/contracts/qiming_uart_assembly/six-irq-uarts.toml"
     --output "${qiming_uart_bundle}"
@@ -104,15 +106,17 @@ endif()
 nexus_google_configuration_inputs("${qiming_uart_bundle}")
 nexus_google_test(nexus_stm32_qiming_multi_uart_cold_factory_test STM32F4_LL
     SOURCES stm32_uart_cold_factory_test.cpp "${qiming_uart_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/uart_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
     LIBRARIES Nexus::IO
     INCLUDES "${qiming_uart_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_qiming_multi_uart_cold_factory_test
     SYSTEM PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 target_compile_definitions(nexus_stm32_qiming_multi_uart_cold_factory_test PRIVATE

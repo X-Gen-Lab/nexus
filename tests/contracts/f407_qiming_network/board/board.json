@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "qiming-f407zg-network-software-contract",
   "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
+  "soc_family": "stm32f4",
   "source_revision": "qiming-manual-printed31-physical33-bsp-a35e981e8a549e1dbaf84bb4522b2f150bc5d51c",
   "physical_pcb_revision": null,
   "clocks": {

@@ -7,11 +7,11 @@ from tools.measurement.elf import Elf32
 from tools.measurement.interfaces import inspect_interfaces
 
 
-def image(*, table_name="nx_legacy_adc_ops", table_size=40,
+def image(*, table_name="nx_stm32_adc_ops", table_size=40,
           table_section=1, duplicate=False, flash_flags=5, flash_files=128):
     """Model the external ELF bytes; do not mock the observer under test."""
     data = bytearray(2048)
-    labels = [table_name, "nx_legacy_pwm_ops", "nx_legacy_flash_ops",
+    labels = [table_name, "nx_stm32_pwm_ops", "nx_stm32_flash_ops",
               "s_nx_face_input", "s_nx_face_output", "s_nx_face_physical",
               "s_nx_rx_input", "s_nx_port_input"]
     names = bytearray(b"\0")
@@ -20,8 +20,8 @@ def image(*, table_name="nx_legacy_adc_ops", table_size=40,
         offsets[label] = len(names)
         names.extend(label.encode() + b"\0")
     objects = [(table_name, 0x08001000, table_size, table_section),
-               ("nx_legacy_pwm_ops", 0x08001028, 16, 1),
-               ("nx_legacy_flash_ops", 0x08001038, 16, 1),
+               ("nx_stm32_pwm_ops", 0x08001028, 16, 1),
+               ("nx_stm32_flash_ops", 0x08001038, 16, 1),
                ("s_nx_face_input", 0x08001048, 8, 1),
                ("s_nx_face_output", 0x08001050, 8, 1),
                ("s_nx_face_physical", 0x08001058, 8, 1),

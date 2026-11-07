@@ -10,15 +10,15 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 try:
-    from . import arch_compile, gd32_memory, memory_budget
+    from . import arch_compile, memory_budget
 except ImportError:
     import arch_compile
-    import gd32_memory
     import memory_budget
 from tools.measurement.elf import Elf32
 from tools.measurement.resources import measure_data
@@ -91,12 +91,37 @@ def validate_layout(elf, resolved, budget, part, selected):
     return metrics
 
 
+def preprocessing_command(entry):
+    """Inspect the actual default compile scope without rewriting depfiles."""
+    command = entry.get("arguments") or shlex.split(entry["command"])
+    result = []
+    index = 0
+    while index < len(command):
+        argument = command[index]
+        if argument in {"-o", "-MF", "-MT", "-MQ"}:
+            index += 2
+        elif any(argument.startswith(prefix) and len(argument) > len(prefix)
+                 for prefix in ("-o", "-MF", "-MT", "-MQ")):
+            index += 1
+        elif argument in {"-c", "-MD", "-MMD", "-MP", "-MG"}:
+            index += 1
+        else:
+            result.append(argument)
+            index += 1
+    return result + ["-E", "-P"]
+
+
+def verify_inputs(inputs):
+    for identity in inputs:
+        if arch_compile.digest(Path(identity["path"])) != identity:
+            raise ValueError("Memory matrix source changed: " + identity["path"])
+
+
 def source_inputs(root):
     inputs = [root / "CMakeLists.txt", Path(__file__).resolve(),
-              root / "scripts/ci/gd32_memory.py",
               root / "scripts/ci/memory_budget.py",
               root / "scripts/ci/arch_compile.py"]
-    for directory in ("arch", "core", "io", "os", "drivers", "soc/stm32/stm32f407",
+    for directory in ("arch", "core", "io", "os", "soc/stm32/stm32f4",
                       "boards/stm32f407_qiming_v31",
                       "boards/stm32f407ve_sky_qingchun", "cmake",
                       "tools/configure", "tools/measurement", "tools/evidence",
@@ -156,7 +181,7 @@ def run(root, compiler, output, parallel=2):
                 if len(system) != 1:
                     raise ValueError("Default SystemInit identity ambiguous")
                 expanded = recorder.execute(
-                    gd32_memory.preprocessing_command(system[0]),
+                    preprocessing_command(system[0]),
                     variant + "-SystemInit-preprocessor", nonempty=True)
                 if "nx_stm32_memory_boot" in expanded:
                     raise ValueError("Default startup retained a CCM path")
@@ -173,7 +198,7 @@ def run(root, compiler, output, parallel=2):
                     "budget": generated / "resource-budget.json",
                     "memory_ld": generated / "memory.ld",
                     "compile_commands": build / "compile_commands.json"}.items()}})
-            gd32_memory.verify_inputs(report["source_inputs"])
+            verify_inputs(report["source_inputs"])
         selected = output / "zg-ccm"
         budget = json.loads((selected / "nexus/generated/resource-budget.json").read_text())
         budget["ram_reserved_max"]["ccm"] = 35
@@ -206,7 +231,7 @@ def run(root, compiler, output, parallel=2):
              "budget": arch_compile.digest(bad_budget)},
             overflow,
             {"kind": "unselected_linker_section", "command": rejection}]
-        gd32_memory.verify_inputs(report["source_inputs"])
+        verify_inputs(report["source_inputs"])
         for name, identity in report["tools"].items():
             if arch_compile.digest(Path(tools[name])) != identity:
                 raise ValueError("Build tool changed during actual execution")
