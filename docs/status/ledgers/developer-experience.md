@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/developer-experience-execution.csv)。
-源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。
+源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -21,7 +21,7 @@ source_language: zh_CN
 **原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
 也按原文保留，不能据此补造某次执行。
 
-本表包含 107 条原记录，仅表示来源行数。
+本表包含 139 条原记录，仅表示来源行数。
 
 ```{contents}
 :local:
@@ -1631,4 +1631,484 @@ source_language: zh_CN
 | `implementation_paths` | docs/explanation/factory.md;docs/guides/provider-porting.md;docs/delivery/capabilities.md;docs/reference/configuration/assembly.md;docs/tutorials/source-sdk.md;docs/design/developer-experience.md;docs/design/README.md;docs/design/source-compatibility.md;docs/status/ledgers/developer-experience.md;docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/labels.json;docs/assets/diagrams/diagram-index.csv;docs/assets/diagrams/localized/en/factory-instances.dot;docs/assets/diagrams/localized/en/factory-instances.svg;docs/assets/diagrams/localized/zh_CN/factory-instances.dot;docs/assets/diagrams/localized/zh_CN/factory-instances.svg;tools/documentation/status.py;tools/release/README.md;docs/status/software-verification.md;docs/locale/en/LC_MESSAGES/delivery/capabilities.po;docs/locale/en/LC_MESSAGES/design/README.po;docs/locale/en/LC_MESSAGES/design/source-compatibility.po;docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/en/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po;docs/locale/zh_CN/LC_MESSAGES/design/README.po;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/design/source-compatibility.po;docs/locale/zh_CN/LC_MESSAGES/explanation/factory.po;docs/locale/zh_CN/LC_MESSAGES/guides/provider-porting.po;docs/locale/zh_CN/LC_MESSAGES/reference/configuration/assembly.po;docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po;docs/locale/zh_CN/LC_MESSAGES/status/software-verification.po;docs/locale/zh_CN/LC_MESSAGES/tutorials/source-sdk.po |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Existing pages and diagrams describe exact current contracts in both locales; commands pass validation; no parallel status authority or inherited firmware qualification. |
+| `owner` | codex |
+
+(status-developer-experience-qb01)=
+## QB01
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB01 |
+| `task` | P0: Freeze schematic identity and reviewed differences |
+| `implementation_status` | implemented |
+| `software_status` | schematic_and_source_reviewed_no_new_runtime_execution |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | boards |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Record both PDF hashes and page/component/net references; schematic facts never establish fitted hardware or PCB inspection. |
+| `owner` | codex |
+
+(status-developer-experience-qb02)=
+## QB02
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB02 |
+| `task` | P0: Introduce two independent exact Qiming Board packages |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected. |
+| `owner` | codex |
+
+(status-developer-experience-qb03)=
+## QB03
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB03 |
+| `task` | P0: Model population jumper and electrical selections |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB01. No invented defaults; absent or unknown devices and unmet jumper conditions reject selected bindings; declarations do not establish physical proof. |
+| `owner` | codex |
+
+(status-developer-experience-qb04)=
+## QB04
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB04 |
+| `task` | P0: Bind hardware selections and PDF provenance into typed configuration |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB02;QB03. Unknown keys and choices reject; immutable selections survive explain and source SDK consumption; one configuration authority and static emission remain. |
+| `owner` | codex |
+
+(status-developer-experience-qb05)=
+## QB05
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB05 |
+| `task` | P0: Implement actual GPIO routes and electrical modes |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04. Exact package ports and pins support input pulls and output drive; inactive levels precede output mode; failed setup and stop preserve ownership. |
+| `owner` | codex |
+
+(status-developer-experience-qb06)=
+## QB06
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB06 |
+| `task` | P0: Extend EXTI lines and real vector ownership |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB05. Selected lines including PF11 use the correct vector; shared owners stop independently; event overflow and rejected initialization remain observable. |
+| `owner` | codex |
+
+(status-developer-experience-qb07)=
+## QB07
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB07 |
+| `task` | P0: Review six UART instances and selected transport modes |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04. USART1/2/3/6 and UART4/5 have exact clock IRQ gate and pad admission; existing modes remain; no unimplemented DMA mode is advertised. |
+| `owner` | codex |
+
+(status-developer-experience-qb08)=
+## QB08
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB08 |
+| `task` | P0: Add actual SPI and I2C routes without capability drift |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04. SPI1 PB3/PB4/PB5 and reviewed I2C1 alternatives match real C admission; preserve SWD and reject conflicting complete JTAG ownership. |
+| `owner` | codex |
+
+(status-developer-experience-qb09)=
+## QB09
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB09 |
+| `task` | P0: Deliver safe minimal Board startup and shutdown |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB05;QB07. Correct two-versus-three LEDs and two-versus-four keys; UART electrical route and CS DE backlight levels are explicit; complete cleanup is proved or retained. |
+| `owner` | codex |
+
+(status-developer-experience-qb10)=
+## QB10
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB10 |
+| `task` | P1: Add an AT24C02 device component |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/at24c02;tests/google/at24c02_test.cpp |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB08. Address 0x50 geometry page boundaries write-cycle ACK progress and failures execute against the actual device transport; product storage layout stays external. |
+| `owner` | codex |
+
+(status-developer-experience-qb11)=
+## QB11
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB11 |
+| `task` | P1: Add a selected W25 SPI NOR component |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/w25;tests/google/w25_test.cpp |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB08;QB03. Expected JEDEC identity and geometry are checked; finite program erase busy and error paths preserve ownership; core unpopulated NOR stays disabled. |
+| `owner` | codex |
+
+(status-developer-experience-qb12)=
+## QB12
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB12 |
+| `task` | P1: Bind both Boards actual CAN routes and electrical conditions |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04;QB09. Core CAN1 PB8/PB9 and high-configuration PA11/PA12 are distinct; CAN2 jumper and shared-filter ownership are reviewed; no transceiver or termination is invented. |
+| `owner` | codex |
+
+(status-developer-experience-qb13)=
+## QB13
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB13 |
+| `task` | P1: Compose exact RS232 and RS485 paths |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_rs232_and_electrical_verification_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB07;QB09;QB03. Declared transceiver supply and P15/PG6 direction are checked; true wire-tail and cleanup execute; standard PA2 Ethernet/RS485 conflict rejects. |
+| `owner` | codex |
+
+(status-developer-experience-qb14)=
+## QB14
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB14 |
+| `task` | P1: Bind actual USB full-speed paths |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB03;QB09. P21 USB/CAN selection and VBUS/ID facts remain explicit; OTG_HS internal FS and external ULPI HS are not confused; host support is not inferred. |
+| `owner` | codex |
+
+(status-developer-experience-qb15)=
+## QB15
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB15 |
+| `task` | P1: Compose V4.1 MAC DP83848 and network transport |
+| `implementation_status` | blocked |
+| `software_status` | v41_phy_facts_unverified_no_admitted_ethernet_route |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_v41/board.json;components/dp83848 |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB03;QB04;QB09. Exact PHY identity address reference clock P5 and receive-valid variant are reviewed; application network policy stays external; unknown wiring is not repaired silently. |
+| `owner` | codex |
+
+(status-developer-experience-qb16)=
+## QB16
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB16 |
+| `task` | P1: Integrate F407 RTC LSE and backup-domain lifecycle |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04;QB09. Calendar and time-domain boundaries execute; LSE failure and retained backup state are explicit; no battery fitting or measured retention is inferred. |
+| `owner` | codex |
+
+(status-developer-experience-qb17)=
+## QB17
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB17 |
+| `task` | P2: Implement one shared FSMC owner with independent banks |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04;QB05. Shared pads and gate have one owner; NE3 SRAM and NE4 LCD own distinct windows and timing; rollback and close never restore another live bank. |
+| `owner` | codex |
+
+(status-developer-experience-qb18)=
+## QB18
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB18 |
+| `task` | P2: Implement SRAM windows and optional pre-runtime initialization |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB17;QB03. Internal bootstrap initializes selected FSMC before external data/bss; CPU and DMA reachability are separate; boot-backed memory prevents unsafe withdrawal. |
+| `owner` | codex |
+
+(status-developer-experience-qb19)=
+## QB19
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB19 |
+| `task` | P2: Integrate the confirmed ILI9341 16-bit display |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB17;QB18. Actual command/data address shift and controller identity are checked; 240x320 RGB565 rectangle and error paths execute; shared NRST is not an invented reset GPIO. |
+| `owner` | codex |
+
+(status-developer-experience-qb20)=
+## QB20
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB20 |
+| `task` | P2: Integrate confirmed XPT2046 through bounded software SPI |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB05;QB06. PA5/PB1/PB2/PB0/PF11 route and mode are explicit; raw 12-bit sampling and final PENIRQ power state execute; uncertain pin cleanup retains bus ownership. |
+| `owner` | codex |
+
+(status-developer-experience-qb21)=
+## QB21
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB21 |
+| `task` | P2: Implement block I/O and F407 SDIO host ownership |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap |
+| `hardware_status` | not_executed |
+| `implementation_paths` | io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04. PC8-PC12/PD2 command and data paths handle CRC timeout cancellation and removal; no unconnected card-detect GPIO is invented; buffers end only after detach. |
+| `owner` | codex |
+
+(status-developer-experience-qb22)=
+## QB22
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB22 |
+| `task` | P2: Integrate SD card protocol and optional filesystem port |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB21. Selected card geometry and bounded block reads/writes execute; optional filesystem policy stays distinct; product directories and persistence remain external. |
+| `owner` | codex |
+
+(status-developer-experience-qb23)=
+## QB23
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB23 |
+| `task` | P2: Implement bounded software two-wire and SCCB ports |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB05. Actual PC0/PC13 and PD6/PD7 paths use release/read semantics with explicit timing and ACK/SCCB differences; no hidden task or long global IRQ mask. |
+| `owner` | codex |
+
+(status-developer-experience-qb24)=
+## QB24
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB24 |
+| `task` | P2: Integrate selected WM8978 audio and complete I2S mode |
+| `implementation_status` | blocked |
+| `software_status` | module_selection_and_complete_driver_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB23;QB04. Actual module must be selected; PB12/PB13/PC2/PC3/PC6 clock sample-rate RX/TX DMA and full withdrawal execute; finite slave TX is not full audio qualification. |
+| `owner` | codex |
+
+(status-developer-experience-qb25)=
+## QB25
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB25 |
+| `task` | P2: Integrate the alternative selected VS1053 module |
+| `implementation_status` | blocked |
+| `software_status` | module_selection_and_complete_driver_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB07;QB08. Actual module must be selected; SPI2 alternate route dual CS DREQ and reset execute; WM8978 and VS1053 cannot own the same connector simultaneously. |
+| `owner` | codex |
+
+(status-developer-experience-qb26)=
+## QB26
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB26 |
+| `task` | P2: Integrate DCMI and an exact OV2640 capture configuration |
+| `implementation_status` | blocked |
+| `software_status` | module_selection_and_complete_driver_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB18;QB23;QB04. Actual module format and rate are fixed; XCLK SCCB frame boundaries malformed frames and DMA withdrawal execute with declared static memory and bandwidth budgets. |
+| `owner` | codex |
+
+(status-developer-experience-qb27)=
+## QB27
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB27 |
+| `task` | P2: Integrate selected DS18B20 and HS0038 devices |
+| `implementation_status` | implemented |
+| `software_status` | software_matrix_verified_source_A |
+| `hardware_status` | not_executed |
+| `implementation_paths` | components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB05. OneWire only pulls low or releases and declares any strong-pullup requirement; infrared timing overflow and selected protocol execute without product calibration policy. |
+| `owner` | codex |
+
+(status-developer-experience-qb28)=
+## QB28
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB28 |
+| `task` | P0: Validate clock DMA IRQ and memory combination budgets |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_resource_guards_audio_video_admission_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB04. Physical DMA Stream exclusivity cannot be bypassed by different channel numbers; TIM2 stays reserved; audio/video buffer reach and bandwidth are explicit. |
+| `owner` | codex |
+
+(status-developer-experience-qb29)=
+## QB29
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB29 |
+| `task` | P2: Deliver legal combinations and external application examples |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending |
+| `hardware_status` | not_executed |
+| `implementation_paths` | boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB09;QB10;QB11;QB12;QB13;QB14;QB15;QB16;QB18;QB19;QB20;QB22;QB24;QB25;QB26;QB27;QB28. Minimal serial CAN network storage HMI and selected media profiles consume public interfaces; impossible standard wiring rejects; private application evidence stays private. |
+| `owner` | codex |
+
+(status-developer-experience-qb30)=
+## QB30
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB30 |
+| `task` | P0: Execute genuine TDD and final source-bound software matrix |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB01. Meaningful original RED precedes new behavior then GREEN; actual ARM and installed SDK images and resource costs bind exact inputs; no existence-only or stale-pass substitution. |
+| `owner` | codex |
+
+(status-developer-experience-qb31)=
+## QB31
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB31 |
+| `task` | P2: Deliver bilingual Board guidance and evidence navigation |
+| `implementation_status` | implemented |
+| `software_status` | strict_en_zh_passed_source_B2 |
+| `hardware_status` | not_applicable |
+| `implementation_paths` | docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB02;QB29;QB30. One existing ledger records exact mode source schematic and declared population identities with actual software results and unexecuted physical scope; both locales stay reviewed. |
+| `owner` | codex |
+
+(status-developer-experience-qb32)=
+## QB32
+
+| 原字段 | 原值 |
+| --- | --- |
+| `task_id` | QB32 |
+| `task` | P3: Prepare and execute exact Board HIL admission |
+| `implementation_status` | partial |
+| `software_status` | software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed |
+| `hardware_status` | not_executed |
+| `implementation_paths` | tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
+| `exit_condition` | Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed. |
 | `owner` | codex |

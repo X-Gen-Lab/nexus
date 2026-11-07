@@ -402,7 +402,21 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 198)
+        declared_physical = set()
+        for family in work_packages.provider_contracts():
+            if family == "native":
+                continue
+            facts = json.loads(
+                (ROOT / source_directory(family) / "soc.json").read_text())
+            for controller, fact in facts["controllers"].items():
+                modes = list(fact["modes"])
+                for extra in fact.get("interfaces", {}).values():
+                    modes.extend(extra)
+                declared_physical.update(
+                    f"{family}.{controller}.{mode}" for mode in modes)
+        self.assertEqual({row["identity"] for row in physical},
+                         declared_physical)
+        self.assertEqual(len(physical), len(declared_physical))
         spi = [row for row in physical
                if row["identity"] == "stm32h743.SPI4.dma"]
         self.assertEqual(len(spi), 1)

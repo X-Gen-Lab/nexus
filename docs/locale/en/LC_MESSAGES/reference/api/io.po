@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 236de56b79c06a0783f6990ddc4d6980e3d7db82afa1313ee5b9652e3fa62eae\n"
+"X-Nexus-Source-SHA256: a943be8fac92c9b4fa6e4bbad79078d01f23e39183028957ce94e067071b7ee1\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -5473,28 +5473,12 @@ msgid "Set an idle calendar and advance its nonwrapping setting domain."
 msgstr "Set an idle calendar and advance its nonwrapping setting domain."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
-msgid ""
-"Rejection changes no state. No implicit backup reset, synchronization, Core-"
-"time adjustment or authorization to overwrite retained hardware."
-msgstr ""
-"Rejection changes no state. No implicit backup reset, synchronization, Core-"
-"time adjustment or authorization to overwrite retained hardware."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "[in] Same single serialized privileged task owner."
 msgstr "[in] Same single serialized privileged task owner."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "[in] Separate raw value, copied on successful validation."
 msgstr "[in] Separate raw value, copied on successful validation."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
-msgid ""
-"SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or "
-"UNSUPPORTED."
-msgstr ""
-"SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or "
-"UNSUPPORTED."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:241
 msgid "Borrow and arm one future alarm; no queue, allocation or worker."
@@ -5795,14 +5779,6 @@ msgstr "[in] Absolute deadline; includes adapter queue residence."
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
 msgid "[out] Complete bytes; reset to zero before execution."
 msgstr "[out] Complete bytes; reset to zero before execution."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
-msgid ""
-"Success, BUSY/INVALID/TIMEOUT/IO. Return releases all buffers and CS after "
-"drain; polling is CPU-active, not IRQ/DMA async."
-msgstr ""
-"Success, BUSY/INVALID/TIMEOUT/IO. Return releases all buffers and CS after "
-"drain; polling is CPU-active, not IRQ/DMA async."
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:257
 msgid "Recover an idle SPI controller after its retained fault."
@@ -8653,3 +8629,491 @@ msgstr ""
 "readable debug control observe its setting. A provider without CPU debug-"
 "control access supports false only; that value does not observe or describe "
 "an external debugger's setting."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Actual ownership phase, UNAVAILABLE for a missing method"
+msgstr "Actual ownership phase, UNAVAILABLE for a missing method"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Actual state, or UNAVAILABLE for an invalid/missing state method."
+msgstr "Actual state, or UNAVAILABLE for an invalid/missing state method."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Admission rejection changes no state. No implicit backup reset, synchronization, Core-time adjustment or authorization to overwrite retained hardware."
+msgstr "Admission rejection changes no state. No implicit backup reset, synchronization, Core-time adjustment or authorization to overwrite retained hardware."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "All endpoint consumers and CPU users must join first. Timeout never revokes a derived pointer. Cold Platform release restores the shared pad lease only afterward."
+msgstr "All endpoint consumers and CPU users must join first. Timeout never revokes a derived pointer. Cold Platform release restores the shared pad lease only afterward."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Availability never substitutes for physical card-detect evidence."
+msgstr "Availability never substitutes for physical card-detect evidence."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Borrow one complete admitted CPU memory window."
+msgstr "Borrow one complete admitted CPU memory window."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded task/IRQ observation, no waiting or callback. High is the physical input value, independent of edge or active polarity. No event is consumed and no pending bit cleared. Output must be disjoint from faces, operations, provider storage and MMIO. Direct hardware providers may require privilege. Failed stop retains the pad until proven cleanup; successful stop ends level access. A missing optional method does not synthesize a level from the event queue."
+msgstr "Bounded task/IRQ observation, no waiting or callback. High is the physical input value, independent of edge or active polarity. No event is consumed and no pending bit cleared. Output must be disjoint from faces, operations, provider storage and MMIO. Direct hardware providers may require privilege. Failed stop retains the pad until proven cleanup; successful stop ends level access. A missing optional method does not synthesize a level from the event queue."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "CPU accessibility is not physical retention or timing qualification. No heap pool or automatic SRAM test exists."
+msgstr "CPU accessibility is not physical retention or timing qualification. No heap pool or automatic SRAM test exists."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Confirmed whole-block prefix; failed block bytes are unspecified."
+msgstr "Confirmed whole-block prefix; failed block bytes are unspecified."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Do not copy a live lease or alter fields. owner is opaque provider identity, not a public device pointer. CPU accesses use address directly without per-load dispatch. This first profile permits CPU data read/write only; it does not grant DMA, executable, allocator or C-runtime startup backing. Join all derived pointer users before release. A timeout or lost pointer never proves that those users have stopped."
+msgstr "Do not copy a live lease or alter fields. owner is opaque provider identity, not a public device pointer. CPU accesses use address directly without per-load dispatch. This first profile permits CPU data read/write only; it does not grant DMA, executable, allocator or C-runtime startup backing. Join all derived pointer users before release. A timeout or lost pointer never proves that those users have stopped."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Dummy-read/command sequencing belongs to the device protocol. This endpoint never interprets a controller ID."
+msgstr "Dummy-read/command sequencing belongs to the device protocol. This endpoint never interprets a controller ID."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Every return ends buffer access. It does not revoke the bank lease or prove physical panel state. Consumer and bus lifecycle must join before shared infrastructure withdrawal."
+msgstr "Every return ends buffer access. It does not revoke the bank lease or prove physical panel state. Consumer and bus lifecycle must join before shared infrastructure withdrawal."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact bank geometry; explicit CPU-window lease only in the runtime profile"
+msgstr "Exact bank geometry; explicit CPU-window lease only in the runtime profile"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact caller-owned CPU memory-window leases."
+msgstr "Exact caller-owned CPU memory-window leases."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit media and external-controller faces"
+msgstr "Explicit media and external-controller faces"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit shared external-controller lifecycle face."
+msgstr "Explicit shared external-controller lifecycle face."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicitly discover one card after infrastructure cold preparation."
+msgstr "Explicitly discover one card after infrastructure cold preparation."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Factory lookup and Platform startup never discover or replace media. Geometry is unavailable before activation. A different card requires explicit stop and activation; errors never silently reprobe a socket."
+msgstr "Factory lookup and Platform startup never discover or replace media. Geometry is unavailable before activation. A different card requires explicit stop and activation; errors never silently reprobe a socket."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Factory lookup returns an existing face without starting hardware or acquiring a bank. A controller face cannot substitute for an endpoint. A CPU-window lease permits direct loads/stores after acquisition and requires all derived pointer users to join before exact release. Startup backing is a separately selected, reset-time memory plan: its backing ownership already exists before Platform start and lasts while static objects exist. It rejects a whole-bank runtime loan and ordinary Platform stop. Neither profile grants DMA, executable memory, an allocator or physical retention evidence. See the [I/O ownership design](../../design/io-evolution.md) and the selected Board's explicit memory profile."
+msgstr "Factory lookup returns an existing face without starting hardware or acquiring a bank. A controller face cannot substitute for an endpoint. A CPU-window lease permits direct loads/stores after acquisition and requires all derived pointer users to join before exact release. Startup backing is a separately selected, reset-time memory plan: its backing ownership already exists before Platform start and lasts while static objects exist. It rejects a whole-bank runtime loan and ordinary Platform stop. Neither profile grants DMA, executable memory, an allocator or physical retention evidence. See the [I/O ownership design](../../design/io-evolution.md) and the selected Board's explicit memory profile."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "For public RS485 composition, use the same exact typed UART reference for `nx_factory_uart_ref()` and `nx_factory_uart_tx_validator_ref()`. The validator getter only returns the existing selected callback; it adds no mutable state or method table and returns NULL for unreviewed modes or IDs. Callback symbols may be shared; pairing with that transport's context and exclusive executor remains a caller precondition. The caller still owns DE, setup/hold timing and joined shutdown. The {ref}`RS485 I/O contract <uart__rs485_8h>` defines that ownership; lookup does not verify transceiver supply, RS485 bus wiring or physical turnaround."
+msgstr "For public RS485 composition, use the same exact typed UART reference for `nx_factory_uart_ref()` and `nx_factory_uart_tx_validator_ref()`. The validator getter only returns the existing selected callback; it adds no mutable state or method table and returns NULL for unreviewed modes or IDs. Callback symbols may be shared; pairing with that transport's context and exclusive executor remains a caller precondition. The caller still owns DE, setup/hold timing and joined shutdown. The {ref}`RS485 I/O contract <uart__rs485_8h>` defines that ownership; lookup does not verify transceiver supply, RS485 bus wiring or physical turnaround."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Geometry valid until session stop/reinitialization, or NULL."
+msgstr "Geometry valid until session stop/reinitialization, or NULL."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "IRQ timestamps and sampled GPIO levels are observations. The F407 EXTI provider marks them COALESCED; that source cannot satisfy the strict NEC source policy. The explicit NEC IRQ-observation reference preserves source flags and publishes sampled/uncertain quality. Protocol inverse checks never establish edge capture completeness or physical timing. See the [infrared source-quality contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)."
+msgstr "IRQ timestamps and sampled GPIO levels are observations. The F407 EXTI provider marks them COALESCED; that source cannot satisfy the strict NEC source policy. The explicit NEC IRQ-observation reference preserves source flags and publishes sampled/uncertain quality. Protocol inverse checks never establish edge capture completeness or physical timing. See the [infrared source-quality contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable controller face, distinct from every child bank endpoint."
+msgstr "Immutable controller face, distinct from every child bank endpoint."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable face; lookup does not acquire, clear or test memory."
+msgstr "Immutable face; lookup does not acquire, clear or test memory."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable face; lookup never starts clocks or accesses media."
+msgstr "Immutable face; lookup never starts clocks or accesses media."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable methods for one exact selected memory bank."
+msgstr "Immutable methods for one exact selected memory bank."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Media geometry remains immutable during one initialized session."
+msgstr "Media geometry remains immutable during one initialized session."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No data pointer remains borrowed after return in this synchronous profile. Media/controller uncertainty may independently retain their owner, pins and gates and make stop refuse. No DMA is implied."
+msgstr "No data pointer remains borrowed after return in this synchronous profile. Media/controller uncertainty may independently retain their owner, pins and gates and make stop refuse. No DMA is implied."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No preparation, device discovery or bank acquisition is implicit. PREPARED is not physical clock or timing proof."
+msgstr "No preparation, device discovery or bank acquisition is implicit. PREPARED is not physical clock or timing proof."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe protocol readiness without replaying a prior failed write."
+msgstr "Observe protocol readiness without replaying a prior failed write."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe the owner state without asserting physical card presence."
+msgstr "Observe the owner state without asserting physical card presence."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe the selected bus owner's software phase."
+msgstr "Observe the selected bus owner's software phase."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe this line's raw electrical level without events."
+msgstr "Observe this line's raw electrical level without events."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One media session with geometry, explicit activation and whole-block progress"
+msgstr "One media session with geometry, explicit activation and whole-block progress"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One readonly method table; callbacks receive the actual bus owner."
+msgstr "One readonly method table; callbacks receive the actual bus owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One settled 16-bit command/data endpoint; no payload survives return"
+msgstr "One settled 16-bit command/data endpoint; no payload survives return"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One shared external controller; distinct from its child bank endpoints"
+msgstr "One shared external controller; distinct from its child bank endpoints"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Partial device effects can survive a failure. No reset, command replay, worker, DMA or GPIO control is implied."
+msgstr "Partial device effects can survive a failure. No reset, command replay, worker, DMA or GPIO control is implied."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Public header"
+msgstr "Public header"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Query admitted media geometry without starting an operation."
+msgstr "Query admitted media geometry without starting an operation."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Quiesce a session; a timeout never authorizes clock/pad withdrawal."
+msgstr "Quiesce a session; a timeout never authorizes clock/pad withdrawal."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read one settled data-register word sequence."
+msgstr "Read one settled data-register word sequence."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read selected bank geometry without acquiring a loan."
+msgstr "Read selected bank geometry without acquiring a loan."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read whole sectors synchronously with a finite absolute deadline."
+msgstr "Read whole sectors synchronously with a finite absolute deadline."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Readonly physical geometry, never permission to use bytes."
+msgstr "Readonly physical geometry, never permission to use bytes."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Release the original loan after all direct users joined."
+msgstr "Release the original loan after all direct users joined."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Return ends CPU buffer access but not uncertain media programming; UNCERTAIN retains controller responsibility. No atomicity, power-loss recovery or durability beyond the selected protocol is promised."
+msgstr "Return ends CPU buffer access but not uncertain media programming; UNCERTAIN retains controller responsibility. No atomicity, power-loss recovery or durability beyond the selected protocol is promised."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after complete withdrawal, BUSY while a bank loan remains, or exact error retaining unfinished responsibility"
+msgstr "SUCCESS after complete withdrawal, BUSY while a bank loan remains, or exact error retaining unfinished responsibility"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only for count words; failed-prefix bytes outside transferred are unspecified. Parameter rejection preserves transferred and performs no access."
+msgstr "SUCCESS only for count words; failed-prefix bytes outside transferred are unspecified. Parameter rejection preserves transferred and performs no access."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only for count words; provider error may report a shorter prefix. Parameter rejection preserves output."
+msgstr "SUCCESS only for count words; provider error may report a shorter prefix. Parameter rejection preserves output."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or exact stale/foreign/release rejection; failed release retains the original responsibility"
+msgstr "SUCCESS or exact stale/foreign/release rejection; failed release retains the original responsibility"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS with exact address/bytes/epoch, or rejection with lease and hardware unchanged"
+msgstr "SUCCESS with exact address/bytes/epoch, or rejection with lease and hardware unchanged"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS with readonly facts, STATE before facts exist, UNSUPPORTED for a missing method or exact provider failure."
+msgstr "SUCCESS with readonly facts, STATE before facts exist, UNSUPPORTED for a missing method or exact provider failure."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or UNSUPPORTED. A physical provider can return IO/TIMEOUT after acquiring hardware; its explicit recovery contract then retains ownership and may prohibit further reads until recovery."
+msgstr "SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or UNSUPPORTED. A physical provider can return IO/TIMEOUT after acquiring hardware; its explicit recovery contract then retains ownership and may prohibit further reads until recovery."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, UNSUPPORTED or provider failure"
+msgstr "SUCCESS, INVALID, UNSUPPORTED or provider failure"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Selected identity and boundary"
+msgstr "Selected identity and boundary"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Send one complete command-register word."
+msgstr "Send one complete command-register word."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Settled 16-bit command and data endpoint."
+msgstr "Settled 16-bit command and data endpoint."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared immutable methods for one 16-bit parallel endpoint."
+msgstr "Shared immutable methods for one 16-bit parallel endpoint."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared readonly methods for one serialized execution owner."
+msgstr "Shared readonly methods for one serialized execution owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Software ownership phase; it never proves physical device fitting."
+msgstr "Software ownership phase; it never proves physical device fitting."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Stable exclusive direct-access loan; zero before acquire."
+msgstr "Stable exclusive direct-access loan; zero before acquire."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Stable readonly face; lookup acquires no bus or bank lease."
+msgstr "Stable readonly face; lookup acquires no bus or bank lease."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Status and confirmed whole-block prefix; current failed block may have changed. REJECTED parameters have zero hardware effects."
+msgstr "Status and confirmed whole-block prefix; current failed block may have changed. REJECTED parameters have zero hardware effects."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Status and whole blocks confirmed after card programming readiness. A failed current block may already have modified media."
+msgstr "Status and whole blocks confirmed after card programming readiness. A failed current block may already have modified media."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success after actual publisher/media withdrawal, or failure with provider cleanup responsibility retained. Platform cold close owns subsequent pad and gate restoration."
+msgstr "Success after actual publisher/media withdrawal, or failure with provider cleanup responsibility retained. Platform cold close owns subsequent pad and gate restoration."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success after exact card identification and geometry admission; failure retains any unproved controller/session cleanup owner."
+msgstr "Success after exact card identification and geometry admission; failure retains any unproved controller/session cleanup owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success only after proved host/media readiness; failure retains uncertainty and never upgrades a prior transfer outcome."
+msgstr "Success only after proved host/media readiness; failure retains uncertainty and never upgrades a prior transfer outcome."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success or INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "Success or INVALID, STATE, CONTEXT or UNSUPPORTED."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU access to the supplied buffers; polling is CPU-active, not IRQ/DMA async. SUCCESS requires complete wire drain and CS withdrawal. A provider that cannot withdraw GPIO CS/clock latches its owner fault, rejects further work and retains pin recovery responsibility until explicit recover/stop succeeds; it never retains payload pointers or reports that failure as successful release."
+msgstr "Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU access to the supplied buffers; polling is CPU-active, not IRQ/DMA async. SUCCESS requires complete wire drain and CS withdrawal. A provider that cannot withdraw GPIO CS/clock latches its owner fault, rejects further work and retains pin recovery responsibility until explicit recover/stop succeeds; it never retains payload pointers or reports that failure as successful release."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Synchronous sector I/O with explicit partial progress."
+msgstr "Synchronous sector I/O with explicit partial progress."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "The F407 `sdio-poll` reference requires explicit media activation, uses 512-byte sectors, one- or four-bit width and a maximum 12 MHz card clock. CPU polling releases caller buffers on every synchronous return; unresolved card/controller completion still retains the session, pins and gate. Stop succeeds only after complete withdrawal. DMA, IRQ completion, asynchronous cancellation, connected card-detect and hot-swap are not provided by this selected mode."
+msgstr "The F407 `sdio-poll` reference requires explicit media activation, uses 512-byte sectors, one- or four-bit width and a maximum 12 MHz card clock. CPU polling releases caller buffers on every synchronous return; unresolved card/controller completion still retains the session, pins and gate. Stop succeeds only after complete withdrawal. DMA, IRQ completion, asynchronous cancellation, connected card-detect and hot-swap are not provided by this selected mode."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "The provider enforces identity and orders prior CPU access before later bank withdrawal. It cannot detect a caller violating the join precondition by reusing a raw pointer."
+msgstr "The provider enforces identity and orders prior CPU access before later bank withdrawal. It cannot detect a caller violating the join precondition by reusing a raw pointer."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "This performs no memory test or implied initialization. startup_backing never grants an exclusive whole-bank loan."
+msgstr "This performs no memory test or implied initialization. startup_backing never grants an exclusive whole-bank loan."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Withdraw selected banks and only the acquired bus effects."
+msgstr "Withdraw selected banks and only the acquired bus effects."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Words are native halfwords; the selected physical route fixes command/data addresses and electrical bus timing. Methods use one serialized task executor and one finite absolute clock domain. No span survives a return, including failure. SUCCESS requires the whole requested word prefix."
+msgstr "Words are native halfwords; the selected physical route fixes command/data addresses and electrical bus timing. Methods use one serialized task executor and one finite absolute clock domain. No span survives a return, including failure. SUCCESS requires the whole requested word prefix."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Write one settled data-register word sequence."
+msgstr "Write one settled data-register word sequence."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Write sectors; memory completion alone never proves media ready."
+msgstr "Write sectors; memory completion alone never proves media ready."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Accessible bytes, at least blocks times block_bytes."
+msgstr "[in] Accessible bytes, at least blocks times block_bytes."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Accessible source bytes, at least the selected extent."
+msgstr "[in] Accessible source bytes, at least the selected extent."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Aligned immutable caller storage until this call returns."
+msgstr "[in] Aligned immutable caller storage until this call returns."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Aligned immutable span, disjoint from known controls"
+msgstr "[in] Aligned immutable span, disjoint from known controls"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact same bank identity that granted the loan"
+msgstr "[in] Exact same bank identity that granted the loan"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Generation captured on the original acquisition"
+msgstr "[in] Generation captured on the original acquisition"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Initialized exact line; serialized against stop/rebind."
+msgstr "[in] Initialized exact line; serialized against stop/rebind."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Initialized exact media session, serialized by its owner."
+msgstr "[in] Initialized exact media session, serialized by its owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Live exact bank under its serialized owner"
+msgstr "[in] Live exact bank under its serialized owner"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Live selected bank under one serialized task owner"
+msgstr "[in] Live selected bank under one serialized task owner"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical sector index, checked before command writes."
+msgstr "[in] Logical sector index, checked before command writes."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical sector index, never a byte address."
+msgstr "[in] Logical sector index, never a byte address."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Native command word, not a byte-count address"
+msgstr "[in] Native command word, not a byte-count address"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite absolute deadline for the sequence"
+msgstr "[in] One finite absolute deadline for the sequence"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded count accepted by the selected provider."
+msgstr "[in] Positive bounded count accepted by the selected provider."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded count; no erase or product policy."
+msgstr "[in] Positive bounded count; no erase or product policy."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive selected word count"
+msgstr "[in] Positive selected word count"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive word count within the selected mode bound"
+msgstr "[in] Positive word count within the selected mode bound"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same exclusive controller owner, storage still alive"
+msgstr "[in] Same exclusive controller owner, storage still alive"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same live bank and task executor"
+msgstr "[in] Same live bank and task executor"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Selected face under the same serialized owner."
+msgstr "[in] Selected face under the same serialized owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable face under the same serialized task executor"
+msgstr "[in] Stable face under the same serialized task executor"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable selected face under its serialized owner."
+msgstr "[in] Stable selected face under its serialized owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero stable disjoint caller storage"
+msgstr "[inout] Fresh zero stable disjoint caller storage"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Original stable lease storage, never a copied token"
+msgstr "[inout] Original stable lease storage, never a copied token"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same initialized media session and serialized owner."
+msgstr "[inout] Same initialized media session and serialized owner."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same owner, live through a refused stop/retry."
+msgstr "[inout] Same owner, live through a refused stop/retry."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same serialized Thread owner; no existing live session."
+msgstr "[inout] Same serialized Thread owner; no existing live session."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Single Thread owner with an admitted writable session."
+msgstr "[inout] Single Thread owner with an admitted writable session."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Single privileged Thread owner; no ISR or reentrancy."
+msgstr "[inout] Single privileged Thread owner; no ISR or reentrancy."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Aligned caller storage, disjoint from provider/MMIO."
+msgstr "[out] Aligned caller storage, disjoint from provider/MMIO."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Aligned writable storage, disjoint from controls"
+msgstr "[out] Aligned writable storage, disjoint from controls"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Caller-owned sample, unchanged on error, never retained."
+msgstr "[out] Caller-owned sample, unchanged on error, never retained."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Distinct aligned caller output, preserved on input rejection; provider errors may leave it unchanged."
+msgstr "[out] Distinct aligned caller output, preserved on input rejection; provider errors may leave it unchanged."
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Distinct exact completed word prefix"
+msgstr "[out] Distinct exact completed word prefix"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`block.h`"
+msgstr "`block.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`external_bus.h`"
+msgstr "`external_bus.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`memory_window.h`"
+msgstr "`memory_window.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`parallel16.h`"
+msgstr "`parallel16.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "block.h"
+msgstr "block.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "external_bus.h"
+msgstr "external_bus.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "memory_window.h"
+msgstr "memory_window.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "parallel16.h"
+msgstr "parallel16.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "startup_backing marks memory with live startup objects. A whole-bank runtime loan is unsupported for that profile. Geometry does not authorize DMA, probing or allocation."
+msgstr "startup_backing marks memory with live startup objects. A whole-bank runtime loan is unsupported for that profile. Geometry does not authorize DMA, probing or allocation."

@@ -9,6 +9,7 @@ from tools.configure import io_traits, selected_contracts
 from tools.configure.providers import for_selection
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats, usb_profiles
+from tools.configure.calls import Symbol
 
 FACTORY_ABI_EPOCH = 1
 
@@ -36,7 +37,7 @@ def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
     if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc"}:
         return f"nx_{class_name}_t"
-    if class_name in {"eth", "mdio"}:
+    if class_name in {"eth", "mdio", "memory_window"}:
         return f"nx_{class_name}_port_t"
     if class_name == "usb_device":
         return "nx_usb_device_port_t"
@@ -83,6 +84,11 @@ def classes(result):
             records.append((name, "endpoint", instances))
     records.append(("usb_endpoint", "endpoint", [item for item in result.devices
                     if item.kind == "usb_device"]))
+    for name in ("memory_window", "parallel16"):
+        instances = [item for item in result.devices
+                     if selected_contracts.endpoint_class(item) == name]
+        if instances:
+            records.append((name, "endpoint", instances))
     records.append(("mdio", "port", [item for item in result.controllers
                                     if item.kind in {"eth", "eth_frames"}]))
     return records
@@ -91,6 +97,56 @@ def classes(result):
 def controller_class(item):
     """Physical UART resource and nominal word face remain distinct facts."""
     return selected_contracts.controller_class(item)
+
+
+def _uart_instances(result):
+    """Nominal byte UART IDs never substitute for word or endpoint IDs."""
+    return tuple(item for item in result.controllers
+                 if controller_class(item) == "uart")
+
+
+def _uart_validator_factory(result):
+    """Expose an optional exact transport callback without a runtime registry."""
+    instances = _uart_instances(result)
+    if not instances:
+        return [], []
+    header = [
+        '/**',
+        ' * \\brief           Pure lookup of reviewed TX admission.',
+        ' * \\param[in]       id: Same exact ID used to obtain the UART face.',
+        ' * \\return          Shared callback, or NULL for unsupported mode/ID.',
+        ' * \\note            Task/ISR lookup has no hardware, allocation or',
+        ' *                  lifecycle effect. Execute the callback only with',
+        ' *                  that transport context under its exclusive owner',
+        ' *                  and provider context contract. It neither admits',
+        ' *                  nor retains request/payload storage. Symbols can',
+        ' *                  be shared; same-ID/context pairing is a caller',
+        ' *                  precondition, not runtime authentication.',
+        ' */',
+        'nx_uart_tx_validate_fn nx_factory_uart_tx_validator(nx_uart_id_t id);']
+    selected = []
+    for item in instances:
+        provider = for_selection(item)
+        implementation = provider.mode_implementation(item.kind, item.mode)
+        callback = getattr(provider, "UART_TX_VALIDATORS", {}).get(
+            (item.provider, item.mode, implementation))
+        if callback is not None:
+            if not isinstance(callback, Symbol):
+                raise ValueError("Reviewed UART validator requires a typed C symbol")
+            selected.append((item, callback))
+    source = []
+    for name in sorted({callback.name for _, callback in selected}):
+        source += [f'extern nx_result_t {name}(void* context,',
+                   '    const nx_uart_tx_request_t* request);']
+    source += [
+        '/** \\brief Exact admission symbol; no per-instance forwarding layer. */',
+        'nx_uart_tx_validate_fn nx_factory_uart_tx_validator(nx_uart_id_t id) {',
+        '    switch (id) {']
+    for item, callback in selected:
+        source += ['        case NX_UART_ID_' + symbol(item.id).upper() + ':',
+                   '            return ' + callback.render() + ';']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
 
 
 @dataclass(frozen=True)
@@ -166,6 +222,9 @@ def emit(result):
                        else f"nx_binding_{name}")
             source += [f"        case {prefix}{name.upper()}:", f"            return {pointer};"]
         source += ["        default:", "            return NULL;", "    }", "}"]
+    validator_header, validator_source = _uart_validator_factory(result)
+    header.extend(validator_header)
+    source.extend(validator_source)
     if result.factory.capabilities:
         cap_header, cap_source = emit_capabilities(result)
         header.extend(cap_header)
@@ -234,6 +293,12 @@ def emit_strong(result):
         header += ["/** \\brief Pure getter; lifecycle remains explicit. */",
                    *signature,
                    f"    return nx_factory_{class_name}(id.value);", "}"]
+    if _uart_instances(result):
+        header += [
+            '/** \\brief Pure callback lookup; pair with the same UART ref. */',
+            'static inline nx_uart_tx_validate_fn',
+            'nx_factory_uart_tx_validator_ref(nx_uart_ref_t id) {',
+            '    return nx_factory_uart_tx_validator(id.value);', '}']
     header += ["#ifdef __cplusplus", "}", "#endif", "#endif", ""]
     return "\n".join(header)
 

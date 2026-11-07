@@ -15,7 +15,8 @@ from tools.evidence.common import (EvidenceError, atomic_json, fields,
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import (Elf32, image_window, interval_bytes,
                                    intervals_union)
-from tools.configure.memory import resource_budget_projection
+from tools.configure.memory import (resource_budget_projection,
+                                    validate_external_projection)
 
 
 def integer(value, name: str, *, minimum: int = 0) -> int:
@@ -91,11 +92,16 @@ def validate_budget(budget: dict, memory: list[dict]) -> None:
 
 
 def memory_contract(resolved: dict) -> tuple[dict, list[dict]]:
-    """Consume memory facts from the resolver's selected exact variant."""
+    """Consume internal facts and exact separately selected external backing."""
     flash = resolved["flash"]
     memory = resolved["memory"]
     if not isinstance(flash, dict) or not isinstance(memory, list) or not memory:
         raise EvidenceError("resolved physical Flash/RAM contract missing")
+    try:
+        validate_external_projection(resolved)
+    except (ValueError, TypeError, KeyError, AttributeError) as error:
+        raise EvidenceError("Invalid external SRAM startup projection: " +
+                            str(error)) from error
     integer(flash["origin"], "Flash origin")
     integer(flash["size"], "Flash size", minimum=1)
     ranges = [(flash["origin"], flash["origin"] + flash["size"])]

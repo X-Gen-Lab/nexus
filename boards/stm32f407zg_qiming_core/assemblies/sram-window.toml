@@ -1,0 +1,29 @@
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[hardware]
+debug_port = "swd"
+sram_population = "is62wv51216"
+display_module = "absent"
+touch_module = "absent"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 131072
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[external_bus.ext0]
+binding = "fsmc0"
+mode = "async16"
+
+# Encoded official LL access-mode-A fields; declared assumptions, not HIL.
+[memory_window.ram0]
+controller = "ext0"
+binding = "sram0"
+mode = "cpu-window"
+read_timing = { address_setup = 4, address_hold = 1, data_setup = 15, bus_turn = 2 }
+write_timing = { address_setup = 4, address_hold = 1, data_setup = 15, bus_turn = 2 }

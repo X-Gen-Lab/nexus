@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "board": "stm32f407zg-qiming-core",
+  "part": "STM32F407ZGT6",
+  "transport": "swd",
+  "probe_interfaces": [
+    "stlink",
+    "cmsis-dap",
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "scope": "software_reference",
+  "pending_qualification": [
+    {
+      "id": "physical_board_review",
+      "fixture": "Inspect independent MCU Board, physical PCB revision, STM32F407ZGT6 marking, UID, HSE8/LSE32.768k crystals, power entry and SWD probe. Schematic document identity does not establish installed parts. No station is connected. Core schematic SHA256 404e9fd9dcc667a94a84e9740e689db4c0ad4d93b36781c67bb03773b232ef07 page1; SRAM, NOR and battery are marked unpopulated. No carrier compatibility or Ethernet/SDIO socket is established.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "declared_fitting_jumpers",
+      "fixture": "Bind exact resolved configuration digest and independently inspect every selected Board hardware option, module marking, DNP population, connector and jumper position. Retain photographs/continuity/waveform inputs as station-owned hashed artifacts; unselected options remain unknown.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "clock_uart_gpio",
+      "fixture": "Measure cold boot, HSE/PLL168 timebase, USART1 PA9/PA10 115200 8N1, active-low LEDs and pull-up keys. Review shared USB power entries and actual voltages before equipment operation.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "display_touch",
+      "fixture": "Confirm ILI9341 16-bit NE4/PG12 RS=A12/PG2, PF10 active-high backlight and MCU-shared NRST. Capture FSMC command/data and XPT2046 PA5/PB1/PB2/PB0 software SPI plus PF11 PENIRQ, final power state, current pin predicate, stop/recovery and electrical timing. No independent LCD reset or hardware-SPI route is inferred.",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "external_memory",
+      "fixture": "Inspect exact fitted IS62WV51216 SRAM grade and W25 variant/capacity before selection; capture NE3 timing, byte lanes, boundaries, independent LCD bank, failed startup and retained ownership. Direct CPU window is distinct from boot-backed memory or DMA reachability. Product erase regions and data are externally owned.",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ from tools.configure.trigger_graph import TriggerPlanIR
 from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
 from tools.configure.i2s2 import I2s2RoleIR
 if TYPE_CHECKING:
+    from tools.configure.board_hardware import BoardHardwareIR
     from tools.configure.providers.hardware import ControllerBinding
     from tools.configure.integration_package import ProviderContext
 
@@ -186,6 +187,21 @@ class ThreadXKernelProfileIR(Record):
 class GpioOptions:
     mask: int
     initial: int
+    pull: str = "none"
+    output_type: str = "push-pull"
+
+
+@dataclass(frozen=True)
+class BlockOptions:
+    bus_width: int
+    max_blocks: int
+    poll_budget: int
+    stop_timeout_us: int
+
+
+@dataclass(frozen=True)
+class ExternalBusOptions:
+    """An exact bus has no policy beyond its reviewed selected banks."""
 
 
 @dataclass(frozen=True)
@@ -297,6 +313,7 @@ class ExtiOptions:
     edge: str
     event_capacity: int
     irq: IrqOptions
+    pull: str = "none"
 
 
 @dataclass(frozen=True)
@@ -525,8 +542,29 @@ class LptimOptions:
 
 
 @dataclass(frozen=True)
+class RtcCalendarOptions:
+    """Copied raw YY calendar, without timezone or century policy."""
+    year: int
+    month: int
+    day: int
+    weekday: int
+    hour: int
+    minute: int
+    second: int
+
+
+@dataclass(frozen=True)
+class RtcOptions:
+    """Explicit admission bounds and optional authored provisioning value."""
+    allow_set: bool
+    timeout_us: int
+    poll_limit: int
+    initial: RtcCalendarOptions | None
+
+
+@dataclass(frozen=True)
 class NoOptions:
-    """Flash, watchdog and raw RTC have no authored construction options."""
+    """Modes with no authored construction options remain distinct."""
 
 
 @dataclass(frozen=True)
@@ -563,17 +601,22 @@ class CanFdOptions:
     irq: IrqOptions
 
 
-ControllerOptions = (GpioOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
+ControllerOptions = (GpioOptions | BlockOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
-                     AdcGroupOptions | LptimOptions | NoOptions)
+                     AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions | NoOptions)
 
 
 def mode_options(values):
     """Project one validated mode into immutable named constructor arguments."""
     kind = values["kind"]
+    if kind == "external_bus":
+        return ExternalBusOptions()
+    if kind == "block":
+        return BlockOptions(values["bus_width"], values["max_blocks"],
+                            values["poll_budget"], values["stop_timeout_us"])
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
                       values.get("irq_probe", False))
            if "irq_priority" in values else None)
@@ -636,7 +679,9 @@ def mode_options(values):
             return PinStateOptions(values["mask"],
                                    PinStateValueOptions(**states["default"]),
                                    PinStateValueOptions(**states["sleep"]))
-        return GpioOptions(values["mask"], values["initial"])
+        return GpioOptions(values["mask"], values["initial"],
+                           values.get("pull", "none"),
+                           values.get("output_type", "push-pull"))
     if kind == "uart":
         return UartOptions(values["baud"], values["rx_profile"],
                            values.get("rx_capacity"), irq,
@@ -655,7 +700,8 @@ def mode_options(values):
         return I2cOptions(values.get("max_hz", 100000), irq,
                          values.get("timing_resolution"))
     if kind == "exti":
-        return ExtiOptions(values["edge"], values["event_capacity"], irq)
+        return ExtiOptions(values["edge"], values["event_capacity"], irq,
+                           values.get("pull", "none"))
     if kind == "pwm":
         return PwmOptions(values["period_ticks"], values["duty_ticks"],
                           values["tick_hz"])
@@ -668,6 +714,15 @@ def mode_options(values):
                           if "stream_resolution" in values else None)
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
+    if kind == "rtc":
+        from tools.configure.rtc import POLICY_MODES
+        if values["mode"] in POLICY_MODES:
+            initial = (values["initial"]
+                       if values["mode"] == "provision-empty" else None)
+            return RtcOptions(values["allow_set"], values["timeout_us"],
+                              values["poll_limit"],
+                              RtcCalendarOptions(**initial)
+                              if initial is not None else None)
     if kind in {"flash", "watchdog", "rtc"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")
@@ -798,6 +853,33 @@ class I2cLongEndpointOptions:
 
 
 @dataclass(frozen=True)
+class ParallelTimingOptions:
+    address_setup: int
+    address_hold: int
+    data_setup: int
+    bus_turn: int
+
+
+@dataclass(frozen=True)
+class MemoryWindowOptions:
+    mode: str
+    binding: str
+    read_timing: ParallelTimingOptions
+    write_timing: ParallelTimingOptions
+    address: int
+    bytes: int
+
+
+@dataclass(frozen=True)
+class Parallel16Options:
+    binding: str
+    read_timing: ParallelTimingOptions
+    write_timing: ParallelTimingOptions
+    command_address: int
+    data_address: int
+
+
+@dataclass(frozen=True)
 class EndpointIR(Record):
     id: str
     controller: str
@@ -805,7 +887,8 @@ class EndpointIR(Record):
     kind: str
     options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
               SpiDMATransactionEndpointOptions |
-              I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions)
+              I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions |
+              MemoryWindowOptions | Parallel16Options)
     source_fields: tuple[str, ...]
 
     def projection(self):
@@ -837,6 +920,15 @@ class EndpointIR(Record):
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",
                             "fifo_start", "fifo_words")))
+        elif kind == "external_bus":
+            arguments = (values["binding"],
+                         ParallelTimingOptions(**values["read_timing"]),
+                         ParallelTimingOptions(**values["write_timing"]))
+            options = (MemoryWindowOptions(values["mode"], *arguments, values["address"],
+                                           values["bytes"])
+                       if values["driver"] == "memory_window-endpoint" else
+                       Parallel16Options(*arguments, values["command_address"],
+                                         values["data_address"]))
         else:
             raise ValueError(f"Unmaintained endpoint decision: {kind}")
         return cls(values["id"], values["controller"], values["driver"],
@@ -976,6 +1068,26 @@ class RuntimePowerIR:
 
 
 @dataclass(frozen=True)
+class ExternalMemoryRegionIR(Record):
+    """Selected placed RAM references its canonical immutable bank endpoint."""
+    id: str
+    endpoint: EndpointIR
+
+    @property
+    def origin(self):
+        return self.endpoint.options.address
+
+    @property
+    def size(self):
+        return self.endpoint.options.bytes
+
+    def memory_projection(self):
+        """Expose placement without adding external RAM to chip facts or DMA."""
+        return freeze({"id": self.id, "origin": self.origin, "size": self.size,
+                       "dma": False, "linker": True})
+
+
+@dataclass(frozen=True)
 class ConfigurationIR(Record):
     source_epoch: ClassVar[int] = 2
     board: str
@@ -1013,6 +1125,8 @@ class ConfigurationIR(Record):
     configuration_sha256: str = ""
     schema_version: int = 1
     provider_context: "ProviderContext | None" = None
+    hardware: "BoardHardwareIR | None" = None
+    external_memory: tuple[ExternalMemoryRegionIR, ...] = ()
 
     @property
     def backend(self):
@@ -1044,7 +1158,8 @@ class ConfigurationIR(Record):
 
     @property
     def memory(self):
-        return self.physical_part.memory
+        return self.physical_part.memory + tuple(
+            region.memory_projection() for region in self.external_memory)
 
     @property
     def image_origin(self):
@@ -1064,7 +1179,7 @@ class ConfigurationIR(Record):
                   if item.name not in {
                       "kernel", "memory_budget", "physical_part", "fact_references",
                       "pwm_shared_owners", "runtime_power", "i2s2", "clock_plan",
-                      "provider_context"}}
+                      "provider_context", "hardware", "external_memory"}}
         result.update(backend=self.backend, enum_abi=self.enum_abi,
                       irq=thaw(self.irq), cpu=self.cpu, part=self.part,
                       package=self.package, flash=self.flash, memory=self.memory,
@@ -1073,11 +1188,14 @@ class ConfigurationIR(Record):
                       memory_budgets=self.memory_budget.projection(),
                       claims=tuple({name: getattr(claim, name) for name in
                           ("key", "owner", "mode", "source")} for claim in self.claims))
-        for name in ("fact_references", "runtime_power", "i2s2", "clock_plan"):
+        for name in ("fact_references", "runtime_power", "i2s2", "clock_plan",
+                     "hardware"):
             if getattr(self, name) is not None:
                 result[name] = getattr(self, name)
         if self.pwm_shared_owners:
             result["pwm_shared_owners"] = self.pwm_shared_owners
+        if self.external_memory:
+            result["external_memory"] = self.external_memory
         if self.provider_context is not None and self.provider_context.external:
             result["soc_package"] = self.provider_context.identity
         return result

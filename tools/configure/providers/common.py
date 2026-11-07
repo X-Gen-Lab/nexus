@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import DirectCall, InitializeSequence
+from tools.configure.calls import DirectCall, InitializeSequence, Symbol
 
 UINT32_MAX = (1 << 32) - 1
 
@@ -165,7 +165,9 @@ class Construction:
     """One provider's explicit static storage and cold lifecycle contract.
 
     Production assembly uses named fields; no family inference or runtime
-    metadata is emitted.
+    metadata is emitted. initial_state names a concrete C aggregate initializer,
+    never generated assignment code. pre_c_effects identifies image-lifetime
+    responsibility that already exists before Platform startup can succeed.
     """
     state_type: str
     definitions: tuple[str, ...]
@@ -178,8 +180,15 @@ class Construction:
     face_definitions: tuple[str, ...] = ()
     admission: tuple[DirectCall, ...] = ()
     initialize_sequences: tuple[InitializeSequence, ...] = ()
+    initial_state: Symbol | None = None
+    pre_c_effects: bool = False
 
     def __post_init__(self):
+        if (self.initial_state is not None and
+                not isinstance(self.initial_state, Symbol)):
+            fail("Construction initial state requires a typed C initializer symbol")
+        if type(self.pre_c_effects) is not bool:
+            fail("Construction pre-C effects require an explicit boolean")
         if not isinstance(self.initialize_sequences, (tuple, list)):
             fail("Construction initialization sequences require an ordered sequence")
         sequences = tuple(self.initialize_sequences)
@@ -248,8 +257,15 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("memory_window", "startup-memory"): ModeTraits(),
+    ("external_bus", "async16"): ModeTraits(polling=True),
+    ("memory_window", "cpu-window"): ModeTraits(),
+    ("parallel16", "8080-16"): ModeTraits(polling=True),
+    ("block", "sdio-poll"): ModeTraits(polling=True),
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("rtc", "retained-calendar-alarm"): ModeTraits(),
+    ("rtc", "adopt-retained"): ModeTraits(polling=True),
+    ("rtc", "provision-empty"): ModeTraits(polling=True),
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),

@@ -29,6 +29,10 @@ static bool s_refused_irq_pending;
 static unsigned s_clear_calls;
 static unsigned s_disable_calls;
 static unsigned s_irq_clear_calls;
+static bool s_privileged;
+extern "C" bool nx_stm32_exti_model_privileged(void) {
+    return s_privileged;
+}
 uint32_t nx_stm32_exti_model_read(volatile uint32_t* reg) {
     return *reg;
 }
@@ -74,6 +78,7 @@ class Stm32Exti : public testing::Test {
     unsigned word = irq / 32U;
     uint32_t irq_bit = 1U << (irq % 32U);
     void SetUp() override {
+        s_privileged = true;
         std::memset(&g_stm32_exti_nvic, 0, sizeof(g_stm32_exti_nvic));
         s_registers = &registers;
         s_ignored_write = nullptr;
@@ -94,6 +99,92 @@ class Stm32Exti : public testing::Test {
         g_stm32_exti_nvic.ISER[word] |= irq_bit;
     }
 };
+
+TEST_F(Stm32Exti, LevelSamplesRawPinWithoutConsumingOrAcknowledgingEvents) {
+    Start();
+    events[0] = {12U, 0U, 5U, NX_EXTI_FALLING};
+    first.count = first.head = 1U;
+    registers.PR = 1U << 5U;
+    const auto before = first;
+    const auto hardware = registers;
+    const unsigned clears = s_clear_calls;
+    bool high = false;
+    gpio.IDR = 1U << 5U;
+    ASSERT_EQ(NX_SUCCESS, nx_exti_port_level(&face, &high));
+    EXPECT_TRUE(high);
+    gpio.IDR = 1U << 6U;
+    ASSERT_EQ(NX_SUCCESS, nx_exti_port_level(&face, &high));
+    EXPECT_FALSE(high);
+    EXPECT_EQ(0, std::memcmp(&first, &before, sizeof(first)));
+    EXPECT_EQ(0, std::memcmp(&registers, &hardware, sizeof(registers)));
+    EXPECT_EQ(1U, first.count);
+    EXPECT_EQ(0U, first.tail);
+    EXPECT_EQ(clears, s_clear_calls);
+}
+
+TEST_F(Stm32Exti, LevelRejectsInvalidFacesOrUnsupportedProviderUnchanged) {
+    bool high = true;
+    const nx_exti_ops_t optional{};
+    const nx_exti_port_t unsupported{&optional, &first};
+    const nx_exti_port_t no_ops{nullptr, &first};
+    const nx_exti_port_t no_context{&nx_stm32_exti_ops, nullptr};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_exti_port_level(nullptr, &high));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_exti_port_level(&no_ops, &high));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_exti_port_level(&no_context, &high));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_exti_port_level(&face, nullptr));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_exti_port_level(&unsupported, &high));
+    EXPECT_TRUE(high);
+}
+
+TEST_F(Stm32Exti, LevelRejectsUnprivilegedOrStoppedOwnerWithoutOutput) {
+    Start();
+    bool high = true;
+    s_privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_exti_port_level(&face, &high));
+    EXPECT_TRUE(high);
+    s_privileged = true;
+    ASSERT_EQ(NX_SUCCESS, nx_exti_port_stop(&face));
+    EXPECT_EQ(NX_ERROR_STATE, nx_exti_port_level(&face, &high));
+    EXPECT_TRUE(high);
+}
+
+TEST_F(Stm32Exti, LevelCannotOverwriteProviderRingRegistersFaceOrOperations) {
+    Start();
+    const auto before = first;
+    const auto original_gpio = gpio;
+    const auto original_exti = registers;
+    const auto original_face = face;
+    const auto operations = nx_stm32_exti_ops;
+    for (void* output :
+         {static_cast<void*>(&first), static_cast<void*>(events),
+          static_cast<void*>(&gpio), static_cast<void*>(&registers),
+          const_cast<void*>(static_cast<const void*>(&face)),
+          const_cast<void*>(static_cast<const void*>(&nx_stm32_exti_ops))}) {
+        EXPECT_EQ(NX_ERROR_INVALID,
+                  nx_exti_port_level(&face, static_cast<bool*>(output)));
+    }
+    EXPECT_EQ(0, std::memcmp(&first, &before, sizeof(first)));
+    EXPECT_EQ(0, std::memcmp(&gpio, &original_gpio, sizeof(gpio)));
+    EXPECT_EQ(0, std::memcmp(&registers, &original_exti, sizeof(registers)));
+    EXPECT_EQ(0, std::memcmp(&face, &original_face, sizeof(face)));
+    EXPECT_EQ(0, std::memcmp(&nx_stm32_exti_ops, &operations,
+                             sizeof(nx_stm32_exti_ops)));
+}
+
+TEST_F(Stm32Exti, FailedWithdrawalRetainsLevelAccessUntilSuccessfulStop) {
+    Start();
+    s_refused_mask = 1U << 5U;
+    ASSERT_EQ(NX_ERROR_IO, nx_exti_port_stop(&face));
+    gpio.IDR = 1U << 5U;
+    bool high = false;
+    EXPECT_EQ(NX_SUCCESS, nx_exti_port_level(&face, &high));
+    EXPECT_TRUE(high);
+    s_refused_mask = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_exti_port_stop(&face));
+    high = false;
+    EXPECT_EQ(NX_ERROR_STATE, nx_exti_port_level(&face, &high));
+    EXPECT_FALSE(high);
+}
 TEST_F(Stm32Exti, NormalStopObservesSourceAndLastVectorBeforeReleasingWake) {
     Start();
     testing::StrictMock<ExtiWakeBoundary> notification;

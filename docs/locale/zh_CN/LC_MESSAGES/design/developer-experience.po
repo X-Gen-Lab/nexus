@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: df8620965960025c056cf5b67a73d64bd85064e99964000cb88e10f9b5a33ad1\n"
+"X-Nexus-Source-SHA256: d6ae445046dd9b5be314ff440f78a54464ae12876b357f8206fa4a36da9c73a3\n"
 
 #: docs/design/developer-experience.md:9
 msgid "Developer experience and provider iteration"
@@ -374,3 +374,213 @@ msgid ""
 msgstr ""
 "本轮未连接物理测试站。H1–H6 保持 `not_executed`：首发板启动与工具；串口／SPI／I2C 与恢复；IRQ／临界区延迟；连续 "
 "DMA／Cache；Flash／看门狗／停机；最终物理支持范围封存。准备的计划为以后真实执行保留未知 PCB 事实、测试站身份与数值验收限值。"
+
+msgid "Exact Qiming Board integration"
+msgstr "启明开发板的精确接入"
+
+msgid "QB01–QB32 extend the same execution ledger for the supplied STM32F407ZGT6 core schematic and high-configuration V4.1 schematic. The earlier 107 rows retain their original identities and exits. This is a complete work breakdown, not a claim that every new driver or physical exit has passed. Read each row's implementation, software and hardware columns separately."
+msgstr "QB01–QB32 在同一执行台账中追加所提供 STM32F407ZGT6 核心板原理图与高配 V4.1 原理图的接入任务。此前 107 行保留原编号和退出条件。这是一份完整的工作分解，不表示每个新驱动或物理退出条件均已通过。每行的实现、软件和硬件状态须分别阅读。"
+
+msgid "Both drawings contain their own MCU, power and clocks. They describe independent Boards; a plug-compatible core/carrier relationship has not been established. `stm32f407zg-qiming-core` and `stm32f407zg-qiming-v41` therefore have separate packages. The original `stm32f407zg-qiming-v31` identity remains unchanged. PDF revision and document date are source identities; physical PCB revision stays unknown until inspected."
+msgstr "两份图纸各自包含 MCU、电源和时钟，描述的是两块独立开发板，尚未证明核心板与底板可直接配插。因此，`stm32f407zg-qiming-core` 与 `stm32f407zg-qiming-v41` 使用独立板卡包。原有 `stm32f407zg-qiming-v31` 身份保持不变。PDF 版本和文档日期仅标识资料来源，实际 PCB 修订在检查前继续为未知。"
+
+msgid "The user confirmed ILI9341 and XPT2046, with a 16-bit display and matching touch connector. The core drawing marks SRAM, NOR and the backup battery unpopulated. The V4.1 drawing contains a conflicting W25Q128/64-Mbit annotation. A declared device choice must be checked against the selected device identity and geometry; the implementation must not silently choose a different part. The exact audio and camera modules still require selection before their physical support is claimed."
+msgstr "用户已确认 ILI9341 和 XPT2046，对应 16 位显示总线及匹配的触摸接口。核心板图纸将 SRAM、NOR 与后备电池标为空贴。V4.1 图纸存在 W25Q128 与 64-Mbit 标注冲突。声明的器件选型必须与选中器件的身份和几何参数核对，实现不能静默改用另一型号。音频与摄像头模块仍须明确选型，才能声明其物理支持。"
+
+msgid "Configuration and runtime responsibilities"
+msgstr "配置与运行时职责"
+
+msgid "The [existing static architecture](../explanation/platform-architecture.md) remains the runtime boundary. One authored TOML selects exact SoC, Board and reviewed hardware choices. Immutable typed IR generates only static data, storage, faces, factory accessors and fixed call ordering. Hardware admission, register operations, waiting, rollback and withdrawal remain C11. CMake owns selected source dependencies; no runtime registry, object pool, mandatory worker or additional per-byte forwarding layer is introduced."
+msgstr "[既有静态架构](../explanation/platform-architecture.md)继续界定运行时边界。一份 authored TOML 选择精确 SoC、Board 和已审硬件选项。不可变 typed IR 只生成静态配置数据、存储、接口对象、factory 访问器和固定调用顺序。硬件准入、寄存器操作、等待、回滚及归还仍由 C11 实现。CMake 拥有所选源码依赖；不增加运行时注册表、对象池、强制工作线程或额外的逐字节转发层。"
+
+msgid "Board `hardware_options` declares allowed choices without defaults. A binding's `requires` conditions must match explicit TOML `[hardware]` selections. Missing population or jumper choices cannot be repaired by the resolver. These are reviewed declarations, not physical inspection evidence. Electrical requirements such as input pull-up, inactive CS, RS485 direction and backlight polarity must also be validated and executed; a text `unknowns` entry cannot perform admission."
+msgstr "Board 的 `hardware_options` 声明允许的选项，不提供默认值。绑定的 `requires` 条件必须匹配 TOML 中显式的 `[hardware]` 选择。解析器不能补齐缺失的器件安装或跳线选择。这些是已审声明，并非实物检查证据。输入上拉、CS 非活动电平、RS485 方向和背光极性等电气要求也必须经过校验并实际执行；`unknowns` 文本不能执行准入。"
+
+msgid "Layer"
+msgstr "层次"
+
+msgid "Owned responsibility"
+msgstr "拥有的职责"
+
+msgid "Boundary"
+msgstr "边界"
+
+msgid "Arch and Core"
+msgstr "Arch 与 Core"
+
+msgid "CPU execution, barriers, time and request lifetime"
+msgstr "CPU 执行、屏障、时间与请求生命周期"
+
+msgid "No PCB pin or product policy"
+msgstr "不包含 PCB 引脚或产品策略"
+
+msgid "SoC and private provider"
+msgstr "SoC 与私有 provider"
+
+msgid "Controller facts, routes, clocks, IRQ/DMA and C lifecycle"
+msgstr "控制器事实、路由、时钟、IRQ/DMA 和 C 生命周期"
+
+msgid "Official Handles and register types stay private"
+msgstr "官方 Handle 和寄存器类型保持私有"
+
+msgid "Board"
+msgstr "Board"
+
+msgid "Exact wiring, optional fitting, jumpers and electrical conditions"
+msgstr "精确接线、可选器件安装、跳线和电气条件"
+
+msgid "Configuration does not establish physical fitting"
+msgstr "配置不能证明实物安装情况"
+
+msgid "Typed I/O"
+msgstr "强类型 I/O"
+
+msgid "Device-class operations and ownership contracts"
+msgstr "设备类别操作与所有权合同"
+
+msgid "Factory lookup has no allocation or startup effects"
+msgstr "factory 查找不分配存储、不启动硬件"
+
+msgid "Optional components"
+msgstr "可选组件"
+
+msgid "AT24/W25, display, raw touch and selected protocol mechanisms"
+msgstr "AT24/W25、显示、原始触摸及选定协议机制"
+
+msgid "No product calibration, framebuffer policy or hidden task"
+msgstr "不包含产品校准、帧缓冲策略或隐藏任务"
+
+msgid "External composition"
+msgstr "外部装配"
+
+msgid "Tasks, buffers, scheduler, budgets and recovery policy"
+msgstr "任务、缓冲区、调度器、预算和恢复策略"
+
+msgid "Examples and private application evidence stay external"
+msgstr "示例和私有应用证据留在外部仓库"
+
+msgid "Shared buses, startup and complete withdrawal"
+msgstr "共享总线、启动与完整归还"
+
+msgid "UART integration uses reviewed controller/pad/IRQ/APB facts instead of inferring every port from USART1. All six serial instances need actual selected-mode validation. Adding a controller must not advertise DMA or alternate pins that have not been implemented. GPIO electrical fields and EXTI line/vector ownership must agree with generated configuration and the real provider."
+msgstr "UART 接入依据已审控制器、焊盘、IRQ 和 APB 事实，不再从 USART1 推断所有端口。六个串口实例都需要验证其实际选定模式。新增控制器不能宣称尚未实现的 DMA 或备用引脚。GPIO 电气字段、EXTI 线与中断向量所有权必须与生成配置及真实 provider 一致。"
+
+msgid "External `.data` or `.bss` requires internal Flash/MSP bootstrap, FSMC admission and bank initialization before C runtime first accesses those regions. A post-start memory window does not establish that support. A bank backing live globals or stack cannot be withdrawn by ordinary Platform stop. Its retained effect must prevent clock/pad withdrawal until reset or an explicit valid quiescence contract. CPU reachability and each DMA master's reachability are reviewed independently; CCM stays excluded from peripheral DMA."
+msgstr "外部 `.data` 或 `.bss` 要求使用内部 Flash/MSP 完成引导，在 C 运行时首次访问对应区域前完成 FSMC 准入和存储区初始化。启动后的内存窗口不能证明具备此能力。承载活跃全局变量或栈的存储区不能由普通 Platform stop 撤回。其保留效果必须阻止时钟和焊盘归还，直到复位或满足显式有效的静止合同。CPU 可达性与每个 DMA master 的可达性须分别评审；CCM 仍不允许外设 DMA 访问。"
+
+msgid "ILI9341 transfers use the actual 16-bit bus and command/data address selection. The shared MCU NRST connection is not an independent display reset GPIO. XPT2046 uses PA5/PB1/PB2/PB0 and PF11; that combination is not a hardware SPI route. Its optional software SPI port must bound transactions and timing without long global interrupt masking. A failed idle-pin withdrawal ends CPU buffer access but retains bus recovery responsibility; it cannot report successful CS release. Raw touch does not include product calibration or filtering policy."
+msgstr "ILI9341 传输使用实际 16 位总线及命令/数据地址选择。与 MCU 共用的 NRST 连接不是独立显示复位 GPIO。XPT2046 使用 PA5/PB1/PB2/PB0 和 PF11，此组合不是硬件 SPI 路由。可选软件 SPI 端口必须限制事务长度和时序，不能长时间全局屏蔽中断。空闲引脚归还失败时，CPU 缓冲区访问结束，但总线恢复责任继续保留，不能报告 CS 已成功释放。原始触摸不包含产品校准或滤波策略。"
+
+msgid "Mode-specific device contracts"
+msgstr "各模式的器件合同"
+
+msgid "Device or path"
+msgstr "器件或路径"
+
+msgid "Required contract"
+msgstr "必需合同"
+
+msgid "Explicit limit"
+msgstr "明确限制"
+
+msgid "AT24C02"
+msgstr "AT24C02"
+
+msgid "256-byte geometry, eight-byte pages and bounded write-cycle progress"
+msgstr "256 字节几何、8 字节页与有界写周期推进"
+
+msgid "No product storage layout or device scan"
+msgstr "不包含产品存储布局或器件扫描"
+
+msgid "W25 NOR"
+msgstr "W25 NOR"
+
+msgid "Expected JEDEC identity, selected geometry and complete program/erase outcome"
+msgstr "预期 JEDEC 身份、所选几何与完整编程/擦除结果"
+
+msgid "Core unpopulated part stays disabled"
+msgstr "核心板空贴器件保持禁用"
+
+msgid "SRAM and ILI9341"
+msgstr "SRAM 与 ILI9341"
+
+msgid "Separate bank timing and memory/8080 contracts"
+msgstr "独立存储区时序和内存/8080 合同"
+
+msgid "No assumed SDRAM, LTDC or DMA2D on F407"
+msgstr "不假设 F407 具有 SDRAM、LTDC 或 DMA2D"
+
+msgid "XPT2046"
+msgstr "XPT2046"
+
+msgid "Complete 12-bit command sequence, raw samples and final PENIRQ power state"
+msgstr "完整 12 位命令序列、原始采样和最终 PENIRQ 电源状态"
+
+msgid "An IRQ is a hint; the current pin predicate is authoritative"
+msgstr "IRQ 只是提示，当前引脚谓词才是权威"
+
+msgid "SDIO card"
+msgstr "SDIO 卡"
+
+msgid "Synchronous CPU-polling block I/O, command/data errors and complete withdrawal"
+msgstr "同步 CPU 轮询 block I/O、命令/数据错误及完整归还"
+
+msgid "The drawn socket has no connected card-detect GPIO; no DMA mode is claimed"
+msgstr "图纸中的卡座未连接卡检测 GPIO；不宣称 DMA 模式"
+
+msgid "WM8978 or VS1053"
+msgstr "WM8978 或 VS1053"
+
+msgid "Selected connector personality, clocks and complete transfer lifecycle"
+msgstr "选定接口用途、时钟和完整传输生命周期"
+
+msgid "A finite I2S slave TX reference is not complete audio"
+msgstr "有限 I2S 从机发送参考不等于完整音频"
+
+msgid "OV2640 capture"
+msgstr "OV2640 采集"
+
+msgid "Exact sensor setup, XCLK, SCCB, frame boundaries and bounded buffers"
+msgstr "精确传感器配置、XCLK、SCCB、帧边界和有界缓冲区"
+
+msgid "No unselected module or measured frame-rate claim"
+msgstr "不宣称未选模块或未经测量的帧率"
+
+msgid "The official locked STM32F4 HAL/LL is preferred where the complete selected mode satisfies the Nexus contract. It does not start global HAL initialization or replace the existing time domain with SysTick. Private callbacks, vendor waits, error drain and source withdrawal still require explicit review. F407 has no data cache; an H7 cache contract must not be copied into this Board profile."
+msgstr "当完整选定模式满足 Nexus 合同时，优先复用已锁定的官方 STM32F4 HAL/LL。接入不执行全局 HAL 初始化，也不以 SysTick 替换现有时间域。私有回调、厂商等待、错误排空和来源归还仍须明确评审。F407 没有数据缓存，不能将 H7 的缓存合同直接套用到此 Board 配置。"
+
+msgid "Legal combinations and evidence"
+msgstr "合法组合与证据"
+
+msgid "Complete Board support is a set of reviewed configurations, not one assembly with every peripheral enabled. V4.1 Ethernet MDIO and the standard RS485 route share PA2. USB FS/CAN1, CAN2/audio, SDIO/camera/UART5 and UART6/camera/audio also have real pad conflicts. A software choice cannot replace physical rewiring. Different DMA channel numbers do not permit simultaneous use of one DMA Stream. The selected profile must reserve clocks, vectors, timers and memory domains as well as pins."
+msgstr "完整开发板支持是一组已审配置，并非将所有外设同时启用的一份装配。V4.1 的以太网 MDIO 与标准 RS485 路由共用 PA2；USB FS/CAN1、CAN2/音频、SDIO/摄像头/UART5 和 UART6/摄像头/音频也存在真实引脚冲突。软件选择不能代替物理改线。不同 DMA channel 编号不能同时使用同一 DMA Stream。选定配置除引脚外，还必须保留时钟、中断向量、定时器及内存域。"
+
+msgid "RGB565 QVGA uses 153600 bytes per frame, already exceeding 128 KiB main SRAM. RGB565 VGA double buffering uses 1228800 bytes, exceeding the drawn 1 MiB SRAM. Memory format, frame rate, buffer count and bus bandwidth therefore belong in the explicit composition budget. The separate 64 KiB CCM is CPU-only for these DMA paths. Measured linked costs, throughput and electrical timing remain separate evidence scopes."
+msgstr "RGB565 QVGA 每帧占 153600 字节，已超过 128 KiB 主 SRAM。RGB565 VGA 双缓冲占 1228800 字节，超过图纸中的 1 MiB SRAM。因此，内存格式、帧率、缓冲数量和总线带宽属于显式装配预算。独立 64 KiB CCM 对这些 DMA 路径仅供 CPU 使用。实测链接成本、吞吐率和电气时序仍分别建立证据。"
+
+msgid "Implementation proceeds through exact facts and minimal startup, electrical and controller admission, reusable device components, FSMC/SDIO/media modes, then legal external examples and frozen integration. Each behavioral change retains genuine RED before implementation, GREEN and independent review. Final ARM, installed SDK, resource and bilingual checks bind their exact source and configuration; a focused model pass does not close the whole Board exit."
+msgstr "实施依次完成精确事实与最小启动、电气和控制器准入、通用器件组件、FSMC/SDIO/介质模式，随后完成合法的外部示例与冻结集成。每项行为变更保留实现前真实 RED、GREEN 和独立评审。最终 ARM、安装后 SDK、资源和双语检查绑定精确源码与配置；定向模型通过不能关闭整板退出条件。"
+
+msgid "The initial FSMC C draft preceded a runnable behavioral RED test. The original draft and failed harness attempts are retained; later genuine failure-path regressions and GREEN executions keep their actual chronology. This exception does not meet the project's strict TDD ordering requirement for that draft. QB30 must retain the exception and its independent-review responsibility rather than reconstructing an earlier RED or claiming full process compliance."
+msgstr "最初的 FSMC C 草稿早于可运行的行为 RED 测试。原始草稿及失败的工装尝试均保留；后续真实失败路径回归和 GREEN 执行保持实际时间顺序。该草稿不满足项目严格的 TDD 顺序要求。QB30 必须保留此例外及其独立评审责任，不能重构出更早的 RED，也不能宣称完全符合流程。"
+
+msgid "HIL admission must bind physical PCB, part population, jumpers, connector path and the selected hardware/configuration digest. V4.1 transceiver supply/part markings, PHY oscillator frequency and the inconsistent MDIO net label require inspection. Prepared station tooling does not turn disconnected hardware into a passed result. Original schematic files are not automatically redistributed by adding their identities to the public Board facts."
+msgstr "HIL 准入必须绑定实际 PCB、器件安装、跳线、连接器路径，以及所选硬件/配置摘要。V4.1 的收发器供电和器件标识、PHY 振荡器频率、MDIO 网络名不一致均须实物检查。准备好站点工装不能将未连接硬件改为通过。将原理图身份加入公开 Board 事实，不表示自动再分发原始原理图文件。"
+
+msgid "FSMC has one shared bus owner and independent bank configuration. SRAM uses NE3 and the display uses NE4; their common pads and gate cannot be independently restored by two providers. The following describes software ownership, not physical memory or timing qualification:"
+msgstr "FSMC 具有一个共享总线 owner 和独立存储区配置。SRAM 使用 NE3，显示使用 NE4；两个 provider 不能各自恢复公共焊盘与门控。下图描述软件所有权，不代表物理存储器或时序资格："
+
+msgid "`cpu-window` and `startup-memory` are explicit alternatives. Startup memory uses the existing ADDSRAM placement attributes and a separate immutable external memory record, without changing the chip's internal RAM facts. Its permanent receipt exists before `Platform.start()`: factory lookup, early startup refusal or failed runtime adoption cannot report a clean global stop. The selected reset path requires internal MSP of at least 512 bytes and currently admits the five non-LTO optimization profiles. Freestanding ARM analysis bounds their reset call chains by 304 bytes; this is static software evidence, not a measured stack peak. LTO, warm handoff, offset images, external code/stack/heap and DMA access remain outside this startup profile."
+msgstr "`cpu-window` 与 `startup-memory` 是显式互斥的用途。启动内存使用已有 ADDSRAM 放置属性和独立的不可变外部内存记录，不修改芯片内部 RAM 事实。其持续资源占用记录早于 `Platform.start()` 存在；仅查找 factory、早期启动拒绝或运行期接管失败，都不能据此将全局停机报告为干净完成。所选复位路径要求至少 512 字节内部 MSP，目前准入五种非 LTO 优化配置。freestanding ARM 静态分析将这些配置的复位调用链限定为 304 字节；这是静态软件证据，不是实测栈峰值。LTO、热交接、偏移镜像、外部代码/栈/heap 及 DMA 访问均不在此启动配置范围内。"
+
+msgid "The selected SDIO implementation is synchronous CPU polling. Platform startup prepares the socket; explicit activation identifies a card and publishes its 512-byte sector geometry. Every return ends CPU payload access, while uncertain card programming can independently keep the controller, pins and gate owned. DMA, IRQ, hot-swap, physical card detection and a filesystem are not provided by this mode. RTC likewise separates explicit retained-calendar adoption from empty-backup provisioning with an authored initial date; provisioning never invents a default calendar or resets the backup domain."
+msgstr "选定的 SDIO 实现采用同步 CPU 轮询。Platform 启动只准备卡座，应用显式激活后才识别卡并发布 512 字节扇区几何。每次返回均结束 CPU 对载荷的访问，但卡编程结果不确定时，控制器、引脚和门控可以独立保留所有权。此模式不提供 DMA、IRQ、热插拔、物理卡检测或文件系统。RTC 同样区分显式的保留日历接管与空后备域配置；后者必须提供 authored 初始日期，既不虚构默认日历，也不复位后备域。"
+
+msgid "The sensor wire profiles are explicit software references. DS18B20 support requires external VDD and a pull-up; parasite power and a strong pull-up are not inferred. Infrared decoding separates strict edge sources from an explicitly selected IRQ-observation reference. The latter preserves source flags and marks its result sampled/uncertain; it cannot attest complete hardware edge capture. The actual remote protocol and fitted audio/camera modules remain unconfirmed."
+msgstr "传感器接线配置是显式的软件参考。DS18B20 要求外部 VDD 和上拉，不推导寄生供电或强上拉。红外解码区分严格边沿来源与另行显式选择的 IRQ 观测参考；后者保留来源标志，并将结果标为采样/不确定，不能证明硬件边沿捕获完整。实际遥控协议及已装音频/摄像头模块仍未确认。"
+
+msgid "The initial `SystemInit` SRAM-hook draft has a second ordering exception: its first host fixture had a mapping conflict, so the later before-image comparison is retrospective. The early compiler-generated `memset` failure also lacks an exact contemporary source snapshot. Later genuine defect regressions and the five accepted freestanding ARM captures retain their own exact source and execution identities; they do not repair those earlier evidence gaps."
+msgstr "最初的 `SystemInit` SRAM 钩子草稿还存在第二个顺序例外：其首个主机夹具有地址映射冲突，因此后来的修改前镜像比较属于追溯分析。早期编译器生成的 `memset` 失败也缺少精确的同时点源码快照。后续真实缺陷回归与五种已接受的 freestanding ARM 采集分别保留其源码和执行身份，不能修补此前的证据缺口。"
+
+msgid "Public RS485 composition obtains the transport with `nx_factory_uart_ref()` and its existing TX admission callback with `nx_factory_uart_tx_validator_ref()`, using the same exact `nx_uart_ref_t`. The getter is a pure lookup: it neither changes instance state nor adds vtable fields, and unreviewed modes or IDs return NULL. The caller pairs that callback with the same UART context and supplies the DE GPIO and setup/hold budget to the existing RS485 adapter through public headers. This pairing is a caller precondition, not runtime authentication. The actual C11 ARM consumer retains the selected UART/GPIO providers and adapter; it does not establish physical bus timing. RS232 acceptance and the drawn MAX485/MAX232 supplies or actual substitute parts still require verification."
+msgstr "公共 RS485 装配使用同一个精确的 `nx_uart_ref_t`，通过 `nx_factory_uart_ref()` 取得传输接口，通过 `nx_factory_uart_tx_validator_ref()` 取得其已有 TX 准入回调。getter 仅执行查找，不修改实例状态、不增加 vtable 字段；未经评审的模式或 ID 返回 NULL。调用者将回调与同一 UART context 配对，并通过公共头文件向既有 RS485 adapter 提供 DE GPIO 和 setup/hold 预算。此配对属于调用者前置条件，不是运行时身份认证。实际 C11 ARM 消费工程保留了所选 UART/GPIO provider 与 adapter，但不建立物理总线时序。RS232 验收，以及图纸中的 MAX485/MAX232 供电或实际替代器件，仍需验证。"

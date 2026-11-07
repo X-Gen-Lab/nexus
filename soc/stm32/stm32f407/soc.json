@@ -430,7 +430,10 @@
       "pins": [
         "PA5",
         "PA6",
-        "PA7"
+        "PA7",
+        "PB3",
+        "PB4",
+        "PB5"
       ],
       "max_hz": 42000000
     },
@@ -447,7 +450,9 @@
       ],
       "pins": [
         "PB6",
-        "PB7"
+        "PB7",
+        "PB8",
+        "PB9"
       ],
       "max_hz": 100000,
       "irq_numbers": {
@@ -545,7 +550,8 @@
         "EXTI9_5_IRQn"
       ],
       "pins": [
-        "PA6"
+        "PA6",
+        "PF6"
       ],
       "resources": [
         "exti:line:6"
@@ -571,7 +577,9 @@
       "clock_hz": 42000000,
       "pins": [
         "PA11",
-        "PA12"
+        "PA12",
+        "PB8",
+        "PB9"
       ]
     },
     "CAN2": {
@@ -698,7 +706,8 @@
     "USART2": {
       "kind": "uart",
       "modes": [
-        "dma-tx"
+        "dma-tx",
+        "irq-byte-event"
       ],
       "irq": [
         "USART2_IRQn"
@@ -744,6 +753,319 @@
         "I2C2_EV": 33,
         "I2C2_ER": 34
       }
+    },
+    "GPIOC": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15"
+      ]
+    },
+    "GPIOD": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15"
+      ]
+    },
+    "GPIOF": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15"
+      ]
+    },
+    "USART3": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "USART3_IRQn"
+      ],
+      "irq_numbers": [
+        39
+      ],
+      "pins": [
+        "PB10",
+        "PB11"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 1000000
+    },
+    "UART4": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "UART4_IRQn"
+      ],
+      "irq_numbers": [
+        52
+      ],
+      "pins": [
+        "PA0",
+        "PA1"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 1000000
+    },
+    "UART5": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "UART5_IRQn"
+      ],
+      "irq_numbers": [
+        53
+      ],
+      "pins": [
+        "PC12",
+        "PD2"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 1000000
+    },
+    "USART6": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "USART6_IRQn"
+      ],
+      "irq_numbers": [
+        71
+      ],
+      "pins": [
+        "PC6",
+        "PC7"
+      ],
+      "clock_hz": 84000000,
+      "max_hz": 1000000
+    },
+    "EXTI7": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI9_5_IRQn"
+      ],
+      "pins": [
+        "PF7"
+      ],
+      "resources": [
+        "exti:line:7"
+      ]
+    },
+    "EXTI8": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI9_5_IRQn"
+      ],
+      "pins": [
+        "PF8"
+      ],
+      "resources": [
+        "exti:line:8"
+      ]
+    },
+    "EXTI9": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI9_5_IRQn"
+      ],
+      "pins": [
+        "PF9"
+      ],
+      "resources": [
+        "exti:line:9"
+      ]
+    },
+    "EXTI11": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI15_10_IRQn"
+      ],
+      "pins": [
+        "PF11"
+      ],
+      "resources": [
+        "exti:line:11"
+      ]
+    },
+    "SDIO": {
+      "kind": "block",
+      "modes": [
+        "sdio-poll"
+      ],
+      "irq": [],
+      "pins": [
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PD2"
+      ],
+      "clock_hz": 48000000,
+      "resources": [
+        "clock:SDIO48"
+      ]
+    },
+    "RTC": {
+      "kind": "rtc",
+      "modes": [
+        "adopt-retained",
+        "provision-empty"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "FSMC": {
+      "kind": "external_bus",
+      "modes": [
+        "async16"
+      ],
+      "irq": [],
+      "pins": [
+        "PD0",
+        "PD1",
+        "PD4",
+        "PD5",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG10",
+        "PG12"
+      ],
+      "clock_hz": 168000000,
+      "interfaces": {
+        "memory_window": [
+          "cpu-window",
+          "startup-memory"
+        ],
+        "parallel16": [
+          "8080-16"
+        ]
+      }
+    },
+    "EXTI2": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI2_IRQn"
+      ],
+      "pins": [
+        "PE2"
+      ],
+      "resources": [
+        "exti:line:2"
+      ]
     }
   },
   "reserved_resources": [

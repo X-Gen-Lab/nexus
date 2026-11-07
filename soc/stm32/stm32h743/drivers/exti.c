@@ -312,6 +312,7 @@ const nx_exti_ops_t nx_stm32h743_exti_ops = {
     .read = read_events,
     .stop = stop,
     .attach_wake = attach_wake,
+    .level = NULL,
 };
 
 nx_result_t

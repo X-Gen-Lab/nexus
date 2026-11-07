@@ -91,6 +91,58 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                     if original is not None:
                         self.files[name] = original
 
+    def test_qiming_device_omissions_reject_before_payload_reads(self):
+        paths = (
+            "boards/stm32f407zg_qiming_core/board.json",
+            "boards/stm32f407zg_qiming_v41/board.json",
+            "io/include/nexus/io/block.h", "io/src/api/block.c",
+            "cmake/platform/STM32FSMC.cmake",
+            "cmake/platform/STM32SDIO.cmake",
+            "soc/stm32/stm32f407/drivers/fsmc.c",
+            "soc/stm32/stm32f407/drivers/fsmc_boot.c",
+            "soc/stm32/stm32f407/sram_boot.c",
+            "soc/stm32/stm32f407/private/stm32f407_sram_boot.h",
+            "soc/stm32/stm32f407/private/stm32f407_fsmc_profile.h",
+            "io/include/nexus/io/parallel16.h",
+            "io/include/nexus/io/memory_window.h",
+            "soc/stm32/stm32f407/drivers/rtc.c",
+            "soc/stm32/stm32f407/drivers/sdio.c",
+            "components/at24c02/src/at24c02.c",
+            "components/w25/src/w25.c",
+            "components/ili9341/src/ili9341.c",
+            "components/xpt2046/src/xpt2046.c",
+            "components/software_spi/src/software_spi.c",
+            "components/software_i2c/src/software_i2c.c",
+            "components/infrared/src/infrared.c",
+            "components/onewire/src/onewire.c",
+            "components/onewire/src/crc8.c",
+            "components/ds18b20/src/ds18b20.c")
+        self.assertTrue(set(paths).issubset(self.sdk.REQUIRED_FILES),
+                        "Qiming source SDK must close device dependencies")
+        self.complete_required_map()
+        for name in paths:
+            with self.subTest(missing=name):
+                original = self.files.pop(name)
+                try:
+                    self.write_manifest()
+                    reads = []
+                    original_read = Path.read_bytes
+
+                    def observe_read(path):
+                        if path != self.root / self.sdk.MANIFEST:
+                            reads.append(path)
+                        return original_read(path)
+
+                    with mock_patch.object(Path, "read_bytes", autospec=True,
+                                           side_effect=observe_read):
+                        with self.assertRaisesRegex(
+                                self.sdk.SDKError,
+                                "missing required sources/licenses"):
+                            self.sdk.verify(self.root)
+                        self.assertEqual(reads, [])
+                finally:
+                    self.files[name] = original
+
     def test_complete_required_map_still_rejects_unsafe_payload_paths(self):
         self.complete_required_map()
         self.files = {"../outside.c": "d" * 64, **self.files}

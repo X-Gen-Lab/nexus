@@ -9,6 +9,111 @@ source_language: en
 
 These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
 
+## Explicit peripheral and protocol components
+
+These optional C11 targets consume already selected public I/O faces. The
+caller owns static storage, serialized progress, finite deadlines, outer resource
+lifetimes and recovery. They add no implicit worker, allocator, calibration or
+product policy. The linked bilingual component contract is authoritative; this
+table is an API navigation aid.
+
+| Target | Public header under `nexus/components/` | Contract |
+| --- | --- | --- |
+| `Nexus::AT24C02` | `at24c02.h` | [Settled EEPROM access and write-cycle responsibility](../../../components/at24c02/README.md) |
+| `Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB` | `software_i2c.h`, `software_sccb.h` | [Separate GPIO I2C and SCCB protocols](../../../components/software_i2c/README.md) |
+| `Nexus::SoftwareSPI` | `software_spi.h` | [Bounded GPIO mode-zero SPI](../../../components/software_spi/README.md) |
+| `Nexus::W25` | `w25.h` | [Explicit W25Q128JV profile and retained Flash completion](../../../components/w25/README.md) |
+| `Nexus::ILI9341` | `ili9341.h` | [Settled RGB565 command/data access](../../../components/ili9341/README.md) |
+| `Nexus::XPT2046` | `xpt2046.h` | [Raw touch samples with live pen observation](../../../components/xpt2046/README.md) |
+| `Nexus::OneWire` | `onewire.h` | [Bounded GPIO slots and failed-withdrawal ownership](../../../components/onewire/README.md) |
+| `Nexus::DS18B20` | `ds18b20.h` | [External-VDD identity, conversion and CRC](../../../components/ds18b20/README.md) |
+| `Nexus::Infrared` | `infrared.h` | [Explicit NEC address and source-quality policies](../../../components/infrared/README.md) |
+
+Reference assemblies and software tests do not establish fitted-part identity,
+electrical timing, calibration or physical HIL. Panel, touch, sensor and decoded
+key results retain their contract's observation limits; products supply display
+policy, calibration, key mapping and recovery.
+
+(at24c02_8h)=
+
+## at24c02.h
+
+```{doxygenfile} components/at24c02/include/nexus/components/at24c02.h
+:project: nexus
+```
+
+(software__i2c_8h)=
+
+## software_i2c.h
+
+```{doxygenfile} components/software_i2c/include/nexus/components/software_i2c.h
+:project: nexus
+```
+
+(software__sccb_8h)=
+
+## software_sccb.h
+
+```{doxygenfile} components/software_i2c/include/nexus/components/software_sccb.h
+:project: nexus
+```
+
+(software__spi_8h)=
+
+## software_spi.h
+
+```{doxygenfile} components/software_spi/include/nexus/components/software_spi.h
+:project: nexus
+```
+
+(w25_8h)=
+
+## w25.h
+
+```{doxygenfile} components/w25/include/nexus/components/w25.h
+:project: nexus
+```
+
+(ili9341_8h)=
+
+## ili9341.h
+
+```{doxygenfile} components/ili9341/include/nexus/components/ili9341.h
+:project: nexus
+```
+
+(xpt2046_8h)=
+
+## xpt2046.h
+
+```{doxygenfile} components/xpt2046/include/nexus/components/xpt2046.h
+:project: nexus
+```
+
+(onewire_8h)=
+
+## onewire.h
+
+```{doxygenfile} components/onewire/include/nexus/components/onewire.h
+:project: nexus
+```
+
+(ds18b20_8h)=
+
+## ds18b20.h
+
+```{doxygenfile} components/ds18b20/include/nexus/components/ds18b20.h
+:project: nexus
+```
+
+(infrared_8h)=
+
+## infrared.h
+
+```{doxygenfile} components/infrared/include/nexus/components/infrared.h
+:project: nexus
+```
+
 ## Byte transport, TLS and MQTT composition
 
 `byte_stream.h` defines immediate partial reads and copied writes with finite

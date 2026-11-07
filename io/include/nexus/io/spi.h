@@ -103,9 +103,14 @@ struct nx_spi_endpoint {
  *
  * \param[out]      transferred: Complete bytes; reset to zero before execution.
  *
- * \return          Success, BUSY/INVALID/TIMEOUT/IO. Return releases all
- *                  buffers and CS after drain; polling is CPU-active, not
- *                  IRQ/DMA async.
+ * \return          Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU
+ *                  access to the supplied buffers; polling is CPU-active,
+ *                  not IRQ/DMA async. SUCCESS requires complete wire drain
+ *                  and CS withdrawal. A provider that cannot withdraw GPIO
+ *                  CS/clock latches its owner fault, rejects further work and
+ *                  retains pin recovery responsibility until explicit
+ *                  recover/stop succeeds; it never retains payload pointers
+ *                  or reports that failure as successful release.
  *
  * \note            Task-only single executor, no allocation/OS lock. One CS
  *                  interval covers the entire transfer. Deadline cannot preempt

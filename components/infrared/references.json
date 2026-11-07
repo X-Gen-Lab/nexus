@@ -1,0 +1,41 @@
+{
+  "sources": [
+    {
+      "url": "https://www.vishay.com/docs/80071/dataform.pdf",
+      "document": "Vishay document 80071, Data Formats for IR Remote Control, Rev. 2.3, 26-Jun-2024",
+      "sha256": "e98baa276bf55d63b9608b096469eca87b887b5af9fc5c6dfd1cb111d745434b",
+      "bytes": 105967,
+      "sections": [
+        "THE NEC CODE, pages 2-3",
+        "Figure 5 NEC Transmission Code"
+      ],
+      "scope": "Standard NEC pulse-distance format, leader, address/command inverse bytes and repeat context; not proof of an installed HS0038 or remote model"
+    },
+    {
+      "url": "https://www.st.com/resource/en/application_note/an4834-implementation-of-transmitters-and-receivers-for-infrared-remote-control-protocols-with-stm32cube-stmicroelectronics.pdf",
+      "document": "ST AN4834 Rev 2, November 2020",
+      "sha256": "cd7c3e57d34d813158e09e962751c2efc95d5fbac9c9afb158b04e3573dc0916",
+      "bytes": 663035,
+      "sections": [
+        "3.1 Hardware considerations, IR receiver demodulation"
+      ],
+      "scope": "Active-low demodulated receiver output and electrical selection; its RC5/SIRC examples are not cited as NEC protocol definitions"
+    }
+  ],
+  "reviewed_scope": {
+    "mechanism": "Explicit software NEC standard 8-bit/inverse or separately selected 16-bit address policy; command/inverse required in both",
+    "input": "Copied public EXTI timestamps in one declared monotonic microsecond epoch. STRICT rejects COALESCED; explicit IRQ_OBSERVATION software reference retains sampled/uncertain quality and original flags, never physical capture completeness.",
+    "excluded": [
+      "Protocol discovery",
+      "Product key mapping",
+      "Receiver carrier validation",
+      "Physical timing calibration",
+      "RC5",
+      "NEC2 repeat labeling",
+      "Installed receiver or remote identity"
+    ],
+    "physical_status": "not_executed",
+    "source_quality": "Actual F407 PE2 IRQ dispatch marks every event COALESCED. Explicit software observation admission is distinct from flag-free source policy; LOSS always invalidates command/repeat history.",
+    "checked_irq_reference": "STM32F407ZGT6 Qiming V4.1 PE2 software observation model only; no other Board/source/remote or physical qualification is inferred."
+  }
+}

@@ -1,6 +1,7 @@
 """Maintained stm32f407 capability and static assembly contract."""
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.uart_formats import UartFormatPolicy
+from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
@@ -15,6 +16,12 @@ PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
 CLASSIC_CAN_MAILBOXES = 3
 
 UART_FORMATS = UartFormatPolicy(words=("USART1",), irq_probe=True, byte_frames=True)
+
+# Exact shared admission helper used by the byte-mode transport itself.
+UART_TX_VALIDATORS = MappingProxyType({
+    ("stm32f407", "irq-byte-event", "uart"):
+        Symbol("nx_stm32_uart_tx_validate"),
+})
 
 STREAM_GEOMETRY = StreamGeometry(2, 1, 65535)
 
@@ -40,7 +47,10 @@ FACT_REFERENCES = descriptor.maintained("stm32f407").references
 ETH_CONTROLLER = 'ETH'
 CONTROLLER_INTERFACES = MappingProxyType({
     'ETH': MappingProxyType({
-        'eth_frames': ('rmii-vlan-sg-ptp',)})})
+        'eth_frames': ('rmii-vlan-sg-ptp',)}),
+    'FSMC': MappingProxyType({
+        'memory_window': ('cpu-window', 'startup-memory'),
+        'parallel16': ('8080-16',)})})
 USB_CONTROLLER = 'OTG_FS'
 CAN_CONTROLLERS = ('CAN1', 'CAN2')
 CAN_CLOCK_HZ = 42000000
@@ -59,8 +69,16 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
+PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('memory_window', 'startup-memory'): 'fsmc',
+    ('external_bus', 'async16'): 'fsmc',
+    ('memory_window', 'cpu-window'): 'fsmc',
+    ('parallel16', '8080-16'): 'fsmc',
+    ('rtc', 'adopt-retained'): 'rtc',
+    ('rtc', 'provision-empty'): 'rtc',
+    ('block', 'sdio-poll'): 'sdio',
     ('timer_capture', 'edge-capture'): 'timer_capture',
     ('advanced_pwm', 'complementary-pwm'): 'advanced_pwm',
     ('eth', 'raw-rmii'): 'eth',
@@ -97,7 +115,13 @@ def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
-    if kind == "uart":
+    if kind == "rtc":
+        from .rtc import validate
+        validate(selection, route)
+    elif kind == "block":
+        from .block import validate
+        validate(selection)
+    elif kind == "uart":
         common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":
         tick = selection["tick_hz"]
@@ -146,7 +170,18 @@ PWM_SHARED = None
 ENDPOINT_POLICY = common.EndpointPolicy(
     spi_transaction=True, spi_dma=("SPI1", "dma"))
 TIMEBASE_ALARM = True
-validate_mode_context = common.validate_mode_context
+
+
+def validate_mode_context(selection, route, *, backend, clock_profile):
+    """Selected policies may narrow the ordinary family RUN contract."""
+    from .rtc import validate_context
+    validate_context(selection, route, backend=backend,
+                     clock_profile=clock_profile)
+    if route['kind'] == 'external_bus' and (
+            backend != 'baremetal' or clock_profile != 'hse8-pll168'):
+        common.fail('FSMC requires exact baremetal hse8-pll168 RUN ownership')
+
+
 mode_fields = common.mode_fields
 validate_controller_set = common.validate_controller_set
 validate_endpoint_clock = common.validate_endpoint_clock

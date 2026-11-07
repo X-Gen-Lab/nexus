@@ -1,4 +1,6 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
+from types import MappingProxyType
+
 from tools.configure.ir import controller_ir
 from tools.configure.calls import DirectCall, Address, Symbol
 from tools.configure.memory import dma_regions, flash_geometry
@@ -8,6 +10,9 @@ from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
 from .contract import (ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
+
+_PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
+_OUTPUT_TYPES = MappingProxyType({"push-pull": 0, "open-drain": 1})
 
 
 def _symbol(value):
@@ -207,14 +212,22 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     """Select immutable resources; concrete C owns every cold transition."""
     del board_bindings, routes, devices
     item = controller_ir(item, "stm32f407")
+    if item.kind == "external_bus":
+        from .fsmc import constructor as fsmc_constructor
+        return fsmc_constructor(item, result)
+    if item.kind == "rtc":
+        from .rtc import constructor as rtc_constructor
+        return rtc_constructor(item, result)
     name, kind = _symbol(item.id), item.kind
     config = f"s_nx_control_config_{name}"
     state = Address(f"s_nx_port_{name}")
     definitions = []
     if kind == "exti":
-        if item.controller not in {"EXTI0", "EXTI5", "EXTI6"} or len(item.pins) != 1:
+        if not item.controller.startswith("EXTI") or len(item.pins) != 1:
             raise ValueError("EXTI line must use a reviewed package route")
         line = int(item.controller[4:])
+        if not 0 <= line <= 15:
+            raise ValueError("EXTI line must fit the GPIO EXTI domain")
         wire = item.pins[0]["pin"]
         if int(wire[2:]) != line:
             raise ValueError("EXTI pin and mux line mismatch")
@@ -230,7 +243,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                         f"    .gpio = GPIO{wire[1]}, .storage = s_nx_events_{name},",
                         f"    .capacity = {capacity}u, .edge = {edge},",
                         f"    .gpio_index = {ord(wire[1]) - ord('A')}u,",
-                        f"    .line = {line}u, .priority = {priority}u", "};"]
+                        f"    .line = {line}u, .priority = {priority}u,",
+                        f"    .pull = {_PULL_VALUES[item.options.pull]}u", "};"]
         initialize = DirectCall("nx_stm32_exti_prepare", (state, Address(config)))
         stop = DirectCall("nx_stm32_exti_close", (state,))
     elif kind == "pwm":
@@ -312,7 +326,8 @@ def shared_irq_definitions(selections):
         if item.kind != "exti":
             continue
         line = int(item.controller[4:])
-        vector = "EXTI0" if line == 0 else "EXTI9_5"
+        vector = (f"EXTI{line}" if line < 5 else
+                  "EXTI9_5" if line < 10 else "EXTI15_10")
         groups.setdefault(vector, []).append(item)
     lines = []
     for vector, items in groups.items():
@@ -337,11 +352,15 @@ def _gpio_constructor(item):
     mask = item.options.mask or sum(1 << int(pin["pin"][2:])
                                    for pin in item.pins)
     initial = item.options.initial
+    pull = _PULL_VALUES[item.options.pull]
+    output_type = _OUTPUT_TYPES[item.options.output_type]
+    output = "true" if item.mode == "output" else "false"
     config = f"s_nx_gpio_config_{name}"
     definitions = [f"static const nx_stm32_gpio_config_t {config} = {{",
                    f"    .registers = GPIO{port}, .mask = {mask}u,",
                    f"    .initial = {initial}u,",
-                   f"    .output = {'true' if item.mode == 'output' else 'false'}", "};"]
+                   f"    .output = {output}, .pull = {pull}u,",
+                   f"    .output_type = {output_type}u", "};"]
     return Construction(
         state_type="nx_stm32_gpio_state_t", definitions=definitions,
         initialize=DirectCall("nx_stm32_gpio_prepare",
@@ -503,6 +522,9 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f407")
+    if item.kind == "block":
+        from .block import constructor as block_constructor
+        return block_constructor(item, result)
     if item.kind == "spi":
         construction = _spi_constructor(
             item, result, board_bindings, routes, devices,

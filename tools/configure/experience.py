@@ -12,7 +12,8 @@ import os
 from pathlib import Path
 import sys
 
-from tools.configure import factory, selected_contracts
+from tools.configure import factory, selected_contracts, board_hardware
+from tools.configure.ir import thaw
 from tools.configure.providers import maintained
 from tools.configure.providers.common import mode_traits, route_dma
 from tools.configure.resource_graph import json_value, normalize_resource
@@ -55,6 +56,11 @@ def describe(result):
                  data, getattr(result, "provider_context", None)),
              "Consult exact-board station records for physical evidence.",
              "", "Controllers:"]
+    if "hardware" in data:
+        selected = data["hardware"]["selected"]
+        lines[8:8] = ["Board hardware choices (declared, not inspected):", *(
+            "  " + option + ": " + selected.get(option, "<unselected>")
+            for option in data["hardware"]["options"]), ""]
     for item in data["controllers"]:
         lines.append(f"  {item['kind']}.{item['id']}: {item['controller']} / "
                      f"{item['mode']} (binding {item['binding']})")
@@ -206,7 +212,7 @@ def differences(before, after):
               "optimization", "controllers", "devices", "components",
               "claims", "memory", "flash", "layout", "memory_budgets",
               "factory", "runtime_power", "i2s2", "trigger_plan",
-              "resource_plan", "pwm_shared_owners", "dma_topology")
+              "resource_plan", "pwm_shared_owners", "dma_topology", "hardware")
     changes = []
     missing = object()
 
@@ -264,10 +270,10 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     board_data = gate.obj(read(directory / "board.json"),
         {"schema_version", "id", "soc", "soc_family", "source_revision",
          "physical_pcb_revision", "clocks", "bindings", "reserved_resources",
-         "unknowns", "provenance"}, {"inputs"}, "Board")
+         "unknowns", "provenance"}, {"inputs", "hardware_options"}, "Board")
     gate.integer(board_data["schema_version"], 1, 1, "Board schema")
     gate.identity(board_data["id"], "Board id")
-    gate.validate_board_context(board_data)
+    hardware_conditions = gate.validate_board_context(board_data)
     family = gate.identity(board_data["soc_family"], "SoC family")
     context = gate.integration_package.select(
         str(soc_package) if soc_package is not None else None,
@@ -289,7 +295,8 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
                           {"schema_version", "routes"}, (), "routes")
     gate.integer(routes_doc["schema_version"], 1, 1, "routes schema")
     routes = gate.resolve_routes(routes_doc, soc, part, provider)
-    bindings = gate.resolve_bindings(board_data, routes, part)
+    bindings = gate.resolve_bindings(board_data, routes, part,
+                                     hardware_conditions)
     reservations = gate.reserved_claims(soc, board_data, provider)
     inputs = [*snapshots, *context.inputs]
     for name in gate.sequence(board_data.get("inputs", []), "declared Board inputs"):
@@ -299,7 +306,9 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
         gate.fact_references.validate(read(reference), soc["variants"])
         inputs.append(reference)
     gate.bind_input_identities(inputs, root, snapshots, None, context)
-    return {"_provider_context": context, "cpu": soc["cpu"],
+    return {**({"hardware": hardware_conditions.to_dict()}
+                if hardware_conditions is not None else {}),
+            "_provider_context": context, "cpu": soc["cpu"],
             "board": board_data["id"], "part": part, "soc_family": family,
             "board_bindings": bindings, "routes": routes,
             "claims": reservations,
@@ -392,7 +401,15 @@ def bindings_view(result, *, kind=None):
                      "selected_by": selected, "occupied_resources": occupied,
                      "mode_contracts": modes,
                      "admission": "configuration-required"})
-    return {"schema_version": 1, "board": data["board"], "part": data["part"],
+        if "requires" in binding:
+            rows[-1].update(
+                hardware_requirements=binding["requires"],
+                hardware_selection=board_hardware.binding_status(
+                    binding, data.get("hardware")))
+        if "electrical" in binding:
+            rows[-1]["electrical"] = thaw(binding["electrical"])
+    return {**({"hardware": data["hardware"]} if "hardware" in data else {}),
+            "schema_version": 1, "board": data["board"], "part": data["part"],
             "physical_verification": physical_scope(data, context), "bindings": rows,
             "selection": {"family": data["soc_family"],
                           "backend": data.get("backend"),
@@ -415,6 +432,9 @@ def render_bindings(view):
                      f"[{row['admission']}]")
         if row["selected_by"]:
             lines.append("  Selected by: " + ", ".join(row["selected_by"]))
+        if "electrical" in row:
+            lines.append("  Required electrical: " +
+                         json.dumps(row["electrical"], sort_keys=True))
         for item in row["occupied_resources"]:
             lines.append(f"  Occupied {item['key']}: {item['owner']} "
                          f"(source {item['source']})")

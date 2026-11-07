@@ -179,6 +179,7 @@ const nx_exti_ops_t nx_native_exti_ops = {
     .read = native_exti_read,
     .stop = native_exti_stop,
     .attach_wake = native_exti_attach_wake,
+    .level = NULL,
 };
 
 /** \brief Select exactly one Native face without affecting default fixtures. */

@@ -53,7 +53,7 @@ FPCCR behind the kernel ABI. See the [short-ISR contract](../../../docs/design/o
 | Provider | Maintained execution and limits |
 |---|---|
 | GPIO | One-port 16-bit authorization mask; atomic BSRR set/reset; serialized toggle; initial level precedes mode |
-| UART | USART1 IRQ bytes/events, IRQ RX blocks, finite TX DMA, RX DMA/IDLE, finite/continuous duplex and continuous RX blocks; USART2 finite TX DMA on its reviewed route; true TC, explicit loss, drain and quarantine |
+| UART | USART1 IRQ bytes/events, IRQ RX blocks, finite TX DMA, RX DMA/IDLE, finite/continuous duplex and continuous RX blocks; USART2 finite TX DMA and IRQ bytes/events; reviewed USART3/UART4/UART5/USART6 IRQ bytes/events; true TC, explicit loss, drain and quarantine |
 | SPI | SPI1 short polling or finite full-duplex DMA; SPI2 finite DMA; 8-bit MSB-first master, modes 0–3, complete CS interval; polling at most 256 bytes and DMA at most 65535 bytes |
 | I2C | I2C1 polling/IRQ/DMA and I2C2 IRQ/DMA messages, 42 MHz / 100 kHz; 7-bit address, at most 8 read/write messages of 1–256 bytes; repeated START, protected final-byte ACK handling, explicit NACK/arbitration/STOP failure |
 | Flash | Exact VE 8-sector / ZG 12-sector geometry, x32 program at caller-declared 2.7–3.6 V; range/alignment checks, complete pulses, cache invalidation; erase is never preempted by a C deadline |
@@ -67,8 +67,10 @@ FPCCR behind the kernel ABI. See the [short-ISR contract](../../../docs/design/o
 | Timer capture | Reviewed TIM4 edge-capture route and bounded events |
 | Advanced PWM | Reviewed TIM1 complementary outputs/deadtime/break; external electrical safety policy |
 
-The two reference Board packages bind their reviewed LED and USART1 routes;
-Qiming also declares reviewed CAN bindings. Selection remains explicit. Internal Flash/IWDG bindings are available for explicit selection;
+Reference Board packages bind only their reviewed routes. The independent Qiming
+core and V4.1 packages retain separate schematic and optional-jumper identities;
+they do not replace the older V3.1 package. Selection remains explicit. Internal
+Flash/IWDG bindings are available for explicit selection;
 they neither reserve storage nor enable the watchdog during startup.
 Other SoC routes describe controller implementation and silicon AF resources;
 they do not establish Board wiring, external pull-ups, device fitting or
@@ -81,6 +83,17 @@ vector/linker and ELF/BIN checks; boot authentication, activation and running-im
 handoff qualification remain outside that software mechanism. The
 [derived matrix](../../../docs/delivery/capabilities.md) records exact selectable
 mode names, reference Board bindings and resolver-selected production source.
+
+The additional byte/event UART routes are USART3 PB10/PB11 AF7, UART4 PA0/PA1
+AF8, UART5 PC12/PD2 AF8 and USART6 PC6/PC7 AF8. APB1 supplies 42 MHz to
+USART2/3 and UART4/5; APB2 supplies 84 MHz to USART1/6 in the selected fixed clock
+profile. Cold admission checks the exact pads, both GPIO banks, clock, gate and
+IRQ before acquisition. The small readonly cold descriptor table is never used
+by byte I/O and adds no mutable per-instance state. Existing DMA routes remain
+limited to USART1 and the selected USART2 finite TX mode; an additional IRQ route
+does not authorize another DMA mode. Factories share the same readonly byte ops
+table and retain independent request, receive and cleanup state. Software models
+do not establish electrical operation or physical board qualification.
 
 The selected `dma-tx` owner combines official HAL finite TX with a disjoint LL
 IRQ-byte/event receiver. Its private callback ABI is 1 for all selected units;

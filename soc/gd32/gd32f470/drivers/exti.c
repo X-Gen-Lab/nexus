@@ -302,4 +302,5 @@ const nx_exti_ops_t nx_gd32_exti_ops = {
     .read = nx_gd32_exti_read,
     .stop = nx_gd32_exti_stop,
     .attach_wake = gd32_exti_attach_wake,
+    .level = NULL,
 };

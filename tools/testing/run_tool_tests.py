@@ -31,7 +31,7 @@ def execute_directory(directory, suite):
     expected = tests.countTestCases()
     if expected == 0:
         raise ValueError("Tool suite discovers zero tests")
-    result = unittest.TextTestRunner(verbosity=1).run(tests)
+    result = unittest.TextTestRunner(verbosity=1, failfast=True).run(tests)
     record = {"suite": suite, "discovered": expected,
               "executed": result.testsRun, "skipped": len(result.skipped),
               "failures": len(result.failures), "errors": len(result.errors),

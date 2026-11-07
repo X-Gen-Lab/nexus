@@ -65,6 +65,10 @@
       "bytes": 99874,
       "sha256": "95a518139f74d14a4477519b5172675347990e9fa637bd3948c69bd475bd7c88"
     },
+    "Inc/stm32f4xx_ll_fsmc.h": {
+      "bytes": 47221,
+      "sha256": "4a87d32439ec8d2d6cf2e6b4b00f5b71a5bf3dd71c4eab8a0270c875dbcfab4a"
+    },
     "Inc/stm32f4xx_ll_gpio.h": {
       "bytes": 37445,
       "sha256": "e46857f5f9a5f5a2d13ca2d6925dc9e66dfa7fc56a2cc72e54b891bdb88e2f16"
@@ -77,6 +81,10 @@
       "bytes": 9098,
       "sha256": "755bdf0e666bc8023fb154734726a681fae718edeb346c60b63534223c57e1ad"
     },
+    "Inc/stm32f4xx_ll_pwr.h": {
+      "bytes": 31539,
+      "sha256": "229af558bfeef8bb88d2224277b083c3b927c5c2612991fdeba00dad56255abc"
+    },
     "Inc/stm32f4xx_ll_rcc.h": {
       "bytes": 341256,
       "sha256": "605960f2e8e57a702b912475f9c154bb58711b58c8f2ff27dd4e75b5d767dc4e"
@@ -84,6 +92,14 @@
     "Inc/stm32f4xx_ll_rng.h": {
       "bytes": 8777,
       "sha256": "253b5a2da69655cad8c98045f9a13e7331a1c3792b8e4bc9e7e81b891b655cfe"
+    },
+    "Inc/stm32f4xx_ll_rtc.h": {
+      "bytes": 138138,
+      "sha256": "c4d24c2b7b8d799b8583eaf29db4ead644c4b772b116a6976912031c6c1d8903"
+    },
+    "Inc/stm32f4xx_ll_sdmmc.h": {
+      "bytes": 60818,
+      "sha256": "46fafb73c1c6fe5390a5a80049a28a443877c03f6dc42586cac11294f5f5a642"
     },
     "Inc/stm32f4xx_ll_spi.h": {
       "bytes": 66631,
@@ -112,6 +128,14 @@
     "Src/stm32f4xx_hal_uart.c": {
       "bytes": 136921,
       "sha256": "a74ed3a9a13a4fcbaada9e6f88f7d4fcabe2a75852a6ce4c09f8d4314a2e851a"
+    },
+    "Src/stm32f4xx_ll_fsmc.c": {
+      "bytes": 39528,
+      "sha256": "5e4c9e660da34ad94144d901bd68aba78095889c77a2b4a36afc4528102ad6af"
+    },
+    "Src/stm32f4xx_ll_sdmmc.c": {
+      "bytes": 50299,
+      "sha256": "888999f70d05daa37f57dc144c6cd31aa50259ac30d73a33ed628e663247f7a4"
     }
   },
   "kind": "nexus-reviewed-official-driver",
@@ -129,5 +153,5 @@
   "release": "v1.8.5",
   "repository": "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f407-ll-inline-eth-definitions-uart-dma-hal-tx"
+  "selected_api": "stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx"
 }

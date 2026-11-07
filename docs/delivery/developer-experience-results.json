@@ -7352,6 +7352,995 @@
           "scope": "Original API/CLI execution used these actual checker bytes before their commit; original receipts and chronology remain unchanged."
         }
       }
+    },
+    "qiming_board_integration_20261107": {
+      "kind": "nexus_qiming_board_integration_development_observation",
+      "date": "2026-11-07",
+      "time_zone": "Asia/Shanghai",
+      "observed_utc": "2026-11-06T20:09:50.330189+00:00",
+      "scope": "Bounded development implementation and original focused software/ARM/preparation records only. Each execution retains its own inputs. This is not a clean-source qualification, completed full gate, installed SDK qualification, formal candidate or physical acceptance.",
+      "task_authority": "docs/design/developer-experience-execution.csv",
+      "task_range": "QB01-QB32; implementation, software and physical exits remain separate in the same CSV",
+      "source": {
+        "parent_commit": "1bfb46a74a4a96826161e992f1f06dbc67033bf2",
+        "dirty": true,
+        "branch": "iteration/qiming-board-integration-20261107",
+        "qualified_clean_head": false,
+        "identity_scope": "Parent names the unchanged pre-increment Git commit. Original receipts bind their own source snapshots; this dirty development observation does not transfer earlier source qualification."
+      },
+      "inputs": {
+        "boards": [
+          "boards/stm32f407zg_qiming_core/board.json",
+          "boards/stm32f407zg_qiming_v41/board.json"
+        ],
+        "schematics": [
+          {
+            "file": "启明欣欣407ZGT6核心板原理图.pdf",
+            "sha256": "404e9fd9dcc667a94a84e9740e689db4c0ad4d93b36781c67bb03773b232ef07",
+            "pages": [
+              1
+            ]
+          },
+          {
+            "file": "启明欣欣407开发板(高配版)V4.1原理图.pdf",
+            "sha256": "64215f6849c4f5b2f76b4ce23241b814cd66be14a4d652f89da1c53e3aa6abe5",
+            "pages": [
+              1,
+              2,
+              3
+            ]
+          }
+        ],
+        "confirmed_modules": [
+          "ILI9341 16-bit parallel",
+          "XPT2046 GPIO software SPI"
+        ],
+        "unconfirmed": [
+          "Physical PCB revisions and fitting",
+          "Audio/camera module models",
+          "Actual infrared remote protocol"
+        ],
+        "reference_scope": "Independent Boards, not a proved core/carrier pair. Source document identities and selected hardware declarations do not prove physical fitting. PDFs and user image are not republished or assigned invented image hashes.",
+        "official_dependency_lock": {
+          "path": "/workspace/nexus/dependencies/stm32f4-hal.lock.json",
+          "sha256": "469d1e694002714c8bf35f20319a4018808df986536165cd29044e2fa4bedfb0",
+          "size": 5671
+        }
+      },
+      "focused_results": {
+        "interpretation": "Records below are local original handoffs, not new test executions. Current-source audits compare only named hashed entries; a matching subset is not a complete input-closure or final-target qualification. Changed shared files remain explicit, no old pass is promoted to current HEAD. Counts across cohorts overlap and are not added.",
+        "configuration": {
+          "scope": "Exact Board facts, explicit hardware/electrical choices and immutable configuration. Later shared configuration edits require final gates.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/boards/handoff.json",
+              "sha256": "9602fff2fde1d06979fde45187eb6425ed545b088277c1bef733c0a1da123cef",
+              "size": 3701,
+              "current_source_audit": {
+                "declared_source_entries": 11,
+                "matching_current_entries": 4,
+                "changed_or_missing_paths": [
+                  "boards/stm32f407zg_qiming_core/README.md",
+                  "boards/stm32f407zg_qiming_core/board.json",
+                  "boards/stm32f407zg_qiming_v41/README.md",
+                  "boards/stm32f407zg_qiming_v41/board.json",
+                  "soc/stm32/stm32f407/routes.json",
+                  "soc/stm32/stm32f407/soc.json",
+                  "tools/configure/test_qiming_board_facts.py"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/conditions/handoff.json",
+              "sha256": "bde6436653c916370e51fdaccf6e45720f8608de6fed43eb53dd66d6cca29bab",
+              "size": 1391,
+              "current_source_audit": {
+                "declared_source_entries": 0,
+                "matching_current_entries": 0,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 7,
+                "all_declared_hashes_match_current": null
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/rtc-config/handoff.json",
+              "sha256": "1697f2d61c712e094c345dece6942b91af6dea8ef052dbec36a6175fbb6aff61",
+              "size": 7154,
+              "current_source_audit": {
+                "declared_source_entries": 26,
+                "matching_current_entries": 11,
+                "changed_or_missing_paths": [
+                  "tools/configure/authored.py",
+                  "tools/configure/contracts.py",
+                  "tools/configure/ir.py",
+                  "tools/configure/configure.py",
+                  "tools/configure/providers/common.py",
+                  "tools/configure/test_qiming_board_facts.py",
+                  "soc/stm32/stm32f407/descriptor.py",
+                  "soc/stm32/stm32f407/configure/contract.py",
+                  "soc/stm32/stm32f407/configure/emission.py",
+                  "soc/stm32/stm32f407/configure/gpio.py",
+                  "soc/stm32/stm32f407/soc.json",
+                  "soc/stm32/stm32f407/routes.json",
+                  "boards/stm32f407zg_qiming_core/README.md",
+                  "boards/stm32f407zg_qiming_v41/board.json",
+                  "boards/stm32f407zg_qiming_v41/README.md"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/sram-config/handoff.json",
+              "sha256": "77ec3fdb0f06be6bb855059cd0ee0354b8fb4110a3df382985f47da94906c236",
+              "size": 8128,
+              "current_source_audit": {
+                "declared_source_entries": 19,
+                "matching_current_entries": 13,
+                "changed_or_missing_paths": [
+                  "tools/configure/providers/common.py",
+                  "soc/stm32/stm32f407/configure/emission.py",
+                  "soc/stm32/stm32f407/configure/__init__.py",
+                  "soc/stm32/stm32f407/configure/contract.py",
+                  "soc/stm32/stm32f407/soc.json",
+                  "soc/stm32/stm32f407/routes.json"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            }
+          ]
+        },
+        "gpio_exti_uart": {
+          "scope": "GPIO electrical modes, EXTI ownership/level predicate and all six exact UART IRQ-byte routes; no unimplemented DMA inference.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/gpio-exti/handoff.json",
+              "sha256": "72c88e8c7446e599728d82787cd28d434f26f7e3ae6a70850c909765d598c30c",
+              "size": 15910,
+              "current_source_audit": {
+                "declared_source_entries": 28,
+                "matching_current_entries": 18,
+                "changed_or_missing_paths": [
+                  "soc/stm32/stm32f407/drivers/gpio.c",
+                  "soc/stm32/stm32f407/configure/__init__.py",
+                  "soc/stm32/stm32f407/configure/contract.py",
+                  "soc/stm32/stm32f407/configure/bindings.py",
+                  "tools/configure/contracts.py",
+                  "tools/configure/selection.py",
+                  "tools/configure/ir.py",
+                  "tools/configure/configure.py",
+                  "tools/configure/dependencies.py",
+                  "tests/google/stm32_basic_cold_test.cpp"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/uart/handoff.json",
+              "sha256": "2d5d5496f40f0f8d60919a25a4dc5f6bd30ca4785aadd6256b45056db612c566",
+              "size": 9364,
+              "current_source_audit": {
+                "declared_source_entries": 8,
+                "matching_current_entries": 7,
+                "changed_or_missing_paths": [
+                  "soc/stm32/stm32f407/configure/preflight.py"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            }
+          ]
+        },
+        "fsmc_startup": {
+          "scope": "One shared FSMC owner, separate NE3/NE4 windows, persistent boot ownership before Platform startup and explicit selected external DATA/BSS.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/fsmc-lcd/handoff.json",
+              "sha256": "715db7aa9da34973fd45af0591f238295e140e69e154e7945b91638b1cec28bb",
+              "size": 7751,
+              "current_source_audit": {
+                "declared_source_entries": 21,
+                "matching_current_entries": 21,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/sram-bootstrap/handoff.json",
+              "sha256": "5488ee05babf8e8728d9122a7cfd118e722dee5d8d0ceed78e14f27e2c4e7028",
+              "size": 18021,
+              "current_source_audit": {
+                "declared_source_entries": 10,
+                "matching_current_entries": 10,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/boot-platform/handoff.json",
+              "sha256": "aba45e4c4a54ea8a050835a46f47203b484d35e7a17511fef4bdd7a7edba28c8",
+              "size": 10819,
+              "current_source_audit": {
+                "declared_source_entries": 11,
+                "matching_current_entries": 11,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            }
+          ]
+        },
+        "device_components": {
+          "scope": "AT24C02, explicitly selected W25Q128JV, ILI9341/raw XPT2046, bounded software SPI and strict I2C/separate SCCB mechanisms. Product storage, calibration and tasks stay external.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/at24c02/handoff.json",
+              "sha256": "2b7578c967d79fb4fc59c47176e440b009a4bf951bf00631dc5dbf127de35a99",
+              "size": 2819,
+              "current_source_audit": {
+                "declared_source_entries": 7,
+                "matching_current_entries": 6,
+                "changed_or_missing_paths": [
+                  "tests/google/at24c02_test.cpp"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/w25/handoff.json",
+              "sha256": "401811feb8b4531bc5ed9a4a85361e44bc359dd598f358a7180985b04b792a74",
+              "size": 3329,
+              "current_source_audit": {
+                "declared_source_entries": 6,
+                "matching_current_entries": 6,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/touch/handoff.json",
+              "sha256": "cd2275f011a1b6f6beaab7c317f1536982a44a6731a06f179a967b94fc59ede7",
+              "size": 7779,
+              "current_source_audit": {
+                "declared_source_entries": 7,
+                "matching_current_entries": 7,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/software-i2c/handoff.json",
+              "sha256": "62a39499235b71222ae40e53f3a947afe4fb11c4076fa3638ab6fcf73c392a00",
+              "size": 2087,
+              "current_source_audit": {
+                "declared_source_entries": 8,
+                "matching_current_entries": 7,
+                "changed_or_missing_paths": [
+                  "tests/google/software_i2c_test.cpp"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            }
+          ]
+        },
+        "sensors": {
+          "scope": "Externally powered DS18B20 through bounded OneWire; explicit NEC reference through flag-free or separately selected sampled/uncertain IRQ-observation quality. Actual receiver/remote and electrical timing remain unqualified.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/ds18b20/handoff.json",
+              "sha256": "8c3c0f83e08b8d59ead1e06913e090040971ea9ebfe5b66acfa655ea65d16e25",
+              "size": 12171,
+              "current_source_audit": {
+                "declared_source_entries": 15,
+                "matching_current_entries": 15,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/infrared/source-quality-handoff.json",
+              "sha256": "f09b9f0d9f8d1b074740a8b68f90696e873fb1a848df51bbad887d7d30b81397",
+              "size": 10461,
+              "current_source_audit": {
+                "declared_source_entries": 9,
+                "matching_current_entries": 9,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            }
+          ]
+        },
+        "sdio_rtc": {
+          "scope": "Synchronous CPU-polling SD card with explicit activation and retained uncertain media duty; explicit RTC retained adoption versus authored empty-backup provisioning.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/sdio/handoff.json",
+              "sha256": "d391aebcc269da40339b9047bcca2c647e7e86fd0d8c81f2333334ab345216fc",
+              "size": 29869,
+              "current_source_audit": {
+                "declared_source_entries": 14,
+                "matching_current_entries": 14,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            },
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/rtc/handoff.json",
+              "sha256": "00c575e393f2847809a937433d316ea289a29a1c4110ac27a0090cbec8688727",
+              "size": 6455,
+              "current_source_audit": {
+                "declared_source_entries": 7,
+                "matching_current_entries": 7,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            }
+          ]
+        },
+        "documentation": {
+          "scope": "Existing139-row view, preserved original107 CSV byte prefix, exact edited-page catalogs and132-page translation metadata/source checks. No full Sphinx/API build.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/docs-final-ledger/handoff.json",
+              "sha256": "25970f53ebd7c71dfb0800d3e8efca0698957f81f3609eb0cef836d015913fd8",
+              "size": 58861,
+              "current_source_audit": {
+                "declared_source_entries": 6,
+                "matching_current_entries": 6,
+                "changed_or_missing_paths": [],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": true
+              }
+            }
+          ]
+        },
+        "hil_preparation": {
+          "scope": "46 actual focused tool tests and two recorded unbound Board plans; no probe, serial device or physical station operated.",
+          "records": [
+            {
+              "path": "/dev/shm/nexus-qiming-implementation-20261107/hil-qiming/handoff.json",
+              "sha256": "7e02d89adf5569183abe7606791f293e7feadb0b6bb66d467160618b80f1d4ea",
+              "size": 4794,
+              "current_source_audit": {
+                "declared_source_entries": 12,
+                "matching_current_entries": 7,
+                "changed_or_missing_paths": [
+                  "docs/design/developer-experience.md",
+                  "docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po",
+                  "docs/status/ledgers/developer-experience.md",
+                  "docs/locale/en/LC_MESSAGES/status/ledgers/developer-experience.po",
+                  "docs/locale/zh_CN/LC_MESSAGES/status/ledgers/developer-experience.po"
+                ],
+                "unhashed_path_entries": 0,
+                "all_declared_hashes_match_current": false
+              }
+            }
+          ]
+        }
+      },
+      "arm": {
+        "scope": "Actual selected links and family C11 compilations remain bounded by their own recorded source/configuration/retention checks. An object compile or cold-only workload is not full-provider residency or a platform-wide resource delta.",
+        "records": [
+          {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/sdio/handoff.json",
+            "sha256": "d391aebcc269da40339b9047bcca2c647e7e86fd0d8c81f2333334ab345216fc",
+            "size": 29869
+          },
+          {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/fsmc-lcd/handoff.json",
+            "sha256": "715db7aa9da34973fd45af0591f238295e140e69e154e7945b91638b1cec28bb",
+            "size": 7751
+          },
+          {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/sram-bootstrap/handoff.json",
+            "sha256": "5488ee05babf8e8728d9122a7cfd118e722dee5d8d0ceed78e14f27e2c4e7028",
+            "size": 18021
+          },
+          {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/ds18b20/handoff.json",
+            "sha256": "8c3c0f83e08b8d59ead1e06913e090040971ea9ebfe5b66acfa655ea65d16e25",
+            "size": 12171
+          },
+          {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/infrared/arm-style-quality/result.json",
+            "sha256": "76bf2cbfd36b7358376a1106d789718ee68b7b53f1f10cdd86dce2e095715b7b",
+            "size": 9111
+          }
+        ],
+        "startup_profile": "O0/Og/O1/O2/Os without LTO; internal MSP at least512 bytes, observed static reset call-chain maximum304 bytes. Not a measured stack peak, NMI/fault allowance or LTO proof.",
+        "physical_execution": "not_executed"
+      },
+      "rs485": {
+        "status": "focused_public_rs485_composition_passed_rs232_and_electrical_verification_pending",
+        "observed_utc": "2026-11-06T20:14:21.031784+00:00",
+        "scope": "Same strong UART ref selects its public transport and existing TX-validator callback, pure lookup without mutable state/vtable growth. Caller-owned existing RS485 adapter uses explicit DE GPIO/setup/hold. No private headers; unreviewed modes/IDs return NULL. Pairing is a caller precondition, not runtime authentication.",
+        "behavior": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skips": 0,
+          "maintained_target": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-platform/final-maintained-receipt.json",
+            "sha256": "39c54242f501cc67850d352591f973467cecbe793e436209d4d991c7d1de259d",
+            "size": 2212
+          },
+          "junit": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-platform/final-maintained-results.xml",
+            "sha256": "ba13a452633d4edd5faa226ce78e205307eef439c537a170f02fd730db00b5b3",
+            "size": 2123
+          },
+          "complete_source_snapshot_record": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-platform/factory-composition-green-current-source/receipt.json",
+            "sha256": "32624ecfd8d8fdd34d416a01518353b576efee13472b419b6cc00b6930e51127",
+            "size": 42152
+          }
+        },
+        "arm": {
+          "status": "selected_link_and_retention_passed",
+          "record": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-factory/arm-public-consumer/result.json",
+            "sha256": "71da31f469bdb3c2bda1a4edafa88f71d7f7414e0452eb32f996bba31dedca87",
+            "size": 167059
+          },
+          "recorded_source_entries": [
+            {
+              "path": "tests/contracts/qiming_rs485_assembly/CMakeLists.txt",
+              "matches_current": true
+            },
+            {
+              "path": "tests/contracts/qiming_rs485_assembly/controller_main.c",
+              "matches_current": true
+            },
+            {
+              "path": "tests/contracts/qiming_rs485_assembly/README.md",
+              "matches_current": true
+            },
+            {
+              "path": "io/include/nexus/io/uart.h",
+              "matches_current": true
+            },
+            {
+              "path": "io/include/nexus/io/uart_rs485.h",
+              "matches_current": true
+            },
+            {
+              "path": "tools/configure/factory.py",
+              "matches_current": true
+            },
+            {
+              "path": "soc/stm32/stm32f407/configure/contract.py",
+              "matches_current": true
+            },
+            {
+              "path": "soc/gd32/gd32f470/configure/contract.py",
+              "matches_current": true
+            }
+          ],
+          "retention": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-factory/arm-public-consumer/build/bin/provider-retention.json",
+            "sha256": "8c1cfbef74d17b0c3152dd4843b8d5d375c6ed430f8e0d7fd4738715c986900f",
+            "size": 28362
+          },
+          "resources": {
+            "path": "/dev/shm/nexus-qiming-implementation-20261107/rs485-factory/arm-public-consumer/build/bin/qiming_rs485_controller_fixture.resources.json",
+            "sha256": "00cc3802c3504f23e1359167aa9406d53d469e926a432ce106737366c43beff1",
+            "size": 3943
+          },
+          "selected_factory_faces": 2,
+          "selected_provider_tables": 2,
+          "selected_provider_method_slots": 11,
+          "flash_loaded_bytes": 12724,
+          "sram_reserved_bytes": 3400,
+          "msp_included_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "scope": "Actual public C11 consumer; selected provider residency, not total table count or measured stack/cycles/bus timing."
+        },
+        "remaining": "RS232 acceptance and physical MAX485/MAX232 supplies/substitute parts remain unverified. Complete-index/SDK gates remain pending.",
+        "physical_status": "not_executed"
+      },
+      "gates": {
+        "ordinary_complete_index": {
+          "status": "passed",
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/commit-integration/commit-a-result.json",
+            "sha256": "35354f2c750aeb9d172dc6a2f4414b7cc47239cf2d69429ced4e18afaff942ae",
+            "bytes": 730,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
+        },
+        "installed_source_sdk": {
+          "status": "passed",
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/verification/verification.json",
+            "sha256": "3de6358b5ad76948c3bb8e965d658ecf52b3269008e6b795d4a93e8d6f553aa4",
+            "bytes": 558786,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
+        },
+        "strict_bilingual_html_api": {
+          "status": "passed",
+          "source_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "qualification_inherited": false,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-docs-b2/documentation-build.json",
+            "sha256": "32f98e04b814a6d70e579ee9590d69cb9b47053236f39c1718dd581dc87dc951",
+            "bytes": 59186,
+            "scope": "Actual final scoped software execution; see final_software_results for identity and limitations",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
+        },
+        "offline_dual_build": {
+          "status": "not_executed",
+          "qualification_inherited": false,
+          "reason": "Not performed in this batch; no completion inferred from SDK relocation/consumers."
+        }
+      },
+      "process_disclosures": {
+        "strict_tdd_ordering_met": false,
+        "exceptions": [
+          {
+            "id": "fsmc_initial_c_draft",
+            "scope": "Initial FSMC C draft preceded a runnable expected behavioral RED; earlier harness attempts did not execute the intended behavior.",
+            "status": "ordering_exception_not_repaired_by_later_green",
+            "record": "/dev/shm/nexus-qiming-implementation-20261107/fsmc-lcd/handoff.json"
+          },
+          {
+            "id": "system_init_sram_hook",
+            "scope": "The initial SystemInit SRAM-hook draft preceded a valid host fixture; its first mapping attempt failed and the later original before-image comparison is retrospective, not contemporaneous RED.",
+            "additional_evidence_gap": "Early compiler-generated memset failure retained objects/receipts but lacks an exact contemporary source snapshot. No such snapshot is reconstructed or claimed.",
+            "status": "ordering_and_snapshot_gaps_retained",
+            "record": "/dev/shm/nexus-qiming-implementation-20261107/sram-bootstrap/handoff.json"
+          }
+        ],
+        "later_evidence": "Standalone validation/bootstrap and subsequent defect fixes retain their own genuine original RED/GREEN. Five accepted freestanding ARM profiles retain their own snapshots. These do not repair the two initial ordering exceptions or establish whole-project TDD compliance."
+      },
+      "hardware": {
+        "status": "not_executed",
+        "station_connected": false,
+        "prepared_scope": "Two exact software_reference fixtures with null physical budgets. Population, PCB, jumpers, clocks, transceiver supply/PHY wiring and actual modules need independent station observation."
+      },
+      "remaining_limits": [
+        "Physical Boards are not connected; physical fitting, waveforms, IRQ/DMA latency, throughput, power and HIL remain not_executed.",
+        "RS485 has exact public installed ARM composition evidence; RS232 and physical MAX485/MAX232 electrical verification remain pending.",
+        "V4.1 Ethernet PHY/reference-clock/MDIO facts are unverified; no V4.1 Ethernet route is admitted.",
+        "Audio/camera model selection and complete codecs/DCMI remain pending; resource conflict guards do not admit those modules.",
+        "Selected SDIO is synchronous CPU polling only; DMA, IRQ completion, asynchronous cancellation, hot-swap detection and filesystem are not provided.",
+        "Minimal private new-Board examples are verified; complete private media/network task exits remain open.",
+        "Two strict-TDD chronology exceptions and the early memset source-snapshot gap remain disclosed. Later software passes do not repair them.",
+        "Offline dual build was not executed. This batch establishes scoped software references and clean Source SDK closure, not a software candidate or release.",
+        "Archive/final report references are locally verified, not durably published. Retired original ELF paths require the recorded archive/member restore map."
+      ],
+      "evidence_retention": {
+        "status": "local_originals_retained_not_published",
+        "public_archive": null,
+        "private_examples_published": false,
+        "scope": "Local paths locate original receipts/snapshots. They are not durable public download claims. A future actually verified archive/member locator may be appended without relabelling old identities. Vendor/user PDFs and private application bytes are excluded.",
+        "final_local_verification": {
+          "status": "local_verified_archive_and_report_references_not_publicly_persisted",
+          "focused_archive": {
+            "path": "/workspace/nexus/build/qiming-board-20261107/evidence-store/185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f.tar.gz",
+            "sha256": "185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f",
+            "size": 389407310
+          },
+          "archive_manifest_sha256": "10d91b1cc2e2335dd14c4fb92f18520c09916cea5111d7dc659a5a539ab24517",
+          "member_files": 19726,
+          "member_uncompressed_bytes": 903456177,
+          "archive_metadata": {
+            "local_original": "/workspace/nexus/build/qiming-board-20261107/evidence-store/185a9987dccbbdcc9d82fc7824f320acdb0032dcd2ce4e9d4af8d3380cb68e2f.json",
+            "sha256": "0805cb3441d7fda38651dbe31ee94c44fcb6bb27b864d1655befc3b565e52c69",
+            "bytes": 521,
+            "scope": "Verified local focused archive; compressed file size differs from uncompressed member bytes",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "retired_elf_original_paths": 293,
+          "retirement_record": {
+            "local_original": "/workspace/nexus/build/qiming-board-20261107/focused-archive-control/archived-elf-retirement-handoff.json",
+            "sha256": "87e53af554b1ac88af57c4d78e98a1ad882aa96a7b1c0df51d62981005f6861a",
+            "bytes": 2146,
+            "scope": "293 frozen ELF paths retired; exact archive/member/SHA restoration retains original bytes",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "restoration_mapping": "/workspace/nexus/build/qiming-board-20261107/focused-archive-control/archived-elf-retirement.jsonl",
+          "old_missing_cache_identities": 18,
+          "old_missing_bytes_reconstructed": false,
+          "older_nine_component_archives_exact": 17,
+          "older_nine_component_archives_total": 18,
+          "older_component_identity_record_retained": "closures_after_initial_observation preserves the exact archive index and original hash scope",
+          "current_source_logs_xml_receipts_arm_objects_preserved": true,
+          "all_historical_raw_paths_still_exist": false,
+          "tail_final_a_sdk_docs_report_archive": null,
+          "tail_scope": "Final A/SDK/B2 reports are local verified references, not yet included in a final tail archive. No public download or durable external persistence is claimed.",
+          "public_durable_availability": false,
+          "private_payload_published": false
+        }
+      },
+      "publishable_candidate": false,
+      "closures_after_initial_observation": {
+        "observed_utc": "2026-11-06T20:37:15.842755+00:00",
+        "scope": "Actual additional focused closure before normal complete-index commit; no clean-source qualification inherited from older records",
+        "records": [
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/xpt-conversion-envelope/handoff.json",
+            "sha256": "d04122c6bb0a8b3795a82a2ab22dd032085d97348189c892874956af6b55f5af",
+            "bytes": 2892
+          },
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/display-profile-dx/handoff.json",
+            "sha256": "00259bbfe93cd06e8deae705571d494897f56973f893eb766cfe1bf97f526867",
+            "bytes": 9076
+          },
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/devices-links/final-board-profiles/results.json",
+            "sha256": "4e2e1fbc036d67aa80e4869f84a6df20950abed7cce127acd77c8b8bdfa9ba68",
+            "bytes": 46511
+          },
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/sram-config/final-lifetime-sram/source-artifacts.json",
+            "sha256": "2aae8e50d13ce3598d9716d1d55f976d683b8887f107233b0abf19f6c7a5b8f1",
+            "bytes": 4946
+          },
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/sram-config/final-lifetime-sram-ccm/source-artifacts.json",
+            "sha256": "82670c8446aed6376248d466298f636df90cac4c01cb25c42c0a52fa62586b6f",
+            "bytes": 4946
+          },
+          {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/components-nine/retained-original-archives/index.json",
+            "sha256": "3100b85b3c362984dd7d60f9ff350295c5a6c2f7c6f9c7b8f0dcb9714eb7fc12",
+            "bytes": 10999
+          }
+        ],
+        "changes": [
+          "XPT2046 conservative whole24clock transfer envelope is less than1600us, including init/stop; true RED retained, final27cases pass",
+          "LCD-only display-touch is independent of unpopulated SRAM; original41-pad combination is preserved as display-touch-sram; both exact Boards have actual ARM links for both profiles"
+        ],
+        "historical_cache_limit": "One earlier GD470 XPT static archive cache was replaced during final component rebuild;17of18 prior archives retain exact original bytes, as the preservation index records. Original command/hash remains; no old bytes were reconstructed. Current XPT firmware compilation and final source-bound validation remain separate."
+      },
+      "final_software_results": {
+        "observed_utc": "2026-11-06T22:05:37.803898+00:00",
+        "scope": "Verified finite software-reference profiles only. Native execution, clean installed Source SDK, documentation compilation and private example metadata retain separate source identities; no physical qualification, whole-platform optimum, software candidate or release is established.",
+        "software_source_A": {
+          "commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "tree": "19829a466bb286703e3a6d555f58ba1b33e4fb80",
+          "normal_complete_index_hooks": "passed",
+          "source_clean_for_publishable_sdk_preparation": true,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-implementation-20261107/commit-integration/commit-a-result.json",
+            "sha256": "35354f2c750aeb9d172dc6a2f4414b7cc47239cf2d69429ced4e18afaff942ae",
+            "bytes": 730,
+            "scope": "Normal complete staged-index hooks that produced A; original failures and retry history remain intact",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          }
+        },
+        "native_and_tools": {
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "google_cases": 8004,
+          "google_executables": 447,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "tool_cases": 4269,
+          "tool_suites": [
+            {
+              "suite": "testing",
+              "discovered": 2211,
+              "executed": 2211,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "configure",
+              "discovered": 1378,
+              "executed": 1378,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "ci",
+              "discovered": 511,
+              "executed": 511,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            },
+            {
+              "suite": "workflows",
+              "discovered": 169,
+              "executed": 169,
+              "skipped": 0,
+              "failures": 0,
+              "errors": 0,
+              "expected_failures": 0,
+              "unexpected_successes": 0,
+              "status": "passed"
+            }
+          ],
+          "record": {
+            "local_original": "/workspace/nexus/build/native-debug/tdd/execution.json",
+            "sha256": "5f9f29e5c7155e8b71790a4be4ba0b910f990eb464fa3b2c518a8fbba70fa891",
+            "bytes": 1411256,
+            "scope": "Fresh complete actual host execution; not physical execution or historical TDD-order proof",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "bounded_io_properties": {
+            "executed_properties": 233,
+            "unproven_scopes": [
+              {
+                "scope": "physical",
+                "reason": "No connected boards: UART/SPI/I2C/CAN/USB/Ethernet buses, ADC/timer/PWM waveforms, electrical effects, IRQ WCET, cache interactions and HIL fault timing are not executed."
+              },
+              {
+                "scope": "continuous duplex combinations",
+                "reason": "Finite duplex TX/RX independence and continuous RX rotate/drain are covered separately; every simultaneous TX cancellation/RX wrap ordering is not exhaustive."
+              },
+              {
+                "scope": "non-streaming IO",
+                "reason": "GPIO/EXTI/basic PWM/watchdog/Flash have independent maintained suites. The selected CAN/USB/Ethernet/timer rows here do not claim every lifecycle, controller, packet type or alternative mode."
+              },
+              {
+                "scope": "IRQ-byte-event TX per MCU",
+                "reason": "Byte/event IRQ receive and base UART tests exist; not every byte-ring profile and secondary-controller cancellation history is represented here."
+              },
+              {
+                "scope": "configuration legality",
+                "reason": "Strict mode/resource conflict and authored-limit tests execute through existing configure suite; this Google catalogue does not infer Python case execution from source names or expand reviewed Board routes."
+              },
+              {
+                "scope": "formal interleavings",
+                "reason": "Selected bounded register fault windows and Native histories are examples, not proof against every timing, ABA bank wrap or concurrent unsupported caller."
+              },
+              {
+                "scope": "test framework",
+                "reason": "Only ordinary reviewed TEST/TEST_F bodies are indexed; parameterized/typed/death-only aggregate properties need explicit review rather than automatic name inference."
+              },
+              {
+                "scope": "external product outputs",
+                "reason": "Advanced-output readback is a modeled platform mechanism. No tested GPIO value establishes real product safety, transceiver/PHY wiring, a physical break path, a reset policy or a safety certification."
+              }
+            ],
+            "formal_proof": false,
+            "record": {
+              "local_original": "/workspace/nexus/build/native-debug/tdd/io-property-report.json",
+              "sha256": "3cbadec72bb965734d2a278d507993e7e2f61e3a26976f82a1f3693114b9415e",
+              "bytes": 24302380,
+              "scope": "233 bounded properties and eight unproven scopes; original independent source/configuration/catalogue hashes remain authoritative",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          }
+        },
+        "installed_source_sdk": {
+          "source_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "source_tree": "19829a466bb286703e3a6d555f58ba1b33e4fb80",
+          "status": "passed",
+          "publishable_clean_source_closure": true,
+          "software_candidate": false,
+          "immutable_prefix": "/dev/shm/nexus-qiming-sdk-a/installed SDK",
+          "package_boundary": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/package-boundary.json",
+            "sha256": "f4d2b7128ab2975bf6cfc3e392d6860e346db73e32764418f93d0c679b033704",
+            "bytes": 417,
+            "scope": "Immutable clean A SDK preparation/relocation boundary",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "manifest_sha256": "95d530cb943c5451a1f28787134cc743f83ea2e0950a6e900cafb5927123a0df",
+          "consumers": 65,
+          "commands": 274,
+          "selected_images": 37,
+          "service_images": 15,
+          "record": {
+            "local_original": "/dev/shm/nexus-qiming-sdk-a/verification/verification.json",
+            "sha256": "3de6358b5ad76948c3bb8e965d658ecf52b3269008e6b795d4a93e8d6f553aa4",
+            "bytes": 558786,
+            "scope": "Actual complete relocated consumer matrix; original per-assembly source/configuration/artifact digest scopes are retained",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "additional_qiming_consumers": {
+            "cases": [
+              {
+                "case": "core-lcd",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-lcd",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-lcd-sram",
+                "status": "passed",
+                "source_main_sha256": "bf3305907fb19f1b36d837c499d35137ffbf3a3f63dac65166da26afa693bbce",
+                "retained_component_exports": {
+                  "expected": 46,
+                  "missing": []
+                }
+              },
+              {
+                "case": "v41-sdio",
+                "status": "passed",
+                "source_main_sha256": "7e675cffe935f8a52f1e1a704a2610c37863062a84a059b644fdfc57d6a84063",
+                "retained_component_exports": null
+              },
+              {
+                "case": "v41-rs485",
+                "status": "passed",
+                "source_main_sha256": "87ce974ced0555d9ed0a942d1a087501c478eaa93f756fb7e5344ed367fe9e21",
+                "retained_component_exports": null
+              }
+            ],
+            "case_count": 5,
+            "scope": "Two exact Boards LCD-only, V4.1 LCD+SRAM, V4.1 polling SDIO and V4.1 public RS485; nine components/46 public exports retained in each first-three ARM image; linking only, not physical execution or product resource peaks",
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-sdk-a/qiming-consumers/results.json",
+              "sha256": "3995d02453bd103a21f33d4d70524b371bb7cfbd39fea72aaf8e30a6001762fa",
+              "bytes": 252687,
+              "scope": "Five additional exact installed ARM public consumers; do not combine their per-assembly configuration hashes",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          },
+          "additional_closure": {
+            "cases": [
+              {
+                "case": "gd470-nine-components",
+                "status": "passed",
+                "artifact_count": 9
+              },
+              {
+                "case": "boot-sram-ccm",
+                "status": "passed",
+                "artifact_count": 4
+              }
+            ],
+            "scope": "GD470 nine component archives and F407 startup SRAM/CCM installed ARM closure; no new Board/family hardware qualification",
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-sdk-a/additional-closure/results.json",
+              "sha256": "a4fc9c36961a8e02b950239d7a186a3018d83a557355eaea607273720fa4550d",
+              "bytes": 7236,
+              "scope": "Additional actual installed SDK ARM artifact/source closure",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          }
+        },
+        "documentation_source_B2": {
+          "commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "tree": "b36bb281f7baa2c67d3c396ca65e05a5f7e93878",
+          "source_clean": true,
+          "status": "passed",
+          "languages": [
+            "en",
+            "zh_CN"
+          ],
+          "scope": "Fresh locked complete-site Doxygen, gettext and English/Chinese HTML. B/B2 change only documentation inputs/catalogs relative to A; firmware remains bound to A.",
+          "build_record": {
+            "local_original": "/dev/shm/nexus-qiming-docs-b2/documentation-build.json",
+            "sha256": "32f98e04b814a6d70e579ee9590d69cb9b47053236f39c1718dd581dc87dc951",
+            "bytes": 59186,
+            "scope": "Actual strict complete documentation build from clean B2",
+            "availability": "local_verified_reference_not_publicly_persisted"
+          },
+          "immutable_package": {
+            "archive": "/dev/shm/nexus-qiming-docs-b2-package/qiming-software-reference-23f3fef1.tar.gz",
+            "archive_sha256": "b421fd009f172665788812dff385ba9e309c51e66178148986d371973adb3372",
+            "manifest_sha256": "4b3ab0a5ae76a305ff1d78582b0581361c44622d4dbb9a016f7489cf01c01e33",
+            "payload_files": 2889,
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-implementation-20261107/docs-strict-b2/package-result.json",
+              "sha256": "62fc82356f6f695d395412bc8b564bdd0d6fcf6d944dba5f49be136aa530d01a",
+              "bytes": 635,
+              "scope": "Actual verified immutable B2 documentation package; not a firmware release or physical qualification",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            }
+          },
+          "earlier_B_translation_failure": {
+            "record": {
+              "local_original": "/dev/shm/nexus-qiming-implementation-20261107/docs-strict-b/result.json",
+              "sha256": "a50446ce6991f9f7b6c1886118634913e6f2a22407736641e6753088ddb15927",
+              "bytes": 690,
+              "scope": "Original complete B strict failure retained; source-map lacked three new io/README include-expanded messages",
+              "availability": "local_verified_reference_not_publicly_persisted"
+            },
+            "correction_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+            "history_preserved": true
+          }
+        },
+        "private_examples_metadata": {
+          "repository": "X-Gen-Lab/nexus-examples",
+          "visibility": "private",
+          "commit": "ca1d5af75b0a9ea27a351cbf07176fc7067a1e42",
+          "tree": "1a25baa0bff095610d6321537ca5a9f99afe4476",
+          "normal_hooks": "passed",
+          "pushed": true,
+          "reviewed": true,
+          "python_tests": 91,
+          "ctests": 29,
+          "google_executables_included_in_ctests": 19,
+          "google_cases": 218,
+          "count_boundary": "The 19 GoogleTest executables / 218 cases are included within 29 CTests; these quantities must not be added.",
+          "source_and_installed_exact_board_arm_consumers": 4,
+          "source_dependency_commit": "cb060a8de58166c4653dd9cd000c8fe01bd24a96",
+          "pr": "https://github.com/X-Gen-Lab/nexus-examples/pull/26",
+          "publication_boundary": "Only limited commit/status/visibility metadata is public; no private source, raw evidence or private local filesystem path is exposed."
+        },
+        "recording_C": {
+          "based_on_documentation_commit": "23f3fef118a1790bd6bf2e4c67bb54974cb67686",
+          "scope": "Later documentation-only results recording, separate from clean software A and strict documentation B2. Its own identity is obtained from Git history, not an embedded self-referential hash.",
+          "whole_site_strict_for_recording_commit": "not_executed_at_recording",
+          "not_predicted": true
+        },
+        "identity_boundary": "A report-file SHA-256 authenticates that report only. Original reports retain distinct source, per-assembly configuration, binary and archive identities; no digest is relabelled as another scope.",
+        "offline_dual_build": {
+          "status": "not_executed",
+          "reason": "No independent offline dual-build execution was performed. SDK relocation/consumers do not establish that result."
+        },
+        "software_candidate": false,
+        "release_published": false,
+        "physical_status": "not_executed",
+        "public_draft_pr": "https://github.com/X-Gen-Lab/nexus/pull/51"
+      },
+      "initial_gate_states": {
+        "ordinary_complete_index": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "installed_source_sdk": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "strict_bilingual_html_api": {
+          "status": "pending",
+          "qualification_inherited": false
+        },
+        "offline_dual_build": {
+          "status": "pending",
+          "qualification_inherited": false
+        }
+      },
+      "remaining_limits_at_initial_observation": [
+        "Public RS485 composition has focused software/ARM evidence; RS232 and physical MAX485/MAX232 electrical verification remain pending.",
+        "V4.1 Ethernet PHY/reference-clock/MDIO facts are unverified; no V4.1 Ethernet route is admitted.",
+        "Audio/camera model selection and complete codecs/DCMI remain pending.",
+        "SDIO mode provides no DMA, IRQ, cancellation, hot-swap detection or filesystem.",
+        "Private companion examples, final complete-index/SDK/bilingual/offline gates remain separately pending; use original CSV exits."
+      ]
     }
   },
   "evidence_members": {

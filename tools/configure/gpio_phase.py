@@ -17,6 +17,15 @@ def selected_pins(result):
     pins = {claim.key.removeprefix("pin:")
             for claim in owned_claims(result, owners)
             if claim.key.startswith("pin:")}
+    policy = getattr(for_selection(result), "GPIO_PHASE", None)
+    exclude = getattr(policy, "excluded_pins", None)
+    if exclude is not None:
+        excluded = tuple(exclude(result))
+        if (len(set(excluded)) != len(excluded) or
+                any(type(pin) is not str or pin not in pins
+                    for pin in excluded)):
+            fail("GPIO lease excluded pins must be unique selected pin claims")
+        pins.difference_update(excluded)
     return tuple(sorted(pins, key=lambda pin: (pin[1], int(pin[2:]))))
 
 

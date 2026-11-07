@@ -16,12 +16,13 @@ nx_stm32_system_t g_nx_stm32_system;
 static bool privileged;
 static bool in_isr;
 static bool masked;
+static bool refuse_restricted_speed;
 static nx_time_us_t model_time;
 class BasicCold : public testing::Test {
   protected:
     void* mapping = MAP_FAILED;
     nx_stm32_gpio_state_t gpio{};
-    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true};
+    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true, 0U, 0U};
     nx_stm32_flash_state_t flash{};
     nx_stm32_watchdog_state_t watchdog{};
     const nx_flash_sector_t sectors[8]{
@@ -39,6 +40,7 @@ class BasicCold : public testing::Test {
         privileged = true;
         in_isr = false;
         masked = false;
+        refuse_restricted_speed = false;
         model_time = 100U;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
@@ -81,6 +83,50 @@ TEST_F(BasicCold, GPIOInputUsesSameAuthorizedBankWithoutOutputMode) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
     EXPECT_FALSE(gpio.output);
     EXPECT_EQ(0U, GPIOD->MODER & (3U << 24U));
+}
+
+TEST_F(BasicCold, GPIOInputUsesExplicitPullWithoutChangingOtherPins) {
+    config.output = false;
+    config.initial = 0U;
+    const uint32_t original = UINT32_C(0x12345678) & ~(3U << 24U);
+    for (uint8_t pull : {uint8_t{1U}, uint8_t{2U}}) {
+        gpio = {};
+        GPIOD->PUPDR = original;
+        config.pull = pull;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(original | (uint32_t{pull} << 24U), GPIOD->PUPDR);
+        EXPECT_EQ(0U, GPIOD->MODER & (3U << 24U));
+    }
+}
+
+TEST_F(BasicCold, GPIOOpenDrainPreloadsReleaseBeforeOutputMode) {
+    config.output_type = 1U;
+    const uint32_t original = UINT32_C(0xA5A5) & ~config.mask;
+    GPIOD->OTYPER = original;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(original | config.mask, GPIOD->OTYPER);
+    EXPECT_EQ(config.mask, GPIOD->BSRR);
+    EXPECT_EQ(1U << 24U, GPIOD->MODER & (3U << 24U));
+}
+
+TEST_F(BasicCold, GPIORejectsInvalidElectricalChoicesBeforeClockOrPinWrites) {
+    const auto reject = [&] {
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOD->BSRR);
+        EXPECT_EQ(0U, GPIOD->MODER);
+        EXPECT_EQ(0U, GPIOD->PUPDR);
+        EXPECT_EQ(0U, GPIOD->OTYPER);
+        EXPECT_EQ(nullptr, gpio.registers);
+    };
+    config.pull = 3U;
+    reject();
+    config.pull = 0U;
+    config.output_type = 2U;
+    reject();
+    config.output_type = 1U;
+    config.output = false;
+    reject();
 }
 
 TEST_F(BasicCold, FlashBindsPhysicalGeometryWithoutMMIOWrites) {
@@ -164,9 +210,47 @@ extern "C" bool nx_arch_irq_is_masked(void) {
     return masked;
 }
 extern "C" void nx_arch_dsb(void) {
+    if (refuse_restricted_speed) {
+        GPIOC->OSPEEDR |= 3U << 26U;
+    }
 }
 
 /** \brief External clock input; cold tests never claim physical timing. */
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return model_time;
+}
+
+TEST_F(BasicCold, RestrictedGpioCOutputsUseLowSpeedAndPreserveOtherFields) {
+    config.registers = GPIOC;
+    config.mask = 0xe001U;
+    config.initial = config.mask;
+    GPIOC->OSPEEDR = 0xffffffffU;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(0x03ffffffU, GPIOC->OSPEEDR);
+    EXPECT_TRUE(gpio.initialized);
+}
+TEST_F(BasicCold, RestrictedInputAndOrdinaryOutputsPreserveTheirSpeed) {
+    config.registers = GPIOC;
+    config.mask = 0x2000U;
+    config.initial = 0U;
+    config.output = false;
+    GPIOC->OSPEEDR = 0xffffffffU;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(0xffffffffU, GPIOC->OSPEEDR);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_stop(&gpio, 0U));
+    config.output = true;
+    config.registers = GPIOD;
+    GPIOD->OSPEEDR = 0xffffffffU;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(0xffffffffU, GPIOD->OSPEEDR);
+}
+TEST_F(BasicCold, RefusedRestrictedSpeedNeverAdmitsOutputOrDropsItsClock) {
+    config.registers = GPIOC;
+    config.mask = config.initial = 0x2000U;
+    GPIOC->OSPEEDR = 3U << 26U;
+    refuse_restricted_speed = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_FALSE(gpio.initialized);
+    EXPECT_EQ(0U, GPIOC->MODER & (3U << 26U));
+    EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIOCEN);
 }

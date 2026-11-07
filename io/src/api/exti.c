@@ -14,6 +14,24 @@
  */
 #include "nexus/io/exti.h"
 
+/** \brief Reject one output byte that aliases an immutable interface object. */
+static bool level_aliases(const bool* output, const void* object, size_t size) {
+    const uintptr_t value = (uintptr_t)output;
+    const uintptr_t first = (uintptr_t)object;
+    return value >= first && value - first < size;
+}
+
+/** \brief Dispatch optional raw level without consuming any queued event. */
+nx_result_t nx_exti_port_level(const nx_exti_port_t* port, bool* high) {
+    if (port == NULL || port->ops == NULL || port->context == NULL ||
+        high == NULL || level_aliases(high, port, sizeof(*port)) ||
+        level_aliases(high, port->ops, sizeof(*port->ops))) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->level != NULL ? port->ops->level(port->context, high)
+                                    : NX_ERROR_UNSUPPORTED;
+}
+
 /** \brief Optional explicit hint target, with provider priority validation. */
 nx_result_t nx_exti_port_attach_wake(const nx_exti_port_t* port,
                                      const nx_irq_wake_t* wake,

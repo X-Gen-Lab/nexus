@@ -109,9 +109,11 @@ nx_result_t nx_rtc_port_read(const nx_rtc_port_t* port,
  * \param[in] port: Same single serialized privileged task owner.
  * \param[in] calendar: Separate raw value, copied on successful validation.
  * \return SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or
- * UNSUPPORTED. \note Rejection changes no state. No implicit backup reset,
- * synchronization, Core-time adjustment or authorization to overwrite retained
- * hardware.
+ * UNSUPPORTED. A physical provider can return IO/TIMEOUT after acquiring
+ * hardware; its explicit recovery contract then retains ownership and may
+ * prohibit further reads until recovery. \note Admission rejection changes
+ * no state. No implicit backup reset, synchronization, Core-time adjustment
+ * or authorization to overwrite retained hardware.
  */
 nx_result_t nx_rtc_port_set(const nx_rtc_port_t* port,
                             const nx_rtc_calendar_t* calendar);

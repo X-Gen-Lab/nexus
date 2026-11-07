@@ -11,6 +11,80 @@ These declarations come from public header files. Selection, lifecycle, supporte
 
 The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
 
+## Explicit media and external-controller faces
+
+| Public header | Selected identity and boundary |
+| --- | --- |
+| `block.h` | One media session with geometry, explicit activation and whole-block progress |
+| `external_bus.h` | One shared external controller; distinct from its child bank endpoints |
+| `parallel16.h` | One settled 16-bit command/data endpoint; no payload survives return |
+| `memory_window.h` | Exact bank geometry; explicit CPU-window lease only in the runtime profile |
+
+Factory lookup returns an existing face without starting hardware or acquiring
+a bank. A controller face cannot substitute for an endpoint. A CPU-window lease
+permits direct loads/stores after acquisition and requires all derived pointer
+users to join before exact release. Startup backing is a separately selected,
+reset-time memory plan: its backing ownership already exists before Platform start
+and lasts while static objects exist. It rejects a whole-bank runtime loan and ordinary Platform
+stop. Neither profile grants DMA, executable memory, an allocator or physical
+retention evidence. See the [I/O ownership design](../../design/io-evolution.md)
+and the selected Board's explicit memory profile.
+
+The F407 `sdio-poll` reference requires explicit media activation, uses 512-byte
+sectors, one- or four-bit width and a maximum 12 MHz card clock. CPU polling
+releases caller buffers on every synchronous return; unresolved card/controller
+completion still retains the session, pins and gate. Stop succeeds only after
+complete withdrawal. DMA, IRQ completion, asynchronous cancellation, connected
+card-detect and hot-swap are not provided by this selected mode.
+
+IRQ timestamps and sampled GPIO levels are observations. The F407 EXTI provider
+marks them COALESCED; that source cannot satisfy the strict NEC source policy.
+The explicit NEC IRQ-observation reference preserves source flags and publishes
+sampled/uncertain quality. Protocol inverse checks never establish edge capture
+completeness or physical timing. See the
+[infrared source-quality contract](../../../components/infrared/README.md).
+
+For public RS485 composition, use the same exact typed UART reference for
+`nx_factory_uart_ref()` and `nx_factory_uart_tx_validator_ref()`. The validator
+getter only returns the existing selected callback; it adds no mutable state or
+method table and returns NULL for unreviewed modes or IDs. Callback symbols may be shared; pairing with that transport's context and
+exclusive executor remains a caller precondition. The caller still owns DE,
+setup/hold timing and joined shutdown. The
+{ref}`RS485 I/O contract <uart__rs485_8h>` defines that ownership; lookup does not
+verify transceiver supply, RS485 bus wiring or physical turnaround.
+
+(block_8h)=
+
+## block.h
+
+```{doxygenfile} io/include/nexus/io/block.h
+:project: nexus
+```
+
+(external__bus_8h)=
+
+## external_bus.h
+
+```{doxygenfile} io/include/nexus/io/external_bus.h
+:project: nexus
+```
+
+(parallel16_8h)=
+
+## parallel16.h
+
+```{doxygenfile} io/include/nexus/io/parallel16.h
+:project: nexus
+```
+
+(memory__window_8h)=
+
+## memory_window.h
+
+```{doxygenfile} io/include/nexus/io/memory_window.h
+:project: nexus
+```
+
 (adc_8h)=
 
 ## adc.h

@@ -137,7 +137,9 @@ physical execution remain separate scopes. These queries launch no build,
 test, network request or equipment action; external provider Python remains
 trusted configuration code, not a sandboxed data file.
 
-The maintained template IDs are `native`, `qiming`, `sky` and `liangshan`.
+The selected examples commit's `templates/manifest.json` is the authoritative
+template catalog. Read that exact checkout for available IDs and payloads; this
+platform README does not maintain a second list or qualify new templates.
 The command verifies the selected commit, manifest, tracked regular files and
 their hashes before exclusive creation. It resolves the copied assembly in its
 final location and rolls back its new directory if validation or copying fails.

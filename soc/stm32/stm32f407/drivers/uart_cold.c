@@ -18,25 +18,78 @@
 #define NX_UART_COLD_VECTORS 4U
 #define NX_UART_COLD_OWNED   8U
 
+/** \brief Immutable reviewed pads, clocks and publishers for cold admission. */
+typedef struct {
+    USART_TypeDef* registers;
+    GPIO_TypeDef* tx_gpio;
+    GPIO_TypeDef* rx_gpio;
+    uint32_t clock_hz;
+    uint32_t gate;
+    IRQn_Type irq;
+    uint8_t tx_port;
+    uint8_t tx_pin;
+    uint8_t rx_port;
+    uint8_t rx_pin;
+    uint8_t alternate;
+    bool apb2;
+} nx_stm32_uart_cold_hardware_t;
+
+/* DS8626 alternate functions and RM0090 APB clocks. This readonly cold table
+ * adds no per-instance state or byte-path lookup. Only listed pad pairs are
+ * admitted; additional silicon alternatives need independent route review. */
+static const nx_stm32_uart_cold_hardware_t s_nx_uart_hardware[] = {
+    {USART1, GPIOA, GPIOA, 84000000U, RCC_APB2ENR_USART1EN, USART1_IRQn, 0U, 9U,
+     0U, 10U, 7U, true},
+    {USART2, GPIOA, GPIOA, 42000000U, RCC_APB1ENR_USART2EN, USART2_IRQn, 0U, 2U,
+     0U, 3U, 7U, false},
+    {USART3, GPIOB, GPIOB, 42000000U, RCC_APB1ENR_USART3EN, USART3_IRQn, 1U,
+     10U, 1U, 11U, 7U, false},
+    {UART4, GPIOA, GPIOA, 42000000U, RCC_APB1ENR_UART4EN, UART4_IRQn, 0U, 0U,
+     0U, 1U, 8U, false},
+    {UART5, GPIOC, GPIOD, 42000000U, RCC_APB1ENR_UART5EN, UART5_IRQn, 2U, 12U,
+     3U, 2U, 8U, false},
+    {USART6, GPIOC, GPIOC, 84000000U, RCC_APB2ENR_USART6EN, USART6_IRQn, 2U, 6U,
+     2U, 7U, 8U, true},
+};
+
+/** \brief Match one reviewed controller without authorizing an inferred bank.
+ */
+static const nx_stm32_uart_cold_hardware_t*
+hardware(const nx_stm32_uart_cold_config_t* config) {
+    if (config == NULL)
+        return NULL;
+    for (size_t i = 0U;
+         i < sizeof(s_nx_uart_hardware) / sizeof(s_nx_uart_hardware[0]); ++i) {
+        if (config->registers == s_nx_uart_hardware[i].registers)
+            return &s_nx_uart_hardware[i];
+    }
+    return NULL;
+}
+
 bool nx_stm32_uart_cold_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
 
 static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
+    const nx_stm32_uart_cold_hardware_t* selected = hardware(config);
     if (config == NULL || config->pins == NULL || config->vectors == NULL ||
         config->vector_count == 0U || config->vector_count > 3U ||
-        config->priority > 15U || config->baud == 0U ||
-        (config->registers != USART1 && config->registers != USART2))
+        config->priority > 15U || config->baud == 0U || selected == NULL)
         return false;
     bool primary = config->registers == USART1;
-    if (config->clock_hz != (primary ? 84000000U : 42000000U) ||
-        config->vectors[0] != (primary ? USART1_IRQn : USART2_IRQn))
+    if (config->clock_hz != selected->clock_hz ||
+        config->vectors[0] != selected->irq ||
+        (!primary && config->registers != USART2 && config->vector_count != 1U))
         return false;
     for (size_t i = 0U; i < 2U; ++i) {
         const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
-        if (pin->registers != GPIOA || pin->port_index != 0U ||
-            pin->snapshot == NULL || pin->pin != (primary ? 9U + i : 2U + i))
+        if (pin->registers !=
+                (i == 0U ? selected->tx_gpio : selected->rx_gpio) ||
+            pin->port_index !=
+                (i == 0U ? selected->tx_port : selected->rx_port) ||
+            pin->snapshot == NULL ||
+            pin->pin != (i == 0U ? selected->tx_pin : selected->rx_pin))
             return false;
     }
     if (config->pins[0].snapshot == config->pins[1].snapshot)
@@ -57,12 +110,11 @@ static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
 
 static volatile uint32_t*
 gate_register(const nx_stm32_uart_cold_config_t* config) {
-    return config->registers == USART1 ? &RCC->APB2ENR : &RCC->APB1ENR;
+    return hardware(config)->apb2 ? &RCC->APB2ENR : &RCC->APB1ENR;
 }
 
 static uint32_t gate(const nx_stm32_uart_cold_config_t* config) {
-    return config->registers == USART1 ? RCC_APB2ENR_USART1EN
-                                       : RCC_APB1ENR_USART2EN;
+    return hardware(config)->gate;
 }
 
 static bool vector_idle(IRQn_Type irq) {
@@ -79,8 +131,11 @@ nx_stm32_uart_cold_acquire(const nx_stm32_uart_cold_config_t* config,
         return NX_ERROR_INVALID;
     if (receipt->effects != 0U || receipt->clock_added != 0U)
         return NX_ERROR_BUSY;
-    /* GPIO is one enclosing Platform lease, never another UART receipt. */
-    if ((RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN) == 0U)
+    /* Both pads may occupy different banks. The enclosing Platform owns their
+     * gates; no UART may silently acquire an unrelated GPIO or release one. */
+    uint32_t gpio_gates =
+        (1U << config->pins[0].port_index) | (1U << config->pins[1].port_index);
+    if ((RCC->AHB1ENR & gpio_gates) != gpio_gates)
         return NX_ERROR_STATE;
     for (size_t i = 0U; i < config->vector_count; ++i) {
         if (!vector_idle(config->vectors[i]))
@@ -118,7 +173,8 @@ nx_stm32_uart_cold_acquire(const nx_stm32_uart_cold_config_t* config,
             if ((pin->registers->ODR & (1U << pin->pin)) == 0U)
                 return NX_ERROR_IO;
         }
-        result = nx_stm32_pin_configure(pin->registers, pin->pin, 2U, 7U,
+        result = nx_stm32_pin_configure(pin->registers, pin->pin, 2U,
+                                        hardware(config)->alternate,
                                         (uint8_t)(i == 0U ? 0U : 1U), false);
         if (result != NX_SUCCESS)
             return result;
@@ -145,7 +201,8 @@ bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
             1U + (receive ? 1U : 0U) + (transmit ? 1U : 0U))
         return false;
     bool primary = config->uart.registers == USART1;
-    if (config->resources.dma != (primary ? DMA2 : DMA1) ||
+    if ((!primary && config->uart.registers != USART2) ||
+        config->resources.dma != (primary ? DMA2 : DMA1) ||
         (receive && (!primary || config->receive != DMA2_Stream2 ||
                      config->uart.vectors[1] != DMA2_Stream2_IRQn)))
         return false;

@@ -21,8 +21,8 @@ class ControllerContract:
 # Declaration order preserves factory enumeration and generated declarations.
 CONTROLLER_CONTRACTS = MappingProxyType({
     'gpio': ControllerContract(
-        frozenset(('binding', 'mode')),
-        frozenset(()), 'gpio'),
+        frozenset(('binding', 'mode', 'pull', 'output_type')),
+        frozenset(('pull', 'output_type')), 'gpio'),
     'uart': ControllerContract(
         frozenset((
             'baud', 'binding', 'fifo', 'frame', 'irq', 'mode', 'rx', 'stream',
@@ -44,9 +44,9 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset(('binding', 'mode')),
         frozenset(()), 'watchdog'),
     'exti': ControllerContract(
-        frozenset(('binding', 'edge', 'event_capacity', 'irq', 'mode')),
+        frozenset(('binding', 'edge', 'event_capacity', 'irq', 'mode', 'pull')),
         frozenset((
-            'calls_os', 'edge', 'event_capacity', 'irq_priority',
+            'calls_os', 'edge', 'event_capacity', 'irq_priority', 'pull',
         )), 'exti'),
     'pwm': ControllerContract(
         frozenset((
@@ -172,11 +172,19 @@ CONTROLLER_CONTRACTS = MappingProxyType({
             'irq_priority', 'rx_count', 'rx_storage_bytes', 'tx_count',
         )), 'ethernet_frames'),
     'rtc': ControllerContract(
-        frozenset(('binding', 'mode')),
-        frozenset(()), 'rtc'),
+        frozenset(('binding', 'mode', 'allow_set', 'timeout_us', 'poll_limit',
+                   'initial')),
+        frozenset(('allow_set', 'timeout_us', 'poll_limit', 'initial')), 'rtc'),
     'lptim': ControllerContract(
         frozenset(('binding', 'irq', 'mode', 'tick_hz')),
         frozenset(('tick_hz',)), 'lptim'),
+    'block': ControllerContract(
+        frozenset(('binding', 'mode', 'bus_width', 'max_blocks',
+                   'poll_budget', 'stop_timeout_us')),
+        frozenset(('bus_width', 'max_blocks', 'poll_budget',
+                   'stop_timeout_us')), 'block'),
+    'external_bus': ControllerContract(
+        frozenset(('binding', 'mode')), frozenset(), 'external_bus'),
 })
 
 CONTROLLER_KINDS = tuple(CONTROLLER_CONTRACTS)
@@ -190,7 +198,13 @@ ENDPOINT_FIELDS = MappingProxyType({
                       "model_bytes")),
     "i2c": frozenset(("controller", "driver", "address", "model_bytes")),
 })
+EXTERNAL_ENDPOINT_FIELDS = frozenset((
+    "controller", "binding", "read_timing", "write_timing"))
+EXTERNAL_ENDPOINT_KINDS = ("memory_window", "parallel16")
+# Endpoint faces are reviewed personalities, never independent controllers.
+FACT_INTERFACE_KINDS = frozenset(CONTROLLER_KINDS) | set(EXTERNAL_ENDPOINT_KINDS)
 USB_ENDPOINT_FIELDS = frozenset(("controller", "number", "direction",
                                  "transfer", "max_packet", "fifo_words"))
 ENDPOINT_SELECTION_FIELDS = frozenset().union(
-    *ENDPOINT_FIELDS.values(), USB_ENDPOINT_FIELDS) | {"authored_kind"}
+    *ENDPOINT_FIELDS.values(), USB_ENDPOINT_FIELDS,
+    EXTERNAL_ENDPOINT_FIELDS) | {"authored_kind", "mode"}

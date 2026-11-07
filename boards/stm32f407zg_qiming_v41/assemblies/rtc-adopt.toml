@@ -1,0 +1,18 @@
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[rtc.calendar]
+binding = "rtc0"
+mode = "adopt-retained"
+allow_set = false
+timeout_us = 2000000
+poll_limit = 1000000

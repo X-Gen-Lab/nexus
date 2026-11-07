@@ -12,6 +12,7 @@ extern "C" {
 /* A missing CMSIS producer is an observable RED, not a fake clock provider. */
 extern uint32_t SystemCoreClock __attribute__((weak));
 uint32_t HAL_GetTick(void) __attribute__((weak));
+uint64_t nx_stm32_system_clock_read(void* context) __attribute__((weak));
 }
 #include "terminal_watchdog.h"
 #include <gmock/gmock.h>
@@ -123,6 +124,34 @@ TEST_F(Stm32System, ExactClockAndIndependentTimerHaveOneLiveEpoch) {
     EXPECT_EQ(5U, nx_stm32_system_now(&g_nx_stm32_system));
     ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, SharedClockAdapterRejectsUnboundAndStoppedEpochs) {
+    ASSERT_NE(nullptr, &nx_stm32_system_clock_read);
+    EXPECT_EQ(UINT64_MAX, nx_stm32_system_clock_read(nullptr));
+    EXPECT_EQ(UINT64_MAX,
+              nx_stm32_system_clock_read(reinterpret_cast<void*>(1U)));
+    EXPECT_EQ(UINT64_MAX, nx_stm32_system_clock_read(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, SharedClockAdapterPreservesValidZeroAndMicroseconds) {
+    ASSERT_NE(nullptr, &nx_stm32_system_clock_read);
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_EQ(0U, nx_stm32_system_clock_read(&g_nx_stm32_system));
+    timer.CNT = 37U;
+    EXPECT_EQ(37U, nx_stm32_system_clock_read(&g_nx_stm32_system));
+    g_nx_stm32_system.timer_error = NX_ERROR_IO;
+    EXPECT_EQ(UINT64_MAX, nx_stm32_system_clock_read(&g_nx_stm32_system));
+    g_nx_stm32_system.timer_error = NX_SUCCESS;
+}
+
+TEST_F(Stm32System, SharedClockAdapterChecksEpochAgainAfterSnapshot) {
+    ASSERT_NE(nullptr, &nx_stm32_system_clock_read);
+    ASSERT_EQ(0, Start().primary);
+    before_save = []() { g_nx_stm32_system.timer_error = NX_ERROR_IO; };
+    EXPECT_EQ(UINT64_MAX, nx_stm32_system_clock_read(&g_nx_stm32_system));
+    before_save = nullptr;
+    g_nx_stm32_system.timer_error = NX_SUCCESS;
 }
 
 TEST_F(Stm32System, CmsisClockTracksConfirmedStartAndHsiReturn) {

@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf",
+      "publisher": "Analog Devices / Maxim Integrated",
+      "document": "DS18B20 programmable resolution 1-Wire digital thermometer",
+      "revision": "19-7487 Rev 6; 7/19",
+      "sha256": "066c8a3c7e9222c49e84488840d5cfe9dd109cf0da6ab4a55480cebac8f97f76",
+      "bytes": 392186
+    }
+  ],
+  "reviewed_scope": "Fixed conservative standard-speed GPIO reset/presence/slots and CRC8; observed jitter checks, no WCET/electrical/parasite claim",
+  "physical_status": "not_executed"
+}

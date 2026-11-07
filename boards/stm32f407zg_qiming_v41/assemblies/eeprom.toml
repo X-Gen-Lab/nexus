@@ -1,0 +1,18 @@
+# Drawn AT24C02, A0/A1/A2 grounded; no discovery or product layout.
+schema=2
+board_package=".."
+backend="baremetal"
+clock="hse8-pll168"
+optimization="Os"
+[memory]
+main_stack_bytes=2048
+libc_heap_bytes=0
+static_ram_limit_bytes=32768
+flash_load_limit_bytes=65536
+[i2c.bus0]
+binding="i2c1"
+mode="poll-messages"
+max_hz=100000
+[i2c_device.eeprom]
+controller="bus0"
+address=80

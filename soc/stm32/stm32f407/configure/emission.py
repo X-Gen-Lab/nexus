@@ -20,6 +20,8 @@ def operations(item):
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
         return "nx_usb_fs_device_ops"
+    if item.kind == "external_bus":
+        return "nx_stm32_fsmc_external_bus_ops"
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_stm32_{selected}_ops"
@@ -71,6 +73,12 @@ def includes(result):
         source.append('#include "stm32f407_can_cold.h"')
     if any(item.kind == "usb_device" for item in selections):
         source.append('#include "stm32f407_usb_cold.h"')
+    if any(item.kind == "block" for item in selections):
+        source.append('#include "stm32f407_sdio.h"')
+    if any(item.kind == "rtc" for item in selections):
+        source.append('#include "stm32f407_rtc.h"')
+    if any(item.kind == "external_bus" for item in selections):
+        source.append('#include "stm32f407_fsmc.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -113,6 +121,8 @@ def state_declarations(result):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
     source.extend(packet.state_declarations(result))
+    from .sram import declarations
+    source.extend(declarations(result))
     return source
 
 
@@ -123,7 +133,16 @@ def shared_irqs(result):
 def stop_system(result, *, system_phase=None):
     selections = result.controllers
     dma_clock = has_dma(result)
-    source = (['    nx_result_t can_domain = nx_stm32_can_domain_close(&s_nx_can_domain);',
+    source = []
+    boot_owners = {child.controller for child in result.devices
+                   if child.driver == "memory_window-endpoint" and
+                   child.options.mode == "startup-memory"}
+    for item in result.controllers:
+        if item.id in boot_owners:
+            name = item.id.replace("-", "_")
+            source += [f'    nx_result_t persistent_{name} = nx_stm32_fsmc_stop(&s_nx_port_{name});',
+                       f'    if (persistent_{name} != NX_SUCCESS) {{ return persistent_{name}; }}']
+    source += (['    nx_result_t can_domain = nx_stm32_can_domain_close(&s_nx_can_domain);',
                '    if (can_domain != NX_SUCCESS) { return can_domain; }']
               if result.can_domain is not None else [])
     source.extend(packet.stop_system(result))

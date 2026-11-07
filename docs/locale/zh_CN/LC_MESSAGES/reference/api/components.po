@@ -6,7 +6,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 57a71720422100f05edf3c113dbba5ed3505134daf76f181e31935d2836b99dc\n"
+"X-Nexus-Source-SHA256: effad7db248068064dd6431fed269ce9be66cf007163e91d8ff1c487a76bff68\n"
 
 msgid "Optional common components"
 msgstr "可选通用组件"
@@ -2440,3 +2440,1427 @@ msgstr "区分准入、保留清理责任与可能发生的效果。"
 
 msgid "accepted means at least one memory pin was acquired. On retained=true the exact kernel call slot and user address space remain borrowed. device_effect_possible is set before a WRITE provider call; an error cannot authorize replay. result describes admission/device execution; cleanup_result separately describes the most recent release attempt. This is software responsibility, not physical pin evidence."
 msgstr "accepted 表示至少成功固定了一个内存区间。retained=true 时，精确的内核调用槽及用户地址空间继续被借用。device_effect_possible 在调用 WRITE 提供者前置位；出错不能授权重放。result 描述准入及器件执行结果；cleanup_result 独立描述最近一次释放尝试。这是软件责任，不是物理引脚证据。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "A value face with shared immutable methods"
+msgstr "共享不可变方法的值类型接口"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "After the real resolution maximum, read/CRC-validate a fresh result."
+msgstr "实际分辨率对应的最长转换时间届满后，读取新结果并校验 CRC。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "All windows are nonzero and at most 20000 us. Zero/one and full/repeat space windows cannot overlap. frame_max_us admits the complete worst permitted 32-bit frame plus trailer, at most 1000000 us. Repeat age is bounded by repeat_max_us, at most 5000000 us since the last valid full frame or repeat. Input is already demodulated active-low, both edges, in one stable monotonic microsecond epoch. Carrier, receiver fitting, measured accuracy, remote model and product key mapping are external. source_policy defaults to STRICT (zero). IRQ_OBSERVATION explicitly permits COALESCED observations as a software reference; every result remains SAMPLED_UNCERTAIN even when particular inputs are flag-free."
+msgstr "所有时间窗口均须非零，且不超过 20000 us。零/一间隔窗口、完整帧/重复帧间隔窗口分别不得重叠。frame_max_us 须容纳允许的最坏情况下完整 32 位帧及尾部，且不超过 1000000 us。重复帧时效由 repeat_max_us 限制，自上一个有效完整帧或重复帧起不超过 5000000 us。输入已解调、低电平有效，包含双边沿，并处于同一个稳定的单调微秒时钟纪元。载波、接收器实装、实测精度、遥控器型号和产品按键映射由外部负责。source_policy 默认为 STRICT（零）。IRQ_OBSERVATION 明确允许将 COALESCED 观察作为软件参考；即使某些输入未带标志，每个结果仍保持 SAMPLED_UNCERTAIN。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "An explicit reviewed model; JEDEC identity alone is not suffix proof."
+msgstr "显式指定已审阅的型号；仅有 JEDEC 身份不能证明型号后缀。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "At most four short SPI transactions; no waiting loop. WRDI may clear an observed idle WEL, then is checked. No reset, resume, unlock or replay. Lost clock epochs retain pending duty. A quiescent device does not prove old data, erase contents or power-loss outcome; read back under product policy. Shared SPI recovery is the outer bus owner's duty."
+msgstr "最多执行四次短 SPI 事务，不进行等待循环。WRDI 可清除已观察到的空闲 WEL，随后须进行检查。不复位、恢复、解锁或重放。时钟纪元丢失时仍保留待完成责任。器件静止不证明旧数据、擦除内容或掉电结果；须按产品策略读回。共享 SPI 的恢复由外层总线所有者负责。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "BUSY before ready without wire activity, SUCCESS once, or a bounded timeout/clock/identity/CRC/configuration error closing admission."
+msgstr "尚未就绪时返回 BUSY，且无线路活动；成功仅返回一次 SUCCESS；或返回有界的超时/时钟/身份/CRC/配置错误并关闭操作接纳。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "BUSY before the required interval or after sleep-out; SUCCESS after RGB565/orientation/display-on programming, or exact failure retaining UNCERTAIN binding."
+msgstr "规定间隔届满前或退出休眠后返回 BUSY；完成 RGB565/方向/显示开启编程后返回 SUCCESS；或返回确切错误并保留 UNCERTAIN 绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "BUSY while WIP remains set. SUS never establishes completion. After WIP0/SUS0 and observed WEL0, pending duty ends and the original operation outcome is returned, including a latched TIMEOUT/IO."
+msgstr "WIP 仍置位时返回 BUSY。SUS 从不证明完成。在 WIP0/SUS0 且观察到 WEL0 后，待完成责任结束，并返回原操作结果，包括已锁存的 TIMEOUT/IO。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bind an explicitly selected polling endpoint without I/O."
+msgstr "绑定显式选择的轮询端点，不进行 I/O。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bind exact wiring and observe a released idle line under a budget."
+msgstr "绑定精确接线，并在预算内观察已释放的空闲线路。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bind explicit timing/address policy without hardware access."
+msgstr "绑定显式时序/地址策略，不访问硬件。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bind strict I2C and observe released idle under a budget."
+msgstr "绑定严格 I2C，并在预算内观察已释放的空闲状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Board A0-A2 must be low, WP low, exact 256-byte/8-byte-page device selected and supplies valid. No discovery or runtime address introspection is available through the opaque face; the caller must provide the exact addressed endpoint. Async-only endpoints reject; no stack-buffer submit fallback."
+msgstr "Board 的 A0-A2 必须为低，WP 必须为低，须选择精确的 256 字节/8 字节页器件，且供电有效。不透明接口不提供发现或运行时地址自省；调用方必须提供精确寻址的端点。仅支持异步的端点会被拒绝，不回退为提交栈缓冲区。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Both pins must already be open-drain outputs with external pull-ups and actual IDR readback. Writing one releases a line; it never drives a push-pull high. Caller owns mode, wiring, voltage and GPIO lifetime. half_period_us is a minimum 5..1000000 us phase, not measured bus frequency. poll_limit is 1..1000000 observations per timed wait. No concurrent foreign controller, IRQ writer or clock/pin reconfiguration is permitted. Arbitration detection avoids forcing STOP after a collision; multi-controller operation and bus-clear pulses are not provided."
+msgstr "两个引脚必须已配置为开漏输出，配有外部上拉，并能读回实际 IDR。写一表示释放线路，绝不以推挽方式驱动高电平。调用方负责模式、接线、电压和 GPIO 生命周期。half_period_us 表示最短 5..1000000 us 的相位时间，不是实测总线频率。poll_limit 为每次定时等待最多 1..1000000 次观察。不允许并发的其他控制器、IRQ 写入者或时钟/引脚重配置。仲裁检测避免碰撞后强制发送 STOP；不提供多控制器运行或总线清除脉冲。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded NEC decoding from copied active-low EXTI edges."
+msgstr "对复制的低电平有效 EXTI 边沿进行有界 NEC 解码。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded W25Q128JV commands and retained busy ownership."
+msgstr "有界 W25Q128JV 命令及忙状态期间保留的所有权。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded open-drain GPIO I2C with explicit bus withdrawal."
+msgstr "有界开漏 GPIO I2C，显式撤出总线。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Bounded standard-speed open-drain one-wire transactions."
+msgstr "有界标准速率开漏单总线事务。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "CRC8; zero for NULL. No mutation, allocation or timing dependence."
+msgstr "CRC8；NULL 时返回零。不修改数据、不分配内存，也不依赖时序。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller exclusively drains one physical source. This method does not initialize, stop, attach a wake, recover or otherwise own that source. A failed/inconsistent read invalidates frame and repeat history."
+msgstr "调用方独占排空一个物理来源。此方法不初始化、停止、连接唤醒、恢复或以其他方式拥有该来源。读取失败或不一致会使帧及重复帧历史失效。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller first reestablishes exclusive bus ownership, including after arbitration, and joins foreign writers/controllers. This is one explicit STOP, never nine-clock bus clear, reset, transaction replay or clock-domain replacement."
+msgstr "调用方须先重新建立总线独占所有权，包括仲裁后，并汇合其他写入者/控制器。本操作仅显式发送一次 STOP，绝不进行九时钟总线清除、复位、事务重放或时钟域替换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller owns pads, pull configuration and clock lifetime. Clock/MOSI/CS are outputs and MISO is an input. Known pin identities must be disjoint; aliases hidden behind different contexts remain the caller's responsibility. Delays are minimum microseconds, never a measured frequency or WCET. Each wait has at most poll_limit clock reads; a stalled clock fails rather than spinning indefinitely. All fields, faces and contexts stay alive and immutable through stop."
+msgstr "调用方负责引脚、上下拉配置和时钟生命周期。Clock/MOSI/CS 为输出，MISO 为输入。已知引脚身份必须互不重叠；不同上下文隐藏的别名仍由调用方负责。延迟表示最短微秒数，绝非实测频率或 WCET。每次等待最多读取 poll_limit 次时钟；时钟停滞时失败，不会无限自旋。所有字段、接口和上下文必须保持存活且不可变，直至 stop 完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned ILI9341 RGB565 parallel-display controller."
+msgstr "调用方拥有的 ILI9341 RGB565 并行显示控制器。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned bounded GPIO mode-zero SPI endpoint."
+msgstr "调用方拥有的有界 GPIO 模式零 SPI 端点。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned exact decoder storage, zero before initialization."
+msgstr "调用方拥有的精确解码器存储，初始化前须清零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned physical wire owner, zero before first init."
+msgstr "调用方拥有的物理线路所有者，首次 init 前须清零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned serialized device state; zero before first init."
+msgstr "调用方拥有的串行化器件状态；首次 init 前须清零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Caller-owned state, zero-initialized before its first initialization."
+msgstr "调用方拥有的状态，首次初始化前须零初始化。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Checked command; timestamp is its final edge or IRQ observation."
+msgstr "经检查的命令；时间戳对应其最终边沿或 IRQ 观察。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Close only software admission; never reset or release the shared bus."
+msgstr "仅关闭软件操作接纳，绝不复位或释放共享总线。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Configuration, bus and clock contexts remain borrowed while open. Conversion is autonomous; software stop/timeout never claims physical cancellation. No task, heap, hidden queue, calibration or retained CPU payload. After software closure and joins, no device reference remains."
+msgstr "绑定有效期间持续借用配置、总线和时钟上下文。转换自主进行；软件 stop/timeout 绝不声称已物理取消。不创建任务、堆、隐藏队列、校准或保留的 CPU 载荷。软件关闭并完成汇合后，不再保留器件引用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Consume one copied edge through the deterministic NEC state machine."
+msgstr "通过确定性 NEC 状态机消费一个已复制的边沿。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Contract"
+msgstr "合同"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Copied 12-bit converter values, without display calibration."
+msgstr "复制的 12 位转换器数值，未经显示校准。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Dallas/Maxim CRC8 (reflected polynomial8Ch), initial accumulator0."
+msgstr "Dallas/Maxim CRC8（反射多项式 8Ch），累加器初值为 0。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Device meaning, identity/readback and side effects are external. SCCB Don't-Care never weakens a strict I2C face."
+msgstr "器件语义、身份/读回和副作用由外部负责。SCCB Don't-Care 绝不削弱严格 I2C 接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Does not power down the module, pulse shared NRST, withdraw the bus or set backlight. The caller stops all components before releasing their transport and platform resources."
+msgstr "不会使模块断电、脉冲驱动共享 NRST、撤出总线或设置背光。调用方须先停止所有组件，再释放其传输和平台资源。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Does not stop the shared SPI owner, change pad modes or join external GPIO/IRQ observers; those remain caller duties."
+msgstr "不会停止共享 SPI 所有者、改变引脚模式或汇合外部 GPIO/IRQ 观察者；这些仍由调用方负责。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Drain/rebind the external source before a new clock epoch is supplied to a reinitialized decoder. Stop does not establish hardware quiescence."
+msgstr "为重新初始化的解码器提供新时钟纪元前，须先排空/重新绑定外部来源。Stop 不证明硬件静止。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Drop only a quiescent fully drained software binding."
+msgstr "仅解除已静止且完全排空的软件绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Drop software decode history after the serialized caller joins."
+msgstr "串行调用方完成汇合后，清除软件解码历史。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Each conversion has its own complete 24-clock CS interval, differential 12-bit mode and PD=00. Any transfer error closes sampling until same-binding init. IRQs are hints; the selected live pen predicate is checked before/after I/O. Nonzero null/trailing bits reject the exact 12-bit wire format; this is not a chip identity or fitting test. Output must also be disjoint from opaque SPI/pen/clock context storage; only known spans are checked here."
+msgstr "每次转换均有独立完整的 24 时钟 CS 区间，使用差分 12 位模式和 PD=00。任一传输错误都会关闭采样，直至以相同绑定重新 init。IRQ 只是提示；I/O 前后均检查选定的实时触笔谓词。空位/尾随位非零时，拒绝该不符合精确 12 位线路格式的数据；这不是芯片身份或实装测试。输出还必须与不透明 SPI/触笔/时钟上下文存储互不重叠；此处仅检查已知存储范围。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Emit one three-phase SCCB register write."
+msgstr "发送一次三阶段 SCCB 寄存器写入。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Every return ends CPU access to data. No asynchronous payload borrow."
+msgstr "每次返回均终止 CPU 对数据的访问。不进行异步载荷借用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact caller-owned state, zero before first initialize."
+msgstr "调用方拥有的精确状态，首次 initialize 前须清零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact immutable touch binding and explicit clock identity."
+msgstr "精确且不可变的触摸绑定及显式时钟身份。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exact zero-initialized single-task owner, without a worker."
+msgstr "精确零初始化的单任务所有者，不包含工作线程。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exactly one authorized open-drain bit with actual input readback."
+msgstr "恰好一个获授权的开漏位，须读回实际输入。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Exactly one preconfigured open-drain output, writing one releases it, actual input readback and an external pull-up are required. Only one serialized task executor controls this physical bus; no concurrent pin, clock, mode or configuration writer. poll_limit is1..1000000. Standard-speed timing uses fixed conservative slot targets and finite observed jitter windows. This detects overruns; it is not a WCET, electrical rise-time or physical qualification. No IRQ masks or worker."
+msgstr "恰好一个预配置的开漏输出；写一表示释放，必须具备实际输入读回和外部上拉。此物理总线仅由一个串行任务执行者控制；不允许并发的引脚、时钟、模式或配置写入者。poll_limit 为 1..1000000。标准速率时序使用固定的保守时隙目标和有限的观察抖动窗口。这可检测超限，但不构成 WCET、电气上升时间或物理资格证明。不屏蔽 IRQ，不创建工作线程。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit XPT2046 raw differential touch sampling."
+msgstr "显式 XPT2046 原始差分触摸采样。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit address policy; no inverse-error fallback is permitted."
+msgstr "显式地址策略；不允许反码错误回退。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit cooperative initialization and uncertainty states."
+msgstr "显式协作式初始化与不确定状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit native orientation and RGB/BGR selection."
+msgstr "显式原生方向及 RGB/BGR 选择。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit peripheral and protocol components"
+msgstr "显式外设与协议组件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit product region and stable power/clock identity declarations."
+msgstr "显式产品区域及稳定的电源/时钟身份声明。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicit two-wire SCCB register protocol, separate from I2C."
+msgstr "显式双线 SCCB 寄存器协议，与 I2C 分离。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Explicitly attempt one protocol STOP under a new budget."
+msgstr "在新预算内显式尝试一次协议 STOP。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "External-VDD DS18B20 identity and cooperative conversion."
+msgstr "外部 VDD 供电的 DS18B20 身份与协作式转换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Failed release retains this binding/fault, never caller buffers. Opaque GPIO/clock contexts stay live and disjoint through stop/joins. Clock discontinuity is terminal for transactions in this clock epoch."
+msgstr "释放失败会保留此绑定/故障，绝不保留调用方缓冲区。不透明 GPIO/时钟上下文须保持存活且互不重叠，直至 stop/汇合完成。时钟不连续对当前时钟纪元的事务是终止性故障。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Fields are implementation state. No transfer retains a payload pointer after return. Failed GPIO withdrawal keeps the same pin owner faulted until recovery or stop succeeds. No concurrent, IRQ or reentrant calls are supported; a callback reentry is rejected BUSY before another pin write."
+msgstr "字段属于实现状态。传输返回后不保留载荷指针。GPIO 撤出失败会使同一引脚所有者保持故障，直至恢复或 stop 成功。不支持并发、IRQ 或重入调用；回调重入会在再次写引脚前以 BUSY 拒绝。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Finish one explicit STOP and drop only a proved binding."
+msgstr "完成一次显式 STOP，仅解除已证明可解除的绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Forget a known-quiescent component binding after callers join."
+msgstr "调用方完成汇合后，解除已知静止的组件绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "ID4 reads four low bytes: dummy, manufacturer, 93h, 41h. External NRST is never driven. Call service after at least 120 ms reset recovery and 120 ms sleep-out recovery. These are elapsed clock intervals, never loop-count delays."
+msgstr "ID4 读取四个低字节：dummy、manufacturer、93h、41h。绝不驱动外部 NRST。复位恢复至少 120 ms、退出休眠恢复至少 120 ms 后调用 service。这些是实际经过的时钟间隔，绝非循环计数延迟。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable complete waveform policy, retained through stop."
+msgstr "完整且不可变的波形策略，保留至 stop 完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable electrical and monotonic-clock facts, borrowed until stop."
+msgstr "不可变的电气与单调时钟事实，借用至 stop 完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable exact addressed child; not another bus owner."
+msgstr "精确且不可变的寻址子端点；不是另一个总线所有者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable mode-zero, MSB-first, active-low-CS wiring."
+msgstr "不可变的模式零、MSB 优先、CS 低有效接线。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable reviewed SCCB child, not an I2C address face."
+msgstr "不可变且经审阅的 SCCB 子端点，不是 I2C 地址接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable selected sensor identity, not a bus or physical fitting."
+msgstr "不可变的选定传感器身份，不代表总线或物理实装。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Immutable single-controller two-wire electrical facts."
+msgstr "不可变的单控制器双线电气事实。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Inclusive authored microsecond limits, not measured tolerances."
+msgstr "显式配置的微秒限值（含边界），不是实测容差。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Initial scratchpad temperature, including85C, is never a fresh result."
+msgstr "初始暂存器温度，包括 85C，绝不是新转换结果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Input/expired preflight is effect-free. After a pin write, failed withdrawal retains the binding for stop/recovery; no CPU buffer loan."
+msgstr "输入/已过期预算的预检无副作用。写引脚后，撤出失败会保留绑定以供 stop/recovery；不借出 CPU 缓冲区。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Invalid input or expired preflight touches no pin. Once a pin write is attempted, failure retains the same binding for explicit recovery/stop. Init is not physical bus proof."
+msgstr "输入无效或预检已过期时不触碰任何引脚。一旦尝试写引脚，失败就会保留相同绑定，以供显式 recovery/stop。Init 不证明物理总线状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Issue 20h erase for one 4 KiB-aligned sector in the declared region."
+msgstr "对声明区域内一个按 4 KiB 对齐的扇区发出 20h 擦除。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Issue one bounded 02h page program without crossing its 256-byte page."
+msgstr "发出一次有界 02h 页编程，不跨越其 256 字节页。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Known ROM requires family28h and CRC8. Skip ROM additionally requires explicit single_device=true, reads/retains its CRC-valid ROM and checks that identity again for subsequent commands. external_vdd must be true and Read Power Supply must confirm it; parasite mode is unsupported. Sensor power and identity remain stable through each conversion."
+msgstr "已知 ROM 要求 family28h 和 CRC8。Skip ROM 还要求显式设置 single_device=true，读取/保留其 CRC 有效的 ROM，并在后续命令中再次检查该身份。external_vdd 必须为 true，且 Read Power Supply 必须予以确认；不支持寄生供电模式。每次转换期间传感器电源和身份须保持稳定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Last cleanup outcome, STATE when arbitration forbade STOP, or INVALID for NULL"
+msgstr "最后一次清理结果；仲裁禁止 STOP 时为 STATE，NULL 时为 INVALID"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Last requested array operation, independent of its final outcome."
+msgstr "最后请求的阵列操作，与其最终结果无关。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Lookup allocates nothing and starts no hardware. The only supported endpoint method is polling transfer. Length is 1..max_bytes (at most 256); deadline must be finite. Exact in-place TX/RX is allowed, partial overlap is rejected. Output buffers can contain completed bytes on failure; transferred reports only complete bytes. Any active error latches a fault even when idle-pin cleanup succeeds."
+msgstr "查找不分配任何内存，也不启动硬件。端点仅支持轮询 transfer 方法。长度为 1..max_bytes（最多 256），deadline 必须有限。允许 TX/RX 完全原地重叠，拒绝部分重叠。失败时输出缓冲区可能含有已完成字节；transferred 仅报告完整字节。任何活动期间错误都会锁存故障，即使空闲引脚清理成功。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Master emits logical-one NA after the read byte. There is no repeated-START substitution or ignored-I2C-NACK fallback. Recover/stop use the shared physical-owner budgeted APIs."
+msgstr "主机在读字节后发送逻辑一 NA。不替换为重复 START，也不通过忽略 I2C NACK 回退。Recover/stop 使用共享物理所有者的带预算 API。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Max waits are93750/187500/375000/750000us for9/10/11/12 bits. No blocking conversion delay. Command execution may have effects even when a later clock/budget observation fails; this is not cancellation."
+msgstr "9/10/11/12 位的最长等待分别为 93750/187500/375000/750000us。不进行阻塞式转换延迟。即使后续时钟/预算观察失败，命令执行仍可能已产生副作用；这不代表取消。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No I/O, bus stop, pin release, power-off or erasure of SPI owner faults."
+msgstr "不进行 I/O、停止总线、释放引脚、断电或清除 SPI 所有者故障。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No buffers survive return; partial receive bytes may change on error. Failure releases the open-drain line and records cleanup separately. Failure to prove release retains physical ownership. No ROM discovery, parasite supply, strong pull-up, overdrive or multichannel registry."
+msgstr "返回后不保留对缓冲区的引用；出错时部分接收字节可能已改变。失败时释放开漏线路并单独记录清理结果。无法证明释放时仍保留物理所有权。不提供 ROM 发现、寄生供电、强上拉、超速模式或多通道注册表。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No bus access, controller stop or physical cancellation. A pending write must first sync or remain owned for explicit external recovery; a timeout cannot authorize forgetting it."
+msgstr "不访问总线、停止控制器或执行物理取消。待完成写入必须先 sync，或保持所有权以供显式外部恢复；超时不能授权遗忘该责任。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No clipping, rotation copy, heap or framebuffer is hidden. Interruption can leave a partially updated physical panel."
+msgstr "不隐藏裁剪、旋转复制、堆或帧缓冲区。中断操作可能使物理面板仅部分更新。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No data write, replay, GPIO recovery, sleep or hidden worker. Readiness never proves previous contents or write success. A synchronous call cannot be preempted by another call."
+msgstr "不写数据、不重放、不恢复 GPIO、不休眠，也不创建隐藏工作线程。就绪状态绝不证明先前内容或写入成功。同步调用不能被另一次调用抢占。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No descriptors survive; a stopped sensor may continue autonomous work. Faulted withdrawal additionally holds the wire through 500us after physical high observation, then rechecks high and deadline. A short deadline or insufficient poll count retains the binding for recovery."
+msgstr "不保留描述符；已停止的传感器仍可能继续自主工作。故障撤出还须在观察到物理高电平后的 500us 期间保留线路所有权，随后再次检查高电平与截止时间。截止时间过短或轮询次数不足会保留绑定以供恢复。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No discovery, allocation or hardware start. Face, child, owner, config and contexts outlive all calls. Transactions use 1..8 messages of 1..256 bytes, repeated START between messages and one final STOP. transferred counts completed payload bytes, excluding address phases; partial reads may remain on error. All spans release even when STOP fails, while the physical bus owner remains faulted and retained. Async submit/start are unsupported, never a stack fallback."
+msgstr "不发现、不分配内存，也不启动硬件。接口、子端点、所有者、配置和上下文的生命周期须覆盖所有调用。事务包含 1..8 条消息，每条 1..256 字节；消息间使用重复 START，最后发送一次 STOP。transferred 计数已完成的载荷字节，不含地址阶段；出错时可能保留部分读取结果。即使 STOP 失败，对所有缓冲区范围的借用也会结束，但物理总线所有者仍保持故障并保留。不支持异步 submit/start，绝不回退使用栈缓冲区。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No payload pointer survives a call. Failed I/O retains the binding as uncertain; recover the SPI owner first when needed, then retry same-binding init or stop. No polling worker, debounce, IRQ owner or allocation is introduced."
+msgstr "调用返回后不保留载荷指针。I/O 失败会将绑定保留为不确定状态；需要时先恢复 SPI 所有者，再以相同绑定重试 init 或 stop。不引入轮询工作线程、消抖、IRQ 所有者或内存分配。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No sleeping, spinning, scheduler, reset or backlight action."
+msgstr "不休眠、不自旋、不运行调度器、不复位，也不操作背光。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "No whole-chip erase, erase suspend, implicit retry or product policy."
+msgstr "不执行整片擦除、擦除挂起、隐式重试或产品策略。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe a retained bus fault without touching pins."
+msgstr "观察保留的总线故障，不触碰引脚。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe cleanup independently of the primary transfer error."
+msgstr "独立于主传输错误观察清理结果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe completion of a retained uncertain write cycle."
+msgstr "观察保留的不确定写周期是否完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe component state and the last requested operation result."
+msgstr "观察组件状态及最后请求的操作结果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe retained bus recovery responsibility."
+msgstr "观察保留的总线恢复责任。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Observe the same finite monotonic epoch without touching the wire."
+msgstr "观察同一有限单调时钟纪元，不触碰线路。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One nonreentrant task owner; no concurrent calls. The configuration reference survives initialization and uncertainty until successful stop. Operations borrow spans only during the call. Errors after the first command retain binding as UNCERTAIN until stop succeeds or the same exact binding is reinitialized. Fields are implementation state, not permission to bypass lifecycle checks. Software READY establishes completed commands, not optical readiness or physical timing qualification. Caller spans are disjoint from all transport and clock owner storage. Checks exclude known readonly objects and context anchors; opaque owner extents remain the caller's responsibility."
+msgstr "单个不可重入的任务所有者；不允许并发调用。配置引用在初始化和不确定状态期间持续有效，直至 stop 成功。操作仅在调用期间借用缓冲区范围。首个命令之后的错误将绑定保留为 UNCERTAIN，直至 stop 成功或以完全相同的绑定重新初始化。字段属于实现状态，不代表可绕过生命周期检查。软件 READY 证明命令已完成，不代表光学就绪或物理时序资格。调用方缓冲区范围须与所有传输和时钟所有者存储互不重叠。检查会拒绝与已知只读对象或上下文锚点的重叠；不透明所有者的完整存储范围仍由调用方负责。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One serialized task executor, no concurrent/reentrant call. No descriptors or payloads survive a synchronous return. An unproved STOP retains config, fault and pin ownership; no buffer loan is invented. Fields are implementation state. SCCB uses this same wire storage with an explicit distinct personality; it is never exposed as an I2C endpoint."
+msgstr "单个串行任务执行者，不允许并发/重入调用。同步返回后不保留对描述符或载荷的引用。未获证明的 STOP 会保留配置、故障和引脚所有权；不会凭空建立缓冲区借用。字段属于实现状态。SCCB 以显式独立的协议类型使用同一线路存储，绝不暴露为 I2C 端点。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One serialized task executor. No edge/request/output survives return. Config and any EXTI face/ops/opaque context remain live and disjoint from this owner. Fields are implementation state, not caller controls."
+msgstr "单个串行任务执行者。返回后不保留对边沿/请求/输出的引用。配置及所有 EXTI 接口/ops/不透明上下文须保持存活，且与此所有者互不重叠。字段属于实现状态，不是调用方控制项。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "One stable initialized GPIO face and exactly one authorized bit."
+msgstr "单个稳定且已初始化的 GPIO 接口，以及恰好一个获授权的位。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Only pre-existing unprotected WPS0/CMP0/BP0 array mode is admitted. Protection is never unlocked. No caller payload pointer is retained. This does not verify bytes or promise atomic/durable replacement."
+msgstr "仅接纳原已处于未保护 WPS0/CMP0/BP0 的阵列模式。绝不解锁保护。不保留调用方载荷指针。不验证字节，也不承诺原子/持久替换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Perform bounded status progress using a separate cleanup deadline."
+msgstr "使用单独的清理截止时间进行有界状态推进。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Physical conversion may continue; no physical cancel/off claim."
+msgstr "物理转换可能继续；不声称已物理取消或断电。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Pointer write then STOP-separated two-phase SCCB read."
+msgstr "先写指针，再执行由 STOP 分隔的两阶段 SCCB 读取。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Port recover has no deadline and is UNSUPPORTED. Its stop only releases/observes an already proved idle bus; otherwise BUSY retains ownership. Use the direct budgeted APIs below."
+msgstr "Port recover 不带截止时间，返回 UNSUPPORTED。其 stop 仅释放/观察已证明空闲的总线；否则返回 BUSY 并保留所有权。请使用下方直接提供的带预算 API。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Private fields are exposed for static allocation, not caller mutation."
+msgstr "公开私有字段仅为静态分配，不供调用方修改。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Probe one explicitly selected awake W25Q128JV through a polling face."
+msgstr "通过轮询接口探测一个显式选择且已唤醒的 W25Q128JV。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Progress at most one timed initialization transition."
+msgstr "最多推进一次带时限的初始化状态转换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Project exact controller identity and nonwaiting stop."
+msgstr "投影精确控制器身份及不等待的 stop。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Project existing SPI owner recovery and stop methods."
+msgstr "投影既有 SPI 所有者的 recovery 和 stop 方法。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Project the existing synchronous SPI endpoint face."
+msgstr "投影既有同步 SPI 端点接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Project the synchronous strict-I2C face for one child."
+msgstr "为一个子端点投影同步严格 I2C 接口。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Public header under `nexus/components/`"
+msgstr "`nexus/components/` 下的公共头文件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Random-read an in-range nonempty byte span."
+msgstr "随机读取范围内非空字节区间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read actual resolution then start one bounded autonomous conversion."
+msgstr "读取实际分辨率，再启动一次有界自主转换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read at most one edge from a caller-owned public EXTI queue."
+msgstr "从调用方拥有的公共 EXTI 队列最多读取一个边沿。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read complete differential X/Y and optional Z1/Z2 samples."
+msgstr "读取完整差分 X/Y 及可选 Z1/Z2 样本。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Read one 1..252-byte region-relative chunk through command 03h."
+msgstr "通过命令 03h 读取一个相对于区域的 1..252 字节块。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Readiness uses a settled one-byte current-address read. Only NACK during this driver's issued cycle is retried; ARBITRATION, IO and other failures are never called busy. The private current-address pointer may advance. Probe-limit or failed withdrawal retains write_pending until sync under a new cleanup budget; no MCU buffer survives any return. A write is irreversible, non-atomic and not cancellable. Endurance, checksums, readback and layout policy are external."
+msgstr "使用同步完成的单字节当前地址读取检查就绪。仅重试本驱动已发出写周期期间的 NACK；ARBITRATION、IO 和其他失败绝不视为忙。私有当前地址指针可能前移。探测次数耗尽或撤出失败会保留 write_pending，直至在新清理预算内 sync；任何返回后都不保留对 MCU 缓冲区的访问。写入不可逆、非原子且不可取消。耐久性、校验和、读回和布局策略由外部负责。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Reads use a fresh reset/select, not a stale conversion-poll context. Undefined low bits are cleared; valid85C is not rejected by value. Temperature range is -55..125C. No UTC or product calibration policy."
+msgstr "读取使用新的复位/选择，不复用过期的转换轮询上下文。未定义的低位会清零；不会仅因值为有效的 85C 而拒绝。温度范围为 -55..125C。不提供 UTC 或产品校准策略。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Recover/stop reject callback reentry, retry inactive CS, SCK-low and MOSI-low without replaying a byte, and preserve the original config on failure. Stop clears the binding only after all three writes succeed. Neither operation restores Board pad modes or ends an external GPIO lease."
+msgstr "Recover/stop 拒绝回调重入，重试将 CS 置为非选中态、SCK 置低、MOSI 置低，不重放任何字节；失败时保留原配置。仅当三次写入全部成功，stop 才清除绑定。这两种操作都不恢复 Board 引脚模式，也不结束外部 GPIO 租约。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Reference assemblies and software tests do not establish fitted-part identity, electrical timing, calibration or physical HIL. Panel, touch, sensor and decoded key results retain their contract's observation limits; products supply display policy, calibration, key mapping and recovery."
+msgstr "参考装配和软件测试不证明实装器件身份、电气时序、校准或物理 HIL。屏幕、触摸、传感器和解码按键结果仍受其合同中的观察边界约束；产品提供显示策略、校准、按键映射和恢复。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Region offset/size are 4 KiB aligned, nonempty and inside the reviewed 16 MiB array. Public offsets are relative to this caller-selected region. ready_at is the absolute time after the actual rail has satisfied the datasheet power-up/write delay; the caller must establish that fact. Domain/epoch labels are declarations, not runtime clock attestation."
+msgstr "区域偏移/大小须按 4 KiB 对齐、非空，且位于已审阅的 16 MiB 阵列内。公共偏移相对于此调用方选定区域。ready_at 是实际电源轨已满足数据手册上电/写入延迟后的绝对时间；调用方须建立该事实。时钟域/纪元标签是声明，不是运行时时钟认证。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Release/observe the line and close admission without a protocol reset."
+msgstr "释放/观察线路并关闭操作接纳，不进行协议复位。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Reset/presence, send LSB-first bytes, then receive bounded bits."
+msgstr "复位/存在检测，发送 LSB 优先字节，再接收有界位数。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Restore converter PD=00 before releasing this device binding."
+msgstr "恢复转换器 PD=00 后再释放此器件绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Results copied once at the end of an admitted write call."
+msgstr "结果在已接纳写调用结束时一次性复制。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SPI mode zero/MSB-first and actual settling/rate are owned by the selected endpoint. Select exactly one GPIO pen face with one-bit mask, or an EXTI pen face with mask zero. EXTI must provide the optional live electrical-level method; buffered edges never substitute for that predicate. Pen is active-low, not an interrupt count. GPIO/pull, endpoint, faces, opaque contexts and clock live through successful device stop. The deadline clock must be the same domain as the endpoint. Nonzero domain/epoch change on reset or discontinuity. Every 24-clock exchange, including init/stop PD=00, must finish before the earlier of the caller deadline and checked exchange start plus 1600 us. This conservative full-exchange bound is postchecked even after SPI SUCCESS; it is not a measured waveform or generic SPI edge limit."
+msgstr "SPI 模式零/MSB 优先及实际稳定时间/速率由选定端点负责。须精确选择一个具有仅含一位掩码的 GPIO 触笔接口，或一个掩码为零的 EXTI 触笔接口。EXTI 必须提供可选的实时电平方法；缓冲边沿绝不能代替该谓词。触笔低电平有效，不是中断计数。GPIO/上下拉、端点、接口、不透明上下文和时钟须存活至器件成功 stop。截止时间时钟必须与端点处于同一时钟域。非零 domain/epoch 在复位或不连续时须改变。每次 24 时钟交换，包括 init/stop 的 PD=00，均须在调用方截止时间与经检查的交换起始时刻加 1600 us 两者中较早者之前完成。即使 SPI 返回 SUCCESS，仍在返回后检查此保守的完整交换上限；它不是实测波形或通用 SPI 边沿限制。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after EF4018 and idle/non-suspended/WEL0 observation; BUSY before ready_at or while the chip is busy/armed/suspended. Unknown models reject. Rejection issues no mutating command."
+msgstr "观察到 EF4018 及空闲/未挂起/WEL0 后返回 SUCCESS；ready_at 前，或芯片忙/已置写使能/已挂起时返回 BUSY。未知型号拒绝。拒绝不发出改变状态的命令。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after SWRESET, BUSY for a live instance or exact validation/transport failure. Malformed inputs and a budget shorter than 240 ms cause no bus access. Once command D3h is attempted, failure retains UNCERTAIN binding."
+msgstr "SWRESET 后返回 SUCCESS；实例已存活时返回 BUSY；或返回确切校验/传输错误。输入格式错误或预算不足 240 ms 时不访问总线。一旦尝试命令 D3h，失败便保留 UNCERTAIN 绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after all port access finishes, BUSY during reset or sleep-out quiet time, or exact failure retaining the binding. An attempted command failure keeps UNCERTAIN for explicit retry; validation never clears existing effects."
+msgstr "所有端口访问结束后返回 SUCCESS；复位或退出休眠的静默期返回 BUSY；或返回确切错误并保留绑定。已尝试命令失败会保持 UNCERTAIN，以供显式重试；校验绝不清除已有副作用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS after unbinding; BUSY preserves state until service proves settlement. Clock loss during a pending operation requires external system recovery; a timeout never revokes that responsibility."
+msgstr "解除绑定后返回 SUCCESS；在 service 证明完全完成前，BUSY 保留状态。待完成操作期间时钟丢失需要外部系统恢复；超时绝不撤销该责任。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS for settled waveform, or exact wire/clock failure"
+msgstr "波形完全结束时返回 SUCCESS，或返回确切线路/时钟错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS idempotently, INVALID or BUSY for an overlapping call."
+msgstr "幂等返回 SUCCESS；或返回 INVALID；调用重叠时返回 BUSY。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS means the command was issued, not completed. Validation rejection has no I/O. A transport/time failure after write-enable may leave pending/uncertain device duty; inspect status and service."
+msgstr "SUCCESS 表示命令已发出，不代表完成。校验拒绝不进行 I/O。写使能后的传输/时间失败可能留下待完成/不确定的器件责任；须检查 status 和 service。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only after STOP/idle observation; other errors retain the fault, immutable binding and external pin-owner duty"
+msgstr "仅观察到 STOP/空闲后返回 SUCCESS；其他错误保留故障、不可变绑定及外部引脚所有者责任"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only after a complete read and STOP; exact error"
+msgstr "仅完整读取并完成 STOP 后返回 SUCCESS；否则返回确切错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only after complete cleanup conversion; failure preserves the binding and recovery responsibility"
+msgstr "仅完整清理转换完成后返回 SUCCESS；失败保留绑定及恢复责任"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only after every page is ready; exact bus failure, TIMEOUT or BUSY when the explicit probe limit is exhausted"
+msgstr "仅每一页均就绪后返回 SUCCESS；否则返回确切总线错误、TIMEOUT，或在显式探测次数耗尽时返回 BUSY"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS only for all pixels, INVALID for malformed bounds, aliases or span, or exact transport/time error. Rejection before bus access leaves written unchanged. Post-command errors retain UNCERTAIN; no caller span survives return."
+msgstr "仅全部像素写入后返回 SUCCESS；边界、别名或缓冲区范围无效时返回 INVALID；或返回确切传输/时间错误。总线访问前拒绝时 written 保持不变。命令之后的错误保留 UNCERTAIN；返回后不保留对调用方缓冲区的引用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or INVALID/BUSY. No GPIO, EXTI stop or hardware access."
+msgstr "SUCCESS 或 INVALID/BUSY。不执行 GPIO、EXTI stop 或硬件访问。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or INVALID/BUSY; no physical I/O or qualification inference."
+msgstr "SUCCESS 或 INVALID/BUSY；不进行物理 I/O，也不推导资格。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED/IO."
+msgstr "SUCCESS 或 INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED/IO。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or INVALID; BUSY retains active/uncertain binding"
+msgstr "SUCCESS 或 INVALID；BUSY 保留活动/不确定绑定"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or STATE/INVALID/IO; backward/NEVER readings fault epoch."
+msgstr "SUCCESS 或 STATE/INVALID/IO；时钟倒退/NEVER 读数使当前纪元故障。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or a checked range/state/transport/time error."
+msgstr "SUCCESS 或经检查的范围/状态/传输/时间错误。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or bounded timing/context/state/GPIO error."
+msgstr "SUCCESS 或有界时序/上下文/状态/GPIO 错误。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS or exact validation/transport error"
+msgstr "SUCCESS 或确切校验/传输错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS when idle; BUSY at probe limit, TIMEOUT or bus error"
+msgstr "空闲时返回 SUCCESS；探测次数耗尽时返回 BUSY，或返回 TIMEOUT、总线错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS when issued; otherwise bounded validation/bus/clock error."
+msgstr "已发出时返回 SUCCESS；否则返回有界校验/总线/时钟错误。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS when released; failure retains binding and wire duty."
+msgstr "已释放时返回 SUCCESS；失败保留绑定及线路责任。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, EMPTY for pen-up, or exact validation/I/O error"
+msgstr "SUCCESS；触笔抬起时为 EMPTY；或返回确切校验/I/O 错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID or BUSY; rejection leaves both spans unchanged."
+msgstr "SUCCESS、INVALID 或 BUSY；拒绝时两个缓冲区范围均保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, BUSY or retained cleanup failure"
+msgstr "SUCCESS、INVALID、BUSY，或保留的清理失败"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, BUSY, TIMEOUT or GPIO/clock error"
+msgstr "SUCCESS、INVALID、BUSY、TIMEOUT 或 GPIO/时钟错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, BUSY, TIMEOUT or GPIO/clock failure."
+msgstr "SUCCESS、INVALID、BUSY、TIMEOUT 或 GPIO/时钟失败。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, BUSY, or the exact GPIO error"
+msgstr "SUCCESS、INVALID、BUSY，或确切 GPIO 错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, STATE, BUSY, TIMEOUT or exact bus error"
+msgstr "SUCCESS、INVALID、STATE、BUSY、TIMEOUT 或确切总线错误"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "SUCCESS, INVALID, UNSUPPORTED or BUSY; no bus transaction"
+msgstr "SUCCESS、INVALID、UNSUPPORTED 或 BUSY；不进行总线事务"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Same binding/idle errors as strict I2C initialization"
+msgstr "绑定/空闲错误与严格 I2C 初始化相同"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Same command-issued and uncertainty contract as program_start."
+msgstr "命令已发出及不确定状态合同与 program_start 相同。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Same exclusive-bus precondition as recover. No outer GPIO lease or Board modes are released here. Clock discontinuity cannot be repaired by a new numerical deadline."
+msgstr "总线独占前提与 recover 相同。此处不释放外层 GPIO 租约或 Board 模式。新的数值截止时间不能修复时钟不连续。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Same feed result, EMPTY or exact port error; no callback is retained."
+msgstr "与 feed 结果相同，或为 EMPTY、确切端口错误；不保留回调。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Select the separate SCCB two-wire personality."
+msgstr "选择独立的 SCCB 双线协议类型。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Send display-off and release the settled software binding."
+msgstr "发送显示关闭命令，并解除同步操作及其借用均已结束的软件绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Send one complete PD=00 conversion to establish PENIRQ mode."
+msgstr "发送一次完整 PD=00 转换以建立 PENIRQ 模式。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Serialized observation; SUCCESS never implies power-loss durability."
+msgstr "串行化观察；SUCCESS 绝不意味着掉电持久性。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Settled AT24C02 page access and explicit write-cycle drain."
+msgstr "同步完成的 AT24C02 页访问及显式写周期排空。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared-method controller face; no hardware access"
+msgstr "共享方法的控制器接口；不访问硬件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Shared-method value face, or zero for invalid/SCCB child"
+msgstr "共享方法的值类型接口；子端点无效或为 SCCB 时返回零"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Source declarations/flags never attest physical capture integrity."
+msgstr "来源声明/标志绝不证明物理捕获完整性。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Split a span at every physical page and await each cycle."
+msgstr "在每个物理页边界拆分缓冲区范围，并等待各写周期完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Stable caller-owned wire state, initially zero and never copied."
+msgstr "调用方拥有的稳定线路状态，初始为零且绝不复制。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Strict by default; IRQ sampling is an explicit software reference."
+msgstr "默认严格；IRQ 采样是显式软件参考。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Target"
+msgstr "目标"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Task-only serialized calls; no worker, heap, lock, discovery fallback, reset or status/QE/protection writes. JEDEC is necessary, not unique model/revision proof. The caller excludes foreign flash, pin, power, clock and bus owners. Endpoint, ops, context and clock outlive the component and stay disjoint from state and writable payloads."
+msgstr "仅任务上下文中的串行化调用；不创建工作线程、堆、锁，不进行发现回退、复位或状态/QE/保护写入。JEDEC 是必要条件，不是型号/修订的唯一证明。调用方须排除其他 Flash、引脚、电源、时钟和总线所有者。端点、ops、上下文和时钟的生命周期须长于组件，且与状态和可写载荷互不重叠。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Task-only, one serialized executor and exclusive endpoint current-address pointer. No concurrent or reentrant calls. The immutable endpoint, ops, opaque contexts and clock remain live and disjoint from device and payload storage. Fields are implementation state, not reclaim permission."
+msgstr "仅限任务上下文，由一个执行者串行推进，并独占端点的当前地址指针。禁止并发或重入调用。不可变端点、ops、不透明上下文和时钟必须持续有效，且与器件状态及载荷存储互不重叠。字段属于实现状态，不能据此认定可以回收存储。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "The chip has no identity read used here. Init does not establish physical module fitting. A failed/short transfer may have changed converter power state and retains recovery responsibility. Rebinding an uncertain device is rejected."
+msgstr "此处不读取该芯片的身份标识。初始化不证明模块已实际安装。失败或短传输可能已经改变转换器的电源状态，因此仍须保留恢复责任。禁止重新绑定处于不确定状态的器件。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "These optional C11 targets consume already selected public I/O faces. The caller owns static storage, serialized progress, finite deadlines, outer resource lifetimes and recovery. They add no implicit worker, allocator, calibration or product policy. The linked bilingual component contract is authoritative; this table is an API navigation aid."
+msgstr "这些可选 C11 目标使用已选择的公共 I/O 接口。调用方负责静态存储、串行推进、有限截止时间、外层资源生命周期和恢复。组件不隐式创建工作线程、分配器、校准或产品策略。详细约定以链接中的双语组件合同为准；本表仅用于查找 API。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "True only for a non-NULL faulted owner"
+msgstr "仅当所有者非 NULL 且处于故障状态时返回 True"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "True only when a non-NULL owner has a latched fault"
+msgstr "仅当所有者非 NULL 且已锁存故障时返回 True"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Two-wire, one target, register8/data8 only. No SCCB_E, push-pull conflict mode or multi-target discovery. The ninth master-byte bit is released and ignored as Don't-Care. A completed waveform does not prove target ACK or presence."
+msgstr "仅支持双线、单目标和 register8/data8。不支持 SCCB_E、推挽冲突模式或多目标发现。主机发送字节的第九位释放，并按 Don't-Care 忽略。波形执行结束不证明目标已 ACK 或实际存在。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Validate exact pins and establish inactive CS/clock/MOSI."
+msgstr "校验精确引脚，并将 CS、时钟和 MOSI 置于非活动状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Validate identity, actual supply mode and scratchpad configuration."
+msgstr "校验身份、实际供电模式及暂存器配置。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Validation failure writes no pin. Once a pin write is attempted, failure retains the config and a faulted owner; retry recovery/stop before rebinding. No clock/IRQ/OS setup or physical electrical proof is inferred."
+msgstr "校验失败时不写入任何引脚。一旦尝试写引脚，失败后仍须保留 config 和处于故障状态的所有者；重新绑定前先重试恢复或停止。不由此推断已完成时钟／IRQ／OS 设置，也不构成物理电气验证。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Value SUCCESS only after 32 valid bits and trailer or valid repeat; EMPTY awaits more edges; OVERFLOW rejects LOSS in every policy and COALESCED in STRICT. IRQ_OBSERVATION retains sampled uncertainty. IO rejects malformed waveform/clock, TIMEOUT rejects a stale frame."
+msgstr "仅在收到 32 个有效位及尾部，或有效重复帧后返回 SUCCESS；EMPTY 表示等待更多边沿；OVERFLOW 在所有策略下拒绝 LOSS，并在 STRICT 下拒绝 COALESCED。IRQ_OBSERVATION 保留采样不确定性。IO 拒绝畸形波形／时钟，TIMEOUT 拒绝过期帧。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Value result; frame is meaningful only with SUCCESS."
+msgstr "返回结果值；仅在 SUCCESS 时 frame 才有意义。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Verify ID 9341h and begin software-reset initialization."
+msgstr "校验 ID 为 9341h，并开始软件复位初始化。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Word-address write plus repeated-START read is settled on every return. No caller buffer is retained. On validation rejection no bus access or output mutation occurs. A pending uncertain write requires explicit sync; no automatic replay."
+msgstr "字地址写入加 repeated-START 读取是同步操作，每次返回时缓冲区借用均已结束。不会保留调用方缓冲区。校验拒绝时不访问总线，也不修改输出。待处理且结果不确定的写入要求显式 sync；不会自动重放。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Write one complete in-bounds packed RGB565 rectangle."
+msgstr "写入一个完整、未越界且紧凑排列的 RGB565 矩形。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Wrong line, unknown flags/edge and invalid spans reject unchanged. LOSS invalidates frame and repeat eligibility; its report timestamp is not a recovered edge and never advances the source clock history. Accepted COALESCED samples retain their observation time and flags. Equal/backward accepted timestamps latch clock_fault until stop/init. Malformed/truncated frames never publish partial commands. No RC5, NEC2 interpretation, automatic protocol discovery or calibration."
+msgstr "错误线路、未知标志／边沿和无效存储区间均被拒绝，状态保持不变。LOSS 使当前帧及重复帧资格失效；其报告时间戳不是恢复出的边沿，绝不推进来源时钟历史。接纳的 COALESCED 采样保留其观察时间和标志。接纳的时间戳若相等或回退，会锁存 clock_fault，直至 stop/init。畸形或截断帧绝不发布部分命令。不提供 RC5、NEC2 解释、自动协议发现或校准。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "Zero-initialized caller-owned serialized touch state."
+msgstr "由调用方所有、零初始化并串行使用的触摸状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Bounded GPIO mode-zero SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_spi/README.md)"
+msgstr "[有界 GPIO 模式零 SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_spi/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Bounded GPIO slots and failed-withdrawal ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/onewire/README.md)"
+msgstr "[有界 GPIO 时隙与撤出失败后的所有权](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/onewire/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Explicit NEC address and source-quality policies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)"
+msgstr "[显式 NEC 地址与来源质量策略](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Explicit W25Q128JV profile and retained Flash completion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/w25/README.md)"
+msgstr "[显式 W25Q128JV 配置与保留的 Flash 完成责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/w25/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[External-VDD identity, conversion and CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ds18b20/README.md)"
+msgstr "[外部 VDD 供电下的身份、转换与 CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ds18b20/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Raw touch samples with live pen observation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/xpt2046/README.md)"
+msgstr "[带实时触笔观察的原始触摸样本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/xpt2046/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Separate GPIO I2C and SCCB protocols](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_i2c/README.md)"
+msgstr "[相互独立的 GPIO I2C 与 SCCB 协议](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_i2c/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Settled EEPROM access and write-cycle responsibility](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/at24c02/README.md)"
+msgstr "[同步 EEPROM 访问与写周期责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/at24c02/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[Settled RGB565 command/data access](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ili9341/README.md)"
+msgstr "[同步 RGB565 命令与数据访问](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ili9341/README.md)"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] 1 through 256, not crossing the device boundary"
+msgstr "[in] 1 至 256，不得越过器件边界"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] 1..252 source bytes, no longer accessed after return."
+msgstr "[in] 1..252 个源字节，返回后不再访问。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Disjoint copied public edge, borrowed only during call."
+msgstr "[in] 已复制的公共边沿，与其他存储互不重叠，仅在调用期间借用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Eight-bit sub-address"
+msgstr "[in] 8 位子地址"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact eight-bit register value"
+msgstr "[in] 精确的 8 位寄存器值"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact eight-bit sub-address"
+msgstr "[in] 精确的 8 位子地址"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact finite byte count."
+msgstr "[in] 精确且有限的字节数。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exact transmitted length."
+msgstr "[in] 精确的发送长度。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Exactly width times height, no implicit stride."
+msgstr "[in] 恰好为宽度乘以高度，不隐含行步长。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Explicit region/model/power/clock facts, copied on success."
+msgstr "[in] 显式区域／型号／供电／时钟事实，成功时复制。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute communication budget."
+msgstr "[in] 有限的绝对通信预算。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline covering all phases."
+msgstr "[in] 覆盖全部阶段的有限绝对截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline covering complete CS withdrawal."
+msgstr "[in] 覆盖 CS 完整撤出的有限绝对截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline for all bus operations."
+msgstr "[in] 全部总线操作共用的有限绝对截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline in that same live clock epoch."
+msgstr "[in] 同一个有效时钟纪元内的有限绝对截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline including later device busy time."
+msgstr "[in] 包括后续器件忙碌时间的有限绝对截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute deadline, including the exchange"
+msgstr "[in] 包括本次交换的有限绝对截止时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute initialization budget"
+msgstr "[in] 有限的绝对初始化预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute monotonic deadline."
+msgstr "[in] 有限的绝对单调截止时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute time in config clock domain"
+msgstr "[in] config 时钟域内的有限绝对时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute time, equality is expired"
+msgstr "[in] 有限绝对时间，相等即视为过期"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite absolute time, not a relative timeout."
+msgstr "[in] 有限绝对时间，不是相对超时。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite cleanup budget, not an expired transfer one"
+msgstr "[in] 有限清理预算，不能使用已过期的传输预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite cleanup budget, possibly later than write"
+msgstr "[in] 有限清理预算，可以晚于写入预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite cleanup time in the same live clock domain"
+msgstr "[in] 同一有效时钟域内的有限清理时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite current deadline, independent of old init."
+msgstr "[in] 当前的有限截止时间，独立于先前初始化。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite new withdrawal budget in the same live epoch."
+msgstr "[in] 同一有效纪元内新的有限撤出预算。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite operation deadline; cannot preempt a flash pulse."
+msgstr "[in] 有限操作截止时间；无法抢占 Flash 脉冲。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Finite overall communication/conversion/read budget."
+msgstr "[in] 覆盖通信／转换／读取全过程的有限总预算。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] First byte, 0 through 255"
+msgstr "[in] 首字节，范围为 0 至 255"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Fixed 7-bit 50h endpoint, alive through stop"
+msgstr "[in] 固定 7 位地址 50h 的端点，持续有效直至停止"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Fresh finite budget, never extends operation time."
+msgstr "[in] 新的有限预算，绝不延长操作时间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable child of an initialized SCCB owner"
+msgstr "[in] 已初始化 SCCB 所有者的不可变子端点"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable child, exact 7-bit address 08h..77h"
+msgstr "[in] 不可变子端点，精确 7 位地址范围为 08h..77h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable exact child on the same live wire owner"
+msgstr "[in] 同一个有效总线所有者上的精确不可变子端点"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable exact selection, with initialized wire owner."
+msgstr "[in] 精确不可变的选择，总线所有者已初始化。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable wiring, alive through successful stop"
+msgstr "[in] 不可变接线配置，持续有效直至成功停止"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Immutable wiring, preconfigured externally."
+msgstr "[in] 不可变接线配置，已在外部预先配置。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical left coordinate."
+msgstr "[in] 逻辑左坐标。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Logical top coordinate."
+msgstr "[in] 逻辑上坐标。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Nonempty span wholly within the 256-byte device"
+msgstr "[in] 完全位于 256 字节器件内部的非空存储区间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Nonzero per-page polling attempt limit"
+msgstr "[in] 非零的每页轮询尝试次数上限"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Nonzero rectangle height."
+msgstr "[in] 非零矩形高度。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Nonzero rectangle width."
+msgstr "[in] 非零矩形宽度。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Offset inside the configured region."
+msgstr "[in] 所配置区域内的偏移。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite absolute budget for all pages/probes"
+msgstr "[in] 所有页／探测共用一个有限绝对预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite budget for both cycles and final STOP"
+msgstr "[in] 两个周期及最终 STOP 共用一个有限预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite budget through final STOP"
+msgstr "[in] 一个覆盖至最终 STOP 的有限预算"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] One finite deadline for the complete sequence"
+msgstr "[in] 完整序列共用一个有限截止时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded byte count inside the region."
+msgstr "[in] 区域内为正且有界的字节数。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Positive bounded span; target obeys NOR 1-to-0 semantics."
+msgstr "[in] 非空且有界的存储区间；目标遵循 NOR 的 1-to-0 语义。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Readable bytes, NULL permitted only when length is zero."
+msgstr "[in] 可读字节；仅在长度为零时允许 NULL。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Ready monotonic microseconds, stable through pending duty."
+msgstr "[in] 已就绪的单调微秒时钟，在待处理责任存续期间保持稳定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Region-relative offset inside one physical page."
+msgstr "[in] 相对区域起点的偏移，位于一个物理页内。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Region-relative, 4 KiB-aligned sector start."
+msgstr "[in] 相对区域起点且按 4 KiB 对齐的扇区起始位置。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same stable monotonic domain as endpoint deadlines"
+msgstr "[in] 与端点截止时间相同且稳定的单调时钟域"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Same stable open-drain/pull-up wire contract"
+msgstr "[in] 相同且稳定的开漏／上拉连线合同"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Separate finite cleanup deadline when necessary"
+msgstr "[in] 必要时提供独立的有限清理截止时间"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Separate immutable input, borrowed only during call"
+msgstr "[in] 独立的不可变输入，仅在调用期间借用"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Separate readable1..16 bytes, unchanged throughout call."
+msgstr "[in] 独立的 1..16 个可读字节，在整个调用期间保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable disjoint configuration; no copied pin state"
+msgstr "[in] 稳定且互不重叠的配置，不复制引脚状态"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable disjoint exact binding, no chip-ID fallback"
+msgstr "[in] 稳定、互不重叠的精确绑定，不回退到其他芯片 ID"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable exact both-edge source in the config clock epoch."
+msgstr "[in] config 时钟纪元内稳定且精确的双边沿来源。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable immutable endpoint, clock and orientation."
+msgstr "[in] 稳定且不可变的端点、时钟及方向。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable mode 0/3, single-line, at most 50 MHz SPI binding."
+msgstr "[in] 稳定的 mode 0/3、单线且最高 50 MHz 的 SPI 绑定。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable owner"
+msgstr "[in] 稳定的所有者"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable owner or NULL"
+msgstr "[in] 稳定的所有者或 NULL"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable packed native-halfword RGB565 span."
+msgstr "[in] 稳定、紧凑排列且使用本机半字格式的 RGB565 存储区间。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable readonly policy, disjoint from owner."
+msgstr "[in] 稳定的只读策略，与所有者存储互不重叠。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable serialized state, no in-progress callback."
+msgstr "[in] 稳定且串行使用的状态，无正在执行的回调。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Stable single-task owner, or NULL"
+msgstr "[in] 稳定的单任务所有者或 NULL"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[in] Zero to128 bits; unused high bits are zero."
+msgstr "[in] 0 至 128 位；未使用的高位为零。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Disjoint caller state, live through successful stop."
+msgstr "[inout] 互不重叠的调用方状态，持续有效直至成功停止。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero or successfully stopped owner"
+msgstr "[inout] 新的零初始化所有者，或已成功停止的所有者"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero or successfully stopped storage"
+msgstr "[inout] 新的零初始化存储，或已成功停止的存储"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero or successfully stopped, aligned storage."
+msgstr "[inout] 新的零初始化存储，或已成功停止的存储；必须对齐。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero/stopped disjoint owner"
+msgstr "[inout] 新的零初始化或已停止的所有者，存储互不重叠"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero/stopped or same-binding uncertain state"
+msgstr "[inout] 新的零初始化／已停止状态，或相同绑定的不确定状态"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Fresh zero/stopped physical wire storage"
+msgstr "[inout] 新的零初始化或已停止的物理总线存储"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized idle exclusive device"
+msgstr "[inout] 已初始化、空闲且独占的器件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized idle owner retained through final service."
+msgstr "[inout] 已初始化的空闲所有者，保留至最后一次 service 完成。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized idle owner; retained while pending."
+msgstr "[inout] 已初始化的空闲所有者；待处理期间持续保留。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized or uncertain exclusive instance"
+msgstr "[inout] 已初始化或处于不确定状态的独占实例"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized serialized owner; no current conversion."
+msgstr "[inout] 已初始化并串行使用的所有者，当前无转换。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized serialized wire owner."
+msgstr "[inout] 已初始化并串行使用的总线所有者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized single consumer in its original epoch."
+msgstr "[inout] 原始纪元内已初始化的单消费者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized, idle single owner."
+msgstr "[inout] 已初始化、空闲的单一所有者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Initialized, idle, nonuncertain exclusive device"
+msgstr "[inout] 已初始化、空闲且无不确定性的独占器件"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Live exclusive initialized instance"
+msgstr "[inout] 有效、独占且已初始化的实例"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Owner storage that outlives the returned face"
+msgstr "[inout] 生命周期长于返回接口的所有者存储"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] READY single-owner instance."
+msgstr "[inout] 处于 READY 状态的单所有者实例。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same binding, storage and live clock retained."
+msgstr "[inout] 保留相同绑定、存储和有效时钟。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same decoder; callback reentry returns BUSY."
+msgstr "[inout] 同一解码器；回调重入返回 BUSY。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same live endpoint and clock binding"
+msgstr "[inout] 相同的有效端点与时钟绑定"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same retained binding, with no active call"
+msgstr "[inout] 相同的保留绑定，当前无活动调用"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same serialized live instance and clock epoch."
+msgstr "[inout] 同一个串行使用的有效实例及其时钟纪元。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same serialized state and live bus/clock epoch."
+msgstr "[inout] 同一串行状态及有效总线／时钟纪元。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same serialized wire owner"
+msgstr "[inout] 同一个串行使用的总线所有者"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Same state, no active or reentrant caller."
+msgstr "[inout] 同一状态，无活动或重入调用方。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Serialized instance with no active call"
+msgstr "[inout] 无活动调用的串行实例"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable initialized state, no overlapping executor."
+msgstr "[inout] 稳定的已初始化状态，无重叠执行者。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable owner storage, never an endpoint substitute"
+msgstr "[inout] 稳定的所有者存储，绝不可用它代替端点"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable physical owner"
+msgstr "[inout] 稳定的物理所有者"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable same-executor state, no in-progress call."
+msgstr "[inout] 同一执行者使用的稳定状态，无正在执行的调用。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable storage with no active feed/poll callback."
+msgstr "[inout] 稳定存储，无活动 feed/poll 回调。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stable zero/stopped disjoint state."
+msgstr "[inout] 稳定的零初始化／已停止状态，存储互不重叠。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] State with no pending or uncertain array operation."
+msgstr "[inout] 无待处理或不确定的阵列操作的状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Stopped or same-owner live/uncertain instance."
+msgstr "[inout] 已停止的实例，或同一所有者的有效／不确定实例。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Zero/stopped disjoint stable state."
+msgstr "[inout] 零初始化／已停止、稳定且互不重叠的状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[inout] Zero/stopped or same-binding uncertain state."
+msgstr "[inout] 零初始化／已停止状态，或相同绑定的不确定状态。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Disjoint caller output, unchanged on rejection."
+msgstr "[out] 互不重叠的调用方输出，拒绝时保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Disjoint output, unchanged on any failed transaction."
+msgstr "[out] 互不重叠的输出，任一事务失败时均保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Distinct completed pixel prefix, set to zero after admission and updated even on a pixel-data failure."
+msgstr "[out] 独立的已完成像素前缀计数，接纳后置零，即使像素数据传输失败也会更新。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate aligned output, unchanged on every error"
+msgstr "[out] 独立且对齐的输出，任一错误时均保持不变"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate byte, unchanged on every error"
+msgstr "[out] 独立字节，任一错误时均保持不变"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate result; unchanged on argument rejection"
+msgstr "[out] 独立结果；参数被拒绝时保持不变"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate signed1/16C output, unchanged on error."
+msgstr "[out] 独立的有符号 1/16C 输出，错误时保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate writable ceil(rx_bits/8) bytes, or NULL if zero."
+msgstr "[out] 独立且可写的 ceil(rx_bits/8) 字节；数量为零时可为 NULL。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate writable output, unchanged on failure."
+msgstr "[out] 独立可写输出，失败时保持不变。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "[out] Separate writable span; may be partial after I/O error"
+msgstr "[out] 独立可写存储区间；I/O 错误后可能仅部分有效"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::AT24C02`"
+msgstr "`Nexus::AT24C02`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::DS18B20`"
+msgstr "`Nexus::DS18B20`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::ILI9341`"
+msgstr "`Nexus::ILI9341`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::Infrared`"
+msgstr "`Nexus::Infrared`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::OneWire`"
+msgstr "`Nexus::OneWire`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB`"
+msgstr "`Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::SoftwareSPI`"
+msgstr "`Nexus::SoftwareSPI`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::W25`"
+msgstr "`Nexus::W25`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`Nexus::XPT2046`"
+msgstr "`Nexus::XPT2046`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`at24c02.h`"
+msgstr "`at24c02.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`ds18b20.h`"
+msgstr "`ds18b20.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`ili9341.h`"
+msgstr "`ili9341.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`infrared.h`"
+msgstr "`infrared.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`onewire.h`"
+msgstr "`onewire.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`software_i2c.h`, `software_sccb.h`"
+msgstr "`software_i2c.h`, `software_sccb.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`software_spi.h`"
+msgstr "`software_spi.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`w25.h`"
+msgstr "`w25.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "`xpt2046.h`"
+msgstr "`xpt2046.h`"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "at24c02.h"
+msgstr "at24c02.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "confirmed_bytes includes only pages whose write-cycle end was observed under the operation deadline. uncertain marks an issued final page with unknown outcome; its bytes must not be counted, replayed or consumed as confirmed. A later sync proves readiness only and never repairs this result."
+msgstr "confirmed_bytes 仅包含在操作截止时间内已观察到写周期结束的页。uncertain 标记已发出但结果未知的最后一页；不得将该页字节计入、重放或视为已确认数据使用。后续 sync 仅证明器件已就绪，绝不会修正本次结果。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "ds18b20.h"
+msgstr "ds18b20.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "ili9341.h"
+msgstr "ili9341.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "infrared.h"
+msgstr "infrared.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "madctl permits MY/MX/MV and BGR only (mask E8h). Native addressing is 240 by 320; MV exchanges logical dimensions. No module-specific gamma, power, scan or voltage settings are guessed. Panel-specific additions require a reviewed separate configuration; this is the controller reset profile with 16-bit RGB565 DBI and display-on. Configuration, endpoint, operations and clock context remain immutable and alive until successful stop. Reinitialization of UNCERTAIN state requires the same exact configuration object."
+msgstr "madctl 仅允许 MY/MX/MV 和 BGR（掩码 E8h）。原生寻址尺寸为 240 × 320；MV 交换逻辑尺寸。不猜测模块专用的 gamma、供电、扫描或电压设置。面板专用扩展必须使用单独审阅的配置；此处为控制器复位配置，使用 16 位 RGB565 DBI 并开启显示。配置、端点、操作表和时钟上下文必须保持不可变且有效，直至成功停止。重新初始化 UNCERTAIN 状态时，必须使用完全相同的配置对象。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "onewire.h"
+msgstr "onewire.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "quality and preserved source_flags describe source uncertainty, not physical capture proof. Repeat provenance includes its predecessor. NEC inverse checks cannot establish that an IRQ source lost no edges."
+msgstr "quality 和保留的 source_flags 描述来源不确定性，不是物理捕获证明。重复帧的来源记录包括其前序帧。NEC 反码检查无法证明 IRQ 来源没有丢失边沿。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "software_i2c.h"
+msgstr "software_i2c.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "software_sccb.h"
+msgstr "software_sccb.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "software_spi.h"
+msgstr "software_spi.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "w25.h"
+msgstr "w25.h"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "write_id is an even 8-bit device ID; OV2640 uses 60h, with 61h for reading. No identity discovery or address fallback."
+msgstr "write_id 是偶数的 8 位器件 ID；OV2640 使用 60h，读取时使用 61h。不进行身份发现或地址回退。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "x/y are channels 101/001; z1/z2 are 011/100 when requested. Axis rotation, pressure resistance, filtering and gesture policy are external. Pen was low before and after the sequence, which does not prove simultaneous conversions or a stable physical contact. observed is software completion time with unknown uncertainty, never conversion timestamp."
+msgstr "x/y 使用通道 101/001；请求压力值时，z1/z2 使用 011/100。轴旋转、压力电阻、滤波和手势策略由外部提供。序列前后触笔均为低电平，不证明转换同时发生，也不证明物理接触稳定。observed 是不确定度未知的软件完成时间，绝不是转换时间戳。"
+
+# Reviewed API prose and declaration comments; literal identities preserved.
+msgid "xpt2046.h"
+msgstr "xpt2046.h"

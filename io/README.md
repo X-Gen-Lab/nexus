@@ -44,11 +44,41 @@ method reports `NX_ERROR_UNSUPPORTED`. Different provider/mode tables coexist
 without replacing public symbols. IRQ entries are fixed to the selected concrete
 instances and do not look up a factory for each byte.
 
+The selected external-bus path separates a shared `nx_external_bus_port_t`
+controller from its `nx_parallel16_endpoint_t` and `nx_memory_window_port_t`
+bank faces. Platform prepares the concrete controller in C and acquires the
+selected display bank; factory lookup only returns stable readonly faces.
+Parallel word calls are synchronous and settle every CPU span before returning.
+The display component consumes that public endpoint and a readonly caller
+configuration; the SoC imports no component protocol or vendor-facing public type.
+
+A memory-window loan returns an address, byte size and epoch. Ordinary CPU
+loads/stores use that address directly without dispatch per access. The caller
+joins all derived pointer users before releasing the original stable loan.
+`cpu-window` and `startup-memory` are explicit separate configuration modes:
+startup backing owns the selected SRAM for the whole image lifetime and cannot
+grant an overlapping whole-bank loan. Its C receipt already owns that backing
+before Platform startup; context, preflight, identity and startup failures never
+erase it. Global stop reports the retained responsibility before withdrawing
+shared pads or system clocks. Geometry reports selected software facts,
+not physical fitting or memory timing qualification. No DMA, heap, external
+stack or executable-memory permission follows from either face.
+
 Generated factory getters return existing identities. Lookup, Platform start,
 request admission, service, recovery and stop remain separate actions. Controller
 and endpoint identities stay distinct for SPI/I2C buses. New products should use
 the generated strong-reference header; see the
 [factory contract](../docs/explanation/factory.md) for headers and ID lifetime.
+
+An optional RS485 owner obtains its UART face and admission callback using the
+same strong UART reference: `nx_factory_uart_ref` and
+`nx_factory_uart_tx_validator_ref`. Only explicitly reviewed exact provider modes
+export that existing callback; other modes and invalid IDs return NULL. Lookup
+allocates nothing, touches no hardware and admits no transfer. The shared
+function is not instance authentication: the caller pairs the exact context and
+owns TX exclusively. It supplies stable adapter/configuration storage, a GPIO
+direction face, polarity and explicit setup/hold durations. No role framework,
+per-UART state or additional operations-table field is introduced.
 
 The direct path has one serialized executor in each operation's allowed context.
 Requests and transfer buffers remain caller-owned through acquire-observed

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: df5ec6de2ca8cfc5ec381a6e5fe04488fd579c255d9876ce7169e9673e935da0\n"
+"X-Nexus-Source-SHA256: 5e4b74c005dd4f4f4938fcfdec316af430d1a529bbcefa54802469565bd8f334\n"
 
 msgid "开发体验执行台账"
 msgstr "开发体验执行台账"
@@ -27,9 +27,6 @@ msgstr ""
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:21
 msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
 msgstr "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
-
-msgid "本表包含 107 条原记录，仅表示来源行数。"
-msgstr "本表包含 107 条原记录，仅表示来源行数。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:32
@@ -2610,5 +2607,434 @@ msgstr "provider_onboarding_commands_and_strict_docs_verified"
 msgid "strict_bilingual_docs_and_diagrams_verified"
 msgstr "strict_bilingual_docs_and_diagrams_verified"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。"
-msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`44205f2d80bd7011e507489fe042fd5fbebac52fdac059490a4a8dedea751f62`。"
+msgid "本表包含 139 条原记录，仅表示来源行数。"
+msgstr "本表包含 139 条原记录，仅表示来源行数。"
+
+msgid "QB01"
+msgstr "QB01"
+
+msgid "P0: Freeze schematic identity and reviewed differences"
+msgstr "P0：冻结原理图身份与已审差异"
+
+msgid "schematic_and_source_reviewed_no_new_runtime_execution"
+msgstr "schematic_and_source_reviewed_no_new_runtime_execution"
+
+msgid "boards"
+msgstr "boards"
+
+msgid "Record both PDF hashes and page/component/net references; schematic facts never establish fitted hardware or PCB inspection."
+msgstr "记录两份 PDF 的哈希，以及页码、元件和网络引用；原理图事实不证明实物器件安装或 PCB 检查。"
+
+msgid "QB02"
+msgstr "QB02"
+
+msgid "P0: Introduce two independent exact Qiming Board packages"
+msgstr "P0：建立两个独立的精确启明 Board 包"
+
+msgid "Depends on QB01. Core and high-configuration V4.1 resolve independently; original V3.1 bytes and identity remain unchanged; PCB revision remains unknown until inspected."
+msgstr "依赖 QB01。核心板和高配 V4.1 独立解析；原 V3.1 字节与身份保持不变；PCB 修订在实物检查前继续未知。"
+
+msgid "QB03"
+msgstr "QB03"
+
+msgid "P0: Model population jumper and electrical selections"
+msgstr "P0：建模器件安装、跳线与电气选择"
+
+msgid "Depends on QB01. No invented defaults; absent or unknown devices and unmet jumper conditions reject selected bindings; declarations do not establish physical proof."
+msgstr "依赖 QB01。不引入虚构默认值；器件缺失、型号未知或跳线条件未满足时，拒绝选中绑定；配置声明不建立物理证明。"
+
+msgid "QB04"
+msgstr "QB04"
+
+msgid "P0: Bind hardware selections and PDF provenance into typed configuration"
+msgstr "P0：将硬件选择与 PDF 来源绑定到强类型配置"
+
+msgid "Depends on QB02;QB03. Unknown keys and choices reject; immutable selections survive explain and source SDK consumption; one configuration authority and static emission remain."
+msgstr "依赖 QB02;QB03。拒绝未知键和选项；不可变选择保留在 explain 和 Source SDK 消费中；保持唯一配置权威与静态生成。"
+
+msgid "QB05"
+msgstr "QB05"
+
+msgid "P0: Implement actual GPIO routes and electrical modes"
+msgstr "P0：实现实际 GPIO 路由与电气模式"
+
+msgid "Depends on QB04. Exact package ports and pins support input pulls and output drive; inactive levels precede output mode; failed setup and stop preserve ownership."
+msgstr "依赖 QB04。精确封装端口和引脚支持输入上下拉与输出驱动；进入输出模式前设置非活动电平；设置或停机失败时保留所有权。"
+
+msgid "QB06"
+msgstr "QB06"
+
+msgid "P0: Extend EXTI lines and real vector ownership"
+msgstr "P0：扩展 EXTI 线与真实中断向量所有权"
+
+msgid "Depends on QB05. Selected lines including PF11 use the correct vector; shared owners stop independently; event overflow and rejected initialization remain observable."
+msgstr "依赖 QB05。PF11 等选定线路使用正确向量；共享 owner 可独立停机；事件溢出和初始化拒绝仍可观察。"
+
+msgid "QB07"
+msgstr "QB07"
+
+msgid "P0: Review six UART instances and selected transport modes"
+msgstr "P0：评审六个 UART 实例及选定传输模式"
+
+msgid "Depends on QB04. USART1/2/3/6 and UART4/5 have exact clock IRQ gate and pad admission; existing modes remain; no unimplemented DMA mode is advertised."
+msgstr "依赖 QB04。USART1/2/3/6 与 UART4/5 具有精确时钟、中断、门控和引脚准入；保留既有模式；不宣称未实现的 DMA 模式。"
+
+msgid "QB08"
+msgstr "QB08"
+
+msgid "P0: Add actual SPI and I2C routes without capability drift"
+msgstr "P0：接入实际 SPI 和 I2C 路由，避免能力漂移"
+
+msgid "Depends on QB04. SPI1 PB3/PB4/PB5 and reviewed I2C1 alternatives match real C admission; preserve SWD and reject conflicting complete JTAG ownership."
+msgstr "依赖 QB04。SPI1 PB3/PB4/PB5 和已审 I2C1 替代路由与真实 C 准入一致；保留 SWD，拒绝冲突的完整 JTAG 所有权。"
+
+msgid "QB09"
+msgstr "QB09"
+
+msgid "P0: Deliver safe minimal Board startup and shutdown"
+msgstr "P0：交付安全的最小 Board 启动与停机"
+
+msgid "Depends on QB05;QB07. Correct two-versus-three LEDs and two-versus-four keys; UART electrical route and CS DE backlight levels are explicit; complete cleanup is proved or retained."
+msgstr "依赖 QB05;QB07。准确区分两/三盏 LED 和两/四个按键；明确 UART 电气路由以及 CS、DE、背光电平；证明完整清理，或保留未归还责任。"
+
+msgid "QB10"
+msgstr "QB10"
+
+msgid "P1: Add an AT24C02 device component"
+msgstr "P1：增加 AT24C02 器件组件"
+
+msgid "Depends on QB08. Address 0x50 geometry page boundaries write-cycle ACK progress and failures execute against the actual device transport; product storage layout stays external."
+msgstr "依赖 QB08。地址 0x50、几何、页边界、写周期 ACK 推进和失败路径均执行真实器件传输；产品存储布局留在外部。"
+
+msgid "QB11"
+msgstr "QB11"
+
+msgid "P1: Add a selected W25 SPI NOR component"
+msgstr "P1：增加显式选定的 W25 SPI NOR 组件"
+
+msgid "Depends on QB08;QB03. Expected JEDEC identity and geometry are checked; finite program erase busy and error paths preserve ownership; core unpopulated NOR stays disabled."
+msgstr "依赖 QB08;QB03。检查预期 JEDEC 身份和几何；有限编程、擦除、忙状态及错误路径保留所有权；核心板空贴 NOR 保持禁用。"
+
+msgid "QB12"
+msgstr "QB12"
+
+msgid "P1: Bind both Boards actual CAN routes and electrical conditions"
+msgstr "P1：绑定两块 Board 的实际 CAN 路由与电气条件"
+
+msgid "Depends on QB04;QB09. Core CAN1 PB8/PB9 and high-configuration PA11/PA12 are distinct; CAN2 jumper and shared-filter ownership are reviewed; no transceiver or termination is invented."
+msgstr "依赖 QB04;QB09。区分核心板 CAN1 PB8/PB9 与高配板 PA11/PA12；评审 CAN2 跳线及共享滤波器所有权；不虚构收发器或终端电阻。"
+
+msgid "QB13"
+msgstr "QB13"
+
+msgid "P1: Compose exact RS232 and RS485 paths"
+msgstr "P1：装配精确 RS232 与 RS485 路径"
+
+msgid "Depends on QB07;QB09;QB03. Declared transceiver supply and P15/PG6 direction are checked; true wire-tail and cleanup execute; standard PA2 Ethernet/RS485 conflict rejects."
+msgstr "依赖 QB07;QB09;QB03。检查声明的收发器供电和 P15/PG6 方向；执行真实线上尾部完成与清理；拒绝标准 PA2 以太网/RS485 冲突。"
+
+msgid "QB14"
+msgstr "QB14"
+
+msgid "P1: Bind actual USB full-speed paths"
+msgstr "P1：绑定实际 USB 全速路径"
+
+msgid "Depends on QB03;QB09. P21 USB/CAN selection and VBUS/ID facts remain explicit; OTG_HS internal FS and external ULPI HS are not confused; host support is not inferred."
+msgstr "依赖 QB03;QB09。明确 P21 USB/CAN 选择与 VBUS/ID 事实；区分 OTG_HS 内部 FS 和外部 ULPI HS；不推导 host 支持。"
+
+msgid "QB15"
+msgstr "QB15"
+
+msgid "P1: Compose V4.1 MAC DP83848 and network transport"
+msgstr "P1：装配 V4.1 MAC、DP83848 和网络传输"
+
+msgid "Depends on QB03;QB04;QB09. Exact PHY identity address reference clock P5 and receive-valid variant are reviewed; application network policy stays external; unknown wiring is not repaired silently."
+msgstr "依赖 QB03;QB04;QB09。评审精确 PHY 身份、地址、参考时钟、P5 及接收有效信号变体；应用网络策略留在外部；不静默修复未知接线。"
+
+msgid "QB16"
+msgstr "QB16"
+
+msgid "P1: Integrate F407 RTC LSE and backup-domain lifecycle"
+msgstr "P1：接入 F407 RTC、LSE 和后备域生命周期"
+
+msgid "Depends on QB04;QB09. Calendar and time-domain boundaries execute; LSE failure and retained backup state are explicit; no battery fitting or measured retention is inferred."
+msgstr "依赖 QB04;QB09。执行日历和时间域边界；明确 LSE 失败及后备状态保留；不推导电池安装或实测保持能力。"
+
+msgid "QB17"
+msgstr "QB17"
+
+msgid "P2: Implement one shared FSMC owner with independent banks"
+msgstr "P2：实现一个共享 FSMC owner 和独立存储区"
+
+msgid "Depends on QB04;QB05. Shared pads and gate have one owner; NE3 SRAM and NE4 LCD own distinct windows and timing; rollback and close never restore another live bank."
+msgstr "依赖 QB04;QB05。共享引脚和门控具有唯一 owner；NE3 SRAM 与 NE4 LCD 分别拥有窗口和时序；回滚与关闭不能恢复另一活跃存储区的资源。"
+
+msgid "QB18"
+msgstr "QB18"
+
+msgid "P2: Implement SRAM windows and optional pre-runtime initialization"
+msgstr "P2：实现 SRAM 窗口与可选运行时前初始化"
+
+msgid "Depends on QB17;QB03. Internal bootstrap initializes selected FSMC before external data/bss; CPU and DMA reachability are separate; boot-backed memory prevents unsafe withdrawal."
+msgstr "依赖 QB17;QB03。内部引导在访问外部 data/bss 前初始化选定 FSMC；分别评审 CPU 与 DMA 可达性；承载启动存储的内存阻止不安全归还。"
+
+msgid "QB19"
+msgstr "QB19"
+
+msgid "P2: Integrate the confirmed ILI9341 16-bit display"
+msgstr "P2：接入已确认的 ILI9341 16 位显示"
+
+msgid "Depends on QB17;QB18. Actual command/data address shift and controller identity are checked; 240x320 RGB565 rectangle and error paths execute; shared NRST is not an invented reset GPIO."
+msgstr "依赖 QB17;QB18。检查实际命令/数据地址位移和控制器身份；执行 240x320 RGB565 矩形及错误路径；不能将共享 NRST 虚构为独立复位 GPIO。"
+
+msgid "QB20"
+msgstr "QB20"
+
+msgid "P2: Integrate confirmed XPT2046 through bounded software SPI"
+msgstr "P2：通过有界软件 SPI 接入已确认的 XPT2046"
+
+msgid "Depends on QB05;QB06. PA5/PB1/PB2/PB0/PF11 route and mode are explicit; raw 12-bit sampling and final PENIRQ power state execute; uncertain pin cleanup retains bus ownership."
+msgstr "依赖 QB05;QB06。明确 PA5/PB1/PB2/PB0/PF11 路由与模式；执行原始 12 位采样和最终 PENIRQ 电源状态；引脚清理不确定时保留总线所有权。"
+
+msgid "QB21"
+msgstr "QB21"
+
+msgid "P2: Implement block I/O and F407 SDIO host ownership"
+msgstr "P2：实现 block I/O 与 F407 SDIO host 所有权"
+
+msgid "Depends on QB04. PC8-PC12/PD2 command and data paths handle CRC timeout cancellation and removal; no unconnected card-detect GPIO is invented; buffers end only after detach."
+msgstr "依赖 QB04。PC8-PC12/PD2 命令和数据路径处理 CRC、超时、取消和移除；不虚构未连接的卡检测 GPIO；完成脱离后才结束缓冲区借用。"
+
+msgid "QB22"
+msgstr "QB22"
+
+msgid "P2: Integrate SD card protocol and optional filesystem port"
+msgstr "P2：接入 SD 卡协议与可选文件系统端口"
+
+msgid "Depends on QB21. Selected card geometry and bounded block reads/writes execute; optional filesystem policy stays distinct; product directories and persistence remain external."
+msgstr "依赖 QB21。执行所选卡几何和有界 block 读写；可选文件系统策略保持独立；产品目录和持久化策略留在外部。"
+
+msgid "QB23"
+msgstr "QB23"
+
+msgid "P2: Implement bounded software two-wire and SCCB ports"
+msgstr "P2：实现有界软件双线与 SCCB 端口"
+
+msgid "Depends on QB05. Actual PC0/PC13 and PD6/PD7 paths use release/read semantics with explicit timing and ACK/SCCB differences; no hidden task or long global IRQ mask."
+msgstr "依赖 QB05。实际 PC0/PC13 和 PD6/PD7 路径采用释放/读取语义，明确时序及 ACK/SCCB 差异；不引入隐藏任务或长时间全局中断屏蔽。"
+
+msgid "QB24"
+msgstr "QB24"
+
+msgid "P2: Integrate selected WM8978 audio and complete I2S mode"
+msgstr "P2：接入选定 WM8978 音频与完整 I2S 模式"
+
+msgid "Depends on QB23;QB04. Actual module must be selected; PB12/PB13/PC2/PC3/PC6 clock sample-rate RX/TX DMA and full withdrawal execute; finite slave TX is not full audio qualification."
+msgstr "依赖 QB23;QB04。必须选择实际模块；执行 PB12/PB13/PC2/PC3/PC6 时钟、采样率、RX/TX DMA 及完整归还；有限从机 TX 不等于完整音频资格。"
+
+msgid "QB25"
+msgstr "QB25"
+
+msgid "P2: Integrate the alternative selected VS1053 module"
+msgstr "P2：接入替代的选定 VS1053 模块"
+
+msgid "Depends on QB07;QB08. Actual module must be selected; SPI2 alternate route dual CS DREQ and reset execute; WM8978 and VS1053 cannot own the same connector simultaneously."
+msgstr "依赖 QB07;QB08。必须选择实际模块；执行 SPI2 替代路由、双 CS、DREQ 和复位；WM8978 与 VS1053 不能同时拥有同一连接器。"
+
+msgid "QB26"
+msgstr "QB26"
+
+msgid "P2: Integrate DCMI and an exact OV2640 capture configuration"
+msgstr "P2：接入 DCMI 和精确 OV2640 采集配置"
+
+msgid "Depends on QB18;QB23;QB04. Actual module format and rate are fixed; XCLK SCCB frame boundaries malformed frames and DMA withdrawal execute with declared static memory and bandwidth budgets."
+msgstr "依赖 QB18;QB23;QB04。固定实际模块格式和帧率；在声明的静态内存与带宽预算内执行 XCLK、SCCB、帧边界、畸形帧及 DMA 归还。"
+
+msgid "QB27"
+msgstr "QB27"
+
+msgid "P2: Integrate selected DS18B20 and HS0038 devices"
+msgstr "P2：接入选定 DS18B20 与 HS0038 器件"
+
+msgid "Depends on QB05. OneWire only pulls low or releases and declares any strong-pullup requirement; infrared timing overflow and selected protocol execute without product calibration policy."
+msgstr "依赖 QB05。OneWire 仅拉低或释放，并声明所需强上拉；执行红外时序溢出和选定协议，不包含产品校准策略。"
+
+msgid "QB28"
+msgstr "QB28"
+
+msgid "P0: Validate clock DMA IRQ and memory combination budgets"
+msgstr "P0：验证时钟、DMA、IRQ 和内存组合预算"
+
+msgid "Depends on QB04. Physical DMA Stream exclusivity cannot be bypassed by different channel numbers; TIM2 stays reserved; audio/video buffer reach and bandwidth are explicit."
+msgstr "依赖 QB04。不同 channel 编号不能绕过物理 DMA Stream 独占；TIM2 保持保留；明确音视频缓冲区可达性和带宽。"
+
+msgid "QB29"
+msgstr "QB29"
+
+msgid "P2: Deliver legal combinations and external application examples"
+msgstr "P2：交付合法组合与外部应用示例"
+
+msgid "Depends on QB09;QB10;QB11;QB12;QB13;QB14;QB15;QB16;QB18;QB19;QB20;QB22;QB24;QB25;QB26;QB27;QB28. Minimal serial CAN network storage HMI and selected media profiles consume public interfaces; impossible standard wiring rejects; private application evidence stays private."
+msgstr "依赖 QB09;QB10;QB11;QB12;QB13;QB14;QB15;QB16;QB18;QB19;QB20;QB22;QB24;QB25;QB26;QB27;QB28。最小串口、CAN、网络、存储、HMI 和选定媒体配置消费公共接口；拒绝标准接线下不可能的组合；私有应用证据保持私有。"
+
+msgid "QB30"
+msgstr "QB30"
+
+msgid "P0: Execute genuine TDD and final source-bound software matrix"
+msgstr "P0：执行真实 TDD 与绑定最终源码的软件矩阵"
+
+msgid "Depends on QB01. Meaningful original RED precedes new behavior then GREEN; actual ARM and installed SDK images and resource costs bind exact inputs; no existence-only or stale-pass substitution."
+msgstr "依赖 QB01。有意义的原始 RED 先于新行为，随后 GREEN；实际 ARM、安装后 SDK 镜像和资源成本绑定精确输入；不能以文件存在或旧通过记录替代。"
+
+msgid "QB31"
+msgstr "QB31"
+
+msgid "P2: Deliver bilingual Board guidance and evidence navigation"
+msgstr "P2：交付双语 Board 指导与证据导航"
+
+msgid "Depends on QB02;QB29;QB30. One existing ledger records exact mode source schematic and declared population identities with actual software results and unexecuted physical scope; both locales stay reviewed."
+msgstr "依赖 QB02;QB29;QB30。同一既有台账记录精确模式、源码、原理图及声明安装身份，以及实际软件结果和未执行的物理范围；两种语言保持已审。"
+
+msgid "QB32"
+msgstr "QB32"
+
+msgid "P3: Prepare and execute exact Board HIL admission"
+msgstr "P3：准备并执行精确 Board HIL 准入"
+
+msgid "Depends on QB09;QB29;QB30;QB31. Station binds PCB BOM jumper profile and fact digests; real startup clock serial buses storage USB network and failed-stop behavior execute; disconnected hardware remains not_executed."
+msgstr "依赖 QB09;QB29;QB30;QB31。站点绑定 PCB、BOM、跳线配置与事实摘要；实际执行启动、时钟、串口、总线、存储、USB、网络及失败停机行为；未连接硬件继续为 not_executed。"
+
+msgid "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+msgstr "boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+
+msgid "tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+msgstr "tools/configure/board_hardware.py;tools/configure/gpio_electrical.py;boards/stm32f407zg_qiming_core/board.json;boards/stm32f407zg_qiming_v41/board.json"
+
+msgid "tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py"
+msgstr "tools/configure/ir.py;tools/configure/authored.py;tools/configure/experience.py;tools/configure/dependencies.py"
+
+msgid "soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py"
+msgstr "soc/stm32/stm32f407/drivers/gpio.c;soc/stm32/stm32f407/private/stm32f407_basic_cold.h;tools/configure/gpio_electrical.py"
+
+msgid "io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h"
+msgstr "io/include/nexus/io/exti.h;io/src/api/exti.c;soc/stm32/stm32f407/drivers/exti.c;soc/stm32/stm32f407/private/stm32f407_control_cold.h"
+
+msgid "soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly"
+msgstr "soc/stm32/stm32f407/drivers/uart_cold.c;soc/stm32/stm32f407/configure/hardware.py;soc/stm32/stm32f407/configure/bindings.py;tests/contracts/qiming_uart_assembly"
+
+msgid "soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c"
+msgstr "soc/stm32/stm32f407/routes.json;soc/stm32/stm32f407/drivers/spi.c;soc/stm32/stm32f407/drivers/i2c_cold.c"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/minimal.toml;boards/stm32f407zg_qiming_v41/assemblies/minimal.toml;soc/stm32/stm32f407/drivers/platform_cold.c"
+
+msgid "components/at24c02;tests/google/at24c02_test.cpp"
+msgstr "components/at24c02;tests/google/at24c02_test.cpp"
+
+msgid "components/w25;tests/google/w25_test.cpp"
+msgstr "components/w25;tests/google/w25_test.cpp"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml;boards/stm32f407zg_qiming_v41/assemblies/can-loopback.toml;soc/stm32/stm32f407/configure/can.py"
+
+msgid "partial"
+msgstr "partial"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c"
+msgstr "boards/stm32f407zg_qiming_core/assemblies/usb-device.toml;boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml;soc/stm32/stm32f407/drivers/usb_device.c"
+
+msgid "blocked"
+msgstr "blocked"
+
+msgid "v41_phy_facts_unverified_no_admitted_ethernet_route"
+msgstr "v41_phy_facts_unverified_no_admitted_ethernet_route"
+
+msgid "boards/stm32f407zg_qiming_v41/board.json;components/dp83848"
+msgstr "boards/stm32f407zg_qiming_v41/board.json;components/dp83848"
+
+msgid "soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml"
+msgstr "soc/stm32/stm32f407/drivers/rtc.c;soc/stm32/stm32f407/configure/rtc.py;boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml;boards/stm32f407zg_qiming_v41/assemblies/rtc-adopt.toml"
+
+msgid "io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py"
+msgstr "io/include/nexus/io/external_bus.h;io/include/nexus/io/parallel16.h;io/include/nexus/io/memory_window.h;soc/stm32/stm32f407/drivers/fsmc.c;soc/stm32/stm32f407/drivers/fsmc_boot.c;soc/stm32/stm32f407/configure/fsmc.py"
+
+msgid "soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
+msgstr "soc/stm32/stm32f407/sram_boot.c;soc/stm32/stm32f407/memory_init.c;soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/configure/sram.py;boards/stm32f407zg_qiming_core/assemblies/sram-startup.toml;boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
+
+msgid "components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml"
+msgstr "components/ili9341;boards/stm32f407zg_qiming_core/assemblies/display-touch.toml;boards/stm32f407zg_qiming_v41/assemblies/display-touch.toml"
+
+msgid "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
+msgstr "components/software_spi;components/xpt2046;boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml;boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml"
+
+msgid "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
+msgstr "io/include/nexus/io/block.h;io/src/api/block.c;soc/stm32/stm32f407/drivers/sdio.c;soc/stm32/stm32f407/configure/block.py"
+
+msgid "soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly"
+msgstr "soc/stm32/stm32f407/drivers/sdio.c;boards/stm32f407zg_qiming_v41/assemblies/sdio.toml;tests/contracts/qiming_sdio_assembly"
+
+msgid "components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+msgstr "components/software_i2c;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+
+msgid "module_selection_and_complete_driver_pending"
+msgstr "module_selection_and_complete_driver_pending"
+
+msgid "boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+msgstr "boards/stm32f407zg_qiming_v41/board.json;boards/stm32f407zg_qiming_v41/assemblies/control-wires.toml"
+
+msgid "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
+msgstr "components/onewire;components/ds18b20;components/infrared;boards/stm32f407zg_qiming_v41/assemblies/sensor-wires.toml"
+
+msgid "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
+msgstr "tools/configure/resource_graph.py;tools/configure/memory.py;tools/configure/dma_topology.py;soc/stm32/stm32f407/routes.json"
+
+msgid "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
+msgstr "boards/stm32f407zg_qiming_core/assemblies;boards/stm32f407zg_qiming_v41/assemblies;tests/contracts/qiming_devices_assembly;tests/contracts/qiming_sdio_assembly"
+
+msgid "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
+msgstr "tests/google;tools/configure;scripts/ci/tdd_gate.py;docs/design/developer-experience.md"
+
+msgid "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
+msgstr "docs/design/developer-experience.md;docs/design/developer-experience-execution.csv;docs/status/ledgers/developer-experience.md;docs/locale/zh_CN/LC_MESSAGES/design/developer-experience.po;docs/delivery/developer-experience-results.json"
+
+msgid "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
+msgstr "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures/stm32f407zg_qiming_core.json;tools/hil/fixtures/stm32f407zg_qiming_v41.json;tools/schemas/hil-fixture.schema.json;tools/testing/test_hil_qiming.py"
+
+msgid "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"
+msgstr "tools/configure/factory.py;io/include/nexus/io/uart.h;io/include/nexus/io/uart_rs485.h;io/src/mechanisms/uart_rs485.c;boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml;tests/contracts/qiming_rs485_assembly;tests/google/qiming_rs485_factory_test.cpp"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A"
+msgstr "software_matrix_verified_source_A"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed"
+msgstr "software_matrix_verified_source_A_hil_preparation_46_tests_passed_physical_not_executed"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending"
+msgstr "software_matrix_verified_source_A_minimal_private_companion_verified_media_network_exit_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap"
+msgstr "software_matrix_verified_source_A_polling_only_no_dma_irq_cancel_hot_swap"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_resource_guards_audio_video_admission_pending"
+msgstr "software_matrix_verified_source_A_resource_guards_audio_video_admission_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_rs232_and_electrical_verification_pending"
+msgstr "software_matrix_verified_source_A_rs232_and_electrical_verification_pending"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open"
+msgstr "software_matrix_verified_source_A_strict_tdd_chronology_and_snapshot_exceptions_open"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "strict_en_zh_passed_source_B2"
+msgstr "strict_en_zh_passed_source_B2"
+
+# Reviewed final scoped software status; configuration identities remain literal.
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/developer-experience-execution.csv>`。 源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`ad391b10a701d14d8fdbf348b53ea3c86156b415123bc47a49285c0c7d0fdeff`。"

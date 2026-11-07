@@ -1,0 +1,624 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-qiming-v41",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "V4.1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "lse_hz": 32768
+  },
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "initial": 8,
+      "mask": 8,
+      "electrical": {
+        "mode": "output",
+        "initial": 8
+      }
+    },
+    {
+      "id": "led1",
+      "controller": "GPIOE",
+      "route": "gpio-pe4",
+      "initial": 16,
+      "mask": 16,
+      "electrical": {
+        "mode": "output",
+        "initial": 16
+      }
+    },
+    {
+      "id": "led2",
+      "controller": "GPIOG",
+      "route": "gpio-pg9",
+      "initial": 512,
+      "mask": 512,
+      "electrical": {
+        "mode": "output",
+        "initial": 512
+      }
+    },
+    {
+      "id": "key0",
+      "controller": "GPIOF",
+      "route": "gpio-pf9",
+      "initial": 0,
+      "mask": 512,
+      "electrical": {
+        "mode": "input",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key1",
+      "controller": "GPIOF",
+      "route": "gpio-pf8",
+      "initial": 0,
+      "mask": 256,
+      "electrical": {
+        "mode": "input",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key2",
+      "controller": "GPIOF",
+      "route": "gpio-pf7",
+      "initial": 0,
+      "mask": 128,
+      "electrical": {
+        "mode": "input",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key3",
+      "controller": "GPIOF",
+      "route": "gpio-pf6",
+      "initial": 0,
+      "mask": 64,
+      "electrical": {
+        "mode": "input",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    },
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1-pb6-pb7"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal"
+    },
+    {
+      "id": "iwdg0",
+      "controller": "IWDG",
+      "route": "iwdg"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pb3-pb4-pb5",
+      "requires": {
+        "nor_population": "fitted",
+        "debug_port": "swd"
+      }
+    },
+    {
+      "id": "nor-cs",
+      "controller": "GPIOG",
+      "route": "gpio-pg8",
+      "initial": 256,
+      "mask": 256,
+      "requires": {
+        "nor_population": "fitted",
+        "debug_port": "swd"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 256
+      }
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3",
+      "requires": {
+        "p15": "rs485"
+      }
+    },
+    {
+      "id": "rs485-de",
+      "controller": "GPIOG",
+      "route": "gpio-pg6",
+      "initial": 0,
+      "mask": 64,
+      "requires": {
+        "p15": "rs485"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "can1",
+      "controller": "CAN1",
+      "route": "can1-pa11-pa12",
+      "requires": {
+        "p21": "can1"
+      }
+    },
+    {
+      "id": "can2",
+      "controller": "CAN2",
+      "route": "can2-pb12-pb13",
+      "requires": {
+        "p15": "can2"
+      }
+    },
+    {
+      "id": "usbfs",
+      "controller": "OTG_FS",
+      "route": "usbfs-pa11-pa12",
+      "requires": {
+        "p21": "usb"
+      }
+    },
+    {
+      "id": "uart3",
+      "controller": "USART3",
+      "route": "usart3-pb10-pb11"
+    },
+    {
+      "id": "uart4",
+      "controller": "UART4",
+      "route": "uart4-pa0-pa1",
+      "requires": {
+        "p5": "wifi"
+      }
+    },
+    {
+      "id": "uart5",
+      "controller": "UART5",
+      "route": "uart5-pc12-pd2"
+    },
+    {
+      "id": "uart6",
+      "controller": "USART6",
+      "route": "usart6-pc6-pc7"
+    },
+    {
+      "id": "key0-edge",
+      "controller": "EXTI9",
+      "route": "exti9-pf9",
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key1-edge",
+      "controller": "EXTI8",
+      "route": "exti8-pf8",
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key2-edge",
+      "controller": "EXTI7",
+      "route": "exti7-pf7",
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "key3-edge",
+      "controller": "EXTI6",
+      "route": "exti6-pf6",
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "up"
+      }
+    },
+    {
+      "id": "lcd-backlight",
+      "controller": "GPIOF",
+      "route": "gpio-pf10",
+      "initial": 0,
+      "mask": 1024,
+      "requires": {
+        "display_module": "ili9341-16bit"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "touch-clk",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "mask": 32,
+      "initial": 0,
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "touch-mosi",
+      "controller": "GPIOB",
+      "route": "gpio-pb1",
+      "mask": 2,
+      "initial": 0,
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "touch-miso",
+      "controller": "GPIOB",
+      "route": "gpio-input-pb2",
+      "mask": 4,
+      "initial": 0,
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "input"
+      }
+    },
+    {
+      "id": "touch-cs",
+      "controller": "GPIOB",
+      "route": "gpio-pb0",
+      "mask": 1,
+      "initial": 1,
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 1
+      }
+    },
+    {
+      "id": "touch-pen",
+      "controller": "GPIOF",
+      "route": "gpio-pf11",
+      "mask": 2048,
+      "initial": 0,
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "input"
+      }
+    },
+    {
+      "id": "touch-pen-edge",
+      "controller": "EXTI11",
+      "route": "exti11-pf11",
+      "requires": {
+        "touch_module": "xpt2046-gpio"
+      },
+      "electrical": {
+        "mode": "edge-event"
+      }
+    },
+    {
+      "id": "sdio",
+      "controller": "SDIO",
+      "route": "sdio-pc8-pd2",
+      "requires": {
+        "sd_card": "inserted"
+      }
+    },
+    {
+      "id": "rtc0",
+      "controller": "RTC",
+      "route": "rtc-lse-pc14-pc15"
+    },
+    {
+      "id": "fsmc0",
+      "controller": "FSMC",
+      "route": "fsmc-async16"
+    },
+    {
+      "id": "sram0",
+      "controller": "FSMC",
+      "route": "fsmc-ne3-is62wv51216",
+      "requires": {
+        "sram_population": "is62wv51216"
+      }
+    },
+    {
+      "id": "lcd0",
+      "controller": "FSMC",
+      "route": "fsmc-ne4-ili9341",
+      "requires": {
+        "display_module": "ili9341-16bit"
+      }
+    },
+    {
+      "id": "camera-scl",
+      "controller": "GPIOD",
+      "route": "gpio-pd6",
+      "mask": 64,
+      "initial": 64,
+      "requires": {
+        "camera_module": "ov2640"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 64,
+        "pull": "none",
+        "output_type": "open-drain"
+      }
+    },
+    {
+      "id": "camera-sda",
+      "controller": "GPIOD",
+      "route": "gpio-pd7",
+      "mask": 128,
+      "initial": 128,
+      "requires": {
+        "camera_module": "ov2640"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 128,
+        "pull": "none",
+        "output_type": "open-drain"
+      }
+    },
+    {
+      "id": "audio-scl",
+      "controller": "GPIOC",
+      "route": "gpio-pc0",
+      "mask": 1,
+      "initial": 1,
+      "requires": {
+        "audio_module": "wm8978"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 1,
+        "pull": "none",
+        "output_type": "open-drain"
+      }
+    },
+    {
+      "id": "audio-sda",
+      "controller": "GPIOC",
+      "route": "gpio-pc13",
+      "mask": 8192,
+      "initial": 8192,
+      "requires": {
+        "audio_module": "wm8978"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 8192,
+        "pull": "none",
+        "output_type": "open-drain"
+      }
+    },
+    {
+      "id": "onewire-data",
+      "controller": "GPIOA",
+      "route": "gpio-pa15",
+      "mask": 32768,
+      "initial": 32768,
+      "requires": {
+        "temperature_module": "ds18b20-external-vdd",
+        "debug_port": "swd"
+      },
+      "electrical": {
+        "mode": "output",
+        "initial": 32768,
+        "pull": "none",
+        "output_type": "open-drain"
+      }
+    },
+    {
+      "id": "beeper",
+      "controller": "GPIOG",
+      "route": "gpio-pg7",
+      "mask": 128,
+      "initial": 0,
+      "electrical": {
+        "mode": "output",
+        "initial": 0,
+        "output_type": "push-pull"
+      }
+    },
+    {
+      "id": "infrared-edge",
+      "controller": "EXTI2",
+      "route": "exti2-pe2",
+      "requires": {
+        "infrared_module": "hs0038"
+      },
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "none"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "hardware_options": {
+    "debug_port": [
+      "swd",
+      "jtag"
+    ],
+    "nor_population": [
+      "absent",
+      "fitted"
+    ],
+    "p21": [
+      "disconnected",
+      "usb",
+      "can1"
+    ],
+    "p15": [
+      "disconnected",
+      "rs485",
+      "can2"
+    ],
+    "p5": [
+      "disconnected",
+      "ethernet",
+      "wifi"
+    ],
+    "display_module": [
+      "absent",
+      "ili9341-16bit"
+    ],
+    "touch_module": [
+      "absent",
+      "xpt2046-gpio"
+    ],
+    "sd_card": [
+      "absent",
+      "inserted"
+    ],
+    "sram_population": [
+      "absent",
+      "is62wv51216"
+    ],
+    "camera_module": [
+      "absent",
+      "ov2640"
+    ],
+    "audio_module": [
+      "absent",
+      "wm8978",
+      "vs1053"
+    ],
+    "temperature_module": [
+      "absent",
+      "ds18b20-external-vdd"
+    ],
+    "infrared_module": [
+      "absent",
+      "hs0038"
+    ]
+  },
+  "unknowns": [
+    "V4.1 is the supplied file revision; the schematic title-block revision and physical PCB revision are unconfirmed. Actual fitting and jumper positions were not inspected.",
+    "W25Q128 heading and 64 Mbit symbol note conflict. Explicit NOR fitting permits its SPI transport only; the exact expected JEDEC identity and geometry require separate reviewed device configuration.",
+    "MAX485 and MAX232 symbols show 3.3 V supply although those standard part names specify 5 V supply. Verify actual compatible part markings and electrical conditions before physical use.",
+    "P21 selects USB FS or CAN1 on PA11/PA12; P15 selects RS485 or CAN2-related connections. Authored hardware selections are declarations, not inspection evidence.",
+    "Ethernet MDIO PA2 conflicts with the default USART2 RS485 TX route; original wiring cannot deliver both simultaneously.",
+    "DP83848 Y3 frequency is unspecified; P5 MDIO labels differ between sheets. PHY address, reference clock, RX_DV wiring compatibility and continuity require review. No V4.1 Ethernet binding is admitted yet.",
+    "PF6/PF7/PF8/PF9 directional keys lack drawn external pullups; select input and explicit internal pullup. The fifth center key is NRST, not another GPIO.",
+    "Touch uses mixed PA5/PB1/PB2 GPIO, not a complete hardware SPI route. Audio control PC0/PC13 and camera control PD6/PD7 are not hardware I2C routes.",
+    "USB_HS on PB14/PB15 uses an internal FS PHY path without ULPI; no 480 Mbps or USB host support is implied.",
+    "FSMC SRAM/LCD, SDIO, RTC, full audio and DCMI drivers remain separate implementation tasks, not support established by this Board package.",
+    "ILI9341/XPT2046 module identities are user-declared; actual connector continuity and fitting remain unverified. Display/touch options do not imply a delivered FSMC or complete device driver. GPIO touch PEN and EXTI PEN are alternative owners and cannot both be selected.",
+    "Camera, WM8978/VS1053, WiFi/Bluetooth, DS18B20 and HS0038 module variants and fitting remain unverified.",
+    "FSMC NE3 is an explicitly declared IS62WV51216 1MiB reference. Exact fitted speed/voltage suffix, encoded bank timing and physical waveform need verification; no memory test or DMA reachability follows from a CPU window.",
+    "Audio and camera choices currently select reviewed GPIO control wires only; they neither select a codec/sensor automatically nor establish I2S/DCMI software support or fitting. DS18B20 external VDD and HS0038/NEC are explicit software references, with no inferred remote model or parasite power support."
+  ],
+  "provenance": [
+    {
+      "file": "\u542f\u660e\u6b23\u6b23407\u5f00\u53d1\u677f(\u9ad8\u914d\u7248)V4.1\u539f\u7406\u56fe.pdf",
+      "sha256": "64215f6849c4f5b2f76b4ce23241b814cd66be14a4d652f89da1c53e3aa6abe5",
+      "pages": [
+        1,
+        2,
+        3
+      ],
+      "components": [
+        "U1",
+        "U2",
+        "U5",
+        "U6",
+        "U7",
+        "U8",
+        "U9",
+        "U10",
+        "U11"
+      ],
+      "nets": [
+        "LED0",
+        "LED1",
+        "USART1_TX",
+        "USART1_RX",
+        "IIC_SCL",
+        "IIC_SDA",
+        "W25_CS"
+      ],
+      "scope": "Exact uploaded schematic identity and reviewed MCU pad connections only; no physical PCB, population, continuity, electrical, timing or HIL qualification."
+    },
+    "User-identified external panel: ILI9341 with 16-bit DB0..DB15 and XPT2046 touch. Shared global NRST and active-high transistor-controlled BL_CTR follow the identified 32-pin module. This is a declared module choice, not physical fitting or qualification evidence.",
+    {
+      "scope": "RTC crystal route only; battery fitting and physical retention remain unqualified. Explicit authored policy and date are never inferred from lookup.",
+      "file": "\u542f\u660e\u6b23\u6b23407\u5f00\u53d1\u677f(\u9ad8\u914d\u7248)V4.1\u539f\u7406\u56fe.pdf",
+      "sha256": "64215f6849c4f5b2f76b4ce23241b814cd66be14a4d652f89da1c53e3aa6abe5",
+      "pages": [
+        1
+      ],
+      "components": [
+        "Y1"
+      ],
+      "nets": [
+        "PC14-OSC32_IN",
+        "PC15-OSC32_OUT"
+      ]
+    },
+    {
+      "file": "\u542f\u660e\u6b23\u6b23407\u5f00\u53d1\u677f(\u9ad8\u914d\u7248)V4.1\u539f\u7406\u56fe.pdf",
+      "sha256": "64215f6849c4f5b2f76b4ce23241b814cd66be14a4d652f89da1c53e3aa6abe5",
+      "pages": [
+        1,
+        3
+      ],
+      "components": [
+        "P8",
+        "P9",
+        "P18",
+        "P19",
+        "J7",
+        "Q1"
+      ],
+      "nets": [
+        "18B20",
+        "HS0038",
+        "BEED",
+        "DCMI_SCL",
+        "DCMI_SDA",
+        "I2S_SCK",
+        "I2S_SDA"
+      ],
+      "scope": "GPIO control and optional sensor connector wiring only; no module fitting, camera/audio driver, remote protocol or electrical qualification. R49 references repeat on the source sheet and are not treated as unique component identity."
+    }
+  ]
+}

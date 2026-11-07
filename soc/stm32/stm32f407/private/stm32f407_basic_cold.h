@@ -17,13 +17,17 @@ typedef struct {
     uint32_t mask;
     uint32_t initial;
     bool output;
+    uint8_t pull;
+    uint8_t output_type;
 } nx_stm32_gpio_config_t;
 
 /** \brief Bind and initialize GPIO after Platform has admitted its pads.
  * \param[in,out] port: Serialized cold owner; live rebind is rejected.
- * \param[in] config: Static exact bank, mask, direction and initial level.
- * \return Success or error; malformed configuration changes no hardware.
- * \note Platform retains the original pin snapshots and shared bank clock.
+ * \param[in] config: Static bank, mask, direction, initial and electrical
+ * facts. \return Success or error; malformed configuration changes no hardware.
+ * \note Pull is none/up/down (0/1/2); output type is push-pull/open-drain
+ *       (0/1). Open-drain applies only to outputs. Platform retains the
+ *       original pin snapshots and shared bank clock.
  */
 nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
                                   const nx_stm32_gpio_config_t* config);

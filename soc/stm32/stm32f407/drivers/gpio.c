@@ -10,9 +10,18 @@
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_gpio.h"
 
+_Static_assert(LL_GPIO_PULL_NO == 0U && LL_GPIO_PULL_UP == 1U &&
+                   LL_GPIO_PULL_DOWN == 2U && LL_GPIO_OUTPUT_PUSHPULL == 0U &&
+                   LL_GPIO_OUTPUT_OPENDRAIN == 1U,
+               "Reviewed GPIO electrical facts differ from the selected SDK");
+
 #ifndef NX_STM32_GPIO_CLOCK_READ
 #define NX_STM32_GPIO_CLOCK_READ(reg) (*(reg))
 #endif
+
+static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
+                                         uint32_t initial, uint8_t pull,
+                                         uint8_t output_type);
 
 nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
                                   const nx_stm32_gpio_config_t* config) {
@@ -20,7 +29,9 @@ nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
         return NX_ERROR_CONTEXT;
     if (port == NULL || config == NULL || config->mask == 0U ||
         (config->mask & ~UINT32_C(0xFFFF)) != 0U ||
-        (config->initial & ~config->mask) != 0U)
+        (config->initial & ~config->mask) != 0U || config->pull > 2U ||
+        config->output_type > 1U ||
+        (!config->output && config->output_type != 0U))
         return NX_ERROR_INVALID;
     if (port->initialized)
         return NX_ERROR_BUSY;
@@ -50,13 +61,16 @@ nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
     port->registers = config->registers;
     port->mask = config->mask;
     port->output = config->output;
-    /* All initialize rejection conditions precede the first pin write. */
-    return nx_stm32_gpio_initialize(port, config->initial);
+    /* Argument rejection precedes pin writes. Hardware refusal retains the
+     * Platform pin receipt/clock for whole-resource rollback. */
+    return initialize_electrical(port, config->initial, config->pull,
+                                 config->output_type);
 }
 
 /** \brief Preload output levels before exposing the configured output mode. */
-nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
-                                     uint32_t initial) {
+static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
+                                         uint32_t initial, uint8_t pull,
+                                         uint8_t output_type) {
     if (port == NULL || port->registers == NULL || port->mask == 0U ||
         (port->mask & ~0xFFFFU) != 0U || (initial & ~port->mask) != 0U) {
         return NX_ERROR_INVALID;
@@ -69,8 +83,17 @@ nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->mask & (1U << pin)) != 0U) {
             uint32_t selected = 1U << pin;
-            LL_GPIO_SetPinOutputType(regs, selected, LL_GPIO_OUTPUT_PUSHPULL);
-            LL_GPIO_SetPinPull(regs, selected, LL_GPIO_PULL_NO);
+            LL_GPIO_SetPinOutputType(regs, selected, output_type);
+            LL_GPIO_SetPinPull(regs, selected, pull);
+            if (port->output && regs == GPIOC && pin >= 13U) {
+                /* PC13/14/15 use the backup-domain power switch: DS8626
+                 * restricts their output speed to the low 2MHz mode. */
+                LL_GPIO_SetPinSpeed(regs, selected, LL_GPIO_SPEED_FREQ_LOW);
+                nx_arch_dsb();
+                if (LL_GPIO_GetPinSpeed(regs, selected) !=
+                    LL_GPIO_SPEED_FREQ_LOW)
+                    return NX_ERROR_IO;
+            }
             LL_GPIO_SetPinMode(regs, selected,
                                port->output ? LL_GPIO_MODE_OUTPUT
                                             : LL_GPIO_MODE_INPUT);
@@ -78,6 +101,12 @@ nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
     }
     port->initialized = true;
     return NX_SUCCESS;
+}
+
+/** \brief Keep existing internal users on explicit push-pull/no-pull facts. */
+nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
+                                     uint32_t initial) {
+    return initialize_electrical(port, initial, 0U, 0U);
 }
 
 /** \brief Validate dynamic masks before the one atomic BSRR write. */

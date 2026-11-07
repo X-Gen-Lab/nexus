@@ -1,0 +1,56 @@
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[hardware]
+debug_port = "swd"
+nor_population = "fitted"
+touch_module = "xpt2046-gpio"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[gpio.touch-clk]
+binding = "touch-clk"
+mode = "output"
+
+[gpio.touch-mosi]
+binding = "touch-mosi"
+mode = "output"
+
+[gpio.touch-cs]
+binding = "touch-cs"
+mode = "output"
+
+[gpio.touch-miso]
+binding = "touch-miso"
+mode = "input"
+pull = "none"
+
+[exti.pen]
+binding = "touch-pen-edge"
+mode = "edge-event"
+edge = "both"
+pull = "none"
+event_capacity = 8
+
+[exti.pen.irq]
+priority = 5
+calls_os = false
+
+[spi.nor]
+binding = "spi1"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.memory]
+controller = "nor"
+driver = "spi-endpoint"
+cs_binding = "nor-cs"
+mode = 0
+max_hz = 1000000

@@ -176,6 +176,32 @@
           "scope"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "board": {
+            "enum": [
+              "stm32f407zg-qiming-core",
+              "stm32f407zg-qiming-v41"
+            ]
+          }
+        },
+        "required": [
+          "board"
+        ]
+      },
+      "then": {
+        "$ref": "#/$defs/software_reference_board_target",
+        "properties": {
+          "scope": {
+            "const": "software_reference"
+          }
+        },
+        "required": [
+          "scope"
+        ]
+      }
     }
   ],
   "$defs": {
@@ -244,6 +270,38 @@
             },
             "part": {
               "const": "STM32U575ZIT6Q"
+            }
+          },
+          "required": [
+            "board",
+            "part"
+          ]
+        }
+      ]
+    },
+    "software_reference_board_target": {
+      "oneOf": [
+        {
+          "properties": {
+            "board": {
+              "const": "stm32f407zg-qiming-core"
+            },
+            "part": {
+              "const": "STM32F407ZGT6"
+            }
+          },
+          "required": [
+            "board",
+            "part"
+          ]
+        },
+        {
+          "properties": {
+            "board": {
+              "const": "stm32f407zg-qiming-v41"
+            },
+            "part": {
+              "const": "STM32F407ZGT6"
             }
           },
           "required": [

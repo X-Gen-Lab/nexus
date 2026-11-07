@@ -1,0 +1,56 @@
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[gpio.led0]
+binding = "led0"
+mode = "output"
+
+[gpio.led1]
+binding = "led1"
+mode = "output"
+
+[gpio.led2]
+binding = "led2"
+mode = "output"
+
+[gpio.key0]
+binding = "key0"
+mode = "input"
+pull = "up"
+
+[gpio.key1]
+binding = "key1"
+mode = "input"
+pull = "up"
+
+[gpio.key2]
+binding = "key2"
+mode = "input"
+pull = "up"
+
+[gpio.key3]
+binding = "key3"
+mode = "input"
+pull = "up"
+
+[uart.console]
+binding = "uart1"
+mode = "irq"
+baud = 115200
+
+[uart.console.rx]
+format = "events"
+capacity = 64
+
+[uart.console.irq]
+priority = 5
+calls_os = false

@@ -5,6 +5,24 @@ an unbound work plan. It validates the exact part and smoke-console pins and
 retains selected controller modes. It records every physical case as
 `not_executed`; it cannot establish station readiness or hardware qualification.
 
+The two new Qiming fixtures, `stm32f407zg_qiming_core.json` and
+`stm32f407zg_qiming_v41.json`, bind the independent STM32F407ZGT6 Boards and
+schematic identities. Both remain `software_reference`: station admission rejects
+them until a separately reviewed physical fixture and tooling change. This does
+not change the older V3.1 fixture or ban other Boards with the same MCU part.
+Their budgets are null. ILI9341/XPT2046 models are confirmed; their fitting,
+electrical timing and physical execution are unobserved. Audio/camera headers do
+not establish an installed controller.
+
+When the resolved build contains Board hardware options, preparation preserves
+their exact catalogue and explicit selections, with
+`physical_verification=not_established_by_configuration`. Omitted selections stay
+unknown. The existing resolved-file identity binds those declarations; no second
+configuration or physical-observation authority is created. A future station
+must independently inspect population, jumpers, connector personality and PCB
+revision before equipment operation. Copying declarations into a plan does not
+perform that inspection.
+
 ```sh
 python tools/hil/prepare.py \
     --fixture tools/hil/fixtures/gd32f470_liangshan.json \

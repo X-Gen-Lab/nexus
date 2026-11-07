@@ -13,6 +13,10 @@
 #if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
 #include "memory_init.h"
 #endif
+#if defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM
+#include "stm32f407_sram_boot.h"
+extern const nx_stm32_sram_boot_plan_t g_nx_stm32_sram_boot_plan;
+#endif
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
 #include "stm32f407_lowpower.h"
 #endif
@@ -192,12 +196,13 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
     return NX_SUCCESS;
 }
 
-#if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
+#if (defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM) ||                         \
+    (defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM)
 #ifndef NX_STM32_BOOT_FAILURE
 /** \brief Fail before constructors without observing initialized global RAM. */
 static _Noreturn void boot_failure(uint32_t reason) {
     volatile uint32_t retained_reason = reason;
-    (void)nx_arch_irq_save();
+    __disable_irq();
     for (;;) {
         (void)retained_reason;
         __NOP();
@@ -272,6 +277,13 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
 
 /** \brief Initialize CPU registers without touching not-yet-initialized RAM. */
 void SystemInit(void) {
+#if defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM
+    /* The complete Flash plan and incoming reset profile must be proved
+     * before RCC writes can erase evidence of a warm/offset handoff. */
+    if (!nx_stm32_sram_bootstrap(&g_nx_stm32_sram_boot_plan)) {
+        NX_STM32_BOOT_FAILURE(3U);
+    }
+#endif
 #ifndef NEXUS_STM32_MODEL
     SCB->CPACR |= (0xFU << 20U);
     __DSB();
@@ -572,6 +584,19 @@ uint64_t nx_stm32_system_now(nx_stm32_system_t* system) {
     }
     nx_arch_irq_restore(mask);
     return high + count;
+}
+
+/** \brief Validate both sides of the snapshot; valid zero remains observable.
+ */
+uint64_t nx_stm32_system_clock_read(void* context) {
+    if (context != &g_nx_stm32_system || !g_nx_stm32_system.started ||
+        g_nx_stm32_system.timer_error != NX_SUCCESS)
+        return UINT64_MAX;
+    uint64_t now = nx_stm32_system_now(&g_nx_stm32_system);
+    return g_nx_stm32_system.started &&
+                   g_nx_stm32_system.timer_error == NX_SUCCESS
+               ? now
+               : UINT64_MAX;
 }
 
 /** \brief Validate observed density without pretending DEV_ID encodes package.
