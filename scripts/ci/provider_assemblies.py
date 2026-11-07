@@ -78,10 +78,12 @@ def validate_fixtures(root, assemblies, *, family=None, project=None):
         seen.add(path)
         actual_project = selected_project or path.parent
         owned_file(actual_project / "CMakeLists.txt")
+        authored = tomllib.loads(path.read_text(encoding="utf-8"))
         if selected_project is not None:
-            authored = tomllib.loads(path.read_text(encoding="utf-8"))
             if type(authored.get("schema")) is not int or authored["schema"] != 2:
                 raise EvidenceError("explicit project requires assembly schema 2")
+        if authored.get("backend") == "native":
+            raise EvidenceError("host model is not an ARM assembly fixture")
         navigation = {}
         resolved = resolve_ir(path, root, input_paths=navigation).to_dict()
         if resolved["cpu"]["arch"] == "native" or resolved["backend"] == "native":

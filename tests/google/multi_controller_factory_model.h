@@ -5,13 +5,9 @@
  */
 #ifndef NEXUS_MULTI_CONTROLLER_FACTORY_MODEL_H
 #define NEXUS_MULTI_CONTROLLER_FACTORY_MODEL_H
+#include "stm32f407xx.h"
 #include <stdbool.h>
 #include <stdint.h>
-#ifdef NX_MULTI_FACTORY_STM32
-#include "stm32f407xx.h"
-#else
-#include "gd32f4xx.h"
-#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,10 +41,6 @@ void nx_multi_factory_i2c_address(void* state);
     nx_multi_factory_write(&(reg), (uint32_t)(value))
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \
     nx_multi_factory_priority_write(&(reg), (uint8_t)(value))
-#ifndef NX_MULTI_FACTORY_STM32
-#define NX_UART_REG_WRITE(address, value)                                      \
-    nx_multi_factory_write((address), (uint32_t)(value))
-#endif
 #define NVIC_EnableIRQ(irq)       nx_multi_factory_irq_enable((int)(irq))
 #define NVIC_DisableIRQ(irq)      nx_multi_factory_irq_disable((int)(irq))
 #define NVIC_ClearPendingIRQ(irq) nx_multi_factory_irq_pending_clear((int)(irq))
@@ -61,14 +53,6 @@ void nx_multi_factory_i2c_address(void* state);
 #define NX_STM32_UART_DMA_ACK(clear, mask)                                     \
     nx_multi_factory_dma_ack((clear), (uint32_t)(mask))
 #define NX_STM32_SPI_DMA_ACK(clear, mask)                                      \
-    nx_multi_factory_dma_ack((clear), (uint32_t)(mask))
-#define NX_GD32_UART_DMA_DISABLE(control, mask)                                \
-    nx_multi_factory_dma_disable((control), (uint32_t)(mask))
-#define NX_GD32_UART_DMA_ACK(clear, mask)                                      \
-    nx_multi_factory_dma_ack((clear), (uint32_t)(mask))
-#define NX_GD32_SPI_DMA_CONTROL_DISABLE(control, mask)                         \
-    nx_multi_factory_dma_disable((control), (uint32_t)(mask))
-#define NX_GD32_SPI_DMA_FLAGS_ACK(clear, mask)                                 \
     nx_multi_factory_dma_ack((clear), (uint32_t)(mask))
 #define NX_STM32_SPI_RESET(reg, mask, active)                                  \
     nx_multi_factory_spi_reset((reg), (uint32_t)(mask), (active))

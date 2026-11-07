@@ -110,7 +110,7 @@ class CreatedProjectConsumptionTests(unittest.TestCase):
 
     def test_create_commands_configure_build_and_execute_the_c11_application(self):
         result = projects.create(self.templates, self.revision, "public-native",
-                                 self.output, source_root=ROOT)
+                                 self.output, source_root=ROOT, test_support=True)
         commands = result["commands"]
         self.assertEqual(set(commands), {"configure", "build", "test"})
         self.assertIn("-DNEXUS_SOURCE=" + str(ROOT), commands["configure"])

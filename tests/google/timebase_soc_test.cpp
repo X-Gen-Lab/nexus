@@ -9,27 +9,10 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus/core/time.h"
 #include "nexus/os/lowpower.h"
-#include "timebase_lowpower.h"
-#include "timebase_soc_model.h"
-#ifdef NX_TIMEBASE_GD_MODEL
-#include "gd32f470_lowpower.h"
-uint32_t SystemCoreClock = 200000000U;
-#define TIMER_CTRL        TIMER_CTL0(TIMER1)
-#define TIMER_PRESCALER   TIMER_PSC(TIMER1)
-#define TIMER_TOP         TIMER_CAR(TIMER1)
-#define TIMER_FLAGS       TIMER_INTF(TIMER1)
-#define TIMER_ENABLE      TIMER_DMAINTEN(TIMER1)
-#define TIMER_COMPARE     TIMER_CH0CV(TIMER1)
-#define TIMER_CLOCK       RCU_APB1EN
-#define TIMER_CLOCK_BIT   RCU_APB1EN_TIMER1EN
-#define TIMER_SLEEP_CLOCK RCU_APB1SPEN
-#define TIMER_SLEEP_BIT   RCU_APB1SPEN_TIMER1SPEN
-#define TIMER_IRQ         TIMER1_IRQn
-#define LOWPOWER_BUSY     nx_gd32_lowpower_busy
-#define LOWPOWER_ALARM    nx_gd32_lowpower_alarm_irq
-#else
 #include "stm32f407_lowpower.h"
 #include "stm32f407_system.h"
+#include "timebase_lowpower.h"
+#include "timebase_soc_model.h"
 nx_stm32_system_t g_nx_stm32_system{};
 #define TIMER_CTRL        TIM2->CR1
 #define TIMER_PRESCALER   TIM2->PSC
@@ -44,7 +27,6 @@ nx_stm32_system_t g_nx_stm32_system{};
 #define TIMER_IRQ         TIM2_IRQn
 #define LOWPOWER_BUSY     nx_stm32_lowpower_busy
 #define LOWPOWER_ALARM    nx_stm32_lowpower_alarm_irq
-#endif
 nx_timebase_model_systick_t g_timebase_model_systick{};
 NVIC_Type g_timebase_model_nvic{};
 SCB_Type g_timebase_model_scb{};
@@ -78,7 +60,6 @@ class TimebaseSoC : public testing::Test {
         now = 1000U;
         ticks = 0U;
         face = nullptr;
-#ifndef NX_TIMEBASE_GD_MODEL
         g_nx_stm32_system = {};
         g_nx_stm32_system.started = true;
         g_nx_stm32_system.core_hz = 168000000U;
@@ -88,23 +69,8 @@ class TimebaseSoC : public testing::Test {
         RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
         FLASH->ACR = FLASH_ACR_LATENCY_5WS;
-#endif
-#ifdef NX_TIMEBASE_GD_MODEL
-        RCU_CFG0 = RCU_CKSYSSRC_PLLP | RCU_SCSS_PLLP | RCU_APB1_CKAHB_DIV4 |
-                   RCU_APB2_CKAHB_DIV2;
-        RCU_PLL = 25U | (400U << 6U) | RCU_PLLSRC_HXTAL | (9U << 24U);
-        RCU_CTL =
-            RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB | RCU_CTL_PLLEN | RCU_CTL_PLLSTB;
-        FMC_WS = WS_WSCNT_7;
-        SystemCoreClock = 200000000U;
-#endif
         TIMER_CTRL = 1U;
-        TIMER_PRESCALER =
-#ifdef NX_TIMEBASE_GD_MODEL
-            99U;
-#else
-            83U;
-#endif
+        TIMER_PRESCALER = 83U;
         TIMER_TOP = UINT32_MAX;
         TIMER_CLOCK |= TIMER_CLOCK_BIT;
         TIMER_SLEEP_CLOCK |= TIMER_SLEEP_BIT;
@@ -156,17 +122,6 @@ TEST_F(TimebaseSoC, WrongPrescalerAndStoppedTimebaseRejectWithoutRepair) {
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
 }
 TEST_F(TimebaseSoC, PLLTupleSourceReadinessAndSpreadSpectrumAreNotCachedFacts) {
-#ifdef NX_TIMEBASE_GD_MODEL
-    const uint32_t pll = RCU_PLL;
-    RCU_PLL ^= 1U;
-    EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
-    EXPECT_EQ(RCU_PLL, pll ^ 1U);
-    RCU_PLL = pll;
-    RCU_CTL &= ~static_cast<uint32_t>(RCU_CTL_PLLSTB);
-    EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
-    RCU_CTL |= RCU_CTL_PLLSTB;
-    RCU_PLLSSCTL |= RCU_PLLSSCTL_SSCGON;
-#else
     const uint32_t pll = RCC->PLLCFGR;
     RCC->PLLCFGR ^= 1U;
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
@@ -176,26 +131,16 @@ TEST_F(TimebaseSoC, PLLTupleSourceReadinessAndSpreadSpectrumAreNotCachedFacts) {
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
     RCC->CR |= RCC_CR_PLLRDY;
     RCC->SSCGR |= RCC_SSCGR_SSCGEN;
-#endif
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
 }
 TEST_F(TimebaseSoC,
        CounterDirectionOnePulseAndComparePreloadRejectWithoutRepair) {
-#ifdef NX_TIMEBASE_GD_MODEL
-    TIMER_CTRL |= TIMER_CTL0_DIR;
-    EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
-    TIMER_CTRL = 1U | TIMER_CTL0_SPM;
-    EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
-    TIMER_CTRL = 1U;
-    TIMER_CHCTL0(TIMER1) = TIMER_CHCTL0_CH0COMSEN;
-#else
     TIMER_CTRL |= TIM_CR1_DIR;
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
     TIMER_CTRL = 1U | TIM_CR1_OPM;
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
     TIMER_CTRL = 1U;
     TIM2->CCMR1 = TIM_CCMR1_OC1PE;
-#endif
     EXPECT_EQ(nx_freertos_lowpower_port(), nullptr);
 }
 TEST_F(TimebaseSoC, ReservedCompareKeepsOverflowAndHasExplicitBorrowState) {

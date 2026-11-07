@@ -119,7 +119,7 @@ def run_ok(arguments):
 
 
 def native_facts():
-    soc = json.loads((ROOT / "soc/native/soc.json").read_text())
+    soc = json.loads((ROOT / "tests/support/native/soc.json").read_text())
     return {"schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
             "clock_hz": soc["clock_profiles"]["model"]["core_hz"]}
 
@@ -187,7 +187,7 @@ class RuntimeConsumerAssertions:
             arguments = command.get("command", "")
             self.assertNotIn("/vendors/", arguments)
             self.assertNotIn("/soc/", arguments)
-            self.assertNotIn("/soc/native/drivers/", arguments)
+            self.assertNotIn("/tests/support/native/drivers/", arguments)
             self.assertNotIn("/os/native/", arguments)
             self.assertNotIn("googletest", arguments)
             self.assertNotIn("googlemock", arguments)
@@ -311,7 +311,7 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         cls.prefix = cls.directory / "relocated prefix with spaces"
         run_ok([sys.executable, "-B", ROOT / "cmake/package/package_source_sdk.py",
                 "--source", ROOT, "--output", original,
-                "--development-fixture"])
+                "--development-fixture", "--host-support", "--backend", "freertos"])
         original.rename(cls.prefix)
         cls.sdk = cls.prefix / "share/nexus/src"
         cls.entry = "find_package(Nexus COMPONENTS Runtime REQUIRED)\n"
@@ -500,7 +500,8 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         result = self.configure(
             source, build, f"-DCMAKE_PREFIX_PATH={self.prefix}",
             "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
-            f"-DNEXUS_ASSEMBLY_FILE={self.sdk}/tools/configure/assemblies/native.toml")
+            f"-DNEXUS_ASSEMBLY_FILE={self.sdk}/tests/support/native/assemblies/native.toml",
+            "-DNEXUS_TEST_SUPPORT=ON")
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("mode", result.stdout + result.stderr)
 

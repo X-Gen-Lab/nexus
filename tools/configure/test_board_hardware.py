@@ -16,12 +16,12 @@ class BoardHardwareTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
-                     "soc/native/soc.json", "soc/native/routes.json",
-                     "boards/native_reference/board.json"):
+                     "tests/support/native/soc.json", "tests/support/native/routes.json",
+                     "tests/support/native/board/board.json"):
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, path)
-        self.board_path = self.root / "boards/native_reference/board.json"
+        self.board_path = self.root / "tests/support/native/board/board.json"
         self.board = gate.load(self.board_path)
         self.assembly = self.root / "assembly.toml"
         self.contents = '''schema = 2
@@ -41,7 +41,7 @@ main_stack_bytes = 2048
     def resolve(self, extra=""):
         self.board_path.write_text(json.dumps(self.board), encoding="utf-8")
         self.assembly.write_text(self.contents + extra, encoding="utf-8")
-        return gate.resolve_ir(self.assembly, self.root)
+        return gate.resolve_ir(self.assembly, self.root, test_support=True)
 
     def gpio(self, selection=""):
         return self.resolve(selection + '''
@@ -133,7 +133,7 @@ priority = 5
         self.options()
         self.board_path.write_text(json.dumps(self.board), encoding="utf-8")
         catalogue = experience.board_catalogue(
-            gate, self.root, board="native_reference")
+            gate, self.root, board="native_reference", test_support=True)
         view = experience.bindings_view(catalogue)
         led = next(x for x in view["bindings"] if x["binding"] == "led0")
         self.assertEqual(led["hardware_selection"], "unselected")
@@ -175,7 +175,7 @@ mode = 0
         self.options()
         self.resolve()
         output = self.root / "bundle"
-        gate.configure(self.assembly, output, self.root)
+        gate.configure(self.assembly, output, self.root, test_support=True)
         paths = json.loads((output / "configuration_code_paths.json").read_text())
         self.assertIn("tools/configure/board_hardware.py",
                       paths)

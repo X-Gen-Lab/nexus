@@ -266,6 +266,17 @@ class QualificationPlanTests(unittest.TestCase):
         self.plan = load_json(ROOT / "tools/dev/plans/software.json")
         self.stages = self.plan["stages"]
 
+    def test_f4_sdk_device_catalog_executes_in_the_formal_plan(self):
+        selected = [stage for stage in self.stages
+                    if stage["checker"] == "stm32f4_devices"]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(CHECKERS.get("stm32f4_devices"),
+                         ("scripts/ci/stm32f4_devices.py",))
+        arguments = selected[0]["args"]
+        self.assertIn("{output}/stm32f4-devices", arguments)
+        self.assertNotIn("--device", arguments)
+        self.assertEqual(arguments[arguments.index("--jobs") + 1], "2")
+
     def test_formal_analyzers_have_explicit_bounded_parallelism(self):
         selected = [stage for stage in self.stages
                     if stage["checker"] == "quality_tools"]
@@ -417,7 +428,7 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertLess(kernel, names.index("configure-native-debug"),
                         "Check isolated SDK/runtime boundaries before Native builds")
         consumers = names.index("sdk-consumers")
-        self.assertEqual(names[consumers + 1], "providers-mainstream_assembly")
+        self.assertEqual(names[consumers + 1], "providers-stm32_assembly")
 
     def test_image_artifact_script_bootstraps_without_import_environment(self):
         script = ROOT / "tests/contracts/test_image_artifacts.py"
@@ -445,88 +456,27 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Prepared ARM compiler required", result.stderr)
 
-    def test_each_expanded_provider_fixture_is_explicitly_qualified_once(self):
-        for directory in ("legacy_transport_assembly", "mainstream_assembly",
-                          "g474_assembly", "h743_assembly", "u575_assembly"):
+    def test_each_retained_provider_fixture_is_explicitly_qualified_once(self):
+        for directory in ("stm32_assembly", "can_assembly", "usb_assembly",
+                          "ethernet_assembly", "timer_assembly",
+                          "multi_controller_assembly"):
             with self.subTest(directory=directory):
-                stages = [stage for stage in self.stages
-                          if stage["name"] == "providers-" + directory]
-                self.assertEqual(len(stages), 1,
-                                 "Missing complete maintained fixture stage")
-                stage = stages[0]
-                self.assertEqual(stage["checker"], "provider_assemblies")
+                stage, = [row for row in self.stages
+                          if row["name"] == "providers-" + directory]
                 fixtures = [stage["args"][index + 1]
                             for index, value in enumerate(stage["args"])
                             if value == "--fixture"]
                 expected = {"{root}/" + path.relative_to(ROOT).as_posix()
                             for path in (ROOT / "tests/contracts" /
                                          directory).glob("*.toml")}
-                if directory == "h743_assembly":
-                    expected |= {
-                        "{root}/tools/configure/assemblies/h743-" + name + ".toml"
-                        for name in ("spi-dma", "spi-dma-cache-on",
-                                     "spi-dma-uart-tx", "spi-dma-uart-rx",
-                                     "uart-continuous", "uart-continuous-cache-on",
-                                     "uart-duplex-continuous",
-                                     "uart-duplex-continuous-cache-on")}
-                    self.assertEqual(len(expected), 34)
-                    projects = [stage["args"][index + 1]
-                                for index, value in enumerate(stage["args"])
-                                if value == "--project"]
-                    self.assertEqual(projects,
-                        ["{root}/tests/contracts/h743_assembly"])
-                if directory == "u575_assembly":
-                    expected |= {
-                        "{root}/tools/configure/assemblies/u575-" + name + ".toml"
-                        for name in ("uart-chain", "lptim-run")}
-                    self.assertEqual(len(expected), 13)
+                if directory == "multi_controller_assembly":
+                    expected.update(
+                        "{root}/" + path.relative_to(ROOT).as_posix()
+                        for path in (ROOT / "tests/contracts" /
+                                     "declared_io_assembly").glob("*.toml"))
                 self.assertTrue(expected)
-                self.assertEqual(len(fixtures), len(set(fixtures)),
-                                 "Duplicate fixture is not another execution")
-                self.assertEqual(set(fixtures), expected,
-                                 "New fixture omitted from formal software plan")
-        validate_plan(self.plan)
-
-    def test_canonical_provider_inputs_use_executable_owned_projects(self):
-        for directory, family in (("h743_assembly", "stm32h743"),
-                                  ("u575_assembly", "stm32u575")):
-            with self.subTest(directory=directory):
-                stage, = [item for item in self.stages
-                          if item["name"] == "providers-" + directory]
-                args = stage["args"]
-                paths = [Path(args[i + 1].replace("{root}", str(ROOT)))
-                         for i, value in enumerate(args)
-                         if value == "--fixture" and args[i + 1].startswith(
-                             "{root}/tools/configure/assemblies/")]
-                projects = [Path(args[i + 1].replace("{root}", str(ROOT)))
-                            for i, value in enumerate(args) if value == "--project"]
-                self.assertTrue(paths)
-                self.assertLessEqual(len(projects), 1)
-                rows = provider_assemblies.validate_fixtures(
-                    ROOT, paths, family=family,
-                    project=projects[0] if projects else None)
-                self.assertEqual(len(rows), len(paths))
-                self.assertEqual({row["project"] for row in rows},
-                                 {str(ROOT / "tests/contracts" / directory)})
-
-
-    def test_named_pin_state_canonical_has_one_real_arm_checker_stage(self):
-        fixture = "{root}/tools/configure/assemblies/g474-pin-states.toml"
-        selected = [stage for stage in self.stages if fixture in stage["args"]]
-        self.assertEqual(len(selected), 1)
-        stage = selected[0]
-        self.assertEqual(stage["checker"], "provider_assemblies")
-        args = stage["args"]
-        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
-                          if arg == "--fixture"], [fixture])
-        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
-                          if arg == "--project"],
-                         ["{root}/tests/contracts/pin_state_fixture"])
-        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
-                          if arg == "--family"], ["stm32g474"])
-        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
-                          if arg == "--parallel"], ["1"])
-        self.assertNotIn("status", stage)
+                self.assertEqual(len(fixtures), len(set(fixtures)))
+                self.assertEqual(set(fixtures), expected)
         validate_plan(self.plan)
 
     def test_each_io_evolution_preset_configures_and_builds_once(self):

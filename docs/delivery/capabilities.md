@@ -1,389 +1,108 @@
-# 派生能力与接入矩阵
+---
+id: delivery.capabilities
+type: reference
+audience: consumer
+source_language: zh_CN
+---
 
-本表由 `tools/maintenance/capabilities.py` 读取维护中的 `soc.json`、
-`routes.json`、参考 Board `board.json`，并运行现有软件 assembly 的生产 resolver
-和 binding emitter 生成。表格不是另一份配置输入；修改能力从原始事实、实现和
-回归开始，随后执行 `--write` 更新本派生文本，`--check` 拒绝任何过时内容。
+# 当前派生能力矩阵
 
-- **Mode** 是 SoC 声明的有限模式；无 route 的模式不能据此选择连接。
-- **Reviewed SoC routes** 描述已维护的芯片路线，不是 PCB 连续性或电气资格。
-- **Declared reference Boards** 表示 Board 中存在对应 binding，不表示默认 assembly
-  已启用它，也不表示实板验收通过。
-- **Resolver fixtures** 是当前实际通过解析的 TOML 软件夹具。
-- **Selected production source** 从实际生成的 face 读取完整 ops 标识，匹配生产 C
-  中已初始化的导出定义；注释、字符串、声明和相似前缀不算定义。这是有限源码
-  一致性证据，不替代编译、执行或物理测量。空白列明确没有该类证据。
+本表由维护工具读取当前 F4 事实、受审路线、四个 Board 包、实际软件装配和生成
+face 对应的生产 ops 定义生成。它不是另一份配置输入，也不建立编译、执行或实板
+资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。
 
-`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native
-软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与
-Board 列因此为空。未选择的主机模型库存不进入本表。
-
-表格不从旧候选继承新 HEAD 的软件资格，也不推断物理结果。三板实物未连接，HIL
-保持 `not_executed`。精确模式限制及所有权合同见[支持范围](support.md)。
+生产聚合只包含 `stm32f4`。Native 属于显式 host-test scope，不计入生产 SoC 支持；
+其他保留的 vendor SDK 不进入本表。精确限制见[支持](support.md)。
 
 ```sh
-python tools/maintenance/capabilities.py --check
 python tools/maintenance/capabilities.py --write
-```
-
-## 查询实际选择与验收阶段
-
-日常入口可用 `dev.py support`。默认输出人读摘要，`--json` 输出同一份机器投影：
-
-```sh
+python tools/maintenance/capabilities.py --check
 python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml
-python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --json
 ```
 
-全局表适合寻找已有路线；产品是否可用要回到精确装配。从固定源码或 SDK 根目录
-执行以下只读查询，选择自己的 TOML。命令正常退出时输出 JSON，不更新下方矩阵：
+从完整仓库根执行，工具按同一原始事实重建表；`--check` 拒绝陈旧内容。修改能力应
+先改真实实现、事实与合同回归，再生成此投影，不手工编辑表格行。
 
-```sh
-python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml
-```
+## 查询与证据
 
-报告保留 Board、完整料号、封装、后端、时钟、CPU、IRQ、物理 PCB 修订、内存域、
-资源所有者和输入哈希。每个 controller 与 endpoint 分别提供已选择的公开合同；
-额外公共 face 单列在 `companion_interfaces`，不伪装成 endpoint。DMA 与引脚来自
-本次解析，不从同系列其他路线补齐。上例是 F407ZG 的 USART1
-有限 `dma-tx` 选择，不能扩展为 F407 全外设或全部 UART 模式支持。
+选择查询报告精确型号、Board、模式、资源、预算和输入身份，不运行新的编译、测试、
+烧录或测量。默认软件阶段保留 `not_assessed`，不表示历史上从未执行，也不表示失败。
 
-`validation` 分开列出以下阶段。默认查询只执行生产 resolver 和合同投影，不搜索旧
-报告，也不运行编译、测试、烧录或测量。因此，下面的 `not_assessed` 表示本次查询
-没有评估该阶段，不表示实现失败或历史上从未执行。
+显式引用原候选或阶段记录时，核对其真实来源、配置、产物和执行 scope；历史源码、
+配置不匹配、缺少原件与无效记录不能升级成本次通过。SDK 字节身份、实际消费与完整
+软件候选也是不同范围。使用 manifest 输入的 SDK 解析可能与 checkout 具有不同
+配置摘要，不能删除该身份以强行匹配。
 
-| 阶段 | 本次查询值 | 判定通过还需要什么 |
-| --- | --- | --- |
-| `configuration` | `validated` | 本次完整输入实际通过 resolver；不建立执行资格 |
-| `host_models` | `not_assessed` | 对应源码与模型范围的真实测试报告 |
-| `arm_image` | `not_assessed` | 精确配置、编译工具及 ELF、链接和资源报告 |
-| `installed_sdk` | `not_assessed` | 固定 SDK 的独立公开接口消费记录 |
-| `software_candidate` | `not_assessed` | clean source、完整计划、两次离线构建与封存产物 |
-| `physical_hil` | MCU 为 `not_assessed`；Native 为 `not_applicable` | 实际 station、板卡、镜像、观测和准入结果 |
-
-用 `configuration_sha256`、`input_identities` 和实际执行记录的源码、配置及工具
-身份对应证据。源码变化、模式变化或 Board 变化后，不能继承另一条记录的通过值。
-`physical_qualified` 保持 `false`；未知 PCB 事实不会因解析成功变为已验证。
-现有记录从[软件证据入口](../status/software-verification.md)进入，实际执行范围
-以各记录中的不可变源码为准。配置、软件和物理阶段是不同证据，并非会自动晋级的
-单个“支持等级”。
-
-运行中需要把 Platform 诊断中的 controller index 映射回装配时，使用
-{ref}`具名序号与可选只读标签 <factory-controller-diagnostics>`。该入口复用已有
-capability 对象；序号不是 typed factory ID，标签不是 ready 或所有权证明。
-它不改变本页 JSON 查询的验收阶段，也不把运行状态写入派生支持矩阵。
-
-## 显式关联已封存候选
-
-需要核对已有执行证据时，在同一查询追加原候选路径：
-
-```sh
-python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --candidate /path/to/sealed/candidate.json
-```
-
-工具调用原候选 verifier 核对全部 payload、qualification 和链接产物，不运行新的
-测试。报告同时保存 `current_source` 和 `evidence.reference.source`，不会用被引用
-源码覆盖当前 checkout。`evidence.relation` 只在干净 commit/tree/submodules 与
-精确解析配置全部相同时为 `exact_source_and_configuration`；此时才把原候选的
-四类软件阶段投影为 `passed`。这是原执行的只读关联，不是本次新执行。
-
-有效候选属于其他源码时标 `historical_source`，配置不同时标
-`configuration_mismatch`；这两种情况保留当前选择的 `not_assessed`。原件缺失、
-被修改或校验失败会拒绝查询，不能降级为已验证引用。未提供 `--candidate` 时
-无需 Git 或证据观察。可搬移候选需先用现有 artifact 工具恢复原 closure，再提供
-其中的 `candidate.json`；只有包摘要或下载位置不能建立通过状态。
-
-任何软件候选都不改变 `physical_hil`、`physical_qualified=false` 或下方聚合表的
-family／mode 行。硬件状态仍需要真实 station 和同一镜像的实际观察；一个精确
-配置通过不等于所有 Board、backend、时钟或模式通过。
-
-专项执行记录可通过同一查询显式导航，无需将它包装成软件候选：
-
-```sh
-python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --results-index docs/delivery/platform-delivery-completion-results.json --record /source_version_records_20261104/core_arch_os_20261104
-```
-
-`--record` 使用 JSON Pointer，必须指向具体记录；工具保留索引文件哈希和原记录。
-`indexed_evidence` 分别报告源码与配置匹配，缺少完整源码或配置身份时保持
-`insufficient_identity`；记录提供 resolved 时另行比对完整投影，仅提供配置哈希时
-明确标记摘要匹配。上例的 Core／Arch／OS 专项没有完整装配身份，
-因此不能证明该 UART 模式通过。此导航不改变任何 `validation`、候选或物理状态；
-它与 `--candidate` 的原候选验证各自独立，也不从父记录继承执行范围。
-
-## 核验具体阶段的原件
-
-索引中的具体叶记录可以声明 `support_evidence`，引用该记录自己的 manifest、
-qualification、SDK、consumer 或 HIL 原件。追加 `--verify-record` 才核验这些
-引用；未追加时继续只做索引导航。工具不从父记录继承身份，也不猜测附近文件。
-
-```sh
-python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml --results-index /path/to/results.json --record /selected_assembly --verify-record
-```
-
-`staged_evidence` 分别显示原始声明、字节身份、执行收条及范围语义核验结果。
-缺原件、实际执行失败、记录损坏、配置不匹配和历史源码分别解释；
-`next_missing_evidence` 给出该选择尚缺的证据。单项通过只影响对应阶段，不能
-拼接成未执行的完整计划。查询本身不启动编译、测试、联网或设备操作；所选外置
-provider 的 Python 仍属于受信配置代码，摘要校验不是执行沙箱。
-
-SDK 包完整性、具体 consumer 执行和完整矩阵是不同范围。具体 consumer 同时
-绑定其 canonical policy 身份与有序 plan 身份，不能只靠可能重排的序号。
-非 publishable 开发包明确显示开发范围；少量 consumer 的通过不升级成完整
-`installed_sdk` 或软件候选。完整包存在也不能证明 consumer 实际使用了 Nexus。
-
-The SDK resolver includes `.nexus-source-sdk.json` in the complete IR `inputs`. Its `configuration_sha256` therefore differs from a checkout resolution of the same logical assembly. Preserve that manifest input: equality of selected devices is narrower than equality of the complete configuration and its provenance.
-
-A direct API check using the SDK's own resolved IR can report `trust=semantic_verified` while a checkout CLI query of that SDK record reports `configuration_mismatch`. Semantic validation and configuration matching are separate observations. Evidence-to-source association through the CLI at a Gitless SDK root is not currently implemented; the direct API result does not establish equivalent end-to-end CLI evidence association.
-
-HIL 关联复用原有 admission、raw 和 measurement 校验，保留 station、PCB、芯片、
-配置、镜像和具体测试范围。软件参考 fixture、工具准备和 synthetic 结果都不能
-变成实板通过。没有真实原件时，物理执行继续保持未执行或未评估。
-
-当前候选的范围语义核验与原版本候选的只读重放分开。`--legacy-replay` 仅用于
-显式读取历史声明和字节闭包，不重新建立当前阶段资格。工具在核验时观察到的
-输入身份也不等于已记录的执行时身份；未建立的执行输入认证必须明确保留。
+物理 HIL 当前为 `not_executed`，查询不会改变 `physical_qualified=false`。
+PCB、供电、跳线、波形、吞吐与时序需要真实 station 原件，软件模型和预算不提供
+这些物理结论。资格规则见[验收边界](../reference/platforms/qualification.md)。
 
 <!-- nexus-capabilities:start -->
 | SoC | Controller | Kind | Mode | Reviewed SoC routes | Declared reference Boards | Resolver fixtures | Selected production source |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| gd32f303 | ADC0 | adc | single-shot | `adc-pa0` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-devices.toml` | `drivers/adc/legacy_adc/legacy_adc.c` |
-| gd32f303 | EXTI0 | exti | edge-event | `exti0-pa0` | `gd32f303-rct6-reference` | `tests/contracts/declared_io_assembly/gd303.toml` | `soc/gd32/gd32f303/drivers/exti.c` |
-| gd32f303 | EXTI1 | exti | edge-event | `exti1-pa1` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-devices.toml` | `soc/gd32/gd32f303/drivers/exti.c` |
-| gd32f303 | FMC | flash | poll-word | `flash-internal` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-devices.toml` | `drivers/flash/legacy_flash/legacy_flash.c` |
-| gd32f303 | FWDGT | watchdog | independent | `fwdgt-internal` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-spi-watchdog-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-spi-watchdog.toml`, `tools/configure/assemblies/gd32-f303-baremetal-spi-watchdog.toml`, `tools/configure/assemblies/gd32-f303-freertos-spi-watchdog.toml` | `soc/gd32/gd32f303/drivers/watchdog.c` |
-| gd32f303 | GPIOA | gpio | input | `gpio-pa4`, `gpio-pa5` | `gd32f303-rct6-reference` | `tests/contracts/declared_io_assembly/gd303.toml` | `soc/gd32/gd32f303/drivers/gpio.c` |
-| gd32f303 | GPIOA | gpio | output | `gpio-pa4`, `gpio-pa5` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-io-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-io.toml`, `tools/configure/assemblies/gd32-f303-baremetal-io.toml`, `tools/configure/assemblies/gd32-f303-freertos-io.toml` | `soc/gd32/gd32f303/drivers/gpio.c` |
-| gd32f303 | I2C0 | i2c | irq-messages | `i2c0-pb6-pb7` | `gd32f303-rct6-reference` | `tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| gd32f303 | SPI0 | spi | short-poll | `spi0-pa5-pa6-pa7` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-spi-watchdog-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-spi-watchdog.toml`, `tools/configure/assemblies/gd32-f303-baremetal-spi-watchdog.toml`, `tools/configure/assemblies/gd32-f303-freertos-spi-watchdog.toml` | `soc/gd32/gd32f303/drivers/spi.c` |
-| gd32f303 | TIMER2 | pwm | fixed-pwm | `pwm-pa6` | `gd32f303-rct6-reference` | `tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-devices.toml` | `drivers/timer/legacy_pwm/legacy_pwm.c` |
-| gd32f303 | USART0 | uart | dma-duplex | `usart0-pa9-pa10` | `gd32f303-rct6-reference` | `tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-duplex.toml` | `drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c` |
-| gd32f303 | USART0 | uart | dma-tx | `usart0-pa9-pa10` | `gd32f303-rct6-reference` | `tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-tx.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-tx.toml` | `drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c` |
-| gd32f303 | USART0 | uart | irq-bytes | `usart0-pa9-pa10` | `gd32f303-rct6-reference` | `tests/contracts/legacy_transport_assembly/gd32f303-baremetal-irq-bytes.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-irq-bytes.toml`, `tests/contracts/mainstream_assembly/gd303-io-freertos.toml`, `tests/contracts/mainstream_assembly/gd303-io.toml`, `tools/configure/assemblies/gd32-f303-baremetal-io.toml`, `tools/configure/assemblies/gd32-f303-freertos-io.toml` | `soc/gd32/gd32f303/drivers/uart.c` |
-| gd32f470 | ADC0 | adc | low-rate-scan | `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/adc-scan.toml` | `soc/gd32/gd32f470/drivers/adc.c` |
-| gd32f470 | ADC0 | adc | single-shot | `adc0-pa0` | — | `tests/contracts/gd32_assembly/adc.toml` | `soc/gd32/gd32f470/drivers/adc.c` |
-| gd32f470 | ADC0 | adc | trigger-dma | `adc0-pa0`, `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/blocks.toml` | `soc/gd32/gd32f470/drivers/adc_stream.c` |
-| gd32f470 | ADC0 | adc | trigger-dma-continuous | `adc0-pa0`, `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/adc-continuous.toml`, `tests/contracts/io_evolution_assembly/gd470-adc-stream-profile.toml` | `soc/gd32/gd32f470/drivers/adc_continuous.c` |
-| gd32f470 | CAN0 | can | classic-irq | `can0-pa11-pa12` | — | `tests/contracts/can_assembly/gd32-both.toml`, `tests/contracts/can_assembly/gd32-first.toml` | `drivers/can/classic_can/can_controller.c` |
-| gd32f470 | CAN1 | can | classic-irq | `can1-pb12-pb13` | — | `tests/contracts/can_assembly/gd32-both.toml` | `drivers/can/classic_can/can_controller.c` |
-| gd32f470 | ENET | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/gd32-freertos.toml`, `tests/contracts/ethernet_assembly/gd32.toml` | `drivers/ethernet/legacy_mac/eth_mac.c` |
-| gd32f470 | ENET | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/gd470-eth-frames.toml` | `drivers/ethernet/legacy_mac/eth_frames_mac.c` |
-| gd32f470 | EXTI3 | exti | edge-event | `exti3-pe3` | — | `tests/contracts/gd32_assembly/exti.toml` | `soc/gd32/gd32f470/drivers/exti.c` |
-| gd32f470 | FMC | flash | poll-word | `physical-flash` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/flash.toml` | `soc/gd32/gd32f470/drivers/flash.c` |
-| gd32f470 | FWDGT | watchdog | independent | `independent-watchdog` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/watchdog.toml` | `soc/gd32/gd32f470/drivers/watchdog.c` |
-| gd32f470 | GPIOB | gpio | input | `gpiob0`, `gpiob1` | — | `tests/contracts/declared_io_assembly/gd470-input.toml` | `soc/gd32/gd32f470/drivers/gpio.c` |
-| gd32f470 | GPIOB | gpio | output | `gpiob0`, `gpiob1` | — | `tests/contracts/declared_io_assembly/gd470.toml` | `soc/gd32/gd32f470/drivers/gpio.c` |
-| gd32f470 | GPIOD | gpio | input | `gpiod7` | `gd32f470zg-liangshan` | `tests/contracts/declared_io_assembly/gd470.toml` | `soc/gd32/gd32f470/drivers/gpio.c` |
-| gd32f470 | GPIOD | gpio | output | `gpiod7` | `gd32f470zg-liangshan` | `tests/contracts/physical_platform_assembly/gd32-gpio.toml`, `tools/configure/assemblies/liangshan-baremetal-gpio.toml`, `tools/configure/assemblies/liangshan-baremetal.toml`, `tools/configure/assemblies/liangshan-freertos-gpio.toml`, `tools/configure/assemblies/liangshan-freertos.toml` | `soc/gd32/gd32f470/drivers/gpio.c` |
-| gd32f470 | I2C0 | i2c | dma-messages | `i2c0-pb6-pb7` | — | `tests/contracts/gd32_assembly/i2c-dma.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| gd32f470 | I2C0 | i2c | irq-messages | `i2c0-pb6-pb7` | — | `tests/contracts/gd32_assembly/i2c-irq.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| gd32f470 | I2C0 | i2c | poll-messages | `i2c0-pb6-pb7` | — | `tests/contracts/gd32_assembly/blocks.toml`, `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/i2c.toml`, `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml` | `soc/gd32/gd32f470/drivers/i2c.c` |
-| gd32f470 | I2C1 | i2c | dma-messages | `i2c1-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/gd32.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| gd32f470 | I2C1 | i2c | irq-messages | `i2c1-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| gd32f470 | I2C1 | i2c | poll-messages | `i2c1-pb10-pb11` | — | `tests/contracts/gd32_assembly/blocks.toml`, `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml` | `soc/gd32/gd32f470/drivers/i2c.c` |
-| gd32f470 | SPI0 | spi | dma-full-duplex | `spi0-pa5-pa7` | — | `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32.toml` | `soc/gd32/gd32f470/drivers/spi_dma.c` |
-| gd32f470 | SPI0 | spi | short-poll | `spi0-pa5-pa7` | — | `tests/contracts/gd32_assembly/blocks.toml`, `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml` | `soc/gd32/gd32f470/drivers/spi.c` |
-| gd32f470 | SPI4 | spi | dma-full-duplex | `spi4-pf6-pf9` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/blocks.toml`, `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32.toml` | `io/src/mechanisms/spi_dma_sequence.c`, `soc/gd32/gd32f470/drivers/spi_dma.c` |
-| gd32f470 | SPI4 | spi | short-poll | `spi4-pf6-pf9` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/gd32_assembly/spi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-transaction.toml`, `tools/configure/assemblies/liangshan-baremetal-spi.toml`, `tools/configure/assemblies/liangshan-freertos-spi.toml` | `soc/gd32/gd32f470/drivers/spi.c` |
-| gd32f470 | TIMER0 | advanced_pwm | complementary-pwm | `complementary-pa8-pb12-pb13` | — | `tests/contracts/timer_assembly/gd32-freertos.toml`, `tests/contracts/timer_assembly/gd32.toml` | `soc/gd32/gd32f470/drivers/advanced_pwm.c` |
-| gd32f470 | TIMER2 | pwm | fixed-pwm | `timer2-pa6` | — | `tests/contracts/gd32_assembly/pwm.toml` | `soc/gd32/gd32f470/drivers/timer.c` |
-| gd32f470 | TIMER3 | timer_capture | edge-capture | `capture-pb6` | — | `tests/contracts/timer_assembly/gd32-freertos.toml`, `tests/contracts/timer_assembly/gd32.toml` | `soc/gd32/gd32f470/drivers/timer_capture.c` |
-| gd32f470 | USART0 | uart | dma-duplex | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml` | `soc/gd32/gd32f470/drivers/uart_duplex.c` |
-| gd32f470 | USART0 | uart | dma-duplex-continuous | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/dma-duplex-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-dma-duplex-continuous.toml` | `soc/gd32/gd32f470/drivers/uart_duplex.c` |
-| gd32f470 | USART0 | uart | dma-tx | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/blocks.toml`, `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-dma-tx.toml` | `soc/gd32/gd32f470/drivers/uart_dma.c` |
-| gd32f470 | USART0 | uart | irq-blocks | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/uart_rx_compact_assembly/gd470-irq-blocks.toml` | `soc/gd32/gd32f470/drivers/uart_stream.c` |
-| gd32f470 | USART0 | uart | irq-byte-event | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-uart7e2.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-irq.toml`, `tools/configure/assemblies/liangshan-baremetal-uart.toml`, `tools/configure/assemblies/liangshan-baremetal.toml`, `tools/configure/assemblies/liangshan-freertos-uart.toml`, `tools/configure/assemblies/liangshan-freertos.toml` | `soc/gd32/gd32f470/drivers/uart.c` |
-| gd32f470 | USART0 | uart | irq-words | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/io_evolution_assembly/gd470-uart9n1-probe.toml`, `tests/contracts/io_evolution_assembly/gd470-uart9n1.toml` | `soc/gd32/gd32f470/drivers/uart_word.c` |
-| gd32f470 | USART0 | uart | rx-dma-continuous | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/rx-dma-continuous.toml`, `tests/contracts/io_evolution_assembly/gd470-uart-stream-profile.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-continuous.toml` | `soc/gd32/gd32f470/drivers/uart_receive.c` |
-| gd32f470 | USART0 | uart | rx-dma-idle | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/rx-dma-idle.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-rx-dma-idle.toml` | `soc/gd32/gd32f470/drivers/uart_receive.c` |
-| gd32f470 | USART1 | uart | dma-tx | `usart1-pa2-pa3` | — | `tests/contracts/multi_controller_assembly/gd32-freertos.toml`, `tests/contracts/multi_controller_assembly/gd32.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/gd470-mixed-rx-tx.toml` | `soc/gd32/gd32f470/drivers/uart_dma.c` |
-| gd32f470 | USART1 | uart | irq-blocks | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/blocks.toml` | `soc/gd32/gd32f470/drivers/uart_stream.c` |
-| gd32f470 | USART1 | uart | irq-byte-event | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/multi.toml`, `tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml` | `soc/gd32/gd32f470/drivers/uart.c` |
-| gd32f470 | USBFS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/gd32-freertos.toml`, `tests/contracts/usb_assembly/gd32-interrupt.toml`, `tests/contracts/usb_assembly/gd32.toml` | `drivers/usb/fs_device_pio/usb_device_controller.c` |
-| stm32f103 | ADC1 | adc | single-shot | `adc-pa0` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, `tests/contracts/mainstream_assembly/f103-devices.toml` | `drivers/adc/legacy_adc/legacy_adc.c` |
-| stm32f103 | EXTI0 | exti | edge-event | `exti0-pa0` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-exti.toml`, `tools/configure/assemblies/stm32-f103-exti.toml` | `soc/stm32/stm32f103/drivers/exti.c` |
-| stm32f103 | EXTI1 | exti | edge-event | `exti1-pa1` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-exti.toml`, `tools/configure/assemblies/stm32-f103-exti.toml` | `soc/stm32/stm32f103/drivers/exti.c` |
-| stm32f103 | FLASH | flash | poll-word | `flash-internal` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, `tests/contracts/mainstream_assembly/f103-devices.toml` | `drivers/flash/legacy_flash/legacy_flash.c` |
-| stm32f103 | GPIOA | gpio | input | `gpio-pa4`, `gpio-pa5` | `stm32f103rb-nucleo-reference` | `tests/contracts/declared_io_assembly/f103.toml` | `soc/stm32/stm32f103/drivers/gpio.c` |
-| stm32f103 | GPIOA | gpio | output | `gpio-pa4`, `gpio-pa5` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-exti.toml`, `tests/contracts/mainstream_assembly/f103-io-freertos.toml`, `tests/contracts/mainstream_assembly/f103-io.toml`, `tests/contracts/mainstream_assembly/f103-watchdog.toml`, `tools/configure/assemblies/stm32-f103-baremetal.toml`, `tools/configure/assemblies/stm32-f103-exti.toml`, `tools/configure/assemblies/stm32-f103-freertos.toml`, `tools/configure/assemblies/stm32-f103-watchdog.toml` | `soc/stm32/stm32f103/drivers/gpio.c` |
-| stm32f103 | I2C1 | i2c | irq-messages | `i2c1-pb6-pb7` | `stm32f103rb-nucleo-reference` | `tests/contracts/legacy_transport_assembly/stm32f103-baremetal-i2c.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-i2c.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| stm32f103 | IWDG | watchdog | independent | `iwdg` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-watchdog.toml`, `tools/configure/assemblies/stm32-f103-watchdog.toml` | `soc/stm32/stm32f103/drivers/watchdog.c` |
-| stm32f103 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-spi-freertos.toml`, `tests/contracts/mainstream_assembly/f103-spi.toml`, `tools/configure/assemblies/stm32-f103-spi.toml` | `soc/stm32/stm32f103/drivers/spi.c` |
-| stm32f103 | TIM3 | pwm | fixed-pwm | `pwm-pa6` | `stm32f103rb-nucleo-reference` | `tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, `tests/contracts/mainstream_assembly/f103-devices.toml` | `drivers/timer/legacy_pwm/legacy_pwm.c` |
-| stm32f103 | USART2 | uart | dma-duplex | `usart2-pa2-pa3` | `stm32f103rb-nucleo-reference` | `tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-duplex.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-duplex.toml` | `drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c` |
-| stm32f103 | USART2 | uart | dma-tx | `usart2-pa2-pa3` | `stm32f103rb-nucleo-reference` | `tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-tx.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-tx.toml` | `drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c` |
-| stm32f103 | USART2 | uart | irq-bytes | `usart2-pa2-pa3` | `stm32f103rb-nucleo-reference` | `tests/contracts/legacy_transport_assembly/stm32f103-baremetal-irq-bytes.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-irq-bytes.toml`, `tests/contracts/mainstream_assembly/f103-exti.toml`, `tests/contracts/mainstream_assembly/f103-io-freertos.toml`, `tests/contracts/mainstream_assembly/f103-io.toml`, `tests/contracts/mainstream_assembly/f103-watchdog.toml`, `tools/configure/assemblies/stm32-f103-baremetal.toml`, `tools/configure/assemblies/stm32-f103-exti.toml`, `tools/configure/assemblies/stm32-f103-freertos.toml`, `tools/configure/assemblies/stm32-f103-watchdog.toml` | `soc/stm32/stm32f103/drivers/uart.c` |
-| stm32f407 | ADC1 | adc | low-rate-scan | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-adc-scan.toml`, `tests/contracts/stm32_assembly/zg-adc-scan.toml` | `soc/stm32/stm32f407/drivers/adc.c` |
-| stm32f407 | ADC1 | adc | single-shot | `adc1-ch0-pa0` | — | `tests/contracts/stm32_assembly/ve-adc.toml`, `tests/contracts/stm32_assembly/zg-adc.toml` | `soc/stm32/stm32f407/drivers/adc.c` |
-| stm32f407 | ADC1 | adc | trigger-dma | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml` | `soc/stm32/stm32f407/drivers/adc_stream.c` |
-| stm32f407 | ADC1 | adc | trigger-dma-continuous | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, `tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, `tests/contracts/stm32_assembly/zg-adc-continuous.toml` | `soc/stm32/stm32f407/drivers/adc_continuous.c` |
-| stm32f407 | CAN1 | can | classic-irq | `can1-pa11-pa12`, `can1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/can_assembly/stm32-first.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `drivers/can/classic_can/can_controller.c` |
-| stm32f407 | CAN2 | can | classic-irq | `can2-pb12-pb13` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `drivers/can/classic_can/can_controller.c` |
-| stm32f407 | ETH | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, `tests/contracts/ethernet_assembly/stm32-zg.toml` | `drivers/ethernet/legacy_mac/eth_mac.c` |
-| stm32f407 | ETH | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/f407zg-eth-frames.toml` | `drivers/ethernet/legacy_mac/eth_frames_mac.c` |
-| stm32f407 | EXTI0 | exti | edge-event | `exti0-pa0` | — | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
-| stm32f407 | EXTI11 | exti | edge-event | `exti11-pf11` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | EXTI2 | exti | edge-event | `exti2-pe2` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | EXTI5 | exti | edge-event | `exti5-pa5` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
-| stm32f407 | EXTI6 | exti | edge-event | `exti6-pa6`, `exti6-pf6` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f407/drivers/exti.c` |
-| stm32f407 | EXTI7 | exti | edge-event | `exti7-pf7` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | EXTI8 | exti | edge-event | `exti8-pf8` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | EXTI9 | exti | edge-event | `exti9-pf9` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | FLASH | flash | poll-word | `flash-internal` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml` | `soc/stm32/stm32f407/drivers/flash.c` |
-| stm32f407 | FSMC | external_bus | async16 | `fsmc-async16` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | FSMC | memory_window | cpu-window | `fsmc-ne3-is62wv51216` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | FSMC | memory_window | startup-memory | `fsmc-ne3-is62wv51216` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | FSMC | parallel16 | 8080-16 | `fsmc-ne4-ili9341` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOA | gpio | input | `gpio-pa0`, `gpio-pa15` | `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOA | gpio | output | `gpio-pa0`, `gpio-pa15`, `gpio-pa5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-output.toml`, `tests/contracts/declared_io_assembly/ve-duplex.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOB | gpio | input | `gpio-input-pb2`, `gpio-pb2` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOB | gpio | output | `gpio-pb0`, `gpio-pb1`, `gpio-pb2` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-output.toml`, `tools/configure/assemblies/sky-baremetal-gpio.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-gpio.toml`, `tools/configure/assemblies/sky-freertos.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOC | gpio | input | `gpio-pc0`, `gpio-pc13` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOC | gpio | output | `gpio-pc0`, `gpio-pc13` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOD | gpio | input | `gpio-pd0`, `gpio-pd6`, `gpio-pd7` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOD | gpio | output | `gpio-pd0`, `gpio-pd6`, `gpio-pd7` | `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOE | gpio | input | `gpio-pe2`, `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOE | gpio | output | `gpio-pe2`, `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOF | gpio | input | `gpio-pf11`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOF | gpio | output | `gpio-pf10` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | GPIOG | gpio | input | `gpio-pg9` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-input.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | GPIOG | gpio | output | `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml` | `soc/stm32/stm32f407/drivers/gpio.c` |
-| stm32f407 | I2C1 | i2c | dma-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/stm32_assembly/zg-i2c-dma.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| stm32f407 | I2C1 | i2c | irq-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/stm32_assembly/zg-i2c-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| stm32f407 | I2C1 | i2c | poll-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-i2c.toml`, `tests/contracts/stm32_assembly/zg-i2c.toml` | `soc/stm32/stm32f407/drivers/i2c.c` |
-| stm32f407 | I2C2 | i2c | dma-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| stm32f407 | I2C2 | i2c | irq-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml` | `drivers/i2c/i2c_v1_async/i2c_v1_async.c` |
-| stm32f407 | IWDG | watchdog | independent | `iwdg` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-watchdog.toml`, `tests/contracts/stm32_assembly/zg-watchdog.toml` | `soc/stm32/stm32f407/drivers/watchdog.c` |
-| stm32f407 | OTG_FS | usb_device | device-fs | `usbfs-pa11-pa12` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml` | `drivers/usb/fs_device_pio/usb_device_controller.c` |
-| stm32f407 | RTC | rtc | adopt-retained | `rtc-lse-pc14-pc15` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | RTC | rtc | provision-empty | `rtc-lse-pc14-pc15` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
-| stm32f407 | SDIO | block | sdio-poll | `sdio-pc8-pd2` | `stm32f407zg-qiming-v41` | `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml` | `soc/stm32/stm32f407/drivers/sdio.c` |
-| stm32f407 | SPI1 | spi | dma | `spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml` | `io/src/mechanisms/spi_dma_sequence.c`, `soc/stm32/stm32f407/drivers/spi_dma.c` |
-| stm32f407 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml` | `soc/stm32/stm32f407/drivers/spi.c` |
-| stm32f407 | SPI2 | spi | dma | `spi2-pb13-pb14-pb15` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `soc/stm32/stm32f407/drivers/spi_dma.c` |
-| stm32f407 | TIM1 | advanced_pwm | complementary-pwm | `complementary-pa8-pb12-pb13` | — | `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml` | `soc/stm32/stm32f407/drivers/advanced_pwm.c` |
-| stm32f407 | TIM3 | pwm | fixed-pwm | `tim3-ch1-pa6` | — | `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml` | `soc/stm32/stm32f407/drivers/timer.c` |
-| stm32f407 | TIM4 | timer_capture | edge-capture | `capture-pb6` | — | `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml` | `soc/stm32/stm32f407/drivers/timer_capture.c` |
-| stm32f407 | UART4 | uart | irq-byte-event | `uart4-pa0-pa1` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32f407 | UART5 | uart | irq-byte-event | `uart5-pc12-pd2` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32f407 | USART1 | uart | dma-duplex | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-duplex.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml` | `soc/stm32/stm32f407/drivers/uart_duplex.c` |
-| stm32f407 | USART1 | uart | dma-duplex-continuous | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml` | `soc/stm32/stm32f407/drivers/uart_duplex.c` |
-| stm32f407 | USART1 | uart | dma-tx | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml` | `soc/stm32/stm32f407/drivers/uart_hal.c` |
-| stm32f407 | USART1 | uart | irq-blocks | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml` | `soc/stm32/stm32f407/drivers/uart_stream.c` |
-| stm32f407 | USART1 | uart | irq-byte-event | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32f407 | USART1 | uart | irq-words | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, `tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, `tests/contracts/io_evolution_assembly/f407-uart9n1.toml` | `soc/stm32/stm32f407/drivers/uart_word.c` |
-| stm32f407 | USART1 | uart | rx-dma-continuous | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/io_evolution_assembly/f407-uart-stream-profile.toml`, `tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-rx-dma-continuous.toml` | `soc/stm32/stm32f407/drivers/uart_receive.c` |
-| stm32f407 | USART1 | uart | rx-dma-idle | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-rx-dma-idle.toml` | `soc/stm32/stm32f407/drivers/uart_receive.c` |
-| stm32f407 | USART2 | uart | dma-tx | `usart2-pa2-pa3` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml` | `soc/stm32/stm32f407/drivers/uart_hal.c` |
-| stm32f407 | USART2 | uart | irq-byte-event | `usart2-pa2-pa3` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32f407 | USART3 | uart | irq-byte-event | `usart3-pb10-pb11` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32f407 | USART6 | uart | irq-byte-event | `usart6-pc6-pc7` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f407/drivers/uart.c` |
-| stm32g474 | ADC1 | adc | single-shot | `adc1-in1-pa0` | — | `tests/contracts/g474_assembly/acquisition-freertos.toml`, `tests/contracts/g474_assembly/acquisition.toml`, `tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml` | `soc/stm32/stm32g474/drivers/adc.c` |
-| stm32g474 | ADC1 | adc | trigger-dma | `adc1-in1-pa0` | — | `tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, `tests/contracts/g474_assembly/acquisition-dma.toml` | `soc/stm32/stm32g474/drivers/adc_stream.c` |
-| stm32g474 | ADC1 | adc_group | injected-sequence | `adc1-sequence-pa0-pa1` | — | `cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml` | `soc/stm32/stm32g474/drivers/adc_group.c` |
-| stm32g474 | ADC1 | adc_group | regular-sequence-dma | `adc1-sequence-pa0-pa1` | — | `cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml`, `cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml` | `soc/stm32/stm32g474/drivers/adc_group.c` |
-| stm32g474 | EXTI0 | exti | edge-event | `exti0-pa0` | — | `tests/contracts/g474_assembly/exti-freertos.toml`, `tests/contracts/g474_assembly/exti.toml` | `soc/stm32/stm32g474/drivers/exti.c` |
-| stm32g474 | EXTI1 | exti | edge-event | `exti1-pa1` | — | `tests/contracts/g474_assembly/exti-freertos.toml`, `tests/contracts/g474_assembly/exti.toml` | `soc/stm32/stm32g474/drivers/exti.c` |
-| stm32g474 | FDCAN1 | can_fd | iso-fd-loopback | `fdcan1-pa11-pa12` | — | `cmake/package/verification/io_evolution/g474-can-fd-loopback.toml` | `soc/stm32/stm32g474/drivers/fdcan.c` |
-| stm32g474 | FDCAN1 | can_fd | iso-fd-normal | `fdcan1-pa11-pa12` | — | `cmake/package/verification/io_evolution/g474-can-fd-normal.toml` | `soc/stm32/stm32g474/drivers/fdcan.c` |
-| stm32g474 | FLASH | flash | poll-word | `internal-flash` | — | `tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, `tests/contracts/g474_assembly/acquisition-dma.toml`, `tests/contracts/g474_assembly/acquisition-freertos.toml`, `tests/contracts/g474_assembly/acquisition.toml`, `tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml` | `soc/stm32/stm32g474/drivers/flash.c` |
-| stm32g474 | GPIOA | gpio | input | `gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9` | `stm32g474re-hse24-reference` | `tests/contracts/declared_io_assembly/g474-input.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOA | gpio | named-states | `gpio-pa5` | `stm32g474re-hse24-reference` | `tools/configure/assemblies/g474-pin-states.toml` | `soc/stm32/stm32g474/drivers/pin_state.c` |
-| stm32g474 | GPIOA | gpio | output | `gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/io-freertos.toml`, `tests/contracts/g474_assembly/io.toml`, `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOB | gpio | input | `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9` | `stm32g474re-hse24-reference` | `tests/contracts/declared_io_assembly/g474-input.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOB | gpio | output | `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOC | gpio | input | `gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOC | gpio | output | `gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9` | `stm32g474re-hse24-reference` | `tests/contracts/declared_io_assembly/g474-input.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOD | gpio | input | `gpio-pd2` | — | `tests/contracts/declared_io_assembly/g474-input.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOD | gpio | output | `gpio-pd2` | — | `tests/contracts/declared_io_assembly/g474-output.toml` | `soc/stm32/stm32g474/drivers/gpio.c` |
-| stm32g474 | GPIOF | gpio | input | `gpio-pf0`, `gpio-pf1` | — | — | — |
-| stm32g474 | GPIOF | gpio | output | `gpio-pf0`, `gpio-pf1` | — | — | — |
-| stm32g474 | GPIOG | gpio | input | `gpio-pg10` | — | — | — |
-| stm32g474 | GPIOG | gpio | output | `gpio-pg10` | — | — | — |
-| stm32g474 | I2C1 | i2c | poll-messages | `i2c1-pb8-pb9` | — | `tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, `tests/contracts/g474_assembly/acquisition-dma.toml`, `tests/contracts/g474_assembly/acquisition-freertos.toml`, `tests/contracts/g474_assembly/acquisition.toml`, `tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml` | `drivers/i2c/i2c_v2/i2c_v2.c` |
-| stm32g474 | IWDG | watchdog | independent | `iwdg` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/spi-freertos.toml`, `tests/contracts/g474_assembly/spi.toml`, `tests/contracts/g474_assembly/watchdog-freertos.toml`, `tests/contracts/g474_assembly/watchdog.toml` | `soc/stm32/stm32g474/drivers/watchdog.c` |
-| stm32g474 | LPUART1 | uart | irq-bytes | `lpuart1-pa2-pa3` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/io-freertos.toml`, `tests/contracts/g474_assembly/io.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32g474 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/spi-freertos.toml`, `tests/contracts/g474_assembly/spi.toml` | `soc/stm32/stm32g474/drivers/spi.c` |
-| stm32g474 | SPI2 | spi | short-poll | `spi2-pb13-pb14-pb15` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/spi-freertos.toml`, `tests/contracts/g474_assembly/spi.toml` | `soc/stm32/stm32g474/drivers/spi.c` |
-| stm32g474 | TIM1 | pwm_group | coherent-pwm | `tim1-group-pa8-pa9-pa10-comp1-pa1-pa4` | — | `tests/contracts/g474_control_assembly/pwm-group.toml` | `soc/stm32/stm32g474/drivers/pwm_group.c` |
-| stm32g474 | TIM1 | pwm_adc | finite-regular-dma | `tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4` | — | `cmake/package/verification/io_evolution/g474-pwm-adc.toml` | `soc/stm32/stm32g474/drivers/pwm_adc.c` |
-| stm32g474 | TIM3 | pwm | fixed-pwm | `tim3-ch1-pa6` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/pwm-freertos.toml`, `tests/contracts/g474_assembly/pwm.toml` | `soc/stm32/stm32g474/drivers/pwm.c` |
-| stm32g474 | TIM3 | pwm | shared-fixed-pwm | `tim3-ch1-pa6`, `tim3-ch2-pa7` | `stm32g474re-hse24-reference` | `cmake/package/verification/io_evolution/g474-pwm-shared.toml` | `soc/stm32/stm32g474/drivers/pwm_shared.c` |
-| stm32g474 | TIM3 | encoder | quadrature | `tim3-encoder-pa6-pa7` | — | `tests/contracts/g474_control_assembly/encoder.toml` | `soc/stm32/stm32g474/drivers/encoder.c` |
-| stm32g474 | TIM4 | pwm | fixed-pwm | `tim4-ch1-pb6` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/pwm-freertos.toml`, `tests/contracts/g474_assembly/pwm.toml` | `soc/stm32/stm32g474/drivers/pwm.c` |
-| stm32g474 | TIM5 | timer_capture | edge-capture | `tim5-ch1-pa0` | — | `tests/contracts/g474_control_assembly/timer-capture.toml` | `soc/stm32/stm32g474/drivers/timer_capture.c` |
-| stm32g474 | UART4 | uart | irq-bytes | `uart4-pc10-pc11` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32g474 | UART5 | uart | irq-bytes | `uart5-pc12-pd2` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32g474 | USART1 | uart | irq-bytes | `usart1-pa9-pa10` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32g474 | USART2 | uart | irq-bytes | `usart2-pa2-pa3` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32g474 | USART3 | uart | irq-bytes | `usart3-pb10-pb11` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/mainstream-freertos.toml`, `tests/contracts/g474_assembly/mainstream.toml` | `soc/stm32/stm32g474/drivers/uart.c` |
-| stm32h743 | ADC1 | adc | single-shot | `adc1-pa3` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, `tools/configure/assemblies/h743-high-peripherals.toml` | `soc/stm32/stm32h743/drivers/adc.c` |
-| stm32h743 | EXTI0 | exti | edge-event | `exti0-pa0` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml` | `soc/stm32/stm32h743/drivers/exti.c` |
-| stm32h743 | EXTI1 | exti | edge-event | `exti1-pa1` | `stm32h743zi-hsi-reference` | `tests/contracts/declared_io_assembly/h743.toml` | `soc/stm32/stm32h743/drivers/exti.c` |
-| stm32h743 | FLASH | flash | poll-word | `flash-internal` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, `tools/configure/assemblies/h743-high-peripherals.toml` | `soc/stm32/stm32h743/drivers/flash.c` |
-| stm32h743 | GPIOB | gpio | input | `gpio-pb0` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `tests/contracts/declared_io_assembly/h743.toml` | `soc/stm32/stm32h743/drivers/gpio.c` |
-| stm32h743 | GPIOB | gpio | output | `gpio-pb0` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `cmake/package/verification/io_evolution/h743-high-uart.toml`, `tests/contracts/h743_assembly/dma-cache-freertos.toml`, `tests/contracts/h743_assembly/dma-cache.toml`, `tests/contracts/h743_assembly/dma-freertos.toml`, `tests/contracts/h743_assembly/dma.toml`, `tests/contracts/h743_assembly/dma32-cache-freertos.toml`, `tests/contracts/h743_assembly/dma32-cache.toml`, `tests/contracts/h743_assembly/dma32-freertos.toml`, `tests/contracts/h743_assembly/dma32.toml`, `tests/contracts/h743_assembly/io-freertos.toml`, `tests/contracts/h743_assembly/io.toml`, `tests/contracts/h743_assembly/rx-cache-freertos.toml`, `tests/contracts/h743_assembly/rx-cache.toml`, `tests/contracts/h743_assembly/rx-freertos.toml`, `tests/contracts/h743_assembly/rx-sram1-cache.toml`, `tests/contracts/h743_assembly/rx-sram1.toml`, `tests/contracts/h743_assembly/rx.toml`, `tests/contracts/h743_assembly/rx32-cache-freertos.toml`, `tests/contracts/h743_assembly/rx32-cache.toml`, `tests/contracts/h743_assembly/rx32-freertos.toml`, `tests/contracts/h743_assembly/rx32.toml`, `tools/configure/assemblies/h743-high-peripherals.toml`, `tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-h743-freertos-uart.toml` | `soc/stm32/stm32h743/drivers/gpio.c` |
-| stm32h743 | GPIOE | gpio | output | `gpio-pe11` | `stm32h743zi-hsi-reference` | `tests/contracts/declared_io_assembly/h743.toml` | `soc/stm32/stm32h743/drivers/gpio.c` |
-| stm32h743 | I2C1 | i2c | poll-messages | `i2c1-pb8-pb9` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, `tools/configure/assemblies/h743-high-peripherals.toml` | `drivers/i2c/i2c_v2/i2c_v2.c` |
-| stm32h743 | IWDG1 | watchdog | independent | `iwdg1` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml` | `soc/stm32/stm32h743/drivers/watchdog.c` |
-| stm32h743 | SPI4 | spi | dma | `spi4-pe12-pe13-pe14` | `stm32h743zi-hsi-reference` | `tools/configure/assemblies/h743-spi-dma-cache-on.toml`, `tools/configure/assemblies/h743-spi-dma-runtime-clock.toml`, `tools/configure/assemblies/h743-spi-dma-uart-rx.toml`, `tools/configure/assemblies/h743-spi-dma-uart-tx.toml`, `tools/configure/assemblies/h743-spi-dma.toml` | `soc/stm32/stm32h743/drivers/spi_dma.c` |
-| stm32h743 | SPI4 | spi | short-poll | `spi4-pe12-pe13-pe14` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, `tools/configure/assemblies/h743-high-peripherals.toml` | `soc/stm32/stm32h743/drivers/spi.c` |
-| stm32h743 | TIM3 | pwm | fixed-pwm | `tim3-pa6` | `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/peripherals-freertos.toml`, `tests/contracts/h743_assembly/peripherals.toml`, `tests/contracts/h743_assembly/peripherals32-freertos.toml`, `tests/contracts/h743_assembly/peripherals32.toml`, `tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml`, `tools/configure/assemblies/h743-high-peripherals.toml` | `soc/stm32/stm32h743/drivers/pwm.c` |
-| stm32h743 | USART3 | uart | dma-duplex-continuous | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml`, `tools/configure/assemblies/h743-uart-duplex-continuous.toml` | `soc/stm32/stm32h743/drivers/uart_duplex.c` |
-| stm32h743 | USART3 | uart | dma-tx | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/dma-cache-freertos.toml`, `tests/contracts/h743_assembly/dma-cache.toml`, `tests/contracts/h743_assembly/dma-freertos.toml`, `tests/contracts/h743_assembly/dma.toml`, `tests/contracts/h743_assembly/dma32-cache-freertos.toml`, `tests/contracts/h743_assembly/dma32-cache.toml`, `tests/contracts/h743_assembly/dma32-freertos.toml`, `tests/contracts/h743_assembly/dma32.toml`, `tools/configure/assemblies/h743-spi-dma-uart-tx.toml` | `soc/stm32/stm32h743/drivers/uart_dma.c` |
-| stm32h743 | USART3 | uart | irq-bytes | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `cmake/package/verification/io_evolution/h743-high-uart.toml`, `tests/contracts/h743_assembly/io-freertos.toml`, `tests/contracts/h743_assembly/io.toml`, `tools/configure/assemblies/h743-high-peripherals.toml`, `tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-h743-freertos-uart.toml` | `soc/stm32/stm32h743/drivers/uart.c` |
-| stm32h743 | USART3 | uart | irq-fifo-bytes | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `cmake/package/verification/io_evolution/h743-uart-fifo.toml` | `soc/stm32/stm32h743/drivers/uart_fifo.c` |
-| stm32h743 | USART3 | uart | irq-fifo-rtscts-bytes | `usart3-pd8-pd9-pd11-pd12-rtscts` | `stm32h743zi-rtscts-reference` | `cmake/package/verification/io_evolution/h743-uart-rtscts.toml` | `soc/stm32/stm32h743/drivers/uart_rtscts.c` |
-| stm32h743 | USART3 | uart | rx-dma-continuous | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `tools/configure/assemblies/h743-uart-continuous-cache-on.toml`, `tools/configure/assemblies/h743-uart-continuous.toml` | `soc/stm32/stm32h743/drivers/uart_continuous.c` |
-| stm32h743 | USART3 | uart | rx-dma-idle | `usart3-pd8-pd9` | `stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference` | `tests/contracts/h743_assembly/rx-cache-freertos.toml`, `tests/contracts/h743_assembly/rx-cache.toml`, `tests/contracts/h743_assembly/rx-freertos.toml`, `tests/contracts/h743_assembly/rx-sram1-cache.toml`, `tests/contracts/h743_assembly/rx-sram1.toml`, `tests/contracts/h743_assembly/rx.toml`, `tests/contracts/h743_assembly/rx32-cache-freertos.toml`, `tests/contracts/h743_assembly/rx32-cache.toml`, `tests/contracts/h743_assembly/rx32-freertos.toml`, `tests/contracts/h743_assembly/rx32.toml`, `tools/configure/assemblies/h743-spi-dma-uart-rx.toml` | `soc/stm32/stm32h743/drivers/uart_receive.c` |
-| stm32u575 | ADC4 | adc | single-shot | `adc4-pc0` | `stm32u575-nucleo-zi-q` | `tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, `tests/contracts/u575_assembly/peripherals-freertos.toml`, `tests/contracts/u575_assembly/peripherals.toml` | `soc/stm32/stm32u575/drivers/adc.c` |
-| stm32u575 | EXTI0 | exti | edge-event | `exti0-pa0` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/exti.c` |
-| stm32u575 | EXTI1 | exti | edge-event | `exti1-pa1` | `stm32u575-nucleo-zi-q` | `tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, `tests/contracts/u575_assembly/peripherals-freertos.toml`, `tests/contracts/u575_assembly/peripherals.toml` | `soc/stm32/stm32u575/drivers/exti.c` |
-| stm32u575 | FLASH | flash | poll-word | `physical-flash` | `stm32u575-nucleo-zi-q` | `tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, `tests/contracts/u575_assembly/peripherals-freertos.toml`, `tests/contracts/u575_assembly/peripherals.toml` | `soc/stm32/stm32u575/drivers/flash.c` |
-| stm32u575 | GPIOA | gpio | input | `gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOA | gpio | output | `gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOB | gpio | input | `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOB | gpio | output | `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOC | gpio | input | `gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOC | gpio | output | `gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/io-freertos.toml`, `tests/contracts/u575_assembly/io.toml`, `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml`, `tools/configure/assemblies/nucleo-u575-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-u575-freertos-uart.toml`, `tools/configure/assemblies/u575-mpu-gpio-write.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOD | gpio | input | `gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOD | gpio | output | `gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOE | gpio | input | `gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOE | gpio | output | `gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOF | gpio | input | `gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOF | gpio | output | `gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOG | gpio | input | `gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOG | gpio | output | `gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOH | gpio | input | `gpio-ph0`, `gpio-ph1`, `gpio-ph3` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | GPIOH | gpio | output | `gpio-ph0`, `gpio-ph1`, `gpio-ph3` | `stm32u575-nucleo-zi-q` | `tests/contracts/declared_io_assembly/u575.toml` | `soc/stm32/stm32u575/drivers/gpio.c` |
-| stm32u575 | I2C1 | i2c | poll-messages | `i2c1-pb8-pb9` | `stm32u575-nucleo-zi-q` | `tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, `tests/contracts/u575_assembly/peripherals-freertos.toml`, `tests/contracts/u575_assembly/peripherals.toml` | `drivers/i2c/i2c_v2/i2c_v2.c` |
-| stm32u575 | IWDG | watchdog | independent | `independent-watchdog` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml`, `tests/contracts/u575_assembly/watchdog.toml` | `soc/stm32/stm32u575/drivers/watchdog.c` |
-| stm32u575 | LPTIM2 | lptim | irq-counter16-oneshot | `lptim2-internal-pclk1` | `stm32u575zi-lptim-reference` | `tools/configure/assemblies/u575-lptim-run.toml` | `soc/stm32/stm32u575/drivers/lptim.c` |
-| stm32u575 | RTC0 | rtc | retained-calendar-alarm | `rtc0-retained-lse-run` | `stm32u575zi-rtc-reference` | `tools/configure/assemblies/u575-rtc-run.toml` | `soc/stm32/stm32u575/drivers/rtc.c` |
-| stm32u575 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7` | `stm32u575-nucleo-zi-q` | `tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml`, `tests/contracts/u575_assembly/peripherals-freertos.toml`, `tests/contracts/u575_assembly/peripherals.toml` | `soc/stm32/stm32u575/drivers/spi.c` |
-| stm32u575 | TIM3 | pwm | fixed-pwm | `tim3-pa6` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/pwm-freertos.toml`, `tests/contracts/u575_assembly/pwm.toml` | `soc/stm32/stm32u575/drivers/pwm.c` |
-| stm32u575 | USART1 | uart | dma-chain-tx | `usart1-pa9-pa10` | `stm32u575-nucleo-zi-q` | `tools/configure/assemblies/u575-uart-chain.toml` | `soc/stm32/stm32u575/drivers/uart_dma_chain.c` |
-| stm32u575 | USART1 | uart | dma-tx | `usart1-pa9-pa10` | `stm32u575-nucleo-zi-q` | `cmake/package/verification/io_evolution/u575-uart-gpdma.toml` | `soc/stm32/stm32u575/drivers/uart_dma.c` |
-| stm32u575 | USART1 | uart | irq-bytes | `usart1-pa9-pa10` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/io-freertos.toml`, `tests/contracts/u575_assembly/io.toml`, `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml`, `tools/configure/assemblies/nucleo-u575-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-u575-freertos-uart.toml` | `soc/stm32/stm32u575/drivers/uart.c` |
-| stm32u575 | USART1 | uart | irq-fifo-bytes | `usart1-pa9-pa10` | `stm32u575-nucleo-zi-q` | `cmake/package/verification/io_evolution/u575-uart-fifo.toml` | `soc/stm32/stm32u575/drivers/uart_fifo.c` |
-| stm32u575 | USART1 | uart | irq-fifo-rtscts-bytes | `usart1-pa9-pa10-pa11-pa12-rtscts` | `stm32u575zi-rtscts-reference` | `cmake/package/verification/io_evolution/u575-uart-rtscts.toml` | `soc/stm32/stm32u575/drivers/uart_rtscts.c` |
-| stm32u575 | USART2 | uart | irq-bytes | `usart2-pa2-pa3` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32/stm32u575/drivers/uart.c` |
-| native (MODEL; physical=false) | ADC0 | adc | low-rate-scan | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/adc.c` |
-| native (MODEL; physical=false) | EXTI6 | exti | edge-event | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/exti.c` |
-| native (MODEL; physical=false) | FLASH0 | flash | poll-byte | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/flash.c` |
-| native (MODEL; physical=false) | GPIOA | gpio | output | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml` | `soc/native/drivers/gpio.c` |
-| native (MODEL; physical=false) | I2C0 | i2c | poll-messages | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/i2c.c` |
-| native (MODEL; physical=false) | I2C1 | i2c | poll-messages | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/i2c.c` |
-| native (MODEL; physical=false) | IWDG | watchdog | independent | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/watchdog.c` |
-| native (MODEL; physical=false) | LPTIM0 | lptim | counter16-oneshot | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `soc/native/drivers/rtc_lptim.c` |
-| native (MODEL; physical=false) | LPTIM1 | lptim | counter16-oneshot | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `soc/native/drivers/rtc_lptim.c` |
-| native (MODEL; physical=false) | PWM0 | pwm | fixed-pwm | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/timer.c` |
-| native (MODEL; physical=false) | RTC0 | rtc | calendar-alarm | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `soc/native/drivers/rtc_lptim.c` |
-| native (MODEL; physical=false) | RTC1 | rtc | calendar-alarm | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `soc/native/drivers/rtc_lptim.c` |
-| native (MODEL; physical=false) | SPI0 | spi | async-model | — | — | `tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml` | `io/src/mechanisms/spi_dma_sequence.c` |
-| native (MODEL; physical=false) | SPI0 | spi | short-poll | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml` | `soc/native/drivers/spi.c` |
-| native (MODEL; physical=false) | SPI1 | spi | async-model | — | — | `tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml` | `io/src/mechanisms/spi_dma_sequence.c` |
-| native (MODEL; physical=false) | SPI1 | spi | short-poll | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/spi.c` |
-| native (MODEL; physical=false) | UART0 | uart | irq-byte-event | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml` | `soc/native/drivers/uart.c` |
-| native (MODEL; physical=false) | UART0 | uart | irq-words | — | — | `tests/contracts/io_evolution_assembly/native-uart9n1.toml` | `soc/native/drivers/uart_word.c` |
-| native (MODEL; physical=false) | UART1 | uart | irq-byte-event | — | — | `tests/contracts/native_assembly/multi.toml` | `soc/native/drivers/uart.c` |
+| stm32f4 | ADC1 | adc | low-rate-scan | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-adc-scan.toml`, `tests/contracts/stm32_assembly/zg-adc-scan.toml` | `soc/stm32/stm32f4/drivers/adc.c` |
+| stm32f4 | ADC1 | adc | single-shot | `adc1-ch0-pa0` | — | `tests/contracts/stm32_assembly/ve-adc.toml`, `tests/contracts/stm32_assembly/zg-adc.toml` | `soc/stm32/stm32f4/drivers/adc.c` |
+| stm32f4 | ADC1 | adc | trigger-dma | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml` | `soc/stm32/stm32f4/drivers/adc_stream.c` |
+| stm32f4 | ADC1 | adc | trigger-dma-continuous | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, `tests/contracts/io_evolution_assembly/f407-adc-stream-profile.toml`, `tests/contracts/stm32_assembly/zg-adc-continuous.toml` | `soc/stm32/stm32f4/drivers/adc_continuous.c` |
+| stm32f4 | CAN1 | can | classic-irq | `can1-pa11-pa12`, `can1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/can_assembly/stm32-first.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c` |
+| stm32f4 | CAN2 | can | classic-irq | `can2-pb12-pb13` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/declared_io_assembly/ve-word-adc-can.toml` | `soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c` |
+| stm32f4 | ETH | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/stm32-zg-freertos.toml`, `tests/contracts/ethernet_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c` |
+| stm32f4 | ETH | eth_frames | rmii-vlan-sg-ptp | `rmii-frames-a-c-g` | — | `cmake/package/verification/io_evolution/f407zg-eth-frames.toml` | `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c` |
+| stm32f4 | EXTI0 | exti | edge-event | `exti0-pa0` | — | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f4/drivers/exti.c` |
+| stm32f4 | EXTI11 | exti | edge-event | `exti11-pf11` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | EXTI2 | exti | edge-event | `exti2-pe2` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | EXTI5 | exti | edge-event | `exti5-pa5` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f4/drivers/exti.c` |
+| stm32f4 | EXTI6 | exti | edge-event | `exti6-pa6`, `exti6-pf6` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32/stm32f4/drivers/exti.c` |
+| stm32f4 | EXTI7 | exti | edge-event | `exti7-pf7` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | EXTI8 | exti | edge-event | `exti8-pf8` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | EXTI9 | exti | edge-event | `exti9-pf9` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | FLASH | flash | poll-word | `flash-internal` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml` | `soc/stm32/stm32f4/drivers/flash.c` |
+| stm32f4 | FSMC | external_bus | async16 | `fsmc-async16` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | FSMC | memory_window | cpu-window | `fsmc-ne3-is62wv51216` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | FSMC | memory_window | startup-memory | `fsmc-ne3-is62wv51216` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | FSMC | parallel16 | 8080-16 | `fsmc-ne4-ili9341` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOA | gpio | input | `gpio-pa0`, `gpio-pa15` | `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOA | gpio | output | `gpio-pa0`, `gpio-pa15`, `gpio-pa5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-output.toml`, `tests/contracts/declared_io_assembly/ve-duplex.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOB | gpio | input | `gpio-input-pb2`, `gpio-pb2` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOB | gpio | output | `gpio-pb0`, `gpio-pb1`, `gpio-pb2` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-output.toml`, `tools/configure/assemblies/sky-baremetal-gpio.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-gpio.toml`, `tools/configure/assemblies/sky-freertos.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOC | gpio | input | `gpio-pc0`, `gpio-pc13` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOC | gpio | output | `gpio-pc0`, `gpio-pc13` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOD | gpio | input | `gpio-pd0`, `gpio-pd6`, `gpio-pd7` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOD | gpio | output | `gpio-pd0`, `gpio-pd6`, `gpio-pd7` | `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOE | gpio | input | `gpio-pe2`, `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOE | gpio | output | `gpio-pe2`, `gpio-pe3`, `gpio-pe4` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOF | gpio | input | `gpio-pf11`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOF | gpio | output | `gpio-pf10` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | GPIOG | gpio | input | `gpio-pg9` | `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407-input.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | GPIOG | gpio | output | `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/f407.toml` | `soc/stm32/stm32f4/drivers/gpio.c` |
+| stm32f4 | I2C1 | i2c | dma-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/stm32_assembly/zg-i2c-dma.toml` | `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` |
+| stm32f4 | I2C1 | i2c | irq-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/stm32_assembly/zg-i2c-irq.toml` | `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` |
+| stm32f4 | I2C1 | i2c | poll-messages | `i2c1-pb6-pb7`, `i2c1-pb8-pb9` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-i2c.toml`, `tests/contracts/stm32_assembly/zg-i2c.toml` | `soc/stm32/stm32f4/drivers/i2c.c` |
+| stm32f4 | I2C2 | i2c | dma-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` |
+| stm32f4 | I2C2 | i2c | irq-messages | `i2c2-pb10-pb11` | — | `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml` | `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` |
+| stm32f4 | IWDG | watchdog | independent | `iwdg` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-watchdog.toml`, `tests/contracts/stm32_assembly/zg-watchdog.toml` | `soc/stm32/stm32f4/drivers/watchdog.c` |
+| stm32f4 | OTG_FS | usb_device | device-fs | `usbfs-pa11-pa12` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c` |
+| stm32f4 | RTC | rtc | adopt-retained | `rtc-lse-pc14-pc15` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | RTC | rtc | provision-empty | `rtc-lse-pc14-pc15` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | — | — |
+| stm32f4 | SDIO | block | sdio-poll | `sdio-pc8-pd2` | `stm32f407zg-qiming-v41` | `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml` | `soc/stm32/stm32f4/drivers/sdio.c` |
+| stm32f4 | SPI1 | spi | dma | `spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml` | `io/src/mechanisms/spi_dma_sequence.c`, `soc/stm32/stm32f4/drivers/spi_dma.c` |
+| stm32f4 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml` | `soc/stm32/stm32f4/drivers/spi.c` |
+| stm32f4 | SPI2 | spi | dma | `spi2-pb13-pb14-pb15` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/spi_dma.c` |
+| stm32f4 | TIM1 | advanced_pwm | complementary-pwm | `complementary-pa8-pb12-pb13` | — | `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/advanced_pwm.c` |
+| stm32f4 | TIM3 | pwm | fixed-pwm | `tim3-ch1-pa6` | — | `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml` | `soc/stm32/stm32f4/drivers/timer.c` |
+| stm32f4 | TIM4 | timer_capture | edge-capture | `capture-pb6` | — | `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml` | `soc/stm32/stm32f4/drivers/timer_capture.c` |
+| stm32f4 | UART4 | uart | irq-byte-event | `uart4-pa0-pa1` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
+| stm32f4 | UART5 | uart | irq-byte-event | `uart5-pc12-pd2` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
+| stm32f4 | USART1 | uart | dma-duplex | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-duplex.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml` | `soc/stm32/stm32f4/drivers/uart_duplex.c` |
+| stm32f4 | USART1 | uart | dma-duplex-continuous | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml` | `soc/stm32/stm32f4/drivers/uart_duplex.c` |
+| stm32f4 | USART1 | uart | dma-tx | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml` | `soc/stm32/stm32f4/drivers/uart_hal.c` |
+| stm32f4 | USART1 | uart | irq-blocks | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml` | `soc/stm32/stm32f4/drivers/uart_stream.c` |
+| stm32f4 | USART1 | uart | irq-byte-event | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/physical_platform_assembly/f407-uart-arm.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
+| stm32f4 | USART1 | uart | irq-words | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-word-adc-can.toml`, `tests/contracts/io_evolution_assembly/f407-uart9n1-probe.toml`, `tests/contracts/io_evolution_assembly/f407-uart9n1.toml` | `soc/stm32/stm32f4/drivers/uart_word.c` |
+| stm32f4 | USART1 | uart | rx-dma-continuous | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/io_evolution_assembly/f407-uart-stream-profile.toml`, `tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-rx-dma-continuous.toml` | `soc/stm32/stm32f4/drivers/uart_receive.c` |
+| stm32f4 | USART1 | uart | rx-dma-idle | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41` | `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-rx-dma-idle.toml` | `soc/stm32/stm32f4/drivers/uart_receive.c` |
+| stm32f4 | USART2 | uart | dma-tx | `usart2-pa2-pa3` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml` | `soc/stm32/stm32f4/drivers/uart_hal.c` |
+| stm32f4 | USART2 | uart | irq-byte-event | `usart2-pa2-pa3` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
+| stm32f4 | USART3 | uart | irq-byte-event | `usart3-pb10-pb11` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
+| stm32f4 | USART6 | uart | irq-byte-event | `usart6-pc6-pc7` | `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41` | `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml` | `soc/stm32/stm32f4/drivers/uart.c` |
 <!-- nexus-capabilities:end -->

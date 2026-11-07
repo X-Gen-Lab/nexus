@@ -20,15 +20,15 @@ class BundleTransactionTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
-                     "soc/native/soc.json", "soc/native/routes.json",
-                     "boards/native_reference/board.json"):
+                     "tests/support/native/soc.json", "tests/support/native/routes.json",
+                     "tests/support/native/board/board.json"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, target)
         self.assembly = self.root / "assembly.toml"
         self.authored = {
             "schema_version": 1,
-            "board_package": "boards/native_reference",
+            "board_package": "tests/support/native/board",
             "backend": "native", "clock_profile": "model",
             "controllers": [], "devices": [],
             "memory_budgets": {"main_stack_bytes": 2048}, "layout": None}
@@ -36,7 +36,7 @@ class BundleTransactionTests(unittest.TestCase):
         self.output = self.root / "generated"
 
     def configure(self):
-        return gate.configure(self.assembly, self.output, self.root)
+        return gate.configure(self.assembly, self.output, self.root, test_support=True)
 
     def timestamps(self):
         return {path.name: (path.read_bytes(), path.stat().st_mtime_ns)
@@ -55,18 +55,18 @@ class BundleTransactionTests(unittest.TestCase):
         authored.write_bytes(self.assembly.read_bytes())
         expected = authored.read_bytes()
         with self.assertRaisesRegex(gate.ConfigurationError, "input"):
-            gate.configure(authored, self.output, self.root)
+            gate.configure(authored, self.output, self.root, test_support=True)
         self.assertEqual(authored.read_bytes(), expected)
 
     def test_owned_marker_never_authorizes_deleting_board_package(self):
         package = self.root / "external-board"
-        shutil.copytree(self.root / "boards/native_reference", package)
+        shutil.copytree(self.root / "tests/support/native/board", package)
         (package / ".nexus-config-bundle").write_text("owned")
         self.authored["board_package"] = "external-board"
         self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
         expected = (package / "board.json").read_bytes()
         with self.assertRaisesRegex(gate.ConfigurationError, "input"):
-            gate.configure(self.assembly, package, self.root)
+            gate.configure(self.assembly, package, self.root, test_support=True)
         self.assertEqual((package / "board.json").read_bytes(), expected)
 
     def test_driver_package_is_protected_before_owned_bundle_withdrawal(self):
@@ -77,12 +77,12 @@ class BundleTransactionTests(unittest.TestCase):
         source.write_text("/* Reviewed hardware algorithm. */\n")
         expected = source.read_bytes()
         with self.assertRaisesRegex(gate.ConfigurationError, "input package"):
-            gate.configure(self.assembly, package, self.root)
+            gate.configure(self.assembly, package, self.root, test_support=True)
         self.assertEqual(source.read_bytes(), expected)
 
     def test_alternate_fact_root_cannot_replace_executed_soc_adapter(self):
         code_root = self.root / "generator"
-        package = code_root / "soc/native/configure"
+        package = code_root / "tests/support/native/configure"
         package.mkdir(parents=True)
         (package / ".nexus-config-bundle").write_text("owned")
         source = package / "bindings.py"
@@ -91,11 +91,11 @@ class BundleTransactionTests(unittest.TestCase):
         with patch.object(gate, "ROOT", code_root):
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "input package"):
-                gate.configure(self.assembly, package, self.root)
+                gate.configure(self.assembly, package, self.root, test_support=True)
         self.assertEqual(source.read_bytes(), expected)
 
     def test_nested_declared_board_fact_is_protected_before_withdrawal(self):
-        package = self.root / "boards/native_reference"
+        package = self.root / "tests/support/native/board"
         output = package / "generated"
         output.mkdir()
         (output / ".nexus-config-bundle").write_text("owned")
@@ -107,7 +107,7 @@ class BundleTransactionTests(unittest.TestCase):
         board["inputs"] = ["generated/reviewed-board-input.txt"]
         board_path.write_text(json.dumps(board))
         with self.assertRaises(gate.ConfigurationError):
-            gate.configure(self.assembly, output, self.root)
+            gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertTrue(fact.is_file())
         self.assertEqual(fact.read_bytes(), expected)
 
@@ -126,7 +126,7 @@ class BundleTransactionTests(unittest.TestCase):
         self.assertIn("tools/configure/factory.py", paths)
         self.assertIn("tools/configure/bundle.py", paths)
         self.assertIn("tools/configure/emission.py", paths)
-        self.assertIn("soc/native/configure/emission.py", paths)
+        self.assertIn("tests/support/native/configure/emission.py", paths)
         self.assertNotIn("soc/gd32/gd32f470/configure/emission.py", paths)
         self.assertEqual(set(paths), {item["path"] for item in identity["files"]})
         for record in identity["files"]:
@@ -139,7 +139,7 @@ class BundleTransactionTests(unittest.TestCase):
         alias = self.root / "alias"
         alias.symlink_to(real, target_is_directory=True)
         with self.assertRaisesRegex(gate.ConfigurationError, "symlink"):
-            gate.configure(self.assembly, alias / "generated", self.root)
+            gate.configure(self.assembly, alias / "generated", self.root, test_support=True)
         self.assertEqual(list(real.iterdir()), [])
 
     def test_same_output_concurrent_writer_is_rejected_without_damage(self):
@@ -161,7 +161,7 @@ class BundleTransactionTests(unittest.TestCase):
                   "configure.generate = lambda *args: os._exit(73)\n"
                   f"configure.configure(__import__('pathlib').Path({str(self.assembly)!r}), "
                   f"__import__('pathlib').Path({str(self.output)!r}), "
-                  f"__import__('pathlib').Path({str(self.root)!r}))\n")
+                  f"__import__('pathlib').Path({str(self.root)!r}), test_support=True)\n")
         process = subprocess.run([sys.executable, "-B", "-c", script],
                                  env={**os.environ, "PYTHONPATH": str(gate.ROOT)})
         self.assertEqual(process.returncode, 73)
@@ -189,24 +189,20 @@ class BundleTransactionTests(unittest.TestCase):
             '[uart.console.rx]\nformat = "bytes"\ncapacity = 32\n'
             '[uart.console.irq]\npriority = 5\n')
         with self.assertRaises(gate.ConfigurationError) as rejected:
-            gate.configure(authored, self.output, self.root)
+            gate.configure(authored, self.output, self.root, test_support=True)
         detail = str(rejected.exception)
         for expected in (str(authored), "console", "uart0", "irq-byte-event", "1200"):
             self.assertIn(expected, detail)
 
     def test_configuration_code_changed_during_resolution_is_rejected(self):
         code_root = self.root / "generator"
-        paths, _ = gate.dependencies.snapshot(mode="platform")
+        paths, _ = gate.dependencies.snapshot(mode="platform", test_support=True)
         for name, source in paths.items():
             target = code_root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        for module in ("tools/configure/factory.py",
-                       "tools/configure/emission.py",
-                       "soc/native/configure/emission.py",
-                       "soc/stm32/stm32h743/configure/clocks.py",
-                       "soc/stm32/stm32f407/configure/hardware.py"):
+        for module in ('tools/configure/factory.py', 'tools/configure/emission.py', 'tests/support/native/configure/emission.py', 'tools/configure/stm32f4/hardware.py'):
             with self.subTest(module=module):
                 def changing(*args, **kwargs):
                     result = original(*args, **kwargs)
@@ -227,7 +223,7 @@ class BundleTransactionTests(unittest.TestCase):
                                       "driver": "spi-endpoint", "mode": 3,
                                       "max_hz": 1000000, "model_bytes": 32}]
         self.assembly.write_text(render_toml(self.authored, kinds={"spi0": "spi"}))
-        result = gate.resolve_ir(self.assembly, self.root)
+        result = gate.resolve_ir(self.assembly, self.root, test_support=True)
         options = result.devices[0].options
         self.assertEqual(options.mode, 3)
         self.assertEqual(options.max_hz, 1000000)
@@ -248,7 +244,7 @@ class RuntimeIncrementalTests(unittest.TestCase):
     def test_runtime_sidecar_includes_factory_and_preserves_timestamps(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
-            soc = json.loads((gate.ROOT / "soc/native/soc.json").read_text())
+            soc = json.loads((gate.ROOT / "tests/support/native/soc.json").read_text())
             (root / "cpu.json").write_text(json.dumps({
                 "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
                 "clock_hz": 1000000}))
@@ -269,7 +265,7 @@ class RuntimeIncrementalTests(unittest.TestCase):
     def test_explicit_step_optimization_profiles(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
-            soc = json.loads((gate.ROOT / "soc/native/soc.json").read_text())
+            soc = json.loads((gate.ROOT / "tests/support/native/soc.json").read_text())
             (root / "cpu.json").write_text(json.dumps({
                 "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
                 "clock_hz": 1000000}))
@@ -291,7 +287,7 @@ class RuntimeIncrementalTests(unittest.TestCase):
     def test_runtime_code_changed_during_resolution_is_rejected(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
-            soc = json.loads((gate.ROOT / "soc/native/soc.json").read_text())
+            soc = json.loads((gate.ROOT / "tests/support/native/soc.json").read_text())
             (root / "cpu.json").write_text(json.dumps({
                 "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
                 "clock_hz": 1000000}))

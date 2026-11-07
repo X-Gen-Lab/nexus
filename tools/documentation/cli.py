@@ -203,19 +203,12 @@ def run_tests(root, report, tool_prefix=None):
 
 
 def _check_status_views(root, report):
-    """Admit maintained views from their source, even when output is missing."""
-    from tools.documentation import status
-    page = root / "docs/index.md"
-    current = (page.is_file()
-               and check.metadata(page.read_text()).get("id") == "index")
-    inputs = [root / "docs/status/ledgers"] + [
-        root / "docs/design" / filename
-        for filename, _, _ in status.SPECIFICATIONS]
-    if current or any(path.exists() or path.is_symlink() for path in inputs):
-        for result in (status.generate(root, check=True),
-                       status.check_mapping(root)):
-            report["errors"].extend(result["errors"])
-        report["status"] = "failed" if report["errors"] else "passed"
+    """Share scan's authority gate, including explicit custom scan callers."""
+    if "maintained_sources" not in report:
+        result = check.validate_maintained_sources(root)
+        report["maintained_sources"] = result
+        report["errors"].extend(result["errors"])
+    report["status"] = "failed" if report["errors"] else "passed"
 
 
 def build(root, destination, *, language="all", tool_prefix=None, timeout=600):

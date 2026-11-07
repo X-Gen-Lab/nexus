@@ -163,22 +163,19 @@ class ThreadXPolicyTests(unittest.TestCase):
 
     def test_platform_scope_does_not_turn_arbitrary_board_into_support(self):
         module = importlib.import_module("tools.configure.threadx")
-        for directory, family in (("native_reference", "native"),
-                                  ("stm32f407_qiming_v31", "stm32f407"),
-                                  ("stm32f407ve_sky_qingchun", "stm32f407"),
-                                  ("gd32f470_liangshan", "gd32f470")):
-            board = json.loads((ROOT / "boards" / directory / "board.json").read_text())["id"]
+        for directory, family in (('native_reference', 'native'), ('stm32f407_qiming_v31', 'stm32f4'), ('stm32f407ve_sky_qingchun', 'stm32f4')):
+            path = (ROOT / "tests/support/native/board/board.json"
+                    if family == "native" else ROOT / "boards" / directory / "board.json")
+            board = json.loads(path.read_text())["id"]
             module.validate_platform(board, family)
-        for board, family in (("custom_unknown", "stm32f407"),
-                              ("stm32f407_qiming_v31", "stm32f407"),
-                              ("stm32f407zg-qiming-v31", "gd32f470")):
+        for board, family in (('custom_unknown', 'stm32f4'), ('stm32f407_qiming_v31', 'stm32f4')):
             with self.subTest(board=board), self.assertRaisesRegex(ValueError, "ThreadX.*platform"):
                 module.validate_platform(board, family)
 
     def test_cpu_runtime_binds_host_policy_into_atomic_bundle(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            soc = json.loads((ROOT / "soc/native/soc.json").read_text())
+            soc = json.loads((ROOT / "tests/support/native/soc.json").read_text())
             (root / "cpu.json").write_text(json.dumps({
                 "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
                 "clock_hz": 1000000}))

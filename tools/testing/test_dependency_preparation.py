@@ -367,7 +367,11 @@ class DependencyPreparationTests(unittest.TestCase):
         self.assertEqual(self.git(checkout, "rev-parse", "HEAD"), target)
         self.assertEqual(len(calls), 1)
         self.assertIn("--no-write-fetch-head", calls[0])
-        self.assertEqual(len(receipt["recursive_submodules"]), 3)
+        self.assertEqual(receipt["recursive_submodules"], [
+            {"path": "ext/freertos", "commit": target}])
+        for child in source_catalogue.children("ext/freertos"):
+            self.assertEqual(self.git(self.root / child.path, "config",
+                "--get", "remote.origin.url"), child.upstream_url)
 
     def test_present_dangling_freertos_target_needs_no_remote_fetch(self):
         kernel, checkout, _, target = self.freertos_transition()

@@ -843,7 +843,7 @@ def validate_consumer_observation(inputs, sdk, source, build, kind,
             arguments = (Path(relocated(str(sdk))), Path(relocated(str(source))),
                          Path(relocated(str(build))))
             expected = (checker.check_selected_image(*arguments, replay,
-                owner_specification=specification) if native else
+                specification=specification) if native else
                 checker.check_service_image(*arguments, specification, replay))
         except ValueError as error:
             raise EvidenceError("consumer checker rejected original inputs: " +

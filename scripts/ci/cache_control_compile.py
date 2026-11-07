@@ -110,6 +110,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
         for path in [source, Path(__file__),
                      root / 'arch/arm/cortex_m/private/cache_control.h',
                      root / 'arch/arm/cortex_m/private/mechanisms.h',
+                     root / 'arch/arm/cortex_m/private/registers.h',
                      root / 'arch/include/nexus/arch/cache_control.h',
                      root / 'arch/include/nexus/arch/arch.h',
                      root / 'arch/include/nexus/arch/features.h']:

@@ -1,4 +1,4 @@
-# Exact changed messages reviewed against canonical source.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,25 +8,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 43fa6e4e05646c2638fdb0393abe8f5c01af8c88b74678c11980cc57efe843e2\n"
+"X-Nexus-Source-SHA256: fe1087f2c0f049169c11fdf08d466208d86b9ca6c20b8e23a16913eddd597c9b\n"
 
+#: docs/guides/source-checkout.md:9
 msgid "Obtain the exact source and pinned dependencies"
 msgstr "取得精确源码与锁定依赖"
 
+#: docs/guides/source-checkout.md:11
 msgid ""
 "Use this guide before running repository commands in a tutorial, "
-"configuration reference or maintenance workflow. You will obtain a "
-"detached, exact Nexus source revision and its reviewed dependency "
-"closure. This requires Git, Python 3.11+ and network access for the "
-"initial clone and dependency retrieval. It does not build, flash or "
-"establish software or hardware qualification."
+"configuration reference or maintenance workflow. You will obtain a detached, "
+"exact Nexus source revision and its reviewed dependency closure. This "
+"requires Git, Python 3.11+ and network access for the initial clone and "
+"dependency retrieval. It does not build, flash or establish software or "
+"hardware qualification."
 msgstr ""
 "在执行教程、配置参考或维护工作流中的仓库命令前，先使用本指南。你将取得处于 detached 状态的精确 Nexus "
 "源码版本及经过审查的依赖闭包。首次克隆和取得依赖需要 Git、Python 3.11+ 及网络访问。本流程不构建、不刷写，也不建立软件或硬件资格。"
 
+#: docs/guides/source-checkout.md:17
 msgid "Select the revision described by your documentation"
 msgstr "选择当前文档描述的版本"
 
+#: docs/guides/source-checkout.md:19
 msgid ""
 "Open the immutable documentation version identified by the page's version "
 "banner. Download `documentation-manifest.json` from that version's root, or "
@@ -40,33 +44,49 @@ msgstr ""
 "manifest.json`，或使用已验证离线包根目录中的同名文件。将其保存在即将创建的 checkout 外，例如工作父目录下的 `nexus-"
 "documentation-manifest.json`。如果从 `stable/` 进入，先记录其选择的不可变版本，再下载；不得混用两个版本。"
 
+#: docs/guides/source-checkout.md:0
 msgid "Manifest field"
 msgstr "清单字段"
 
+#: docs/guides/source-checkout.md:0
 msgid "Use"
 msgstr "用途"
 
+#: docs/guides/source-checkout.md:0
 msgid "`documentation_source.commit`"
 msgstr "`documentation_source.commit`"
 
+#: docs/guides/source-checkout.md:0
 msgid "Exact source containing these pages and their tools"
 msgstr "包含这些页面及其工具的精确源码"
 
+#: docs/guides/source-checkout.md:0
 msgid "`code_source.commit`"
 msgstr "`code_source.commit`"
 
+#: docs/guides/source-checkout.md:0
 msgid "Source described by the package; inspect its identity separately"
 msgstr "文档包描述的源码；应单独核对其身份"
 
+#: docs/guides/source-checkout.md:0
 msgid "`qualification_references[]`"
 msgstr "`qualification_references[]`"
 
-msgid "Explicitly verified candidate references in a schema 2 package, each with its original source and scope; may be empty"
+#: docs/guides/source-checkout.md:0
+msgid ""
+"Explicitly verified candidate references in a schema 2 package, each with its"
+" original source and scope; may be empty"
 msgstr "schema 2 包中显式验证的候选引用，各自保留原源码和范围；可以为空"
 
-msgid "Historical schema 1 packages retain their original `qualified_code.commit` field for read-only recovery. Do not interpret it as a current schema 2 reference."
-msgstr "历史 schema 1 包保留原始 `qualified_code.commit` 字段，用于只读恢复。不得将其解释为当前 schema 2 引用。"
+#: docs/guides/source-checkout.md:32
+msgid ""
+"Historical schema 1 packages retain their original `qualified_code.commit` "
+"field for read-only recovery. Do not interpret it as a current schema 2 "
+"reference."
+msgstr ""
+"历史 schema 1 包保留原始 `qualified_code.commit` 字段，用于只读恢复。不得将其解释为当前 schema 2 引用。"
 
+#: docs/guides/source-checkout.md:35
 msgid ""
 "The default GitHub branch may lag a reviewed documentation branch. A branch "
 "name, successful clone or documentation release is not a substitute for the "
@@ -83,9 +103,11 @@ msgstr ""
 "lab.github.io/nexus/versions/docs-20261014-5a7a75c321ea/documentation-"
 "manifest.json)是一个具体例子。执行当前教程时，使用你所读版本自己的清单。"
 
+#: docs/guides/source-checkout.md:42
 msgid "Clone and initialize that exact revision"
 msgstr "克隆并初始化该精确版本"
 
+#: docs/guides/source-checkout.md:44
 msgid ""
 "Run these POSIX-shell commands from the parent directory containing the "
 "downloaded manifest. Choose a new checkout directory; the commands do not "
@@ -95,20 +117,21 @@ msgstr ""
 "从保存已下载清单的父目录执行以下 POSIX shell 命令。选择新的 checkout 目录；命令不会替换已有目录。Python "
 "命令先验证身份，再将其传给 Git："
 
+#: docs/guides/source-checkout.md:62
 msgid ""
 "Check every command's exit status. `git rev-parse HEAD` must equal the "
-"manifest's full commit. Recursive submodule lines must have neither a "
-"leading `-` (missing), `+` (different revision) nor `U` (conflict), and "
-"`git status --short` must be empty before starting a clean-source "
-"workflow. Stop on an unavailable commit or failed dependency retrieval; "
-"never substitute `main`, `HEAD` or a latest dependency. The preparation "
-"command audits the source-owned catalogue and each parent Gitlink before "
-"initializing its explicitly selected paths. Firmware configuration does "
-"not retrieve dependencies. For historical revisions predating this "
-"command, use the matching immutable documentation rather than applying "
-"current commands to an older source tree. For a preview without a package"
-" manifest, record the full commit from its source banner or "
-"`documentation-build.json` and use that validated commit explicitly."
+"manifest's full commit. Recursive submodule lines must have neither a leading"
+" `-` (missing), `+` (different revision) nor `U` (conflict), and `git status "
+"--short` must be empty before starting a clean-source workflow. Stop on an "
+"unavailable commit or failed dependency retrieval; never substitute `main`, "
+"`HEAD` or a latest dependency. The preparation command audits the source-"
+"owned catalogue and each parent Gitlink before initializing its explicitly "
+"selected paths. Firmware configuration does not retrieve dependencies. For "
+"historical revisions predating this command, use the matching immutable "
+"documentation rather than applying current commands to an older source tree. "
+"For a preview without a package manifest, record the full commit from its "
+"source banner or `documentation-build.json` and use that validated commit "
+"explicitly."
 msgstr ""
 "检查每条命令的退出状态。`git rev-parse HEAD` 必须与清单中的完整提交一致。递归子模块状态输出不能以 "
 "`-`（缺失）、`+`（版本不同）或 `U`（冲突）开头；开始干净源码工作流前，`git status --short` "
@@ -117,69 +140,100 @@ msgstr ""
 "Gitlink。固件配置过程不会取得依赖。对于本命令引入之前的历史版本，请使用与其对应的不可变文档，不要把当前命令用于旧源码树。没有包清单的预览应从源码横幅或"
 " `documentation-build.json` 记录完整提交，并显式使用该已验证提交。"
 
-msgid "Fetching the exact source commit avoids downloading unrelated artifact branches. The `documentation-assets` branch holds large historical evidence archives; it is not a source dependency. Retrieve only an archive identified by the [software evidence entry](../status/software-verification.md) when you need its original raw evidence. A verified Source SDK is another supported consumption path; it does not require the source repository's artifact history."
-msgstr "获取精确源码提交可避免下载无关的产物分支。`documentation-assets` 分支存放大型历史证据归档，不是源码依赖。只有需要原始证据时，才按[软件证据入口](../status/software-verification.md)取得其标识的单个归档。经过验证的 Source SDK 是另一条维护的消费路径，不需要源码仓库的产物历史。"
+#: docs/guides/source-checkout.md:75
+msgid ""
+"Fetching the exact source commit avoids downloading unrelated artifact "
+"branches. The `documentation-assets` branch holds large historical evidence "
+"archives; it is not a source dependency. Retrieve only an archive identified "
+"by the [software evidence entry](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
+"verification.md) when you need its original raw evidence. A verified Source "
+"SDK is another supported consumption path; it does not require the source "
+"repository's artifact history."
+msgstr ""
+"取得精确源码提交可避免下载无关产物分支。`documentation-assets` "
+"分支保存大型历史证据归档，不是源码依赖。仅在需要原始证据时，获取[软件证据入口](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
+"verification.md)明确标识的归档。经过验证的 Source SDK 是另一条受维护消费路径，不需要源码仓库的产物历史。"
 
+#: docs/guides/source-checkout.md:82
 msgid ""
 "On Windows, run the POSIX snippet in Git Bash, or read the same manifest "
-"field and perform the corresponding Git commands in your shell. Do not treat"
-" the shell variable syntax as a portable PowerShell command."
+"field and perform the corresponding Git commands in your shell. Do not treat "
+"the shell variable syntax as a portable PowerShell command."
 msgstr ""
 "Windows 下可在 Git Bash 中执行这段 POSIX 命令，或读取同一清单字段，在自己的 shell 中执行对应 Git "
 "命令。不要将这里的变量语法直接当作可移植的 PowerShell 命令。"
 
+#: docs/guides/source-checkout.md:86
 msgid "Prepare only the tools required by your task"
 msgstr "只准备当前任务所需的工具"
 
+#: docs/guides/source-checkout.md:0
 msgid "Task"
 msgstr "任务"
 
+#: docs/guides/source-checkout.md:0
 msgid "Next preparation"
 msgstr "后续准备"
 
+#: docs/guides/source-checkout.md:0
 msgid "Native consumer or I/O fixtures"
 msgstr "Native 消费工程或 I/O 夹具"
 
+#: docs/guides/source-checkout.md:0
 msgid ""
 "Host Python, CMake, Ninja and C/C++ compiler required by the selected "
 "tutorial"
 msgstr "所选教程要求的主机 Python、CMake、Ninja 和 C/C++ 编译器"
 
+#: docs/guides/source-checkout.md:0
 msgid "Configuration inspection"
 msgstr "检查配置"
 
+#: docs/guides/source-checkout.md:0
 msgid ""
 "Python and the maintained resolver; ARM compilation remains a separate step"
 msgstr "Python 与维护中的解析器；ARM 编译仍是独立步骤"
 
+#: docs/guides/source-checkout.md:0
 msgid "Platform maintenance"
 msgstr "平台维护"
 
+#: docs/guides/source-checkout.md:0
 msgid "[Development tools, TDD and hooks](../development/workflow.md)"
 msgstr "[开发工具、TDD 与钩子](../development/workflow.md)"
 
+#: docs/guides/source-checkout.md:0
 msgid "Documentation check, build or package"
 msgstr "文档检查、构建或打包"
 
+#: docs/guides/source-checkout.md:0
 msgid ""
 "[Locked documentation tuple and unified CLI](../reference/documentation-"
 "tools.md)"
 msgstr "[锁定文档工具组合与统一 CLI](../reference/documentation-tools.md)"
 
+#: docs/guides/source-checkout.md:0
 msgid "MCU linking or hardware preparation"
 msgstr "MCU 链接或硬件准备"
 
+#: docs/guides/source-checkout.md:0
 msgid "[Exact toolchain and HIL preparation](performance-hil.md)"
 msgstr "[精确工具链与 HIL 准备](performance-hil.md)"
 
+#: docs/guides/source-checkout.md:96
 msgid ""
 "Each tutorial starts from the repository root established above. Keep "
 "independent consumer and package outputs outside the source checkout when "
 "instructed. Retain manifests, source identities and required reports before "
 "deleting only directories you created. A clean checkout supplies input "
-"identity; actual execution and [qualification evidence](../status/software-"
+"identity; actual execution and [qualification "
+"evidence](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
 "verification.md) remain separate."
 msgstr ""
-"每个教程都从上面确定的仓库根目录开始。按要求将独立消费工程和包输出保存在源码 checkout "
-"外。删除目录前，保留清单、源码身份及必需报告，并且只删除自己创建的目录。干净 checkout "
-"只提供输入身份；实际执行与[资格证据](../status/software-verification.md)仍需分别建立。"
+"每个教程均从上面确定的仓库根开始。按说明将独立消费者和打包输出放在源码 checkout 外。删除自己创建的目录前，保留 "
+"manifest、源码身份和必要报告。干净 checkout 提供输入身份；实际执行与[资格证据](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
+"verification.md)仍然独立。"

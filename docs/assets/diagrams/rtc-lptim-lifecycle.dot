@@ -53,7 +53,7 @@ digraph rtcLptimLifecycle {
     source -> held [label="source can keep progressing during hold\nLPTIM result uses final withdrawal ticks", constraint=false];
     subgraph clusterTarget {
         label="CURRENT build: ordinary typed configuration and static assembly"; style=rounded; color="#64748b";
-    toml [label="Ordinary [rtc.name] / [lptim.name]\nNative RTC0/1 and LPTIM0/1, no pins/IRQ", fillcolor="#f8fafc"];
+    toml [label="Ordinary [rtc.name] / [lptim.name]\nNative RTC0/1 and LPTIM0/1, no pins/IRQ\nNEXUS_TEST_SUPPORT=ON / --test-support", fillcolor="#f8fafc"];
     ir [label="Existing ControllerIR -> provider path\nno second configuration authority", fillcolor="#f8fafc"];
     platform [label="Generated nx_platform_start/stop\nexplicit external lifecycle, no scheduler"];
     generated [label="Emit selected static state/faces\nand pure typed factory lookup", fillcolor="#f8fafc"];
@@ -67,8 +67,8 @@ digraph rtcLptimLifecycle {
     platform -> reopen [label="later preparation: private start of constructed owner", constraint=false];
     platform -> stop [label="public port stop; retain failed cleanup", constraint=false];
     subgraph clusterHardwareTarget {
-        label="TARGET: physical adaptation, not implemented or executed"; style=dashed; color="#64748b";
-    hardware [label="H743 / U575 RTC + LPTIM\nclock / backup reset / IRQ / STOP / VBAT\nNo hardware or HIL qualification", fillcolor="#f8fafc"];
+        label="TARGET: this asynchronous RTC/LPTIM hardware contract"; style=dashed; color="#64748b";
+    hardware [label="Physical asynchronous RTC / LPTIM provider\nclock / backup reset / IRQ / STOP / VBAT\nNative does not grant hardware or HIL qualification", fillcolor="#f8fafc"];
     }
     hardware -> face [label="future provider must meet the public contract", style=dashed, constraint=false];
 }

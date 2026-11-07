@@ -219,6 +219,14 @@ def _mapped_path(root, value):
     return path
 
 
+def _current_site_target(root, path):
+    """A retained source file alone does not establish an active site page."""
+    from tools.documentation import check
+    candidates = (path.with_suffix(".md"), path.with_suffix(".rst"))
+    return any(candidate.is_file() and check.is_source(root, candidate)
+               for candidate in candidates)
+
+
 def check_mapping(root):
     """Check authored authority/navigation and versioned alias mappings offline."""
     root = Path(root).absolute()
@@ -243,8 +251,7 @@ def check_mapping(root):
                         errors.append(source + ": missing authority " + value)
                 for value in filter(None, row.get("actual_site_paths", "").split(";")):
                     target = _mapped_path(root / "docs", value)
-                    if not any(target.with_suffix(suffix).is_file()
-                               for suffix in (".md", ".rst")):
+                    if not _current_site_target(root, target):
                         errors.append(source + ": missing site target " + value)
             except ValueError as error:
                 errors.append(source + ": " + str(error))
@@ -266,8 +273,7 @@ def check_mapping(root):
                 if not canonical.endswith(".html"):
                     raise ValueError("redirect target path must be HTML")
                 page = _mapped_path(root / "docs", canonical[:-5])
-                if not any(page.with_suffix(suffix).is_file()
-                           for suffix in (".md", ".rst")):
+                if not _current_site_target(root, page):
                     errors.append(old + ": missing redirect site target " + target)
                 if (row.get("semantics") == "historical_contract_version_boundary"
                         and canonical != "reference/history.html"):

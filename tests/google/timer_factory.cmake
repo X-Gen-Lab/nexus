@@ -1,16 +1,11 @@
 # Execute the actual atomic generated bundle and exact SDK timer providers.
-foreach(timer_family stm32 gd32)
-    if(timer_family STREQUAL "stm32")
-        set(timer_label "stm32-zg")
-        set(timer_soc "stm32f407")
-    else()
-        set(timer_label "gd32")
-        set(timer_soc "gd32f470")
-    endif()
+foreach(timer_family stm32)
+    set(timer_label "stm32-zg")
+    set(timer_soc "stm32f4")
     set(timer_input "${NEXUS_SOURCE_DIR}/tests/contracts/timer_assembly/${timer_label}.toml")
     set(timer_bundle "${CMAKE_CURRENT_BINARY_DIR}/timer-factory-${timer_family}")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
         --source-root "${NEXUS_SOURCE_DIR}" --assembly "${timer_input}"
         --output "${timer_bundle}" RESULT_VARIABLE timer_generated
         OUTPUT_VARIABLE timer_output ERROR_VARIABLE timer_error)
@@ -30,27 +25,15 @@ foreach(timer_family stm32 gd32)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_factory_model.h")
     target_compile_definitions(${timer_target} PRIVATE
         _init=nx_timer_fixture_init _fini=nx_timer_fixture_fini)
-    if(timer_family STREQUAL "stm32")
-        target_sources(${timer_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c")
-        target_include_directories(${timer_target} SYSTEM PRIVATE
-            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
-        nexus_use_cmsis_core(${timer_target})
-        target_compile_definitions(${timer_target} PRIVATE
-            STM32F407xx NX_TIMER_FACTORY_STM32)
-    else()
-        target_sources(${timer_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/platform_cold.c")
-        set(timer_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
-        target_include_directories(${timer_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
-        target_include_directories(${timer_target} SYSTEM PRIVATE
-            "${timer_gd}/CMSIS/GD/GD32F4xx/Include"
-            "${timer_gd}/GD32F4xx_standard_peripheral/Include")
-        target_compile_definitions(${timer_target} PRIVATE
-            GD32F470 HXTAL_VALUE=25000000 NX_TIMER_FACTORY_GD32)
-        target_compile_options(${timer_target} PRIVATE
-            "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
-    endif()
+    target_sources(${timer_target} PRIVATE
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+    target_include_directories(${timer_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timer_target})
+    target_compile_definitions(${timer_target} PRIVATE
+        STM32F407xx NX_TIMER_FACTORY_STM32)
 endforeach()

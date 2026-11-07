@@ -119,15 +119,9 @@ class EthernetFramesMac : public testing::Test {
          * against these same registers, rather than inherit this assignment. */
         *reinterpret_cast<uint32_t*>(UINT32_C(0x40023800)) = UINT32_C(
             0x03030003); /* HSE/HXTAL + PLL ready, HSI/IRC16 retained. */
-#if defined(NX_ETH_FRAMES_TEST_GD32)
-        *reinterpret_cast<uint32_t*>(UINT32_C(0x40023804)) =
-            25U | (400U << 6U) | UINT32_C(0x00400000) | (9U << 24U);
-        *reinterpret_cast<uint32_t*>(UINT32_C(0x40023c00)) = 7U;
-#else
         *reinterpret_cast<uint32_t*>(UINT32_C(0x40023804)) =
             8U | (336U << 6U) | UINT32_C(0x00400000) | (7U << 24U);
         *reinterpret_cast<uint32_t*>(UINT32_C(0x40023c00)) = 0x705U;
-#endif
         *reinterpret_cast<uint32_t*>(UINT32_C(0x40023808)) = UINT32_C(
             0x0000940a); /* Actual PLL source, HPRE1, APB1/4, APB2/2. */
 
@@ -142,10 +136,6 @@ class EthernetFramesMac : public testing::Test {
         mac.hclk_hz = 168000000U;
         mac.clock_domain = 1U;
         mac.irq_policy = {NX_IRQ_KERNEL_NONE, 82U, 4U, 0U};
-#if defined(NX_ETH_FRAMES_TEST_GD32)
-        mac.hclk_hz = 200000000U;
-        mac.irq_policy = {NX_IRQ_KERNEL_NONE, 91U, 4U, 0U};
-#endif
         mac.source = {61U, 5U, 0U};
         mac.irq_control = nx_eth_frames_model_irq_control;
         mac.pend_irq = nx_eth_frames_model_pend_irq;
@@ -239,8 +229,6 @@ class EthernetFramesMac : public testing::Test {
     nx_result_t Initialize(nx_time_us_t deadline = 10000U) {
 #if defined(NX_ETH_FRAMES_TEST_STM32)
         return nx_stm32_eth_frames_initialize(&mac, deadline);
-#elif defined(NX_ETH_FRAMES_TEST_GD32)
-        return nx_gd32_eth_frames_initialize(&mac, deadline);
 #else
         return nx_eth_frames_mac_initialize(&mac, deadline);
 #endif
@@ -297,11 +285,7 @@ extern "C" uint32_t nx_eth_frames_model_read(uintptr_t address,
                                              unsigned offset) {
     auto* registers = reinterpret_cast<uint32_t*>(address);
     ++hardware->mac_reads;
-#if defined(NX_ETH_FRAMES_TEST_GD32)
-    hardware->nanoseconds += 5U;
-#else
     hardware->nanoseconds += 6U;
-#endif
     if (offset == 0x708U && hardware->timestamp_rollover_on_read) {
         hardware->timestamp_rollover_on_read = false;
         const uint32_t before = registers[offset / 4U];
@@ -315,11 +299,7 @@ extern "C" void nx_eth_frames_model_write(uintptr_t address, unsigned offset,
                                           uint32_t value) {
     auto* registers = reinterpret_cast<uint32_t*>(address);
     ++hardware->mac_writes;
-#if defined(NX_ETH_FRAMES_TEST_GD32)
-    hardware->nanoseconds += 5U;
-#else
     hardware->nanoseconds += 6U;
-#endif
     hardware->Write(offset, value);
     if (offset == status) {
         registers[offset / 4U] &= ~(value & UINT32_C(0x0001e7ff));
@@ -426,11 +406,7 @@ TEST_F(EthernetFramesMac,
     EXPECT_NE(0U, Regs()[bus / 4U] & 0x80U);
     EXPECT_EQ(20U, Regs()[0x704U / 4U]);
     EXPECT_EQ(0x303U, Regs()[ptp / 4U] & 0x303U);
-#if defined(NX_ETH_FRAMES_TEST_GD32)
-    EXPECT_EQ(1073741824U, Regs()[0x718U / 4U]);
-#else
     EXPECT_EQ(1278264076U, Regs()[0x718U / 4U]);
-#endif
     EXPECT_EQ(memory + 32U, tx[0].next);
     EXPECT_EQ(memory, tx[count - 1U].next);
     EXPECT_NE(0U, mac.clock_epoch);
@@ -697,7 +673,7 @@ TEST_F(EthernetFramesMac, ColdInitializeRejectsLiveRawOwnerBeforeReset) {
     EXPECT_EQ(0U, oracle.mac_writes);
     EXPECT_FALSE(mac.retained);
 }
-#if defined(NX_ETH_FRAMES_TEST_STM32) || defined(NX_ETH_FRAMES_TEST_GD32)
+#if defined(NX_ETH_FRAMES_TEST_STM32)
 TEST_F(EthernetFramesMac, MissingSeparatePtpGateRejectsBeforeAnyMacAccess) {
     *reinterpret_cast<uint32_t*>(UINT32_C(0x40023830)) &= ~UINT32_C(0x10000000);
     EXPECT_EQ(NX_ERROR_STATE, Initialize());
@@ -1060,7 +1036,7 @@ TEST_F(EthernetFramesMac,
         testing::ExitedWithCode(0), "");
 }
 
-#if defined(NX_ETH_FRAMES_TEST_STM32) || defined(NX_ETH_FRAMES_TEST_GD32)
+#if defined(NX_ETH_FRAMES_TEST_STM32)
 TEST_F(EthernetFramesMac,
        SixteenMegahertzFallbackCannotBeAuthorizedByConfiguredFrequency) {
     *reinterpret_cast<uint32_t*>(UINT32_C(0x40023800)) = 3U;

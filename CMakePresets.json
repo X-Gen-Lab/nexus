@@ -8,7 +8,6 @@
     "include": [
         "cmake/presets/native.json",
         "cmake/presets/stm32.json",
-        "cmake/presets/gd32.json",
         "cmake/presets/verification.json"
     ]
 }

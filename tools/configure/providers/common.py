@@ -28,6 +28,91 @@ def fail(message, **details):
     raise ConfigurationError(message, **details)
 
 
+def validate_vendor_device(value):
+    """Admit data identifiers only, never compiler flags or startup paths."""
+    if (not isinstance(value, Mapping) or
+            set(value) != {"macro", "startup"}):
+        fail("Vendor device requires exact macro and startup fields")
+    macro, startup = value["macro"], value["startup"]
+    if (not isinstance(macro, str) or
+            re.fullmatch(r"STM32F4[A-Za-z0-9]+", macro) is None or
+            startup != "startup_" + macro.lower() + ".s"):
+        fail("Invalid STM32F4 vendor device identifiers")
+
+
+@dataclass(frozen=True)
+class VendorDeviceProfile:
+    """Catalog compile facts; existence does not grant a supported exact part."""
+
+    identifier: str
+    macro: str
+    startup: str
+    priority_bits: int
+    external_irq_count: int
+
+
+def vendor_device_catalog(value):
+    """Validate declaration data without opening any vendor SDK input."""
+    if (not isinstance(value, Mapping) or
+            set(value) != {"schema_version", "scope", "sdk", "devices", "inputs"} or
+            type(value["schema_version"]) is not int or value["schema_version"] != 1 or
+            value["scope"] != "sdk_device_compile"):
+        fail("Vendor device catalog schema differs from the maintained contract")
+    sdk = value["sdk"]
+    if (not isinstance(sdk, Mapping) or
+            set(sdk) != {"directory", "commit", "core_directory", "core_commit"} or
+            sdk["directory"] != "vendors/st/cmsis_device_f4" or
+            sdk["core_directory"] != "vendors/arm/CMSIS_6" or
+            any(not isinstance(sdk[name], str) or
+                re.fullmatch(r"[0-9a-f]{40}", sdk[name]) is None
+                for name in ("commit", "core_commit"))):
+        fail("Vendor device catalog requires exact source identities")
+    entries = {}
+    macros = set()
+    for row in sequence(value["devices"], "Vendor device catalog entries"):
+        if (not isinstance(row, Mapping) or set(row) != {
+                "id", "define", "header", "startup", "external_irq_count",
+                "last_external_irq", "nvic_priority_bits", "timebase_presence"}):
+            fail("Vendor device catalog requires exact entry fields")
+        macro, identifier = row["define"], row["id"]
+        if (not isinstance(macro, str) or not isinstance(identifier, str) or
+                identifier != macro.lower().removesuffix("xx")):
+            fail("Vendor device catalog ID differs from its declared selector")
+        startup = "startup_" + macro.lower() + ".s"
+        validate_vendor_device({"macro": macro, "startup": startup})
+        if (row["header"] != "Include/" + macro.lower() + ".h" or
+                row["startup"] != "Source/Templates/gcc/" + startup):
+            fail("Vendor device catalog header/startup identity mismatch")
+        if identifier in entries or macro in macros:
+            fail("Vendor device catalog contains duplicate device IDs or selectors")
+        bits = integer(row["nvic_priority_bits"], 1, 8, "Catalog IRQ priority bits")
+        count = integer(row["external_irq_count"], 1, 496, "Catalog external IRQ count")
+        last = row["last_external_irq"]
+        if (not isinstance(last, Mapping) or set(last) != {"name", "number"} or
+                not isinstance(last["name"], str) or
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQn", last["name"]) is None or
+                type(last["number"]) is not int or last["number"] != count - 1):
+            fail("Vendor device catalog has inconsistent last IRQ facts")
+        timebases = row["timebase_presence"]
+        if (not isinstance(timebases, Mapping) or
+                set(timebases) != {"TIM2", "TIM5", "LPTIM1"} or
+                any(type(flag) is not bool for flag in timebases.values())):
+            fail("Vendor device catalog requires boolean timebase presence")
+        entries[identifier] = VendorDeviceProfile(identifier, macro, startup, bits, count)
+        macros.add(macro)
+    if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
+        fail("Vendor device catalog entries and input identities are required")
+    for name, record in value["inputs"].items():
+        if (not isinstance(name, str) or "\\" in name or name.startswith("/") or
+                any(part in {"", ".", ".."} for part in name.split("/")) or
+                not isinstance(record, Mapping) or set(record) != {"bytes", "sha256"} or
+                type(record["bytes"]) is not int or record["bytes"] <= 0 or
+                not isinstance(record["sha256"], str) or
+                re.fullmatch(r"[0-9a-f]{64}", record["sha256"]) is None):
+            fail("Vendor device catalog requires ordinary input identity records")
+    return MappingProxyType(entries)
+
+
 @dataclass(frozen=True)
 class PartPolicy:
     """Reviewed package and optional placement, separate from physical sizes."""
@@ -155,9 +240,6 @@ def _static_definitions(values):
         fail("Construction static assembly cannot contain executable hardware algorithms")
 
 
-def validate_user_io_context(assembly, part, *, selected=None):
-    """Protected user GPIO is admitted only by its exact maintained family."""
-    fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
 
 
 @dataclass(frozen=True)

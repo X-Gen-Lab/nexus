@@ -9,17 +9,18 @@
 extern "C" {
 #include "stm32f407_platform_cold.h"
 nx_stm32_system_t g_nx_stm32_system;
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+NVIC_Type g_f4_model_nvic;
+SCB_Type g_f4_model_scb;
+SysTick_Type g_f4_model_systick;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 uint16_t nx_platform_actual_pin_capture(const GPIO_TypeDef* gpio, uint8_t pin);
 void nx_platform_actual_pin_restore(GPIO_TypeDef* gpio, uint8_t pin,
                                     uint16_t saved);
 }
 #include <array>
 #include <cstring>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 #include <vector>
@@ -31,12 +32,19 @@ uint32_t held_bits;
 unsigned writes;
 unsigned captures;
 unsigned restores;
+unsigned barriers;
 GPIO_TypeDef* refused_restore_gpio;
 uint8_t refused_restore_pin;
 std::array<GPIO_TypeDef*, 3> selected_gpio{GPIOB, GPIOB, GPIOC};
 std::array<uint8_t, 3> selected_pin{6U, 7U, 1U};
 std::array<unsigned, 3> restore_counts;
 bool require_all_withdrawn;
+
+class SystemStopMock {
+  public:
+    MOCK_METHOD(int, Stop, (nx_stm32_system_t*, uint32_t));
+};
+SystemStopMock* system_stop;
 
 class PlatformCold : public testing::Test {
   protected:
@@ -53,17 +61,19 @@ class PlatformCold : public testing::Test {
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mmio, reinterpret_cast<void*>(UINT32_C(0x40000000)));
-        g_gd32_model_nvic = {};
-        g_gd32_model_scb = {};
-        g_gd32_model_systick = {};
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_nvic = {};
+        g_f4_model_scb = {};
+        g_f4_model_systick = {};
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         privileged = true;
         refused = nullptr;
         held_bits = 0U;
         writes = captures = restores = 0U;
+        barriers = 0U;
+        system_stop = nullptr;
         refused_restore_gpio = nullptr;
         refused_restore_pin = 16U;
         restore_counts.fill(0U);
@@ -108,8 +118,8 @@ class PlatformCold : public testing::Test {
 TEST_F(PlatformCold, ColdContextRejectsBeforeAcquiringOrWritingResources) {
     for (unsigned context = 0U; context < 3U; ++context) {
         privileged = context != 0U;
-        g_gd32_model_isr = context == 1U;
-        g_gd32_model_mask = context == 2U ? 1U : 0U;
+        g_f4_model_isr = context == 1U;
+        g_f4_model_mask = context == 2U ? 1U : 0U;
         const auto before = Registers();
         EXPECT_EQ(NX_ERROR_CONTEXT,
                   nx_stm32_platform_selected_preflight(&config));
@@ -143,9 +153,9 @@ TEST_F(PlatformCold, IrqEnablePendingAndActiveRemainIndependentOnRefusal) {
     const std::array<uint32_t*, 3> words{NVIC->ISER, NVIC->ISPR, NVIC->IABR};
     for (uint32_t* word : words) {
         word[1] = 1U;
-        const auto before = g_gd32_model_nvic;
+        const auto before = g_f4_model_nvic;
         EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_platform_selected_preflight(&config));
-        EXPECT_EQ(0, std::memcmp(&before, &g_gd32_model_nvic, sizeof(before)));
+        EXPECT_EQ(0, std::memcmp(&before, &g_f4_model_nvic, sizeof(before)));
         EXPECT_EQ(0U, writes);
         word[1] = 0U;
     }
@@ -175,10 +185,10 @@ TEST_F(PlatformCold, UnselectedControllersAndPublishersRemainUntouched) {
     DMA1_Stream1->CR = DMA_SxCR_EN;
     EXTI->IMR = EXTI->EMR = EXTI->PR = 1U << 4U;
     const auto before = Registers();
-    const auto nvic = g_gd32_model_nvic;
+    const auto nvic = g_f4_model_nvic;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_selected_preflight(&config));
     EXPECT_EQ(before, Registers());
-    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_f4_model_nvic, sizeof(nvic)));
     EXPECT_EQ(0U, writes);
 }
 
@@ -404,29 +414,113 @@ TEST_F(PlatformCold, SyscfgGatePreservesPreviousOwnerAndRetriesRefusedRelease) {
     EXPECT_EQ(RCC_APB2ENR_USART1EN, RCC->APB2ENR);
 }
 
+TEST_F(PlatformCold, SharedAcquireRejectsInvalidBindingBeforeHardwareEffects) {
+    uint32_t syscfg = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_platform_resources_acquire(
+                                    RCC_AHB1ENR_DMA1EN, nullptr, &syscfg));
+    EXPECT_EQ(0U, writes);
+    EXPECT_EQ(0U, syscfg);
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+}
+
+TEST_F(PlatformCold, SharedAcquireRetainsPartialEffectsUntilOwnerCleanup) {
+    uint32_t dma = 0U;
+    uint32_t syscfg = 0U;
+    refused = &RCC->APB2ENR;
+    held_bits = RCC_APB2ENR_SYSCFGEN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_platform_resources_acquire(
+                               RCC_AHB1ENR_DMA1EN, &dma, &syscfg));
+    EXPECT_EQ(RCC_AHB1ENR_DMA1EN, dma);
+    EXPECT_EQ(RCC_AHB1ENR_DMA1EN, RCC->AHB1ENR);
+    EXPECT_EQ(RCC_APB2ENR_SYSCFGEN, syscfg);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_resources_release(&dma, &syscfg));
+    EXPECT_EQ(0U, dma);
+    EXPECT_EQ(0U, syscfg);
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+}
+
+TEST_F(PlatformCold, SharedReleaseKeepsDmaWhileSyscfgWithdrawalIsRefused) {
+    uint32_t dma = 0U;
+    uint32_t syscfg = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_platform_resources_acquire(
+                              RCC_AHB1ENR_DMA1EN, &dma, &syscfg));
+    refused = &RCC->APB2ENR;
+    held_bits = RCC_APB2ENR_SYSCFGEN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_platform_resources_release(&dma, &syscfg));
+    EXPECT_EQ(RCC_APB2ENR_SYSCFGEN, syscfg);
+    EXPECT_EQ(RCC_AHB1ENR_DMA1EN, dma);
+    EXPECT_EQ(RCC_AHB1ENR_DMA1EN, RCC->AHB1ENR);
+    refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_resources_release(&dma, &syscfg));
+    EXPECT_EQ(0U, dma);
+    EXPECT_EQ(0U, syscfg);
+}
+
+TEST_F(PlatformCold, SharedAcquireNeverOverwritesRetainedResponsibility) {
+    uint32_t dma = RCC_AHB1ENR_DMA1EN;
+    uint32_t syscfg = 0U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_platform_resources_acquire(
+                                  RCC_AHB1ENR_DMA1EN, &dma, &syscfg));
+    EXPECT_EQ(RCC_AHB1ENR_DMA1EN, dma);
+    EXPECT_EQ(0U, syscfg);
+    EXPECT_EQ(0U, writes);
+}
+
+TEST_F(PlatformCold, SystemReleaseOrdersBarrierBeforeActualSystemWithdrawal) {
+    testing::StrictMock<SystemStopMock> stop;
+    system_stop = &stop;
+    EXPECT_CALL(stop, Stop(&g_nx_stm32_system, 17U))
+        .WillOnce(testing::Invoke([](nx_stm32_system_t*, uint32_t) {
+            EXPECT_GT(barriers, 0U);
+            return -1;
+        }));
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_stm32_platform_system_release(&g_nx_stm32_system, true, 17U));
+    EXPECT_GT(barriers, 0U);
+    system_stop = nullptr;
+}
+
+TEST_F(PlatformCold, UnacquiredSystemReleaseDoesNotStopForeignSystem) {
+    testing::StrictMock<SystemStopMock> stop;
+    system_stop = &stop;
+    EXPECT_CALL(stop, Stop(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_platform_system_release(&g_nx_stm32_system, false, 17U));
+    EXPECT_GT(barriers, 0U);
+    system_stop = nullptr;
+}
+
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
 extern "C" bool nx_arch_in_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
+    ++barriers;
 }
 extern "C" void nx_arch_dmb(void) {
 }
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
-    const nx_arch_irq_state_t previous{g_gd32_model_mask};
-    g_gd32_model_mask = 1U;
+    const nx_arch_irq_state_t previous{g_f4_model_mask};
+    g_f4_model_mask = 1U;
     return previous;
 }
 extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
-    g_gd32_model_mask = previous.value;
+    g_f4_model_mask = previous.value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return 100U;
+}
+extern "C" int nx_stm32_system_stop(nx_stm32_system_t* system,
+                                    uint32_t poll_limit) {
+    return system_stop != nullptr ? system_stop->Stop(system, poll_limit) : 0;
 }
 extern "C" void nx_platform_cold_model_write(volatile uint32_t* reg,
                                              uint32_t value) {

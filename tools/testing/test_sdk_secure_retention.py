@@ -47,7 +47,7 @@ def image():
 
 class SDKSecureRetentionTests(unittest.TestCase):
     def inspect(self, elf=None, *, source_mutation=False, **changes):
-        resolved = dict(soc_family="stm32f407", part="STM32F407ZGT6",
+        resolved = dict(soc_family="stm32f4", part="STM32F407ZGT6",
                         backend="baremetal", clock_profile="hse8-pll168",
                         controllers=[], devices=[])
         resolved.update(changes)

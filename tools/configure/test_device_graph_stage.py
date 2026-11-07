@@ -28,12 +28,12 @@ class DeviceGraphStageTests(unittest.TestCase):
             return graph
 
         with patch.object(configure, "_resolve_device_graph", side_effect=capture):
-            result = configure.resolve_ir(configure.ROOT / relative)
+            result = configure.resolve_ir(configure.ROOT / relative, test_support=True)
         self.assertEqual(len(observed), 1)
         return observed[0], result
 
     def test_empty_graph_has_typed_immutable_plans_and_no_builder_escape(self):
-        graph, result = self.resolve_graph("tools/configure/assemblies/native.toml")
+        graph, result = self.resolve_graph("tests/support/native/assemblies/native.toml")
         self.assertNotIsInstance(graph, Mapping)
         self.assertEqual(graph.controllers, ())
         self.assertEqual(graph.devices, ())
@@ -78,21 +78,6 @@ class DeviceGraphStageTests(unittest.TestCase):
         self.assertTrue(all(lane.owner in owners for lane in graph.dma.lanes))
         self.assertTrue(any(lane.owner == spi.id for lane in graph.dma.lanes))
 
-    def test_adc_trigger_identity_and_review_input_belong_to_the_same_graph(self):
-        graph, result = self.resolve_graph(
-            "cmake/package/verification/io_evolution/"
-            "g474-adc-group-regular-timer.toml")
-        adc, = graph.controllers
-        edge_index = next(index + 1 for index, edge in
-                          enumerate(graph.triggers.edges)
-                          if edge.target == adc.id + ":adc")
-        self.assertEqual(adc.options.trigger_identity, edge_index)
-        self.assertEqual(result.controllers[0].options.trigger_identity, edge_index)
-        self.assertEqual(len(graph.inputs), 1)
-        self.assertIsInstance(graph.inputs[0], Path)
-        self.assertTrue(graph.inputs[0].is_file())
-        self.assertIn(graph.inputs[0].relative_to(configure.ROOT).as_posix(),
-                      {item["path"] for item in result.inputs})
 
 
 if __name__ == "__main__":

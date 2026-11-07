@@ -8,7 +8,7 @@ until its publisher set has been withdrawn and the instance stopped.
 
 ## I2C V1 IRQ and finite DMA
 
-STM32F407 I2C1 and I2C2, and GD32F470 I2C0 and I2C1, execute the same maintained
+STM32F407 I2C1 and I2C2 execute the same maintained
 V1 register algorithm. Per-controller cold wrappers validate all register
 pointers, DATA offsets, line inputs, bus clocks and DMA selectors against the
 actual SDK. Their EV, ER, RX DMA and TX DMA IRQs come from the selected
@@ -19,17 +19,14 @@ returns `BUSY` before changing its control registers or IRQ priorities.
 | --- | --- | --- | --- |
 | STM32F407 I2C1 | PB6/PB7 or PB8/PB9, AF4 | 42 MHz | DMA1 stream0 / stream6, channel1 |
 | STM32F407 I2C2 | PB10/PB11, AF4 | 42 MHz | DMA1 stream2 / stream7, channel7 |
-| GD32F470 I2C0 | PB6/PB7 or PB8/PB9, AF4 | 50 MHz | DMA0 channel0 / channel6, selector1 |
-| GD32F470 I2C1 | PB10/PB11, AF4 | 50 MHz | DMA0 channel2 / channel7, selector7 |
 
-GD32 names in this table are the vendor's literal DMA0/DMA1 names. The platform
-configuration's opaque controller IDs use a separate mapping. A DMA request
+A DMA request
 selector never identifies or allocates a memory engine. Static cold assembly
 must reject other devices that select an already owned physical engine.
 
 Setting the private state's DMA descriptor to `NULL` selects IRQ-only messages
 and acquires no DMA vector. Exact immutable macros
-`NX_STM32_I2C2_DMA(regions, count)` and `NX_GD32_I2C1_DMA(regions, count)` select
+`NX_STM32_I2C2_DMA(regions, count)` selects
 the secondary finite routes. The initialization API is unchanged. Pin, bus
 clock, DMA clock and shared resource leases remain cold assembly's
 responsibility; the provider does not silently allocate these resources.
@@ -50,8 +47,7 @@ The provider and shared algorithm objects contain zero global DATA/BSS.
 Selected object text size is evidence of a compiled object, not an entire
 image's retained Flash size or a cycle measurement.
 
-The reviewed silicon route sources are STM32 RM0090 Rev22 Table 43 and GD32F4xx
-User Manual Rev3.3 Tables 10-2 and 10-3. These facts do not establish a board's
+The reviewed silicon route source is STM32 RM0090 Rev22 Table 43. These facts do not establish a board's
 external wiring. Secondary-board routes require an explicit reviewed board
 configuration. Host tests model external CPU/MMIO behavior, and real ARM
 compilation uses actual vendor SDK headers. Bus timing, electrical levels and

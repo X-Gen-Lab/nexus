@@ -1,28 +1,19 @@
-// FIG-31 current: maintenance decisions, not runtime calls or qualification.
-// Source basis: 7b985c4c source layout and docs/guides/provider-porting.md.
-digraph DriverSourceOwnership {
-    graph [label="FIG-31 Shared IP or exact SoC ownership",
-           rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35,
-           ranksep=0.45, fontname="Noto Sans CJK SC", fontsize=15,
-           labelloc=t];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=12, margin="0.16,0.10"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
-
-    work [label="Private controller work", fillcolor="#f8fafc"];
-    protocol [label="Owns register-protocol sequencing?", shape=diamond,
-              fillcolor="#fefce8"];
-    reviewed [label="Layout / flags / order / reset compatibility reviewed;\nevery chip erratum explicitly handled?",
-              shape=diamond, fillcolor="#fefce8"];
-    integration [label="Keep exact SoC integration\nfacts / clock / reset / pins / IRQ / DMA\nor a narrowly scoped collaboration helper"];
-    shared [label="drivers/<kind>/<ip>/\nReviewed shared algorithm"];
-    exact [label="soc/<vendor>/<family>/drivers/\nExact or not-yet-reviewed protocol"];
-
-    work -> protocol [label="Classify responsibility"];
-    protocol -> integration [label="No"];
-    protocol -> reviewed [label="Yes"];
-    reviewed -> shared [label="Yes: reviewed compatibility"];
-    reviewed -> exact [label="No: retain exact scope"];
+// FIG-31 current: F4 source ownership; labels distinguish calls and build inputs.
+digraph F4SourceOwnership {
+  graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.5, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, label="FIG-31 F4 source ownership and interface boundaries\nEach edge states compilation or calls; no software or HIL qualification"];
+  node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11];
+  io [label="io/\nPublic types, requests and borrow contracts"];
+  f4 [label="soc/stm32/stm32f4/\nResources, lifecycle and official-library adaptation"];
+  ip [label="F4 drivers/ip/\nRetained private hardware implementations"];
+  vendor [label="vendors/st/ F4 HAL / Device\nKeep all inventoried sources; consume selected inputs"];
+  host [label="tests/support/native/\nExplicit test scope, not a production SoC"];
+  components [label="components/\nILI9341 / XPT2046 / W25 and peers"];
+  config [label="Board JSON + TOML\nFacts, modes and instance selection"];
+  io -> f4 [label="Runtime: ops(context)"];
+  f4 -> ip [label="Build: selected private sources", style=dashed];
+  f4 -> vendor [label="Build: private include / link", style=dashed];
+  host -> ip [label="Test: execute actual IP sources", style=dashed];
+  components -> io [label="Runtime: public narrow ports"];
+  config -> f4 [label="Build: generate static connections", style=dashed];
 }

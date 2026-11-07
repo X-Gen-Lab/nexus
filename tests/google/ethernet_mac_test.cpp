@@ -9,15 +9,8 @@
 #include "eth_mac.h"
 #if defined(NX_ETH_TEST_STM32)
 #include "stm32f407_eth.h"
-#elif defined(NX_ETH_TEST_GD32)
-extern "C" {
-#include "gd32f470_eth.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_syscfg.h"
-NVIC_Type g_gd32_model_nvic;
-}
 #endif
-#if defined(NX_ETH_TEST_STM32) || defined(NX_ETH_TEST_GD32)
+#if defined(NX_ETH_TEST_STM32)
 #include <sys/mman.h>
 #endif
 #include <array>
@@ -60,7 +53,7 @@ class EthernetMac : public testing::Test {
         hold_table_clear = false;
         mdio_writes = 0;
         std::memset(phy, 0, sizeof(phy));
-#if defined(NX_ETH_TEST_STM32) || defined(NX_ETH_TEST_GD32)
+#if defined(NX_ETH_TEST_STM32)
         registers_mapping =
             mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000,
                  PROT_READ | PROT_WRITE,
@@ -96,18 +89,10 @@ class EthernetMac : public testing::Test {
         mac.rx_slots = rxslots;
         mac.tx_count = mac.rx_count = 2;
         mac.drain_timeout_us = 1000;
-#if defined(NX_ETH_TEST_GD32)
-        mac.hclk_hz = 200000000;
-#else
         mac.hclk_hz = 168000000;
-#endif
         mac.address[0] = 2;
         mac.address[5] = 1;
-#if defined(NX_ETH_TEST_GD32)
-        mac.irq_policy = {NX_IRQ_KERNEL_NONE, 91, 4, 0};
-#else
         mac.irq_policy = {NX_IRQ_KERNEL_NONE, 82, 4, 0};
-#endif
         mac.source = {61, 5, 0};
         rxslots[0].data = buffers[0];
         rxslots[1].data = buffers[1];
@@ -118,14 +103,12 @@ class EthernetMac : public testing::Test {
     nx_result_t Initialize(nx_time_us_t deadline = 10000) {
 #if defined(NX_ETH_TEST_STM32)
         return nx_stm32_eth_initialize(&mac, deadline);
-#elif defined(NX_ETH_TEST_GD32)
-        return nx_gd32_eth_initialize(&mac, deadline);
 #else
         return nx_eth_mac_initialize(&mac, deadline);
 #endif
     }
     void TearDown() override {
-#if defined(NX_ETH_TEST_STM32) || defined(NX_ETH_TEST_GD32)
+#if defined(NX_ETH_TEST_STM32)
         if (memory_mapping != nullptr && memory_mapping != MAP_FAILED)
             munmap(memory_mapping, 0x20000);
         if (registers_mapping != nullptr && registers_mapping != MAP_FAILED)
@@ -341,7 +324,7 @@ TEST_F(EthernetMac, CapturedWakeRemainsBorrowedDuringItsCallback) {
     EXPECT_EQ(nullptr, mac.wake);
 }
 
-#if defined(NX_ETH_TEST_STM32) || defined(NX_ETH_TEST_GD32)
+#if defined(NX_ETH_TEST_STM32)
 extern "C" nx_result_t nx_eth_model_irq_control(nx_eth_mac_t*, bool) {
     return NX_SUCCESS;
 }
@@ -480,7 +463,7 @@ TEST_F(EthernetMac, WakeBindingUsesActualPriorityAfterExternalChange) {
     EXPECT_EQ(nullptr, mac.wake);
 }
 
-#if defined(NX_ETH_TEST_STM32) || defined(NX_ETH_TEST_GD32)
+#if defined(NX_ETH_TEST_STM32)
 extern "C" void nx_eth_model_pend_irq(nx_eth_mac_t*) {
 }
 extern "C" nx_result_t

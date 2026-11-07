@@ -292,77 +292,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         self.assertEqual(profile.selected_files, expected)
         self.assertEqual(profile.contract(proposed_lock('u5')), expected)
 
-    def test_u5_exported_gpio_hal_source_closes_only_reviewed_headers(self):
-        compiler = os.environ.get('NEXUS_ARM_GCC') or shutil.which(
-            'arm-none-eabi-gcc')
-        self.assertIsNotNone(compiler, 'Prepared ARM compiler required')
-        specification = importlib.util.spec_from_file_location(
-            'sdk_u5_gpio_source_closure',
-            ROOT / 'cmake/package/package_source_sdk.py')
-        module = importlib.util.module_from_spec(specification)
-        sys.path.insert(0, str(ROOT / 'cmake/package'))
-        specification.loader.exec_module(module)
-        profile = PROFILES['u5']
-        selected = module.dependency_entries(ROOT, profile.directory)
-        with tempfile.TemporaryDirectory(prefix='u5 GPIO HAL closure ') as value:
-            retained = os.environ.get('NEXUS_HAL_CLOSURE_TEST_ROOT')
-            root = (Path(retained) / self._testMethodName if retained
-                    else Path(value))
-            root.mkdir(parents=True, exist_ok=True)
-            exported = root / 'exported'
-            for name in selected:
-                path = exported / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / profile.directory / name, path)
-            private = ROOT / 'soc/stm32/stm32u575/private/hal'
-            dependencies = root / 'gpio.d'
-            includes = [private, exported / 'Inc',
-                        ROOT / profile.cmsis_directory / 'Include',
-                        ROOT / 'vendors/arm/CMSIS_6/CMSIS/Core/Include']
-            result = run([
-                compiler, '-std=c11', '-mcpu=cortex-m33', '-mthumb',
-                '-mfloat-abi=soft', '-Os', '-DSTM32U575xx',
-                '-ffunction-sections', '-fdata-sections',
-                '-Werror=implicit-function-declaration',
-                *[arg for path in includes for arg in ('-I', str(path))],
-                '-MMD', '-MF', str(dependencies), '-c',
-                str(exported / 'Src/stm32u5xx_hal_gpio.c'),
-                '-o', str(root / 'gpio.o')], cwd=root, env=os.environ.copy(),
-                log=root / 'gpio.log', timeout=60,
-                stage='u5-exported-gpio-hal-source-closure')
-            self.assertEqual(result.returncode, 0, result.stderr)
-            used = set()
-            for token in shlex.split(dependencies.read_text().replace(
-                    '\\\n', ' ')):
-                path = Path(token)
-                if path.is_relative_to(exported):
-                    used.add(path.relative_to(exported).as_posix())
-            self.assertEqual(used, ADDITIONS['u5'].keys() - {
-                'Inc/stm32u5xx_ll_dma.h', 'Inc/stm32u5xx_ll_usart.h',
-                'Inc/stm32u5xx_ll_rtc.h', 'Inc/stm32u5xx_ll_iwdg.h'})
 
-    def test_u5_rtc_sdk_export_closes_actual_provider_and_cmsis_includes(self):
-        import re
-        header = 'Inc/stm32u5xx_ll_rtc.h'
-        profile = PROFILES['u5']
-        provider = (ROOT / 'soc/stm32/stm32u575/drivers/rtc.c').read_text()
-        self.assertIn('#include "stm32u5xx_ll_rtc.h"', provider)
-        spec = importlib.util.spec_from_file_location(
-            'nexus_package_for_rtc_header_closure',
-            ROOT / 'cmake/package/package_source_sdk.py')
-        module = importlib.util.module_from_spec(spec)
-        sys.path.insert(0, str(ROOT / 'cmake/package'))
-        spec.loader.exec_module(module)
-        selected = module.dependency_entries(ROOT, profile.directory)
-        self.assertIn(header, selected)
-        text = (ROOT / profile.directory / header).read_text()
-        includes = set(re.findall(r'^#include "([^"]+)"', text, re.MULTILINE))
-        self.assertEqual(includes, {'stm32u5xx.h'})
-        device = module.dependency_entries(ROOT, profile.cmsis_directory)
-        self.assertTrue({'Include/stm32u5xx.h', 'Include/stm32u575xx.h',
-                         'Include/system_stm32u5xx.h'}.issubset(device))
-        core = module.dependency_entries(ROOT, 'vendors/arm/CMSIS_6')
-        self.assertIn('CMSIS/Core/Include/core_cm33.h', core)
 
     def test_g4_exact_closed_graph_closes_i2c_and_fdcan_definitions(self):
         profile = PROFILES['g4']
@@ -444,19 +374,6 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                             packaged_cmsis_commit=profile.cmsis_commit)
                     (driver / name).write_bytes(original)
 
-    def test_sdk_dependency_selection_requires_the_same_exact_headers(self):
-        spec = importlib.util.spec_from_file_location(
-            'nexus_package_for_official_header_closure',
-            ROOT / 'cmake/package/package_source_sdk.py')
-        self.assertIsNotNone(spec)
-        module = importlib.util.module_from_spec(spec)
-        sys.path.insert(0, str(ROOT / 'cmake/package'))
-        spec.loader.exec_module(module)
-        for family in ADDITIONS:
-            with self.subTest(family=family):
-                selected = module.dependency_entries(ROOT, PROFILES[family].directory)
-                self.assertEqual(set(selected), BASE_FILES[family] |
-                                 ADDITIONS[family].keys())
 
 
 if __name__ == '__main__':

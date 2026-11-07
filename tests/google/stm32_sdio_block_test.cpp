@@ -9,11 +9,11 @@
 extern "C" {
 #include "stm32f407_sdio.h"
 nx_stm32_system_t g_nx_stm32_system;
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+NVIC_Type g_f4_model_nvic;
+SCB_Type g_f4_model_scb;
+SysTick_Type g_f4_model_systick;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 uint32_t SystemCoreClock = 168000000U;
 }
 #include <algorithm>
@@ -180,11 +180,11 @@ class SdioBlock : public testing::Test {
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mmio, reinterpret_cast<void*>(UINT32_C(0x40000000)));
-        g_gd32_model_nvic = {};
-        g_gd32_model_scb = {};
-        g_gd32_model_systick = {};
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_nvic = {};
+        g_f4_model_scb = {};
+        g_f4_model_systick = {};
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         privileged = true;
@@ -233,8 +233,8 @@ class SdioBlock : public testing::Test {
     void TearDown() override {
         privileged = true;
         refused_write = nullptr;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         if (mmio != MAP_FAILED) {
             silence_commands = write_busy = host_stuck = false;
             expire_after_deselect = 0U;
@@ -242,7 +242,7 @@ class SdioBlock : public testing::Test {
             *const_cast<volatile uint32_t*>(&SDIO->STA) &=
                 ~static_cast<uint32_t>(SDIO_STA_RXACT | SDIO_STA_TXACT |
                                        SDIO_STA_CMDACT);
-            g_gd32_model_nvic = {};
+            g_f4_model_nvic = {};
             if (receipt.owned || receipt.pin_mask != 0U ||
                 receipt.clock_added != 0U) {
                 EXPECT_EQ(NX_SUCCESS,
@@ -434,11 +434,11 @@ TEST_F(SdioBlock, InvalidTransferAndContextAreRejectedBeforeClockOrMmio) {
               nx_block_port_read(&face, 0U, data.data(), data.size(), 1U,
                                  NX_DEADLINE_NEVER)
                   .result);
-    g_gd32_model_isr = true;
+    g_f4_model_isr = true;
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_block_port_read(&face, 0U, data.data(),
                                                    data.size(), 1U, 1000000U)
                                     .result);
-    g_gd32_model_isr = false;
+    g_f4_model_isr = false;
     EXPECT_EQ(before_writes, writes);
     EXPECT_EQ(before_time, time_calls);
 }
@@ -781,10 +781,10 @@ extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
 extern "C" bool nx_arch_in_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
 }
@@ -793,12 +793,12 @@ extern "C" void nx_arch_dmb(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
-    const nx_arch_irq_state_t prior{g_gd32_model_mask};
-    g_gd32_model_mask = 1U;
+    const nx_arch_irq_state_t prior{g_f4_model_mask};
+    g_f4_model_mask = 1U;
     return prior;
 }
 extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t prior) {
-    g_gd32_model_mask = prior.value;
+    g_f4_model_mask = prior.value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
     ++time_calls;

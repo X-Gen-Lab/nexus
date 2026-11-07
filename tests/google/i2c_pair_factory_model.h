@@ -6,12 +6,8 @@
 #ifndef NEXUS_I2C_PAIR_FACTORY_MODEL_H
 #define NEXUS_I2C_PAIR_FACTORY_MODEL_H
 #include "i2c_async_register_model.h"
-#include <stdbool.h>
-#ifdef NX_I2C_PAIR_STM32
 #include "stm32f407xx.h"
-#else
-#include "gd32f4xx.h"
-#endif
+#include <stdbool.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

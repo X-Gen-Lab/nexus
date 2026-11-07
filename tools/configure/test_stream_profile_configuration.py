@@ -1,4 +1,5 @@
 """Selected stream profiles bind real TOML budgets to typed cold start faces."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 import re
@@ -14,13 +15,8 @@ class StreamProfileConfiguration(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 
-    def resolve(self, kind="uart", family="stm32f407", **changes):
-        fixtures = {
-            ("uart", "stm32f407"): "stm32_assembly/zg-rx-dma-continuous.toml",
-            ("uart", "gd32f470"): "gd32_assembly/rx-dma-continuous.toml",
-            ("adc", "stm32f407"): "stm32_assembly/zg-adc-continuous.toml",
-            ("adc", "gd32f470"): "gd32_assembly/adc-continuous.toml",
-        }
+    def resolve(self, kind="uart", family='stm32f4', **changes):
+        fixtures = {('uart', 'stm32f4'): 'stm32_assembly/zg-rx-dma-continuous.toml', ('adc', 'stm32f4'): 'stm32_assembly/zg-adc-continuous.toml'}
         path = configure.ROOT / "tests/contracts" / fixtures[(kind, family)]
         contents = path.read_text().replace("baud = 115200", "baud = 9600")
         match = re.search(r'(?m)^board_package\s*=\s*"([^"]+)"', contents)
@@ -42,10 +38,10 @@ class StreamProfileConfiguration(unittest.TestCase):
             contents += key + " = " + literal + "\n"
         assembly = self.root / "stream.toml"
         assembly.write_text(contents)
-        return configure.resolve_ir(assembly)
+        return configure.resolve_ir(assembly, test_support=native_fixture(assembly))
 
     def test_uart_continuous_derives_two_targets_and_one_replacement(self):
-        for family in ("stm32f407", "gd32f470"):
+        for family in ('stm32f4',):
             with self.subTest(family=family):
                 result = self.resolve(family=family)
                 profile = result.controllers[0].options.stream_profile
@@ -62,7 +58,7 @@ class StreamProfileConfiguration(unittest.TestCase):
                     profile.hardware_targets = 1
 
     def test_adc_uses_complete_selected_scans_without_resolution_alias(self):
-        for family in ("stm32f407", "gd32f470"):
+        for family in ('stm32f4',):
             with self.subTest(family=family):
                 result = self.resolve(kind="adc", family=family)
                 profile = result.controllers[0].options.stream_profile
@@ -124,7 +120,8 @@ class StreamProfileConfiguration(unittest.TestCase):
 
     def test_unselected_profiles_add_no_firmware_object_or_factory(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml")
+            "tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml", test_support=native_fixture(configure.ROOT /
+            "tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml"))
         self.assertIsNone(result.controllers[0].options.stream_profile)
         self.assertNotIn("s_nx_stream_profile_", bindings.emit(result)[1])
         self.assertNotIn("nx_factory_uart_stream_profile(",
@@ -138,13 +135,13 @@ class StreamProfileConfiguration(unittest.TestCase):
         built = {name: row for name, (row, _) in presets.rows["build"].items()}
         directory = configure.ROOT / "tests/contracts/io_evolution_assembly"
         main = (directory / "controller_main.c").read_text()
-        for family in ("f407", "gd470"):
+        for family in ('f407',):
             for kind in ("uart", "adc"):
                 name = f"{family}-{kind}-stream-profile"
                 with self.subTest(fixture=name):
                     path = directory / (name + ".toml")
                     self.assertTrue(path.is_file(), str(path))
-                    result = configure.resolve_ir(path)
+                    result = configure.resolve_ir(path, test_support=native_fixture(path))
                     self.assertIsNotNone(
                         result.controllers[0].options.stream_profile)
                     header, _ = factory.emit(result)

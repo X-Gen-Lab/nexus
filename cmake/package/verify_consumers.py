@@ -18,7 +18,6 @@ if __name__ == "__main__":
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
-from tools.measurement.retention import COMPONENT_OWNER_SMOKES  # noqa: E402
 from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
@@ -81,7 +80,7 @@ def private_compile_inputs(entry, sdk, extra_private=()):
                 continue
             relative = path.relative_to(root)
             parts = relative.parts
-            if (not parts or parts[0] in {"soc", "drivers"} or
+            if (not parts or parts[0] in {"soc", "drivers", "tests"} or
                     {"vendors", "private"}.intersection(parts)):
                 return True
             if parts == ("components",):
@@ -142,6 +141,8 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
     """One public consumer template shared by qualification and boundary tests."""
     prefix = Path(prefix)
     sdk = prefix / "share/nexus/src"
+    if chip not in {"native", "stm32"}:
+        raise ValueError("Only STM32F4 and explicit host consumers are maintained")
     if version is None:
         version = load_policy(sdk)["semantic_version"]
     source = directory / (name + " source")
@@ -217,181 +218,16 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         arguments.append("-DNEXUS_BUILD_WORKLOAD=ON")
     if expected_revision:
         arguments.append("-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision)
-    arm_assembly = "liangshan-baremetal.toml" if chip == "gd32" else "sky-baremetal.toml"
-    assembly = sdk / "tools/configure/assemblies" / (arm_assembly if arm else "native.toml")
+    assembly = (sdk / "tools/configure/assemblies/sky-baremetal.toml" if arm else
+                sdk / "tests/support/native/assemblies/native.toml")
+    if not arm:
+        arguments.append("-DNEXUS_TEST_SUPPORT=ON")
     arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
     if arm:
         arguments.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")
     return source, build, arguments
 
 
-def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
-                            *, fixture=False, expected_revision=None):
-    """Prepare exact MCU public consumers, with actual selected kernel use."""
-    choices = {
-        "h743": ("stm32h743_nucleo_zi2", "hsi64-fixed-cache-off", "led0", "uart3", 0),
-        "u575": ("stm32u575_nucleo_zi_q", "msis4", "led0", "uart1", 7),
-        "f103": ("stm32f103_reference", "hsi8-fixed", "led0", "uart1", 5),
-        "gd303": ("gd32f303_reference", "irc8", "gpio0", "uart0", 5),
-        "g474": ("stm32g474re_hse24_reference", "hse24-pll170", "led0", "uart1", 5),
-    }
-    if family not in choices or backend not in {"baremetal", "freertos"}:
-        raise ValueError("Unreviewed modern consumer family/backend")
-    board, clock, gpio, uart, pin = choices[family]
-    prefix = Path(prefix)
-    sdk = prefix / "share/nexus/src"
-    version = load_policy(sdk)["semantic_version"]
-    source = directory / (family + " " + backend + " source")
-    build = directory / (family + " " + backend + " build")
-    source.mkdir()
-    run_checked(["git", "init", "--quiet", str(source)])
-    libraries = ["Nexus::OSFreeRTOS"] if backend == "freertos" else []
-    if family == "h743":
-        libraries.append("Nexus::H743FrameDMA2D")
-    kernel = " LIBRARIES " + " ".join(libraries) if libraries else ""
-    (source / "CMakeLists.txt").write_text(
-        'cmake_minimum_required(VERSION 3.31)\n'
-        'project(installed_modern_consumer LANGUAGES C ASM)\n'
-        'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-        f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
-        f'nexus_add_firmware(installed_modern SOURCES main.c{kernel})\n'
-        + ('set_target_properties(installed_modern PROPERTIES C_STANDARD 11 '
-           'C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)\n'
-           'nexus_target_warnings(installed_modern STRICT)\n'
-           if family == "h743" else '') +
-        'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
-        'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
-        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
-        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
-    assembly = source / "assembly.toml"
-    assembly.write_text(
-        f'schema = 2\nboard_package = "{sdk}/boards/{board}"\n'
-        f'backend = "{backend}"\nclock = "{clock}"\n'
-        '[factory]\ncapabilities = true\n'
-        '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
-        'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
-        f'[gpio.led]\nbinding = "{gpio}"\nmode = "output"\n'
-        f'[uart.console]\nbinding = "{uart}"\n'
-        'mode = "irq-bytes"\nbaud = 115200\n'
-        '[uart.console.rx]\nformat = "bytes"\ncapacity = 64\n'
-        '[uart.console.irq]\npriority = 5\ncalls_os = false\n')
-    code = (
-        '#include "nexus_bindings.h"\n#include "nexus_factory_strong.h"\n'
-        '#if __has_include("stm32h7xx.h") || __has_include("stm32u5xx.h") || '
-        '__has_include("stm32f1xx.h") || __has_include("gd32f30x.h") || '
-        '__has_include("stm32g4xx.h")\n'
-        '#error Vendor SDK leaked into the product\n#endif\n'
-        '#if __has_include("stm32h743_provider.h") || '
-        '__has_include("stm32u575_provider.h") || '
-        '__has_include("stm32f103_provider.h") || '
-        '__has_include("gd32f303_provider.h") || '
-        '__has_include("stm32g474_provider.h") || '
-        '__has_include("rtc_lptim_provider.h")\n'
-        '#error Provider implementation leaked into the product\n#endif\n'
-        'static nx_uart_tx_request_t request;\n'
-        'static uint8_t data[2] = {0x12U, 0x34U};\n')
-    if backend == "freertos":
-        code += (
-            '#include "nexus/os/freertos.h"\n'
-            'static nx_freertos_task_t task;\n'
-            '_Alignas(8) static StackType_t task_stack[128];\n'
-            'static void task_entry(void* context) {\n'
-            '    (void)context;\n    for (;;) {}\n}\n')
-    if family == "h743":
-        code += (
-            '#include "nexus/components/frame_dma2d.h"\n'
-            'static nx_h743_frame_dma2d_storage_t frame_storage;\n'
-            'static const nx_frame_blitter_t frame_blitter = {\n'
-            '    &nx_h743_frame_dma2d_ops, &frame_storage};\n'
-            'static const nx_h743_frame_dma2d_config_t frame_configuration = {\n'
-            '    NX_H743_FRAME_DMA2D_CONTROLLER, 4U};\n'
-            'static nx_stream_slot_t frame_slot;\n'
-            'static nx_stream_t frame_queue;\n'
-            'static nx_frame_stream_t frame_stream;\n'
-            'static nx_frame_dma_loan_t frame_source;\n'
-            'static nx_frame_blit_request_t frame_request;\n'
-            'static uint32_t frame_pixels[24];\n'
-            'static uint16_t frame_output[48];\n')
-    code += (
-        'int main(void) {\n'
-        '    nx_platform_start_result_t start = nx_platform_start();\n'
-        '    if (start.primary != NX_SUCCESS) return (int)start.primary;\n'
-        '    const nx_gpio_port_t* led = nx_factory_gpio_ref(NX_GPIO_REF_LED);\n'
-        '    const nx_uart_port_t* console = '
-        'nx_factory_uart_ref(NX_UART_REF_CONSOLE);\n'
-        '    nx_request_initialize(&request.base);\n'
-        f'    (void)nx_gpio_port_write(led, 1U << {pin}U, 0U);\n'
-        '    (void)nx_uart_tx_prepare(&request, data, sizeof(data),\n'
-        '        nx_deadline_after(nx_time_now_us(), 1000U));\n'
-        '    (void)nx_uart_port_submit(console, &request);\n'
-        '    (void)nx_uart_port_cancel(console, &request);\n'
-        '    nx_uart_port_service(console);\n')
-    if family == "h743":
-        code += (
-            '    /* Public link reference only: no physical DMA/timing result. */\n'
-            '    const nx_frame_plane_t frame_plane = {0U, 16U, 24U, 4U};\n'
-            '    nx_frame_layout_t frame_layout;\n'
-            '    frame_slot.data = (uint8_t*)frame_pixels;\n'
-            '    frame_slot.capacity = sizeof(frame_pixels);\n'
-            '    if (nx_frame_layout_planar(&frame_plane, 1U, &frame_layout) != NX_SUCCESS ||\n'
-            '        nx_stream_initialize(&frame_queue, &frame_slot, 1U) != NX_SUCCESS ||\n'
-            '        nx_frame_stream_initialize(&frame_stream, &frame_queue, &frame_layout) != NX_SUCCESS ||\n'
-            '        nx_h743_frame_dma2d_initialize(&frame_storage, &frame_blitter,\n'
-            '                                      &frame_configuration) != NX_SUCCESS) return 9;\n'
-            '    nx_stream_fill_t frame_fill;\n'
-            '    if (nx_stream_reserve(&frame_queue, &frame_fill) != NX_SUCCESS ||\n'
-            '        nx_frame_stream_publish(&frame_stream, &frame_fill, 0U) != NX_SUCCESS ||\n'
-            '        nx_frame_stream_acquire(&frame_stream, &frame_source) != NX_SUCCESS) return 10;\n'
-            '    nx_request_initialize(&frame_request.base);\n'
-            '    if (nx_request_prepare(&frame_request.base, NX_DEADLINE_NEVER) != NX_SUCCESS) return 11;\n'
-            '    frame_request.source = &frame_source;\n'
-            '    frame_request.width_bytes = 16U;\n'
-            '    frame_request.rows = 4U;\n'
-            '    frame_request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;\n'
-            '    frame_request.destination = (uint8_t*)frame_output;\n'
-            '    frame_request.destination_stride = 24U;\n'
-            '    frame_request.destination_capacity = sizeof(frame_output);\n'
-            '    if (frame_blitter.ops->submit(frame_blitter.context, &frame_request,\n'
-            '                                  nx_time_now_us()) == NX_SUCCESS) {\n'
-            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
-            '        (void)frame_blitter.ops->cancel(frame_blitter.context, &frame_request);\n'
-            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
-            '    } else {\n'
-            '        const nx_dma_drain_facts_t unsubmitted = {frame_layout.bytes, 0U, true, true, true};\n'
-            '        (void)nx_frame_dma_release(&frame_stream, &frame_source, &unsubmitted);\n'
-            '    }\n'
-            '    /* Quarantine retains all static storage; this image is never run. */\n'
-            '    (void)frame_blitter.ops->stop(frame_blitter.context);\n')
-    if backend == "freertos":
-        code += (
-            '    /* Link the actual kernel; software qualification never runs it. */\n'
-            '    (void)nx_freertos_task_start(&task, "sdk", task_stack, 128U, 1U,\n'
-            '                                 task_entry, NULL);\n'
-            '    vTaskStartScheduler();\n    for (;;) {}\n}\n')
-    else:
-        code += '    return (int)nx_platform_stop();\n}\n'
-    (source / "main.c").write_text(code)
-    arguments = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
-                 "-DCMAKE_BUILD_TYPE=Release",
-                 f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
-                 "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
-                 f"-DNEXUS_ASSEMBLY_FILE={assembly}",
-                 f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}"]
-    if fixture:
-        arguments.append("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
-    if expected_revision:
-        arguments.append("-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision)
-    return source, build, arguments
-
-
-def component_owner_selection(specification):
-    """Only the exact maintained tuple enables an independent owner audit."""
-    if specification[2] not in COMPONENT_OWNER_SMOKES:
-        return None
-    if tuple(specification) not in SELECTED_CONSUMERS:
-        raise ValueError(
-            "Owner consumer differs from the canonical transport plan")
-    return specification[2]
 
 
 def service_profile(specification):
@@ -426,94 +262,16 @@ def service_sources(sdk, specification):
     return {"main.c": verification / "services.c"}
 
 
-def external_package_sources(fixture):
-    """Select authored Board/assembly plus verified package inputs only."""
-    from tools.configure import integration_package
-
-    fixture = Path(fixture).resolve()
-    manifest = integration_package.load_manifest(fixture / "provider")
-    paths = [regular_file(fixture / "assembly.toml"),
-             regular_file(fixture / "board/board.json"), *manifest.inputs]
-    return {path.relative_to(fixture).as_posix(): path for path in paths}
 
 
-def prepare_external_provider_consumer(prefix, directory, run_checked, *,
-                                       expected_revision, fixture=False):
-    """Copy the canonical C11 starter into a separate consumer-owned project."""
-    sdk = Path(prefix) / "share/nexus/src"
-    canonical = sdk / "cmake/package/verification/external_provider"
-    source = Path(directory) / "external provider source"
-    build = Path(directory) / "external provider build"
-    source.mkdir()
-    paths = external_package_sources(canonical)
-    paths.update({name: regular_file(canonical / name) for name in
-                  ("CMakeLists.txt", "README.md", "consumer.c",
-                   "lifecycle_test.cpp")})
-    for name, path in paths.items():
-        target = source / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, target)
-    run_checked(["git", "init", "--quiet", str(source)])
-    command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
-               "-DCMAKE_BUILD_TYPE=Release",
-               "-DNexus_DIR=" + str(Path(prefix) / "lib/cmake/Nexus"),
-               "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
-    if fixture:
-        command.append("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
-    return source, build, command
 
 
-def check_external_provider_consumer(sdk, source, build, run_checked):
-    """Execute the same C lifecycle model and audit actual public includes."""
-    if (build / "resolved-sdk.txt").read_text() != str(sdk):
-        raise ValueError("External lifecycle selected another source SDK")
-    canonical = Path(sdk) / "cmake/package/verification/external_provider"
-    paths = external_package_sources(canonical)
-    paths.update({name: regular_file(canonical / name) for name in
-                  ("CMakeLists.txt", "README.md", "consumer.c",
-                   "lifecycle_test.cpp")})
-    for name, path in paths.items():
-        if regular_file(source / name).read_bytes() != path.read_bytes():
-            raise ValueError("External provider differs from canonical SDK "
-                             "input: " + name)
-    entries = json.loads((build / "compile_commands.json").read_text())
-    public = [entry for entry in entries
-              if Path(entry["file"]).resolve() == source / "consumer.c"]
-    private = (source / "provider/soc", source / "provider/configure")
-    if len(public) != 1 or private_compile_inputs(public[0], sdk, private):
-        raise ValueError("Private provider input leaked into lifecycle consumer")
-    adapter = source / "provider/soc/lifecycle_adapter.c"
-    if sum(Path(entry["file"]).resolve() == adapter for entry in entries) != 1:
-        raise ValueError("External lifecycle adapter has no unique compile row")
-    image = build / "bin/external_lifecycle_consumer"
-    inputs = {"source/" + name: source / name for name in paths}
-    inputs.update({"canonical/" + name: path for name, path in paths.items()})
-    inputs.update(elf=image, compile_commands=build / "compile_commands.json",
-                  sdk_manifest=Path(sdk) / ".nexus-source-sdk.json")
-    before = {name: file_identity(path) for name, path in inputs.items()}
-    execution = run_checked([str(image)])
-    if execution.returncode:
-        raise ValueError("External provider C lifecycle failed")
-    if before != {name: file_identity(path) for name, path in inputs.items()}:
-        raise ValueError("External provider observation inputs changed "
-                         "during execution")
-    return {"kind": "external-provider-host-model", "status": "passed",
-            "name": "external provider", "domain": "external-provider",
-            "physical_status": "not_executed", "elf": before["elf"],
-            "canonical_source": before["canonical/consumer.c"],
-            "public_source": before["source/consumer.c"],
-            "package_manifest": before["source/provider/nexus-soc.json"],
-            "runtime_executed": True, "inputs": before}
 
 
 def prepare_service_consumer(prefix, directory, specification, run_checked, *,
                              expected_revision, fixture=False):
     """Copy an installed public scenario; external packages stay consumer-owned."""
     specification = service_profile(specification)
-    if specification.scenario == "external_provider":
-        return prepare_external_provider_consumer(
-            prefix, directory, run_checked, expected_revision=expected_revision,
-            fixture=fixture)
     sdk = Path(prefix) / "share/nexus/src"
     verification = sdk / "cmake/package/verification" / specification.scenario
     assembly = regular_file(verification / specification.assembly)
@@ -609,6 +367,8 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        + ('nexus_add_lwip()\n' if secure or specification.scenario in {
+            'common_services', 'loaned_rx'} else '')
         + ('nexus_add_tls()\n'
            'nexus_add_coremqtt()\n'
            'add_library(installed_public STATIC application.c private_headers.c)\n'
@@ -640,13 +400,14 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     if specification.arm:
         command.append("-DCMAKE_TOOLCHAIN_FILE=" +
                        str(sdk / "cmake/toolchains/arm-gcc.cmake"))
+    else:
+        command.append("-DNEXUS_TEST_SUPPORT=ON")
     return source, build, command
 
 
 def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name,
                               run_checked, *, expected_revision):
     """Reuse installed canonical inputs through a separate public C project."""
-    owner = component_owner_selection((name, assembly_name, smoke_name))
     sdk = prefix / "share/nexus/src"
     verification = sdk / "cmake/package/verification/io_evolution"
     relative = PurePosixPath(assembly_name)
@@ -666,12 +427,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
     version = load_policy(sdk)["semantic_version"]
-    library = {"u575-retained-time": "Nexus::U575RetainedTime",
-               "u575-stop2": "Nexus::U575Stop2",
-               "u575-lpdma-copy": "Nexus::U575Stop2Copy",
-               "u575-lptim1-lpbam": "Nexus::U575Stop2Lptim1",
-               "u575-mpu-gpio": "Nexus::U575MpuGpio",
-               "f407-i2s2-slave-tx": "Nexus::F407I2S2SlaveTx"}.get(smoke_name)
+    library = ("Nexus::F407I2S2SlaveTx"
+               if smoke_name == "f407-i2s2-slave-tx" else None)
     component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
@@ -689,55 +446,15 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
     shutil.copyfile(smoke, source / "main.c")
     (source / "private_headers.c").write_text(
-        '#if __has_include("stm32h7xx.h") || '
-        '__has_include("stm32u5xx.h") || __has_include("stm32g4xx.h") || '
-        '__has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
+        '#if __has_include("stm32f4xx.h")\n'
         '#error Vendor SDK leaked into product source\n#endif\n'
-        '#if __has_include("stm32h743_clock.h") || '
-        '__has_include("stm32h743_provider.h") || '
-        '__has_include("stm32h743_spi_dma.h") || '
-        '__has_include("stm32h743_uart_rtscts.h") || '
-        '__has_include("stm32h743_uart_continuous.h") || '
-        '__has_include("stm32h743_uart_duplex.h") || '
-        '__has_include("stm32h743_uart_continuous_impl.h") || '
-        '__has_include("stm32h743_uart_dma_parts.h") || '
-        '__has_include("stm32u575_uart_gpdma.h") || '
-        '__has_include("stm32u575_uart_gpdma_chain.h") || '
-        '__has_include("stm32u575_uart_gpdma_impl.h") || '
-        '__has_include("stm32u575_provider.h") || '
-        '__has_include("stm32u575_uart_rtscts.h") || '
-        '__has_include("stm32u575_lptim.h") || '
-        '__has_include("stm32u575_gpio_mpu.h") || '
-        '__has_include("stm32u575_mpu_user_init.h") || '
-        '__has_include("stm32u575_rtc.h") || '
-        '__has_include("retained_time.h") || '
-        '__has_include("stm32u575_rtc_calendar.h") || '
-        '__has_include("stm32u575_stop2_hw.h") || '
-        '__has_include("stm32u575_lpdma_copy_hw.h") || '
-        '__has_include("stm32u575_lpdma_copy_internal.h") || '
-        '__has_include("stm32u575_lptim1_profile.h") || '
-        '__has_include("stm32u575_lpdma_lptim1_internal.h") || '
-        '__has_include("stm32g474_fdcan.h") || '
-        '__has_include("stm32g474_pwm_adc.h") || '
-        '__has_include("stm32g474_adc_group.h") || '
-        '__has_include("stm32g474_pwm_shared.h") || '
-        '__has_include("stm32g474_pin_state.h") || '
-        '__has_include("pin_state_impl.h") || '
+        '#if __has_include("stm32f407_provider.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
         '__has_include("stm32f407_i2s2_slave_tx.h") || '
-        '__has_include("gd32f470_eth_frames.h") || '
-        '__has_include("stm32g474_provider.h") || '
-        '__has_include("rtc_lptim_provider.h")\n'
+        '__has_include("can_controller.h") || '
+        '__has_include("usb_device_controller.h")\n'
         '#error Private provider leaked into product source\n#endif\n'
         '_Static_assert(1, "Public source include isolation");\n')
-    if owner is not None:
-        with (source / "private_headers.c").open("a") as output:
-            output.write(
-                '#include "nexus/core/time.h"\n'
-                '/** \\brief External caller reads the injected face. */\n'
-                'nx_time_us_t nx_installed_clock_read(\n'
-                '    const nx_clock_t* clock) {\n'
-                '    return clock->read(clock->context);\n}\n')
     command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
                "-DCMAKE_BUILD_TYPE=Release",
                f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
@@ -746,6 +463,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
                "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
     if authored["backend"] != "native":
         command.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")
+    else:
+        command.append("-DNEXUS_TEST_SUPPORT=ON")
     return source, build, command
 
 
@@ -854,7 +573,7 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
 
 
 def check_selected_image(sdk, source, build, run_checked, *,
-                         owner_specification=None):
+                         specification=None):
     """Bind selected artifacts to actual resources and the retained provider."""
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Selected consumer resolved another source SDK")
@@ -869,8 +588,8 @@ def check_selected_image(sdk, source, build, run_checked, *,
         raise ValueError("Selected consumer private inputs leaked into product")
     config = Path((build / "resolved-config.txt").read_text())
     resolved = json.loads((config / "resolved.json").read_text())
-    if owner_specification is not None:
-        domain = selected_domain(owner_specification)
+    if specification is not None:
+        domain = selected_domain(specification)
         if ((domain == "native-time") !=
                 (resolved.get("cpu", {}).get("arch") == "native")):
             raise ValueError("Selected consumer differs from its reviewed domain")
@@ -888,8 +607,6 @@ def check_selected_image(sdk, source, build, run_checked, *,
             resources["elf"] != artifacts["elf"] or
             resources["resolved"] != file_identity(config / "resolved.json")):
         raise ValueError("Selected consumer resource/configuration binding failed")
-    owner = (component_owner_selection(owner_specification)
-             if owner_specification is not None else None)
     retention_path = build / "provider-retention.json"
     command = [sys.executable, "-B",
                  str(sdk / "tools/measurement/retention.py"),
@@ -897,19 +614,11 @@ def check_selected_image(sdk, source, build, run_checked, *,
                  "--bindings", str(config / "bindings.c"),
                  "--resolved", str(config / "resolved.json"),
                  "--output", str(retention_path)]
-    if owner is not None:
-        command += ["--component-owner", owner, "--consumer",
-                    str(source / "main.c")]
     run_checked(command)
     retention = json.loads(retention_path.read_text())
     if (retention["status"] != "passed" or
             retention["elf"] != artifacts["elf"]):
         raise ValueError("Selected consumer provider retention failed")
-    if owner is not None and (
-            retention.get("kind") != "linked_component_owner_retention" or
-            retention.get("owner_profile") != owner or
-            retention.get("consumer") != file_identity(source / "main.c")):
-        raise ValueError("Selected component owner retention binding failed")
     return {"artifacts": artifacts, "resources": file_identity(resources_path),
             "resolved": file_identity(config / "resolved.json"),
             "retention": file_identity(retention_path)}
@@ -1015,9 +724,7 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
     if (resolved.get("enum_abi") != ("short-enums" if specification.arm
                                     else "native-int")):
         raise ValueError("Service enum ABI differs from its profile")
-    if specification.arm and (resolved.get("soc_family") != (
-            "gd32f470" if specification.name == "gd470 loaned rx" else
-            "stm32f407") or
+    if specification.arm and (resolved.get("soc_family") != "stm32f4" or
             resolved.get("cpu", {}).get("arch") != "cortex-m4" or
             resolved["cpu"].get("float_abi") != "hard" or
             resolved["cpu"].get("fpu") != "fpv4-sp-d16"):
@@ -1040,8 +747,6 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
 def check_service_image(sdk, source, build, specification, run_checked):
     """Check one exact scenario, real runtime or ARM resources, and retention."""
     specification = service_profile(specification)
-    if specification.scenario == "external_provider":
-        return check_external_provider_consumer(sdk, source, build, run_checked)
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Service consumer resolved another source SDK")
     verification = sdk / "cmake/package/verification" / specification.scenario
@@ -1064,12 +769,6 @@ def check_service_image(sdk, source, build, specification, run_checked):
                        for name in canonical_sources})
     else:
         inputs["public_source"] = source / "main.c"
-    if specification.domain == "external-package":
-        for name, path in external_package_sources(canonical.parent).items():
-            copied = source / name
-            if copied.read_bytes() != path.read_bytes():
-                raise ValueError("External service package differs from SDK")
-            inputs["external/" + name] = copied
     config = Path((build / "resolved-config.txt").read_text())
     if config != build / "nexus-sdk/generated":
         raise ValueError("Service configuration directory is not canonical")
@@ -1080,9 +779,6 @@ def check_service_image(sdk, source, build, specification, run_checked):
             resolved.get("backend") != ("baremetal" if specification.arm
                                          else "native")):
         raise ValueError("Service consumer differs from its reviewed domain")
-    if (specification.domain == "external-package" and
-            resolved.get("soc_family") != "sdk_services_model"):
-        raise ValueError("External service consumer did not select its package")
     commands = json.loads((build / "compile_commands.json").read_text())
     products = ({source / "private_headers.c"} if boot else
                 {source / ("application.c" if split else "main.c"),
@@ -1246,41 +942,12 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
         else:
             for application in ("installed_c", "installed_cpp"):
                 run_checked([str(build / "bin" / application)])
-    elif kind == "modern":
-        family, backend = specification
-        source, build, command = prepare_modern_consumer(
-            prefix, output, family, backend, run_checked,
-            expected_revision=identity["source_revision"])
-        run_checked(command)
-        run_checked(["cmake", "--build", str(build), "--parallel", "1",
-                     "--target", "installed_modern"])
-        commands = json.loads((build / "compile_commands.json").read_text())
-        products = [entry for entry in commands
-                    if Path(entry["file"]).resolve() == source / "main.c"]
-        if len(products) != 1 or private_compile_inputs(products[0], sdk):
-            raise ValueError("Modern consumer private inputs leaked into product")
-        image = build / "bin/installed_modern.elf"
-        resources = json.loads(
-            (build / "bin/installed_modern.resources.json").read_text())
-        if resources["status"] != "passed" or image.stat().st_size == 0:
-            raise ValueError("Modern consumer linked resource binding failed")
-        config = Path((build / "resolved-config.txt").read_text())
-        retention_path = build / "provider-retention.json"
-        run_checked([sys.executable, "-B",
-            str(sdk / "tools/measurement/retention.py"),
-            "--elf", str(image), "--bindings", str(config / "bindings.c"),
-            "--resolved", str(config / "resolved.json"),
-            "--output", str(retention_path)])
-        if json.loads(retention_path.read_text())["status"] != "passed":
-            raise ValueError("Modern consumer provider retention failed")
     elif kind == "services":
         source, build, command = prepare_service_consumer(
             prefix, output, specification, run_checked,
             expected_revision=identity["source_revision"])
         run_checked(command)
-        target = ("external_lifecycle_consumer"
-                  if specification.scenario == "external_provider"
-                  else "installed_services")
+        target = "installed_services"
         run_checked(["cmake", "--build", str(build), "--parallel", "1",
                      "--target", target])
         return check_service_image(sdk, source, build, specification, run_checked)
@@ -1293,7 +960,7 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
         run_checked(["cmake", "--build", str(build), "--parallel", "1",
                      "--target", "installed_selected"])
         image = check_selected_image(sdk, source, build, run_checked,
-                                     owner_specification=specification)
+                                     specification=specification)
         image.update({"name": name, "assembly": str(sdk / assembly)})
         return image
     else:

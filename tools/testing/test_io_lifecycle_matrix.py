@@ -17,7 +17,7 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         self.source = self.root / "tests/google/provider_test.cpp"
         self.source.parent.mkdir(parents=True)
         self.source.write_text("TEST_F(Provider, Retains) { run(); EXPECT_EQ(state, ACTIVE); EXPECT_EQ(count, 0U); }\n")
-        self.production = self.root / "soc/example/provider.c"
+        self.production = self.root / "soc/stm32/stm32f4/drivers/provider.c"
         self.production.parent.mkdir(parents=True)
         self.production.write_text("void run(void) {}\n")
         self.binary = self.build / "bin/nexus_provider_test"
@@ -132,14 +132,14 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
     def shared_native_model(self, owner="nexus_io_native"):
-        source = self.root / "soc/native/drivers/uart.c"
+        source = self.root / "tests/support/native/drivers/uart.c"
         source.parent.mkdir(parents=True)
         self.production.rename(source)
         database = self.build / "compile_commands.json"
         entries = json.loads(database.read_text())
         entry = entries[1]
         old_object = Path(entry["arguments"][-1])
-        output = (self.build / "soc/native/CMakeFiles" / (owner + ".dir") /
+        output = (self.build / "tests/support/native/CMakeFiles" / (owner + ".dir") /
                   "drivers/uart.c.o")
         output.parent.mkdir(parents=True)
         output.write_bytes(old_object.read_bytes())
@@ -172,7 +172,7 @@ class IOLifecycleMatrixTests(unittest.TestCase):
 
     def test_native_owner_marker_cannot_hide_another_compiled_target(self):
         _, output = self.shared_native_model()
-        another = (self.build / "soc/native/CMakeFiles/another_target.dir" /
+        another = (self.build / "tests/support/native/CMakeFiles/another_target.dir" /
                    "drivers/uart.c.o")
         another.parent.mkdir(parents=True)
         another.write_bytes(output.read_bytes())
@@ -188,7 +188,7 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         database = self.build / "compile_commands.json"
         entries = json.loads(database.read_text())
         old_object = Path(entries[1]["arguments"][-1])
-        output = (self.build / "soc/native/CMakeFiles/nexus_io_native.dir" /
+        output = (self.build / "tests/support/native/CMakeFiles/nexus_io_native.dir" /
                   old_object.name)
         output.parent.mkdir(parents=True)
         output.write_bytes(old_object.read_bytes())
@@ -198,8 +198,8 @@ class IOLifecycleMatrixTests(unittest.TestCase):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
     def hardware_source_alias(self, name):
-        source = self.root / "soc/stm32/stm32f407/drivers/uart.c"
-        source.parent.mkdir(parents=True)
+        source = self.root / "soc/stm32/stm32f4/drivers/uart.c"
+        source.parent.mkdir(parents=True, exist_ok=True)
         self.production.rename(source)
         alias = self.root / name
         alias.parent.mkdir(parents=True, exist_ok=True)
@@ -208,7 +208,7 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         entries = json.loads(database.read_text())
         entry = entries[1]
         old_object = Path(entry["arguments"][-1])
-        output = (self.build / "soc/native/CMakeFiles/nexus_io_native.dir" /
+        output = (self.build / "tests/support/native/CMakeFiles/nexus_io_native.dir" /
                   "drivers/uart.c.o")
         output.parent.mkdir(parents=True)
         output.write_bytes(old_object.read_bytes())
@@ -222,17 +222,17 @@ class IOLifecycleMatrixTests(unittest.TestCase):
 
     def test_hardware_source_alias_cannot_borrow_the_native_owner(self):
         self.hardware_source_alias(
-            "soc/native/drivers/../../stm32/stm32f407/drivers/uart.c")
+            "tests/support/native/drivers/../../../../soc/stm32/stm32f4/drivers/uart.c")
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
     def test_hardware_source_alias_cannot_skip_soc_ownership(self):
-        self.hardware_source_alias("io/../soc/stm32/stm32f407/drivers/uart.c")
+        self.hardware_source_alias("io/../soc/stm32/stm32f4/drivers/uart.c")
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
     def shared_ip_driver(self, owner, *, alias=False,
-                         source_name="drivers/i2c/i2c_v1_async/i2c_v1_async.c"):
+                         source_name="soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"):
         source = self.root / source_name
         source.parent.mkdir(parents=True)
         self.production.rename(source)
@@ -280,21 +280,21 @@ class IOLifecycleMatrixTests(unittest.TestCase):
 
     def test_classic_can_shared_engine_keeps_its_reviewed_native_owner(self):
         self.assert_reviewed_shared_engine(
-            "drivers/can/classic_can/can_controller.c", "nexus_can_native_engine")
+            "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c", "nexus_can_native_engine")
 
     def test_fs_usb_shared_engine_keeps_its_reviewed_native_owner(self):
         self.assert_reviewed_shared_engine(
-            "drivers/usb/fs_device_pio/usb_device_controller.c",
+            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
             "nexus_usb_native_engine")
 
     def test_legacy_mac_shared_engine_keeps_its_reviewed_native_owner(self):
         self.assert_reviewed_shared_engine(
-            "drivers/ethernet/legacy_mac/eth_mac.c", "nexus_eth_native_engine")
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c", "nexus_eth_native_engine")
 
     def test_reviewed_engine_cannot_borrow_a_different_shared_owner(self):
         self.shared_ip_driver(
             "nexus_usb_native_engine",
-            source_name="drivers/can/classic_can/can_controller.c")
+            source_name="soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c")
         with self.assertRaisesRegex(ValueError, "compiled only for another target"):
             matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
@@ -436,10 +436,10 @@ class CurrentHALCatalogueTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         data, _, _ = matrix.catalogue_inputs(
             root, root / "tools/testing/io_lifecycle_matrix.json")
-        provider = "soc/stm32/stm32f407/drivers/uart_hal.c"
+        provider = "soc/stm32/stm32f4/drivers/uart_hal.c"
         rows = [row for row in data["properties"]
                 if (row["family"], row["peripheral"], row["mode"])
-                == ("stm32f407", "uart", "dma-tx")
+                == ("stm32f4", "uart", "dma-tx")
                 and provider in row["production_sources"]]
         required = {
             "F407HalContract.ExpiredRequestRejectsBeforeHalRetainsPayload",
@@ -463,7 +463,7 @@ class CurrentHALCatalogueTests(unittest.TestCase):
                     "nexus_stm32_uart_dma_tx_cold_factory_test",
                     "nexus_stm32_multi_controller_factory_test",
                 })
-                self.assertNotIn("soc/stm32/stm32f407/drivers/uart_dma.c",
+                self.assertNotIn("soc/stm32/stm32f4/drivers/uart_dma.c",
                                  row["production_sources"])
 
 

@@ -8,7 +8,6 @@
  */
 #include "nexus/arch/arch.h"
 extern "C" {
-#if defined(NX_DMA_MULTI_STM32)
 #include "stm32f407_dma.h"
 #define DMA_STATE nx_stm32_uart_dma_state_t
 #define DMA_OPS   nx_stm32_uart_dma_ops
@@ -25,25 +24,6 @@ extern "C" {
 #define DATA(i)   (uarts[i]->DR)
 #define TC        USART_SR_TC
 #define RX_READY  USART_SR_RXNE
-#else
-#include "gd32f470_dma.h"
-#include "gd32f4xx_dma.h"
-#define DMA_STATE nx_gd32_uart_dma_state_t
-#define DMA_OPS   nx_gd32_uart_dma_ops
-#define DMA_IRQ   nx_gd32_uart_dma_irq
-#define UART_IRQ  nx_gd32_uart_dma_uart_irq
-#define UART0     USART0
-#define UART1     USART1
-#define TXIRQ0    DMA1_Channel7_IRQn
-#define TXIRQ1    DMA0_Channel6_IRQn
-#define UIRQ0     USART0_IRQn
-#define UIRQ1     USART1_IRQn
-#define STATUS(i) USART_STAT0(uarts[i])
-#define BAUD(i)   USART_BAUD(uarts[i])
-#define DATA(i)   USART_DATA(uarts[i])
-#define TC        USART_STAT0_TC
-#define RX_READY  USART_STAT0_RBNE
-#endif
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -51,9 +31,9 @@ extern "C" {
 #include <sys/mman.h>
 
 extern "C" {
-extern uint64_t g_gd32_model_now;
-extern bool g_gd32_model_isr;
-extern uint32_t g_gd32_model_mask;
+extern uint64_t g_f4_model_now;
+extern bool g_f4_model_isr;
+extern uint32_t g_f4_model_mask;
 }
 namespace {
 volatile uint32_t* held;
@@ -65,47 +45,30 @@ class UARTMultiple : public testing::Test {
     uint8_t payload[2][4]{{1U, 2U, 3U, 4U}, {5U, 6U, 7U, 8U}};
     uint8_t rings[2][8]{};
     nx_dma_memory_region_t regions[1]{};
-#if defined(NX_DMA_MULTI_STM32)
     USART_TypeDef* uarts[2]{UART0, UART1};
     volatile uint32_t* controls[2]{&DMA2_Stream7->CR, &DMA1_Stream6->CR};
     volatile uint32_t* counts[2]{&DMA2_Stream7->NDTR, &DMA1_Stream6->NDTR};
     volatile uint32_t* flags[2]{&DMA2->HISR, &DMA1->HISR};
     volatile uint32_t* destinations[2]{&DMA2_Stream7->PAR, &DMA1_Stream6->PAR};
-#else
-    uint32_t uarts[2]{UART0, UART1};
-    volatile uint32_t* controls[2]{&DMA_CH7CTL(DMA1), &DMA_CH6CTL(DMA0)};
-    volatile uint32_t* counts[2]{&DMA_CH7CNT(DMA1), &DMA_CH6CNT(DMA0)};
-    volatile uint32_t* flags[2]{&DMA_INTF1(DMA1), &DMA_INTF1(DMA0)};
-    volatile uint32_t* destinations[2]{&DMA_CH7PADDR(DMA1),
-                                       &DMA_CH6PADDR(DMA0)};
-#endif
     unsigned shifts[2]{22U, 16U};
     nx_result_t Initialize(unsigned i) {
-#if defined(NX_DMA_MULTI_STM32)
         return nx_stm32_uart_dma_initialize(&states[i],
                                             i == 0U ? 84000000U : 42000000U);
-#else
-        return nx_gd32_uart_dma_initialize_at(
-            &states[i],
-            i == 0U ? &nx_gd32_usart0_controller : &nx_gd32_usart1_controller,
-            115200U, NX_UART_RX_BYTES, rings[i], sizeof(rings[i]), 6U);
-#endif
     }
     void SetUp() override {
         void* p = mmap(
             (void*)(uintptr_t)0x40000000U, 0x80000U, PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(p, (void*)(uintptr_t)0x40000000U);
-        g_gd32_model_nvic = {};
-        g_gd32_model_now = 100U;
-        g_gd32_model_isr = false;
-        g_gd32_model_mask = 0U;
+        g_f4_model_nvic = {};
+        g_f4_model_now = 100U;
+        g_f4_model_isr = false;
+        g_f4_model_mask = 0U;
         held = nullptr;
         regions[0] = {(uintptr_t)payload, sizeof(payload), NX_DMA_MEMORY_READ};
         for (unsigned i = 0U; i < 2U; ++i) {
             states[i].resources.regions = regions;
             states[i].resources.region_count = 1U;
-#if defined(NX_DMA_MULTI_STM32)
             states[i].uart.registers = uarts[i];
             states[i].uart.baud = 115200U;
             states[i].uart.profile = NX_UART_RX_BYTES;
@@ -117,7 +80,6 @@ class UARTMultiple : public testing::Test {
             states[i].transmit.stream = i == 0U ? 7U : 6U;
             states[i].transmit.channel = 4U;
             states[i].transmit.dma_irq = i == 0U ? TXIRQ0 : TXIRQ1;
-#endif
             nx_request_initialize(&requests[i].base);
             ASSERT_EQ(nx_uart_tx_prepare(&requests[i], payload[i],
                                          sizeof(payload[i]), 1000000U),
@@ -126,8 +88,8 @@ class UARTMultiple : public testing::Test {
     }
     void TearDown() override {
         held = nullptr;
-        g_gd32_model_isr = false;
-        g_gd32_model_mask = 0U;
+        g_f4_model_isr = false;
+        g_f4_model_mask = 0U;
         for (unsigned i = 0U; i < 2U; ++i) {
             if (states[i].uart.initialized) {
                 if (states[i].uart.active != nullptr) {
@@ -169,11 +131,7 @@ TEST_F(UARTMultiple, SecondaryColdInitPreservesPrimaryRegistersAndIrqs) {
     EXPECT_TRUE(Enabled(TXIRQ1));
     EXPECT_TRUE(Enabled(UIRQ0));
     EXPECT_TRUE(Enabled(UIRQ1));
-#if defined(NX_DMA_MULTI_STM32)
     constexpr uint32_t peripheral_clock = 42000000U;
-#else
-    constexpr uint32_t peripheral_clock = 50000000U;
-#endif
     EXPECT_EQ(BAUD(1U), (peripheral_clock + 57600U) / 115200U);
 }
 TEST_F(UARTMultiple, SeparateRequestsRequireTheirOwnDmaAndWireCompletion) {
@@ -206,7 +164,7 @@ TEST_F(UARTMultiple, FailedSecondaryDrainRetainsOnlyItsExactBorrow) {
     ASSERT_EQ(nx_uart_port_cancel(&ports[1], &requests[1]), NX_SUCCESS);
     STATUS(1U) |= TC;
     UART_IRQ(&states[1]);
-    g_gd32_model_now = 2000000U;
+    g_f4_model_now = 2000000U;
     nx_uart_port_service(&ports[1]);
     EXPECT_EQ(nx_request_state(&requests[1].base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(states[1].uart.active, &requests[1]);
@@ -233,10 +191,6 @@ TEST_F(UARTMultiple, SecondaryStopPreservesPrimaryPublishersAndClock) {
     EXPECT_EQ(NVIC->ISPR[(unsigned)TXIRQ1 / 32U] &
                   (1U << ((unsigned)TXIRQ1 % 32U)),
               0U);
-#if !defined(NX_DMA_MULTI_STM32)
-    EXPECT_NE(RCU_APB2EN & RCU_APB2EN_USART0EN, 0U);
-    EXPECT_EQ(RCU_APB1EN & RCU_APB1EN_USART1EN, 0U);
-#endif
 }
 TEST_F(UARTMultiple, SecondaryIrqReceiveCannotWritePrimaryRing) {
     ASSERT_NO_FATAL_FAILURE(Both());
@@ -284,10 +238,10 @@ TEST_F(UARTMultiple, LivePhysicalControllerCannotBeAcquiredTwice) {
     states[1].uart.initialized = true;
 }
 TEST_F(UARTMultiple, ContextAndSharedEngineConflictRejectBeforeAcquisition) {
-    g_gd32_model_isr = true;
+    g_f4_model_isr = true;
     EXPECT_EQ(Initialize(1U), NX_ERROR_CONTEXT);
     EXPECT_FALSE(Enabled(TXIRQ1));
-    g_gd32_model_isr = false;
+    g_f4_model_isr = false;
     *controls[1] = 1U;
     EXPECT_EQ(Initialize(1U), NX_ERROR_BUSY);
     EXPECT_FALSE(states[1].uart.initialized);
@@ -306,19 +260,11 @@ TEST_F(UARTMultiple, IdleForeignPublisherRejectsBeforeClockOrFlagMutation) {
     EXPECT_TRUE(Enabled(TXIRQ1));
 }
 TEST_F(UARTMultiple, SecondaryCannotAcquireForeignColdControllerFacts) {
-#if defined(NX_DMA_MULTI_STM32)
     states[1].transmit.tx = DMA2_Stream7;
     EXPECT_EQ(Initialize(1U), NX_ERROR_UNSUPPORTED);
     states[1].transmit.tx = DMA1_Stream6;
     EXPECT_EQ(nx_stm32_uart_dma_initialize(&states[1], 84000000U),
               NX_ERROR_UNSUPPORTED);
-#else
-    const nx_gd32_uart_controller_t copied = nx_gd32_usart1_controller;
-    EXPECT_EQ(nx_gd32_uart_dma_initialize_at(&states[1], &copied, 115200U,
-                                             NX_UART_RX_BYTES, rings[1],
-                                             sizeof(rings[1]), 6U),
-              NX_ERROR_INVALID);
-#endif
     EXPECT_FALSE(states[1].uart.initialized);
     EXPECT_FALSE(Enabled(TXIRQ0));
     EXPECT_FALSE(Enabled(TXIRQ1));

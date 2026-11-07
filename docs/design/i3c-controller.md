@@ -2,10 +2,9 @@
 
 This contract explains how an external controller port uses the optional
 `Nexus::I3CController` C11 core for explicit discovery, finite SDR transfers and
-copied IBI/hot-join events. The STM32H563 I3C1 private polling port implements this hardware boundary for
-an explicit software reference. It does not provide H563 SoC startup, Board
-routing or a physical qualification. External C preparation and trusted wire,
-IRQ and all-target address-reset proofs remain required.
+copied IBI/hot-join events. Current production F4 integration does not expose an
+I3C hardware adapter. External C preparation and trusted wire, IRQ and all-target
+address-reset proofs remain required by any future concrete port.
 
 The public contracts are
 [request and endpoint API](../../components/i3c_controller/include/nexus/components/i3c_controller.h)
@@ -24,8 +23,7 @@ core, invoke application code or mutate retained core storage.
 
 FIG-26 describes the [current implementation](../../components/i3c_controller/src/i3c_controller.c).
 Solid arrows label software calls, copied observations or retained state; dashed
-arrows label required external proofs. The hardware port is an injected contract with a selected H563 private polling
-implementation. External preparation and whole-bus proofs remain explicit. There
+arrows label required external proofs. The hardware port is an injected contract; no production MCU port is selected here. External preparation and whole-bus proofs remain explicit. There
 is one active request and no software transfer queue; bounded FIFO work belongs
 to the selected port.
 
@@ -124,50 +122,10 @@ pump handles at most the selected 1..8 B batch, one IBI and one hot-join
 observation. Caller storage grows with target count, event capacity and exact
 request/payload sizes. These are software bounds, not measured wire latency.
 
-## STM32H563 private polling reference and evidence boundary
+## Validation boundary
 
-The [private H563 port](../../components/soc/stm32/stm32h563_i3c/src/stm32h563_i3c_port.c)
-uses unchanged official LL operations under one controller owner. HAL polling
-waits on `HAL_GetTick`; HAL interrupt transfers retain caller spans. Those complete
-transport contracts do not fit a synchronous pump that retains no span, so this
-reference uses bounded LL FIFO work rather than a second live HAL transport.
-
-The port admits an already prepared controller with interrupts, DMA and the
-control/status FIFOs disabled, arbitration headers enabled and byte thresholds.
-It transfers at most the supplied payload capacity, capped at eight bytes per
-pump. DAA consumes at most one eight-byte identity; IBI uses at most four copied
-bytes and four hardware characteristic slots. Enqueuing an address is not its
-acknowledgement: a later error-free hardware observation must establish the
-assignment before the core exposes an endpoint. Abort requests FIFO flushing;
-flush writes and frame completion alone do not establish whole-bus quiescence.
-
-An external resource owner supplies the controller clock, pins, electrical timing,
-exclusive IRQ ownership and correctly prepared register state. It must establish
-the ES0565 SDA pull-up preparation before controller enable and prove every
-powered target's dynamic address invalidated, including after MCU-only reset.
-The port does not invent this proof from a peripheral reset or FIFO flush.
-Unavailable proof retains ownership and borrowed storage. No hidden wait,
-automatic DAA, pin route or startup owner is added.
-
-The source tuple is the exact pair in official STM32CubeH5 v1.7.0:
-[CMSIS-device H5](../../dependencies/stm32h5.lock.json) and
-[HAL/LL H5](../../dependencies/stm32h5-hal.lock.json), fetched through the
-organization forks. Existing CMSIS Core 6 is reused. The HAL child contains the
-Cube-selected ETH timestamp correction after its own v1.7.0 tag; those revisions
-must not be conflated. `STM32H563xx` in the source lock is a vendor header selector,
-not a complete ordering suffix or a supported SoC declaration.
-
-The public Cortex-M33 Runtime and official C11/C++17 declaration probes establish
-software compile/link boundaries only. The earlier
-[development evidence](../../tests/evidence/i3c-controller/README.md) retains its
-original scope and tuple; it cannot qualify this later port by inheritance.
-Exact silicon revision, complete RM0481/errata review, Board wiring, timing,
-all-target reset behavior and physical IBI/hot-join operation require independent
-reference and station evidence. Physical HIL remains `not_executed`.
-
-Host GoogleTest/GoogleMock cases exercise the actual C core while mocking only
-hardware and clock leaves. Development RED/GREEN execution logs bind source hashes and raw
-results; the ordinary complete-index gates, SDK closure and ARM consumer must
-run after integration. Development execution does not establish a clean software
-candidate, reproducibility or physical qualification. The original
-[IO-38](io-evolution-execution.csv) exit remains open and unchanged.
+Host GoogleTest/GoogleMock exercises the actual C core with external port
+behavior modeled. Such tests do not establish physical discovery, SDA timing,
+IBI/hot-join or all-target reset. The retired hardware reference remains available
+at its original source revision and does not qualify a new port by inheritance.
+Physical HIL is not executed.

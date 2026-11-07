@@ -5,7 +5,6 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
-#if defined(NX_I2C_MULTI_STM32)
 #include "stm32f407_i2c_async.h"
 #define PRIMARY_REGS   ((volatile uint32_t*)I2C1)
 #define SECONDARY_REGS ((volatile uint32_t*)I2C2)
@@ -22,24 +21,6 @@
 #define RX1            DMA1_Stream2_IRQn
 #define TX1            DMA1_Stream7_IRQn
 #define MHZ            42U
-#else
-#include "gd32f470_i2c_async.h"
-#define PRIMARY_REGS   ((volatile uint32_t*)(uintptr_t)I2C0)
-#define SECONDARY_REGS ((volatile uint32_t*)(uintptr_t)I2C1)
-#define LINE_INPUT     GPIO_ISTAT(GPIOB)
-#define PRIMARY_DMA    NX_GD32_I2C0_DMA
-#define SECONDARY_DMA  NX_GD32_I2C1_DMA
-#define INITIALIZE     nx_gd32_i2c_async_initialize
-#define EV0            I2C0_EV_IRQn
-#define ER0            I2C0_ER_IRQn
-#define EV1            I2C1_EV_IRQn
-#define ER1            I2C1_ER_IRQn
-#define RX0            DMA0_Channel0_IRQn
-#define TX0            DMA0_Channel6_IRQn
-#define RX1            DMA0_Channel2_IRQn
-#define TX1            DMA0_Channel7_IRQn
-#define MHZ            50U
-#endif
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -47,7 +28,7 @@
 #include <vector>
 
 extern "C" {
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 namespace {
 uint32_t mask;
@@ -86,7 +67,7 @@ class I2CMultiple : public testing::Test {
         now = 100U;
         held_engine = nullptr;
         clock_observer = nullptr;
-        g_gd32_model_nvic = {};
+        g_f4_model_nvic = {};
         LINE_INPUT = 0xFFFFU;
         regions[0] = {(uintptr_t)buffers, sizeof(buffers),
                       NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
@@ -284,7 +265,7 @@ TEST_F(I2CMultiple, IsrInitializationCannotMutateDisabledControllerOrIrqs) {
 TEST_F(I2CMultiple, UnprivilegedInitializationCannotAcquireEitherController) {
     const auto* mmio = reinterpret_cast<const uint8_t*>(uintptr_t{0x40000000U});
     const std::vector<uint8_t> before(mmio, mmio + 0x80000U);
-    const auto nvic = g_gd32_model_nvic;
+    const auto nvic = g_f4_model_nvic;
     model_privileged = false;
     for (unsigned i = 0U; i < 2U; ++i) {
         EXPECT_EQ(NX_ERROR_CONTEXT, INITIALIZE(&states[i], 5U));
@@ -292,7 +273,7 @@ TEST_F(I2CMultiple, UnprivilegedInitializationCannotAcquireEitherController) {
         EXPECT_EQ(nullptr, states[i].active);
     }
     EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
-    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_f4_model_nvic, sizeof(nvic)));
 }
 
 TEST_F(I2CMultiple, UnprivilegedPublicCallsCannotMutateOrBorrowEitherInstance) {
@@ -303,7 +284,7 @@ TEST_F(I2CMultiple, UnprivilegedPublicCallsCannotMutateOrBorrowEitherInstance) {
     }
     const auto* mmio = reinterpret_cast<const uint8_t*>(uintptr_t{0x40000000U});
     const std::vector<uint8_t> before(mmio, mmio + 0x80000U);
-    const auto nvic = g_gd32_model_nvic;
+    const auto nvic = g_f4_model_nvic;
     model_privileged = false;
     for (unsigned i = 0U; i < 2U; ++i) {
         EXPECT_EQ(NX_ERROR_CONTEXT,
@@ -318,7 +299,7 @@ TEST_F(I2CMultiple, UnprivilegedPublicCallsCannotMutateOrBorrowEitherInstance) {
         EXPECT_TRUE(states[i].initialized);
     }
     EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
-    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_f4_model_nvic, sizeof(nvic)));
 }
 
 TEST_F(I2CMultiple, FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow) {

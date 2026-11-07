@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "stm32f407zg-four-spi-endpoints-software-fixture",
   "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
+  "soc_family": "stm32f4",
   "source_revision": "software-only-three-cs-bank-pad-contract",
   "physical_pcb_revision": null,
   "clocks": {

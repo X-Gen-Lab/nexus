@@ -10,7 +10,7 @@ from tools.configure import configure, dependencies, factory
 class SelectedIoPlanTests(unittest.TestCase):
     def test_resource_plan_is_the_immutable_selected_claim_projection(self):
         result = configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies/native-gpio.toml")
+            configure.ROOT / "tests/support/native/assemblies/native-gpio.toml", test_support=True)
         self.assertEqual(len(result.resource_plan.claims),
                          len(result.claims))
         self.assertEqual(result.resource_plan.to_dict(),
@@ -20,7 +20,7 @@ class SelectedIoPlanTests(unittest.TestCase):
 
     def test_fixed_adc_trigger_and_dma_are_resolved_not_invented(self):
         result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/stm32_assembly/zg-blocks.toml")
+            "tests/contracts/stm32_assembly/zg-blocks.toml", test_support=True)
         self.assertTrue(result.trigger_plan.nodes)
         self.assertTrue(result.trigger_plan.edges)
         self.assertTrue(result.dma_topology.lanes)
@@ -32,7 +32,7 @@ class SelectedIoPlanTests(unittest.TestCase):
 
     def test_empty_selection_has_explicit_empty_plans(self):
         result = configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies/native.toml")
+            configure.ROOT / "tests/support/native/assemblies/native.toml", test_support=True)
         self.assertFalse(result.resource_plan.claims)
         self.assertFalse(result.trigger_plan.nodes)
         self.assertFalse(result.dma_topology.lanes)
@@ -46,7 +46,7 @@ class SelectedIoPlanTests(unittest.TestCase):
                 'board_package = "zg_board"',
                 'board_package = "' + str(source.parent / "zg_board") + '"')
             path.write_text(contents + "\n[factory]\ncapabilities = true\n")
-            result = configure.resolve_ir(path)
+            result = configure.resolve_ir(path, test_support=True)
             header, emitted = factory.emit(result)
             self.assertIn("nx_factory_uart_traits_t", header)
             self.assertIn("nx_factory_adc_traits_t", header)
@@ -54,11 +54,11 @@ class SelectedIoPlanTests(unittest.TestCase):
             self.assertIn("NX_IO_TIMESTAMP_IRQ_OBSERVATION", emitted)
             self.assertNotIn("measured_hz", emitted)
             self.assertNotIn("hardware_qualified = true", emitted)
-        disabled = configure.resolve_ir(source)
+        disabled = configure.resolve_ir(source, test_support=True)
         self.assertNotIn("_traits_t", factory.emit(disabled)[0])
 
     def test_generator_identity_includes_all_plan_and_trait_modules(self):
-        paths, _ = dependencies.snapshot(mode="platform", family="native")
+        paths, _ = dependencies.snapshot(mode="platform", family="native", test_support=True)
         for module in ("resource_graph", "trigger_graph", "dma_topology",
                        "io_traits"):
             self.assertIn("tools/configure/" + module + ".py", paths)

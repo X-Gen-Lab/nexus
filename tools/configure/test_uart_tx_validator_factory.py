@@ -1,4 +1,5 @@
 """Exact selected UART admission callbacks compose without private headers."""
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure as gate, factory
@@ -6,7 +7,7 @@ from tools.configure import configure as gate, factory
 
 class UartValidatorFactoryTests(unittest.TestCase):
     def resolve(self, relative):
-        return gate.resolve_ir(gate.ROOT / relative)
+        return gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
 
     def test_reviewed_irq_byte_mode_exports_shared_callback_and_strong_lookup(self):
         result = self.resolve(
@@ -25,14 +26,10 @@ class UartValidatorFactoryTests(unittest.TestCase):
         header, source = factory.emit(result)
         self.assertIn("nx_factory_uart_tx_validator(", header)
         self.assertNotIn("nx_stm32_uart_tx_validate", source)
-        result = self.resolve("tools/configure/assemblies/native-empty.toml")
+        result = self.resolve("tests/support/native/assemblies/native-empty.toml")
         self.assertNotIn("nx_factory_uart_tx_validator", factory.emit(result)[0])
         self.assertNotIn("nx_factory_uart_tx_validator", factory.emit_strong(result))
 
-    def test_gd470_irq_byte_mode_has_its_own_existing_validator(self):
-        result = self.resolve("tools/configure/assemblies/liangshan-baremetal.toml")
-        self.assertIn("return nx_gd32_uart_tx_validate;", factory.emit(result)[1])
-        self.assertNotIn("nx_stm32_uart_tx_validate", factory.emit(result)[1])
 
 
 

@@ -1,28 +1,19 @@
-// FIG-31 current: maintenance decisions, not runtime calls or qualification.
-// Source basis: 7b985c4c source layout and docs/guides/provider-porting.md.
-digraph DriverSourceOwnership {
-    graph [label="FIG-31 共享 IP 与精确 SoC 源码归属",
-           rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35,
-           ranksep=0.45, fontname="Noto Sans CJK SC", fontsize=15,
-           labelloc=t];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=12, margin="0.16,0.10"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
-
-    work [label="私有控制器实现", fillcolor="#f8fafc"];
-    protocol [label="是否拥有寄存器协议时序？", shape=diamond,
-              fillcolor="#fefce8"];
-    reviewed [label="布局／位／顺序／复位兼容性已复核；\n各芯片勘误均已显式处理？",
-              shape=diamond, fillcolor="#fefce8"];
-    integration [label="保留精确 SoC 集成\n事实／时钟／复位／引脚／IRQ／DMA\n或窄范围协作辅助代码"];
-    shared [label="drivers/<kind>/<ip>/\n经复核的共享算法"];
-    exact [label="soc/<vendor>/<family>/drivers/\n精确或尚未复核的协议"];
-
-    work -> protocol [label="判定责任"];
-    protocol -> integration [label="否"];
-    protocol -> reviewed [label="是"];
-    reviewed -> shared [label="是：兼容性已复核"];
-    reviewed -> exact [label="否：保留精确范围"];
+// FIG-31 current: F4 source ownership; labels distinguish calls and build inputs.
+digraph F4SourceOwnership {
+  graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.5, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, label="FIG-31 F4 源码归属与接口边界\n逐边说明编译或调用；不建立软件／实板资格"];
+  node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11];
+  io [label="io/\n公共类型、请求与借用合同"];
+  f4 [label="soc/stm32/stm32f4/\n资源、生命周期与官方库适配"];
+  ip [label="F4 drivers/ip/\n仍使用的私有硬件实现"];
+  vendor [label="vendors/st/ F4 HAL / Device\n全部库存来源保留，按选择消费"];
+  host [label="tests/support/native/\n显式测试 scope，不是生产 SoC"];
+  components [label="components/\nILI9341 / XPT2046 / W25 等"];
+  config [label="Board JSON + TOML\n事实、模式与实例选择"];
+  io -> f4 [label="运行：ops(context)"];
+  f4 -> ip [label="构建：私有源码选编", style=dashed];
+  f4 -> vendor [label="构建：私有 include / link", style=dashed];
+  host -> ip [label="测试：执行真实 IP 源码", style=dashed];
+  components -> io [label="运行：公共窄端口"];
+  config -> f4 [label="构建：生成静态连接", style=dashed];
 }

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e40aa36b755b0ea5b588d6bb31c20b3a832c11f70265fc9ed58b97bd3b486779\n"
+"X-Nexus-Source-SHA256: 94b20aeb4fef2a193a027122e58e27aaff7a27388114232d09fbd3bdc80ecdfc\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:1
 msgid "下一代平台工程运行手册"
@@ -2232,11 +2232,11 @@ msgstr ""
 "directories and compare two actual ELF/BIN outputs. That process must "
 "still execute before claiming byte-for-byte reproducibility."
 
-msgid "`drivers/`"
-msgstr "`drivers/`"
+msgid "`soc/stm32/stm32f4/drivers/ip/`"
+msgstr "`soc/stm32/stm32f4/drivers/ip/`"
 
-msgid "经复核的共享 IP 寄存器算法，由所选 SoC target 私有选编"
-msgstr "Reviewed shared IP register algorithms, selected privately by the SoC target"
+msgid "经复核且仍被 F4 使用的硬件 IP 算法，由 F4 target 私有选编"
+msgstr "Reviewed hardware IP algorithms still used by F4, selected privately by the F4 target"
 
 msgid "CodeQL 的数据库与中间查询缓存放在 tmpfs 时，文件占用与查询进程、子进程和内核内存共用同一 cgroup 预算；不同 tmpfs 的可用空间不能相加当作独立 RAM。按实际余量显式设置 `--ram`、`--threads` 和 `--max-disk-cache`，并为数据库增长、执行中的临时文件及其他进程留出空间。`--ram` 是 evaluator 的内存目标，file-backed mmap 可能使实际占用超过它；`--max-disk-cache` 限定中间结果缓存，不能作为执行中查询、全部临时文件或整个 cgroup 的硬配额。不能依据 `build/` 路径判定缓存角色；清理前按 producer 角色与实际引用分类，postlink audit JSON、`.su`、`*.compiler.raw` 和 `*.objdump.raw` 属于 producer 证据，并保留原失败与恢复事实。"
 msgstr "When a CodeQL database and its intermediate query cache are stored on tmpfs, their files share one cgroup memory budget with query processes, child processes and kernel memory. Free space on separate tmpfs mounts does not provide independent RAM budgets. Set `--ram`, `--threads` and `--max-disk-cache` explicitly from observed headroom, leaving room for database growth, temporary files created by running queries and other processes. `--ram` is a memory target for the evaluator; file-backed mmap can cause actual usage to exceed it. `--max-disk-cache` limits the intermediate-result cache and does not impose a hard quota on running queries, all temporary files or the entire cgroup. A `build/` path does not establish a cache role; classify files by their producer role and actual references before cleanup, treat postlink audit JSON, `.su`, `*.compiler.raw` and `*.objdump.raw` as producer evidence, and retain the original failure and recovery facts."

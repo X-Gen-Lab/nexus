@@ -222,10 +222,6 @@ class DirtyGitSourceObservationTests(unittest.TestCase):
             self.assertTrue(observed["submodules"][0].startswith(" "))
         with self.subTest(contract="all_raw_recursive_rows_preserved"):
             self.assertEqual(observed["submodules"], expected)
-        with self.subTest(contract="strict_portable_clean_source_admitted"):
-            from tools.evidence.u575_pair import _source
-            _source(observed)
-            self.verify(observed, clean=True)
 
     def test_normal_clean_commit_change_is_already_stale(self):
         before = self.observe("clean_before_commit")

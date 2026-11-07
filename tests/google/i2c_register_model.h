@@ -26,8 +26,4 @@ void nx_i2c_model_address_cleared(void* port);
 #define NX_STM32_I2C_WRITE_DATA(port, value) nx_i2c_model_write(port, value)
 #define NX_STM32_I2C_READ_DATA(port)         nx_i2c_model_read(port)
 #define NX_STM32_I2C_ADDRESS_CLEARED(port)   nx_i2c_model_address_cleared(port)
-#define NX_GD32_I2C_POLL(port)               nx_i2c_model_poll(port)
-#define NX_GD32_I2C_WRITE_DATA(port, value)  nx_i2c_model_write(port, value)
-#define NX_GD32_I2C_READ_DATA(port)          nx_i2c_model_read(port)
-#define NX_GD32_I2C_ADDRESS_CLEARED(port)    nx_i2c_model_address_cleared(port)
 #endif

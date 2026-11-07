@@ -1,4 +1,5 @@
 """Version policy is metadata, never a competing configuration authority."""
+from tools.configure.tests.native_fixture import native_fixture
 import copy
 import json
 from pathlib import Path
@@ -34,7 +35,7 @@ class CompatibilityTests(unittest.TestCase):
         from tools.configure.ir import ConfigurationIR
 
         result = configure.resolve_ir(
-            ROOT / "tools/configure/assemblies/native-gpio.toml")
+            ROOT / "tests/support/native/assemblies/native-gpio.toml", test_support=native_fixture(ROOT / "tests/support/native/assemblies/native-gpio.toml"))
         observed = compatibility.observe(ROOT)
         self.assertIsInstance(result, ConfigurationIR)
         self.assertEqual(result.source_epoch, 2)
@@ -90,13 +91,13 @@ class CompatibilityTests(unittest.TestCase):
         self.assertTrue(expected.issubset(paths), sorted(expected - paths))
 
     def test_invalid_manufacturer_facts_cannot_hide_behind_native(self):
-        for family in ("stm32/stm32f407", "gd32/gd32f470"):
+        for family in ("stm32/stm32f4",):
             for name in ("soc.json", "routes.json"):
                 with self.subTest(family=family, name=name):
                     with tempfile.TemporaryDirectory() as directory:
                         root = self.fixture(directory)
                         path = root / "soc" / family / name
-                        path.parent.mkdir(parents=True)
+                        path.parent.mkdir(parents=True, exist_ok=True)
                         path.write_text('{"schema_version":999}')
                         with self.assertRaisesRegex(ValueError,
                                                     "fact schema differs"):
@@ -210,8 +211,10 @@ class CompatibilityTests(unittest.TestCase):
                  "tools/configure/configure.py", "tools/configure/runtime.py",
                  "tools/configure/ir.py",
                  "tools/configure/assembly.schema.json", "tools/configure/factory.py", "cmake/package/package_source_sdk.py",
-                 "cmake/package/NexusConfigVersion.cmake.in", "boards/native_reference/board.json",
-                 "soc/native/soc.json", "soc/native/routes.json"]
+                 "cmake/package/NexusConfigVersion.cmake.in", "tests/support/native/board/board.json",
+                 "tests/support/native/soc.json", "tests/support/native/routes.json",
+                 "boards/stm32f407_qiming_v31/board.json",
+                 "soc/stm32/stm32f4/soc.json", "soc/stm32/stm32f4/routes.json"]
         for name in names:
             target = root / name; target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, target)
@@ -235,7 +238,7 @@ class CompatibilityTests(unittest.TestCase):
             path = root / "tools/configure/configure.py"
             path.write_text(path.read_text().replace('integer(board["schema_version"], 1, 1, "Board schema")',
                                                     'integer(board["schema_version"], 2, 2, "Board schema")'))
-            board = root / "boards/native_reference/board.json"
+            board = root / "tests/support/native/board/board.json"
             data = json.loads(board.read_text()); data["schema_version"] = 2
             board.write_text(json.dumps(data))
             with self.assertRaisesRegex(ValueError, "schema"):

@@ -126,7 +126,6 @@ ID用于目录和迁移；公共anchor使用标准显式target/label，不能依
 | FIG-11 | 软件与HIL证据 | 各自实际取得，再按scope准入；不自动生成物理资格 |
 | FIG-12 | 文档/SDK发布与恢复 | 身份、不可变版本、离线包、下载和独立恢复 |
 | FIG-13 | Cortex-M能力分层 | 原语、Runtime、SoC接入、实板资格分别表达 |
-| FIG-14 | U575双域 | 仅选定TZEN=1同步参考；SAU/MPU/GTZC/gateway责任 |
 | FIG-15 | 连续流与丢块 | producer/block/consumer、overrun和停止排空；服务预算 |
 
 运行图必须让读者看到：factory取得已有接口以后，日常I/O直接通过face进入

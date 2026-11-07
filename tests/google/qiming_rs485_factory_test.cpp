@@ -12,11 +12,11 @@ extern "C" {
 #include "nexus_factory_strong.h"
 #include "stm32f407_provider.h"
 nx_stm32_system_t g_nx_stm32_system;
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+NVIC_Type g_f4_model_nvic;
+SCB_Type g_f4_model_scb;
+SysTick_Type g_f4_model_systick;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 void USART2_IRQHandler(void);
 }
 #include <array>
@@ -68,11 +68,11 @@ class QimingRs485 : public testing::Test {
                  PROT_READ | PROT_WRITE,
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(reinterpret_cast<void*>(UINT32_C(0x40000000)), mapping);
-        g_gd32_model_nvic = {};
-        g_gd32_model_scb = {};
-        g_gd32_model_systick = {};
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_nvic = {};
+        g_f4_model_scb = {};
+        g_f4_model_systick = {};
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         USART2->SR = USART_SR_TXE | USART_SR_TC;
@@ -88,8 +88,8 @@ class QimingRs485 : public testing::Test {
     void TearDown() override {
         if (mapping == MAP_FAILED)
             return;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         if (bound) {
             USART2->SR = USART_SR_TC;
             if (nx_uart_port_stop(&face) != NX_SUCCESS) {
@@ -137,9 +137,9 @@ class QimingRs485 : public testing::Test {
     }
     void fire(uint32_t status) {
         USART2->SR = status;
-        g_gd32_model_isr = true;
+        g_f4_model_isr = true;
         USART2_IRQHandler();
-        g_gd32_model_isr = false;
+        g_f4_model_isr = false;
         gpio_latch();
     }
     void active_one_byte(void) {
@@ -291,10 +291,10 @@ extern "C" bool nx_arch_is_privileged(void) {
     return true;
 }
 extern "C" bool nx_arch_in_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
 }
@@ -303,12 +303,12 @@ extern "C" void nx_arch_dmb(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
-    const nx_arch_irq_state_t previous{g_gd32_model_mask};
-    g_gd32_model_mask = 1U;
+    const nx_arch_irq_state_t previous{g_f4_model_mask};
+    g_f4_model_mask = 1U;
     return previous;
 }
 extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
-    g_gd32_model_mask = previous.value;
+    g_f4_model_mask = previous.value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
     ++clock_reads;

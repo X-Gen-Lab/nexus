@@ -9,17 +9,9 @@
 extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "timer_advanced_controller.h"
-#ifdef NX_TIMER_FACTORY_STM32
 #include "stm32f407_provider.h"
 #include "stm32f407_timer_cold.h"
-#else
-#include "gd32f470_provider.h"
-#include "gd32f470_timer_cold.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_timer.h"
-#endif
+#include "timer_advanced_controller.h"
 void TIM4_IRQHandler(void);
 void TIM1_BRK_TIM9_IRQHandler(void);
 void TIMER3_IRQHandler(void);
@@ -32,7 +24,6 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 #include <sys/mman.h>
 #include <vector>
 
-#ifdef NX_TIMER_FACTORY_STM32
 #define CAP_CR1     TIM4->CR1
 #define CAP_EGR     TIM4->EGR
 #define CAP_PSC     TIM4->PSC
@@ -53,31 +44,8 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 #define BREAK_INPUT GPIOB->IDR
 #define CAP_IRQ     TIM4_IRQHandler
 #define ADV_IRQ     TIM1_BRK_TIM9_IRQHandler
-#else
-#define CAP_CR1     TIMER_CTL0(TIMER3)
-#define CAP_EGR     TIMER_SWEVG(TIMER3)
-#define CAP_PSC     TIMER_PSC(TIMER3)
-#define CAP_CCR     TIMER_CH0CV(TIMER3)
-#define CAP_CCER    TIMER_CHCTL2(TIMER3)
-#define CAP_DIER    TIMER_DMAINTEN(TIMER3)
-#define CAP_SR      TIMER_INTF(TIMER3)
-#define ADV_CR1     TIMER_CTL0(TIMER0)
-#define ADV_PSC     TIMER_PSC(TIMER0)
-#define ADV_CCER    TIMER_CHCTL2(TIMER0)
-#define ADV_DIER    TIMER_DMAINTEN(TIMER0)
-#define ADV_BDTR    TIMER_CCHP(TIMER0)
-#define ADV_SR      TIMER_INTF(TIMER0)
-#define PEER_DIER   TIMER_DMAINTEN(TIMER8)
-#define CAP_GATE    RCU_APB1EN
-#define ADV_GATE    RCU_APB2EN
-#define GPIO_GATE   RCU_AHB1EN
-#define BREAK_INPUT GPIO_ISTAT(GPIOB)
-#define CAP_IRQ     TIMER3_IRQHandler
-#define ADV_IRQ     TIMER0_BRK_TIMER8_IRQHandler
-#endif
 
 namespace {
-#ifdef NX_TIMER_FACTORY_STM32
 using TimerCold = nx_stm32_timer_cold_t;
 using CaptureColdConfig = nx_stm32_capture_cold_config_t;
 using AdvancedColdConfig = nx_stm32_advanced_cold_config_t;
@@ -85,15 +53,6 @@ constexpr auto CaptureColdPrepare = nx_stm32_capture_cold_prepare;
 constexpr auto CaptureColdClose = nx_stm32_capture_cold_close;
 constexpr auto AdvancedColdPrepare = nx_stm32_advanced_cold_prepare;
 constexpr auto AdvancedColdClose = nx_stm32_advanced_cold_close;
-#else
-using TimerCold = nx_gd32_timer_cold_t;
-using CaptureColdConfig = nx_gd32_capture_cold_config_t;
-using AdvancedColdConfig = nx_gd32_advanced_cold_config_t;
-constexpr auto CaptureColdPrepare = nx_gd32_capture_cold_prepare;
-constexpr auto CaptureColdClose = nx_gd32_capture_cold_close;
-constexpr auto AdvancedColdPrepare = nx_gd32_advanced_cold_prepare;
-constexpr auto AdvancedColdClose = nx_gd32_advanced_cold_close;
-#endif
 } /* namespace */
 
 using testing::_;
@@ -236,7 +195,6 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
 extern "C" bool nx_timer_factory_is_privileged(void) {
     return s_privileged;
 }
-#ifdef NX_TIMER_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
@@ -277,39 +235,6 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
                                               uint8_t pull, bool drain) {
     return configure_pin(port_index(port), pin, mode, af, pull, drain);
 }
-#else
-/** \brief Keep generated admission observable without simulating clocks. */
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return s_ports->Preflight();
-}
-extern "C" int nx_gd32_soc_start(void) {
-    return s_ports->Start();
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    return s_ports->Stop();
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
-    nx_result_t status = s_ports->Clock(index);
-    if (status == NX_SUCCESS)
-        GPIO_GATE |= 1U << index;
-    return status;
-}
-static unsigned port_index(uint32_t port) {
-    return (port - GPIOA) / 0x400U;
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
-    return capture_pin(port_index(port), pin);
-}
-extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
-                                    uint16_t saved) {
-    restore_pin(port_index(port), pin, saved);
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
-                                             uint8_t mode, uint8_t af,
-                                             uint8_t pull, bool drain) {
-    return configure_pin(port_index(port), pin, mode, af, pull, drain);
-}
-#endif
 
 class TimerFactory : public testing::Test {
   protected:
@@ -342,12 +267,8 @@ class TimerFactory : public testing::Test {
         ON_CALL(ports, Stop()).WillByDefault(Return(0));
         ON_CALL(ports, Clock(_)).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Configure(_, _, _)).WillByDefault(Return(NX_SUCCESS));
-#ifdef NX_TIMER_FACTORY_STM32
         g_nx_stm32_system.rcc = RCC;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
-#else
-        RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
-#endif
         NVIC->IPR[30] = 0x20U;
         NVIC->IPR[24] = 0x30U;
         cap = nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_ENCODER);
@@ -492,11 +413,7 @@ TEST_F(TimerFactory,
     EXPECT_EQ(NVIC->IPR[24], 0x30U);
 }
 TEST_F(TimerFactory, OffPeerBankContentsDoNotAdmitAFalseForeignPublisher) {
-#ifdef NX_TIMER_FACTORY_STM32
     ASSERT_EQ(ADV_GATE & RCC_APB2ENR_TIM9EN, 0U);
-#else
-    ASSERT_EQ(ADV_GATE & RCU_APB2EN_TIMER8EN, 0U);
-#endif
     PEER_DIER = UINT32_MAX;
     EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);

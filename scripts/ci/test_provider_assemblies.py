@@ -34,7 +34,7 @@ class FixtureAdmission(unittest.TestCase):
 
     def test_real_authored_input_is_resolved_without_rewriting(self):
         before = USB.read_bytes()
-        rows = gate.validate_fixtures(ROOT, [USB], family="stm32f407")
+        rows = gate.validate_fixtures(ROOT, [USB], family="stm32f4")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["resolved"]["part"], "STM32F407ZGT6")
         self.assertEqual(rows[0]["resolved"]["backend"], "baremetal")
@@ -65,16 +65,16 @@ class FixtureAdmission(unittest.TestCase):
 class ExplicitProjectAdmission(unittest.TestCase):
     def setUp(self):
         self.assembly = ROOT / (
-            "tools/configure/assemblies/nucleo-h743-baremetal-uart.toml")
-        self.project = ROOT / "tests/contracts/h743_assembly"
+            "tools/configure/assemblies/qiming-baremetal-uart.toml")
+        self.project = ROOT / "tests/contracts/stm32_assembly"
 
     def test_canonical_input_uses_the_explicit_owned_project(self):
         before = self.assembly.read_bytes()
         rows = gate.validate_fixtures(
-            ROOT, [self.assembly], project=self.project, family="stm32h743")
+            ROOT, [self.assembly], project=self.project, family="stm32f4")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["project"], str(self.project))
-        self.assertEqual(rows[0]["resolved"]["part"], "STM32H743ZIT6")
+        self.assertEqual(rows[0]["resolved"]["part"], "STM32F407ZGT6")
         self.assertEqual(self.assembly.read_bytes(), before)
 
     def test_canonical_input_without_project_remains_rejected(self):
@@ -120,9 +120,11 @@ class ExplicitProjectAdmission(unittest.TestCase):
                 gate.validate_fixtures(ROOT, [source], project=self.project)
 
     def test_native_canonical_is_not_an_arm_fixture(self):
-        source = self.assembly.with_name("native.toml")
-        with self.assertRaisesRegex(EvidenceError, "host model"):
-            gate.validate_fixtures(ROOT, [source], project=self.project)
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+            source = Path(directory) / "native.toml"
+            source.write_text((ROOT / "tests/support/native/assemblies/native.toml").read_text())
+            with self.assertRaisesRegex(EvidenceError, "host model"):
+                gate.validate_fixtures(ROOT, [source], project=self.project)
 
     def test_explicit_canonical_input_requires_schema_two(self):
         with tempfile.NamedTemporaryFile(
@@ -416,12 +418,12 @@ class OutputAdmission(unittest.TestCase):
 
     def test_wrong_built_configuration_is_rejected(self):
         with self.assertRaisesRegex(EvidenceError, "configuration"):
-            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f407"},
-                                       {"configuration_sha256": "b", "soc_family": "stm32f407"})
+            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f4"},
+                                       {"configuration_sha256": "b", "soc_family": "stm32f4"})
 
     def test_wrong_built_family_is_rejected_even_if_hash_is_claimed_equal(self):
         with self.assertRaisesRegex(EvidenceError, "family"):
-            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f407"},
+            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f4"},
                                        {"configuration_sha256": "a", "soc_family": "gd32f470"})
 
     def test_budget_failure_is_never_admitted(self):

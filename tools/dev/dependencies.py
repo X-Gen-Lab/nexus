@@ -36,21 +36,37 @@ FAMILY_MODULE = {item.family: tuple(path for _, path in item.git_dependencies)
 
 
 def required_submodules(scope: str, family: str | None = None,
-                        backend: str = "baremetal") -> tuple[str, ...]:
-    if scope in ("native", "sdk", "candidate"):
-        if scope == "native" and family not in (None, "native"):
-            raise EvidenceError("Native dependencies cannot select a hardware family")
-        # Native models compile all maintained vendor headers and host tests.
-        # Firmware/source-SDK exports do not acquire the host test framework.
-        return MODULES if scope == "native" else RUNTIME_MODULES
-    if scope != "arm" or family not in FAMILY_MODULE or backend not in ("baremetal", "freertos", "threadx"):
-        raise EvidenceError("unsupported dependency scope/family/backend")
-    # Family descriptors own every approved compiler dependency, including the
-    # shared Core used by imported GD32 device definitions.
-    selected = list(FAMILY_MODULE[family])
-    if backend != "baremetal":
-        selected.append("ext/" + backend)
-    return tuple(dict.fromkeys(selected))
+                        backend: str = "baremetal", *,
+                        components=(), host_support=False) -> tuple[str, ...]:
+    """Prepare production choices or the explicit maintained host test graph."""
+    if type(host_support) is not bool or (
+            host_support and scope not in {"sdk", "candidate"}):
+        raise EvidenceError("host support is an explicit SDK source profile")
+    if scope == "host-config":
+        if family is not None or backend != "baremetal" or components:
+            raise EvidenceError("host configuration has no MCU source profile")
+        return tuple(item.path for item in
+                     source_catalogue.host_configuration_sources())
+    if scope == "native":
+        if family not in (None, "native"):
+            raise EvidenceError("Native tests cannot select a hardware family")
+        return tuple(item.path for item in ALL_SOURCE_DEPENDENCIES
+                     if item.scope in {"runtime", "host-test"}) + tuple(
+            item.path for item in source_catalogue.host_configuration_sources())
+    if scope not in {"arm", "sdk", "candidate"}:
+        raise EvidenceError("unsupported dependency scope")
+    family = "stm32f4" if family is None and scope != "arm" else family
+    try:
+        return tuple(item.path for item in source_catalogue.runtime_selection(
+            family, backend=backend, components=components))
+    except ValueError as error:
+        raise EvidenceError("unsupported dependency scope/family/backend") from error
+
+
+def _runtime_children(parent):
+    # F4 uses built-in GCC ports. Retain third-party declarations in inventory
+    # without fetching or requiring unrelated port repositories.
+    return () if parent == "ext/freertos" else source_catalogue.children(parent)
 
 
 def _git(root: Path, *arguments: str, check: bool = True,
@@ -265,7 +281,7 @@ def _inspect_sources(root: Path, selected, *, migrating: bool):
         records.append({"path": item.path, "commit": expected})
         identities.append({"path": item.path, "commit": expected,
             "tree": _git(path, "rev-parse", "HEAD^{tree}").stdout.strip()})
-        for child in source_catalogue.children(item.path):
+        for child in _runtime_children(item.path):
             visit(child, links[source_catalogue.relative_path(child)])
 
     for name in selected:
@@ -310,9 +326,12 @@ def _available_sources(root: Path, records):
 
 
 def prepare(root: Path, scope: str, *, family: str | None = None,
-            backend: str = "baremetal", allow_network: bool = False) -> dict:
+            backend: str = "baremetal", components=(),
+            host_support: bool = False,
+            allow_network: bool = False) -> dict:
     root = Path(root).absolute()
-    selected = required_submodules(scope, family, backend)
+    selected = required_submodules(scope, family, backend, components=components,
+                                  host_support=host_support)
     closure = _inspect_sources(root, selected, migrating=allow_network)
     if allow_network:
         _available_sources(root, closure)
@@ -331,7 +350,7 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
             advertised.update(record["path"] for record in closure)
             descendants = []
             for parent in parents:
-                children = source_catalogue.children(parent.path)
+                children = _runtime_children(parent.path)
                 if not children:
                     continue
                 owner = root / parent.path
@@ -344,10 +363,12 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
         closure = _inspect_sources(root, selected, migrating=False)
     if "ext/freertos" in selected:
         from tools.maintenance import freertos_transport
-        freertos_transport.verify(root, parent_index=False)
+        freertos_transport.verify(root, parent_index=False,
+                                  require_children=False)
     records = [record for record in closure if record["path"] in selected]
     return {"schema_version": 1, "kind": "dependency_preparation",
             "scope": scope, "family": family, "backend": backend,
+            "components": sorted(components), "host_support": host_support,
             "network_authorized": allow_network, "submodules": records,
             "recursive_submodules": closure,
             "status": "verified"}
@@ -367,6 +388,11 @@ def preset_selection(root: Path, preset: str) -> dict:
     path = Path(assembly)
     if not path.is_absolute():
         path = root / path
+    test_support = values.get("NEXUS_TEST_SUPPORT", False)
+    if isinstance(test_support, dict):
+        test_support = test_support.get("value")
+    test_support = test_support is True or (
+        isinstance(test_support, str) and test_support.upper() in {"ON", "TRUE", "1"})
     authored = tomllib.loads(regular_file(path).read_text())
     if "board" in authored and "board_package" in authored:
         raise EvidenceError("assembly must choose Board identity or package, not both")
@@ -380,16 +406,24 @@ def preset_selection(root: Path, preset: str) -> dict:
         board_path = directory.resolve() / "board.json"
     else:
         board = identifier(authored.get("board"), "assembly Board")
-        board_path = root / "boards" / board / "board.json"
+        if board == "native_reference":
+            if not test_support:
+                raise EvidenceError("Native Board requires NEXUS_TEST_SUPPORT")
+            board_path = root / "tests/support/native/board/board.json"
+        else:
+            board_path = root / "boards" / board / "board.json"
     facts = load_json(board_path)
     family = facts.get("soc_family")
     backend = authored.get("backend")
     if family == "native":
+        if not test_support:
+            raise EvidenceError("Native Board requires NEXUS_TEST_SUPPORT")
         scope = "native"
     else:
         scope = "arm"
-    required_submodules(scope, family, backend)
-    return {"scope": scope, "family": family, "backend": backend,
+    components = list(authored.get("components", ()))
+    required_submodules(scope, family, backend, components=components)
+    return {"components": components, "test_support": test_support,"scope": scope, "family": family, "backend": backend,
             "preset": preset, "assembly": file_identity(path),
             "board": file_identity(board_path)}
 
@@ -397,7 +431,8 @@ def preset_selection(root: Path, preset: str) -> dict:
 def prepare_preset(root: Path, preset: str, *, allow_network: bool = False) -> dict:
     selection = preset_selection(root, preset)
     return {**prepare(root, selection["scope"], family=selection["family"],
-                     backend=selection["backend"], allow_network=allow_network),
+                     backend=selection["backend"], components=selection["components"],
+                     allow_network=allow_network),
             **selection}
 
 
@@ -841,10 +876,13 @@ def main(argv=None) -> int:
     actions = parser.add_subparsers(dest="operation", required=True)
     child = actions.add_parser("prepare")
     child.add_argument("--root", type=Path, default=ROOT)
-    child.add_argument("--scope", choices=("native", "arm", "sdk", "candidate", "preset"), required=True)
+    child.add_argument("--scope", choices=("native", "arm", "sdk", "candidate",
+                                           "preset", "host-config"), required=True)
     child.add_argument("--preset")
     child.add_argument("--family", choices=tuple(FAMILY_MODULE))
     child.add_argument("--backend", choices=("baremetal", "freertos", "threadx"))
+    child.add_argument("--component", action="append", default=[])
+    child.add_argument("--host-support", action="store_true")
     child.add_argument("--allow-network", action="store_true")
     child.add_argument("--report", type=Path)
     child = actions.add_parser("wheel-export")
@@ -872,12 +910,16 @@ def main(argv=None) -> int:
             if args.scope == "preset":
                 if args.preset is None:
                     parser.error("preset preparation requires --preset")
-                if args.family is not None or args.backend is not None:
-                    parser.error("preset preparation selects family/backend from its assembly")
+                if (args.family is not None or args.backend is not None or
+                        args.component or args.host_support):
+                    parser.error("preset preparation selects its source profile from its assembly")
                 result = prepare_preset(args.root, args.preset, allow_network=args.allow_network)
             else:
                 result = prepare(args.root, args.scope, family=args.family,
-                                 backend=args.backend or "baremetal", allow_network=args.allow_network)
+                                 backend=args.backend or "baremetal",
+                                 components=tuple(args.component),
+                                 host_support=args.host_support,
+                                 allow_network=args.allow_network)
             if args.report:
                 atomic_json(args.report, result)
         elif args.operation == "wheel-export":

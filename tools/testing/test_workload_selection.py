@@ -11,11 +11,19 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class WorkloadSelectionTests(unittest.TestCase):
-    def select(self, kind="UART", selected="", assembly="gd32-f303-baremetal-io.toml"):
+    def select(self, kind="UART", selected="", assembly=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             output = root / "generated"
-            configure(ROOT / "tools/configure/assemblies" / assembly, output, ROOT)
+            if assembly is None:
+                authored = root / "assembly.toml"
+                template = ROOT / "tools/configure/assemblies/qiming-baremetal.toml"
+                authored.write_text(template.read_text().replace(
+                    "[gpio.led0]", "[gpio.output]").replace(
+                    "[uart.uart1", "[uart.serial"))
+            else:
+                authored = ROOT / "tools/configure/assemblies" / assembly
+            configure(authored, output, ROOT)
             script = root / "check.cmake"
             script.write_text(f'include("{ROOT}/cmake/platform/Workload.cmake")\n'
                 f'nexus_workload_identity("{output}" "{kind}" "{selected}" result)\n'
@@ -23,7 +31,7 @@ class WorkloadSelectionTests(unittest.TestCase):
             return subprocess.run([shutil.which("cmake"), "-P", str(script)],
                                   capture_output=True, text=True, timeout=30)
 
-    def test_real_gd303_logical_serial_id_is_selected(self):
+    def test_f4_logical_serial_id_is_selected(self):
         result = self.select()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("SELECTED=NX_UART_ID_SERIAL", result.stdout)
@@ -40,7 +48,7 @@ class WorkloadSelectionTests(unittest.TestCase):
                 self.assertNotEqual(self.select(selected=value).returncode, 0)
 
     def test_no_uart_cannot_silently_select_a_nonexistent_port(self):
-        result = self.select(assembly="gd32-f303-baremetal-empty.toml")
+        result = self.select(assembly="qiming-baremetal-empty.toml")
         self.assertNotEqual(result.returncode, 0)
 
 

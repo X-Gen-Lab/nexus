@@ -16,7 +16,7 @@ from tools.configure import configure, experience, onboarding, selected_contract
 
 ROOT = configure.ROOT
 LIFECYCLE_REFERENCE = (ROOT /
-    "cmake/package/verification/external_provider")
+    "tests/support/external_provider")
 
 
 class ExternalPackageTests(unittest.TestCase):
@@ -34,16 +34,16 @@ class ExternalPackageTests(unittest.TestCase):
         source.mkdir(parents=True)
         configuration.mkdir()
         family = "partner_model"
-        soc = configure.load(ROOT / "soc/native/soc.json")
+        soc = configure.load(ROOT / "tests/support/native/soc.json")
         soc["id"] = family
         (source / "soc.json").write_text(json.dumps(soc), encoding="utf-8")
-        shutil.copyfile(ROOT / "soc/native/routes.json", source / "routes.json")
+        shutil.copyfile(ROOT / "tests/support/native/routes.json", source / "routes.json")
         (source / "CMakeLists.txt").write_text(
             "add_library(nexus_soc_partner_model INTERFACE)\n"
             "target_link_libraries(nexus_soc_partner_model INTERFACE Nexus::IO)\n",
             encoding="utf-8")
         for name in ("__init__.py", "contract.py", "bindings.py", "emission.py"):
-            text = (ROOT / "soc/native/configure" / name).read_text(
+            text = (ROOT / "tests/support/native/configure" / name).read_text(
                 encoding="utf-8")
             text = text.replace('"native"', '"partner_model"')
             if name == "__init__.py":
@@ -56,7 +56,7 @@ class ExternalPackageTests(unittest.TestCase):
         self.reseal(package, manifest)
         board = self.root / (package.name + "-board")
         board.mkdir()
-        facts = configure.load(ROOT / "boards/native_reference/board.json")
+        facts = configure.load(ROOT / "tests/support/native/board/board.json")
         facts["id"] = "package-" + hashlib.sha256(
             package.name.encode()).hexdigest()[:12]
         facts["soc_family"] = family
@@ -91,7 +91,7 @@ class ExternalPackageTests(unittest.TestCase):
 
     def test_independent_family_resolves_and_emits_static_factory(self):
         package, assembly = self.package()
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=True)
         self.assertEqual(result.soc_family, "partner_model")
         self.assertEqual(result.provider_context.provider.PACKAGE_TEST_MARKER, 1)
         self.assertEqual(result.provider_context.directory, package)
@@ -102,7 +102,7 @@ class ExternalPackageTests(unittest.TestCase):
         with self.assertRaises(dataclasses.FrozenInstanceError):
             result.provider_context.directory = ROOT
         output = self.root / "generated"
-        configure.configure(assembly, output)
+        configure.configure(assembly, output, test_support=True)
         self.assertIn("nx_factory_gpio", (output / "bindings.c").read_text())
         self.assertIn(str(package / "soc"),
                       (output / "selection.cmake").read_text())
@@ -114,7 +114,7 @@ class ExternalPackageTests(unittest.TestCase):
     def test_same_family_in_two_packages_never_reuses_other_provider(self):
         first_package, first = self.package("one", 1)
         second_package, second = self.package("two", 2)
-        left, right = configure.resolve_ir(first), configure.resolve_ir(second)
+        left, right = configure.resolve_ir(first, test_support=True), configure.resolve_ir(second, test_support=True)
         self.assertEqual(left.provider_context.provider.PACKAGE_TEST_MARKER, 1)
         self.assertEqual(right.provider_context.provider.PACKAGE_TEST_MARKER, 2)
         self.assertIsNot(left.provider_context.provider,
@@ -130,20 +130,20 @@ class ExternalPackageTests(unittest.TestCase):
                 package, assembly = self.package("case" + str(len(list(self.root.iterdir()))))
                 self.manifest(package, **change)
                 with self.assertRaisesRegex(ValueError, message):
-                    configure.resolve_ir(assembly)
+                    configure.resolve_ir(assembly, test_support=True)
 
     def test_builtin_family_cannot_be_shadowed(self):
         package, assembly = self.package()
-        self.manifest(package, family="native")
+        self.manifest(package, family="stm32f4")
         with self.assertRaisesRegex(ValueError, "shadow|built-in"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     def test_changed_input_is_rejected_before_loading_provider(self):
         package, assembly = self.package()
         entry = package / "configure/__init__.py"
         entry.write_text('raise RuntimeError("unverified code executed")\n')
         with self.assertRaisesRegex(ValueError, "digest|SHA256|identity"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     def test_missing_required_input_is_rejected(self):
         package, assembly = self.package()
@@ -152,7 +152,7 @@ class ExternalPackageTests(unittest.TestCase):
         del value["inputs"]["soc/CMakeLists.txt"]
         self.manifest(package, inputs=value["inputs"])
         with self.assertRaisesRegex(ValueError, "required|CMakeLists"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     def test_declared_input_cannot_escape_package(self):
         package, assembly = self.package()
@@ -161,7 +161,7 @@ class ExternalPackageTests(unittest.TestCase):
         value["inputs"]["../outside.py"] = "0" * 64
         self.manifest(package, inputs=value["inputs"])
         with self.assertRaisesRegex(ValueError, "path|escape|relative"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     @unittest.skipUnless(hasattr(os, "symlink"), "host has no symlink support")
     def test_selected_package_and_input_symlinks_reject(self):
@@ -172,25 +172,25 @@ class ExternalPackageTests(unittest.TestCase):
         assembly.write_text(original.replace('soc_package = "partner"',
                                              'soc_package = "package-link"'))
         with self.assertRaisesRegex(ValueError, "symlink"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
         assembly.write_text(original)
         source = package / "soc/routes.json"
         relocated = self.root / "routes-copy.json"
         source.rename(relocated)
         source.symlink_to(relocated)
         with self.assertRaisesRegex(ValueError, "symlink"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     def test_generation_cannot_withdraw_selected_package(self):
         package, assembly = self.package()
         original = (package / "soc/soc.json").read_bytes()
         with self.assertRaisesRegex(ValueError, "overlap|input|package|protected"):
-            configure.configure(assembly, package)
+            configure.configure(assembly, package, test_support=True)
         self.assertEqual((package / "soc/soc.json").read_bytes(), original)
 
     def test_binding_views_and_provider_check_use_selected_package(self):
         _, assembly = self.package()
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=True)
         facts = experience.binding_facts(configure, result, ROOT)
         view = experience.bindings_view(facts, kind="gpio")
         self.assertEqual(view["selection"]["family"], "partner_model")
@@ -208,12 +208,12 @@ class ExternalPackageTests(unittest.TestCase):
         py_compile.compile(str(helper), doraise=True)
         before = helper.stat()
         self.reseal(package)
-        self.assertEqual(configure.resolve_ir(assembly).provider_context.provider.
+        self.assertEqual(configure.resolve_ir(assembly, test_support=True).provider_context.provider.
                          PACKAGE_TEST_MARKER, 1)
         helper.write_text("PACKAGE_TEST_MARKER = 2\n")
         os.utime(helper, ns=(before.st_atime_ns, before.st_mtime_ns))
         self.reseal(package)
-        self.assertEqual(configure.resolve_ir(assembly).provider_context.provider.
+        self.assertEqual(configure.resolve_ir(assembly, test_support=True).provider_context.provider.
                          PACKAGE_TEST_MARKER, 2)
 
     def test_undeclared_helper_rejects_before_its_code_executes(self):
@@ -224,7 +224,19 @@ class ExternalPackageTests(unittest.TestCase):
         (package / "configure/helper.py").write_text(
             'raise RuntimeError("undeclared code executed")\n')
         with self.assertRaisesRegex(ValueError, "undeclared"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
+
+    def test_external_host_model_requires_explicit_test_support(self):
+        consumer = self.root / "consumer"
+        shutil.copytree(LIFECYCLE_REFERENCE, consumer)
+        execution = subprocess.run(
+            ["cmake", "-S", str(consumer), "-B", str(self.root / "build"),
+             "-G", "Ninja", "-DNEXUS_REFERENCE_PLATFORM_SOURCE=" + str(ROOT)],
+            capture_output=True, text=True, timeout=60,
+            env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertNotEqual(execution.returncode, 0)
+        self.assertIn("Only the STM32F4 production SoC is maintained",
+                      execution.stdout + execution.stderr)
 
     def test_external_source_target_configures_links_and_runs(self):
         """Execute a package-owned C adapter, not a generated-source snapshot."""
@@ -234,7 +246,7 @@ class ExternalPackageTests(unittest.TestCase):
         report = build / "external-lifecycle-google.xml"
         commands = (
             ["cmake", "-S", str(consumer), "-B", str(build), "-G", "Ninja",
-             "-DCMAKE_BUILD_TYPE=Debug",
+             "-DCMAKE_BUILD_TYPE=Debug", "-DNEXUS_TEST_SUPPORT=ON",
              "-DNEXUS_REFERENCE_PLATFORM_SOURCE=" + str(ROOT),
              "-DEXTERNAL_LIFECYCLE_HOST_TESTS=ON",
              "-DNEXUS_REFERENCE_GOOGLETEST_SOURCE=" + str(ROOT / "ext/googletest")],
@@ -272,7 +284,7 @@ class ExternalPackageTests(unittest.TestCase):
             with self.subTest(character=character):
                 package, assembly = self.package("parent" + character)
                 with self.assertRaisesRegex(ValueError, "CMake path"):
-                    configure.resolve_ir(assembly)
+                    configure.resolve_ir(assembly, test_support=True)
 
     def test_package_path_with_spaces_is_supported(self):
         package, assembly = self.package("package with spaces")
@@ -280,7 +292,7 @@ class ExternalPackageTests(unittest.TestCase):
         content = json.loads(board.read_text())
         content["id"] = "space-reference"
         board.write_text(json.dumps(content))
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=True)
         self.assertEqual(result.provider_context.directory, package)
 
     def test_deferred_declared_helper_uses_verified_source(self):
@@ -293,7 +305,7 @@ class ExternalPackageTests(unittest.TestCase):
                          "    from .helper import PACKAGE_TEST_MARKER\n"
                          "    return PACKAGE_TEST_MARKER\n")
         self.reseal(package)
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=True)
         self.assertEqual(result.provider_context.provider.deferred_marker(), 42)
 
     def test_deferred_undeclared_helper_cannot_use_filesystem_fallback(self):
@@ -305,7 +317,7 @@ class ExternalPackageTests(unittest.TestCase):
                          "    return PACKAGE_TEST_MARKER\n")
         self.reseal(package)
         (package / "configure/helper.py").write_text("PACKAGE_TEST_MARKER = 42\n")
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=True)
         with self.assertRaises((ImportError, ValueError)):
             result.provider_context.provider.deferred_marker()
 
@@ -318,7 +330,7 @@ class ExternalPackageTests(unittest.TestCase):
             'max_hz = 1000000\n[spi_device.device]\ncontroller = "bus"\n'
             'driver = "spi-dma-transaction"\n')
         output = self.root / "enhanced-generated"
-        configure.configure(assembly, output)
+        configure.configure(assembly, output, test_support=True)
         self.assertIn("nx_factory_spi_dma_owner_binding",
                       (output / "bindings.c").read_text())
 
@@ -330,7 +342,7 @@ class ExternalPackageTests(unittest.TestCase):
         path.write_text(json.dumps(facts))
         self.reseal(package)
         with self.assertRaisesRegex(ValueError, "External.*inputs"):
-            configure.resolve_ir(assembly)
+            configure.resolve_ir(assembly, test_support=True)
 
     def test_relocation_across_platform_path_order_preserves_identity(self):
         parent = self.root
@@ -341,10 +353,10 @@ class ExternalPackageTests(unittest.TestCase):
         self.root = parent / "a-product"
         self.root.mkdir()
         _, assembly = self.package()
-        original = configure.resolve_ir(assembly, root=platform)
+        original = configure.resolve_ir(assembly, root=platform, test_support=True)
         relocated = parent / "z-product"
         shutil.copytree(self.root, relocated)
-        moved = configure.resolve_ir(relocated / assembly.name, root=platform)
+        moved = configure.resolve_ir(relocated / assembly.name, root=platform, test_support=True)
         self.assertNotEqual(original.provider_context.directory,
                             moved.provider_context.directory)
         self.assertEqual(sorted(original.to_dict()["inputs"],

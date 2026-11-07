@@ -1,4 +1,5 @@
 """Optional factory metadata and nominal IDs exercise actual generated C."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 import subprocess
@@ -17,12 +18,12 @@ class OptionalFactoryTests(unittest.TestCase):
         self.root = Path(self.directory.name)
         self.assembly = self.root / "assembly.toml"
         self.contents = (gate.ROOT /
-                         "tools/configure/assemblies/native-gpio.toml").read_text()
+                         "tests/support/native/assemblies/native-gpio.toml").read_text()
         self.output = self.root / "bundle"
 
     def generate(self, policy=""):
         self.assembly.write_text(self.contents + policy)
-        return gate.configure(self.assembly, self.output)
+        return gate.configure(self.assembly, self.output, test_support=True)
 
     def compile(self, compiler, standard, expression):
         suffix = "c" if compiler == "cc" else "cpp"
@@ -65,7 +66,7 @@ class OptionalFactoryTests(unittest.TestCase):
 
     def test_capability_selection_is_explicit_and_immutable(self):
         self.generate("\n[factory]\ncapabilities = true\n")
-        ir = gate.resolve_ir(self.assembly)
+        ir = gate.resolve_ir(self.assembly, test_support=True)
         self.assertTrue(ir.factory.capabilities)
         with self.assertRaises(FrozenInstanceError):
             ir.factory.capabilities = False
@@ -88,17 +89,16 @@ class OptionalFactoryTests(unittest.TestCase):
         self.assertFalse(self.output.exists())
 
     def test_mcu_capabilities_execute_compiled_getters_and_exact_bounds(self):
-        for fixture in ("stm32_assembly/zg-blocks.toml",
-                        "gd32_assembly/blocks.toml"):
+        for fixture in ("stm32_assembly/zg-blocks.toml",):
             with self.subTest(fixture=fixture):
                 path = gate.ROOT / "tests/contracts" / fixture
-                normalized = gate.load_assembly(path).to_dict()
+                normalized = gate.load_assembly(path, test_support=native_fixture(path)).to_dict()
                 normalized["board_package"] = str(
                     path.parent / normalized["board_package"])
                 normalized["factory"] = {"capabilities": True}
                 assembly = self.root / "mcu.toml"
                 assembly.write_text(render_toml(normalized))
-                result = gate.resolve_ir(assembly)
+                result = gate.resolve_ir(assembly, test_support=native_fixture(assembly))
                 header, getters = factory.emit(result)
                 (self.root / "nexus_factory.h").write_text(header)
                 aliases = []
@@ -143,8 +143,8 @@ class OptionalFactoryTests(unittest.TestCase):
                 self.assertEqual(execution.returncode, 0)
 
     def test_i2c_capabilities_follow_the_actual_public_header_bounds(self):
-        fixture = gate.ROOT / 'tests/contracts/gd32_assembly/i2c-irq.toml'
-        result = gate.resolve_ir(fixture)
+        fixture = gate.ROOT / 'tests/contracts/stm32_assembly/zg-i2c-irq.toml'
+        result = gate.resolve_ir(fixture, test_support=native_fixture(fixture))
         header, getters = factory.emit(result)
         (self.root / 'nexus_factory.h').write_text(header)
         include = self.root / 'include/nexus/io'

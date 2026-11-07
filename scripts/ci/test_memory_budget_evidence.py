@@ -19,9 +19,9 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
             root = Path(name)
             (root / 'scripts/ci').mkdir(parents=True)
             (root / 'CMakeLists.txt').write_text('# Source fixture.\n')
-            for name in ('gd32_memory.py', 'memory_budget.py', 'arch_compile.py'):
+            for name in ('memory_budget.py', 'arch_compile.py'):
                 (root / 'scripts/ci' / name).write_text('# Recorded helper.\n')
-            for module in ('gd32_memory', 'stm32_memory', 'os_threadx'):
+            for module in ('stm32_memory', 'os_threadx'):
                 gate = importlib.import_module(module)
                 before = gate.source_inputs(root)
                 paths = {item['path'] for item in before}
@@ -41,14 +41,14 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
             root = Path(name)
             (root / 'scripts/ci').mkdir(parents=True)
             (root / 'CMakeLists.txt').write_text('# Source fixture.\n')
-            for name in ('gd32_memory.py', 'memory_budget.py', 'arch_compile.py'):
+            for name in ('memory_budget.py', 'arch_compile.py'):
                 (root / 'scripts/ci' / name).write_text('# Recorded helper.\n')
-            for module in ('gd32_memory', 'stm32_memory', 'os_threadx'):
+            for module in ('stm32_memory', 'os_threadx'):
                 gate = importlib.import_module(module)
                 for suffix in ('.c', '.h'):
                     with self.subTest(module=module, suffix=suffix):
                         source = root / (
-                            'drivers/uart/reviewed_ip/driver' + suffix)
+                            'soc/stm32/stm32f4/drivers/uart' + suffix)
                         source.parent.mkdir(parents=True, exist_ok=True)
                         source.write_text('/* Reviewed driver bytes. */\n')
                         before = gate.source_inputs(root)
@@ -89,9 +89,7 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
     def test_small_limit_is_authored_toml_and_preserves_other_regions(self):
         with tempfile.TemporaryDirectory() as name:
             output = Path(name)
-            for family, preset, region in (('stm32', 'zg-ccm', 'ccm'),
-                                          ('gd32', 'both', 'addsram'),
-                                          ('gd32', 'both', 'tcm')):
+            for family, preset, region in (('stm32', 'zg-ccm', 'ccm'),):
                 template = ROOT / 'tests/contracts' / (family + '_memory') / (preset + '.toml')
                 before = template.read_bytes()
                 selected = output / (region + '.toml')

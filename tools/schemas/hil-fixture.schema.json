@@ -18,11 +18,7 @@
     "part": {
       "enum": [
         "STM32F407ZGT6",
-        "STM32F407VET6",
-        "GD32F470ZGT6",
-        "STM32G474RET6",
-        "STM32H743ZIT6",
-        "STM32U575ZIT6Q"
+        "STM32F407VET6"
       ]
     },
     "transport": {
@@ -137,48 +133,6 @@
   "allOf": [
     {
       "if": {
-        "anyOf": [
-          {
-            "properties": {
-              "board": {
-                "enum": [
-                  "stm32g474re-hse24-reference",
-                  "stm32h743-nucleo-zi2",
-                  "stm32h743zi-hsi-reference",
-                  "stm32u575-nucleo-zi-q",
-                  "stm32u575zi-lptim-reference"
-                ]
-              }
-            },
-            "required": [
-              "board"
-            ]
-          },
-          {
-            "properties": {
-              "part": {
-                "enum": [
-                  "STM32G474RET6",
-                  "STM32H743ZIT6",
-                  "STM32U575ZIT6Q"
-                ]
-              }
-            },
-            "required": [
-              "part"
-            ]
-          }
-        ]
-      },
-      "then": {
-        "$ref": "#/$defs/software_reference_target",
-        "required": [
-          "scope"
-        ]
-      }
-    },
-    {
-      "if": {
         "properties": {
           "board": {
             "enum": [
@@ -205,80 +159,6 @@
     }
   ],
   "$defs": {
-    "software_reference_target": {
-      "oneOf": [
-        {
-          "properties": {
-            "board": {
-              "const": "stm32g474re-hse24-reference"
-            },
-            "part": {
-              "const": "STM32G474RET6"
-            }
-          },
-          "required": [
-            "board",
-            "part"
-          ]
-        },
-        {
-          "properties": {
-            "board": {
-              "const": "stm32h743-nucleo-zi2"
-            },
-            "part": {
-              "const": "STM32H743ZIT6"
-            }
-          },
-          "required": [
-            "board",
-            "part"
-          ]
-        },
-        {
-          "properties": {
-            "board": {
-              "const": "stm32h743zi-hsi-reference"
-            },
-            "part": {
-              "const": "STM32H743ZIT6"
-            }
-          },
-          "required": [
-            "board",
-            "part"
-          ]
-        },
-        {
-          "properties": {
-            "board": {
-              "const": "stm32u575-nucleo-zi-q"
-            },
-            "part": {
-              "const": "STM32U575ZIT6Q"
-            }
-          },
-          "required": [
-            "board",
-            "part"
-          ]
-        },
-        {
-          "properties": {
-            "board": {
-              "const": "stm32u575zi-lptim-reference"
-            },
-            "part": {
-              "const": "STM32U575ZIT6Q"
-            }
-          },
-          "required": [
-            "board",
-            "part"
-          ]
-        }
-      ]
-    },
     "software_reference_board_target": {
       "oneOf": [
         {

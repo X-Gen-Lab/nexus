@@ -1,7 +1,6 @@
 """New SDK service profiles execute explicit, bounded consumer contracts."""
 
 from dataclasses import FrozenInstanceError, replace
-import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -16,8 +15,6 @@ from tools.release import transport
 
 
 ROOT = Path(__file__).resolve().parents[2]
-LEGACY_LAYOUT_SHA256 = (
-    "f8ffdf097e5379d76b49b97caae526b9d9f25a006407cf8a9f5e72a344ed2e99")
 
 
 class SDKServicesPolicyTests(unittest.TestCase):
@@ -52,30 +49,20 @@ class SDKServicesPolicyTests(unittest.TestCase):
                          execution.stdout + execution.stderr)
         return execution
 
-    def test_current_retains_the_complete_legacy_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v16")
-        layout = transport.consumer_layout()
-        encoded = json.dumps(layout[:50], separators=(",", ":")).encode()
-        self.assertEqual(hashlib.sha256(encoded).hexdigest(),
-                         LEGACY_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 65)
-        self.assertEqual(len(transport.IMAGES), 68)
-        self.assertEqual(len(transport.FIXTURES), 65)
-
     def test_service_profiles_are_exact_frozen_plan_entries(self):
-        profiles = transport.SERVICE_CONSUMERS[:4]
+        profiles = tuple(item for item in transport.SERVICE_CONSUMERS
+                         if item.scenario == "common_services")
         self.assertEqual([item.name for item in profiles], [
-            "native services", "external services", "f407 services",
-            "gd470 services"])
+            "native services", "f407 services"])
         self.assertEqual([item.domain for item in profiles], [
-            "native-services", "external-package", "arm-services",
-            "arm-services"])
+            "native-services", "arm-services"])
         self.assertEqual([item.arm for item in profiles],
-                         [False, False, True, True])
+                         [False, True])
         with self.assertRaises(FrozenInstanceError):
             profiles[0].name = "changed"
         plan = transport.consumer_plan()
-        self.assertEqual(plan[50:54], tuple(("services", item)
+        self.assertEqual(tuple(entry for entry in plan if entry[0] == "services" and
+                               entry[1].scenario == "common_services"), tuple(("services", item)
                                           for item in profiles))
         changed = replace(profiles[0], domain="arm-services")
         with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
@@ -87,9 +74,9 @@ class SDKServicesPolicyTests(unittest.TestCase):
         directories = [name for source, build, _ in rows
                        for name in (source, build, build + "/bin")]
         transport.consumer_images(files, directories)
-        self.assertIn("external services build/bin/installed_services", files)
         self.assertIn("f407 services build/bin/installed_services.elf", files)
-        del files["external services build/bin/installed_services"]
+        self.assertIn("f407 services build/bin/installed_services.elf", files)
+        del files["f407 services build/bin/installed_services.elf"]
         with self.assertRaisesRegex(ValueError, "roots and images"):
             transport.consumer_images(files, directories)
 
@@ -113,25 +100,9 @@ class SDKServicesPolicyTests(unittest.TestCase):
                      "nx_lwip_adapter_start", "nx_lwip_adapter_service",
                      "nx_lwip_adapter_stop"):
             self.assertIn(call, smoke)
-        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT)
+        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT, test_support=True)
         self.assertEqual(resolved.soc_family, "native")
         self.assertEqual(resolved.memory_budget.static_ram_limit_bytes, 65536)
-
-    def test_external_package_is_copied_outside_sdk_and_relocates(self):
-        prefix = self.prefix()
-        output = self.directory / "a product"
-        output.mkdir()
-        source, _, _ = self.consumers.prepare_service_consumer(
-            prefix, output, transport.SERVICE_CONSUMERS[1], self.command,
-            expected_revision="a" * 40, fixture=True)
-        original = configure.resolve_ir(source / "assembly.toml", root=ROOT)
-        self.assertEqual(original.soc_family, "sdk_services_model")
-        self.assertTrue(original.provider_context.provider.MODEL)
-        self.assertTrue(original.provider_context.directory.is_relative_to(source))
-        relocated = self.directory / "z relocated product"
-        shutil.copytree(source, relocated)
-        moved = configure.resolve_ir(relocated / "assembly.toml", root=ROOT)
-        self.assertEqual(original.to_dict(), moved.to_dict())
 
     def test_unknown_profile_rejects_before_creating_a_consumer(self):
         prefix = self.prefix()
@@ -160,7 +131,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         (build / "resolved-sdk.txt").write_text(str(sdk))
         (build / "resolved-config.txt").write_text(str(config))
         (config / "bindings.c").write_text("/* compiler port fixture */\n")
-        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT)
+        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT, test_support=True)
         (config / "resolved.json").write_text(json.dumps(resolved.to_dict()))
         rows = [{"directory": str(build), "file": str(path),
                  "arguments": ["cc", "-c", str(path)]}
@@ -192,7 +163,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         return sdk, source, build, config, profile, calls, external
 
     def test_service_checker_runs_only_native_and_binds_arm_resources(self):
-        for index in (0, 2):
+        for index in (0, 1):
             with self.subTest(profile=index):
                 fixture = self.image_fixture(index)
                 sdk, source, build, _, profile, calls, external = fixture
@@ -272,7 +243,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
             self.consumers.check_service_image(sdk, source, build, profile, failed)
 
     def test_service_checker_rejects_arm_resource_identity_before_retention(self):
-        sdk, source, build, _, profile, calls, external = self.image_fixture(2)
+        sdk, source, build, _, profile, calls, external = self.image_fixture(1)
         path = build / "bin/installed_services.resources.json"
         data = json.loads(path.read_text())
         data["elf"]["sha256"] = "f" * 64

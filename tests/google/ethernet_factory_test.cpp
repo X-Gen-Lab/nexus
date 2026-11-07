@@ -8,17 +8,9 @@ extern "C" {
 #include "eth_mac.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_ETH_FACTORY_STM32
 #include "stm32f407_eth.h"
 #include "stm32f407_eth_cold.h"
 #include "stm32f407_provider.h"
-#else
-#include "gd32f470_eth.h"
-#include "gd32f470_eth_cold.h"
-#include "gd32f470_provider.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_syscfg.h"
-#endif
 }
 #include <array>
 #include <cstring>
@@ -27,7 +19,6 @@ extern "C" {
 #include <sys/mman.h>
 #include <vector>
 namespace {
-#ifdef NX_ETH_FACTORY_STM32
 using EthColdConfig = nx_stm32_eth_cold_config_t;
 using EthPinReceipt = nx_stm32_eth_pin_receipt_t;
 using EthResourceReceipt = nx_stm32_eth_resource_receipt_t;
@@ -38,18 +29,6 @@ constexpr auto EthResourcesCapture = nx_stm32_eth_resources_capture;
 constexpr auto EthResourcesClose = nx_stm32_eth_resources_close;
 constexpr uint32_t ColdGpioMask =
     RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOGEN;
-#else
-using EthColdConfig = nx_gd32_eth_cold_config_t;
-using EthPinReceipt = nx_gd32_eth_pin_receipt_t;
-using EthResourceReceipt = nx_gd32_eth_resource_receipt_t;
-using EthPinConfig = nx_gd32_platform_pin_config_t;
-constexpr auto EthColdPrepare = nx_gd32_eth_cold_prepare;
-constexpr auto EthColdClose = nx_gd32_eth_cold_close;
-constexpr auto EthResourcesCapture = nx_gd32_eth_resources_capture;
-constexpr auto EthResourcesClose = nx_gd32_eth_resources_close;
-constexpr uint32_t ColdGpioMask =
-    RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN | RCU_AHB1EN_PGEN;
-#endif
 } /* namespace */
 
 using testing::_;
@@ -79,18 +58,10 @@ static uint32_t* registers() {
     return reinterpret_cast<uint32_t*>(s_mac->registers);
 }
 static volatile uint32_t& ahb() {
-#ifdef NX_ETH_FACTORY_STM32
     return RCC->AHB1ENR;
-#else
-    return RCU_AHB1EN;
-#endif
 }
 static volatile uint32_t& mux() {
-#ifdef NX_ETH_FACTORY_STM32
     return SYSCFG->PMC;
-#else
-    return SYSCFG_CFG1;
-#endif
 }
 extern "C" void nx_eth_factory_register_write(volatile uint32_t* address,
                                               uint32_t value) {
@@ -100,7 +71,6 @@ extern "C" void nx_eth_factory_register_write(volatile uint32_t* address,
         return;
     *address = value;
 }
-#ifdef NX_ETH_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_eth_factory_nvic;
@@ -149,49 +119,6 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
         s_pins[port_index(port)][pin] = 0x456U;
     return result;
 }
-#else
-extern "C" {
-NVIC_Type g_gd32_model_nvic;
-}
-/** \brief Model only the external SoC's read-only preflight port. */
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return s_ports->Preflight();
-}
-extern "C" int nx_gd32_soc_start(void) {
-    return s_ports->Start();
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    return s_ports->Stop();
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
-    nx_result_t result = s_ports->Clock(index);
-    if (result == NX_SUCCESS)
-        ahb() |= 1U << index;
-    return result;
-}
-static unsigned port_index(uint32_t port) {
-    return (port - GPIOA) / 0x400U;
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
-    return s_pins[port_index(port)][pin];
-}
-extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
-                                    uint16_t state) {
-    s_ports->Restore(port_index(port), pin, state);
-    if (!s_hold_restore)
-        s_pins[port_index(port)][pin] = state;
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
-                                             uint8_t mode, uint8_t af,
-                                             uint8_t pull, bool drain) {
-    if (mode != 2U || af != 11U || pull != 0U || drain)
-        return NX_ERROR_INVALID;
-    nx_result_t result = s_ports->Configure(port_index(port), pin);
-    if (result == NX_SUCCESS)
-        s_pins[port_index(port)][pin] = 0x456U;
-    return result;
-}
-#endif
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return s_now;
 }
@@ -265,12 +192,7 @@ class EthernetFactory : public testing::Test {
     nx_result_t Memory(const nx_dma_memory_region_t* regions, size_t count,
                        const void* data, size_t length, size_t alignment,
                        nx_dma_direction_t direction) {
-        const size_t reviewed =
-#ifdef NX_ETH_FACTORY_STM32
-            131072U;
-#else
-            196608U;
-#endif
+        const size_t reviewed = 131072U;
         if (count != 1U || regions[0].begin != 0x20000000U ||
             regions[0].size != reviewed || regions[0].permissions != 3U ||
             alignment != 4U || length == 0U ||

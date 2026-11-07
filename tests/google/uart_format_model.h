@@ -37,6 +37,4 @@ void nx_uart_format_model_clock(bool enabled, uint32_t clock);
 #define NX_STM32_UART_ENABLE(registers)                                        \
     nx_uart_format_model_enable((uintptr_t)(registers),                        \
                                 (registers)->CR1 | USART_CR1_UE)
-#define NX_GD32_UART_ENABLE(registers, control)                                \
-    nx_uart_format_model_enable((uintptr_t)(registers), (control))
 #endif

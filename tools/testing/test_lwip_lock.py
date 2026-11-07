@@ -197,17 +197,24 @@ class LwIPSourceLockTests(unittest.TestCase):
             "if p.is_symlink():\n"
             " print('symbolic selector rejected',file=sys.stderr)\n"
             " raise SystemExit(1)\n")
-        script = self.root / "selector.cmake"
+        script = self.root / "CMakeLists.txt"
         script.write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(symbolic_source_selector NONE)\n'
+            'add_library(fixture_config INTERFACE)\n'
+            'add_library(Nexus::Config ALIAS fixture_config)\n'
+            'set_property(TARGET fixture_config PROPERTY NEXUS_SOURCE_DIR "'
+            + self.root.as_posix() + '")\n' +
             'set(NEXUS_LWIP_DEVELOPMENT ON)\n' +
             'set(NEXUS_LWIP_SOURCE "' + alias.as_posix() + '")\n' +
             'set(NEXUS_SOURCE_DIR "' + self.root.as_posix() + '")\n' +
             'set(Python3_EXECUTABLE "' + Path(sys.executable).as_posix() +
             '")\ninclude("' +
             (lwip_lock.ROOT / "components/network/CMakeLists.txt").as_posix() +
-            '")\n')
+            '")\nnexus_add_lwip()\n')
         tool = shutil.which("cmake") or str(lwip_lock.ROOT / ".venv/bin/cmake")
-        executed = subprocess.run([tool, "-P", str(script)],
+        executed = subprocess.run([tool, "-S", str(self.root), "-B",
+                                   str(self.root / "selector build")],
                                   capture_output=True, text=True, timeout=30,
                                   check=False)
         self.assertNotEqual(0, executed.returncode)

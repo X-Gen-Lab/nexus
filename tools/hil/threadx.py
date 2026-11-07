@@ -32,9 +32,12 @@ def contract(resolved):
         board, family = resolved["board"], resolved["soc_family"]
         policy.validate_platform(board, family)
         # Read the owned Board identity instead of copying a chip/Board table.
-        boards = [load_json(path) for path in
-                  (Path(__file__).resolve().parents[2] / "boards").glob(
-                      "*/board.json")]
+        root = Path(__file__).resolve().parents[2]
+        if family == "native" and resolved["cpu"]["arch"] == "native":
+            board_paths = (root / "tests/support/native/board/board.json",)
+        else:
+            board_paths = (root / "boards").glob("*/board.json")
+        boards = [load_json(path) for path in board_paths]
         require(any(item.get("id") == board and
                     item.get("soc_family") == family and
                     item.get("soc") == resolved.get("part") for item in boards),

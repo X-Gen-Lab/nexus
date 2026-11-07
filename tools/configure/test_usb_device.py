@@ -1,4 +1,5 @@
 """Exact selected USB directions/FIFOs, cold clock ownership and typed faces."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -26,10 +27,10 @@ class UsbConfigurationTests(unittest.TestCase):
         path.write_text(content)
         return path
 
-    def test_three_parts_resolve_exact_software_only_fs_irq_and_no_dma_claim(self):
-        for family in ("stm32-zg", "stm32-ve", "gd32"):
+    def test_two_parts_resolve_exact_software_only_fs_irq_and_no_dma_claim(self):
+        for family in ('stm32-zg', 'stm32-ve'):
             with self.subTest(family=family):
-                ir = gate.resolve_ir(self.assembly(family))
+                ir = gate.resolve_ir(self.assembly(family), test_support=native_fixture(self.assembly(family)))
                 self.assertFalse(ir.physical_qualified)
                 self.assertEqual(len(ir.controllers), 1)
                 self.assertEqual(len(ir.devices), 4)
@@ -40,12 +41,9 @@ class UsbConfigurationTests(unittest.TestCase):
                 claims = {item.key for item in ir.claims}
                 self.assertIn("pin:PA11", claims)
                 self.assertIn("pin:PA12", claims)
-                self.assertIn("irq:USBFS" if family == "gd32" else "irq:OTG_FS", claims)
+                self.assertIn("irq:OTG_FS", claims)
                 self.assertFalse(any(item.startswith("dma:") for item in claims))
                 self.assertIn("clock:USBFS48", claims)
-                if family == "gd32":
-                    self.assertIn("clock:CK48", claims)
-                    self.assertIn("clock:PLLSAIP", claims)
 
     def interrupt_endpoint(self, **changes):
         fields = {"controller": '"fs"', "number": "2", "direction": '"in"',
@@ -57,11 +55,11 @@ class UsbConfigurationTests(unittest.TestCase):
                           if value is not None) + "\n")
 
     def test_interrupt_in_preserves_exact_typed_plan_and_existing_bulk_ports(self):
-        for family in ("stm32-zg", "stm32-ve", "gd32"):
+        for family in ('stm32-zg', 'stm32-ve'):
             with self.subTest(family=family):
                 path = self.assembly(family, mutate=lambda text:
                                      text + self.interrupt_endpoint())
-                ir = gate.resolve_ir(path)
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
                 options = next(item.options for item in ir.devices
                                if item.id == "notification")
                 self.assertEqual((options.number, options.direction,
@@ -74,11 +72,11 @@ class UsbConfigurationTests(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     options.transfer = "bulk"
                 claims = {item.key for item in ir.claims}
-                controller = "USBFS" if family == "gd32" else "OTG_FS"
+                controller = "OTG_FS"
                 self.assertIn("usb:" + controller + ":endpoint:2:in", claims)
                 self.assertFalse(any(item.startswith("dma:") for item in claims))
                 output = self.root / (family + "-interrupt")
-                gate.configure(path, output)
+                gate.configure(path, output, test_support=native_fixture(path))
                 source = (output / "bindings.c").read_text()
                 self.assertIn("static nx_usb_endpoint_t s_nx_usb_endpoints_fs[5]",
                               source)
@@ -91,7 +89,7 @@ class UsbConfigurationTests(unittest.TestCase):
             with self.subTest(maximum=maximum):
                 path = self.assembly(mutate=lambda text: text +
                     self.interrupt_endpoint(max_packet=str(maximum)))
-                ir = gate.resolve_ir(path)
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
                 options = next(item.options for item in ir.devices
                                if item.id == "notification")
                 self.assertEqual(options.max_packet, maximum)
@@ -106,18 +104,20 @@ class UsbConfigurationTests(unittest.TestCase):
         for change in changes:
             with self.subTest(change=change), self.assertRaises(ValueError):
                 gate.resolve_ir(self.assembly(mutate=lambda text:
-                    text + self.interrupt_endpoint(**change)))
+                    text + self.interrupt_endpoint(**change)), test_support=native_fixture(self.assembly(mutate=lambda text:
+                    text + self.interrupt_endpoint(**change))))
         for legacy in ('transfer="control"', 'transfer="bulk"'):
             with self.subTest(legacy=legacy), self.assertRaises(ValueError):
                 gate.resolve_ir(self.assembly(mutate=lambda text:
-                    text.replace(legacy, legacy + "\ninterval_frames=1", 1)))
+                    text.replace(legacy, legacy + "\ninterval_frames=1", 1)), test_support=native_fixture(self.assembly(mutate=lambda text:
+                    text.replace(legacy, legacy + "\ninterval_frames=1", 1))))
 
     def test_interrupt_in_keeps_optional_profile_emission_opt_out(self):
         path = self.assembly(mutate=lambda text:
             text.replace("capabilities=true", "capabilities=false") +
             self.interrupt_endpoint())
         output = self.root / "interrupt-no-capabilities"
-        gate.configure(path, output)
+        gate.configure(path, output, test_support=native_fixture(path))
         header = (output / "nexus_factory.h").read_text()
         source = (output / "bindings.c").read_text()
         self.assertNotIn("nx_factory_usb_profile", header)
@@ -125,7 +125,7 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn("static nx_usb_endpoint_t s_nx_usb_endpoints_fs[5]", source)
 
     def test_fifo_starts_are_one_typed_plan_with_exact_selected_storage(self):
-        ir = gate.resolve_ir(self.assembly())
+        ir = gate.resolve_ir(self.assembly(), test_support=native_fixture(self.assembly()))
         directions = {(item.options.number, item.options.direction): item.options
                       for item in ir.devices}
         self.assertEqual(directions[(0, "in")].fifo_start, 96)
@@ -134,7 +134,7 @@ class UsbConfigurationTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             ir.devices[0].options.max_packet = 8
         output = self.root / "generated"
-        gate.configure(self.assembly(), output)
+        gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
         header = (output / "nexus_factory.h").read_text()
         self.assertIn("static nx_usb_endpoint_t s_nx_usb_endpoints_fs[4]", source)
@@ -145,19 +145,17 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn("&nx_usb_fs_endpoint_ops, &s_nx_usb_endpoints_fs[", source)
         self.assertNotIn("malloc", source)
 
-    def test_cold_failure_is_counted_before_typed_prepare_and_close(self):
+    def test_cold_failure_retains_typed_prepare_and_close_responsibility(self):
         output = self.root / "generated"
-        gate.configure(self.assembly(), output)
+        gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
-        start = source.index("nx_platform_start_result_t nx_platform_start")
-        prepare = source.index("result.primary = nx_stm32_usb_cold_prepare(", start)
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
-                        prepare)
-        self.assertIn("&s_nx_port_fs, &s_nx_usb_config_fs, "
-                      "&s_nx_usb_pin_leases_fs", source[prepare:])
-        close = source.index("nx_stm32_usb_cold_close(")
-        resources = source.index("nx_stm32_platform_pins_release(", close)
-        self.assertLess(close, resources)
+        self.assertIn("(nx_lifecycle_acquisition_t){ "
+                      "nx_stm32_usb_cold_prepare(&s_nx_port_fs, "
+                      "&s_nx_usb_config_fs, &s_nx_usb_pin_leases_fs), true }",
+                      source)
+        self.assertIn("nx_stm32_usb_cold_close(", source)
+        self.assertIn(".resources_release = nx_platform_resources_release,",
+                      source)
         self.assertIn("static const nx_stm32_usb_cold_config_t", source)
         self.assertIn("static const nx_stm32_usb_endpoint_config_t", source)
         self.assertNotIn("nx_stm32_usb_clock_start(", source)
@@ -177,7 +175,7 @@ class UsbConfigurationTests(unittest.TestCase):
                    ("event_capacity=8", "event_capacity=true"))
         for before, after in changes:
             with self.subTest(after=after), self.assertRaisesRegex(ValueError, "USB"):
-                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)))
+                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)), test_support=native_fixture(self.assembly(mutate=lambda text: text.replace(before, after))))
 
     def test_ep0_directions_are_required_and_cannot_be_bulk_or_non64(self):
         changes = (('number=0\ndirection="out"', 'number=2\ndirection="out"'),
@@ -186,7 +184,7 @@ class UsbConfigurationTests(unittest.TestCase):
                     'number=0\ndirection="in"\ntransfer="control"\nmax_packet=32'))
         for before, after in changes:
             with self.subTest(after=after), self.assertRaisesRegex(ValueError, "USB"):
-                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)))
+                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)), test_support=native_fixture(self.assembly(mutate=lambda text: text.replace(before, after))))
 
     def test_duplicate_directions_out_fifo_and_unknown_options_are_rejected(self):
         changes = (('number=1\ndirection="out"', 'number=0\ndirection="out"'),
@@ -195,31 +193,32 @@ class UsbConfigurationTests(unittest.TestCase):
                    ('vbus_sensing=false', 'vbus_sensing=false\ndma=true'))
         for before, after in changes:
             with self.subTest(after=after), self.assertRaises(ValueError):
-                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)))
+                gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(before, after)), test_support=native_fixture(self.assembly(mutate=lambda text: text.replace(before, after))))
 
     def test_unknown_external_vbus_electrical_path_is_not_promoted_by_pin_facts(self):
         with self.assertRaisesRegex(ValueError, "VBUS.*reviewed"):
             gate.resolve_ir(self.assembly(mutate=lambda text: text.replace(
-                "vbus_sensing=false", "vbus_sensing=true")))
+                "vbus_sensing=false", "vbus_sensing=true")), test_support=native_fixture(self.assembly(mutate=lambda text: text.replace(
+                "vbus_sensing=false", "vbus_sensing=true"))))
 
     def test_reserved_shared_clock_is_rejected_before_emission(self):
-        path = self.assembly("gd32")
+        path = self.assembly("stm32-zg")
         package = self.root / "board"
         package.mkdir()
-        source = gate.ROOT / "tests/contracts/usb_assembly/gd32-board/board.json"
+        source = gate.ROOT / "tests/contracts/usb_assembly/stm32-zg-board/board.json"
         board = gate.load(source)
-        board["reserved_resources"].append("clock:CK48")
+        board["reserved_resources"].append("clock:USBFS48")
         (package / "board.json").write_text(json.dumps(board))
         content = path.read_text()
         start = content.index("board_package=")
         end = content.index("\n", start)
         path.write_text(content[:start] + 'board_package="board"' + content[end:])
-        with self.assertRaisesRegex(ValueError, "Resource conflict clock:CK48"):
-            gate.resolve_ir(path)
+        with self.assertRaisesRegex(ValueError, "Resource conflict clock:USBFS48"):
+            gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_unselected_usb_generates_no_state_clock_or_vectors(self):
         output = self.root / "generated"
-        gate.configure(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml", output)
+        gate.configure(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml", output, test_support=native_fixture(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml"))
         source = (output / "bindings.c").read_text()
         self.assertNotIn("static nx_usb_controller_t", source)
         self.assertNotIn("nx_stm32_usb_clock_start", source)

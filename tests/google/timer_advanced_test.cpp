@@ -7,58 +7,15 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#ifdef NX_TIMER_GD_MODEL
-#include "gd32f470_timer_advanced.h"
-#include "gd32f4xx.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_timer.h"
-#else
+#include "nexus/arch/arch.h"
 #include "stm32f407_timer_advanced.h"
 #include "stm32f407xx.h"
-#endif
-#include "nexus/arch/arch.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
-#ifdef NX_TIMER_GD_MODEL
-#define CAP_INIT    nx_gd32_timer_capture_initialize
-#define CAP_RELEASE nx_gd32_timer_capture_release
-#define CAP_IRQ     nx_gd32_timer_capture_irq
-#define CAP_OPS     nx_gd32_timer_capture_ops
-#define ADV_INIT    nx_gd32_advanced_pwm_initialize
-#define ADV_RELEASE nx_gd32_advanced_pwm_release
-#define ADV_IRQ     nx_gd32_advanced_pwm_irq
-#define ADV_OPS     nx_gd32_advanced_pwm_ops
-#define CAP_HZ      100000000U
-#define ADV_HZ      200000000U
-#define CAP_CR1     TIMER_CTL0(TIMER3)
-#define CAP_CR2     TIMER_CTL1(TIMER3)
-#define CAP_SMCR    TIMER_SMCFG(TIMER3)
-#define CAP_PSC     TIMER_PSC(TIMER3)
-#define CAP_ARR     TIMER_CAR(TIMER3)
-#define CAP_CCR     TIMER_CH0CV(TIMER3)
-#define CAP_EGR     TIMER_SWEVG(TIMER3)
-#define CAP_CCMR    TIMER_CHCTL0(TIMER3)
-#define CAP_CCER    TIMER_CHCTL2(TIMER3)
-#define CAP_DIER    TIMER_DMAINTEN(TIMER3)
-#define CAP_SR      TIMER_INTF(TIMER3)
-#define ADV_CR1     TIMER_CTL0(TIMER0)
-#define ADV_SMCR    TIMER_SMCFG(TIMER0)
-#define ADV_RCR     TIMER_CREP(TIMER0)
-#define ADV_PSC     TIMER_PSC(TIMER0)
-#define ADV_ARR     TIMER_CAR(TIMER0)
-#define ADV_CCR     TIMER_CH0CV(TIMER0)
-#define ADV_CCMR    TIMER_CHCTL0(TIMER0)
-#define ADV_CCER    TIMER_CHCTL2(TIMER0)
-#define ADV_DIER    TIMER_DMAINTEN(TIMER0)
-#define ADV_BDTR    TIMER_CCHP(TIMER0)
-#define ADV_SR      TIMER_INTF(TIMER0)
-#define BREAK_INPUT GPIO_ISTAT(GPIOB)
-#else
 #define CAP_INIT    nx_stm32_timer_capture_initialize
 #define CAP_RELEASE nx_stm32_timer_capture_release
 #define CAP_IRQ     nx_stm32_timer_capture_irq
@@ -92,7 +49,6 @@ extern "C" {
 #define ADV_BDTR    TIM1->BDTR
 #define ADV_SR      TIM1->SR
 #define BREAK_INPUT GPIOB->IDR
-#endif
 
 static bool s_isr;
 static bool s_privileged;
@@ -212,17 +168,6 @@ class TimerHardware : public ::testing::Test {
         s_edge_before_capture_read = false;
         s_edge_after_capture_read = false;
         s_observation = nullptr;
-#ifdef NX_TIMER_GD_MODEL
-        RCU_APB1EN = RCU_APB1EN_TIMER3EN;
-        RCU_APB2EN = RCU_APB2EN_TIMER0EN;
-        RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
-        RCU_AHB1EN = RCU_AHB1EN_PAEN | RCU_AHB1EN_PBEN;
-        GPIO_CTL(GPIOA) = 2U << 16U;
-        GPIO_AFSEL1(GPIOA) = 1U;
-        GPIO_CTL(GPIOB) = (2U << 12U) | (10U << 24U);
-        GPIO_AFSEL0(GPIOB) = 2U << 24U;
-        GPIO_AFSEL1(GPIOB) = 17U << 16U;
-#else
         RCC->APB1ENR = RCC_APB1ENR_TIM4EN;
         RCC->APB2ENR = RCC_APB2ENR_TIM1EN;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
@@ -232,7 +177,6 @@ class TimerHardware : public ::testing::Test {
         GPIOB->MODER = (2U << 12U) | (10U << 24U);
         GPIOB->AFR[0] = 2U << 24U;
         GPIOB->AFR[1] = 17U << 16U;
-#endif
     }
     void edge(uint32_t ticks, uint32_t flags = 2U) {
         CAP_CCR = ticks;
@@ -553,11 +497,7 @@ TEST_F(TimerHardware, CaptureRejectsAlteredInputSelectionAtStart) {
 }
 
 TEST_F(TimerHardware, BothColdConstructorsRequireActualSelectedClockGates) {
-#ifdef NX_TIMER_GD_MODEL
-    RCU_APB1EN = RCU_APB2EN = 0U;
-#else
     RCC->APB1ENR = RCC->APB2ENR = 0U;
-#endif
     EXPECT_EQ(CAP_INIT(&capture, &cap_config), NX_ERROR_STATE);
     EXPECT_EQ(ADV_INIT(&advanced, &adv_config), NX_ERROR_STATE);
     EXPECT_EQ(s_writes, 0U);

@@ -10,10 +10,14 @@ function(nexus_resolve_assembly)
     get_filename_component(assembly "${NEXUS_ASSEMBLY_FILE}" ABSOLUTE
         BASE_DIR "${CMAKE_SOURCE_DIR}")
     set(bundle "${NEXUS_BINARY_DIR}/generated")
+    set(test_support_arguments)
+    if(NEXUS_TEST_SUPPORT)
+        list(APPEND test_support_arguments --test-support)
+    endif()
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
         --source-root "${NEXUS_SOURCE_DIR}" --assembly "${assembly}"
-        --output "${bundle}" RESULT_VARIABLE result
+        --output "${bundle}" ${test_support_arguments} RESULT_VARIABLE result
         OUTPUT_VARIABLE output ERROR_VARIABLE error)
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "Configuration rejected: ${output}${error}")
@@ -30,6 +34,7 @@ function(nexus_resolve_assembly)
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
     endforeach()
     foreach(value NEXUS_SOC_FAMILY NEXUS_SOC_SOURCE_DIRECTORY NEXUS_EXACT_PART NEXUS_BACKEND
+                  NEXUS_STM32_DEVICE NEXUS_STM32_STARTUP
                   NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
                   NEXUS_ARCH_HAS_DWT_CYCCNT NEXUS_IRQ_PRIORITY_BITS
                   NEXUS_ARCH_MPU_VERSION NEXUS_ARCH_ICACHE_LINE_BYTES

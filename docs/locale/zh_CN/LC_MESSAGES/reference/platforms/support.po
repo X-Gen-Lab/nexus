@@ -1,4 +1,4 @@
-# Authored translation; review state is explicit in catalog metadata.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,228 +8,144 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a0a95d66c8b4d443b6664e1ffa402ccea3452335a1c879eff982cf6125181a55\n"
+"X-Nexus-Source-SHA256: 93fd10703541a2d6f078de742f3f64d21c6b50f0a007b471a61e0ca877754103\n"
 
-msgid "Read exact platform support"
-msgstr "理解精确平台支持"
+#: docs/reference/platforms/support.md:9
+msgid "读取精确平台支持"
+msgstr "读取精确平台支持"
 
+#: docs/reference/platforms/support.md:11
 msgid ""
-"Support has five separate dimensions: chip fact, maintained provider/mode, "
-"reviewed Board route, executed software scope and physical station scope. "
-"The [derived capability matrix](../../delivery/capabilities.md) owns "
-"mode/route/ fixture/source associations. The [support "
-"record](../../delivery/support.md) owns current detailed limits; this page "
-"explains how to select them."
+"当前生产系列入口是 STM32F4，已迁入的实现限定 STM32F407VET6 与 STM32F407ZGT6。 同系列名称、官方 SDK "
+"文件或器件宏存在，不代表其他 F4 型号已经适配。"
 msgstr ""
-"支持分为五个独立维度：芯片事实、维护的提供者/模式、复核 Board "
-"路由、实际软件执行范围和物理工位范围。[派生能力矩阵](../../delivery/capabilities.md)拥有模式/路由/夹具/源码关联。[支持记录](../../delivery/support.md)拥有当前详细限制；本页说明如何选择。"
+"当前生产系列入口是 STM32F4，已迁入的实现限定 STM32F407VET6 与 STM32F407ZGT6。 同系列名称、官方 SDK "
+"文件或器件宏存在，不代表其他 F4 型号已经适配。"
 
-msgid "Platform"
-msgstr "平台"
+#: docs/reference/platforms/support.md:0
+msgid "维度"
+msgstr "维度"
 
-msgid "Maintained selection and essential boundary"
-msgstr "维护选择与关键边界"
+#: docs/reference/platforms/support.md:0
+msgid "当前含义"
+msgstr "当前含义"
 
-msgid "Native"
-msgstr "Native"
+#: docs/reference/platforms/support.md:0
+msgid "芯片事实"
+msgstr "芯片事实"
 
+#: docs/reference/platforms/support.md:0
+msgid "精确料号、封装、Flash／RAM 和允许路线"
+msgstr "精确料号、封装、Flash／RAM 和允许路线"
+
+#: docs/reference/platforms/support.md:0
+msgid "实现与模式"
+msgstr "实现与模式"
+
+#: docs/reference/platforms/support.md:0
+msgid "F4 provider 明确维护的有限模式"
+msgstr "F4 provider 明确维护的有限模式"
+
+#: docs/reference/platforms/support.md:0
+msgid "Board"
+msgstr "Board"
+
+#: docs/reference/platforms/support.md:0
+msgid "四个独立 F407 包中已审查的连接与条件"
+msgstr "四个独立 F407 包中已审查的连接与条件"
+
+#: docs/reference/platforms/support.md:0
+msgid "软件验证"
+msgstr "软件验证"
+
+#: docs/reference/platforms/support.md:0
+msgid "精确源码、配置、工具和本次实际执行"
+msgstr "精确源码、配置、工具和本次实际执行"
+
+#: docs/reference/platforms/support.md:0
+msgid "物理验证"
+msgstr "物理验证"
+
+#: docs/reference/platforms/support.md:0
+msgid "同一镜像、PCB、station 和真实观测"
+msgstr "同一镜像、PCB、station 和真实观测"
+
+#: docs/reference/platforms/support.md:22
 msgid ""
-"Independent host models, POSIX behavior and real selected RTOS host tests; "
-"no MCU qualification"
-msgstr "独立主机模型、POSIX 行为和实际选定 RTOS 主机测试；不建立 MCU 资格"
-
-msgid "F407ZG Qiming / F407VE Sky"
-msgstr "F407ZG 启明 / F407VE 天空星"
-
-msgid ""
-"Exact M4F parts and separate Board facts; broad explicit F407 modes, "
-"baremetal/FreeRTOS and reviewed ThreadX M4 subset"
-msgstr "精确 M4F 料号和各自 Board 事实；明确选择广泛 F407 模式、裸机/FreeRTOS 与复核 ThreadX M4 子集"
-
-msgid "F470ZG Liangshan"
-msgstr "F470ZG 梁山派"
-
-msgid ""
-"Exact GD32 M4F provider and Board; broad explicit modes, baremetal/FreeRTOS "
-"and reviewed ThreadX M4 subset"
-msgstr "精确 GD32 M4F 提供者与 Board；明确选择广泛模式、裸机/FreeRTOS 与复核 ThreadX M4 子集"
-
-msgid "F103RB / GD303RC references"
-msgstr "F103RB / GD303RC 参考"
-
-msgid ""
-"Exact legacy GPIO/UART/SPI plus finite channel-DMA UART, IRQ-message I2C, "
-"physical Flash, single ADC and fixed PWM; finite RX has rearm gaps and I2C "
-"priority-zero IRQs cannot notify a kernel"
+"模式限制见[详细支持](../../delivery/support.md)，路线、夹具和生产源码关联见 "
+"[派生矩阵](../../delivery/capabilities.md)，目录见[源码图](../../explanation/source-"
+"map.md)。"
 msgstr ""
-"精确 legacy GPIO/UART/SPI，加有限 channel-DMA UART、IRQ 消息 I2C、物理 Flash、单次 ADC 和固定 "
-"PWM；有限 RX 有 rearm 间隙，I2C priority0 IRQ 不能调用内核通知"
+"模式限制见[详细支持](../../delivery/support.md)，路线、夹具和生产源码关联见 "
+"[派生矩阵](../../delivery/capabilities.md)，目录见[源码图](../../explanation/source-"
+"map.md)。"
 
-msgid "G474RE source reference"
-msgstr "G474RE 来源参考"
+#: docs/reference/platforms/support.md:25
+msgid "当前可选择范围"
+msgstr "当前可选择范围"
 
-msgid ""
-"GPIO, six IRQ UARTs, polling SPI, fixed PWM, IWDG and EXTI; selected ADC1 "
-"bulb-sampling single conversions and finite TIM6 DMA blocks, polling I2C1 "
-"and ECC Flash; no continuous ADC or inherited F407 modes"
-msgstr ""
-"GPIO、六个 IRQ UART、轮询 SPI、固定 PWM、IWDG 和 EXTI；所选 ADC1 bulb 采样单次转换和有限 TIM6 DMA 块、轮询 "
-"I2C1 与 ECC Flash；不提供连续 ADC，也不继承 F407 其他模式"
+#: docs/reference/platforms/support.md:27
+msgid "启明 F407ZG V3.1、独立核心板和 V4.1 保留不同来源与装配身份。"
+msgstr "启明 F407ZG V3.1、独立核心板和 V4.1 保留不同来源与装配身份。"
 
-msgid "H743ZI reference selections"
-msgstr "H743ZI 参考选择"
-
-msgid ""
-"Fixed HSI32/HSI64 and Cache off/on; base selections provide finite USART3 "
-"TX DMA or RX DMA-IDLE, optional initialized D2 SRAM1 and selected "
-"SPI/I2C/ADC/PWM/EXTI/IWDG/Flash; separate V-revision/HSI64/baremetal/AXI "
-"SRAM selections provide continuous USART3 RX or finite TX DMA with "
-"continuous RX; Flash requires Cache off; no running-state handoff"
-msgstr ""
-"固定 HSI32/HSI64 与 Cache off/on；基础选择提供有限 USART3 TX DMA 或 RX DMA-IDLE、可选已初始化 D2 "
-"SRAM1 和所选 SPI/I2C/ADC/PWM/EXTI/IWDG/Flash；独立 V 修订／HSI64／裸机／AXI SRAM 选择提供 USART3 连续 RX，"
-"或有限 TX DMA 与连续 RX 的双向模式；Flash 要求 Cache off；不提供运行态交接"
-
-msgid "U575ZI-Q default reference"
-msgstr "U575ZI-Q 默认参考"
-
-msgid ""
-"Externally established TZEN=0/SWAP_BANK=0 and MSIS4; default IRQ-byte UART "
-"plus GPIO/IWDG and selected finite SPI/I2C/ADC/PWM/EXTI/Flash; separate "
-"USART1 selections provide finite SRAM1 GPDMA TX or a bounded hardware TX "
-"chain, with IRQ-byte RX; external ADC supply admission; no RX DMA or "
-"dual-domain factory"
-msgstr ""
-"外部已建立 TZEN=0/SWAP_BANK=0 与 MSIS4；默认 IRQ-byte UART，加 GPIO/IWDG 和所选有限 "
-"SPI/I2C/ADC/PWM/EXTI/Flash；独立 USART1 选择提供有限 SRAM1 GPDMA TX 或有界硬件 TX 链，RX 保持 IRQ bytes；"
-"ADC 供电由外部准入；不提供 RX DMA 或双域 factory"
-
-msgid "U575 separate dual-domain reference"
-msgstr "U575 独立双域参考"
-
-msgid ""
-"TZEN=1, no OS; synchronous scalar gateway and copied cooperative jobs of at "
-"most eight PC7 commands in Secure storage; no retained NS pointer or generic"
-" asynchronous cross-domain transport"
-msgstr ""
-"TZEN=1、无 OS；同步 scalar gateway 与最多八条 PC7 命令复制到 Secure 存储的 cooperative job；不保留"
-" NS 指针，不提供通用异步跨域 transport"
-
-msgid "CPU-only Runtime"
-msgstr "CPU-only Runtime"
-
-msgid ""
-"M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch and selected baremetal/FreeRTOS "
-"software profiles; no generated SoC/Board/factory"
-msgstr ""
-"M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch 及选定裸机/FreeRTOS 软件配置；不生成 "
-"SoC/Board/factory"
-
-msgid ""
-"ThreadX currently maintains Native Linux GNU and M4 GNU profiles; it does "
-"not inherit the FreeRTOS Cortex-M, MPU, split-security or tickless matrix. "
-"Platform startup does not enter either kernel. The application owns "
-"scheduler startup."
-msgstr ""
-"ThreadX 当前维护 Native Linux GNU 与 M4 GNU 配置；不继承 FreeRTOS Cortex-M、MPU、分裂安全状态或 "
-"tickless 矩阵。平台启动不进入任何内核。应用拥有调度器启动。"
-
-msgid ""
-"![CPU primitive, runtime, SoC and physical qualification "
-"boundaries](../../assets/diagrams/cortex-m-capabilities.svg)"
-msgstr ""
-"![CPU 原语、runtime、SoC 与物理资格边界](../../assets/diagrams/cortex-m-"
-"capabilities.svg)"
-
-msgid "CPU primitive, runtime, SoC and physical qualification boundaries"
-msgstr "CPU 原语、runtime、SoC 与物理资格边界"
-
-msgid ""
-"FIG-13 separates CPU software coverage from exact SoC integration and "
-"physical acceptance. FPU, DSP, Cache, MVE, SAU and IRQ width are explicit "
-"required facts; a CPU name never enables an optional capability "
-"automatically."
-msgstr ""
-"FIG-13 分开 CPU 软件覆盖、精确 SoC 接入和物理验收。FPU、DSP、缓存、MVE、SAU 和 IRQ 优先级位宽必须作为明确事实；CPU"
-" 名称绝不自动启用可选能力。"
-
-msgid "Check a selection before using it"
-msgstr "使用前核对选择"
-
-msgid ""
-"Find the exact full part and Board package, including unknown physical "
-"facts."
-msgstr "确认精确完整料号与 Board 包，包括未知物理事实。"
-
-msgid ""
-"Inspect the selected controller route and mode in the capability matrix."
-msgstr "在能力矩阵核对选定控制器路由与模式。"
-
-msgid ""
-"Resolve the actual complete assembly; unsupported modes and conflicts "
-"reject."
-msgstr "解析实际完整 assembly；不支持模式和冲突会拒绝。"
-
-msgid ""
-"Check software evidence for its exact source/configuration, not a nearby "
-"tuple."
-msgstr "核对精确源码/配置的软件证据，不能使用近似组合。"
-
-msgid "Check an actual station record before claiming physical behavior."
-msgstr "声明物理行为前核对实际工位记录。"
-
-msgid ""
-"All maintained MCU physical HIL remains not executed in the current records."
-" Default Board bindings do not cover every connector, transceiver or "
-"external part. Finite block modes include rearm gaps. Continuous modes need "
-"explicit replacement storage and service budgets; they do not promise "
-"losslessness under arbitrary load. Flash geometry is physical, while product"
-" partitions and update policy are external. ECC `program_flags` can require "
-"proven fresh erase before each program unit; all-FF readback cannot "
-"establish erased ECC history. Every started pulse settles before return, and"
-" deadlines only prevent later pulses. These source mechanisms and their "
-"developer tests do not inherit final qualification from historical results. "
-"Exact current-source software execution is recorded separately."
-msgstr ""
-"当前记录中全部维护 MCU 的物理 HIL 均未执行。默认 Board binding 不覆盖每个 connector、transceiver "
-"或外部器件。有限 block 模式有 rearm 间隙；连续模式也需显式替换存储与 service 预算，不保证任意负载下无丢失。Flash "
-"geometry 是物理事实，产品分区和升级策略由外部负责。ECC `program_flags` 可以要求每个编程单元有可证明的新擦除；全 FF "
-"读回不能证明 ECC 擦除历史。每个已启动脉冲先排空再返回，deadline "
-"只阻止后续脉冲。这些源机制及开发测试不继承历史结果的最终资格；精确当前源码的软件执行另行记录。"
-
-msgid ""
-"![Selected U575 synchronous Secure/NonSecure "
-"reference](../../assets/diagrams/u575-security-domains.svg)"
-msgstr ""
-"![选定 U575 同步 Secure/NonSecure 参考](../../assets/diagrams/u575-security-"
-"domains.svg)"
-
-msgid "Selected U575 synchronous Secure/NonSecure reference"
-msgstr "选定 U575 同步 Secure/NonSecure 参考"
-
-msgid ""
-"FIG-14 applies only to its declared TZEN=1 synchronous reference. It does "
-"not change the default TZEN=0 Platform configuration or establish physical "
-"isolation. Read [qualification](qualification.md) before treating any "
-"software result as a release."
-msgstr ""
-"FIG-14 仅适用其声明的 TZEN=1 同步参考。不改变默认 TZEN=0 Platform "
-"配置，也不建立物理隔离。把软件结果视为发布前先阅读[资格](qualification.md)。"
+#: docs/reference/platforms/support.md:28
+msgid "天空星 F407VE 青春版使用其独立封装和 PCB 事实。"
+msgstr "天空星 F407VE 青春版使用其独立封装和 PCB 事实。"
 
 #: docs/reference/platforms/support.md:29
+msgid "裸机、FreeRTOS 和明确维护的 ThreadX M4 子集分别选择；启动不进入内核。"
+msgstr "裸机、FreeRTOS 和明确维护的 ThreadX M4 子集分别选择；启动不进入内核。"
+
+#: docs/reference/platforms/support.md:30
 msgid ""
-"The [F103 source boundary](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md) separates the CPU-"
-"readable 128 KiB Flash-density check from its declared orderable part. ES096"
-" section2.2.2 prevents normal firmware from observing the debug-only device "
-"group and revision. Standalone startup does not require a debugger, and an "
-"unavailable zero read cannot establish a reviewed silicon revision."
+"Native 只属于 `tests/support/native/`，需要 `test_support=True`、CLI `--test-"
+"support` 或声明了 `NEXUS_TEST_SUPPORT=ON` 的测试 preset。"
 msgstr ""
-"[F103 来源边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f103/README.md) 将 CPU 可读的 128 KiB Flash "
-"密度检查与配置声明的完整料号分开。ES096 第 2.2.2 "
-"节说明，正常固件不能观测仅调试模式可读的设备组和修订。独立启动不要求连接调试器，也不能凭不可用的零读取值建立已审硅片修订。"
+"Native 只属于 `tests/support/native/`，需要 `test_support=True`、CLI `--test-"
+"support` 或声明了 `NEXUS_TEST_SUPPORT=ON` 的测试 preset。"
 
+#: docs/reference/platforms/support.md:32
+msgid "Core／Arch 的 CPU 软件能力与具体 SoC 集成分开，不从 CPU 名称推导芯片支持。"
+msgstr "Core／Arch 的 CPU 软件能力与具体 SoC 集成分开，不从 CPU 名称推导芯片支持。"
 
-msgid "F407 `dma-tx` selects official HAL finite TX and a disjoint LL IRQ-byte/event receiver under one private static owner. It keeps the existing public mode, shared ops, cancellation and drain contracts; other F407 UART modes retain their existing engines. Private UART/DMA/RCC source selection does not start HAL SysTick or establish whole-library support. Read the [exact transport contract](../../design/official-stm32-provider.md#selected-f407-hal-uart-transport) and current-source evidence before selecting it. Exact linked cost, final-source evidence and physical HIL remain separate exits."
-msgstr "F407 `dma-tx` 在一个私有静态 owner 内选择官方 HAL 有限 TX 和分离的 LL IRQ byte/event 接收器。它保留既有公共 mode、共享 ops、取消和 drain 合同；其他 F407 UART 模式保留既有引擎。私有 UART/DMA/RCC 源码选择不会启动 HAL SysTick，也不建立整库支持。选择前阅读[精确 transport 合同](../../design/official-stm32-provider.md#selected-f407-hal-uart-transport)和当前源码证据。精确链接成本、最终源码证据和物理 HIL 仍须分别验收。"
+#: docs/reference/platforms/support.md:34
+msgid ""
+"所有 `vendors/` 保留，未使用 SDK 的存在不扩大生产支持。旧 F103、G474、H743、 U575 和 GD32 "
+"等接入退出当前生产选择；原证据按 [固定旧源码](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) 读取，不将旧通过值转移到重构源码。"
+msgstr ""
+"所有 `vendors/` 保留，未使用 SDK 的存在不扩大生产支持。旧 F103、G474、H743、 U575 和 GD32 "
+"等接入退出当前生产选择；原证据按 [固定旧源码](https://github.com/X-Gen-"
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) 读取，不将旧通过值转移到重构源码。"
+
+#: docs/reference/platforms/support.md:39
+msgid "使用前检查"
+msgstr "使用前检查"
+
+#: docs/reference/platforms/support.md:41
+msgid "固定完整料号、Board、振荡源和必要跳线条件。"
+msgstr "固定完整料号、Board、振荡源和必要跳线条件。"
+
+#: docs/reference/platforms/support.md:42
+msgid "查看对应控制器、route、mode 和资源冲突。"
+msgstr "查看对应控制器、route、mode 和资源冲突。"
+
+#: docs/reference/platforms/support.md:43
+msgid "解析实际 TOML；未知字段、未维护模式与冲突必须拒绝。"
+msgstr "解析实际 TOML；未知字段、未维护模式与冲突必须拒绝。"
+
+#: docs/reference/platforms/support.md:44
+msgid "核对同一源码与配置的模型、ARM、SDK 或候选记录。"
+msgstr "核对同一源码与配置的模型、ARM、SDK 或候选记录。"
+
+#: docs/reference/platforms/support.md:45
+msgid "需要物理行为结论时，核对实际 station 原件。"
+msgstr "需要物理行为结论时，核对实际 station 原件。"
+
+#: docs/reference/platforms/support.md:47
+msgid ""
+"异步 ACCEPTED 后持续借用到 acquire 观察 SETTLED；timeout、cancel 与排空失败 不授权复用存储。物理 HIL 当前为"
+" `not_executed`，未知 PCB 修订仍保持未知。 完整资格边界见[资格参考](qualification.md)。"
+msgstr ""
+"异步 ACCEPTED 后持续借用到 acquire 观察 SETTLED；timeout、cancel 与排空失败 不授权复用存储。物理 HIL 当前为"
+" `not_executed`，未知 PCB 修订仍保持未知。 完整资格边界见[资格参考](qualification.md)。"

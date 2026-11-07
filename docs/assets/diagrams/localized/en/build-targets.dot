@@ -11,11 +11,11 @@ digraph BuildTargets {
     edge [color="#475569", fontcolor="#0f172a",
           fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
 
-    graph [label="FIG-02 H743 / baremetal / IRQ UART: selected target dependencies\nArrow: dependent -> dependency, not a runtime call"];
+    graph [label="FIG-02 F407ZG / baremetal / IRQ UART: selected target dependencies\nArrow: dependent -> dependency, not a runtime call"];
     firmware [label="External firmware\nnexus_add_firmware()", fillcolor="#f8fafc"];
     startup [label="firmware_nexus_startup\nOBJECT: official startup + owned system"];
     platform [label="Nexus::Platform\ngenerated bindings.c"];
-    soc [label="nexus_soc_stm32h743\nselected GPIO / UART drivers"];
+    soc [label="nexus_soc_stm32f4\nselected GPIO / UART drivers"];
     io [label="Nexus::IO"];
     arch [label="Nexus::Arch"];
     core [label="Nexus::Core"];
@@ -23,7 +23,7 @@ digraph BuildTargets {
     wait [label="Nexus::OSWait"];
     abi [label="nexus_abi_options\nselected by the frozen CPU profile"];
     config [label="Nexus::Config\ngenerated includes / ABI / build policy"];
-    sdk [label="Vendor CMSIS headers\nSYSTEM PRIVATE include", fillcolor="#fefce8"];
+    sdk [label="F4 LL headers + CMSIS Device / Core\nSYSTEM PRIVATE include", fillcolor="#fefce8"];
     firmware -> platform [label="PRIVATE link"];
     firmware -> arch [label="PRIVATE link"];
     firmware -> bare [label="PRIVATE: selected backend"];

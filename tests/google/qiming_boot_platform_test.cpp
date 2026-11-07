@@ -11,8 +11,8 @@ extern "C" {
 #include "nexus_factory_strong.h"
 #include "stm32f407_fsmc.h"
 nx_stm32_system_t g_nx_stm32_system;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 uint32_t SystemCoreClock = 168000000U;
 extern const nx_stm32_sram_boot_plan_t g_nx_stm32_sram_boot_plan;
 }
@@ -150,8 +150,8 @@ class QimingBootPlatform : public testing::TestWithParam<Scenario> {
         }
         privileged = true;
         clock_reads = 0U;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         RCC->AHB1ENR = RCC_AHB1ENR_GPIODEN | RCC_AHB1ENR_GPIOEEN |
@@ -222,10 +222,10 @@ extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
 extern "C" bool nx_arch_in_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
 }
@@ -234,12 +234,12 @@ extern "C" void nx_arch_dmb(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
-    const nx_arch_irq_state_t previous{g_gd32_model_mask};
-    g_gd32_model_mask = 1U;
+    const nx_arch_irq_state_t previous{g_f4_model_mask};
+    g_f4_model_mask = 1U;
     return previous;
 }
 extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t state) {
-    g_gd32_model_mask = state.value;
+    g_f4_model_mask = state.value;
 }
 extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
     return system_ports->Preflight();

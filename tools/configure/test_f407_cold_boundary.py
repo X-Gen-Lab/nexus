@@ -1,4 +1,5 @@
 """Complete selected F407 paths keep executable hardware behavior in C."""
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure as gate
@@ -21,9 +22,9 @@ class F407ColdBoundaryTests(unittest.TestCase):
         kinds = set()
         for relative in inputs:
             with self.subTest(assembly=relative):
-                result = gate.resolve_ir(gate.ROOT / "tests/contracts" / relative)
+                result = gate.resolve_ir(gate.ROOT / "tests/contracts" / relative, test_support=native_fixture(gate.ROOT / "tests/contracts" / relative))
                 provider = maintained(result.soc_family)
-                self.assertEqual(result.soc_family, "stm32f407")
+                self.assertEqual(result.soc_family, 'stm32f4')
                 for item in result.controllers:
                     if item.kind not in {"can", "usb_device", "eth", "eth_frames",
                                          "timer_capture", "advanced_pwm"}:

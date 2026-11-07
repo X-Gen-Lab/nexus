@@ -71,3 +71,9 @@
 [submodule "vendors/st/stm32h5_hal"]
 	path = vendors/st/stm32h5_hal
 	url = https://github.com/X-Gen-Lab/stm32h5xx-hal-driver.git
+[submodule "ext/tomlc99"]
+	path = ext/tomlc99
+	url = https://github.com/X-Gen-Lab/tomlc99.git
+[submodule "ext/cjson"]
+	path = ext/cjson
+	url = https://github.com/X-Gen-Lab/cJSON.git

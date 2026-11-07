@@ -40,9 +40,14 @@ def support_catalogue(root):
         provider = maintained(family)
         soc = configure.load(root / source_directory(family) / "soc.json")
         routes = configure.load(root / source_directory(family) / "routes.json")
+        catalog = (configure.load(root / integration.source_directory /
+                                  integration.device_catalog)
+                   if integration.device_catalog is not None else None)
         for part in sorted(soc["variants"]):
-            configure.validate_soc(soc, part)
-            reviewed = configure.resolve_routes(routes, soc, part, provider)
+            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
+                        if catalog is not None else soc)
+            configure.validate_soc(selected, part)
+            reviewed = configure.resolve_routes(routes, selected, part, provider)
             for controller, facts in sorted(soc["controllers"].items()):
                 interfaces = [(facts["kind"], facts["modes"])]
                 interfaces += sorted(facts.get("interfaces", {}).items())
@@ -106,8 +111,12 @@ def check_contracts(root=configure.ROOT):
     for family in descriptor.families():
         provider = maintained(family.family)
         soc = configure.load(root / source_directory(family.family) / "soc.json")
+        catalog = (configure.load(root / family.source_directory / family.device_catalog)
+                   if family.device_catalog is not None else None)
         for part in soc["variants"]:
-            configure.validate_soc(soc, part)
+            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
+                        if catalog is not None else soc)
+            configure.validate_soc(selected, part)
         for controller in soc["controllers"].values():
             interfaces = [(controller["kind"], controller["modes"])]
             interfaces += sorted(controller.get("interfaces", {}).items())

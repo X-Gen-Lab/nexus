@@ -11,7 +11,7 @@ digraph BuildTargets {
     edge [color="#475569", fontcolor="#0f172a",
           fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
 
-    graph [label="FIG-02 H743 / baremetal / IRQ UART：选定目标依赖
+    graph [label="FIG-02 F407ZG / baremetal / IRQ UART：选定目标依赖
 箭头：依赖者 → 被依赖目标；不是运行调用"];
     firmware [label="外部 firmware
 nexus_add_firmware()", fillcolor="#f8fafc"];
@@ -19,7 +19,7 @@ nexus_add_firmware()", fillcolor="#f8fafc"];
 OBJECT：官方启动 + 自有 system"];
     platform [label="Nexus::Platform
 generated bindings.c"];
-    soc [label="nexus_soc_stm32h743
+    soc [label="nexus_soc_stm32f4
 所选 GPIO / UART 驱动"];
     io [label="Nexus::IO"];
     arch [label="Nexus::Arch"];
@@ -30,7 +30,7 @@ generated bindings.c"];
 由冻结 CPU profile 决定"];
     config [label="Nexus::Config
 生成 include / ABI / 构建策略"];
-    sdk [label="厂商 CMSIS headers
+    sdk [label="F4 LL headers + CMSIS Device / Core
 SYSTEM PRIVATE include", fillcolor="#fefce8"];
     firmware -> platform [label="PRIVATE link"];
     firmware -> arch [label="PRIVATE link"];

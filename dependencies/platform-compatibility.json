@@ -18,7 +18,7 @@
     "runtime_assembly": 1,
     "cpu_facts": 1,
     "runtime_resolved": 1,
-    "source_sdk_manifest": 1
+    "source_sdk_manifest": 2
   },
   "configured_backends": [
     "baremetal",

@@ -60,7 +60,8 @@ class CoreMQTTConsumerTests(unittest.TestCase):
             setup = (
                 'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Host tests")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Host workload")\n'
-                f'set(NEXUS_ASSEMBLY_FILE "{ROOT}/tools/configure/assemblies/native-gpio.toml")\n'
+                'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Host test model")\n'
+                f'set(NEXUS_ASSEMBLY_FILE "{ROOT}/tests/support/native/assemblies/native-gpio.toml")\n'
                 f'add_subdirectory("{ROOT}" nexus EXCLUDE_FROM_ALL)\n')
         (source / 'CMakeLists.txt').write_text(
             'cmake_minimum_required(VERSION 3.31)\n'

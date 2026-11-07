@@ -21,7 +21,7 @@ from tools.hil.admit import require
 from tools.hil.measure import _identity_paths
 from tools.hil.prepare import preparation_plan
 from tools.configure.providers.common import ConfigurationError, mode_traits
-from tools.hil import selected_modes, threadx
+from tools.hil import threadx
 
 
 def _definition(work_item, kinds, stimulus, observations, instruments, safety,
@@ -242,29 +242,6 @@ WORKLOADS = MappingProxyType({
          "no_reclaim_before_settlement"),
         {"segments_exercised": "count", "protocol_errors": "count",
          "wire_completion_latency": "us"}),
-    "i2c_v2_long_timing": _definition(
-        7, ("i2c",),
-        "Exercise 255/256/257/511/512-byte messages and TCR fault boundaries",
-        ("scl_sda_start_tcr_stop", "ack_nack_wire_counts",
-         "measured_clock_rise_fall_voltage", "timingr_cr1_readback",
-         "register_progress_separate_from_wire_ack", "failed_abort_no_replay"),
-        ("oscilloscope", "logic_analyzer", "reviewed_i2c_peer", "debug_probe"),
-        ("authored_timing_envelope", "analog_filter_on_digital_filter_zero",
-         "measured_pullups_voltage", "isolated_fault_injection"),
-        {"message_count": "count", "protocol_errors": "count",
-         "rise_time": "ns"}),
-    "pwm_group_comp_break": _definition(
-        7, ("pwm_group",),
-        "Commit CH1..3 shadows and observe COMP1 latched break without restart",
-        ("pwm_trigger_common_timebase", "udis_shadow_commits",
-         "fresh_uif_no_bootstrap_trigger", "comparator_break_latch",
-         "tim1_syscfg_gate_reset", "close_irq_join"),
-        ("reference_source", "oscilloscope", "logic_analyzer", "debug_probe"),
-        ("exact_group_comparator_route", "analog_input_limits",
-         "passive_loads_outputs_disconnected", "external_rearm_policy"),
-        {"commits": "count", "break_cases": "count",
-         "unsafe_restart_count": "count", "commit_skew": "ns"}),
-    **selected_modes.workload_definitions(_definition),
 })
 
 MAX_VALUE = 2 ** 64 - 1
@@ -290,8 +267,7 @@ def _selected_dma(controller):
 MODE_CASES = frozenset({"uart_rx_dma", "uart_direction_flow", "adc_continuous",
                         "can_bus", "ethernet_raw", "usb_device",
                         "timer_capture", "advanced_pwm_break"})
-IO_PROTOCOL_CASES = frozenset({"uart_word_wire", "spi_dma_whole_cs_segments",
-                               "i2c_v2_long_timing", "pwm_group_comp_break"})
+IO_PROTOCOL_CASES = frozenset({"uart_word_wire", "spi_dma_whole_cs_segments"})
 
 
 def _selected_io_protocol(name, controller, resolved):
@@ -311,31 +287,6 @@ def _selected_io_protocol(name, controller, resolved):
         return (controller["kind"] == "spi" and _selected_dma(controller) and
                 controller.get("interface_kind") == "spi_dma_transaction" and
                 child("spi-dma-transaction"))
-    if name == "i2c_v2_long_timing":
-        timing = controller.get("timing_resolution")
-        if (resolved.get("soc_family") not in
-                ("stm32g474", "stm32h743", "stm32u575") or
-                controller["kind"] != "i2c" or
-                controller["mode"] != "poll-messages" or
-                not child("i2c-long-endpoint") or not isinstance(timing, dict)):
-            return False
-        assumptions = timing.get("assumptions", {})
-        return (type(timing.get("cr1_filter_bits")) is int and
-                timing["cr1_filter_bits"] == 0 and
-                timing.get("provenance") == "authored_declared_assumptions" and
-                assumptions.get("analog_filter_ns_min") == 50 and
-                assumptions.get("analog_filter_ns_max") == 260 and
-                assumptions.get("digital_filter_cycles") == 0)
-    if name == "pwm_group_comp_break":
-        pins = {(pin.get("function"), pin.get("pin"))
-                for pin in controller.get("pins", ())}
-        return (resolved.get("soc_family") == "stm32g474" and
-                controller["kind"] == "pwm_group" and
-                controller["mode"] == "coherent-pwm" and
-                controller["controller"] == "TIM1" and
-                controller.get("exclusive") is True and
-                {("ch1", "PA8"), ("ch2", "PA9"), ("ch3", "PA10"),
-                 ("comp1-inp", "PA1"), ("comp1-inm", "PA4")} <= pins)
     return False
 
 
@@ -369,9 +320,6 @@ def _selection(name, definition, resolved):
         return "unsupported", ["physical_target_required"]
     if name in threadx.WORKLOAD_CASES:
         return threadx.selection(name, resolved)
-    if name in selected_modes.WORKLOAD_NAMES:
-        return selected_modes.selection(selected_modes.WORKLOAD_NAMES[name],
-                                        resolved)
     if name in TASK_CASES and resolved["backend"] != "freertos":
         return "unsupported", ["freertos_task_workload_required"]
     if name == "m4f_context":
@@ -399,9 +347,7 @@ def _selection(name, definition, resolved):
 
 def workload_plan(fixture: dict, resolved: dict, workload: dict | None = None):
     """Prepare maintained obligations; no plan establishes station readiness."""
-    base = (selected_modes.preparation_base(fixture, resolved)
-            if selected_modes.has_selected(resolved) else
-            preparation_plan(fixture, resolved))
+    base = preparation_plan(fixture, resolved)
     require(resolved.get("backend") in
             ("native", "baremetal", "freertos", "threadx"),
             "maintained workload backend required")
@@ -541,10 +487,6 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
             require(any(_selected_io_protocol(name, selected[value], resolved)
                         for value in bound_ids),
                     "workload must bind its actual selected typed protocol")
-        if name in selected_modes.WORKLOAD_NAMES:
-            require(selected_modes.selection(selected_modes.WORKLOAD_NAMES[name],
-                    resolved, [selected[value] for value in bound_ids])[0] ==
-                    "selected", "workload must bind its exact selected mode")
         _text(case["stimulus"], "stimulus")
         _descriptions(case["raw_observations"], definition["raw_observations"],
                       "raw acquisition")
@@ -553,11 +495,6 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
         for instrument in case["instruments"].values():
             verify_file_identity(instrument)
         _limits(case["limits"], definition["metric_units"])
-        if name in selected_modes.WORKLOAD_NAMES:
-            errors = case["limits"]["protocol_errors"]
-            require(type(errors["maximum"]) is int and
-                    errors["maximum"] == errors.get("minimum", 0) == 0,
-                    "selected-mode protocol errors must remain zero")
     return copy.deepcopy(workload)
 
 

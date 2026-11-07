@@ -104,7 +104,7 @@ add_executable(consumer main.c)
                          "ext/mbedtls/library/ssl_tls.c",
                          "ext/mbedtls/tf-psa-crypto/core/psa_crypto.c"):
             self.assertEqual(paths.count(ROOT / relative), 1, relative)
-        self.assertFalse(any((ROOT / "soc/native") in path.parents
+        self.assertFalse(any((ROOT / "tests/support/native") in path.parents
                              for path in paths))
         self.assertNotIn("--gc-sections", (root / "build/build.ninja").read_text())
 

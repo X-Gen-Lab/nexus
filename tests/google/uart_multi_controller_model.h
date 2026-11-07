@@ -20,7 +20,4 @@ void nx_uart_multi_dma_disable(volatile uint32_t* control, uint32_t mask);
     nx_uart_multi_dma_disable(&(stream)->CR, (mask))
 #define NX_STM32_UART_DMA_ACK(clear, mask)                                     \
     nx_uart_multi_dma_ack((clear), (mask))
-#define NX_GD32_UART_DMA_DISABLE(control, mask)                                \
-    nx_uart_multi_dma_disable((control), (mask))
-#define NX_GD32_UART_DMA_ACK(clear, mask) nx_uart_multi_dma_ack((clear), (mask))
 #endif

@@ -1,4 +1,4 @@
-# Prepared changed messages; independent semantic review and actual gettext admission pending.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,1036 +7,144 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1218b1e41b4c37bdc3c85448f9f3039e77955c024eac06a72b908f7e0f9e01c8\n"
+"X-Nexus-Source-SHA256: e39e9655a91ca9d99f39091261d472990868794e9e97a93549e183816e19b4bc\n"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:1
-msgid "后续迭代与团队执行"
-msgstr "Next iterations and team execution"
+#: docs/delivery/next-iterations.md:8
+msgid "F4 收敛后的迭代边界"
+msgstr "Iteration boundaries after F4 consolidation"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:12
+#: docs/delivery/next-iterations.md:10
 msgid ""
-"以同一 candidate ELF 做 cycles、IRQ latency、最长 service 间隔、stack high-water、 "
-"丢失、长负载测量。源码／汇编推断只能帮助定位，不写成真实时序结果。需要调整 预算或 provider 时重新生成对应 "
-"source/config/artifact 证据。"
+"当前工作只围绕 STM32F4、实际公共消费者和精炼工程流程。全部 vendor 来源保留， 生产支持、默认构建和依赖库存分别管理。原跨系列规划从 "
+"[固定旧源码](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/next-"
+"iterations.md) 追溯，不作为新的生产任务清单。"
 msgstr ""
-"Use the same candidate ELF to measure cycles, IRQ latency, maximum service "
-"interval, stack high-water, loss and sustained load. Source/assembly "
-"inference helps locate causes but is not a measured timing result. Budget or"
-" provider changes require regenerated source/config/artifact evidence."
+"Current work focuses on STM32F4, actual public consumers and a concise "
+"engineering workflow. All vendor sources are retained; production support, "
+"default builds and dependency inventory are managed separately. The original"
+" cross-series plan remains traceable at the [fixed prior "
+"source](https://github.com/X-Gen-"
+"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/next-"
+"iterations.md) and is not a new production task list."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:18
+#: docs/delivery/next-iterations.md:0
+msgid "顺序"
+msgstr "Order"
+
+#: docs/delivery/next-iterations.md:0
+msgid "退出条件"
+msgstr "Exit condition"
+
+#: docs/delivery/next-iterations.md:0
+msgid "行为保全与清理"
+msgstr "Behavior preservation and cleanup"
+
+#: docs/delivery/next-iterations.md:0
+msgid "四个 F407 Board、两种密度、有效 OS 和原有模式可装配；退出平台无悬空代码、测试和命令"
+msgstr ""
+"Four F407 Boards, two densities, applicable OS backends and existing modes "
+"assemble; retired platforms leave no dangling code, tests or commands"
+
+#: docs/delivery/next-iterations.md:0
+msgid "系列事实与驱动"
+msgstr "Series facts and drivers"
+
+#: docs/delivery/next-iterations.md:0
+msgid "精确型号导出 device／startup／内存，消除固定时钟、IRQ、DMA 路线和几何假设"
+msgstr ""
+"Exact parts provide device/startup/memory facts, removing fixed clock, IRQ, "
+"DMA-route and geometry assumptions"
+
+#: docs/delivery/next-iterations.md:0
+msgid "官方库与冷态行为"
+msgstr "Official libraries and cold-state behavior"
+
+#: docs/delivery/next-iterations.md:0
+msgid "默认 F407 冷态算法已由 C 维护；扩展完整模式时继续验证 HAL／LL、回滚和排空"
+msgstr ""
+"Default F407 cold-state algorithms are maintained in C; continue "
+"verifying HAL/LL, rollback and drain when extending complete modes"
+
+#: docs/delivery/next-iterations.md:0
+msgid "默认配置链路"
+msgstr "Default configuration path"
+
+#: docs/delivery/next-iterations.md:0
+msgid "保持 Python 校验、typed IR、原子输出与输入身份；生成器只负责静态连接"
+msgstr ""
+"Preserve Python validation, typed IR, atomic output and input identity; the "
+"generator only assembles static connections"
+
+#: docs/delivery/next-iterations.md:0
+msgid "精确系列覆盖"
+msgstr "Exact series coverage"
+
+#: docs/delivery/next-iterations.md:0
+msgid "官方器件宏差异、完整料号与硬件 profile 分别验证，不以头文件数量代表功能支持"
+msgstr ""
+"Validate official device-macro differences, full part numbers and hardware "
+"profiles separately; header counts do not represent functional support"
+
+#: docs/delivery/next-iterations.md:0
+msgid "软件交付"
+msgstr "Software delivery"
+
+#: docs/delivery/next-iterations.md:0
+msgid "当前源码完整门禁、实际 SDK 消费、资源比较与独立离线构建"
+msgstr ""
+"Complete gates on current source, actual SDK consumption, resource "
+"comparisons and independent offline builds"
+
+#: docs/delivery/next-iterations.md:0
+msgid "实板接入"
+msgstr "Physical-board integration"
+
+#: docs/delivery/next-iterations.md:0
+msgid "实际 station 与同一镜像的启动、时钟、IRQ／DMA、失败及测量原件"
+msgstr ""
+"Actual station and same-image startup, clocks, IRQ/DMA, failures and "
+"original measurements"
+
+#: docs/delivery/next-iterations.md:25
 msgid ""
-"F407/F470 已有 UART/SPI 有限 DMA、UART 连续 RX／双向 DMA、ADC 有限／连续 trigger blocks、I2C "
-"IRQ／DMA、Classic CAN、USB FS PIO，以及精确软件夹具的 Ethernet、capture 和 complementary "
-"PWM。先以实际吞吐、IRQ latency、块间 间隙、line drain 和 overload 测量收敛这些已存在模式；连续模式也不能承诺任意 "
-"IRQ 延迟或消费者速度下无丢失。I2C 保持 100 kHz、7-bit address，每条1–256 bytes、 最多8条消息和精确 "
-"route；10-bit 或更长事务仍是独立扩展。"
+"Host C11 配置器是 `tools/nxconfig` 中的可选主机工具试点，当前只覆盖 Linux 上的 GPIO、UART irq-byte "
+"和 SPI poll。默认配置入口仍为 Python。Host C 全面替换不作为 平台使用、固件 C 化或本轮软件交付的前置条件；它不进入 MCU "
+"镜像，也不会直接改变 MCU 热路径或资源占用。后续是否扩展，按实际配置需求与主机工具维护收益单独评估。"
 msgstr ""
-"F407/F470 already have bounded UART/SPI DMA, continuous UART "
-"RX/bidirectional DMA, bounded/continuous ADC trigger blocks, I2C IRQ/DMA, "
-"Classic CAN, USB FS PIO and Ethernet/capture/complementary-PWM exact "
-"software fixtures. First refine these existing modes with actual throughput,"
-" IRQ latency, inter-block gap, line-drain and overload measurements. "
-"Continuous modes cannot promise losslessness under arbitrary IRQ latency or "
-"consumer speed. I2C remains 100 kHz, 7-bit, 1–256 bytes per message, at most"
-" eight messages and exact routes; 10-bit or longer transactions are separate"
-" extensions."
+"The Host C11 configuration tool in `tools/nxconfig` is an optional host-tool"
+" pilot, currently covering only GPIO, UART irq-byte and SPI poll on Linux. "
+"The default configuration entry point remains Python. Full replacement by "
+"Host C is not a prerequisite for using the platform, moving firmware "
+"behavior to C, or this software delivery. It does not enter MCU images or "
+"directly change MCU hot paths or resource use. Further expansion is "
+"evaluated separately against actual configuration needs and host-tool "
+"maintenance benefits."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:25
+#: docs/delivery/next-iterations.md:25
 msgid ""
-"F103/GD303 新增有限 UART channel-DMA、正常 RX block、I2C IRQ 消息及物理 Flash／单次 ADC／固定 "
-"PWM；GD303 另维护 EXTI。有限 RX 依赖 owner service 重新装填，必须测量间隙、背压和丢失；I2C priority0 "
-"不允许内核通知。GD303 的硬件 timer 级联还需实测跨域 carry 与 Flash 停顿，不能由主机模型推断传播延迟。"
+"维护者按功能批次交付 C、配置、真实回归、文档和普通提交。目录移动不宣称性能改善； 新实现与旧实现须用同一工具链和等价配置比较 ELF／map "
+"与实际热路径。"
 msgstr ""
-"F103/GD303 add finite UART channel-DMA, normal RX blocks, IRQ-message I2C "
-"and physical Flash/single-shot ADC/fixed PWM; GD303 also maintains EXTI. "
-"Finite RX depends on owner service to rearm, so gaps, backpressure and loss "
-"require measurement; priority-zero I2C cannot notify a kernel. The GD303 "
-"hardware timer cascade also needs physical carry and Flash-stall "
-"observations; host models cannot establish bridge propagation delay."
+"Maintainers deliver C, configuration, real regressions, documentation and "
+"ordinary commits in feature batches. Moving directories claims no "
+"performance improvement. Compare new and old implementations using the same "
+"toolchain and equivalent configuration, including ELF/map and actual hot "
+"paths."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:30
+#: docs/delivery/next-iterations.md:33
 msgid ""
-"G474 新增 ADC1 bulb 单次／TIM6 正常 DMA block、I2C1 polling 和 ECC Flash； "
-"必须实测首次转换丢弃、预热、2.5–50 kHz 精确触发范围与真实采样孔径。H743 已维护 有限 UART RX DMA-IDLE、可选已初始化 "
-"D2 SRAM1 和七类有限外设；Cache-on DMA 仍要求独占完整 lines，RX 有 service/rearm 间隙，Flash 仅开放 "
-"Cache off。U575 TZEN0 已有 SPI/I2C/ADC/PWM/EXTI/Flash 的有限夹具；VDDA/ASV、VDDIO2 与真实"
-" 总线电气须单独验收。独立 TZEN1 参考仅新增复制最多八个 PC7 命令的 cooperative job，Secure 私有存储保留状态，NS "
-"地址不跨调用保留；没有通用异步借用、RTOS、 双域 factory 或跨域 DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见"
-" [SOC-28–36](../design/soc-refinement.md)："
+"默认链路的启动、停止、失败回滚、资源协调与硬件算法已由手写 C 维护；固定配置和 "
+"可选诊断在编译期裁剪，通用入口复用同一实现。后续按具体需求开展精确型号适配、 运行期电源管理、完整软件候选与真实 "
+"IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
+" 继承，未执行的 HIL 保持 `not_executed`。"
 msgstr ""
-"G474 adds ADC1 bulb shots/TIM6 normal-DMA blocks, polling I2C1 and ECC "
-"Flash; first-conversion discard, warmup, the exact 2.5–50 kHz trigger range "
-"and actual sampling aperture require measurement. H743 maintains finite UART"
-" RX DMA-IDLE, optional initialized D2 SRAM1 and seven finite peripheral "
-"classes. Cache-on DMA still requires exclusively owned complete lines; RX "
-"has service/rearm gaps and Flash requires Cache off. U575 TZEN0 has finite "
-"SPI/I2C/ADC/PWM/EXTI/Flash fixtures; VDDA/ASV, VDDIO2 and actual bus "
-"electrical behavior need separate acceptance. The independent TZEN1 "
-"reference only adds cooperative jobs of up to eight copied PC7 commands, "
-"retaining state in private Secure storage and no NS address across calls. It"
-" supplies no general asynchronous borrow, RTOS, dual-world factory or cross-"
-"domain DMA. Chip facts authorize neither additional modes/routes nor "
-"physical qualification. See [SOC-28–36](../design/soc-refinement.md) for "
-"sequencing and explicit exits:"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "方向"
-msgstr "Direction"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "进入实现前必须固定的合同"
-msgstr "Contract to fix before implementation"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "G474 新模式或更多 controller/route"
-msgstr "New G474 modes or more controllers/routes"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "已有 bulb/有限 DMA/I2C/Flash 的实测边界；新控制器另固定 IRQ／DMA 冲突、Board 来源、实例隔离与预算"
-msgstr ""
-"Measured limits of existing bulb/finite-DMA/I2C/Flash paths; new controllers"
-" additionally fix IRQ/DMA conflicts, Board provenance, instance isolation "
-"and budgets"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "H743 DMA 与 Cache"
-msgstr "H743 DMA and Cache"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid ""
-"已有 AXI/SRAM1 有限路径的实测一致性；其他 DMA1/2、BDMA、MDMA 分别审查可达域、cache-line 所有权、维护时点与失败借用"
-msgstr ""
-"Measured coherency of existing AXI/SRAM1 finite paths; other DMA1/2, BDMA "
-"and MDMA paths independently review reachability, cache-line ownership, "
-"maintenance points and retained borrows on failure"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "U575 DMA 与安全域"
-msgstr "U575 DMA and security domains"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理"
-msgstr ""
-"GPDMA/LPDMA descriptor lifecycle, memory/peripheral ownership, GTZC/MPCBB, "
-"actual TZEN entry and error handling"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "新固定时钟或运行时变频"
-msgstr "New fixed clocks or runtime frequency changes"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现"
-msgstr ""
-"Power/Flash/bus ordering, consumer reconfiguration, rollback and deadline "
-"domains; implement fixed profiles separately from dynamic transitions"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "bootloader 接管或 deep STOP"
-msgstr "Bootloader handover or deep STOP"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度"
-msgstr ""
-"Active VTOR/mask/FP/DMA state, RAM ownership, RTC/LPTIM continuous domain, "
-"wake recovery and precision"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "userspace I/O transport"
-msgstr "userspace I/O transport"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid ""
-"真实 principal、权限、copy/pin、异步借用、退出回收和 SVC/MPU/TZ gateway；现有 scalar broker 不代替 "
-"transport"
-msgstr ""
-"Actual principals, permissions, copy/pin, asynchronous borrows, exit "
-"reclamation and SVC/MPU/TZ gateways; the existing scalar broker does not "
-"replace transport"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:50
-msgid ""
-"每次扩展先明确 owner、buffer、cancel/drain、ISR、deadline、对齐/cache 与停止 合同，再用 "
-"GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片， 随后验证实际生成 factory、ARM "
-"ELF、SDK 与物理边界。未选择模式不驻留资源， 不把不断扩大的通用对象成本摊到全部产品。"
-msgstr ""
-"Each extension first fixes owner, buffer, cancel/drain, ISR, deadline, "
-"alignment/cache and stop contracts. Then use GoogleTest/GoogleMock for an "
-"actual RED→GREEN production-provider vertical slice, followed by generated "
-"factory, ARM ELF, SDK and physical-boundary verification. Unselected modes "
-"retain no resources; growing generic-object costs are not imposed on every "
-"product."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:55
-msgid ""
-"本轮源实现、定向开发执行与最终集成软件资格分开记录。最终验收须绑定冻结后的 精确 "
-"source/config/tool/artifact；新文档、源码合并或旧测试计数不替代实际执行。 ECC Flash 的 "
-"`program_flags`、fresh-erase 来源及逐脉冲完成证据也要进入产品调用 合同。实板未接入，物理项继续为 "
-"`not_executed`，不提升为安全认证或生产发布。"
-msgstr ""
-"This iteration records source implementation, targeted developer execution "
-"and final integrated software qualification separately. Final acceptance "
-"must bind exact frozen source/configuration/tool/artifact identities; new "
-"documentation, source merges and historical counts do not replace actual "
-"execution. ECC Flash `program_flags`, fresh-erase provenance and per-pulse "
-"completion evidence also belong in the product caller contract. Physical "
-"equipment is absent, so physical items remain `not_executed`; they are not "
-"promoted to safety certification or production release."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:60
-msgid ""
-"优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的 破坏性变更。Flash "
-"认证、升级、制造密钥与工业安全政策属于外部产品／独立机制， 不能因已有 storage CRC 或 watchdog feed 就声称完成。"
-msgstr ""
-"Reuse existing narrow ports and static assembly first; allow explicitly "
-"versioned breaking changes when contracts cannot express hardware facts. "
-"Flash authentication, upgrades, manufacturing keys and industrial security "
-"policy belong to external products/independent mechanisms. Existing storage "
-"CRC or watchdog feed cannot establish their completion."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:64
-msgid "十人角色与企业工作流"
-msgstr "Ten-person roles and enterprise workflow"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "角色"
-msgstr "Role"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "席位"
-msgstr "Seats"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "负责的可复核产物"
-msgstr "Reviewable outputs owned"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "技术负责人"
-msgstr "Technical lead"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "1"
-msgstr "1"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "契约、边界、预算与支持 scope，跨层设计审查"
-msgstr ""
-"Contracts, boundaries, budgets, support scope and cross-layer design review"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "Core/I/O/OS"
-msgstr "Core/I/O/OS"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "2"
-msgstr "2"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "所有权、并发、时间、静态资源与公共 ABI"
-msgstr "Ownership, concurrency, time, static resources and public ABI"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "STM32/GD32 BSP"
-msgstr "STM32/GD32 BSP"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "精确 facts/routes、SDK/startup/provider、故障模型"
-msgstr "Exact facts/routes, SDK/startup/provider and fault models"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "通用器件／通信与外部应用"
-msgstr "Generic devices/communications and external applications"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "窄端口组件、器件 driver、外部 composition"
-msgstr "Narrow-port components, device drivers and external composition"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "QA/HIL"
-msgstr "QA/HIL"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "软件故障、实际 station、时序／掉电／长期负载证据"
-msgstr ""
-"Software faults, actual stations, timing/power-cut/sustained-load evidence"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "构建发布"
-msgstr "Build/release"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
-msgid "唯一配置／CMake图、锁与 SDK、CI、候选／复现证据"
-msgstr ""
-"Single configuration/CMake graph, locks/SDK, CI and candidate/reproduction "
-"evidence"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:75
-msgid ""
-"维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用 `agent_managed` "
-"策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、 制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。"
-msgstr ""
-"Codex assumes all maintenance responsibility; `.github/maintainer-"
-"roles.json` uses `agent_managed`. Ten-person roles remain domain/capacity "
-"divisions without requiring named accounts. The same maintenance "
-"responsibility covers security, manufacturing and field interfaces; product "
-"permissions/processes remain in external application repositories."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:79
-msgid ""
-"`python tools/maintenance/ownership.py --require-assigned` 验证负责 agent、 "
-"路径覆盖、备用领域和强制门禁。GoogleTest／GoogleMock、配置、ARM、预算、SDK 和证据身份检查继续执行。该策略不生成虚构 "
-"CODEOWNERS，不声明独立人工评审； GitHub branch rules 与 required checks 的实际配置状态仍须远程核实。 "
-"具体命令见[维护工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/maintenance/README.md)。"
-msgstr ""
-"`python tools/maintenance/ownership.py --require-assigned` verifies "
-"responsible agents, path coverage, backup domains and required gates. "
-"GoogleTest/GoogleMock, configuration, ARM, budget, SDK and evidence-identity"
-" checks continue. This policy fabricates no CODEOWNERS and claims no "
-"independent human review. Actual GitHub branch-rule/required-check "
-"configuration still needs remote verification. Commands are in [maintenance "
-"tools](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/maintenance/README.md)."
-
-#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:85
-msgid ""
-"Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次 commit 自动检查 staged 内容和 "
-"Conventional Commit，CI 用同一整文件规范。 新行为和缺陷修复必须 TDD，主机合同采用 "
-"GoogleTest／GoogleMock；Python 工具 保留 unittest。新增用例先实际 RED，再最小修复 "
-"GREEN；机械门禁不证明历史编辑 顺序，PR 记录命令、失败原因和原始日志。中断、生命周期、持久化和并发变更要有 真实 failure-path "
-"回归。nightly/正式候选的测量、离线构建和 station 结果独立封存， 生产发布不由普通平台 CI 自动提升。"
-msgstr ""
-"Issues describe concrete triggers and observable results. PRs state "
-"source/config/dependency/tool identities and affected contracts. Each commit"
-" automatically checks staged content and Conventional Commit; CI uses the "
-"same whole-file standard. New behavior and bug fixes require TDD: "
-"GoogleTest/GoogleMock for host contracts, unittest for Python tools. New "
-"cases run RED first, then a minimal GREEN fix. Mechanical gates do not prove"
-" historical editing order; PRs record commands, failure reasons and raw "
-"logs. IRQ, lifecycle, persistence and concurrency changes need actual "
-"failure-path regressions. Nightly/formal-candidate measurements, offline "
-"builds and station results are sealed separately; ordinary platform CI does "
-"not automatically promote production releases."
-
-msgid "目标是外部团队独立接入 SoC/provider，应用团队完成工业控制与安全联网，维护者能定位失败并升级。静态 factory、只读 face、C11 硬件行为、显式执行与借用合同继续保留；可选能力不能变成默认线程、全局设备注册表或通用最大池。"
-msgstr "The goals are independent external SoC/provider integration, usable industrial control and secure networking, and diagnosable failure and upgrade paths. Preserve static factories, read-only faces, C11 hardware behavior, explicit execution and borrowing contracts; optional features must not become default threads, global device registries or maximum-size pools."
-
-msgid "工作包、依赖与权威任务"
-msgstr "Work packages, dependencies and authoritative tasks"
-
-msgid "本轮共同前提是精确 part/Board/backend/controller/mode/route，以及内存、clock 和安全配置。CPU profile 不代替 SoC/Board 支持；未选组件不驻留，新增成本用实际 ELF 解释。外置 Board、资源图、能力查询、生命周期诊断、Storage、ClockDomain 和 HIL 直接扩展原机制。"
-msgstr "Every item starts from exact part/Board/backend/controller/mode/route selections and memory, clock and security configuration. CPU profiles do not substitute for SoC/Board support; unselected components stay absent and actual ELF results explain added cost. Extend existing external Boards, resource graphs, capability queries, lifecycle diagnostics, Storage, ClockDomain and HIL."
-
-msgid "基线与交付入口"
-msgstr "Baseline and delivery entry points"
-
-msgid "优先级：`P0`。进入与顺序：无；先核对实际源码与已发布资产。"
-msgstr "Priority: `P0`. Admission and order: None; first check actual source and published assets."
-
-msgid "规划编号"
-msgstr "Planning ID"
-
-msgid "本轮工作入口"
-msgstr "Iteration work entry"
-
-msgid "权威任务编号"
-msgstr "Authoritative task IDs"
-
-msgid "`IT-B01`"
-msgstr "`IT-B01`"
-
-msgid "版本与资格导航"
-msgstr "Version and qualification navigation"
-
-msgid "`G04`"
-msgstr "`G04`"
-
-msgid "`IT-B02`"
-msgstr "`IT-B02`"
-
-msgid "精确支持矩阵"
-msgstr "Exact support matrix"
-
-msgid "`A01`, `V-A01`"
-msgstr "`A01`, `V-A01`"
-
-msgid "`IT-B03`"
-msgstr "`IT-B03`"
-
-msgid "完整开发操作基线"
-msgstr "Complete development-operation baseline"
-
-msgid "`V-K05`"
-msgstr "`V-K05`"
-
-msgid "`IT-B04`"
-msgstr "`IT-B04`"
-
-msgid "同条件成本基线"
-msgstr "Same-context cost baseline"
-
-msgid "`A03`, `F01`, `F07`"
-msgstr "`A03`, `F01`, `F07`"
-
-msgid "`IT-B05`"
-msgstr "`IT-B05`"
-
-msgid "服务端分支保护"
-msgstr "Server-side branch protection"
-
-msgid "`V-X02`"
-msgstr "`V-X02`"
-
-msgid "外置 SoC/provider 接入"
-msgstr "External SoC/provider integration"
-
-msgid "优先级：`P0`。进入与顺序：IT-B02；先固定包契约，再实现解析、构建、SDK 与独立夹具。"
-msgstr "Priority: `P0`. Admission and order: IT-B02; fix the package contract before resolution, build, SDK and independent fixtures."
-
-msgid "`IT-P01`"
-msgstr "`IT-P01`"
-
-msgid "外置 SoC/provider 包契约"
-msgstr "External SoC/provider package contract"
-
-msgid "`IT-P02`"
-msgstr "`IT-P02`"
-
-msgid "不可变 package context"
-msgstr "Immutable package context"
-
-msgid "`IT-P03`"
-msgstr "`IT-P03`"
-
-msgid "外置包身份与路径准入"
-msgstr "External-package identity and path admission"
-
-msgid "`IT-P04`"
-msgstr "`IT-P04`"
-
-msgid "外置配置解析接入"
-msgstr "External configuration resolution"
-
-msgid "`IT-P05`"
-msgstr "`IT-P05`"
-
-msgid "外置 CMake 集成"
-msgstr "External CMake integration"
-
-msgid "`IT-P06`"
-msgstr "`IT-P06`"
-
-msgid "安装版 SDK 消费外置包"
-msgstr "Installed-SDK consumption of external packages"
-
-msgid "`IT-P07`"
-msgstr "`IT-P07`"
-
-msgid "外置包输入与证据闭包"
-msgstr "External-package input and evidence closure"
-
-msgid "`IT-P08`"
-msgstr "`IT-P08`"
-
-msgid "独立接入验收夹具"
-msgstr "Independent integration acceptance fixture"
-
-msgid "配置与诊断"
-msgstr "Configuration and diagnostics"
-
-msgid "优先级：`P0–P1`。进入与顺序：复用 selected contracts 和 typed IR；外置包结果必须贯穿查询。"
-msgstr "Priority: `P0–P1`. Admission and order: Reuse selected contracts and typed IR; external-package results must reach queries."
-
-msgid "`IT-C01`"
-msgstr "`IT-C01`"
-
-msgid "模式 list/explain"
-msgstr "Mode list/explain"
-
-msgid "`N06`, `N08`"
-msgstr "`N06`, `N08`"
-
-msgid "`IT-C02`"
-msgstr "`IT-C02`"
-
-msgid "使用与生命周期约束"
-msgstr "Usage and lifecycle constraints"
-
-msgid "`V-A02`, `B02`"
-msgstr "`V-A02`, `B02`"
-
-msgid "`IT-C03`"
-msgstr "`IT-C03`"
-
-msgid "用户配置中的生命周期诊断"
-msgstr "Lifecycle diagnostics in user configuration"
-
-msgid "`V-C08`, `N08`"
-msgstr "`V-C08`, `N08`"
-
-msgid "`IT-C04`"
-msgstr "`IT-C04`"
-
-msgid "resolver 阶段局部化"
-msgstr "Resolver-stage localization"
-
-msgid "`D02`, `V-H01`"
-msgstr "`D02`, `V-H01`"
-
-msgid "`IT-C05`"
-msgstr "`IT-C05`"
-
-msgid "CMake 模式查询成本"
-msgstr "CMake mode-query costs"
-
-msgid "`F05`, `N09`"
-msgstr "`F05`, `N09`"
-
-msgid "驱动与资源成本"
-msgstr "Drivers and resource costs"
-
-msgid "优先级：`P1`。进入与顺序：按完整模式审查官方实现；修改具体驱动前固定回归范围。"
-msgstr "Priority: `P1`. Admission and order: Review official implementations by complete mode; fix regression scope before changing each driver."
-
-msgid "`IT-D01`"
-msgstr "`IT-D01`"
-
-msgid "官方库与直接访问决策"
-msgstr "Official-library and direct-access decisions"
-
-msgid "`V-A03`, `V-A04`"
-msgstr "`V-A03`, `V-A04`"
-
-msgid "`IT-D02`"
-msgstr "`IT-D02`"
-
-msgid "共享 IP engine 归属"
-msgstr "Shared-IP engine ownership"
-
-msgid "`V-H04`"
-msgstr "`V-H04`"
-
-msgid "`IT-D03`"
-msgstr "`IT-D03`"
-
-msgid "DMA 内存与所有权"
-msgstr "DMA memory and ownership"
-
-msgid "`D04`, `V-G06`, `V-G07`"
-msgstr "`D04`, `V-G06`, `V-G07`"
-
-msgid "`IT-D04`"
-msgstr "`IT-D04`"
-
-msgid "只读配置与可变状态成本"
-msgstr "Read-only configuration and mutable-state costs"
-
-msgid "`V-I01`, `V-I03`"
-msgstr "`V-I01`, `V-I03`"
-
-msgid "`IT-D05`"
-msgstr "`IT-D05`"
-
-msgid "完整模式回归与成本比较"
-msgstr "Full-mode regressions and cost comparisons"
-
-msgid "`V-J02`, `V-J05`, `V-I06`"
-msgstr "`V-J02`, `V-J05`, `V-I06`"
-
-msgid "运行时与关闭协调"
-msgstr "Runtime and shutdown coordination"
-
-msgid "`IT-R01`"
-msgstr "`IT-R01`"
-
-msgid "只读运行状态观察"
-msgstr "Read-only runtime-state observation"
-
-msgid "`IT-R02`"
-msgstr "`IT-R02`"
-
-msgid "多源 wait-set 与显式 executor"
-msgstr "Multi-source wait-set and explicit executor"
-
-msgid "`IT-R03`"
-msgstr "`IT-R03`"
-
-msgid "关闭与恢复协调"
-msgstr "Shutdown and recovery coordination"
-
-msgid "`E02`, `E03`, `V-C06`, `V-C08`"
-msgstr "`E02`, `E03`, `V-C06`, `V-C08`"
-
-msgid "`IT-R04`"
-msgstr "`IT-R04`"
-
-msgid "精确 runtime PM 路径"
-msgstr "Exact runtime-PM path"
-
-msgid "`IT-R05`"
-msgstr "`IT-R05`"
-
-msgid "第二传感器与采样合同"
-msgstr "Second sensor and sampling contract"
-
-msgid "网络与安全连接"
-msgstr "Networking and secure connections"
-
-msgid "优先级：`P0–P1`。进入与顺序：N01→N02→N03/N04→N05；N06→N07→N08，随后 N09。"
-msgstr "Priority: `P0–P1`. Admission and order: N01→N02→N03/N04→N05; N06→N07→N08, followed by N09."
-
-msgid "`IT-N01`"
-msgstr "`IT-N01`"
-
-msgid "首发联网范围与预算"
-msgstr "Initial networking scope and budgets"
-
-msgid "`IT-N02`"
-msgstr "`IT-N02`"
-
-msgid "成熟 C 网络栈接入"
-msgstr "Mature C network-stack integration"
-
-msgid "`IT-N03`"
-msgstr "`IT-N03`"
-
-msgid "Ethernet frames 网络栈适配"
-msgstr "Ethernet-frames network-stack adapter"
-
-msgid "`IT-N04`"
-msgstr "`IT-N04`"
-
-msgid "网络执行与有界内存"
-msgstr "Network execution and bounded memory"
-
-msgid "`IT-N05`"
-msgstr "`IT-N05`"
-
-msgid "基础 IPv4 联网"
-msgstr "Basic IPv4 networking"
-
-msgid "`IT-N06`"
-msgstr "`IT-N06`"
-
-msgid "熵接口与首个 provider"
-msgstr "Entropy interface and first provider"
-
-msgid "`IT-N07`"
-msgstr "`IT-N07`"
-
-msgid "TLS 资源与信任端口"
-msgstr "TLS resource and trust ports"
-
-msgid "`IT-N08`"
-msgstr "`IT-N08`"
-
-msgid "可选 MQTT 适配"
-msgstr "Optional MQTT adapter"
-
-msgid "`IT-N09`"
-msgstr "`IT-N09`"
-
-msgid "联网端到端故障与资源验证"
-msgstr "End-to-end networking fault and resource validation"
-
-msgid "Settings 与镜像维护"
-msgstr "Settings and image maintenance"
-
-msgid "优先级：`P1–P2`。进入与顺序：复用 Storage；S03→S04→S05；S06 以真实文件需求进入。"
-msgstr "Priority: `P1–P2`. Admission and order: Reuse Storage; S03→S04→S05; enter S06 on a real file requirement."
-
-msgid "`IT-S01`"
-msgstr "`IT-S01`"
-
-msgid "有界 Settings/KV"
-msgstr "Bounded Settings/KV"
-
-msgid "`IT-S02`"
-msgstr "`IT-S02`"
-
-msgid "Settings 故障回归"
-msgstr "Settings failure regressions"
-
-msgid "`IT-S03`"
-msgstr "`IT-S03`"
-
-msgid "镜像维护窄端口"
-msgstr "Narrow image-maintenance ports"
-
-msgid "`IT-S04`"
-msgstr "`IT-S04`"
-
-msgid "成熟 bootloader 外部集成"
-msgstr "External integration of a mature bootloader"
-
-msgid "`IT-S05`"
-msgstr "`IT-S05`"
-
-msgid "镜像故障与资源验证"
-msgstr "Image fault and resource validation"
-
-msgid "`IT-S06`"
-msgstr "`IT-S06`"
-
-msgid "文件系统准入与适配"
-msgstr "Filesystem admission and adaptation"
-
-msgid "开发使用体验"
-msgstr "Developer experience"
-
-msgid "优先级：`P0–P1`。进入与顺序：复用现有 dev/provenance/station lock；按明确主机与探针扩展。"
-msgstr "Priority: `P0–P1`. Admission and order: Reuse existing dev/provenance/station locks; extend explicit hosts and probes."
-
-msgid "`IT-X01`"
-msgstr "`IT-X01`"
-
-msgid "模板到固件的完整操作"
-msgstr "Complete template-to-firmware workflow"
-
-msgid "`E05`, `V-K05`"
-msgstr "`E05`, `V-K05`"
-
-msgid "`IT-X02`"
-msgstr "`IT-X02`"
-
-msgid "可选 GDB 客户端流程"
-msgstr "Optional GDB client workflow"
-
-msgid "`IT-X03`"
-msgstr "`IT-X03`"
-
-msgid "串口主机与波特率扩展"
-msgstr "Serial host and baud-rate extensions"
-
-msgid "`IT-X04`"
-msgstr "`IT-X04`"
-
-msgid "统一设备 runner 扩展"
-msgstr "Unified device-runner extension"
-
-msgid "`IT-X05`"
-msgstr "`IT-X05`"
-
-msgid "安装版 SDK 开发诊断"
-msgstr "Installed-SDK developer diagnostics"
-
-msgid "`V-K01`, `V-K02`"
-msgstr "`V-K01`, `V-K02`"
-
-msgid "`IT-X06`"
-msgstr "`IT-X06`"
-
-msgid "固件产物查询"
-msgstr "Firmware-artifact queries"
-
-msgid "测试质量与执行效率"
-msgstr "Test quality and execution efficiency"
-
-msgid "优先级：`P0–P1`。进入与顺序：先记录同覆盖成本，保留完整提交门禁与独立编译上下文。"
-msgstr "Priority: `P0–P1`. Admission and order: First record same-coverage costs; retain complete commit gates and independent compile contexts."
-
-msgid "`IT-T01`"
-msgstr "`IT-T01`"
-
-msgid "测试计划只读预览"
-msgstr "Read-only test-plan preview"
-
-msgid "`IT-T02`"
-msgstr "`IT-T02`"
-
-msgid "真实 TDD 交接"
-msgstr "Actual TDD handoff"
-
-msgid "`V-J01`, `V-J02`"
-msgstr "`V-J01`, `V-J02`"
-
-msgid "`IT-T03`"
-msgstr "`IT-T03`"
-
-msgid "同覆盖验证耗时"
-msgstr "Same-coverage validation costs"
-
-msgid "`F07`"
-msgstr "`F07`"
-
-msgid "`IT-T04`"
-msgstr "`IT-T04`"
-
-msgid "有依据的测试清理"
-msgstr "Evidence-based test cleanup"
-
-msgid "`F04`, `V-J07`"
-msgstr "`F04`, `V-J07`"
-
-msgid "`IT-T05`"
-msgstr "`IT-T05`"
-
-msgid "资源预算与早失败"
-msgstr "Resource budgets and early failure"
-
-msgid "`F03`, `F06`, `V-J08`"
-msgstr "`F03`, `F06`, `V-J08`"
-
-msgid "`IT-T06`"
-msgstr "`IT-T06`"
-
-msgid "高风险输入与并发补充验证"
-msgstr "Additional high-risk input and concurrency validation"
-
-msgid "外部参考系统与文档"
-msgstr "External reference systems and documentation"
-
-msgid "优先级：`P0–P1`。进入与顺序：控制系统复用现有机制；网关依赖 N；同步双语和包外使用。"
-msgstr "Priority: `P0–P1`. Admission and order: Reuse existing mechanisms for control; gateway depends on N; keep bilingual and external use current."
-
-msgid "`IT-E01`"
-msgstr "`IT-E01`"
-
-msgid "工业控制外部参考系统"
-msgstr "External industrial-control reference system"
-
-msgid "`IT-E02`"
-msgstr "`IT-E02`"
-
-msgid "联网网关外部参考系统"
-msgstr "External network-gateway reference system"
-
-msgid "`IT-E03`"
-msgstr "`IT-E03`"
-
-msgid "参考系统资源与故障说明"
-msgstr "Reference-system resources and failures"
-
-msgid "`V-I05`, `V-K04`"
-msgstr "`V-I05`, `V-K04`"
-
-msgid "`IT-E04`"
-msgstr "`IT-E04`"
-
-msgid "双语文档与架构图"
-msgstr "Bilingual documentation and architecture diagrams"
-
-msgid "`E06`, `V-K07`"
-msgstr "`E06`, `V-K07`"
-
-msgid "`IT-E05`"
-msgstr "`IT-E05`"
-
-msgid "从零使用验收"
-msgstr "From-scratch usage acceptance"
-
-msgid "`N14`, `V-K05`"
-msgstr "`N14`, `V-K05`"
-
-msgid "真实硬件验收"
-msgstr "Physical acceptance"
-
-msgid "优先级：`设备接入后`。进入与顺序：先 H01/H02，再逐模式、联网、掉电、性能；工装不等于实测。"
-msgstr "Priority: `After equipment connection`. Admission and order: After H01/H02, execute modes, networking, power cuts and performance; tooling is not measurement."
-
-msgid "`IT-H01`"
-msgstr "`IT-H01`"
-
-msgid "真实 station 接入"
-msgstr "Real-station connection"
-
-msgid "`H02`, `H03`, `V-P01`"
-msgstr "`H02`, `H03`, `V-P01`"
-
-msgid "`IT-H02`"
-msgstr "`IT-H02`"
-
-msgid "启动与基础事实实测"
-msgstr "Startup and basic-fact measurements"
-
-msgid "`H03`, `V-P02`"
-msgstr "`H03`, `V-P02`"
-
-msgid "`IT-H03`"
-msgstr "`IT-H03`"
-
-msgid "I/O 完成与关闭实测"
-msgstr "I/O completion and shutdown measurements"
-
-msgid "`H06`, `H07`, `H08`, `V-P05`"
-msgstr "`H06`, `H07`, `H08`, `V-P05`"
-
-msgid "`IT-H04`"
-msgstr "`IT-H04`"
-
-msgid "完整联网实测"
-msgstr "Complete networking measurements"
-
-msgid "`H06`, `H10`"
-msgstr "`H06`, `H10`"
-
-msgid "`IT-H05`"
-msgstr "`IT-H05`"
-
-msgid "掉电与启动维护实测"
-msgstr "Power-cut and boot-maintenance measurements"
-
-msgid "`H09`, `V-P06`"
-msgstr "`H09`, `V-P06`"
-
-msgid "`IT-H06`"
-msgstr "`IT-H06`"
-
-msgid "性能与低功耗实测"
-msgstr "Performance and low-power measurements"
-
-msgid "`H04`, `H05`, `H08`, `H10`"
-msgstr "`H04`, `H05`, `H08`, `H10`"
-
-msgid "候选与发布"
-msgstr "Candidates and publication"
-
-msgid "优先级：`集成退出`。进入与顺序：冻结 clean source，实际完整计划、SDK、离线复现后再发布。"
-msgstr "Priority: `Integration exit`. Admission and order: Freeze clean source; execute the full plan, SDK and offline reproduction before publication."
-
-msgid "`IT-L01`"
-msgstr "`IT-L01`"
-
-msgid "可复现锁定环境"
-msgstr "Reproducible locked environment"
-
-msgid "`I01`, `I02`, `I03`"
-msgstr "`I01`, `I02`, `I03`"
-
-msgid "`IT-L02`"
-msgstr "`IT-L02`"
-
-msgid "新增依赖维护闭环"
-msgstr "New-dependency maintenance closure"
-
-msgid "`V-B01`, `V-B06`"
-msgstr "`V-B01`, `V-B06`"
-
-msgid "`IT-L03`"
-msgstr "`IT-L03`"
-
-msgid "冻结源码的软件总验收"
-msgstr "Frozen-source software acceptance"
-
-msgid "`J02`, `J03`, `V-L03`, `V-L04`"
-msgstr "`J02`, `J03`, `V-L03`, `V-L04`"
-
-msgid "`IT-L04`"
-msgstr "`IT-L04`"
-
-msgid "新精确软件候选"
-msgstr "New exact software candidate"
-
-msgid "`N13`, `V-L07`"
-msgstr "`N13`, `V-L07`"
-
-msgid "`IT-L05`"
-msgstr "`IT-L05`"
-
-msgid "发布与独立恢复"
-msgstr "Publication and independent recovery"
-
-msgid "`V-L08`, `G05`, `G06`"
-msgstr "`V-L08`, `G05`, `G06`"
-
-msgid "里程碑退出"
-msgstr "Milestone exits"
-
-msgid "里程碑"
-msgstr "Milestone"
-
-msgid "主要范围"
-msgstr "Main scope"
-
-msgid "可观察退出"
-msgstr "Observable exit"
-
-msgid "M1 基线与操作"
-msgstr "M1 Baseline and operations"
-
-msgid "`B、C01、T01、X01`"
-msgstr "`B、C01、T01、X01`"
-
-msgid "用户能找到版本与支持范围，解释配置和测试计划，走通既有软件流程。"
-msgstr "Users find versions and support scope, explain configurations and test plans, and complete existing software workflows."
-
-msgid "M2 独立接入"
-msgstr "M2 Independent integration"
-
-msgid "`P、C02–C04、D`"
-msgstr "`P、C02–C04、D`"
-
-msgid "包外维护者无需修改主库即可交付一个可验证集成；不虚构新实芯片资格。"
-msgstr "An external maintainer delivers a verifiable integration without changing the main repository or inventing physical-chip qualification."
-
-msgid "M3 工业控制"
-msgstr "M3 Industrial control"
-
-msgid "`D、R01–R03、S01–S02、E01`"
-msgstr "`D、R01–R03、S01–S02、E01`"
-
-msgid "精确外部系统可运行、持久化、维护、停止和恢复，并有故障回归。"
-msgstr "An exact external system runs, persists, enters maintenance, stops and recovers with failure regressions."
-
-msgid "M4 安全联网"
-msgstr "M4 Secure networking"
-
-msgid "`N、E02–E03、X`"
-msgstr "`N、E02–E03、X`"
-
-msgid "一个精确组合完成有界 TCP/TLS/MQTT、资源检查与故障退出。"
-msgstr "One exact composition completes bounded TCP/TLS/MQTT, resource checks and failure shutdown."
-
-msgid "M5 维护与条件扩展"
-msgstr "M5 Maintenance and conditional extensions"
-
-msgid "`S03–S06、R04–R05`"
-msgstr "`S03–S06、R04–R05`"
-
-msgid "镜像维护与外部参考构建完成；PM、传感器、FS 按明确进入条件验收。"
-msgstr "Complete image-maintenance and external reference builds; admit PM, sensors and filesystems under explicit conditions."
-
-msgid "M6 资格与发布"
-msgstr "M6 Qualification and publication"
-
-msgid "`E04–E05、L、H`"
-msgstr "`E04–E05、L、H`"
-
-msgid "冻结源码的软件候选、SDK、双语文档可恢复；物理仅发布实际执行范围。"
-msgstr "Restore the frozen-source software candidate, SDK and bilingual docs; publish only actually executed physical scope."
-
-msgid "接入、控制、联网与交付可并行；共享合同先交接再改行为。每个功能增量同时交付实现、真实回归、当前文档和适用的完整门禁。软件、实板与发布分别关闭，不用提交数、计划生成或旧测试计数替代完成。"
-msgstr "Integration, control, networking and delivery may proceed in parallel; hand off shared contracts before changing behavior. Each increment includes implementation, actual regressions, current documentation and applicable full gates. Close software, physical and publication exits separately, never replacing completion with commit counts, generated plans or old test totals."
-
-msgid "通用机制进入平台，任务、协议寄存器表、Flash 分区、密钥、授权和恢复策略留外部工程。私有应用源码和证据不进入公开平台产物；参考系统的软件通过也不代表实板通过。"
-msgstr "Reusable mechanisms belong in the platform; tasks, protocol register maps, Flash partitions, keys, authorization and recovery policy remain external. Private application source and evidence stay out of public platform artifacts; software success for a reference system does not establish physical success."
-
-msgid "通用 DVFS、全设备 PM、userspace I/O、通用 TrustZone 异步传输和多种文件系统仍需独立需求与合同。Zephyr 可借鉴外部模块、设备模型、测试计划、Settings 与 PM 分层；代码复用前固定具体版本或提交，不把滚动文档作为实现身份。"
-msgstr "General DVFS, all-device PM, userspace I/O, general asynchronous TrustZone transport and multiple filesystems still need independent requirements and contracts. Learn from Zephyr external modules, device models, test planning, Settings and PM layering; fix a version or commit before code reuse rather than using rolling documentation as implementation identity."
-
-msgid "实板与后续测量的进入条件"
-msgstr "Admission conditions for physical work and subsequent measurement"
-
-msgid "实板接入后，先核对三块首发实际 Board、记录 PCB/晶振/供电/接线，建立 probe、serial 和 waveform/power-cut station。G474、H743、U575 来源参考配置另行核对实际板卡， H743 还需观察供电模式，U575 需在执行镜像前确认 option bytes 与启动状态。 先复核安全初值与 clock，再验证 UART 真 TC、取消、 RX 丢失、watchdog reset、Flash 掉电与 EXTI/PWM/ADC。每种 mode 只在实际执行过的 target tuple 上资格化。试验输出保持脱离产品负载，具体现场操作由 station 合同约束。"
-msgstr "After equipment connection, first verify the three initial physical Boards and record PCB, oscillator, supply and wiring, then establish probe, serial and waveform/power-cut stations. Check actual G474, H743 and U575 reference boards separately; observe H743 supply mode and confirm U575 option bytes and boot state before running images. First check safe initial levels and clocks, then real UART TC, cancellation, RX loss, watchdog reset, Flash power cuts and EXTI/PWM/ADC. Qualify each mode only for the actually executed target tuple. Keep test outputs disconnected from product loads and follow station contracts for field operations."
-
-msgid "按测量增加能力"
-msgstr "Expand capabilities according to measurements"
-
-msgid "下表保留原 71 个规划编号及其到 107 个权威任务的映射，不另建状态台账。 {download}`同一交付台账 <../design/platform-delivery-completion.csv>`仍有 210 行，原 175 行 保持历史身份；35 个 `IT-` 行分别描述实现与当前开发检查。[派生视图](../status/ledgers/platform-delivery-completion.md) 由原 renderer 生成，原编号、顺序和退出条件不变。"
-msgstr "The tables preserve the original 71 planning IDs and their mapping to 107 authoritative tasks, without creating another status ledger. The {download}`same delivery ledger <../design/platform-delivery-completion.csv>` still contains 210 rows: the original 175 retain their historical identities, and the 35 `IT-` rows separately describe implementation and current development checks. The [readable view](../status/ledgers/platform-delivery-completion.md) is generated by the existing renderer; original IDs, order and exit conditions remain unchanged."
-
-msgid "外置 provider、Settings、wait-select、可选观察、TMP117、熵、TLS、MQTT 和开发 工具已有有界实现。新增 RX 负载借用、MCUboot 控制、TX 错误观察、PCAP、resolver／ CLI 与 SDK v15 属于当前组合；实现、定向 GREEN、完整门禁和安装版 SDK 分别验收。 原测试源码路径是审查入口，不能代替新鲜执行 receipt。"
-msgstr "External providers, Settings, wait-select, optional observation, TMP117, entropy, TLS, MQTT and developer tools have bounded implementations. RX payload loans, MCUboot control, TX error observation, PCAP, resolver/CLI refinements and SDK v15 belong to the current combination. Implementation, focused GREEN results, the complete gate and installed SDK are accepted separately. Test-source paths are review entry points and do not replace fresh execution receipts."
-
-msgid "`IT-R04` 复用已有 H743 V／固定 HSI64／Cache off／裸机 SPI4 的生命周期 pause/resume，不规划新的通用 PM。它仍需当前集成执行与实板验收。`IT-S06` 的 已审调用方使用 Settings、显式 Flash region 和 MCUboot 字节存储，尚无文件语义 消费者；`IT-X04` 尚无新探针需求。因此暂不增加文件系统依赖或设备 runner， 真实需求出现后再按原退出条件进入。"
-msgstr "`IT-R04` reuses the existing H743 V/fixed HSI64/Cache-off/baremetal SPI4 lifecycle pause/resume path; it does not plan a new generic PM system. Current integration execution and physical acceptance remain open. Reviewed `IT-S06` consumers use Settings, explicit Flash regions and MCUboot byte storage, with no file-oriented consumer yet. `IT-X04` has no new probe requirement. No filesystem dependency or device runner is added until a real requirement enters through the original exit conditions."
-
-msgid "优先级：`P1–P2`。进入与顺序：R01/R02 复用现有观察与等待合同；R04 核对已有精确 H743 路径的集成、保留与恢复，不从公共类型推导通用 PM。"
-msgstr "Priority: `P1–P2`. Entry and order: R01/R02 reuse existing observation and wait contracts. R04 checks integration, retention and recovery of the existing exact H743 path; public types do not imply generic PM."
-
-msgid "本轮选定软件交付固定公共 P2 `ab532250`，完整两轮159、SDK v15、8 个候选／ 16 次 fresh 断网构建、P2 严格双语文档及无签名 outer 的公开实际恢复均已完成。 独立 QA 后续 `706ee80` 的普通完整索引门禁与完整 Python174 复扫通过：38 条 finding 为 30 note／6 warning／2 error，全部唯一对应原已审处置；七条旧 finding 消失且无新增。当前私有 E `f59debf1` 固定 P2 的 17 presets／ 116 命令、source／installed 各五个真实 C broker 场景、三个 recipes 和公共 SDK walk 均实际通过；E 已正常 nonforce push 并精确读回 `f59debf1`， 仓库保持 private、private main 未更新；后续 D／部署及最终 FF 仍待实际结果。已发布 `v0.2.1` 的 `b1b903da` 预览与 `7590b2d4` 历史候选保留原身份。精确源码、执行及 取得边界见{ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`。"
-msgstr "Selected software delivery in this round is fixed to public P2 `ab532250`: two complete 159-stage runs, SDK v15, eight candidates / 16 fresh network-disabled builds, P2 strict bilingual documentation and actual public recovery of the unsigned outer archive have completed. Independent QA followup `706ee80` passed the ordinary complete-index gate and full Python174 analysis: all 38 findings, comprising 30 notes / 6 warnings / 2 errors, uniquely map to previously reviewed dispositions; seven old findings disappeared and none is new. Current private E `f59debf1` pins P2, with 17 presets / 116 commands, five real C broker scenarios each in source and installed builds, three recipes and the public SDK walk actually passed. E completed a normal nonforce push and exact readback of `f59debf1`; the repository remains private and private main is unchanged. Later D/deployment and final FF await actual results. The published `v0.2.1` preview at `b1b903da` and historical candidates at `7590b2d4` retain their original identities. See {ref}`current P2 unsigned software delivery <p2-unsigned-software-ab532250>` for exact source, execution and obtainability boundaries."
-
-msgid "F01 当前159检查与原成本已对账；F07 完成同 P2／工具／环境的 observational 比较，缓存与 RSS 限制保留，不能称为受控因果提速。N09 的 fresh build directory／ warm configure-build 只证明选定 Native trace，其他 MCU、CLI 与 F05 退出仍独立。 继续开放 Flash／ECC event-owner／sticky／恢复细节、七组 vendor-leaf 提案、GD303 引用审查、物理开发入口、后续 D／部署／FF、 服务端规则和物理 HIL。测试保留须有原合同或独立等价覆盖依据，不能为通过而减项。"
-msgstr "F01 reconciled current159 checks and their original costs. F07 completed an observational comparison on the same P2/tools/environment, retaining cache and RSS limitations without claiming controlled causal acceleration. N09 fresh-build-directory/warm configure-build observations establish only the selected Native trace; other MCU, CLI and F05 exits remain independent. Open work includes Flash/ECC event-owner/sticky/recovery details, seven vendor-leaf proposals, GD303 reference review, the physical developer path, later D/deployment/FF, server rules and physical HIL. Test retention decisions need original-contract or independent equivalent-coverage evidence; checks must not be removed to manufacture a pass."
+"Default startup, stop, failure rollback, resource coordination and "
+"hardware algorithms are maintained in handwritten C. Fixed configuration"
+" and optional diagnostics are folded at compile time, and generic "
+"entries reuse the same implementation. Further work follows concrete "
+"needs for exact parts, runtime power management, a complete software "
+"candidate and physical IRQ/throughput/stack/power measurements. Current "
+"F4 configurations still reject runtime power; non-F407 parts require "
+"exact adaptation. Software-candidate and physical status cannot be "
+"inherited from an older version; unexecuted HIL remains `not_executed`."

@@ -1,4 +1,6 @@
 """CPU facts and interrupt policy remain one validated assembly decision."""
+from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError
 from pathlib import Path
@@ -13,34 +15,34 @@ from tools.configure.providers import maintained
 
 class InterruptProfileTests(unittest.TestCase):
     def test_cpu_counter_fact_matches_the_maintained_implementation(self):
-        for family, part in (("native", "NATIVE_MODEL"),
-                             ("stm32f407", "STM32F407ZGT6"),
-                             ("gd32f470", "GD32F470ZGT6")):
+        for family, part in (('native', 'NATIVE_MODEL'), ('stm32f4', 'STM32F407ZGT6')):
             for value in (1, "enabled", None, family == "native"):
                 with self.subTest(family=family, value=value):
-                    soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
+                    soc = load_soc_facts(gate.ROOT / ("tests/support/native" if family == "native"
+                                               else source_directory(family)) / "soc.json")
                     soc["cpu"]["dwt_cyccnt"] = value
                     with self.assertRaisesRegex(gate.ConfigurationError,
                                                 "DWT cycle counter"):
-                        gate.validate_soc(soc, part)
+                        gate.validate_soc(soc, part, gate.maintained(
+                            family, test_support=family == "native"))
 
     def test_irq_width_cannot_contradict_verified_soc_facts(self):
         for value in (True, 0, 9, 3):
             with self.subTest(value=value):
-                soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+                soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 soc["irq"]["priority_bits"] = value
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "IRQ priority bits"):
                     gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_unknown_interrupt_fact_is_rejected(self):
-        soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         soc["irq"] = {"priority_bits": 4, "syscall_priority": 1}
         with self.assertRaisesRegex(gate.ConfigurationError, "unknown"):
             gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_kernel_profile_derives_the_irq_range_and_ceiling(self):
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         for bits in (3, 4, 8):
             with self.subTest(bits=bits):
                 irq = selection.resolve_interrupts(provider.CPU_ABI,
@@ -55,7 +57,7 @@ class InterruptProfileTests(unittest.TestCase):
                                       {"priority_bits": 2}, "freertos", provider)
 
     def test_kernel_profile_cannot_inherit_another_cpu_or_unknown_port(self):
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         with self.assertRaisesRegex(gate.ConfigurationError, "kernel CPU ABI"):
             selection.resolve_interrupts({"arch": "cortex-m0", "fpu": "none",
                                        "float_abi": "soft"},
@@ -68,15 +70,12 @@ class InterruptProfileTests(unittest.TestCase):
                                           "freertos", provider)
 
     def test_irq_policy_is_typed_immutable_and_exported_for_each_backend(self):
-        for stem, backend, dwt in (("native", "native", False),
-                                   ("qiming", "baremetal", True),
-                                   ("qiming", "freertos", True),
-                                   ("liangshan", "freertos", True)):
+        for stem, backend, dwt in (('native', 'native', False), ('qiming', 'baremetal', True), ('qiming', 'freertos', True)):
             name = ("native-empty.toml" if stem == "native" else
                     f"{stem}-{backend}-empty.toml")
-            source = gate.ROOT / "tools/configure/assemblies" / name
+            source = canonical_assembly(gate.ROOT, name)
             with self.subTest(assembly=name), tempfile.TemporaryDirectory() as temp:
-                ir = gate.resolve_ir(source)
+                ir = gate.resolve_ir(source, test_support=native_fixture(source))
                 self.assertEqual(ir.irq.priority_bits, 4)
                 self.assertEqual(ir.irq.maximum_priority, 15)
                 self.assertEqual(ir.irq.syscall_priority,
@@ -85,7 +84,7 @@ class InterruptProfileTests(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     ir.irq.priority_bits = 2
                 output = Path(temp) / "bundle"
-                gate.configure(source, output)
+                gate.configure(source, output, test_support=native_fixture(source))
                 selection = (output / "selection.cmake").read_text()
                 header = (output / "nexus_config.h").read_text()
                 self.assertIn(f'set(NEXUS_ARCH_HAS_DWT_CYCCNT "{int(dwt)}")',
@@ -106,7 +105,7 @@ class InterruptProfileTests(unittest.TestCase):
                               '[abi]\narch="native"\nfpu="none"\n'
                               'float_abi="native"\n'
                               '[memory]\nmain_stack_bytes=2048\n')
-            ir = gate.resolve_ir(source)
+            ir = gate.resolve_ir(source, test_support=native_fixture(source))
             self.assertFalse(ir.cpu["dwt_cyccnt"])
 
     def test_selected_irq_checks_fact_range_and_os_policy_before_generation(self):
@@ -124,11 +123,11 @@ class InterruptProfileTests(unittest.TestCase):
                         f'calls_os = {str(calls_os).lower()}'))
                     output = Path(temp) / "bundle"
                     if accepted:
-                        gate.configure(source, output)
+                        gate.configure(source, output, test_support=native_fixture(source))
                     else:
                         with self.assertRaisesRegex(gate.ConfigurationError,
                                                     "IRQ priority|syscall ceiling"):
-                            gate.configure(source, output)
+                            gate.configure(source, output, test_support=native_fixture(source))
                         self.assertFalse(output.exists())
 
 

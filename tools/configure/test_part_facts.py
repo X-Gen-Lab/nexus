@@ -1,4 +1,6 @@
 """Exact part policy and emitted physical geometry share validated facts."""
+from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.native_fixture import native_fixture
 import copy
 from dataclasses import replace
 import unittest
@@ -10,10 +12,11 @@ from tools.configure.providers import descriptor
 
 class PartFactsTests(unittest.TestCase):
     def test_ethernet_memory_window_uses_the_selected_physical_domain(self):
-        for fixture in ("stm32-zg", "gd32"):
+        for fixture in ("stm32-zg",):
             with self.subTest(fixture=fixture):
                 result = gate.resolve_ir(gate.ROOT /
-                    f"tests/contracts/ethernet_assembly/{fixture}.toml")
+                    f"tests/contracts/ethernet_assembly/{fixture}.toml", test_support=native_fixture(gate.ROOT /
+                    f"tests/contracts/ethernet_assembly/{fixture}.toml"))
                 regions = tuple(freeze({**region, "size": 65536})
                                 if region["id"] == "sram" else region
                                 for region in result.physical_part.memory)
@@ -29,30 +32,11 @@ class PartFactsTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Ethernet.*memory"):
                     bindings.emit(result)
 
-    def test_fixed_flash_exports_are_defined_from_selected_facts(self):
-        fixtures = (
-            ("stm32f103", "mainstream_assembly/f103-devices.toml", 131072, 128, 2),
-            ("gd32f303", "mainstream_assembly/gd303-devices.toml", 262144, 128, 2),
-            ("gd32f470", "gd32_assembly/flash.toml", 1048576, 256, 2),
-            ("stm32g474", "g474_assembly/acquisition.toml", 524288, 256, 8),
-            ("stm32h743", "h743_assembly/peripherals.toml", 2097152, 16, 32),
-            ("stm32u575", "u575_assembly/peripherals.toml", 2097152, 256, 16),
-        )
-        for family, fixture, size, count, unit in fixtures:
-            with self.subTest(family=family):
-                result = gate.resolve_ir(gate.ROOT / "tests/contracts" / fixture)
-                source = bindings.emit(result)[1]
-                symbol = "g_nx_" + family + "_flash_geometry"
-                self.assertTrue(f"const nx_flash_geometry_t {symbol} = {{"
-                                in source, symbol)
-                self.assertIn(f".size = {size}u", source)
-                self.assertIn(f".sector_count = {count}u", source)
-                self.assertIn(f".program_unit = {unit}u", source)
 
     def test_unreviewed_part_cannot_copy_a_reviewed_physical_variant(self):
         for family in descriptor.families():
             with self.subTest(family=family.family):
-                facts = gate.load(gate.ROOT / family.source_directory / "soc.json")
+                facts = load_soc_facts(gate.ROOT / family.source_directory / "soc.json")
                 unknown = "UNREVIEWED_PART"
                 facts["variants"][unknown] = copy.deepcopy(
                     next(iter(facts["variants"].values())))
@@ -60,7 +44,7 @@ class PartFactsTests(unittest.TestCase):
                     gate.validate_soc(facts, unknown)
 
     def test_package_identity_cannot_drift_from_exact_part(self):
-        facts = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         facts["variants"]["STM32F407VET6"]["package"] = "LQFP144"
         with self.assertRaisesRegex(ValueError, "package"):
             gate.validate_soc(facts, "STM32F407VET6")
@@ -97,14 +81,14 @@ class PartFactsTests(unittest.TestCase):
                               (optional_memory, "Optional memory"),
                               (linker_domains, "default RAM")):
             with self.subTest(contract=mutate.__name__):
-                facts = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 mutate(facts["variants"]["STM32F407ZGT6"])
                 with self.assertRaisesRegex(ValueError, error):
                     gate.validate_soc(facts, "STM32F407VET6")
 
     def test_full_variant_validation_preserves_selected_fact_identity(self):
         for provider in descriptor.families():
-            facts = gate.load(gate.ROOT / provider.source_directory / "soc.json")
+            facts = load_soc_facts(gate.ROOT / provider.source_directory / "soc.json")
             original = copy.deepcopy(facts)
             for part, variant in facts["variants"].items():
                 with self.subTest(family=provider.family, part=part):
@@ -114,14 +98,15 @@ class PartFactsTests(unittest.TestCase):
     def test_malformed_memory_entries_are_configuration_rejections(self):
         for selected in ("STM32F407VET6", "STM32F407ZGT6"):
             with self.subTest(selected=selected):
-                facts = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
+                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 facts["variants"]["STM32F407ZGT6"]["memory"] = [False]
                 with self.assertRaisesRegex(ValueError, "memory"):
                     gate.validate_soc(facts, selected)
 
     def test_unknown_f407_part_cannot_fall_through_to_zg_geometry(self):
         result = gate.resolve_ir(gate.ROOT /
-                              "tests/contracts/stm32_assembly/ve-flash.toml")
+                              "tests/contracts/stm32_assembly/ve-flash.toml", test_support=native_fixture(gate.ROOT /
+                              "tests/contracts/stm32_assembly/ve-flash.toml"))
         result = replace(result, physical_part=replace(
             result.physical_part, part="UNREVIEWED_PART"))
         with self.assertRaisesRegex(ValueError, "part"):
@@ -132,7 +117,8 @@ class PartFactsTests(unittest.TestCase):
                                      ("zg", 1048576, 12)):
             with self.subTest(density=density):
                 result = gate.resolve_ir(gate.ROOT /
-                    f"tests/contracts/stm32_assembly/{density}-flash.toml")
+                    f"tests/contracts/stm32_assembly/{density}-flash.toml", test_support=native_fixture(gate.ROOT /
+                    f"tests/contracts/stm32_assembly/{density}-flash.toml"))
                 source = bindings.emit(result)[1]
                 self.assertIn("static const nx_flash_sector_t "
                               "s_nx_flash_sectors_flash0[]", source)

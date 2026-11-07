@@ -46,47 +46,5 @@ nexus_behavior_test(contract_spi_adapter SOURCES components_spi.c
 nexus_behavior_test(contract_uart_adapter SOURCES components_uart.c
     LIBRARIES Nexus::UARTOwner Nexus::OSNative Nexus::NativeModel)
 
-set(gd32_driver_root "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers")
-set(gd32_vendor_root "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
-set(gd32_driver_sources)
-foreach(unit gpio uart spi i2c i2c_cold flash watchdog exti timer adc)
-    list(APPEND gd32_driver_sources "${gd32_driver_root}/${unit}.c")
-endforeach()
-nexus_behavior_test(contract_gd32_io SOURCES gd32_io_test.c
-    gd32f470_flash_geometry.c
-    gd32_model/model.c ${gd32_driver_sources}
-    LIBRARIES Nexus::IO
-    INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model"
-        "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
-    DEFINITIONS GD32F470 HXTAL_VALUE=25000000)
-# SDK address macros are uint32_t by design; the host model interprets those
-# addresses. This host-only diagnostic differs from the unchanged ARM gate.
-target_compile_options(contract_gd32_io PRIVATE -Wno-int-to-pointer-cast
-    -include "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model/io_w1c.h")
-target_include_directories(contract_gd32_io SYSTEM PRIVATE
-    "${gd32_vendor_root}/CMSIS/GD/GD32F4xx/Include"
-    "${gd32_vendor_root}/GD32F4xx_standard_peripheral/Include")
-nexus_behavior_test(contract_gd32_system SOURCES gd32_system_test.c
-    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/timebase.c"
-    LIBRARIES Nexus::IO
-    INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model"
-        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
-    DEFINITIONS GD32F470 HXTAL_VALUE=25000000 NX_GD32_CLOCK_MODEL)
-target_include_directories(contract_gd32_system PRIVATE
-    "${NEXUS_SOURCE_DIR}/arch/include")
-target_compile_options(contract_gd32_system PRIVATE -Wno-int-to-pointer-cast)
-target_include_directories(contract_gd32_system SYSTEM PRIVATE
-    "${gd32_vendor_root}/CMSIS/GD/GD32F4xx/Include"
-    "${gd32_vendor_root}/GD32F4xx_standard_peripheral/Include")
-foreach(scenario watchdog-late-failure watchdog-hardware-enabled
-        watchdog-config-failure)
-    add_test(NAME contract_gd32_${scenario} COMMAND contract_gd32_io ${scenario})
-    set_tests_properties(contract_gd32_${scenario} PROPERTIES TIMEOUT 30)
-endforeach()
-
 # New behavioral contracts use one pinned host-only GoogleTest/GoogleMock layer.
 add_subdirectory("${NEXUS_SOURCE_DIR}/tests/google" google)

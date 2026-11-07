@@ -1,4 +1,5 @@
 """Behavioral rejection, identity and atomic-generation tests for the resolver."""
+from tools.configure.tests.native_fixture import native_fixture
 import json
 from pathlib import Path
 import shutil
@@ -15,20 +16,20 @@ class ResolverTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
-                     "soc/native/soc.json", "soc/native/routes.json",
-                     "boards/native_reference/board.json"):
+                     "tests/support/native/soc.json", "tests/support/native/routes.json",
+                     "tests/support/native/board/board.json"):
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, destination)
         self.assembly = self.root / "assembly.toml"
-        self.data = {"schema_version": 1, "board_package": "boards/native_reference",
+        self.data = {"schema_version": 1, "board_package": "tests/support/native/board",
                      "backend": "native", "clock_profile": "model",
                      "controllers": [], "devices": [],
                      "memory_budgets": {"main_stack_bytes": 2048}, "layout": None}
         self.write(self.assembly, self.data)
-        self.board_path = self.root / "boards/native_reference/board.json"
-        self.soc_path = self.root / "soc/native/soc.json"
-        self.routes_path = self.root / "soc/native/routes.json"
+        self.board_path = self.root / "tests/support/native/board/board.json"
+        self.soc_path = self.root / "tests/support/native/soc.json"
+        self.routes_path = self.root / "tests/support/native/routes.json"
 
     def write(self, path, data):
         path.write_text(render_toml(data, kinds={"led0": "gpio",
@@ -37,7 +38,7 @@ class ResolverTests(unittest.TestCase):
 
     def resolve(self):
         self.write(self.assembly, self.data)
-        return gate.resolve_ir(self.assembly, self.root)
+        return gate.resolve_ir(self.assembly, self.root, test_support=True)
 
     def mutate(self, path, callback):
         data = json.loads(path.read_text())
@@ -63,7 +64,7 @@ class ResolverTests(unittest.TestCase):
     def test_duplicate_json_keys_rejected(self):
         self.soc_path.write_text('{"schema_version":1,"schema_version":1}')
         with self.assertRaisesRegex(gate.ConfigurationError, "Duplicate"):
-            gate.resolve_ir(self.assembly, self.root)
+            gate.resolve_ir(self.assembly, self.root, test_support=True)
 
     def test_unknown_assembly_key_rejected(self):
         self.data["business_worker"] = True
@@ -180,13 +181,9 @@ class ResolverTests(unittest.TestCase):
                     lambda item: item["bindings"][0].pop("mask", None))
         self.data["controllers"] = [self.selected()]
         self.resolve()
-        ir = gate.resolve_ir(self.assembly, self.root)
+        ir = gate.resolve_ir(self.assembly, self.root, test_support=True)
         self.assertEqual(ir.controllers[0].options.mask, 1)
 
-    def test_spi_builtin_cs_initial_is_not_a_gpio_bitmask(self):
-        result = gate.resolve_ir(gate.ROOT /
-                              "tools/configure/assemblies/liangshan-baremetal.toml")
-        self.assertEqual(result.board_bindings["spi_flash"]["initial"], 1)
 
     def test_unknown_nested_pin_key_rejected(self):
         self.mutate(self.routes_path, lambda item: item["routes"][0]["pins"][0].update(auto=True))
@@ -222,20 +219,20 @@ class ResolverTests(unittest.TestCase):
 
     def test_successful_bundle_is_atomic_and_failure_invalidates(self):
         output = self.root / "bundle"
-        result = gate.configure(self.assembly, output, self.root)
+        result = gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertEqual(json.loads((output / "resolved.json").read_text()), result)
         self.assertTrue((output / "memory.ld").is_file())
         self.data["clock_profile"] = "bad"
         self.write(self.assembly, self.data)
         with self.assertRaises(gate.ConfigurationError):
-            gate.configure(self.assembly, output, self.root)
+            gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertFalse(output.exists())
 
     def test_failed_generation_leaves_no_partial_bundle(self):
         from unittest.mock import patch
         with patch.object(gate, "generate", side_effect=OSError("disk-full")):
             with self.assertRaises(OSError):
-                gate.configure(self.assembly, self.root / "bundle", self.root)
+                gate.configure(self.assembly, self.root / "bundle", self.root, test_support=True)
         self.assertFalse((self.root / "bundle").exists())
         self.assertFalse(list(self.root.glob(".nexus-config-*")))
 
@@ -244,7 +241,7 @@ class ResolverTests(unittest.TestCase):
         output.mkdir()
         (output / "user.txt").write_text("keep")
         with self.assertRaisesRegex(gate.ConfigurationError, "not an owned"):
-            gate.configure(self.assembly, output, self.root)
+            gate.configure(self.assembly, output, self.root, test_support=True)
         self.assertEqual((output / "user.txt").read_text(), "keep")
 
     def test_input_hash_changes_effective_identity(self):
@@ -258,7 +255,7 @@ class ResolverTests(unittest.TestCase):
         destination = self.root.parent / (self.root.name + "-relocated")
         shutil.copytree(self.root, destination)
         self.addCleanup(shutil.rmtree, destination)
-        after = gate.resolve_ir(destination / "assembly.toml", destination)
+        after = gate.resolve_ir(destination / "assembly.toml", destination, test_support=True)
         self.assertEqual(before.configuration_sha256, after.configuration_sha256)
 
     def test_unsupported_image_offset_rejected(self):
@@ -268,7 +265,7 @@ class ResolverTests(unittest.TestCase):
 
     def test_generated_text_has_no_control_characters(self):
         output = self.root / "bundle"
-        gate.configure(self.assembly, output, self.root)
+        gate.configure(self.assembly, output, self.root, test_support=True)
         for path in output.iterdir():
             text = path.read_text()
             self.assertFalse(any(ord(char) < 32 and char not in "\n\t"
@@ -276,14 +273,15 @@ class ResolverTests(unittest.TestCase):
         # Inspect the MCU-specific runtime hooks as well as the Native bundle.
         from tools.configure import bindings
         result = gate.resolve_ir(gate.ROOT /
-            "tools/configure/assemblies/qiming-baremetal-empty.toml")
+            "tools/configure/assemblies/qiming-baremetal-empty.toml", test_support=native_fixture(gate.ROOT /
+            "tools/configure/assemblies/qiming-baremetal-empty.toml"))
         _, source = bindings.emit(result)
         self.assertIn(r"\brief C runtime", source)
         self.assertNotIn("\x08", source)
 
     def test_budget_schema_generated_without_double_stack(self):
         output = self.root / "bundle"
-        gate.configure(self.assembly, output, self.root)
+        gate.configure(self.assembly, output, self.root, test_support=True)
         budget = json.loads((output / "resource-budget.json").read_text())
         self.assertEqual(budget["msp_max"], 2048)
         linker = (output / "memory.ld").read_text()
@@ -321,7 +319,7 @@ class ResolverTests(unittest.TestCase):
 
     def test_navigation_sidecar_binds_declared_bytes(self):
         output = self.root / "bundle"
-        result = gate.configure(self.assembly, output, self.root)
+        result = gate.configure(self.assembly, output, self.root, test_support=True)
         navigation = json.loads((output / "input_paths.json").read_text())
         self.assertEqual(set(navigation), {item["path"] for item in result["inputs"]})
         for item in result["inputs"]:
@@ -336,14 +334,14 @@ class AdvancedResolverTests(unittest.TestCase):
 
     def fixture(self, name):
         directory = gate.ROOT / "tests/contracts/stm32_assembly"
-        result = gate.load_assembly(directory / ("ve-" + name + ".toml")).to_dict()
+        result = gate.load_assembly(directory / ("ve-" + name + ".toml"), test_support=native_fixture(directory / ("ve-" + name + ".toml"))).to_dict()
         result["board_package"] = str(directory / result["board_package"])
         return result
 
     def reject(self, data, message):
         self.assembly.write_text(render_toml(data))
         with self.assertRaisesRegex(gate.ConfigurationError, message):
-            gate.resolve_ir(self.assembly)
+            gate.resolve_ir(self.assembly, test_support=native_fixture(self.assembly))
 
     def test_shared_exti_priority_contradiction_rejected(self):
         data = self.fixture("exti")
@@ -410,17 +408,6 @@ class AdvancedResolverTests(unittest.TestCase):
         data["devices"][0]["address"] = 80
         self.reject(data, "spi_device.*unknown.*address")
 
-    def test_gd32_builtin_spi_cs_remains_supported(self):
-        directory = gate.ROOT / "tests/contracts/gd32_assembly"
-        data = gate.load_assembly(directory / "spi.toml").to_dict()
-        data["board_package"] = str(directory / data["board_package"])
-        data["devices"] = [{"id": "sensor", "controller": "spi0",
-                            "driver": "spi-endpoint", "mode": 3,
-                            "max_hz": 1000000}]
-        self.assembly.write_text(render_toml(data))
-        result = gate.resolve_ir(self.assembly)
-        self.assertIsNone(result.devices[0].options.cs_binding)
-        self.assertIn("pin:PF6", {item.key for item in result.claims})
 
     def test_invalid_device_reconfiguration_invalidates_old_bundle(self):
         for transport, field, value in (("spi", "capacity", 32),
@@ -429,12 +416,12 @@ class AdvancedResolverTests(unittest.TestCase):
                 data = self.fixture(transport)
                 self.assembly.write_text(render_toml(data))
                 output = Path(self.temporary.name) / (transport + "-bundle")
-                gate.configure(self.assembly, output)
+                gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
                 self.assertTrue((output / "bindings.c").is_file())
                 data["devices"][0][field] = value
                 self.assembly.write_text(render_toml(data))
                 with self.assertRaisesRegex(gate.ConfigurationError, field):
-                    gate.configure(self.assembly, output)
+                    gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
                 self.assertFalse(output.exists())
 
 

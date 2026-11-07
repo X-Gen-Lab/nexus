@@ -19,10 +19,9 @@ The first platform bindings accept the actual Board identities:
 
 | Board identity | SoC family | Port |
 | --- | --- | --- |
-| `native-reference` | Native | Linux GNU |
+| `native-reference` | Explicit host-test scope | Linux GNU |
 | `stm32f407zg-qiming-v31` | STM32F407 | Cortex-M4 GNU |
 | `stm32f407ve-sky-qingchun` | STM32F407 | Cortex-M4 GNU |
-| `gd32f470zg-liangshan` | GD32F470 | Cortex-M4 GNU |
 
 Directory names are not Board identities. Unknown Board/SoC pairings are rejected.
 CPU-only runtime assemblies may select explicit Native or Cortex-M4/M4F CPU
@@ -108,7 +107,7 @@ integer/softfp links. These are development results, not physical execution.
 FreeRTOS keeps its existing profiles. Its additive `lowpower_port` is `custom`
 by default, retaining the explicit product port/weak-null behavior. Selecting
 `timebase` requires tickless SysTick, privileged single-world operation and the
-reviewed STM32F407/GD32F470 timer implementation. It does not authorize deep sleep.
+reviewed STM32F407 timer implementation. It does not authorize deep sleep.
 CPU-only runtime/emission rejects this selection because CPU facts do not supply
 that SoC timer/alarm contract. This field never selects a ThreadX sleep mechanism.
 Actual timer implementation tests, physical wake latency/power and clock behavior

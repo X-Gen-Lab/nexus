@@ -5,13 +5,9 @@
  */
 #ifndef NEXUS_PHYSICAL_PLATFORM_FACTORY_MODEL_H
 #define NEXUS_PHYSICAL_PLATFORM_FACTORY_MODEL_H
+#include "stm32f407xx.h"
 #include <stdbool.h>
 #include <stdint.h>
-#ifdef NX_PHYSICAL_FACTORY_STM32
-#include "stm32f407xx.h"
-#else
-#include "gd32f4xx.h"
-#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

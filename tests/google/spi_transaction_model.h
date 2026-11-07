@@ -19,9 +19,6 @@ void nx_spi_transaction_model_cs(bool active);
 #endif
 #define NX_STM32_SPI_TRANSACTION_WRITE(port, word, bits)                       \
     nx_spi_transaction_model_write((port), (word), (bits))
-#define NX_GD32_SPI_TRANSACTION_WRITE(port, word, bits)                        \
-    nx_spi_transaction_model_write((port), (word), (bits))
 #define NX_STM32_SPI_TRANSACTION_CS(active)                                    \
     nx_spi_transaction_model_cs((active))
-#define NX_GD32_SPI_TRANSACTION_CS(active) nx_spi_transaction_model_cs((active))
 #endif

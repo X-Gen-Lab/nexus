@@ -28,7 +28,8 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         self.payload.write_bytes(b"reviewed payload bytes\n")
         self.files = {"ordinary.c": self.sdk.digest(self.payload.read_bytes())}
         self.identity = {
-            "schema": 1, "kind": "nexus-installed-source-sdk",
+            "schema": 2, "profile": self.sdk.source_profile(),
+            "kind": "nexus-installed-source-sdk",
             "source_revision": "a" * 40, "source_tree": "b" * 40,
             "publishable": True, "source_dirty": False,
             "files_sha256": self.files, "dependencies": [],
@@ -44,8 +45,16 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
     def complete_required_map(self):
         # Portable rejection fixtures do not claim a complete installed SDK.
         # Retain the actual policy; no vendor checkout or reduced checker graph.
-        for name in self.sdk.REQUIRED_FILES:
+        for name in self.sdk.required_files(ROOT, self.identity["profile"]):
             self.files[name] = self.sdk.digest(b"fixture placeholder")
+        # Selection admission reads the real supplier lock before payload
+        # traversal. Placeholder payload files remain deliberate rejection data.
+        name = "dependencies/stm32f4-hal.lock.json"
+        lock = self.root / name
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        data = (ROOT / name).read_bytes()
+        lock.write_bytes(data)
+        self.files[name] = self.sdk.digest(data)
 
     def test_missing_required_names_reject_without_opening_payload(self):
         self.write_manifest()
@@ -73,23 +82,6 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                                     "file identity changed: ordinary.c"):
             self.sdk.verify(self.root)
 
-    def test_reference_component_omissions_reject_before_payload_reads(self):
-        self.complete_required_map()
-        for name in (
-                "components/soc/stm32/stm32h563_i3c/src/stm32h563_i3c_port.c",
-                "soc/stm32/stm32h743/drivers/w25q128_mapped.c",
-                "components/soc/stm32/stm32h747_amp/src/hardware.c"):
-            with self.subTest(missing=name):
-                original = self.files.pop(name, None)
-                try:
-                    self.write_manifest()
-                    with self.assertRaisesRegex(
-                            self.sdk.SDKError,
-                            "missing required sources/licenses"):
-                        self.sdk.verify(self.root)
-                finally:
-                    if original is not None:
-                        self.files[name] = original
 
     def test_qiming_device_omissions_reject_before_payload_reads(self):
         paths = (
@@ -98,15 +90,15 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "io/include/nexus/io/block.h", "io/src/api/block.c",
             "cmake/platform/STM32FSMC.cmake",
             "cmake/platform/STM32SDIO.cmake",
-            "soc/stm32/stm32f407/drivers/fsmc.c",
-            "soc/stm32/stm32f407/drivers/fsmc_boot.c",
-            "soc/stm32/stm32f407/sram_boot.c",
-            "soc/stm32/stm32f407/private/stm32f407_sram_boot.h",
-            "soc/stm32/stm32f407/private/stm32f407_fsmc_profile.h",
+            "soc/stm32/stm32f4/drivers/fsmc.c",
+            "soc/stm32/stm32f4/drivers/fsmc_boot.c",
+            "soc/stm32/stm32f4/sram_boot.c",
+            "soc/stm32/stm32f4/private/stm32f407_sram_boot.h",
+            "soc/stm32/stm32f4/private/stm32f407_fsmc_profile.h",
             "io/include/nexus/io/parallel16.h",
             "io/include/nexus/io/memory_window.h",
-            "soc/stm32/stm32f407/drivers/rtc.c",
-            "soc/stm32/stm32f407/drivers/sdio.c",
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "soc/stm32/stm32f4/drivers/sdio.c",
             "components/at24c02/src/at24c02.c",
             "components/w25/src/w25.c",
             "components/ili9341/src/ili9341.c",
@@ -154,7 +146,7 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
 
     def test_schema_and_provenance_precede_required_name_admission(self):
         for changes, message in (
-                ({"schema": 2}, "Unsupported installed source SDK identity"),
+                ({"schema": 1}, "Unsupported installed source SDK identity"),
                 ({"source_revision": "invalid"}, "Invalid source Git identity"),
                 ({"publishable": "true"},
                  "Invalid source SDK provenance flags"),

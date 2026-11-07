@@ -47,13 +47,23 @@ INSTANCE_FIELDS = MappingProxyType(
 KINDS = frozenset(CONTROLLER_KINDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
                  "flash_load_limit_bytes", "image_prefix_bytes",
-                 "image_suffix_bytes", "regions", "mpu"}
+                 "image_suffix_bytes", "regions"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
 TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2", "hardware"}
 
 
 
-def normalize(data, path, root, fail, obj, integer, text):
+def builtin_board_directory(root, name, fail, *, test_support=False):
+    """Resolve production Boards or the explicitly enabled host-test fixture."""
+    if name == "native_reference":
+        if not test_support:
+            fail("Native host model requires explicit test support")
+        return root / "tests/support/native/board"
+    return root / "boards" / name
+
+
+def normalize(data, path, root, fail, obj, integer, text, *,
+              test_support=False):
     obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | set(EXTERNAL_ENDPOINT_KINDS) | {"spi_device", "i2c_device", "usb_endpoint"},
         "assembly TOML")
     integer(data["schema"], 2, 2, "assembly schema")
@@ -63,7 +73,8 @@ def normalize(data, path, root, fail, obj, integer, text):
         name = text(data["board"], "Board id")
         if "/" in name or "\\" in name or name in {".", ".."}:
             fail("Board id cannot be a path; use explicit board_package")
-        package = root / "boards" / name
+        package = builtin_board_directory(root, name, fail,
+                                          test_support=test_support)
         if not (package / "board.json").is_file():
             fail(f"Unknown Board package id: {name}")
         package = str(package)
@@ -144,7 +155,8 @@ def normalize(data, path, root, fail, obj, integer, text):
     return AuthoredAssembly.create(result)
 
 
-def read(path, snapshots, root, fail, obj, integer, text):
+def read(path, snapshots, root, fail, obj, integer, text, *,
+         test_support=False):
     if path.is_symlink() or not path.is_file():
         fail(f"Assembly input must be a regular file: {path}")
     contents = path.read_bytes()
@@ -153,7 +165,8 @@ def read(path, snapshots, root, fail, obj, integer, text):
         data = tomllib.loads(contents.decode("utf-8"))
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
         fail(f"Invalid TOML: {error}")
-    return normalize(data, path, root, fail, obj, integer, text)
+    return normalize(data, path, root, fail, obj, integer, text,
+                     test_support=test_support)
 
 
 def editor_schema():
@@ -239,13 +252,6 @@ def editor_schema():
     properties["memory"]["properties"]["regions"]["additionalProperties"][
         "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
                                         "multipleOf": 4}
-    mpu_fields = {"privileged_flash_bytes", "user_flash_bytes",
-                  "syscall_flash_bytes", "privileged_ram_bytes",
-                  "user_ram_bytes"}
-    properties["memory"]["properties"]["mpu"] = record(mpu_fields, mpu_fields)
-    properties["memory"]["properties"]["mpu"]["properties"] = {
-        name: {"type": "integer", "minimum": 32, "maximum": 0xffffffff,
-               "multipleOf": 32} for name in sorted(mpu_fields)}
     properties["can_domain"] = record({"split", "filters"}, {"split", "filters"})
     filter_fields = {"controller", "bank", "id", "mask", "format", "fifo",
                      "remote", "match_remote"}

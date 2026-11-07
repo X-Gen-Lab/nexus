@@ -5,11 +5,7 @@
  */
 #ifndef NX_TIMEBASE_SOC_MODEL_H
 #define NX_TIMEBASE_SOC_MODEL_H
-#ifdef NX_TIMEBASE_GD_MODEL
-#include "gd32f4xx.h"
-#else
 #include "stm32f407xx.h"
-#endif
 #include "timebase_lowpower_model.h"
 
 #ifdef __cplusplus
@@ -46,7 +42,6 @@ void nx_timebase_model_priority(IRQn_Type irq, uint32_t priority);
 #ifdef __cplusplus
 }
 #endif
-#define NX_GD32_TIMEBASE_ACK(value)          nx_timebase_model_ack(value)
 #define NX_STM32_TIMEBASE_ACK(system, value) nx_timebase_model_ack(value)
 #undef NVIC_EnableIRQ
 #undef NVIC_DisableIRQ

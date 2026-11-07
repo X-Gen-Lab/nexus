@@ -32,32 +32,27 @@ or access; it is not an initialization sequence.
 
 ## Current source organization
 
-The source tree groups MCU families by vendor and CPU implementations by
-instruction-set architecture. These directories describe ownership at build
-time; they add no runtime dispatch or lookup layer. Public include paths,
-target names and authored family identifiers remain stable.
+The production MCU tree contains one series package,
+`soc/stm32/stm32f4/`. Its current concrete implementations remain limited to
+STM32F407VET6 and STM32F407ZGT6; a family directory or official HAL macro does
+not establish support for another exact part or mode.
 
-The [source-adjacent contracts](source-map.md) own the directory map and layer
-README content. Native models implement the same public I/O contracts under the
-Native SoC package. Shared register-protocol algorithms live under
-`drivers/<kind>/<ip>/` only when the participating wrappers independently
-establish their silicon semantics. Selected SoC targets compile these private
-sources directly; the directory adds no runtime layer to FIG-01. Cross-vendor
-SoC collaboration remains in `soc/common/`, while STM32 identity access remains
-under `soc/stm32/common/`.
+Private IP sources now belong to the F4 package. SoC targets select and compile
+those sources directly; source ownership adds no runtime dispatch layer.
+Native models live under `tests/support/native/` and require explicit
+`test_support=True`, CLI `--test-support` or `NEXUS_TEST_SUPPORT=ON` in CMake.
+They are test support, not a second production SoC.
 
-Each family's `configure/` package owns its capability policy, constructors and
-lifecycle emission; Native uses `soc/native/configure/`. The explicit provider
-map and shared leaf contracts remain in `tools/configure/providers/`. Common
-parsing, resource arbitration, typed IR and atomic publication stay in
-`tools/configure/`. Configuration tests stay under
-`tools/configure/tests/providers/<family>/`. These are build-time Python
-boundaries, independent of the C execution path.
+The [source map](source-map.md) links authoritative layer contracts. Board and
+SoC directories contain no Python plugins. The default host generator uses Python
+for validation and static connections. Core's handwritten C platform coordinator
+owns startup, stop, rollback and diagnostics; F4's private C coordinator owns
+System and shared-resource sequencing. The independent Host C11 tool is an optional
+pilot, not a prerequisite for firmware behavior in C or software delivery.
 
-Common components and selected STM32 extensions have distinct source ownership.
-Components are explicit targets; a chip-specific target still requires its
-exact SoC, mode and backend, and its presence does not extend the public support
-matrix.
+All vendor sources, Gitlinks, locks and licenses remain available. Only selected
+dependencies enter preparation, verification, compilation or Source SDK output.
+An unused SDK is neither current platform support nor a required F4 build input.
 
 ## Optional network data and boot boundaries
 
@@ -129,15 +124,13 @@ configuration, exact instances, factory getters and fixed IRQ handlers. Constant
 addresses and thin typed call sequences can remain generated without adding a
 runtime interpreter or another dispatch layer.
 
-The reviewed Native and seven MCU-family cold paths keep preflight, resource
-acquisition, preparation, failed-start cleanup and stop behavior in C. Shared
-enhanced-SPI admission calls read-only C checks before acquiring resources or
-marking failed-init cleanup responsibility. H743 fixed-run pause/resume uses C
-resource and runtime lease owners. Unreachable hardware generators and unused
-default MMIO macros have been removed; pure pruning and intentional output
-deletions retain separate comparisons. The
-[delivery-completion ledger](../design/platform-delivery-completion.csv) records
-implementation, exact development executions and final integration separately.
+F4 C owners implement admission, acquired-resource receipts, withdrawal and
+readback. The default generated plan connects fixed typed callbacks and ordinals
+from the resolved controller order to `nx_platform_lifecycle_start/stop`; the C
+engine owns the control flow and retries only the retained prefix. The existing
+`nx_lifecycle_*` reversible-resource engine remains a separate optional mechanism.
+Native support is explicitly test-scoped. Actual generated factories, models and ARM images each
+require validation; historical cross-family results do not qualify this refactor.
 
 A cold receipt proves which resources this caller actually acquired. Rejection
 with an empty receipt cannot stop or overwrite an existing owner. Partial
@@ -165,47 +158,17 @@ existing face. After explicit successful platform start, ordinary operations cal
 its shared ops table with its instance context. IRQ dispatch is fixed to provider
 instances and does not repeat factory lookup for every byte.
 
-Each of the eight maintained providers owns data-only `descriptor.py` metadata
-at its SoC package root, outside `configure/`. The central frozen
-`FamilyDescriptor` and explicit family-to-module map remain in
-`tools/configure/providers/descriptor.py`; the provider loader delegates that
-lookup without a second eager registry. A single `descriptor.maintained()` lookup
-loads only selected metadata, without configuration behavior; `providers.maintained()`
-uses that record to import the selected configure package. Explicit enumeration,
-source snapshots and SDK inventory may read all metadata. No descriptor becomes
-a second software source graph.
+The explicit F4 descriptor is `tools/configure/stm32f4_descriptor.py`; the
+centralized configuration adapter lives under `tools/configure/stm32f4/`. Production family enumeration contains only F4;
+Native uses an explicit test-support context. Descriptors identify inputs and
+selected code, without becoming a second source graph.
 
-The constructor contract names private state, definitions, read-only admission,
-initialization, stop actions and failed-init responsibility explicitly. Admission,
-initializer and stop lists use immutable `DirectCall` values with explicit static
-references or constants; no free-form C expression or function-pointer/member-call
-expression can enter those fields. Definitions remain generated static C source
-and fixed connections; hardware algorithms are maintained in C. The C compiler
-establishes actual symbol and parameter types. Model tests and linked-image
-checks remain necessary: this narrow representation is not a complete typed C
-AST. Common generation does not infer these decisions from family names. Selected
-STM32F4 official LL operations remain inside private SoC state machines. Selected
-F407 UART `dma-tx` uses private HAL finite TX with disjoint LL IRQ RX under one
-owner; other UART modes retain their existing engines. The static shared-ops
-factory and public I/O contracts are unchanged. The current bounded U575
-PWM/UART/RTC/GPIO, H743 SPI and five-SoC I2C operation changes select private
-LL/HAL calls at compile time inside their existing engines, with no additional
-runtime forwarding layer. These mode-specific integrations do not qualify
-another family or replace final clean-source evidence. See
-[official driver integration](../design/official-stm32-provider.md).
-
-The legacy F103/GD303 selections share private algorithms only after exact vendor
-register, bit, clock and memory checks. A TX-only channel-DMA instance owns a
-compact TX prefix and an IRQ-byte ring; only duplex adds the finite RX-block
-extension. Selected methods and direct IRQ entries let ordinary section GC remove
-unused block code. No runtime forwarding layer or implicit mode fallback is added.
-
-G474's selected ADC bulb mode, H743's Cache/domain policies and U575's TZEN0
-peripherals remain exact SoC contracts. Optional H743 D2 SRAM1 is budgeted and
-initialized before DMA admission; hardware reachability alone does not authorize
-an arbitrary address. Finite RX/ADC blocks require explicit owner service and
-rearm gaps. The separate TZEN1 GPIO job copies at most eight commands into Secure
-storage and retains no NonSecure pointer. It is not general asynchronous I/O.
+The constructor contract uses named immutable IR and direct calls for fixed
+connections. Vendor types and mutable Handles stay private. Generated definitions
+still require compiler, model and linked-image validation. The selected F407
+UART `dma-tx` transport combines finite official HAL TX and disjoint LL IRQ RX
+under one owner. Other modes retain their explicit implementations. See the
+[official driver contract](../design/official-stm32-provider.md).
 
 ## Lifecycle and failure responsibility
 

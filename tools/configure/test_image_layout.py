@@ -1,4 +1,5 @@
 """Reviewed offset images retain physical geometry and exact link windows."""
+from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 
 import json
 from pathlib import Path
@@ -34,11 +35,11 @@ class ImageLayoutTests(unittest.TestCase):
         self.layout.write_text(json.dumps({"schema_version": 1,
                                           "regions": regions}),
                                encoding="utf-8")
-        return configure.resolve_ir(self.assembly)
+        return configure.resolve_ir(self.assembly, test_support=native_fixture(self.assembly))
 
     def baseline(self, name):
         return configure.resolve_ir(
-            configure.ROOT / "tools/configure/assemblies" / name)
+            canonical_assembly(configure.ROOT, name), test_support=native_fixture(canonical_assembly(configure.ROOT, name)))
 
     def image(self, original, *, offset=0x20000):
         flash = original.flash
@@ -72,12 +73,9 @@ class ImageLayoutTests(unittest.TestCase):
     def test_f407_ve_image_uses_its_smaller_physical_density(self):
         self.assert_offset("sky-baremetal-empty.toml")
 
-    def test_gd470_offset_preserves_physical_geometry(self):
-        self.assert_offset("liangshan-baremetal-empty.toml")
 
     def test_reviewed_freertos_images_keep_existing_kernel_and_resources(self):
-        for name in ("qiming-freertos-empty.toml", "sky-freertos-empty.toml",
-                     "liangshan-freertos-empty.toml"):
+        for name in ('qiming-freertos-empty.toml', 'sky-freertos-empty.toml'):
             with self.subTest(assembly=name):
                 result = self.assert_offset(name)
                 original = self.baseline(name)
@@ -85,8 +83,7 @@ class ImageLayoutTests(unittest.TestCase):
                 self.assertEqual(result.resource_plan, original.resource_plan)
 
     def test_offset_uart_keeps_interfaces_and_dma_resources(self):
-        for name in ("qiming-baremetal-uart.toml",
-                     "liangshan-baremetal-uart.toml"):
+        for name in ('qiming-baremetal-uart.toml',):
             with self.subTest(assembly=name):
                 result = self.assert_offset(name)
                 original = self.baseline(name)
@@ -107,19 +104,6 @@ class ImageLayoutTests(unittest.TestCase):
         self.assertEqual(result.flash, original.flash)
         self.assertEqual(result.layout.origin, image["origin"])
 
-    def test_unreviewed_startups_continue_to_reject_offset_images(self):
-        cases = ("tools/configure/assemblies/stm32-f103-baremetal.toml",
-                 "tools/configure/assemblies/gd32-f303-baremetal-empty.toml",
-                 "tests/contracts/g474_assembly/empty.toml",
-                 "tools/configure/assemblies/nucleo-h743-baremetal-empty.toml",
-                 "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml")
-        for relative in cases:
-            with self.subTest(assembly=relative):
-                original = configure.resolve_ir(configure.ROOT / relative)
-                offset = original.flash["erase_blocks"][0]
-                with self.assertRaisesRegex(configure.ConfigurationError,
-                                            "offset|reset-address"):
-                    self.select(relative, [self.image(original, offset=offset)])
 
     def test_image_requires_exact_physical_erase_boundaries(self):
         original = self.baseline("qiming-baremetal-empty.toml")
@@ -133,13 +117,13 @@ class ImageLayoutTests(unittest.TestCase):
                 [image])
 
     def test_image_cannot_extend_beyond_physical_flash(self):
-        original = self.baseline("liangshan-baremetal-empty.toml")
+        original = self.baseline("qiming-baremetal-empty.toml")
         image = self.image(original)
         image["size"] += original.flash["erase_blocks"][-1]
         with self.assertRaisesRegex(configure.ConfigurationError,
                                     "erase boundaries"):
             self.select(
-                "tools/configure/assemblies/liangshan-baremetal-empty.toml",
+                "tools/configure/assemblies/qiming-baremetal-empty.toml",
                 [image])
 
     def test_data_cannot_overlap_an_offset_image(self):

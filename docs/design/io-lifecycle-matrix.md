@@ -1,19 +1,12 @@
 # 有界 I/O 生命周期属性矩阵
 
-`tools/testing/io_lifecycle_matrix.json` 维护 233 条经过审查的有限属性，覆盖
-STM32F407/GD32F470 UART、SPI、I2C、ADC、CAN、USB、raw Ethernet、capture/
-advanced timer，选定的 STM32G474 软件参考 provider/factory，以及 Native
-descriptor 序列和 RS485 方向适配。每条属性明确实例模式、生产 TU、寄存器模型、
-真实 Google case、该 case 内的断言和生产调用、所证明的不变量与限制。
-名称和测试数量不能单独建立属性成立的证据。
+`tools/testing/io_lifecycle_matrix.json` 索引当前 F4 与显式 Native 测试的有限属性。
+每项绑定真实生产 TU、模型、Google case、断言、调用链、不变量和限制。退役平台行
+不进入当前索引；条目数量随真实覆盖维护，不从旧台账继承通过数。
 
-原 203 项属性和 `unproven` 定义保持不变，另追加 30 项 F407 HAL `dma-tx`
-属性。既有 LL/provider 行保留各自列明的源码和模式，不按相似名称重绑到 HAL。
-新增行单独绑定实际 `uart_hal.c`、共享 RX／冷态／Core、锁定的官方 UART/DMA
-源码及既有 runtime、cold、generated factory case，覆盖 IRQ RX 事件／错误／loss 和 source mask、取消、
-EN=0 IRQ 门禁及迟到 TE 竞态、wake、复用、冷态 lease 和双控制器隔离。
-233 是导航条目数量；元数据检查或 capture 成功不表示本轮执行了全部 case，
-也不表示硬件通过。实际执行仍须绑定下述完整链路。
+所选 F407 HAL `dma-tx` 属性独立关联 `uart_hal.c`、共享 RX／冷态／Core、锁定官方
+源码及实际 runtime、cold 和 generated factory case。LL 行不能按相似名字重绑 HAL。
+元数据检查或 capture 成功不表示执行了全部 case，也不表示硬件通过。
 
 ## 唯一执行链路
 

@@ -129,6 +129,27 @@ class FreeRtosTransportTests(unittest.TestCase):
         self.assertEqual(result["upstream_base"], self.base)
         self.assertEqual(result["selected_commit"], self.base)
 
+    def test_selected_builtin_port_does_not_require_third_party_checkouts(self):
+        for item in catalogue.children("ext/freertos"):
+            path = self.root / item.path
+            shutil.rmtree(path)
+            path.mkdir()
+        self.assertEqual(self.verify(require_children=False)["selected_commit"],
+                         self.selected)
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_selected_builtin_port_still_rejects_changed_nested_gitlinks(self):
+        self.controlled()
+        item = catalogue.children("ext/freertos")[0]
+        self.git(self.source, "update-index", "--cacheinfo", "160000",
+                 "a" * 40, catalogue.relative_path(item))
+        self.git(self.source, "commit", "--amend", "--quiet", "--no-edit")
+        self.selected = self.git(self.source, "rev-parse", "HEAD")
+        self.write_review()
+        with self.assertRaisesRegex(ValueError, "tree"):
+            self.verify(require_children=False)
+
     def test_exact_two_url_change_is_admitted(self):
         self.controlled()
         result = self.verify()

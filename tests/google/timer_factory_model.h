@@ -5,12 +5,8 @@
  */
 #ifndef NEXUS_TIMER_FACTORY_MODEL_H
 #define NEXUS_TIMER_FACTORY_MODEL_H
-#include <stdint.h>
-#ifdef NX_TIMER_FACTORY_STM32
 #include "stm32f407xx.h"
-#else
-#include "gd32f4xx.h"
-#endif
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,11 +23,6 @@ uint32_t nx_timer_factory_read(volatile uint32_t* address);
 #endif
 #undef NVIC
 #define NVIC (&g_nx_timer_factory_nvic)
-#ifndef NX_TIMER_FACTORY_STM32
-/* Model the same grouping fact after redirecting the SDK NVIC leaf. */
-#undef NVIC_GetPriorityGrouping
-#define NVIC_GetPriorityGrouping() (NVIC->priority_group & 7U)
-#endif
 #define NX_PLATFORM_REGISTER_WRITE(reg, value)                                 \
     nx_timer_factory_write(&(reg), (uint32_t)(value))
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \

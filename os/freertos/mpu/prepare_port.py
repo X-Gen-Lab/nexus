@@ -66,12 +66,6 @@ def unique_replace(text: str, original: str, replacement: str) -> str:
     return text.replace(original, replacement)
 
 
-def check_gpio_port(source: Path, gpio_write: bool) -> None:
-    """The scalar GPIO extension has one reviewed real port ABI only."""
-    if gpio_write and port_name(source) != "ARM_CM33_NTZ/non_secure":
-        raise ValueError("GPIO syscall requires exact ARM_CM33_NTZ port")
-
-
 def publish(output: Path, text: str) -> None:
     """Only complete, validated transformations reach the build output."""
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -80,9 +74,8 @@ def publish(output: Path, text: str) -> None:
     temporary.replace(output)
 
 
-def prepare(source: Path, output: Path, *, gpio_write: bool = False) -> None:
+def prepare(source: Path, output: Path) -> None:
     """Keep exact grants and the real port's single-use bootstrap lease."""
-    check_gpio_port(source, gpio_write)
     text = checked_text(source, HASHES)
     name = port_name(source)
     patch = (name.lower() + "-port.patch" if name in
@@ -90,40 +83,31 @@ def prepare(source: Path, output: Path, *, gpio_write: bool = False) -> None:
     publish(output, PATCH.apply_reviewed_patch(text, PATCH_ROOT / patch))
 
 
-def prepare_assembly(source: Path, output: Path, *,
-                     gpio_write: bool = False) -> None:
+def prepare_assembly(source: Path, output: Path) -> None:
     """Preserve context assembly and attach special-SVC LR/origin explicitly."""
-    check_gpio_port(source, gpio_write)
     text = checked_text(source, ASSEMBLY_HASHES)
     patch = ("v8-baseline-assembly.patch" if port_name(source) ==
              "ARM_CM23_NTZ/non_secure" else "v8-mainline-assembly.patch")
     publish(output, PATCH.apply_reviewed_patch(text, PATCH_ROOT / patch))
 
 
-def prepare_numbers(source: Path, output: Path, *,
-                    gpio_write: bool = False) -> None:
-    """Keep all pinned numbers; select only the reviewed extra GPIO slot."""
+def prepare_numbers(source: Path, output: Path) -> None:
+    """Keep exactly the seventy pinned syscall numbers."""
     content = source.read_bytes()
     if hashlib.sha256(content).hexdigest() != NUMBERS_HASH:
         raise ValueError("unreviewed or changed pinned syscall numbers")
     text = content.decode("utf-8")
-    if gpio_write:
-        text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / "gpio-numbers.patch")
     publish(output, text)
 
 
-def prepare_veneers(source: Path, output: Path, *,
-                    gpio_write: bool = False) -> None:
+def prepare_veneers(source: Path, output: Path) -> None:
     """Retain the two pinned SVC bodies with no unreviewed service exports."""
-    check_gpio_port(source, gpio_write)
     text = checked_text(source, VENEER_HASHES)
     name = port_name(source)
     profile = ("v7" if name in {"ARM_CM3_MPU", "ARM_CM4_MPU"} else
                "v8-baseline" if name == "ARM_CM23_NTZ/non_secure" else
                "v8-mainline")
     text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / (profile + "-veneers.patch"))
-    if gpio_write:
-        text = PATCH.apply_reviewed_patch(text, PATCH_ROOT / "gpio-veneers.patch")
     publish(output, text)
 
 
@@ -135,13 +119,12 @@ def main() -> int:
     modes.add_argument("--veneers", action="store_true")
     modes.add_argument("--assembly", action="store_true")
     modes.add_argument("--numbers", action="store_true")
-    parser.add_argument("--gpio-write", action="store_true")
     arguments = parser.parse_args()
     try:
         (prepare_numbers if arguments.numbers else
          prepare_veneers if arguments.veneers else
          prepare_assembly if arguments.assembly else prepare)(
-            arguments.source, arguments.output, gpio_write=arguments.gpio_write)
+            arguments.source, arguments.output)
     except ValueError as error:
         parser.error(str(error))
     return 0

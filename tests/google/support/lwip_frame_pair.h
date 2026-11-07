@@ -346,7 +346,8 @@ inline uint32_t RandomU32() {
 /** \brief Report a stack assertion and terminate its isolated worker process.
  */
 [[noreturn]] inline void Assert(const char* message) {
-    (void)write(STDERR_FILENO, message, std::strlen(message));
+    ssize_t written = write(STDERR_FILENO, message, std::strlen(message));
+    (void)written;
     _exit(90);
 }
 
