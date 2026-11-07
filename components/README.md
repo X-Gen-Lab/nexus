@@ -7,7 +7,7 @@
 ## 架构与阅读入口
 
 组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。
-[FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读
+[FIG-04 静态实例与接口](../docs/explanation/factory.md)说明共享只读
 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。
 
 | 类别 | 组件及入口 | 外部工程仍负责 |

@@ -9,7 +9,7 @@ I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操
 
 该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动
 硬件。当前通用装配与执行另见
-[FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见
+[FIG-16](../docs/design/io-evolution.md)，范围与图例见
 [图册](../docs/assets/diagrams/README.md)。
 
 ## 目录和构建边界

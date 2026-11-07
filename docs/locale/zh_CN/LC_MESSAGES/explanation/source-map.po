@@ -351,8 +351,8 @@ msgstr "![FIG-04：factory 与静态实例](/assets/diagrams/factory-instances.s
 msgid "FIG-04：factory 与静态实例"
 msgstr "FIG-04：factory 与静态实例"
 
-msgid "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
-msgstr "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
+msgid "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](/design/io-evolution.md)，范围与图例见 [图册](/assets/diagrams/README.md)。"
+msgstr "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](/design/io-evolution.md)，范围与图例见 [图册](/assets/diagrams/README.md)。"
 
 msgid "目录和构建边界"
 msgstr "目录和构建边界"
@@ -588,8 +588,8 @@ msgstr "本目录提供可复用的器件协议、共享资源组合、存储与
 msgid "架构与阅读入口"
 msgstr "架构与阅读入口"
 
-msgid "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
-msgstr "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
+msgid "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](/explanation/factory.md)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
+msgstr "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](/explanation/factory.md)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
 
 msgid "类别"
 msgstr "类别"
